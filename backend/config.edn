@@ -1,0 +1,9 @@
+
+{:debug-level 1
+ :graphite-host "127.0.0.1"
+ :openapi-key "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"
+ :openapi-org-id nil
+ :default "./screens/looking-glass-redux.edn"
+ :harvest-on-boot? true
+ :eleven-labs-api-key nil}
+

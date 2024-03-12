@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset='utf-8'>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/vendor/css/material-design-iconic-font.min.css">
+  <link rel="stylesheet" href="/vendor/css/re-com.css">
+  <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <script src="https://kit.fontawesome.com/fec966b23c.js" crossorigin="anonymous"></script>
+
+  <link rel="icon" type="image/png" href="images/boot-rabbit-neon3.png">
+
+  <link
+    href="https://fonts.googleapis.com/css?family=Ubuntu|Alata|Oxygen+Mono|Lato|Poppins|Montserrat|Open+Sans|Oswald|Raleway|Homemade+Apple|Kulim+Park"
+    rel="stylesheet">
+  <link href="http://fonts.googleapis.com/css?family=Kulim+Park:300,400,500,700,400italic" rel="stylesheet"
+    type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=IBM+Plex+Mono:300,400,500,700,400italic" rel="stylesheet"
+    type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Roboto+Slab:300,400,500,700,400italic" rel="stylesheet"
+    type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500,700,400italic" rel="stylesheet"
+    type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,500,700,400italic" rel="stylesheet"
+    type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Roboto+Condensed:400,300" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Fira+Sans:600,500,400,300" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Fira+Code:600,500,400,300" rel="stylesheet" type="text/css">
+
+  <link href="https://fonts.cdnfonts.com/css/pastor-of-muppets" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/sudo-var" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/overpass-mono" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/odor-mean-chey" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/zt-gatha-95306" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/instagram-sans-condensed" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/instagram-sans-2" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Chivo+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600;1,700;1,800&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Noto+Sans+Linear+A&family=Nova+Mono&family=Nova+Square&family=Sansita+Swashed:wght@300;400;500;600;700;800;900&family=Share+Tech+Mono&family=Victor+Mono:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&display=swap"
+    rel="stylesheet">
+
+  <link href="/css/codemirror.css" rel="stylesheet" type="text/css">
+
+  <!-- <link href="/css/codemirror/oceanic-next.css" rel="stylesheet" type="text/css">
+    <link href="/css/codemirror/hopscotch.css" rel="stylesheet" type="text/css">
+    <link href="/css/codemirror/ayu-mirage.css" rel="stylesheet" type="text/css"> -->
+
+  <link href="/css/codemirror/3024-day.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/bespin.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/gruvbox-dark.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/material.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/panda-syntax.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/tomorrow-night-bright.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/3024-night.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/blackboard.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/hopscotch.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/mbo.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/paraiso-dark" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/tomorrow-night-eighties.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/abcdef.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/cobalt.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/icecoder.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/mdn-like.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/paraiso-light.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/ttcn.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/ambiance-mobile.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/colorforth.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/idea.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/midnight" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/pastel-on-dark.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/twilight.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/ambiance.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/darcula.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/isotope.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/monokai.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/railscasts.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/vibrant-ink.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/ayu-dark-smaller.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/dracula.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/lesser-dark" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/moxer.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/rubyblue.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/xq-dark.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/ayu-dark.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/duotone-dark.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/liquibyte.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/neat.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/seti.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/xq-light.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/ayu-mirage.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/duotone-light.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/lucario.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/neo" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/shadowfox.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/yeti.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/ayu-yellow.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/eclipse.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/material-darker.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/night.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/solarized.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/yonce.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/base16-dark.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/elegant.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/material-ocean.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/nord" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/ssms.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/zenburn.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/base16-light.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/erlang-dark.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/material-palenight.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/oceanic-next.css" rel="stylesheet" type="text/css">
+  <link href="/css/codemirror/the-matrix.css" rel="stylesheet" type="text/css">
+
+  <link href="/css/ayu-mirage-formula.css" rel="stylesheet" type="text/css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sono:wght@200;300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@200;300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+
+  <link href="https://hypeserver.github.io/react-date-range/dist/styles.css" rel="stylesheet" type="text/css">
+  <link href="https://hypeserver.github.io/react-date-range/dist/theme/default.css" rel="stylesheet" type="text/css">
+
+  <style>
+    /* body {background-color: #47555e;} */
+    /* body  {background-size: 50px 50px;
+         background-color: #47555e;
+         background-image: radial-gradient(circle, #000000 1px, rgba(0, 0, 0, 0) 1px);} */
+
+    body {
+      background-size: 50px 50px;
+      background-color: #47555e;
+      overflow: hidden;
+      background-image:
+        linear-gradient(to right, #00000055 1px, transparent 1px),
+        linear-gradient(to bottom, #00000055 1px, transparent 1px);
+    }
+
+    /* .chosen-container-single .chosen-single {
+                                          background-color: #000000;
+                                          border: 1px solid #ffffff22; }
+
+         .chosen-container-single .chosen-single { border: 1px solid #ffffff22;} */
+
+    .chosen-container-single {
+      overflow: visible;
+    }
+
+    .chosen-container-single .chosen-single {
+      overflow: visible;
+      background-color: inherit;
+      border: inherit;
+    }
+
+    .chosen-container-single .chosen-single {
+      border: inherit;
+      color: inherit;
+      overflow: visible;
+    }
+
+    .rc-dropdown {
+      z-index: 333;
+      overflow: visible;
+    }
+
+    .chosen-drop {
+      z-index: 333;
+      overflow: visible;
+    }
+
+     /* .div.popover-content.rc-popover-content {display: none;}   */
+
+     .popover.popover {
+    background-color: #00000000 !important;
+}
+
+ 
+
+
+    @keyframes zoomFadeAway {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(1.5);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(2);
+      }
+    }
+
+    .zoom-and-fade {
+      animation-name: zoomFadeAway;
+      animation-duration: 0.5s;
+      /* you can adjust duration as per your preference */
+      animation-timing-function: ease-out;
+      animation-fill-mode: forwards;
+      /* makes sure the final animation state persists */
+    }
+
+
+    @keyframes zoomFadeAway2 {
+      0% {
+
+        transform: scale(1);
+      }
+
+      50% {
+
+        transform: scale(1.5);
+      }
+
+      100% {
+
+        transform: scale(2);
+      }
+    }
+
+    @keyframes dash {
+      0% {
+        stroke-dasharray: 10, 10;
+      }
+
+      50% {
+        stroke-dasharray: 20, 20;
+      }
+
+      100% {
+        stroke-dasharray: 10, 10;
+      }
+    }
+
+    .dash {
+      animation: dash 2s infinite;
+      /* You can adjust the timing (1.5s) to speed up or slow down the pulse */
+    }
+
+    @keyframes pulsate {
+      0% {
+        stroke-opacity: 1;
+      }
+
+      50% {
+        stroke-opacity: 0.5;
+      }
+
+      100% {
+        stroke-opacity: 1;
+      }
+    }
+
+    .pulsate {
+      animation: pulsate 2s infinite;
+      /* You can adjust the timing (1.5s) to speed up or slow down the pulse */
+    }
+
+    @keyframes dash2 {
+      to {
+        stroke-dashoffset: -20;
+      }
+    }
+
+    .dash2 {
+      stroke-dasharray: 10 10;
+      animation: dash 2s linear infinite;
+    }
+
+
+
+    .flow-right {
+      stroke-dasharray: 12;
+      animation: flow-right 15s linear infinite;
+    }
+
+    @keyframes flow-right {
+      to {
+        stroke-dashoffset: -1000;
+      }
+    }
+
+
+
+    @keyframes stroker {
+      0% {
+        stroke-width: 4;
+      }
+
+      50% {
+        stroke-width: 14;
+      }
+
+      100% {
+        stroke-width: 4;
+      }
+    }
+
+    .stroker {
+      animation: stroker 1s infinite;
+
+    }
+
+
+    @keyframes shake {
+      0% {
+        transform: translate(1px, 1px) rotate(0deg) skew(1deg, 1deg);
+      }
+
+      10% {
+        transform: translate(-1px, -2px) rotate(-1deg) skew(-1deg, -1deg);
+      }
+
+      20% {
+        transform: translate(-2px, 0px) rotate(1deg) skew(1deg, 1deg);
+      }
+
+      30% {
+        transform: translate(1px, 2px) rotate(0deg) skew(-1deg, -1deg);
+      }
+
+      40% {
+        transform: translate(1px, -1px) rotate(1deg) skew(1deg, 1deg);
+      }
+
+      50% {
+        transform: translate(-1px, 2px) rotate(-1deg) skew(-1deg, -1deg);
+      }
+
+      60% {
+        transform: translate(-1px, 1px) rotate(0deg) skew(1deg, 1deg);
+      }
+
+      70% {
+        transform: translate(2px, 1px) rotate(-1deg) skew(-1deg, -1deg);
+      }
+
+      80% {
+        transform: translate(-1px, -1px) rotate(1deg) skew(1deg, 1deg);
+      }
+
+      90% {
+        transform: translate(1px, 2px) rotate(0deg) skew(-1deg, -1deg);
+      }
+
+      100% {
+        transform: translate(1px, -2px) rotate(-1deg) skew(1deg, 1deg);
+      }
+    }
+
+    .shake {
+      animation: shake 0.5s linear infinite;
+    }
+
+
+
+    .zoom-and-fade2 {
+      animation-name: zoomFadeAway2;
+      animation-duration: 0.5s;
+      /* you can adjust duration as per your preference */
+      animation-timing-function: ease-out;
+      animation-fill-mode: forwards;
+      /* makes sure the final animation state persists */
+    }
+
+
+    .triangle-div {
+      position: relative;
+      width: 100px;
+      /* Example width */
+      height: 100px;
+      /* Example height */
+      background-color: #e0e0e0;
+      /* Example background color */
+    }
+
+    .triangle-div::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 20px;
+      /* Width of the triangle */
+      height: 20px;
+      /* Height of the triangle */
+      background-color: #ff0000;
+      /* Color of the triangle */
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+    }
+
+    .rotate-fast {
+      animation: rotation 0.4s;
+    }
+
+    .rotate {
+      animation: rotation 0.7s;
+    }
+
+    @keyframes rotation {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(359deg);
+      }
+    }
+
+    .rotate-reverse {
+      animation: rotation-reverse 0.7s;
+    }
+
+    @keyframes rotation-reverse {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(-359deg);
+      }
+    }
+
+    .linear {
+      animation-timing-function: linear;
+    }
+
+    .infinite {
+      animation-iteration-count: infinite;
+    }
+
+
+    /* Heartbeat Animation */
+    @keyframes heartbeat {
+      0% {
+        transform: scale(1);
+      }
+
+      25% {
+        transform: scale(1.1);
+      }
+
+      50% {
+        transform: scale(1);
+      }
+
+      75% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Class to Apply the Animation */
+    .heartbeat {
+      animation: heartbeat 1.5s ease-in-out infinite;
+      /* You can adjust the timing (1.5s) to speed up or slow down the pulse */
+    }
+
+
+    @font-face {
+      font-family: 'VikingNormal';
+      src: url('fonts/VikingNormal.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'WolfpackHalloweed';
+      src: url('fonts/WolfpackHalloweed.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+  </style>
+
+
+  <title>rvbbit-frontend</title>
+</head>
+
+<body>
+  <noscript>
+    rvbbit-frontend is a JavaScript app. Please enable JavaScript to continue.
+  </noscript>
+  <div id="app"></div>
+
+
+  <!-- <div id="initialDiv" 
+  style="
+  font-size: 2.1vw; 
+  font-weight: bold; 
+  font-family: 'Homemade Apple'; 
+  /* background-color: #000000 ; */
+  background-image: linear-gradient(to right, #eeeeee03 2px, transparent 4px), linear-gradient(to bottom, #eeeeee03 2px, transparent 4px);
+  background-size: 80px 80px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  transition: all 0.6s ease-in-out;
+  align-items: center;
+  color: #feb733;">
+    <img src="images/chunky-black2.png" style=" transition: all 0.6s ease-in-out;" class="heartbeat">
+  </div> -->
+
+
+  <div id="initialDiv" style="
+  font-size: 2.1vw; 
+  font-weight: bold; 
+  font-family: 'Homemade Apple'; 
+ 
+  background-image: linear-gradient(to right, #eeeeee03 2px, transparent 4px), linear-gradient(to bottom, #eeeeee03 2px, transparent 4px);
+  background-size: 80px 80px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  transition: all 0.6s ease-in-out;
+  align-items: center;
+  color: #feb733;">
+    <!-- <img src="images/boot-rabbit-neon3.png" style="filter: blur(8px); transition: all 0.6s ease-in-out;" > -->
+    <img src="images/chunky-black2.png" style=" transition: all 0.6s ease-in-out;" class="heartbeat">
+    <!-- Sometimes,<br> the best way to<br>explain a thing,<br> is to show it...<br/> -->
+  </div>
+
+
+
+  <script src="/detect-element-resize.js" type="text/javascript"></script>
+  <script src="/js/compiled/app.js"></script>
+
+</body>
+
+</html>

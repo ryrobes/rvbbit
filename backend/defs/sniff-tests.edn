@@ -1,0 +1,49 @@
+{
+;; :distinct-values {:sql-map    {:select-distinct [:field] :from [:table] :limit 50}
+;;                    ;:when       [:and [:= :db-type "SQLite"] [:like :field-name "%fips%"]]
+;;                    :fetch-one? false}
+
+ :distinct-count {;:sql-map    {:select [[[:count 1] :cnt]] :from [[{:select-distinct [:field] :from [:table]} :subq]]}
+                  :sql-map    {:select [[[:count [:distinct :field]] :cnt]] :from [:table]}
+                   ;:when       [:and [:= :db-type "SQLite"] [:like :field-name "%fips%"]]
+                  :fetch-one? true}
+
+;;  :top-10-values {:sql-map    {:select [:field [[:count 1] :rows]]
+;;                               :from [:table]
+;;                               :group-by [:field]
+;;                               :order-by [[:rows :desc]]
+;;                               :limit 10}
+;;                  ;:when [:like :field-type "%char%"]
+;;                  :fetch-one? false}
+
+ :example-value {:sql-map    {:select [[:field :example_value]] :from [:table] :where [:<> nil :field] :limit 1}
+                 :fetch-one? true}
+ 
+
+ :max-val         {:sql-map    {:select [[[:max :field] :maxval]] :from [:table]}
+                   ;:when [:not [:like :field-type "%char%"]]
+                   :fetch-one? true}
+
+ :avg-val         {:sql-map    {:select [[[:avg :field] :avgval]] :from [:table]}
+                   :when [:and [:<> :data-type "string"] [:<> :data-type "boolean"] [:not [:like :data-type "%date%"]]]
+                   :fetch-one? true}
+
+ :sum-val         {:sql-map    {:select [[[:sum :field] :sumval]] :from [:table]}
+                   :when [:and [:<> :data-type "string"] [:<> :data-type "boolean"] [:not [:like :data-type "%date%"]]]
+                   :fetch-one? true}
+
+ :min-val         {:sql-map    [[[:min :field] :minval]] ;; whole map isn't essential... but being explicit is always good, no?
+                   ;:when [:not [:like :field-type "%char%"]]
+                   :fetch-one? true}
+
+ 
+ ;;; these are run at table granularity, not field granularity since the  don't reference the :field at all
+
+ :total-rows     {:sql-map    {:select [[[:count 1] :cnt]] :from [:table]}
+                  ;:when       [:not-string?]
+                  :fetch-one? true}
+ 
+;;  :sample-rows     {:sql-map    {:select [:*] :from [:table] :limit 10}
+;;                    ;:when       [:not-string?]
+;;                    :fetch-one? false}
+ }
