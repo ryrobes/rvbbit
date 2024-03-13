@@ -1,0 +1,521 @@
+{:flowmaps
+ {:movie-name
+  {:y 700,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [value] (Thread/sleep 900) value),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:value :any}, :out {:out :string}},
+   :h 75,
+   :x 1150,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-25
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}},
+  :rando-string
+  {:w 125,
+   :h 75,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input "feed me, seymour!"},
+   :z 0,
+   :ports {:in {}, :out {:out :string}},
+   :x 1350,
+   :y 575},
+  :full-wow-line
+  {:y 700,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [value] value),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:value :any}, :out {:out :string}},
+   :h 75,
+   :x 1300,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :view-output? true,
+    :queries
+    {:name-drag-25
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}},
+  :unpack-results-map
+  {:y 550,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn (fn [value] (Thread/sleep 900) value),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports
+   {:in {:value :any},
+    :out
+    {:video :map,
+     :total_wows_in_movie :integer,
+     :* :map,
+     :release_date :string,
+     :director :string,
+     :full_line :string,
+     :movie :string,
+     :year :integer,
+     :poster :string,
+     :audio :string,
+     :current_wow_in_movie :integer,
+     :timestamp :string,
+     :movie_duration :string,
+     :character :string}},
+   :h 100,
+   :x 1050,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :view-output? true,
+    :queries
+    {:name-drag-25
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}},
+  :open-input
+  {:w 225,
+   :h 85,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true, :inputs []},
+    :user-input
+    {:url "https://owen-wilson-wow-api.onrender.com/wows/random"},
+    :view-output? false,
+    :width 350},
+   :z 0,
+   :ports {:out {:url :string, :* :map}, :in {}},
+   :x 1000,
+   :y 275},
+  :send-info-to-client-requested
+  {:w 225,
+   :h 85,
+   :x 1125,
+   :y 900,
+   :z 0,
+   :data
+   {:flow-item
+    {:description "Push items to the client UI.",
+     :category ":rabbit-base",
+     :fn
+     (fn [destination
+          ref
+          item-key
+          thread-id
+          message-name
+          thread-desc
+          &
+          args]
+       (rvbbit-backend.websockets/kick
+         destination
+         ref
+         item-key
+         thread-id
+         message-name
+         thread-desc
+         args)),
+     :name ":kick",
+     :type :kick,
+     :icon "images/pink-rabbit-head.png",
+     :defaults
+     {:destination :client-name,
+      :item-key ":base",
+      :thread-id :flow-id,
+      :message-name "Unnamed Message",
+      :thread-desc :flow-id,
+      :ref :flow-id},
+     :types
+     {:destination [:keyword :vector :list :set],
+      :ref :string,
+      :item-key :keyword,
+      :thread-id :string,
+      :message-name :string,
+      :thread-desc :string,
+      :out :any},
+     :pill-name "content",
+     :input_types
+     "[[:keyword :vector :list :set] :string :keyword :string :string :string]",
+     :style {:color "#fc0fc0"},
+     :selected-style {:color "#fc0fc0"},
+     :inputs
+     [:content-8
+      :ref
+      :item-key
+      :message-name
+      :thread-desc
+      :content-6
+      :thread-id
+      :content-9
+      :destination
+      :content-7],
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Push items to the client UI.\", :fn (fn [destination ref item-key thread-id message-name thread-desc & args] (rvbbit-backend.websockets/kick destination ref item-key thread-id message-name thread-desc args)), :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :item-key \":base\", :thread-id :flow-id, :message-name \"Unnamed Message\", :thread-desc :flow-id, :ref :flow-id}, :types {:destination [:keyword :vector :list :set], :ref :string, :item-key :keyword, :thread-id :string, :message-name :string, :thread-desc :string, :out :any}, :pill-name \"content\", :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :ref :item-key :thread-id :message-name :thread-desc], :expandable? true, :required [:destination :ref :item-key :thread-id :message-name :thread-desc]}",
+     :required
+     [:destination
+      :ref
+      :item-key
+      :thread-id
+      :message-name
+      :thread-desc]},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [1150.1770935058594 179.171875],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-10
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ee280]],
+      :where [:= :name ":kick"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":kick",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :kick,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 7}},
+   :icon "images/pink-rabbit-head.png",
+   :ports
+   {:in
+    {:content-8 :any,
+     :ref :string,
+     :item-key :keyword,
+     :message-name :string,
+     :thread-desc :string,
+     :content-6 :any,
+     :thread-id :string,
+     :content-9 :any,
+     :destination [:keyword :vector :list :set],
+     :content-7 :any},
+    :out {:out :keyword}}},
+  :open-fn-5
+  {:y 700,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [value] (str value)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:value :any}, :out {:out :string}},
+   :h 75,
+   :x 1450,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-25
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}},
+  :http-call-1
+  {:w 175,
+   :h 100,
+   :x 1050,
+   :y 400,
+   :z 0,
+   :data
+   {:flow-item
+    {:description "Basic HTTP call primitive",
+     :category ":rabbit-base",
+     :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)),
+     :name ":http-call",
+     :icon "zmdi-http",
+     :defaults
+     {:req-map
+      {:url "https://owen-wilson-wow-api.onrender.com/wows/random",
+       :query-params {:movie "Wedding Crashers", :results 40}}},
+     :types {:req-map :map, :out :any},
+     :input_types "[:map]",
+     :style {:color "#7BB696"},
+     :selected-style {:color "#7BB696"},
+     :inputs "[:req-map]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Basic HTTP call primitive\", :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)), :icon \"zmdi-http\", :defaults {:req-map {:url \"https://owen-wilson-wow-api.onrender.com/wows/random\", :query-params {:movie \"Wedding Crashers\", :results 40}}}, :types {:req-map :map, :out :any}, :style {:color \"#7BB696\"}, :selected-style {:color \"#7BB696\"}, :inputs [:req-map], :expandable? true, :required [:req-map]}",
+     :required [:req-map]},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [395 185],
+    :h 6,
+    :connection-id nil,
+    :view-output? true,
+    :queries
+    {:name-drag-26
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :nn42]],
+      :where [:= :name ":http-call"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":http-call",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :where,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 6}},
+   :icon "zmdi-http",
+   :ports {:in {:req-map :map}, :out {:idx0 :map, :* :vector}}},
+  :character
+  {:y 700,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [value] value),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:value :any}, :out {:out :string}},
+   :h 75,
+   :x 1000,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-25
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}}},
+ :zoom [-571.26 -323.2 1.325],
+ :flow-id "a-random-wow",
+ :flowmaps-connections
+ [[:http-call-1/idx0 :unpack-results-map/value]
+  [:unpack-results-map/full_line :full-wow-line/value]
+  [:open-input/* :http-call-1/req-map]
+  [:unpack-results-map/character :character/value]
+  [:unpack-results-map/movie :movie-name/value]
+  [:rando-string :open-fn-5/value]
+  [:movie-name :send-info-to-client-requested/content-6]
+  [:full-wow-line :send-info-to-client-requested/content-7]
+  [:character :send-info-to-client-requested/content-8]
+  [:open-fn-5 :send-info-to-client-requested/content-9]
+  [:send-info-to-client-requested :done]]}

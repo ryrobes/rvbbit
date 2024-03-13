@@ -1,0 +1,12 @@
+{:flowmaps
+ {:open-input
+  {:w 200,
+   :h 60,
+   :data
+   {:drag-meta {:type :open-block}, :user-input "feed me, seymour!"},
+   :z 0,
+   :ports {:out {:out :string}},
+   :x 1125.4885937499998,
+   :y 1201.018426846591}},
+ :flow-id "shark-flow-494",
+ :flowmaps-connections []}

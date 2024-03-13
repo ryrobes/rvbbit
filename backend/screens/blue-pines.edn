@@ -1,0 +1,605 @@
+{:orders
+ {:connections-sys [:database_name :connection_id],
+  :fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema
+   :db_catalog
+   :connection_id
+   :schema_cat
+   :table_name
+   :fields],
+  :reco-counts [:table_name :cnt]},
+ :reco-preview nil,
+ :meta
+ {:connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"state" 1, "comments" 1, "datetime" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"DECIMAL" 2, "VARCHAR(9)" 2, "VARCHAR(2)" 2},
+     :cardinality 76},
+    :data_type
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"string" 8, "float" 2, "integer" 1},
+     :cardinality 38}},
+   :rowcount 13},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 9},
+     :cardinality 11},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 9},
+     :cardinality 11},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"bigfoot-ufos" 9},
+     :cardinality 11},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 9},
+     :cardinality 11},
+    :table_name
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"us_states" 1, "ufo_sightings_vw" 1, "test_me" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? false,
+     :commons {42 1, 14 1, 11 1},
+     :cardinality 100}},
+   :rowcount 9},
+  :reco-counts {:fields {}, :rowcount 0}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys 137},
+  :system-fields-list* {:fields-sys 170}},
+ :data-hash 1277417971,
+ :tabs ["strategic grill locations"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/winter-theme.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"},
+    :outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn
+     (rabbit-kit-outliers.core/get-outliers
+       :query-name
+       :panel-name
+       :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description
+     "WIP: basic timeseries forecasting based on previous values",
+     :fn
+     (rabbit-kit-outliers.core/get-forecast
+       :query-name
+       :panel-name
+       :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1}},
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "aaaaah-esday-the-day"
+    "aaaaah-wednesday-the-day"
+    "aaaah-wednesday-the-day"
+    "asdasdasdasd"
+    "autumn-theme"
+    "battle-mage"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "boston-test-10-3-23"
+    "broken-jacket"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "capecod-viking"
+    "chaos simple"
+    "chaos-views"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "crazy-alice"
+    "dark-crested-jackelope"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "desktops-and-broomsticks"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "evil-main-street"
+    "fake-books-1"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
+    "glass-fish-board-test"
+    "green-storm-city"
+    "hue-board-1"
+    "late-winter-theme"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "my-goodness"
+    "neverwinter-amy"
+    "night-city-never-sleeps"
+    "nightcity-cape-cod"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "old-fashioned-christmas"
+    "old-town-snow-stars"
+    "pensive-look"
+    "pine-wood-dawn"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "purple-dusk-old-town"
+    "purple-nightshades"
+    "purple-techno-sunset"
+    "recharts-test-blocks"
+    "refresh-test"
+    "riffle-test"
+    "sick-of-your-shit"
+    "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "swamp-nightgown"
+    "swamp-reacher"
+    "tallica-param-test2"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-outer-blues"
+    "trad-hybrid"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "viking-pastels"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "winter-twin-peaks"
+    "witchy425"
+    "wow-board"],
+   :openapi-key
+   "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"}},
+ :editor? true,
+ :buffy? false,
+ :memory [252820499 229436607 4294705152],
+ :status-data
+ {:heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2024-02-13 05:41:05",
+      :payload nil,
+      :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
+ :re-pressed.core/keydown
+ {:keys
+  [{:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}],
+  :event-keys
+  [[[:viz-yard.bricks/esc-unselect-current] [{:keyCode 27}]]
+   [[:viz-yard.bricks/redo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey true}]]
+   [[:viz-yard.bricks/undo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey false}]]
+   [[:viz-yard.bricks/toggle-buffy]
+    [{:keyCode 32, :shiftKey true, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-editor]
+    [{:keyCode 32, :shiftKey false, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-flow]
+    [{:keyCode 32, :shiftKey false, :ctrlKey true}]]
+   [[:viz-yard.bricks/next-panel] [{:keyCode 9}]]
+   [[:viz-yard.bricks/toggle-kick-alert] [{:keyCode 75}]]
+   [[:viz-yard.bricks/toggle-peek] [{:keyCode 80}]]
+   [[:viz-yard.bricks/toggle-lines] [{:keyCode 76}]]
+   [[:viz-yard.bricks/toggle-auto-run] [{:keyCode 79}]]
+   [[:viz-yard.bricks/delete-selected-panel]
+    [{:keyCode 46, :shiftKey true}]]
+   [[:viz-yard.bricks/cycle-column-select false] [{:keyCode 81}]]
+   [[:viz-yard.bricks/cycle-column-select true] [{:keyCode 69}]]
+   [[:viz-yard.audio/start-recording] [{:keyCode 84}]]
+   [[:viz-yard.audio/stop-recording] [{:keyCode 89}]]
+   [[:viz-yard.bricks/stretch-panel :wider]
+    [{:keyCode 68, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :longer]
+    [{:keyCode 83, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :narrower]
+    [{:keyCode 65, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :shorter]
+    [{:keyCode 87, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-up] [{:keyCode 82, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-down]
+    [{:keyCode 70, :shiftKey true}]]
+   [[:viz-yard.bricks/save]
+    [{:keyCode 83, :shiftKey false, :ctrlKey true}]]
+   [[:viz-yard.bricks/nudge-panel :up] [{:keyCode 87}]]
+   [[:viz-yard.bricks/nudge-panel :down] [{:keyCode 83}]]
+   [[:viz-yard.bricks/nudge-panel :left] [{:keyCode 65}]]
+   [[:viz-yard.bricks/nudge-panel :right] [{:keyCode 68}]]
+   [[:viz-yard.core/alt-key-toggle] [{:keyCode 86}]]
+   [[:viz-yard.core/alt-key-down] [{:keyCode 67}]]],
+  :clear-keys nil,
+  :always-listen-keys nil,
+  :prevent-default-keys
+  [{:keyCode 32}
+   {:keyCode 86}
+   {:keyCode 46, :shiftKey true}
+   {:keyCode 83, :ctrlKey true}
+   {:keyCode 83, :shiftKey false, :ctrlKey true}
+   {:keyCode 9}
+   {:keyCode 70, :ctrlKey true}]},
+ :flow-subs [],
+ :client-name :zealous-icosahedral-quail-of-the-drumlin,
+ :openai-api-key "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",
+ :window {:w 2039, :h 1131},
+ :status {:heartbeat {:kick []}},
+ :screen-name "blue-pines",
+ :recos-page2 0,
+ :selected-tab "strategic grill locations",
+ :col-names nil,
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :alerts [],
+ :recos-page 0,
+ :re-pollsive.core/polling
+ {:rules
+  [{:interval 10,
+    :event [:viz-yard.bricks/dispatch-auto-queries],
+    :poll-when [:viz-yard.bricks/auto-run-and-connected?],
+    :dispatch-event-on-start? false}
+   {:interval 5,
+    :event [:viz-yard.bricks/update-metadata],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 120,
+    :event [:viz-yard.bricks/clean-up-reco-previews],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 2,
+    :event [:viz-yard.bricks/prune-alerts],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 5,
+    :event [:viz-yard.bricks/get-memory-usage],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 2,
+    :event [:viz-yard.bricks/refresh-runstreams],
+    :poll-when [:viz-yard.bricks/runstream-running?],
+    :dispatch-event-on-start? false}
+   {:interval 1,
+    :event [:viz-yard.bricks/sub-to-flows],
+    :poll-when [:viz-yard.bricks/new-flow-subs?],
+    :dispatch-event-on-start? false}
+   {:interval 1000,
+    :event [:viz-yard.bricks/update-metadata-tabs],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 1,
+    :event [:viz-yard.bricks/update-conditionals],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 4,
+    :event [:viz-yard.bricks/refresh-status],
+    :poll-when [:viz-yard.bricks/bg-status?],
+    :dispatch-event-on-start? false}],
+  :counter 24},
+ :rs-overrides-hashmap {},
+ :re-pressed.core/keyup
+ {:keys
+  [{:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}],
+  :event-keys [[[:viz-yard.core/alt-key-up] [{:keyCode 67}]]],
+  :clear-keys nil,
+  :always-listen-keys nil},
+ :panels-hash 1428528398,
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :websocket-fx.core/sockets
+ {:default
+  {:status :connected,
+   :options
+   {:url "ws://localhost:3030/ws",
+    :format :edn,
+    :on-disconnect
+    [:websocket-fx.core/unsubscribe :default :server-push2],
+    :on-connect
+    [:websocket-fx.core/subscribe
+     :default
+     :server-push2
+     {:message
+      {:kind :server-push2,
+       :client-name :zealous-icosahedral-quail-of-the-drumlin,
+       :ui-keypath [:server],
+       :extras {:hello? true}},
+      :on-message [:viz-yard.http/simple-response]}]},
+   :requests {},
+   :subscriptions
+   {:server-push2
+    {:message
+     {:kind :server-push2,
+      :client-name :zealous-icosahedral-quail-of-the-drumlin,
+      :ui-keypath [:server],
+      :extras {:hello? true}},
+     :on-message [:viz-yard.http/simple-response]}}}},
+ :user-params-hash 278685043,
+ :grid-recos? true,
+ :panels
+ {:hello-there-brother
+  {:h 3,
+   :w 12,
+   :root [2 2],
+   :name "hello there!",
+   :tab "strategic grill locations",
+   :views
+   {:heya!
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "50px",
+      :font-weight 700,
+      :color :theme/editor-outer-rim-color,
+      :padding-top "14px",
+      :opacity 1,
+      :font-family :theme/base-font}
+     :child
+     "hello! 🐇 🍂 🦃"]},
+   :queries {}}},
+ :click-param
+ {:theme
+  {:codemirror-theme "ayu-dark",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header
+    {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#05041182",
+   :editor-rim-color "#297fb8",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#2A3959",
+    "boolean" "#13283E",
+    "map" "#536D82",
+    "list" "#1F374E",
+    "string" "#484F71",
+    "vector" "#6B6B87",
+    "keyword" "#C6DDAE",
+    "rabbit-code" "#3E5970",
+    "datetime" "#94939A",
+    "integer" "#2D485F",
+    "unknown" "#D510BBB",
+    "date" "#A2AFB7",
+    "nil" "#13283E"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#b8b2bb",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"},
+      :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid
+    {:line
+     {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#297fb8",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/b64-decoded-9884793-8k-4k.png)",
+    :transition "all 0.8s ease-in-out",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Instagram Sans",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :param {:selected-view [nil nil], :selected-view-data nil},
+  :connections-sys
+  {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "bigfoot-ufos",
+   :schema_cat nil,
+   :table_name "ufo_sightings",
+   :fields 14}},
+ :selected-flow "live-scratch-flow"}

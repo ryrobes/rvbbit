@@ -1,0 +1,973 @@
+{:orders
+ {:bigfoot_sightings
+  [:bfroid
+   :submitted
+   :submitted_date
+   :title
+   :class
+   :month
+   :fixed_month
+   :date
+   :year
+   :fixed_year
+   :season
+   :state
+   :county
+   :locationdetails
+   :nearesttown
+   :nearestroad
+   :observed
+   :alsonoticed
+   :otherwitnesses
+   :otherstories
+   :timeandconditions
+   :environment
+   :url
+   :run_id
+   :run_time
+   :sketch],
+  :bigfoot-sightings-drag-32
+  [:alsonoticed
+   :bfroid
+   :class
+   :county
+   :date
+   :environment
+   :fixed_month
+   :fixed_year
+   :locationdetails
+   :month
+   :nearestroad
+   :nearesttown
+   :observed
+   :otherstories
+   :otherwitnesses
+   :run_id
+   :run_time
+   :season
+   :sketch
+   :state
+   :submitted
+   :submitted_date
+   :timeandconditions
+   :title
+   :url
+   :year],
+  :connections-sys [:database_name :connection_id],
+  :tables-sys
+  [:db_schema
+   :db_catalog
+   :connection_id
+   :schema_cat
+   :table_name
+   :fields],
+  :fields-sys [:field_name :field_type :data_type],
+  :reco-counts [:table_name :cnt],
+  :files-sys [:file_path :screen_name :blocks :queries :ts],
+  :blocks-sys
+  [:block_key
+   :block_name
+   :queries
+   :views
+   :block_data
+   :view_names
+   :query_names]},
+ :reco-preview nil,
+ :sql-source
+ {:bigfoot-sightings-drag-32
+  {:select
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :date
+    :environment
+    :fixed_month
+    :fixed_year
+    :locationdetails
+    :month
+    :nearestroad
+    :nearesttown
+    :observed
+    :otherstories
+    :otherwitnesses
+    :run_id
+    :run_time
+    :season
+    :sketch
+    :state
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :year],
+   :from [[:bigfoot_sightings :xx922]]},
+  :bigfoot_sightings
+  {:select [:*], :from [:bigfoot_sightings], :limit 111}},
+ :meta
+ {:flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 29,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :cardinality 100},
+    :full_map
+    {:data-type "string",
+     :distinct 29,
+     :group-by? true,
+     :commons
+     {"{:file-path \"./flows/a-random-wow.edn\", :icon \"zmdi-pizza\", :description \"A random Owen Wilson quote from the Wedding Crashers movie.\"}"
+      1,
+      "{:description \"Clojure greater-than-or-equal function.\", :fn >, :inputs [:value1 :value2], :icon \"zmdi-chevron-right\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :boolean}}"
+      1,
+      "{:description \"Clojure subtract function.\", :fn =, :inputs [:value1 :value2], :icon \"zmdi-swap\", :types {:value1 :any, :value2 :any, :out :boolean}}"
+      1},
+     :cardinality 100},
+    :description
+    {:data-type "string",
+     :distinct 28,
+     :group-by? true,
+     :commons
+     {"Clojure subtract function." 2,
+      "Get top 50 color frequencies from an image in hex form." 1,
+      "Clojure.string's join function." 1},
+     :cardinality 96},
+    :inputs
+    {:data-type "string",
+     :distinct 16,
+     :group-by? true,
+     :commons {"[:value1 :value2]" 8, "[:value]" 6, "" 2},
+     :cardinality 55},
+    :icon
+    {:data-type "string",
+     :distinct 18,
+     :group-by? true,
+     :commons {"zmdi-pizza" 4, "zmdi-file-text" 3, "zmdi-dns" 2},
+     :cardinality 62},
+    :input_types
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons
+     {"[[:integer :float] [:integer :float]]" 7,
+      "[:string]" 5,
+      "[:any]" 3},
+     :cardinality 48},
+    :output_types
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons {":boolean" 11, ":any" 6, ":string" 4},
+     :cardinality 27},
+    :category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {":clojure-base" 16, ":rabbit-base" 12, ":owen-wilson" 1},
+     :cardinality 10}},
+   :rowcount 29},
+  :blocks-sys
+  {:fields
+   {:block_key
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {":hello-there-brother" 1,
+      "strategic grill locations" 1,
+      ":*theme*" 1},
+     :cardinality 100},
+    :block_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"hello there!" 1,
+      "board: strategic grill locations" 1,
+      "(meta: this screen's theme)" 1},
+     :cardinality 100},
+    :queries
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 3},
+     :cardinality 33},
+    :views
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {1 1, 0 1, 27 1},
+     :cardinality 100},
+    :block_data
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"{:h 3, :w 12, :root [2 2], :name \"hello there!\", :tab \"strategic grill locations\", :views {:heya! [:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 700, :color :theme/editor-outer-rim-color, :padding-top \"14px\", :opacity 1, :font-family :theme/base-font} :child \"hello! 🐇 🍂 🦃\"]}, :queries {}}"
+      1,
+      "{:panels {:hello-there-brother {:h 3, :w 12, :root [2 2], :name \"hello there!\", :tab \"strategic grill locations\", :views {:heya! [:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 700, :color :theme/editor-outer-rim-color, :padding-top \"14px\", :opacity 1, :font-family :theme/base-font} :child \"hello! 🐇 🍂 🦃\"]}, :queries {}}}, :click-param {:param {:selected-view [nil nil], :selected-view-data nil}}}"
+      1,
+      "{:codemirror-theme \"ayu-dark\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b062982\", :editor-rim-color \"#4795dd\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#D8129F1\", \"boolean\" \"#CAD4C7\", \"map\" \"#253258\", \"list\" \"#E0158126\", \"string\" \"#CFFDD2\", \"vector\" \"#ABA1B3\", \"keyword\" \"#E0DCD7\", \"rabbit-code\" \"#949FB0\", \"datetime\" \"#BBC1C7\", \"integer\" \"#FDECDD\", \"unknown\" \"#536383\", \"date\" \"#253258\", \"nil\" \"#718099\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#e1a6bf\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#4795dd\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/pine-wood-dawn-8k-4k.png)\", :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Instagram Sans\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}"
+      1},
+     :cardinality 100},
+    :view_names
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {":heya!" 1,
+      "" 1,
+      ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color"
+      1},
+     :cardinality 100},
+    :query_names
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 3},
+     :cardinality 33}},
+   :rowcount 3},
+  :fields-sys {:fields {}, :rowcount 0},
+  :tables-sys {:fields {}, :rowcount 0},
+  :fflows-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":flow" 55},
+     :cardinality 1},
+    :description
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 55},
+     :cardinality 1},
+    :name
+    {:data-type "string",
+     :distinct 53,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
+     :cardinality 96},
+    :file_path
+    {:data-type "string",
+     :distinct 55,
+     :group-by? true,
+     :commons
+     {"./flows/hey-rabbit-pathfinder.edn" 1,
+      "./flows/dalle3-create-image-newengland-old.edn" 1,
+      "./flows/hue-change-group-color.edn" 1},
+     :cardinality 100},
+    :full_map
+    {:data-type "string",
+     :distinct 54,
+     :group-by? true,
+     :commons
+     {"{:flowmaps {:open-input {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :user-input \"feed me, seymour!!\"}, :z 0, :ports {:out {:out :string}}, :x 1169.1345454545453, :y 1210.6763636363637}}, :flow-id \"clam-flow-851\", :flowmaps-connections [[:open-input :done]]}"
+      2,
+      "{:flowmaps {:kick-1 {:w 200, :h 100, :x 3449.707608604431, :y 1367.7343490600585, :z 0, :data {:flow-item {:description \"Push items to the client UI.\", :category \":rabbit-base\", :fn (fn [destination name sub-task & args] (rvbbit-backend.websockets/kick destination name sub-task args)), :name \":kick\", :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :sub-task :flow-id, :name :flow-id}, :types {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :out :any}, :input_types \"[[:keyword :vector :list :set] :string [:string :keyword]]\", :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :name :sub-task :value-3 :value-4], :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Push items to the client UI.\\\", :fn (fn [destination name sub-task & args] (rvbbit-backend.websockets/kick destination name sub-task args)), :type :kick, :icon \\\"images/pink-rabbit-head.png\\\", :defaults {:destination :client-name, :sub-task :flow-id, :name :flow-id}, :types {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :out :any}, :style {:color \\\"#fc0fc0\\\"}, :selected-style {:color \\\"#fc0fc0\\\"}, :inputs [:destination :name :sub-task], :expandable? true, :required [:destination :name :sub-task]}\", :required [:destination :name :sub-task]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [357.3567810058594 157.34896850585938], :h 6, :connection-id nil, :queries {:name-drag-40 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :nn284]], :where [:= :name \":kick\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":kick\", :param-field :name, :source-panel-key :flow-fn-list*, :type :kick, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 6}}, :icon \"images/pink-rabbit-head.png\", :ports {:in {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :value-3 :any, :value-4 :any}, :out {:error :string, :* {:error \"java.lang.IllegalArgumentException: Don't know how to create ISeq from: java.lang.Long\"}}}}, :open-input-1 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"feed me, seymour!\"}, :z 0, :ports {:in {}, :out {:out :string}}, :x 2736.8722753576326, :y 1370.837915698902}, :open-input-3 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input :base}, :z 0, :ports {:out {:out :keyword}}, :x 2764.800122707993, :y 1561.5292232684237}, :kick-2 {:w 200, :h 100, :x 3412.0444202088465, :y 1642.0587967722038, :z 0, :data {:flow-item {:description \"Push items to the client UI.\", :category \":rabbit-base\", :fn (fn [destination name sub-task & args] (rvbbit-backend.websockets/kick destination name sub-task args)), :name \":kick\", :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :sub-task :flow-id, :name :flow-id}, :types {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :out :any}, :input_types \"[[:keyword :vector :list :set] :string [:string :keyword]]\", :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :name :sub-task :value-3 :value-4 :value-5 :value-6], :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Push items to the client UI.\\\", :fn (fn [destination name sub-task & args] (rvbbit-backend.websockets/kick destination name sub-task args)), :type :kick, :icon \\\"images/pink-rabbit-head.png\\\", :defaults {:destination :client-name, :sub-task :flow-id, :name :flow-id}, :types {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :out :any}, :style {:color \\\"#fc0fc0\\\"}, :selected-style {:color \\\"#fc0fc0\\\"}, :inputs [:destination :name :sub-task], :expandable? true, :required [:destination :name :sub-task]}\", :required [:destination :name :sub-task]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [1096.4557304382324 275.4192810058594], :h 6, :connection-id nil, :queries {:name-drag-19 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :tt488]], :where [:= :name \":kick\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":kick\", :param-field :name, :source-panel-key :flow-fn-list*, :type :kick, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 6}}, :icon \"images/pink-rabbit-head.png\", :ports {:in {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :value-3 :any, :value-4 :any, :value-5 :any, :value-6 :any}, :out {:error :string, :* {:error \"java.lang.IllegalArgumentException: Don't know how to create ISeq from: java.lang.Long\"}}}}, :open-input-5 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"nope!\"}, :z 0, :ports {:out {:out :string}}, :x 2720.677470934069, :y 1741.4885174725507}, :open-input {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"kick-test\"}, :z 0, :ports {:out {:out :string}}, :x 3004.6165799724517, :y 1592.9840098822297}, :open-input-4 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"3853.75\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"1099.883942741233\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"4\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:YEAR]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]], :view-output? false, :width 350}, :z 0, :ports {:out {:idx7 :keyword, :idx5 :keyword, :* [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"3853.75\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"1099.883942741233\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"4\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:YEAR]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]], :idx2 :string, :idx4 :string, :idx1 :keyword, :idx6 :map, :idx3 :keyword, :idx8 :vector, :idx0 :keyword}}, :x 3020.2006378998626, :y 1715.8480772276178}, :open-input-2 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input :ufo-sightings-drag-44}, :z 0, :ports {:out {:out :keyword}}, :x 2759.2156427639634, :y 1475.5767468808303}}, :flow-id \"kick-test-1-3-24\", :flowmaps-connections [[:open-input-1 :kick-1/value-3] [:open-input :kick-1/name] [:kick-1 :done] [:open-input-3 :kick-1/sub-task] [:open-input-2 :kick-2/sub-task] [:open-input-4 :kick-2/value-3] [:open-input-5 :kick-2/value-4] [:open-input-1 :kick-2/value-5]]}"
+      1,
+      "{:flowmaps {:image-path {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \" /home/ryanr/viz-yard/resources/public/images/shannon45.png\"}, :z 0, :ports {:out {:out :string}}, :x 948.9116738809121, :y 1074.148015202703}, :shell-command-1 {:w 200, :h 100, :x 1758.4411167689732, :y 1117.7292503720237, :z 0, :data {:flow-item {:description \"Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs\", :category \":rabbit-base\", :fn (fn [command] (rvbbit-backend.websockets/run-shell-command command)), :name \":shell-command\", :icon \"zmdi-washing-machine\", :defaults {:command \"ls -la\"}, :types {:command :string, :out :any}, :input_types \"[:string]\", :style {:color \"#ffdd3c\"}, :selected-style {:color \"#ffdd3c\"}, :inputs \"[:command]\", :output_types \":any\", :full_map \"{:description \\\"Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs\\\", :fn (fn [command] (rvbbit-backend.websockets/run-shell-command command)), :icon \\\"zmdi-washing-machine\\\", :defaults {:command \\\"ls -la\\\"}, :types {:command :string, :out :any}, :style {:color \\\"#ffdd3c\\\"}, :selected-style {:color \\\"#ffdd3c\\\"}, :inputs [:command], :required [:command]}\", :required [:command]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [539.1770935058594 176.171875], :h 6, :connection-id nil, :queries {:name-drag-42 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :cc59]], :where [:= :name \":shell-command\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":shell-command\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 6}}, :icon \"zmdi-washing-machine\", :ports {:in {:command :string}, :out {:output :vector, :exception :vector, :seconds :vector, :command :string, :* :map}}}, :clojure-string-join-1 {:w 200, :h 100, :x 1348.4940418061756, :y 1136.4640299479165, :z 0, :data {:flow-item {:description \"Clojure.string's join function.\", :category \":clojure-base\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :name \":clojure-string-join\", :icon \"zmdi-group\", :defaults {:delimiter \" \"}, :types {:delimiter :string, :out :string}, :input_types \"[:string]\", :inputs \"[:delimiter]\", :output_types \":string\", :expandable? true, :full_map \"{:description \\\"Clojure.string's join function.\\\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :inputs [:delimiter], :required [:delimiter], :defaults {:delimiter \\\" \\\"}, :expandable? true, :icon \\\"zmdi-group\\\", :types {:delimiter :string, :out :string}}\", :required [:delimiter]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [540.1770935058594 279.171875], :h 6, :connection-id nil, :queries {:name-drag-12 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ww526]], :where [:= :name \":clojure-string-join\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":clojure-string-join\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 15}}, :icon \"zmdi-group\", :ports {:in {:delimiter :string, :value-1 :any, :value-2 :any}, :out {:out :string}}}, :shell-command-in {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"cd /home/ryanr/color-thief-project ; node ./colorThief.js\"}, :z 0, :ports {:out {:out :string}}, :x 960.0851863779922, :y 1224.4579849567817}, :join-output-as-string {:y 1158.848120777027, :fn (fn [x] x), :w 200, :raw-fn (fn [x] (clojure.string/join \" \" x)), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 2212.3248878272807, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :json-to-edn {:w 200, :h 100, :x 2685.7088668823244, :y 1151.33984375, :z 0, :data {:flow-item {:description \"Convert a JSON string to Clojure EDN\", :category \":rabbit-base\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :name \":json-to-edn\", :icon \"zmdi-file-text\", :types {:json-string :string, :out :any}, :input_types \"[:string]\", :inputs \"[:json-string]\", :output_types \":any\", :full_map \"{:description \\\"Convert a JSON string to Clojure EDN\\\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :inputs [:json-string], :icon \\\"zmdi-file-text\\\", :types {:json-string :string, :out :any}}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [1297.1770935058594 207.171875], :h 6, :connection-id nil, :queries {:name-drag-41 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :uu284]], :where [:= :name \":json-to-edn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":json-to-edn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 7}}, :icon \"zmdi-file-text\", :ports {:in {:json-string :string}, :out {:dominantColor :string, :colorPalette :vector, :* :map}}}}, :flow-id \"node-color-thief-js\", :flowmaps-connections [[:shell-command-in :clojure-string-join-1/value-1] [:image-path :clojure-string-join-1/value-2] [:clojure-string-join-1 :shell-command-1/command] [:shell-command-1/output :join-output-as-string/value] [:join-output-as-string :json-to-edn/json-string] [:json-to-edn :done]]}"
+      1},
+     :cardinality 98},
+    :icon
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"zmdi-developer-board" 55},
+     :cardinality 1}},
+   :rowcount 55},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 53,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
+     :cardinality 96},
+    :file_path
+    {:data-type "string",
+     :distinct 55,
+     :group-by? true,
+     :commons
+     {"./flows/hey-rabbit-pathfinder.edn" 1,
+      "./flows/dalle3-create-image-newengland-old.edn" 1,
+      "./flows/hue-change-group-color.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 55,
+     :group-by? true,
+     :commons
+     {"2023-12-31 20:10:21" 1,
+      "2024-01-24 13:20:30" 1,
+      "2024-01-06 18:53:33" 1},
+     :cardinality 100}},
+   :rowcount 55},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 101,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/fox-hills.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 96,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 5,
+      "tallica-param-test2" 2,
+      "swamp-nightgown" 1},
+     :cardinality 95},
+    :blocks
+    {:data-type "integer",
+     :distinct 38,
+     :group-by? true,
+     :commons {3 25, 14 5, 12 5},
+     :cardinality 37},
+    :queries
+    {:data-type "integer",
+     :distinct 32,
+     :group-by? true,
+     :commons {0 29, 5 9, 11 6},
+     :cardinality 31},
+    :ts
+    {:data-type "string",
+     :distinct 18,
+     :group-by? true,
+     :commons
+     {"2024-01-28 21:44:12" 39,
+      "2024-01-28 21:44:13" 30,
+      "2024-01-28 21:44:11" 17},
+     :cardinality 17}},
+   :rowcount 101},
+  :fflowparts-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {":clojure-base" 16, ":rabbit-base" 12, ":owen-wilson" 1},
+     :cardinality 10},
+    :description
+    {:data-type "string",
+     :distinct 28,
+     :group-by? true,
+     :commons
+     {"Clojure subtract function." 2,
+      "Get top 50 color frequencies from an image in hex form." 1,
+      "Clojure.string's join function." 1},
+     :cardinality 96},
+    :name
+    {:data-type "string",
+     :distinct 29,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :cardinality 100},
+    :file_path
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"" 27,
+      "./flows/a-random-wow.edn" 1,
+      "./flows/node-color-thief-js.edn" 1},
+     :cardinality 10},
+    :full_map
+    {:data-type "string",
+     :distinct 29,
+     :group-by? true,
+     :commons
+     {"{:file-path \"./flows/a-random-wow.edn\", :icon \"zmdi-pizza\", :description \"A random Owen Wilson quote from the Wedding Crashers movie.\"}"
+      1,
+      "{:description \"Clojure greater-than-or-equal function.\", :fn >, :inputs [:value1 :value2], :icon \"zmdi-chevron-right\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :boolean}}"
+      1,
+      "{:description \"Clojure subtract function.\", :fn =, :inputs [:value1 :value2], :icon \"zmdi-swap\", :types {:value1 :any, :value2 :any, :out :boolean}}"
+      1},
+     :cardinality 100},
+    :icon
+    {:data-type "string",
+     :distinct 18,
+     :group-by? true,
+     :commons {"zmdi-pizza" 4, "zmdi-file-text" 3, "zmdi-dns" 2},
+     :cardinality 62}},
+   :rowcount 29},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":rabbit-base" 1, ":owen-wilson" 1, ":clojure-base" 1},
+     :cardinality 100}},
+   :rowcount 3},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
+  :reco-counts {:fields {}, :rowcount 0},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 29,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :cardinality 100}},
+   :rowcount 29}},
+ :default-col-widths
+ {:block-8712 {:bigfoot-sightings-drag-32 100},
+  :system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys 137},
+  :system-fields-list* {:fields-sys 170},
+  :files-list* {:files-sys 178},
+  :blocks-list* {:blocks-sys 127}},
+ :data-hash 1693734536,
+ :tabs ["strategic grill locations" "electric-blue alligator"],
+ :selected-cols {},
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/winter-theme.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"},
+    :outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn
+     (rabbit-kit-outliers.core/get-outliers
+       :query-name
+       :panel-name
+       :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description
+     "WIP: basic timeseries forecasting based on previous values",
+     :fn
+     (rabbit-kit-outliers.core/get-forecast
+       :query-name
+       :panel-name
+       :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1}},
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "aaaah-wednesday-the-day"
+    "asdasdasdasd"
+    "autumn-theme"
+    "battle-mage"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "boston-test-10-3-23"
+    "broken-jacket"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "chaos simple"
+    "chaos-views"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "crazy-alice"
+    "dark-crested-jackelope"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "desktops-and-broomsticks"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "evil-main-street"
+    "fake-books-1"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
+    "glass-fish-board-test"
+    "green-storm-city"
+    "hue-board-1"
+    "late-winter-theme"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "neverwinter-amy"
+    "night-city-never-sleeps"
+    "nightcity-cape-cod"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "old-fashioned-christmas"
+    "pine-wood-dawn"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "purple-techno-sunset"
+    "recharts-test-blocks"
+    "refresh-test"
+    "riffle-test"
+    "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "swamp-nightgown"
+    "swamp-reacher"
+    "tallica-param-test2"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "trad-hybrid"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "winter-twin-peaks"
+    "wow-board"],
+   :openapi-key
+   "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"}},
+ :runstreams nil,
+ :editor? true,
+ :buffy? false,
+ :status-data
+ {:file-change
+  {:file-changed
+   {:data
+    [{:path
+      "./live/unwavering-pyramidal-whale-exiled-from-draw/strategic grill locations/hello there!/hello-there-brother.edn",
+      :type :modify,
+      :panel-key :hello-there-brother,
+      :block-data
+      {:h 3,
+       :w 12,
+       :root [2 2],
+       :tab "strategic grill locations",
+       :name "hello there!"}}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  "kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :unwavering-pyramidal-whale-exiled-from-draw,
+      :at "2024-01-31 18:37:06",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-01-31 18:37:06 - query ran in 110 ms."],
+          :name "query-log-:bigfoot-sightings-drag-32",
+          :order 1706744226,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:bigfoot-sightings-drag-32",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:bigfoot-sightings-drag-32 "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
+ :re-pressed.core/keydown
+ {:keys
+  [{:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}],
+  :event-keys
+  [[[:viz-yard.bricks/esc-unselect-current] [{:keyCode 27}]]
+   [[:viz-yard.bricks/redo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey true}]]
+   [[:viz-yard.bricks/undo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey false}]]
+   [[:viz-yard.bricks/toggle-buffy]
+    [{:keyCode 32, :shiftKey true, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-editor]
+    [{:keyCode 32, :shiftKey false, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-flow]
+    [{:keyCode 32, :shiftKey false, :ctrlKey true}]]
+   [[:viz-yard.bricks/next-panel] [{:keyCode 9}]]
+   [[:viz-yard.bricks/toggle-kick-alert] [{:keyCode 75}]]
+   [[:viz-yard.bricks/toggle-peek] [{:keyCode 80}]]
+   [[:viz-yard.bricks/toggle-lines] [{:keyCode 76}]]
+   [[:viz-yard.bricks/toggle-auto-run] [{:keyCode 79}]]
+   [[:viz-yard.bricks/delete-selected-panel]
+    [{:keyCode 46, :shiftKey true}]]
+   [[:viz-yard.bricks/cycle-column-select false] [{:keyCode 81}]]
+   [[:viz-yard.bricks/cycle-column-select true] [{:keyCode 69}]]
+   [[:viz-yard.audio/start-recording] [{:keyCode 84}]]
+   [[:viz-yard.audio/stop-recording] [{:keyCode 89}]]
+   [[:viz-yard.bricks/stretch-panel :wider]
+    [{:keyCode 68, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :longer]
+    [{:keyCode 83, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :narrower]
+    [{:keyCode 65, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :shorter]
+    [{:keyCode 87, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-up] [{:keyCode 82, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-down]
+    [{:keyCode 70, :shiftKey true}]]
+   [[:viz-yard.bricks/nudge-panel :up] [{:keyCode 87}]]
+   [[:viz-yard.bricks/nudge-panel :down] [{:keyCode 83}]]
+   [[:viz-yard.bricks/nudge-panel :left] [{:keyCode 65}]]
+   [[:viz-yard.bricks/nudge-panel :right] [{:keyCode 68}]]
+   [[:viz-yard.core/alt-key-down] [{:keyCode 67}]]],
+  :clear-keys nil,
+  :always-listen-keys nil,
+  :prevent-default-keys
+  [{:keyCode 32}
+   {:keyCode 46, :shiftKey true}
+   {:keyCode 83, :ctrlKey true}
+   {:keyCode 9}
+   {:keyCode 70, :ctrlKey true}]},
+ :flow-subs
+ [:flow/simple-python-exec>*running?
+  :flow/a-random-wow>*running?
+  :flow/a-random-wow>:open-fn-2
+  :flow/simple-python-exec>:output-only],
+ :client-name :unwavering-pyramidal-whale-exiled-from-draw,
+ :openai-api-key "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",
+ :window {:w 2057, :h 1222},
+ :post-meta {:bigfoot-sightings-drag-32 {:* {:rowcount 5035}}},
+ :status
+ {:file-change {:file-changed :done},
+  "kick-test!" {:kick :bigfoot-sightings-drag-32}},
+ :screen-name "aaaaah-wednesday-the-day",
+ :recos-page2 0,
+ :selected-tab "electric-blue alligator",
+ :snapshots nil,
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :alerts [],
+ :recos-page 0,
+ :re-pollsive.core/polling
+ {:rules
+  [{:interval 10,
+    :event [:viz-yard.bricks/dispatch-auto-queries],
+    :poll-when [:viz-yard.bricks/auto-run-and-connected?],
+    :dispatch-event-on-start? false}
+   {:interval 5,
+    :event [:viz-yard.bricks/update-metadata],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 120,
+    :event [:viz-yard.bricks/clean-up-reco-previews],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 2,
+    :event [:viz-yard.bricks/prune-alerts],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 1,
+    :event [:viz-yard.bricks/refresh-runstreams],
+    :poll-when [:viz-yard.bricks/runstream-running?],
+    :dispatch-event-on-start? false}
+   {:interval 1,
+    :event [:viz-yard.bricks/sub-to-flows],
+    :poll-when [:viz-yard.bricks/new-flow-subs?],
+    :dispatch-event-on-start? false,
+    :started-at nil,
+    :stopped-time-since-last-poll -1,
+    :started-before? true}
+   {:interval 1000,
+    :event [:viz-yard.bricks/update-metadata-tabs],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 1,
+    :event [:viz-yard.bricks/update-conditionals],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 4,
+    :event [:viz-yard.bricks/refresh-status],
+    :poll-when [:viz-yard.bricks/bg-status?],
+    :dispatch-event-on-start? false}],
+  :counter 32},
+ :base-sniff-queries {:bigfoot_sightings 302026766},
+ :re-pressed.core/keyup
+ {:keys
+  [{:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}],
+  :event-keys [[[:viz-yard.core/alt-key-up] [{:keyCode 67}]]],
+  :clear-keys nil,
+  :always-listen-keys nil},
+ :panels-hash 989889032,
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :websocket-fx.core/sockets
+ {:default
+  {:status :connected,
+   :options
+   {:url "ws://localhost:3030/ws",
+    :format :edn,
+    :on-disconnect
+    [:websocket-fx.core/unsubscribe :default :server-push2],
+    :on-connect
+    [:websocket-fx.core/subscribe
+     :default
+     :server-push2
+     {:message
+      {:kind :server-push2,
+       :client-name :unwavering-pyramidal-whale-exiled-from-draw,
+       :ui-keypath [:server],
+       :extras {:hello? true}},
+      :on-message [:viz-yard.http/simple-response]}]},
+   :requests {},
+   :subscriptions
+   {:server-push2
+    {:message
+     {:kind :server-push2,
+      :client-name :unwavering-pyramidal-whale-exiled-from-draw,
+      :ui-keypath [:server],
+      :extras {:hello? true}},
+     :on-message [:viz-yard.http/simple-response]}}}},
+ :user-params-hash -117035900,
+ :grid-recos? true,
+ :panels
+ {:hello-there-brother
+  {:h 3,
+   :w 12,
+   :root [2 2],
+   :name "hello there!",
+   :tab "strategic grill locations",
+   :views
+   {:heya!
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "50px",
+      :font-weight 700,
+      :color :theme/editor-outer-rim-color,
+      :padding-top "14px",
+      :opacity 1,
+      :font-family :theme/base-font}
+     :child
+     "hello! 🐇 🌲 🌲"]},
+   :queries {}}},
+ :selected-block "none!",
+ :click-param
+ {:theme
+  {:codemirror-theme "ayu-dark",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header
+    {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#0b062982",
+   :editor-rim-color "#4795dd",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#D8129F1",
+    "boolean" "#CAD4C7",
+    "map" "#253258",
+    "list" "#E0158126",
+    "string" "#CFFDD2",
+    "vector" "#ABA1B3",
+    "keyword" "#E0DCD7",
+    "rabbit-code" "#949FB0",
+    "datetime" "#BBC1C7",
+    "integer" "#FDECDD",
+    "unknown" "#536383",
+    "date" "#253258",
+    "nil" "#718099"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#e1a6bf",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"},
+      :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid
+    {:line
+     {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#4795dd",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/pine-wood-dawn-8k-4k.png)",
+    :transition "all 0.8s ease-in-out",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Instagram Sans",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :param
+  {:selected-view [nil nil],
+   :selected-view-data nil,
+   :selected-block :hello-there-brother},
+  :files-sys
+  {:file_path "./screens/pine-wood-dawn.edn",
+   :screen_name "pine-wood-dawn",
+   :blocks 3,
+   :queries 0,
+   :ts "2024-01-30 20:35:49"},
+  :blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 27,
+   :block_data
+   "{:codemirror-theme \"ayu-dark\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b062982\", :editor-rim-color \"#4795dd\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#D8129F1\", \"boolean\" \"#CAD4C7\", \"map\" \"#253258\", \"list\" \"#E0158126\", \"string\" \"#CFFDD2\", \"vector\" \"#ABA1B3\", \"keyword\" \"#E0DCD7\", \"rabbit-code\" \"#949FB0\", \"datetime\" \"#BBC1C7\", \"integer\" \"#FDECDD\", \"unknown\" \"#536383\", \"date\" \"#253258\", \"nil\" \"#718099\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#e1a6bf\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#4795dd\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/pine-wood-dawn-8k-4k.png)\", :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Instagram Sans\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :sys {:selected-tab "electric-blue alligator", :selected-tab-idx 1}},
+ :selected-flow "live-scratch-flow"}

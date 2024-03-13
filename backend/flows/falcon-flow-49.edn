@@ -1,0 +1,134 @@
+{:flowmaps
+ {:open-input
+  {:w 125,
+   :h 60,
+   :z 0,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input "string!"},
+   :right-click? true,
+   :ports {:in {}, :out {:out {:out :string}}},
+   :x 1425,
+   :y 1175},
+  :open-fn-1
+  {:y 1275,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x] x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 1400,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :open-fn-2
+  {:y 1375,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x] x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 1550,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :open-fn-3
+  {:y 1375,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x y z u] x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any, :y :any, :z :any, :u :any}, :out {:out :any}},
+   :h 60,
+   :x 1350,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}},
+    :user-input
+    ["123"
+     "123"
+     "333"
+     ""
+     "\"heyhh!\""
+     ""
+     "### commentsd"
+     "3"
+     "3"
+     ""
+     ""
+     ""]}},
+  :open-fn-4
+  {:y 1475,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x] x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 1475,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :open-input-1
+  {:w 125,
+   :h 60,
+   :z 0,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input 123},
+   :right-click? true,
+   :ports {:in {}, :out {:out :integer}},
+   :x 1575,
+   :y 1250}},
+ :flow-id "falcon-flow-49",
+ :flowmaps-connections
+ [[:open-input :open-fn-1/x]
+  [:open-fn-1 :open-fn-3/x]
+  [:open-fn-2 :open-fn-4/x]
+  [:open-fn-3 :open-fn-4/x]
+  [:open-input-1 :open-fn-2/x]
+  [:open-fn-1 :open-fn-2/x]]}

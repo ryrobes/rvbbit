@@ -1,0 +1,88 @@
+{:flowmaps
+ {:start-py-process
+  {:y 1175,
+   :fn (fn [x] x),
+   :w 150,
+   :raw-fn
+   (fn [x]
+     (let [pid "funky-town"]
+       (rvbbit-backend.websockets/start-process pid ["python3" "/tmp/scratch.py"] true)
+       (rvbbit-backend.websockets/get-output pid))),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :inputs nil,
+   :h 110,
+   :x 1850,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :bang
+  {:w 125,
+   :h 85,
+   :z 0,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input :go},
+   :right-click? true,
+   :ports {:in {}, :out {:out :keyword}},
+   :x 1850,
+   :y 1050},
+  :start-py-process_stdout
+  {:y 1350,
+   :fn (fn [x] (get-in x [:stdout])),
+   :w 125,
+   :raw-fn (fn [x] (get-in x [:stdout])),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 85,
+   :x 1950,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] (get-in x [:stdout])),
+     :name ":open-fn",
+     :raw-fn (fn [x] (get-in x [:stdout])),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :start-py-process_stderr
+  {:y 1350,
+   :fn (fn [x] (get-in x [:stderr])),
+   :w 125,
+   :raw-fn (fn [x] (get-in x [:stderr])),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 85,
+   :x 1800,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] (get-in x [:stderr])),
+     :name ":open-fn",
+     :raw-fn (fn [x] (get-in x [:stderr])),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}}},
+ :opts {:retry-on-error? false, :retries 5, :close-on-done? true, :timeout 80000000},
+ :zoom [-3198.73 -2246.32 2.225],
+ :flow-id "frog-flow-121",
+ :flowmaps-connections
+ [[:bang :start-py-process/x]
+  [:start-py-process :done]
+  [:start-py-process :start-py-process_stdout/x]
+  [:start-py-process :start-py-process_stderr/x]]}

@@ -1,0 +1,202 @@
+{:flowmaps
+ {:dialog-pusher
+  {:y 1075,
+   :push {:push-path {:fn (fn [out] (not (nil? out))), :dest []}, :push-path-1 {:fn (fn [out] (not (nil? out))), :dest []}},
+   :fn (fn [x] x),
+   :w 150,
+   :raw-fn (fn [x] (when (number? x) (inc x))),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :cond {},
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :inputs nil,
+   :h 260,
+   :x 1875,
+   :view
+   (fn [x] [:v-box
+            :size
+            "auto"
+            :style
+            {:font-weight 700, :font-size "14px", :cursor "pointer", :color "black"}
+            :children
+            [[:v-box
+              :height
+              "80px"
+              :align
+              :center
+              :justify
+              :center
+              :padding
+              "15px"
+              :children
+              [[:box :child (str x) :style {:font-size "38px"}] [:box :child "add one"]]
+              :style
+              {:background-color "maroon"}
+              :attr
+              {:on-click [:push-path> x]}]
+             [:v-box
+              :height
+              "80px"
+              :align
+              :center
+              :justify
+              :center
+              :padding
+              "15px"
+              :children
+              [[:box :child (str (* 2 x)) :style {:font-size "38px"}] [:box :child "double it"]]
+              :style
+              {:background-color "lime"}
+              :attr
+              {:on-click [:push-path-1> (* 2 x)]}]
+             [:box :padding "8px" :align :center :justify :center :style {:color "#ffffff"} :child "...and recur!"]]]),
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :hit-me
+  {:y 1350,
+   :fn (fn [x] x),
+   :w 100,
+   :raw-fn (fn [x] x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 85,
+   :x 2050,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :returnal
+  {:y 1450,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x y] (+ y x)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any, :y :any}, :out {:out :any}},
+   :inputs nil,
+   :h 85,
+   :x 1825,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :seeded
+  {:w 100,
+   :h 85,
+   :z 0,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input 123},
+   :right-click? true,
+   :ports {:in {}, :out {:out :integer}},
+   :x 1800,
+   :y 950},
+  :back-to-the-front
+  {:y 1375,
+   :fn (fn [x] x),
+   :w 100,
+   :raw-fn (fn [x] x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :cond {:cond-path {:fn (fn [out] (not (nil? out))), :dest []}},
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 85,
+   :x 2200,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :open-fn-3
+  {:y 1475,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x] x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :cond {:cond-path {:fn (fn [out] (not (nil? out))), :dest []}},
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 85,
+   :x 2025,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :split-it
+  {:y 1200,
+   :fn (fn [x] x),
+   :w 100,
+   :raw-fn (fn [x] x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 85,
+   :x 2150,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}}},
+ :opts {:retry-on-error? true, :retries 5, :close-on-done? false},
+ :zoom [-1847.72 -1289.14 1.425],
+ :flow-id "eggplanter23",
+ :flowmaps-connections
+ [[:dialog-pusher :returnal/x]
+  [:dialog-pusher :returnal/y]
+  [:returnal :done]
+  [:seeded :dialog-pusher/x]
+  [:dialog-pusher/push-path-1 :open-fn-3/x]
+  [:dialog-pusher/push-path :split-it/x]
+  [:split-it :hit-me/x]
+  [:split-it :back-to-the-front/x]
+  [:open-fn-3/cond-path :back-to-the-front/x]
+  [:back-to-the-front/cond-path :dialog-pusher/x]]}

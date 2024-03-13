@@ -1,0 +1,2 @@
+{:jdbc-url "jdbc:sqlite:file:sniffdbdb2?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL&auto_vacuum=FULL"}
+

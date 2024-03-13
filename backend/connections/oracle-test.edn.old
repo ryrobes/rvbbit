@@ -1,0 +1,3 @@
+
+{:jdbc-url "jdbc:oracle:scott/tiger@localhost:1521:XE"}
+

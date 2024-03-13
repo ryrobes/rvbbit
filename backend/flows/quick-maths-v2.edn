@@ -1,0 +1,456 @@
+{:flowmaps
+ {:divider-out-out
+  {:y 1525,
+   :fn (fn [x] x),
+   :w 150,
+   :raw-fn (fn [x] x),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :float}},
+   :h 85,
+   :x 1775,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :random-vector-full-of-stuff
+  {:w 250,
+   :h 100,
+   :z 0,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item
+    {:expandable? true,
+     :meta
+     {:test1*
+      {:desc
+       "Replace /path/to/source/dir with the path to your source directory and *.ext with the file extension that matches your source files. For instance, if you're counting lines in a Python project, you would use *.py.",
+       :scrubber {:message "ytodad", :values ["area" "bar" "circle" "line" "point" "rect" "rule" "square" "text" "tick"]}}},
+     :defaults {:test1* "point"}},
+    :user-input [37 84 95 :injffy1* {:fook true, :bite 984, :goo :test1*} 0 true [0 9 :rando2*]],
+    :defaults {:test1* 143}},
+   :right-click? true,
+   :ports
+   {:in {:injffy1* :any, :test1* :any, :rando2* :any},
+    :out
+    {:idx7 :vector,
+     :idx5 :integer,
+     :* :vector,
+     :idx2 :integer,
+     :idx4 :map,
+     :idx1 :integer,
+     :idx6 :boolean,
+     :idx3 :keyword,
+     :idx0 :integer}},
+   :x 1200,
+   :y 1225},
+  :random-vector-full-of-stuff_idx6
+  {:y 1525,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn (fn [x y] [x 3 (= y "fook") y]),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any, :y :any}, :out {:idx0 :boolean, :idx1 :integer, :idx2 :boolean, :idx3 :float, :* :vector}},
+   :h 85,
+   :x 1475,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :divisive-2
+  {:y 1400,
+   :fn (fn [x] (/ x 2.2)),
+   :w 150,
+   :raw-fn (fn [x y1] (/ x y1)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any, :y1 :any}, :out {:out :float}},
+   :h 85,
+   :x 1550,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] (/ x 2.2)),
+     :name ":open-fn",
+     :raw-fn (fn [x] (/ x 2.2)),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :static-value-1
+  {:w 100,
+   :h 75,
+   :z 0,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input 123323},
+   :right-click? true,
+   :ports {:in {}, :out {:out :integer}},
+   :x 1575,
+   :y 1150},
+  :get-random-integer
+  {:y 1125,
+   :description ["Grabs a random integer and sends it along."],
+   :fn (fn [_] (rand-int 500)),
+   :w 150,
+   :raw-fn (fn [_] (rand-int 5000)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:_ :any}, :out {:out :integer}},
+   :h 75,
+   :x 1400,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [_] (rand-int 500)),
+     :name ":open-fn",
+     :raw-fn (fn [_] (rand-int 500)),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :test-integer-slider
+  {:w 125,
+   :h 75,
+   :z 0,
+   :data
+   {:drag-meta {:type :open-block}, :flow-item {:meta {:* {:scrubber [0 1 900]}}, :expandable? true}, :user-input 135},
+   :right-click? true,
+   :ports {:in {}, :out {:out :integer}},
+   :x 1750,
+   :y 1125},
+  :static-value-2-out-out
+  {:y 1350,
+   :fn (fn [x] x),
+   :w 175,
+   :raw-fn (fn [x] (* 3 x)),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :integer}},
+   :h 85,
+   :x 1950,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :start-with-a-bang
+  {:y 1025,
+   :description
+   ["Does nothing, just used as a signal to tell step one to start. Value sent can be anything, the receiving block is going to ignore it."],
+   :w 175,
+   :right-click? true,
+   :z 0,
+   :ports {:in {}, :out {:out :keyword}},
+   :h 85,
+   :x 1350,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input :go}},
+  :random-vector-full-of-stuff_idx6_out
+  {:y 1650,
+   :fn (fn [x] x),
+   :w 100,
+   :raw-fn (fn [x] x),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:idx0 :boolean, :idx1 :integer, :idx2 :boolean, :idx3 :float, :* :vector}},
+   :h 85,
+   :x 1725,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :divider-out
+  {:y 1425,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x] x),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :float}},
+   :h 60,
+   :x 1800,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :divider
+  {:y 1300,
+   :fn (fn [x y] (/ x y)),
+   :w 125,
+   :raw-fn (fn [x y] (/ x y)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any, :y :any}, :out {:out :float}},
+   :h 75,
+   :x 1650,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x y] (/ x y)),
+     :name ":open-fn",
+     :raw-fn (fn [x y] (/ x y)),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :scrubber-buttons
+  {:w 125,
+   :h 85,
+   :z 0,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item
+    {:expandable? true,
+     :meta
+     {:*
+      {:desc
+       "Replace /path/to/source/dir with the path to your source directory and *.ext with the file extension that matches your source files. For instance, if you're counting lines in a Python project, you would use *.py.",
+       :scrubber
+       {:message "ytodad", :values ["area" "bar" "circle" "line" "point" "rect" "rule" "square" "text" "tick"]}}}},
+    :user-input "tick"},
+   :ports {:in {}, :out {:out :string}},
+   :x 1125,
+   :y 1075},
+  :random-vector-full-of-stuff_idx6_idx0
+  {:y 1650,
+   :fn (fn [x] x),
+   :w 300,
+   :raw-fn (fn [x] x),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :boolean}},
+   :h 60,
+   :x 1375,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :java-uid-test-string
+  {:y 1525,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn (fn [x] (str "uuid:  " (java.util.UUID/randomUUID))),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :string}},
+   :h 75,
+   :x 1225,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-25
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}},
+  :some-quick-maths-yo
+  {:y 1300,
+   :fn (fn [x y] (+ x y)),
+   :w 150,
+   :raw-fn (fn [x y z] (Thread/sleep 700) (+ 2000 x y z)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any, :y :any, :z :any}, :out {:out :integer}},
+   :h 75,
+   :x 1475,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x y] (+ x y)),
+     :name ":open-fn",
+     :raw-fn (fn [x y] (+ x y)),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :random-vector-full-of-stuff_idx1
+  {:y 1425,
+   :fn (fn [x] x),
+   :w 100,
+   :raw-fn (fn [x] x),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :integer}},
+   :h 85,
+   :x 1325,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :static-value-2-out
+  {:y 1250,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x] x),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :integer}},
+   :h 60,
+   :x 1825,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :grab-an-item
+  {:y 1375,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x] (Thread/sleep 200) x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:fook :boolean, :bite :integer, :goo :string, :* :map}},
+   :h 110,
+   :x 1175,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :static-value-2-out-out-out
+  {:y 1475,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn (fn [x] 343.4),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :float}},
+   :h 85,
+   :x 1975,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}}},
+ :opts {:close-on-done? true, :retry-on-error? false, :retries 0},
+ :zoom [99.67 -341.34 0.525],
+ :flow-id "quick-maths-v2",
+ :flowmaps-connections
+ [[:static-value-1 :some-quick-maths-yo/x]
+  [:start-with-a-bang :get-random-integer/_]
+  [:get-random-integer :some-quick-maths-yo/z]
+  [:get-random-integer :divider/x]
+  [:start-with-a-bang :random-vector-full-of-stuff/injffy1*]
+  [:get-random-integer :random-vector-full-of-stuff/rando2*]
+  [:test-integer-slider :some-quick-maths-yo/y]
+  [:random-vector-full-of-stuff/idx4 :grab-an-item/x]
+  [:some-quick-maths-yo :divisive-2/x]
+  [:grab-an-item :java-uid-test-string/x]
+  [:divider :divisive-2/y1]
+  [:test-integer-slider :divider/y]
+  [:divider :divider-out/x]
+  [:test-integer-slider :static-value-2-out/x]
+  [:divider-out :divider-out-out/x]
+  [:static-value-2-out :divider-out/x]
+  [:static-value-2-out :static-value-2-out-out/x]
+  [:static-value-2-out-out :static-value-2-out-out-out/x]
+  [:random-vector-full-of-stuff/idx6 :random-vector-full-of-stuff_idx6/x]
+  [:random-vector-full-of-stuff_idx6 :random-vector-full-of-stuff_idx6_out/x]
+  [:divisive-2 :random-vector-full-of-stuff_idx6/y]
+  [:random-vector-full-of-stuff_idx6/idx0 :random-vector-full-of-stuff_idx6_idx0/x]
+  [:random-vector-full-of-stuff_idx6_idx0 :done]
+  [:random-vector-full-of-stuff/idx1 :random-vector-full-of-stuff_idx1/x]
+  [:scrubber-buttons :random-vector-full-of-stuff/test1*]]}

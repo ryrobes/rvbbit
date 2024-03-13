@@ -1,0 +1,128 @@
+{:flowmaps
+ {:roger
+  {:y 1339.1852549848886,
+   :sub-flow
+   {:flow-id "roger that",
+    :file-path
+    "./flows/novel-ovoid-turtle-exiled-from-plunge-pool.edn",
+    :map
+    {:+
+     {:w 200,
+      :h 100,
+      :x 1343.9960758964198,
+      :y 1355.2660601455943,
+      :z 0,
+      :data
+      {:flow-item
+       {:description "Clojure add function.",
+        :category ":clojure-base",
+        :name ":+",
+        :icon "zmdi-plus",
+        :types
+        {:value1 [:integer :float],
+         :value2 [:integer :float],
+         :out [:integer :float]},
+        :input_types "[[:integer :float] [:integer :float]]",
+        :inputs [:value1 :value2],
+        :output_types "[:integer :float]",
+        :full_map
+        "{:description \"Clojure add function.\", :view (fn [_]), :fn +, :inputs [:value1 :value2], :icon \"zmdi-plus\", :types {:value1 [:integer :float], :value2 [:integer :float], :out [:integer :float]}}"},
+       :name "drag-from-",
+       :w 5,
+       :source-panel :flow-fn-list*,
+       :root [643 175],
+       :h 6,
+       :connection-id nil,
+       :queries
+       {:name-drag-31
+        {:select
+         [:name
+          :full_map
+          :description
+          :inputs
+          :icon
+          :input_types
+          :output_types
+          :category],
+         :from [[:query/flow-fn-sys :oo18]],
+         :where [:= :name ":+"]}},
+       :drag-meta
+       {:data-type "string",
+        :source-query :flow-fn-sys,
+        :param-full ":+",
+        :param-field :name,
+        :source-panel-key :flow-fn-list*,
+        :type :where,
+        :param-table :flow-fn-sys,
+        :source-table :query/flow-fn-sys,
+        :connection-id nil,
+        :target :name,
+        :row-num 11}},
+      :icon "zmdi-plus",
+      :ports
+      {:in {:value1 [:integer :float], :value2 [:integer :float]},
+       :out {:out [:integer :float]}}},
+     :open-input
+     {:w 200,
+      :h 60,
+      :data {:drag-meta {:type :open-block}, :user-input 4},
+      :z 0,
+      :ports {:out {:out :integer}},
+      :x 1053.221899314876,
+      :y 1322.7866427730974},
+     :open-input-1
+     {:w 200,
+      :h 60,
+      :data {:drag-meta {:type :open-block}, :user-input 5},
+      :z 0,
+      :ports {:out {:out :integer}},
+      :x 1057.8639364480557,
+      :y 1426.1019994876306}},
+    :connections
+    [[:open-input :+/value1] [:open-input-1 :+/value2] [:+ :done]]},
+   :flow-id "roger that",
+   :w 200,
+   :icon "zmdi-puzzle-piece",
+   :z 0,
+   :ports
+   {:in {:open-input :integer, :open-input-1 :integer},
+    :out {:out [:integer :float]}},
+   :h 100,
+   :file-path "./flows/novel-ovoid-turtle-exiled-from-plunge-pool.edn",
+   :x 1311.0689644649108,
+   :data
+   {:flow-item nil,
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-list*,
+    :root [675 195],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:flow-id-drag-16
+     {:select [:flow_id :file_path :last_modified],
+      :from [[:query/flows-sys :mm44]],
+      :where [:= :flow_id "roger that"]}},
+    :drag-meta
+    {:data-type "string",
+     :done-block :+,
+     :source-query :flows-sys,
+     :param-full "roger that",
+     :param-field :flow_id,
+     :source-panel-key :flow-list*,
+     :type :sub-flow,
+     :param-table :flows-sys,
+     :source-table :query/flows-sys,
+     :connection-id nil,
+     :target :flow_id,
+     :row-num 0}}},
+  :open-input
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 6},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 1034.671390928071,
+   :y 1361.2652489234663}},
+ :flow-id "new-flow-573075",
+ :flowmaps-connections [[:open-input :roger/open-input] [:roger :done]]}

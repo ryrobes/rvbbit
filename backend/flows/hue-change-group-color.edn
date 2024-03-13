@@ -1,0 +1,256 @@
+{:flowmaps
+ {:http-call-1
+  {:w 200,
+   :h 100,
+   :x 1790.4873838682431,
+   :y 1233.2681706608953,
+   :z 0,
+   :data
+   {:flow-item
+    {:description "Basic HTTP call primitive",
+     :category ":rabbit-base",
+     :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)),
+     :name ":http-call",
+     :icon "zmdi-http",
+     :defaults
+     {:req-map
+      {:url "https://owen-wilson-wow-api.onrender.com/wows/random",
+       :query-params {:movie "Wedding Crashers", :results 40}}},
+     :types {:req-map :map, :out :any},
+     :input_types "[:map]",
+     :style {:color "#7BB696"},
+     :selected-style {:color "#7BB696"},
+     :inputs "[:req-map]",
+     :output_types ":any",
+     :expandable? false,
+     :full_map
+     "{:description \"Basic HTTP call primitive\", :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)), :icon \"zmdi-http\", :defaults {:req-map {:url \"https://owen-wilson-wow-api.onrender.com/wows/random\", :query-params {:movie \"Wedding Crashers\", :results 40}}}, :types {:req-map :map, :out :any}, :style {:color \"#7BB696\"}, :selected-style {:color \"#7BB696\"}, :inputs [:req-map], :expandable? false, :required [:req-map]}",
+     :required [:req-map]},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [446.9193115234375 154.8854217529297],
+    :h 6,
+    :connection-id nil,
+    :view-output? false,
+    :queries
+    {:name-drag-8
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :zz280]],
+      :where [:= :name ":http-call"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":http-call",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :where,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}},
+   :icon "zmdi-http",
+   :ports
+   {:in {:req-map :map},
+    :out {:idx0 :map, :idx1 :map, :idx2 :map, :* :vector}}},
+  :open-input
+  {:w 200,
+   :h 100,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input
+    {:method :put,
+     :body {:hue :value-0, :on :value-3, :sat :value-1},
+     :url :value-2}},
+   :z 0,
+   :ports
+   {:out {:method :keyword, :body :map, :url :string, :* :map},
+    :in {:value-0 :any, :value-1 :any, :value-2 :any, :value-3 :any}},
+   :x 1423.3972761824323,
+   :y 1195.8532899598815},
+  :ccolor
+  {:w 200,
+   :h 90,
+   :x 597.3122360641892,
+   :y 1412.1360839843749,
+   :z 0,
+   :data
+   {:h 3,
+    :w 6,
+    :root [0 0],
+    :drag-meta
+    {:type :param,
+     :param-full :param/ccolor,
+     :param-table :param,
+     :param-field :ccolor}},
+   :icon "zmdi-tune",
+   :ports {:in {}, :out {:out :string}}},
+  :open-fn-1
+  {:y 1355.9307551203544,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn (fn [x] (rvbbit-backend.util/hex-to-hue-sat x)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports
+   {:in {:value :any},
+    :out {:idx0 :integer, :idx1 :integer, :* :vector}},
+   :h 100,
+   :x 1028.3633604307431,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-25
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}},
+  :group-id
+  {:w 200,
+   :h 100,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input 200},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 615.7898543074323,
+   :y 1060.3662624049832},
+  :open-fn-2
+  {:y 1076.5051454286315,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn
+   (fn [x]
+     (str
+       "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/groups/"
+       x
+       "/action")),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:value :any}, :out {:out :any}},
+   :h 100,
+   :x 1033.2374630489865,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-25
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}},
+  :on-switch
+  {:w 200,
+   :h 90,
+   :x 638.0523120777027,
+   :y 1230.9223421663849,
+   :z 0,
+   :data
+   {:h 3,
+    :w 6,
+    :root [0 0],
+    :drag-meta
+    {:type :param,
+     :param-full :param/on-switch,
+     :param-table :param,
+     :param-field :on-switch}},
+   :icon "zmdi-tune",
+   :ports {:in {}, :out {:out :boolean}}}},
+ :flow-id "hue-change-group-color",
+ :flowmaps-connections
+ [[:open-input/* :http-call-1/req-map]
+  [:http-call-1/* :done]
+  [:ccolor :open-fn-1/value]
+  [:open-fn-1/idx0 :open-input/value-0]
+  [:open-fn-1/idx1 :open-input/value-1]
+  [:group-id :open-fn-2/value]
+  [:open-fn-2 :open-input/value-2]
+  [:on-switch :open-input/value-3]]}

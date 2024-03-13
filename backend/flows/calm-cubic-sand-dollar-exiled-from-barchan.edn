@@ -1,0 +1,19 @@
+{:flowmaps
+ {:open-input
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 478},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 908.1989600929053,
+   :y 1118.9323789854307},
+  :open-input-1
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 856},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 906.042710779657,
+   :y 1269.8794020914956}},
+ :flow-id :new-flow-148843,
+ :flowmaps-connections []}

@@ -1,0 +1,1343 @@
+{:orders
+ {:fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema
+   :db_catalog
+   :connection_id
+   :schema_cat
+   :table_name
+   :fields],
+  :recos-sys2
+  [:context_hash
+   :combo_hash
+   :connection_id
+   :shape_name
+   :query_map
+   :query_map_str
+   :viz_map
+   :combo_edn
+   :selected_view
+   :table_name
+   :condis
+   :h
+   :w
+   :score],
+  :viz-shapes0-sys2 [:shape :recos],
+  :viz-tables-sys2 [:table_name :recos],
+  :viz-shapes-sys2 [:combo_edn :recos],
+  :offense_codes [:CODE :NAME],
+  :offenses
+  [:INCIDENT_NUMBER
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :DISTRICT
+   :REPORTING_AREA
+   :SHOOTING
+   :OCCURRED_ON_DATE
+   :YEAR
+   :MONTH
+   :DAY_OF_WEEK
+   :HOUR
+   :UCR_PART
+   :STREET
+   :Lat
+   :Long
+   :Location],
+  :connections-sys [:database_name :connection_id],
+  :nypd_arrest_data
+  [:ARREST_KEY
+   :ARREST_DATE
+   :PD_CD
+   :PD_DESC
+   :KY_CD
+   :OFNS_DESC
+   :LAW_CODE
+   :LAW_CAT_CD
+   :ARREST_BORO
+   :ARREST_PRECINCT
+   :JURISDICTION_CODE
+   :AGE_GROUP
+   :PERP_SEX
+   :PERP_RACE
+   :X_COORD_CD
+   :Y_COORD_CD
+   :LAT
+   :LONG
+   :LONG_LAT],
+  :reco-counts [:table_name :cnt],
+  :kit-results-sys
+  [:id
+   :item_hash
+   :item_name
+   :kit_name
+   :item_type
+   :item_key
+   :item_idx
+   :item_options
+   :item_data
+   :client_name
+   :flow_id
+   :updated]},
+ :reco-preview nil,
+ :sql-source
+ {:offenses {:select [:*], :from [:offenses], :limit 111},
+  :offense_codes {:select [:*], :from [:offense_codes], :limit 111},
+  :nypd_arrest_data
+  {:select [:*], :from [:nypd_arrest_data], :limit 111}},
+ :meta
+ {:fields-sys {:fields {}, :rowcount 0},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 9},
+     :cardinality 11},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 9},
+     :cardinality 11},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"bigfoot-ufos" 9},
+     :cardinality 11},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 9},
+     :cardinality 11},
+    :table_name
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"us_states" 1, "ufo_sightings_vw" 1, "test_me" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? false,
+     :commons {42 1, 14 1, 11 1},
+     :cardinality 100}},
+   :rowcount 9},
+  :recos-sys2
+  {:fields
+   {:query_map
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons
+     {"[{:select [[[[:sum :rows]] :rows] :ARREST_BORO], :from [\"query/nypd_arrest_data_drag_9\"], :group-by [:ARREST_BORO]}]"
+      6,
+      "[{:select [[[[:sum :rows]] :rows] :ARREST_BORO :LAW_CAT_CD], :from [\"query/nypd_arrest_data_drag_9\"], :group-by [:ARREST_BORO :LAW_CAT_CD]}]"
+      3,
+      "[{:select [[[[:avg :ARREST_KEY]] :ARREST_KEY] :ARREST_BORO], :from [\"query/nypd_arrest_data_drag_9\"], :group-by [:ARREST_BORO]}]"
+      2},
+     :cardinality 65},
+    :shape_name
+    {:data-type "string",
+     :distinct 26,
+     :group-by? true,
+     :commons
+     {"scatterplot_nivo_color" 1,
+      "point_map_freq" 1,
+      "basic_h_bar_avg_color" 1},
+     :cardinality 100},
+    :w
+    {:data-type "unknown",
+     :distinct 3,
+     :group-by? true,
+     :commons {nil 23, 9 2, 6 1},
+     :cardinality 11},
+    :combo_edn
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons
+     {"\"ARREST_BORO, rows\"" 7,
+      "\"ARREST_BORO, LAW_CAT_CD, rows\"" 4,
+      "\"ARREST_BORO\"" 3},
+     :cardinality 50},
+    :query_map_str
+    {:data-type "string",
+     :distinct 16,
+     :group-by? true,
+     :commons
+     {"\nSELECT (SUM(rows)) AS rows, ARREST_BORO\nFROM 'query/nypd_arrest_data_drag_9'\nGROUP BY ARREST_BORO\n"
+      6,
+      "\nSELECT (SUM(rows)) AS rows, ARREST_BORO, LAW_CAT_CD\nFROM 'query/nypd_arrest_data_drag_9'\nGROUP BY ARREST_BORO, LAW_CAT_CD\n"
+      3,
+      "\nSELECT ARREST_BORO\nFROM 'query/nypd_arrest_data_drag_9'\nGROUP BY ARREST_BORO\nORDER BY ARREST_BORO ASC\n"
+      2},
+     :cardinality 61},
+    :selected_view
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"" 23, ":reech" 3},
+     :cardinality 7},
+    :combo_hash
+    {:data-type "string",
+     :distinct 26,
+     :group-by? true,
+     :commons {"-137861064" 1, "-1834978867" 1, "33976498" 1},
+     :cardinality 100},
+    :h
+    {:data-type "unknown",
+     :distinct 4,
+     :group-by? true,
+     :commons {nil 23, 2 1, 9 1},
+     :cardinality 15},
+    :condis
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"" 21,
+      "{:country-lines? true, :us-counties? false, :us-states? false, :geo-background? true}"
+      3,
+      "{:true? [:= 1 1]}" 1},
+     :cardinality 15},
+    :score
+    {:data-type "float",
+     :distinct 4,
+     :group-by? true,
+     :commons {0 12, 48.39999999999999 11, 2.4 2},
+     :cardinality 15},
+    :table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nypd_arrest_data_drag_9" 26},
+     :cardinality 3},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"cache.db" 26},
+     :cardinality 3},
+    :context_hash
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"-1817655447" 26},
+     :cardinality 3},
+    :viz_map
+    {:data-type "string",
+     :distinct 26,
+     :group-by? true,
+     :commons
+     {"[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
+      1,
+      "[:nivo-scatterplot {:axisTop nil, :axisLeft {:orient \"left\", :tickSize 5, :tickPadding 5, :tickRotation 0, :legend \"size\", :legendPosition \"middle\", :legendOffset -60}, :legends [{:symbolSize 12, :itemHeight 12, :justify false, :translateY 0, :translateX 130, :symbolShape \"circle\", :itemDirection \"left-to-right\", :effects {:on \"hover\", :style {:itemOpacity 1}}, :anchor \"bottom-right\", :direction \"column\", :itemWidth 100, :itemsSpacing 5}], :borderRadius 3, :axisBottom {:orient \"bottom\", :tickSize 5, :tickPadding 5, :tickRotation 0, :legend \"weight\", :legendPosition \"middle\", :legendOffset 46}, :width :panel-width+70, :colors :theme/vega-default-color-scheme, :blendMode \"multiply\", :transformation-map {:transform-select [[:KY_CD :y] [:ARREST_KEY :x]], :fill-gaps? false, :order-nest-by :x, :nest-by [:ARREST_BORO]}, :theme :theme/nivo-defaults, :click {:c :ARREST_KEY, :y :KY_CD}, :axisRight nil, :padding 1, :yScale {:type \"linear\", :min 0, :max \"auto\"}, :nodeSize 14, :xScale {:type \"linear\", :min 0, :max \"auto\"}, :height :panel-height+50, :margin {:top 5, :right 5, :bottom 45, :left 45}, :data :query-preview}]"
+      1,
+      "[:nivo-scatterplot {:axisTop nil, :axisLeft {:orient \"left\", :tickSize 5, :tickPadding 5, :tickRotation 0, :legend \"size\", :legendPosition \"middle\", :legendOffset -60}, :legends [{:symbolSize 12, :itemHeight 12, :justify false, :translateY 0, :translateX 130, :symbolShape \"circle\", :itemDirection \"left-to-right\", :effects {:on \"hover\", :style {:itemOpacity 1}}, :anchor \"bottom-right\", :direction \"column\", :itemWidth 100, :itemsSpacing 5}], :borderRadius 3, :axisBottom {:orient \"bottom\", :tickSize 5, :tickPadding 5, :tickRotation 0, :legend \"weight\", :legendPosition \"middle\", :legendOffset 46}, :width :panel-width+70, :colors :theme/vega-default-color-scheme, :blendMode \"multiply\", :transformation-map {:transform-select [[:KY_CD :y] [:ARREST_KEY :x]], :fill-gaps? false, :order-nest-by :x, :nest-by [\"single\"]}, :theme :theme/nivo-defaults, :click {:c :ARREST_KEY, :y :KY_CD}, :axisRight nil, :padding 1, :yScale {:type \"linear\", :min 0, :max \"auto\"}, :nodeSize 14, :xScale {:type \"linear\", :min 0, :max \"auto\"}, :height :panel-height+50, :margin {:top 5, :right 5, :bottom 45, :left 45}, :data :query-preview}]"
+      1},
+     :cardinality 100}},
+   :rowcount 26},
+  :viz-shapes0-sys2
+  {:fields
+   {:shape
+    {:data-type "string",
+     :distinct 26,
+     :group-by? false,
+     :commons
+     {"scatterplot_nivo_color" 1,
+      "point_map_freq" 1,
+      "basic_h_bar_avg_color" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 13,
+     :group-by? false,
+     :commons {62 6, 252 3, 6 3},
+     :cardinality 50}},
+   :rowcount 26},
+  :viz-tables-sys2
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nypd_arrest_data_drag_9" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {2987 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :viz-shapes-sys2
+  {:fields
+   {:combo_edn
+    {:data-type "string",
+     :distinct 471,
+     :group-by? true,
+     :commons
+     {"\"PD_CD, X_COORD_CD, Y_COORD_CD\"" 1,
+      "\"AGE_GROUP, ARREST_BORO, ARREST_KEY\"" 1,
+      "\"LAT, LONG, rows\"" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? false,
+     :commons {6 148, 2 100, 12 90},
+     :cardinality 1}},
+   :rowcount 471},
+  :offense_codes
+  {:fields
+   {:CODE
+    {:data-type "integer",
+     :distinct 389,
+     :group-by? true,
+     :commons {2605 2, 2204 2, 2660 2},
+     :cardinality 77},
+    :NAME
+    {:data-type "string",
+     :distinct 435,
+     :group-by? true,
+     :commons
+     {"MANSLAUGHTER - NON-VEHICLE - NEGLIGENCE" 2,
+      "M/V - LEAVING SCENE - PROPERTY DAMAGE" 2,
+      "BIOLOGICAL THREATS" 2},
+     :cardinality 87}},
+   :rowcount 500},
+  :offenses
+  {:fields
+   {:SHOOTING
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :DISTRICT
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"C11" 82, "B2" 75, "B3" 49},
+     :cardinality 2},
+    :INCIDENT_NUMBER
+    {:data-type "string",
+     :distinct 454,
+     :group-by? true,
+     :commons {"I182070397" 5, "I182070779" 4, "I182070889" 3},
+     :cardinality 90},
+    :OFFENSE_DESCRIPTION
+    {:data-type "string",
+     :distinct 89,
+     :group-by? true,
+     :commons
+     {"SICK/INJURED/MEDICAL - PERSON" 43,
+      "VERBAL DISPUTE" 34,
+      "INVESTIGATE PERSON" 33},
+     :cardinality 17},
+    :DAY_OF_WEEK
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"0001-01-07" 228, "0001-01-08" 178, "0001-01-06" 75},
+     :cardinality 1},
+    :MONTH
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {9 477, 8 21, 7 1},
+     :cardinality 0},
+    :YEAR
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {2018 500},
+     :cardinality 0},
+    :HOUR
+    {:data-type "integer",
+     :distinct 24,
+     :group-by? true,
+     :commons {18 45, 14 33, 20 32},
+     :cardinality 4},
+    :STREET
+    {:data-type "string",
+     :distinct 275,
+     :group-by? true,
+     :commons {nil 41, "WASHINGTON ST" 20, "HUNTINGTON AVE" 12},
+     :cardinality 55},
+    :OFFENSE_CODE_GROUP
+    {:data-type "string",
+     :distinct 41,
+     :group-by? true,
+     :commons
+     {"Motor Vehicle Accident Response" 69,
+      "Medical Assistance" 50,
+      "Larceny" 41},
+     :cardinality 8},
+    :UCR_PART
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"Part Three" 265, "Part Two" 140, "Part One" 93},
+     :cardinality 0},
+    :Long
+    {:data-type "float",
+     :distinct 413,
+     :group-by? true,
+     :commons {-1 6, -71.1136693 5, nil 5},
+     :cardinality 82},
+    :REPORTING_AREA
+    {:data-type "integer",
+     :distinct 282,
+     :group-by? true,
+     :commons {nil 42, 519 6, 177 5},
+     :cardinality 56},
+    :Location
+    {:data-type "string",
+     :distinct 413,
+     :group-by? true,
+     :commons
+     {"(-1.00000000, -1.00000000)" 6,
+      "(0.00000000, 0.00000000)" 5,
+      "(42.24635332, -71.11366930)" 5},
+     :cardinality 82},
+    :OFFENSE_CODE
+    {:data-type "integer",
+     :distinct 89,
+     :group-by? true,
+     :commons {3006 43, 3301 34, 3115 33},
+     :cardinality 17},
+    :Lat
+    {:data-type "float",
+     :distinct 413,
+     :group-by? true,
+     :commons {-1 6, 42.24635332 5, nil 5},
+     :cardinality 82},
+    :OCCURRED_ON_DATE
+    {:data-type "string",
+     :distinct 404,
+     :group-by? true,
+     :commons
+     {"2018-09-02 00:00:00.000000" 5,
+      "2018-09-03 10:00:00.000000" 5,
+      "2018-09-01 17:03:00.000000" 5},
+     :cardinality 80}},
+   :rowcount 500},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "ClickHouse" 1},
+     :cardinality 36},
+    :connection_id
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "clickhouse-test" 1},
+     :cardinality 100}},
+   :rowcount 11},
+  :nypd_arrest_data
+  {:fields
+   {:ARREST_BORO
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"M" 145, "K" 139, "Q" 113},
+     :cardinality 0},
+    :ARREST_KEY
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {9930213 1, 9930214 1, 9930032 1},
+     :cardinality 100},
+    :PD_DESC
+    {:data-type "string",
+     :distinct 59,
+     :group-by? true,
+     :commons
+     {"ASSAULT 3" 53,
+      "INTOXICATED DRIVING,ALCOHOL" 39,
+      "WEAPONS POSSESSION 3" 30},
+     :cardinality 11},
+    :LAT
+    {:data-type "float",
+     :distinct 390,
+     :group-by? true,
+     :commons
+     {40.77485969700007 8, 40.81353554800006 6, 40.88179268700002 5},
+     :cardinality 77},
+    :KY_CD
+    {:data-type "integer",
+     :distinct 39,
+     :group-by? true,
+     :commons {344 65, 359 46, 235 40},
+     :cardinality 7},
+    :LAW_CAT_CD
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"M" 311, "F" 151, "V" 32},
+     :cardinality 0},
+    :AGE_GROUP
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"25-44" 241, "18-24" 170, "45-64" 59},
+     :cardinality 0},
+    :JURISDICTION_CODE
+    {:data-type "integer",
+     :distinct 8,
+     :group-by? true,
+     :commons {0 423, 2 59, 1 9},
+     :cardinality 1},
+    :LAW_CODE
+    {:data-type "string",
+     :distinct 107,
+     :group-by? true,
+     :commons {"PL 1200001" 53, "PL 2211001" 26, "VTL11920M2" 24},
+     :cardinality 21},
+    :PERP_SEX
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"M" 435, "F" 65},
+     :cardinality 0},
+    :Y_COORD_CD
+    {:data-type "float",
+     :distinct 389,
+     :group-by? true,
+     :commons {221583 8, 235688 6, 260565 5},
+     :cardinality 77},
+    :PD_CD
+    {:data-type "integer",
+     :distinct 60,
+     :group-by? true,
+     :commons {101 53, 905 33, 793 30},
+     :cardinality 11},
+    :ARREST_DATE
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"01/01/2006" 498, "01/02/2006" 2},
+     :cardinality 0},
+    :X_COORD_CD
+    {:data-type "float",
+     :distinct 387,
+     :group-by? true,
+     :commons {1002577 8, 1016142 6, 1021937 5},
+     :cardinality 77},
+    :LONG_LAT
+    {:data-type "string",
+     :distinct 390,
+     :group-by? true,
+     :commons
+     {"POINT (-73.933831684 40.77485969700007)" 8,
+      "POINT (-73.88478821899997 40.81353554800006)" 6,
+      "POINT (-73.86371337599996 40.88179268700002)" 5},
+     :cardinality 77},
+    :OFNS_DESC
+    {:data-type "string",
+     :distinct 35,
+     :group-by? true,
+     :commons
+     {"ASSAULT 3 & RELATED OFFENSES" 65,
+      "DANGEROUS DRUGS" 54,
+      "DANGEROUS WEAPONS" 48},
+     :cardinality 7},
+    :LONG
+    {:data-type "float",
+     :distinct 390,
+     :group-by? true,
+     :commons
+     {-73.93383168399998 8,
+      -73.88478821899997 6,
+      -73.86371337599996 5},
+     :cardinality 77},
+    :ARREST_PRECINCT
+    {:data-type "integer",
+     :distinct 70,
+     :group-by? true,
+     :commons {114 24, 73 19, 9 17},
+     :cardinality 14},
+    :PERP_RACE
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"BLACK" 238, "WHITE HISPANIC" 132, "WHITE" 65},
+     :cardinality 1}},
+   :rowcount 500},
+  :reco-counts
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"nypd_arrest_data_drag_9" 1, "ARREST_BORO_drag_37" 1},
+     :cardinality 100},
+    :cnt
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {2987 1, 26 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :kit-results-sys {:fields {}, :rowcount 0}},
+ :default-col-widths
+ {:block-3405 {:nypd-arrest-data-drag-14 100},
+  :block-4301 {:rowcnt-drag-31 161},
+  :block-5885 {:query-3741 211},
+  :block-325 {:PERP-SEX-drag-40 361},
+  :block-6685 {:rowcnt-drag-44 161},
+  :block-2377 {:query-9160 105},
+  :block-7680 {:offenses-drag-17 100},
+  :system-connections-list* {:connections-sys 111},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-860 {:rowcnt-drag-36 161},
+  :block-7851 {:query-6920 211},
+  :block-1030 {:ARREST-BORO-drag-37 180},
+  :block-11793 {:STREET-drag-11 180},
+  :block-6471 {:ARREST-BORO-drag-21 180},
+  :block-984 {:OFFENSE-CODE-GROUP-drag-40 100},
+  :block-7460 {:nypd-arrest-data-drag-22 100},
+  :block-9976 {:nypd-arrest-data-drag-9 100},
+  :block-6800 {:offenses-drag-9 103},
+  :system-tables-list* {:tables-sys 137},
+  :block-10504 {:offense-codes-drag-1 105},
+  :block-4591 {:rowcnt-drag-41 161}},
+ :data-hash -2099425190,
+ :tabs ["making data fun again"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/winter-theme.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"},
+    :outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn
+     (rabbit-kit-outliers.core/get-outliers
+       :query-name
+       :panel-name
+       :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description
+     "WIP: basic timeseries forecasting based on previous values",
+     :fn
+     (rabbit-kit-outliers.core/get-forecast
+       :query-name
+       :panel-name
+       :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1}},
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "asdasdasdasd"
+    "autumn-theme"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "boston-test-10-3-23"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "chaos simple"
+    "chaos-views"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "fake-books-1"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "glass-fish-board-test"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "night-city-never-sleeps"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "recharts-test-blocks"
+    "refresh-test"
+    "tallica-param-test2"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-ne"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "wow-board"],
+   :openapi-key
+   "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"}},
+ :editor? true,
+ :buffy? false,
+ :status-data
+ {"kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :lucky-slate-gray-gerbil-banned-from-horst,
+      :at "2024-01-09 00:06:43",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-01-09 00:06:43 - query ran in 213 ms."],
+          :name "query-log-:gen-viz-980",
+          :order 1704776803,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:gen-viz-980",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:gen-viz-980 "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2024-01-09 00:43:10",
+      :payload nil,
+      :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :file-change
+  {:file-changed
+   {:data
+    [{:path
+      "./live/lucky-slate-gray-gerbil-banned-from-horst/making data fun again/block-2377/block-2377.edn",
+      :type :modify,
+      :panel-key :block-2377,
+      :block-data
+      {:name "block-2377",
+       :w 5,
+       :selected-view :query-9160,
+       :root [32 2],
+       :h 4,
+       :connection-id "clickhouse-test",
+       :tab "making data fun again",
+       :views
+       {:stack
+        [:layout
+         {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}],
+        :hi
+        [:box
+         :align
+         :center
+         :justify
+         :center
+         :attr
+         {:id ":block-2377.:hi"}
+         :style
+         {:font-size "106px",
+          :font-weight 700,
+          :padding-top "6px",
+          :padding-left "14px",
+          :margin-top "-8px",
+          :color :theme/editor-outer-rim-color,
+          :font-family :theme/base-font}
+         :child
+         "hi!"]}}}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :reco
+  {:ARREST-BORO-drag-37
+   {:data [[:reco-status :ARREST-BORO-drag-37] 26],
+    :elapsed-ms 1607,
+    :reco-count 26},
+   :nypd-arrest-data-drag-9
+   {:data [[:reco-status :nypd-arrest-data-drag-9] 2987],
+    :elapsed-ms 8115,
+    :reco-count 2987}}},
+ :re-pressed.core/keydown
+ {:keys
+  [{:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 65}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 115}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 115}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}],
+  :event-keys
+  [[[:viz-yard.bricks/esc-unselect-current] [{:keyCode 27}]]
+   [[:viz-yard.bricks/redo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey true}]]
+   [[:viz-yard.bricks/undo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey false}]]
+   [[:viz-yard.bricks/toggle-buffy]
+    [{:keyCode 32, :shiftKey true, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-editor]
+    [{:keyCode 32, :shiftKey false, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-flow]
+    [{:keyCode 32, :shiftKey false, :ctrlKey true}]]
+   [[:viz-yard.bricks/next-panel] [{:keyCode 9}]]
+   [[:viz-yard.bricks/toggle-peek] [{:keyCode 80}]]
+   [[:viz-yard.bricks/toggle-lines] [{:keyCode 76}]]
+   [[:viz-yard.bricks/toggle-auto-run] [{:keyCode 79}]]
+   [[:viz-yard.bricks/delete-selected-panel]
+    [{:keyCode 46, :shiftKey true}]]
+   [[:viz-yard.bricks/cycle-column-select false] [{:keyCode 81}]]
+   [[:viz-yard.bricks/cycle-column-select true] [{:keyCode 69}]]
+   [[:viz-yard.audio/start-recording] [{:keyCode 84}]]
+   [[:viz-yard.audio/stop-recording] [{:keyCode 89}]]
+   [[:viz-yard.bricks/stretch-panel :wider]
+    [{:keyCode 68, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :longer]
+    [{:keyCode 83, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :narrower]
+    [{:keyCode 65, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :shorter]
+    [{:keyCode 87, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-up] [{:keyCode 82, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-down]
+    [{:keyCode 70, :shiftKey true}]]
+   [[:viz-yard.bricks/nudge-panel :up] [{:keyCode 87}]]
+   [[:viz-yard.bricks/nudge-panel :down] [{:keyCode 83}]]
+   [[:viz-yard.bricks/nudge-panel :left] [{:keyCode 65}]]
+   [[:viz-yard.bricks/nudge-panel :right] [{:keyCode 68}]]],
+  :clear-keys nil,
+  :always-listen-keys nil,
+  :prevent-default-keys
+  [{:keyCode 32}
+   {:keyCode 46, :shiftKey true}
+   {:keyCode 83, :ctrlKey true}
+   {:keyCode 9}
+   {:keyCode 70, :ctrlKey true}]},
+ :flow-subs [],
+ :client-name :lucky-slate-gray-gerbil-banned-from-horst,
+ :openai-api-key "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",
+ :window {:w 1906, :h 1072},
+ :post-meta {},
+ :status
+ {"kick-test!" {:kick :gen-viz-980},
+  :heartbeat {:kick []},
+  :file-change {:file-changed :done},
+  :reco {:ARREST-BORO-drag-37 :done, :nypd-arrest-data-drag-9 :done}},
+ :screen-name "sizzle-board-1",
+ :recos-page2 0,
+ :selected-tab "making data fun again",
+ :col-names nil,
+ :snapshots {:params {}},
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :recos-page 0,
+ :re-pollsive.core/polling
+ {:rules
+  [{:interval 10,
+    :event [:viz-yard.bricks/dispatch-auto-queries],
+    :poll-when [:viz-yard.bricks/auto-run-and-connected?],
+    :dispatch-event-on-start? false}
+   {:interval 5,
+    :event [:viz-yard.bricks/update-metadata],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 120,
+    :event [:viz-yard.bricks/clean-up-reco-previews],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 1,
+    :event [:viz-yard.bricks/sub-to-flows],
+    :poll-when [:viz-yard.bricks/new-flow-subs?],
+    :dispatch-event-on-start? false}
+   {:interval 1000,
+    :event [:viz-yard.bricks/update-metadata-tabs],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 1,
+    :event [:viz-yard.bricks/update-conditionals],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 4,
+    :event [:viz-yard.bricks/refresh-status],
+    :poll-when [:viz-yard.bricks/bg-status?],
+    :dispatch-event-on-start? false}],
+  :counter 4928},
+ :base-sniff-queries
+ {:offenses -505802446,
+  :offense_codes -1076692702,
+  :nypd_arrest_data -1837799805},
+ :panels-hash 1110689276,
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :websocket-fx.core/sockets
+ {:default
+  {:status :connected,
+   :options
+   {:url "ws://localhost:3030/ws",
+    :format :edn,
+    :on-disconnect
+    [:websocket-fx.core/unsubscribe :default :server-push2],
+    :on-connect
+    [:websocket-fx.core/subscribe
+     :default
+     :server-push2
+     {:message
+      {:kind :server-push2,
+       :client-name :lucky-slate-gray-gerbil-banned-from-horst,
+       :ui-keypath [:server],
+       :extras {:hello? true}},
+      :on-message [:viz-yard.http/simple-response]}]},
+   :requests {},
+   :subscriptions
+   {:server-push2
+    {:message
+     {:kind :server-push2,
+      :client-name :lucky-slate-gray-gerbil-banned-from-horst,
+      :ui-keypath [:server],
+      :extras {:hello? true}},
+     :on-message [:viz-yard.http/simple-response]}}}},
+ :grid-recos? true,
+ :preview-keys2 ["-1464758740" "1982095538" "1792279844" "1545845059"],
+ :panels
+ {:queries {{:select [["heya, friendo"] :greetings]} {:view nil}},
+  :views
+  {[:box "heya" :size "auto" :style {:font-size "22px"}] {:view nil}}},
+ :selected-block "none!",
+ :click-param
+ {:flow-fn-sys
+  {:name ":clojure-string-join",
+   :full_map
+   "{:description \"Clojure.string's join function.\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :inputs [:delimiter], :required [:delimiter], :defaults {:delimiter \" \"}, :expandable? true, :icon \"zmdi-group\", :types {:delimiter :string, :out :string}}",
+   :description "Clojure.string's join function.",
+   :inputs "[:delimiter]",
+   :icon "zmdi-group",
+   :input_types "[:string]",
+   :output_types ":string",
+   :category ":clojure-base"},
+  :blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 27,
+   :block_data
+   "{:codemirror-theme \"the-matrix\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#091536\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b0f2180\", :editor-rim-color \"#2b4270\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2c728e\", \"boolean\" \"#f386bf\", \"map\" \"#00FFFF\", \"list\" \"#c32148\", \"string\" \"#7de883\", \"vector\" \"#008080\", \"keyword\" \"#add8e6\", \"rabbit-code\" \"#FC0FC0\", \"datetime\" \"#472d7b\", \"integer\" \"#d6e367\", \"unknown\" \"#c7005d\", \"date\" \"#3b528b\", \"nil\" \"#ff2147\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#8879bc\", :nivo-defaults {:font-family :theme/base-font, :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family :theme/base-font, :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family :theme/base-font, :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#40d6ff\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/vap66-huge.png)\", :transition \"all 0.6s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Nova Square\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :kit-query-18989472110-agg nil,
+  :query-9160 {:PERP_SEX "F", :rowcnt 221755},
+  :tables-sys
+  {:db_schema "default",
+   :db_catalog "default",
+   :connection_id "clickhouse-test",
+   :schema_cat "default/default",
+   :table_name "nypd_arrest_data",
+   :fields 20},
+  :kit-query--14203030730-agg
+  {:UCR_PART nil, :rows 90, :styler_highlight_group 0},
+  :OFFENSE-CODE-GROUP-drag-40 nil,
+  :kick--1310980509 nil,
+  :kit-query--6830423270-agg nil,
+  :PERP-SEX-drag-40 {:PERP_SEX "M", :rowcnt 4573998},
+  :kick--979571925 nil,
+  :user-sys nil,
+  :offenses-drag-9 nil,
+  :flows-sys
+  {:flow_id "python-test-1",
+   :file_path "./flows/python-test-1.edn",
+   :last_modified "2024-01-03 00:43:05"},
+  :files-sys
+  {:file_path "./screens/winter-theme2.edn",
+   :screen_name "winter-theme2",
+   :blocks 11,
+   :queries 3,
+   :ts "2023-12-07 07:57:47"},
+  :chat-drag-23 {:YEAR 2017, :rows 734, :styler_highlight_group 0},
+  :offenses-drag-17
+  {:SHOOTING nil,
+   :DISTRICT "C11",
+   :INCIDENT_NUMBER "I182070943",
+   :OFFENSE_DESCRIPTION "VANDALISM",
+   :DAY_OF_WEEK "0001-01-02",
+   :MONTH 8,
+   :YEAR 2018,
+   :HOUR 0,
+   :STREET "HECLA ST",
+   :OFFENSE_CODE_GROUP "Vandalism",
+   :UCR_PART "Part Two",
+   :Long -71.06030035,
+   :REPORTING_AREA 347,
+   :Location "(42.30682138, -71.06030035)",
+   :OFFENSE_CODE 1402,
+   :Lat 42.30682138,
+   :OCCURRED_ON_DATE "2018-08-21 00:00:00.000000"},
+  :viz-tables-sys2 {:table_name :nypd-arrest-data-drag-9},
+  :STREET-drag-11 {:STREET "BLUE HILL AVE", :rowcnt 7794},
+  :ufo-sightings-drag-22
+  {:duration_seconds_int 900,
+   :comments
+   "AS a Marine 1st Lt. flying an FJ4B fighter/attack aircraft on a solo night exercise&#44 I was at 50&#44000&#39 in a &quot;clean&quot; aircraft (no ordinan",
+   :city "kaneohe",
+   :date_posted "2004-01-22",
+   :longitude -157.8036111,
+   :state "hi",
+   :duration_seconds "900",
+   :duration_hours "15 minutes",
+   :id 5,
+   :shape "light",
+   :datetime "1960-10-10 20:00:00.000000",
+   :latitude "21.4180556",
+   :country "us"},
+  :query-9160.* {:PERP_SEX ["F"]},
+  :param
+  {:keys 123,
+   :keys2 [3 4 5],
+   :string "this is string",
+   :bools true,
+   :offense "VANDALISM",
+   :float 324.444},
+  :theme
+  {:codemirror-theme "blackboard",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header
+    {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#091536",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#0b0f2180",
+   :editor-rim-color "#2b4270",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#2c728e",
+    "boolean" "#f386bf",
+    "map" "#00FFFF",
+    "list" "#c32148",
+    "string" "#7de8b9",
+    "rowset" "#DAF7A6",
+    "any" "#c3ec52",
+    "vector" "#008080",
+    "keyword" "#add8e6",
+    "rabbit-code" "#FC0FC0",
+    "datetime" "#472d7b",
+    "integer" "#12e3ff",
+    "unknown" "#ffcf99",
+    "date" "#3b528b",
+    "rabbitsql" "#FC0FC0",
+    "nil" "#eeeeee"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#8879bc",
+   :nivo-defaults
+   {:font-family :theme/base-font,
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family :theme/base-font,
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family :theme/base-font,
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"},
+      :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid
+    {:line
+     {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#40d6ff",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/yvette56-localup2.png)",
+    :transition "all 0.6s ease-in-out",
+    :background-blend-mode "normal",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Alata",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
+  :kick--1668167951 nil,
+  :kit-query--10577285230-agg nil,
+  :nypd-arrest-data-drag-14
+  {:ARREST_BORO "K",
+   :ARREST_KEY 9926904,
+   :PD_DESC "MARIJUANA, POSSESSION 4 & 5",
+   :LAT 40.66095619600002,
+   :KY_CD 235,
+   :LAW_CAT_CD "M",
+   :AGE_GROUP "18-24",
+   :JURISDICTION_CODE 0,
+   :LAW_CODE "PL 2211001",
+   :PERP_SEX "M",
+   :Y_COORD_CD 180080,
+   :PD_CD 567,
+   :ARREST_DATE "01/01/2006",
+   :X_COORD_CD 995164,
+   :LONG_LAT "POINT (-73.96066365499998 40.66095619600002)",
+   :OFNS_DESC "DANGEROUS DRUGS",
+   :LONG -73.96066365499998,
+   :ARREST_PRECINCT 71,
+   :PERP_RACE "BLACK"},
+  :connections-sys
+  {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+  :kit-query-20835852960-agg nil,
+  :narratives
+  {:base>narrative-22>theme :cyberpunk,
+   :base>narrative-22>craps "#ffffff",
+   :base>narrative-22>floatss 123.4,
+   :base>narrative-1>floaty 123.4,
+   :base>narrative-1>stuff1 "some stuff!",
+   :base>narrative-22>namer "some stuff!",
+   :base>narrative-22>vibes? true,
+   :base>narrative-22>gopv ["test" "test3" "test4"],
+   :base>narrative-22>mappy {:map 34}},
+  :nypd-arrest-data-drag-9 nil,
+  :kits-sys
+  {:enabled [[:query-basics-1 :buffy] [:query-basics-1 :outliers]]}},
+ :selected-flow "live-scratch-flow"}

@@ -1,0 +1,84 @@
+{:flowmaps
+ {:+
+  {:w 200,
+   :h 100,
+   :x 1563.561889648437,
+   :y 1209.5341612119933,
+   :z 0,
+   :data
+   {:flow-item
+    {:description "Clojure add function.",
+     :category ":clojure-base",
+     :name ":+",
+     :icon "zmdi-plus",
+     :types
+     {:value1 [:integer :float],
+      :value2 [:integer :float],
+      :out :integer},
+     :input_types "[[:integer :float] [:integer :float]]",
+     :inputs [:value1 :value2],
+     :output_types ":integer",
+     :full_map
+     "{:description \"Clojure add function.\", :view (fn [_]), :fn +, :inputs [:value1 :value2], :icon \"zmdi-plus\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :integer}}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [706.6666717529297 211.5],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-4
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :aa411]],
+      :where [:= :name ":+"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":+",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :where,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 3}},
+   :icon "zmdi-plus",
+   :ports
+   {:in {:value1 [:integer :float], :value2 [:integer :float]},
+    :out {:out :integer}}},
+  :open-input
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 12333},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 1304.871935045397,
+   :y 1151.8276974239864},
+  :open-input-1
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 234333},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 1308.6251022751262,
+   :y 1290.7428552576011},
+  :open-input-2
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input "TOUGH CALLS!"},
+   :z 0,
+   :ports {:out {:out :string}},
+   :x 1836.2201883567955,
+   :y 1175.147307389937}},
+ :flow-id "live-scratch-flow",
+ :flowmaps-connections
+ [[:open-input :+/value1] [:open-input-1 :+/value2] [:+ :done]]}

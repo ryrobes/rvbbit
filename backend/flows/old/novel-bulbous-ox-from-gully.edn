@@ -1,0 +1,134 @@
+{:flowmaps
+ {:step1
+  {:y 1414.504295305854,
+   :sub-flow
+   {:flow-id "step1",
+    :file-path "./flows/positive-carmine-hog-of-the-side-valley.edn",
+    :map
+    {:+
+     {:w 200,
+      :h 100,
+      :x 1426.5692742695571,
+      :y 1359.038642789821,
+      :z 0,
+      :data
+      {:flow-item
+       {:description "Clojure add function.",
+        :category ":clojure-base",
+        :name ":+",
+        :icon "zmdi-plus",
+        :types
+        {:value1 [:integer :float],
+         :value2 [:integer :float],
+         :out [:integer :float]},
+        :input_types "[[:integer :float] [:integer :float]]",
+        :inputs [:value1 :value2],
+        :output_types "[:integer :float]",
+        :full_map
+        "{:description \"Clojure add function.\", :view (fn [_]), :fn +, :inputs [:value1 :value2], :icon \"zmdi-plus\", :types {:value1 [:integer :float], :value2 [:integer :float], :out [:integer :float]}}"},
+       :name "drag-from-",
+       :w 5,
+       :source-panel :flow-fn-list*,
+       :root [596 209],
+       :h 6,
+       :connection-id nil,
+       :queries
+       {:name-drag-4
+        {:select
+         [:name
+          :full_map
+          :description
+          :inputs
+          :icon
+          :input_types
+          :output_types
+          :category],
+         :from [[:query/flow-fn-sys :ii499]],
+         :where [:= :name ":+"]}},
+       :drag-meta
+       {:data-type "string",
+        :source-query :flow-fn-sys,
+        :param-full ":+",
+        :param-field :name,
+        :source-panel-key :flow-fn-list*,
+        :type :where,
+        :param-table :flow-fn-sys,
+        :source-table :query/flow-fn-sys,
+        :connection-id nil,
+        :target :name,
+        :row-num 11}},
+      :icon "zmdi-plus",
+      :ports
+      {:in {:value1 [:integer :float], :value2 [:integer :float]},
+       :out {:out [:integer :float]}}},
+     :open-input
+     {:w 200,
+      :h 60,
+      :data {:drag-meta {:type :open-block}, :user-input 123},
+      :z 0,
+      :ports {:out {:out :integer}},
+      :x 1070.9453521901582,
+      :y 1308.4623894213728},
+     :open-input-1
+     {:w 200,
+      :h 60,
+      :data {:drag-meta {:type :open-block}, :user-input 555},
+      :z 0,
+      :ports {:out {:out :integer}},
+      :x 1046.9263775254017,
+      :y 1486.4883105561053}},
+    :connections
+    [[:open-input :+/value1] [:open-input-1 :+/value2] [:+ :done]]},
+   :w 200,
+   :icon "zmdi-puzzle-piece",
+   :z 0,
+   :ports
+   {:in {:open-input :integer, :open-input-1 :integer},
+    :out {:out [:integer :float]}},
+   :h 100,
+   :file-path "./flows/positive-carmine-hog-of-the-side-valley.edn",
+   :x 1399.561550205281,
+   :data
+   {:flow-item nil,
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-list*,
+    :root [675 197],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:flow-id-drag-22
+     {:select [:flow_id :file_path :last_modified],
+      :from [[:query/flows-sys :dd799]],
+      :where [:= :flow_id "step1"]}},
+    :drag-meta
+    {:data-type "string",
+     :done-block :+,
+     :source-query :flows-sys,
+     :param-full "step1",
+     :param-field :flow_id,
+     :source-panel-key :flow-list*,
+     :type :sub-flow,
+     :param-table :flows-sys,
+     :source-table :query/flows-sys,
+     :connection-id nil,
+     :target :flow_id,
+     :row-num 0}}},
+  :open-input
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 777},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 980.7598837724478,
+   :y 1333.3688141042205},
+  :open-input-1
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 777},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 971.305607296343,
+   :y 1486.4903585221227}},
+ :flow-id "step2",
+ :flowmaps-connections [[:open-input :step1/open-input] [:step1 :done]]}

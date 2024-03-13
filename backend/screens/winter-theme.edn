@@ -1,0 +1,2488 @@
+{:orders
+ {:fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema
+   :db_catalog
+   :connection_id
+   :schema_cat
+   :table_name
+   :fields],
+  :tmp--626210007-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :bigfoot-sightings-drag-32
+  [:alsonoticed
+   :bfroid
+   :class
+   :county
+   :date
+   :environment
+   :fixed_month
+   :fixed_year
+   :locationdetails
+   :month
+   :nearestroad
+   :nearesttown
+   :observed
+   :otherstories
+   :otherwitnesses
+   :run_id
+   :run_time
+   :season
+   :sketch
+   :state
+   :submitted
+   :submitted_date
+   :timeandconditions
+   :title
+   :url
+   :year],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :bigfoot_sightings
+  [:bfroid
+   :submitted
+   :submitted_date
+   :title
+   :class
+   :month
+   :fixed_month
+   :date
+   :year
+   :fixed_year
+   :season
+   :state
+   :county
+   :locationdetails
+   :nearesttown
+   :nearestroad
+   :observed
+   :alsonoticed
+   :otherwitnesses
+   :otherstories
+   :timeandconditions
+   :environment
+   :url
+   :run_id
+   :run_time
+   :sketch],
+  :connections-sys [:database_name :connection_id],
+  :reco-counts [:table_name :cnt],
+  :tmp-1816643893-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :kit-results-sys
+  [:id
+   :item_hash
+   :item_name
+   :kit_name
+   :item_type
+   :item_key
+   :item_idx
+   :item_options
+   :item_data
+   :client_name
+   :flow_id
+   :updated]},
+ :reco-preview nil,
+ :sql-source
+ {:bigfoot_sightings
+  {:select [:*], :from [:bigfoot_sightings], :limit 111},
+  :bigfoot-sightings-drag-32
+  {:select
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :date
+    :environment
+    :fixed_month
+    :fixed_year
+    :locationdetails
+    :month
+    :nearestroad
+    :nearesttown
+    :observed
+    :otherstories
+    :otherwitnesses
+    :run_id
+    :run_time
+    :season
+    :sketch
+    :state
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :year],
+   :from [[:bigfoot_sightings :xx922]]}},
+ :meta
+ {:fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 26,
+     :group-by? true,
+     :commons {"submitted_date" 1, "nearestroad" 1, "observed" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"DATE" 3, "DECIMAL" 2, "TIMESTAMP" 2},
+     :cardinality 80},
+    :data_type
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"string" 18, "date" 3, "datetime" 2},
+     :cardinality 19}},
+   :rowcount 26},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 9},
+     :cardinality 11},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 9},
+     :cardinality 11},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"bigfoot-ufos" 9},
+     :cardinality 11},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 9},
+     :cardinality 11},
+    :table_name
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"us_states" 1, "ufo_sightings_vw" 1, "test_me" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? false,
+     :commons {42 1, 14 1, 11 1},
+     :cardinality 100}},
+   :rowcount 9},
+  :tmp--626210007-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-5036 :base]" 9},
+     :cardinality 11},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 9},
+     :cardinality 11},
+    :updated
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons
+     {"2024-01-22 19:26:32" 3,
+      "2024-01-22 18:20:39" 1,
+      "2024-01-22 18:24:29" 1},
+     :cardinality 77},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":base" 9},
+     :cardinality 11},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-5036" 9},
+     :cardinality 11},
+    :diff_kp
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"([:views :new-view 1] [:views :new-view 0] [:views :new-view] [:views :vv 1] [:views :vv 0] [:views :vv] [:views] [:ghosted?] [:minimized?] [:tab] [:h] [:root 1] [:root 0] [:root] [:selected-view] [:style :background-color] [:style :background-size] [:style :background-blend-mode] [:style :background-image] [:style] [:w] [:name] [:pinned?])"
+      4,
+      "()" 2,
+      "([:root 0] [:root])" 2},
+     :cardinality 44},
+    :client_name
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {":energetic-square-goat-banned-from-diatreme" 6,
+      ":constant-triangular-coyote-of-the-swamp" 1,
+      ":accepted-green-heron-of-the-lavaka" 1},
+     :cardinality 44},
+    :pre_data
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"nil" 4,
+      "{:pinned? false, :name \"scarlet walrus\", :w 11, :style {:background-image \"url(images/cozy-winter-streets.png)\", :background-blend-mode \"hard-light\", :background-size \"cover\", :background-color \"#00000099\"}, :selected-view :vv, :root [22 2], :h 6, :tab \"winter-wonder-lands\", :minimized? false, :ghosted? false, :views {:vv [:grid \"scarlet walrus\"], :new-view [:grid \"bulbous elephant\"]}}"
+      2,
+      "{:pinned? false, :name \"scarlet walrus\", :w 11, :style {:background-image \"url(images/cozy-winter-streets.png)\", :background-blend-mode \"hard-light\", :background-size \"cover\", :background-color \"#00000099\"}, :selected-view :vv, :root [14 4], :h 6, :tab \"winter-wonder-lands\", :minimized? false, :ghosted? false, :views {:vv [:grid \"scarlet walrus\"], :new-view [:grid \"bulbous elephant\"]}}"
+      1},
+     :cardinality 55},
+    :diff
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"{:pinned? false, :name \"scarlet walrus\", :w 11, :style {:background-image \"url(images/cozy-winter-streets.png)\", :background-blend-mode \"hard-light\", :background-size \"cover\", :background-color \"#00000099\"}, :selected-view :vv, :root [14 4], :h 6, :tab \"winter-wonder-lands\", :minimized? false, :ghosted? false, :views {:vv [:grid \"scarlet walrus\"], :new-view [:grid \"bulbous elephant\"]}}"
+      4,
+      "nil" 2,
+      "{:root [22]}" 2},
+     :cardinality 44},
+    :data
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"{:pinned? false, :name \"scarlet walrus\", :w 11, :style {:background-image \"url(images/cozy-winter-streets.png)\", :background-blend-mode \"hard-light\", :background-size \"cover\", :background-color \"#00000099\"}, :selected-view :vv, :root [14 4], :h 6, :tab \"winter-wonder-lands\", :minimized? false, :ghosted? false, :views {:vv [:grid \"scarlet walrus\"], :new-view [:grid \"bulbous elephant\"]}}"
+      4,
+      "{:pinned? false, :name \"scarlet walrus\", :w 11, :style {:background-image \"url(images/cozy-winter-streets.png)\", :background-blend-mode \"hard-light\", :background-size \"cover\", :background-color \"#00000099\"}, :selected-view :vv, :root [22 2], :h 6, :tab \"winter-wonder-lands\", :minimized? false, :ghosted? false, :views {:vv [:grid \"scarlet walrus\"], :new-view [:grid \"bulbous elephant\"]}}"
+      3,
+      "{:pinned? false, :name \"scarlet walrus\", :w 11, :style {:background-image \"url(images/cozy-winter-streets.png)\", :background-blend-mode \"hard-light\", :background-size \"cover\", :background-color \"#00000099\"}, :selected-view :vv, :root [22 4], :h 6, :tab \"winter-wonder-lands\", :minimized? false, :ghosted? false, :views {:vv [:grid \"scarlet walrus\"], :new-view [:grid \"bulbous elephant\"]}}"
+      1},
+     :cardinality 44}},
+   :rowcount 9},
+  :bigfoot-sightings-drag-32
+  {:fields
+   {:nearestroad
+    {:data-type "string",
+     :distinct 373,
+     :group-by? true,
+     :commons {nil 81, "Highway 108" 11, "285" 5},
+     :cardinality 74},
+    :date
+    {:data-type "string",
+     :distinct 165,
+     :group-by? true,
+     :commons {nil 188, "1" 16, "15" 11},
+     :cardinality 33},
+    :locationdetails
+    {:data-type "string",
+     :distinct 431,
+     :group-by? true,
+     :commons
+     {nil 69,
+      "Take Highway 108 to Cold Springs." 2,
+      "It was about 50 yards north-west of the Giant Forest Museum and about 20 yards north of the Bear Hill Trail."
+      1},
+     :cardinality 86},
+    :submitted_date
+    {:data-type "string",
+     :distinct 455,
+     :group-by? true,
+     :commons {"2001-02-04" 3, "2001-01-02" 3, "2004-01-15" 3},
+     :cardinality 91},
+    :sketch
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 500},
+     :cardinality 0},
+    :bfroid
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {33088 1, 65566 1, 2199 1},
+     :cardinality 100},
+    :otherwitnesses
+    {:data-type "string",
+     :distinct 412,
+     :group-by? true,
+     :commons {nil 65, "No" 6, "no" 5},
+     :cardinality 82},
+    :run_id
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {34 500},
+     :cardinality 0},
+    :nearesttown
+    {:data-type "string",
+     :distinct 377,
+     :group-by? true,
+     :commons {nil 56, "Strawberry" 9, "Leadville" 5},
+     :cardinality 75},
+    :timeandconditions
+    {:data-type "string",
+     :distinct 445,
+     :group-by? true,
+     :commons
+     {nil 55,
+      "late night" 2,
+      "Please see above report for complete details" 1},
+     :cardinality 88},
+    :month
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"0001-08-01" 89, nil 64, "0001-09-01" 60},
+     :cardinality 2},
+    :county
+    {:data-type "string",
+     :distinct 88,
+     :group-by? true,
+     :commons
+     {"Humboldt County" 42,
+      "Tuolumne County" 35,
+      "Siskiyou County" 31},
+     :cardinality 17},
+    :state
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"California" 328, "Colorado" 125, "Florida" 21},
+     :cardinality 1},
+    :fixed_month
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"0001-08-01" 89, "0001-07-01" 81, "0001-09-01" 73},
+     :cardinality 2},
+    :submitted
+    {:data-type "string",
+     :distinct 455,
+     :group-by? true,
+     :commons
+     {"2003-09-26 00:00:00.000000" 3,
+      "2000-10-28 00:00:00.000000" 3,
+      "2001-02-04 00:00:00.000000" 3},
+     :cardinality 91},
+    :title
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"Sightings by hunting guide in Pike National Forest" 1,
+      "Couple Has Frightening Encounter Near Lake Shasta" 1,
+      "Motorist daylight sighting between Redding and Lassen National Forest"
+      1},
+     :cardinality 100},
+    :otherstories
+    {:data-type "string",
+     :distinct 258,
+     :group-by? true,
+     :commons {nil 180, "No" 24, "no" 19},
+     :cardinality 51},
+    :year
+    {:data-type "string",
+     :distinct 104,
+     :group-by? true,
+     :commons {"2001" 29, "2000" 25, "1998" 20},
+     :cardinality 20},
+    :season
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"Summer" 221, "Fall" 129, "Spring" 85},
+     :cardinality 0},
+    :class
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"Class B" 257, "Class A" 238, "Class C" 5},
+     :cardinality 0},
+    :alsonoticed
+    {:data-type "string",
+     :distinct 285,
+     :group-by? true,
+     :commons {nil 202, "no" 7, "No" 4},
+     :cardinality 56},
+    :url
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"http://www.bfro.net/GDB/show_report.asp?id=27966&PrinterFriendly=True"
+      1,
+      "http://www.bfro.net/GDB/show_report.asp?id=596&PrinterFriendly=True"
+      1,
+      "http://www.bfro.net/GDB/show_report.asp?id=1367&PrinterFriendly=True"
+      1},
+     :cardinality 100},
+    :observed
+    {:data-type "string",
+     :distinct 496,
+     :group-by? true,
+     :commons
+     {nil 5,
+      " My uncle and I were elk hunting near Fossil Ridge northeast of Gunnison, CO when this incident ocurred.  It was late afternoon when we noticed a strong odor that we thought might be elk so we headed east toward a small ridge hoping to find one on the other side.  As we got closer we heard the noise of rocks being banged together.  As we topped the ridge we saw a large dark brown animal squatting at the edge of a dry creek bed with it''s back toward us. It was banging 2 rocks together with it''s \"hands\" and making a grunting/growling noise each time the  rocks hit.<BR><BR>It seemed to sense our presence almost immediately and turned around and looked at us.  Then it quickly stood up and jumped across the creek in one motion.  I remember thinking \"nothing can move like that!\".  It ran up the slope on the north side of the creek bed at an angle and disappeared into the pine and aspen trees farther up the hill.  We could see it for about 50 feet before it was gone from sight.  It moved real quietly for something that big.<BR><BR>I estimate it''s height as 6''5''''.  It was covered with long dark brown hair that made me think of a yak.  It had a strong smell, at least there was a strong smell in the area that was like elk urine.<BR><BR>After we calmed down a bit, we went into the creek bed and found the 2 rocks which were chipped and broken.  We looked for other signs in that place but couldn''t find anything else."
+      1,
+      " I was working in the northern part of New Mexico training to be a Wildland Fire Fighter. In September 2003 (maybe the second week of that month) I was dispatched with 22 other people to the Del Loma Fire in the Shasta/Trinity Forest area, the Northern part of California. Each Crew had about 20 people, our plane that left Albuquerque held 2 crews. For almost the whole two weeks, we were all on standby. On the 4th to the last day of our 2 weeks of Fire call, we were setting up camp close to a river, about 5-10 miles out from the original forest fire. It was close to sun down when, a couple of guys were amazed at something. I heard them from inside my tent, but just ignored the whole thing until one of my crew members came and pulled me out of my tent. <BR><BR>I had no idea what I was supposed to be looking at or for. He pointed across the river and I was in shock when he pointed out the biggest, hairiest mammal I had ever seen just walking along the river side minding his own business. It stopped and looked at us. The way he stood on his hind legs was like an ordinary human. He had dark, long hair and stood about 7ft tall with a muscular build. <BR><BR>At this point I was the 4th person standing there in amazement. Maybe about 5 minutes of watching him watch us, with more people coming out with flashlights (because the sun was still going down) he darted in to the trees. He was running, taking long strides, and was gone in about 3 seconds.....and was literally pushing trees out of his way (not breaking them, but  pushing them out of his way). The trees behind him on his path up the mountain were swaying back and forth. I was surprised to see to these trees moving because they are thick in width and very tall. <BR><BR>By this time it was dark but lit enough to see which way he was headed. Up the mountain a little, there was a clearing, where we spotted him again before he disappeared for good. He made no noise, no yelling or screaming. He was just as timid as can be.<BR><BR>I have heard many stories about Bigfoot, and known that they are real but when seeing one in real life....you get a sense of respect for them and just have that feeling that there is more to life than you know. <BR><BR><BR><BR>"
+      1},
+     :cardinality 99},
+    :environment
+    {:data-type "string",
+     :distinct 449,
+     :group-by? true,
+     :commons {nil 41, "Pine forest" 6, "Forest" 3},
+     :cardinality 89},
+    :fixed_year
+    {:data-type "string",
+     :distinct 77,
+     :group-by? true,
+     :commons {"2001" 30, "2000" 25, "1998" 23},
+     :cardinality 15},
+    :run_time
+    {:data-type "string",
+     :distinct 187,
+     :group-by? true,
+     :commons
+     {"2022-05-20 16:15:54.000000" 4,
+      "2022-05-20 16:15:30.000000" 4,
+      "2022-05-20 16:14:33.000000" 4},
+     :cardinality 37}},
+   :rowcount 500},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 47,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
+     :cardinality 95},
+    :file_path
+    {:data-type "string",
+     :distinct 49,
+     :group-by? true,
+     :commons
+     {"./flows/dalle3-create-image-newengland-old.edn" 1,
+      "./flows/hue-change-group-color.edn" 1,
+      "./flows/dalle3-create-image-rvbbit4aa.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 49,
+     :group-by? true,
+     :commons
+     {"2023-12-31 20:10:21" 1,
+      "2024-01-06 18:53:33" 1,
+      "2024-01-19 10:37:23" 1},
+     :cardinality 100}},
+   :rowcount 49},
+  :runstream-chart-simple-python-exec-1
+  {:fields
+   {:elapsed
+    {:data-type "float",
+     :distinct 12,
+     :group-by? false,
+     :commons {71 103, 49 96, 58 81},
+     :cardinality 2},
+    :started
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :ts
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"2024-01-19 15:45:48" 1,
+      "2024-01-19 15:40:59" 1,
+      "2024-01-19 15:48:04" 1},
+     :cardinality 100}},
+   :rowcount 500},
+  :bigfoot_sightings
+  {:fields
+   {:nearestroad
+    {:data-type "string",
+     :distinct 373,
+     :group-by? true,
+     :commons {nil 81, "Highway 108" 11, "285" 5},
+     :cardinality 74},
+    :date
+    {:data-type "string",
+     :distinct 165,
+     :group-by? true,
+     :commons {nil 188, "1" 16, "15" 11},
+     :cardinality 33},
+    :locationdetails
+    {:data-type "string",
+     :distinct 431,
+     :group-by? true,
+     :commons
+     {nil 69,
+      "Take Highway 108 to Cold Springs." 2,
+      "It was about 50 yards north-west of the Giant Forest Museum and about 20 yards north of the Bear Hill Trail."
+      1},
+     :cardinality 86},
+    :submitted_date
+    {:data-type "string",
+     :distinct 455,
+     :group-by? true,
+     :commons {"2001-02-04" 3, "2001-01-02" 3, "2004-01-15" 3},
+     :cardinality 91},
+    :sketch
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 500},
+     :cardinality 0},
+    :bfroid
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {33088 1, 65566 1, 2199 1},
+     :cardinality 100},
+    :otherwitnesses
+    {:data-type "string",
+     :distinct 412,
+     :group-by? true,
+     :commons {nil 65, "No" 6, "no" 5},
+     :cardinality 82},
+    :run_id
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {34 500},
+     :cardinality 0},
+    :nearesttown
+    {:data-type "string",
+     :distinct 377,
+     :group-by? true,
+     :commons {nil 56, "Strawberry" 9, "Leadville" 5},
+     :cardinality 75},
+    :timeandconditions
+    {:data-type "string",
+     :distinct 445,
+     :group-by? true,
+     :commons
+     {nil 55,
+      "late night" 2,
+      "Please see above report for complete details" 1},
+     :cardinality 88},
+    :month
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"0001-08-01" 89, nil 64, "0001-09-01" 60},
+     :cardinality 2},
+    :county
+    {:data-type "string",
+     :distinct 88,
+     :group-by? true,
+     :commons
+     {"Humboldt County" 42,
+      "Tuolumne County" 35,
+      "Siskiyou County" 31},
+     :cardinality 17},
+    :state
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"California" 328, "Colorado" 125, "Florida" 21},
+     :cardinality 1},
+    :fixed_month
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"0001-08-01" 89, "0001-07-01" 81, "0001-09-01" 73},
+     :cardinality 2},
+    :submitted
+    {:data-type "string",
+     :distinct 455,
+     :group-by? true,
+     :commons
+     {"2003-09-26 00:00:00.000000" 3,
+      "2000-10-28 00:00:00.000000" 3,
+      "2001-02-04 00:00:00.000000" 3},
+     :cardinality 91},
+    :title
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"Sightings by hunting guide in Pike National Forest" 1,
+      "Couple Has Frightening Encounter Near Lake Shasta" 1,
+      "Motorist daylight sighting between Redding and Lassen National Forest"
+      1},
+     :cardinality 100},
+    :otherstories
+    {:data-type "string",
+     :distinct 258,
+     :group-by? true,
+     :commons {nil 180, "No" 24, "no" 19},
+     :cardinality 51},
+    :year
+    {:data-type "string",
+     :distinct 104,
+     :group-by? true,
+     :commons {"2001" 29, "2000" 25, "1998" 20},
+     :cardinality 20},
+    :season
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"Summer" 221, "Fall" 129, "Spring" 85},
+     :cardinality 0},
+    :class
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"Class B" 257, "Class A" 238, "Class C" 5},
+     :cardinality 0},
+    :alsonoticed
+    {:data-type "string",
+     :distinct 285,
+     :group-by? true,
+     :commons {nil 202, "no" 7, "No" 4},
+     :cardinality 56},
+    :url
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"http://www.bfro.net/GDB/show_report.asp?id=27966&PrinterFriendly=True"
+      1,
+      "http://www.bfro.net/GDB/show_report.asp?id=596&PrinterFriendly=True"
+      1,
+      "http://www.bfro.net/GDB/show_report.asp?id=1367&PrinterFriendly=True"
+      1},
+     :cardinality 100},
+    :observed
+    {:data-type "string",
+     :distinct 496,
+     :group-by? true,
+     :commons
+     {nil 5,
+      " My uncle and I were elk hunting near Fossil Ridge northeast of Gunnison, CO when this incident ocurred.  It was late afternoon when we noticed a strong odor that we thought might be elk so we headed east toward a small ridge hoping to find one on the other side.  As we got closer we heard the noise of rocks being banged together.  As we topped the ridge we saw a large dark brown animal squatting at the edge of a dry creek bed with it''s back toward us. It was banging 2 rocks together with it''s \"hands\" and making a grunting/growling noise each time the  rocks hit.<BR><BR>It seemed to sense our presence almost immediately and turned around and looked at us.  Then it quickly stood up and jumped across the creek in one motion.  I remember thinking \"nothing can move like that!\".  It ran up the slope on the north side of the creek bed at an angle and disappeared into the pine and aspen trees farther up the hill.  We could see it for about 50 feet before it was gone from sight.  It moved real quietly for something that big.<BR><BR>I estimate it''s height as 6''5''''.  It was covered with long dark brown hair that made me think of a yak.  It had a strong smell, at least there was a strong smell in the area that was like elk urine.<BR><BR>After we calmed down a bit, we went into the creek bed and found the 2 rocks which were chipped and broken.  We looked for other signs in that place but couldn''t find anything else."
+      1,
+      " I was working in the northern part of New Mexico training to be a Wildland Fire Fighter. In September 2003 (maybe the second week of that month) I was dispatched with 22 other people to the Del Loma Fire in the Shasta/Trinity Forest area, the Northern part of California. Each Crew had about 20 people, our plane that left Albuquerque held 2 crews. For almost the whole two weeks, we were all on standby. On the 4th to the last day of our 2 weeks of Fire call, we were setting up camp close to a river, about 5-10 miles out from the original forest fire. It was close to sun down when, a couple of guys were amazed at something. I heard them from inside my tent, but just ignored the whole thing until one of my crew members came and pulled me out of my tent. <BR><BR>I had no idea what I was supposed to be looking at or for. He pointed across the river and I was in shock when he pointed out the biggest, hairiest mammal I had ever seen just walking along the river side minding his own business. It stopped and looked at us. The way he stood on his hind legs was like an ordinary human. He had dark, long hair and stood about 7ft tall with a muscular build. <BR><BR>At this point I was the 4th person standing there in amazement. Maybe about 5 minutes of watching him watch us, with more people coming out with flashlights (because the sun was still going down) he darted in to the trees. He was running, taking long strides, and was gone in about 3 seconds.....and was literally pushing trees out of his way (not breaking them, but  pushing them out of his way). The trees behind him on his path up the mountain were swaying back and forth. I was surprised to see to these trees moving because they are thick in width and very tall. <BR><BR>By this time it was dark but lit enough to see which way he was headed. Up the mountain a little, there was a clearing, where we spotted him again before he disappeared for good. He made no noise, no yelling or screaming. He was just as timid as can be.<BR><BR>I have heard many stories about Bigfoot, and known that they are real but when seeing one in real life....you get a sense of respect for them and just have that feeling that there is more to life than you know. <BR><BR><BR><BR>"
+      1},
+     :cardinality 99},
+    :environment
+    {:data-type "string",
+     :distinct 449,
+     :group-by? true,
+     :commons {nil 41, "Pine forest" 6, "Forest" 3},
+     :cardinality 89},
+    :fixed_year
+    {:data-type "string",
+     :distinct 77,
+     :group-by? true,
+     :commons {"2001" 30, "2000" 25, "1998" 23},
+     :cardinality 15},
+    :run_time
+    {:data-type "string",
+     :distinct 187,
+     :group-by? true,
+     :commons
+     {"2022-05-20 16:15:54.000000" 4,
+      "2022-05-20 16:15:30.000000" 4,
+      "2022-05-20 16:14:33.000000" 4},
+     :cardinality 37}},
+   :rowcount 500},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
+  :reco-counts {:fields {}, :rowcount 0},
+  :tmp-1816643893-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-12064 :views :param-val]" 1},
+     :cardinality 100},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":param-val" 1},
+     :cardinality 100},
+    :updated
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2024-01-22 19:26:48" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 1},
+     :cardinality 100},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-12064" 1},
+     :cardinality 100},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([10 1] [10 0] [10] [9] [8 :font-size] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":energetic-square-goat-banned-from-diatreme" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"45px\"} :child [:string :flow/simple-python-exec>:output-only]]"
+      1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"45px\"} :child [:string :flow/simple-python-exec>:output-only]]"
+      1},
+     :cardinality 100}},
+   :rowcount 1},
+  :kit-results-sys {:fields {}, :rowcount 0}},
+ :default-col-widths
+ {:block-8712 {:bigfoot-sightings-drag-32 100},
+  :system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys 137},
+  :system-fields-list* {:fields-sys 170}},
+ :data-hash -38668852,
+ :tabs
+ ["winter-wonder-lands"
+  "pyramidal eagle"
+  "growing seastar"
+  "viridian codfish"
+  "oval cheetah"
+  "scarlet walrus"
+  "soulful codfish"
+  "bulbous elephant"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/winter-theme.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"},
+    :outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn
+     (rabbit-kit-outliers.core/get-outliers
+       :query-name
+       :panel-name
+       :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description
+     "WIP: basic timeseries forecasting based on previous values",
+     :fn
+     (rabbit-kit-outliers.core/get-forecast
+       :query-name
+       :panel-name
+       :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1}},
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "asdasdasdasd"
+    "autumn-theme"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "boston-test-10-3-23"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "chaos simple"
+    "chaos-views"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "fake-books-1"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "glass-fish-board-test"
+    "hue-board-1"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "night-city-never-sleeps"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "recharts-test-blocks"
+    "refresh-test"
+    "riffle-test"
+    "sizzle-board-1"
+    "tallica-param-test2"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "wow-board"],
+   :openapi-key
+   "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"}},
+ :runstreams
+ {"simple-python-exec"
+  {:open? true,
+   :open-outputs? true,
+   :values
+   {:python-code-string
+    {:value :param/poised-spring-bud-fly,
+     :source :param,
+     :open? false},
+    :tmp-file-path {:open? true},
+    :py-executable {:open? true}}},
+  "a-random-wow" {:open? true, :open-outputs? true}},
+ :editor? true,
+ :buffy? false,
+ :status-data
+ {"kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :energetic-square-goat-banned-from-diatreme,
+      :at "2024-01-22 14:26:37",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-01-22 14:26:37 - query ran in 0 ms."],
+          :name "query-log-:flows-sys",
+          :order 1705951597,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:flows-sys",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:flows-sys "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :file-change
+  {:file-changed
+   {:data
+    [{:path
+      "./live/energetic-square-goat-banned-from-diatreme/winter-wonder-lands/flow-play-from-runstreams/block-3291.edn",
+      :type :modify,
+      :panel-key nil,
+      :block-data
+      {:block-3291
+       {:h 2, :w 19, :style {:border-radius "14px"}, :root [2 14]},
+       :views
+       {:flow-play-runstreamed
+        [:box
+         :align
+         :center
+         :justify
+         :center
+         :style
+         {:font-size "25px",
+          :font-weight 700,
+          :padding-top "6px",
+          :padding-left "14px",
+          :margin-top "-8px",
+          :color :theme/editor-outer-rim-color,
+          :font-family :theme/base-font}
+         :child
+         [:run-flow
+          ["simple-python-exec"
+           "run simple-python-exec"
+           :runstream-overrides]]]},
+       :tab "winter-wonder-lands",
+       :name "flow-play-from-runstreams"}}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2024-01-22 14:30:16",
+      :payload nil,
+      :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :alert1
+  {:alerts
+   {:data
+    [[[:v-box
+       :justify
+       :center
+       :style
+       {:margin-top "-6px", :color "inherit"}
+       :children
+       [[:box :child "flow simple-python-exec has finished"]
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "0 second [\"damn son!\" \"162\" \"hello from a data board!\" \"Today's date:..."]]]
+      10
+      1
+      8]
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
+ :re-pressed.core/keydown
+ {:keys
+  [{:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 83}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 87}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 87}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 87}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}],
+  :event-keys
+  [[[:viz-yard.bricks/esc-unselect-current] [{:keyCode 27}]]
+   [[:viz-yard.bricks/redo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey true}]]
+   [[:viz-yard.bricks/undo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey false}]]
+   [[:viz-yard.bricks/toggle-buffy]
+    [{:keyCode 32, :shiftKey true, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-editor]
+    [{:keyCode 32, :shiftKey false, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-flow]
+    [{:keyCode 32, :shiftKey false, :ctrlKey true}]]
+   [[:viz-yard.bricks/next-panel] [{:keyCode 9}]]
+   [[:viz-yard.bricks/toggle-kick-alert] [{:keyCode 75}]]
+   [[:viz-yard.bricks/toggle-peek] [{:keyCode 80}]]
+   [[:viz-yard.bricks/toggle-lines] [{:keyCode 76}]]
+   [[:viz-yard.bricks/toggle-auto-run] [{:keyCode 79}]]
+   [[:viz-yard.bricks/delete-selected-panel]
+    [{:keyCode 46, :shiftKey true}]]
+   [[:viz-yard.bricks/cycle-column-select false] [{:keyCode 81}]]
+   [[:viz-yard.bricks/cycle-column-select true] [{:keyCode 69}]]
+   [[:viz-yard.audio/start-recording] [{:keyCode 84}]]
+   [[:viz-yard.audio/stop-recording] [{:keyCode 89}]]
+   [[:viz-yard.bricks/stretch-panel :wider]
+    [{:keyCode 68, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :longer]
+    [{:keyCode 83, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :narrower]
+    [{:keyCode 65, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :shorter]
+    [{:keyCode 87, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-up] [{:keyCode 82, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-down]
+    [{:keyCode 70, :shiftKey true}]]
+   [[:viz-yard.bricks/nudge-panel :up] [{:keyCode 87}]]
+   [[:viz-yard.bricks/nudge-panel :down] [{:keyCode 83}]]
+   [[:viz-yard.bricks/nudge-panel :left] [{:keyCode 65}]]
+   [[:viz-yard.bricks/nudge-panel :right] [{:keyCode 68}]]],
+  :clear-keys nil,
+  :always-listen-keys nil,
+  :prevent-default-keys
+  [{:keyCode 32}
+   {:keyCode 46, :shiftKey true}
+   {:keyCode 83, :ctrlKey true}
+   {:keyCode 9}
+   {:keyCode 70, :ctrlKey true}]},
+ :flow-subs
+ [:flow/a-random-wow>*running?
+  :flow/a-random-wow>:open-fn-2
+  :flow/simple-python-exec>*running?
+  :flow/simple-python-exec>:output-only],
+ :client-name :energetic-square-goat-banned-from-diatreme,
+ :runstreams-lookups
+ {"simple-python-exec"
+  {:open-inputs
+   {:python-code-string
+    {:user-input
+     ["import sys" "" "print('install python ver', sys.version)" ""],
+     :defaults {},
+     :type :any},
+    :py-executable
+    {:user-input "python3", :defaults {}, :type :string},
+    :tmp-file-path
+    {:user-input "/tmp/scratch.py", :defaults {}, :type :string}},
+   :blocks
+   {:python-code-string
+    {:type :string,
+     :last? false,
+     :sample
+     "import sys, random \nfrom datetime import date\n\nprint(\"intere..."},
+    :shell-command-1
+    {:type :map,
+     :last? false,
+     :sample
+     "{:output [\"interesting!\" \"992\" \"hello from a data board!\" \"T..."},
+    :py-executable {:type :string, :last? false, :sample "python3"},
+    :write-file-1
+    {:type :map,
+     :last? false,
+     :sample "{:status :ok, :file-path \"/tmp/scratch.py\"}"},
+    :tmp-file-path
+    {:type :string, :last? false, :sample "/tmp/scratch.py"},
+    :output-only
+    {:type :vector,
+     :last? false,
+     :sample
+     "[\"interesting!\" \"992\" \"hello from a data board!\" \"Today's da..."},
+    :clojure-string-join-1
+    {:type :string, :last? false, :sample "python3 /tmp/scratch.py"}}},
+  "a-random-wow"
+  {:open-inputs
+   {:rando-string
+    {:user-input "feed me, seymour!", :defaults {}, :type :string},
+    :open-input
+    {:user-input
+     {:url "https://owen-wilson-wow-api.onrender.com/wows/random"},
+     :defaults {},
+     :type :map},
+    :http-call-1-idx0 {:user-input nil, :defaults {}, :type :map}},
+   :blocks
+   {:open-fn-1
+    {:type
+     {:video :map,
+      :total_wows_in_movie :integer,
+      :* :map,
+      :release_date :string,
+      :director :string,
+      :full_line :string,
+      :movie :string,
+      :year :integer,
+      :poster :string,
+      :audio :string,
+      :current_wow_in_movie :integer,
+      :timestamp :string,
+      :movie_duration :string,
+      :character :string},
+     :last? false,
+     :sample "no sample data"},
+    :kick-1 {:type {:out :any}, :last? true, :sample "no sample data"},
+    :rando-string
+    {:type {:out :string}, :last? false, :sample "no sample data"},
+    :open-fn-2
+    {:type {:out :any}, :last? false, :sample "no sample data"},
+    :open-input
+    {:type {:url :string, :* :map},
+     :last? false,
+     :sample "no sample data"},
+    :http-call-1-idx0
+    {:type
+     {:video :map,
+      :total_wows_in_movie :integer,
+      :* :map,
+      :release_date :string,
+      :director :string,
+      :full_line :string,
+      :movie :string,
+      :year :integer,
+      :poster :string,
+      :audio :string,
+      :current_wow_in_movie :integer,
+      :timestamp :string,
+      :movie_duration :string,
+      :character :string},
+     :last? false,
+     :sample "no sample data"},
+    :open-fn-3
+    {:type {:out :any}, :last? false, :sample "no sample data"},
+    :open-fn-4
+    {:type {:out :any}, :last? false, :sample "no sample data"},
+    :open-fn-5
+    {:type {:out :any}, :last? false, :sample "no sample data"},
+    :http-call-1
+    {:type {:idx0 :map, :* :vector},
+     :last? false,
+     :sample "no sample data"}}}},
+ :openai-api-key "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",
+ :window {:w 2543, :h 1546},
+ :post-meta
+ {:runstream-chart-simple-python-exec-1
+  {:*
+   {:rowcount
+    "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}},
+  :bigfoot-sightings-drag-32 {:* {:rowcount 5035}}},
+ :status
+ {"kick-test!" {:kick :flows-sys},
+  :file-change {:file-changed :done},
+  :heartbeat
+  {:kick
+   [:flow/a-random-wow>*running?
+    :flow/a-random-wow>:open-fn-2
+    :flow/simple-python-exec>*running?
+    :flow/simple-python-exec>:output-only]},
+  :alert1 {:alerts :alert2}},
+ :screen-name "winter-theme",
+ :recos-page2 0,
+ :selected-tab "winter-wonder-lands",
+ :col-names nil,
+ :snapshots {:params {}},
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :alerts
+ [[[:h-box
+    :children
+    [[:v-box
+      :justify
+      :center
+      :style
+      {:margin-top "-6px", :color "inherit"}
+      :children
+      [[:box :child "flow simple-python-exec has finished"]
+       [:box
+        :style
+        {:font-weight 700, :font-size "10px", :opacity 0.7}
+        :child
+        "0 second [\"damn son!\" \"162\" \"hello from a data board!\" \"Today's date:..."]]]]]
+   10
+   1
+   696]],
+ :recos-page 0,
+ :re-pollsive.core/polling
+ {:rules
+  [{:interval 10,
+    :event [:viz-yard.bricks/dispatch-auto-queries],
+    :poll-when [:viz-yard.bricks/auto-run-and-connected?],
+    :dispatch-event-on-start? false}
+   {:interval 5,
+    :event [:viz-yard.bricks/update-metadata],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 120,
+    :event [:viz-yard.bricks/clean-up-reco-previews],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 2,
+    :event [:viz-yard.bricks/prune-alerts],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 1,
+    :event [:viz-yard.bricks/sub-to-flows],
+    :poll-when [:viz-yard.bricks/new-flow-subs?],
+    :dispatch-event-on-start? false,
+    :started-at nil,
+    :stopped-time-since-last-poll -1,
+    :started-before? true}
+   {:interval 1000,
+    :event [:viz-yard.bricks/update-metadata-tabs],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 1,
+    :event [:viz-yard.bricks/update-conditionals],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 4,
+    :event [:viz-yard.bricks/refresh-status],
+    :poll-when [:viz-yard.bricks/bg-status?],
+    :dispatch-event-on-start? false}],
+  :counter 695},
+ :base-sniff-queries {:bigfoot_sightings 302026766},
+ :panels-hash 405739875,
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :websocket-fx.core/sockets
+ {:default
+  {:status :connected,
+   :options
+   {:url "ws://localhost:3030/ws",
+    :format :edn,
+    :on-disconnect
+    [:websocket-fx.core/unsubscribe :default :server-push2],
+    :on-connect
+    [:websocket-fx.core/subscribe
+     :default
+     :server-push2
+     {:message
+      {:kind :server-push2,
+       :client-name :energetic-square-goat-banned-from-diatreme,
+       :ui-keypath [:server],
+       :extras {:hello? true}},
+      :on-message [:viz-yard.http/simple-response]}]},
+   :requests {},
+   :subscriptions
+   {:server-push2
+    {:message
+     {:kind :server-push2,
+      :client-name :energetic-square-goat-banned-from-diatreme,
+      :ui-keypath [:server],
+      :extras {:hello? true}},
+     :on-message [:viz-yard.http/simple-response]}}}},
+ :grid-recos? true,
+ :panels
+ {:block-3540
+  {:name "python inpit block",
+   :w 11,
+   :style {:background-color "#000000", :border-radius "14px"},
+   :selected-view :poised-spring-bud-fly,
+   :root [2 4],
+   :h 7,
+   :tab "winter-wonder-lands",
+   :drag-meta {:type :open-input},
+   :minimized? false,
+   :views
+   {:poised-spring-bud-fly
+    [:box
+     :size
+     "none"
+     :width
+     :panel-width+100-px
+     :height
+     :panel-height+80-px
+     :style
+     {:background-image "url(images/gen/b64-decoded-1156592.png)",
+      :background-blend-mode "soft-light",
+      :border-radius "20px",
+      :background-size "cover",
+      :background-color "#00000099"}
+     :child
+     [:box
+      :style
+      {}
+      :child
+      [:open-input
+       {:kp [:param :poised-spring-bud-fly],
+        :width-int :panel-width+100,
+        :height-int :panel-height+80,
+        :syntax "python"}]]]}},
+  :block-11340
+  {:h 4,
+   :w 5,
+   :root [15 3],
+   :tab "bulbous elephant",
+   :selected-view :hi,
+   :name "block-11340",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11340.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-9573
+  {:h 5,
+   :w 11,
+   :tab "winter-wonder-lands",
+   :root [2 18],
+   :name "block-9573",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :flow/a-random-wow>:open-fn-2]]},
+   :queries {}},
+  :block-8712
+  {:pinned? true,
+   :name "select-all-bigfoot_sightings",
+   :w 21,
+   :selected-view :bigfoot-sightings-drag-32,
+   :root [15 7],
+   :h 6,
+   :iconized? false,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:bigfoot-sightings-drag-32
+    {:select
+     [:alsonoticed
+      :bfroid
+      :class
+      :county
+      :date
+      :environment
+      :fixed_month
+      :fixed_year
+      :locationdetails
+      :month
+      :nearestroad
+      :nearesttown
+      :observed
+      :otherstories
+      :otherwitnesses
+      :run_id
+      :run_time
+      :season
+      :sketch
+      :state
+      :submitted
+      :submitted_date
+      :timeandconditions
+      :title
+      :url
+      :year],
+     :from [[:bigfoot_sightings :xx922]]}},
+   :tab "winter-wonder-lands",
+   :minimized? true},
+  :block-10849
+  {:h 4,
+   :w 5,
+   :root [4 2],
+   :tab "pyramidal eagle",
+   :selected-view :hi,
+   :name "block-10849",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-10849.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-9513
+  {:name "pyramidal eagle",
+   :w 10,
+   :selected-view :vv,
+   :root [26 14],
+   :h 8,
+   :tab "winter-wonder-lands",
+   :minimized? true,
+   :ghosted? false,
+   :views {:vv [:grid "pyramidal eagle"]}},
+  :block-6073
+  {:w 6,
+   :selected-view :vv,
+   :name "scarlet walrus",
+   :h 4,
+   :ghosted? false,
+   :views {:vv [:grid "scarlet walrus"]},
+   :root [16 2],
+   :tab "oval cheetah"},
+  :block-6135
+  {:w 12,
+   :selected-view :vv,
+   :name "viridian codfish",
+   :h 3,
+   :ghosted? false,
+   :views {:vv [:grid "viridian codfish"]},
+   :root [14 18],
+   :tab "winter-wonder-lands"},
+  :block-10046
+  {:name "block-10046",
+   :w 5,
+   :selected-view :hi,
+   :root [1.75 1.75],
+   :h 4,
+   :iconized? true,
+   :queries {},
+   :tab "scarlet walrus",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-10046.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-5036
+  {:pinned? false,
+   :name "scarlet walrus",
+   :w 11,
+   :style
+   {:background-image "url(images/cozy-winter-streets.png)",
+    :background-blend-mode "hard-light",
+    :background-size "cover",
+    :background-color "#00000099"},
+   :selected-view :vv,
+   :root [22 2],
+   :h 6,
+   :tab "winter-wonder-lands",
+   :minimized? false,
+   :ghosted? false,
+   :views
+   {:vv [:grid "scarlet walrus"],
+    :new-view [:grid "bulbous elephant"]}},
+  :block-2944
+  {:name "block-2944",
+   :w 5,
+   :selected-view :hi,
+   :root [9 6],
+   :h 4,
+   :queries {},
+   :tab "pyramidal eagle",
+   :minimized? false,
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-2944.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-195
+  {:name "block-195",
+   :w 19,
+   :style {:background-color "#000000", :border-radius "14px"},
+   :z -1,
+   :selected-view :hi,
+   :root [2 4],
+   :h 12,
+   :queries {},
+   :tab "winter-wonder-lands",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-195.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-2031
+  {:h 4,
+   :w 5,
+   :root [20 3],
+   :tab "bulbous elephant",
+   :selected-view :hi,
+   :name "block-2031",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-2031.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-5633
+  {:h 3,
+   :w 12,
+   :root [2 2],
+   :tab "viridian codfish",
+   :selected-view :hi,
+   :name "block-5633",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "50px",
+      :font-weight 700,
+      :color :theme/editor-outer-rim-color,
+      :padding-top "14px",
+      :opacity 1,
+      :font-family :theme/base-font}
+     :child
+     "hello! 🐇 🍂 🦃"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-5880
+  {:name "block-5880",
+   :w 5,
+   :selected-view :hi,
+   :root [1.75 0.5],
+   :h 4,
+   :iconized? true,
+   :queries {},
+   :tab "scarlet walrus",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-5880.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-7844
+  {:name "block-7844",
+   :w 7,
+   :selected-view :hi,
+   :root [16.75 2],
+   :h 7,
+   :iconized? true,
+   :queries {},
+   :tab "winter-wonder-lands",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-7844.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hfffff!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-8495
+  {:h 4,
+   :w 5,
+   :root [10 4],
+   :tab "oval cheetah",
+   :selected-view :hi,
+   :name "block-8495",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-8495.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-2883
+  {:name "bulbous elephant",
+   :w 10,
+   :selected-view :vv,
+   :root [23 13],
+   :h 4,
+   :tab "winter-wonder-lands",
+   :minimized? false,
+   :ghosted? false,
+   :views {:vv [:grid "bulbous elephant"]}},
+  :block-1366
+  {:name "block-1366",
+   :w 5,
+   :selected-view :hi,
+   :root [3 0.5],
+   :h 4,
+   :iconized? true,
+   :queries {},
+   :tab "scarlet walrus",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-1366.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-7844-window
+  {:pinned? false,
+   :name "block-7844",
+   :w 5,
+   :window "spawned-from-icon-of_:block-7844",
+   :z 21,
+   :selected-view :hi,
+   :root [23 2],
+   :h 4,
+   :iconized? false,
+   :queries {},
+   :tab "soulful codfish",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-7844.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-12064
+  {:h 10,
+   :w 8,
+   :tab "winter-wonder-lands",
+   :style {:background-color "#000000", :border-radius "14px"},
+   :root [13 4],
+   :name "block-12064",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "18px", :font-family "Consolas"}
+     :child
+     [:string :flow/simple-python-exec>:output-only]]},
+   :queries {}},
+  :block-4693
+  {:name "block-4693",
+   :w 5,
+   :selected-view :hi,
+   :root [0.5 0.5],
+   :h 4,
+   :iconized? true,
+   :queries {},
+   :tab "scarlet walrus",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-4693.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-11642
+  {:name "block-11642",
+   :w 5,
+   :selected-view :hi,
+   :root [18 2],
+   :h 4,
+   :iconized? true,
+   :queries {},
+   :tab "winter-wonder-lands",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11642.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-5880-window
+  {:pinned? false,
+   :name "block-5880",
+   :w 5,
+   :window "spawned-from-icon-of_:block-5880",
+   :z 21,
+   :selected-view :hi,
+   :root [23 7],
+   :h 4,
+   :iconized? false,
+   :queries {},
+   :tab "soulful codfish",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-5880.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-3291
+  {:h 2,
+   :w 19,
+   :style {:border-radius "14px"},
+   :views
+   {:flow-play-runstreamed
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "25px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:run-flow
+      ["simple-python-exec"
+       "run simple-python-exec"
+       :runstream-overrides]]]},
+   :name "flow-play-from-runstreams",
+   :root [2 14],
+   :tab "winter-wonder-lands"},
+  :block-4675
+  {:pinned? false,
+   :name "block-4675",
+   :w 8,
+   :icon? false,
+   :selected-view :nutritious-periwinkle-sheep,
+   :root [2 1],
+   :h 2,
+   :tab "winter-wonder-lands",
+   :drag-meta {:type :open-input},
+   :minimized? false,
+   :views
+   {:nutritious-periwinkle-sheep
+    [:open-input
+     {:kp [:param :nutritious-periwinkle-sheep],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "clojure"}]}},
+  :block-7569
+  {:pinned? false,
+   :name "block-7569",
+   :w 5,
+   :selected-view :hi,
+   :root [4 6],
+   :h 4,
+   :queries {},
+   :tab "pyramidal eagle",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-7569.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-11642-window
+  {:pinned? false,
+   :name "block-11642",
+   :w 5,
+   :window "spawned-from-icon-of_:block-11642",
+   :z 21,
+   :selected-view :hi,
+   :root [17 7],
+   :h 4,
+   :iconized? false,
+   :queries {},
+   :tab "soulful codfish",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11642.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-7863
+  {:name "block-7863",
+   :w 5,
+   :selected-view :hi,
+   :root [9 2],
+   :h 4,
+   :queries {},
+   :tab "pyramidal eagle",
+   :minimized? false,
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-7863.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack
+    [:layout
+     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}},
+ :selected-block "none!",
+ :click-param
+ {:flow-fn-sys
+  {:name ":clojure-string-join",
+   :full_map
+   "{:description \"Clojure.string's join function.\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :inputs [:delimiter], :required [:delimiter], :defaults {:delimiter \" \"}, :expandable? true, :icon \"zmdi-group\", :types {:delimiter :string, :out :string}}",
+   :description "Clojure.string's join function.",
+   :inputs "[:delimiter]",
+   :icon "zmdi-group",
+   :input_types "[:string]",
+   :output_types ":string",
+   :category ":clojure-base"},
+  :blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 27,
+   :block_data
+   "{:codemirror-theme \"the-matrix\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#091536\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b0f2180\", :editor-rim-color \"#2b4270\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2c728e\", \"boolean\" \"#f386bf\", \"map\" \"#00FFFF\", \"list\" \"#c32148\", \"string\" \"#7de883\", \"vector\" \"#008080\", \"keyword\" \"#add8e6\", \"rabbit-code\" \"#FC0FC0\", \"datetime\" \"#472d7b\", \"integer\" \"#d6e367\", \"unknown\" \"#c7005d\", \"date\" \"#3b528b\", \"nil\" \"#ff2147\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#8879bc\", :nivo-defaults {:font-family :theme/base-font, :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family :theme/base-font, :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family :theme/base-font, :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#40d6ff\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/vap66-huge.png)\", :transition \"all 0.6s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Nova Square\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "bigfoot-ufos",
+   :schema_cat nil,
+   :table_name "bigfoot_sightings",
+   :fields 27},
+  :flow
+  {:simple-python-exec>write-file-1
+   {:status :ok, :file-path "/tmp/scratch.py"},
+   :simple-python-exec>tmp-file-path "/tmp/scratch.py",
+   :gpt35-color-parser>*running? nil,
+   :dalle3-create-image>*running? false,
+   :simple-python-exec>output-only
+   ["damn son!"
+    "162"
+    "hello from a data board!"
+    "Today's date: 2024-01-22"],
+   :a-random-wow>open-fn-2 nil,
+   :simple-python-exec>python-code-string
+   "import sys, random \nfrom datetime import date\n\nprint(\"interesting!\")\nprint(random.randrange(1,100))\nprint('hello from a data board!')\n\ntoday = date.today()\nprint(\"Today's date:\", today)\n\n\n\n",
+   :a-random-wow>*running? nil,
+   :simple-python-exec>clojure-string-join-1 "python3 /tmp/scratch.py",
+   :simple-python-exec>*running? true,
+   :dalle3-create-image-newengland>*running? nil},
+  :flows-sys
+  {:flow_id "simple-python-exec",
+   :file_path "./flows/simple-python-exec.edn",
+   :last_modified "2024-01-19 10:37:23"},
+  :files-sys
+  {:file_path "./screens/winter-theme2.edn",
+   :screen_name "winter-theme2",
+   :blocks 11,
+   :queries 3,
+   :ts "2023-12-07 07:57:47"},
+  :chat-drag-23 {:YEAR 2017, :rows 734, :styler_highlight_group 0},
+  :offenses-drag-17
+  {:SHOOTING nil,
+   :DISTRICT "C11",
+   :INCIDENT_NUMBER "I182070943",
+   :OFFENSE_DESCRIPTION "VANDALISM",
+   :DAY_OF_WEEK "0001-01-02",
+   :MONTH 8,
+   :YEAR 2018,
+   :HOUR 0,
+   :STREET "HECLA ST",
+   :OFFENSE_CODE_GROUP "Vandalism",
+   :UCR_PART "Part Two",
+   :Long -71.06030035,
+   :REPORTING_AREA 347,
+   :Location "(42.30682138, -71.06030035)",
+   :OFFENSE_CODE 1402,
+   :Lat 42.30682138,
+   :OCCURRED_ON_DATE "2018-08-21 00:00:00.000000"},
+  :viz-tables-sys2 {:table_name :OFFENSE-CODE-GROUP-drag-40},
+  :STREET-drag-11 {:STREET "BLUE HILL AVE", :rowcnt 7794},
+  :ufo-sightings-drag-22
+  {:duration_seconds_int 900,
+   :comments
+   "AS a Marine 1st Lt. flying an FJ4B fighter/attack aircraft on a solo night exercise&#44 I was at 50&#44000&#39 in a &quot;clean&quot; aircraft (no ordinan",
+   :city "kaneohe",
+   :date_posted "2004-01-22",
+   :longitude -157.8036111,
+   :state "hi",
+   :duration_seconds "900",
+   :duration_hours "15 minutes",
+   :id 5,
+   :shape "light",
+   :datetime "1960-10-10 20:00:00.000000",
+   :latitude "21.4180556",
+   :country "us"},
+  :param
+  {:nutritious-periwinkle-sheep "hello from a data board!",
+   :offense "VANDALISM",
+   :float 324.444,
+   :string "this is string",
+   :essential-olive-toad "from clojure boar param",
+   :poised-spring-bud-fly
+   ["import sys, random "
+    "from datetime import date"
+    ""
+    "print(\"damn son!\")"
+    "print(random.randrange(1,300))"
+    "print('{{:param/nutritious-periwinkle-sheep}}')"
+    ""
+    "today = date.today()"
+    "print(\"Today's date:\", today)"
+    ""
+    "####INTERESTING...."
+    ""
+    ""
+    ""
+    ""],
+   :keys 123,
+   :bools true,
+   :keys2 [3 4 5]},
+  :theme
+  {:codemirror-theme "ayu-dark",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header
+    {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#091536",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#0b0f2180",
+   :editor-rim-color "#2b4270",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#2c728e",
+    "boolean" "#f386bf",
+    "map" "#00FFFF",
+    "list" "#c32148",
+    "string" "#7de8b9",
+    "rowset" "#DAF7A6",
+    "any" "#c3ec52",
+    "vector" "#008080",
+    "keyword" "#add8e6",
+    "rabbit-code" "#FC0FC0",
+    "datetime" "#472d7b",
+    "integer" "#12e3ff",
+    "unknown" "#ffcf99",
+    "date" "#3b528b",
+    "rabbitsql" "#FC0FC0",
+    "nil" "#eeeeee"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#8879bc",
+   :nivo-defaults
+   {:font-family :theme/base-font,
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family :theme/base-font,
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family :theme/base-font,
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"},
+      :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid
+    {:line
+     {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#40d6ff",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/cozy-winter-streets.png)",
+    :transition "all 0.6s ease-in-out",
+    :background-blend-mode "normal",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Instagram Sans",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
+  :connections-sys
+  {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+  :narratives
+  {:base>narrative-22>theme :cyberpunk,
+   :base>narrative-22>craps "#ffffff",
+   :base>narrative-22>floatss 123.4,
+   :base>narrative-1>floaty 123.4,
+   :base>narrative-1>stuff1 "some stuff!",
+   :base>narrative-22>namer "some stuff!",
+   :base>narrative-22>vibes? true,
+   :base>narrative-22>gopv ["test" "test3" "test4"],
+   :base>narrative-22>mappy {:map 34}},
+  :kits-sys
+  {:enabled
+   [[:query-basics-1 :buffy]
+    [:grab-bag :buffy]
+    [:query-basics-1 :outliers]]}},
+ :selected-flow "live-scratch-flow"}

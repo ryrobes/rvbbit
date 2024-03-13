@@ -1,0 +1,178 @@
+{:flowmaps
+ {:kick-1
+  {:w 200,
+   :h 100,
+   :x 1576.9781841856063,
+   :y 1145.0634632457388,
+   :z 0,
+   :data
+   {:flow-item
+    {:description "Push items to the client UI.",
+     :category ":rabbit-base",
+     :fn
+     (fn [destination
+          ref
+          item-key
+          thread-id
+          message-name
+          thread-desc
+          &
+          args]
+       (rvbbit-backend.websockets/kick
+         destination
+         ref
+         item-key
+         thread-id
+         message-name
+         thread-desc
+         args)),
+     :name ":kick",
+     :type :kick,
+     :icon "images/pink-rabbit-head.png",
+     :defaults
+     {:destination :client-name,
+      :item-key ":base",
+      :thread-id :flow-id,
+      :message-name "Unnamed Message",
+      :thread-desc :flow-id,
+      :ref :flow-id},
+     :types
+     {:destination [:keyword :vector :list :set],
+      :ref :string,
+      :item-key :keyword,
+      :thread-id :string,
+      :message-name :string,
+      :thread-desc :string,
+      :out :any},
+     :pill-name "content",
+     :input_types
+     "[[:keyword :vector :list :set] :string :keyword :string :string :string]",
+     :style {:color "#fc0fc0"},
+     :selected-style {:color "#fc0fc0"},
+     :inputs
+     "[:destination :ref :item-key :thread-id :message-name :thread-desc]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Push items to the client UI.\", :fn (fn [destination ref item-key thread-id message-name thread-desc & args] (rvbbit-backend.websockets/kick destination ref item-key thread-id message-name thread-desc args)), :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :item-key \":base\", :thread-id :flow-id, :message-name \"Unnamed Message\", :thread-desc :flow-id, :ref :flow-id}, :types {:destination [:keyword :vector :list :set], :ref :string, :item-key :keyword, :thread-id :string, :message-name :string, :thread-desc :string, :out :any}, :pill-name \"content\", :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :ref :item-key :thread-id :message-name :thread-desc], :expandable? true, :required [:destination :ref :item-key :thread-id :message-name :thread-desc]}",
+     :required
+     [:destination
+      :ref
+      :item-key
+      :thread-id
+      :message-name
+      :thread-desc]},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [503 83.5],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-18
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :hh902]],
+      :where [:= :name ":kick"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":kick",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :kick,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 3}},
+   :icon "images/pink-rabbit-head.png",
+   :ports
+   {:in
+    {:destination [:keyword :vector :list :set],
+     :ref :string,
+     :item-key :keyword,
+     :thread-id :string,
+     :message-name :string,
+     :thread-desc :string,
+     :content-6 :any,
+     :content-7 :any},
+    :out {:out :any}}},
+  :open-input
+  {:w 200,
+   :h 100,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input
+    {:select [[[:count 1] :value] [:db_conn :id]],
+     :connection-id "system-db",
+     :order-by [[1 :desc]],
+     :_h 4,
+     :from
+     [{:select [:db_conn :error_str :sql_stmt :ts],
+       :from [[:errors :yy112]]}],
+     :group-by [:db_conn]},
+    :width 750},
+   :z 0,
+   :ports
+   {:out
+    {:select :vector,
+     :connection-id :string,
+     :order-by :vector,
+     :from :rowset,
+     :group-by :vector,
+     :* :map}},
+   :x 813.9592743844698,
+   :y 1328.5993963068183},
+  :open-input-1
+  {:w 200,
+   :h 100,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input
+    [:speak
+     "Good evening, Ryan. If you have a minute - I have some updates for you. First of all, I found some recent anomalies in the system-db errors table that you should be aware of. "]},
+   :z 0,
+   :ports {:out {:idx0 :keyword, :idx1 :string, :* :vector}},
+   :x 845.4678415009471,
+   :y 1181.922372159091},
+  :open-input-2
+  {:w 200,
+   :h 100,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input :free-pyramidal-goat-exiled-from-blowhole},
+   :z 0,
+   :ports {:out {:out :keyword}},
+   :x 845.4678415009471,
+   :y 1181.922372159091},
+  :open-input-3
+  {:w 200,
+   :h 100,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input "evening-ryan-3456"},
+   :z 0,
+   :ports {:out {:out :string}},
+   :x 764.3220081676138,
+   :y 1039.1373009883998}},
+ :flow-id "callie-1",
+ :flowmaps-connections
+ [[:open-input/* :kick-1/content-7]
+  [:open-input-1 :kick-1/content-6]
+  [:open-input-2 :kick-1/destination]
+  [:kick-1 :done]
+  [:open-input-3 :kick-1/ref]
+  [:open-input-3 :kick-1/thread-id]
+  [:open-input-3 :kick-1/message-name]]}

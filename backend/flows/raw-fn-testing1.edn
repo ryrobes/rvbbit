@@ -1,0 +1,132 @@
+{:flowmaps
+ {:open-fn
+  {:y 1156.415897902397,
+   :w 200,
+   :raw-fn (fn [x s] (str s " - " (+ 1323 x))),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:value* :any, :value-1 :any}, :out {:out :any}},
+   :h 100,
+   :x 1738.5048052226027,
+   :data
+   {:flow-item
+    {:description
+     "Clojure count function, takes a sequence and returns an integer of the number of items.",
+     :category ":clojure-base",
+     :name ":open-fn",
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value* :any, :out :any},
+     :input_types "[:any]",
+     :inputs [:value* :value-1],
+     :output_types ":any",
+     :full_map
+     "{:description \"Clojure count function, takes a sequence and returns an integer of the number of items.\", :view (fn [_]), :fn (fn [x] x), :inputs [:value*], :icon \"zmdi-functions\", :type :open-fn, :types {:value* :any, :out :any}}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [594 192.5],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-1
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :mm486]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}},
+  :open-input
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 44},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 1457.109658604452,
+   :y 1130.7648116438356},
+  :open-input-1
+  {:w 200,
+   :h 60,
+   :data
+   {:drag-meta {:type :open-block}, :user-input "feed me, seymour!"},
+   :z 0,
+   :ports {:out {:out :string}},
+   :x 1465.3423480308222,
+   :y 1238.531292808219},
+  :open-fn-1
+  {:y 1154.0710369318183,
+   :w 200,
+   :raw-fn (fn [x] (count (for [i (range 434)] {i x}))),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:value* :any}, :out {:out :any}},
+   :h 100,
+   :x 2013.7187393465908,
+   :data
+   {:flow-item
+    {:description
+     "Clojure count function, takes a sequence and returns an integer of the number of items.",
+     :category ":clojure-base",
+     :name ":open-fn",
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value* :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value*]",
+     :output_types ":any",
+     :full_map
+     "{:description \"Clojure count function, takes a sequence and returns an integer of the number of items.\", :view (fn [_]), :fn (fn [x] x), :inputs [:value*], :icon \"zmdi-functions\", :type :open-fn, :types {:value* :any, :out :any}}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [1275 225.5],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-43
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ee518]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}}},
+ :flow-id "raw-fn-testing1",
+ :flowmaps-connections
+ [[:open-input :open-fn/value*]
+  [:open-input-1 :open-fn/value-1]
+  [:open-fn :open-fn-1/value*]
+  [:open-fn-1 :done]]}

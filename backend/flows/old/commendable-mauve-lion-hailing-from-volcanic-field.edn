@@ -1,0 +1,76 @@
+{:flowmaps
+ {:+
+  {:w 200,
+   :h 100,
+   :x 1576.9369424355996,
+   :y 1127.027027027027,
+   :z 0,
+   :data
+   {:flow-item
+    {:description "Clojure add function.",
+     :category ":clojure-base",
+     :name ":+",
+     :icon "zmdi-plus",
+     :types
+     {:value1 [:integer :float],
+      :value2 [:integer :float],
+      :out :integer},
+     :input_types "[[:integer :float] [:integer :float]]",
+     :inputs [:value1 :value2],
+     :output_types ":integer",
+     :full_map
+     "{:description \"Clojure add function.\", :view (fn [_]), :fn +, :inputs [:value1 :value2], :icon \"zmdi-plus\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :integer}}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [673.6666717529297 180.5],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-44
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :gg24]],
+      :where [:= :name ":+"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":+",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :where,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 3}},
+   :icon "zmdi-plus",
+   :ports
+   {:in {:value1 [:integer :float], :value2 [:integer :float]},
+    :out {:out :integer}}},
+  :open-input
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 123},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 1228.3232124947212,
+   :y 1103.4722075591217},
+  :open-input-1
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input 234},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 1214.7747802734375,
+   :y 1248.1081081081081}},
+ :flow-id "live-scratch-flow",
+ :flowmaps-connections
+ [[:open-input :+/value1] [:open-input-1 :+/value2] [:+ :done]]}

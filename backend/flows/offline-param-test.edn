@@ -1,0 +1,79 @@
+{:flowmaps
+ {:thorough-gold-fly-1
+  {:w 200,
+   :h 90,
+   :x 984.9533955342058,
+   :y 1147.6545179212414,
+   :z 0,
+   :data
+   {:h 2,
+    :w 5,
+    :root [0 0],
+    :drag-meta
+    {:type :param,
+     :param-full :param/thorough-gold-fly,
+     :param-type "string",
+     :param-table :param,
+     :param-field :thorough-gold-fly}},
+   :icon "zmdi-tune",
+   :ports {:in {}, :out {:out :string}}},
+  :open-fn-1
+  {:y 1125.5487268326133,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn (fn [x] x),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:value :any}, :out {:out :any}},
+   :h 100,
+   :x 1400.3657486286565,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-25
+     {:select
+      [:name
+       :full_map
+       :description
+       :inputs
+       :icon
+       :input_types
+       :output_types
+       :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}}},
+ :flow-id "offline-param-test",
+ :flowmaps-connections
+ [[:thorough-gold-fly-1 :open-fn-1/value] [:open-fn-1 :done]]}

@@ -1,0 +1,199 @@
+{:flowmaps
+ {:name-issue!
+  {:y 1265.8855014475569,
+   :sub-flow
+   {:flow-id :new-flow-429939,
+    :file-path
+    "./flows/reassuring-periwinkle-cheetah-from-coral-reef.edn",
+    :map
+    {:fart-fax
+     {:y 1241.5053782989985,
+      :sub-flow
+      {:flow-id "fart-fax",
+       :file-path "./flows/robust-linear-goat-of-towhead.edn",
+       :map
+       {:+
+        {:w 200,
+         :h 100,
+         :x 1561.064064265797,
+         :y 1280.7236435608293,
+         :z 0,
+         :data
+         {:flow-item
+          {:description "Clojure add function.",
+           :category ":clojure-base",
+           :name ":+",
+           :icon "zmdi-plus",
+           :types
+           {:value1 [:integer :float],
+            :value2 [:integer :float],
+            :out :integer},
+           :input_types "[[:integer :float] [:integer :float]]",
+           :inputs [:value1 :value2],
+           :output_types ":integer",
+           :full_map
+           "{:description \"Clojure add function.\", :view (fn [_]), :fn +, :inputs [:value1 :value2], :icon \"zmdi-plus\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :integer}}"},
+          :name "drag-from-",
+          :w 5,
+          :source-panel :flow-fn-list*,
+          :root [706.6666717529297 211.5],
+          :h 6,
+          :connection-id nil,
+          :queries
+          {:name-drag-4
+           {:select
+            [:name
+             :full_map
+             :description
+             :inputs
+             :icon
+             :input_types
+             :output_types
+             :category],
+            :from [[:query/flow-fn-sys :aa411]],
+            :where [:= :name ":+"]}},
+          :drag-meta
+          {:data-type "string",
+           :source-query :flow-fn-sys,
+           :param-full ":+",
+           :param-field :name,
+           :source-panel-key :flow-fn-list*,
+           :type :where,
+           :param-table :flow-fn-sys,
+           :source-table :query/flow-fn-sys,
+           :connection-id nil,
+           :target :name,
+           :row-num 3}},
+         :icon "zmdi-plus",
+         :ports
+         {:in {:value1 [:integer :float], :value2 [:integer :float]},
+          :out {:out :integer}}},
+        :open-input
+        {:w 200,
+         :h 60,
+         :data {:drag-meta {:type :open-block}, :user-input 12333},
+         :z 0,
+         :ports {:out {:out :integer}},
+         :x 1304.871935045397,
+         :y 1151.8276974239864},
+        :open-input-1
+        {:w 200,
+         :h 60,
+         :data {:drag-meta {:type :open-block}, :user-input 234333},
+         :z 0,
+         :ports {:out {:out :integer}},
+         :x 1190.6098152741881,
+         :y 1255.999760048473},
+        :open-input-2
+        {:w 200,
+         :h 60,
+         :data
+         {:drag-meta {:type :open-block}, :user-input "TOUGH CALLS!"},
+         :z 0,
+         :ports {:out {:out :string}},
+         :x 1821.1202012547906,
+         :y 1311.5401404038914},
+        :open-input-3
+        {:w 200,
+         :h 60,
+         :data {:drag-meta {:type :open-block}, :user-input 5555},
+         :z 0,
+         :ports {:out {:out :integer}},
+         :x 1222.830764383016,
+         :y 1369.2368988476965}},
+       :connections
+       [[:open-input :+/value1]
+        [:open-input-1 :+/value2]
+        [:+ :done]
+        [:open-input-3 :+/value2]]},
+      :w 200,
+      :icon "zmdi-puzzle-piece",
+      :z 0,
+      :ports
+      {:in
+       {:open-input :integer,
+        :open-input-1 :integer,
+        :open-input-2 :string,
+        :open-input-3 :integer},
+       :out {:out :integer}},
+      :h 100,
+      :x 1631.6871159435052,
+      :data
+      {:flow-item nil,
+       :name "drag-from-",
+       :w 5,
+       :source-panel :flow-list*,
+       :root [715 168],
+       :h 6,
+       :connection-id nil,
+       :queries
+       {:flow-id-drag-22
+        {:select [:flow_id :file_path :last_modified],
+         :from [[:query/flows-sys :xx944]],
+         :where [:= :flow_id "fart-fax"]}},
+       :drag-meta
+       {:data-type "string",
+        :done-block :+,
+        :source-query :flows-sys,
+        :param-full "fart-fax",
+        :param-field :flow_id,
+        :source-panel-key :flow-list*,
+        :type :sub-flow,
+        :param-table :flows-sys,
+        :source-table :query/flows-sys,
+        :connection-id nil,
+        :target :flow_id,
+        :row-num 0}}},
+     :open-input
+     {:w 200,
+      :h 60,
+      :data {:drag-meta {:type :open-block}, :user-input 45000},
+      :z 0,
+      :ports {:out {:out :integer}},
+      :x 1350.632704923966,
+      :y 1198.9163071862133}},
+    :connections
+    [[:open-input :fart-fax/open-input] [:fart-fax :done]]},
+   :w 200,
+   :icon "zmdi-puzzle-piece",
+   :z 0,
+   :ports {:in {:open-input :integer}, :out {:out :integer}},
+   :h 100,
+   :x 1558.3077622832632,
+   :data
+   {:flow-item nil,
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-list*,
+    :root [816 219],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:flow-id-drag-44
+     {:select [:flow_id :file_path :last_modified],
+      :from [[:query/flows-sys :qq168]],
+      :where [:= :flow_id ":new-flow-429939"]}},
+    :drag-meta
+    {:data-type "string",
+     :done-block :fart-fax,
+     :source-query :flows-sys,
+     :param-full ":new-flow-429939",
+     :param-field :flow_id,
+     :source-panel-key :flow-list*,
+     :type :sub-flow,
+     :param-table :flows-sys,
+     :source-table :query/flows-sys,
+     :connection-id nil,
+     :target :flow_id,
+     :row-num 0}}},
+  :open-input
+  {:w 200,
+   :h 60,
+   :data {:drag-meta {:type :open-block}, :user-input -564000},
+   :z 0,
+   :ports {:out {:out :integer}},
+   :x 1328.4227056923153,
+   :y 1291.1730081810138}},
+ :flow-id "double-nested-sub flow2",
+ :flowmaps-connections
+ [[:open-input :name-issue!/open-input] [:name-issue! :done]]}

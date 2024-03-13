@@ -1,0 +1,3 @@
+
+{:jdbc-url "jdbc:mysql://root:notofox@10.174.1.248:3306/rabbit"}
+

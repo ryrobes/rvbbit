@@ -1,0 +1,44 @@
+{:flowmaps
+ {:make-http-call-1
+  {:y 1225,
+   :w 150,
+   :right-click? true,
+   :icon "zmdi-http",
+   :z 0,
+   :ports {:in {:req-map :map}, :out {:out :any}},
+   :h 110,
+   :x 1925,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :name ":make-http-call",
+     :type :make-http-call,
+     :icon "zmdi-http",
+     :defaults
+     {:req-map
+      {:url "https://owen-wilson-wow-api.onrender.com/wows/random",
+       :query-params {:movie "Wedding Crashers", :results 40}}},
+     :types {:req-map :map, :out :any},
+     :style {:color "#7BB696"},
+     :selected-style {:color "#7BB696"},
+     :inputs [:req-map],
+     :expandable? true,
+     :required [:req-map]},
+    :drag-meta {:type :make-http-call}}},
+  :open-input
+  {:w 175,
+   :h 135,
+   :z 0,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input
+    {:url "https://owen-wilson-wow-api.onrender.com/wows/random", :query-params {:movie "Wedding Crashers", :results 40}}},
+   :right-click? true,
+   :ports {:in {}, :out {:out :map}},
+   :x 1850,
+   :y 1025}},
+ :opts {:retry-on-error? true, :retries 5, :close-on-done? true},
+ :zoom [-1803.1 -1312.13 1.4],
+ :flow-id "chat-loop-337",
+ :flowmaps-connections [[:make-http-call-1 :done]]}

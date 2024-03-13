@@ -1,0 +1,9 @@
+
+;; {:classname   "org.sqlite.JDBC"
+;;  :subprotocol "sqlite"
+;;  :subname     "./data/met-on-tour.db"}
+
+{:jdbc-url "jdbc:sqlite:data/met-on-tour.db"
+ ;:idle-timeout       600000
+ ;:max-lifetime       1800000
+ :cache "shared"}

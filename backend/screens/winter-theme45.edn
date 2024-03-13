@@ -1,0 +1,3893 @@
+{:orders
+ {:flow-fn-sys
+  [:name
+   :full_map
+   :description
+   :inputs
+   :icon
+   :input_types
+   :output_types
+   :category],
+  :STREET-drag-20 [:STREET :rowcnt],
+  :blocks-sys
+  [:block_key
+   :block_name
+   :queries
+   :views
+   :block_data
+   :view_names
+   :query_names],
+  :fields-sys [:field_name :field_type :data_type],
+  :kits-drag-18
+  [:item_data
+   :item_hash
+   :item_idx
+   :item_key
+   :item_name
+   :item_options
+   :item_type
+   :kit_name
+   :updated],
+  :OCCURRED-ON-DATE-drag-17 [:OCCURRED_ON_DATE :rowcnt],
+  :STREET-drag-37 [:STREET :rowcnt],
+  :tables-sys
+  [:db_schema
+   :db_catalog
+   :connection_id
+   :schema_cat
+   :table_name
+   :fields],
+  :tmp--937456566-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :tmp--306276754-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :OFFENSE-CODE-GROUP-drag-40
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Long
+   :MONTH
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :STREET
+   :YEAR
+   :styler_higlight2083585296
+   :styler_higlight_1556752600],
+  :tmp--623736141-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :OCCURRED-ON-DATE-drag-36 [:OCCURRED_ON_DATE :rowcnt :MONTH],
+  :STREET-drag-30 [:STREET :rowcnt],
+  :bigfoot-sightings-drag-27
+  [:alsonoticed
+   :bfroid
+   :class
+   :county
+   :date
+   :environment
+   :fixed_month
+   :fixed_year
+   :locationdetails
+   :month
+   :nearestroad
+   :nearesttown
+   :observed
+   :otherstories
+   :otherwitnesses
+   :run_id
+   :run_time
+   :season
+   :sketch
+   :state
+   :submitted
+   :submitted_date
+   :timeandconditions
+   :title
+   :url
+   :year],
+  :INCIDENT-NUMBER-drag-11 [:INCIDENT_NUMBER :rowcnt],
+  :OCCURRED-ON-DATE-drag-19 [:OCCURRED_ON_DATE :rowcnt],
+  :offenses-drag-9
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Long
+   :MONTH
+   :OCCURRED_ON_DATE
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :SHOOTING
+   :STREET
+   :UCR_PART
+   :YEAR],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :files-sys [:file_path :screen_name :blocks :queries :ts],
+  :OCCURRED-ON-DATE-drag-27 [:OCCURRED_ON_DATE :rowcnt],
+  :kits
+  [:item_hash
+   :item_name
+   :kit_name
+   :item_type
+   :item_key
+   :item_idx
+   :item_options
+   :item_data
+   :updated],
+  :tmp--754731808-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :tmp--1912438500-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :STREET-drag-18 [:STREET :rowcnt],
+  :tmp--46321701-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :tmp--1715804607-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :tmp-1904596537-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :bigfoot_sightings
+  [:bfroid
+   :submitted
+   :submitted_date
+   :title
+   :class
+   :month
+   :fixed_month
+   :date
+   :year
+   :fixed_year
+   :season
+   :state
+   :county
+   :locationdetails
+   :nearesttown
+   :nearestroad
+   :observed
+   :alsonoticed
+   :otherwitnesses
+   :otherstories
+   :timeandconditions
+   :environment
+   :url
+   :run_id
+   :run_time
+   :sketch],
+  :item-key-drag-8 [:item_key :rowcnt :item_name :kit_name],
+  :offenses
+  [:INCIDENT_NUMBER
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :DISTRICT
+   :REPORTING_AREA
+   :SHOOTING
+   :OCCURRED_ON_DATE
+   :YEAR
+   :MONTH
+   :DAY_OF_WEEK
+   :HOUR
+   :UCR_PART
+   :STREET
+   :Lat
+   :Long
+   :Location],
+  :flow-fn-categories-sys [:category],
+  :tmp-2092157300-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :connections-sys [:database_name :connection_id],
+  :tmp-488816211-hist-sys
+  [:client_name
+   :data
+   :diff
+   :diff_kp
+   :key
+   :kp
+   :panel_key
+   :pre_data
+   :type
+   :updated],
+  :INCIDENT-NUMBER-drag-27
+  [:INCIDENT_NUMBER :rowcnt :OCCURRED_ON_DATE],
+  :rowcnt-drag-16 [:rowcnt_sum],
+  :reco-counts [:table_name :cnt],
+  :OFFENSE-CODE-GROUP-drag-40->-OCCURRED_ON_DATE
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Long
+   :MONTH
+   :OCCURRED_ON_DATE
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :SHOOTING
+   :STREET
+   :UCR_PART
+   :YEAR],
+  :kit-results-sys
+  [:item_hash
+   :item_name
+   :kit_name
+   :item_type
+   :item_key
+   :item_idx
+   :item_options
+   :item_data
+   :updated],
+  :flow-fn-all-sys [:name]},
+ :reco-preview nil,
+ :flow? true,
+ :sql-source
+ {:STREET-drag-20
+  {:select [:STREET [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :vv597]],
+   :group-by [:STREET],
+   :order-by [[:rowcnt :desc]]},
+  :kits-drag-18
+  {:select
+   [:item_data
+    :item_hash
+    :item_idx
+    :item_key
+    :item_name
+    :item_options
+    :item_type
+    :kit_name
+    :updated],
+   :from [[:kits :vv417]]},
+  :OCCURRED-ON-DATE-drag-17
+  {:select [:OCCURRED_ON_DATE [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :hh445]],
+   :group-by [:OCCURRED_ON_DATE],
+   :order-by [[:rowcnt :desc]]},
+  :STREET-drag-37
+  {:select [:STREET [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :cc765]],
+   :group-by [:STREET],
+   :order-by [[:rowcnt :desc]]},
+  :OFFENSE-CODE-GROUP-drag-40
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Long
+    :MONTH
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :STREET
+    :YEAR],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :pp28]],
+   :page 1,
+   :where
+   [:and
+    [:and [:= :OFFENSE_DESCRIPTION "VANDALISM"] [:= :DISTRICT "C11"]]
+    [:= :HOUR 0]],
+   :style-rules
+   {[:* :higlight2083585296]
+    {:logic
+     [:and
+      [:= :DISTRICT "C11"]
+      [:= :OFFENSE_DESCRIPTION "VANDALISM"]
+      [:= :YEAR 2016]],
+     :style
+     {:background-color "#008b8b66", :border "1px solid #00000000"}},
+    [:* :higlight-1556752600]
+    {:logic [:and [:= :DAY_OF_WEEK "0001-01-06"]],
+     :style
+     {:background-color "#008b8b66", :border "1px solid #00000000"}}}},
+  :OCCURRED-ON-DATE-drag-36
+  {:select [:OCCURRED_ON_DATE [[:count 1] :rowcnt] :MONTH],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :uu325]],
+   :group-by [:OCCURRED_ON_DATE :MONTH],
+   :order-by [[:rowcnt :desc]]},
+  :STREET-drag-30
+  {:select [:STREET [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :jj294]],
+   :group-by [:STREET],
+   :order-by [[:rowcnt :desc]]},
+  :bigfoot-sightings-drag-27
+  {:select
+   [:alsonoticed
+    :bfroid
+    :class
+    :county
+    :date
+    :environment
+    :fixed_month
+    :fixed_year
+    :locationdetails
+    :month
+    :nearestroad
+    :nearesttown
+    :observed
+    :otherstories
+    :otherwitnesses
+    :run_id
+    :run_time
+    :season
+    :sketch
+    :state
+    :submitted
+    :submitted_date
+    :timeandconditions
+    :title
+    :url
+    :year],
+   :from [[:bigfoot_sightings :oo882]]},
+  :INCIDENT-NUMBER-drag-11
+  {:select [:INCIDENT_NUMBER [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :kk981]],
+   :group-by [:INCIDENT_NUMBER],
+   :order-by [[:rowcnt :desc]]},
+  :OCCURRED-ON-DATE-drag-19
+  {:select [:OCCURRED_ON_DATE [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :ww95]],
+   :group-by [:OCCURRED_ON_DATE],
+   :order-by [[:rowcnt :desc]]},
+  :offenses-drag-9
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Long
+    :MONTH
+    :OCCURRED_ON_DATE
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :SHOOTING
+    :STREET
+    :UCR_PART
+    :YEAR],
+   :from [[:offenses :mm47]]},
+  :OCCURRED-ON-DATE-drag-27
+  {:select [:OCCURRED_ON_DATE [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :ff85]],
+   :group-by [:OCCURRED_ON_DATE],
+   :order-by [[:rowcnt :desc]]},
+  :kits {:select [:*], :from [:kits], :limit 111},
+  :STREET-drag-18
+  {:select [:STREET [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:STREET [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:DAY_OF_WEEK
+          :DISTRICT
+          :HOUR
+          :INCIDENT_NUMBER
+          :Lat
+          :Long
+          :MONTH
+          :OCCURRED_ON_DATE
+          :OFFENSE_CODE
+          :OFFENSE_CODE_GROUP
+          :OFFENSE_DESCRIPTION
+          :REPORTING_AREA
+          :SHOOTING
+          :STREET
+          :UCR_PART
+          :YEAR],
+         :from [[:offenses :mm47]]}
+        :cc765]],
+      :group-by [:STREET],
+      :order-by [[:rowcnt :desc]]}
+     :zz63]],
+   :group-by [:STREET],
+   :order-by [[:rowcnt :desc]]},
+  :bigfoot_sightings
+  {:select [:*], :from [:bigfoot_sightings], :limit 111},
+  :item-key-drag-8
+  {:select [:item_key [[:count 1] :rowcnt] :item_name :kit_name],
+   :from
+   [[{:select
+      [:item_data
+       :item_hash
+       :item_idx
+       :item_key
+       :item_name
+       :item_options
+       :item_type
+       :kit_name
+       :updated],
+      :from [[:kits :vv417]]}
+     :vv835]],
+   :group-by [:item_key :item_name :kit_name],
+   :order-by [[:rowcnt :desc]]},
+  :offenses {:select [:*], :from [:offenses], :limit 111},
+  :INCIDENT-NUMBER-drag-27
+  {:select [:INCIDENT_NUMBER [[:count 1] :rowcnt] :OCCURRED_ON_DATE],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :mm47]]}
+     :nn582]],
+   :group-by [:INCIDENT_NUMBER :OCCURRED_ON_DATE],
+   :order-by [[:rowcnt :desc]]},
+  :rowcnt-drag-16
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:OCCURRED_ON_DATE [[:count 1] :rowcnt] :MONTH],
+      :from
+      [[{:select
+         [:DAY_OF_WEEK
+          :DISTRICT
+          :HOUR
+          :INCIDENT_NUMBER
+          :Lat
+          :Long
+          :MONTH
+          :OCCURRED_ON_DATE
+          :OFFENSE_CODE
+          :OFFENSE_CODE_GROUP
+          :OFFENSE_DESCRIPTION
+          :REPORTING_AREA
+          :SHOOTING
+          :STREET
+          :UCR_PART
+          :YEAR],
+         :from [[:offenses :mm47]]}
+        :uu325]],
+      :group-by [:OCCURRED_ON_DATE :MONTH],
+      :order-by [[:rowcnt :desc]]}
+     :qq448]]},
+  :OFFENSE-CODE-GROUP-drag-40->-OCCURRED_ON_DATE
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Long
+    :MONTH
+    :OCCURRED_ON_DATE
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :SHOOTING
+    :STREET
+    :UCR_PART
+    :YEAR],
+   :from [[:offenses :mm47]],
+   :where [:*when {} [:*all= {} []]]}},
+ :selected-flow-block :*-1,
+ :meta
+ {:flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 20,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, ":single-if" 1},
+     :cardinality 100},
+    :full_map
+    {:data-type "string",
+     :distinct 20,
+     :group-by? true,
+     :commons
+     {"{:description \"Clojure greater-than-or-equal function.\", :fn >, :inputs [:value1 :value2], :icon \"zmdi-chevron-right\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :boolean}}"
+      1,
+      "{:description \"Clojure subtract function.\", :fn =, :inputs [:value1 :value2], :icon \"zmdi-swap\", :types {:value1 :any, :value2 :any, :out :boolean}}"
+      1,
+      "{:description \"Clojure greater-than function.\", :fn >, :inputs [:value1 :value2], :icon \"zmdi-chevron-right\", :types {:value1 [:integer :float], :value2 [:integer :float], :out :boolean}}"
+      1},
+     :cardinality 100},
+    :description
+    {:data-type "string",
+     :distinct 19,
+     :group-by? true,
+     :commons
+     {"Clojure subtract function." 2,
+      "Clojure some function (fixed to act as a simple IN)." 1,
+      "Clojure count function, takes a sequence and returns an integer of the number of items."
+      1},
+     :cardinality 94},
+    :inputs
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons {"[:value1 :value2]" 8, "[:value]" 6, "[:seq]" 1},
+     :cardinality 40},
+    :icon
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {"zmdi-pizza" 3, "zmdi-dns" 2, "zmdi-chevron-right" 2},
+     :cardinality 69},
+    :input_types
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons
+     {"[[:integer :float] [:integer :float]]" 7,
+      "[:any]" 4,
+      "[:boolean]" 3},
+     :cardinality 44},
+    :output_types
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons {":boolean" 11, "[:integer :float]" 3, ":any" 2},
+     :cardinality 30},
+    :category
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":clojure-base" 17, ":rabbit-base" 3},
+     :cardinality 10}},
+   :rowcount 20},
+  :STREET-drag-20
+  {:fields
+   {:STREET
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"BROOKS ST" 1, "GROVE ST" 1, "NORWELL ST" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 280,
+     :group-by? false,
+     :commons {127 9, 189 7, 182 7},
+     :cardinality 56}},
+   :rowcount 500},
+  :blocks-sys
+  {:fields
+   {:block_key
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons {":block-1965" 1, ":block-7510" 1, ":views" 1},
+     :cardinality 100},
+    :block_name
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons
+     {"" 4,
+      "recharts_h_bar - \"country, rows\" - 603" 1,
+      "drag-from-chat-sql-" 1},
+     :cardinality 72},
+    :queries
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 8, 1 3},
+     :cardinality 18},
+    :views
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {0 6, 1 4, 27 1},
+     :cardinality 27},
+    :block_data
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons
+     {"{:codemirror-theme \"the-matrix\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#091536\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b0f2180\", :editor-rim-color \"#2b4270\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2c728e\", \"boolean\" \"#f386bf\", \"map\" \"#00FFFF\", \"list\" \"#c32148\", \"string\" \"#7de883\", \"vector\" \"#008080\", \"keyword\" \"#add8e6\", \"rabbit-code\" \"#FC0FC0\", \"datetime\" \"#472d7b\", \"integer\" \"#d6e367\", \"unknown\" \"#c7005d\", \"date\" \"#3b528b\", \"nil\" \"#ff2147\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#8879bc\", :nivo-defaults {:font-family :theme/base-font, :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family :theme/base-font, :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family :theme/base-font, :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#40d6ff\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/vap66-huge.png)\", :transition \"all 0.6s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Nova Square\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}"
+      1,
+      "{{:select [[\"heya, friendo\"] :greetings]} {:view nil}}" 1,
+      "{:select [:country [[:count 1] :rowcnt]], :from [[:ufo_sightings :ww355]], :group-by [:country], :order-by [[:rowcnt :desc]], :style-rules {[:* :highlight-4040] {:logic [:> :rowcnt 3000], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}"
+      1},
+     :cardinality 100},
+    :view_names
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"" 6, ":param-val" 2, ":reech" 1},
+     :cardinality 45},
+    :query_names
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"" 8, ":gen-viz-1162" 1, ":rowcnt-drag-42" 1},
+     :cardinality 36}},
+   :rowcount 11},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"item_options" 1, "item_name" 1, "updated" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"TEXT" 7, "TIMESTAMP" 1, "INTEGER" 1},
+     :cardinality 33},
+    :data_type
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"string" 7, "datetime" 1, "integer" 1},
+     :cardinality 33}},
+   :rowcount 9},
+  :kits-drag-18
+  {:fields
+   {:item_idx
+    {:data-type "integer",
+     :distinct 13,
+     :group-by? true,
+     :commons {8 1, 10 1, 5 1},
+     :cardinality 100},
+    :item_options
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:options {:pages? true, :search? false, :actions? false}, :parameters {}, :mutates {}, :description \"Top 13 Outlier by Severity\"}"
+      13},
+     :cardinality 7},
+    :updated
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2023-12-31 00:11:17" 13},
+     :cardinality 7},
+    :item_hash
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"-649093148" 13},
+     :cardinality 7},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 13},
+     :cardinality 7},
+    :item_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":OFFENSE-CODE-GROUP-drag-40" 13},
+     :cardinality 7},
+    :item_data
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons
+     {"{:name \"4. When grouping by street and aggregating by :rows there are values that are higher than the mean  by 5.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:STREET]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1302324412]] {:logic [:and [:= :STREET \"ADAMS ST\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1.4390244\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"1.0252609539992064\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"82\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:STREET]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":STREET\"] [:box :child \"\\\"ADAMS ST\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:STREET [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--13023244120-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:STREET], :style-rules {[:* :highlight-group] {:logic [:and [:= :STREET \"ADAMS ST\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--13023244120-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query--13023244120-agg/*.clicked [:*all= :kit-query--13023244120-agg/*.clicked [:STREET]] [:and [:= :STREET \"ADAMS ST\"]]]}], :order 3}"
+      1,
+      "{:name \"12. When grouping by day_of_week, month, year and aggregating by :rows there are values that are higher than the mean  by 2.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DAY_OF_WEEK :MONTH :YEAR]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-2039577961]] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-06\"] [:= :MONTH 9] [:= :YEAR 2015]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1.2421052\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"0.5752032038869158\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"95\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DAY_OF_WEEK :MONTH :YEAR]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DAY_OF_WEEK\"] [:box :child \"\\\"0001-01-06\\\"\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":MONTH\"] [:box :child \"9\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":YEAR\"] [:box :child \"2015\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:DAY_OF_WEEK :MONTH :YEAR [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--20395779610-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:DAY_OF_WEEK :MONTH :YEAR], :style-rules {[:* :highlight-group] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-06\"] [:= :MONTH 9] [:= :YEAR 2015]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[4 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--20395779610-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query--20395779610-agg/*.clicked [:*all= :kit-query--20395779610-agg/*.clicked [:DAY_OF_WEEK :MONTH :YEAR]] [:and [:= :DAY_OF_WEEK \"0001-01-06\"] [:= :MONTH 9] [:= :YEAR 2015]]]}], :order 11}"
+      1,
+      "{:name \"6. When grouping by day_of_week and aggregating by :rows there are values that are lower than the mean  by 4.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DAY_OF_WEEK]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight2001331933]] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-02\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"16.857143\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"4.189393799604336\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"7\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DAY_OF_WEEK]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DAY_OF_WEEK\"] [:box :child \"\\\"0001-01-02\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:DAY_OF_WEEK [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query-20013319330-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:DAY_OF_WEEK], :style-rules {[:* :highlight-group] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-02\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :asc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query-20013319330-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query-20013319330-agg/*.clicked [:*all= :kit-query-20013319330-agg/*.clicked [:DAY_OF_WEEK]] [:and [:= :DAY_OF_WEEK \"0001-01-02\"]]]}], :order 5}"
+      1},
+     :cardinality 100},
+    :item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":top-outliers" 13},
+     :cardinality 7},
+    :kit_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":outliers" 13},
+     :cardinality 7}},
+   :rowcount 13},
+  :OCCURRED-ON-DATE-drag-17
+  {:fields
+   {:OCCURRED_ON_DATE
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"2018-07-29 18:00:00.000000" 1,
+      "2017-05-21 01:00:00.000000" 1,
+      "2018-08-15 12:00:00.000000" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 18,
+     :group-by? false,
+     :commons {8 200, 9 104, 7 59},
+     :cardinality 3}},
+   :rowcount 500},
+  :STREET-drag-37
+  {:fields
+   {:STREET
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"BROOKS ST" 1, "GROVE ST" 1, "NORWELL ST" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 280,
+     :group-by? false,
+     :commons {127 9, 189 7, 182 7},
+     :cardinality 56}},
+   :rowcount 500},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 23},
+     :cardinality 4},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 23},
+     :cardinality 4},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"system-db" 23},
+     :cardinality 4},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 23},
+     :cardinality 4},
+    :table_name
+    {:data-type "string",
+     :distinct 23,
+     :group-by? true,
+     :commons
+     {"connections" 1, "board_history" 1, "rule_maps_tests" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 14,
+     :group-by? false,
+     :commons {5 3, 6 3, 10 2},
+     :cardinality 60}},
+   :rowcount 23},
+  :tmp--937456566-hist-sys {:fields {}, :rowcount 0},
+  :tmp--306276754-hist-sys {:fields {}, :rowcount 0},
+  :OFFENSE-CODE-GROUP-drag-40
+  {:fields
+   {:DISTRICT
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"C11" 118},
+     :cardinality 0},
+    :INCIDENT_NUMBER
+    {:data-type "string",
+     :distinct 118,
+     :group-by? true,
+     :commons {"I172088714" 1, "I162072722" 1, "I182052412" 1},
+     :cardinality 100},
+    :OFFENSE_DESCRIPTION
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"VANDALISM" 118},
+     :cardinality 0},
+    :styler_higlight2083585296
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 83, 1 35},
+     :cardinality 1},
+    :DAY_OF_WEEK
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"0001-01-06" 26, "0001-01-07" 19, "0001-01-05" 16},
+     :cardinality 5},
+    :MONTH
+    {:data-type "integer",
+     :distinct 12,
+     :group-by? true,
+     :commons {7 18, 5 12, 3 12},
+     :cardinality 10},
+    :YEAR
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {2016 35, 2017 34, 2018 29},
+     :cardinality 3},
+    :HOUR
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 118},
+     :cardinality 0},
+    :styler_higlight_1556752600
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 92, 1 26},
+     :cardinality 1},
+    :STREET
+    {:data-type "string",
+     :distinct 82,
+     :group-by? true,
+     :commons {"ADAMS ST" 7, "DORCHESTER AVE" 6, "GENEVA AVE" 4},
+     :cardinality 69},
+    :OFFENSE_CODE_GROUP
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"Vandalism" 118},
+     :cardinality 0},
+    :Long
+    {:data-type "float",
+     :distinct 106,
+     :group-by? true,
+     :commons {-71.06570084 2, -71.06316929 2, -71.06674608 2},
+     :cardinality 89},
+    :REPORTING_AREA
+    {:data-type "integer",
+     :distinct 59,
+     :group-by? true,
+     :commons {337 7, 823 6, 336 5},
+     :cardinality 50},
+    :OFFENSE_CODE
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1402 118},
+     :cardinality 0},
+    :Lat
+    {:data-type "float",
+     :distinct 106,
+     :group-by? true,
+     :commons {42.30344073 2, 42.29881968 2, 42.29990887 2},
+     :cardinality 89}},
+   :rowcount 118},
+  :tmp--623736141-hist-sys {:fields {}, :rowcount 0},
+  :OCCURRED-ON-DATE-drag-36
+  {:fields
+   {:OCCURRED_ON_DATE
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"2018-07-29 18:00:00.000000" 1,
+      "2017-05-21 01:00:00.000000" 1,
+      "2017-05-09 16:00:00.000000" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 18,
+     :group-by? false,
+     :commons {8 200, 9 104, 7 59},
+     :cardinality 3},
+    :MONTH
+    {:data-type "integer",
+     :distinct 12,
+     :group-by? true,
+     :commons {7 80, 8 62, 6 59},
+     :cardinality 2}},
+   :rowcount 500},
+  :STREET-drag-30
+  {:fields
+   {:STREET
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"BROOKS ST" 1, "GROVE ST" 1, "NORWELL ST" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 280,
+     :group-by? false,
+     :commons {127 9, 189 7, 182 7},
+     :cardinality 56}},
+   :rowcount 500},
+  :bigfoot-sightings-drag-27
+  {:fields
+   {:nearestroad
+    {:data-type "string",
+     :distinct 373,
+     :group-by? true,
+     :commons {nil 81, "Highway 108" 11, "285" 5},
+     :cardinality 74},
+    :date
+    {:data-type "string",
+     :distinct 165,
+     :group-by? true,
+     :commons {nil 188, "1" 16, "15" 11},
+     :cardinality 33},
+    :locationdetails
+    {:data-type "string",
+     :distinct 431,
+     :group-by? true,
+     :commons
+     {nil 69,
+      "Take Highway 108 to Cold Springs." 2,
+      "It was about 50 yards north-west of the Giant Forest Museum and about 20 yards north of the Bear Hill Trail."
+      1},
+     :cardinality 86},
+    :submitted_date
+    {:data-type "string",
+     :distinct 455,
+     :group-by? true,
+     :commons {"2001-02-04" 3, "2001-01-02" 3, "2004-01-15" 3},
+     :cardinality 91},
+    :sketch
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 500},
+     :cardinality 0},
+    :bfroid
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {33088 1, 65566 1, 2199 1},
+     :cardinality 100},
+    :otherwitnesses
+    {:data-type "string",
+     :distinct 412,
+     :group-by? true,
+     :commons {nil 65, "No" 6, "no" 5},
+     :cardinality 82},
+    :run_id
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {34 500},
+     :cardinality 0},
+    :nearesttown
+    {:data-type "string",
+     :distinct 377,
+     :group-by? true,
+     :commons {nil 56, "Strawberry" 9, "Leadville" 5},
+     :cardinality 75},
+    :timeandconditions
+    {:data-type "string",
+     :distinct 445,
+     :group-by? true,
+     :commons
+     {nil 55,
+      "late night" 2,
+      "Please see above report for complete details" 1},
+     :cardinality 88},
+    :month
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"0001-08-01" 89, nil 64, "0001-09-01" 60},
+     :cardinality 2},
+    :county
+    {:data-type "string",
+     :distinct 88,
+     :group-by? true,
+     :commons
+     {"Humboldt County" 42,
+      "Tuolumne County" 35,
+      "Siskiyou County" 31},
+     :cardinality 17},
+    :state
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"California" 328, "Colorado" 125, "Florida" 21},
+     :cardinality 1},
+    :fixed_month
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"0001-08-01" 89, "0001-07-01" 81, "0001-09-01" 73},
+     :cardinality 2},
+    :submitted
+    {:data-type "string",
+     :distinct 455,
+     :group-by? true,
+     :commons
+     {"2003-09-26 00:00:00.000000" 3,
+      "2000-10-28 00:00:00.000000" 3,
+      "2001-02-04 00:00:00.000000" 3},
+     :cardinality 91},
+    :title
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"Sightings by hunting guide in Pike National Forest" 1,
+      "Couple Has Frightening Encounter Near Lake Shasta" 1,
+      "Motorist daylight sighting between Redding and Lassen National Forest"
+      1},
+     :cardinality 100},
+    :otherstories
+    {:data-type "string",
+     :distinct 258,
+     :group-by? true,
+     :commons {nil 180, "No" 24, "no" 19},
+     :cardinality 51},
+    :year
+    {:data-type "string",
+     :distinct 104,
+     :group-by? true,
+     :commons {"2001" 29, "2000" 25, "1998" 20},
+     :cardinality 20},
+    :season
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"Summer" 221, "Fall" 129, "Spring" 85},
+     :cardinality 0},
+    :class
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"Class B" 257, "Class A" 238, "Class C" 5},
+     :cardinality 0},
+    :alsonoticed
+    {:data-type "string",
+     :distinct 285,
+     :group-by? true,
+     :commons {nil 202, "no" 7, "No" 4},
+     :cardinality 56},
+    :url
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"http://www.bfro.net/GDB/show_report.asp?id=27966&PrinterFriendly=True"
+      1,
+      "http://www.bfro.net/GDB/show_report.asp?id=596&PrinterFriendly=True"
+      1,
+      "http://www.bfro.net/GDB/show_report.asp?id=1367&PrinterFriendly=True"
+      1},
+     :cardinality 100},
+    :observed
+    {:data-type "string",
+     :distinct 496,
+     :group-by? true,
+     :commons
+     {nil 5,
+      " My uncle and I were elk hunting near Fossil Ridge northeast of Gunnison, CO when this incident ocurred.  It was late afternoon when we noticed a strong odor that we thought might be elk so we headed east toward a small ridge hoping to find one on the other side.  As we got closer we heard the noise of rocks being banged together.  As we topped the ridge we saw a large dark brown animal squatting at the edge of a dry creek bed with it''s back toward us. It was banging 2 rocks together with it''s \"hands\" and making a grunting/growling noise each time the  rocks hit.<BR><BR>It seemed to sense our presence almost immediately and turned around and looked at us.  Then it quickly stood up and jumped across the creek in one motion.  I remember thinking \"nothing can move like that!\".  It ran up the slope on the north side of the creek bed at an angle and disappeared into the pine and aspen trees farther up the hill.  We could see it for about 50 feet before it was gone from sight.  It moved real quietly for something that big.<BR><BR>I estimate it''s height as 6''5''''.  It was covered with long dark brown hair that made me think of a yak.  It had a strong smell, at least there was a strong smell in the area that was like elk urine.<BR><BR>After we calmed down a bit, we went into the creek bed and found the 2 rocks which were chipped and broken.  We looked for other signs in that place but couldn''t find anything else."
+      1,
+      " I was working in the northern part of New Mexico training to be a Wildland Fire Fighter. In September 2003 (maybe the second week of that month) I was dispatched with 22 other people to the Del Loma Fire in the Shasta/Trinity Forest area, the Northern part of California. Each Crew had about 20 people, our plane that left Albuquerque held 2 crews. For almost the whole two weeks, we were all on standby. On the 4th to the last day of our 2 weeks of Fire call, we were setting up camp close to a river, about 5-10 miles out from the original forest fire. It was close to sun down when, a couple of guys were amazed at something. I heard them from inside my tent, but just ignored the whole thing until one of my crew members came and pulled me out of my tent. <BR><BR>I had no idea what I was supposed to be looking at or for. He pointed across the river and I was in shock when he pointed out the biggest, hairiest mammal I had ever seen just walking along the river side minding his own business. It stopped and looked at us. The way he stood on his hind legs was like an ordinary human. He had dark, long hair and stood about 7ft tall with a muscular build. <BR><BR>At this point I was the 4th person standing there in amazement. Maybe about 5 minutes of watching him watch us, with more people coming out with flashlights (because the sun was still going down) he darted in to the trees. He was running, taking long strides, and was gone in about 3 seconds.....and was literally pushing trees out of his way (not breaking them, but  pushing them out of his way). The trees behind him on his path up the mountain were swaying back and forth. I was surprised to see to these trees moving because they are thick in width and very tall. <BR><BR>By this time it was dark but lit enough to see which way he was headed. Up the mountain a little, there was a clearing, where we spotted him again before he disappeared for good. He made no noise, no yelling or screaming. He was just as timid as can be.<BR><BR>I have heard many stories about Bigfoot, and known that they are real but when seeing one in real life....you get a sense of respect for them and just have that feeling that there is more to life than you know. <BR><BR><BR><BR>"
+      1},
+     :cardinality 99},
+    :environment
+    {:data-type "string",
+     :distinct 449,
+     :group-by? true,
+     :commons {nil 41, "Pine forest" 6, "Forest" 3},
+     :cardinality 89},
+    :fixed_year
+    {:data-type "string",
+     :distinct 77,
+     :group-by? true,
+     :commons {"2001" 30, "2000" 25, "1998" 23},
+     :cardinality 15},
+    :run_time
+    {:data-type "string",
+     :distinct 187,
+     :group-by? true,
+     :commons
+     {"2022-05-20 16:15:54.000000" 4,
+      "2022-05-20 16:15:30.000000" 4,
+      "2022-05-20 16:14:33.000000" 4},
+     :cardinality 37}},
+   :rowcount 500},
+  :item-name-drag-39 {:fields {}, :rowcount 0},
+  :INCIDENT-NUMBER-drag-11
+  {:fields
+   {:INCIDENT_NUMBER
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"I182004681" 1, "I182052513" 1, "I162105518" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 8,
+     :group-by? false,
+     :commons {5 301, 6 131, 7 44},
+     :cardinality 1}},
+   :rowcount 500},
+  :OCCURRED-ON-DATE-drag-19
+  {:fields
+   {:OCCURRED_ON_DATE
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"2018-07-29 18:00:00.000000" 1,
+      "2017-05-21 01:00:00.000000" 1,
+      "2018-08-15 12:00:00.000000" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 18,
+     :group-by? false,
+     :commons {8 200, 9 104, 7 59},
+     :cardinality 3}},
+   :rowcount 500},
+  :offenses-drag-9
+  {:fields
+   {:SHOOTING
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :DISTRICT
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"C11" 82, "B2" 75, "B3" 49},
+     :cardinality 2},
+    :INCIDENT_NUMBER
+    {:data-type "string",
+     :distinct 454,
+     :group-by? true,
+     :commons {"I182070397" 5, "I182070779" 4, "I182070889" 3},
+     :cardinality 90},
+    :OFFENSE_DESCRIPTION
+    {:data-type "string",
+     :distinct 89,
+     :group-by? true,
+     :commons
+     {"SICK/INJURED/MEDICAL - PERSON" 43,
+      "VERBAL DISPUTE" 34,
+      "INVESTIGATE PERSON" 33},
+     :cardinality 17},
+    :DAY_OF_WEEK
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"0001-01-07" 228, "0001-01-08" 178, "0001-01-06" 75},
+     :cardinality 1},
+    :MONTH
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {9 477, 8 21, 7 1},
+     :cardinality 0},
+    :YEAR
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {2018 500},
+     :cardinality 0},
+    :HOUR
+    {:data-type "integer",
+     :distinct 24,
+     :group-by? true,
+     :commons {18 45, 14 33, 20 32},
+     :cardinality 4},
+    :STREET
+    {:data-type "string",
+     :distinct 275,
+     :group-by? true,
+     :commons {nil 41, "WASHINGTON ST" 20, "HUNTINGTON AVE" 12},
+     :cardinality 55},
+    :OFFENSE_CODE_GROUP
+    {:data-type "string",
+     :distinct 41,
+     :group-by? true,
+     :commons
+     {"Motor Vehicle Accident Response" 69,
+      "Medical Assistance" 50,
+      "Larceny" 41},
+     :cardinality 8},
+    :UCR_PART
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"Part Three" 265, "Part Two" 140, "Part One" 93},
+     :cardinality 0},
+    :Long
+    {:data-type "float",
+     :distinct 413,
+     :group-by? true,
+     :commons {-1 6, -71.1136693 5, nil 5},
+     :cardinality 82},
+    :REPORTING_AREA
+    {:data-type "integer",
+     :distinct 282,
+     :group-by? true,
+     :commons {nil 42, 519 6, 177 5},
+     :cardinality 56},
+    :OFFENSE_CODE
+    {:data-type "integer",
+     :distinct 89,
+     :group-by? true,
+     :commons {3006 43, 3301 34, 3115 33},
+     :cardinality 17},
+    :Lat
+    {:data-type "float",
+     :distinct 413,
+     :group-by? true,
+     :commons {-1 6, 42.24635332 5, nil 5},
+     :cardinality 82},
+    :OCCURRED_ON_DATE
+    {:data-type "string",
+     :distinct 404,
+     :group-by? true,
+     :commons
+     {"2018-09-02 00:00:00.000000" 5,
+      "2018-09-03 10:00:00.000000" 5,
+      "2018-09-01 17:03:00.000000" 5},
+     :cardinality 80}},
+   :rowcount 500},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "kick-test-1" 1, "shark-flow-494" 1},
+     :cardinality 83},
+    :file_path
+    {:data-type "string",
+     :distinct 12,
+     :group-by? true,
+     :commons
+     {"./flows/raw-fn-testing1.edn" 1,
+      "./flows/add-then-multiply.edn" 1,
+      "./flows/kick-test-1.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 12,
+     :group-by? true,
+     :commons
+     {"2023-12-28 17:03:55" 1,
+      "2023-12-28 17:08:54" 1,
+      "2023-12-28 17:11:57" 1},
+     :cardinality 100}},
+   :rowcount 12},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 67,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/boston-test-10-3-23.edn" 1,
+      "./screens/tweet-bigfoot-is-blurry.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 63,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 4, "tallica-param-test2" 2, "light-theme" 1},
+     :cardinality 94},
+    :blocks
+    {:data-type "integer",
+     :distinct 31,
+     :group-by? true,
+     :commons {13 5, 15 5, 11 4},
+     :cardinality 46},
+    :queries
+    {:data-type "integer",
+     :distinct 28,
+     :group-by? true,
+     :commons {5 7, 11 6, 0 6},
+     :cardinality 41},
+    :ts
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"2023-12-30 23:36:14" 32,
+      "2023-12-30 23:36:15" 23,
+      "2023-12-30 23:36:16" 12},
+     :cardinality 4}},
+   :rowcount 67},
+  :OCCURRED-ON-DATE-drag-27
+  {:fields
+   {:OCCURRED_ON_DATE
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"2018-07-29 18:00:00.000000" 1,
+      "2017-05-21 01:00:00.000000" 1,
+      "2018-08-15 12:00:00.000000" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 18,
+     :group-by? false,
+     :commons {8 200, 9 104, 7 59},
+     :cardinality 3}},
+   :rowcount 500},
+  :kits
+  {:fields
+   {:item_idx
+    {:data-type "integer",
+     :distinct 13,
+     :group-by? true,
+     :commons {8 1, 10 1, 5 1},
+     :cardinality 100},
+    :item_options
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:options {:pages? true, :search? false, :actions? false}, :parameters {}, :mutates {}, :description \"Top 13 Outlier by Severity\"}"
+      13},
+     :cardinality 7},
+    :updated
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2023-12-31 00:11:17" 13},
+     :cardinality 7},
+    :item_hash
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"-649093148" 13},
+     :cardinality 7},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 13},
+     :cardinality 7},
+    :item_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":OFFENSE-CODE-GROUP-drag-40" 13},
+     :cardinality 7},
+    :item_data
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons
+     {"{:name \"4. When grouping by street and aggregating by :rows there are values that are higher than the mean  by 5.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:STREET]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1302324412]] {:logic [:and [:= :STREET \"ADAMS ST\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1.4390244\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"1.0252609539992064\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"82\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:STREET]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":STREET\"] [:box :child \"\\\"ADAMS ST\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:STREET [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--13023244120-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:STREET], :style-rules {[:* :highlight-group] {:logic [:and [:= :STREET \"ADAMS ST\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--13023244120-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query--13023244120-agg/*.clicked [:*all= :kit-query--13023244120-agg/*.clicked [:STREET]] [:and [:= :STREET \"ADAMS ST\"]]]}], :order 3}"
+      1,
+      "{:name \"12. When grouping by day_of_week, month, year and aggregating by :rows there are values that are higher than the mean  by 2.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DAY_OF_WEEK :MONTH :YEAR]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-2039577961]] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-06\"] [:= :MONTH 9] [:= :YEAR 2015]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1.2421052\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"0.5752032038869158\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"95\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DAY_OF_WEEK :MONTH :YEAR]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DAY_OF_WEEK\"] [:box :child \"\\\"0001-01-06\\\"\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":MONTH\"] [:box :child \"9\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":YEAR\"] [:box :child \"2015\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:DAY_OF_WEEK :MONTH :YEAR [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--20395779610-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:DAY_OF_WEEK :MONTH :YEAR], :style-rules {[:* :highlight-group] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-06\"] [:= :MONTH 9] [:= :YEAR 2015]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[4 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--20395779610-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query--20395779610-agg/*.clicked [:*all= :kit-query--20395779610-agg/*.clicked [:DAY_OF_WEEK :MONTH :YEAR]] [:and [:= :DAY_OF_WEEK \"0001-01-06\"] [:= :MONTH 9] [:= :YEAR 2015]]]}], :order 11}"
+      1,
+      "{:name \"6. When grouping by day_of_week and aggregating by :rows there are values that are lower than the mean  by 4.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DAY_OF_WEEK]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight2001331933]] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-02\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"16.857143\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"4.189393799604336\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"7\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DAY_OF_WEEK]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DAY_OF_WEEK\"] [:box :child \"\\\"0001-01-02\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:DAY_OF_WEEK [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query-20013319330-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:DAY_OF_WEEK], :style-rules {[:* :highlight-group] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-02\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :asc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query-20013319330-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query-20013319330-agg/*.clicked [:*all= :kit-query-20013319330-agg/*.clicked [:DAY_OF_WEEK]] [:and [:= :DAY_OF_WEEK \"0001-01-02\"]]]}], :order 5}"
+      1},
+     :cardinality 100},
+    :item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":top-outliers" 13},
+     :cardinality 7},
+    :kit_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":outliers" 13},
+     :cardinality 7}},
+   :rowcount 13},
+  :bigfoot-sightings-by-country-code-drag-14
+  {:fields
+   {:class
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {nil 217, "Class A" 148, "Class B" 129},
+     :cardinality 0},
+    :id
+    {:data-type "string",
+     :distinct 218,
+     :group-by? true,
+     :commons {nil 15, "06023" 10, "06029" 9},
+     :cardinality 43},
+    :rate
+    {:data-type "integer",
+     :distinct 19,
+     :group-by? true,
+     :commons {0 217, 1 212, 2 38},
+     :cardinality 3},
+    :season
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons {nil 217, "Summer" 94, "Fall" 73},
+     :cardinality 1},
+    :state_name
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons {"ARKANSAS" 143, "ALABAMA" 139, "CALIFORNIA" 122},
+     :cardinality 1}},
+   :rowcount 500},
+  :kits-drag-28
+  {:fields
+   {:item_idx
+    {:data-type "integer",
+     :distinct 7,
+     :group-by? true,
+     :commons {4 2, 3 2, 2 2},
+     :cardinality 58},
+    :item_options
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:options {:pages? true, :search? false, :actions? false}, :parameters {}, :mutates {}, :description \"Top 20 Outlier by Severity\"}"
+      12},
+     :cardinality 8},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2023-12-10 09:33:30" 7, "2023-12-10 09:33:23" 5},
+     :cardinality 16},
+    :item_hash
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"-299268089" 7, "-78898070" 5},
+     :cardinality 16},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 12},
+     :cardinality 8},
+    :item_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {":kits-drag-28" 7,
+      ":bigfoot-sightings-by-country-code-drag-14" 5},
+     :cardinality 16},
+    :item_data
+    {:data-type "string",
+     :distinct 12,
+     :group-by? true,
+     :commons
+     {"{:name \"When grouping by class and aggregating by :rows there are values that are higher than the mean (1469 for this particular aggregation) by 1451.\", :highlight-columns {:bigfoot-sightings-by-country-code-drag-14 [:class]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-5892 :queries :bigfoot-sightings-by-country-code-drag-14 :style-rules [:* :higlight1199652968]] {:logic [:and [:= :class \"Class C\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1469.75\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"1144.431818633159\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"4\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:class]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":class\"] [:box :child \"\\\"Class C\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:class [[:count 1] :rows]], :from [:query/bigfoot-sightings-by-country-code-drag-14], :_query-id :kit-query-11996529680-agg, :_h 4, :connection-id \"bigfoot-ufos\", :group-by [:class], :style-rules {[:* :highlight-group] {:logic [:and [:= :class \"Class C\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/bigfoot-sightings-by-country-code-drag-14], :_query-id :kit-query-11996529680-detail, :_h 8, :connection-id \"bigfoot-ufos\", :where [:*if :kit-query-11996529680-agg/*.clicked [:*all= :kit-query-11996529680-agg/*.clicked [:class]] [:and [:= :class \"Class C\"]]]}], :order 3}"
+      1,
+      "{:name \"When grouping by item_hash and aggregating by :rows there are values that are higher than the mean (17 for this particular aggregation) by 4.\", :highlight-columns {:kits-drag-28 [:item_hash]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-4288 :queries :kits-drag-28 :style-rules [:* :higlight1383676617]] {:logic [:and [:= :item_hash \"-1903271016\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"17.666666\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"3.299831645537222\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"3\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:item_hash]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":item_hash\"] [:box :child \"\\\"-1903271016\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:item_hash [[:count 1] :rows]], :from [:query/kits-drag-28], :_query-id :kit-query-13836766170-agg, :_h 4, :connection-id \"system-db\", :group-by [:item_hash], :style-rules {[:* :highlight-group] {:logic [:and [:= :item_hash \"-1903271016\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/kits-drag-28], :_query-id :kit-query-13836766170-detail, :_h 8, :connection-id \"system-db\", :where [:*if :kit-query-13836766170-agg/*.clicked [:*all= :kit-query-13836766170-agg/*.clicked [:item_hash]] [:and [:= :item_hash \"-1903271016\"]]]}], :order 6}"
+      1,
+      "{:name \"When grouping by item_hash, item_name, updated and aggregating by :rows there are values that are higher than the mean (17 for this particular aggregation) by 4.\", :highlight-columns {:kits-drag-28 [:item_hash :item_name :updated]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-4288 :queries :kits-drag-28 :style-rules [:* :higlight-20001325]] {:logic [:and [:= :item_hash \"-1903271016\"] [:= :item_name \":OFFENSE-CODE-GROUP-drag-40\"] [:= :updated \"2023-12-10 05:46:47\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"17.666666\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"3.299831645537222\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"3\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:item_hash :item_name :updated]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":item_hash\"] [:box :child \"\\\"-1903271016\\\"\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":item_name\"] [:box :child \"\\\":OFFENSE-CODE-GROUP-drag-40\\\"\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":updated\"] [:box :child \"\\\"2023-12-10 05:46:47\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:item_hash :item_name :updated [[:count 1] :rows]], :from [:query/kits-drag-28], :_query-id :kit-query--200013250-agg, :_h 4, :connection-id \"system-db\", :group-by [:item_hash :item_name :updated], :style-rules {[:* :highlight-group] {:logic [:and [:= :item_hash \"-1903271016\"] [:= :item_name \":OFFENSE-CODE-GROUP-drag-40\"] [:= :updated \"2023-12-10 05:46:47\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[4 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/kits-drag-28], :_query-id :kit-query--200013250-detail, :_h 8, :connection-id \"system-db\", :where [:*if :kit-query--200013250-agg/*.clicked [:*all= :kit-query--200013250-agg/*.clicked [:item_hash :item_name :updated]] [:and [:= :item_hash \"-1903271016\"] [:= :item_name \":OFFENSE-CODE-GROUP-drag-40\"] [:= :updated \"2023-12-10 05:46:47\"]]]}], :order 0}"
+      1},
+     :cardinality 100},
+    :item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":top-20-outliers" 12},
+     :cardinality 8},
+    :kit_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":outliers" 12},
+     :cardinality 8}},
+   :rowcount 12},
+  :tmp--754731808-hist-sys {:fields {}, :rowcount 0},
+  :tmp--1912438500-hist-sys {:fields {}, :rowcount 0},
+  :STREET-drag-18
+  {:fields
+   {:STREET
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"WALDO TER" 1, "WINTHROP SQ" 1, "WADLEIGH PL" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {1 500},
+     :cardinality 0}},
+   :rowcount 500},
+  :tmp--46321701-hist-sys {:fields {}, :rowcount 0},
+  :tmp--1715804607-hist-sys {:fields {}, :rowcount 0},
+  :tmp-1904596537-hist-sys {:fields {}, :rowcount 0},
+  :bigfoot_sightings
+  {:fields
+   {:nearestroad
+    {:data-type "string",
+     :distinct 373,
+     :group-by? true,
+     :commons {nil 81, "Highway 108" 11, "285" 5},
+     :cardinality 74},
+    :date
+    {:data-type "string",
+     :distinct 165,
+     :group-by? true,
+     :commons {nil 188, "1" 16, "15" 11},
+     :cardinality 33},
+    :locationdetails
+    {:data-type "string",
+     :distinct 431,
+     :group-by? true,
+     :commons
+     {nil 69,
+      "Take Highway 108 to Cold Springs." 2,
+      "It was about 50 yards north-west of the Giant Forest Museum and about 20 yards north of the Bear Hill Trail."
+      1},
+     :cardinality 86},
+    :submitted_date
+    {:data-type "string",
+     :distinct 455,
+     :group-by? true,
+     :commons {"2001-02-04" 3, "2001-01-02" 3, "2004-01-15" 3},
+     :cardinality 91},
+    :sketch
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 500},
+     :cardinality 0},
+    :bfroid
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {33088 1, 65566 1, 2199 1},
+     :cardinality 100},
+    :otherwitnesses
+    {:data-type "string",
+     :distinct 412,
+     :group-by? true,
+     :commons {nil 65, "No" 6, "no" 5},
+     :cardinality 82},
+    :run_id
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {34 500},
+     :cardinality 0},
+    :nearesttown
+    {:data-type "string",
+     :distinct 377,
+     :group-by? true,
+     :commons {nil 56, "Strawberry" 9, "Leadville" 5},
+     :cardinality 75},
+    :timeandconditions
+    {:data-type "string",
+     :distinct 445,
+     :group-by? true,
+     :commons
+     {nil 55,
+      "late night" 2,
+      "Please see above report for complete details" 1},
+     :cardinality 88},
+    :month
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"0001-08-01" 89, nil 64, "0001-09-01" 60},
+     :cardinality 2},
+    :county
+    {:data-type "string",
+     :distinct 88,
+     :group-by? true,
+     :commons
+     {"Humboldt County" 42,
+      "Tuolumne County" 35,
+      "Siskiyou County" 31},
+     :cardinality 17},
+    :state
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"California" 328, "Colorado" 125, "Florida" 21},
+     :cardinality 1},
+    :fixed_month
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"0001-08-01" 89, "0001-07-01" 81, "0001-09-01" 73},
+     :cardinality 2},
+    :submitted
+    {:data-type "string",
+     :distinct 455,
+     :group-by? true,
+     :commons
+     {"2003-09-26 00:00:00.000000" 3,
+      "2000-10-28 00:00:00.000000" 3,
+      "2001-02-04 00:00:00.000000" 3},
+     :cardinality 91},
+    :title
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"Sightings by hunting guide in Pike National Forest" 1,
+      "Couple Has Frightening Encounter Near Lake Shasta" 1,
+      "Motorist daylight sighting between Redding and Lassen National Forest"
+      1},
+     :cardinality 100},
+    :otherstories
+    {:data-type "string",
+     :distinct 258,
+     :group-by? true,
+     :commons {nil 180, "No" 24, "no" 19},
+     :cardinality 51},
+    :year
+    {:data-type "string",
+     :distinct 104,
+     :group-by? true,
+     :commons {"2001" 29, "2000" 25, "1998" 20},
+     :cardinality 20},
+    :season
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"Summer" 221, "Fall" 129, "Spring" 85},
+     :cardinality 0},
+    :class
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"Class B" 257, "Class A" 238, "Class C" 5},
+     :cardinality 0},
+    :alsonoticed
+    {:data-type "string",
+     :distinct 285,
+     :group-by? true,
+     :commons {nil 202, "no" 7, "No" 4},
+     :cardinality 56},
+    :url
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"http://www.bfro.net/GDB/show_report.asp?id=27966&PrinterFriendly=True"
+      1,
+      "http://www.bfro.net/GDB/show_report.asp?id=596&PrinterFriendly=True"
+      1,
+      "http://www.bfro.net/GDB/show_report.asp?id=1367&PrinterFriendly=True"
+      1},
+     :cardinality 100},
+    :observed
+    {:data-type "string",
+     :distinct 496,
+     :group-by? true,
+     :commons
+     {nil 5,
+      " My uncle and I were elk hunting near Fossil Ridge northeast of Gunnison, CO when this incident ocurred.  It was late afternoon when we noticed a strong odor that we thought might be elk so we headed east toward a small ridge hoping to find one on the other side.  As we got closer we heard the noise of rocks being banged together.  As we topped the ridge we saw a large dark brown animal squatting at the edge of a dry creek bed with it''s back toward us. It was banging 2 rocks together with it''s \"hands\" and making a grunting/growling noise each time the  rocks hit.<BR><BR>It seemed to sense our presence almost immediately and turned around and looked at us.  Then it quickly stood up and jumped across the creek in one motion.  I remember thinking \"nothing can move like that!\".  It ran up the slope on the north side of the creek bed at an angle and disappeared into the pine and aspen trees farther up the hill.  We could see it for about 50 feet before it was gone from sight.  It moved real quietly for something that big.<BR><BR>I estimate it''s height as 6''5''''.  It was covered with long dark brown hair that made me think of a yak.  It had a strong smell, at least there was a strong smell in the area that was like elk urine.<BR><BR>After we calmed down a bit, we went into the creek bed and found the 2 rocks which were chipped and broken.  We looked for other signs in that place but couldn''t find anything else."
+      1,
+      " I was working in the northern part of New Mexico training to be a Wildland Fire Fighter. In September 2003 (maybe the second week of that month) I was dispatched with 22 other people to the Del Loma Fire in the Shasta/Trinity Forest area, the Northern part of California. Each Crew had about 20 people, our plane that left Albuquerque held 2 crews. For almost the whole two weeks, we were all on standby. On the 4th to the last day of our 2 weeks of Fire call, we were setting up camp close to a river, about 5-10 miles out from the original forest fire. It was close to sun down when, a couple of guys were amazed at something. I heard them from inside my tent, but just ignored the whole thing until one of my crew members came and pulled me out of my tent. <BR><BR>I had no idea what I was supposed to be looking at or for. He pointed across the river and I was in shock when he pointed out the biggest, hairiest mammal I had ever seen just walking along the river side minding his own business. It stopped and looked at us. The way he stood on his hind legs was like an ordinary human. He had dark, long hair and stood about 7ft tall with a muscular build. <BR><BR>At this point I was the 4th person standing there in amazement. Maybe about 5 minutes of watching him watch us, with more people coming out with flashlights (because the sun was still going down) he darted in to the trees. He was running, taking long strides, and was gone in about 3 seconds.....and was literally pushing trees out of his way (not breaking them, but  pushing them out of his way). The trees behind him on his path up the mountain were swaying back and forth. I was surprised to see to these trees moving because they are thick in width and very tall. <BR><BR>By this time it was dark but lit enough to see which way he was headed. Up the mountain a little, there was a clearing, where we spotted him again before he disappeared for good. He made no noise, no yelling or screaming. He was just as timid as can be.<BR><BR>I have heard many stories about Bigfoot, and known that they are real but when seeing one in real life....you get a sense of respect for them and just have that feeling that there is more to life than you know. <BR><BR><BR><BR>"
+      1},
+     :cardinality 99},
+    :environment
+    {:data-type "string",
+     :distinct 449,
+     :group-by? true,
+     :commons {nil 41, "Pine forest" 6, "Forest" 3},
+     :cardinality 89},
+    :fixed_year
+    {:data-type "string",
+     :distinct 77,
+     :group-by? true,
+     :commons {"2001" 30, "2000" 25, "1998" 23},
+     :cardinality 15},
+    :run_time
+    {:data-type "string",
+     :distinct 187,
+     :group-by? true,
+     :commons
+     {"2022-05-20 16:15:54.000000" 4,
+      "2022-05-20 16:15:30.000000" 4,
+      "2022-05-20 16:14:33.000000" 4},
+     :cardinality 37}},
+   :rowcount 500},
+  :item-key-drag-8
+  {:fields
+   {:item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":top-outliers" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {13 1},
+     :cardinality 100},
+    :item_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":OFFENSE-CODE-GROUP-drag-40" 1},
+     :cardinality 100},
+    :kit_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":outliers" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :offenses
+  {:fields
+   {:SHOOTING
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :DISTRICT
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"C11" 82, "B2" 75, "B3" 49},
+     :cardinality 2},
+    :INCIDENT_NUMBER
+    {:data-type "string",
+     :distinct 454,
+     :group-by? true,
+     :commons {"I182070397" 5, "I182070779" 4, "I182070889" 3},
+     :cardinality 90},
+    :OFFENSE_DESCRIPTION
+    {:data-type "string",
+     :distinct 89,
+     :group-by? true,
+     :commons
+     {"SICK/INJURED/MEDICAL - PERSON" 43,
+      "VERBAL DISPUTE" 34,
+      "INVESTIGATE PERSON" 33},
+     :cardinality 17},
+    :DAY_OF_WEEK
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"0001-01-07" 228, "0001-01-08" 178, "0001-01-06" 75},
+     :cardinality 1},
+    :MONTH
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {9 477, 8 21, 7 1},
+     :cardinality 0},
+    :YEAR
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {2018 500},
+     :cardinality 0},
+    :HOUR
+    {:data-type "integer",
+     :distinct 24,
+     :group-by? true,
+     :commons {18 45, 14 33, 20 32},
+     :cardinality 4},
+    :STREET
+    {:data-type "string",
+     :distinct 275,
+     :group-by? true,
+     :commons {nil 41, "WASHINGTON ST" 20, "HUNTINGTON AVE" 12},
+     :cardinality 55},
+    :OFFENSE_CODE_GROUP
+    {:data-type "string",
+     :distinct 41,
+     :group-by? true,
+     :commons
+     {"Motor Vehicle Accident Response" 69,
+      "Medical Assistance" 50,
+      "Larceny" 41},
+     :cardinality 8},
+    :UCR_PART
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"Part Three" 265, "Part Two" 140, "Part One" 93},
+     :cardinality 0},
+    :Long
+    {:data-type "float",
+     :distinct 413,
+     :group-by? true,
+     :commons {-1 6, -71.1136693 5, nil 5},
+     :cardinality 82},
+    :REPORTING_AREA
+    {:data-type "integer",
+     :distinct 282,
+     :group-by? true,
+     :commons {nil 42, 519 6, 177 5},
+     :cardinality 56},
+    :Location
+    {:data-type "string",
+     :distinct 413,
+     :group-by? true,
+     :commons
+     {"(-1.00000000, -1.00000000)" 6,
+      "(0.00000000, 0.00000000)" 5,
+      "(42.24635332, -71.11366930)" 5},
+     :cardinality 82},
+    :OFFENSE_CODE
+    {:data-type "integer",
+     :distinct 89,
+     :group-by? true,
+     :commons {3006 43, 3301 34, 3115 33},
+     :cardinality 17},
+    :Lat
+    {:data-type "float",
+     :distinct 413,
+     :group-by? true,
+     :commons {-1 6, 42.24635332 5, nil 5},
+     :cardinality 82},
+    :OCCURRED_ON_DATE
+    {:data-type "string",
+     :distinct 404,
+     :group-by? true,
+     :commons
+     {"2018-09-02 00:00:00.000000" 5,
+      "2018-09-03 10:00:00.000000" 5,
+      "2018-09-01 17:03:00.000000" 5},
+     :cardinality 80}},
+   :rowcount 500},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":rabbit-base" 1, ":clojure-base" 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :item-key-drag-42 {:fields {}, :rowcount 0},
+  :tmp-2092157300-hist-sys {:fields {}, :rowcount 0},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
+  :tmp-488816211-hist-sys {:fields {}, :rowcount 0},
+  :INCIDENT-NUMBER-drag-27
+  {:fields
+   {:INCIDENT_NUMBER
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"I162043769" 1, "I162105518" 1, "I162006074" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 8,
+     :group-by? false,
+     :commons {5 301, 6 131, 7 44},
+     :cardinality 1},
+    :OCCURRED_ON_DATE
+    {:data-type "string",
+     :distinct 499,
+     :group-by? true,
+     :commons
+     {"2016-09-16 23:35:00.000000" 2,
+      "2018-07-29 18:00:00.000000" 1,
+      "2016-09-02 12:39:00.000000" 1},
+     :cardinality 99}},
+   :rowcount 500},
+  :rowcnt-drag-16
+  {:fields
+   {:rowcnt_sum
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {319073 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :reco-counts {:fields {}, :rowcount 0},
+  :OFFENSE-CODE-GROUP-drag-40->-OCCURRED_ON_DATE
+  {:fields
+   {:SHOOTING
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :DISTRICT
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"C11" 82, "B2" 75, "B3" 49},
+     :cardinality 2},
+    :INCIDENT_NUMBER
+    {:data-type "string",
+     :distinct 454,
+     :group-by? true,
+     :commons {"I182070397" 5, "I182070779" 4, "I182070889" 3},
+     :cardinality 90},
+    :OFFENSE_DESCRIPTION
+    {:data-type "string",
+     :distinct 89,
+     :group-by? true,
+     :commons
+     {"SICK/INJURED/MEDICAL - PERSON" 43,
+      "VERBAL DISPUTE" 34,
+      "INVESTIGATE PERSON" 33},
+     :cardinality 17},
+    :DAY_OF_WEEK
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"0001-01-07" 228, "0001-01-08" 178, "0001-01-06" 75},
+     :cardinality 1},
+    :MONTH
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {9 477, 8 21, 7 1},
+     :cardinality 0},
+    :YEAR
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {2018 500},
+     :cardinality 0},
+    :HOUR
+    {:data-type "integer",
+     :distinct 24,
+     :group-by? true,
+     :commons {18 45, 14 33, 20 32},
+     :cardinality 4},
+    :STREET
+    {:data-type "string",
+     :distinct 275,
+     :group-by? true,
+     :commons {nil 41, "WASHINGTON ST" 20, "HUNTINGTON AVE" 12},
+     :cardinality 55},
+    :OFFENSE_CODE_GROUP
+    {:data-type "string",
+     :distinct 41,
+     :group-by? true,
+     :commons
+     {"Motor Vehicle Accident Response" 69,
+      "Medical Assistance" 50,
+      "Larceny" 41},
+     :cardinality 8},
+    :UCR_PART
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"Part Three" 265, "Part Two" 140, "Part One" 93},
+     :cardinality 0},
+    :Long
+    {:data-type "float",
+     :distinct 413,
+     :group-by? true,
+     :commons {-1 6, -71.1136693 5, nil 5},
+     :cardinality 82},
+    :REPORTING_AREA
+    {:data-type "integer",
+     :distinct 282,
+     :group-by? true,
+     :commons {nil 42, 519 6, 177 5},
+     :cardinality 56},
+    :OFFENSE_CODE
+    {:data-type "integer",
+     :distinct 89,
+     :group-by? true,
+     :commons {3006 43, 3301 34, 3115 33},
+     :cardinality 17},
+    :Lat
+    {:data-type "float",
+     :distinct 413,
+     :group-by? true,
+     :commons {-1 6, 42.24635332 5, nil 5},
+     :cardinality 82},
+    :OCCURRED_ON_DATE
+    {:data-type "string",
+     :distinct 404,
+     :group-by? true,
+     :commons
+     {"2018-09-02 00:00:00.000000" 5,
+      "2018-09-03 10:00:00.000000" 5,
+      "2018-09-01 17:03:00.000000" 5},
+     :cardinality 80}},
+   :rowcount 500},
+  :rowcnt-drag-44
+  {:fields
+   {:rowcnt_sum
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :kit-results-sys
+  {:fields
+   {:item_idx
+    {:data-type "integer",
+     :distinct 13,
+     :group-by? true,
+     :commons {8 1, 10 1, 5 1},
+     :cardinality 100},
+    :item_options
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:options {:pages? true, :search? false, :actions? false}, :parameters {}, :mutates {}, :description \"Top 13 Outlier by Severity\"}"
+      13},
+     :cardinality 7},
+    :updated
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2023-12-31 01:51:39" 13},
+     :cardinality 7},
+    :item_hash
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"4376673" 13},
+     :cardinality 7},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 13},
+     :cardinality 7},
+    :item_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":OFFENSE-CODE-GROUP-drag-40" 13},
+     :cardinality 7},
+    :item_data
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons
+     {"{:name \"4. When grouping by street and aggregating by :rows there are values that are higher than the mean  by 5.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:STREET]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1302324412]] {:logic [:and [:= :STREET \"ADAMS ST\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1.4390244\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"1.0252609539992064\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"82\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:STREET]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":STREET\"] [:box :child \"\\\"ADAMS ST\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:STREET [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--13023244120-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:STREET], :style-rules {[:* :highlight-group] {:logic [:and [:= :STREET \"ADAMS ST\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--13023244120-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query--13023244120-agg/*.clicked [:*all= :kit-query--13023244120-agg/*.clicked [:STREET]] [:and [:= :STREET \"ADAMS ST\"]]]}], :order 3}"
+      1,
+      "{:name \"12. When grouping by day_of_week, month, year and aggregating by :rows there are values that are higher than the mean  by 2.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DAY_OF_WEEK :MONTH :YEAR]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-2039577961]] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-06\"] [:= :MONTH 9] [:= :YEAR 2015]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"1.2421052\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"0.5752032038869158\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"95\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DAY_OF_WEEK :MONTH :YEAR]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DAY_OF_WEEK\"] [:box :child \"\\\"0001-01-06\\\"\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":MONTH\"] [:box :child \"9\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":YEAR\"] [:box :child \"2015\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:DAY_OF_WEEK :MONTH :YEAR [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--20395779610-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:DAY_OF_WEEK :MONTH :YEAR], :style-rules {[:* :highlight-group] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-06\"] [:= :MONTH 9] [:= :YEAR 2015]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[4 :desc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--20395779610-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query--20395779610-agg/*.clicked [:*all= :kit-query--20395779610-agg/*.clicked [:DAY_OF_WEEK :MONTH :YEAR]] [:and [:= :DAY_OF_WEEK \"0001-01-06\"] [:= :MONTH 9] [:= :YEAR 2015]]]}], :order 11}"
+      1,
+      "{:name \"6. When grouping by day_of_week and aggregating by :rows there are values that are lower than the mean  by 4.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:DAY_OF_WEEK]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight2001331933]] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-02\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"16.857143\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"4.189393799604336\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"7\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:DAY_OF_WEEK]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":DAY_OF_WEEK\"] [:box :child \"\\\"0001-01-02\\\"\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:DAY_OF_WEEK [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query-20013319330-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:DAY_OF_WEEK], :style-rules {[:* :highlight-group] {:logic [:and [:= :DAY_OF_WEEK \"0001-01-02\"]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :asc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query-20013319330-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query-20013319330-agg/*.clicked [:*all= :kit-query-20013319330-agg/*.clicked [:DAY_OF_WEEK]] [:and [:= :DAY_OF_WEEK \"0001-01-02\"]]]}], :order 5}"
+      1},
+     :cardinality 100},
+    :item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":top-outliers" 13},
+     :cardinality 7},
+    :kit_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":outliers" 13},
+     :cardinality 7}},
+   :rowcount 13},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 20,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, ":single-if" 1},
+     :cardinality 100}},
+   :rowcount 20}},
+ :default-col-widths
+ {:block-59 {:STREET-drag-30 180},
+  :block-2291 {:OCCURRED-ON-DATE-drag-17 180},
+  :virtual-panel
+  {:kit-query-19354125000-agg 230,
+   :kit-query--15567526000-detail 100,
+   :kit-query-19354125000-detail 100,
+   :kit-query--13023244120-agg 230,
+   :kit-query-16401701570-agg 230,
+   :kit-query--18381605500-detail 100,
+   :kit-query-20013319330-detail 100,
+   :kit-query--18381605500-agg 230,
+   :kit-query--15567526000-agg 230,
+   :kit-query-16401701570-detail 100,
+   :kit-query-20013319330-agg 230,
+   :kit-query--13023244120-detail 100},
+  :flow-list* {:flows-sys 187},
+  :flow-cat-list* {:flow-fn-categories-sys 111},
+  :block-2901 {:OCCURRED-ON-DATE-drag-36 120},
+  :block-7603 {:STREET-drag-18 180},
+  :system-connections-list* {:connections-sys 111},
+  :system-fields-list* {:fields-sys 170},
+  :block-10509 {:STREET-drag-20 180},
+  :block-1837 {:INCIDENT-NUMBER-drag-11 180},
+  :block-7872 {:STREET-drag-37 255},
+  :files-list* {:files-sys 178},
+  :flow-fn-list* {:flow-fn-sys 100},
+  :block-246 {:kits-drag-18 106},
+  :block-11764 {:bigfoot-sightings-drag-27 100},
+  :block-984 {:OFFENSE-CODE-GROUP-drag-40 100},
+  :blocks-list* {:blocks-sys 127},
+  :block-1909 {:INCIDENT-NUMBER-drag-27 120},
+  :block-1307 {:rowcnt-drag-16 161},
+  :block-10823 {:OCCURRED-ON-DATE-drag-19 180},
+  :block-7489 {:OCCURRED-ON-DATE-drag-27 180},
+  :block-6800 {:offenses-drag-9 103},
+  :block-904 {:item-key-drag-8 202},
+  :system-tables-list* {:tables-sys 137}},
+ :data-hash 2132918893,
+ :tabs ["strategic grill locations" "rejoiceful gnu"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/winter-theme.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"},
+    :outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn
+     (rabbit-kit-outliers.core/get-outliers
+       :query-name
+       :panel-name
+       :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description
+     "WIP: basic timeseries forecasting based on previous values",
+     :fn
+     (rabbit-kit-outliers.core/get-forecast
+       :query-name
+       :panel-name
+       :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1}},
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "asdasdasdasd"
+    "autumn-theme"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "boston-test-10-3-23"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "chaos simple"
+    "chaos-views"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "fake-books-1"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "glass-fish-board-test"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "mapbox-test"
+    "night-city-never-sleeps"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "recharts-test-blocks"
+    "refresh-test"
+    "tallica-param-test2"
+    "the-future-soon"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "wow-board"],
+   :openapi-key
+   "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"}},
+ :editor? true,
+ :buffy? false,
+ :status-data
+ {:heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2023-12-31 20:00:09",
+      :payload [nil]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :outliers
+  {:OFFENSE-CODE-GROUP-drag-40
+   {:data [[:kit-status :OFFENSE-CODE-GROUP-drag-40] 13],
+    :elapsed-ms 1879,
+    :reco-count 13}},
+  "live-scratch-flow"
+  {:kick
+   {:data
+    [{:sent! "live-scratch-flow",
+      :to :heavenly-Prussian-blue-toad-of-wetland,
+      :at "2023-12-31 16:03:06",
+      :payload [("LONG LIVE MACHINE")]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
+ :re-pressed.core/keydown
+ {:keys
+  [{:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 68}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 68}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 65}
+   {:altKey false,
+    :ctrlKey true,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 72}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey true,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 72}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey true,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey true,
+    :keyCode 32}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 9}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 27}
+   {:altKey false,
+    :ctrlKey false,
+    :metaKey false,
+    :shiftKey false,
+    :keyCode 40}],
+  :event-keys
+  [[[:viz-yard.bricks/esc-unselect-current] [{:keyCode 27}]]
+   [[:viz-yard.bricks/redo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey true}]]
+   [[:viz-yard.bricks/undo-one]
+    [{:keyCode 90, :ctrlKey true, :shiftKey false}]]
+   [[:viz-yard.bricks/toggle-buffy]
+    [{:keyCode 32, :shiftKey true, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-editor]
+    [{:keyCode 32, :shiftKey false, :ctrlKey false}]]
+   [[:viz-yard.bricks/toggle-flow]
+    [{:keyCode 32, :shiftKey false, :ctrlKey true}]]
+   [[:viz-yard.bricks/next-panel] [{:keyCode 9}]]
+   [[:viz-yard.bricks/toggle-peek] [{:keyCode 80}]]
+   [[:viz-yard.bricks/toggle-lines] [{:keyCode 76}]]
+   [[:viz-yard.bricks/toggle-auto-run] [{:keyCode 79}]]
+   [[:viz-yard.bricks/delete-selected-panel]
+    [{:keyCode 46, :shiftKey true}]]
+   [[:viz-yard.bricks/cycle-column-select false] [{:keyCode 81}]]
+   [[:viz-yard.bricks/cycle-column-select true] [{:keyCode 69}]]
+   [[:viz-yard.audio/start-recording] [{:keyCode 84}]]
+   [[:viz-yard.audio/stop-recording] [{:keyCode 89}]]
+   [[:viz-yard.bricks/stretch-panel :wider]
+    [{:keyCode 68, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :longer]
+    [{:keyCode 83, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :narrower]
+    [{:keyCode 65, :shiftKey true}]]
+   [[:viz-yard.bricks/stretch-panel :shorter]
+    [{:keyCode 87, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-up] [{:keyCode 82, :shiftKey true}]]
+   [[:viz-yard.bricks/panel-depth-down]
+    [{:keyCode 70, :shiftKey true}]]
+   [[:viz-yard.bricks/nudge-panel :up] [{:keyCode 87}]]
+   [[:viz-yard.bricks/nudge-panel :down] [{:keyCode 83}]]
+   [[:viz-yard.bricks/nudge-panel :left] [{:keyCode 65}]]
+   [[:viz-yard.bricks/nudge-panel :right] [{:keyCode 68}]]],
+  :clear-keys nil,
+  :always-listen-keys nil,
+  :prevent-default-keys
+  [{:keyCode 32}
+   {:keyCode 46, :shiftKey true}
+   {:keyCode 83, :ctrlKey true}
+   {:keyCode 9}
+   {:keyCode 70, :ctrlKey true}]},
+ :client-name :heavenly-Prussian-blue-toad-of-wetland,
+ :flows
+ {"live-scratch-flow"
+  {:map
+   {:kick-1
+    {:w 200,
+     :h 100,
+     :x 1788.3238367101649,
+     :y 1155.9081859546704,
+     :z 0,
+     :data
+     {:flow-item
+      {:description "Push items to the client UI.",
+       :category ":clojure-base",
+       :fn
+       (fn [destination name sub-task & args]
+         (rvbbit-backend.websockets/kick
+           destination
+           name
+           sub-task
+           args)),
+       :name ":kick",
+       :type :kick,
+       :icon "images/pink-rabbit-head.png",
+       :defaults
+       {:destination :client-name, :sub-task :flow-id, :name :flow-id},
+       :types
+       {:destination [:keyword :vector :list :set],
+        :name :string,
+        :sub-task [:string :keyword],
+        :out :any},
+       :input_types
+       "[[:keyword :vector :list :set] :string [:string :keyword]]",
+       :style {:color "#fc0fc0"},
+       :selected-style {:color "#fc0fc0"},
+       :inputs [:destination :name :sub-task :value-3],
+       :output_types ":any",
+       :expandable? true,
+       :full_map
+       "{:description \"Push items to the client UI.\", :fn (fn [destination name sub-task & args] (rvbbit-backend.websockets/kick destination name sub-task args)), :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :sub-task :flow-id, :name :flow-id}, :types {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :out :any}, :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :name :sub-task], :expandable? true, :required [:destination :name :sub-task]}",
+       :required [:destination :name :sub-task]},
+      :name "drag-from-",
+      :w 5,
+      :source-panel :flow-fn-list*,
+      :root [720 194],
+      :h 6,
+      :connection-id nil,
+      :queries
+      {:name-drag-4
+       {:select
+        [:name
+         :full_map
+         :description
+         :inputs
+         :icon
+         :input_types
+         :output_types
+         :category],
+        :from [[:query/flow-fn-sys :kk251]],
+        :where [:= :name ":kick"]}},
+      :drag-meta
+      {:data-type "string",
+       :source-query :flow-fn-sys,
+       :param-full ":kick",
+       :param-field :name,
+       :source-panel-key :flow-fn-list*,
+       :type :kick,
+       :param-table :flow-fn-sys,
+       :source-table :query/flow-fn-sys,
+       :connection-id nil,
+       :target :name,
+       :row-num 5}},
+     :icon "images/pink-rabbit-head.png",
+     :ports
+     {:in
+      {:destination [:keyword :vector :list :set],
+       :name :string,
+       :sub-task [:string :keyword],
+       :value-3 :any},
+      :out {:out :any}}},
+    :open-input
+    {:w 200,
+     :h 60,
+     :data
+     {:drag-meta {:type :open-block}, :user-input "LONG LIVE MACHINE"},
+     :z 0,
+     :ports {:out {:out :string}},
+     :x 1504.8929902129123,
+     :y 1200.3539062500001}},
+   :connections [[:kick-1 :done] [:open-input :kick-1/value-3]]},
+  "jellyfish-flow-465"
+  {:map
+   {:open-input
+    {:w 200,
+     :h 60,
+     :data
+     {:drag-meta {:type :open-block},
+      :user-input
+      {:map1 43, :map2 "test", :map3 23.3, :map4 [1 2 3 4]}},
+     :z 0,
+     :ports
+     {:out
+      {:map1 :integer,
+       :map2 :string,
+       :map3 :float,
+       :map4 :vector,
+       :* {:map1 43, :map2 "test", :map3 23.3, :map4 [1 2 3 4]}}},
+     :x 1513.0323466169725,
+     :y 1176.1711439220185},
+    :+-1
+    {:w 200,
+     :h 100,
+     :x 1833.5462514334863,
+     :y 1177.0594574254587,
+     :z 0,
+     :data
+     {:flow-item
+      {:description "Clojure add function.",
+       :category ":clojure-base",
+       :fn +,
+       :name ":+",
+       :icon "zmdi-plus",
+       :types
+       {:value1 [:integer :float],
+        :value2 [:integer :float],
+        :out [:integer :float]},
+       :input_types "[[:integer :float] [:integer :float]]",
+       :inputs "[:value1 :value2]",
+       :output_types "[:integer :float]",
+       :full_map
+       "{:description \"Clojure add function.\", :fn +, :inputs [:value1 :value2], :icon \"zmdi-plus\", :types {:value1 [:integer :float], :value2 [:integer :float], :out [:integer :float]}}"},
+      :name "drag-from-",
+      :w 5,
+      :source-panel :flow-fn-list*,
+      :root [1138 184],
+      :h 6,
+      :connection-id nil,
+      :queries
+      {:name-drag-13
+       {:select
+        [:name
+         :full_map
+         :description
+         :inputs
+         :icon
+         :input_types
+         :output_types
+         :category],
+        :from [[:query/flow-fn-sys :yy802]],
+        :where [:= :name ":+"]}},
+      :drag-meta
+      {:data-type "string",
+       :source-query :flow-fn-sys,
+       :param-full ":+",
+       :param-field :name,
+       :source-panel-key :flow-fn-list*,
+       :type :where,
+       :param-table :flow-fn-sys,
+       :source-table :query/flow-fn-sys,
+       :connection-id nil,
+       :target :name,
+       :row-num 14}},
+     :icon "zmdi-plus",
+     :ports
+     {:in {:value1 [:integer :float], :value2 [:integer :float]},
+      :out {:out [:integer :float]}}}},
+   :connections
+   [[:open-input/map1 :+-1/value1]
+    [:open-input/map3 :+-1/value2]
+    [:+-1 :done]]},
+  "kick-test-1"
+  {:map
+   {:kick-1
+    {:w 200,
+     :h 100,
+     :x 1622.5566620879122,
+     :y 1118.217917239011,
+     :z 0,
+     :data
+     {:flow-item
+      {:description "Push items to the client UI.",
+       :category ":clojure-base",
+       :fn
+       (fn [destination name & args]
+         (rvbbit-backend.websockets/kick destination name args)),
+       :name ":kick",
+       :type :kick,
+       :icon "images/pink-rabbit-head.png",
+       :defaults {:destination :client-name, :name :flow-id},
+       :types {:destination :keyword, :name :string, :out :any},
+       :input_types "[:keyword :string]",
+       :style {:color "#fc0fc0"},
+       :selected-style {:color "#fc0fc0"},
+       :inputs "[:destination :name]",
+       :output_types ":any",
+       :expandable? true,
+       :full_map
+       "{:description \"Push items to the client UI.\", :fn (fn [destination name & args] (rvbbit-backend.websockets/kick destination name args)), :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :name :flow-id}, :types {:destination :keyword, :name :string, :out :any}, :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :name], :expandable? true, :required [:destination :name]}",
+       :required [:destination :name]},
+      :name "drag-from-",
+      :w 5,
+      :source-panel :flow-fn-list*,
+      :root [576 169],
+      :h 6,
+      :connection-id nil,
+      :queries
+      {:name-drag-33
+       {:select
+        [:name
+         :full_map
+         :description
+         :inputs
+         :icon
+         :input_types
+         :output_types
+         :category],
+        :from [[:query/flow-fn-sys :dd313]],
+        :where [:= :name ":kick"]}},
+      :drag-meta
+      {:data-type "string",
+       :source-query :flow-fn-sys,
+       :param-full ":kick",
+       :param-field :name,
+       :source-panel-key :flow-fn-list*,
+       :type :kick,
+       :param-table :flow-fn-sys,
+       :source-table :query/flow-fn-sys,
+       :connection-id nil,
+       :target :name,
+       :row-num 5}},
+     :icon "images/pink-rabbit-head.png",
+     :ports
+     {:in {:destination :keyword, :name :string}, :out {:out :any}}},
+    :open-input
+    {:w 200,
+     :h 60,
+     :data
+     {:drag-meta {:type :open-block},
+      :user-input "feed me, seymour!ddd"},
+     :z 0,
+     :ports {:out {:out :string}},
+     :x 1350.3344994848903,
+     :y 1190.7886375343408}},
+   :connections ([:kick-1 :done] [:open-input :kick-1/name])},
+  "map-unpacking-test-1"
+  {:map
+   {:open-fn
+    {:y 1156.415897902397,
+     :w 200,
+     :raw-fn (fn [x s] (str s " - " (+ 1323 x))),
+     :icon "zmdi-functions",
+     :z 0,
+     :ports {:in {:value* :any, :value-1 :any}, :out {:out :any}},
+     :h 100,
+     :x 1738.5048052226027,
+     :data
+     {:flow-item
+      {:description
+       "Clojure count function, takes a sequence and returns an integer of the number of items.",
+       :category ":clojure-base",
+       :name ":open-fn",
+       :type :open-fn,
+       :icon "zmdi-functions",
+       :types {:value* :any, :out :any},
+       :input_types "[:any]",
+       :inputs [:value* :value-1],
+       :output_types ":any",
+       :full_map
+       "{:description \"Clojure count function, takes a sequence and returns an integer of the number of items.\", :view (fn [_]), :fn (fn [x] x), :inputs [:value*], :icon \"zmdi-functions\", :type :open-fn, :types {:value* :any, :out :any}}"},
+      :name "drag-from-",
+      :w 5,
+      :source-panel :flow-fn-list*,
+      :root [594 192.5],
+      :h 6,
+      :connection-id nil,
+      :queries
+      {:name-drag-1
+       {:select
+        [:name
+         :full_map
+         :description
+         :inputs
+         :icon
+         :input_types
+         :output_types
+         :category],
+        :from [[:query/flow-fn-sys :mm486]],
+        :where [:= :name ":open-fn"]}},
+      :drag-meta
+      {:data-type "string",
+       :source-query :flow-fn-sys,
+       :param-full ":open-fn",
+       :param-field :name,
+       :source-panel-key :flow-fn-list*,
+       :type :open-fn,
+       :param-table :flow-fn-sys,
+       :source-table :query/flow-fn-sys,
+       :connection-id nil,
+       :target :name,
+       :row-num 5}}},
+    :open-input
+    {:w 200,
+     :h 60,
+     :data {:drag-meta {:type :open-block}, :user-input 44},
+     :z 0,
+     :ports {:out {:out :integer}},
+     :x 1457.109658604452,
+     :y 1130.7648116438356},
+    :open-input-1
+    {:w 200,
+     :h 60,
+     :data
+     {:drag-meta {:type :open-block}, :user-input "feed me, seymour!"},
+     :z 0,
+     :ports {:out {:out :string}},
+     :x 1465.3423480308222,
+     :y 1238.531292808219},
+    :open-fn-1
+    {:y 1201.8522904829545,
+     :w 200,
+     :raw-fn
+     (fn [x]
+       {:counts (count (for [i (range 434)] {i x})),
+        :map {:tt 45},
+        :moo? true}),
+     :icon "zmdi-functions",
+     :z 0,
+     :ports
+     {:in {:value* :any},
+      :out
+      {:counts :integer,
+       :map :map,
+       :moo? :boolean,
+       :* {:counts 434, :map {:tt 45}, :moo? true}}},
+     :h 100,
+     :x 2014.4219140624998,
+     :data
+     {:flow-item
+      {:description
+       "Clojure count function, takes a sequence and returns an integer of the number of items.",
+       :category ":clojure-base",
+       :name ":open-fn",
+       :type :open-fn,
+       :icon "zmdi-functions",
+       :types {:value* :any, :out :any},
+       :input_types "[:any]",
+       :inputs "[:value*]",
+       :output_types ":any",
+       :full_map
+       "{:description \"Clojure count function, takes a sequence and returns an integer of the number of items.\", :view (fn [_]), :fn (fn [x] x), :inputs [:value*], :icon \"zmdi-functions\", :type :open-fn, :types {:value* :any, :out :any}}"},
+      :name "drag-from-",
+      :w 5,
+      :source-panel :flow-fn-list*,
+      :root [1275 225.5],
+      :h 6,
+      :connection-id nil,
+      :queries
+      {:name-drag-43
+       {:select
+        [:name
+         :full_map
+         :description
+         :inputs
+         :icon
+         :input_types
+         :output_types
+         :category],
+        :from [[:query/flow-fn-sys :ee518]],
+        :where [:= :name ":open-fn"]}},
+      :drag-meta
+      {:data-type "string",
+       :source-query :flow-fn-sys,
+       :param-full ":open-fn",
+       :param-field :name,
+       :source-panel-key :flow-fn-list*,
+       :type :open-fn,
+       :param-table :flow-fn-sys,
+       :source-table :query/flow-fn-sys,
+       :connection-id nil,
+       :target :name,
+       :row-num 5}}},
+    :*-1
+    {:w 200,
+     :h 100,
+     :x 2351.323636363636,
+     :y 1220.8,
+     :z 0,
+     :data
+     {:flow-item
+      {:description "Clojure multiply function.",
+       :category ":clojure-base",
+       :fn *,
+       :name ":*",
+       :icon "zmdi-plus",
+       :types
+       {:value1 [:integer :float],
+        :value2 [:integer :float],
+        :out [:integer :float]},
+       :input_types "[[:integer :float] [:integer :float]]",
+       :inputs "[:value1 :value2]",
+       :output_types "[:integer :float]",
+       :full_map
+       "{:description \"Clojure multiply function.\", :fn *, :inputs [:value1 :value2], :icon \"zmdi-plus\", :types {:value1 [:integer :float], :value2 [:integer :float], :out [:integer :float]}}"},
+      :name "drag-from-",
+      :w 5,
+      :source-panel :flow-fn-list*,
+      :root [1426 238],
+      :h 6,
+      :connection-id nil,
+      :queries
+      {:name-drag-16
+       {:select
+        [:name
+         :full_map
+         :description
+         :inputs
+         :icon
+         :input_types
+         :output_types
+         :category],
+        :from [[:query/flow-fn-sys :ss488]],
+        :where [:= :name ":*"]}},
+      :drag-meta
+      {:data-type "string",
+       :source-query :flow-fn-sys,
+       :param-full ":*",
+       :param-field :name,
+       :source-panel-key :flow-fn-list*,
+       :type :where,
+       :param-table :flow-fn-sys,
+       :source-table :query/flow-fn-sys,
+       :connection-id nil,
+       :target :name,
+       :row-num 4}},
+     :icon "zmdi-plus",
+     :ports
+     {:in {:value1 [:integer :float], :value2 [:integer :float]},
+      :out {:out [:integer :float]}}},
+    :open-input-2
+    {:w 200,
+     :h 60,
+     :data {:drag-meta {:type :open-block}, :user-input 3},
+     :z 0,
+     :ports {:out {:out :integer}},
+     :x 2021.1136754261363,
+     :y 1094.6733132102272}},
+   :connections
+   [[:open-input :open-fn/value*]
+    [:open-input-1 :open-fn/value-1]
+    [:open-fn :open-fn-1/value*]
+    [:open-fn-1/counts :*-1/value1]
+    [:open-input-2 :*-1/value2]
+    [:*-1 :done]]}},
+ :openai-api-key "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",
+ :window {:w 2826, :h 1934},
+ :post-meta
+ {:STREET-drag-20 {:* {:rowcount 4658}},
+  :kits-drag-18 {:* {:rowcount 13}},
+  :OCCURRED-ON-DATE-drag-17 {:* {:rowcount 233229}},
+  :STREET-drag-37 {:* {:rowcount 4658}},
+  :OFFENSE-CODE-GROUP-drag-40 {:* {:rowcount 118}},
+  :OCCURRED-ON-DATE-drag-36 {:* {:rowcount 233229}},
+  :STREET-drag-30 {:* {:rowcount 4658}},
+  :bigfoot-sightings-drag-27 {:* {:rowcount 5035}},
+  :item-name-drag-39 {:* {:rowcount 1}},
+  :INCIDENT-NUMBER-drag-11 {:* {:rowcount 282517}},
+  :OCCURRED-ON-DATE-drag-19 {:* {:rowcount 233229}},
+  :offenses-drag-9 {:* {:rowcount 319073}},
+  :OCCURRED-ON-DATE-drag-27 {:* {:rowcount 233229}},
+  :bigfoot-sightings-by-country-code-drag-14 {:* {:rowcount 5879}},
+  :kits-drag-28 {:* {:rowcount 13}},
+  :STREET-drag-18 {:* {:rowcount 4658}},
+  :item-key-drag-8 {:* {:rowcount 1}},
+  :item-key-drag-42 {:* {:rowcount 1}},
+  :INCIDENT-NUMBER-drag-27 {:* {:rowcount 282517}},
+  :rowcnt-drag-16 {:* {:rowcount 1}},
+  :OFFENSE-CODE-GROUP-drag-40->-OCCURRED_ON_DATE
+  {:* {:rowcount 319073}},
+  :rowcnt-drag-44 {:* {:rowcount 1}}},
+ :status
+ {:heartbeat {:kick :heartbeat},
+  :outliers {:OFFENSE-CODE-GROUP-drag-40 :done},
+  "live-scratch-flow" {:kick "live-scratch-flow"}},
+ :screen-name "winter-theme45",
+ :recos-page2 0,
+ :selected-tab "strategic grill locations",
+ :col-names nil,
+ :snapshots nil,
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :recos-page 0,
+ :re-pollsive.core/polling
+ {:rules
+  [{:interval 10,
+    :event [:viz-yard.bricks/dispatch-auto-queries],
+    :poll-when [:viz-yard.bricks/auto-run-and-connected?],
+    :dispatch-event-on-start? false}
+   {:interval 5,
+    :event [:viz-yard.bricks/update-metadata],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 120,
+    :event [:viz-yard.bricks/clean-up-reco-previews],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 2,
+    :event [:viz-yard.bricks/check-status],
+    :poll-when [:viz-yard.bricks/something-running?],
+    :dispatch-event-on-start? false,
+    :started-at nil,
+    :stopped-time-since-last-poll -1,
+    :started-before? true}
+   {:interval 1000,
+    :event [:viz-yard.bricks/update-metadata-tabs],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 1,
+    :event [:viz-yard.bricks/update-conditionals],
+    :dispatch-event-on-start? false,
+    :started-at 0,
+    :stopped-time-since-last-poll nil,
+    :started-before? true}
+   {:interval 4,
+    :event [:viz-yard.bricks/refresh-status],
+    :poll-when [:viz-yard.bricks/bg-status?],
+    :dispatch-event-on-start? false}],
+  :counter 84823},
+ :base-sniff-queries
+ {:bigfoot_sightings 302026766,
+  :offenses -505802446,
+  :kits 1883252379},
+ :panels-hash -1702033878,
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :websocket-fx.core/sockets
+ {:default
+  {:status :connected,
+   :options
+   {:url "ws://localhost:3030/ws",
+    :format :edn,
+    :on-disconnect
+    [:websocket-fx.core/unsubscribe :default :server-push2],
+    :on-connect
+    [:websocket-fx.core/subscribe
+     :default
+     :server-push2
+     {:message
+      {:kind :server-push2,
+       :client-name :heavenly-Prussian-blue-toad-of-wetland,
+       :ui-keypath [:server],
+       :extras {:hello? true}},
+      :on-message [:viz-yard.http/simple-response]}]},
+   :subscriptions
+   {:server-push2
+    {:message
+     {:kind :server-push2,
+      :client-name :heavenly-Prussian-blue-toad-of-wetland,
+      :ui-keypath [:server],
+      :extras {:hello? true}},
+     :on-message [:viz-yard.http/simple-response]}},
+   :requests {}}},
+ :grid-recos? true,
+ :panels
+ {:block-59
+  {:h 5,
+   :w 8,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:STREET-drag-30
+    {:select [:STREET [[:count 1] :rowcnt]],
+     :from [[:query/offenses-drag-9 :jj294]],
+     :group-by [:STREET],
+     :order-by [[:rowcnt :desc]]}},
+   :root [9 24],
+   :tab "strategic grill locations"},
+  :block-2291
+  {:h 5,
+   :w 8,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:OCCURRED-ON-DATE-drag-17
+    {:select [:OCCURRED_ON_DATE [[:count 1] :rowcnt]],
+     :from [[:query/offenses-drag-9 :hh445]],
+     :group-by [:OCCURRED_ON_DATE],
+     :order-by [[:rowcnt :desc]]}},
+   :root [1 19],
+   :tab "strategic grill locations"},
+  :block-3841
+  {:h 5,
+   :w 8,
+   :connection-id "system-db",
+   :name "drag-from-select-all-kits",
+   :queries
+   {:item-name-drag-39
+    {:select [:item_name [[:count 1] :rowcnt]],
+     :from [[{:select [:*], :from [[:kits :aa744]]} :tt523]],
+     :group-by [:item_name],
+     :order-by [[:rowcnt :desc]]}},
+   :root [41 15],
+   :tab "rejoiceful gnu"},
+  :block-2901
+  {:h 5,
+   :w 8,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:OCCURRED-ON-DATE-drag-36
+    {:select [:OCCURRED_ON_DATE [[:count 1] :rowcnt] :MONTH],
+     :from [[:query/offenses-drag-9 :uu325]],
+     :group-by [:OCCURRED_ON_DATE :MONTH],
+     :order-by [[:rowcnt :desc]]}},
+   :root [1 29],
+   :tab "strategic grill locations"},
+  :block-7603
+  {:h 5,
+   :w 8,
+   :connection-id "boston-crime",
+   :name "drag-from-drag-from-select-all-offenses",
+   :queries
+   {:STREET-drag-18
+    {:select [:STREET [[:count 1] :rowcnt]],
+     :from [[:query/STREET-drag-37 :zz63]],
+     :group-by [:STREET],
+     :order-by [[:rowcnt :desc]]}},
+   :root [51 7],
+   :tab "strategic grill locations"},
+  :block-3566
+  {:h 4,
+   :w 4,
+   :connection-id "system-db",
+   :name "drag-from-drag-from-select-all-kits",
+   :queries
+   {:rowcnt-drag-44
+    {:select [[[:sum :rowcnt] :rowcnt_sum]],
+     :from [[:query/item-key-drag-42 :nn709]]}},
+   :root [41 10],
+   :tab "rejoiceful gnu"},
+  :block-5892
+  {:h 7,
+   :w 17,
+   :connection-id "bigfoot-ufos",
+   :name "select-all-bigfoot_sightings_by_country_code",
+   :queries
+   {:bigfoot-sightings-by-country-code-drag-14
+    {:select [:class :id :rate :season :state_name],
+     :from [[:bigfoot_sightings_by_country_code :pp556]]}},
+   :root [2 1],
+   :tab "rejoiceful gnu"},
+  :block-11017
+  {:h 5,
+   :w 8,
+   :connection-id "system-db",
+   :name "drag-from-select-all-kits",
+   :queries
+   {:item-key-drag-42
+    {:select [:item_key [[:count 1] :rowcnt]],
+     :from [[{:select [:*], :from [[:kits :aa744]]} :nn875]],
+     :group-by [:item_key],
+     :order-by [[:rowcnt :desc]]}},
+   :root [41 4],
+   :tab "rejoiceful gnu"},
+  :block-10509
+  {:h 5,
+   :w 8,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:STREET-drag-20
+    {:select [:STREET [[:count 1] :rowcnt]],
+     :from [[:query/offenses-drag-9 :vv597]],
+     :group-by [:STREET],
+     :order-by [[:rowcnt :desc]]}},
+   :root [13 29],
+   :tab "strategic grill locations"},
+  :block-1837
+  {:h 5,
+   :w 8,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:INCIDENT-NUMBER-drag-11
+    {:select [:INCIDENT_NUMBER [[:count 1] :rowcnt]],
+     :from [[:query/offenses-drag-9 :kk981]],
+     :group-by [:INCIDENT_NUMBER],
+     :order-by [[:rowcnt :desc]]}},
+   :root [17 19],
+   :tab "strategic grill locations"},
+  :block-7872
+  {:h 6,
+   :w 11,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:STREET-drag-37
+    {:select [:STREET [[:count 1] :rowcnt]],
+     :from [[:query/offenses-drag-9 :cc765]],
+     :group-by [:STREET],
+     :order-by [[:rowcnt :desc]]}},
+   :root [48 1],
+   :tab "strategic grill locations",
+   :selected-view :STREET-drag-37},
+  :block-4288
+  {:h 7,
+   :w 23,
+   :connection-id "system-db",
+   :name "select-all-kits",
+   :queries
+   {:kits-drag-28
+    {:select
+     [:item_data
+      :item_hash
+      :item_idx
+      :kit_name
+      :item_key
+      :item_name
+      :item_options
+      :item_type
+      :updated],
+     :from [[:kits :dd524]]}},
+   :root [2 8],
+   :tab "rejoiceful gnu"},
+  :block-246
+  {:h 7,
+   :w 20,
+   :connection-id "system-db",
+   :name "select-all-kits",
+   :queries
+   {:kits-drag-18
+    {:select
+     [:item_data
+      :item_hash
+      :item_idx
+      :item_key
+      :item_name
+      :item_options
+      :item_type
+      :kit_name
+      :updated],
+     :from [[:kits :vv417]]}},
+   :root [23 11],
+   :tab "strategic grill locations"},
+  :block-11764
+  {:h 7,
+   :w 10,
+   :connection-id "bigfoot-ufos",
+   :name "select-all-bigfoot_sightings",
+   :queries
+   {:bigfoot-sightings-drag-27
+    {:select
+     [:alsonoticed
+      :bfroid
+      :class
+      :county
+      :date
+      :environment
+      :fixed_month
+      :fixed_year
+      :locationdetails
+      :month
+      :nearestroad
+      :nearesttown
+      :observed
+      :otherstories
+      :otherwitnesses
+      :run_id
+      :run_time
+      :season
+      :sketch
+      :state
+      :submitted
+      :submitted_date
+      :timeandconditions
+      :title
+      :url
+      :year],
+     :from [[:bigfoot_sightings :oo882]]}},
+   :root [49 12],
+   :tab "strategic grill locations"},
+  :block-984
+  {:h 12,
+   :w 18,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:OFFENSE-CODE-GROUP-drag-40
+    {:select
+     [:DAY_OF_WEEK
+      :DISTRICT
+      :HOUR
+      :INCIDENT_NUMBER
+      :Lat
+      :Long
+      :MONTH
+      :OFFENSE_CODE
+      :OFFENSE_CODE_GROUP
+      :OFFENSE_DESCRIPTION
+      :REPORTING_AREA
+      :STREET
+      :YEAR],
+     :from [[:query/offenses-drag-9 :pp28]],
+     :page 1,
+     :where
+     [:and
+      [:and [:= :OFFENSE_DESCRIPTION "VANDALISM"] [:= :DISTRICT "C11"]]
+      [:= :HOUR 0]],
+     :style-rules
+     {[:* :higlight2083585296]
+      {:logic
+       [:and
+        [:= :DISTRICT "C11"]
+        [:= :OFFENSE_DESCRIPTION "VANDALISM"]
+        [:= :YEAR 2016]],
+       :style
+       {:background-color "#008b8b66", :border "1px solid #00000000"}},
+      [:* :higlight-1556752600]
+      {:logic [:and [:= :DAY_OF_WEEK "0001-01-06"]],
+       :style
+       {:background-color "#008b8b66",
+        :border "1px solid #00000000"}}}},
+    :OFFENSE-CODE-GROUP-drag-40->-OCCURRED_ON_DATE
+    {:select
+     [:DAY_OF_WEEK
+      :DISTRICT
+      :HOUR
+      :INCIDENT_NUMBER
+      :Lat
+      :Long
+      :MONTH
+      :OCCURRED_ON_DATE
+      :OFFENSE_CODE
+      :OFFENSE_CODE_GROUP
+      :OFFENSE_DESCRIPTION
+      :REPORTING_AREA
+      :SHOOTING
+      :STREET
+      :UCR_PART
+      :YEAR],
+     :from [[:offenses :mm47]],
+     :where
+     [:*when
+      :OFFENSE-CODE-GROUP-drag-40->-OCCURRED_ON_DATE/*.clicked
+      [:*all=
+       :OFFENSE-CODE-GROUP-drag-40->-OCCURRED_ON_DATE/*.clicked
+       []]]}},
+   :root [1 7],
+   :tab "strategic grill locations",
+   :selected-view :OFFENSE-CODE-GROUP-drag-40},
+  :block-1909
+  {:h 5,
+   :w 8,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:INCIDENT-NUMBER-drag-27
+    {:select [:INCIDENT_NUMBER [[:count 1] :rowcnt] :OCCURRED_ON_DATE],
+     :from [[:query/offenses-drag-9 :nn582]],
+     :group-by [:INCIDENT_NUMBER :OCCURRED_ON_DATE],
+     :order-by [[:rowcnt :desc]]}},
+   :root [17 24],
+   :tab "strategic grill locations"},
+  :block-1307
+  {:h 4,
+   :w 4,
+   :connection-id "boston-crime",
+   :name "drag-from-drag-from-select-all-offenses",
+   :queries
+   {:rowcnt-drag-16
+    {:select [[[:sum :rowcnt] :rowcnt_sum]],
+     :from [[:query/OCCURRED-ON-DATE-drag-36 :qq448]]}},
+   :root [9 29],
+   :tab "strategic grill locations"},
+  :block-10823
+  {:h 5,
+   :w 8,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:OCCURRED-ON-DATE-drag-19
+    {:select [:OCCURRED_ON_DATE [[:count 1] :rowcnt]],
+     :from [[:query/offenses-drag-9 :ww95]],
+     :group-by [:OCCURRED_ON_DATE],
+     :order-by [[:rowcnt :desc]]}},
+   :root [1 24],
+   :tab "strategic grill locations"},
+  :queries {{:select [["heya, friendo"] :greetings]} {:view nil}},
+  :block-7489
+  {:h 5,
+   :w 8,
+   :connection-id "boston-crime",
+   :name "drag-from-select-all-offenses",
+   :queries
+   {:OCCURRED-ON-DATE-drag-27
+    {:select [:OCCURRED_ON_DATE [[:count 1] :rowcnt]],
+     :from [[:query/offenses-drag-9 :ff85]],
+     :group-by [:OCCURRED_ON_DATE],
+     :order-by [[:rowcnt :desc]]}},
+   :root [9 19],
+   :tab "strategic grill locations"},
+  :block-6800
+  {:h 6,
+   :w 34,
+   :connection-id "boston-crime",
+   :name "select-all-offenses",
+   :queries
+   {:offenses-drag-9
+    {:select
+     [:DAY_OF_WEEK
+      :DISTRICT
+      :HOUR
+      :INCIDENT_NUMBER
+      :Lat
+      :Long
+      :MONTH
+      :OCCURRED_ON_DATE
+      :OFFENSE_CODE
+      :OFFENSE_CODE_GROUP
+      :OFFENSE_DESCRIPTION
+      :REPORTING_AREA
+      :SHOOTING
+      :STREET
+      :UCR_PART
+      :YEAR],
+     :from [[:offenses :mm47]]}},
+   :root [1 1],
+   :tab "strategic grill locations",
+   :selected-view :offenses-drag-9},
+  :block-904
+  {:h 5,
+   :w 17,
+   :connection-id "system-db",
+   :name "drag-from-select-all-kits",
+   :queries
+   {:item-key-drag-8
+    {:select [:item_key [[:count 1] :rowcnt] :item_name :kit_name],
+     :from [[:query/kits-drag-18 :vv835]],
+     :group-by [:item_key :item_name :kit_name],
+     :order-by [[:rowcnt :desc]]}},
+   :root [39 21],
+   :tab "strategic grill locations"},
+  :views
+  {[:box "heya" :size "auto" :style {:font-size "22px"}] {:view nil}}},
+ :selected-block "none!",
+ :click-param
+ {:flow-fn-sys
+  {:name ":*",
+   :full_map
+   "{:description \"Clojure multiply function.\", :fn *, :inputs [:value1 :value2], :icon \"zmdi-plus\", :types {:value1 [:integer :float], :value2 [:integer :float], :out [:integer :float]}}",
+   :description "Clojure multiply function.",
+   :inputs "[:value1 :value2]",
+   :icon "zmdi-plus",
+   :input_types "[[:integer :float] [:integer :float]]",
+   :output_types "[:integer :float]",
+   :category ":clojure-base"},
+  :blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 27,
+   :block_data
+   "{:codemirror-theme \"the-matrix\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#091536\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b0f2180\", :editor-rim-color \"#2b4270\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2c728e\", \"boolean\" \"#f386bf\", \"map\" \"#00FFFF\", \"list\" \"#c32148\", \"string\" \"#7de883\", \"vector\" \"#008080\", \"keyword\" \"#add8e6\", \"rabbit-code\" \"#FC0FC0\", \"datetime\" \"#472d7b\", \"integer\" \"#d6e367\", \"unknown\" \"#c7005d\", \"date\" \"#3b528b\", \"nil\" \"#ff2147\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#8879bc\", :nivo-defaults {:font-family :theme/base-font, :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family :theme/base-font, :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family :theme/base-font, :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#40d6ff\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/vap66-huge.png)\", :transition \"all 0.6s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Nova Square\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :kits-drag-18
+  {:item_idx 0,
+   :item_options
+   "{:options {:pages? true, :search? false, :actions? false}, :parameters {}, :mutates {}, :description \"Top 13 Outlier by Severity\"}",
+   :updated "2023-12-31 00:11:17",
+   :item_hash "-649093148",
+   :item_type ":queries",
+   :item_name ":OFFENSE-CODE-GROUP-drag-40",
+   :item_data
+   "{:name \"1. When grouping by year and aggregating by :rows there are values that are lower than the mean  by 9.\", :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:YEAR]}, :parameters {}, :step-mutates {}, :ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight-1838160550]] {:logic [:and [:= :YEAR 2015]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"29.5\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"5.937171043518958\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"4\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:YEAR]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":YEAR\"] [:box :child \"2015\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:select [:YEAR [[:count 1] :rows]], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--18381605500-agg, :_h 4, :connection-id \"boston-crime\", :group-by [:YEAR], :style-rules {[:* :highlight-group] {:logic [:and [:= :YEAR 2015]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}, :order-by [[2 :asc]]} \"All rows in this group:\" {:select [:*], :from [:query/OFFENSE-CODE-GROUP-drag-40], :_query-id :kit-query--18381605500-detail, :_h 8, :connection-id \"boston-crime\", :where [:*if :kit-query--18381605500-agg/*.clicked [:*all= :kit-query--18381605500-agg/*.clicked [:YEAR]] [:and [:= :YEAR 2015]]]}], :order 0}",
+   :item_key ":top-outliers",
+   :kit_name ":outliers"},
+  :kit-query-18989472110-agg nil,
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "system-db",
+   :schema_cat nil,
+   :table_name "kits",
+   :fields 10},
+  :kit-query--14203030730-agg nil,
+  :OFFENSE-CODE-GROUP-drag-40 nil,
+  :kick--1310980509 nil,
+  :kick--979571925 nil,
+  :user-sys nil,
+  :offenses-drag-9 nil,
+  :flows-sys
+  {:flow_id "raw-fn-testing1",
+   :file_path "./flows/raw-fn-testing1.edn",
+   :last_modified "2023-12-28 18:59:44"},
+  :kits-drag-27
+  {:item_data
+   "{:ask-mutates {\"Highlight these in your source query?\" {[:panels :block-984 :queries :OFFENSE-CODE-GROUP-drag-40 :style-rules [:* :higlight1640170157]] {:logic [:and [:= :YEAR 2016]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}, :content [[:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"3853.75\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"1099.883942741233\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"4\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:YEAR]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]] [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"16px\"} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":YEAR\"] [:box :child \"2016\" :style {:font-weight 400}]]]]] \"as a wider aggregate:\" {:_h 4, :_query-id :kit-query-16401701570-agg, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :group-by [:YEAR], :order-by [[2 :desc]], :select [:YEAR [[:count 1] :rows]], :style-rules {[:* :highlight-group] {:logic [:and [:= :YEAR 2016]], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}} \"All rows in this group:\" {:_h 8, :_query-id :kit-query-16401701570-detail, :connection-id \"boston-crime\", :from [:query/OFFENSE-CODE-GROUP-drag-40], :select [:*], :where [:*if :kit-query-16401701570-agg/*.clicked [:*all= :kit-query-16401701570-agg/*.clicked [:YEAR]] [:and [:= :YEAR 2016]]]}], :highlight-columns {:OFFENSE-CODE-GROUP-drag-40 [:YEAR]}, :name \"When grouping by year and aggregating by :rows there are values that are higher than the mean (3853 for this particular aggregation) by 1209.\", :order 1, :parameters {}, :step-mutates {}}",
+   :item_hash "570348060",
+   :item_idx nil,
+   :item_key ":top-20-outliers",
+   :item_name ":offenses-drag-9",
+   :item_options
+   "{:options {:actions? false, :pages? true, :search? false}, :parameters {}, :mutates {}, :description \"Top 20 Outlier by Severity\"}",
+   :item_type ":queries",
+   :updated "2023-12-10 03:40:22"},
+  :files-sys
+  {:file_path "./screens/winter-theme2.edn",
+   :screen_name "winter-theme2",
+   :blocks 11,
+   :queries 3,
+   :ts "2023-12-07 07:57:47"},
+  :viz-tables-sys2 {:table_name :STREET-drag-37},
+  :ufo-sightings-drag-22
+  {:duration_seconds_int 900,
+   :comments
+   "AS a Marine 1st Lt. flying an FJ4B fighter/attack aircraft on a solo night exercise&#44 I was at 50&#44000&#39 in a &quot;clean&quot; aircraft (no ordinan",
+   :city "kaneohe",
+   :date_posted "2004-01-22",
+   :longitude -157.8036111,
+   :state "hi",
+   :duration_seconds "900",
+   :duration_hours "15 minutes",
+   :id 5,
+   :shape "light",
+   :datetime "1960-10-10 20:00:00.000000",
+   :latitude "21.4180556",
+   :country "us"},
+  :param
+  {:keys 123,
+   :keys2 [3 4 5],
+   :string "this is string",
+   :bools true,
+   :float 324.444},
+  :kits-drag-28 nil,
+  :theme
+  {:codemirror-theme "blackboard",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header
+    {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#091536",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#0b0f2180",
+   :editor-rim-color "#2b4270",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#2c728e",
+    "boolean" "#f386bf",
+    "map" "#00FFFF",
+    "list" "#c32148",
+    "string" "#7de8b9",
+    "vector" "#008080",
+    "keyword" "#add8e6",
+    "rabbit-code" "#FC0FC0",
+    "datetime" "#472d7b",
+    "integer" "#12e3ff",
+    "unknown" "#c7005d",
+    "date" "#3b528b",
+    "nil" "#ff2147"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#8879bc",
+   :nivo-defaults
+   {:font-family :theme/base-font,
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family :theme/base-font,
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family :theme/base-font,
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"},
+      :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid
+    {:line
+     {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#40d6ff",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/elizabeth1-localup.png)",
+    :transition "all 0.6s ease-in-out",
+    :background-size "cover",
+    :background-blend-mode "hard-light",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Nova Square",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
+  :kick--1668167951 nil,
+  :kit-query--10577285230-agg nil,
+  :connections-sys
+  {:database_name "*cache-db*", :connection_id "system-db"},
+  :kits-syss {:enabled [:outliers "Outliers" [:outliers "Outliers"]]},
+  :kit-query-20835852960-agg nil,
+  :narratives
+  {:base>narrative-22>theme :cyberpunk,
+   :base>narrative-22>craps "#ffffff",
+   :base>narrative-22>floatss 123.4,
+   :base>narrative-1>floaty 123.4,
+   :base>narrative-1>stuff1 "some stuff!",
+   :base>narrative-22>namer "some stuff!",
+   :base>narrative-22>vibes? true,
+   :base>narrative-22>gopv ["test" "test3" "test4"],
+   :base>narrative-22>mappy {:map 34}},
+  :kits-sys
+  {:enabled
+   [[:outliers "Outliers"]
+    [:outliers "Ask Buffy!"]
+    [:outliers :outliers]
+    [:outliers :buffy]
+    [:query-basics-1 :outliers]
+    [:grab-bag :buffy]]}},
+ :selected-flow "map-unpacking-test-1"}
