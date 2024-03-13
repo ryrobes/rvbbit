@@ -1486,17 +1486,45 @@
 
 (defn client-statuses []
   (into {}
-        (for [[k v] @ack-scoreboard]
-          {k (let [seconds-ago (int (/ (- (System/currentTimeMillis)
-                                          (get-in v [:last-ack 0] 0)) 1000))
-                   never? (nil? (get-in v [:last-ack 0]))]
-               (-> v
-                   (assoc :server-subs (count (keys (get @atoms-and-watchers k))))
-                   (assoc :last-seen-seconds (if never? -1 seconds-ago))
-                   (dissoc :client-sub-list)
-                   (assoc :last-seen (cond (< seconds-ago 0) "not since boot"
-                                           (= k :rvbbit-scheduler) "n/a"
-                                           :else (ut/format-duration-seconds seconds-ago)))))})))
+        ;(remove (fn [[_ v]] (= -1 (:last-seen-seconds v))) ;; just take out any dead ones for now
+                (for [[k v] @ack-scoreboard]
+                  {k (let [seconds-ago (int (/ (- (System/currentTimeMillis)
+                                                  (get-in v [:last-ack 0] 0)) 1000))
+                           never? (nil? (get-in v [:last-ack 0]))]
+                       (-> v
+                           (assoc :server-subs (count (keys (get @atoms-and-watchers k))))
+                           (assoc :last-seen-seconds (if never? -1 seconds-ago))
+                           (dissoc :client-sub-list)
+                           (assoc :last-seen (cond (< seconds-ago 0) "not since boot"
+                                                   (= k :rvbbit-scheduler) "n/a"
+                                                   :else (ut/format-duration-seconds seconds-ago)))))})));)
+
+(defn flow-statuses []
+  (into {} (for [[k {:keys [*time-running *running? *started-by *finished tracker-events]}] @flow-status
+                 :let [chans (count (get @flow-db/channels-atom k))
+                       chans-open (count
+                                   (doall
+                                    (map (fn [[_ ch]]
+                                           (let [vv (try (not (ut/channel-open? ch))
+                                                         (catch Throwable e (str e)))]
+                                             (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
+                                         (get @flow-db/channels-atom k))))
+                       channels-open? (true? (> chans-open 0))
+                                                ;_ (swap! flow-status assoc-in [k :*channels-open?] channels-open?)
+                                                ;_ (swap! flow-status assoc-in [k :*channels-open] chans-open)
+                                                ;; ^^ TODO, important should be elsewhere - but is an expensive check, so passively here makes some sense
+                                                ;;_ (swap! channel-counts assoc k {:channels chans :channels-open chans-open}) ;; wtf is this? unused
+                       ]]
+             {k {:time-running *time-running
+                 :*running? *running?
+                 :tracker-events tracker-events
+                 :*started-by *started-by
+                 ;:timeouts (count (filter #(= % :timeout) (ut/deep-flatten tracker-events)))
+                 ;:skips (count (filter #(= % :skip) (ut/deep-flatten tracker-events)))
+                 :channels-open? channels-open?
+                 :channels chans
+                 :channels-open chans-open
+                 :blocks_finished *finished}})))
 
 ;; (defn close-channels! [uid]
 ;;   (ut/pp [:closing-channels uid (get @flow-db/channels-atom uid)]))
@@ -1524,10 +1552,10 @@
             ;errors? (some #(get % :error) (map :value (get @flow-db/channel-history uid)))
             ]
         ;(ut/pp {:running errors? :chist chist})
-        ;(Thread/sleep 100)
+        (Thread/sleep 100)
 )) ;; check the atom every 100 ms
     (let [err? (some #(get % :error) (map :value (get @flow-db/channel-history uid)))]
-      (if err? (flow/close-channels! uid))
+      (when err? (flow/close-channels! uid))
       (or @a (some #(get % :error) (map :value (get @flow-db/channel-history uid)))))))
 
 (defn gn [x] (try (name x) (catch Exception _ x)))
@@ -2363,7 +2391,7 @@
    :data (get @queue-data client-name)})
 
 (defmethod wl/handle-request :get-flow-statuses [{:keys [client-name]}]
-  (let [payload   (merge @flow-status
+  (let [payload   (merge (flow-statuses) ;; @flow-status
                          (into {} (for [[k v] @processes]
                                     {k (-> v
                                            (assoc :process? true)
@@ -4784,30 +4812,7 @@
       ;(ut/pp "Hi.")
       (println " "))
 
-    (ut/pp [:flow-status (into {} (for [[k {:keys [*time-running *running? *finished tracker-events]}] @flow-status
-                                        :let [chans (count (get @flow-db/channels-atom k))
-                                              chans-open (count
-                                                          (doall
-                                                           (map (fn [[_ ch]]
-                                                                  (let [vv (try (not (ut/channel-open? ch))
-                                                                                (catch Throwable e (str e)))]
-                                                                    (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
-                                                                (get @flow-db/channels-atom k))))
-                                              channels-open? (true? (> chans-open 0))
-                                              ;_ (swap! flow-status assoc-in [k :*channels-open?] channels-open?)
-                                              ;_ (swap! flow-status assoc-in [k :*channels-open] chans-open)
-                                              ;; ^^ TODO, important should be elsewhere - but is an expensive check, so passively here makes some sense
-                                              ;;_ (swap! channel-counts assoc k {:channels chans :channels-open chans-open}) ;; wtf is this? unused
-                                              ]]
-                                    {k {:time-running *time-running
-                                        :*running? *running?
-                                        :tracker-events tracker-events
-                                        ;:timeouts (count (filter #(= % :timeout) (ut/deep-flatten tracker-events)))
-                                        ;:skips (count (filter #(= % :skip) (ut/deep-flatten tracker-events)))
-                                        :channels-open? channels-open?
-                                        :channels chans
-                                        :channels-open chans-open
-                                        :blocks_finished *finished}}))])
+    (ut/pp [:flow-status (flow-statuses)])
 
     (ut/pp [:processes (into {} (for [[k {:keys [start *running? end]}] @processes]
                                   {k {:time-running (- (or end (System/currentTimeMillis)) start)
@@ -4815,7 +4820,8 @@
 
     ;(ut/pp [:child-atoms? @client-queues])
 
-    (ut/pp [:ack-scoreboard (client-statuses)])
+    (ut/pp [:ack-scoreboard (into {} (for [[k v] (client-statuses)
+                                  :when (not= (get v :last-seen-seconds) -1)] {k v}))])
 
     ;(ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
 

@@ -770,7 +770,7 @@
 (re-frame/reg-sub
  ::flow-channels-open?
  (fn [db [_ flow-id]]
-   (get-in db [:flow-statuses flow-id :*channels-open?] false)))
+   (get-in db [:flow-statuses flow-id :channels-open?] false)))
 
 (re-frame/reg-event-db
  ::update-flow-statuses

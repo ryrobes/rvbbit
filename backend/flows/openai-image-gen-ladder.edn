@@ -290,7 +290,7 @@
      :target :flow_id,
      :row-num 4}}},
   :dominant-color
-  {:y 2025,
+  {:y 2075,
    :fn (fn [x] x),
    :w 125,
    :raw-fn (fn [x] x),
@@ -298,42 +298,13 @@
    :z 0,
    :ports {:in {:x :any}, :out {:out :string}},
    :h 85,
-   :x 2175,
+   :x 2200,
    :data
    {:flow-item
     {:category ":rabbit-base",
      :fn (fn [x] x),
      :name ":open-fn",
      :raw-fn (fn [x] x),
-     :type :open-fn,
-     :icon "zmdi-functions",
-     :types {:x :any, :out :any},
-     :expandable? true,
-     :drag-meta {:type :open-fn}}}},
-  :oai-api-call_error>msg
-  {:y 1575,
-   :fn (fn [x] (get-in x [:error :msg])),
-   :w 225,
-   :raw-fn
-   (fn [x]
-     (let [msg (get-in x [:error :error])
-           extract-http-error (fn [error-str]
-                                (println "Error String:" error-str)
-                                (let [pattern (re-pattern "<title>\\s*(.*?)\\s*</title>")
-                                      matcher (re-find pattern error-str)]
-                                  (if matcher (get matcher 1) "Unknown Error")))]
-       (extract-http-error msg))),
-   :icon "zmdi-functions",
-   :z 0,
-   :ports {:in {:x :any}, :out {:out :list}},
-   :h 60,
-   :x 2125,
-   :data
-   {:flow-item
-    {:category ":rabbit-base",
-     :fn (fn [x] (get-in x [:error :msg])),
-     :name ":open-fn",
-     :raw-fn (fn [x] (get-in x [:error :msg])),
      :type :open-fn,
      :icon "zmdi-functions",
      :types {:x :any, :out :any},
@@ -381,7 +352,7 @@
      :required [:command]},
     :drag-meta {:type :shell-command}}},
   :pop-color
-  {:y 2150,
+  {:y 2075,
    :fn (fn [x] (get-in x [:colorPalette 0])),
    :w 150,
    :raw-fn (fn [x] (get-in x [:colorPalette 0])),
@@ -389,7 +360,7 @@
    :z 0,
    :ports {:in {:x :any}, :out {:out :string}},
    :h 85,
-   :x 2050,
+   :x 2025,
    :data
    {:flow-item
     {:category ":rabbit-base",
@@ -411,15 +382,15 @@
    :x 2075,
    :y 1200},
   :color-palette
-  {:y 2025,
+  {:y 2050,
    :fn (fn [x] x),
    :w 100,
    :raw-fn (fn [x] x),
    :icon "zmdi-functions",
    :z 0,
    :ports {:in {:x :any}, :out {:dominantColor :string, :colorPalette :vector, :* :map}},
-   :h 110,
-   :x 2050,
+   :h 135,
+   :x 1875,
    :data
    {:flow-item
     {:category ":rabbit-base",
@@ -578,7 +549,7 @@
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
   :hiccup-image-box-w-png
-  {:y 2275,
+  {:y 2250,
    :description ["Take all the strings from earlier and compose a singular view element with them."],
    :fn (fn [x] [:box :child (str x)]),
    :w 450,
@@ -717,12 +688,12 @@
     ""
     "(also it censors and removes things it does not like, feels like an early gatekeep step since raw images are much harder to automatically moderate)..."],
    :fn (fn [x] (get-in x [:data 0 :revised_prompt])),
-   :w 250,
+   :w 350,
    :raw-fn (fn [x] (get-in x [:data 0 :revised_prompt])),
    :icon "zmdi-functions",
    :z 0,
    :ports {:in {:x :any}, :out {:out :string}},
-   :h 110,
+   :h 210,
    :x 2150,
    :data
    {:flow-item
@@ -752,8 +723,8 @@
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
  :opts {:retry-on-error? true, :retries 5, :close-on-done? true},
- :zoom [-1074.74 -1166.57 1],
- :flow-id "openai-image-gen",
+ :zoom [-674.28 -1028.09 0.8],
+ :flow-id "openai-image-gen-ladder",
  :flowmaps-connections
  [[:http-req-map/* :oai-api-call/req-map]
   [:oai-api-call/* :just-the-image/x]
@@ -774,7 +745,6 @@
   [:execute-shell-command/command :hiccup-image-box-w-png/_]
   [:hiccup-image-box-w-png/* :relative-url-path-for-png-version/x]
   [:relative-url-path-for-png-version :done]
-  [:oai-api-call/* :oai-api-call_error>msg/x]
   [:base-save-directory :generate-file-path/base-dir]
   [:base-web-directory :create-png-path/base-web-dir]
   [:base-save-directory :create-png-path/base-dir]

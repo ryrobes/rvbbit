@@ -75,8 +75,8 @@
 
 (defonce channel-holster (reagent/atom {}))
 
-(def canvas-width 4500)
-(def canvas-height 4500)
+(def canvas-width 7500)
+(def canvas-height 6000)
 
 (defonce flow-details-block-container-atom (reagent/atom {}))
 
@@ -1040,6 +1040,7 @@
     (if (= keypath [])
 
       (let [k-val-type (ut/data-typer data)
+            nin? (not (= block-id :inline-render))
             val-color (get @(re-frame/subscribe [::conn/data-colors]) k-val-type)]
         [re-com/v-box
          :size "auto"
@@ -1047,7 +1048,7 @@
          [[re-com/v-box
            :style {:word-wrap "break-word"
                    :overflow-wrap "break-word"}
-           :children [(when (not (= block-id :inline-render))
+           :children [(when nin?
                         [re-com/v-box
                        ;:justify :end
                          :padding "6px"
@@ -1068,7 +1069,7 @@
            :padding "0px"]]
          :style {:font-family "Poppins"
                  :color val-color
-                 :margin-top (if  (not (= block-id :inline-render)) "0px" "-10px")
+                 :margin-top (if nin? "0px" "-10px")
                  :border-radius "12px"}])
       main-boxes)))
 
@@ -1145,9 +1146,10 @@
                                ; w (- w 15) ;; spacer
 
                                  ik (keys ii)
-                                 ok (try (into (into (vec (sort (keys ooo))) (vec (keys oop))) (vec (keys oopp)))
+                                 ok (try (into (into (vec (sort-by str (keys ooo))) (vec (keys oop))) (vec (keys oopp)))
                                          (catch :default e (do (tap> [:error-sorting-keys e (keys oo) :flows.cljs :ln 1148])
-                                                               (into (into (vec (sort (keys ooo))) (vec (keys oop))) (vec (keys oopp))))))
+                                                               (into (into (vec (sort-by str (keys ooo))) (vec (keys oop))) (vec (keys oopp)))
+                                                               )))
                                 ;;  _ (when
                                 ;;     (= bid-o :open-fn-3)
                                 ;;      (tap> [:ok bid-o  ok oop]))
@@ -2384,7 +2386,7 @@
         condi-ports (when (not input?) @(re-frame/subscribe [::condi-ports bid]))
         push-ports (when (not input?) @(re-frame/subscribe [::push-ports bid]))
         condi-valves (when condi-ports @(re-frame/subscribe [::bricks/condi-valves flow-id])) ;; react!
-        outport-keys (into (into (vec (sort (keys ports))) (keys condi-ports)) (keys push-ports))
+        outport-keys (into (into (vec (sort-by str (keys ports))) (keys condi-ports)) (keys push-ports))
         ;; _ (when (not (empty? condi-ports))
         ;;     (tap> [:ports bid input? condi-ports ports ]))
         ports (if (not input?) (let [cports (into {} (for [n (into (keys condi-ports) (keys push-ports))] {n (get ports :out :any)}))]
@@ -5184,7 +5186,7 @@
      ;:gap "4px"
      :children (for [[fid v] ss
                      :let [time-running (get v :*time-running)
-                           open-channels (get v :*channels-open?)
+                           open-channels (get v :channels-open?)
                            started-by (get v :*started-by)
                            process? (get v :process?)
                            command (get v :command)
@@ -5214,7 +5216,12 @@
                                         :font-size "15px"
                                         :font-weight 700}]
                              ;[re-com/box :child (str open-channels) :width "33%"]
-                               [re-com/box :child (if running? "running" "stopped") :width "34%"]
+                               [re-com/box
+                                :child (cond running? "running"
+                                             open-channels "idling"
+                                             :else "stopped")
+
+                                :width "34%"]
                                ;[re-com/box :child (str time-running) :width "30%"]
                                (if (not process?)
 
@@ -5272,7 +5279,7 @@
         ;flowmaps @(re-frame/subscribe [::flowmap-raw])
         flow-id @(re-frame/subscribe [::selected-flow])
         blocks @(re-frame/subscribe [::flowmap])
-        orderb (vec (sort (keys blocks)))
+        orderb (vec (sort-by str (keys blocks)))
         opts-map @(re-frame/subscribe [::opts-map])
         gantt? @(re-frame/subscribe [::bricks/flow-gantt?])
         ;read-only-flow? (true? (cstr/includes? flow-id "/"))
@@ -5690,9 +5697,9 @@
                                       ;:style {:border "1px solid lime"}
                                         :width "60px"
                                         :padding "4px"]]]]
-                          (for [[vk vv] (if (= type :in) (sort-map-keys (vec (or inputs-vec (sort (keys v)))) v)
+                          (for [[vk vv] (if (= type :in) (sort-map-keys (vec (or inputs-vec (sort-by str (keys v)))) v)
                                           ;v
-                                            (sort-map-keys (try (sort (keys v)) (catch :default e (do (tap> [:fucking-sorting-error e :flows.cljs :ln 4216 (keys v)]) (keys v)))) v))
+                                            (sort-map-keys (try (sort-by str (keys v)) (catch :default e (do (tap> [:fucking-sorting-error e :flows.cljs :ln 4216 (keys v)]) (keys v)))) v))
 
                                 :let [select-vec [bid vk]
                                       selected? (or (and @sniffy-sniff (= @port-hover2 bid)
@@ -6632,7 +6639,7 @@
         react! [@(re-frame/subscribe [::http/flow-results]) @(re-frame/subscribe [::http/flow-results]) @gantt-log]
         blocks @(re-frame/subscribe [::flowmap])
         running? @(re-frame/subscribe [::is-running? :* flow-id])
-        orderb (vec (sort (keys blocks)))
+        orderb (vec (sort-by str (keys blocks)))
         data (select-keys data orderb)
         data-pairs (remove #(or (= (first %) :done)
                                 (cstr/includes? (str (first %)) "/")) data)
@@ -6711,7 +6718,7 @@
         react! [@(re-frame/subscribe [::http/flow-results]) @(re-frame/subscribe [::http/flow-results]) @gantt-log]
         blocks @(re-frame/subscribe [::flowmap])
         running? @(re-frame/subscribe [::is-running? :* flow-id])
-        orderb (vec (sort (keys blocks)))
+        orderb (vec (sort-by str (keys blocks)))
         sorted-data-pairs (mapcat (fn [[k v]] (map (fn [run] [k run]) v)) data)
         ;; Sort by orderb to maintain the order for rendering
         sorted-data-pairs (sort-by (fn [[k _]] (.indexOf orderb k)) sorted-data-pairs)
@@ -6760,7 +6767,7 @@
   (let [gap 11
         react! [@(re-frame/subscribe [::http/flow-results]) @gantt-log]
         blocks @(re-frame/subscribe [::flowmap])
-        orderb (vec (sort (keys blocks)))
+        orderb (vec (sort-by str (keys blocks)))
         running? @(re-frame/subscribe [::is-running? :* flow-id])
         transformed-data (transform-data data svg-width flow-id)
         height 26
@@ -6962,7 +6969,7 @@
   (let [react-hacks [@flow-hover @scroll-id @editor-mode @(re-frame/subscribe [::http/flow-results])]
         ;details-panel-height (/ panel-height 1.25)
         blocks @(re-frame/subscribe [::flowmap])
-        orderb (vec (sort (keys blocks)))
+        orderb (vec (sort-by str (keys blocks)))
         flow-id @(re-frame/subscribe [::selected-flow])
         flow-select @(re-frame/subscribe [::selected-flow-block])
         ;running? (is-running? :* flow-id)
@@ -7951,7 +7958,7 @@
 
     ;; (tap> [:port-hover @port-hover])
     ;;(tap> [:db/flow-results @(re-frame/subscribe [::http/flow-results])])
-    (tap> [:wtf-man running? chans-open?])
+    ;(tap> [:wtf-man flow-id running? chans-open?])
 
     [rc/catch
      [re-com/box

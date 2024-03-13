@@ -648,7 +648,7 @@
      ;(doseq [p pp] (ut/dissoc-in db p))
 
          ;prevs (for [r (filter #(cstr/starts-with? (str %) ":reco-preview") (keys (get-in db [:panels])))] [:panels r])
-         base-keys (filter (comp not namespace) (keys db)) 
+         base-keys (filter (comp not namespace) (keys db))
          request {:image (if (= save-type :skinny)
                            (-> db ;; dehydrated... as it were
                                ;(ut/dissoc-in prevs)

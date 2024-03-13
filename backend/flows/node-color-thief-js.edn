@@ -1,15 +1,17 @@
 {:flowmaps
  {:image-path
-  {:w 475,
+  {:y 800,
+   :w 475,
+   :types nil,
+   :z 0,
+   :ports {:out {:out {:out :string}}, :in {}},
+   :inputs nil,
    :h 125,
+   :x 1425,
    :data
    {:drag-meta {:type :open-block},
     :flow-item {:expandable? true},
-    :user-input " /home/ryanr/rvbbit/frontend/resources/public/images/shannon45.png"},
-   :z 0,
-   :ports {:out {:out :string}},
-   :x 1425,
-   :y 800},
+    :user-input " /home/ryanr/rvbbit/frontend/resources/public/images/large/shannon45.png"}},
   :shell-command-1
   {:w 200,
    :h 100,
@@ -108,13 +110,13 @@
    :ports {:in {:delimiter :string, :value-1 :any, :value-2 :any}, :out {:out :string}}},
   :shell-command-in
   {:y 800,
-   :w 275,
+   :w 225,
    :types nil,
    :z 0,
    :ports {:out {:out {:out :string}}, :in {}},
    :inputs nil,
    :h 125,
-   :x 1100,
+   :x 1175,
    :data
    {:drag-meta {:type :open-block},
     :flow-item {:expandable? true},
@@ -213,7 +215,7 @@
    :icon "zmdi-file-text",
    :ports {:in {:json-string :string}, :out {:dominantColor :string, :colorPalette :vector, :* :map}}}},
  :opts {:close-on-done? true, :retry-on-error? false, :retries 0},
- :zoom [-265.36 -587.53 0.9],
+ :zoom [-417.62 -730.77 1.1],
  :flow-id "node-color-thief-js",
  :flowmaps-connections
  [[:shell-command-in :clojure-string-join-1/value-1]

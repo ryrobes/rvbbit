@@ -127,8 +127,8 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}}},
- :opts {:retry-on-error? false, :retries 0, :loops 44, :close-on-done? true, :timeout 8000},
- :zoom [-2074.47 -1520.83 1.5],
+ :opts {:retry-on-error? false, :retries 0, :loops 33, :debug? false, :close-on-done? true, :timeout 8000},
+ :zoom [-2257.7 -1718.26 1.6],
  :flow-id "counting-loop",
  :flowmaps-connections
  [[:seed-value :sleep-then-pass/x]

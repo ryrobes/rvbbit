@@ -132,7 +132,7 @@
     (catch Throwable _ 85)))
 
 ;; (defn get-terminal-width []
-;;   (try 
+;;   (try
 ;;     (.getWidth (TerminalFactory/get))
 ;;     (catch Throwable _ 85)))
 
@@ -146,6 +146,7 @@
 ;(defn ifdebug? [x] (when debug? x))
 
 (defn json-to-edn [json-str]
+  (pp [:json-to-end-debug! (str json-str)])
   (json2/read-str (str json-str) :key-fn keyword))
 
 (defn get-colors [image-path]
@@ -650,7 +651,7 @@
 
 ;; (defn limit-elements [x]
 ;;   (try (cond
-;;          (map? x) x ;; dont limit maps elements at all 
+;;          (map? x) x ;; dont limit maps elements at all
 ;;          (instance? clojure.lang.IPending x) (doall (take db/sample-limit x))
 ;;          :else x)
 ;;        (catch Exception _ x)))
@@ -842,7 +843,7 @@
        (filter #(= (namespace (key %)) (name ns-sym)))
        (into {})))
 
-(defn instrument-ns [ns-syms & [un?]] ;; nice 
+(defn instrument-ns [ns-syms & [un?]] ;; nice
   (doseq [ns-sym ns-syms]
     (->> (ns-publics ns-sym)
          keys
@@ -1188,7 +1189,7 @@
     (assoc item :category category :name name)))
 
 (defn sanitize-name-fn [name] ;; keep updated in client also
-  (-> name ;; chars that make file and folder operations annoying 
+  (-> name ;; chars that make file and folder operations annoying
       (clojure.string/replace  " " "_")
       (clojure.string/replace  "<" "_")
       (clojure.string/replace  ">" "_")

@@ -497,10 +497,10 @@
 
                            _ (swap! last-look assoc k done?)
                            _ (when run-sql? (swap! saved-uids conj run-id))
-                            ;; _ (when (and run-sql? (not error?) done?) ;; TEMP REMOVE FOR CHANNEL PUSHING!
-                            ;;     (wss/remove-watchers-for-flow (str k)))
+                          ; _ (when (and run-sql? (not error?) done?) ;; TEMP REMOVE FOR CHANNEL PUSHING!
+                          ;     (wss/remove-watchers-for-flow (str k)))
                             ;chans (count (get @flow-db/channels-atom k))
-                           _ (when done? (ut/delay-execution 5000 (fn [] (swap! wss/flow-status assoc-in [k :*running?] false))))
+                           ;_ (when done? (ut/delay-execution 5000 (fn [] (swap! wss/flow-status assoc-in [k :*running?] false))))
                            chans-open (count
                                        (doall
                                         (map (fn [[_ ch]]
@@ -532,10 +532,11 @@
 
         ;(ut/pp [:trigger-status-change! kks {:diff b}])
 
-        ;; (async/thread ;; relly expensive logging below. temp
+        ;; (async/thread ;; really expensive logging below. temp
         ;;   (let [fp (str "./status-change-logs/" (str (System/currentTimeMillis)) ".edn")]
         ;;     (ext/create-dirs "./status-change-logs/")
         ;;     (ut/pretty-spit fp {:kks kks
+        ;;                         :res @flow-db/results-atom ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
         ;;                         :diff (ut/replace-large-base64 b)} 125)))
 
         (update-stat-atom kks))
