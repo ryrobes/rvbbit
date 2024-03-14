@@ -149,7 +149,7 @@
      (str
        (clojure.string/replace
          x
-         "/home/ryanr/viz-yard/resources/public/"
+         "/home/ryanr/rvbbit/frontend/resources/public/"
          "url(")
        ")")),
    :right-click? true,
@@ -761,7 +761,7 @@
      (clojure.string/replace
        (clojure.string/replace x ".webp" ".png")
        "/home/ryanr/rvbbit-out"
-       "/home/ryanr/viz-yard/resources/public/images/gen")),
+       "/home/ryanr/rvbbit/frontend/resources/public/images/gen")),
    :right-click? true,
    :icon "zmdi-functions",
    :z 0,
@@ -885,7 +885,7 @@
       {:drag-meta {:type :open-block},
        :flow-item {:expandable? true},
        :user-input
-       " /home/ryanr/viz-yard/resources/public/images/shannon45.png"},
+       " /home/ryanr/rvbbit/frontend/resources/public/images/shannon45.png"},
       :z 0,
       :ports {:out {:out :string}},
       :x 948.9116738809121,
@@ -1021,7 +1021,7 @@
       {:drag-meta {:type :open-block},
        :flow-item {:expandable? true},
        :user-input
-       "cd /home/ryanr/color-thief-project ; node ./colorThief.js"},
+       "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"},
       :z 0,
       :ports {:out {:out :string}},
       :x 960.0851863779922,

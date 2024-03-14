@@ -382,14 +382,14 @@
    :x 2075,
    :y 1200},
   :color-palette
-  {:y 2050,
+  {:y 2025,
    :fn (fn [x] x),
    :w 100,
    :raw-fn (fn [x] x),
    :icon "zmdi-functions",
    :z 0,
    :ports {:in {:x :any}, :out {:dominantColor :string, :colorPalette :vector, :* :map}},
-   :h 135,
+   :h 185,
    :x 1875,
    :data
    {:flow-item
@@ -552,7 +552,7 @@
   {:y 2250,
    :description ["Take all the strings from earlier and compose a singular view element with them."],
    :fn (fn [x] [:box :child (str x)]),
-   :w 450,
+   :w 550,
    :raw-fn
    (fn [x bg-color color _]
      (let [x (clojure.string/replace (str x) "/home/ryanr/rvbbit/frontend/resources/public" ".")]
@@ -569,6 +569,7 @@
         [[:box :child (str x)] [:box :size "auto" :child [:img {:src (str x), :style {:border-radius "30px"}}]]]])),
    :right-click? true,
    :icon "zmdi-functions",
+   :types nil,
    :z 0,
    :ports
    {:in {:x :any, :bg-color :any, :color :any, :_ :any},
@@ -585,8 +586,10 @@
      :idx8 :map,
      :idx9 :keyword,
      :idx0 :keyword}},
+   :inputs nil,
    :h 360,
-   :x 1900,
+   :x 1800,
+   :view (fn [x] x),
    :data
    {:flow-item
     {:category ":rabbit-base",
@@ -722,8 +725,8 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
- :opts {:retry-on-error? true, :retries 5, :close-on-done? true},
- :zoom [-674.28 -1028.09 0.8],
+ :opts {:timeout 240000, :close-on-done? true, :retries 3, :retry-on-error? true},
+ :zoom [-967.46 -1116.55 1],
  :flow-id "openai-image-gen-ladder",
  :flowmaps-connections
  [[:http-req-map/* :oai-api-call/req-map]

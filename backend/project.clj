@@ -49,6 +49,8 @@
 
                  [jline "2.14.6"] ;; to detect console width
 
+                 [clj-commons/clj-ssh "0.5.15"]
+
                 ;;  [commons-codec/commons-codec "1.15"]
 
                  [com.ryrobes/flowmaps "0.31-SNAPSHOT"]

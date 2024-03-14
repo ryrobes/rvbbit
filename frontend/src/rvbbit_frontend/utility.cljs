@@ -14,6 +14,16 @@
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))
 
+(defn format-duration-seconds [seconds]
+  (let [hours (int (/ seconds 3600))
+        minutes (int (mod (/ seconds 60) 60))
+        seconds (int (mod seconds 60))
+        out (str (when (pos? hours) (str hours " hour" (when (> hours 1) "s") ", "))
+                 (when (pos? minutes) (str minutes " minute" (when (> minutes 1) "s") ", "))
+                 seconds " second" (when (> seconds 1) "s"))]
+    (if (= out "0 second")
+      "less than a second" out)))
+
 (defn truncate-string
   "Truncates a string to a max-length and appends an ellipsis if it exceeds the length."
   [s max-length]
@@ -347,7 +357,7 @@
 
 
 ;; (defn unkeyword [x]
-;;   (try (str (name x)) (catch :default _ 
+;;   (try (str (name x)) (catch :default _
 ;;                         (cstr/replace (str x) #":" ""))))
 
 
@@ -513,12 +523,12 @@
 
 
 
-;; runstream below 
+;; runstream below
 
 
 (def clean-sql-atom (atom {}))
 
-(defn clean-sql-from-ui-keys [x] ; <-- gets called hundreds of times 
+(defn clean-sql-from-ui-keys [x] ; <-- gets called hundreds of times
   (let [hx (hash x)
         cache (get @clean-sql-atom hx)]
     (if cache cache (let [deep (clean-sql-from-ui-keys-fn x)]
@@ -609,7 +619,7 @@
 (defn canvas-size [rects]
   (reduce (fn [[max-x max-y] [x y h w]]
             [(max max-x (+ x w)) (max max-y (+ y h))])
-          ;corner 
+          ;corner
           [0 0]
           rects))
 
@@ -700,7 +710,7 @@
                        (cstr/starts-with? (cstr/trim-newline s) "[:") :hiccup
                        :else :justified)
             o (zp/zprint-str s (js/Math.floor (/ w 9))
-                             {:parse-string? true ;; was :parse-string-all? 
+                             {:parse-string? true ;; was :parse-string-all?
                              ; :style :justified-original ;; cool but SLOOOOOOWWWWW
                               :style type ;:community ;[:binding-nl :extend-nl] ;:community
                               :pair {:force-nl? true}
@@ -816,7 +826,7 @@
 (defn namespaced-swapper [source-ns target-ns data] ;; back here for ->> usage in honeycomb
   (walk/postwalk (partial replace-namespaced-keyv source-ns target-ns) data))
 
-(defn keywordify ;; same as server 
+(defn keywordify ;; same as server
   [s]
   (let [formatted-value (cond (nil? s) "is_null"  ;; handle nil
                               (number? s) (str s) ;; handle numbers by
@@ -828,7 +838,7 @@
         (cstr/replace "-" "_")
         keyword)))
 
-(defn remove-key ;; for sql select field and aliased fields 
+(defn remove-key ;; for sql select field and aliased fields
   [coll key]
   (vec
    (mapcat (fn [item]
@@ -872,7 +882,7 @@
               m)))
 
 (defn sanitize-name [name] ;; keep updated in server also
-  (-> name ;; chars that make file and folder operations annoying 
+  (-> name ;; chars that make file and folder operations annoying
       (clojure.string/replace  " " "_")
       (clojure.string/replace  "<" "_")
       (clojure.string/replace  ">" "_")
@@ -1002,7 +1012,7 @@
 
 ;; (defn curved-path-v3 [x1 y1 x2 y2 ]
 ;;   (let [
-;;         straight-segment-length 10 
+;;         straight-segment-length 10
 ;;         mid-y (+ y1 (/ (- y2 y1) 2))
 ;;         control-point-offset (Math/min straight-segment-length (/ (Math/abs (- y2 y1)) 2))
 ;;         control-y1 (+ y1 control-point-offset)
@@ -1019,7 +1029,7 @@
 
 
 ;; (defn curved-path-v4 [x1 y1 x2 y2 ]
-;;   (let [straight-segment-length 10 
+;;   (let [straight-segment-length 10
 ;;         dy (Math/abs (- y2 y1))
 ;;         straight-seg-adjust (Math/min straight-segment-length (/ dy 4))
 ;;         ;; Calculate the positions where the straight segments end and the curves begin

@@ -392,6 +392,7 @@
     ;;                                  :tracker (get result :tracker)
     ;;                                  :run-refs (get result :run-refs)}))
      (ut/dispatch-delay 1500 [::delay-tracker (get result :tracker-history) flow-id]) ;; TODO delayed atom side effects
+     (swap! bricks/progress-bars assoc flow-id 100) ;; just in case we finish early
   ;(let [] db)
      (-> db
          ;;(assoc-in [:flow-results :status] :done)
@@ -671,7 +672,7 @@
         server-running? (or (if only? false
                                 chans-open?)
                          ;chans-open?
-                         @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]]))
+                            @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]]))
         rrblocks (get @db/real-running-blocks flow-id [])]
     (if (= bid :*)
       server-running?
@@ -1148,8 +1149,7 @@
                                  ik (keys ii)
                                  ok (try (into (into (vec (sort-by str (keys ooo))) (vec (keys oop))) (vec (keys oopp)))
                                          (catch :default e (do (tap> [:error-sorting-keys e (keys oo) :flows.cljs :ln 1148])
-                                                               (into (into (vec (sort-by str (keys ooo))) (vec (keys oop))) (vec (keys oopp)))
-                                                               )))
+                                                               (into (into (vec (sort-by str (keys ooo))) (vec (keys oop))) (vec (keys oopp))))))
                                 ;;  _ (when
                                 ;;     (= bid-o :open-fn-3)
                                 ;;      (tap> [:ok bid-o  ok oop]))
@@ -5187,6 +5187,7 @@
      :children (for [[fid v] ss
                      :let [time-running (get v :*time-running)
                            open-channels (get v :channels-open?)
+                           channels (get v :channels-open)
                            started-by (get v :*started-by)
                            process? (get v :process?)
                            command (get v :command)
@@ -5217,8 +5218,8 @@
                                         :font-weight 700}]
                              ;[re-com/box :child (str open-channels) :width "33%"]
                                [re-com/box
-                                :child (cond running? "running"
-                                             open-channels "idling"
+                                :child (cond running? (str "running (" channels " chans)")
+                                             open-channels (str "idling (" channels " chans)")
                                              :else "stopped")
 
                                 :width "34%"]
@@ -7506,30 +7507,60 @@
 ;;              :color "white"}]))
 
 
+(re-frame/reg-sub
+ ::estimates
+ (fn [db _]
+   (get db :flow-estimates)))
+
 (defn alert-box []
   [rc/catch
    (let [rekt [@db/kick-alert @db/pause-alerts]
          rs-running @(re-frame/subscribe [::bricks/runstreams-running])
          rs-running-list @(re-frame/subscribe [::bricks/runstreams-running-list])
          alerts @(re-frame/subscribe [::bricks/alerts])
+         ;;tick (rand-int 12345)
+         ;tick "" ;(str (js/Date.now) "-" (rand-int 1000000))
+         estimates @(re-frame/subscribe [::estimates])
+         max-w (apply max (for [a alerts
+                                :let [width (* (get a 1) bricks/brick-size)]]
+                            width))
+         max-w (if (or (nil? max-w) (< max-w 50))
+                 300 ;420
+                 max-w)
          alerts (if (> rs-running 0)
                   (conj alerts [[:v-box
                                  :children
                                  (vec (into [[:box
-                                              :style {}
+                                              ;:style {:border "1px solid red"}
                                               :child (str rs-running " flow" (when (> rs-running 1) "s") " running")]]
-                                            (vec (for [e rs-running-list]
-                                                   [:box
-                                                    :style {:font-size "11px"}
-                                                    :child (str e)]))))]
-                                4 (+ 1 (* 0.275 rs-running)) 0])
+                                            (vec (for [e rs-running-list
+                                                       :let [fid (ut/replacer e ":" "")
+                                                             run-id (get-in estimates [fid :run-id])
+                                                             est (+ (js/Math.round (get-in estimates [fid :times] 0)) 1)
+                                                             est? (> est 0)]]
+                                                   [:v-box
+                                                    :padding "3px"
+                                                    :width (px max-w) ;;"215px"
+                                                    :size "auto" ;:justify :center
+                                                    :style {:font-size "11px"
+                                                            ;:border "1px solid red"
+                                                            }
+                                                    :children [[:box
+                                                                :size "auto"
+                                                                :style {:padding-left "5px"}
+                                                                :child (str fid)]
+                                                               (when true ;est?
+                                                                 [:box :child [:progress-bar [(- max-w 15) est (str e run-id)]] :height "25px" :padding "3px"])
+                                                               (when true ;est?
+                                                                 [:box :align :end
+                                                                  :style {:font-size "10px" :font-weight 400 :padding-right "5px"}
+                                                                  :child (str "estimate: " (ut/format-duration-seconds est))])]]))))]
+                                4 (+ 1.25 (* 1.05 rs-running)
+                                     (when (= 1 rs-running) -0.275)) 0])
                   alerts)
          ;;alerts (reverse alerts)
          ;;alerts (conj alerts (when (> rs-running 0) [[:box :child (str rs-running " flows running")] 8 1 0]))
-         max-w (apply max (for [a alerts
-                                :let [width (* (get a 1) bricks/brick-size)]]
-                            width))
-         max-w (if (or (nil? max-w) (< max-w 50)) 420 max-w)
+
          alerts-cnt (try (count alerts) (catch :default _ 0))
          gap 1 ;11
          all-h (apply + (for [a alerts

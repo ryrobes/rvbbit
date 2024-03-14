@@ -189,9 +189,9 @@
                           {:id "sinebow" :label "sinebow" :group "Cyclical Schemes"}]}
       [:aggregate] {:message "vega-lite axis aggregation fn used"
                     :url "https://vega.github.io/vega-lite/docs/aggregate.html"
-                    :values ["count" "distinct" "sum" ;"product" "mean" 
+                    :values ["count" "distinct" "sum" ;"product" "mean"
                              "average" "variance" "variancep" "stdev"
-                                           ;"stdevp" "stderr" 
+                                           ;"stdevp" "stderr"
                              "median" "q1" "q3" "ci0" "ci1" "min" "max"]}
       [:sort] {:message "vega-lite axis sorting attrib"
                :url "https://vega.github.io/vega-lite/docs/sort.html"
@@ -307,6 +307,8 @@
          step-val (if has-values? (nth values 1) 1)
          max-val (if has-values? (nth values 2) 200)]
 
+     ;(tap> [:view-key type-key view-key kp v])
+
      [re-com/h-box
       :src (at)
       ;:style {:padding-left "11px"}
@@ -335,7 +337,9 @@
                   :min       min-val
                   :step      step-val
                   :max       max-val
-                  :width (when (= (first view-key) :runstreams) "210px")
+                  :width (when (try
+                                 (= (first view-key) :runstreams)
+                                 (catch :default _ false)) "210px")
                   ;:width     "200%" ;"460px"
                   ;:style {:width "100%"}
                   :on-change #(re-frame/dispatch [::scrubber-view-update kp
@@ -379,7 +383,7 @@
                     :width "29px" :height "41px" :padding "2px"
                     :style {:transform "rotate(90deg)" :color "#ffffff44" :font-size "15px"
                            ; :padding-bottom "4px"
-                          ;:font-family "Kulim Park" 
+                          ;:font-family "Kulim Park"
                             :font-weight 400}])])
 
 (defn color-farmer [kp v view-key type-key]
@@ -498,7 +502,7 @@
                    :size "auto"
                  ;:width "200px"
                  ;:height "300px"
-                   :style {:background-color "#090f1e" ; (str color 25) 
+                   :style {:background-color "#090f1e" ; (str color 25)
                            ;:filter (str "drop-shadow(0px 0px 1px " color ") drop-shadow(0px 0px 1px " color ") drop-shadow(0px 0px 1px " color ") drop-shadow(0px 0px 1px " color ")")
                            ;:border (str "1px solid " color )
                            :border (if new? (str "3px dashed " color 36) "none")}
@@ -712,8 +716,8 @@
                  ;:padding "3px"
                    :children [;[re-com/box :child (str (if (not (keyword? v)) "fn-val" "field-val"))]
                               base-box] :size "auto"]
-         ;(get @(re-frame/subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]) "white") 
-         ;(get @(re-frame/subscribe [::conn/data-colors]) data-type  ) 
+         ;(get @(re-frame/subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]) "white")
+         ;(get @(re-frame/subscribe [::conn/data-colors]) data-type  )
            (get @(re-frame/subscribe [::conn/data-colors]) data-type "#ffffff33")
            (get-in @lookup-atom [view-key idx])
            v]
@@ -950,7 +954,7 @@
             :on-mouse-leave #(reset! db/pixel-pusher-key nil)}
      :children [[re-com/box
                  :padding "15px"
-     ;:height "180px" 
+     ;:height "180px"
                  :width "300px"
 
                  :size "none"
@@ -968,7 +972,7 @@
                            :children [[re-com/box ;:size "160px"
                                        :size "auto"
                                        :child
-                                       [re-com/v-box ;;:align :center  :justify :center 
+                                       [re-com/v-box ;;:align :center  :justify :center
                                         :style {:font-family "Roboto Mono" :font-size "10px" :font-weight 500 :color "#ffffff77"}
                                         :padding "5px" ;:size "auto"
                                         :children [[re-com/h-box :children [[re-com/box :child [re-com/v-box
@@ -976,7 +980,7 @@
                                                                                                 :children [[re-com/box :child (str x)]
                                                                                                            [re-com/box :child "x"
                                                                                                             :style {:font-size "8px"
-                                                                                                                    :font-weight 400}]]] ;(str x)    
+                                                                                                                    :font-weight 400}]]] ;(str x)
                                                                              :align :center
                                                                              :width "33px" :height "31px" :justify :center ; :size "30px"
                                                                              :style  blank-block-style]
@@ -1029,7 +1033,7 @@
                                                                                      :children [[re-com/box :child (str h)]
                                                                                                 [re-com/box :child "height"
                                                                                                  :style {:font-size "8px"
-                                                                                                         :font-weight 400}]]] ;(str h)  
+                                                                                                         :font-weight 400}]]] ;(str h)
                                                                              :align :center
                                                                              :width "33px" :height "31px" :justify :center ; :size "30px"
                                                                              :style  blank-block-style]
@@ -1044,7 +1048,7 @@
                                                                                      :children [[re-com/box :child (str z)]
                                                                                                 [re-com/box :child "order"
                                                                                                  :style {:font-size "8px"
-                                                                                                         :font-weight 400}]]] ;(str o)   
+                                                                                                         :font-weight 400}]]] ;(str o)
                                                                              :align :center
                                                                              :width "33px" :height "31px" :justify :center ; :size "30px"
                                                                              :style  blank-block-style]]]
@@ -1062,7 +1066,7 @@
                                                                                      :children [[re-com/box :child (str y)]
                                                                                                 [re-com/box :child "y"
                                                                                                  :style {:font-size "8px"
-                                                                                                         :font-weight 400}]]] ;(str y)   
+                                                                                                         :font-weight 400}]]] ;(str y)
                                                                              :align :center
                                                                              :width "33px" :height "31px" :justify :center ; :size "30px"
                                                                              :style  blank-block-style]
@@ -1117,7 +1121,7 @@
                                                                                                 :children [[re-com/box :child (str w)]
                                                                                                            [re-com/box :child "width"
                                                                                                             :style {:font-size "8px"
-                                                                                                                    :font-weight 400}]]] ;(str w)      
+                                                                                                                    :font-weight 400}]]] ;(str w)
                                                                              :align :center
                                                                              :width "33px" :height "31px" :justify :center ; :size "30px"
                                                                              :style  blank-block-style]
@@ -1197,7 +1201,7 @@
 
 
 
-;; scrubber panel logic based on keypaths and values 
+;; scrubber panel logic based on keypaths and values
 ;; higher up in the list is treated as priority, since only the first gets rendered...
 ;; (or be more specific with filtering via keypath-contains items...)
 

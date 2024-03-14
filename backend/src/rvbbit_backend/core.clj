@@ -439,7 +439,7 @@
                            res (get-in @flow-db/results-atom [k :done] :nope)
                            running? (or (= res :nope) (ut/chan? res) (= res :skip))
                            done? (not (= res :nope))
-                           error? (try (some #(= % :error) (ut/deep-flatten res)) (catch Exception _ false))
+                           error? (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
 
                             ;;_ (ut/pp [k :*running? running? done? res error?])
 
@@ -475,6 +475,8 @@
                                          (not (some #(= % run-id) @saved-uids))
                                           ;(not (get @last-look k))
                                          )
+                           _ (when (and done? (not error?))
+                               (swap! wss/times-atom assoc k (conj (get @wss/times-atom k []) (int (/ elapsed 1000)))))
                            _ (when run-sql?
                                (try
                                  (let [row {:client_name client-name
@@ -536,7 +538,7 @@
         ;;   (let [fp (str "./status-change-logs/" (str (System/currentTimeMillis)) ".edn")]
         ;;     (ext/create-dirs "./status-change-logs/")
         ;;     (ut/pretty-spit fp {:kks kks
-        ;;                         :res @flow-db/results-atom ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
+        ;;                         :res (select-keys @flow-db/results-atom kks) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
         ;;                         :diff (ut/replace-large-base64 b)} 125)))
 
         (update-stat-atom kks))
@@ -546,6 +548,30 @@
   (add-watch flow-db/status :tracker-watch tracker-changed)
   ;(add-watch flow-db/status :tracker-watch update-stat-atom)
   ;(add-watch flow-db/tracker :tracker-watch update-stat-atom) ;; tracker could be too much...
+
+
+
+  ;; ;;; temp, SUPER expensive logging
+  ;;   (defn tracker-changed2 [key ref old-state new-state]
+  ;;   (let [[_ b _] (data/diff old-state new-state)
+  ;;         kks (try (keys b) (catch Exception _ nil))]
+  ;;     ;(when (> (count (remove #(= "client-keepalive" %) kks)) 0)
+
+  ;;         ;(ut/pp [:trigger-status-change! kks {:diff b}])
+
+  ;;       (when (not (nil? b))
+  ;;         (async/thread ;; really expensive logging below. temp
+  ;;           (let [fp (str "./status-change-logs/" (str (System/currentTimeMillis)) ".tracker.edn")]
+  ;;             (ext/create-dirs "./status-change-logs/")
+  ;;             (ut/pretty-spit fp {:kks kks
+  ;;                               ;:res (select-keys @flow-db/results-atom kks) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
+  ;;                                 :diff (ut/replace-large-base64 b)} 125))))
+
+  ;;       ;)
+  ;;       ;(when kks (ut/pp [:flow-finished kks]))
+  ;;     ))
+
+  ;;     (add-watch flow-db/tracker :tracker-watch tracker-changed2)
 
 
 

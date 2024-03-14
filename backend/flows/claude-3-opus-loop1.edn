@@ -137,17 +137,17 @@
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
   :dialog-chat-box
-  {:y 1650,
+  {:y 975,
    :push {:push-path {:fn (fn [out] (not (nil? out))), :dest []}},
    :fn (fn [x] x),
-   :w 375,
+   :w 475,
    :raw-fn (fn [x] x),
    :right-click? true,
    :icon "zmdi-functions",
    :z 0,
    :ports {:in {:x :any}, :out {:out :any}},
-   :h 260,
-   :x 1675,
+   :h 310,
+   :x 2275,
    :view
    (fn [x] [:v-box
             :style
@@ -281,8 +281,7 @@
      :expandable? true,
      :required [:req-map]},
     :drag-meta {:type :make-http-call}}}},
- :opts {:retry-on-error? false, :retries 0, :timeout 800000, :close-on-done? false, :debug? false},
- :zoom [-584.6 -666.91 0.8],
+ :zoom [-1374.75 -1146.69 1.3],
  :flow-id "claude-3-opus-loop1",
  :flowmaps-connections
  [[:http-request-map :http-call-anthropic/req-map]

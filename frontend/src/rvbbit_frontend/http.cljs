@@ -305,6 +305,7 @@
            flow-runner-sub? (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?)) ;; server mutate only for click-param
            flow-runner-tracker? (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
            condi-tracker? (and kick? (= (get-in result [:task-id 0]) :condis) (not heartbeat?))
+           estimate? (and kick? (= (get-in result [:task-id 0]) :estimate) (not heartbeat?))
            refresh? (or (not (empty? (get-in result [:data 0 :payload])))
                         ;;; ^^ calliope test TEMP
                         (and payload-kp
@@ -314,6 +315,8 @@
            ;sys-queries (filter #(cstr/ends-with? (str %) "-sys") (keys (get db :query-history)))
 
        ;(tap> [:payload! (get db :client-name) result])
+
+      ;;  (when estimate? (tap> [:estimate! (get db :client-name) result]))
 
       ;;  (when (and (not heartbeat?) not-sys-stats?
       ;;             (= client-name :whole-coffee-pronghorn-hailing-from-natural-arch))
@@ -434,6 +437,8 @@
                          ;status
                          ;(into {} (for [[k v] status] {k [v]}))
                              tracker-history) db)))
+
+             estimate?        (assoc db :flow-estimates (merge (get db :flow-estimates) (get result :status)))
 
              flow-runner-sub? (let [rtn (get result :status)
                                     mp-key (walk/postwalk-replace {:flow-runner :return-map} task-id)

@@ -136,17 +136,23 @@
                            :types {:req-map :map
                                    :out :any}}
                :start-process {:description "Start an external process (eg. Python script, etc)"
-                           :fn (fn [process-name command-vec wait?]
-                                 (rvbbit-backend.websockets/start-process process-name command-vec wait?))
-                           :inputs [:process-name :command-vec :wait?]
+                           :fn (fn [process-name command-vec wait? ssh-host ssh-user ssh-pass]
+                                 (rvbbit-backend.websockets/start-process process-name command-vec wait? ssh-host ssh-user ssh-pass))
+                           :inputs [:process-name :command-vec :wait? :ssh-host :ssh-user :ssh-pass]
                            :required [:process-name :command-vec]
                            :defaults {:process-name "ls -l -h"
+                                      :ssh-host ""
+                                      :ssh-user ""
+                                      :ssh-pass ""
                                       :command-vec ["ls" "-l" "-h"]
                                       :wait? true}
                            :icon "fa-solid fa-terminal" ;;"zmdi-washing-machine" ;; <i class= "fa-solid fa-terminal" ></i>
                            ;;:type :kick ;; for special UI handling
                            :types {:process-name :string
                                    :command-vec :vector
+                                   :ssh-host :string
+                                   :ssh-user :string
+                                   :ssh-pass :string
                                    :wait? :boolean
                                    :out :any}}
                :stop-process {:description "Stop an external process (eg. Python script, etc)"

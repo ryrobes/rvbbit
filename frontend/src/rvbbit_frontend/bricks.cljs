@@ -3316,9 +3316,9 @@
          panel-key           @(re-frame/subscribe [::selected-block])
          block-map           @(re-frame/subscribe [::selected-block-map])
          wild?               (true? (and (not (= (cstr/trim (str wildcard)) "")) (not (nil? wildcard))))
-         ;;_ (tap> [:keypath=map keypath-map])
+        ; _ (tap> [:keypath=map keypath-map])
          scrubber-boxes      (into (sorted-map) (for [[kp [v [scrub-type [ffn ffnx]]]] keypath-map
-                                                      ;:let [_ (tap> kp)]
+                                                      ;:let [_ (tap> [scrub-type kp])]
                                                       ]
                                                   {kp (when (and (and (not (nil? scrub-type))
                                                                       (not (nil? v))
@@ -9032,6 +9032,39 @@
                       :theme             (theme-pull :theme/codemirror-theme nil) ;"ayu-mirage" ;"hopscotch"
                       }}]])
 
+(defn edn-code-box [width-int height-int value & [syntax]]
+  [re-com/box
+   :size "auto"
+     ;:width "100%" ;(px (- width-int 24))
+     ;:height (px (- height-int 24))
+   :style {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
+           :font-size     "12px"
+           :overflow      "auto"
+           :border-radius "12px"
+           :font-weight   700}
+   :child [(reagent/adapt-react-class cm/UnControlled)
+           {;:value   (str value)
+            :value (ut/format-map width-int (str value))
+            :options {:mode              "clojure" ;(or syntax "text")
+                      :lineWrapping      true
+                      :lineNumbers       false ; true
+                      :matchBrackets     true
+                      :autoCloseBrackets true
+                      :autofocus         false
+                      :autoScroll        false
+                      :detach            true
+                      :readOnly          true            ;true
+                      :theme             (theme-pull :theme/codemirror-theme nil) ;"ayu-mirage" ;"hopscotch"
+                      }}]])
+
+(defonce progress-bars (reagent.core/atom {}))
+(defonce progress-loops (reagent.core/atom {}))
+
+(defn stop-progress-loop [uid]
+  (when-let [loop (get @progress-loops uid)]
+    (async/close! loop)
+    (swap! progress-loops dissoc uid)))
+
 (declare grid)
 
 (defn honeycomb [panel-key & [override-view fh fw replacement-view replacement-query]]         ;; can sub lots of this TODO. no need to pass it all
@@ -9142,6 +9175,7 @@
                                  :nivo-swarmplot        #(nivo-render % nivo-swarmplot/SwarmPlot panel-key)
                                  :nivo-treemap          #(nivo-render % nivo-treemap/TreeMap panel-key)
                                  :ro-code-box           #(code-box nil nil %)
+                                 :edn-code-box          #(edn-code-box ww nil %)
                                  ;:date-range-picker     date-ranger-picker
                                  ;:auto-font-size-px ut/auto-font-size-px
                                  :LineChart reech/LineChart
@@ -9183,6 +9217,58 @@
                                  :str (fn [args]
                                        ; (cstr/join "" args)
                                         (apply str args))
+
+                                 :progress-bar (fn [[ww seconds uid]]
+                                                 (let [progress (or (get @progress-bars uid) (reagent.core/atom 0))
+                                                       transition-duration (/ seconds 40.0)]
+                                                   (when (and (zero? @progress) (not (get @progress-loops uid)))
+                                                     (let [loop (async/go-loop []
+                                                                  (<! (async/timeout 1000))
+                                                                  (swap! progress + (quot 100 seconds))
+                                                                  (when (< @progress 100)
+                                                                    (recur)))]
+                                                       (swap! progress-loops assoc uid loop)))
+                                                   (swap! progress-bars assoc uid progress)
+                                                   (fn []
+                                                     [re-com/progress-bar
+                                                      :model (if (> @progress 100) 100 @progress)
+                                                      :striped? true
+                                                      :bar-style {:color (str (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil)) 67)
+                                                                  :outline "none"
+                                                                  :border "none"
+                                                                  :transition (str "all " transition-duration "s ease-in-out")
+                                                                  ;:border-radius "9px"
+                                                                  :background-color (theme-pull :theme/editor-outer-rim-color nil)}
+                                                      :style {:font-family (theme-pull :theme/base-font nil)
+                                                              :background-color "#00000000"
+                                                              :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 55)
+                                                              :outline "none"
+                                                              :width ww}])))
+
+                                ;;  :progress-bar (fn [[ww seconds uid]]
+                                ;;                  (let [progress (or (get @progress-bars uid) (reagent.core/atom 0))]
+                                ;;                    (when (and (zero? @progress) (not (get @progress-loops uid)))
+                                ;;                      (let [loop (async/go-loop []
+                                ;;                                   (<! (async/timeout 1000))
+                                ;;                                   (swap! progress + (quot 100 seconds))
+                                ;;                                   (when (< @progress 100)
+                                ;;                                     (recur)))]
+                                ;;                        (swap! progress-loops assoc uid loop)))
+                                ;;                    (swap! progress-bars assoc uid progress)
+                                ;;                    (fn []
+                                ;;                      [re-com/progress-bar
+                                ;;                       :model (if (> @progress 100) 100 @progress)
+                                ;;                       :bar-style {:color (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil))
+                                ;;                                   :outline "none"
+                                ;;                                   :border "none"
+                                ;;                                   :transition "all 0.2s ease-in-out"
+                                ;;                                   ;:border-radius "9px"
+                                ;;                                   :background-color (theme-pull :theme/editor-outer-rim-color nil)}
+                                ;;                       :style {:font-family (theme-pull :theme/base-font nil)
+                                ;;                               :background-color "#00000000"
+                                ;;                               :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 55)
+                                ;;                               :outline "none"
+                                ;;                               :width ww}])))
 
                                  :speak (fn [text] (let []
                                                      (when (not (some #(= % text) @db/speech-log))

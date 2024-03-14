@@ -19,6 +19,7 @@
             ;[flowmaps.db :as flow-db]
             ;[durable-atom.core :refer [durable-atom]]
             [rvbbit-backend.embeddings :as em]
+            [clj-ssh.ssh :as ssh]
             ;[duratom.core :as da]
             [cheshire.core :as json]
             [ring.util.response :as ring-resp]
@@ -142,14 +143,7 @@
 ;;       (println (str "Task cancelled: " task-name)))))
 
 
-(def processes (atom {}))
 
-(defn- read-stream [input-stream process-id output-key]
-  (let [reader (BufferedReader. (InputStreamReader. input-stream))]
-    (loop [line (.readLine reader)]
-      (when line
-        (swap! processes update-in [process-id :output output-key] #(str % line "\n"))
-        (recur (.readLine reader))))))
 
 ;; (defn start-process [process-id command & [wait?]]
 ;;   (let [process-builder (ProcessBuilder. command)
@@ -169,8 +163,7 @@
 ;;         @stdout-future
 ;;         @stderr-future))))
 
-(defn get-output [process-id]
-  (get-in @processes [process-id :output]))
+
 
 ;; (defn start-process [process-id command & [wait?]]
 ;;   (let [process-builder (ProcessBuilder. command)
@@ -192,23 +185,65 @@
 ;;       (let [exit-code @exit-code-promise]
 ;;         (get-output process-id)))))
 
-(defn start-process [process-id command & [wait?]]
-  (let [process-builder (ProcessBuilder. command)
-        process (.start process-builder)]
-    (swap! processes assoc process-id {:process process
-                                       :output {:stdout "" :stderr ""}
-                                       :command (cstr/join " " command)
-                                       :*running? true
-                                       :start (System/currentTimeMillis)})
-    (future (read-stream (.getInputStream process) process-id :stdout))
-    (future (read-stream (.getErrorStream process) process-id :stderr))
-    (if wait?
-      (let [exit-code (.waitFor process)]
-        (swap! processes assoc-in [process-id :exit-code] exit-code)
-        (swap! processes assoc-in [process-id :end] (System/currentTimeMillis))
-        (swap! processes assoc-in [process-id :*running?] false)
-        (get-output process-id))
-      process)))
+(def processes (atom {}))
+
+(defn- read-stream [input-stream process-id output-key]
+  (let [reader (BufferedReader. (InputStreamReader. input-stream))]
+    (loop [line (.readLine reader)]
+      (when line
+        (swap! processes update-in [process-id :output output-key] #(str % line "\n"))
+        (recur (.readLine reader))))))
+
+(defn get-output [process-id]
+  (get-in @processes [process-id :output]))
+
+;; (defn start-process [process-id command & [wait?]]
+;;   (let [process-builder (ProcessBuilder. command)
+;;         process (.start process-builder)]
+;;     (swap! processes assoc process-id {:process process
+;;                                        :output {:stdout "" :stderr ""}
+;;                                        :command (cstr/join " " command)
+;;                                        :*running? true
+;;                                        :start (System/currentTimeMillis)})
+;;     (future (read-stream (.getInputStream process) process-id :stdout))
+;;     (future (read-stream (.getErrorStream process) process-id :stderr))
+;;     (if wait?
+;;       (let [exit-code (.waitFor process)]
+;;         (swap! processes assoc-in [process-id :exit-code] exit-code)
+;;         (swap! processes assoc-in [process-id :end] (System/currentTimeMillis))
+;;         (swap! processes assoc-in [process-id :*running?] false)
+;;         (get-output process-id))
+;;       process)))
+
+(defn start-process [process-id command & [wait? ssh-host ssh-user ssh-pass]]
+  (if (not (empty? ssh-host))
+    (let [session (ssh/session ssh-host ssh-user ssh-pass)]
+      (ssh/with-connection session
+        (let [result (ssh/ssh session {:cmd (cstr/join " " command)})
+              end-time (System/currentTimeMillis)]
+          (swap! processes assoc process-id {:output {:stdout (:out result) :stderr (:err result)}
+                                             :command (cstr/join " " command)
+                                             :*running? false
+                                             :start (System/currentTimeMillis)
+                                             :end end-time
+                                             :exit-code (:exit result)}))))
+    (let [process-builder (ProcessBuilder. command)
+          process (.start process-builder)]
+      (swap! processes assoc process-id {:process process
+                                         :output {:stdout "" :stderr ""}
+                                         :command (cstr/join " " command)
+                                         :*running? true
+                                         :start (System/currentTimeMillis)})
+      (future (read-stream (.getInputStream process) process-id :stdout))
+      (future (read-stream (.getErrorStream process) process-id :stderr))
+      (if wait?
+        (let [exit-code (.waitFor process)
+              end-time (System/currentTimeMillis)]
+          (swap! processes assoc-in [process-id :exit-code] exit-code)
+          (swap! processes assoc-in [process-id :end] end-time)
+          (swap! processes assoc-in [process-id :*running?] false)
+          (get-output process-id))
+        process))))
 
 (defn stop-process [process-id]
   (when-let [process-info (@processes process-id)]
@@ -220,6 +255,8 @@
 
 (defn process-exit-code [process-id]
   (get-in @processes [process-id :exit-code]))
+
+
 
 (defn sql-formatter [sql-str]
   (try (let [res (pr-str (SqlFormatter/format sql-str))]
@@ -408,9 +445,12 @@
                      (.getStackTrace t))})
 
 (defn parse-error-body [e]
-  (let [response-body (-> e ex-data :body json2/read-str)]
+  (try
+    (let [response-body (-> e ex-data :body json2/read-str)]
     {:error (get-in response-body ["error" "message"])
-     :class (str (type e))}))
+     :class (str (type e))})
+    (catch Exception _ {:error (str e)
+                        :class "ERROR IN PARSE-ERROR-BODY. lol"})))
 
 (defn make-http-call [req]
   (ut/pp [:MAKE-HTTP-CALL! (hash req) req])
@@ -454,7 +494,7 @@
                         ;:error (Throwable->map e)
                         ;:msg (str e)
                         :class (str (type e))}))]
-     ; (ut/pp [:HTTP-CALL2 method req response])
+      (ut/pp [:HTTP-CALL-RESPONSE method req (ut/replace-large-base64 response)])
       (cond (:error response)
             (do (ut/pp [:http-call2-error response :body-sent body2])
                 {:error response
@@ -1476,6 +1516,7 @@
 ;(def last-run (atom nil))
 ;(defonce params-atom (durable-atom "./data/params-atom.edn")) ;(atom {}))
 ;(def params-atom (atom {}))
+(def times-atom (ut/thaw-atom {} "./data/atoms/times-atom.edn"))
 (def params-atom (ut/thaw-atom {} "./data/atoms/params-atom.edn"))
 (def atoms-and-watchers (atom {}))
 
@@ -1988,6 +2029,7 @@
                     (str uid "-" (count (filter #(cstr/starts-with? % uid) (keys @flow-db/channel-history))))
                     uid)
           run-id (get-in @flow-db/results-atom [flow-id :run-id] "no-run-id")
+          uuid (str (java.util.UUID/randomUUID))
         ;;_ (ut/pp [:incoming-flowmap flowmap])
         ;; eval the flowmap to get the compiled functions in there rather than just un-read symbols
                ;; might be a problem with repl shipping though... might have to selectively eval the fns pre run step?
@@ -2013,7 +2055,12 @@
           ;;                                     finished-flowmap 125)))
           ;;_ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
-
+          ;_ (alert! client-name  10 1.35)
+          ;_ (push-to-client [:estimate] (ut/avg (get @times-atom flow-id [-1])) client-name -1 :est1 :est2)
+          _ (kick client-name (vec (cons :estimate [])) {flow-id {:times (ut/avg   ;; avg based on last 10 runs, but only if > 1
+                                                                          (vec (take-last 10 (vec (remove #(< % 1)
+                                                                                                (get @times-atom flow-id []))))))
+                                                                  :run-id uuid}} nil nil nil)
           return-val (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn symbols in the maps
           ;return-val (submit-named-task-and-wait uid (flow-waiter (eval finished-flowmap) uid opts))
 
@@ -2049,7 +2096,7 @@
         (ut/pp [:flowmap-returned-val (ut/limited (ut/replace-large-base64 return-val)) :flowmap-returned-val])
       ;(push-to-client [:alerts] (str "flow " flow-id " has finished") client-name -1 :alert1 :alert2)
         (let [cnt (count (str return-val))
-              limit 60
+              limit 160
               over? (> cnt limit)
               error? (cstr/includes? (str return-val) ":error")
               sample (str ; (str (get-in @flow-status [flow-id :*time-running]) " ")
@@ -2078,8 +2125,12 @@
                                            :style {:font-weight 700 :font-size "10px" :opacity 0.7}
                                            :child (str (get-in @flow-status [flow-id :*time-running]) " ")]
                                           [:box
+                                           ;:size "auto"
+                                           ;:width "455px"
                                            :style {:font-weight 700 :font-size "10px" :opacity 0.7}
-                                           :child (str "returns: " sample)]]] 10 1.35 (if error?  15 8))
+                                           :child (str "returns: " sample)]]] 10
+                                                                              (if (and error? restarts-left?) 1.5 1.35)
+                                                                              (if error?  25 9))
 
           (when (and error? restarts-left?)
             (async/thread
@@ -4384,6 +4435,15 @@
                                    :style {:font-weight 700 :font-size "11px" :opacity 0.6}
                                    :child (str "@ " fpath)]]] 10 1.6 8))
 
+(defn save-alert-notification-pre [client-name name fpath flow?]
+  (alert! client-name [:v-box
+                       :justify :center
+                       :style {;:margin-top "-6px"
+                               :opacity 0.6} ;:color (if error? "red" "inherit")}
+                       :children [[:box
+                                   :style {:font-weight 700 :font-size "13px"}
+                                   :child (str "saving " name "...")]]] 10 0.6 8))
+
 (defn save [request]
   (time (do
           (let [screen-name (get-in request [:edn-params :screen-name])
@@ -4391,6 +4451,7 @@
                 file-base-name (ut/sanitize-name (str screen-name))
                 file-path (str "./screens/" file-base-name ".edn")
                 fpath (ut/abs-file-path file-path)]
+            (save-alert-notification-pre client-name screen-name nil false)
             (do (ut/pp [:saved-file file-path])
                ;(ut/pretty-spit file-path (get-in request [:edn-params :image])) ;; file looks good, but SO fuggin slow
                 ;(ut/pretty-spit file-path (get-in request [:edn-params :image]))
@@ -4442,6 +4503,7 @@
                 file-base-name (ut/sanitize-name (str screen-name))
                 file-path (str "./flows/" file-base-name ".edn")
                 fpath (ut/abs-file-path file-path)]
+            (save-alert-notification-pre client-name screen-name nil false)
             (do (ut/pp [:saved-flow file-path])
                ;(ut/pretty-spit file-path (get-in request [:edn-params :image])) ;; file looks good, but SO fuggin slow
                 (ut/pretty-spit file-path (get-in request [:edn-params :image]) 125)
@@ -4821,10 +4883,11 @@
     ;(ut/pp [:child-atoms? @client-queues])
 
     (ut/pp [:ack-scoreboard (into {} (for [[k v] (client-statuses)
-                                  :when (not= (get v :last-seen-seconds) -1)] {k v}))])
+                                           :when (not= (get v :last-seen-seconds) -1)] {k v}))])
 
     ;(ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
 
+    (ut/pp [:times-atom (into {} (for [[k v] @times-atom] {k [(count v) :samples (int (ut/avg v)) :avg-seconds]}))])
 
     ;(ut/pp [:flow-tracker @flow-db/tracker])
 

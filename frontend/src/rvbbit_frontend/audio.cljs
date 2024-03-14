@@ -787,7 +787,7 @@
                      host (.-host js/window.location)
                      host-without-port (clojure.string/replace host #":\d+$" "")
                      new-port "8888"]
-                     (str protocol "//" host-without-port ":" new-port "/audio"))
+                 (str protocol "//" host-without-port ":" new-port "/audio"))
          url (if audio-file?
                aturl ;;"http://localhost:8888/audio"
                url)
