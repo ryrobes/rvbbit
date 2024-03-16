@@ -725,7 +725,7 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
- :opts {:timeout 240000, :close-on-done? true, :retries 3, :retry-on-error? true},
+ :opts {:timeout 240000, :close-on-done? true, :retries 33, :retry-on-error? true},
  :zoom [-967.46 -1116.55 1],
  :flow-id "openai-image-gen-ladder",
  :flowmaps-connections

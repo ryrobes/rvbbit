@@ -125,6 +125,9 @@
         luma (luminance rgb)]
     (if (> luma 0.5) "#000000" "#ffffff")))
 
+(defn find-next [v k]
+  (second (drop-while #(not= % k) v)))
+
 (defn sort-map-by-key [m]
   (sort-by first (into [] m)))
 

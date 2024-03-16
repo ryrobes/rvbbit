@@ -105,7 +105,7 @@
         ; _ (tap> [:kits kits item-type item])
          filtered-map (into {}
                             (for [[k v] kits
-                                  :when (and  (some #(= [(get v :package-name) (get v :kit-name)] %) curr) ;; is enabled in params? 
+                                  :when (and  (some #(= [(get v :package-name) (get v :kit-name)] %) curr) ;; is enabled in params?
                                               valid-where? (= (get v :run-on) item-type))]
                               {k v}))]
      ;(tap> [:filtered-map filtered-map])
@@ -185,7 +185,7 @@
  ::table-meta-chat
  (fn [db [_]]
    (let [qid (first (keys (get-in db [:panels (get db :selected-block) :queries])))]
-     (str "I have a SQL system that takes Clojure HoneySQL (map style) queries as input. Do not use functions, only data-structure based queries. 
+     (str "I have a SQL system that takes Clojure HoneySQL (map style) queries as input. Do not use functions, only data-structure based queries.
            Do not use sql/call everything is a map and a vector. Instead of :count :*, please use :count 1 - and the proper aliasing for aggregations is [[:count 1] :alias]
            Given this table metadata and referring to this table as :query/" (ut/replacer qid #":" "") " what are some interesting queries that I could run?  "
           (str "```clojure " (get-in db [:meta qid :fields] {}) "``` ")))))
@@ -197,8 +197,8 @@
          recos (vec (take 10000 ;;; 1k max?
                           (for [row (get-in db [:data :recos-sys2] [])]
                             (vec (vals (select-keys row [:combo_hash :shape_name :combo_edn]))))))]
-     (str "For this table, I have a list generated visualizations - could you recommend a few based on their descriptions here please? 
-           Just give me the combo_hash ids and a quick description for why you chose that one or ones please. 
+     (str "For this table, I have a list generated visualizations - could you recommend a few based on their descriptions here please?
+           Just give me the combo_hash ids and a quick description for why you chose that one or ones please.
            The format is a vector of vectors with keys :combo_hash (the id we need to render) :shape_name (the viz desc name) :combo_edn (the fields involved).
            List: ```clojure"
           recos " ```  Lets do top 10 please. For each recommendation please include a bit of code so I can render it as ```[:reco-preview *combo-hash-id*]``` . Put this between your title and reason explanation please."))))
@@ -239,20 +239,20 @@
          meta-fields (into {} (for [[k v] (get-in db [:meta qid :fields] {})] {k (merge v {:commons (vec (keys (get v :commons)))})}))]
 
      (cond (= type :views)
-           (str "Hey Rabbit! I have a Clojure Vector based DSL for data visualization which uses an EDN format. I am using reagent components based off of the " type-explain ". Can you show me some viz variations I can try? 
-           Please preface the examples with rabbit-view before you enclose the, in triple backticks for code. Please make sure that the vector brackets and curly brackets are balanced and closed and it is a 
+           (str "Hey Rabbit! I have a Clojure Vector based DSL for data visualization which uses an EDN format. I am using reagent components based off of the " type-explain ". Can you show me some viz variations I can try?
+           Please preface the examples with rabbit-view before you enclose the, in triple backticks for code. Please make sure that the vector brackets and curly brackets are balanced and closed and it is a
            valid Clojure datastructure. Do not use functions, just the keywords that correspond to recharts functions as you'll see in my example code. Use only the data fields I have used here since they are specifc to
-           the query you are working with. Feel free to be creative within these confines with various rechart options and configs. Do not modify the dimensions of the chart since they are specific to 
-           it's container, and experimenting with different sizes has no value to the user. Reminder EDN keywords have the color up front, not on the back. Do not modify the options map in :ResponsiveContainer at all. Please try to provide value. Don't concern yourself with modifying the CartesianGrid component, 
+           the query you are working with. Feel free to be creative within these confines with various rechart options and configs. Do not modify the dimensions of the chart since they are specific to
+           it's container, and experimenting with different sizes has no value to the user. Reminder EDN keywords have the color up front, not on the back. Do not modify the options map in :ResponsiveContainer at all. Please try to provide value. Don't concern yourself with modifying the CartesianGrid component,
            since it only draws lines, focus on different ways to visualize the data so a human can interpret it.
            Here is my code and also an example of how I want your variations presented:"
                 "rabbit-view```"
                 (str obj)
                 "```
-           
+
            Also, you cannot change the query - but for reference, here is the metadata for the query that underlies this view, which might be useful: "
                 "```" meta-fields "```"
-                "Commons are common value examples, distinct is the number of distinct values in the dataset, cardinality is what percent of the total rows are unique, data-type is self explanatory, 
+                "Commons are common value examples, distinct is the number of distinct values in the dataset, cardinality is what percent of the total rows are unique, data-type is self explanatory,
            and group-by tells if a value is an aggregate or a group-by. Use this information to help you decide how to best visualize the data within the confines of the request."
              ; ". And here is a max 20 row sample of the data itself: "
              ; "```"(vec (take 20 (get-in db [:data qid]))) "```"
@@ -262,12 +262,12 @@
                 " background. Let's try to present at least 5 options of various reasonable types please, but also include at least 2 fairly 'far out' creative examples to help inspire and iterate.")
 
            (= type :queries)
-           (str "Hey Rabbit! I have a SQL interface that takes Clojure HoneySQL (map style) queries as input. Do not use functions, only data-structure based queries. 
-           Do not use sql/call everything is a map and a vector. Instead of :count :*, please use :count 1 - and the proper aliasing for aggregations is [[:count 1] :alias], 
+           (str "Hey Rabbit! I have a SQL interface that takes Clojure HoneySQL (map style) queries as input. Do not use functions, only data-structure based queries.
+           Do not use sql/call everything is a map and a vector. Instead of :count :*, please use :count 1 - and the proper aliasing for aggregations is [[:count 1] :alias],
                  you can't order by aggregation calcs, please use their position number instead. Proper order by syntax is [[:field-name :asc] ...].
            Given this table metadata and referring to this table as :query/" (ut/replacer qid #":" "") " Based on this what are some interesting queries that I could run?  "
                 (str "```" meta-fields "``` ")
-                "Commons are common value examples, distinct is the number of distinct values in the dataset, cardinality is what percent of the total rows are unique, data-type is self explanatory, 
+                "Commons are common value examples, distinct is the number of distinct values in the dataset, cardinality is what percent of the total rows are unique, data-type is self explanatory,
            and group-by tells if a value is an aggregate or a group-by. Use this information to help you decide how to best visualize the data within the confines of the request."
                 "If you need to go deeper, the parent table " (get-in obj [:from 0]) " has this metadata: "
                 "```" (into {} (for [[k v] (get-in db [:meta (keyword (ut/replacer (get-in obj [:from 0]) ":query/" "")) :fields] {})] {k (merge v {:commons (vec (keys (get v :commons)))})})) "```")
@@ -282,7 +282,7 @@
    (let [curr (get-in db (cons :click-param keypath))]
      (assoc-in db (cons :click-param keypath) (merge curr value)))))
 ;;; DUPE OF CONN/CLICK-PARAMETER due to diff logic
-;; its a simple fn, but still 
+;; its a simple fn, but still
 
 
 (defn code-box [width-int height-int value]
@@ -457,16 +457,16 @@
      :children (cond (= mode :snapshots)
                      [[re-com/box
                        :padding "8px"
-                       :style {;:background-color "orange" 
-                               :color (theme-pull :theme/editor-outer-rim-color nil) ;"black" 
+                       :style {;:background-color "orange"
+                               :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                                :cursor "pointer"}
                        :attr {:on-click #(re-frame/dispatch [::create-snapshot])}
                        :child "create new snapshot"]
 
                       [re-com/box
                        :padding "8px"
-                       :style {;:background-color "orange" 
-                               :color (theme-pull :theme/editor-outer-rim-color nil) ;"black" 
+                       :style {;:background-color "orange"
+                               :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                                :opacity 0.5
                                :text-decoration (when @hide-diffs? "line-through")
                                :cursor "pointer"}
@@ -475,8 +475,8 @@
 
                       [re-com/box
                        :padding "8px"
-                       :style {;:background-color "orange" 
-                               :color (theme-pull :theme/editor-outer-rim-color nil) ;"black" 
+                       :style {;:background-color "orange"
+                               :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                                :opacity 0.5
                                :text-decoration (when @hide-block-diffs? "line-through")
                                :cursor "pointer"}
@@ -485,8 +485,8 @@
 
             ;; [re-com/box
             ;;  :padding "8px"
-            ;;  :style {;:background-color "orange" 
-            ;;          :color (theme-pull :theme/editor-outer-rim-color nil) ;"black" 
+            ;;  :style {;:background-color "orange"
+            ;;          :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
             ;;          :opacity 0.5
             ;;          :cursor "pointer"}
             ;;  :attr {:on-click #(re-frame/dispatch [::audio/clear-chat kp])}
@@ -500,11 +500,11 @@
                      [[re-com/box
                        :padding "4px"
                        :size "auto"
-                       ;:align :center 
+                       ;:align :center
                        :justify :center
-                       :style {;:background-color "orange" 
+                       :style {;:background-color "orange"
                                ;:border "1px solid yellow"
-                               :color (theme-pull :theme/editor-outer-rim-color nil) ;"black" 
+                               :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                                :overflow "auto"
                                :font-weight 700
                                ;:cursor "pointer"
@@ -540,10 +540,10 @@
                                            :border "1px solid #ffffff18"}
                                    :children [[re-com/box :child "allow step"]
                                               [re-com/box :child "mutations?"]]]
-                                  [re-com/h-box ;; moode :buffy implied 
+                                  [re-com/h-box ;; moode :buffy implied
                                    :padding "8px"
-                                   :style {;:background-color "orange" 
-                                           :color (theme-pull :theme/editor-outer-rim-color nil) ;"black" 
+                                   :style {;:background-color "orange"
+                                           :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                                ;:cursor "pointer"
                                            ;:border "1px solid pink"
                                            :border-radius "6px"
@@ -580,8 +580,8 @@
                     ;;  :else [[re-com/box ;; moode :buffy implied - OLD buffy panel - pre calliope demo
                     ;;          :padding "8px"
                     ;;          :size "auto"
-                    ;;          :style {;:background-color "orange" 
-                    ;;                  :color (theme-pull :theme/editor-outer-rim-color nil) ;"black" 
+                    ;;          :style {;:background-color "orange"
+                    ;;                  :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                     ;;                  :cursor "pointer"}
                     ;;         ; :attr {:on-click #(re-frame/dispatch [::audio/add-chat meta-object-msg kp])}
                     ;;          :child "request variations"]
@@ -589,8 +589,8 @@
                     ;;         [re-com/box
                     ;;          :padding "8px"
                     ;;          :size "auto"
-                    ;;          :style {;:background-color "orange" 
-                    ;;                  :color (theme-pull :theme/editor-outer-rim-color nil) ;"black" 
+                    ;;          :style {;:background-color "orange"
+                    ;;                  :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                     ;;                  :opacity 0.5
                     ;;                  :cursor "pointer"}
                     ;;          ;:attr {:on-click #(re-frame/dispatch [::audio/clear-chat kp])}
@@ -615,10 +615,10 @@
                                          :margin-top "-1px"
                                          :font-size "23px"}]
                                 [re-com/box :child " :ai-worker/ " :style {}]
-                                [re-com/box :child " Calliope"  ; " Buffy" 
+                                [re-com/box :child " Calliope"  ; " Buffy"
                                  :style {:font-family "Homemade Apple" :color "orange" :margin-top "2px"}]]]
 
-                              [re-com/h-box ;:align :center 
+                              [re-com/h-box ;:align :center
                                :justify :center
                                :size "none" :width "210px" :height "21px" ;:style {:border "1px solid white" }
                                :gap "8px"
@@ -836,7 +836,7 @@
                                     body
                                     [re-com/v-box
                                      :padding "10px" :gap "5px" :size "none" :width "575px"
-                                     :style {;:border "1px solid orange" 
+                                     :style {;:border "1px solid orange"
                                              :border-bottom (if assistant? "2px dashed #ffffff17" "inherit")
                                                          ;:border-right (if assistant? "2px dashed #ffffff17" "inherit")
                                              :background-color (if assistant? "inherit" (str (theme-pull :theme/editor-rim-color nil) 89))}
@@ -930,7 +930,7 @@
 (defonce add-flow-shelf (reagent/atom nil))
 
 (defn prepare-output-param-drag [k flow-id dtype]
-  ;;(tap> [:out-drag k flow-id dtype])
+  (tap> [:out-drag k flow-id dtype])
   (let [is-image?   false
         is-video?   false ;; maybe later re-enable, but would require me to sample the entire output, which in this case is bad news bears
         pwidth      5 ;(js/Math.floor (/ (count (str param-value)) 1.7))
@@ -940,12 +940,17 @@
         pheight     (js/Math.floor (/ pwidth 30))
         pheight     (cond (> pheight 3) 3
                           (< pheight 1) 1
-                          :else pheight)]
+                          :else pheight)
+        viewable?   (or (= dtype "map") (= dtype "vector"))
+        kkp         (keyword (str "flow/" flow-id ">" k))]
     {:h         (cond is-image? 6 is-video? 9 :else (+ 2 pheight))
      :w         (cond is-image? 6 is-video? 13 :else pwidth)
      :root      [0 0]
-     :drag-meta {:type        :param
-                 :param-full (keyword (str "flow/" flow-id ">" k))
+     :drag-meta {:type        (if viewable?
+                                :viewer-pull :param)
+                 :param-full (if viewable?
+                               [:box :style {} :child [:data-viewer kkp]]
+                               kkp)
                  ;:param-type  dtype
                  :param-table flow-id
                  :param-field k}}))
@@ -992,7 +997,7 @@
                                             ccolor (get (theme-pull :theme/data-colors db/data-colors) type)
                                             is-input? (true? (some #(= % k) open-input-keys))]]
                                   (bricks/draggable
-                                   (prepare-output-param-drag k flow-id :output)
+                                   (prepare-output-param-drag k flow-id type)
                                    "meta-menu"
                                    [re-com/v-box
                                     :height "77px"
@@ -1070,7 +1075,7 @@
 
 (re-frame/reg-sub
  ::get-meta
- (fn [db [_ flow-id bid]] ;; same as in flows.cljs, but with added flow-id param 
+ (fn [db [_ flow-id bid]] ;; same as in flows.cljs, but with added flow-id param
    (get-in db [:flows flow-id :map bid :data :flow-item :meta])))
 
 ;(def add-action-shelf (reagent/atom {}))
@@ -1084,7 +1089,7 @@
    :width "200px"
    :suggestion-to-string (fn [item]
                            (str (get item :label)))
-    ;; render in input box (must be string, no hiccup :()) 
+    ;; render in input box (must be string, no hiccup :())
    :render-suggestion (fn [ss _] ;; render in dropdown
                         [re-com/box
                          :style {:color "#000000"
@@ -1197,19 +1202,19 @@
                                       overrides-map? (not (empty? override-map))
                                       override-map (if (empty? override-map) nil override-map)
                                       no-data? (not open-inputs)
-                                      ;; drops 
+                                      ;; drops
                                       input-ports (vec (keys open-inputs))
                                       output-ports (vec (cset/difference (set (keys blocks-map)) (set input-ports)))
                                       drops @(re-frame/subscribe [::drops flow-id])]
 
                              ;(tap> [:override-map flow-id override-map])
 
-                                  (when no-data? ;; fetch updated port info from server 
+                                  (when no-data? ;; fetch updated port info from server
                                     (re-frame/dispatch [::get-runstream-ports flow-id]))
 
                                   [re-com/v-box
                                    :padding "5px"
-                                   :style {:border (when false ;open? 
+                                   :style {:border (when false ;open?
                                                      (str "2px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 44)))
                                            :border-radius "11px"
                                            :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 22)}
@@ -1341,7 +1346,7 @@
                                                           [re-com/h-box
                                                            :children
                                                            [(when overrides-map?
-                                                        ;;  [re-com/box 
+                                                        ;;  [re-com/box
                                                         ;;   :style {:margin-top "11px" :margin-right "-10px"}
                                                         ;;   :child "*"]
                                                               [re-com/md-icon-button :src (at)
@@ -1525,7 +1530,7 @@
                                                    :align :center :justify :center
                                                    :children [[re-com/h-box
                                                                :style {:color (str (theme-pull :theme/editor-outer-rim-color nil) 75)}
-                                                               ;:height "40px" 
+                                                               ;:height "40px"
                                                                :align :center :justify :center
                                                                :gap "14px"
                                                                :children [[re-com/md-icon-button :src (at)
@@ -1720,7 +1725,7 @@
                                                                      b2-meta (get-in blocks-map [(first b2) :meta :* :scrubber])
                                                                      ;;single-scrubber? (or (= ttype :open-block) (= ttype :open-input)) ;; implied by 'open-blocks'?
                                                                      ;_ (when b1-meta (tap> [:b1-meta b1-meta b1]))
-                                                                     ;_ (when b2-meta (tap> [:b2-meta b2-meta b1])) 
+                                                                     ;_ (when b2-meta (tap> [:b2-meta b2-meta b1]))
                                                                      ttype1 (get (last b1) :type)
                                                                      ttype2 (get (last b2) :type)
                                                                      droppable? (fn [x] ;(tap> [:gg (gn x) (get-in @bricks/dragging-body [:drag-meta :param-type])])
@@ -1782,7 +1787,7 @@
                                                                                               :child [re-com/box
                                                                                                       :style {:border (str "1px solid " cc)
                                                                                                               :background-color (str cc 55)
-                                                                                                                ;:color cc 
+                                                                                                                ;:color cc
                                                                                                               :padding-top "3px"
                                                                                                               :padding-bottom "3px"
                                                                                                               :padding-left "12px"
@@ -1811,7 +1816,7 @@
                                                                                                      :justify :between
                                                                                                      :children [[re-com/h-box
                                                                                                                  :children [(bricks/draggable
-                                                                                                                             (prepare-output-param-drag (first bbb) flow-id :input)
+                                                                                                                             (prepare-output-param-drag (first bbb) flow-id ttype)
                                                                                                                              "meta-menu" [re-com/box
                                                                                                                                           :attr {:on-click #(re-frame/dispatch [::toggle-runstream-value flow-id kkey])}
                                                                                                                                           :style {:font-size "17px"}
@@ -1994,7 +1999,7 @@
                                                            ;:width "250px"
                                                            :suggestion-to-string (fn [item]
                                                                                    (str (get item :label)))
-                                                                                   ;; render in input box (must be string, no hiccup :()) 
+                                                                                   ;; render in input box (must be string, no hiccup :())
                                                            :render-suggestion (fn [ss _] ;; render in dropdown
                                                                                 [re-com/box
                                                                                  :style {:color "#000000"}
@@ -2103,7 +2108,7 @@
  (fn [db [_ params]]
    (true? (= params (get db :click-param {})))))
 
-(defn render-honey-comb-fragments [c & [w h]] ;; TODO REPLACE WITH bricks/honeycomb-fragments 
+(defn render-honey-comb-fragments [c & [w h]] ;; TODO REPLACE WITH bricks/honeycomb-fragments
   (let [panel-key :virtual-panel ;:block-4752 ;:hello-there-brother
         key :virtual-view ;:view ;:ufo-country ;:heya!
         type (cond (vector? c) :view
@@ -2149,7 +2154,7 @@
                                   ]
                                                                                   ;(tap> [:qkeys (get data_d :selected-view) qkeys views (walk/postwalk-replace qkeys views)])
                               [bricks/honeycomb panel-key
-                                                                                   ;(or (first (keys views)) (first (keys queries))) 
+                                                                                   ;(or (first (keys views)) (first (keys queries)))
                                key ;:view ;(get data_d :selected-view)
                                h w
                                {key (get ndata :view)} ;views ;(walk/postwalk-replace qkeys views)
@@ -2483,7 +2488,7 @@
                                                                             :width "580px" :align :end :justify :end
                                                                             :style {:margin-right "30px"}
                                                                             :child [re-com/box
-                                                                            ;:align :end :justify :end 
+                                                                            ;:align :end :justify :end
                                                                                     :size "none"
                                                                                     :child (str "*ran " mods " board modification" (when (> mods 1) "s"))
                                                                                     :style {;:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 45)
@@ -2579,7 +2584,7 @@
     ;; (reset! db/active-tmp-history hist-key)
     ;; (dorun (for [[k query] sql-calls]
     ;;          (let [;query (walk/postwalk-replace sql-params v)
-    ;;                data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])   
+    ;;                data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
     ;;                unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
     ;;            (when (or (not data-exists?) unrun-sql?)
     ;;              (conn/sql-data [k] query)))))
@@ -2657,7 +2662,7 @@
                                                                       :user-select "none"}
                                                               :attr {:on-double-click #(reset! title-edit-idx key)
                                                                      :on-click #(re-frame/dispatch [::bricks/swap-snapshot key])}
-                                                              :child ;(str key)                                                              
+                                                              :child ;(str key)
                                                               (if (= @title-edit-idx key)
                                                                 [re-com/h-box
                                                                  :children
@@ -2681,7 +2686,7 @@
                                                                   [re-com/md-icon-button :src (at)
                                                                    :md-icon-name "zmdi-delete"
                                                                    ;:tooltip "delete this tab"
-                                                                   :style {;:transform (when @db/show-tabs? "rotate(90deg)")  
+                                                                   :style {;:transform (when @db/show-tabs? "rotate(90deg)")
                                                                                           ;:background-color (theme-pull :theme/base-block-color-selected nil)
                                                                            :color (theme-pull :theme/editor-outer-rim-color nil)
                                                                                           ;:padding-left "4px"
@@ -2852,10 +2857,10 @@
                                       has-flow-drop? @(re-frame/subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
                                       key (try (edn/read-string key) (catch :default _ :nope-cant-work-key))
                                       temp-key (keyword (str (ut/replacer (str key) #":" "") "-hist-" (rand-int 123) (hash data)))]
-                                 ; (tap> [:prev-q temp-key data]) 
+                                 ; (tap> [:prev-q temp-key data])
 
                                   [re-com/v-box
-                                   ;:padding "10px" 
+                                   ;:padding "10px"
                                    :gap "5px" :size "none"
                                    :style {;:border (str "2px solid " (theme-pull :theme/editor-rim-color nil))
                                            ;:border-bottom (if assistant? "2px dashed #ffffff17" "inherit")
@@ -2884,7 +2889,7 @@
                                               [re-com/box
                                                :style {:zoom 0.6 :transform "translate(0)"}
                                                :child (cond has-flow-drop?       ""
-                                                            ;; [re-com/box 
+                                                            ;; [re-com/box
                                                             ;;                      :style {:font-size "16px"}
                                                             ;;                      :child "(contains flow drop code, no preview)"]
                                                             (= type ":views")   (let [view {key data_d}]
@@ -2904,7 +2909,7 @@
                                                                                       ndata (walk/postwalk-replace qkeys data_d)]
                                                                                   ;(tap> [:qkeys (get data_d :selected-view) qkeys views (walk/postwalk-replace qkeys views)])
                                                                                   [bricks/honeycomb panel_key
-                                                                                   ;(or (first (keys views)) (first (keys queries))) 
+                                                                                   ;(or (first (keys views)) (first (keys queries)))
                                                                                    (get data_d :selected-view)
                                                                                    11 9
                                                                                    (get ndata :views) ;views ;(walk/postwalk-replace qkeys views)
@@ -2951,11 +2956,11 @@
         mode (get @db/chat-mode kp (if
                                     ;(nil? (second kp))
                                     (= "none!" (first kp))
-                                     ;:snapshots 
+                                     ;:snapshots
                                      :runstreams
                                      :history
                                      ;:runstreams
-)) ;; default to snap if unselected 
+)) ;; default to snap if unselected
         kmode (get @db/kit-mode kp)
         ;;_ (tap> [:kp kp mode kmode])
         text-box? (or (= mode :snapshots) (= mode :buffy) (= mode :narratives) (= mode :kick))
@@ -2979,7 +2984,7 @@
 
                                     [:kick :kick]])))]
 
-    ;; (tap> [:shit mode (vals @db/kit-mode) @db/kit-keys @db/kit-mode]) 
+    ;; (tap> [:shit mode (vals @db/kit-mode) @db/kit-keys @db/kit-mode])
     ;(tap> [:valid-kits valid-kits selected-block selected-view kp])
     ;(tap> [:choices choices mode kmode])
     ;(tap> [:buffy-modes mode kmode])
@@ -2998,7 +3003,7 @@
               :z-index 100
               :font-family (theme-pull :theme/base-font nil)
               :color (theme-pull :theme/editor-font-color nil)
-              :background-color (str (theme-pull :theme/editor-background-color nil) 99) ; "#000000" 
+              :background-color (str (theme-pull :theme/editor-background-color nil) 99) ; "#000000"
               :backdrop-filter "blur(5px)"
               :border (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil)) ; #b7e27c"
               :filter "drop-shadow(0.35rem 0.35rem 0.4rem rgba(0, 0, 0, 0.8))"
@@ -3058,10 +3063,10 @@
                                                                                              [::refresh-kits]))}]
 
                                                      (for [[c v] choices]
-                                                       [re-com/box :child (if (= c :buffy) ;(str v "!")  
+                                                       [re-com/box :child (if (= c :buffy) ;(str v "!")
                                                                             [re-com/h-box :children
                                                                              [[re-com/box :child " :ai-worker/ " :style {}]
-                                                                              [re-com/box :child " Calliope"  ; " Buffy" 
+                                                                              [re-com/box :child " Calliope"  ; " Buffy"
                                                                                :style {:font-family "Homemade Apple" :color "orange" :margin-top "2px"}]]]
                                                                             (str v))
                                                         :attr {:on-click #(do (swap! db/chat-mode assoc kp c)

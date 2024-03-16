@@ -150,7 +150,7 @@
 ;(defn ifdebug? [x] (when debug? x))
 
 (defn json-to-edn [json-str]
-  (pp [:json-to-end-debug! (str json-str)])
+  ;;(pp [:json-to-end-debug! (str json-str)])
   (json2/read-str (str json-str) :key-fn keyword))
 
 (defn get-colors [image-path]

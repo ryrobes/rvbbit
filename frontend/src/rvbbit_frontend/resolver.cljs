@@ -151,10 +151,13 @@
           singles               {:text                  str
                                  ;:case (fn [x] (ut/vectorized-case x))
                                  :str (fn [args]
-                                        ;  (cstr/join "" args)
-                                        ; (do (tap> [:str args])
-                                        (apply str args);)
-                                        )}
+                                           (if (vector? args)
+                                             (cstr/join "" (apply str args))
+                                             (str args)))
+                                 :string (fn [args]
+                                           (if (vector? args)
+                                             (cstr/join "" (apply str args))
+                                             (str args)))}
                                ;:string str
                               ; :strings               (fn [_ x] (apply str x))
                               ; :string                (fn [x] (try
@@ -170,11 +173,11 @@
                              (walk/postwalk-replace condi-walks)
                              (walk/postwalk-replace workspace-params)
                              ;(string-walk 1)
-                             (string-walk 2)
-                             (string-walk 3)
-                             (string-walk 4)
-                             (string-walk 5)
-                             (string-walk 6)
+                            ;;  (string-walk 2)
+                            ;;  (string-walk 3)
+                            ;;  (string-walk 4)
+                            ;;  (string-walk 5)
+                            ;;  (string-walk 6)
                            ;map-walk-map2
                              =-walk-map2
                              if-walk-map2

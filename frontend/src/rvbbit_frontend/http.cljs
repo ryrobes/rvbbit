@@ -391,6 +391,7 @@
 
              (and ;(get db :flow-gantt?) ;; no need if view isnt up!
                   ;(not (= (get @(re-frame/subscribe [::flow-results]) :status) :done)) ;; or channel running? we want animations!
+              (get db :flow?)
               flow-runner-tracker?)
 
              (let [flow-id (get-in result [:task-id 1])

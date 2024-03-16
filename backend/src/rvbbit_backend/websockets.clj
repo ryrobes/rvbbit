@@ -2101,7 +2101,8 @@
               error? (cstr/includes? (str return-val) ":error")
               sample (str ; (str (get-in @flow-status [flow-id :*time-running]) " ")
                       (if over? (str (subs (str return-val) 0 limit) "...")
-                          (str return-val)))]
+                          (str return-val)))
+              sample (if error? (get-in return-val [:error :error] sample) sample)]
           (alert! client-name [:v-box
                            ;:size "auto" :height "60px"
                                :justify :center
@@ -4883,7 +4884,8 @@
     ;(ut/pp [:child-atoms? @client-queues])
 
     (ut/pp [:ack-scoreboard (into {} (for [[k v] (client-statuses)
-                                           :when (not= (get v :last-seen-seconds) -1)] {k v}))])
+                                           :when (not= (get v :last-seen-seconds) -1)]
+                                       {k (ut/deselect-keys v [:booted :last-ack :last-push])}))])
 
     ;(ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
 

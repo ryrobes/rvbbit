@@ -822,7 +822,7 @@
                     :width (when cells? "280px")
                     :gap "2px"
                     :style {:color "black"
-                            :font-family "Poppins"
+                            :font-family (theme-pull :theme/base-font nil)
                             :font-size font-size; "11px"
                             :font-weight 500}
                     :children
@@ -1068,7 +1068,7 @@
                     ;[re-com/box :child  :size "auto"]
                       main-boxes]
            :padding "0px"]]
-         :style {:font-family "Poppins"
+         :style {:font-family (theme-pull :theme/base-font nil)
                  :color val-color
                  :margin-top (if nin? "0px" "-10px")
                  :border-radius "12px"}])
@@ -5457,7 +5457,7 @@
                           :type "nominal"}}}
               {:data {:values chart-data}
                :mark {:type "text"
-                      :font "Poppins"
+                      :font (theme-pull :theme/base-font nil)
                       :fontSize 9}
                :encoding
                {:color {:value "black"}
