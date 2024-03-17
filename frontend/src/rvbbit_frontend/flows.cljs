@@ -512,7 +512,7 @@
         flowmaps-connections (vec (for [[c1 c2] flowmaps-connections]
                                     (if (cstr/ends-with? (str c1) "/*")
                                       [(keyword (-> (ut/unkeyword (str c1)) (cstr/replace "/*" "") (cstr/replace ":" ""))) c2] [c1 c2])))
-        components-key (into {} (for [[k {:keys [data ports view file-path raw-fn flow-id sub-flow]}] flowmap ;; <-- flow-id refers to the subflow embed, not the parent
+        components-key (into {} (for [[k {:keys [data ports view file-path flow-path raw-fn sub-flow-id flow-id sub-flow]}] flowmap ;; <-- flow-id refers to the subflow embed, not the parent
                                       :let [ttype (or (get-in data [:flow-item :type])                        ;; ^^-- fid is the parent flow-id
                                                       (get-in data [:drag-meta :type]))
                                             try-read  (fn [x] (try (edn/read-string x) (catch :default _ x)))
@@ -542,7 +542,8 @@
                                                                   view (view-swaps view fid push-key-bid-pairs)]
                                                               ;(tap> [:view-builder k push-key-bid-pairs view fid])
                                                               view))
-                                            fn-key (try-read (get-in data [:flow-item :name] ":unknown!"))
+                                            nname (get-in data [:flow-item :name] ":unknown!")
+                                            fn-key (if flow-path nname (try-read nname))
                                             fn-category (try-read (get-in data [:flow-item :category] ":unknown!"))]]
                                   (cond
 
@@ -566,6 +567,11 @@
 
                                     (= ttype :query)
                                     {k {:fn (get data :user-input) ;'(fn [x] x) ;:raw-fn '(fn [x] x)
+                                        :inputs (vec (keys (get ports :in)))}}
+
+                                    flow-path
+                                    {k {:flow-path flow-path :sub-flow-id sub-flow-id
+                                        :default-overrides (get-in data [:flow-item :defaults] {})
                                         :inputs (vec (keys (get ports :in)))}}
 
                                     (= ttype :sub-flow)
@@ -7661,6 +7667,7 @@
         try-read (fn [x] (try (edn/read-string x) (catch :default _ x)))
         [x y] @detached-coords
         flow?  (= (get starting-val :category) ":flow") ;; also packaged flows... not raws... how to?
+        sub-flow?  (= (get starting-val :category) ":sub-flows")
         part-key? (true? (and (map? starting-val) (not flow?)
                               (not (nil? (get starting-val :category)))
                               (not (nil? (get starting-val :name)))
@@ -7717,33 +7724,38 @@
                                               (cstr/replace "+" "")
                                               (cstr/replace ":" "")
                                               keyword) e}))]
-                   {:w 125 :h 60 :z 0
-                    :data
-                    {:flow-item
-                     {:category (get lookup-map :category) ;; important for lookup server-side! (string fine)
-                      :type (try-read (get lookup-map :name))  ;; important for client render (expects keyword)
-                      :name (get lookup-map :name)  ;; important for lookup server-side! (string fine)
-                      :icon (get lookup-map :icon)
-                      :inputs (walk/postwalk-replace arg-walks (get lookup-map :inputs))
-                      :defaults (get lookup-map :defaults)
-                      :types (walk/postwalk-replace arg-walks (get lookup-map :types))
-                      :style (get lookup-map :style)
-                      :selected-style (get lookup-map :selected-style)
-                      :expandable? true
-                      :required (get lookup-map :required)}
-                     :drag-meta {:type (try-read (get lookup-map :name))}}
-                    :right-click? true ;; important for add-block to get current coords
-                    :ports {:in
+                   (merge
+                    (if sub-flow? {:flow-path (get lookup-map :flow-path)  ;; for unpacking later
+                                   :sub-flow-id (get lookup-map :flow-id)})
+                    {:w 125 :h 60 :z 0
+                     :data
+                     {:flow-item
+                      {:category (get lookup-map :category) ;; important for lookup server-side! (string fine)
+                       :type (if (not sub-flow?) (try-read (get lookup-map :name)) (get lookup-map :name))  ;; important for client render (expects keyword)
+                       :name (get lookup-map :name)  ;; important for lookup server-side! (string fine)
+                       :icon (get lookup-map :icon)
+                       :inputs (walk/postwalk-replace arg-walks (get lookup-map :inputs))
+                       :defaults (get lookup-map :defaults)
+                       :types (walk/postwalk-replace arg-walks (get lookup-map :types))
+                       :style (get lookup-map :style)
+                       :selected-style (get lookup-map :selected-style)
+                       :expandable? true
+                       :required (get lookup-map :required)}
+                      :drag-meta {:type (if (not sub-flow?) (try-read (get lookup-map :name)) (get lookup-map :name))}}
+                     :right-click? true ;; important for add-block to get current coords
+                     :ports {:in
                           ;; (try
                           ;;       (into {} (for [e (second (get lookup-map :fn))
                           ;;                      :let [kk (keyword (str e))]]
                           ;;                  {kk (get-in lookup-map [:types kk] :any)}))
                           ;;       (catch :default _ {:value :any}))
 
-                            f2i
+                             (if sub-flow?
+                               (select-keys (get lookup-map :types) (get lookup-map :inputs))
+                               f2i)
 
-                            :out {:out (get-in lookup-map [:types :out] :any)}}
-                    :icon (get lookup-map :icon)})
+                             :out {:out (get-in lookup-map [:types :out] :any)}}
+                     :icon (get lookup-map :icon)}))
         open-fn-body (let [;port-map (try
                            ;           (into {} (for [e (second starting-val)]
                            ;                      {(keyword (str e)) :any}))

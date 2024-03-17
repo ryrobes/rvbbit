@@ -152,7 +152,10 @@
   (sql-exec flows-db (to-sql {:delete-from [:flows]})) ;; just in case
   (let [prefix "./flows/"
         files (ut/get-file-vectors-simple prefix ".edn")]
-    (doseq [f files] (update-flow-meta (str prefix f)))))
+    (doseq [f files]
+      (let [f-path (str prefix f)]
+        (wss/create-flowblock f-path)
+        (update-flow-meta f-path)))))
 
 (defn watch-flows-folder []
   (let [file-path "./flows/"]
@@ -163,6 +166,7 @@
         (let [f-path (str (get % :path))
               f-op (get % :type)]
           (ut/pp [:flow-change! f-op f-path])
+          (wss/create-flowblock f-path)
           (update-flow-meta f-path)))
      file-path)))
 
@@ -301,7 +305,12 @@
                                  cruiser/default-field-attributes
                                  cruiser/default-derived-fields
                                  cruiser/default-viz-shapes
-                                 cruiser/default-flow-functions)
+                                 (merge
+                                  cruiser/default-flow-functions
+                                  ;; (let [] ;; custom categories instead of :sub-flow
+                                  ;;   (doseq [[k v] @wss/sub-flow-blocks] {k v}))
+                                  {:sub-flows @wss/sub-flow-blocks}
+                                  ))
 
   (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
    "system-db"

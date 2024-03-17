@@ -75,6 +75,7 @@
 (def stats-cnt (atom 0))
 (def restart-map (atom {}))
 (def orig-caller (atom {}))
+(def sub-flow-blocks (atom {}))
 
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
@@ -1617,10 +1618,18 @@
              (ut/template-replace walkmap ~v)
              (walk/postwalk-replace walkmap ~v)))))))
 
+
+
+
+(declare materialize-flowmap)
+
+;;; materialize-flowmap  [client-name flowmap flow-id opts & [no-eval?]]
+
 (defn process-flowmaps [flowmap sub-map]
   ;(ut/pp [:processing-flowmap flowmap])
   (doall (let [flowmap-comps (into {} (for [[k v] (get flowmap :components)
                                             ;:let [_ (ut/pp [:*processing-comp k v])]
+                                            :let [v (if (get v :flow-path) (materialize-flowmap (get sub-map :client-name) (get v :flow-path) (get v :sub-flow-id) {} true) v)]
                                             ]
                                         (walk/postwalk-replace
                                          {:block-id k
@@ -1635,7 +1644,13 @@
                                                 ;;                        {k {:error "cant process fn" :e (str e)}}))
                                                 ;; )
 
-                                               (not (empty? (get v :components))) ;; subflow!
+                                              ;;  (not (empty? (get v :file-path))) ;; pre-packed subflow from file
+                                              ;;  (let [file-path (get v :file-path)
+                                              ;;        sflow-id (get v :flow-id nil)
+                                              ;;        vv (materialize-flowmap (get sub-map :client-name) file-path sflow-id {} true)] ;; <-- true flag is to not pre-eval fn forms
+                                              ;;    {k (assoc (process-flowmaps vv sub-map) :description [file-path sflow-id])})
+
+                                               (not (empty? (get v :components))) ;; unpacked subflow! (legacy saved flows and post unpacking)
                                                ;; or :file-path not empty?
                                                {k (assoc (process-flowmaps v sub-map) :description [(get v :file-path nil) (get v :flow-id nil)])} ;; sneaky sneaky
                                        ;;; ^^^ need to load file from disk instead of using the saved flowmap in the embedded flow... TODO
@@ -1961,15 +1976,18 @@
         server-flowmap {:canvas canvas-key :components components-key :connections flowmaps-connections}]
     server-flowmap))
 
-(defn materialize-flowmap  [client-name flowmap flow-id opts]
+(defn materialize-flowmap  [client-name flowmap flow-id opts & [no-eval?]]
   (let [flowmap (if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
-                  (let [raw (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
+                  (let [ppath (if (cstr/ends-with? (cstr/lower-case flowmap) ".edn")
+                                flowmap ;; already a file path
+                                (str "./flows/" flowmap ".edn"))
+                        raw (try (edn/read-string (slurp ppath))
                                  (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
                                                         {})))
                         flowmaps (process-flow-map (get raw :flowmaps))
                         connections (get raw :flowmaps-connections)
                         fmap (process-flowmap2 flowmaps connections)]
-                    (ut/pp fmap)
+                    (ut/pp [:materialized-flowmap fmap])
                     fmap)
                   flowmap)
         uid (str flow-id) ;(ut/generate-name)
@@ -1981,8 +1999,48 @@
                ;; might be a problem with repl shipping though... might have to selectively eval the fns pre run step?
        ; _ (ut/pp [:flowmap finished-flowmap])
         sub-map {:flow-id uid :client-name client-name}
-        finished-flowmap (process-flowmaps flowmap sub-map)]
-    (eval finished-flowmap)))
+        finished-flowmap (if no-eval?
+                           flowmap
+                           (process-flowmaps flowmap sub-map))]
+    (if no-eval?
+      finished-flowmap
+      (eval finished-flowmap))))
+
+(declare get-flow-open-ports)
+
+(defn create-flowblock  [file-path]
+  (let [data (get-flow-open-ports file-path nil nil)
+        fid0 (cstr/split file-path #"/")
+        fid (cstr/replace (last fid0) ".edn" "")
+        out (first (for [[_ v] (get data :blocks)
+                         :when (true? (get v :last?))] (get-in v [:type :out] (get-in v [:type :*]))))
+        flow-id (get data :flow-id)
+        block {:flow-id flow-id
+               :flow-path file-path
+               :fn '()
+               :inputs (vec (keys (get data :open-inputs [])))
+               :required (vec (keys (get data :open-inputs [])))
+               :defaults (into {} (for [[k v] (get data :open-inputs [])] {k (get v :user-input)}))
+               :description (get data :description)
+               :icon "zmdi-puzzle-piece"
+               :types (assoc
+                       (into {} (for [[k v] (get data :open-inputs [])] {k (get-in v [:type :out] (get v :type))})) ;; work around for legacy issue, TODO
+                       :out out)}
+        ;data (assoc data :flow-block block)
+        ]
+
+    (ut/pp [:create-flowblock-for file-path])
+
+    (async/thread ;; really expensive logging below. temp
+      (let [fp (str "./flow-blocks/" fid ".edn")]
+        (ext/create-dirs "./flow-blocks/")
+        (ut/pretty-spit fp block 225)))
+
+    (swap! sub-flow-blocks assoc flow-id block)
+    ;; update the flow-blocks sql db with the new block
+
+    ))
+
 
 (defn alert! [client-name content w h duration & [type]]
   (push-to-client [:alerts] [content w h duration] client-name -1 :alert1 :alert2)
@@ -2020,9 +2078,9 @@
                       ;(ut/pp fmap)
                       fmap)
                     flowmap)
-          ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps-pre") ;; TEMP FOR DEBUGGING - expensive
-          ;;                     (ut/pretty-spit (str "./flow-history/src-maps-pre/" flow-id ".edn") ;; ut/pretty-spit is SO expensive...
-          ;;                                     flowmap 125)))
+          _ (async/thread (do (ext/create-dirs "./flow-history/src-maps-pre") ;; TEMP FOR DEBUGGING - expensive
+                              (ut/pretty-spit (str "./flow-history/src-maps-pre/" flow-id ".edn") ;; ut/pretty-spit is SO expensive...
+                                              flowmap 185)))
           user-opts (get flowmap :opts (get opts :opts))
           opts (assoc opts :opts user-opts) ;; kinda weird, but we need to account for saved opts or live interactive opts
           ;;_ (ut/pp [:flow!-opts opts user-opts])
@@ -2057,10 +2115,10 @@
           opts (merge opts (select-keys (get opts :opts {}) [:close-on-done? :debug? :timeout]))
           opts (merge {:client-name client-name} opts)
           finished-flowmap (assoc finished-flowmap :opts opts)
-          ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps") ;; TEMP FOR DEBUGGING - expensive
-          ;;                     (ut/pretty-spit (str "./flow-history/src-maps/" flow-id ".edn") ;; ut/pretty-spit is SO expensive...
-          ;;                                     finished-flowmap 125)))
-          ;;_ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
+          _ (async/thread (do (ext/create-dirs "./flow-history/src-maps") ;; TEMP FOR DEBUGGING - expensive
+                              (ut/pretty-spit (str "./flow-history/src-maps/" flow-id ".edn") ;; ut/pretty-spit is SO expensive...
+                                              finished-flowmap 185)))
+          _ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
 
           ;_ (alert! client-name  10 1.35)
@@ -2069,7 +2127,7 @@
                                                                           (vec (take-last 10 (vec (remove #(< % 1)
                                                                                                 (get @times-atom flow-id []))))))
                                                                   :run-id uuid}} nil nil nil)
-          _ (ut/pp [:opts!! opts flow-id])
+         ;; _ (ut/pp [:opts!! opts flow-id])
           return-val (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn symbols in the maps
           ;return-val (submit-named-task-and-wait uid (flow-waiter (eval finished-flowmap) uid opts))
 
@@ -2223,7 +2281,10 @@
       (swap! flow-db/live-schedules #(remove (fn [x] (= (:flow-id x) flow-id)) %)))))
 
 (defn get-flow-open-ports [flowmap flow-id client-name] ;; generally a local path, not a map, but hey w/e
-  (let [raw (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
+  (let [raw (try (edn/read-string
+                  (slurp (if (cstr/ends-with? (cstr/lower-case flowmap) ".edn")
+                           flowmap ;; file path, use as is
+                           (str "./flows/" flowmap ".edn"))))
                  (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
                                         {})))
         [flowmap raw-conns] [(if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
@@ -2237,6 +2298,7 @@
                            :when (get v :view)]
                        (keyword (str (cstr/replace (str k) ":" "") "-vw"))))
         blocks     (set (into vblocks (vec (keys (get flowmap :components)))))
+        flow-id (or flow-id (get raw :flow-id)) ;; if not passed in, get from file (mostly for flowblock creation)
         blocks-types (into {}
                            (for [b blocks]
                              (let [actual-data (get-in @flow-db/results-atom [flow-id b])
@@ -2263,7 +2325,8 @@
                                                "no sample data"))}})))
         base-conns (set (for [[_ v2] raw-conns ;(get flowmap :connections)
                               ;; ^^ we need condis also which have diff connections that get removed by process-flowmaps2
-                              ](keyword (gns v2))))
+                              ] (keyword (gns v2))))
+        desc (get-in raw [:opts :description])
         no-inputs (vec (remove #(cstr/ends-with? (str %) "-vw") (cset/difference blocks base-conns)))
         flow-inputs (into {} (for [i no-inputs
                                    :let [outs (keys (get-in raw [:flowmaps i :ports :out]))
@@ -2273,7 +2336,7 @@
                                    :defaults (get-in raw [:flowmaps i :data :flow-item :defaults] {})
                                    :type (get-in raw [:flowmaps i :ports :out
                                                       (if (some #(= % :*) outs) :* (first outs))])}}))]
-    {:flow-id flow-id :open-inputs flow-inputs :blocks blocks-types :found? (true? (not (empty? raw)))}))
+    {:flow-id flow-id :description desc :open-inputs flow-inputs :blocks blocks-types :found? (true? (not (empty? raw)))}))
 
 (defmethod wl/handle-request :get-flow-open-ports [{:keys [client-name flowmap flow-id]}]
   ;;(ut/pp [:get-flow-open-ports client-name flow-id])

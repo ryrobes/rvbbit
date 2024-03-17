@@ -1,2 +1,2 @@
-(ns rvbbit-shared.utils)
+(ns rvbbit.shared.utils)
 ;; I don't do shit yet.
