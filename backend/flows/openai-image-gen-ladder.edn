@@ -488,18 +488,20 @@
     :flow-item {:expandable? true},
     :user-input "/home/ryanr/rvbbit/frontend/resources/public/images/gen"}},
   :prompt
-  {:w 300,
-   :h 110,
+  {:y 850,
+   :w 300,
+   :right-click? true,
+   :types nil,
    :z 0,
+   :ports {:in {}, :out {:out {:out :string}}},
+   :inputs nil,
+   :h 110,
+   :x 1850,
    :data
    {:drag-meta {:type :open-block},
     :flow-item {:expandable? true},
     :user-input
-    "A highly detailed illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her body radiantly."},
-   :right-click? true,
-   :ports {:in {}, :out {:out :string}},
-   :x 1850,
-   :y 850},
+    "A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her body."}},
   :create-png-path
   {:y 1775,
    :description
@@ -725,8 +727,8 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
- :opts {:timeout 240000, :close-on-done? true, :retries 33, :retry-on-error? true},
- :zoom [-967.46 -1116.55 1],
+ :opts {:retries 40, :retry-on-error? true, :close-on-done? true},
+ :zoom [-87.42 -418.75 0.6],
  :flow-id "openai-image-gen-ladder",
  :flowmaps-connections
  [[:http-req-map/* :oai-api-call/req-map]

@@ -5986,22 +5986,24 @@
                                                                       :child [:img {:src (str "data:image/png;base64," pval)}]]]]
                                                                    [code-box 555 nil (pr-str pval)]))]
 
-                                                              [re-com/v-box
-                                                               :width "31px"
-                                                               :align :center :justify :center
+                                                              (when multi?
+                                                                [re-com/v-box
+                                                                 :width "31px"
+                                                                 :align :center :justify :center
                                                ;:style {:border "1px solid white"}
-                                                               :children [[re-com/md-icon-button
-                                                                           :attr {:on-click #(re-frame/dispatch [::re-order-connection c-line :up])}
-                                                                           :style {:font-size "12px"
+                                                                 :children [[re-com/md-icon-button
+                                                                             :attr {:on-click #(re-frame/dispatch [::re-order-connection c-line :up])}
+                                                                             :style {:font-size "12px"
                                                                                  ;:margin-top "4px"
-                                                                                   :color (str (theme-pull :theme/editor-font-color nil) "75")}
-                                                                           :md-icon-name "zmdi-chevron-up"]
-                                                                          [re-com/md-icon-button
-                                                                           :attr {:on-click #(re-frame/dispatch [::re-order-connection c-line :down])}
-                                                                           :style {:font-size "12px"
+                                                                                     :color (str (theme-pull :theme/editor-font-color nil) "75")}
+                                                                             :md-icon-name "zmdi-chevron-up"]
+                                                                            [re-com/md-icon-button
+                                                                             :attr {:on-click #(re-frame/dispatch [::re-order-connection c-line :down])}
+                                                                             :style {:font-size "12px"
                                                                                  ;:margin-bottom "4px"
-                                                                                   :color (str (theme-pull :theme/editor-font-color nil) "75")}
-                                                                           :md-icon-name "zmdi-chevron-down"]]]]]
+                                                                                     :color (str (theme-pull :theme/editor-font-color nil) "75")}
+                                                                             :md-icon-name "zmdi-chevron-down"]]])
+                                                              ]]
 
                                                   (when show-scrubber? ;; scrubber?
                                                          ;;(tap> [:kk @(re-frame/subscribe [::bricks/keypaths-in-flow bid])])
@@ -7537,7 +7539,7 @@
                                                        :let [fid (ut/replacer e ":" "")
                                                              run-id (get-in estimates [fid :run-id])
                                                              est (+ (js/Math.round (get-in estimates [fid :times] 0)) 1)
-                                                             est? (> est 0)]]
+                                                             est? (> est 1)]]
                                                    [:v-box
                                                     :padding "3px"
                                                     :width (px max-w) ;;"215px"
@@ -7549,9 +7551,9 @@
                                                                 :size "auto"
                                                                 :style {:padding-left "5px"}
                                                                 :child (str fid)]
-                                                               (when true ;est?
+                                                               (when est? ;true ;est?
                                                                  [:box :child [:progress-bar [(- max-w 15) est (str e run-id)]] :height "25px" :padding "3px"])
-                                                               (when true ;est?
+                                                               (when est? ;true ;est?
                                                                  [:box :align :end
                                                                   :style {:font-size "10px" :font-weight 400 :padding-right "5px"}
                                                                   :child (str "estimate: " (ut/format-duration-seconds est))])]]))))]

@@ -464,7 +464,8 @@
                             ;; _ (ut/pp [:uid (str (get-in @flow-db/results-atom [k :run-id]))
                             ;;           (str (get-in @flow-db/results-atom [k :opts-map :client-id] "n/a"))
                             ;;           done? (get @last-look k)])
-                           cname (get-in @flow-db/results-atom [k :opts-map :client-name] :rvbbit-scheduler)
+                           cname (get-in @flow-db/results-atom [k :opts-map :client-name]
+                                         (get @wss/orig-caller k :rvbbit-scheduler))
                            client-name (str cname)
                             ;; orig-tracker (get @flow-db/tracker k)
                             ;; tracker (into {} (for [[k v] orig-tracker ;; remove condi non-starts. dont send to client. data noise. neccessary noise for reactions, but noise
@@ -532,14 +533,14 @@
           kks (try (keys b) (catch Exception _ nil))]
       (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
 
-        ;(ut/pp [:trigger-status-change! kks {:diff b}])
+        (ut/pp [:trigger-status-changes! kks])
 
-        ;; (async/thread ;; really expensive logging below. temp
-        ;;   (let [fp (str "./status-change-logs/" (str (System/currentTimeMillis)) ".edn")]
-        ;;     (ext/create-dirs "./status-change-logs/")
-        ;;     (ut/pretty-spit fp {:kks kks
-        ;;                         :res (select-keys @flow-db/results-atom kks) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
-        ;;                         :diff (ut/replace-large-base64 b)} 125)))
+        (async/thread ;; really expensive logging below. temp
+          (let [fp (str "./status-change-logs/" (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":")) "@" (str (System/currentTimeMillis)) ".edn")]
+            (ext/create-dirs "./status-change-logs/")
+            (ut/pretty-spit fp {:kks kks
+                                :res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
+                                :diff (ut/replace-large-base64 b)} 125)))
 
         (update-stat-atom kks))
       ;(when kks (ut/pp [:flow-finished kks]))

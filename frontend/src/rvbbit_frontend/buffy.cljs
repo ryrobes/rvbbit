@@ -930,7 +930,7 @@
 (defonce add-flow-shelf (reagent/atom nil))
 
 (defn prepare-output-param-drag [k flow-id dtype]
-  (tap> [:out-drag k flow-id dtype])
+  ;(tap> [:out-drag k flow-id dtype])
   (let [is-image?   false
         is-video?   false ;; maybe later re-enable, but would require me to sample the entire output, which in this case is bad news bears
         pwidth      5 ;(js/Math.floor (/ (count (str param-value)) 1.7))
@@ -995,7 +995,9 @@
                                       :let [type (if (cstr/ends-with? (str k) "-vw") "rabbit-code" (gn type))
                                             view? (= type "rabbit-code")
                                             ccolor (get (theme-pull :theme/data-colors db/data-colors) type)
-                                            is-input? (true? (some #(= % k) open-input-keys))]]
+                                            is-input? (true? (some #(= % k) open-input-keys))
+                                            ;_ (tap> [:inn k type sample])
+                                            ]]
                                   (bricks/draggable
                                    (prepare-output-param-drag k flow-id type)
                                    "meta-menu"
@@ -1726,8 +1728,10 @@
                                                                      ;;single-scrubber? (or (= ttype :open-block) (= ttype :open-input)) ;; implied by 'open-blocks'?
                                                                      ;_ (when b1-meta (tap> [:b1-meta b1-meta b1]))
                                                                      ;_ (when b2-meta (tap> [:b2-meta b2-meta b1]))
-                                                                     ttype1 (get (last b1) :type)
-                                                                     ttype2 (get (last b2) :type)
+                                                                     fix-type (fn [x] (get x :out x)) ;; TODO remove when input fixed upstream
+                                                                     ttype1 (fix-type (get (last b1) :type))
+                                                                     ttype2 (fix-type (get (last b2) :type))
+                                                                     ;;_ (tap> [:inn b1 b2 ttype1 ttype2 ])
                                                                      droppable? (fn [x] ;(tap> [:gg (gn x) (get-in @bricks/dragging-body [:drag-meta :param-type])])
                                                                                   (try (or
                                                                                         (and @bricks/dragging? ;; all parameters that are valid

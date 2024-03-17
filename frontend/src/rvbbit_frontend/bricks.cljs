@@ -132,8 +132,10 @@
 (re-frame/reg-event-db
  ::take-screenshot
  (fn [db _]
-   (let [element (js/document.getElementById "base-canvas")]
-     ;(tap> [:ppush-snap? (get db :client-name)])
+   (let [element (js/document.getElementById "base-canvas")
+         session-hash (hash [(get db :panels)
+                             (get db :click-param)])]
+     ;(tap> [:pushed-snap? (get db :client-name)])
      (.then (html2canvas element)
             (fn [canvas]
               (let [dataUrl (.toDataURL canvas "image/jpeg" 0.75)]
@@ -148,9 +150,8 @@
                          {:message    {:kind :session-snaps
                                        :client-name (get db :client-name)}
                           :on-response [::save-sessions]
-                          :timeout    500000}]))
-
-   db))
+                          :timeout    500000}])
+     (assoc db :session-hash session-hash))))
 
 (defn mouse-active-recently? [seconds]
   (let [now (js/Date.)
@@ -161,8 +162,11 @@
 
 (re-frame/reg-sub
  ::is-mouse-active?
- (fn [_ _]
-   (not (true? (mouse-active-recently? 5)))))
+ (fn [db _]
+   (let [session-hash (hash [(get db :panels)
+                             (get db :click-param)])]
+     (and (not= session-hash (get db :session-hash))
+          (not (true? (mouse-active-recently? 5)))))))
 
 ;;(tap> [:screenshot @screenshot])
 

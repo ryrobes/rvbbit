@@ -73,6 +73,8 @@
 
 (defonce flow-status (atom {}))
 (def stats-cnt (atom 0))
+(def restart-map (atom {}))
+(def orig-caller (atom {}))
 
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
@@ -1559,6 +1561,7 @@
              {k {:time-running *time-running
                  :*running? *running?
                  :tracker-events tracker-events
+                 :retries-left (get @restart-map k -1)
                  :*started-by *started-by
                  ;:timeouts (count (filter #(= % :timeout) (ut/deep-flatten tracker-events)))
                  ;:skips (count (filter #(= % :skip) (ut/deep-flatten tracker-events)))
@@ -1633,6 +1636,7 @@
                                                 ;; )
 
                                                (not (empty? (get v :components))) ;; subflow!
+                                               ;; or :file-path not empty?
                                                {k (assoc (process-flowmaps v sub-map) :description [(get v :file-path nil) (get v :flow-id nil)])} ;; sneaky sneaky
                                        ;;; ^^^ need to load file from disk instead of using the saved flowmap in the embedded flow... TODO
                                        ;;; we just need to copy the server flowmap version, or post-process it here using FE's fn
@@ -1993,16 +1997,18 @@
 
 ;; (tap> "Hello, world!")
 
-(def restart-map (atom {}))
+
 
 (defn flow! [client-name flowmap flow-id opts & [no-return?]]
   (try
     (let [orig-flowmap flowmap
+           _ (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of flowmaps starter overlap
         ;opts (merge {:client-name (str (or (get opts :client-name) client-name :rvbbit))} (or opts {}))) ;; stuff into opts for flow-waiter
           ;user-opts (get opts :opts)
           ;opts (dissoc opts :opts)
           ;instance-id (get opts :instance-id)
-          opts (if (get opts :client-name) opts (merge {:client-name client-name} opts)) ;; stuff into opts for flow-waiter
+          ;opts (if (get opts :client-name) opts (merge {:client-name client-name} opts)) ;; stuff into opts for flow-waiter
+          ;opts (merge {:client-name client-name} opts)
           flowmap (if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
                     (let [raw (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
                                    (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
@@ -2049,18 +2055,21 @@
                                                   ;; ^^ any user-space flow opts that are not system level
                                                   finished-flowmap)
           opts (merge opts (select-keys (get opts :opts {}) [:close-on-done? :debug? :timeout]))
+          opts (merge {:client-name client-name} opts)
           finished-flowmap (assoc finished-flowmap :opts opts)
           ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps") ;; TEMP FOR DEBUGGING - expensive
           ;;                     (ut/pretty-spit (str "./flow-history/src-maps/" flow-id ".edn") ;; ut/pretty-spit is SO expensive...
           ;;                                     finished-flowmap 125)))
           ;;_ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
+
           ;_ (alert! client-name  10 1.35)
           ;_ (push-to-client [:estimate] (ut/avg (get @times-atom flow-id [-1])) client-name -1 :est1 :est2)
           _ (kick client-name (vec (cons :estimate [])) {flow-id {:times (ut/avg   ;; avg based on last 10 runs, but only if > 1
                                                                           (vec (take-last 10 (vec (remove #(< % 1)
                                                                                                 (get @times-atom flow-id []))))))
                                                                   :run-id uuid}} nil nil nil)
+          _ (ut/pp [:opts!! opts flow-id])
           return-val (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn symbols in the maps
           ;return-val (submit-named-task-and-wait uid (flow-waiter (eval finished-flowmap) uid opts))
 
@@ -2108,28 +2117,31 @@
                                :justify :center
                                :style {:margin-top "-6px" :color (if error? "red" "inherit")}
                                :children [[:box :child (str "flow " flow-id " has finished"
-                                                            (when error? (str " in error"
-                                                                              (when restarts-left?
-                                                                                (str "  " restarts " more restarts")))))
+                                                            (when error? (str " in error")))
                                          ;:style {:font-size "12px"}
                                            ]
                                           (when (and error? restarts-left?)
                                             [:box
                                              :style {:font-size "9px"}
-                                             :child "waiting 10 seconds & restarting..."])
+                                             :child (str "  " restarts " attempts left, restarting in 10 seconds...")])
                                         ;; [:box ;:align :end
                                         ;;  :style {:font-weight 400 :font-size "10px"
                                         ;;          ;:margin-left "20px"
                                         ;;          :opacity 0.6}
                                         ;;  :child (str "in " (get-in @flow-status [flow-id :*time-running]))]
-                                          [:box
-                                           :style {:font-weight 700 :font-size "10px" :opacity 0.7}
-                                           :child (str (get-in @flow-status [flow-id :*time-running]) " ")]
+                                          (when (not error?)
+                                            [:box
+                                             :style {:font-weight 700 :font-size "10px" :opacity 0.7}
+                                             :child (str (get-in @flow-status [flow-id :*time-running]) " ")])
                                           [:box
                                            ;:size "auto"
                                            ;:width "455px"
-                                           :style {:font-weight 700 :font-size "10px" :opacity 0.7}
-                                           :child (str "returns: " sample)]]] 10
+                                           :style {:font-weight 700
+                                                   :font-size (if error? "13px" "10px")
+                                                   :opacity (if error? 1.0 0.7)}
+                                           :child (if error?
+                                                    (str sample)
+                                                    (str "returns: " sample))]]] 10
                                                                               (if (and error? restarts-left?) 1.5 1.35)
                                                                               (if error?  25 9))
 
@@ -2563,13 +2575,17 @@
           old-value (get-in old-state keypath)
           new-value (get-in new-state keypath)
           last-value (get @last-values keypath)]
-      (when ;(and new-value
-            ;     (not= old-value new-value)
-            ;     ;(not= last-value new-value) ;; temp remove. some weird issue
-            ;     )
-       (and (not (nil? new-value))
-            (not= old-value new-value))
-            ;(not= last-value new-value)
+      (when ;(or
+             (and (not (nil? new-value))
+                 (or (not= old-value new-value) (some #(cstr/starts-with? (str %) ":*") keypath)))
+                 ;(not= last-value new-value) ;; temp remove. some weird issue
+               ;  ) (and (not (nil? new-value))
+                ;        (some #(cstr/starts-with? (str %) ":*") keypath)))
+      ;;  (and (not (nil? new-value))
+      ;;       (or (not= old-value new-value)
+      ;;       ;)
+      ;;       (not= last-value new-value)))
+
         (handler-fn keypath client-name new-value)
         ;(ut/pp [:make-watcher keypath client-name new-value])
         ;(when (not (cstr/starts-with? (str keypath) ":tracker"))
@@ -2629,7 +2645,7 @@
     [(first ff2) (keyword (last ff2))]))
 
 (defn send-reaction [keypath client-name new-value]
-  (ut/pp [keypath client-name new-value])
+  (ut/pp [:client-reaction-push! keypath client-name new-value])
   (kick client-name [:flow (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))] new-value nil nil nil))
 
 (defn send-reaction-runner [keypath client-name new-value]
