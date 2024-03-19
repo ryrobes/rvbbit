@@ -128,6 +128,9 @@
 (defn find-next [v k]
   (second (drop-while #(not= % k) v)))
 
+(defn select-keypaths [m keys]
+  (into {} (for [k keys] [k (get-in m k)])))
+
 (defn sort-map-by-key [m]
   (sort-by first (into [] m)))
 

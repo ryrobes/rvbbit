@@ -451,7 +451,6 @@
                      full (-> v
                               (assoc-in [:data :user-input] ddata)
                               (assoc-in [:ports] {:out {:out (keyword dtype)}}))]
-
                  {k full})
                      ;; (first (resolver/logic-and-params [cell-ref] nil))
 
@@ -1517,7 +1516,9 @@
                        (.zoomToElement z @(re-frame/subscribe [::get-flow-brick]) 0.8))
                        ;(let [[positionX positionY scale] @(re-frame/subscribe [::zoom-start])] (.setTransform z positionX positionY scale 0 ))
                        ;(.zoomOut z 5)
-                     1000))))
+                     1000)
+
+      )))
       ;(.resetTransform z)
       ;(.centerView z)
 
@@ -3507,8 +3508,9 @@
                     (let [file-path @(re-frame/subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]])]
                       (re-frame/dispatch [::http/load-flow file-path])
                       (tap> [:load-flow file-path])
-                    ;(center-zoom-and-pan)
-                      (center-to-saved-coords))
+                      ;(center-zoom-and-pan)
+                      ;(center-to-saved-coords)
+                      )
 
                     (let [incoming   (js->clj %)
                      ;_ (tap> [:start? types-vec (last (last incoming)) (map? (last (last incoming))) (try (read-string (last (last incoming))) (catch :default e (str e)))])
@@ -6974,6 +6976,60 @@
 
                             :font-size "24px"}]]))))
 
+;; (re-frame/reg-event-db
+;;  ::custom-response-flow
+;;  (fn [db [_ result]]
+;;    (assoc-in db [:http-req :custom-block] result)))
+
+(defn save-custom-block [flow-id flow-select]
+  [re-com/v-box
+   :gap "4px"
+   :style {:font-size "10px"
+           :font-weight 400
+           :color (theme-pull :theme/editor-outer-rim-color nil)}
+   :children [[re-com/box :child "This will save this block definition to the general 'flow block parts' menu and will be accessible under the 'custom' category."]
+              [re-com/h-box
+               :padding "5px" :gap "6px"
+               :children [[re-com/box
+                           :attr {:on-click #(re-frame/dispatch [::wfx/request :default
+                                                                 {:message    {:kind :save-custom-flow-block
+                                                                               :name flow-select
+                                                                               :block-map (let [flowmap @(re-frame/subscribe [::flowmap])
+                                                                                                flowmap-raw @(re-frame/subscribe [::flowmap-raw])
+                                                                                                flow-id @(re-frame/subscribe [::selected-flow])
+                                                                                                flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
+                                                                                                server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)]
+                                                                                            (merge {:types (get-in flowmap-raw [flow-select :data :flow-item :types])
+                                                                                                    :description (cstr/join " " (get-in flowmap-raw [flow-select :description]))}
+                                                                                                  (select-keys (get flowmap-raw flow-select) [:description])
+                                                                                             (get-in server-flowmap [:components flow-select])
+                                                                                             ))
+                                                                               :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                                                  :on-response [::simple-response]
+                                                                  ;:on-timeout  [::timeout-response :run-flow flowmap] ;; requeue?
+                                                                  :timeout    15000000}])}
+                           :align :center :justify :center
+                           :size "auto"
+                           :child "save"
+                           :padding "5px"
+                           :style {:font-weight 700
+                                   :border-radius "6px"
+                                   :cursor "pointer"
+                                   :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 22)}]
+                          [re-com/box
+                           :align :center :justify :center
+                           :size "auto"
+                           :child "delete"
+                           :padding "5px"
+                           :style {:font-weight 700
+                                   :border-radius "6px"
+                                   :cursor "pointer"
+                                   :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 22)}]]]
+              [re-com/box :height "14px"
+               :size "auto" :align :center :justify :center
+               :child " "]]])
+
+
 (defn flow-details-panel [panel-height panel-width details-panel-height]
   (let [react-hacks [@flow-hover @scroll-id @editor-mode @(re-frame/subscribe [::http/flow-results])]
         ;details-panel-height (/ panel-height 1.25)
@@ -7218,6 +7274,10 @@
                                                           nil nil]]
                                                  "zmdi-aspect-ratio"])
 
+                                              (when (= ttype :open-fn)
+                                                [flow-details-block-container "save as a flow block*" flow-id flow-select
+                                               [save-custom-block flow-id flow-select]
+                                               "fa-solid fa-cube"])
 
 
                                               ;[flow-details-block top-px 580 flow-select body false]
@@ -7252,7 +7312,14 @@
                                                [re-com/box ;;; edit-conns
                                                 :child [code-box-rwc 580 nil
                                                         (str @(re-frame/subscribe [::flowmap-connections]))]]
-                                               "zmdi-bug"]]]]]))
+                                               "zmdi-bug"]
+
+
+
+
+                                              [re-com/gap :size "10px"]
+
+                                              ]]]]))
                                               ;; [re-com/h-box
                                               ;;  :justify :between
                                               ;;  :children [[re-com/box :child "weird footer? THE END" :size "auto" :justify :start :padding "5px"]
@@ -7649,8 +7716,9 @@
  ::flow-parts-lookup
  (fn [_ [_ & [part-key]]]
    (let [fflowparts-sys @(re-frame/subscribe [::conn/sql-data [:fflowparts-sys]])
-         fflow-sys  @(re-frame/subscribe [::conn/sql-data [:fflows-sys]])
-         flow-parts (vec (sort-by :name (into fflowparts-sys fflow-sys)))
+         ;fflow-sys  @(re-frame/subscribe [::conn/sql-data [:fflows-sys]])
+         ;flow-parts (vec (sort-by :name (into fflowparts-sys fflow-sys)))
+         flow-parts (vec (sort-by :name fflowparts-sys))
          flow-parts-key (when part-key
                           (let [ss (cstr/split (cstr/replace (str part-key) ":" "") "/")
                                 cat (keyword (first ss))

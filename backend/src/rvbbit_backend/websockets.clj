@@ -76,6 +76,7 @@
 (def restart-map (atom {}))
 (def orig-caller (atom {}))
 (def sub-flow-blocks (atom {}))
+(def custom-flow-blocks (ut/thaw-atom {} "./data/atoms/custom-flow-blocks-atom.edn"))
 
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
@@ -456,7 +457,7 @@
                         :class "ERROR IN PARSE-ERROR-BODY. lol"})))
 
 (defn make-http-call [req]
-  (ut/pp [:MAKE-HTTP-CALL! (hash req) req])
+  ;(ut/pp [:MAKE-HTTP-CALL! (hash req) req])
   (try
     (let [{:keys [url headers query-params method body file save-to] :or {method :get}} req
           http-method (case method
@@ -497,13 +498,13 @@
                         ;:error (Throwable->map e)
                         ;:msg (str e)
                         :class (str (type e))}))]
-      (ut/pp [:HTTP-CALL-RESPONSE method req (ut/replace-large-base64 response)])
+      ;(ut/pp [:HTTP-CALL-RESPONSE method req (ut/replace-large-base64 response)])
       (cond (:error response)
-            (do (ut/pp [:http-call2-error response :body-sent body2])
+            (do ;(ut/pp [:http-call2-error response :body-sent body2])
                 {:error response
                  :message (:error response)})
             (cstr/includes? (str response) "status 400")
-            (do (ut/pp [:http-call2-error-400 response :body-sent body2])
+            (do ;(ut/pp [:http-call2-error-400 response :body-sent body2])
                 {:error response
                  :message "400 code"})
             :else (if save-to
@@ -514,7 +515,7 @@
                           rrs (pr-str rr) ;; i hate everyone, why does client-http keywording fucked ""keys""?
                           tts (cstr/replace rrs #":/" ":")
                           ttsr (edn/read-string tts)]
-                      (ut/pp [:MAKE-HTTP-CALL-RESPONSE-SUCCESS ttsr])
+                     ;(ut/pp [:MAKE-HTTP-CALL-RESPONSE-SUCCESS ttsr])
                       ttsr))))
     (catch Exception e ;{:error (str e)
                        ; :message (str (.getMessage e))
@@ -1625,11 +1626,32 @@
 
 ;;; materialize-flowmap  [client-name flowmap flow-id opts & [no-eval?]]
 
+;; (defn process-flow-paths [m]
+;;   (cond
+;;     (map? m)
+;;     (if-let [flow-path (:flow-path m)]
+;;       (let [sub-flow-id (:sub-flow-id m)
+;;             new-map (materialize-flowmap :client-name flow-path sub-flow-id  {} true)]
+;;         (process-flow-paths new-map))
+;;       (into {} (map (fn [[k v]] [k (process-flow-paths v)]) m)))
+;;     (coll? m)
+;;     (mapv process-flow-paths m)
+;;     :else m))
+
+;; (defn process-nested-map [m]
+;;   (let [processed-map (process-flow-paths m)]
+;;     (if (= processed-map m)
+;;       m
+;;       (recur processed-map))))
+
 (defn process-flowmaps [flowmap sub-map]
-  ;(ut/pp [:processing-flowmap flowmap])
+  ;;(ut/pp [:processing-nested-flowmap (process-nested-map flowmap)])
   (doall (let [flowmap-comps (into {} (for [[k v] (get flowmap :components)
                                             ;:let [_ (ut/pp [:*processing-comp k v])]
-                                            :let [v (if (get v :flow-path) (materialize-flowmap (get sub-map :client-name) (get v :flow-path) (get v :sub-flow-id) {} true) v)]
+                                            :let [;vv v ;; for debugging
+                                                  v (if (get v :flow-path) (materialize-flowmap (get sub-map :client-name) (get v :flow-path) (get v :sub-flow-id) {} true) v)
+                                                  ;_ (ut/pp [:process-flowmaps k vv v ])
+                                                  ]
                                             ]
                                         (walk/postwalk-replace
                                          {:block-id k
@@ -1841,12 +1863,30 @@
                  :let [ttype (get-in v [:data :drag-meta :type])]]
              (cond
 
+
               ;;  (= ttype :sub-flow222) ;; kek
               ;;  (let [subs (get v :sub-flow)
               ;;        post-subs (process-flow-map (get subs :map))]
               ;;   ; (tap> [:sub-flow-preporocess subs post-subs])
               ;;    {k (-> v
               ;;           (assoc :sub-flow post-subs))})
+
+               (= ttype :query)
+               (let [pfull (first (vals (get-in v [:data :queries])))
+                      ;; _ (tap> [:param-fmaps ttype k pfull])
+                    ;ddata @(re-frame/subscribe [::conn/clicked-parameter-key [pfull]])
+                     ddata pfull ;(first @(re-frame/subscribe [::resolver/logic-and-params [pfull]]))
+                     dtype (ut/data-typer ddata)
+                     ports {:out {:out (keyword dtype)}}
+                     ports (cond (= dtype "map")
+                                 {:out (assoc (into {} (for [[k v] ddata] {k (keyword (ut/data-typer v))})) :* :map)}
+                                 (or (= dtype "vector") (= dtype "rowset"))
+                                 {:out (assoc (into {} (for [k (range (count ddata)) :let [v (get ddata k)]] {(keyword (str "idx" k)) (keyword (ut/data-typer v))})) :* :vector)}
+                                 :else ports)
+                     full (-> v
+                              (assoc-in [:data :user-input] ddata)
+                              (assoc-in [:ports] ports))]
+                 {k full})
 
                (= ttype :param)
                (let [pfull (get-in v [:data :drag-meta :param-full])
@@ -1864,6 +1904,7 @@
                               (assoc-in [:ports] ports))]
                  {k full})
                       ;; (first (resolver/logic-and-params [cell-ref] nil))
+
                (= ttype :cell)
                (let [pfull (get-in v [:data :drag-meta :param-full])
                        ;; _ (tap> [:param-fmaps ttype k pfull])
@@ -1905,17 +1946,46 @@
                  {k full})
                :else {k v}))))
 
-(defn process-flowmap2 [flowmap flowmaps-connections]
+
+(defn process-flowmap2 [flowmap flowmaps-connections fid]
   ;;; test
   (let [canvas-key (into {} (for [[k {:keys [w h x y]}] flowmap]
                               {k {:w w :h h :x x :y y :view-mode "text"}}))
-        components-key (into {} (for [[k {:keys [data ports view file-path raw-fn flow-id sub-flow]}] flowmap ;; <-- flow-id refers to the subflow embed, not the parent
-                                      :let [;ttype (get-in data [:drag-meta :type])
-                                            ttype (or (get-in data [:flow-item :type])
+        flowmaps-connections (vec (for [[c1 c2] flowmaps-connections]
+                                    (if (cstr/ends-with? (str c1) "/*")
+                                      [(keyword (-> (ut/unkeyword (str c1)) (cstr/replace "/*" "") (cstr/replace ":" ""))) c2] [c1 c2])))
+        components-key (into {} (for [[k {:keys [data ports view file-path flow-path raw-fn sub-flow-id flow-id sub-flow]}] flowmap ;; <-- flow-id refers to the subflow embed, not the parent
+                                      :let [ttype (or (get-in data [:flow-item :type])
                                                       (get-in data [:drag-meta :type]))
                                             try-read (fn [x] (try (edn/read-string x) (catch Exception _ x)))
-                                                    ;expandable-in? (try (cstr/ends-with? (str (first (keys (get ports :in)))) "*") (catch :default _ false))
-                                            fn-key (try-read (get-in data [:flow-item :name] ":unknown!"))
+                                            view-swap (fn [obody flow-id bid push-key]
+                                                        (let [pkey       (keyword (str (cstr/replace (str push-key) ":" "") ">"))
+                                                              kps        (ut/extract-patterns obody pkey 2)
+                                                              logic-kps  (into {} (for [v kps]
+                                                                                    (let [[_ that] v]
+                                                                                      {v [:push> [flow-id (str bid) that]]})))]
+                                                          (walk/postwalk-replace logic-kps obody)))
+                                            view-swap2 (fn [obody flow-id bid push-key]
+                                                         (let [pkey       (keyword (str (cstr/replace (str push-key) ":" "") ">"))
+                                                               kps        (ut/extract-patterns obody pkey 1)
+                                                               logic-kps  (into {} (for [v kps]
+                                                                                     (let [[_] v]
+                                                                                       {v [:push>> [flow-id (str bid)]]})))]
+                                                           (walk/postwalk-replace logic-kps obody)))
+                                            view-swaps (fn [obody flow-id push-key-bid-pairs]
+                                                         (reduce (fn [body [push-key bid]]
+                                                                   (-> body
+                                                                       (view-swap flow-id bid push-key)
+                                                                       (view-swap2 flow-id bid push-key)))
+                                                                 obody
+                                                                 push-key-bid-pairs))
+                                            view (when view (let [conns (vec (filter #(cstr/includes? (str (first %)) "/push-path") flowmaps-connections))
+                                                                  push-key-bid-pairs (vec (for [[c1 c2] conns] [(keyword (last (cstr/split (str c1) #"/"))) c2]))
+                                                                  view (view-swaps view fid push-key-bid-pairs)]
+                                                              ;(tap> [:view-builder k push-key-bid-pairs view fid])
+                                                              view))
+                                            nname (get-in data [:flow-item :name] ":unknown!")
+                                            fn-key (if flow-path nname (try-read nname))
                                             fn-category (try-read (get-in data [:flow-item :category] ":unknown!"))]]
                                   (cond
 
@@ -1941,8 +2011,13 @@
                                     {k {:fn (get data :user-input) ;'(fn [x] x) ;:raw-fn '(fn [x] x)
                                         :inputs (vec (keys (get ports :in)))}}
 
+                                    flow-path
+                                    {k {:flow-path flow-path :sub-flow-id sub-flow-id
+                                        :default-overrides (get-in data [:flow-item :defaults] {})
+                                        :inputs (vec (keys (get ports :in)))}}
+
                                     (= ttype :sub-flow)
-                                    {k (-> (process-flowmap2 (get sub-flow :map) (get sub-flow :connections))
+                                    {k (-> (process-flowmap2 (get sub-flow :map) (get sub-flow :connections) fid)
                                            (assoc :file-path file-path)
                                            (assoc :flow-id flow-id))} ;; flow-id of the embdeeded flow, NOT the parent
                                                 ;; {k {:components (get sub-flow :map)
@@ -1954,9 +2029,6 @@
                                               :inputs (if false ;expandable-in?
                                                         [(vec (keys (get ports :in)))] ;; send as single value to apply%
                                                         (vec (keys (get ports :in))))}})))
-        flowmaps-connections (vec (for [[c1 c2] flowmaps-connections]
-                                    (if (cstr/ends-with? (str c1) "/*")
-                                      [(keyword (-> (ut/unkeyword (str c1)) (cstr/replace "/*" "") (cstr/replace ":" ""))) c2] [c1 c2])))
         components-key (into {} ;; deconstruct conditional paths to single condi key
                              (for [[k v] flowmap]
                                (if (not (empty? (get v :cond)))
@@ -1986,7 +2058,7 @@
                                                         {})))
                         flowmaps (process-flow-map (get raw :flowmaps))
                         connections (get raw :flowmaps-connections)
-                        fmap (process-flowmap2 flowmaps connections)]
+                        fmap (process-flowmap2 flowmaps connections flow-id)]
                     (ut/pp [:materialized-flowmap fmap])
                     fmap)
                   flowmap)
@@ -2038,7 +2110,7 @@
 
     (swap! sub-flow-blocks assoc flow-id block)
     ;; update the flow-blocks sql db with the new block
-
+    {flow-id block}
     ))
 
 
@@ -2073,7 +2145,7 @@
                                                           {})))
                           flowmaps (process-flow-map (get raw :flowmaps))
                           connections (get raw :flowmaps-connections)
-                          fmap (process-flowmap2 flowmaps connections)
+                          fmap (process-flowmap2 flowmaps connections flow-id)
                           fmap (merge fmap {:opts (get raw :opts)})]
                       ;(ut/pp fmap)
                       fmap)
@@ -2118,7 +2190,7 @@
           _ (async/thread (do (ext/create-dirs "./flow-history/src-maps") ;; TEMP FOR DEBUGGING - expensive
                               (ut/pretty-spit (str "./flow-history/src-maps/" flow-id ".edn") ;; ut/pretty-spit is SO expensive...
                                               finished-flowmap 185)))
-          _ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
+          ;;_ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
 
           ;_ (alert! client-name  10 1.35)
@@ -2290,7 +2362,7 @@
         [flowmap raw-conns] [(if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
                                (let [flowmaps (process-flow-map (get raw :flowmaps))
                                      connections (get raw :flowmaps-connections)
-                                     fmap (process-flowmap2 flowmaps connections)]
+                                     fmap (process-flowmap2 flowmaps connections flow-id)]
                                  fmap)
                                flowmap) (get raw :flowmaps-connections)]
         ;;_ (ut/pp [:get-flow-open-ports flowmap raw-conns (get flowmap :connections)])
@@ -2456,6 +2528,12 @@
    :tracker (get @flow-db/results-atom flow-id)
    ;:channels (get @flow-db/channels-atom flow-id)
    :flow-id flow-id})
+
+(defmethod wl/handle-request :save-custom-flow-block [{:keys [client-name name block-map]}]
+  (ut/pp [:saving-custom-flow-block client-name :for name])
+  (let [bm {name block-map}]
+    (ut/pp [:saving-new-custom-block bm])))
+
 
 (defmethod wl/handle-request :sync-client-params [{:keys [client-name params-map]}]
   (ut/pp [:sync-client-params-from client-name (keys (or params-map {}))])
@@ -4968,7 +5046,7 @@
 
     ;(ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
 
-    (ut/pp [:times-atom (into {} (for [[k v] @times-atom] {k [(count v) :samples (int (ut/avg v)) :avg-seconds]}))])
+    ;(ut/pp [:times-atom (into {} (for [[k v] @times-atom] {k [(count v) :samples (int (ut/avg v)) :avg-seconds]}))])
 
     ;(ut/pp [:flow-tracker @flow-db/tracker])
 

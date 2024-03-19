@@ -23,7 +23,7 @@
    :right-click? true,
    :icon "zmdi-plus",
    :z 0,
-   :ports {:in {:args+ [:integer :float]}, :out {:out [:integer :float]}},
+   :ports {:in {:args+ [:integer :float]}, :out {:out :integer}},
    :h 85,
    :x 2000,
    :data
@@ -41,7 +41,7 @@
      :required nil},
     :drag-meta {:type :+}}},
   :open-fn-1
-  {:y 1600,
+  {:y 1675,
    :fn (fn [x] x),
    :w 125,
    :raw-fn (fn [x] (+ 600 x)),
@@ -52,7 +52,7 @@
    :ports {:in {:x :any}, :out {:out :any}},
    :inputs nil,
    :h 85,
-   :x 2000,
+   :x 2025,
    :data
    {:flow-item
     {:category ":rabbit-base",
@@ -63,8 +63,38 @@
      :icon "zmdi-functions",
      :types {:x :any, :out :any},
      :expandable? true,
-     :drag-meta {:type :open-fn}}}}},
+     :drag-meta {:type :open-fn}}}},
+  :mathalete1
+  {:y 1550,
+   :w 125,
+   :right-click? true,
+   :icon "zmdi-puzzle-piece",
+   :flow-path "./flows/mathalete1.edn",
+   :z 0,
+   :ports {:in {:open-input :integer}, :out {:out :any}},
+   :h 85,
+   :x 2000,
+   :sub-flow-id "mathalete1",
+   :data
+   {:flow-item
+    {:category ":sub-flows",
+     :name "mathalete1",
+     :type "mathalete1",
+     :icon "zmdi-puzzle-piece",
+     :defaults {:open-input 123},
+     :types {:open-input :integer, :out :any},
+     :style nil,
+     :selected-style nil,
+     :inputs [:open-input],
+     :expandable? true,
+     :required [:open-input]},
+    :drag-meta {:type "mathalete1"}}}},
  :opts {:retry-on-error? true, :retries 5, :close-on-done? true},
- :zoom [-785 -862 0.925],
+ :zoom [-1154.36 -1246.25 1.1],
  :flow-id "left-right-math",
- :flowmaps-connections [[:left-int :+-1/args+] [:right-int :+-1/args+] [:+-1 :open-fn-1/x] [:open-fn-1 :done]]}
+ :flowmaps-connections
+ [[:left-int :+-1/args+]
+  [:right-int :+-1/args+]
+  [:open-fn-1 :done]
+  [:+-1 :mathalete1/open-input]
+  [:mathalete1 :open-fn-1/x]]}

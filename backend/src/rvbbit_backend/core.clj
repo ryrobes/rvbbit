@@ -157,6 +157,24 @@
         (wss/create-flowblock f-path)
         (update-flow-meta f-path)))))
 
+(defn refresh-flow-fn [flow-functions-map]
+  (doseq [{:keys [category name description file-path inputs icon types]} (ut/flatten-map flow-functions-map)]
+    (wss/enqueue-task3 ;; since out base sqlite db hate concurrency, with a "real" db, this can likely be done in parallel TODO
+     (fn [] (let [connection_id "system-db"]
+              (sql-exec system-db (to-sql {:delete-from [:flow_functions] :where [:and [:= :name name] [:= :category category]]}))
+              (sql-exec system-db (to-sql {:insert-into [:flow_functions]
+                                           :columns [:connection_id :run_id :category :name :full_map :description :inputs :icon :input_types :output_types :file_path]
+                                           :values [[connection_id 0 ;;this-run-id
+                                                     (str category)
+                                                     (str name)
+                                                     (str (get-in flow-functions-map [category name])) ;; full map
+                                                     (str description)
+                                                     (str inputs)
+                                                     (str icon)
+                                                     (str (vec (vals (dissoc types :out))))
+                                                     (str (get types :out))
+                                                     (str file-path)]]})))))))
+
 (defn watch-flows-folder []
   (let [file-path "./flows/"]
     ;(do
@@ -164,9 +182,10 @@
     (beholder/watch
      #(when (cstr/ends-with? (str (get % :path)) ".edn")
         (let [f-path (str (get % :path))
-              f-op (get % :type)]
+              f-op (get % :type)
+              ffn (wss/create-flowblock f-path)]
+          (refresh-flow-fn {:sub-flow ffn}) ;; change the sql for the sub-flow block
           (ut/pp [:flow-change! f-op f-path])
-          (wss/create-flowblock f-path)
           (update-flow-meta f-path)))
      file-path)))
 
@@ -246,13 +265,15 @@
               (wss/process-csv {} f-path)))
      file-path)))
 
-(defonce start-conn-watcher (watch-connections-folder))
-(defonce start-screen-watcher (watch-screens-folder))
-(defonce start-flow-watcher (watch-flows-folder))
+
+
+  (defonce start-conn-watcher (watch-connections-folder))
+  (defonce start-screen-watcher (watch-screens-folder))
+  (defonce start-flow-watcher (watch-flows-folder))
 ;(defonce jvm-monitor (tt/every! 240 2 (bound-fn [] (wss/jvm-memory-used))))
 
 
-(defn -main [& args]
+  (defn -main [& args]
   ;"The entry-point for 'lein run'"
   ;;;(ut/pp (surveyor/get-test-conn-meta target-db5))
   ;(lets-give-it-a-whirl target-db8 system-db default-sniff-tests default-field-attributes default-derived-fields default-viz-shapes [:like :table-name "%TESTIMDB%"]) ;; oracle
@@ -275,7 +296,7 @@
 
 
 ;; begin bootup runstream procs
-  (shutdown/add-hook! ::heads-up-msg #(ut/ppa "Shutting down now, commander!"))
+    (shutdown/add-hook! ::heads-up-msg #(ut/ppa "Shutting down now, commander!"))
 
 
 
@@ -283,69 +304,69 @@
   ;(sql-exec system-db "drop table if exists combos ;")
 
 
-  (sql-exec system-db "drop table if exists jvm_stats;")
-  (sql-exec system-db "drop table if exists errors;")
-  (sql-exec system-db "drop view  if exists viz_recos_vw;")
-  (sql-exec system-db "drop view  if exists viz_recos_vw2;")
-  (sql-exec system-db "drop view  if exists latest_status;")
+    (sql-exec system-db "drop table if exists jvm_stats;")
+    (sql-exec system-db "drop table if exists errors;")
+    (sql-exec system-db "drop view  if exists viz_recos_vw;")
+    (sql-exec system-db "drop view  if exists viz_recos_vw2;")
+    (sql-exec system-db "drop view  if exists latest_status;")
 
-  (cruiser/create-sqlite-sys-tables-if-needed! system-db)
-  (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
+    (cruiser/create-sqlite-sys-tables-if-needed! system-db)
+    (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
   ;(cruiser/create-sys-tables-if-needed! system-db) ;; sqlite
 
-  (update-all-screen-meta)
-  (update-all-flow-meta)
+    (update-all-screen-meta)
+    (update-all-flow-meta)
 
   ;(when harvest-on-boot?
-  (update-all-conn-meta)
+    (update-all-conn-meta)
   ;  )
 
-  (cruiser/insert-current-rules! system-db "system-db" 0
-                                 cruiser/default-sniff-tests
-                                 cruiser/default-field-attributes
-                                 cruiser/default-derived-fields
-                                 cruiser/default-viz-shapes
-                                 (merge
-                                  cruiser/default-flow-functions
+    (cruiser/insert-current-rules! system-db "system-db" 0
+                                   cruiser/default-sniff-tests
+                                   cruiser/default-field-attributes
+                                   cruiser/default-derived-fields
+                                   cruiser/default-viz-shapes
+                                   (merge
+                                    cruiser/default-flow-functions
                                   ;; (let [] ;; custom categories instead of :sub-flow
                                   ;;   (doseq [[k v] @wss/sub-flow-blocks] {k v}))
-                                  {:sub-flows @wss/sub-flow-blocks}
-                                  ))
+                                    {:custom @wss/custom-flow-blocks}
+                                    {:sub-flows @wss/sub-flow-blocks}))
 
-  (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
-   "system-db"
-   system-db
-   system-db
-   cruiser/default-sniff-tests
-   cruiser/default-field-attributes
-   cruiser/default-derived-fields
-   cruiser/default-viz-shapes)
+    (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
+     "system-db"
+     system-db
+     system-db
+     cruiser/default-sniff-tests
+     cruiser/default-field-attributes
+     cruiser/default-derived-fields
+     cruiser/default-viz-shapes)
 
-  (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
-   "flows-db"
-   flows-db
-   system-db
-   cruiser/default-sniff-tests
-   cruiser/default-field-attributes
-   cruiser/default-derived-fields
-   cruiser/default-viz-shapes)
+    (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
+     "flows-db"
+     flows-db
+     system-db
+     cruiser/default-sniff-tests
+     cruiser/default-field-attributes
+     cruiser/default-derived-fields
+     cruiser/default-viz-shapes)
 
-  (cruiser/lets-give-it-a-whirl-no-viz  ;;; force cache-db as a conn, takes a sec
-   "cache.db"
-   wss/cache-db
-   system-db
-   cruiser/default-sniff-tests
-   cruiser/default-field-attributes
-   cruiser/default-derived-fields
-   cruiser/default-viz-shapes)
+    (cruiser/lets-give-it-a-whirl-no-viz  ;;; force cache-db as a conn, takes a sec
+     "cache.db"
+     wss/cache-db
+     system-db
+     cruiser/default-sniff-tests
+     cruiser/default-field-attributes
+     cruiser/default-derived-fields
+     cruiser/default-viz-shapes)
 
-  (shutdown/add-hook! ::the-pool-is-now-closed
-                      #(doseq [[conn-name conn] @wss/conn-map]
-                         (do (ut/ppa [:shutting-down-connection-pool conn-name conn])
-                             (try (hik/close-datasource (get conn :datasource))
-                                  (catch Exception e (ut/pp [:close-error e]))))))
+    (shutdown/add-hook! ::the-pool-is-now-closed
+                        #(doseq [[conn-name conn] @wss/conn-map]
+                           (do (ut/ppa [:shutting-down-connection-pool conn-name conn])
+                               (try (hik/close-datasource (get conn :datasource))
+                                    (catch Exception e (ut/pp [:close-error e]))))))
 
-  (shutdown/add-hook! ::close-system-pools #(do
+    (shutdown/add-hook! ::close-system-pools #(do
                                               ;; (let [destinations (vec (keys @wss/client-queues))]
                                               ;;   (doseq [d destinations]
                                               ;;     (wss/alert! d [:v-box
@@ -357,23 +378,23 @@
                                               ;;                                ;[:speak-always (str "Heads up: R-V-B-B-I-T system going offline.")]
                                               ;;                                [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]] 10 1 5)))
                                               ;;(Thread/sleep 3000)
-                                              (wss/destroy-websocket-server!)
-                                              (wss/stop-web-server!)
-                                              (wss/stop-worker)
-                                              (wss/stop-worker2)
-                                              (wss/stop-worker3)
-                                              (ut/ppa [:shutting-down-system-pools])
-                                              (hik/close-datasource (get system-db :datasource))))
+                                                (wss/destroy-websocket-server!)
+                                                (wss/stop-web-server!)
+                                                (wss/stop-worker)
+                                                (wss/stop-worker2)
+                                                (wss/stop-worker3)
+                                                (ut/ppa [:shutting-down-system-pools])
+                                                (hik/close-datasource (get system-db :datasource))))
 
-  (shutdown/add-hook! ::clear-cache #(do (ut/ppa [:freezing-system-atom])
-                                         (ut/freeze-atoms)
-                                         (ut/ppa [:clearing-cache-db])
-                                         (shell/sh "/bin/bash" "-c" (str "rm " "db/cache.db"))
-                                         (shell/sh "/bin/bash" "-c" (str "rm " "db/flow.db"))
-                                         (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps/*"))
-                                         (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps-pre/*"))
-                                         (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/*"))
-                                         (shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))))
+    (shutdown/add-hook! ::clear-cache #(do (ut/ppa [:freezing-system-atom])
+                                           (ut/freeze-atoms)
+                                           (ut/ppa [:clearing-cache-db])
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "db/cache.db"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "db/flow.db"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps/*"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps-pre/*"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/*"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))))
 
 
 
@@ -397,165 +418,165 @@
   ;;(io/delete-file "./live/" :recursive true)
 
 
-  (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+    (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
 
-  (tt/start!)
-  (def mon (tt/every! 30 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30 seconds (excessive, lenghten in prod..)
-  (instrument-jvm instrument/metric-registry)
-  (wss/subscribe-to-session-changes)
+    (tt/start!)
+    (def mon (tt/every! 30 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30 seconds (excessive, lenghten in prod..)
+    (instrument-jvm instrument/metric-registry)
+    (wss/subscribe-to-session-changes)
   ;;(wss/start-thread-worker) ;; used for side-car sniffs
   ;(def worker-thread (wss/start-thread-worker))
   ;(def lunchbreak (tt/every! 90 2 (bound-fn [] (wss/recycle-worker worker-thread)))) ;; "reboot" the sniffer worker thread every 30 mins
 
-  (def lunchbreak  (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker)))) ;; "reboot" the sniffer worker thread every hour
-  (def lunchbreak2 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker2))))
-  (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
+    (def lunchbreak  (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker)))) ;; "reboot" the sniffer worker thread every hour
+    (def lunchbreak2 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker2))))
+    (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
 
-  (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too much?
+    (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too much?
 
-  (def purge (tt/every! 30 2 (bound-fn [] (wss/purge-dead-client-watchers))))
+    (def purge (tt/every! 30 2 (bound-fn [] (wss/purge-dead-client-watchers))))
 
-  (def last-look (atom {}))
-  (def saved-uids (atom []))
+    (def last-look (atom {}))
+    (def saved-uids (atom []))
 
-  (defn update-stat-atom [kks]
-    (let [;flows (if (or (nil? flows) (empty? flows))
+    (defn update-stat-atom [kks]
+      (let [;flows (if (or (nil? flows) (empty? flows))
           ;        (keys @flow-db/results-atom)
           ;        (vec flows))
           ;flows (or flows (keys @flow-db/results-atom))
-          ]
+            ]
       ;(ut/pp [:update-stats-atom-for flows])
-      (swap! wss/flow-status merge
+        (swap! wss/flow-status merge
              ;(merge @wss/flow-status
-             (into {}
-                   (for [k kks ;(keys @flow-db/results-atom)
-                         :when (not (= k "client-keepalive"))] ;; dont want to track heartbeats
-                     (let [;; _ (ut/pp [:flow-status-atom-all! k (get @flow-db/results-atom k)
+               (into {}
+                     (for [k kks ;(keys @flow-db/results-atom)
+                           :when (not (= k "client-keepalive"))] ;; dont want to track heartbeats
+                       (let [;; _ (ut/pp [:flow-status-atom-all! k (get @flow-db/results-atom k)
                             ;;           :status! (get @flow-db/status k)
                             ;;           :tracker! (get @flow-db/tracker k)])
                             ;; condis (get-in @flow-db/status [k :condis])
-                           cc (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf? doing way too much work here
-                           blocks (get-in @flow-db/working-data [k :components-list])
-                           running-blocks (vec (for [[k v] (get @flow-db/tracker k)
-                                                     :when (nil? (get v :end))]
-                                                 k))
-                           done-blocks (vec (for [[k v] (get @flow-db/tracker k)
-                                                  :when (not (nil? (get v :end)))]
-                                              k))
-                           not-started-yet (cset/difference
-                                            (set blocks)
-                                            (set (into running-blocks done-blocks)))
-                           res (get-in @flow-db/results-atom [k :done] :nope)
-                           running? (or (= res :nope) (ut/chan? res) (= res :skip))
-                           done? (not (= res :nope))
-                           error? (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
+                             cc (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf? doing way too much work here
+                             blocks (get-in @flow-db/working-data [k :components-list])
+                             running-blocks (vec (for [[k v] (get @flow-db/tracker k)
+                                                       :when (nil? (get v :end))]
+                                                   k))
+                             done-blocks (vec (for [[k v] (get @flow-db/tracker k)
+                                                    :when (not (nil? (get v :end)))]
+                                                k))
+                             not-started-yet (cset/difference
+                                              (set blocks)
+                                              (set (into running-blocks done-blocks)))
+                             res (get-in @flow-db/results-atom [k :done] :nope)
+                             running? (or (= res :nope) (ut/chan? res) (= res :skip))
+                             done? (not (= res :nope))
+                             error? (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
 
                             ;;_ (ut/pp [k :*running? running? done? res error?])
 
                             ;;res (ut/deep-remove-keys res [:b64_json]) ;; just in case. 5mb strings as no bueno
 
-                           start (try (apply min (or (for [[_ v] (get @flow-db/tracker k)]
-                                                       (get v :start)) [-1]))
-                                      (catch Exception _ (System/currentTimeMillis)))
+                             start (try (apply min (or (for [[_ v] (get @flow-db/tracker k)]
+                                                         (get v :start)) [-1]))
+                                        (catch Exception _ (System/currentTimeMillis)))
                             ;;start (for [[_ v] (get @flow-db/tracker k)] (get v :start))
                             ;; end (if done?
                             ;;       (try (apply max (or (for [[_ v] (get @flow-db/tracker k)] (get v :end)) [-1])) (catch Exception _ 0))
                             ;;       (System/currentTimeMillis))
-                           end (try (apply max (or (remove nil? (for [[_ v] (get @flow-db/tracker k)]
-                                                                  (get v :end))) [-1]))
-                                    (catch Exception e (do (ut/pp [:exception-in-getting-time-duration k (str e)
-                                                                   (for [[_ v] (get @flow-db/tracker k)] (get v :end))])
-                                                           (System/currentTimeMillis))))
-                           elapsed (- end start)
-                           human-elapsed (ut/format-duration start end)
-                           run-id (str (get-in @flow-db/results-atom [k :run-id]))
-                           parent-run-id (str (get-in @flow-db/results-atom [k :parent-run-id]))
+                             end (try (apply max (or (remove nil? (for [[_ v] (get @flow-db/tracker k)]
+                                                                    (get v :end))) [-1]))
+                                      (catch Exception e (do (ut/pp [:exception-in-getting-time-duration k (str e)
+                                                                     (for [[_ v] (get @flow-db/tracker k)] (get v :end))])
+                                                             (System/currentTimeMillis))))
+                             elapsed (- end start)
+                             human-elapsed (ut/format-duration start end)
+                             run-id (str (get-in @flow-db/results-atom [k :run-id]))
+                             parent-run-id (str (get-in @flow-db/results-atom [k :parent-run-id]))
                             ;; _ (ut/pp [:uid (str (get-in @flow-db/results-atom [k :run-id]))
                             ;;           (str (get-in @flow-db/results-atom [k :opts-map :client-id] "n/a"))
                             ;;           done? (get @last-look k)])
-                           cname (get-in @flow-db/results-atom [k :opts-map :client-name]
-                                         (get @wss/orig-caller k :rvbbit-scheduler))
-                           client-name (str cname)
+                             cname (get-in @flow-db/results-atom [k :opts-map :client-name]
+                                           (get @wss/orig-caller k :rvbbit-scheduler))
+                             client-name (str cname)
                             ;; orig-tracker (get @flow-db/tracker k)
                             ;; tracker (into {} (for [[k v] orig-tracker ;; remove condi non-starts. dont send to client. data noise. neccessary noise for reactions, but noise
                             ;;                        :when (not (get v :in-chan?))]
                             ;;                    {k v}))
                             ;_ (ut/pp [:fid k client-name (get-in @flow-db/results-atom [k :opts-map] "?")])
-                           run-sql? (and done?
-                                         (not (some #(= % run-id) @saved-uids))
+                             run-sql? (and done?
+                                           (not (some #(= % run-id) @saved-uids))
                                           ;(not (get @last-look k))
-                                         )
-                           _ (when (and done? (not error?))
-                               (swap! wss/times-atom assoc k (conj (get @wss/times-atom k []) (int (/ elapsed 1000)))))
-                           _ (when run-sql?
-                               (try
-                                 (let [row {:client_name client-name
-                                            :flow_id (str k)
-                                            :started start ;(get-in @flow-db/results-atom [k :start])
-                                            :ended end ;(get-in @flow-db/results-atom [k :end])
-                                            :run_id run-id
-                                            :parent-run_id parent-run-id
-                                            :elapsed elapsed
-                                            :elapsed_seconds (float (/ elapsed 1000))
-                                            :in_error (cstr/includes? (str res) ":error")
-                                            :human_elapsed (str human-elapsed)}
+                                           )
+                             _ (when (and done? (not error?))
+                                 (swap! wss/times-atom assoc k (conj (get @wss/times-atom k []) (int (/ elapsed 1000)))))
+                             _ (when run-sql?
+                                 (try
+                                   (let [row {:client_name client-name
+                                              :flow_id (str k)
+                                              :started start ;(get-in @flow-db/results-atom [k :start])
+                                              :ended end ;(get-in @flow-db/results-atom [k :end])
+                                              :run_id run-id
+                                              :parent-run_id parent-run-id
+                                              :elapsed elapsed
+                                              :elapsed_seconds (float (/ elapsed 1000))
+                                              :in_error (cstr/includes? (str res) ":error")
+                                              :human_elapsed (str human-elapsed)}
                                         ;;_ (ut/pp [:inserting?])
-                                       insert-sql {:insert-into [:flow_history] :values [row]}]
+                                         insert-sql {:insert-into [:flow_history] :values [row]}]
                                                                 ;(ut/pp [:flow-done k])
-                                   (wss/enqueue-task3 ;; temp remove to test some shit 3/9/24
-                                    (fn []
-                                      (sql-exec flows-db (to-sql insert-sql)))))
-                                 (catch Exception e (ut/pp [:flow-history-insert-error k (str e)]))))
+                                     (wss/enqueue-task3 ;; temp remove to test some shit 3/9/24
+                                      (fn []
+                                        (sql-exec flows-db (to-sql insert-sql)))))
+                                   (catch Exception e (ut/pp [:flow-history-insert-error k (str e)]))))
 
-                           _ (swap! last-look assoc k done?)
-                           _ (when run-sql? (swap! saved-uids conj run-id))
+                             _ (swap! last-look assoc k done?)
+                             _ (when run-sql? (swap! saved-uids conj run-id))
                           ; _ (when (and run-sql? (not error?) done?) ;; TEMP REMOVE FOR CHANNEL PUSHING!
                           ;     (wss/remove-watchers-for-flow (str k)))
                             ;chans (count (get @flow-db/channels-atom k))
                            ;_ (when done? (ut/delay-execution 5000 (fn [] (swap! wss/flow-status assoc-in [k :*running?] false))))
-                           chans-open (count
-                                       (doall
-                                        (map (fn [[_ ch]]
-                                               (let [vv (try (not (ut/channel-open? ch))
-                                                             (catch Throwable e (str e)))]
-                                                 (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
-                                             (get @flow-db/channels-atom k))))
-                           channels-open? (true? (> chans-open 0))]
+                             chans-open (count
+                                         (doall
+                                          (map (fn [[_ ch]]
+                                                 (let [vv (try (not (ut/channel-open? ch))
+                                                               (catch Throwable e (str e)))]
+                                                   (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
+                                               (get @flow-db/channels-atom k))))
+                             channels-open? (true? (> chans-open 0))]
 
-                       {k {:*done? done? ;(true? (not (nil? res)))
-                           :*started-by cname
-                           :*channels-open? channels-open?
-                           :*channels-open chans-open
-                           :tracker-events (count (get @wss/tracker-history k []))
+                         {k {:*done? done? ;(true? (not (nil? res)))
+                             :*started-by cname
+                             :*channels-open? channels-open?
+                             :*channels-open chans-open
+                             :tracker-events (count (get @wss/tracker-history k []))
                              ;:*result (str res)
-                           :*finished (count done-blocks)
-                           :*running running-blocks
-                           :*done done-blocks
-                           :*ms-elapsed elapsed
-                           :*time-running (str human-elapsed)
-                           :*not-started (vec not-started-yet)
-                           :*open-channels (get cc k)
-                           :*running? running?}}))))))
+                             :*finished (count done-blocks)
+                             :*running running-blocks
+                             :*done done-blocks
+                             :*ms-elapsed elapsed
+                             :*time-running (str human-elapsed)
+                             :*not-started (vec not-started-yet)
+                             :*open-channels (get cc k)
+                             :*running? running?}}))))))
 
-  (defn tracker-changed [key ref old-state new-state]
-    (let [[_ b _] (data/diff old-state new-state)
-          kks (try (keys b) (catch Exception _ nil))]
-      (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
+    (defn tracker-changed [key ref old-state new-state]
+      (let [[_ b _] (data/diff old-state new-state)
+            kks (try (keys b) (catch Exception _ nil))]
+        (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
 
-        (ut/pp [:trigger-status-changes! kks])
+          (ut/pp [:trigger-status-changes! kks])
 
-        (async/thread ;; really expensive logging below. temp
-          (let [fp (str "./status-change-logs/" (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":")) "@" (str (System/currentTimeMillis)) ".edn")]
-            (ext/create-dirs "./status-change-logs/")
-            (ut/pretty-spit fp {:kks kks
-                                :res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
-                                :diff (ut/replace-large-base64 b)} 125)))
+          (async/thread ;; really expensive logging below. temp
+            (let [fp (str "./status-change-logs/" (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":")) "@" (str (System/currentTimeMillis)) ".edn")]
+              (ext/create-dirs "./status-change-logs/")
+              (ut/pretty-spit fp {:kks kks
+                                  :res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
+                                  :diff (ut/replace-large-base64 b)} 125)))
 
-        (update-stat-atom kks))
+          (update-stat-atom kks))
       ;(when kks (ut/pp [:flow-finished kks]))
-      ))
+        ))
 
-  (add-watch flow-db/status :tracker-watch tracker-changed)
+    (add-watch flow-db/status :tracker-watch tracker-changed)
   ;(add-watch flow-db/status :tracker-watch update-stat-atom)
   ;(add-watch flow-db/tracker :tracker-watch update-stat-atom) ;; tracker could be too much...
 
@@ -617,8 +638,8 @@
   ;;                                      (range 10))))))
 
 
-  (ut/pp {:settings config/settings})
-  (ut/pp {:kits-loaded config/kits})
+    (ut/pp {:settings config/settings})
+    (ut/pp {:kits-loaded config/kits})
 
 
   ;; (defn create-windows-test []
@@ -671,24 +692,24 @@
   ;; quoted so it evals them into fn objects before passing them to flowmaps.core/flow... TODO, detect if needed. 2/1/24
 
 
-  (defn heartbeat [dest] {:components
-                          {:kick-1
-                           {:inputs [:destination :name :sub-task :thread-id :thread-desc :message-name],
-                            :fn '(fn [destination name sub-task thread-id thread-desc message-name & args]
-                                   (rvbbit-backend.websockets/kick destination name sub-task thread-id thread-desc message-name args))
-                            :raw-fn '(fn [destination name sub-task thread-id thread-desc message-name & args]
-                                       (rvbbit-backend.websockets/kick destination name sub-task thread-id thread-desc message-name args))}
-                           :open-input :heartbeat
+    (defn heartbeat [dest] {:components
+                            {:kick-1
+                             {:inputs [:destination :name :sub-task :thread-id :thread-desc :message-name],
+                              :fn '(fn [destination name sub-task thread-id thread-desc message-name & args]
+                                     (rvbbit-backend.websockets/kick destination name sub-task thread-id thread-desc message-name args))
+                              :raw-fn '(fn [destination name sub-task thread-id thread-desc message-name & args]
+                                         (rvbbit-backend.websockets/kick destination name sub-task thread-id thread-desc message-name args))}
+                             :open-input :heartbeat
                              ;:get-client-subs get-client-subs
                              ;; last step, remove queue for delinq clients, etc - save :last-seen timestamps
-                           :kick-1destination dest}
-                          :connections [[:kick-1 :done]
-                                        [:open-input :kick-1/name]
-                                        [:open-input :kick-1/sub-task]
-                                        [:open-input :kick-1/thread-id]
-                                        [:open-input :kick-1/thread-desc]
-                                        [:open-input :kick-1/message-name]
-                                        [:kick-1destination :kick-1/destination]]})
+                             :kick-1destination dest}
+                            :connections [[:kick-1 :done]
+                                          [:open-input :kick-1/name]
+                                          [:open-input :kick-1/sub-task]
+                                          [:open-input :kick-1/thread-id]
+                                          [:open-input :kick-1/thread-desc]
+                                          [:open-input :kick-1/message-name]
+                                          [:kick-1destination :kick-1/destination]]})
 
 
   ;; (ut/pp [:fucking-http-call (wss/http-call {:url "https://oaidalleapiprodscus.blob.core.windows.net/private/org-YLngjih2M4oju0tnnZtKCAYg/user-shufdPruUBHCac1ylMZBDu4J/img-xElH7oGe63C8W9422OXz3shM.png?st=2024-01-06T08%3A30%3A21Z&se=2024-01-06T10%3A30%3A21Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-01-05T17%3A08%3A33Z&ske=2024-01-06T17%3A08%3A33Z&sks=b&skv=2021-08-06&sig=OswRl0Yu8nGMmfaMZCwby4IbYllGj%2BUvgH7zW/2Xq0c%3D"
@@ -718,8 +739,8 @@
   ;(flow/schedule! [:seconds 4] (test-client :appealing-white-hyena-hailing-from-hogback) {:flow-id "client-1" :increment-id? false :close-on-done? true :debug? false})
 
 
-  (wss/schedule! [:seconds 45] (heartbeat :all)
-                 {:flow-id "client-keepalive" :increment-id? false :close-on-done? true :debug? false})
+    (wss/schedule! [:seconds 45] (heartbeat :all)
+                   {:flow-id "client-keepalive" :increment-id? false :close-on-done? true :debug? false})
 
   ;; (wss/schedule! [:minutes 5] fex/looping-net
   ;;                {:flow-id "loop-time1!" :close-on-done? true :debug? false})
@@ -742,7 +763,7 @@
   ;;        res (flow/flow-waiter flow/my-network)]
   ;;    (ut/pp [:flow-answer res])))
 
-  (try (wss/flow-atoms>sql) (catch Exception e (ut/pp [:flow-atoms>sql-error (str e)])))
+    (try (wss/flow-atoms>sql) (catch Exception e (ut/pp [:flow-atoms>sql-error (str e)])))
 
 
 
@@ -750,12 +771,12 @@
   ;(doall (flow/flow flow/my-network {:debug? true :flow-id "yoyoyoy"} wss/rez))
 
 
-  (wss/create-web-server!)
-  (wss/create-websocket-server!)
+    (wss/create-web-server!)
+    (wss/create-websocket-server!)
 
-  (evl/create-nrepl-server!)
+    (evl/create-nrepl-server!)
 
-  (println " ")
+    (println " ")
 
 ;;  (ut/print-ansi-art "rvbbit.ans")
 
@@ -781,5 +802,5 @@
   ;; (cruiser/lets-give-it-a-whirl-no-viz cruiser/target-db4 system-db cruiser/default-sniff-tests cruiser/default-field-attributes cruiser/default-derived-fields cruiser/default-viz-shapes) ;; clickhouse
 
   ;(wss/process-csv {} "data/ref_us_counties.csv")
-  )
+    )
 

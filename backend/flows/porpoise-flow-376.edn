@@ -1,14 +1,96 @@
 {:flowmaps
- {:left-right-math
+ {:open-fn-1
+  {:y 1150,
+   :fn (fn [x] x),
+   :w 100,
+   :raw-fn (fn [x] (+ 1 (rand-int x))),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :integer}},
+   :inputs nil,
+   :h 85,
+   :x 1850,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :open-fn-2
+  {:y 1400,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x] (rand-int x)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :integer}},
+   :inputs nil,
+   :h 85,
+   :x 2200,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :open-input-1
+  {:w 100,
+   :h 85,
+   :z 0,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input 45},
+   :right-click? true,
+   :ports {:in {}, :out {:out :integer}},
+   :x 1975,
+   :y 1150},
+  :left-right-math
   {:y 1275,
-   :w 200,
+   :w 175,
    :right-click? true,
    :icon "zmdi-puzzle-piece",
    :flow-path "./flows/left-right-math.edn",
    :z 0,
    :ports {:in {:right-int :integer, :left-int :integer}, :out {:out :integer}},
-   :h 110,
+   :h 85,
    :x 1850,
+   :sub-flow-id "left-right-math",
+   :data
+   {:flow-item
+    {:category ":sub-flows",
+     :name "left-right-math",
+     :type "left-right-math",
+     :icon "zmdi-puzzle-piece",
+     :defaults {:right-int 2, :left-int 2},
+     :types {:right-int :integer, :left-int :integer, :out :any},
+     :style nil,
+     :selected-style nil,
+     :inputs [:right-int :left-int],
+     :expandable? true,
+     :required [:right-int :left-int]},
+    :drag-meta {:type "left-right-math"}}},
+  :left-right-math-2
+  {:y 1525,
+   :w 250,
+   :right-click? true,
+   :icon "zmdi-puzzle-piece",
+   :flow-path "./flows/left-right-math.edn",
+   :z 0,
+   :ports {:in {:right-int :integer, :left-int :integer}, :out {:out :integer}},
+   :h 85,
+   :x 2075,
    :sub-flow-id "left-right-math",
    :data
    {:flow-item
@@ -34,20 +116,20 @@
    :inputs nil,
    :h 85,
    :x 1850,
-   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input 1123}},
-  :open-fn-1
-  {:y 1125,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input 11233}},
+  :open-fn-3
+  {:y 1650,
    :fn (fn [x] x),
-   :w 125,
-   :raw-fn (fn [x] (+ 1 x)),
+   :w 250,
+   :raw-fn (fn [x] (defonce tester (atom [])) (swap! tester conj x) @tester),
    :right-click? true,
    :icon "zmdi-functions",
    :types nil,
    :z 0,
-   :ports {:in {:x :any}, :out {:out :integer}},
+   :ports {:in {:x :any}, :out {:out :any}},
    :inputs nil,
    :h 85,
-   :x 1850,
+   :x 2075,
    :data
    {:flow-item
     {:category ":rabbit-base",
@@ -59,45 +141,26 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
-  :open-fn-1_out
-  {:y 1725,
-   :fn (fn [x] x),
+  :open-input-2
+  {:y 1175,
    :w 125,
-   :raw-fn (fn [x] x),
-   :icon "zmdi-functions",
-   :z 0,
-   :ports {:in {:x :any}, :out {:out :any}},
-   :h 60,
-   :x 2425,
-   :data
-   {:flow-item
-    {:category ":rabbit-base",
-     :fn (fn [x] x),
-     :name ":open-fn",
-     :raw-fn (fn [x] x),
-     :type :open-fn,
-     :icon "zmdi-functions",
-     :types {:x :any, :out :any},
-     :expandable? true,
-     :drag-meta {:type :open-fn}}}},
-  :open-input-1
-  {:w 125,
-   :h 85,
-   :z 0,
-   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input 45},
    :right-click? true,
-   :ports {:in {}, :out {:out :integer}},
-   :x 2000,
-   :y 1125},
+   :types nil,
+   :z 0,
+   :ports {:in {}, :out {:out {:out :integer}}},
+   :inputs nil,
+   :h 85,
+   :x 2200,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input 4543}},
   :left-right-math-1
-  {:y 1450,
+  {:y 1400,
    :w 225,
    :right-click? true,
    :icon "zmdi-puzzle-piece",
    :flow-path "./flows/left-right-math.edn",
    :z 0,
-   :ports {:in {:right-int :integer, :left-int :integer}, :out {:out :any}},
-   :h 110,
+   :ports {:in {:right-int :integer, :left-int :integer}, :out {:out :integer}},
+   :h 85,
    :x 1950,
    :sub-flow-id "left-right-math",
    :data
@@ -113,18 +176,9 @@
      :inputs [:right-int :left-int],
      :expandable? true,
      :required [:right-int :left-int]},
-    :drag-meta {:type "left-right-math"}}},
-  :open-input-2
-  {:w 125,
-   :h 85,
-   :z 0,
-   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input 454},
-   :right-click? true,
-   :ports {:in {}, :out {:out :integer}},
-   :x 2225,
-   :y 1200}},
+    :drag-meta {:type "left-right-math"}}}},
  :opts {:retry-on-error? true, :retries 5, :close-on-done? true},
- :zoom [-1493.29 -1257.83 1.325],
+ :zoom [-1282.78 -1099.16 1.133],
  :flow-id "porpoise-flow-376",
  :flowmaps-connections
  [[:open-input :open-fn-1/x]
@@ -132,4 +186,8 @@
   [:open-input-1 :left-right-math/left-int]
   [:left-right-math :left-right-math-1/right-int]
   [:open-input-2 :left-right-math-1/left-int]
-  [:left-right-math-1 :done]]}
+  [:left-right-math-1 :left-right-math-2/right-int]
+  [:open-input-2 :open-fn-2/x]
+  [:open-fn-2 :left-right-math-2/left-int]
+  [:left-right-math-2 :open-fn-3/x]
+  [:open-fn-3 :done]]}
