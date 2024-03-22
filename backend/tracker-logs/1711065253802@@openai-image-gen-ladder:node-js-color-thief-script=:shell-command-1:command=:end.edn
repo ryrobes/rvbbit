@@ -1,0 +1,6 @@
+{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
+ :value
+ {:port-in? true,
+  :shell-command-1/command
+  "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-36720-52185.webp"},
+ :diff {"openai-image-gen-ladder/node-js-color-thief-script" {:shell-command-1/command {:end 1711065253801}}}}

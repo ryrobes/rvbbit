@@ -1,0 +1,13 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ {:error
+  {:error
+   {:error
+    "Your request was rejected as a result of our safety system. Image descriptions generated from your prompt may contain text that is not allowed by our safety system. If you believe this was done in error, your request may succeed if retried, or by adjusting your prompt.",
+    :class "class clojure.lang.ExceptionInfo"},
+   :class "class clojure.lang.ExceptionInfo"},
+  :message
+  {:error
+   "Your request was rejected as a result of our safety system. Image descriptions generated from your prompt may contain text that is not allowed by our safety system. If you believe this was done in error, your request may succeed if retried, or by adjusting your prompt.",
+   :class "class clojure.lang.ExceptionInfo"}},
+ :diff {"openai-image-gen-ladder" {:oai-api-call {:end 1711064480974}}}}

@@ -1,0 +1,7 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ {:port-in? true,
+  :node-js-color-thief-script-dominantColor/in
+  {:dominantColor "#e9a566",
+   :colorPalette ["#e9a94e" "#52ccda" "#975355" "#1a1339" "#4772c3" "#eec4e1" "#5f324c" "#404b88" "#d9345b" "#476c67"]}},
+ :diff {"openai-image-gen-ladder" {:node-js-color-thief-script-dominantColor/in {:end 1711064827334}}}}

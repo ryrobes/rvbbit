@@ -1,0 +1,4 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ "Create a vivid, hyperrealistic, high-definition 16:9 cyberpunk illustration inspired by the pin-up style. A Caucasian woman in her late 20s harkens to Alice from a classic children's story, characterized by golden locks, full lips, and a slightly upturned nose. Her skin is adorned with fine, intricate tattoos that maintain her recognizable story-book persona. She engages in a challenging interaction arranging a geometric piece onto a wall filled with other cut-out shapes. A quirky machine on the wall's opposite side busily inserts and removes shapes. The backdrop unfolds in a rough metropolitan area, with vibrant neon lights painting an atmospheric luminescence, reminiscent of futuristic dystopian cityscapes. The woman is robust, with exaggerated curves, dons a choker ribbon, a long necklace and exudes a burlesque vibe.",
+ :diff {"openai-image-gen-ladder" {:output-revised-prompt {:end 1711064728690}}}}

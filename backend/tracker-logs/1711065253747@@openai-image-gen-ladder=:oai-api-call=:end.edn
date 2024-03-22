@@ -1,0 +1,8 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ {:created 1711065251,
+  :data
+  [{:b64_json "**huge base64 string**",
+    :revised_prompt
+    "A meticulously detailed, high-definition, hyperreal, vivid 16:9 stylized cyberpunk portrayal of a woman in her late 20s, reminiscent of Alice from a classic children's tale but not directly referencing it. She is a beautiful Caucasian woman with blonde hair, full lips, and a slightly upturned nose. Adorned with intricate tattoos, she retains a slight charm of the 'Alice' character through her features and attire. She's dynamically interacting with a wall covered in cut-out shapes, tediously fitting a piece into place. A fantastical machine on the other side of the wall interacts with her, inserting and retracting shapes. The surrounding is a gritty urban setting, bathed in the atmospheric glow of colorful neon lights, echoing a cyberpunk aesthetic. She exhibits a robust, exaggerated curvaceous physique. Her attire includes a choker ribbon and a long necklace, adding a burlesque touch to her look."}]},
+ :diff {"openai-image-gen-ladder" {:oai-api-call {:end 1711065253747}}}}

@@ -1,0 +1,3 @@
+{:kks ("openai-image-gen-ladder"),
+ :value nil,
+ :diff {"openai-image-gen-ladder" {:save-base64-to-webp-file/file-path {:start 1711064780108, :in-chan? false}}}}

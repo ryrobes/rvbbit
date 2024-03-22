@@ -1,0 +1,3 @@
+{:kks ("openai-image-gen-ladder"),
+ :value nil,
+ :diff {"openai-image-gen-ladder" {:hiccup-image-box-w-png/bg-color {:start 1711065254509, :in-chan? false}}}}

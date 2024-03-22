@@ -1,0 +1,4 @@
+{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
+ :value
+ "{   \"dominantColor\": \"#384950\",   \"colorPalette\": [     \"#d88f6f\",     \"#25343f\",     \"#97605b\",     \"#4fc0ab\",     \"#338b83\",     \"#6b4241\",     \"#52657e\",     \"#c62d5b\",     \"#3c98b2\",     \"#eedace\"   ] }",
+ :diff {"openai-image-gen-ladder/node-js-color-thief-script" {:join-output-as-string {:end 1711066057226}}}}

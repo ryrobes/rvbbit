@@ -1,0 +1,13 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ {:error
+  {:error
+   {:error
+    "We were unable to process your prompt. Please try again later. You can retry your request, or contact us through our help center at help.openai.com if the error persists. (Please include the request ID req_ec5087581404571dc847daf87b182e2e in your message.)",
+    :class "class clojure.lang.ExceptionInfo"},
+   :class "class clojure.lang.ExceptionInfo"},
+  :message
+  {:error
+   "We were unable to process your prompt. Please try again later. You can retry your request, or contact us through our help center at help.openai.com if the error persists. (Please include the request ID req_ec5087581404571dc847daf87b182e2e in your message.)",
+   :class "class clojure.lang.ExceptionInfo"}},
+ :diff {"openai-image-gen-ladder" {:oai-api-call {:end 1711064770006}}}}

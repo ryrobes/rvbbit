@@ -1,0 +1,5 @@
+{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
+ :value "/home/ryanr/rvbbit-out/b64-image-62291-79599.webp",
+ :diff
+ {"openai-image-gen-ladder/node-js-color-thief-script"
+  {:image-path {:start 1711063884758, :end 1711063884758, :static? true}}}}

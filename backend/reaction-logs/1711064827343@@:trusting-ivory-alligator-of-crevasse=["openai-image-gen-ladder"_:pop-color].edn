@@ -1,0 +1,21 @@
+{:client-name :trusting-ivory-alligator-of-crevasse,
+ :keypath ["openai-image-gen-ladder" :pop-color],
+ :value "#e9a94e",
+ :last-vals
+ {["openai-image-gen-ladder" :output-revised-prompt]
+  "A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated cyberpunk illustration that portrays a late-20s character inspired by a storybook, detailed in a pin-up style illustration. She is a beautiful Caucasian woman with blonde hair - pouty lips and a slightly upturned nose. She has intricate tattoos, keeping her recognizably fictional yet with features and attire that hint at her storybook identity. She's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. The other side of the wall is operated by a complex, whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing visual depth, reminiscent of a future-tech neon-lit city. She is buxom, robust, with a hyper curvaceous physique. She wears a ribbon choker and a long necklace, adding to her burlesque look.",
+  ["openai-image-gen-ladder" :relative-url-path-for-png-version] "./images/gen/b64-image-59261-112.png",
+  ["openai-image-gen-ladder" :dominant-color] "#e9a14b",
+  ["openai-image-gen-ladder" :pop-color] "#e9a94e",
+  ["openai-image-gen-ladder" :*running?] true},
+ :subs-at-time
+ (:flow/live-scratch-flow>*running?
+   :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+   :flow/openai-image-gen-ladder>:dominant-color
+   :flow/flow-forever>*running?
+   :flow/openai-image-gen-ladder>*running?
+   :flow/openai-image-gen-ladder>:pop-color
+   :flow/openai-image-gen-ladder>:output-revised-prompt
+   :flow/flow-forever>:final-math),
+ :child-atoms
+ ("client-keepalive" "openai-image-gen-ladder" "flow-forever" "openai-image-gen-ladder/node-js-color-thief-script")}

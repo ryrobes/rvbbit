@@ -1,0 +1,21 @@
+{:client-name :trusting-ivory-alligator-of-crevasse,
+ :keypath ["openai-image-gen-ladder" :*running?],
+ :value true,
+ :last-vals
+ {["openai-image-gen-ladder" :output-revised-prompt]
+  "Create a high-definition, hyperreal and vivid 16:9 highly stylized illustration resembling the pinup style. The subject is a late-20s woman of Caucasian descent, influenced by the Alice in Wonderland character. She features blonde hair, pouty lips, a slightly upturned nose, and intricate tattoos. Although her style is decidedly modern and edgy, she still bears recognizable elements that hint at her inspiration, the storybook character Alice. The woman is interacting with a wall filled with cut-out shapes, looking to snugly fit a piece into place. On the flip side, a fantastical machine puts in and pulls out shapes. This all takes place within a gritty, urban scene, a city bathed in the atmospheric glow of brilliant neon lights which imbue the scene with a vibe reminiscent of a cyberpunk setting. She has a robust, heavily curvaceous figure and is dressed in a stylish ensemble that includes a choker ribbon and a long necklace, adding a touch of burlesque to her overall look.",
+  ["openai-image-gen-ladder" :relative-url-path-for-png-version] "./images/gen/b64-image-62291-79599.png",
+  ["openai-image-gen-ladder" :dominant-color] "#293c4b",
+  ["openai-image-gen-ladder" :pop-color] "#eab58b",
+  ["openai-image-gen-ladder" :*running?] true},
+ :subs-at-time
+ (:flow/live-scratch-flow>*running?
+   :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+   :flow/openai-image-gen-ladder>:dominant-color
+   :flow/flow-forever>*running?
+   :flow/openai-image-gen-ladder>*running?
+   :flow/openai-image-gen-ladder>:pop-color
+   :flow/openai-image-gen-ladder>:output-revised-prompt
+   :flow/flow-forever>:final-math),
+ :child-atoms
+ ("client-keepalive" "openai-image-gen-ladder" "flow-forever" "openai-image-gen-ladder/node-js-color-thief-script")}

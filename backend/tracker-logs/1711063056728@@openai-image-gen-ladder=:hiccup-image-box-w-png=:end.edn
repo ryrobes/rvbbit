@@ -1,0 +1,15 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ [:v-box
+  :padding
+  "10px"
+  :gap
+  "8px"
+  :width
+  :width-px
+  :style
+  {:background-color "#26262e", :border-radius "20px", :font-size "12px", :font-weight 700, :color "#eec7a3"}
+  :children
+  [[:box :child "./images/gen/b64-image-61274-16371.png"]
+   [:box :size "auto" :child [:img {:src "./images/gen/b64-image-61274-16371.png", :style {:border-radius "30px"}}]]]],
+ :diff {"openai-image-gen-ladder" {:hiccup-image-box-w-png {:end 1711063056727}}}}

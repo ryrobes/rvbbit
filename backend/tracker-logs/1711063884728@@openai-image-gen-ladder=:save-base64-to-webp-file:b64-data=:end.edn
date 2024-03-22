@@ -1,0 +1,3 @@
+{:kks ("openai-image-gen-ladder"),
+ :value {:port-in? true, :save-base64-to-webp-file/b64-data "**huge base64 string**"},
+ :diff {"openai-image-gen-ladder" {:save-base64-to-webp-file/b64-data {:end 1711063884728}}}}

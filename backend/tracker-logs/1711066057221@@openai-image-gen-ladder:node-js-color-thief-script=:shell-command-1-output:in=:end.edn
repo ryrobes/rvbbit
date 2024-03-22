@@ -1,0 +1,25 @@
+{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
+ :value
+ {:port-in? true,
+  :shell-command-1-output/in
+  {:output
+   ["{"
+    "  \"dominantColor\": \"#384950\","
+    "  \"colorPalette\": ["
+    "    \"#d88f6f\","
+    "    \"#25343f\","
+    "    \"#97605b\","
+    "    \"#4fc0ab\","
+    "    \"#338b83\","
+    "    \"#6b4241\","
+    "    \"#52657e\","
+    "    \"#c62d5b\","
+    "    \"#3c98b2\","
+    "    \"#eedace\""
+    "  ]"
+    "}"],
+   :exception [],
+   :seconds [],
+   :command
+   "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-32886-15117.webp"}},
+ :diff {"openai-image-gen-ladder/node-js-color-thief-script" {:shell-command-1-output/in {:end 1711066057221}}}}

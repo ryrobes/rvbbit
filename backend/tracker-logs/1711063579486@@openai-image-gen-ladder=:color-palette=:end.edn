@@ -1,0 +1,5 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ {:dominantColor "#e09973",
+  :colorPalette ["#dead5f" "#4dcf9d" "#0c133d" "#774a54" "#29728e" "#db2281" "#4a7bb7" "#eedfc7" "#1a3a65" "#23666b"]},
+ :diff {"openai-image-gen-ladder" {:color-palette {:end 1711063579485}}}}

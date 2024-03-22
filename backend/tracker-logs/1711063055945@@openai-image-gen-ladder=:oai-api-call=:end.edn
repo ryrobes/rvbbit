@@ -1,0 +1,8 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ {:created 1711063054,
+  :data
+  [{:b64_json "**huge base64 string**",
+    :revised_prompt
+    "Generate a hyperreal, high-definition, exaggerated pin-up style portrait in 16:9 proportion, set within a gritty, neon-lit urban environment of a cyberpunk theme. This vivid illustration should portray a fictional caucasian woman in her late twenties, inspired by the character Alice from a classic tale (not Alice in Wonderland). She possesses blonde hair, pouty lips, a slightly upturned nose and intricate body art that provides subtle allusions to her fictional inspiration. The woman can be seen engaging in a complex interaction with a wall adorned with cut-out shapes, skillfully fitting a piece into its place. On the other side, a whimsical, complex machine can be seen inserting and retracting shapes. This woman is robust with an exaggerated, curvaceous voluptuous figure. She sports a ribbon choker and a lengthy necklace, giving off a hint of burlesque aura."}]},
+ :diff {"openai-image-gen-ladder" {:oai-api-call {:end 1711063055944}}}}

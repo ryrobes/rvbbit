@@ -1,0 +1,10 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ {:port-in? true,
+  :execute-shell-command-command/in
+  {:output [],
+   :exception [],
+   :seconds [],
+   :command
+   "convert /home/ryanr/rvbbit-out/b64-image-81647-90502.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-81647-90502.png"}},
+ :diff {"openai-image-gen-ladder" {:execute-shell-command-command/in {:end 1711063579203}}}}

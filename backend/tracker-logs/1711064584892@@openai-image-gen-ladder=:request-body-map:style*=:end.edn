@@ -1,0 +1,3 @@
+{:kks ("openai-image-gen-ladder"),
+ :value {:port-in? true, :request-body-map/style* "vivid"},
+ :diff {"openai-image-gen-ladder" {:request-body-map/style* {:end 1711064584892}}}}

@@ -1,0 +1,10 @@
+{:kks ("openai-image-gen-ladder"),
+ :value
+ {:port-in? true,
+  :output-revised-prompt/x
+  {:created 1711063576,
+   :data
+   [{:b64_json "**huge base64 string**",
+     :revised_prompt
+     "Create an HD, hyperrealistic, and vivid 16:9 stylized illustration in a pin-up style with a cyberpunk twist. It portrays a Caucasian lady in her late 20s whose appearance and attire hint towards the character Alice from Lewis Carroll's stories. Her blonde hair, slightly upturned nose, and pouty lips are complimented by a series of intricate tattoos. She's interacting in a complex way with a wall filled with cut-out shapes and fitting a piece into its place. The other side of the wall is operated by a peculiar machine that inserts and retracts shapes. Surrounding her is a gritty urban environment with colorful neon lights casting atmospheric illumination, giving the vibe of a typical Cyberpunk genre scene. She's robust with exaggerated curves. Around her neck, she dons a choker ribbon and a long necklace, adding to her burlesque appeal."}]}},
+ :diff {"openai-image-gen-ladder" {:output-revised-prompt/x {:end 1711063578631}}}}

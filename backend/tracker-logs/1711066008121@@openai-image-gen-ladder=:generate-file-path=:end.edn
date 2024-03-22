@@ -1,0 +1,3 @@
+{:kks ("openai-image-gen-ladder"),
+ :value "/home/ryanr/rvbbit-out/b64-image-32886-15117.webp",
+ :diff {"openai-image-gen-ladder" {:generate-file-path {:end 1711066008120}}}}

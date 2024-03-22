@@ -1,0 +1,3 @@
+{:kks ("openai-image-gen-ladder"),
+ :value "vivid",
+ :diff {"openai-image-gen-ladder" {:style-param {:start 1711064534677, :end 1711064534677, :static? true}}}}

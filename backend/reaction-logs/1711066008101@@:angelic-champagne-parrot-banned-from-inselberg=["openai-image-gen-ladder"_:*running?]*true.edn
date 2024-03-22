@@ -1,0 +1,21 @@
+{:client-name :angelic-champagne-parrot-banned-from-inselberg,
+ :keypath ["openai-image-gen-ladder" :*running?],
+ :value true,
+ :last-vals
+ {["openai-image-gen-ladder" :pop-color] "#eab19b",
+  ["openai-image-gen-ladder" :dominant-color] "#e49a88",
+  ["openai-image-gen-ladder" :output-revised-prompt]
+  "Design a hyperreal, dynamic 16:9 cyberpunk-themed artwork, that showcases a late-20s fictional character, in a distinct pinup style. The character takes inspiration from a well-known story about a girl exploring a fantastical world, characterized by her Caucasian descent, blonde hair, pouty lips, and slightly upturned nose. Detailed tattoos decorate her skin, but her design should still hint at her fictional identity. Engage her in an intricate interaction with a wall filled with cut-out shapes, as she fits a piece into place. An eccentric machine operates on the other side of the wall, interacting with the shapes. The setting is an edgy urban environment with radiant, multicolored neon lights casting atmospheric illumination. The character has a generously curved figure and she is adorned in a choker ribbon and long necklace, creating an aesthetic reminiscent of a burlesque performance.",
+  ["openai-image-gen-ladder" :relative-url-path-for-png-version] "./images/gen/b64-image-27842-87672.png",
+  ["openai-image-gen-ladder" :*running?] false},
+ :subs-at-time
+ (:flow/live-scratch-flow>*running?
+   :flow/openai-image-gen-ladder>*running?
+   :flow/flow-forever>*running?
+   :flow/openai-image-gen-ladder>:output-revised-prompt
+   :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+   :flow/openai-image-gen-ladder>:dominant-color
+   :flow/flow-forever>:final-math
+   :flow/openai-image-gen-ladder>:pop-color),
+ :child-atoms
+ ("client-keepalive" "openai-image-gen-ladder" "flow-forever" "openai-image-gen-ladder/node-js-color-thief-script")}

@@ -394,6 +394,9 @@
                                            (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps-pre/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/*"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "status-change-logs/*"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))))
 
 
@@ -570,6 +573,7 @@
               (ext/create-dirs "./status-change-logs/")
               (ut/pretty-spit fp {:kks kks
                                   :res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
+                                  :tracker (ut/replace-large-base64 (select-keys @flow-db/tracker kks))
                                   :diff (ut/replace-large-base64 b)} 125)))
 
           (update-stat-atom kks))
@@ -580,6 +584,33 @@
   ;(add-watch flow-db/status :tracker-watch update-stat-atom)
   ;(add-watch flow-db/tracker :tracker-watch update-stat-atom) ;; tracker could be too much...
 
+
+    
+    ;; temp, expensive, tracking down some issues
+    (defn tracker-changed2 [key ref old-state new-state]
+      (let [[_ b _] (data/diff old-state new-state)
+            kks (try (keys b) (catch Exception _ nil))]
+        (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
+
+          ;(ut/pp [:tracker-changes! kks])
+
+          (async/thread ;; really expensive logging below. temp
+            (let [kks-string (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":"))
+                  block-changed (first (keys (get b (first kks))))
+                  what-changed (first (remove #(= % :in-chan?)(keys (get-in b [(first kks) (first (keys (get b (first kks))))]))))
+                  summary (-> (str block-changed "=" what-changed) (cstr/replace " " "_") (cstr/replace "/" ":"))
+                  fp (str "./tracker-logs/" (str (System/currentTimeMillis)) "@@" kks-string "=" summary ".edn")]
+              (ext/create-dirs "./tracker-logs/")
+              (ut/pretty-spit fp {:kks kks
+                                  :value (ut/replace-large-base64 (get-in @flow-db/results-atom [(first kks) block-changed]))
+                                  ;:res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
+                                  ;:tracker (ut/replace-large-base64 (select-keys @flow-db/tracker kks))
+                                  :diff (ut/replace-large-base64 b)} 125)))
+
+          (update-stat-atom kks))
+      ;(when kks (ut/pp [:flow-finished kks]))
+        ))
+    (add-watch flow-db/tracker :tracker-watch tracker-changed2)
 
 
   ;; ;;; temp, SUPER expensive logging

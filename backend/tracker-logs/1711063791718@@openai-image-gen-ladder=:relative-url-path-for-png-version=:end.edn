@@ -1,0 +1,3 @@
+{:kks ("openai-image-gen-ladder"),
+ :value "./images/gen/b64-image-66107-83032.png",
+ :diff {"openai-image-gen-ladder" {:relative-url-path-for-png-version {:end 1711063791718}}}}

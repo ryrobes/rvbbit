@@ -1,0 +1,14 @@
+{:client-name :virtuous-cerise-finch-hailing-from-flared-slope,
+ :keypath ["openai-image-gen-ladder" :relative-url-path-for-png-version],
+ :value "./images/gen/b64-image-91102-96794.png",
+ :last-vals {["openai-image-gen-ladder" :relative-url-path-for-png-version] "./images/gen/b64-image-91102-96794.png"},
+ :subs-at-time
+ (:flow/crow-flow-201a>*running?
+   :flow/flow-forever>:final-math
+   :flow/flow-forever>*running?
+   :flow/counting-loop>*running?
+   :flow/live-scratch-flow>*running?
+   :flow/crow-flow-201>*running?
+   :flow/openai-image-gen-ladder>:relative-url-path-for-png-version),
+ :child-atoms
+ ("client-keepalive" "openai-image-gen-ladder" "flow-forever" "openai-image-gen-ladder/node-js-color-thief-script")}

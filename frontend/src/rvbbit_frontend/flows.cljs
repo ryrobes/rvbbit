@@ -85,6 +85,7 @@
 
 ;;(def zoomer (reagent/atom nil))
 
+
 (defn gn [x] (try (name x) (catch :default _ x)))
 (defn gns [x] (try (namespace x) (catch :default _ x)))
 (defn gns? [x] (not (nil? (try (namespace x) (catch :default _ false)))))
@@ -7001,9 +7002,8 @@
                                                                                                 server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)]
                                                                                             (merge {:types (get-in flowmap-raw [flow-select :data :flow-item :types])
                                                                                                     :description (cstr/join " " (get-in flowmap-raw [flow-select :description]))}
-                                                                                                  (select-keys (get flowmap-raw flow-select) [:description])
-                                                                                             (get-in server-flowmap [:components flow-select])
-                                                                                             ))
+                                                                                                   (select-keys (get flowmap-raw flow-select) [:description])
+                                                                                                   (get-in server-flowmap [:components flow-select])))
                                                                                :client-name @(re-frame/subscribe [::bricks/client-name])}
                                                                   :on-response [::simple-response]
                                                                   ;:on-timeout  [::timeout-response :run-flow flowmap] ;; requeue?

@@ -1,0 +1,21 @@
+{:client-name :trusting-ivory-alligator-of-crevasse,
+ :keypath ["openai-image-gen-ladder" :*running?],
+ :value false,
+ :last-vals
+ {["openai-image-gen-ladder" :output-revised-prompt]
+  "Create a vivid, hyperrealistic, high-definition 16:9 cyberpunk illustration inspired by the pin-up style. A Caucasian woman in her late 20s harkens to Alice from a classic children's story, characterized by golden locks, full lips, and a slightly upturned nose. Her skin is adorned with fine, intricate tattoos that maintain her recognizable story-book persona. She engages in a challenging interaction arranging a geometric piece onto a wall filled with other cut-out shapes. A quirky machine on the wall's opposite side busily inserts and removes shapes. The backdrop unfolds in a rough metropolitan area, with vibrant neon lights painting an atmospheric luminescence, reminiscent of futuristic dystopian cityscapes. The woman is robust, with exaggerated curves, dons a choker ribbon, a long necklace and exudes a burlesque vibe.",
+  ["openai-image-gen-ladder" :relative-url-path-for-png-version] "./images/gen/b64-image-59261-112.png",
+  ["openai-image-gen-ladder" :dominant-color] "#e9a14b",
+  ["openai-image-gen-ladder" :pop-color] "#eaa841",
+  ["openai-image-gen-ladder" :*running?] false},
+ :subs-at-time
+ (:flow/live-scratch-flow>*running?
+   :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+   :flow/openai-image-gen-ladder>:dominant-color
+   :flow/flow-forever>*running?
+   :flow/openai-image-gen-ladder>*running?
+   :flow/openai-image-gen-ladder>:pop-color
+   :flow/openai-image-gen-ladder>:output-revised-prompt
+   :flow/flow-forever>:final-math),
+ :child-atoms
+ ("client-keepalive" "openai-image-gen-ladder" "flow-forever" "openai-image-gen-ladder/node-js-color-thief-script")}

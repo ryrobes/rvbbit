@@ -1,0 +1,3 @@
+{:kks ("openai-image-gen-ladder"),
+ :value "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-66107-83032.png",
+ :diff {"openai-image-gen-ladder" {:create-png-path {:end 1711063790976}}}}

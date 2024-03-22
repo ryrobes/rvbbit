@@ -1528,6 +1528,7 @@
 ;(defonce last-values (durable-atom "./data/flow-sub-last-values.edn")) ;; so we can persist between server sessions
 ;(def last-values (atom {}))
 (def last-values (ut/thaw-atom {} "./data/atoms/last-values.edn"))
+(def last-values-per (ut/thaw-atom {} "./data/atoms/last-values-per.edn"))
 
 (defn client-statuses []
   (into {}
@@ -2715,10 +2716,17 @@
     (let [;status? (cstr/includes? (str keypath) ":*")
           old-value (get-in old-state keypath)
           new-value (get-in new-state keypath)
-          last-value (get @last-values keypath)]
+          last-value (get-in @last-values-per [client-name keypath])]
+      ;(ut/pp [:mk-watcher keypath (not= last-value new-value) (not= old-value new-value)])
       (when ;(or
              (and (not (nil? new-value))
-                 (or (not= old-value new-value) (some #(cstr/starts-with? (str %) ":*") keypath)))
+                  (or (not= last-value new-value) 
+                      (not= old-value new-value)
+                      )
+                ; (or (not= old-value new-value) 
+                ;     ;(some #(cstr/starts-with? (str %) ":*") keypath)
+                ;     )
+             )
                  ;(not= last-value new-value) ;; temp remove. some weird issue
                ;  ) (and (not (nil? new-value))
                 ;        (some #(cstr/starts-with? (str %) ":*") keypath)))
@@ -2728,11 +2736,13 @@
       ;;       (not= last-value new-value)))
 
         (handler-fn keypath client-name new-value)
-        ;(ut/pp [:make-watcher keypath client-name new-value])
+        ;(ut/pp [:make-watcher key keypath client-name new-value])
         ;(when (not (cstr/starts-with? (str keypath) ":tracker"))
         (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker updates and other ephemeral shit
             ;(swap! last-values assoc-in [keypath client-name] new-value)
-          (swap! last-values assoc keypath new-value)) ;; if a new client loads a subbed screen, we want to have a cache avail
+          (swap! last-values assoc keypath new-value)
+          (swap! last-values-per assoc-in [client-name keypath] new-value)
+          ) ;; if a new client loads a subbed screen, we want to have a cache avail
         ;  )
         ))))
 
@@ -2746,7 +2756,8 @@
                             tracker? flow-db/tracker
                             ;:else flow-db/results-atom
                             :else (get-or-create-child-atom (first keypath)))]
-    (remove-watch atom-to-watch watch-key)
+    ;(remove-watch atom-to-watch watch-key)
+    (ut/pp [:add-watcher client-name keypath sub-type])
     (add-watch atom-to-watch watch-key watcher)
     (swap! atoms-and-watchers assoc-in [client-name flow-key]
            {:created (ut/get-current-timestamp)
@@ -2786,12 +2797,27 @@
     [(first ff2) (keyword (last ff2))]))
 
 (defn send-reaction [keypath client-name new-value]
-  (ut/pp [:client-reaction-push! keypath client-name new-value])
+  ;(ut/pp [:client-reaction-push! keypath client-name new-value]) 
+
+  (async/thread ;; really expensive logging below. temp
+    (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
+          b? (boolean? new-value)
+          fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value))".edn")]
+      (ext/create-dirs "./reaction-logs/")
+      (ut/pretty-spit fp {:client-name client-name
+                          :keypath keypath
+                          :value (ut/replace-large-base64 new-value)
+                          :last-vals (ut/replace-large-base64 (get @last-values-per client-name))
+                          :subs-at-time (keys (get @atoms-and-watchers client-name))
+                          :child-atoms (keys @child-atoms)} 125)))
+
+
   (kick client-name [:flow (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))] new-value nil nil nil))
 
 (defn send-reaction-runner [keypath client-name new-value]
   (let [flow-id (first keypath)]
-   ; (ut/pp [:reaction-runner flow-id keypath client-name ]) ;; (ut/replace-large-base64 new-value)
+   (ut/pp [:reaction-runner flow-id keypath client-name ]) ;; (ut/replace-large-base64 new-value)
+
     (kick client-name (vec (cons :flow-runner keypath)) new-value nil nil nil)
     ;(kick client-name (vec (cons :tracker keypath)) (get @flow-db/tracker flow-id) nil nil nil)
     ))
