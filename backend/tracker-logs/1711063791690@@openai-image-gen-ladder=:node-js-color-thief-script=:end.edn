@@ -1,5 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value
- {:dominantColor "#dbb996",
-  :colorPalette ["#ddc39b" "#6ab5aa" "#7a5d56" "#0d0e21" "#c1416c" "#287cab" "#225878" "#425645" "#1e2e4c" "#ca9d39"]},
- :diff {"openai-image-gen-ladder" {:node-js-color-thief-script {:end 1711063791689}}}}

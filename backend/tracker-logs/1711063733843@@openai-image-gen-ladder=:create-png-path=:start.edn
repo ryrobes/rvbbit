@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value nil,
- :diff {"openai-image-gen-ladder" {:create-png-path {:start 1711063733842, :in-chan? nil}}}}

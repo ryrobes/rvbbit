@@ -1,6 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value
- {:port-in? true,
-  :request-body-map/prompty*
-  "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. \n\nShe should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. \n\nShe's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. \n\nThe other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene.\n\nShe is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."},
- :diff {"openai-image-gen-ladder" {:request-body-map/prompty* {:end 1711064847696}}}}

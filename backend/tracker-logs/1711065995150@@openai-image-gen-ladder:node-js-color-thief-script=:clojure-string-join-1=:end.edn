@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
- :value "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-27842-87672.webp",
- :diff {"openai-image-gen-ladder/node-js-color-thief-script" {:clojure-string-join-1 {:end 1711065995149}}}}

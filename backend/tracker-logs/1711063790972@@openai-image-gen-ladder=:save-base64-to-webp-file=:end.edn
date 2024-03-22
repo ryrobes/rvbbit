@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value "/home/ryanr/rvbbit-out/b64-image-66107-83032.webp",
- :diff {"openai-image-gen-ladder" {:save-base64-to-webp-file {:end 1711063790972}}}}

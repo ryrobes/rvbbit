@@ -1,7 +1,0 @@
-{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
- :value
- {:port-in? true,
-  :json-to-edn/json-string
-  "{   \"dominantColor\": \"#e4aa63\",   \"colorPalette\": [     \"#79273b\",     \"#f3d875\",     \"#6b6566\",     \"#17142d\",     \"#97c6e1\",     \"#c95a4c\",     \"#cc835c\",     \"#f49522\",     \"#31a4c8\",     \"#2b6ea5\"   ] }"},
- :diff
- {"openai-image-gen-ladder/node-js-color-thief-script" {:json-to-edn/json-string {:start 1711063734698, :in-chan? false}}}}

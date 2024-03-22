@@ -339,10 +339,25 @@
  ::sub-to-flows
  (fn [db _]
    (let [new @(re-frame/subscribe [::get-new-flow-subs])
+         ;all (get db :flow-subs [])
          subbed (vec (for [n new]
                        (do (re-frame/dispatch [::http/sub-to-flow-value n])
                            n)))]
      (assoc db :flow-subs (into subbed (get db :flow-subs []))))))
+
+(re-frame/reg-event-db
+ ::sub-to-flows-all ;; temp debugging
+ (fn [db _]
+   (let [;new @(re-frame/subscribe [::get-new-flow-subs])
+         all (get db :flow-subs [])
+        ;;  subbed (vec (for [n all]
+        ;;                (do (re-frame/dispatch [::http/sub-to-flow-value n])
+        ;;                    n)))
+         ]
+     (doseq [n all] (re-frame/dispatch [::http/sub-to-flow-value n]))
+     ;(assoc db :flow-subs (into subbed (get db :flow-subs [])))
+     db
+     )))
 
 ;(re-frame/dispatch [::sub-to-flows])
 

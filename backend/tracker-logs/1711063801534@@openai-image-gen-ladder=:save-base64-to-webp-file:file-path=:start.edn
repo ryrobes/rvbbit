@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value {:port-in? true, :save-base64-to-webp-file/file-path "/home/ryanr/rvbbit-out/b64-image-19250-1265.webp"},
- :diff {"openai-image-gen-ladder" {:save-base64-to-webp-file/file-path {:start 1711063801531, :in-chan? false}}}}

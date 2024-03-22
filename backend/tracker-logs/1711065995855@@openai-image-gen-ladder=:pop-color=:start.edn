@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value "#eab19b",
- :diff {"openai-image-gen-ladder" {:pop-color {:start 1711065995852, :in-chan? nil}}}}

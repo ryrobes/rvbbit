@@ -1,0 +1,59 @@
+{:kks ("openai-image-gen-ladder"),
+ :value {:port-in? true, :create-convert-command-line/y "/home/ryanr/rvbbit-out/b64-image-73994-50710.webp"},
+ :diff {"openai-image-gen-ladder" {:create-convert-command-line/y {:end 1711082844436}}},
+ :full
+ {:request-body-map/quality* {:port-in? true, :request-body-map/quality* "hd"},
+  :quality-param "hd",
+  :base-save-directory "/home/ryanr/rvbbit-out",
+  :size-param "1792x1024",
+  :create-png-path/base-dir {:port-in? true, :create-png-path/base-dir "/home/ryanr/rvbbit-out"},
+  :request-body-map
+  {:prompt
+   "A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly.\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.\n",
+   :n 1,
+   :size "1792x1024",
+   :style "vivid",
+   :response_format "b64_json",
+   :model "dall-e-3",
+   :quality "hd"},
+  :generate-file-path/base-dir {:port-in? true, :generate-file-path/base-dir "/home/ryanr/rvbbit-out"},
+  :base-web-directory "/home/ryanr/rvbbit/frontend/resources/public/images/gen",
+  :http-req-map/req-body*
+  {:port-in? true,
+   :http-req-map/req-body*
+   {:prompt
+    "A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly.\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.\n",
+    :n 1,
+    :size "1792x1024",
+    :style "vivid",
+    :response_format "b64_json",
+    :model "dall-e-3",
+    :quality "hd"}},
+  :request-body-map/size* {:port-in? true, :request-body-map/size* "1792x1024"},
+  :create-png-path/base-web-dir
+  {:port-in? true, :create-png-path/base-web-dir "/home/ryanr/rvbbit/frontend/resources/public/images/gen"},
+  :request-body-map/style* {:port-in? true, :request-body-map/style* "vivid"},
+  :prompt
+  "A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly.\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.\n",
+  :create-convert-command-line/y
+  {:port-in? true, :create-convert-command-line/y "/home/ryanr/rvbbit-out/b64-image-73994-50710.webp"},
+  :request-body-map/prompty*
+  {:port-in? true,
+   :request-body-map/prompty*
+   "A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly.\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.\n"},
+  :opts-map
+  {:overrides
+   {:prompt
+    "A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly.\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.\n",
+    :style-param "vivid"},
+   :flow-id "openai-image-gen-ladder",
+   :client-name :valued-ivory-pronghorn-hailing-from-landforms-by-shape,
+   :debux? false,
+   :close-on-done? true,
+   :debug? false,
+   :opts {:retries 400, :retry-on-error? true, :close-on-done? true},
+   :increment-id? false,
+   :run-id "2d202225-9395-4b4b-af33-b0da13303752"},
+  :generate-file-path "/home/ryanr/rvbbit-out/b64-image-73994-50710.webp",
+  :run-id "2d202225-9395-4b4b-af33-b0da13303752",
+  :style-param "vivid"}}

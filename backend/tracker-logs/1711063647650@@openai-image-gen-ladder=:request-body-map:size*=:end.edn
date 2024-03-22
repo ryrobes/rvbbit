@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value {:port-in? true, :request-body-map/size* "1792x1024"},
- :diff {"openai-image-gen-ladder" {:request-body-map/size* {:end 1711063647649}}}}

@@ -1,0 +1,108 @@
+{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
+ :value nil,
+ :diff
+ {"openai-image-gen-ladder/node-js-color-thief-script" {:join-output-as-string {:start 1711083163524, :in-chan? nil}}},
+ :full
+ {:done nil,
+  :shell-command-1
+  {:output
+   ["{"
+    "  \"dominantColor\": \"#e69e77\","
+    "  \"colorPalette\": ["
+    "    \"#e9b98a\","
+    "    \"#55d0be\","
+    "    \"#282334\","
+    "    \"#8b4e4e\","
+    "    \"#3c8783\","
+    "    \"#d9254f\","
+    "    \"#5891b9\","
+    "    \"#275766\","
+    "    \"#de862b\","
+    "    \"#396283\""
+    "  ]"
+    "}"],
+   :exception [],
+   :seconds [],
+   :command "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-60508-14683.webp"},
+  :clojure-string-join-1/value-2
+  {:port-in? true, :clojure-string-join-1/value-2 "/home/ryanr/rvbbit-out/b64-image-60508-14683.webp"},
+  :shell-command-1-output
+  ["{"
+   "  \"dominantColor\": \"#e69e77\","
+   "  \"colorPalette\": ["
+   "    \"#e9b98a\","
+   "    \"#55d0be\","
+   "    \"#282334\","
+   "    \"#8b4e4e\","
+   "    \"#3c8783\","
+   "    \"#d9254f\","
+   "    \"#5891b9\","
+   "    \"#275766\","
+   "    \"#de862b\","
+   "    \"#396283\""
+   "  ]"
+   "}"],
+  :join-output-as-string/value
+  {:port-in? true,
+   :join-output-as-string/value
+   ["{"
+    "  \"dominantColor\": \"#e69e77\","
+    "  \"colorPalette\": ["
+    "    \"#e9b98a\","
+    "    \"#55d0be\","
+    "    \"#282334\","
+    "    \"#8b4e4e\","
+    "    \"#3c8783\","
+    "    \"#d9254f\","
+    "    \"#5891b9\","
+    "    \"#275766\","
+    "    \"#de862b\","
+    "    \"#396283\""
+    "  ]"
+    "}"]},
+  :clojure-string-join-1/delimiter {:port-in? true, :clojure-string-join-1/delimiter " "},
+  :parent-run-id "66575942-9446-4ebf-aa5f-e77c08b252c7",
+  :clojure-string-join-1/value-1
+  {:port-in? true, :clojure-string-join-1/value-1 "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"},
+  :clojure-string-join-1
+  "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-60508-14683.webp",
+  :image-path "/home/ryanr/rvbbit-out/b64-image-60508-14683.webp",
+  :opts-map
+  {:debug? false,
+   :debux? false,
+   :close-on-done? false,
+   :run-id "48783d43-142c-4efd-9ba3-e8ef2440d625",
+   :increment-id? false,
+   :flow-id "openai-image-gen-ladder/node-js-color-thief-script",
+   :parent-run-id "66575942-9446-4ebf-aa5f-e77c08b252c7",
+   :client-name :favorable-rose-camel-hailing-from-hanging-valley},
+  :clojure-string-join-1delimiter " ",
+  :shell-command-1/command
+  {:port-in? true,
+   :shell-command-1/command
+   "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-60508-14683.webp"},
+  :shell-command-1-output/in
+  {:port-in? true,
+   :shell-command-1-output/in
+   {:output
+    ["{"
+     "  \"dominantColor\": \"#e69e77\","
+     "  \"colorPalette\": ["
+     "    \"#e9b98a\","
+     "    \"#55d0be\","
+     "    \"#282334\","
+     "    \"#8b4e4e\","
+     "    \"#3c8783\","
+     "    \"#d9254f\","
+     "    \"#5891b9\","
+     "    \"#275766\","
+     "    \"#de862b\","
+     "    \"#396283\""
+     "  ]"
+     "}"],
+    :exception [],
+    :seconds [],
+    :command
+    "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-60508-14683.webp"}},
+  :run-id "48783d43-142c-4efd-9ba3-e8ef2440d625",
+  :shell-command-in "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"}}

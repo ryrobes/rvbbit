@@ -1,7 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value
- {:port-in? true,
-  :pop-color/x
-  {:dominantColor "#26262e",
-   :colorPalette ["#eec7a3" "#88c7d0" "#9a5935" "#121421" "#6383a5" "#346e7b" "#602c1a" "#db7d32" "#1d5068" "#d5453d"]}},
- :diff {"openai-image-gen-ladder" {:pop-color/x {:end 1711063056715}}}}

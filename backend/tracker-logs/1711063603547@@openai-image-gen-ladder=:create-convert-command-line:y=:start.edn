@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value {:port-in? true, :create-convert-command-line/y "/home/ryanr/rvbbit-out/b64-image-23255-94870.webp"},
- :diff {"openai-image-gen-ladder" {:create-convert-command-line/y {:start 1711063603543, :in-chan? false}}}}

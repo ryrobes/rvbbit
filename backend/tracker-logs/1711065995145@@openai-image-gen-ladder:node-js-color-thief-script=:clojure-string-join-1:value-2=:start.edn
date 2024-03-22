@@ -1,5 +1,0 @@
-{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
- :value {:port-in? true, :clojure-string-join-1/value-2 "/home/ryanr/rvbbit-out/b64-image-27842-87672.webp"},
- :diff
- {"openai-image-gen-ladder/node-js-color-thief-script"
-  {:clojure-string-join-1/value-2 {:start 1711065995143, :in-chan? false}}}}

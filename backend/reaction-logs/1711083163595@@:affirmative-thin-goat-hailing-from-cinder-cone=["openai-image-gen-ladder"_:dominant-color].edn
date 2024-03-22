@@ -1,0 +1,21 @@
+{:client-name :affirmative-thin-goat-hailing-from-cinder-cone,
+ :keypath ["openai-image-gen-ladder" :dominant-color],
+ :value "#e69e77",
+ :last-vals
+ {["openai-image-gen-ladder" :*running?] false,
+  ["openai-image-gen-ladder" :output-revised-prompt]
+  "Create an intricate, high-definition illustration with a blend of traditional and cyberpunk aesthetics in a 16:9 ratio. The scene is set in a New England town in America, just before the dawn during a heavy snowstorm. The gritty atmosphere is highlighted, with the town covered in snow and buildings gently glowing with soft pink and neon blue lights. On the left, we see a gorgeous Irish woman in her early 30s, characterized by her full pouty lips, slightly upturned nose and pleased, sultry expression. Her long hair, speckled with flakes of snow, intensifies the effect of the heavy snowfall. Celtic-inspired tattoos of rabbits and wilderness artfully contrast against her skin, spread over her neck, collarbone and shoulders. She is robust and hyper-curvaceous, wearing a choker ribbon and a long necklace. The rising sun, twinkling off her buxom figure, instills a serene yet enigmatic ambiance, emphasizing the harmony between the natural world and technological influence.",
+  ["openai-image-gen-ladder" :pop-color] "#d8a0c3",
+  ["openai-image-gen-ladder" :dominant-color] "#3e3d4a",
+  ["openai-image-gen-ladder" :relative-url-path-for-png-version] "./images/gen/b64-image-31868-8794.png"},
+ :subs-at-time
+ (:flow/openai-image-gen-ladder>:output-revised-prompt
+   :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+   :flow/live-scratch-flow>*running?
+   :flow/flow-forever>*running?
+   :flow/openai-image-gen-ladder>*running?
+   :flow/openai-image-gen-ladder>:pop-color
+   :flow/openai-image-gen-ladder>:dominant-color
+   :flow/flow-forever>:final-math),
+ :child-atoms
+ ("client-keepalive" "openai-image-gen-ladder" "flow-forever" "openai-image-gen-ladder/node-js-color-thief-script")}

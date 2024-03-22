@@ -1,7 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value
- {:error
-  {:error {:error "This request has been blocked by our content filters.", :class "class clojure.lang.ExceptionInfo"},
-   :class "class clojure.lang.ExceptionInfo"},
-  :message {:error "This request has been blocked by our content filters.", :class "class clojure.lang.ExceptionInfo"}},
- :diff {"openai-image-gen-ladder" {:oai-api-call {:end 1711063686076}}}}

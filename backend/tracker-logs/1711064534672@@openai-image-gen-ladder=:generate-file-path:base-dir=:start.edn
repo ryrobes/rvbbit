@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value {:port-in? true, :generate-file-path/base-dir "/home/ryanr/rvbbit-out"},
- :diff {"openai-image-gen-ladder" {:generate-file-path/base-dir {:start 1711064534670, :in-chan? false}}}}

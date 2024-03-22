@@ -605,7 +605,8 @@
                                   :value (ut/replace-large-base64 (get-in @flow-db/results-atom [(first kks) block-changed]))
                                   ;:res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
                                   ;:tracker (ut/replace-large-base64 (select-keys @flow-db/tracker kks))
-                                  :diff (ut/replace-large-base64 b)} 125)))
+                                  :diff (ut/replace-large-base64 b)
+                                  :full (ut/replace-large-base64 (get-in @flow-db/results-atom [(first kks)]))} 125)))
 
           (update-stat-atom kks))
       ;(when kks (ut/pp [:flow-finished kks]))

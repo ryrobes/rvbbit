@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value {:port-in? true, :node-js-color-thief-script/image-path "/home/ryanr/rvbbit-out/b64-image-12250-27332.webp"},
- :diff {"openai-image-gen-ladder" {:node-js-color-thief-script/image-path {:end 1711064826615}}}}

@@ -1,5 +1,0 @@
-{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
- :value {:port-in? true, :clojure-string-join-1/value-1 "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"},
- :diff
- {"openai-image-gen-ladder/node-js-color-thief-script"
-  {:clojure-string-join-1/value-1 {:start 1711063790990, :in-chan? false}}}}

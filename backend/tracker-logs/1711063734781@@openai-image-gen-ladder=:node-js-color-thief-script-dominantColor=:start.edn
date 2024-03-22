@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value "#e4aa63",
- :diff {"openai-image-gen-ladder" {:node-js-color-thief-script-dominantColor {:start 1711063734779, :in-chan? nil}}}}

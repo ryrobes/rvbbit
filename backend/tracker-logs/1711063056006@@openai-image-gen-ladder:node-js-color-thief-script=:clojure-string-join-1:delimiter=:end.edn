@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
- :value {:port-in? true, :clojure-string-join-1/delimiter " "},
- :diff {"openai-image-gen-ladder/node-js-color-thief-script" {:clojure-string-join-1/delimiter {:end 1711063056005}}}}

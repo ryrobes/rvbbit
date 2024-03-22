@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value nil,
- :diff {"openai-image-gen-ladder" {:prompt {:start 1711064534673, :end 1711064534673, :static? true}}}}

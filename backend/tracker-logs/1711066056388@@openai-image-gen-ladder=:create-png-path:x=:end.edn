@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value {:port-in? true, :create-png-path/x "/home/ryanr/rvbbit-out/b64-image-32886-15117.webp"},
- :diff {"openai-image-gen-ladder" {:create-png-path/x {:end 1711066056387}}}}

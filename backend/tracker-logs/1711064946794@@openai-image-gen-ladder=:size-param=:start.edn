@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value "1792x1024",
- :diff {"openai-image-gen-ladder" {:size-param {:start 1711064946794, :end 1711064946794, :static? true}}}}

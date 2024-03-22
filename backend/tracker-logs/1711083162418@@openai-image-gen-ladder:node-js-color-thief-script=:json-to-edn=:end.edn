@@ -1,0 +1,4 @@
+{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
+ :value nil,
+ :diff {"openai-image-gen-ladder/node-js-color-thief-script" {:json-to-edn {:end 1711083162365}}},
+ :full {:done nil}}

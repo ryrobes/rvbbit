@@ -2196,10 +2196,11 @@
 
           ;_ (alert! client-name  10 1.35)
           ;_ (push-to-client [:estimate] (ut/avg (get @times-atom flow-id [-1])) client-name -1 :est1 :est2)
-          _ (kick client-name (vec (cons :estimate [])) {flow-id {:times (ut/avg   ;; avg based on last 10 runs, but only if > 1
+          ship-est (fn [client-name] (kick client-name (vec (cons :estimate [])) {flow-id {:times (ut/avg   ;; avg based on last 10 runs, but only if > 1
                                                                           (vec (take-last 10 (vec (remove #(< % 1)
                                                                                                 (get @times-atom flow-id []))))))
-                                                                  :run-id uuid}} nil nil nil)
+                                                                  :run-id uuid}} nil nil nil))
+          _ (doseq [client-name (keys (client-statuses))] (ship-est client-name)) ;; send to all clients just in case they care... (TODO make this more relevant)
          ;; _ (ut/pp [:opts!! opts flow-id])
           return-val (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn symbols in the maps
           ;return-val (submit-named-task-and-wait uid (flow-waiter (eval finished-flowmap) uid opts))
@@ -2238,7 +2239,8 @@
         (let [cnt (count (str return-val))
               limit 160
               over? (> cnt limit)
-              error? (cstr/includes? (str return-val) ":error")
+              error? (or (cstr/includes? (str return-val) ":error")
+                         (cstr/includes? (str return-val) ":timeout"))
               sample (str ; (str (get-in @flow-status [flow-id :*time-running]) " ")
                       (if over? (str (subs (str return-val) 0 limit) "...")
                           (str return-val)))
@@ -2711,17 +2713,22 @@
 ;;; ^^ master atom watcher. dissects keys into child atoms to watch easier...
 
 
-(defn make-watcher [keypath client-name handler-fn & [no-save]]
-  (fn [key atom old-state new-state]
-    (let [;status? (cstr/includes? (str keypath) ":*")
+(defn make-watcher [keypath watch-key client-name handler-fn & [no-save]]
+  (fn [kkey atom old-state new-state]
+    (let [client-name :all ;; test
           old-value (get-in old-state keypath)
           new-value (get-in new-state keypath)
-          last-value (get-in @last-values-per [client-name keypath])]
-      ;(ut/pp [:mk-watcher keypath (not= last-value new-value) (not= old-value new-value)])
+          param-key (-> (str watch-key) (cstr/replace ":flow/" "") (cstr/replace ":" "") keyword)
+          param-value (get-in @params-atom [client-name :flow param-key])
+          last-value (get-in @last-values-per [client-name keypath])
+          all-clients-subbed (for [c (keys @atoms-and-watchers)
+                                   :when (some #(= % watch-key) (keys (get @atoms-and-watchers c)))] c)]
+      ;(ut/pp [:mkk-watcher client-name watch-key param-key keypath param-value (not= last-value new-value) (not= old-value new-value)])
       (when ;(or
              (and (not (nil? new-value))
-                  (or (not= last-value new-value) 
+                  (or ;(not= last-value new-value) 
                       (not= old-value new-value)
+                      ;(not= param-value new-value) ;; the actual last seen value on client...
                       )
                 ; (or (not= old-value new-value) 
                 ;     ;(some #(cstr/starts-with? (str %) ":*") keypath)
@@ -2735,7 +2742,9 @@
       ;;       ;)
       ;;       (not= last-value new-value)))
 
-        (handler-fn keypath client-name new-value)
+        (doseq [client-name all-clients-subbed]
+          (handler-fn keypath client-name new-value))
+        
         ;(ut/pp [:make-watcher key keypath client-name new-value])
         ;(when (not (cstr/starts-with? (str keypath) ":tracker"))
         (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker updates and other ephemeral shit
@@ -2747,18 +2756,21 @@
         ))))
 
 (defn add-watcher [keypath client-name fn flow-key sub-type & [flow-id]] ;; flow id optional is for unsub stuff later (NOT reduntant)
-  (let [watcher (make-watcher keypath client-name fn (= sub-type :tracker))
+  (let [;;client-name :all ;; test
+        ;watch-key (str client-name "-" (str keypath) "-" sub-type)
+        ;watcher (make-watcher keypath flow-key client-name fn (= sub-type :tracker))
+        watch-key (str :all "-" (str keypath) "-" sub-type)
+        watcher (make-watcher keypath flow-key :all fn (= sub-type :tracker))
         status? (cstr/includes? (str keypath) ":*")
         tracker? (= sub-type :tracker)
-        watch-key (str client-name "-" (str keypath) "-" sub-type)
         ;;_ (ut/pp [:is-flow-id? (first keypath)])
         atom-to-watch (cond status? flow-status
                             tracker? flow-db/tracker
                             ;:else flow-db/results-atom
                             :else (get-or-create-child-atom (first keypath)))]
-    ;(remove-watch atom-to-watch watch-key)
-    (ut/pp [:add-watcher client-name keypath sub-type])
-    (add-watch atom-to-watch watch-key watcher)
+    (remove-watch atom-to-watch watch-key)
+    ;;(ut/pp [:add-watcher client-name keypath sub-type])
+    (add-watch atom-to-watch watch-key watcher) 
     (swap! atoms-and-watchers assoc-in [client-name flow-key]
            {:created (ut/get-current-timestamp)
             :sub-type sub-type

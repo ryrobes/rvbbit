@@ -1,5 +1,0 @@
-{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
- :value "cd /home/ryanr/color-thief-project ; node ./colorThief2.js",
- :diff
- {"openai-image-gen-ladder/node-js-color-thief-script"
-  {:shell-command-in {:start 1711065253794, :end 1711065253794, :static? true}}}}

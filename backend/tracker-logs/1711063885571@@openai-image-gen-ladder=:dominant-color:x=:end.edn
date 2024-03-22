@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value {:port-in? true, :dominant-color/x "#293c4b"},
- :diff {"openai-image-gen-ladder" {:dominant-color/x {:end 1711063885571}}}}

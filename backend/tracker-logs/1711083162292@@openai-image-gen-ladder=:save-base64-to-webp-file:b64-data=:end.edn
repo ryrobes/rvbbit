@@ -1,0 +1,117 @@
+{:kks ("openai-image-gen-ladder"),
+ :value {:port-in? true, :save-base64-to-webp-file/b64-data "**huge base64 string**"},
+ :diff {"openai-image-gen-ladder" {:save-base64-to-webp-file/b64-data {:end 1711083162284}}},
+ :full
+ {:oai-api-call
+  {:created 1711083160,
+   :data
+   [{:b64_json "**huge base64 string**",
+     :revised_prompt
+     "Generate a 16:9, high-definition, hyperreal, and exaggeratedly vivid cyberpunk illustration embodying elements of pin-up aesthetics. The central character is a Caucasian woman in her late 20s, drawing inspiration from Alice from Alice's Adventures in Wonderland. She is beautiful with blonde hair, pouty lips, and a slightly upturned nose. Her body is tattooed intricately, enhancing her identity related to Alice's character while maintaining enough subtlety for recognizable aspects. She is interacting with a wall full of cut-out shapes, fitting a piece into the right gap. A whimsical machine on the other side of the wall engages with the shapes. The illustration's setting encapsulates an urban environment with the gritty aesthetics of cyberpunk genre, while colorful neon lights provide atmospheric illumination. The woman's figure is robust and curvaceous, adorned with a choker ribbon and a lengthy necklace. The overall mood is evocative of a burlesque atmosphere."}]},
+  :request-body-map/quality* {:port-in? true, :request-body-map/quality* "hd"},
+  :save-base64-to-webp-file/file-path
+  {:port-in? true, :save-base64-to-webp-file/file-path "/home/ryanr/rvbbit-out/b64-image-60508-14683.webp"},
+  :quality-param "hd",
+  :base-save-directory "/home/ryanr/rvbbit-out",
+  :size-param "1792x1024",
+  :create-png-path/base-dir {:port-in? true, :create-png-path/base-dir "/home/ryanr/rvbbit-out"},
+  :output-revised-prompt/x
+  {:port-in? true,
+   :output-revised-prompt/x
+   {:created 1711083160,
+    :data
+    [{:b64_json "**huge base64 string**",
+      :revised_prompt
+      "Generate a 16:9, high-definition, hyperreal, and exaggeratedly vivid cyberpunk illustration embodying elements of pin-up aesthetics. The central character is a Caucasian woman in her late 20s, drawing inspiration from Alice from Alice's Adventures in Wonderland. She is beautiful with blonde hair, pouty lips, and a slightly upturned nose. Her body is tattooed intricately, enhancing her identity related to Alice's character while maintaining enough subtlety for recognizable aspects. She is interacting with a wall full of cut-out shapes, fitting a piece into the right gap. A whimsical machine on the other side of the wall engages with the shapes. The illustration's setting encapsulates an urban environment with the gritty aesthetics of cyberpunk genre, while colorful neon lights provide atmospheric illumination. The woman's figure is robust and curvaceous, adorned with a choker ribbon and a lengthy necklace. The overall mood is evocative of a burlesque atmosphere."}]}},
+  :request-body-map
+  {:prompt
+   "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. \n\nShe should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. \n\nShe's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. \n\nThe other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene.\n\nShe is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.",
+   :n 1,
+   :size "1792x1024",
+   :style "vivid",
+   :response_format "b64_json",
+   :model "dall-e-3",
+   :quality "hd"},
+  :generate-file-path/base-dir {:port-in? true, :generate-file-path/base-dir "/home/ryanr/rvbbit-out"},
+  :base-web-directory "/home/ryanr/rvbbit/frontend/resources/public/images/gen",
+  :http-req-map/req-body*
+  {:port-in? true,
+   :http-req-map/req-body*
+   {:prompt
+    "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. \n\nShe should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. \n\nShe's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. \n\nThe other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene.\n\nShe is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.",
+    :n 1,
+    :size "1792x1024",
+    :style "vivid",
+    :response_format "b64_json",
+    :model "dall-e-3",
+    :quality "hd"}},
+  :request-body-map/size* {:port-in? true, :request-body-map/size* "1792x1024"},
+  :create-png-path/base-web-dir
+  {:port-in? true, :create-png-path/base-web-dir "/home/ryanr/rvbbit/frontend/resources/public/images/gen"},
+  :request-body-map/style* {:port-in? true, :request-body-map/style* "vivid"},
+  :prompt
+  "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. \n\nShe should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. \n\nShe's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. \n\nThe other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene.\n\nShe is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.",
+  :create-convert-command-line/y
+  {:port-in? true, :create-convert-command-line/y "/home/ryanr/rvbbit-out/b64-image-60508-14683.webp"},
+  :request-body-map/prompty*
+  {:port-in? true,
+   :request-body-map/prompty*
+   "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. \n\nShe should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. \n\nShe's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. \n\nThe other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene.\n\nShe is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."},
+  :opts-map
+  {:overrides
+   {:prompt
+    "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. \n\nShe should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. \n\nShe's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. \n\nThe other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene.\n\nShe is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.",
+    :style-param "vivid"},
+   :flow-id "openai-image-gen-ladder",
+   :client-name :favorable-rose-camel-hailing-from-hanging-valley,
+   :debux? false,
+   :close-on-done? true,
+   :debug? false,
+   :opts {:retries 400, :retry-on-error? true, :close-on-done? true},
+   :increment-id? false,
+   :run-id "66575942-9446-4ebf-aa5f-e77c08b252c7"},
+  :generate-file-path "/home/ryanr/rvbbit-out/b64-image-60508-14683.webp",
+  :save-base64-to-webp-file/b64-data {:port-in? true, :save-base64-to-webp-file/b64-data "**huge base64 string**"},
+  :oai-api-call/req-map
+  {:port-in? true,
+   :oai-api-call/req-map
+   {:headers
+    {"Authorization" "Bearer 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", "Content-Type" "application/json"},
+    :method :post,
+    :url "https://api.openai.com/v1/images/generations",
+    :body
+    {:prompt
+     "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. \n\nShe should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. \n\nShe's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. \n\nThe other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene.\n\nShe is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.",
+     :n 1,
+     :size "1792x1024",
+     :style "vivid",
+     :response_format "b64_json",
+     :model "dall-e-3",
+     :quality "hd"}}},
+  :run-id "66575942-9446-4ebf-aa5f-e77c08b252c7",
+  :http-req-map
+  {:headers
+   {"Authorization" "Bearer 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", "Content-Type" "application/json"},
+   :method :post,
+   :url "https://api.openai.com/v1/images/generations",
+   :body
+   {:prompt
+    "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. \n\nShe should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. \n\nShe's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. \n\nThe other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene.\n\nShe is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.",
+    :n 1,
+    :size "1792x1024",
+    :style "vivid",
+    :response_format "b64_json",
+    :model "dall-e-3",
+    :quality "hd"}},
+  :just-the-image "**huge base64 string**",
+  :output-revised-prompt
+  "Generate a 16:9, high-definition, hyperreal, and exaggeratedly vivid cyberpunk illustration embodying elements of pin-up aesthetics. The central character is a Caucasian woman in her late 20s, drawing inspiration from Alice from Alice's Adventures in Wonderland. She is beautiful with blonde hair, pouty lips, and a slightly upturned nose. Her body is tattooed intricately, enhancing her identity related to Alice's character while maintaining enough subtlety for recognizable aspects. She is interacting with a wall full of cut-out shapes, fitting a piece into the right gap. A whimsical machine on the other side of the wall engages with the shapes. The illustration's setting encapsulates an urban environment with the gritty aesthetics of cyberpunk genre, while colorful neon lights provide atmospheric illumination. The woman's figure is robust and curvaceous, adorned with a choker ribbon and a lengthy necklace. The overall mood is evocative of a burlesque atmosphere.",
+  :style-param "vivid",
+  :just-the-image/x
+  {:port-in? true,
+   :just-the-image/x
+   {:created 1711083160,
+    :data
+    [{:b64_json "**huge base64 string**",
+      :revised_prompt
+      "Generate a 16:9, high-definition, hyperreal, and exaggeratedly vivid cyberpunk illustration embodying elements of pin-up aesthetics. The central character is a Caucasian woman in her late 20s, drawing inspiration from Alice from Alice's Adventures in Wonderland. She is beautiful with blonde hair, pouty lips, and a slightly upturned nose. Her body is tattooed intricately, enhancing her identity related to Alice's character while maintaining enough subtlety for recognizable aspects. She is interacting with a wall full of cut-out shapes, fitting a piece into the right gap. A whimsical machine on the other side of the wall engages with the shapes. The illustration's setting encapsulates an urban environment with the gritty aesthetics of cyberpunk genre, while colorful neon lights provide atmospheric illumination. The woman's figure is robust and curvaceous, adorned with a choker ribbon and a lengthy necklace. The overall mood is evocative of a burlesque atmosphere."}]}}}}

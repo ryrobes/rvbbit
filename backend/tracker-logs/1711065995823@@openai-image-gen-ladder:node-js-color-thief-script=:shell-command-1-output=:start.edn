@@ -1,4 +1,0 @@
-{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
- :value nil,
- :diff
- {"openai-image-gen-ladder/node-js-color-thief-script" {:shell-command-1-output {:start 1711065995823, :in-chan? nil}}}}

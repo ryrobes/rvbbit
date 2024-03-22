@@ -115,6 +115,14 @@
       (binding [*out* wtr]
         (prn @a)))))
 
+;; (defn freeze-atoms ;; slow as all hell
+;;   "Freezes all managed atoms to disk."
+;;   []
+;;   (doseq [[file-path a] @managed-atoms]
+;;     (with-open [wtr (io/writer file-path)]
+;;       (binding [*out* wtr]
+;;         (clojure.pprint/pprint @a)))))
+
 (defn freeze-atom
   "Freezes a single atom to disk."
   [file-path]

@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value nil,
- :diff {"openai-image-gen-ladder" {:base-save-directory {:start 1711064679515, :end 1711064679515, :static? true}}}}

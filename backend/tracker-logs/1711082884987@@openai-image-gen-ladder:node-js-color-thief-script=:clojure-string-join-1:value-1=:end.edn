@@ -1,0 +1,24 @@
+{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
+ :value {:port-in? true, :clojure-string-join-1/value-1 "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"},
+ :diff {"openai-image-gen-ladder/node-js-color-thief-script" {:clojure-string-join-1/value-1 {:end 1711082884979}}},
+ :full
+ {:done nil,
+  :clojure-string-join-1/value-2
+  {:port-in? true, :clojure-string-join-1/value-2 "/home/ryanr/rvbbit-out/b64-image-73994-50710.webp"},
+  :clojure-string-join-1/delimiter {:port-in? true, :clojure-string-join-1/delimiter " "},
+  :parent-run-id "2d202225-9395-4b4b-af33-b0da13303752",
+  :clojure-string-join-1/value-1
+  {:port-in? true, :clojure-string-join-1/value-1 "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"},
+  :image-path "/home/ryanr/rvbbit-out/b64-image-73994-50710.webp",
+  :opts-map
+  {:debug? false,
+   :debux? false,
+   :close-on-done? false,
+   :run-id "86cedd5f-5911-4407-8402-6a3d10d06cac",
+   :increment-id? false,
+   :flow-id "openai-image-gen-ladder/node-js-color-thief-script",
+   :parent-run-id "2d202225-9395-4b4b-af33-b0da13303752",
+   :client-name :valued-ivory-pronghorn-hailing-from-landforms-by-shape},
+  :clojure-string-join-1delimiter " ",
+  :run-id "86cedd5f-5911-4407-8402-6a3d10d06cac",
+  :shell-command-in "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"}}

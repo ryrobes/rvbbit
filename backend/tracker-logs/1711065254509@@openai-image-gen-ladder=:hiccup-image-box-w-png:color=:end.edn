@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value {:port-in? true, :hiccup-image-box-w-png/color "#da9566"},
- :diff {"openai-image-gen-ladder" {:hiccup-image-box-w-png/color {:end 1711065254508}}}}

@@ -1,3 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value {:port-in? true, :request-body-map/quality* "hd"},
- :diff {"openai-image-gen-ladder" {:request-body-map/quality* {:end 1711064534662}}}}

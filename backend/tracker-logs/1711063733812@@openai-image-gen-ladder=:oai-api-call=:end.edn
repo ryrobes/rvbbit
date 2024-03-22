@@ -1,8 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value
- {:created 1711063731,
-  :data
-  [{:b64_json "**huge base64 string**",
-    :revised_prompt
-    "Visualize a high-definition, hyperreal, vivid 16:9 stylized over-the-top illustration in the vein of pin-up and cyberpunk aesthetics. The central character is a Caucasian woman in her late twenties, inspired by the character 'Alice' from classic literature. She is attractive, possessing classic pinup beauty - blonde hair, plump lips, and slightly upturned nose. Intricate tattoos adorn her skin, adding a unique edge to her character while subtly maintaining her unique identity affiliated with her literary origin. A notable interaction is happening between this tattooed heroine and a wall filled with uniquely shaped cutouts. She seems busy fitting a piece into an appropriate place in the wall, which on the other end is manipulated by an eccentric, mechanical contraption, inserting and retracting shapes. The atmosphere can be defined as a gritty metropolis, with colorful neon lights casting a cinematic glow, evoking the mood of a cyberpunk cityscape. Her physique is markedly voluptuous, robust, and overtly curvaceous. Noteworthy is her attire, consisting of a ribbon choker and a long necklace, adding a touch of burlesque to her overall appearance."}]},
- :diff {"openai-image-gen-ladder" {:oai-api-call {:end 1711063733812}}}}

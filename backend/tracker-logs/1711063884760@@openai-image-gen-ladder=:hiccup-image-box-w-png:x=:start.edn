@@ -1,5 +1,0 @@
-{:kks ("openai-image-gen-ladder"),
- :value
- {:port-in? true,
-  :hiccup-image-box-w-png/x "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-62291-79599.png"},
- :diff {"openai-image-gen-ladder" {:hiccup-image-box-w-png/x {:start 1711063884753, :in-chan? false}}}}

@@ -2751,20 +2751,21 @@
 (re-frame/reg-event-db
  ::update-user-params-hash
  (fn [db _]
-   (let [pp (get-in db [:click-param :param])
+   (let [pp (get-in db [:click-param]) ;; was param
          new-h (hash pp)
          client-name (get db :client-name)]
-     ;(tap> [:push-params client-name pp])
+     (tap> [:push-params! client-name (keys pp)])
      (re-frame/dispatch [::wfx/request   :default ;; just a push, no response handling
                          {:message      {:kind         :sync-client-params
                                          :params-map   pp
+                                         ;:flow-params-map 
                                          :client-name  client-name}}])
      (assoc db :user-params-hash new-h))))
 
 (re-frame/reg-sub
  ::watch-user-params
  (fn [db]
-   (hash (get-in db [:click-param :param]))))
+   (hash (get-in db [:click-param])))) ;; was :param
 
 (re-frame/reg-sub
  ::user-params-hash

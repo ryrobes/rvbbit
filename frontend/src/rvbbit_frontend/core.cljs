@@ -189,6 +189,11 @@
       :event                    [::bricks/sub-to-flows]
       :poll-when                [::bricks/new-flow-subs?]
       :dispatch-event-on-start? false}
+     
+    ;;  {:interval                 30
+    ;;   :event                    [::bricks/sub-to-flows-all]
+    ;;   ;:poll-when                [::bricks/new-flow-subs?]
+    ;;   :dispatch-event-on-start? true}     
 
    ;  {:interval                 1
    ;   :event                    [::bricks/update-metadata-styles]

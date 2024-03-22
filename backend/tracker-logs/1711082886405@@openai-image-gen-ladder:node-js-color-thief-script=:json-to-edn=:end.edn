@@ -1,0 +1,120 @@
+{:kks ("openai-image-gen-ladder/node-js-color-thief-script"),
+ :value
+ {:dominantColor "#3f5081",
+  :colorPalette ["#294072" "#8ad4f0" "#e1b7d6" "#8b6193" "#120f34" "#7997d2" "#d83b84" "#368aa5" "#4068aa" "#db6369"]},
+ :diff {"openai-image-gen-ladder/node-js-color-thief-script" {:json-to-edn {:end 1711082886378}}},
+ :full
+ {:json-to-edn/json-string
+  {:port-in? true,
+   :json-to-edn/json-string
+   "{   \"dominantColor\": \"#3f5081\",   \"colorPalette\": [     \"#294072\",     \"#8ad4f0\",     \"#e1b7d6\",     \"#8b6193\",     \"#120f34\",     \"#7997d2\",     \"#d83b84\",     \"#368aa5\",     \"#4068aa\",     \"#db6369\"   ] }"},
+  :done
+  {:dominantColor "#3f5081",
+   :colorPalette ["#294072" "#8ad4f0" "#e1b7d6" "#8b6193" "#120f34" "#7997d2" "#d83b84" "#368aa5" "#4068aa" "#db6369"]},
+  :shell-command-1
+  {:output
+   ["{"
+    "  \"dominantColor\": \"#3f5081\","
+    "  \"colorPalette\": ["
+    "    \"#294072\","
+    "    \"#8ad4f0\","
+    "    \"#e1b7d6\","
+    "    \"#8b6193\","
+    "    \"#120f34\","
+    "    \"#7997d2\","
+    "    \"#d83b84\","
+    "    \"#368aa5\","
+    "    \"#4068aa\","
+    "    \"#db6369\""
+    "  ]"
+    "}"],
+   :exception [],
+   :seconds [],
+   :command "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-73994-50710.webp"},
+  :clojure-string-join-1/value-2
+  {:port-in? true, :clojure-string-join-1/value-2 "/home/ryanr/rvbbit-out/b64-image-73994-50710.webp"},
+  :shell-command-1-output
+  ["{"
+   "  \"dominantColor\": \"#3f5081\","
+   "  \"colorPalette\": ["
+   "    \"#294072\","
+   "    \"#8ad4f0\","
+   "    \"#e1b7d6\","
+   "    \"#8b6193\","
+   "    \"#120f34\","
+   "    \"#7997d2\","
+   "    \"#d83b84\","
+   "    \"#368aa5\","
+   "    \"#4068aa\","
+   "    \"#db6369\""
+   "  ]"
+   "}"],
+  :join-output-as-string/value
+  {:port-in? true,
+   :join-output-as-string/value
+   ["{"
+    "  \"dominantColor\": \"#3f5081\","
+    "  \"colorPalette\": ["
+    "    \"#294072\","
+    "    \"#8ad4f0\","
+    "    \"#e1b7d6\","
+    "    \"#8b6193\","
+    "    \"#120f34\","
+    "    \"#7997d2\","
+    "    \"#d83b84\","
+    "    \"#368aa5\","
+    "    \"#4068aa\","
+    "    \"#db6369\""
+    "  ]"
+    "}"]},
+  :clojure-string-join-1/delimiter {:port-in? true, :clojure-string-join-1/delimiter " "},
+  :parent-run-id "2d202225-9395-4b4b-af33-b0da13303752",
+  :json-to-edn
+  {:dominantColor "#3f5081",
+   :colorPalette ["#294072" "#8ad4f0" "#e1b7d6" "#8b6193" "#120f34" "#7997d2" "#d83b84" "#368aa5" "#4068aa" "#db6369"]},
+  :clojure-string-join-1/value-1
+  {:port-in? true, :clojure-string-join-1/value-1 "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"},
+  :clojure-string-join-1
+  "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-73994-50710.webp",
+  :image-path "/home/ryanr/rvbbit-out/b64-image-73994-50710.webp",
+  :opts-map
+  {:debug? false,
+   :debux? false,
+   :close-on-done? false,
+   :run-id "86cedd5f-5911-4407-8402-6a3d10d06cac",
+   :increment-id? false,
+   :flow-id "openai-image-gen-ladder/node-js-color-thief-script",
+   :parent-run-id "2d202225-9395-4b4b-af33-b0da13303752",
+   :client-name :valued-ivory-pronghorn-hailing-from-landforms-by-shape},
+  :clojure-string-join-1delimiter " ",
+  :shell-command-1/command
+  {:port-in? true,
+   :shell-command-1/command
+   "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-73994-50710.webp"},
+  :shell-command-1-output/in
+  {:port-in? true,
+   :shell-command-1-output/in
+   {:output
+    ["{"
+     "  \"dominantColor\": \"#3f5081\","
+     "  \"colorPalette\": ["
+     "    \"#294072\","
+     "    \"#8ad4f0\","
+     "    \"#e1b7d6\","
+     "    \"#8b6193\","
+     "    \"#120f34\","
+     "    \"#7997d2\","
+     "    \"#d83b84\","
+     "    \"#368aa5\","
+     "    \"#4068aa\","
+     "    \"#db6369\""
+     "  ]"
+     "}"],
+    :exception [],
+    :seconds [],
+    :command
+    "cd /home/ryanr/color-thief-project ; node ./colorThief2.js /home/ryanr/rvbbit-out/b64-image-73994-50710.webp"}},
+  :join-output-as-string
+  "{   \"dominantColor\": \"#3f5081\",   \"colorPalette\": [     \"#294072\",     \"#8ad4f0\",     \"#e1b7d6\",     \"#8b6193\",     \"#120f34\",     \"#7997d2\",     \"#d83b84\",     \"#368aa5\",     \"#4068aa\",     \"#db6369\"   ] }",
+  :run-id "86cedd5f-5911-4407-8402-6a3d10d06cac",
+  :shell-command-in "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"}}
