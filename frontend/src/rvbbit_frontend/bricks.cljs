@@ -294,6 +294,15 @@
 (re-frame/reg-event-db ::shift-up (fn [db [_]] (assoc db :shift? true)))
 (re-frame/reg-sub ::shift? (fn [db [_]] (get db :shift? false)))
 
+(defn flatten-values [data]
+  (cond
+    (map? data) (mapcat flatten-values (vals data))
+    (vector? data) (mapcat flatten-values data)
+    :else [data]))
+
+(defn get-all-values [data]
+  (vec (flatten-values data)))
+
 (re-frame/reg-sub
  ::get-flow-subs
  (fn [db _]
@@ -309,7 +318,17 @@
          sflow (get db :selected-flow)
          current-flow-open (when (not (empty? sflow)) (keyword (str "flow/" sflow ">*running?")))
          flow-refs (vec (distinct
-                         (conj (filter #(cstr/starts-with? (str %) ":flow/") (filter keyword? (ut/deep-flatten panels)))
+                         (conj (filter #(or (cstr/starts-with? (str %) ":flow/")
+                                            (cstr/starts-with? (str %) ":screen/")
+                                            (cstr/starts-with? (str %) ":ext-param/")
+                                            (cstr/starts-with? (str %) ":panel/")
+                                            (cstr/starts-with? (str %) ":client/"))
+                                       (filter keyword? 
+                                               (into 
+                                                (ut/deep-flatten panels)
+                                                (ut/deep-flatten (get-all-values (get db :click-param))) ;; do we have params in params? 
+                                                )
+                                               ))
                                current-flow-open)))
          theme-refs (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/") (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))]
      ;(tap> [:flow-refs flow-refs])
@@ -10148,6 +10167,7 @@
         ;                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])} {})))
         workspace-params       (into {} (for [k valid-body-params] ;; deref here?
                                           {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+        ;;_ (when (= panel-key :block-55) (tap> [:workspace-params workspace-params]))  
         value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
         value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
                                           (let [fs    (cstr/split (ut/unkeyword k) "/")

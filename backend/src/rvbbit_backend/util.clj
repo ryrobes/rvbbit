@@ -1090,21 +1090,50 @@
 (defn delay-execution [ms f]
   (future (Thread/sleep ms) (f)))
 
+;; (defn ppln [x]
+;;   (if (>= debug-level 2)
+;;     (puget/with-options {:width (get-terminal-width)}
+;;       (puget/cprint x))
+;;     ((fn [& _]) x)))
+
+;; (defn pp [x]
+;;   (if (>= debug-level 1)
+;;     (puget/with-options {:width (get-terminal-width)}
+;;       (puget/cprint x))
+;;     ((fn [& _]) x)))
+
+;; (defn ppa [x] ;; always print
+;;   (puget/with-options {:width (get-terminal-width)}
+;;     (puget/cprint x)))
+
+(def console-lock (Object.))
+
+;; (defn safe-cprint [x]
+;;   (locking console-lock
+;;     (puget/with-options {:width (get-terminal-width)}
+;;       (puget/cprint x))))
+
+(defn safe-cprint [x]
+  (locking console-lock
+    (try
+      (puget/with-options {:width (get-terminal-width)}
+        (puget/cprint x))
+      (finally ;; pass
+        ))))
+
+
 (defn ppln [x]
   (if (>= debug-level 2)
-    (puget/with-options {:width (get-terminal-width)}
-      (puget/cprint x))
+    (safe-cprint x)
     ((fn [& _]) x)))
 
 (defn pp [x]
   (if (>= debug-level 1)
-    (puget/with-options {:width (get-terminal-width)}
-      (puget/cprint x))
+    (safe-cprint x)
     ((fn [& _]) x)))
 
 (defn ppa [x] ;; always print
-  (puget/with-options {:width (get-terminal-width)}
-    (puget/cprint x)))
+  (safe-cprint x))
 
 ;; (defn pp [& _]
 ;;   ;; Do nothing

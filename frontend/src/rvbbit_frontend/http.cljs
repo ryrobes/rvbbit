@@ -301,7 +301,12 @@
            heartbeat? (= task-id :heartbeat)
            alert? (= task-id :alert1)
            not-sys-stats? (not (cstr/includes? (str (get result :data)) "[sys-stats]"))
-           server-sub? (and kick? (= (get-in result [:task-id 0]) :flow) (not heartbeat?)) ;; server mutate only for click-param
+           server-sub? (and kick? (or (= (get-in result [:task-id 0]) :flow)
+                                      (= (get-in result [:task-id 0]) :screen)
+                                      (= (get-in result [:task-id 0]) :ext-param)
+                                      (= (get-in result [:task-id 0]) :panel)
+                                      (= (get-in result [:task-id 0]) :client)) 
+                            (not heartbeat?)) ;; server mutate only for click-param
            flow-runner-sub? (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?)) ;; server mutate only for click-param
            flow-runner-tracker? (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
            condi-tracker? (and kick? (= (get-in result [:task-id 0]) :condis) (not heartbeat?))

@@ -70,10 +70,36 @@
         formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd HH:mm:ss")]
     (.format formatter zonedDateTime)))
 
+;; reagent has special keywords that are invalid in edn, so we need to convert them to valid keywords. lame, but needed!
+(def invalid-to-valid-keywords {":>" ":reagent-gt"})
+(def valid-to-invalid-keywords (zipmap (vals invalid-to-valid-keywords) (keys invalid-to-valid-keywords)))
+(defn convert-to-valid-edn [s]
+  (reduce (fn [s [invalid valid]]
+            (clojure.string/replace s invalid valid))
+          s
+          invalid-to-valid-keywords))
+
+(defn convert-back-to-original [m]
+  (clojure.walk/postwalk
+   (fn [x]
+     (if (and (keyword? x) (valid-to-invalid-keywords x))
+       (valid-to-invalid-keywords x)
+       x))
+   m))
+
+(defn read-screen [f-path]
+  (let [screen-str (slurp f-path)
+        valid-edn-str (convert-to-valid-edn screen-str)
+        screen-data (try (edn/read-string valid-edn-str)
+                         (catch Exception e (ut/pp [:read-screen-error!!!!! f-path e]) {}))]
+    (convert-back-to-original screen-data)))
+
 (defn update-screen-meta [f-path]
   (let [;file-path "./screens/"
-        screen-str (slurp (str f-path))
-        screen-data (try (edn/read-string screen-str) (catch Exception e (ut/pp [:read-screen-error!!!!! f-path e]) {}))
+        ;; screen-str (slurp (str f-path))
+        ;; screen-data (try (edn/read-string screen-str) 
+        ;;                  (catch Exception e (ut/pp [:read-screen-error!!!!! f-path e]) {}))
+        screen-data (read-screen f-path)
         screen-name (get screen-data :screen-name "unnamed-screen!")
         theme-map (get-in screen-data [:click-param :theme])
         has-theme? (and (not (nil? theme-map)) (not (empty? theme-map)))
@@ -94,6 +120,7 @@
         board-map (into {} (for [b boards] {b (into {} (for [[k v] (get-in screen-data [:panels])
                                                              :when (= (get v :tab) b)] {k v}))}))
         queries (into {} (for [b blocks] (get-in screen-data [:panels b :queries])))]
+    (swap! wss/screens-atom assoc screen-name screen-data) ;; update master screen atom for param reactions etc 
     (ut/pp [:updating-screen-meta-for f-path])
     (sql-exec system-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
     (sql-exec system-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
@@ -312,14 +339,44 @@
 
     (cruiser/create-sqlite-sys-tables-if-needed! system-db)
     (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
-  ;(cruiser/create-sys-tables-if-needed! system-db) ;; sqlite
+    ;(cruiser/create-sys-tables-if-needed! system-db) ;; sqlite
+
+
+
+    (add-watch wss/screens-atom :master-screen-watcher ;; watcher splitter
+               (fn [_ _ old-state new-state]
+                 ;;(ut/pp [:SCREEN-WATCHER-ACTIVATE!])
+                 (doseq [key (keys new-state)]
+                   (if-let [child-atom (get @wss/screen-child-atoms key)]
+                     (swap! child-atom assoc key (get new-state key))
+                     (let [new-child-atom (atom {})]
+                       (swap! wss/screen-child-atoms assoc key new-child-atom)
+                       (swap! new-child-atom assoc key (get new-state key)))))))
+
+    (add-watch wss/params-atom :master-params-watcher ;; watcher splitter
+               (fn [_ _ old-state new-state]
+                 (doseq [key (keys new-state)]
+                   (if-let [child-atom (get @wss/param-child-atoms key)]
+                     (swap! child-atom assoc key (get new-state key))
+                     (let [new-child-atom (atom {})]
+                       (swap! wss/param-child-atoms assoc key new-child-atom)
+                       (swap! new-child-atom assoc key (get new-state key)))))))
+
+    (add-watch wss/panels-atom :master-panels-watcher ;; watcher splitter
+               (fn [_ _ old-state new-state]
+                 (doseq [key (keys new-state)]
+                   (if-let [child-atom (get @wss/panel-child-atoms key)]
+                     (swap! child-atom assoc key (get new-state key))
+                     (let [new-child-atom (atom {})]
+                       (swap! wss/panel-child-atoms assoc key new-child-atom)
+                       (swap! new-child-atom assoc key (get new-state key)))))))
 
     (update-all-screen-meta)
     (update-all-flow-meta)
 
   ;(when harvest-on-boot?
     (update-all-conn-meta)
-  ;  )
+  ;)
 
     (cruiser/insert-current-rules! system-db "system-db" 0
                                    cruiser/default-sniff-tests
@@ -585,7 +642,7 @@
   ;(add-watch flow-db/tracker :tracker-watch update-stat-atom) ;; tracker could be too much...
 
 
-    
+
     ;; temp, expensive, tracking down some issues
     (defn tracker-changed2 [key ref old-state new-state]
       (let [[_ b _] (data/diff old-state new-state)
@@ -597,7 +654,7 @@
           (async/thread ;; really expensive logging below. temp
             (let [kks-string (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":"))
                   block-changed (first (keys (get b (first kks))))
-                  what-changed (first (remove #(= % :in-chan?)(keys (get-in b [(first kks) (first (keys (get b (first kks))))]))))
+                  what-changed (first (remove #(= % :in-chan?) (keys (get-in b [(first kks) (first (keys (get b (first kks))))]))))
                   summary (-> (str block-changed "=" what-changed) (cstr/replace " " "_") (cstr/replace "/" ":"))
                   fp (str "./tracker-logs/" (str (System/currentTimeMillis)) "@@" kks-string "=" summary ".edn")]
               (ext/create-dirs "./tracker-logs/")

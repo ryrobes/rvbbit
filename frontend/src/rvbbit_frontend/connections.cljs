@@ -323,12 +323,20 @@
     ; (when (cstr/includes? (str keypath) "theme") (tap> [:clicked-param-fetch keypath val]))
      val)))
 
+(defn contains-namespaced-keyword? [data]
+  (cond
+    (map? data) (some contains-namespaced-keyword? (concat (keys data) (vals data)))
+    (vector? data) (some contains-namespaced-keyword? data)
+    (keyword? data) (boolean (namespace data))
+    :else false))
+
 (re-frame/reg-sub ;; RESOLVE KEYPATH
  ::clicked-parameter-key  ;;; important, common, and likely more expensive than need be. TODO
  (fn [db [_ keypath]]
    (let [cmp (cstr/split (ut/unkeyword (nth keypath 0)) "/")
          kkey (keyword (cstr/replace (nth cmp 0) "-parameter" ""))
          vkey (keyword (peek cmp))
+         ;;_ (when (cstr/includes? (str keypath) ":panel") (tap> [:? kkey vkey (get-in db (cons :click-param [kkey vkey]))]))
          val0 (get-in db (cons :click-param [kkey vkey]))
          if-walk-map2           (fn [obody] (let [kps       (ut/extract-patterns obody :if 4)
                                                   logic-kps (into {} (for [v kps]
@@ -372,7 +380,10 @@
          val      (if (and (string? val) (cstr/starts-with? (str val) ":") (not (cstr/includes? (str val) " ")))
        ;(cstr/replace (str val) ":" "")
                     (edn/read-string val) ;; temp hacky param work around (since we cant save keywords in the DB).. TODO :/
-                    val)]
+                    val)
+         ;_ (tap> [:resolver (logic-and-params-fn val nil)])
+         contains-params? (contains-namespaced-keyword? val)
+         ]
      ;;(tap> [:rec-param (ut/deep-template-find val0)])
     ; (when (cstr/includes? (str val) "theme") 
     ;   (tap> [:clicked-param-key? keypath val (if-walk-map2 val) val0]))
@@ -383,8 +394,11 @@
      ;(if (nil? val) (str "(nil val)") val)
 
      ;(resolver/logic-and-params val nil)
-     ;(logic-and-params-fn val nil)
-     val)))
+     (if contains-params? 
+       (logic-and-params-fn val nil)
+       val)
+     ;val
+     )))
 
 (re-frame/reg-event-db
  ::click-parameter

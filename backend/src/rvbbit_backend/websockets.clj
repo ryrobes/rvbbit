@@ -77,6 +77,10 @@
 (def orig-caller (atom {}))
 (def sub-flow-blocks (atom {}))
 (def custom-flow-blocks (ut/thaw-atom {} "./data/atoms/custom-flow-blocks-atom.edn"))
+;(def screens-atom (atom {}))
+(def screens-atom (ut/thaw-atom {} "./data/atoms/screens-atom.edn"))
+;;(def panels-atom (atom {}))
+(def panels-atom (ut/thaw-atom {} "./data/atoms/panels-atom.edn"))
 
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
@@ -1385,6 +1389,7 @@
 
 (defmethod wl/handle-request :current-panels [{:keys [panels client-name tabs orders click-param screen-name]}] ;; TODO add these
   (ext/write-panels client-name panels) ;; pushn to file system for beholder cascades
+  (swap! panels-atom assoc client-name panels) ;; save to master atom for reactions, etc 
   (let [prev-hashes (hash-objects (get @last-panels client-name))
         this-hashes (hash-objects panels)
         diffy (data/diff this-hashes prev-hashes)
@@ -2234,7 +2239,8 @@
           ]
       (do
         (swap! restart-map assoc flow-id (inc (get @restart-map flow-id 0)))
-        (ut/pp [:flowmap-returned-val (ut/limited (ut/replace-large-base64 return-val)) :flowmap-returned-val])
+        (when (not (cstr/includes? flow-id "keepalive"))
+          (ut/pp [:flowmap-returned-val (ut/limited (ut/replace-large-base64 return-val)) :flowmap-returned-val]))
       ;(push-to-client [:alerts] (str "flow " flow-id " has finished") client-name -1 :alert1 :alert2)
         (let [cnt (count (str return-val))
               limit 160
@@ -2275,8 +2281,8 @@
                                            :child (if error?
                                                     (str sample)
                                                     (str "returns: " sample))]]] 10
-                                                                              (if (and error? restarts-left?) 1.5 1.35)
-                                                                              (if error?  25 9))
+                  (if (and error? restarts-left?) 1.5 1.35)
+                  (if error?  25 9))
 
           (when (and error? restarts-left?)
             (async/thread
@@ -2466,7 +2472,7 @@
 
 (defmethod wl/handle-request :session-snaps [{:keys [client-name]}]
   ;(ut/pp [:get-session-snaps :from client-name :!])
-  (ut/get-file-vectors-with-time-diff "./snaps/" "edn"))
+  (take 20 (ut/get-file-vectors-with-time-diff "./snaps/" "edn")))
 
 ;; (defmethod wl/handle-request :save-snap [{:keys [client-name image]}] ;; too big for websockets, fucks everything all up
 ;;   (ut/pp [:saving-image-snap :from client-name])
@@ -2691,39 +2697,57 @@
 ;;     (swap! atoms-and-watchers ut/dissoc-in [client-name keypath])))
 
 
-(defonce child-atoms (atom {}))
+(defonce screen-child-atoms (atom {}))
+(defonce param-child-atoms (atom {}))
+(defonce panel-child-atoms (atom {}))
+(defonce flow-child-atoms (atom {})) ;; flows
 
-(defn get-or-create-child-atom [key]
-  (if-let [child-atom (get @child-atoms key)]
+(defn get-atom-splitter [key child-atom parent-atom]
+  (if-let [child-atom (get @child-atom key)]
     child-atom
     (let [new-child-atom (atom {})]
-      (swap! child-atoms assoc key new-child-atom)
-      (swap! new-child-atom assoc key (get @flow-db/results-atom key))
-      ;new-child-atom
-      (get @child-atoms key))))
+      (swap! child-atom assoc key new-child-atom)
+      (swap! new-child-atom assoc key (get @parent-atom key))
+      (get @child-atom key))))
 
-(add-watch flow-db/results-atom :master-watcher
+;; (defn get-or-create-child-atom [key]
+;;   (if-let [child-atom (get @flow-child-atoms key)]
+;;     child-atom
+;;     (let [new-child-atom (atom {})]
+;;       (swap! flow-child-atoms assoc key new-child-atom)
+;;       (swap! new-child-atom assoc key (get @flow-db/results-atom key))
+;;       (get @flow-child-atoms key))))
+
+(add-watch flow-db/results-atom :master-watcher ;; flow watcher split of results-atom 
            (fn [_ _ old-state new-state]
              (doseq [key (keys new-state)]
-               (if-let [child-atom (get @child-atoms key)]
+               (if-let [child-atom (get @flow-child-atoms key)]
                  (swap! child-atom assoc key (get new-state key))
                  (let [new-child-atom (atom {})]
-                   (swap! child-atoms assoc key new-child-atom)
+                   (swap! flow-child-atoms assoc key new-child-atom)
                    (swap! new-child-atom assoc key (get new-state key)))))))
 ;;; ^^ master atom watcher. dissects keys into child atoms to watch easier...
 
+(defn break-up-flow-key-ext [key]
+  (let [ff (cstr/split (-> (str key) (cstr/replace #":" "")) #"/")
+        ff2 (cstr/split (last ff) #">")]
+    ;(ut/pp [:splitter ff ff2])
+    ;(vec (map keyword ff2))
+    (vec (into [(keyword (first ff)) (first ff2)] (rest (for [e ff2] (keyword e)))))))
 
-(defn make-watcher [keypath watch-key client-name handler-fn & [no-save]]
+(defn make-watcher [keypath flow-key client-name handler-fn & [no-save]]
   (fn [kkey atom old-state new-state]
     (let [client-name :all ;; test
           old-value (get-in old-state keypath)
           new-value (get-in new-state keypath)
-          param-key (-> (str watch-key) (cstr/replace ":flow/" "") (cstr/replace ":" "") keyword)
-          param-value (get-in @params-atom [client-name :flow param-key])
-          last-value (get-in @last-values-per [client-name keypath])
+          sub-path (break-up-flow-key-ext flow-key)
+          base-type (first sub-path)
+          ;param-key (-> (str watch-key) (cstr/replace ":flow/" "") (cstr/replace ":" "") keyword)
+          ;param-value (get-in @params-atom [client-name :flow param-key])
+          ;last-value (get-in @last-values-per [client-name keypath])
           all-clients-subbed (for [c (keys @atoms-and-watchers)
-                                   :when (some #(= % watch-key) (keys (get @atoms-and-watchers c)))] c)]
-      ;(ut/pp [:mkk-watcher client-name watch-key param-key keypath param-value (not= last-value new-value) (not= old-value new-value)])
+                                   :when (some #(= % flow-key) (keys (get @atoms-and-watchers c)))] c)]
+      (ut/pp [:mkk-watcher flow-key client-name keypath (not= old-value new-value)])
       (when ;(or
              (and (not (nil? new-value))
                   (or ;(not= last-value new-value) 
@@ -2743,7 +2767,7 @@
       ;;       (not= last-value new-value)))
 
         (doseq [client-name all-clients-subbed]
-          (handler-fn keypath client-name new-value))
+          (handler-fn base-type keypath client-name new-value))
         
         ;(ut/pp [:make-watcher key keypath client-name new-value])
         ;(when (not (cstr/starts-with? (str keypath) ":tracker"))
@@ -2755,21 +2779,44 @@
         ;  )
         ))))
 
+
+
+;;; [:add-watcher! :fair-salmon-hawk-hailing-from-malpais :screen/error-monitor-vanessa3>:panels>:block-494>:name :param-sub [:screen "error-monitor-vanessa3" :panels :block-494 :name]]
+;;; [:add-watcher! :screen :fair-salmon-hawk-hailing-from-malpais :screen/error-monitor-vanessa3>:panels>:block-899>:name :param-sub [:screen "error-monitor-vanessa3" :panels :block-899 :name] ("error-monitor-vanessa3" :panels :block-899 :name)]
+
 (defn add-watcher [keypath client-name fn flow-key sub-type & [flow-id]] ;; flow id optional is for unsub stuff later (NOT reduntant)
   (let [;;client-name :all ;; test
         ;watch-key (str client-name "-" (str keypath) "-" sub-type)
         ;watcher (make-watcher keypath flow-key client-name fn (= sub-type :tracker))
-        watch-key (str :all "-" (str keypath) "-" sub-type)
-        watcher (make-watcher keypath flow-key :all fn (= sub-type :tracker))
+        watch-key (str :all "-" (str keypath) "-" sub-type "-" flow-key)
+        sub-path (break-up-flow-key-ext flow-key)
+        base-type (first sub-path)
         status? (cstr/includes? (str keypath) ":*")
         tracker? (= sub-type :tracker)
+        flow?    (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
+        client?  (= base-type :client)
+        panel?   (= base-type :panel)
+        ;param?  (= base-type :ext-param)
+        screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
+        keypath  (cond ;flow? keypath 
+                   screen? (vec (rest sub-path))
+                   panel?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                   client? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                   :else keypath)
+        watcher (make-watcher keypath flow-key :all fn (= sub-type :tracker))
+
         ;;_ (ut/pp [:is-flow-id? (first keypath)])
         atom-to-watch (cond status? flow-status
                             tracker? flow-db/tracker
                             ;:else flow-db/results-atom
-                            :else (get-or-create-child-atom (first keypath)))]
+                            ;:else (get-or-create-child-atom (first keypath))
+                            panel?  (get-atom-splitter (keyword (second sub-path)) panel-child-atoms panels-atom)
+                            client? (get-atom-splitter (keyword (second sub-path)) param-child-atoms params-atom)
+                            flow? (get-atom-splitter (first keypath) flow-child-atoms flow-db/results-atom)
+                            screen? (get-atom-splitter (second sub-path) screen-child-atoms screens-atom)
+                            :else (get-atom-splitter (first keypath) flow-child-atoms flow-db/results-atom))]
     (remove-watch atom-to-watch watch-key)
-    ;;(ut/pp [:add-watcher client-name keypath sub-type])
+    (ut/pp [:add-watcher! (first sub-path) client-name flow-key sub-type sub-path keypath])
     (add-watch atom-to-watch watch-key watcher) 
     (swap! atoms-and-watchers assoc-in [client-name flow-key]
            {:created (ut/get-current-timestamp)
@@ -2782,11 +2829,13 @@
 ;;(def client-subscriptions (atom {}))
 
 (defn remove-watcher [keypath client-name sub-type flow-id flow-key]
-  (let [watch-key (str client-name "-" (str keypath) "-" sub-type)
+  (let [watch-key (str client-name "-" (str keypath) "-" sub-type "-" flow-key)
         atom-to-watch (if (cstr/includes? (str keypath) ":*")
                         flow-status
                         ;flow-db/results-atom
-                        (get-or-create-child-atom (first keypath)))]
+                        ;(get-or-create-child-atom (first keypath))
+                        (get-atom-splitter (first keypath) flow-child-atoms flow-db/results-atom)
+                        )]
     (ut/pp [:removing-watcher keypath client-name sub-type flow-id watch-key])
     (remove-watch atom-to-watch watch-key)
     ;; (swap! client-subscriptions update keypath (partial remove #(= % client-name)))
@@ -2808,23 +2857,33 @@
     ;(vec (map keyword ff2))
     [(first ff2) (keyword (last ff2))]))
 
-(defn send-reaction [keypath client-name new-value]
-  ;(ut/pp [:client-reaction-push! keypath client-name new-value]) 
+;;;  :client-reaction-push! ["error-monitor-vanessa3" :panels :block-899 :name] :fair-salmon-hawk-hailing-from-malpais "drag-from-select-all-jvm_stddat!s!!" :error-monitor-vanessa3>name]
+;;; [:client-reaction-push! ["error-monitor-vanessa3" :panels :block-899 :name] :fair-salmon-hawk-hailing-from-malpais "drag-from-seldect-all-jvm_sstddat!s!!" :error-monitor-vanessa3>name]
+
+
+(defn send-reaction [base-type keypath client-name new-value]
+(let [flow-client-param-path (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+      other-client-param-path (keyword (cstr/replace (cstr/join ">" keypath) ":" "")) ;;(keyword (cstr/join ">" keypath))
+      client-param-path (if (= base-type :flow) 
+                          flow-client-param-path 
+                          other-client-param-path)]
+  
+  (ut/pp [:client-reaction-push! base-type keypath client-name new-value client-param-path])
 
   (async/thread ;; really expensive logging below. temp
     (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
           b? (boolean? new-value)
-          fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value))".edn")]
+          fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value)) ".edn")]
       (ext/create-dirs "./reaction-logs/")
       (ut/pretty-spit fp {:client-name client-name
                           :keypath keypath
                           :value (ut/replace-large-base64 new-value)
                           :last-vals (ut/replace-large-base64 (get @last-values-per client-name))
                           :subs-at-time (keys (get @atoms-and-watchers client-name))
-                          :child-atoms (keys @child-atoms)} 125)))
+                          :flow-child-atoms (keys @flow-child-atoms)} 125)))
 
 
-  (kick client-name [:flow (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))] new-value nil nil nil))
+  (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)))
 
 (defn send-reaction-runner [keypath client-name new-value]
   (let [flow-id (first keypath)]
@@ -2843,8 +2902,9 @@
       (ut/pp [:dead-client :cleaning-up k])
       ;(ut/pp [:***DEAD-CLIENT-SUBS***! subs])
 
-      (doseq [[kk {:keys [keypath sub-type flow-id]}] subs]
-        (remove-watcher keypath k sub-type flow-id kk))
+      ;; (doseq [[kk {:keys [keypath sub-type flow-id]}] subs] ;; temp remove since we are dealing with master watchers now with :* as client-name...
+      ;;   (remove-watcher keypath k sub-type flow-id kk))
+      
       (swap! atoms-and-watchers dissoc k) ;; remove client from watchers atom
       (swap! ack-scoreboard dissoc k)     ;; remove client client board
       )))
@@ -2874,6 +2934,8 @@
         (kick client-name (vec (cons :tracker keypath)) tracker nil nil nil)
         (kick client-name (vec (cons :condis keypath)) condis nil nil nil)))))
 
+;; :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
+
 (defmethod wl/handle-request :sub-to-flow-value [{:keys [client-name flow-key]}]
   ;;  (ut/pp [:lookup-flow-value client-name :> flow-key]) ;; set callback to kick updates? "subscribe" to this value?
   ;; monitor changes to value and kick updates to client-name so it can add to click-param
@@ -2883,20 +2945,37 @@
   ;; OR a watcher that updates OTHER atoms based on results-atom changes, and then we can just watch those atoms instead... [big brain]
   (let [[flow-id step-id] (break-up-flow-key flow-key)
         keypath [flow-id step-id]
+        sub-path (break-up-flow-key-ext flow-key)
+        base-type (first sub-path)
+        ;screen? (cstr/starts-with? (str flow-key) ":screen/")
+        flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+        other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
+        client-param-path (if (= base-type :flow)
+                            flow-client-param-path
+                            other-client-param-path)
+        ;; keypath (cond ;flow? keypath 
+        ;;           screen? (vec (rest sub-path))
+        ;;           :else keypath)
         ;;clis (first (keys (get-in @last-values [keypath]))) ;; in case we are a new ""client"" (as is usual)
         lv (get @last-values keypath)]
-    (ut/pp [:client-sub flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key])
+    
+    (ut/pp [:client-sub! base-type flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key :keypath keypath :client-param-path client-param-path])
 
     (when (get-in @flow-db/results-atom keypath)
       (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
 
     (add-watcher keypath client-name send-reaction flow-key :param-sub)
 
-    (kick client-name [:flow (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))]
-          (if (cstr/includes? (str flow-key) "*running?") false
-              (get-in @flow-db/results-atom keypath lv)
-              ;; ^^ SHOULD be the last val (persistently cached), on cold boot @results-atom will be empty anyways
-              )nil nil nil) ;; push init val, else try cache, else nil!
+    (kick client-name [base-type client-param-path]
+          (cond (cstr/includes? (str flow-key) "*running?") false
+                (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
+                (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+                (= base-type :panels) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+                :else (get-in @flow-db/results-atom keypath lv) ;; assume flow
+                  ;; ^^ SHOULD be the last val (persistently cached), on cold boot @results-atom will be empty anyways
+                ) nil nil nil)
+
+    ;; push init val, else try cache, else nil!
 
     [:client-sub-request flow-id :step-id step-id :client-name client-name]))
 
@@ -4148,7 +4227,7 @@
 
          ;;  (ut/pp [:sniffable? sniffable? ui-keypath :via client-name ui-keypath])
         ; (ut/pp [:result! ui-keypath (take 2 result)])
-                              (ut/pp [:sniffable? sniffable? sniff?])
+                              ;(ut/pp [:sniffable? sniffable? sniff?])
 
                               (if sniffable?
              ;; full reco sniff or just quick meta cache...
@@ -4641,23 +4720,26 @@
                                    :child (str "saving " name "...")]]] 10 0.6 8))
 
 (defn save [request]
-  (time (do
+  ;(time 
+   (do
           (let [screen-name (get-in request [:edn-params :screen-name])
                 client-name (get-in request [:edn-params :client-name] "unknown")
                 file-base-name (ut/sanitize-name (str screen-name))
                 file-path (str "./screens/" file-base-name ".edn")
                 fpath (ut/abs-file-path file-path)]
             (save-alert-notification-pre client-name screen-name nil false)
+
             (do (ut/pp [:saved-file file-path])
                ;(ut/pretty-spit file-path (get-in request [:edn-params :image])) ;; file looks good, but SO fuggin slow
-                ;(ut/pretty-spit file-path (get-in request [:edn-params :image]))
-                (spit file-path (get-in request [:edn-params :image]))
+                (ut/pretty-spit file-path (get-in request [:edn-params :image]))
+                ;(spit file-path (get-in request [:edn-params :image]))
 
          ; (async/go
          ;   (async/<! (ut/pretty-spit file-path (get-in request [:edn-params :image])))
          ;   ;(ut/ppln [:finished :prety-spit-fn])
          ;   )
-                (save-alert-notification client-name screen-name fpath false)))))
+                (save-alert-notification client-name screen-name fpath false))))
+   ;)
 
 
    ; (let [flow_name (get-in request [:edn-params :flowset-name])
@@ -5076,8 +5158,6 @@
                                   {k {:time-running (- (or end (System/currentTimeMillis)) start)
                                       :*running? *running?}}))])
 
-    ;(ut/pp [:child-atoms? @client-queues])
-
     (ut/pp [:ack-scoreboard (into {} (for [[k v] (client-statuses)
                                            :when (not= (get v :last-seen-seconds) -1)]
                                        {k (ut/deselect-keys v [:booted :last-ack :last-push])}))])
@@ -5087,6 +5167,11 @@
     ;(ut/pp [:times-atom (into {} (for [[k v] @times-atom] {k [(count v) :samples (int (ut/avg v)) :avg-seconds]}))])
 
     ;(ut/pp [:flow-tracker @flow-db/tracker])
+
+    (ut/pp [:watchers {:screen [(count (keys @screen-child-atoms)) (count (keys @screens-atom))]
+                       :params [(count (keys @param-child-atoms)) (count (keys @params-atom))]
+                       :panels [(count (keys @panel-child-atoms)) (count (keys @panels-atom))]
+                       :flow [(count (keys @flow-child-atoms))]}])
 
     ;;(ut/pp [:live-schedules (map #(dissoc % :next-times) @flow-db/live-schedules)])
     ;; (ut/pp {:tables {:fn-history (keys (first @flow-db/fn-history))
@@ -5188,7 +5273,7 @@
 (defonce websocket-server (jetty/run-jetty #'web-handler ring-options))
 
 (defn create-websocket-server! []
-  (ut/ppa [:*websocket (format "starting websocket server @ %d" websocket-port)])
+  (ut/ppa [:starting-websocket-server :port websocket-port])
   (.start websocket-server)
   ;(reset! websocket-server (jetty/run-jetty web-handler ring-options))
   )
@@ -5198,7 +5283,8 @@
 ;;   (.stop websocket-server))
 
 (defn destroy-websocket-server! []
-  (ut/ppa [:*websocket (format "stopping websocket server @ %d" websocket-port)])
+  ;(ut/ppa [:*websocket (format "stopping websocket server @ %d" websocket-port)])
+  (ut/ppa [:shutting-down-websocket-server :port websocket-port])
   (.stop websocket-server)
   (let [timeout-ms 10000
         start-time (System/currentTimeMillis)]
@@ -5206,14 +5292,14 @@
                 (< (- (System/currentTimeMillis) start-time) timeout-ms))
       (Thread/sleep 300))
     (when (.isRunning websocket-server)
-      (ut/ppa [:*websocket (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
+      (ut/ppa [:killing-websocket-server! (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
       (.destroy websocket-server))))
 
 (defn restart-websocket-server! []
   (let [cache-size (count @sql-cache)]
     ;(println (format "(re)starting websocket server @ %d ...\n  " websocket-port))
     (jvm-memory-used)
-    (ut/ppa [:*websocket (format "(re)starting websocket server @ %d" websocket-port)])
+    (ut/ppa [:resstarting-websocket-server :port websocket-port])
     (.stop websocket-server)
     ;(.reset ^MultiFn wl/handle-subscription)
 
@@ -5252,6 +5338,8 @@
               ;["/home" :get (conj common-interceptors `home-page)]
               })
 
+(def web-server-port 8888)
+
 (def service {:env :prod
               ::http/routes routes
               ::http/allowed-origins {:creds false :allowed-origins (constantly true)}
@@ -5260,7 +5348,7 @@
               :max-threads 150
               ::http/type :jetty
               ::http/host "0.0.0.0"
-              ::http/port 8888
+              ::http/port web-server-port
               ::http/container-options {:h2c? true
                                         :h2? false
                                         :ssl? false}})
@@ -5270,11 +5358,12 @@
 (def web-server (atom nil))
 
 (defn create-web-server! []
-  (ut/ppa [:*web (format "starting web server @ %d" 8888)])
+  (ut/ppa [:starting-web-server :port web-server-port])
   (reset! web-server
           (server/start runnable-service)))
 
 (defn stop-web-server! []
+  (ut/ppa [:shutting-down-web-server :port web-server-port])
   (when @web-server
     (server/stop @web-server)
     (reset! web-server nil)))

@@ -34,4 +34,7 @@ snaps/
 flow-blocks/
 reaction-logs/
 tracker-logs/
+.lsp/
+*.log
+
 
