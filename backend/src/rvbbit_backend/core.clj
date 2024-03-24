@@ -26,6 +26,7 @@
    [clojure.walk :as walk]
    [clojure.core.async :refer [<! timeout]]
    [rvbbit-backend.websockets :as wss]
+   [rvbbit-backend.search :as search]
    [rvbbit-backend.cruiser :as cruiser]
    [rvbbit-backend.util :as ut]
    [rvbbit-backend.evaluator :as evl]
@@ -121,6 +122,9 @@
                                                              :when (= (get v :tab) b)] {k v}))}))
         queries (into {} (for [b blocks] (get-in screen-data [:panels b :queries])))]
     (swap! wss/screens-atom assoc screen-name screen-data) ;; update master screen atom for param reactions etc 
+    (search/add-or-update-document search/index-writer (str :screen "-" screen-name) 
+                                   {:content screen-data :type :screen 
+                                    :row {:file-path f-path :screen-name screen-name :blocks 0 :queries 0}})
     (ut/pp [:updating-screen-meta-for f-path])
     (sql-exec system-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
     (sql-exec system-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
@@ -137,7 +141,11 @@
                                                  views (if theme? theme-map (get-in screen-data [:panels b :views]))
                                                  block-name (str (cond theme? (str "(meta: this screen's theme" theme-name ")")
                                                                        board? (str "board: " b)
-                                                                       :else (get-in screen-data [:panels b :name])))]
+                                                                       :else (get-in screen-data [:panels b :name])))
+                                                 _ (search/add-or-update-document search/index-writer (str :block "-" screen-name b)
+                                                                                  {:content (get-in screen-data [:panels b]) :type :block
+                                                                                   :row {:file-path f-path :screen-name screen-name 
+                                                                                         :block_key (str b) :block_name block-name}})]
                                              ;; do side-effect insert for deeper table?
                                              [f-path screen-name (str b) block-name
                                               (count (keys views))
@@ -171,6 +179,9 @@
                                    :connections (count (get flow-data :connections))
                                    :file_path (str f-path)
                                    :body (pr-str flow-data)}]}]
+         (search/add-or-update-document search/index-writer (str :flow "-" flow-id)
+                                        {:content flow-data :type :flow
+                                         :row {:file-path f-path :flow-id flow-id}})
          (sql-exec flows-db (to-sql {:delete-from [:flows] :where [:= :file_path f-path]}))
          (sql-exec flows-db (to-sql insert-sql)))
        (catch Exception e (ut/pp [:read-flow-error f-path e]))))
@@ -294,13 +305,20 @@
 
 
 
-  (defonce start-conn-watcher (watch-connections-folder))
-  (defonce start-screen-watcher (watch-screens-folder))
-  (defonce start-flow-watcher (watch-flows-folder))
-;(defonce jvm-monitor (tt/every! 240 2 (bound-fn [] (wss/jvm-memory-used))))
 
 
-  (defn -main [& args]
+
+  (defn -main [& args] 
+
+    #_{:clj-kondo/ignore [:inline-def]}
+    (defonce start-conn-watcher (watch-connections-folder))
+    #_{:clj-kondo/ignore [:inline-def]}
+    (defonce start-screen-watcher (watch-screens-folder))
+    #_{:clj-kondo/ignore [:inline-def]}
+    (defonce start-flow-watcher (watch-flows-folder))
+
+    ;(defonce jvm-monitor (tt/every! 240 2 (bound-fn [] (wss/jvm-memory-used))))
+    
   ;"The entry-point for 'lein run'"
   ;;;(ut/pp (surveyor/get-test-conn-meta target-db5))
   ;(lets-give-it-a-whirl target-db8 system-db default-sniff-tests default-field-attributes default-derived-fields default-viz-shapes [:like :table-name "%TESTIMDB%"]) ;; oracle
@@ -435,6 +453,8 @@
                                               ;;                                ;[:speak-always (str "Heads up: R-V-B-B-I-T system going offline.")]
                                               ;;                                [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]] 10 1 5)))
                                               ;;(Thread/sleep 3000)
+                                                (do (ut/pp [:shutting-down-lucene-index-writers])
+                                                    (search/close-index-writer search/index-writer))
                                                 (wss/destroy-websocket-server!)
                                                 (wss/stop-web-server!)
                                                 (wss/stop-worker)

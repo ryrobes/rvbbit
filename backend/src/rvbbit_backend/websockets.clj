@@ -12,6 +12,7 @@
             [clojure.data :as data]
             [rvbbit-backend.external :as ext]
             [rvbbit-backend.evaluator :as evl]
+            [rvbbit-backend.search :as search]
             [io.pedestal.http.body-params :as body-params]
             [chime.core :as chime]
             ;[rvbbit-backend.flowmaps :as flow]
@@ -2470,6 +2471,18 @@
     (flow-kill! flow-id client-name))
   [:assassin-sent!])
 
+(defmethod wl/handle-request :search-groups [{:keys [client-name search-str max-hits]}]
+  (ut/pp [:search-for search-str :from client-name])
+  (let [results (search/search-index search/idx-path search-str )]
+    ;(group-by :type (for [[k v] results] (merge {:docid k} v)))
+    (frequencies (map :type (for [[k v] results] (merge {:docid k} v))))
+    ))
+
+(defmethod wl/handle-request :search [{:keys [client-name search-str max-hits hit-type]}]
+  (ut/pp [:search-for search-str :from client-name])
+  (let [results (search/search-index search/idx-path search-str (or max-hits 100))]
+    results))
+
 (defmethod wl/handle-request :session-snaps [{:keys [client-name]}]
   ;(ut/pp [:get-session-snaps :from client-name :!])
   (take 20 (ut/get-file-vectors-with-time-diff "./snaps/" "edn")))
@@ -2543,12 +2556,29 @@
   (let [bm {name block-map}]
     (ut/pp [:saving-new-custom-block bm])))
 
+;;(def client-param-lucene-history (atom {}))
+(def client-param-lucene-history (ut/thaw-atom {} "./data/atoms/client-param-lucene-history-atom.edn"))
 
 (defmethod wl/handle-request :sync-client-params [{:keys [client-name params-map]}]
-  (ut/pp [:sync-client-params-from client-name (keys (or (dissoc params-map nil) {}))])
+  ;; (ut/pp [:sync-client-params-from client-name (keys (or (dissoc params-map nil) {}))])
   ;; set running flow from client-name/flow-id
-  (swap! params-atom assoc client-name (or (dissoc params-map nil) {}))
-  [:got-it!])
+  (let [params (or (dissoc params-map nil) {})
+        kps (ut/kvpaths params)
+        make-key (fn [x] (str :client-param "-" (cstr/join ">" x)))
+        these-keys (map make-key kps)]
+    (swap! params-atom assoc client-name params) ;; push the actual params
+    ;; now we update the lucene index...
+    (doseq [kk (cset/difference ;; trying to only do the ones that are gone to avoid more work than needed, since existing will get overwritten anways
+                (set these-keys)
+                (set (get @client-param-lucene-history client-name)))] ;; clean up ones from last time in case they were deleted
+      (search/delete-document search/index-writer kk))
+    (doseq [kp kps]
+      (let [doc-key (make-key kp)]
+        (search/add-or-update-document search/index-writer doc-key
+                                       {:content (str kp " - " (get params kp)) :type :client-param
+                                        :row {:client-name client-name :keypath kp}})))
+    (swap! client-param-lucene-history assoc client-name these-keys)
+    [:got-it!]))
 
 (defmethod wl/handle-request :run-flow2 [{:keys [client-name flowmap flow-id]}]
   (ut/pp [:running-flow-map-from client-name])
@@ -5171,6 +5201,10 @@
                        :params [(count (keys @param-child-atoms)) (count (keys @params-atom))]
                        :panels [(count (keys @panel-child-atoms)) (count (keys @panels-atom))]
                        :flow [(count (keys @flow-child-atoms))]}])
+    
+    (ut/pp [:lucene 
+            (search/count-documents-by-type search/idx-path) 
+            (search/count-documents search/idx-path)])
 
     ;;(ut/pp [:live-schedules (map #(dissoc % :next-times) @flow-db/live-schedules)])
     ;; (ut/pp {:tables {:fn-history (keys (first @flow-db/fn-history))

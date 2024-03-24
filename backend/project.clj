@@ -47,6 +47,10 @@
                  [org.clojure/core.cache "1.0.207"]
                  [talltale "0.5.8"]
 
+                 [org.apache.lucene/lucene-core "8.11.3"]
+                 [org.apache.lucene/lucene-analyzers-common "8.11.3"]
+                 [org.apache.lucene/lucene-queryparser "8.11.3"]
+
                  [jline "2.14.6"] ;; to detect console width
 
                  [clj-commons/clj-ssh "0.5.15"]

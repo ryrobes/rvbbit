@@ -1,9 +1,4 @@
-{:orders
- {:fields-sys [:field_name :field_type :data_type],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :connections-sys [:database_name :connection_id],
-  :reco-counts [:table_name :cnt]},
+{:orders {:reco-counts [:table_name :cnt]},
  :reco-preview nil,
  :meta
  {:fields-sys {:fields {}, :rowcount 0},
@@ -62,11 +57,8 @@
      :cardinality 100}},
    :rowcount 10},
   :reco-counts {:fields {}, :rowcount 0}},
- :default-col-widths
- {:system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys 137},
-  :system-fields-list* {:fields-sys ##Inf}},
- :data-hash 1732443099,
+ :runstream-drops nil,
+ :data-hash 359686701,
  :tabs ["strategic grill locations"],
  :selected-cols nil,
  :server
@@ -136,6 +128,7 @@
     "bigfoot-snapshots"
     "bigfoot-snapshots2"
     "bigfoot-snapshots3"
+    "blackberries"
     "blank-sizzle"
     "blank-sizzle2"
     "blue-pines"
@@ -170,6 +163,7 @@
     "error-monitor-vanessa3"
     "evil-main-street"
     "fake-books-1"
+    "fake-bricks"
     "fetching-pentagonal-termite-of-tghe-submarine-canyon"
     "final-fantasy-dorchester"
     "fox-hills"
@@ -185,6 +179,7 @@
     "looking-glass-redux"
     "looking-glass-redux2"
     "looking-glass-redux2a"
+    "looking-glass-redux2aa"
     "luck-of-the-irish"
     "mapbox-test"
     "may-20"
@@ -201,6 +196,7 @@
     "old-fashioned-christmas"
     "old-town-snow-stars"
     "pensive-look"
+    "pensive-look2"
     "pine-wood-dawn"
     "pink-and-green-elk"
     "pink-dusk-falls"
@@ -251,16 +247,49 @@
     "wonderland-horror-interface"
     "wow-board"],
    :openapi-key "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"}},
- :editor? true,
+ :runstreams nil,
+ :editor? false,
  :buffy? false,
- :memory [413759783 363036399 4294705152],
+ :memory [226097745 204501537 4294705152],
  :status-data
- {:heartbeat
+ {:file-change
+  {:file-changed
+   {:data
+    [{:path
+      "./live/unwavering-circular-grasshopper-of-the-isthmus/strategic grill locations/hello there!/hello-there-brother.edn",
+      :type :modify,
+      :panel-key :hello-there-brother,
+      :block-data
+      {:h 29,
+       :w 50,
+       :root [1 2],
+       :views
+       {:heya!
+        [:box
+         :align
+         :center
+         :justify
+         :center
+         :style
+         {:font-size "50px",
+          :font-weight 700,
+          :color :theme/editor-outer-rim-color,
+          :padding-top "14px",
+          :opacity 1,
+          :font-family :theme/base-font}
+         :child
+         "hello! 🐇 🍂 🦃"]},
+       :tab "strategic grill locations",
+       :name "hello there!"}}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-03-23 22:34:11",
+      :at "2024-03-24 15:31:56",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -275,56 +304,56 @@
        [:>
         :ComposedChart
         {:data
-         [{:mem 560, :tick 50, :threads 113, :subs 54, :load 5.69091796875}
-          {:mem 352, :tick 51, :threads 138, :subs 54, :load 6.171875}
-          {:mem 383, :tick 52, :threads 136, :subs 54, :load 6.59130859375}
-          {:mem 567, :tick 53, :threads 113, :subs 54, :load 5.80126953125}
-          {:mem 925, :tick 54, :threads 135, :subs 54, :load 5.52978515625}
-          {:mem 243, :tick 55, :threads 120, :subs 54, :load 4.90625}
-          {:mem 289, :tick 56, :threads 114, :subs 54, :load 4.40673828125}
-          {:mem 336, :tick 57, :threads 115, :subs 54, :load 3.85791015625}
-          {:mem 369, :tick 58, :threads 124, :subs 54, :load 3.9736328125}
-          {:mem 428, :tick 59, :threads 130, :subs 54, :load 4.80126953125}
-          {:mem 480, :tick 60, :threads 114, :subs 54, :load 5.26171875}
-          {:mem 510, :tick 61, :threads 114, :subs 54, :load 4.06005859375}
-          {:mem 558, :tick 62, :threads 108, :subs 54, :load 4.18017578125}
-          {:mem 605, :tick 63, :threads 111, :subs 54, :load 4.85693359375}
-          {:mem 636, :tick 64, :threads 107, :subs 54, :load 4.95166015625}
-          {:mem 685, :tick 65, :threads 110, :subs 54, :load 4.7998046875}
-          {:mem 734, :tick 66, :threads 109, :subs 54, :load 3.56396484375}
-          {:mem 764, :tick 67, :threads 105, :subs 54, :load 4.1728515625}
-          {:mem 221, :tick 68, :threads 107, :subs 54, :load 4.1044921875}
-          {:mem 240, :tick 69, :threads 108, :subs 54, :load 4.27197265625}
-          {:mem 270, :tick 70, :threads 107, :subs 54, :load 3.43310546875}
-          {:mem 319, :tick 71, :threads 106, :subs 54, :load 4.7421875}
-          {:mem 457, :tick 72, :threads 111, :subs 54, :load 5.94970703125}
-          {:mem 514, :tick 73, :threads 107, :subs 54, :load 6.28173828125}
-          {:mem 476, :tick 74, :threads 156, :subs 54, :load 5.408203125}
-          {:mem 697, :tick 75, :threads 153, :subs 54, :load 4.84033203125}
-          {:mem 616, :tick 76, :threads 145, :subs 54, :load 4.078125}
-          {:mem 232, :tick 77, :threads 136, :subs 54, :load 3.9736328125}
-          {:mem 350, :tick 78, :threads 150, :subs 54, :load 3.31201171875}
-          {:mem 500, :tick 79, :threads 150, :subs 54, :load 3.0166015625}
-          {:mem 1046, :tick 80, :threads 144, :subs 54, :load 2.8701171875}
-          {:mem 645, :tick 81, :threads 143, :subs 54, :load 2.89990234375}
-          {:mem 328, :tick 82, :threads 148, :subs 54, :load 3.328125}
-          {:mem 675, :tick 83, :threads 149, :subs 54, :load 2.6162109375}
-          {:mem 484, :tick 84, :threads 148, :subs 54, :load 2.37548828125}
-          {:mem 579, :tick 85, :threads 145, :subs 54, :load 2.375}
-          {:mem 610, :tick 86, :threads 151, :subs 54, :load 2.7060546875}
-          {:mem 272, :tick 87, :threads 149, :subs 54, :load 2.76416015625}
-          {:mem 310, :tick 88, :threads 102, :subs 54, :load 2.86669921875}
-          {:mem 375, :tick 89, :threads 103, :subs 54, :load 2.75537109375}
-          {:mem 436, :tick 90, :threads 103, :subs 54, :load 3.6103515625}
-          {:mem 473, :tick 91, :threads 102, :subs 42, :load 3.00048828125}
-          {:mem 536, :tick 92, :threads 104, :subs 42, :load 3.89990234375}
-          {:mem 598, :tick 93, :threads 106, :subs 42, :load 3.28173828125}
-          {:mem 658, :tick 94, :threads 135, :subs 42, :load 3.0830078125}
-          {:mem 278, :tick 95, :threads 116, :subs 42, :load 3.1328125}
-          {:mem 338, :tick 96, :threads 108, :subs 42, :load 2.5419921875}
-          {:mem 369, :tick 97, :threads 103, :subs 42, :load 3.06298828125}
-          {:mem 426, :tick 98, :threads 109, :subs 42, :load 2.8916015625}
-          {:mem 482, :tick 99, :threads 109, :subs 42, :load 2.55322265625}],
+         [{:mem 1302, :tick 2050, :threads 106, :subs 37, :load 2.95068359375}
+          {:mem 1363, :tick 2051, :threads 106, :subs 37, :load 2.48583984375}
+          {:mem 1644, :tick 2052, :threads 127, :subs 37, :load 2.779296875}
+          {:mem 1920, :tick 2053, :threads 125, :subs 37, :load 3.33984375}
+          {:mem 366, :tick 2054, :threads 148, :subs 37, :load 3.732421875}
+          {:mem 737, :tick 2055, :threads 149, :subs 37, :load 4.2568359375}
+          {:mem 383, :tick 2056, :threads 140, :subs 37, :load 4.08935546875}
+          {:mem 725, :tick 2057, :threads 137, :subs 37, :load 3.55126953125}
+          {:mem 786, :tick 2058, :threads 107, :subs 37, :load 3.58349609375}
+          {:mem 819, :tick 2059, :threads 103, :subs 37, :load 3.59716796875}
+          {:mem 1675, :tick 2060, :threads 121, :subs 37, :load 3.3583984375}
+          {:mem 1734, :tick 2061, :threads 124, :subs 37, :load 2.8681640625}
+          {:mem 1430, :tick 2062, :threads 144, :subs 37, :load 3.43310546875}
+          {:mem 1550, :tick 2063, :threads 143, :subs 37, :load 3.28173828125}
+          {:mem 1994, :tick 2064, :threads 157, :subs 37, :load 3.013671875}
+          {:mem 1141, :tick 2065, :threads 161, :subs 37, :load 3.71826171875}
+          {:mem 1229, :tick 2066, :threads 156, :subs 37, :load 3.40380859375}
+          {:mem 2036, :tick 2067, :threads 154, :subs 37, :load 3.00732421875}
+          {:mem 2066, :tick 2068, :threads 104, :subs 37, :load 3.349609375}
+          {:mem 411, :tick 2069, :threads 104, :subs 37, :load 2.9404296875}
+          {:mem 482, :tick 2070, :threads 107, :subs 37, :load 3.640625}
+          {:mem 520, :tick 2071, :threads 105, :subs 37, :load 3.42578125}
+          {:mem 596, :tick 2072, :threads 112, :subs 37, :load 2.9482421875}
+          {:mem 678, :tick 2073, :threads 114, :subs 37, :load 3.30126953125}
+          {:mem 889, :tick 2074, :threads 108, :subs 37, :load 2.92724609375}
+          {:mem 964, :tick 2075, :threads 108, :subs 37, :load 2.68896484375}
+          {:mem 1031, :tick 2076, :threads 107, :subs 37, :load 2.49951171875}
+          {:mem 1072, :tick 2077, :threads 106, :subs 37, :load 2.72314453125}
+          {:mem 1137, :tick 2078, :threads 103, :subs 37, :load 3.3330078125}
+          {:mem 1207, :tick 2079, :threads 107, :subs 37, :load 3.0703125}
+          {:mem 1237, :tick 2080, :threads 107, :subs 37, :load 3.57373046875}
+          {:mem 1298, :tick 2081, :threads 104, :subs 37, :load 3.1640625}
+          {:mem 1358, :tick 2082, :threads 105, :subs 37, :load 2.91162109375}
+          {:mem 1389, :tick 2083, :threads 105, :subs 37, :load 3.15283203125}
+          {:mem 1811, :tick 2084, :threads 127, :subs 37, :load 3.0419921875}
+          {:mem 482, :tick 2085, :threads 126, :subs 37, :load 2.82470703125}
+          {:mem 634, :tick 2086, :threads 110, :subs 37, :load 2.92431640625}
+          {:mem 731, :tick 2087, :threads 104, :subs 37, :load 3.384765625}
+          {:mem 793, :tick 2088, :threads 105, :subs 37, :load 3.02734375}
+          {:mem 825, :tick 2089, :threads 103, :subs 37, :load 2.6318359375}
+          {:mem 887, :tick 2090, :threads 105, :subs 37, :load 2.54833984375}
+          {:mem 946, :tick 2091, :threads 105, :subs 37, :load 2.5068359375}
+          {:mem 977, :tick 2092, :threads 104, :subs 37, :load 2.61669921875}
+          {:mem 1039, :tick 2093, :threads 105, :subs 37, :load 2.662109375}
+          {:mem 1103, :tick 2094, :threads 108, :subs 37, :load 2.8125}
+          {:mem 1135, :tick 2095, :threads 103, :subs 37, :load 3.4462890625}
+          {:mem 1191, :tick 2096, :threads 101, :subs 37, :load 3.21533203125}
+          {:mem 1174, :tick 2097, :threads 127, :subs 37, :load 3.16748046875}
+          {:mem 1680, :tick 2098, :threads 146, :subs 37, :load 3.10595703125}
+          {:mem 376, :tick 2099, :threads 146, :subs 37, :load 2.85986328125}],
          :margin {:top 5, :bottom 5, :right 30, :left 20}}
         [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
         [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
@@ -366,137 +395,103 @@
       5]
      nil],
     :elapsed-ms nil,
-    :reco-count nil}},
-  :file-change
-  {:file-changed
-   {:data
-    [{:path
-      "./live/fair-salmon-hawk-hailing-from-malpais/strategic grill locations/hello there!/hello-there-brother.edn",
-      :type :modify,
-      :panel-key nil,
-      :block-data
-      {:hello-there-brother {:h 13, :w 27, :root [1 2]},
-       :views
-       {:heya!
-        [:box
-         :align
-         :center
-         :justify
-         :center
-         :padding
-         "13px"
-         :style
-         {:font-size "45px"}
-         :child
-         [:img
-          {:src :flow/openai-image-gen-ladder>:relative-url-path-for-png-version,
-           :width :width-px}]]},
-       :tab "strategic grill locations",
-       :name "hello there!"}}
-     nil],
-    :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:flow/openai-image-gen-ladder>:relative-url-path-for-png-version
-  :screen/error-monitor-vanessa3>:panels>:block-899>:name
-  :screen/error-monitor-vanessa3>panels>block-899>name
+ [:screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi
   :flow/live-scratch-flow>*running?
-  :screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi],
- :client-name :fair-salmon-hawk-hailing-from-malpais,
+  :flow/openai-image-gen-ladder>:relative-url-path-for-png-version],
+ :client-name :unwavering-circular-grasshopper-of-the-isthmus,
  :openai-api-key "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",
- :window {:w 2974, :h 1642},
+ :window {:w 2576, :h 1668},
  :flow-estimates
- {"client-keepalive" {:times nil, :run-id "539101af-8f6d-432c-891a-a19165b2c44f"},
+ {"client-keepalive" {:times nil, :run-id "3f4b4204-768e-486f-9b05-66237bcdd96b"},
   "openai-image-gen-ladder"
-  {:times 31.9, :run-id "873dcdc7-b7c7-4a02-989a-45613310b67a"},
-  "quick-maths-v2" {:times nil, :run-id "e7515f2e-d356-43eb-bd9f-3f8c3f704a5a"}},
+  {:times 38.1, :run-id "817e64e7-c55b-495a-8c7a-d86d0227d808"}},
  :status
- {:heartbeat
+ {:file-change {:file-changed :done},
+  :heartbeat
   {:kick
-   [:flow/openai-image-gen-ladder>:relative-url-path-for-png-version
-    :screen/error-monitor-vanessa3>:panels>:block-899>:name
-    :screen/error-monitor-vanessa3>panels>block-899>name
+   [:screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi
     :flow/live-scratch-flow>*running?
-    :screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi]},
-  :alert1 {:alerts :alert2},
-  :file-change {:file-changed :done}},
+    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]},
+  :alert1 {:alerts :alert2}},
  :screen-name "fake-bricks",
  :recos-page2 0,
  :selected-tab "strategic grill locations",
- :col-names nil,
+ :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
  :recos-page 0,
  :rs-overrides-hashmap {},
- :panels-hash 353465373,
+ :panels-hash -1109877532,
  :sessions
  (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
-   "283 hours, 50 minutes, 55 seconds"
-   1021855524]
+   "300 hours, 49 minutes, 2 seconds"
+   1082942250]
    ["vigorous-square-serval-banned-from-thalweg.edn"
-    "278 hours, 28 minutes, 37 seconds"
-    1002517524]
+    "295 hours, 26 minutes, 44 seconds"
+    1063604250]
    ["exciting-globular-mouse-banned-from-maar.edn"
-    "175 hours, 46 minutes, 46 seconds"
-    632806524]
+    "192 hours, 44 minutes, 53 seconds"
+    693893250]
    ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
-    "283 hours, 50 minutes, 55 seconds"
-    1021855524]
+    "300 hours, 49 minutes, 2 seconds"
+    1082942250]
    ["restored-raspberry-mule-of-baymouth-bar.edn"
-    "46 hours, 4 minutes, 21 seconds"
-    165861439]
+    "63 hours, 2 minutes, 28 seconds"
+    226948165]
    ["awesome-prismatic-jay-banned-from-malpaís.edn"
-    "46 hours, 4 minutes, 58 seconds"
-    165898315]
+    "63 hours, 3 minutes, 5 seconds"
+    226985041]
    ["constant-star-shaped-echidna-banned-from-towhead.edn"
-    "260 hours, 22 minutes, 8 seconds"
-    937328524]
+    "277 hours, 20 minutes, 15 seconds"
+    998415250]
    ["special-globular-coyote-of-oceanic-trench.edn"
-    "283 hours, 50 minutes, 56 seconds"
-    1021856524]
+    "300 hours, 49 minutes, 3 seconds"
+    1082943250]
    ["proud-thin-elk-of-rôche-moutonnée.edn"
-    "283 hours, 50 minutes, 55 seconds"
-    1021855524]
+    "300 hours, 49 minutes, 2 seconds"
+    1082942250]
    ["kind-rhomboidal-lion-of-the-floodplain.edn"
-    "283 hours, 50 minutes, 55 seconds"
-    1021855524]
+    "300 hours, 49 minutes, 2 seconds"
+    1082942250]
    ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
-    "283 hours, 50 minutes, 56 seconds"
-    1021856524]
+    "300 hours, 49 minutes, 3 seconds"
+    1082943250]
    ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
-    "283 hours, 50 minutes, 55 seconds"
-    1021855524]
+    "300 hours, 49 minutes, 2 seconds"
+    1082942250]
    ["courageous-linear-platypus-of-corrie.edn"
-    "46 hours, 25 minutes, 11 seconds"
-    167111456]
+    "63 hours, 23 minutes, 18 seconds"
+    228198182]
    ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
-    "283 hours, 50 minutes, 55 seconds"
-    1021855524]
+    "300 hours, 49 minutes, 2 seconds"
+    1082942250]
    ["ethical-round-oyster-of-glacial-horn.edn"
-    "283 hours, 50 minutes, 55 seconds"
-    1021855524]
+    "300 hours, 49 minutes, 2 seconds"
+    1082942250]
    ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
-    "283 hours, 50 minutes, 55 seconds"
-    1021855524]
+    "300 hours, 49 minutes, 2 seconds"
+    1082942250]
    ["transforming-ivory-clam-of-the-volcanic-field.edn"
-    "100 hours, 24 minutes, 20 seconds"
-    361460524]
+    "117 hours, 22 minutes, 27 seconds"
+    422547250]
    ["remarkable-thin-wombat-banned-from-flyggberg.edn"
-    "226 hours, 1 minute, 52 seconds"
-    813712524]
-   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "8 seconds" 8538]
+    "242 hours, 59 minutes, 59 seconds"
+    874799250]
+   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "39 seconds" 39096]
    ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
-    "283 hours, 50 minutes, 55 seconds"
-    1021855524]),
+    "300 hours, 49 minutes, 2 seconds"
+    1082942250]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1150098168,
+ :user-params-hash 728783689,
  :grid-recos? true,
- :session-hash -8765360,
+ :session-hash -704604171,
  :panels
  {:hello-there-brother
   {:h 29,
    :w 50,
-   :root [1 2],
+   :root [1 0],
    :name "hello there!",
    :tab "strategic grill locations",
    :views
@@ -531,7 +526,7 @@
      :screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}}},
- :selected-block "none!",
+ :selected-block :hello-there-brother,
  :theme-colors-hashmap
  {"float" "#2c728e",
   "boolean" "#f386bf",
@@ -655,7 +650,7 @@
   :flow
   {:live-scratch-flow>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-20521-5147.png",
+   "./images/gen/b64-image-20481-8805.png",
    :looking-glass-redux2>hi! nil,
    :error-monitor-vanessa3>hi! nil,
    :error-monitor-vanessa3>name "drag-from-select-all-jvm_stddat!s!!"},
@@ -663,7 +658,7 @@
   {:selected-view [nil nil],
    :selected-view-data nil,
    :jessica "Apple Pie",
-   :selected-block :block-8508},
+   :selected-block :hello-there-brother},
   :screen
   {:error-monitor-vanessa3>name "drag-from-selddddect-addll-jvm_sst??ddat!s!!",
    :error-monitor-vanessa3>:name nil,

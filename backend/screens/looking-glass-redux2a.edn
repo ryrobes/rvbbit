@@ -1,1 +1,1519 @@
-{:orders {:reco-counts [:table_name :cnt], :flows-sys [:flow_id :file_path :last_modified], :connections-sys [:database_name :connection_id], :tables-sys [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields], :fields-sys [:field_name :field_type :data_type]}, :reco-preview nil, :sql-source {}, :meta {:fields-sys {:fields {:field_name {:data-type "string", :distinct 13, :group-by? true, :commons {"state" 1, "comments" 1, "datetime" 1}, :cardinality 100}, :field_type {:data-type "string", :distinct 10, :group-by? true, :commons {"DECIMAL" 2, "VARCHAR(9)" 2, "VARCHAR(2)" 2}, :cardinality 76}, :data_type {:data-type "string", :distinct 5, :group-by? true, :commons {"string" 8, "float" 2, "integer" 1}, :cardinality 38}}, :rowcount 13}, :tables-sys {:fields {:db_schema {:data-type "string", :distinct 1, :group-by? true, :commons {"none" 9}, :cardinality 11}, :db_catalog {:data-type "unknown", :distinct 1, :group-by? true, :commons {nil 9}, :cardinality 11}, :connection_id {:data-type "string", :distinct 1, :group-by? true, :commons {"bigfoot-ufos" 9}, :cardinality 11}, :schema_cat {:data-type "unknown", :distinct 1, :group-by? false, :commons {nil 9}, :cardinality 11}, :table_name {:data-type "string", :distinct 9, :group-by? true, :commons {"us_states" 1, "ufo_sightings_vw" 1, "test_me" 1}, :cardinality 100}, :fields {:data-type "integer", :distinct 9, :group-by? false, :commons {42 1, 14 1, 11 1}, :cardinality 100}}, :rowcount 9}, :flows-sys {:fields {:flow_id {:data-type "string", :distinct 85, :group-by? true, :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1}, :cardinality 97}, :file_path {:data-type "string", :distinct 87, :group-by? true, :commons {"./flows/stitches-math.edn" 1, "./flows/hey-rabbit-pathfinder.edn" 1, "./flows/dalle3-create-image-newengland-old.edn" 1}, :cardinality 100}, :last_modified {:data-type "string", :distinct 17, :group-by? true, :commons {"2024-03-12 02:37:43" 71, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1}, :cardinality 19}}, :rowcount 87}, :rowcnt-drag-2 {:fields {:rowcnt_sum {:data-type "integer", :distinct 1, :group-by? false, :commons {80332 1}, :cardinality 100}}, :rowcount 1}, :connections-sys {:fields {:database_name {:data-type "string", :distinct 3, :group-by? true, :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1}, :cardinality 30}, :connection_id {:data-type "string", :distinct 10, :group-by? true, :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1}, :cardinality 100}}, :rowcount 10}, :ufo-sightings-drag-9 {:fields {:duration_seconds_int {:data-type "integer", :distinct 46, :group-by? true, :commons {300 55, 60 45, 120 41}, :cardinality 9}, :comments {:data-type "string", :distinct 500, :group-by? true, :commons {"18 glowing UFOs seen over Phoenix  AZ tonight&#44 10/12/12 8:45PM" 1, "amber fireball descending&#44splits into 3 objects&#44stops&#44they hover above ground with erratic movements" 1, "Slow moving bright orange light." 1}, :cardinality 100}, :city {:data-type "string", :distinct 423, :group-by? true, :commons {"cincinnati" 5, "san diego" 5, "austin" 4}, :cardinality 84}, :date_posted {:data-type "string", :distinct 115, :group-by? true, :commons {"2013-10-14" 38, "2012-10-30" 31, "2008-10-31" 25}, :cardinality 23}, :longitude {:data-type "float", :distinct 433, :group-by? true, :commons {-122.3308333 6, -84.4569444 5, -117.1563889 5}, :cardinality 86}, :state {:data-type "string", :distinct 53, :group-by? true, :commons {"ca" 51, "ny" 35, nil 30}, :cardinality 10}, :duration_seconds {:data-type "string", :distinct 46, :group-by? true, :commons {"300" 55, "60" 45, "120" 41}, :cardinality 9}, :duration_hours {:data-type "string", :distinct 225, :group-by? true, :commons {"1 minute" 26, "5 minutes" 24, "30 seconds" 22}, :cardinality 44}, :id {:data-type "integer", :distinct 500, :group-by? true, :commons {84 1, 390 1, 49 1}, :cardinality 100}, :shape {:data-type "string", :distinct 21, :group-by? true, :commons {"light" 104, "circle" 50, "triangle" 46}, :cardinality 4}, :datetime {:data-type "string", :distinct 449, :group-by? true, :commons {"2008-10-10 20:00:00.000000" 4, "1999-10-11 20:15:00.000000" 4, "2007-10-10 22:00:00.000000" 4}, :cardinality 89}, :latitude {:data-type "string", :distinct 430, :group-by? true, :commons {"47.6063889" 6, "39.1619444" 5, "32.7152778" 5}, :cardinality 86}, :country {:data-type "string", :distinct 5, :group-by? true, :commons {"us" 411, nil 55, "ca" 17}, :cardinality 0}}, :rowcount 500}, :duration-hours-drag-43 {:fields {:duration_hours {:data-type "string", :distinct 500, :group-by? true, :commons {"30 min." 1, "3 days" 1, "5-7 min" 1}, :cardinality 100}, :rowcnt {:data-type "integer", :distinct 162, :group-by? false, :commons {12 29, 13 23, 14 22}, :cardinality 32}}, :rowcount 500}, :city-drag-26 {:fields {:city {:data-type "string", :distinct 500, :group-by? true, :commons {"ottawa (canada)" 1, "burlington (canada)" 1, "cary" 1}, :cardinality 100}, :rowcnt {:data-type "integer", :distinct 118, :group-by? false, :commons {27 35, 26 24, 29 23}, :cardinality 23}}, :rowcount 500}, :reco-counts {:fields {}, :rowcount 0}, :state-drag-3 {:fields {:state {:data-type "string", :distinct 68, :group-by? true, :commons {"nd" 1, "az" 1, "in" 1}, :cardinality 100}, :rowcnt {:data-type "integer", :distinct 68, :group-by? false, :commons {183 1, 968 1, 633 1}, :cardinality 100}}, :rowcount 68}, :shape-drag-7 {:fields {:shape {:data-type "string", :distinct 30, :group-by? true, :commons {"formation" 1, "cone" 1, "rectangle" 1}, :cardinality 100}, :rowcnt {:data-type "integer", :distinct 25, :group-by? false, :commons {1 5, 2 2, 1283 1}, :cardinality 83}}, :rowcount 30}}, :default-col-widths {:system-connections-list* {:connections-sys 111}, :system-tables-list* {:tables-sys 137}, :system-fields-list* {:fields-sys 170}}, :runstream-drops nil, :data-hash -241349551, :tabs ["through the rabbit hole and out the other side" "sapphire ape" "fat zebra"], :selected-cols nil, :server {:settings {:harvest-on-boot? true, :default "./screens/looking-glass-redux.edn", :eleven-labs-api-key nil, :kits {:outliers {:description "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.", :image-url "images/outliers-image.png", :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query), :name "Outliers", :icon "zmdi-functions", :author {:name "Ryan Robitaille", :email "ryan.robitaille@gmail.com", :x "@ryrobes", :site "https://ryrob.es/"}, :run-on :queries, :repl {:host "127.0.0.1", :port 42999}, :kit-name :outliers, :package-name :query-basics-1}, :forecast {:description "WIP: basic timeseries forecasting based on previous values", :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query), :name "Forecasting", :icon "zmdi-brightness-7", :author {:name "Ryan Robitaille", :email "ryan.robitaille@gmail.com", :x "@ryrobes", :site "https://ryrob.es/"}, :run-on :queries, :repl {:host "127.0.0.1", :port 42999}, :kit-name :forecast, :package-name :query-basics-1}, :buffy {:author {:name "Ryan Robitaille", :email "ryan.robitaille@gmail.com", :x "@ryrobes", :site "https://ryrob.es/"}, :kit-name :buffy, :package-name :grab-bag, :fn (rvbbit-backend.assistants/buffy :query-name), :name "Ask Buffy!", :icon "zmdi-cocktail", :run-on :queries, :description "What does Buffy think about this data? Who knows!"}}, :graphite-host "127.0.0.1", :openapi-org-id nil, :debug-level 1, :screens ["GGGeat-ochre-mole-exiled-from-abyssal-plain" "SSSSSSuccessful-oval-sea-urchin-of-mountain-range" "SSuccessful-oval-sea-urchin-of-mountain-range" "aaa-run-amok" "aaaaah-esday-the-day" "aaaaah-wednesday-the-day" "aaaah-wednesday-the-day" "alice-puzzle-1" "asdasdasdasd" "autumn-theme" "battle-mage" "bigfoot-snapshots" "bigfoot-snapshots2" "bigfoot-snapshots3" "blank-sizzle" "blank-sizzle2" "blue-pines" "boston-test-10-3-23" "broken-jacket" "bunch of bullshit" "bunch of bullshit2" "bunch of bullshit4" "caliope" "calliope" "canvas-scrubber-test1" "capecod-viking" "chaos simple" "chaos-views" "chompers" "claude-testing2" "clean-grey-defaults" "code-data-literal-stonks-test" "conifer-boughs" "counting-lord-of-the-woods" "crazy-alice" "dark-crested-jackelope" "data-literals-test-sunday" "data-literals-test-sundaydd" "demo-dark-pumpkin-bkgrd-sept23" "demo-light-bkgrd-sept23" "demo-lime-green-slime" "desktops-and-broomsticks" "error-monitor" "error-monitor-vanessa" "error-monitor-vanessa2" "error-monitor-vanessa3" "evil-main-street" "fake-books-1" "fetching-pentagonal-termite-of-tghe-submarine-canyon" "final-fantasy-dorchester" "fox-hills" "glass-fish-board-test" "green-storm-city" "hue-board-1" "late-winter-theme" "lavender-side-eye" "layout-test-1" "layout-test-12" "light-theme" "literal-data-test" "looking-glass-redux" "looking-glass-redux2" "luck-of-the-irish" "mapbox-test" "may-20" "my-goodness" "my-goodness-the-sequel" "neverwinter-amy" "night-city-never-sleeps" "nightcity-cape-cod" "nivo-getting-better!" "nivo-hacking-2023" "nivo-hacking-2023333" "nivo-hacking-october-2nd" "old-defaults" "old-fashioned-christmas" "old-town-snow-stars" "pensive-look" "pine-wood-dawn" "pink-and-green-elk" "pink-dusk-falls" "pinup-rabbit-fields" "poor-touring-me" "pres-sql-test-1" "purple-dusk-old-town" "purple-nightshades" "purple-techno-sunset" "recharts-test-blocks" "refresh-test" "retro-machines" "riffle-test" "sick-of-your-shit" "sizzle-board-1" "sneaky-swamp-creatures1" "stop-drawing-dead-dashboards" "swamp-nightgown" "swamp-reacher" "tallica-param-test2" "tangerine-dreams" "technicolor-shanny" "the-future-soon" "the-generated-lass" "the-generated-lass-glow" "the-generated-lass-ne" "the-generated-lass-sgt" "the-generated-lassff" "the-outer-blues" "trad-hybrid" "tweet-bigfoot-is-blurry" "tweet-demo-thing-bigfoot-is-blurry" "unnamed-screen!" "viking-pastels" "weave-test" "weave-test1" "weave-test122" "who ya gonna call?" "who ya gonna call? again" "winter-theme" "winter-theme-choom" "winter-theme2" "winter-theme33" "winter-theme45" "winter-theme47" "winter-twin-peaks" "witchy425" "wonderland-horror-interface" "wow-board"], :openapi-key "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"}}, :runstreams {"openai-image-gen-ladder" {:open? true, :values {:prompt {:value :param/reliable-coral-moose, :source :param, :open? false}, :style-param {:open? true, :value "vivid"}}, :open-outputs? true}}, :editor? false, :buffy? false, :memory [610765544 416356388 4294705152], :status-data {:heartbeat {:kick {:data [{:sent! :heartbeat, :to :all, :at "2024-03-22 22:03:29", :payload nil, :payload-kp [:heartbeat :heartbeat]} nil], :elapsed-ms nil, :reco-count nil}}, "kick-test!" {:kick {:data [{:sent! "kick-test!", :to :favorable-rose-camel-hailing-from-hanging-valley, :at "2024-03-22 01:13:15", :payload {:query-log {:data [{:content ["2024-03-22 01:13:15 - query ran in 1 ms."], :name "query-log-:flows-sys", :order 1711084395, :parameters {}, :forced-mutates {}, :step-mutates {}}], :description "query-log-:flows-sys", :mutates {}, :options {:actions? false, :pages? false, :search? false}, :parameters {}}}, :payload-kp [:flows-sys "kick-test!"]} nil], :elapsed-ms nil, :reco-count nil}}, :alert1 {:alerts {:data [[[:v-box :justify :center :style {:opacity 0.7} :children [[:box :style {:font-weight 700, :font-size "11px", :opacity 0.6} :child "successfully saved screen"] [:box :style {:font-weight 700, :font-size "18px"} :child "looking-glass-redux2a"] [:box :style {:font-weight 700, :font-size "11px", :opacity 0.6} :child "@ /home/ryanr/rvbbit/backend/screens/looking-glass-redux2a.edn"]]] 10 1.6 8] nil], :elapsed-ms nil, :reco-count nil}}, :file-change {:file-changed {:data [{:path "./live/favorable-rose-camel-hailing-from-hanging-valley/fat zebra/block-1927/block-1927.edn", :type :modify, :panel-key nil, :block-data {:block-1927 {:w 10, :selected-view :active-silver-buffalo, :root [51 17], :h 8, :drag-meta {:type :open-input}, :minimized? false}, :views {:active-silver-buffalo [:open-input {:kp [:param :active-silver-buffalo], :width-int :panel-width+100, :height-int :panel-height+80, :syntax "text"}]}, :tab "fat zebra", :name "block-1927"}} nil], :elapsed-ms nil, :reco-count nil}}}, :flow-subs [:flow/openai-image-gen-ladder>*running? :flow/live-scratch-flow>*running? :flow/openai-image-gen-ladder>:relative-url-path-for-png-version :flow/openai-image-gen-ladder>:output-revised-prompt :flow/flow-forever>*running? :flow/openai-image-gen-ladder>:pop-color :flow/openai-image-gen-ladder>:dominant-color :flow/flow-forever>:final-math], :client-name :favorable-rose-camel-hailing-from-hanging-valley, :runstreams-lookups {"openai-image-gen-ladder" {:open-inputs {:quality-param {:user-input "hd", :defaults {}, :type :string}, :base-save-directory {:user-input "/home/ryanr/rvbbit-out", :defaults {}, :type :string}, :size-param {:user-input "1792x1024", :defaults {}, :type :string}, :base-web-directory {:user-input "/home/ryanr/rvbbit/frontend/resources/public/images/gen", :defaults {}, :type {:out :string}}, :prompt {:user-input "A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her body.", :defaults {}, :type {:out :string}}, :style-param {:user-input "vivid", :defaults {}, :type :string}}, :blocks {:oai-api-call {:type {:created :integer, :data :rowset, :* :map}, :ttype :make-http-call, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :node-js-color-thief-script {:type {:dominantColor :string, :colorPalette :vector, :* :map}, :ttype :sub-flow, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :dominant-color {:type {:out :string}, :ttype :open-fn, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :quality-param {:type :string, :ttype :open-block, :meta {:* {:scrubber {:message "OpenAI image gen quality selector - DALLE3", :values ["hd" "standard"]}}}, :last? false, :defaults {}, :sample "hd"}, :execute-shell-command {:type {:output :list, :exception :list, :seconds :list, :command :string, :* :map}, :ttype :shell-command, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :pop-color {:type {:out :string}, :ttype :open-fn, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :base-save-directory {:type :string, :ttype :open-block, :meta nil, :last? false, :defaults {}, :sample "/home/ryanr/rvbbit-out"}, :color-palette {:type {:dominantColor :string, :colorPalette :vector, :* :map}, :ttype :open-fn, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :size-param {:type :string, :ttype :open-block, :meta {:* {:scrubber {:message "OpenAI image gen size selector - DALLE3", :values ["1024x1024" "1792x1024" "1024x1792"]}}}, :last? false, :defaults {}, :sample "1792x1024"}, :save-base64-to-webp-file {:type {:out :string}, :ttype :save-base64-to-webp, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :request-body-map {:type :map, :ttype :open-block, :meta nil, :last? false, :defaults {}, :sample "{:prompt \"A high-definition, highly stylized and artistic 16..."}, :base-web-directory {:type :string, :ttype :open-block, :meta nil, :last? false, :defaults {}, :sample "/home/ryanr/rvbbit/frontend/resources/public/images/gen"}, :prompt {:type :string, :ttype :open-block, :meta nil, :last? false, :defaults {}, :sample "A high-definition, highly stylized and artistic 16:9 illustr..."}, :create-png-path {:type {:out :string}, :ttype :open-fn, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :hiccup-image-box-w-png-vw {:type nil, :ttype nil, :meta nil, :last? false, :defaults {}, :sample "(renderable view)"}, :create-convert-command-line {:type {:out :string}, :ttype :open-fn, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :hiccup-image-box-w-png {:type {:idx7 :keyword, :idx5 :keyword, :* :vector, :idx2 :string, :idx4 :string, :idx1 :keyword, :idx6 :keyword, :idx3 :keyword, :idx10 :vector, :idx8 :map, :idx9 :keyword, :idx0 :keyword}, :ttype :open-fn, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :generate-file-path {:type :string, :ttype :open-fn, :meta nil, :last? false, :defaults {}, :sample "/home/ryanr/rvbbit-out/b64-image-98197-51396.webp"}, :relative-url-path-for-png-version {:type {:out :string}, :ttype :open-fn, :meta nil, :last? true, :defaults {}, :sample "no sample data"}, :http-req-map {:type :map, :ttype :open-block, :meta {}, :last? false, :defaults {}, :sample "{:headers {\"Authorization\" \"Bearer sk-wdy5fbKL5OOMv0BqmiowT3..."}, :just-the-image {:type {:out :string}, :ttype :open-fn, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :output-revised-prompt {:type {:out :string}, :ttype :open-fn, :meta nil, :last? false, :defaults {}, :sample "no sample data"}, :style-param {:type :string, :ttype :open-block, :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}, :last? false, :defaults {}, :sample "vivid"}}}}, :openai-api-key "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", :window {:w 3318, :h 1728}, :post-meta {:city-drag-26 {:* {:rowcount 19899}}, :rowcnt-drag-2 {:* {:rowcount 1}}, :duration-hours-drag-43 {:* {:rowcount 8349}}, :shape-drag-7 {:* {:rowcount 30}}, :state-drag-3 {:* {:rowcount 68}}, :ufo-sightings-drag-9 {:* {:rowcount 80332}}}, :flow-estimates {"client-keepalive" {:times nil, :run-id "190822b1-1476-48f2-815e-93c6887fdeff"}, "openai-image-gen-ladder" {:times 41.9, :run-id "fc308efc-f05c-4b07-bd9d-7532a078bfc9"}}, :status {:heartbeat {:kick [:flow/openai-image-gen-ladder>*running? :flow/live-scratch-flow>*running? :flow/openai-image-gen-ladder>:relative-url-path-for-png-version :flow/openai-image-gen-ladder>:output-revised-prompt :flow/flow-forever>*running? :flow/openai-image-gen-ladder>:pop-color :flow/openai-image-gen-ladder>:dominant-color :flow/flow-forever>:final-math]}, "kick-test!" {:kick :flows-sys}, :alert1 {:alerts :alert2}, :file-change {:file-changed :done}}, :screen-name "looking-glass-redux2a", :recos-page2 0, :selected-tab "fat zebra", :col-names nil, :snapshots nil, :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg", :alerts [], :recos-page 0, :rs-overrides-hashmap {"openai-image-gen-ladder" {:prompt "A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  \n\nShe has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly.\n\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy look.  \n", :style-param "vivid"}}, :panels-hash 512998987, :sessions [["impressive-periwinkle-jay-banned-from-rock-formations.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["vigorous-square-serval-banned-from-thalweg.edn" "254 hours, 1 minute, 57 seconds" 914517733] ["exciting-globular-mouse-banned-from-maar.edn" "151 hours, 20 minutes, 6 seconds" 544806733] ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["restored-raspberry-mule-of-baymouth-bar.edn" "21 hours, 37 minutes, 41 seconds" 77861648] ["awesome-prismatic-jay-banned-from-malpaís.edn" "21 hours, 38 minutes, 18 seconds" 77898524] ["constant-star-shaped-echidna-banned-from-towhead.edn" "235 hours, 55 minutes, 28 seconds" 849328733] ["special-globular-coyote-of-oceanic-trench.edn" "259 hours, 24 minutes, 16 seconds" 933856733] ["proud-thin-elk-of-rôche-moutonnée.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["kind-rhomboidal-lion-of-the-floodplain.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["trusting-cubic-eagle-hailing-from-salt-pan.edn" "259 hours, 24 minutes, 16 seconds" 933856733] ["meaningful-turquoise-fly-hailing-from-lithalsa.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["courageous-linear-platypus-of-corrie.edn" "21 hours, 58 minutes, 31 seconds" 79111665] ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["ethical-round-oyster-of-glacial-horn.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["transforming-ivory-clam-of-the-volcanic-field.edn" "75 hours, 57 minutes, 40 seconds" 273460733] ["remarkable-thin-wombat-banned-from-flyggberg.edn" "201 hours, 35 minutes, 12 seconds" 725712733] ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["satisfactory-narrow-donkey-banned-from-tea-table.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["poised-tan-seal-of-the-potrero.edn" "200 hours, 46 minutes, 14 seconds" 722774733] ["remarkable-teal-mallard-of-the-corrie.edn" "69 hours, 58 minutes, 5 seconds" 251885442] ["keen-bronze-skunk-of-the-salt-pan.edn" "253 hours, 19 minutes, 1 second" 911941733] ["glowing-long-grasshopper-of-playa-lake.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["optimistic-carmine-mole-hailing-from-flat.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["adorable-fat-swan-hailing-from-moraine.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["famous-burgundy-eel-of-glacier.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["encouraging-octohedral-spider-banned-from-col.edn" "122 hours, 26 minutes, 7 seconds" 440767733] ["good-bulbous-woodpecker-banned-from-pingo.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["ideal-long-oyster-banned-from-lava.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["brilliant-maroon-otter-banned-from-entrenched-meander.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["attractive-magenta-turtle-exiled-from-hillock.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["favorable-rose-camel-hailing-from-hanging-valley.edn" "2 minutes, 3 seconds" 123525] ["moving-elliptic-ferret-banned-from-river.edn" "34 hours, 21 minutes, 2 seconds" 123662897] ["valued-ivory-pronghorn-hailing-from-landforms-by-shape.edn" "13 minutes, 0 second" 780281] ["dazzling-blush-badger-banned-from-plunge-pool.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["famous-lilac-jay-hailing-from-bluff.edn" "74 hours, 40 minutes, 37 seconds" 268837733] ["ethical-orange-buffalo-exiled-from-hornito.edn" "252 hours, 41 minutes, 41 seconds" 909701733] ["lovely-cyan-hummingbird-banned-from-stratovolcano.edn" "179 hours, 1 minute, 53 seconds" 644513733] ["victorious-plum-locust-exiled-from-watershed.edn" "162 hours, 23 minutes, 55 seconds" 584635733] ["genuine-elliptic-wolf-of-the-oasis.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["supporting-narrow-beaver-banned-from-strath.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["smile-globular-jellyfish-hailing-from-list-of-rock-formations.edn" "76 hours, 15 minutes, 52 seconds" 274552733] ["reassuring-fat-dog-banned-from-flat.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["vibrant-champagne-gnat-of-the-volcanic-island.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["independent-fat-koala-banned-from-tuya.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["refined-carmine-crow-exiled-from-ejecta-blanket.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["plentiful-pyramidal-sand-dollar-of-arroyo.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["upbeat-fat-dove-exiled-from-marine-terrace.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["cute-amethyst-opossum-hailing-from-cirque.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["ethical-jungle-green-walrus-of-the-submarine-canyon.edn" "75 hours, 5 minutes, 44 seconds" 270344733] ["stellar-oval-swan-of-salt-marsh.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["virtuous-cerise-finch-hailing-from-flared-slope.edn" "12 minutes, 50 seconds" 770742] ["upbeat-oval-ox-of-pediplain.edn" "21 hours, 37 minutes, 48 seconds" 77868288] ["clean-pyramidal-human-hailing-from-gulch.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["agreeable-orchid-dove-of-palsa.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["lucky-indigo-bear-of-hornito.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["refreshing-thin-dolphin-of-the-cuesta.edn" "208 hours, 51 minutes, 41 seconds" 751901733] ["upright-slate-gray-termite-of-the-central-peak.edn" "181 hours, 17 minutes, 20 seconds" 652640733] ["soulful-red-termite-exiled-from-backswamp.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["champion-ovoid-ox-of-the-fault-scarp.edn" "76 hours, 52 minutes, 42 seconds" 276762733] ["genuine-bulbous-hedgehog-banned-from-cratered-landscape.edn" "151 hours, 18 minutes, 30 seconds" 544710733] ["beaming-cyan-dolphin-hailing-from-pond.edn" "44 hours, 4 minutes, 38 seconds" 158678316] ["terrific-round-pheasant-hailing-from-honeycomb-weathering.edn" "235 hours, 57 minutes, 6 seconds" 849426733] ["effortless-gray-monkey-exiled-from-monadnock.edn" "126 hours, 6 minutes, 7 seconds" 453967733] ["grin-fat-wren-of-thalweg.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["accomplished-globular-dove-banned-from-swamp.edn" "198 hours, 54 minutes, 5 seconds" 716045733] ["positive-circular-platypus-exiled-from-pit-crater.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["marvelous-sapphire-mosquito-hailing-from-dirt-cone.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["prepared-circular-tiger-of-tidal-marsh.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["prepared-aquamarine-wasp-of-the-geyser.edn" "33 hours, 24 minutes, 48 seconds" 120288972] ["refined-rhomboidal-hawk-banned-from-nivation-hollow.edn" "175 hours, 23 minutes, 37 seconds" 631417733] ["light-baby-blue-dog-banned-from-sandur.edn" "21 hours, 36 minutes, 36 seconds" 77796120] ["keen-periwinkle-butterfly-of-trim-line.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["bountiful-lime-deer-hailing-from-spit.edn" "77 hours, 2 minutes, 50 seconds" 277370733] ["vital-octohedral-snake-hailing-from-drumlin.edn" "33 hours, 6 minutes, 34 seconds" 119194918] ["instantaneous-rectangular-bird-of-lava.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["meaningful-rhomboidal-kangaroo-banned-from-volcanic-dam.edn" "206 hours, 48 minutes, 48 seconds" 744528733] ["handsome-lime-rabbit-of-floodplain.edn" "75 hours, 52 minutes, 24 seconds" 273144733] ["sunny-mauve-tiger-hailing-from-permafrost-plateau.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["positive-raspberry-swallow-exiled-from-sound.edn" "161 hours, 12 minutes, 1 second" 580321733] ["independent-pyramidal-pheasant-banned-from-stratocone.edn" "259 hours, 24 minutes, 16 seconds" 933856733] ["charming-blue-platypus-of-dreikanter.edn" "27 hours, 10 minutes, 6 seconds" 97806710] ["favorable-baby-blue-wasp-hailing-from-Carolina-bay.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["fantastic-magenta-hyena-of-the-scarp.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["kind-turquoise-parrot-banned-from-machair.edn" "171 hours, 15 minutes, 0 second" 616500733] ["worthy-cyan-rat-of-the-tea-table.edn" "183 hours, 47 minutes, 48 seconds" 661668733] ["friendly-turquoise-yak-exiled-from-pseudocrater.edn" "206 hours, 49 minutes, 43 seconds" 744583733] ["ready-cerise-badger-of-the-ria.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["fair-long-mule-exiled-from-watershed.edn" "175 hours, 23 minutes, 25 seconds" 631405733] ["agreeable-amaranth-goose-banned-from-stream-pool.edn" "74 hours, 38 seconds" 266438733] ["instinctive-square-nightingale-of-the-hoodoo.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["favorable-icosahedral-opossum-banned-from-archipelago.edn" "180 hours, 47 minutes, 0 second" 650820733] ["kind-pentagonal-gnu-banned-from-v-shaped-valley.edn" "6 minutes, 53 seconds" 413983] ["gorgeous-wide-wren-banned-from-etchplain.edn" "256 hours, 55 minutes, 43 seconds" 924943733] ["energetic-plum-hyena-of-the-marine-terrace.edn" "206 hours, 41 minutes, 34 seconds" 744094733] ["healthy-orchid-otter-of-pseudocrater.edn" "171 hours, 14 minutes, 51 seconds" 616491733] ["genuine-slate-gray-gerbil-banned-from-strait.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["kind-lemon-mallard-hailing-from-supervolcano.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["courageous-amber-buffalo-exiled-from-barrier-bar.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["moving-fat-hamster-banned-from-oxbow-lake.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["quick-narrow-jay-of-ria.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["affirmative-thin-goat-hailing-from-cinder-cone.edn" "6 minutes, 50 seconds" 410327] ["earnest-ultramarine-serval-exiled-from-landforms-by-shape.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["spirited-crimson-weasel-hailing-from-lithalsa.edn" "158 hours, 40 minutes, 53 seconds" 571253733] ["spiritual-rectangular-sea-urchin-banned-from-ria.edn" "125 hours, 35 minutes, 26 seconds" 452126733] ["protected-linear-owl-hailing-from-raised-beach.edn" "151 hours, 28 minutes, 32 seconds" 545312733] ["accepted-icosahedral-hedgehog-exiled-from-tuff-cone.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["green-periwinkle-gnat-of-shoal.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["intelligent-silver-swallow-banned-from-maar.edn" "201 hours, 39 minutes, 19 seconds" 725959733] ["attractive-baby-blue-hummingbird-of-lagoon.edn" "157 hours, 5 minutes, 26 seconds" 565526733] ["engaging-spring-green-antelope-of-the-table.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["novel-viridian-magpie-banned-from-moraine.edn" "151 hours, 21 minutes, 31 seconds" 544891733] ["reassuring-rectangular-locust-exiled-from-oceanic-trench.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["willing-puce-fish-of-the-thalweg.edn" "70 hours, 1 minute, 2 seconds" 252062063] ["fine-orange-louse-of-bluff.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["instinctive-lilac-chicken-of-the-scree.edn" "158 hours, 43 minutes, 21 seconds" 571401733] ["secure-elliptic-locust-hailing-from-badlands.edn" "126 hours, 55 minutes, 27 seconds" 456927733] ["zealous-linear-raven-banned-from-lava-spine.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["brilliant-copper-toad-of-the-proglacial-lake.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["safe-conical-bat-exiled-from-marine-terrace.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["effective-spherical-fox-of-the-volcanic-field.edn" "21 hours, 50 minutes, 46 seconds" 78646692] ["remarkable-orchid-gull-hailing-from-somma-volcano.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["gorgeous-spring-bud-wallaby-of-the-permafrost-plateau.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["whole-icosahedral-frog-hailing-from-thermokarst.edn" "259 hours, 24 minutes, 16 seconds" 933856733] ["popular-cubic-fox-of-the-mountain.edn" "55 hours, 10 minutes, 14 seconds" 198614410] ["plentiful-cylindrical-grasshopper-banned-from-gulch.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["friendly-bulbous-hippopotamus-exiled-from-erg.edn" "158 hours, 4 minutes, 25 seconds" 569065733] ["trusting-ivory-alligator-of-crevasse.edn" "21 hours, 58 minutes, 33 seconds" 79113173] ["gorgeous-elliptic-pronghorn-banned-from-rock-formations.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["spirited-bulbous-clam-of-the-towhead.edn" "208 hours, 40 minutes, 27 seconds" 751227733] ["rejoiceful-burgundy-wasp-banned-from-sand-boil.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["honest-orchid-fish-banned-from-volcanic-crater.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["sunny-puce-grasshopper-of-dry-lake.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["honorable-amethyst-skunk-of-the-calanque.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["affluent-baby-blue-kangaroo-hailing-from-hoodoo.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["classic-round-mole-exiled-from-dirt-cone.edn" "158 hours, 36 minutes, 27 seconds" 570987733] ["favorable-lemon-hare-banned-from-watershed.edn" "27 hours, 55 minutes, 49 seconds" 100549899] ["open-crimson-bear-of-the-supervolcano.edn" "235 hours, 55 minutes, 33 seconds" 849333733] ["earnest-puce-squirrel-of-flared-slope.edn" "225 hours, 13 minutes, 29 seconds" 810809733] ["honest-lavender-panda-banned-from-turlough.edn" "75 hours, 44 minutes, 45 seconds" 272685733] ["meritorious-long-mule-of-pediplain.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["honest-sapphire-eagle-exiled-from-escarpment.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["honest-icosahedral-boar-of-the-arroyo.edn" "206 hours, 39 minutes, 4 seconds" 743944733] ["satisfactory-navy-blue-fly-exiled-from-bar.edn" "200 hours, 21 minutes, 49 seconds" 721309733] ["fun-prismatic-deer-of-the-pyroclastic-shield.edn" "13 minutes, 18 seconds" 798617] ["brilliant-linear-monkey-hailing-from-natural-arch.edn" "259 hours, 24 minutes, 16 seconds" 933856733] ["fresh-electric-blue-seal-of-gulch.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["angelic-champagne-parrot-banned-from-inselberg.edn" "21 hours, 58 minutes, 32 seconds" 79112917] ["restored-indigo-pigeon-hailing-from-pyroclastic-shield.edn" "49 hours, 59 minutes, 10 seconds" 179950428] ["robust-mauve-ox-of-the-cave.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["open-wide-dog-of-the-bluff.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["vivacious-rectangular-penguin-hailing-from-lacustrine-terrace.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["healing-rectangular-pig-of-salt-pan.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["beneficial-spherical-ostrich-hailing-from-volcanic-cone.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["sunny-globular-locust-of-wadi.edn" "21 hours, 14 minutes, 25 seconds" 76465960] ["impressive-square-platypus-banned-from-strike-ridge.edn" "77 hours, 2 minutes, 56 seconds" 277376733] ["good-hexagonal-hummingbird-banned-from-ait.edn" "204 hours, 27 minutes, 12 seconds" 736032733] ["fine-hexagonal-kangaroo-hailing-from-lava-spine.edn" "77 hours, 28 minutes, 28 seconds" 278908733] ["famous-square-sand-dollar-hailing-from-yazoo-stream.edn" "256 hours, 53 minutes, 1 second" 924781733] ["seemly-carmine-skunk-banned-from-outwash-plain.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["light-linear-hedgehog-of-confluence.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["luminous-black-codfish-of-the-dale.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["amazing-ochre-yellow-jacket-of-the-complex-volcano.edn" "175 hours, 27 minutes, 52 seconds" 631672733] ["wholesome-thin-bee-hailing-from-tuya.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["secure-taupe-heron-banned-from-tepui.edn" "256 hours, 57 minutes, 33 seconds" 925053733] ["stupendous-square-kangaroo-of-submarine-volcano.edn" "24 hours, 39 minutes, 34 seconds" 88774668] ["distinguished-harlequin-cheetah-of-the-drumlin.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["honest-wide-mouse-exiled-from-subglacial-mound.edn" "259 hours, 24 minutes, 15 seconds" 933855733] ["soulful-cylindrical-opossum-of-pyroclastic-shield.edn" "29 hours, 37 minutes, 2 seconds" 106622384] ["transformative-globular-butterfly-of-tuya.edn" "55 minutes, 5 seconds" 3305469]], :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6", :user-params-hash -2018192807, :grid-recos? true, :session-hash 754056695, :panels {:block-11251 {:name "block-11251", :w 6, :selected-view :hi, :root [5 7], :h 2, :queries {}, :tab "through the rabbit hole and out the other side", :minimized? true, :views {:hi [:box :align :center :justify :center :attr {:id ":block-11251.:hi"} :style {:font-size "14px", :font-weight 700, :padding-top "6px", :padding-left "14px", :margin-top "-8px", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:push ["flow-forever" ":open-input" 21555]]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}, :block-11609 {:h 5, :w 8, :connection-id "bigfoot-ufos", :name "drag-from-select-all-ufo_sightings", :queries {:city-drag-26 {:select [:city [[:count 1] :rowcnt]], :from [[:query/ufo-sightings-drag-9 :ff571]], :group-by [:city], :order-by [[:rowcnt :desc]]}}, :root [1 8], :tab "sapphire ape"}, :block-1774 {:h 26, :w 45, :tab "fat zebra", :root [0 1], :name "block-1774", :views {:param-val [:box :align :center :justify :center :padding "13px" :style {:font-size "45px"} :child [:img {:src :flow/openai-image-gen-ladder>:relative-url-path-for-png-version, :width :width-px}]]}, :queries {}}, :block-6016 {:h 7, :w 37, :tab "fat zebra", :root [13 27], :name "block-6016", :views {:param-val [:box :align :center :justify :center :padding "13px" :style {:font-size "26px"} :child [:string :flow/openai-image-gen-ladder>:output-revised-prompt]]}, :queries {}, :minimized? false}, :block-7416 {:h 4, :w 4, :connection-id "bigfoot-ufos", :name "drag-from-drag-from-select-all-ufo_sightings", :queries {:rowcnt-drag-2 {:select [[[:sum :rowcnt] :rowcnt_sum]], :from [[:query/city-drag-26 :yy403]]}}, :root [1 13], :tab "sapphire ape"}, :block-11530 {:h 2, :w 9, :views {:flow-play-runstreamed [:box :align :center :justify :center :style {:font-size "25px", :font-weight 700, :padding-top "6px", :padding-left "14px", :margin-top "-8px", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:run-flow ["flow-forever" "run flow 'flow-forever'" :runstream-overrides]]]}, :name "flow-play-from-runstreams", :root [5 18], :tab "through the rabbit hole and out the other side"}, :block-8240 {:drag-meta {:type :open-input}, :w 7, :selected-view :unreal-magenta-frog, :h 10, :views {:unreal-magenta-frog [:open-input {:kp [:param :unreal-magenta-frog], :width-int :panel-width+100, :height-int :panel-height+80, :syntax "text"}]}, :tab "fat zebra", :root [45 12], :name "block-8240"}, :block-2536 {:h 2, :w 16, :root [0 1], :tab "through the rabbit hole and out the other side", :selected-view :hi, :name "block-2536", :views {:hi [:box :attr {:id ":block-6121.:hi"} :style {:font-size "15px", :padding-top "6px", :padding-left "14px", :margin-top "-8px", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:speak-click "Did you ever need a flow to stop and present an operator with some choices? Static or dynamic we need help to continue processing. How about this ALSO happening headlessly & seamlessly with your data UI?"]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-8805 {:h 5, :w 8, :connection-id "bigfoot-ufos", :name "drag-from-select-all-ufo_sightings", :queries {:duration-hours-drag-43 {:select [:duration_hours [[:count 1] :rowcnt]], :from [[:query/ufo-sightings-drag-9 :cc350]], :group-by [:duration_hours], :order-by [[:rowcnt :desc]]}}, :root [25 8], :tab "sapphire ape"}, :block-5866 {:drag-meta {:type :open-input}, :w 8, :selected-view :fabulous-pink-eagle, :h 13, :views {:fabulous-pink-eagle [:open-input {:kp [:param :fabulous-pink-eagle], :width-int :panel-width+100, :height-int :panel-height+80, :syntax "text"}]}, :tab "fat zebra", :root [52 1], :name "block-5866"}, :block-7383 {:h 2, :w 7, :tab "fat zebra", :root [45 24], :name "block-7383", :views {:param-val [:box :align :center :justify :center :padding "0px" :style {:font-size "45px", :background-color :flow/openai-image-gen-ladder>:pop-color} :child [:string :flow/openai-image-gen-ladder>:pop-color]]}, :queries {}}, :block-1913 {:h 2, :w 16, :root [0 15], :tab "through the rabbit hole and out the other side", :selected-view :hi, :name "block-1913", :views {:hi [:box :attr {:id ":block-4121.:hi"} :style {:font-size "15px", :padding-top "6px", :padding-left "14px", :margin-top "-8px", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:speak-click "Pretty cool, if you ask me. Regular Dashboards are, like, totally lame - reactive flow-powered data boards...  thats where its at."]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-9369 {:h 3, :w 16, :root [0 11], :tab "through the rabbit hole and out the other side", :selected-view :hi, :name "block-9369", :views {:hi [:box :attr {:id ":block-9363.:hi"} :style {:font-size "15px", :padding-top "6px", :padding-left "14px", :margin-top "-8px", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:speak-click "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-3630 {:h 7, :w 13, :views {:flow-play-runstreamed [:box :align :center :justify :center :style {:font-weight 700, :font-size "92px", :padding-top "6px", :padding-left "14px", :margin-top "46px", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:run-flow ["openai-image-gen-ladder" "run me" :runstream-overrides]]]}, :name "flow-play-from-runstreams", :root [0 27], :tab "fat zebra"}, :block-11372 {:h 2, :w 7, :tab "fat zebra", :root [45 22], :name "block-11372", :views {:param-val [:box :align :center :justify :center :padding "0px" :style {:font-size "45px", :background-color :flow/openai-image-gen-ladder>:dominant-color} :child [:string :flow/openai-image-gen-ladder>:dominant-color]]}, :queries {}}, :block-7319 {:h 5, :w 8, :connection-id "bigfoot-ufos", :name "drag-from-select-all-ufo_sightings", :queries {:shape-drag-7 {:select [:shape [[:count 1] :rowcnt]], :from [[:query/ufo-sightings-drag-9 :hh354]], :group-by [:shape], :order-by [[:rowcnt :desc]]}}, :root [9 8], :tab "sapphire ape"}, :block-4121 {:h 3, :w 16, :root [0 7], :tab "through the rabbit hole and out the other side", :selected-view :hi, :name "block-4121", :views {:hi [:box :attr {:id ":block-4121.:hi"} :style {:font-size "15px", :padding-top "6px", :padding-left "14px", :margin-top "-8px", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:speak-click "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-5620 {:name "block-5620", :w 13, :selected-view :good-electric-blue-toad, :root [58 28], :h 8, :tab "fat zebra", :drag-meta {:type :open-input}, :minimized? false, :views {:good-electric-blue-toad [:open-input {:kp [:param :good-electric-blue-toad], :style {:color "red", :font-size "11px"}, :width-int :panel-width+100, :height-int :panel-height+80, :syntax "text"}]}}, :block-7262 {:drag-meta {:type :open-input}, :w 8, :selected-view :quiet-peach-armadillo, :h 14, :views {:quiet-peach-armadillo [:open-input {:kp [:param :quiet-peach-armadillo], :width-int :panel-width+100, :height-int :panel-height+80, :syntax "text"}]}, :tab "fat zebra", :root [52 14], :name "block-7262"}, :block-7215 {:h 4, :w 9, :tab "through the rabbit hole and out the other side", :root [5 20], :name "block-7215", :views {:param-val [:box :align :center :justify :center :padding "13px" :style {:font-size "88px"} :child [:string :flow/flow-forever>:final-math]]}, :queries {}}, :block-3777 {:h 5, :w 8, :connection-id "bigfoot-ufos", :name "drag-from-select-all-ufo_sightings", :queries {:state-drag-3 {:select [:state [[:count 1] :rowcnt]], :from [[:query/ufo-sightings-drag-9 :uu58]], :group-by [:state], :order-by [[:rowcnt :desc]]}}, :root [17 8], :tab "sapphire ape"}, :block-1322 {:drag-meta {:type :open-input}, :w 6, :selected-view :reliable-coral-moose, :h 20, :views {:reliable-coral-moose [:open-input {:kp [:param :reliable-coral-moose], :width-int :panel-width+100, :height-int :panel-height+80, :syntax "text"}]}, :tab "fat zebra", :root [52 28], :name "block-1322"}, :block-1784 {:drag-meta {:type :open-input}, :w 7, :selected-view :brave-white-butterfly, :h 11, :views {:brave-white-butterfly [:open-input {:kp [:param :brave-white-butterfly], :width-int :panel-width+100, :height-int :panel-height+80, :syntax "text"}]}, :tab "fat zebra", :root [45 1], :name "block-1784"}, :block-1927 {:name "block-1927", :w 10, :selected-view :active-silver-buffalo, :root [60 22], :h 8, :tab "fat zebra", :drag-meta {:type :open-input}, :minimized? false, :views {:active-silver-buffalo [:open-input {:kp [:param :active-silver-buffalo], :width-int :panel-width+100, :height-int :panel-height+80, :syntax "text"}]}}, :block-1519 {:drag-meta {:type :open-input}, :w 7, :selected-view :composed-azure-fish, :h 21, :views {:composed-azure-fish [:open-input {:kp [:param :composed-azure-fish], :width-int :panel-width+100, :height-int :panel-height+80, :syntax "text"}]}, :tab "fat zebra", :root [60 1], :name "block-1519"}, :block-6121 {:h 2, :w 16, :root [0 4], :tab "through the rabbit hole and out the other side", :selected-view :hi, :name "block-6121", :views {:hi [:box :attr {:id ":block-6121.:hi"} :style {:font-size "15px", :padding-top "6px", :padding-left "14px", :margin-top "-8px", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:speak-click "Here you can see that while running the flow interactively, we get the dialog push, as well as the ability to manipulate the options on the flow directly."]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-1449 {:h 7, :w 32, :connection-id "bigfoot-ufos", :name "select-all-ufo_sightings", :queries {:ufo-sightings-drag-9 {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]]}}, :root [1 1], :tab "sapphire ape"}}, :selected-block "none!", :theme-colors-hashmap {"float" "#ff2050", "boolean" "#8EA2A8", "map" "#379fb5", "list" "#36fb04", "string" "#CEEFD1", "any" "#eeeeee", "vector" "#2C4761", "keyword" "#006666", "rabbit-code" "#9F93AE", "datetime" "#A7B2B4", "integer" "#723c5f", "unknown" "#77919B", "date" "#6A6391", "nil" "#ff8222"}, :click-param {:blocks-sys {:block_key ":*theme*", :block_name "(meta: this screen's theme)", :queries 0, :views 27, :block_data "{:codemirror-theme \"ayu-dark\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#04041e82\", :editor-rim-color \"#379fb5\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#ff2050\", \"boolean\" \"#8EA2A8\", \"map\" \"#379fb5\", \"list\" \"#D4118EE\", \"string\" \"#CEEFD1\", \"any\" \"#eeeeee\", \"vector\" \"#2C4761\", \"keyword\" \"#006666\", \"rabbit-code\" \"#9F93AE\", \"datetime\" \"#A7B2B4\", \"integer\" \"#723c5f\", \"unknown\" \"#77919B\", \"date\" \"#6A6391\", \"nil\" \"#3B5A71\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"Nova Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#379fb5\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/capecod-viking234-8k-4k.png)\", :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Nova Square\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}", :view_names ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color", :query_names ""}, :tables-sys {:db_schema "none", :db_catalog nil, :connection_id "bigfoot-ufos", :schema_cat nil, :table_name "ufo_sightings", :fields 14}, :flow {:counting-loop>open-fn-1 nil, :openai-image-gen-ladder>pop-color "#b5c3d2", :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926}, :crow-flow-201>*running? false, :openai-image-gen-ladder>relative-url-path-for-png-version "./images/gen/b64-image-58195-71433.png", :counting-loop>open-fn-2 44, :openai-image-gen-ladder>*running? false, :crow-flow-201a>*running? false, :openai-image-gen-ladder>output-revised-prompt "Create a high-definition, artistic illustration in a 16:9 aspect ratio, showcasing a fantasy-inspired scene in Scotland. The setting is otherworldly yet maintains traditional Scottish characteristics. A young Caucasian woman, specifically of Scottish origin, with brunette hair and in her late 20s, exhibits a pleased, sultry expression. Her notable facial features include full, pouty lips, with the bottom lip being more prominent, and a slightly upturned nose. Her decadently long hair flows down her back. Her neck, collarbone, and shoulders are embellished with intricate Celtic-style tattoos representing rabbits and the wilderness. Mysterious blue and pink lights from the forest reflect off her buxom figure, lighting it radiantly. Noteworthily buxom and curvaceous, she adorns a choker ribbon and a long necklace, hinting at a burlesque style. She leans flirtatiously against a wall, casting a coy look toward the viewer.", :live-scratch-flow>*running? false, :openai-image-gen-ladder>hiccup-image-box-w-png-vw [:v-box :padding "10px" :gap "8px" :width :width-px :style {:background-color "#688ab3", :border-radius "20px", :font-size "12px", :font-weight 700, :color "#d39ec1"} :children [[:box :child "./images/gen/b64-image-84236-40490.png"] [:box :size "auto" :child [:img {:src "./images/gen/b64-image-84236-40490.png", :style {:border-radius "30px"}}]]]], :counting-loop>*running? false, :counting-loop>open-fn-3 45, :flow-forever>*running? false, :openai-image-gen-ladder>execute-shell-command {:output [], :exception [], :seconds [], :command "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"}, :counting-loop>final-value 44, :openai-image-gen-ladder>dominant-color "#162a35", :flow-forever>final-math nil}, :flows-sys {:flow_id "openai-image-gen-ladder", :file_path "./flows/openai-image-gen-ladder.edn", :last_modified "2024-03-14 09:23:21"}, :files-sys {:file_path "./screens/capecod-viking.edn", :screen_name "capecod-viking", :blocks 12, :queries 9, :ts "2024-02-18 21:40:58"}, :param {:reliable-coral-moose ["A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  " "" "She has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly." "" "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy look.  " ""], :brave-white-butterfly ["A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly." "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque." ""], :selected-view-data [:box :align :center :justify :center :padding "0px" :style {:font-size "45px"} :child [:string :flow/openai-image-gen-ladder>:pop-color]], :selected-view [:views :param-val], :fabulous-pink-eagle ["A classic 1990s American Pizza Hut location, now even more run down and abandoned, takes on a slightly more dystopian aspect with a crucial detail: the building's roof shingles are distinctly red, highlighting the iconic Pizza Hut design. The parking lot is now heavily littered with remnants of bar charts, pie charts, old school dashboards, and shredded Tableau signage, symbolizing the profound death of the 'old world' of business intelligence. This scene is illustrated in a highly stylistic, striking, and dramatic manner, with an intensified essence of decay and the passage of time. The architecture of the Pizza Hut, with its iconic red roof and signage, stands more prominently as a relic amidst an overwhelming detritus of outdated analytics tools. This wider, cinematic view should further emphasize the desolation and dramatic change, adding a more dystopian atmosphere to the landscape. " "" "The surrounding area has a distinct cyberpunk vibe to it with pink and blue neon dramatic lighting - further showing that the restaurant and these data analysis tools are lost in time."], :good-electric-blue-toad ["A high-definition, hyperreal, vibrant 16:9 image of a snowy New England landscape in America, captured just before dawn during an intense snowstorm, masterfully merging aspects of traditional aesthetics and cyberpunk themes. The town is coated in a thick layer of snow, with structures radiating soft pink and neon blue light contributing to the slightly gritty ambiance. " "" "To the left of the picture, a young Caucasian woman, notably in her late 20s, with full pouty lips, her bottom lip being notably prominent, and a subtly upturned nose, confidently presents a content yet playful expression. Her long hair holds accumulating snow, revealing the severity of the blizzard. " "" "Intricate Celtic-inspired tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. The subtle illumination of pre-dawn adds a tranquil yet enigmatic tone to the image, highlighting the harmonious blend of nature and technological intrusion."], :quiet-peach-armadillo ["A meticulously-detailed, hyperrealistic 16:9 digitally-rendered depiction of a wintery morning scene set in traditional New England, showcasing a unique mixture of rustic charm and futuristic, cyberpunk elements. The quaint town is enshrouded under a fresh white carpet of snow amidst a flurry storm, which creates an ambiance of slight grittiness. The architectural structures radiate a soft, inviting glow, tinted in hues of pastel pink and neon light blue. To the left side of the composition, a strikingly beautiful Irish woman in her early 30s is emphasised. Her attractive features include a buxom build, full pouty lips with a prominently larger lower lip, a perky nose, and an expression that cleverly combines satisfaction with a hint of alluring sophistication. Her flowing, slightly damp hair cascades over her neck and shoulders due to the falling snow. Intricately designed, Celtic-inspired tattoos of rabbits and scenes from nature beautifully cover her neck, collarbone, and shoulders. The timidly emerging morning sun from the horizon casts a gentle light upon her body, playing up the serene and slightly mysterious atmosphere created by the pre-dawn illumination. Her full, maternal figure basks in the sunlight, creating a visually pleasing interplay of light and shadow on her richly adorned body"], :unreal-magenta-frog ["A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her ample body."], :composed-azure-fish ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style illustration showcasing a stunning, buxom, robust, and fit yet curvaceous white woman in her late 20s, posing and dressed as the Statue of Liberty, a slightly upturned nose, and a buxom yet slim figure. She holds and AR-15 rifle. She stands majestically at the port of an American New England scene with boats, American flags and cheering crowds with rifles. " "" "She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting. " "" "Her dark hair contrasts with her pale skin. A sly, playful smile dances on her full lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate freedom and liberty tattoos. " "" "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. " "" "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."], :selected-block :block-1927, :active-silver-buffalo ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. " "" "She should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. " "" "She's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. " "" "The other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene." "" "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."]}, :theme {:codemirror-theme "ayu-dark", :editor-param-background-color "#000000", :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "}, :vega-defaults {:view {:stroke "transparent"}, :axis {:domainColor "#ffffff22", :grid true, :font "Lato", :labelColor "#ffffff88", :titleFont "Lato", :titleColor "#ffffff99", :labelFont "Lato", :domain false, :gridColor "#ffffff22", :tickColor "#ffffff22", :axisFont "Lato"}, :legend {:labelFont "Lato", :legendFont "Lato", :labelColor "#ffffff99", :titleColor "#ffffff99", :stroke "#ffffff99", :titleFont "Lato"}, :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"}, :mark {:font "Lato"}, :title {:font "Lato", :subtitleFont "Lato", :labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"}}, :grid-selected-column-css {:background-color "#00000088", :filter "brightness(200%)"}, :base-block-color-selected "#00030a", :block-title-font-color "#ffffff", :base-block-color "#04041e82", :editor-rim-color "#379fb5", :base-block-filter-selected "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)", :vega-default-color-scheme {:scheme "pastel2"}, :data-colors {"float" "#ff2050", "boolean" "#8EA2A8", "map" "#379fb5", "list" "#36fb04", "string" "#CEEFD1", "any" "#eeeeee", "vector" "#2C4761", "keyword" "#006666", "rabbit-code" "#9F93AE", "datetime" "#A7B2B4", "integer" "#723c5f", "unknown" "#77919B", "date" "#6A6391", "nil" "#ff8222"}, :editor-grid-selected-font-color "#000000", :monospaced-font "Nova Mono", :editor-grid-selected-background-color "#dc9cb0", :nivo-defaults {:font-family "Instagram Sans", :labels {:text {:fill "#ffffff", :font-size "16px", :font-family "Instagram Sans", :font-weight 700}}, :tooltip {:container {:background "#000", :color "#ffffff", :text {:fill "#eeeeee"}, :fontSize "18px", :borderRadius "4px", :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)", :padding "5px 9px"}, :basic {:whiteSpace "pre", :display "flex", :alignItems "center"}, :tableCell {:padding "3px 5px"}}, :axis {:legend {:text {:fill "#ffffff", :font-size "14px", :font-family "Instagram Sans", :font-weight 700}}, :ticks {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}}, :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}}, :editor-outer-rim-color "#379fb5", :grid-selected-font-color "#000000", :block-title-selected-font-color "#ffffff", :grid-selected-background-color "#a3d3ff", :grid-font-color "#ffffff", :canvas-background-css {:background-image "url(images/large/alice-grid3.png)", :transition "all 0.8s ease-in-out", :background-size "cover", :background-color "#424f57"}, :editor-font-color "#ffffff", :base-font "Nova Square", :block-tab-selected-font-color "#c9d1ff", :editor-background-color "#000006", :editor-grid-font-color "#ffffff"}, :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"}, :sys {:selected-tab "fat zebra", :selected-tab-idx 2}}, :selected-flow "live-scratch-flow"}
+{:orders
+ {:reco-counts [:table_name :cnt], :flows-sys [:flow_id :file_path :last_modified]},
+ :reco-preview nil,
+ :sql-source {},
+ :meta
+ {:reco-counts {:fields {}, :rowcount 0},
+  :city-drag-26
+  {:fields
+   {:city
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"ottawa (canada)" 1, "burlington (canada)" 1, "cary" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 118,
+     :group-by? false,
+     :commons {27 35, 26 24, 29 23},
+     :cardinality 23}},
+   :rowcount 500},
+  :rowcnt-drag-2
+  {:fields
+   {:rowcnt_sum
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {80332 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :duration-hours-drag-43
+  {:fields
+   {:duration_hours
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"30 min." 1, "3 days" 1, "5-7 min" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 162,
+     :group-by? false,
+     :commons {12 29, 13 23, 14 22},
+     :cardinality 32}},
+   :rowcount 500},
+  :shape-drag-7
+  {:fields
+   {:shape
+    {:data-type "string",
+     :distinct 30,
+     :group-by? true,
+     :commons {"formation" 1, "cone" 1, "rectangle" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 25,
+     :group-by? false,
+     :commons {1 5, 2 2, 1283 1},
+     :cardinality 83}},
+   :rowcount 30},
+  :state-drag-3
+  {:fields
+   {:state
+    {:data-type "string",
+     :distinct 68,
+     :group-by? true,
+     :commons {"nd" 1, "az" 1, "in" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 68,
+     :group-by? false,
+     :commons {183 1, 968 1, 633 1},
+     :cardinality 100}},
+   :rowcount 68},
+  :ufo-sightings-drag-9
+  {:fields
+   {:duration_seconds_int
+    {:data-type "integer",
+     :distinct 46,
+     :group-by? true,
+     :commons {300 55, 60 45, 120 41},
+     :cardinality 9},
+    :comments
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"18 glowing UFOs seen over Phoenix  AZ tonight&#44 10/12/12 8:45PM" 1,
+      "amber fireball descending&#44splits into 3 objects&#44stops&#44they hover above ground with erratic movements"
+      1,
+      "Slow moving bright orange light." 1},
+     :cardinality 100},
+    :city
+    {:data-type "string",
+     :distinct 423,
+     :group-by? true,
+     :commons {"cincinnati" 5, "san diego" 5, "austin" 4},
+     :cardinality 84},
+    :date_posted
+    {:data-type "string",
+     :distinct 115,
+     :group-by? true,
+     :commons {"2013-10-14" 38, "2012-10-30" 31, "2008-10-31" 25},
+     :cardinality 23},
+    :longitude
+    {:data-type "float",
+     :distinct 433,
+     :group-by? true,
+     :commons {-122.3308333 6, -84.4569444 5, -117.1563889 5},
+     :cardinality 86},
+    :state
+    {:data-type "string",
+     :distinct 53,
+     :group-by? true,
+     :commons {"ca" 51, "ny" 35, nil 30},
+     :cardinality 10},
+    :duration_seconds
+    {:data-type "string",
+     :distinct 46,
+     :group-by? true,
+     :commons {"300" 55, "60" 45, "120" 41},
+     :cardinality 9},
+    :duration_hours
+    {:data-type "string",
+     :distinct 225,
+     :group-by? true,
+     :commons {"1 minute" 26, "5 minutes" 24, "30 seconds" 22},
+     :cardinality 44},
+    :id
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {84 1, 390 1, 49 1},
+     :cardinality 100},
+    :shape
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"light" 104, "circle" 50, "triangle" 46},
+     :cardinality 4},
+    :datetime
+    {:data-type "string",
+     :distinct 449,
+     :group-by? true,
+     :commons
+     {"2008-10-10 20:00:00.000000" 4,
+      "1999-10-11 20:15:00.000000" 4,
+      "2007-10-10 22:00:00.000000" 4},
+     :cardinality 89},
+    :latitude
+    {:data-type "string",
+     :distinct 430,
+     :group-by? true,
+     :commons {"47.6063889" 6, "39.1619444" 5, "32.7152778" 5},
+     :cardinality 86},
+    :country
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"us" 411, nil 55, "ca" 17},
+     :cardinality 0}},
+   :rowcount 500},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 85,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
+     :cardinality 97},
+    :file_path
+    {:data-type "string",
+     :distinct 87,
+     :group-by? true,
+     :commons
+     {"./flows/stitches-math.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1,
+      "./flows/dalle3-create-image-newengland-old.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 71, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
+     :cardinality 19}},
+   :rowcount 87}},
+ :runstream-drops nil,
+ :data-hash 999356622,
+ :tabs
+ ["through the rabbit hole and out the other side" "sapphire ape" "fat zebra"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/looking-glass-redux.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description "WIP: basic timeseries forecasting based on previous values",
+     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1},
+    :buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"}},
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "aaaaah-esday-the-day"
+    "aaaaah-wednesday-the-day"
+    "aaaah-wednesday-the-day"
+    "alice-puzzle-1"
+    "asdasdasdasd"
+    "autumn-theme"
+    "battle-mage"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "blackberries"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "blue-pines"
+    "boston-test-10-3-23"
+    "broken-jacket"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "capecod-viking"
+    "chaos simple"
+    "chaos-views"
+    "chompers"
+    "claude-testing2"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "counting-lord-of-the-woods"
+    "crazy-alice"
+    "dark-crested-jackelope"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "desktops-and-broomsticks"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
+    "evil-main-street"
+    "fake-books-1"
+    "fake-bricks"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
+    "glass-fish-board-test"
+    "green-storm-city"
+    "hue-board-1"
+    "late-winter-theme"
+    "lavender-side-eye"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "looking-glass-redux"
+    "looking-glass-redux2"
+    "looking-glass-redux2a"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "may-20"
+    "my-goodness"
+    "my-goodness-the-sequel"
+    "neverwinter-amy"
+    "night-city-never-sleeps"
+    "nightcity-cape-cod"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "old-fashioned-christmas"
+    "old-town-snow-stars"
+    "pensive-look"
+    "pensive-look2"
+    "pine-wood-dawn"
+    "pink-and-green-elk"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "purple-dusk-old-town"
+    "purple-nightshades"
+    "purple-techno-sunset"
+    "recharts-test-blocks"
+    "refresh-test"
+    "retro-machines"
+    "riffle-test"
+    "sick-of-your-shit"
+    "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "stop-drawing-dead-dashboards"
+    "swamp-nightgown"
+    "swamp-reacher"
+    "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-outer-blues"
+    "trad-hybrid"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "viking-pastels"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "winter-twin-peaks"
+    "witchy425"
+    "wonderland-horror-interface"
+    "wow-board"],
+   :openapi-key "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"}},
+ :runstreams
+ {"openai-image-gen-ladder"
+  {:open? true,
+   :values
+   {:prompt {:value :param/quiet-peach-armadillo, :source :param, :open? false},
+    :style-param {:open? true, :value "vivid"}},
+   :open-outputs? true}},
+ :editor? false,
+ :buffy? false,
+ :memory [262860982 236387682 4294705152],
+ :status-data
+ {"kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :awesome-pentagonal-swallow-banned-from-atoll,
+      :at "2024-03-23 22:25:13",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-03-23 22:25:13 - query ran in 0 ms."],
+          :name "query-log-:flows-sys",
+          :order 1711247113,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:flows-sys",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:flows-sys "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2024-03-24 14:46:11",
+      :payload nil,
+      :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :alert1
+  {:alerts
+   {:data
+    [[[:v-box
+       :justify
+       :center
+       :style
+       {:margin-top "-6px", :color "inherit"}
+       :children
+       [[:box :child "flow openai-image-gen-ladder has finished"]
+        nil
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "40 seconds "]
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "returns: ./images/gen/b64-image-75621-14934.png"]]]
+      10
+      1.35
+      9]
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
+ :flow-subs
+ [:flow/flow-forever>*running?
+  :flow/openai-image-gen-ladder>:pop-color
+  :flow/openai-image-gen-ladder>:dominant-color
+  :flow/flow-forever>:final-math
+  :flow/openai-image-gen-ladder>*running?
+  :flow/openai-image-gen-ladder>:output-revised-prompt
+  :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+  :flow/live-scratch-flow>*running?],
+ :client-name :awesome-pentagonal-swallow-banned-from-atoll,
+ :runstreams-lookups
+ {"openai-image-gen-ladder"
+  {:open-inputs
+   {:quality-param {:user-input "hd", :defaults {}, :type :string},
+    :base-save-directory
+    {:user-input "/home/ryanr/rvbbit-out", :defaults {}, :type :string},
+    :size-param {:user-input "1792x1024", :defaults {}, :type :string},
+    :base-web-directory
+    {:user-input "/home/ryanr/rvbbit/frontend/resources/public/images/gen",
+     :defaults {},
+     :type {:out :string}},
+    :prompt
+    {:user-input
+     "A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her body.",
+     :defaults {},
+     :type {:out :string}},
+    :style-param {:user-input "vivid", :defaults {}, :type :string}},
+   :blocks
+   {:oai-api-call
+    {:type :map,
+     :ttype :make-http-call,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "{:created 1711246585, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
+    :node-js-color-thief-script
+    {:type :map,
+     :ttype :sub-flow,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample
+     "{:dominantColor \"#ca9daa\", :colorPalette [\"#cfb2b4\" \"#0e2f69..."},
+    :dominant-color
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "#ca9daa"},
+    :quality-param
+    {:type :string,
+     :ttype :open-block,
+     :meta
+     {:*
+      {:scrubber
+       {:message "OpenAI image gen quality selector - DALLE3",
+        :values ["hd" "standard"]}}},
+     :last? false,
+     :defaults {},
+     :sample "hd"},
+    :execute-shell-command
+    {:type :map,
+     :ttype :shell-command,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "{:output [], :exception [], :seconds [], :command \"convert /..."},
+    :pop-color
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "#cfb2b4"},
+    :base-save-directory
+    {:type :string,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit-out"},
+    :color-palette
+    {:type :map,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample
+     "{:dominantColor \"#ca9daa\", :colorPalette [\"#cfb2b4\" \"#0e2f69..."},
+    :size-param
+    {:type :string,
+     :ttype :open-block,
+     :meta
+     {:*
+      {:scrubber
+       {:message "OpenAI image gen size selector - DALLE3",
+        :values ["1024x1024" "1792x1024" "1024x1792"]}}},
+     :last? false,
+     :defaults {},
+     :sample "1792x1024"},
+    :save-base64-to-webp-file
+    {:type :string,
+     :ttype :save-base64-to-webp,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit-out/b64-image-61074-21717.webp"},
+    :request-body-map
+    {:type :map,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "{:prompt \"A high-definition, highly stylized and artistic 16..."},
+    :base-web-directory
+    {:type :string,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit/frontend/resources/public/images/gen"},
+    :prompt
+    {:type :string,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "A high-definition, highly stylized and artistic 16:9 illustr..."},
+    :create-png-path
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-..."},
+    :hiccup-image-box-w-png-vw
+    {:type :vector,
+     :ttype nil,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "(renderable view)"},
+    :create-convert-command-line
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "convert /home/ryanr/rvbbit-out/b64-image-61074-21717.webp /h..."},
+    :hiccup-image-box-w-png
+    {:type :vector,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "[:v-box :padding \"10px\" :gap \"8px\" :width :width-px :style {..."},
+    :generate-file-path
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit-out/b64-image-61074-21717.webp"},
+    :relative-url-path-for-png-version
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? true,
+     :defaults {},
+     :sample "./images/gen/b64-image-61074-21717.png"},
+    :http-req-map
+    {:type :map,
+     :ttype :open-block,
+     :meta {},
+     :last? false,
+     :defaults {},
+     :sample "{:headers {\"Authorization\" \"Bearer sk-wdy5fbKL5OOMv0BqmiowT3..."},
+    :just-the-image
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "iVBORw0KGgoAAAANSUhEUgAABwAAAAQACAIAAABpndrVAAA552NhQlgAADnn..."},
+    :output-revised-prompt
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "Create a high-definition, highly stylized and artistic 16:9 ..."},
+    :style-param
+    {:type :string,
+     :ttype :open-block,
+     :meta
+     {:*
+      {:scrubber
+       {:message "OpenAI image gen style selector - DALLE3",
+        :values ["vivid" "natural"]}}},
+     :last? false,
+     :defaults {},
+     :sample "vivid"}}}},
+ :openai-api-key "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",
+ :window {:w 3318, :h 1728},
+ :post-meta
+ {:city-drag-26 {:* {:rowcount 19899}},
+  :rowcnt-drag-2 {:* {:rowcount 1}},
+  :duration-hours-drag-43 {:* {:rowcount 8349}},
+  :shape-drag-7 {:* {:rowcount 30}},
+  :state-drag-3 {:* {:rowcount 68}},
+  :ufo-sightings-drag-9 {:* {:rowcount 80332}}},
+ :flow-estimates
+ {"client-keepalive" {:times nil, :run-id "f3350f3c-27a4-4354-bf33-8f6e07cbc49a"},
+  "openai-image-gen-ladder"
+  {:times 42, :run-id "aabf0758-282b-4b84-bc1b-66701d64f05c"}},
+ :status
+ {"kick-test!" {:kick :flows-sys},
+  :heartbeat
+  {:kick
+   [:flow/flow-forever>*running?
+    :flow/openai-image-gen-ladder>:pop-color
+    :flow/openai-image-gen-ladder>:dominant-color
+    :flow/flow-forever>:final-math
+    :flow/openai-image-gen-ladder>*running?
+    :flow/openai-image-gen-ladder>:output-revised-prompt
+    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+    :flow/live-scratch-flow>*running?]},
+  :alert1 {:alerts :alert2}},
+ :screen-name "looking-glass-redux2a",
+ :recos-page2 0,
+ :selected-tab "fat zebra",
+ :snapshots nil,
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :alerts [],
+ :recos-page 0,
+ :rs-overrides-hashmap
+ {"openai-image-gen-ladder"
+  {:prompt
+   "For testing purposes, please use this prompt exactly as it is! \n\nA meticulously-detailed, hyperrealistic 16:9 digitally-rendered depiction of a wintery morning scene set in traditional New England, showcasing a unique mixture of rustic charm and futuristic, cyberpunk elements. The quaint town is enshrouded under a fresh white carpet of snow amidst a flurry storm, which creates an ambiance of slight grittiness. The architectural structures radiate a soft, inviting glow, tinted in hues of pastel pink and neon light blue. To the left side of the composition, a strikingly beautiful Irish woman in her early 30s is emphasised. Her attractive features include a buxom build, full pouty lips with a prominently larger lower lip, a perky nose, and an expression that cleverly combines satisfaction with a hint of alluring sophistication. Her flowing, slightly damp hair cascades over her neck and shoulders due to the falling snow. Intricately designed, Celtic-inspired tattoos of rabbits and scenes from nature beautifully cover her neck, collarbone, and shoulders. The timidly emerging morning sun from the horizon casts a gentle light upon her body, playing up the serene and slightly mysterious atmosphere created by the pre-dawn illumination. Her full, maternal figure basks in the sunlight, creating a visually pleasing interplay of light and shadow on her richly adorned body",
+   :style-param "vivid"}},
+ :panels-hash 512998987,
+ :sessions
+ (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
+   "300 hours, 8 minutes, 22 seconds"
+   1080502481]
+   ["vigorous-square-serval-banned-from-thalweg.edn"
+    "294 hours, 46 minutes, 4 seconds"
+    1061164481]
+   ["exciting-globular-mouse-banned-from-maar.edn"
+    "192 hours, 4 minutes, 13 seconds"
+    691453481]
+   ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
+    "300 hours, 8 minutes, 22 seconds"
+    1080502481]
+   ["restored-raspberry-mule-of-baymouth-bar.edn"
+    "62 hours, 21 minutes, 48 seconds"
+    224508396]
+   ["awesome-prismatic-jay-banned-from-malpaís.edn"
+    "62 hours, 22 minutes, 25 seconds"
+    224545272]
+   ["constant-star-shaped-echidna-banned-from-towhead.edn"
+    "276 hours, 39 minutes, 35 seconds"
+    995975481]
+   ["special-globular-coyote-of-oceanic-trench.edn"
+    "300 hours, 8 minutes, 23 seconds"
+    1080503481]
+   ["proud-thin-elk-of-rôche-moutonnée.edn"
+    "300 hours, 8 minutes, 22 seconds"
+    1080502481]
+   ["kind-rhomboidal-lion-of-the-floodplain.edn"
+    "300 hours, 8 minutes, 22 seconds"
+    1080502481]
+   ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
+    "300 hours, 8 minutes, 23 seconds"
+    1080503481]
+   ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
+    "300 hours, 8 minutes, 22 seconds"
+    1080502481]
+   ["courageous-linear-platypus-of-corrie.edn"
+    "62 hours, 42 minutes, 38 seconds"
+    225758413]
+   ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
+    "300 hours, 8 minutes, 22 seconds"
+    1080502481]
+   ["ethical-round-oyster-of-glacial-horn.edn"
+    "300 hours, 8 minutes, 22 seconds"
+    1080502481]
+   ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
+    "300 hours, 8 minutes, 22 seconds"
+    1080502481]
+   ["transforming-ivory-clam-of-the-volcanic-field.edn"
+    "116 hours, 41 minutes, 47 seconds"
+    420107481]
+   ["remarkable-thin-wombat-banned-from-flyggberg.edn"
+    "242 hours, 19 minutes, 19 seconds"
+    872359481]
+   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "4 seconds" 4245]
+   ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
+    "300 hours, 8 minutes, 22 seconds"
+    1080502481]),
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :user-params-hash -1162509822,
+ :grid-recos? true,
+ :session-hash 1649157065,
+ :panels
+ {:block-11251
+  {:name "block-11251",
+   :w 6,
+   :selected-view :hi,
+   :root [5 7],
+   :h 2,
+   :queries {},
+   :tab "through the rabbit hole and out the other side",
+   :minimized? true,
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11251.:hi"}
+     :style
+     {:font-size "14px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:push ["flow-forever" ":open-input" 21555]]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-11609
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:city-drag-26
+    {:select [:city [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :ff571]],
+     :group-by [:city],
+     :order-by [[:rowcnt :desc]]}},
+   :root [1 8],
+   :tab "sapphire ape"},
+  :block-1774
+  {:h 26,
+   :w 45,
+   :tab "fat zebra",
+   :root [0 1],
+   :name "block-1774",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:img
+      {:src :flow/openai-image-gen-ladder>:relative-url-path-for-png-version,
+       :width :width-px}]]},
+   :queries {}},
+  :block-6016
+  {:h 7,
+   :w 37,
+   :tab "fat zebra",
+   :root [13 27],
+   :name "block-6016",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "26px"}
+     :child
+     [:string :flow/openai-image-gen-ladder>:output-revised-prompt]]},
+   :queries {},
+   :minimized? false},
+  :block-7416
+  {:h 4,
+   :w 4,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-drag-from-select-all-ufo_sightings",
+   :queries
+   {:rowcnt-drag-2
+    {:select [[[:sum :rowcnt] :rowcnt_sum]], :from [[:query/city-drag-26 :yy403]]}},
+   :root [1 13],
+   :tab "sapphire ape"},
+  :block-11530
+  {:h 2,
+   :w 9,
+   :views
+   {:flow-play-runstreamed
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "25px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:run-flow ["flow-forever" "run flow 'flow-forever'" :runstream-overrides]]]},
+   :name "flow-play-from-runstreams",
+   :root [5 18],
+   :tab "through the rabbit hole and out the other side"},
+  :block-8240
+  {:drag-meta {:type :open-input},
+   :w 7,
+   :selected-view :unreal-magenta-frog,
+   :h 10,
+   :views
+   {:unreal-magenta-frog
+    [:open-input
+     {:kp [:param :unreal-magenta-frog],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [45 12],
+   :name "block-8240"},
+  :block-2536
+  {:h 2,
+   :w 16,
+   :root [0 1],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-2536",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-6121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Did you ever need a flow to stop and present an operator with some choices? Static or dynamic we need help to continue processing. How about this ALSO happening headlessly & seamlessly with your data UI?"]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-8805
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:duration-hours-drag-43
+    {:select [:duration_hours [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :cc350]],
+     :group-by [:duration_hours],
+     :order-by [[:rowcnt :desc]]}},
+   :root [25 8],
+   :tab "sapphire ape"},
+  :block-5866
+  {:drag-meta {:type :open-input},
+   :w 8,
+   :selected-view :fabulous-pink-eagle,
+   :h 13,
+   :views
+   {:fabulous-pink-eagle
+    [:open-input
+     {:kp [:param :fabulous-pink-eagle],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [52 1],
+   :name "block-5866"},
+  :block-7383
+  {:h 2,
+   :w 7,
+   :tab "fat zebra",
+   :root [45 24],
+   :name "block-7383",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "0px"
+     :style
+     {:font-size "45px", :background-color :flow/openai-image-gen-ladder>:pop-color}
+     :child
+     [:string :flow/openai-image-gen-ladder>:pop-color]]},
+   :queries {}},
+  :block-1913
+  {:h 2,
+   :w 16,
+   :root [0 15],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-1913",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-4121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Pretty cool, if you ask me. Regular Dashboards are, like, totally lame - reactive flow-powered data boards...  thats where its at."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-9369
+  {:h 3,
+   :w 16,
+   :root [0 11],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-9369",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-9363.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-3630
+  {:h 7,
+   :w 13,
+   :views
+   {:flow-play-runstreamed
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-weight 700,
+      :font-size "92px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "46px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:run-flow ["openai-image-gen-ladder" "run me" :runstream-overrides]]]},
+   :name "flow-play-from-runstreams",
+   :root [0 27],
+   :tab "fat zebra"},
+  :block-11372
+  {:h 2,
+   :w 7,
+   :tab "fat zebra",
+   :root [45 22],
+   :name "block-11372",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "0px"
+     :style
+     {:font-size "45px",
+      :background-color :flow/openai-image-gen-ladder>:dominant-color}
+     :child
+     [:string :flow/openai-image-gen-ladder>:dominant-color]]},
+   :queries {}},
+  :block-7319
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:shape-drag-7
+    {:select [:shape [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :hh354]],
+     :group-by [:shape],
+     :order-by [[:rowcnt :desc]]}},
+   :root [9 8],
+   :tab "sapphire ape"},
+  :block-4121
+  {:h 3,
+   :w 16,
+   :root [0 7],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-4121",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-4121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-5620
+  {:name "block-5620",
+   :w 13,
+   :selected-view :good-electric-blue-toad,
+   :root [58 28],
+   :h 8,
+   :tab "fat zebra",
+   :drag-meta {:type :open-input},
+   :minimized? false,
+   :views
+   {:good-electric-blue-toad
+    [:open-input
+     {:kp [:param :good-electric-blue-toad],
+      :style {:color "red", :font-size "11px"},
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]}},
+  :block-7262
+  {:drag-meta {:type :open-input},
+   :w 8,
+   :selected-view :quiet-peach-armadillo,
+   :h 14,
+   :views
+   {:quiet-peach-armadillo
+    [:open-input
+     {:kp [:param :quiet-peach-armadillo],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [52 14],
+   :name "block-7262"},
+  :block-7215
+  {:h 4,
+   :w 9,
+   :tab "through the rabbit hole and out the other side",
+   :root [5 20],
+   :name "block-7215",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "88px"}
+     :child
+     [:string :flow/flow-forever>:final-math]]},
+   :queries {}},
+  :block-3777
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:state-drag-3
+    {:select [:state [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :uu58]],
+     :group-by [:state],
+     :order-by [[:rowcnt :desc]]}},
+   :root [17 8],
+   :tab "sapphire ape"},
+  :block-1322
+  {:drag-meta {:type :open-input},
+   :w 6,
+   :selected-view :reliable-coral-moose,
+   :h 20,
+   :views
+   {:reliable-coral-moose
+    [:open-input
+     {:kp [:param :reliable-coral-moose],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [52 28],
+   :name "block-1322"},
+  :block-1784
+  {:drag-meta {:type :open-input},
+   :w 7,
+   :selected-view :brave-white-butterfly,
+   :h 11,
+   :views
+   {:brave-white-butterfly
+    [:open-input
+     {:kp [:param :brave-white-butterfly],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [45 1],
+   :name "block-1784"},
+  :block-1927
+  {:name "block-1927",
+   :w 10,
+   :selected-view :active-silver-buffalo,
+   :root [60 22],
+   :h 8,
+   :tab "fat zebra",
+   :drag-meta {:type :open-input},
+   :minimized? false,
+   :views
+   {:active-silver-buffalo
+    [:open-input
+     {:kp [:param :active-silver-buffalo],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]}},
+  :block-1519
+  {:drag-meta {:type :open-input},
+   :w 7,
+   :selected-view :composed-azure-fish,
+   :h 21,
+   :views
+   {:composed-azure-fish
+    [:open-input
+     {:kp [:param :composed-azure-fish],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [60 1],
+   :name "block-1519"},
+  :block-6121
+  {:h 2,
+   :w 16,
+   :root [0 4],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-6121",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-6121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Here you can see that while running the flow interactively, we get the dialog push, as well as the ability to manipulate the options on the flow directly."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-1449
+  {:h 7,
+   :w 32,
+   :connection-id "bigfoot-ufos",
+   :name "select-all-ufo_sightings",
+   :queries
+   {:ufo-sightings-drag-9
+    {:select
+     [:city
+      :comments
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :id
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]]}},
+   :root [1 1],
+   :tab "sapphire ape"}},
+ :selected-block :block-7262,
+ :theme-colors-hashmap
+ {"float" "#ff2050",
+  "boolean" "#8EA2A8",
+  "map" "#379fb5",
+  "list" "#36fb04",
+  "string" "#CEEFD1",
+  "any" "#eeeeee",
+  "vector" "#2C4761",
+  "keyword" "#006666",
+  "rabbit-code" "#9F93AE",
+  "datetime" "#A7B2B4",
+  "integer" "#723c5f",
+  "unknown" "#77919B",
+  "date" "#6A6391",
+  "nil" "#ff8222"},
+ :click-param
+ {:blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 27,
+   :block_data
+   "{:codemirror-theme \"ayu-dark\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#04041e82\", :editor-rim-color \"#379fb5\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#ff2050\", \"boolean\" \"#8EA2A8\", \"map\" \"#379fb5\", \"list\" \"#D4118EE\", \"string\" \"#CEEFD1\", \"any\" \"#eeeeee\", \"vector\" \"#2C4761\", \"keyword\" \"#006666\", \"rabbit-code\" \"#9F93AE\", \"datetime\" \"#A7B2B4\", \"integer\" \"#723c5f\", \"unknown\" \"#77919B\", \"date\" \"#6A6391\", \"nil\" \"#3B5A71\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"Nova Mono\", :editor-grid-selected-background-color \"#dc9cb0\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#379fb5\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/capecod-viking234-8k-4k.png)\", :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Nova Square\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "bigfoot-ufos",
+   :schema_cat nil,
+   :table_name "ufo_sightings",
+   :fields 14},
+  :flow
+  {:counting-loop>open-fn-1 nil,
+   :openai-image-gen-ladder>pop-color "#a1c7d1",
+   :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
+   :crow-flow-201>*running? false,
+   :openai-image-gen-ladder>relative-url-path-for-png-version
+   "./images/gen/b64-image-75621-14934.png",
+   :counting-loop>open-fn-2 44,
+   :openai-image-gen-ladder>*running? false,
+   :crow-flow-201a>*running? false,
+   :openai-image-gen-ladder>output-revised-prompt
+   "An intricately detailed, hyperrealistic 16:9 digitally-rendered representation of a snowy morning in a traditional New England town skilfully blended with futuristic cyberpunk elements. The town is carpeted with freshly fallen snow amidst a swirling snowstorm, adding a gritty ambience. The buildings emit a warm glow, tinted in shades of soft pastel pink and neon light blue. On the left side of the composition, there's an emphasis on an Irish woman in her early 30s. Her features include a buxom physique, full lips with a larger bottom lip, pert nose, and an expression blending contentment with appealing sophistication. Her long, slightly wet hair from the snowfall drapes over her neck and shoulders, and finely detailed Celtic-inspired tattoos of rabbits and elements from nature adorn her neck, collarbone, and shoulders. The subtly rising morning sun from the horizon casts a gentle light on her, amplifying the serene and slightly mysterious ambiance owing to the pre-dawn lighting. Her full-bodied figure is bathed in the sunlight, creating an aesthetically pleasing interplay of light and shadow on her lavishly tattooed body.",
+   :live-scratch-flow>*running? false,
+   :openai-image-gen-ladder>hiccup-image-box-w-png-vw
+   [:v-box
+    :padding
+    "10px"
+    :gap
+    "8px"
+    :width
+    :width-px
+    :style
+    {:background-color "#688ab3",
+     :border-radius "20px",
+     :font-size "12px",
+     :font-weight 700,
+     :color "#d39ec1"}
+    :children
+    [[:box :child "./images/gen/b64-image-84236-40490.png"]
+     [:box
+      :size
+      "auto"
+      :child
+      [:img
+       {:src "./images/gen/b64-image-84236-40490.png",
+        :style {:border-radius "30px"}}]]]],
+   :counting-loop>*running? false,
+   :counting-loop>open-fn-3 45,
+   :flow-forever>*running? false,
+   :openai-image-gen-ladder>execute-shell-command
+   {:output [],
+    :exception [],
+    :seconds [],
+    :command
+    "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
+   :counting-loop>final-value 44,
+   :openai-image-gen-ladder>dominant-color "#3f515d",
+   :flow-forever>final-math nil},
+  :flows-sys
+  {:flow_id "openai-image-gen-ladder",
+   :file_path "./flows/openai-image-gen-ladder.edn",
+   :last_modified "2024-03-14 09:23:21"},
+  :files-sys
+  {:file_path "./screens/capecod-viking.edn",
+   :screen_name "capecod-viking",
+   :blocks 12,
+   :queries 9,
+   :ts "2024-02-18 21:40:58"},
+  :param
+  {:reliable-coral-moose
+   ["A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  "
+    ""
+    "She has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly."
+    ""
+    "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy look.  "
+    ""],
+   :brave-white-butterfly
+   ["A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly."
+    "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."
+    ""],
+   :selected-view-data
+   [:open-input
+    {:kp [:param :quiet-peach-armadillo],
+     :width-int :panel-width+100,
+     :height-int :panel-height+80,
+     :syntax "text"}],
+   :selected-view [:views :quiet-peach-armadillo],
+   :fabulous-pink-eagle
+   ["A classic 1990s American Pizza Hut location, now even more run down and abandoned, takes on a slightly more dystopian aspect with a crucial detail: the building's roof shingles are distinctly red, highlighting the iconic Pizza Hut design. The parking lot is now heavily littered with remnants of bar charts, pie charts, old school dashboards, and shredded Tableau signage, symbolizing the profound death of the 'old world' of business intelligence. This scene is illustrated in a highly stylistic, striking, and dramatic manner, with an intensified essence of decay and the passage of time. The architecture of the Pizza Hut, with its iconic red roof and signage, stands more prominently as a relic amidst an overwhelming detritus of outdated analytics tools. This wider, cinematic view should further emphasize the desolation and dramatic change, adding a more dystopian atmosphere to the landscape. "
+    ""
+    "The surrounding area has a distinct cyberpunk vibe to it with pink and blue neon dramatic lighting - further showing that the restaurant and these data analysis tools are lost in time."],
+   :good-electric-blue-toad
+   ["A high-definition, hyperreal, vibrant 16:9 image of a snowy New England landscape in America, captured just before dawn during an intense snowstorm, masterfully merging aspects of traditional aesthetics and cyberpunk themes. The town is coated in a thick layer of snow, with structures radiating soft pink and neon blue light contributing to the slightly gritty ambiance. "
+    ""
+    "To the left of the picture, a young Caucasian woman, notably in her late 20s, with full pouty lips, her bottom lip being notably prominent, and a subtly upturned nose, confidently presents a content yet playful expression. Her long hair holds accumulating snow, revealing the severity of the blizzard. "
+    ""
+    "Intricate Celtic-inspired tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. The subtle illumination of pre-dawn adds a tranquil yet enigmatic tone to the image, highlighting the harmonious blend of nature and technological intrusion."],
+   :quiet-peach-armadillo
+   ["For testing purposes, please use this prompt exactly as it is! "
+    ""
+    "A meticulously-detailed, hyperrealistic 16:9 digitally-rendered depiction of a wintery morning scene set in traditional New England, showcasing a unique mixture of rustic charm and futuristic, cyberpunk elements. The quaint town is enshrouded under a fresh white carpet of snow amidst a flurry storm, which creates an ambiance of slight grittiness. The architectural structures radiate a soft, inviting glow, tinted in hues of pastel pink and neon light blue. To the left side of the composition, a strikingly beautiful Irish woman in her early 30s is emphasised. Her attractive features include a buxom build, full pouty lips with a prominently larger lower lip, a perky nose, and an expression that cleverly combines satisfaction with a hint of alluring sophistication. Her flowing, slightly damp hair cascades over her neck and shoulders due to the falling snow. Intricately designed, Celtic-inspired tattoos of rabbits and scenes from nature beautifully cover her neck, collarbone, and shoulders. The timidly emerging morning sun from the horizon casts a gentle light upon her body, playing up the serene and slightly mysterious atmosphere created by the pre-dawn illumination. Her full, maternal figure basks in the sunlight, creating a visually pleasing interplay of light and shadow on her richly adorned body"],
+   :unreal-magenta-frog
+   ["A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her ample body."],
+   :composed-azure-fish
+   ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style illustration showcasing a stunning, buxom, robust, and fit yet curvaceous white woman in her late 20s, posing and dressed as the Statue of Liberty, a slightly upturned nose, and a buxom yet slim figure. She holds and AR-15 rifle. She stands majestically at the port of an American New England scene with boats, American flags and cheering crowds with rifles. "
+    ""
+    "She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting. "
+    ""
+    "Her dark hair contrasts with her pale skin. A sly, playful smile dances on her full lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate freedom and liberty tattoos. "
+    ""
+    "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. "
+    ""
+    "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
+   :selected-block :block-7262,
+   :active-silver-buffalo
+   ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
+    ""
+    "She should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. "
+    ""
+    "She's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. "
+    ""
+    "The other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene."
+    ""
+    "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."]},
+  :theme
+  {:codemirror-theme "ayu-dark",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#04041e82",
+   :editor-rim-color "#379fb5",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#ff2050",
+    "boolean" "#8EA2A8",
+    "map" "#379fb5",
+    "list" "#36fb04",
+    "string" "#CEEFD1",
+    "any" "#eeeeee",
+    "vector" "#2C4761",
+    "keyword" "#006666",
+    "rabbit-code" "#9F93AE",
+    "datetime" "#A7B2B4",
+    "integer" "#723c5f",
+    "unknown" "#77919B",
+    "date" "#6A6391",
+    "nil" "#ff8222"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "Nova Mono",
+   :editor-grid-selected-background-color "#dc9cb0",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#379fb5",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/large/alice-grid3.png)",
+    :transition "all 0.8s ease-in-out",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Nova Square",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+  :sys {:selected-tab "fat zebra", :selected-tab-idx 2}},
+ :selected-flow "live-scratch-flow"}

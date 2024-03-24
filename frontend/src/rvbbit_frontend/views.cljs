@@ -1185,6 +1185,75 @@
                                                  ;(try (str (deref p)) (catch :default _ "err"))
                                                  (str p))]]])]]))
 
+(re-frame/reg-event-db
+ ::save-search-results
+ (fn [db [_ res]]
+   (assoc db :search-results res)))
+
+(re-frame/reg-sub
+ ::search-results
+ (fn [db _]
+   (get db :search-results)))
+
+(defn search-panel-left [single-width single-height]
+  (let [client-name @(re-frame/subscribe [::bricks/client-name])
+        results @(re-frame/subscribe [::search-results])]
+    [re-com/v-box
+     :children [;[re-com/box
+                ; :child "search-box"]
+                [re-com/box
+                 :padding "10px"
+                 :child [re-com/input-text
+                         :model @db/search-box
+                 ;:change-on-blur? false
+                         :on-change #(do (reset! db/search-box %)
+                                         (when (not (empty? (cstr/trim (str %))))
+                                           (re-frame/dispatch [::wfx/request :default
+                                                               {:message    {:kind :search-groups
+                                                                             :client-name client-name
+                                                                             :max-hits 200
+                                                                             :search-str (str %)}
+                                                                :on-response [::save-search-results]
+                                                                :timeout    500000}])))
+                         :height "50px"
+                         :width (px (- single-width 25))
+                         :style {:background-color (theme-pull :theme/editor-background-color nil)
+                                 :font-size "25px"
+                         ;:padding "9px"
+                                 :font-weight 700
+                                 :color (theme-pull :theme/editor-font-color nil) ;; (theme-pull :theme/editor-outer-rim-color nil)
+                                 :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 75)}]]
+                [re-com/box
+                 :height (px (- single-height 120))
+                 :style {:border "1px solid cyan"
+                         :overflow "auto"}
+                 :size "none"
+                 :child [re-com/v-box
+                         :padding "10px"
+                         :style {:color (theme-pull :theme/editor-font-color nil)}
+                         :children (for [[r cnt] results]
+                                     [re-com/h-box
+                                      :padding "4px"
+                                      :justify :between
+                                      :align :center 
+                                      :height "30px"
+                                      :style {:border "1px solid darkcyan"}
+                                      :children [[re-com/box :child (str r)]
+                                                 [re-com/box :child (str (ut/nf cnt))]]])]]]
+     :size "auto"
+     :width (px single-width)
+     :height (px single-height)
+     ;:style {:border "2px solid red"}
+     ]))
+
+(defn search-panel-right [single-width single-height]
+  [re-com/box
+   :child "search"
+   :size "auto"
+   :width (px single-width)
+   :height (px single-height)
+   :style {:border "2px solid yellow"}])
+
 (defn editor-panel [bricks-wide bricks-tall]
   (let [selected-panel-map @(re-frame/subscribe [::bricks/selected-block-map])
         selected-block @(re-frame/subscribe [::bricks/selected-block])
@@ -1308,6 +1377,12 @@
                                                                                                      :opacity (if (= @db/editor-mode :meta) 1.0 0.4)
                                                                                                      :cursor "pointer"}
                                                                                              :attr {:on-click #(reset! db/editor-mode :meta)}]
+                                                                                            
+                                                                                            [re-com/box :child (str "search")
+                                                                                             :style {;:opacity (if @file-mode? 0.4 1.0)
+                                                                                                     :opacity (if (= @db/editor-mode :search) 1.0 0.4)
+                                                                                                     :cursor "pointer"}
+                                                                                             :attr {:on-click #(reset! db/editor-mode :search)}]
 
                                                                                             ;; [re-com/box :child (str "viz suggestions")
                                                                                             ;;  :style {:opacity (if (= @db/editor-mode :viz) 1.0 0.4)
@@ -1325,7 +1400,7 @@
                                                                                                      :cursor "pointer"}
                                                                                              :attr {:on-click #(reset! db/editor-mode :files)}]
 
-                                                                                            [re-com/box :child (str "params/theme")
+                                                                                            [re-com/box :child (str "params")
                                                                                              :style {:opacity (if (= @db/editor-mode :params) 1.0 0.4)
                                                                                                      :cursor "pointer"}
                                                                                              :attr {:on-click #(reset! db/editor-mode :params)}]
@@ -1417,6 +1492,11 @@
                                              :viz [re-com/box :child [editor-panel-viz]
                                                    :style {:padding-top "10px"}
                                                    :height (px (- ttl-height 40))]
+
+                                             :search [re-com/box 
+                                                      :child [search-panel-left single-width single-height]
+                                                      :style {:padding-top "10px"}
+                                                      :height (px (- ttl-height 40))]
 
                                              :vvv [re-com/box :child
                                               ; [re-com/box :child "hey" :size "1" :style {:border "2px solid yellow"}]
@@ -2119,6 +2199,7 @@
                                                  :params [editor-panel-metadata-params single-width single-height :theme]
                                                  :meta [editor-panel-metadata-ext]
                                                  :viz [editor-panel-metadata-viz] ;[re-com/box :child "poop"]
+                                                 :search [search-panel-right single-width single-height]
                                                  :vvv [re-com/box
                                                        :size "none"
                                                        :child " " :width "0px"]
@@ -2139,8 +2220,11 @@
                   ;:size "none"
                   ;:height "490px"
                   :children
-                  [(if (and (or (= @db/editor-mode :viz) (= @db/editor-mode :vvv))
-                            reco-selected? (or (= selected-block "none!") (nil? selected-block)))
+                  [(if (and (or (= @db/editor-mode :viz) 
+                                (= @db/editor-mode :vvv))
+                            reco-selected? 
+                            (or (= selected-block "none!") 
+                                (nil? selected-block)))
 
                      [re-com/v-box
                       :size "auto"
@@ -2745,7 +2829,6 @@
              ;:height "auto"
              ;:width "50px"
                      :width "100%"}]])
-
     " "))
 
 (re-frame/reg-event-db

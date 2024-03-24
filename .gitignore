@@ -36,5 +36,6 @@ reaction-logs/
 tracker-logs/
 .lsp/
 *.log
+*.code-workspace
 
 
