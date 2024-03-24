@@ -1,0 +1,1038 @@
+{:orders
+ {:reco-counts [:table_name :cnt],
+  :connections-sys [:database_name :connection_id],
+  :fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
+  :files-sys [:file_path :screen_name :blocks :queries :ts],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :tmp--1092261340-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated]},
+ :reco-preview nil,
+ :meta
+ {:connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons {"DISTRICT" 1, "SHOOTING" 1, "HOUR" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons {"DECIMAL" 7, "BOOLEAN" 1, "VARCHAR(58)" 1},
+     :cardinality 64},
+    :data_type
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"float" 7, "string" 7, "boolean" 1},
+     :cardinality 29}},
+   :rowcount 17},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 2},
+     :cardinality 50},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 2},
+     :cardinality 50},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"boston-crime" 2},
+     :cardinality 50},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 2},
+     :cardinality 50},
+    :table_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"offenses" 1, "offense_codes" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {18 1, 3 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :reco-counts {:fields {}, :rowcount 0},
+  :blocks-sys
+  {:fields
+   {:block_key
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {":hello-there-brother" 1, "strategic grill locations" 1, ":*theme*" 1},
+     :cardinality 100},
+    :block_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"hello there!" 1,
+      "board: strategic grill locations" 1,
+      "(meta: this screen's theme)" 1},
+     :cardinality 100},
+    :queries
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 3},
+     :cardinality 33},
+    :views
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {1 1, 0 1, 27 1},
+     :cardinality 100},
+    :block_data
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"{:h 3, :w 12, :root [2 2], :name \"hello there!\", :tab \"strategic grill locations\", :views {:heya! [:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 700, :color :theme/editor-outer-rim-color, :padding-top \"14px\", :opacity 1, :font-family :theme/base-font} :child \"hello! 🐇 🍂 🦃\"]}, :queries {}}"
+      1,
+      "{:panels {:hello-there-brother {:h 3, :w 12, :root [2 2], :name \"hello there!\", :tab \"strategic grill locations\", :views {:heya! [:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 700, :color :theme/editor-outer-rim-color, :padding-top \"14px\", :opacity 1, :font-family :theme/base-font} :child \"hello! 🐇 🍂 🦃\"]}, :queries {}}}, :click-param {:param {:selected-view [nil nil], :selected-view-data nil}}}"
+      1,
+      "{:codemirror-theme \"ayu-dark\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#05041182\", :editor-rim-color \"#297fb8\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2A3959\", \"boolean\" \"#13283E\", \"map\" \"#536D82\", \"list\" \"#1F374E\", \"string\" \"#484F71\", \"vector\" \"#6B6B87\", \"keyword\" \"#C6DDAE\", \"rabbit-code\" \"#3E5970\", \"datetime\" \"#94939A\", \"integer\" \"#2D485F\", \"unknown\" \"#D510BBB\", \"date\" \"#A2AFB7\", \"nil\" \"#13283E\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#b8b2bb\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#297fb8\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/b64-decoded-9884793-8k-4k.png)\", :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Instagram Sans\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}"
+      1},
+     :cardinality 100},
+    :view_names
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {":heya!" 1,
+      "" 1,
+      ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color"
+      1},
+     :cardinality 100},
+    :query_names
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 3},
+     :cardinality 33}},
+   :rowcount 3},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 136,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 129,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 94},
+    :blocks
+    {:data-type "integer",
+     :distinct 39,
+     :group-by? true,
+     :commons {3 46, 14 6, 12 6},
+     :cardinality 28},
+    :queries
+    {:data-type "integer",
+     :distinct 32,
+     :group-by? true,
+     :commons {0 52, 6 10, 5 9},
+     :cardinality 23},
+    :ts
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons
+     {"2024-03-24 00:18:02" 35, "2024-03-24 00:18:01" 32, "2024-03-24 00:18:04" 28},
+     :cardinality 4}},
+   :rowcount 136},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 85,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
+     :cardinality 97},
+    :file_path
+    {:data-type "string",
+     :distinct 87,
+     :group-by? true,
+     :commons
+     {"./flows/stitches-math.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1,
+      "./flows/dalle3-create-image-newengland-old.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 71, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
+     :cardinality 19}},
+   :rowcount 87},
+  :tmp--1092261340-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-6857 :views :pulled-val]" 1},
+     :cardinality 100},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":pulled-val" 1},
+     :cardinality 100},
+    :updated
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2024-03-24 00:54:41" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 1},
+     :cardinality 100},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-6857" 1},
+     :cardinality 100},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"([4 1] [4 0] [4] [3] [2] [1] [0])" 1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":poised-oval-wombat-of-the-oceanic-plateau" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:box :style {} :child [:data-viewer :flow/quick-maths-v2>:random-vector-full-of-stuff_idx6_out]]"
+      1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:box :style {} :child [:data-viewer :flow/quick-maths-v2>:random-vector-full-of-stuff_idx6_out]]"
+      1},
+     :cardinality 100}},
+   :rowcount 1}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys 137},
+  :system-fields-list* {:fields-sys 170},
+  :files-list* {:files-sys 178},
+  :blocks-list* {:blocks-sys 127}},
+ :runstream-drops nil,
+ :data-hash 1603282226,
+ :tabs ["strategic grill locations"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/looking-glass-redux.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description "WIP: basic timeseries forecasting based on previous values",
+     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1},
+    :buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"}},
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "aaaaah-esday-the-day"
+    "aaaaah-wednesday-the-day"
+    "aaaah-wednesday-the-day"
+    "alice-puzzle-1"
+    "asdasdasdasd"
+    "autumn-theme"
+    "battle-mage"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "blue-pines"
+    "boston-test-10-3-23"
+    "broken-jacket"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "capecod-viking"
+    "chaos simple"
+    "chaos-views"
+    "chompers"
+    "claude-testing2"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "counting-lord-of-the-woods"
+    "crazy-alice"
+    "dark-crested-jackelope"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "desktops-and-broomsticks"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
+    "evil-main-street"
+    "fake-books-1"
+    "fake-bricks"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
+    "glass-fish-board-test"
+    "green-storm-city"
+    "hue-board-1"
+    "late-winter-theme"
+    "lavender-side-eye"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "looking-glass-redux"
+    "looking-glass-redux2"
+    "looking-glass-redux2a"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "may-20"
+    "my-goodness"
+    "my-goodness-the-sequel"
+    "neverwinter-amy"
+    "night-city-never-sleeps"
+    "nightcity-cape-cod"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "old-fashioned-christmas"
+    "old-town-snow-stars"
+    "pensive-look"
+    "pine-wood-dawn"
+    "pink-and-green-elk"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "purple-dusk-old-town"
+    "purple-nightshades"
+    "purple-techno-sunset"
+    "recharts-test-blocks"
+    "refresh-test"
+    "retro-machines"
+    "riffle-test"
+    "sick-of-your-shit"
+    "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "stop-drawing-dead-dashboards"
+    "swamp-nightgown"
+    "swamp-reacher"
+    "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-outer-blues"
+    "trad-hybrid"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "viking-pastels"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "winter-twin-peaks"
+    "witchy425"
+    "wonderland-horror-interface"
+    "wow-board"],
+   :openapi-key "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"}},
+ :runstreams {"quick-maths-v2" {:open? true, :open-outputs? true}},
+ :editor? true,
+ :session-modal? false,
+ :buffy? false,
+ :memory [102628404 74843832 4294705152],
+ :status-data
+ {"kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :poised-oval-wombat-of-the-oceanic-plateau,
+      :at "2024-03-23 20:53:53",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-03-23 20:53:53 - query ran in 0 ms."],
+          :name "query-log-:flows-sys",
+          :order 1711241633,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:flows-sys",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:flows-sys "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2024-03-23 20:55:44",
+      :payload nil,
+      :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :alert1
+  {:alerts
+   {:data
+    [[[:v-box
+       :justify
+       :center
+       :style
+       {:margin-top "-6px", :color "inherit"}
+       :children
+       [[:box :child "flow quick-maths-v2 has finished"]
+        nil
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "less than a second "]
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "returns: true"]]]
+      10
+      1.35
+      9]
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
+ :flow-subs
+ [:flow/crow-flow-201a>*running?
+  :flow/counting-loop>*running?
+  :flow/live-scratch-flow>*running?
+  :flow/flow-forever>:final-math
+  :flow/flow-forever>*running?
+  :flow/crow-flow-201>*running?
+  :flow/quick-maths-v2>*running?
+  :flow/quick-maths-v2>:random-vector-full-of-stuff_idx6_out],
+ :client-name :poised-oval-wombat-of-the-oceanic-plateau,
+ :runstreams-lookups
+ {"quick-maths-v2"
+  {:open-inputs
+   {:static-value-1 {:user-input 123323, :defaults {}, :type :integer},
+    :test-integer-slider {:user-input 135, :defaults {}, :type :integer},
+    :start-with-a-bang {:user-input :go, :defaults {}, :type :keyword},
+    :scrubber-buttons {:user-input "tick", :defaults {}, :type :string}},
+   :blocks
+   {:divider-out-out
+    {:type :unknown,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "2552/135"},
+    :random-vector-full-of-stuff
+    {:type :vector,
+     :ttype :open-block,
+     :meta
+     {:test1*
+      {:desc
+       "Replace /path/to/source/dir with the path to your source directory and *.ext with the file extension that matches your source files. For instance, if you're counting lines in a Python project, you would use *.py.",
+       :scrubber
+       {:message "ytodad",
+        :values
+        ["area"
+         "bar"
+         "circle"
+         "line"
+         "point"
+         "rect"
+         "rule"
+         "square"
+         "text"
+         "tick"]}}},
+     :last? false,
+     :defaults {:test1* 143},
+     :sample "[37 84 95 :go {:fook true, :bite 984, :goo \"tick\"} 0 true [0..."},
+    :random-vector-full-of-stuff_idx6
+    {:type :vector,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "[true 3 false 8640675/1276]"},
+    :divisive-2
+    {:type :unknown,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "8640675/1276"},
+    :static-value-1
+    {:type :integer,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "123323"},
+    :get-random-integer
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "2552"},
+    :test-integer-slider
+    {:type :integer,
+     :ttype :open-block,
+     :meta {:* {:scrubber [0 1 900]}},
+     :last? false,
+     :defaults {},
+     :sample "135"},
+    :static-value-2-out-out
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "405"},
+    :start-with-a-bang
+    {:type :keyword,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample ":go"},
+    :random-vector-full-of-stuff_idx6_out
+    {:type :vector,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "[true 3 false 8640675/1276]"},
+    :divider-out
+    {:type :unknown,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "2552/135"},
+    :divider
+    {:type :unknown,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "2552/135"},
+    :scrubber-buttons
+    {:type :string,
+     :ttype :open-block,
+     :meta
+     {:*
+      {:desc
+       "Replace /path/to/source/dir with the path to your source directory and *.ext with the file extension that matches your source files. For instance, if you're counting lines in a Python project, you would use *.py.",
+       :scrubber
+       {:message "ytodad",
+        :values
+        ["area"
+         "bar"
+         "circle"
+         "line"
+         "point"
+         "rect"
+         "rule"
+         "square"
+         "text"
+         "tick"]}}},
+     :last? false,
+     :defaults {},
+     :sample "tick"},
+    :random-vector-full-of-stuff_idx6_idx0
+    {:type :boolean,
+     :ttype :open-fn,
+     :meta nil,
+     :last? true,
+     :defaults {},
+     :sample "true"},
+    :java-uid-test-string
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "uuid:  a04dd3bf-5a5d-4e8f-818c-c60f3cbbed1d"},
+    :some-quick-maths-yo
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "128010"},
+    :random-vector-full-of-stuff_idx1
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "84"},
+    :static-value-2-out
+    {:type :integer,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "135"},
+    :grab-an-item
+    {:type :map,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "{:fook true, :bite 984, :goo \"tick\"}"},
+    :static-value-2-out-out-out
+    {:type :float,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "343.4"}}}},
+ :alt-key-held? false,
+ :openai-api-key "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",
+ :window {:w 1438, :h 1525},
+ :post-meta
+ {:ufo-sightings-drag-9 {:* {:rowcount 80332}},
+  :state-drag-3 {:* {:rowcount 68}},
+  :city-drag-26 {:* {:rowcount 19899}},
+  :shape-drag-7 {:* {:rowcount 30}},
+  :duration-hours-drag-43 {:* {:rowcount 8349}},
+  :rowcnt-drag-2 {:* {:rowcount 1}}},
+ :flow-estimates
+ {"client-keepalive" {:times nil, :run-id "cd5ea2ad-1ac4-4bbd-9f24-786212167265"},
+  "quick-maths-v2" {:times nil, :run-id "20f1d5a2-daf5-45f4-a6fd-c8e932ef6c6d"}},
+ :status
+ {"kick-test!" {:kick :flows-sys},
+  :heartbeat
+  {:kick
+   [:flow/crow-flow-201a>*running?
+    :flow/counting-loop>*running?
+    :flow/live-scratch-flow>*running?
+    :flow/flow-forever>:final-math
+    :flow/flow-forever>*running?
+    :flow/crow-flow-201>*running?
+    :flow/quick-maths-v2>*running?
+    :flow/quick-maths-v2>:random-vector-full-of-stuff_idx6_out]},
+  :alert1 {:alerts :alert2}},
+ :screen-name "blackberries",
+ :recos-page2 0,
+ :selected-tab "strategic grill locations",
+ :col-names nil,
+ :snapshots nil,
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :alerts [],
+ :recos-page 0,
+ :rs-overrides-hashmap {"quick-maths-v2" nil},
+ :panels-hash 1640701991,
+ :sessions
+ (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
+   "282 hours, 17 minutes, 48 seconds"
+   1016268287]
+   ["vigorous-square-serval-banned-from-thalweg.edn"
+    "276 hours, 55 minutes, 30 seconds"
+    996930287]
+   ["exciting-globular-mouse-banned-from-maar.edn"
+    "174 hours, 13 minutes, 39 seconds"
+    627219287]
+   ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
+    "282 hours, 17 minutes, 48 seconds"
+    1016268287]
+   ["restored-raspberry-mule-of-baymouth-bar.edn"
+    "44 hours, 31 minutes, 14 seconds"
+    160274202]
+   ["awesome-prismatic-jay-banned-from-malpaís.edn"
+    "44 hours, 31 minutes, 51 seconds"
+    160311078]
+   ["constant-star-shaped-echidna-banned-from-towhead.edn"
+    "258 hours, 49 minutes, 1 second"
+    931741287]
+   ["special-globular-coyote-of-oceanic-trench.edn"
+    "282 hours, 17 minutes, 49 seconds"
+    1016269287]
+   ["proud-thin-elk-of-rôche-moutonnée.edn"
+    "282 hours, 17 minutes, 48 seconds"
+    1016268287]
+   ["kind-rhomboidal-lion-of-the-floodplain.edn"
+    "282 hours, 17 minutes, 48 seconds"
+    1016268287]
+   ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
+    "282 hours, 17 minutes, 49 seconds"
+    1016269287]
+   ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
+    "282 hours, 17 minutes, 48 seconds"
+    1016268287]
+   ["courageous-linear-platypus-of-corrie.edn"
+    "44 hours, 52 minutes, 4 seconds"
+    161524219]
+   ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
+    "282 hours, 17 minutes, 48 seconds"
+    1016268287]
+   ["ethical-round-oyster-of-glacial-horn.edn"
+    "282 hours, 17 minutes, 48 seconds"
+    1016268287]
+   ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
+    "282 hours, 17 minutes, 48 seconds"
+    1016268287]
+   ["transforming-ivory-clam-of-the-volcanic-field.edn"
+    "98 hours, 51 minutes, 13 seconds"
+    355873287]
+   ["remarkable-thin-wombat-banned-from-flyggberg.edn"
+    "224 hours, 28 minutes, 45 seconds"
+    808125287]
+   ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
+    "282 hours, 17 minutes, 48 seconds"
+    1016268287]
+   ["satisfactory-narrow-donkey-banned-from-tea-table.edn"
+    "282 hours, 17 minutes, 48 seconds"
+    1016268287]),
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :user-params-hash -1522278460,
+ :grid-recos? true,
+ :preview-keys2 [],
+ :session-hash -255156802,
+ :panels
+ {:hello-there-brother
+  {:h 3,
+   :w 12,
+   :root [3 3],
+   :name "hello there!",
+   :tab "strategic grill locations",
+   :views
+   {:heya!
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "50px",
+      :font-weight 700,
+      :color :theme/editor-outer-rim-color,
+      :padding-top "14px",
+      :opacity 1,
+      :font-family :theme/base-font}
+     :child
+     "hello! 🐇 🍂 🦞"]},
+   :queries {}},
+  :block-4599
+  {:drag-meta {:type :open-input},
+   :w 9,
+   :selected-view :upstanding-crimson-frog,
+   :h 3,
+   :views
+   {:upstanding-crimson-frog
+    [:open-input
+     {:kp [:param :upstanding-crimson-frog],
+      :style {:font-size "27px"},
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "clojure"}]},
+   :tab "strategic grill locations",
+   :root [3 7],
+   :name "block-4599"},
+  :block-6857
+  {:h 5,
+   :w 6,
+   :tab "strategic grill locations",
+   :root [3 11],
+   :name "block-6857",
+   :views
+   {:pulled-val
+    [:box
+     :style
+     {}
+     :child
+     [:data-viewer :flow/quick-maths-v2>:random-vector-full-of-stuff_idx6_out]]},
+   :queries {}}},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#2A3959",
+  "boolean" "#13283E",
+  "map" "#536D82",
+  "list" "#1F374E",
+  "string" "#484F71",
+  "vector" "#6B6B87",
+  "keyword" "#C6DDAE",
+  "rabbit-code" "#3E5970",
+  "datetime" "#94939A",
+  "integer" "#2D485F",
+  "unknown" "#D510BBB",
+  "date" "#A2AFB7",
+  "nil" "#13283E"},
+ :click-param
+ {:theme
+  {:codemirror-theme "ayu-dark",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#05041182",
+   :editor-rim-color "#297fb8",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#2A3959",
+    "boolean" "#13283E",
+    "map" "#536D82",
+    "list" "#1F374E",
+    "string" "#484F71",
+    "vector" "#6B6B87",
+    "keyword" "#C6DDAE",
+    "rabbit-code" "#3E5970",
+    "datetime" "#94939A",
+    "integer" "#2D485F",
+    "unknown" "#D510BBB",
+    "date" "#A2AFB7",
+    "nil" "#13283E"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#b8b2bb",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#297fb8",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/large/b64-decoded-9884793-8k-4k.png)",
+    :transition "all 0.8s ease-in-out",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Instagram Sans",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :param
+  {:selected-view [nil nil],
+   :selected-view-data nil,
+   :selected-block :block-6857,
+   :upstanding-crimson-frog "new parameter value!"},
+  :connections-sys {:database_name "SQLite", :connection_id "boston-crime"},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "boston-crime",
+   :schema_cat nil,
+   :table_name "offenses",
+   :fields 18},
+  :files-sys
+  {:file_path "./screens/blue-pines.edn",
+   :screen_name "blue-pines",
+   :blocks 3,
+   :queries 0,
+   :ts "2024-03-24 00:18:04"},
+  :blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 27,
+   :block_data
+   "{:codemirror-theme \"ayu-dark\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#05041182\", :editor-rim-color \"#297fb8\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2A3959\", \"boolean\" \"#13283E\", \"map\" \"#536D82\", \"list\" \"#1F374E\", \"string\" \"#484F71\", \"vector\" \"#6B6B87\", \"keyword\" \"#C6DDAE\", \"rabbit-code\" \"#3E5970\", \"datetime\" \"#94939A\", \"integer\" \"#2D485F\", \"unknown\" \"#D510BBB\", \"date\" \"#A2AFB7\", \"nil\" \"#13283E\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#b8b2bb\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#297fb8\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/b64-decoded-9884793-8k-4k.png)\", :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Instagram Sans\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :flow
+  {:quick-maths-v2>*running? false,
+   :quick-maths-v2>random-vector-full-of-stuff_idx6_out
+   [true 3 false 6771.688871473354]}},
+ :selected-flow "live-scratch-flow"}

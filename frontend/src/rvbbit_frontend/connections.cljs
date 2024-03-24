@@ -395,7 +395,7 @@
 
      ;(resolver/logic-and-params val nil)
      (if contains-params? 
-       (logic-and-params-fn val nil)
+       (logic-and-params-fn val nil) ;; process again, no recursion here for now... we want to contain this reaction chain
        val)
      ;val
      )))

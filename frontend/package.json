@@ -3,7 +3,7 @@
 	"scripts": {
 		"ancient": "lein ancient",
 		"watch": "npx shadow-cljs watch app browser-test karma-test",
-                "format": "lein cljfmt fix",
+		"format": "lein cljfmt fix",
 		"release": "npx shadow-cljs release app",
 		"build-report": "npx shadow-cljs run shadow.cljs.build-report app target/build-report.html"
 	},

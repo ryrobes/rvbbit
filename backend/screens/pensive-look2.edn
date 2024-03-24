@@ -1,0 +1,650 @@
+{:orders
+ {:connections-sys [:database_name :connection_id],
+  :fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :reco-counts [:table_name :cnt],
+  :blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
+  :files-sys [:file_path :screen_name :blocks :queries :ts]},
+ :reco-preview nil,
+ :meta
+ {:connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons {"DISTRICT" 1, "SHOOTING" 1, "HOUR" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons {"DECIMAL" 7, "BOOLEAN" 1, "VARCHAR(58)" 1},
+     :cardinality 64},
+    :data_type
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"float" 7, "string" 7, "boolean" 1},
+     :cardinality 29}},
+   :rowcount 17},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 2},
+     :cardinality 50},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 2},
+     :cardinality 50},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"boston-crime" 2},
+     :cardinality 50},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 2},
+     :cardinality 50},
+    :table_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"offenses" 1, "offense_codes" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {18 1, 3 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :reco-counts {:fields {}, :rowcount 0},
+  :blocks-sys {:fields {}, :rowcount 0},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 136,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 129,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 94},
+    :blocks
+    {:data-type "integer",
+     :distinct 39,
+     :group-by? true,
+     :commons {3 46, 14 6, 12 6},
+     :cardinality 28},
+    :queries
+    {:data-type "integer",
+     :distinct 32,
+     :group-by? true,
+     :commons {0 52, 6 10, 5 9},
+     :cardinality 23},
+    :ts
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons
+     {"2024-03-24 00:18:02" 35, "2024-03-24 00:18:01" 32, "2024-03-24 00:18:04" 28},
+     :cardinality 4}},
+   :rowcount 136}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys 137},
+  :system-fields-list* {:fields-sys 170},
+  :files-list* {:files-sys 178},
+  :blocks-list* {:blocks-sys ##Inf}},
+ :runstream-drops nil,
+ :data-hash 1965289748,
+ :tabs ["strategic grill locations"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/looking-glass-redux.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description "WIP: basic timeseries forecasting based on previous values",
+     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1},
+    :buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"}},
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "aaaaah-esday-the-day"
+    "aaaaah-wednesday-the-day"
+    "aaaah-wednesday-the-day"
+    "alice-puzzle-1"
+    "asdasdasdasd"
+    "autumn-theme"
+    "battle-mage"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "blue-pines"
+    "boston-test-10-3-23"
+    "broken-jacket"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "capecod-viking"
+    "chaos simple"
+    "chaos-views"
+    "chompers"
+    "claude-testing2"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "counting-lord-of-the-woods"
+    "crazy-alice"
+    "dark-crested-jackelope"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "desktops-and-broomsticks"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
+    "evil-main-street"
+    "fake-books-1"
+    "fake-bricks"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
+    "glass-fish-board-test"
+    "green-storm-city"
+    "hue-board-1"
+    "late-winter-theme"
+    "lavender-side-eye"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "looking-glass-redux"
+    "looking-glass-redux2"
+    "looking-glass-redux2a"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "may-20"
+    "my-goodness"
+    "my-goodness-the-sequel"
+    "neverwinter-amy"
+    "night-city-never-sleeps"
+    "nightcity-cape-cod"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "old-fashioned-christmas"
+    "old-town-snow-stars"
+    "pensive-look"
+    "pine-wood-dawn"
+    "pink-and-green-elk"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "purple-dusk-old-town"
+    "purple-nightshades"
+    "purple-techno-sunset"
+    "recharts-test-blocks"
+    "refresh-test"
+    "retro-machines"
+    "riffle-test"
+    "sick-of-your-shit"
+    "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "stop-drawing-dead-dashboards"
+    "swamp-nightgown"
+    "swamp-reacher"
+    "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-outer-blues"
+    "trad-hybrid"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "viking-pastels"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "winter-twin-peaks"
+    "witchy425"
+    "wonderland-horror-interface"
+    "wow-board"],
+   :openapi-key "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"}},
+ :runstreams nil,
+ :editor? true,
+ :buffy? false,
+ :memory [62850517 51907793 4294705152],
+ :status-data
+ {"kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :effortless-aquamarine-mouse-exiled-from-kame,
+      :at "2024-03-23 20:50:58",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-03-23 20:50:58 - query ran in 58 ms."],
+          :name "query-log-:city-drag-26",
+          :order 1711241458,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:city-drag-26",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:city-drag-26 "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2024-03-23 20:54:59",
+      :payload nil,
+      :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
+ :flow-subs
+ [:flow/crow-flow-201a>*running?
+  :flow/counting-loop>*running?
+  :flow/live-scratch-flow>*running?
+  :flow/flow-forever>:final-math
+  :flow/flow-forever>*running?
+  :flow/crow-flow-201>*running?],
+ :client-name :effortless-aquamarine-mouse-exiled-from-kame,
+ :openai-api-key "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",
+ :window {:w 1442, :h 1525},
+ :post-meta
+ {:ufo-sightings-drag-9 {:* {:rowcount 80332}},
+  :state-drag-3 {:* {:rowcount 68}},
+  :shape-drag-7 {:* {:rowcount 30}},
+  :duration-hours-drag-43 {:* {:rowcount 8349}},
+  :rowcnt-drag-2 {:* {:rowcount 1}},
+  :city-drag-26 {:* {:rowcount 19899}}},
+ :flow-estimates
+ {"client-keepalive" {:times nil, :run-id "951cfd97-8d1e-4100-8ef8-f6f2b8480d65"},
+  "quick-maths-v2" {:times nil, :run-id "20f1d5a2-daf5-45f4-a6fd-c8e932ef6c6d"}},
+ :status
+ {"kick-test!" {:kick :city-drag-26},
+  :heartbeat
+  {:kick
+   [:flow/crow-flow-201a>*running?
+    :flow/counting-loop>*running?
+    :flow/live-scratch-flow>*running?
+    :flow/flow-forever>:final-math
+    :flow/flow-forever>*running?
+    :flow/crow-flow-201>*running?]}},
+ :screen-name "pensive-look2",
+ :recos-page2 0,
+ :selected-tab "strategic grill locations",
+ :col-names nil,
+ :snapshots nil,
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :alerts [],
+ :recos-page 0,
+ :rs-overrides-hashmap {},
+ :panels-hash -80385436,
+ :sessions
+ (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
+   "282 hours, 15 minutes, 58 seconds"
+   1016158060]
+   ["vigorous-square-serval-banned-from-thalweg.edn"
+    "276 hours, 53 minutes, 40 seconds"
+    996820060]
+   ["exciting-globular-mouse-banned-from-maar.edn"
+    "174 hours, 11 minutes, 49 seconds"
+    627109060]
+   ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
+    "282 hours, 15 minutes, 58 seconds"
+    1016158060]
+   ["restored-raspberry-mule-of-baymouth-bar.edn"
+    "44 hours, 29 minutes, 23 seconds"
+    160163975]
+   ["awesome-prismatic-jay-banned-from-malpaís.edn"
+    "44 hours, 30 minutes, 0 second"
+    160200851]
+   ["constant-star-shaped-echidna-banned-from-towhead.edn"
+    "258 hours, 47 minutes, 11 seconds"
+    931631060]
+   ["special-globular-coyote-of-oceanic-trench.edn"
+    "282 hours, 15 minutes, 59 seconds"
+    1016159060]
+   ["proud-thin-elk-of-rôche-moutonnée.edn"
+    "282 hours, 15 minutes, 58 seconds"
+    1016158060]
+   ["kind-rhomboidal-lion-of-the-floodplain.edn"
+    "282 hours, 15 minutes, 58 seconds"
+    1016158060]
+   ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
+    "282 hours, 15 minutes, 59 seconds"
+    1016159060]
+   ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
+    "282 hours, 15 minutes, 58 seconds"
+    1016158060]
+   ["courageous-linear-platypus-of-corrie.edn"
+    "44 hours, 50 minutes, 13 seconds"
+    161413992]
+   ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
+    "282 hours, 15 minutes, 58 seconds"
+    1016158060]
+   ["ethical-round-oyster-of-glacial-horn.edn"
+    "282 hours, 15 minutes, 58 seconds"
+    1016158060]
+   ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
+    "282 hours, 15 minutes, 58 seconds"
+    1016158060]
+   ["transforming-ivory-clam-of-the-volcanic-field.edn"
+    "98 hours, 49 minutes, 23 seconds"
+    355763060]
+   ["remarkable-thin-wombat-banned-from-flyggberg.edn"
+    "224 hours, 26 minutes, 55 seconds"
+    808015060]
+   ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
+    "282 hours, 15 minutes, 58 seconds"
+    1016158060]
+   ["satisfactory-narrow-donkey-banned-from-tea-table.edn"
+    "282 hours, 15 minutes, 58 seconds"
+    1016158060]),
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :user-params-hash -197073038,
+ :grid-recos? true,
+ :session-hash 335319208,
+ :panels
+ {:hello-there-brother
+  {:h 3,
+   :w 12,
+   :root [2 3],
+   :name "hello there!",
+   :tab "strategic grill locations",
+   :views
+   {:heya!
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "50px",
+      :font-weight 700,
+      :color :theme/editor-outer-rim-color,
+      :padding-top "14px",
+      :opacity 1,
+      :font-family :theme/base-font}
+     :child
+     "hello! 🐇 🍂 🦃"]},
+   :queries {}},
+  :block-9327
+  {:drag-meta {:type :open-input},
+   :w 8,
+   :selected-view :imaginative-chocolate-weasel,
+   :h 3,
+   :views
+   {:imaginative-chocolate-weasel
+    [:open-input
+     {:kp [:param :imaginative-chocolate-weasel],
+      :width-int :panel-width+100,
+      :style {:font-size "27px"},
+      :height-int :panel-height+80,
+      :syntax "clojure"}]},
+   :tab "strategic grill locations",
+   :root [2 10],
+   :name "block-9327"}},
+ :selected-block :hello-there-brother,
+ :theme-colors-hashmap
+ {"float" "#9E8F9F",
+  "boolean" "#3A3863",
+  "map" "#4A4C71",
+  "list" "#887590",
+  "string" "#112177DF",
+  "vector" "#AFABAE",
+  "keyword" "#B8C3BC",
+  "rabbit-code" "#10013AD0",
+  "datetime" "#C9D2B4",
+  "integer" "#A6A6A7",
+  "unknown" "#554A72",
+  "date" "#75748C",
+  "nil" "#E7103C2"},
+ :click-param
+ {:theme
+  {:codemirror-theme "ayu-dark",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#090a1082",
+   :editor-rim-color "#b85796",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#9E8F9F",
+    "boolean" "#3A3863",
+    "map" "#4A4C71",
+    "list" "#887590",
+    "string" "#112177DF",
+    "vector" "#AFABAE",
+    "keyword" "#B8C3BC",
+    "rabbit-code" "#10013AD0",
+    "datetime" "#C9D2B4",
+    "integer" "#A6A6A7",
+    "unknown" "#554A72",
+    "date" "#75748C",
+    "nil" "#E7103C2"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "JetBrains Mono",
+   :editor-grid-selected-background-color "#d9cbe0",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#b85796",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/large/pensive-look-234-8k-4k.png)",
+    :transition "all 0.8s ease-in-out",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Instagram Sans",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :param
+  {:selected-view [:views :heya!],
+   :selected-view-data
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-size "50px",
+     :font-weight 700,
+     :color :theme/editor-outer-rim-color,
+     :padding-top "14px",
+     :opacity 1,
+     :font-family :theme/base-font}
+    :child
+    "hello! 🐇 🍂 🦃"],
+   :imaginative-chocolate-weasel "my simple parameter",
+   :selected-block :hello-there-brother},
+  :connections-sys {:database_name "SQLite", :connection_id "boston-crime"},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "boston-crime",
+   :schema_cat nil,
+   :table_name "offenses",
+   :fields 18}},
+ :selected-flow "live-scratch-flow"}

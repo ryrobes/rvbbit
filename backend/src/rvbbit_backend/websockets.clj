@@ -2545,9 +2545,9 @@
 
 
 (defmethod wl/handle-request :sync-client-params [{:keys [client-name params-map]}]
-  (ut/pp [:sync-client-params-from client-name (keys (or params-map {}))])
+  (ut/pp [:sync-client-params-from client-name (keys (or (dissoc params-map nil) {}))])
   ;; set running flow from client-name/flow-id
-  (swap! params-atom assoc client-name (or params-map {}))
+  (swap! params-atom assoc client-name (or (dissoc params-map nil) {}))
   [:got-it!])
 
 (defmethod wl/handle-request :run-flow2 [{:keys [client-name flowmap flow-id]}]
@@ -2747,7 +2747,7 @@
           ;last-value (get-in @last-values-per [client-name keypath])
           all-clients-subbed (for [c (keys @atoms-and-watchers)
                                    :when (some #(= % flow-key) (keys (get @atoms-and-watchers c)))] c)]
-      (ut/pp [:mkk-watcher flow-key client-name keypath (not= old-value new-value)])
+      ;; (ut/pp [:mkk-watcher flow-key client-name keypath (not= old-value new-value)])
       (when ;(or
              (and (not (nil? new-value))
                   (or ;(not= last-value new-value) 
@@ -2882,7 +2882,6 @@
                           :subs-at-time (keys (get @atoms-and-watchers client-name))
                           :flow-child-atoms (keys @flow-child-atoms)} 125)))
 
-
   (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)))
 
 (defn send-reaction-runner [keypath client-name new-value]
@@ -2970,7 +2969,7 @@
           (cond (cstr/includes? (str flow-key) "*running?") false
                 (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
                 (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
-                (= base-type :panels) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+                (= base-type :panel) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
                 :else (get-in @flow-db/results-atom keypath lv) ;; assume flow
                   ;; ^^ SHOULD be the last val (persistently cached), on cold boot @results-atom will be empty anyways
                 ) nil nil nil)
