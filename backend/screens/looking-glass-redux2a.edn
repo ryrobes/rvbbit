@@ -385,7 +385,7 @@
    :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [262860982 236387682 4294705152],
+ :memory [293382743 266899547 4294705152],
  :status-data
  {"kick-test!"
   {:kick
@@ -415,7 +415,7 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-03-24 14:46:11",
+      :at "2024-03-25 12:10:28",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -436,12 +436,12 @@
          :style
          {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "40 seconds "]
+         "58 seconds "]
         [:box
          :style
          {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "returns: ./images/gen/b64-image-75621-14934.png"]]]
+         "returns: ./images/gen/b64-image-65963-90940.png"]]]
       10
       1.35
       9]
@@ -449,13 +449,13 @@
     :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:flow/flow-forever>*running?
+ [:flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+  :flow/openai-image-gen-ladder>:output-revised-prompt
+  :flow/flow-forever>*running?
   :flow/openai-image-gen-ladder>:pop-color
   :flow/openai-image-gen-ladder>:dominant-color
   :flow/flow-forever>:final-math
   :flow/openai-image-gen-ladder>*running?
-  :flow/openai-image-gen-ladder>:output-revised-prompt
-  :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
   :flow/live-scratch-flow>*running?],
  :client-name :awesome-pentagonal-swallow-banned-from-atoll,
  :runstreams-lookups
@@ -661,20 +661,20 @@
   :state-drag-3 {:* {:rowcount 68}},
   :ufo-sightings-drag-9 {:* {:rowcount 80332}}},
  :flow-estimates
- {"client-keepalive" {:times nil, :run-id "f3350f3c-27a4-4354-bf33-8f6e07cbc49a"},
+ {"client-keepalive" {:times nil, :run-id "63f5ded4-fc60-487a-9f12-228bb453636b"},
   "openai-image-gen-ladder"
-  {:times 42, :run-id "aabf0758-282b-4b84-bc1b-66701d64f05c"}},
+  {:times 47.9, :run-id "24cba73e-bfc1-4913-983d-f45283ff66a5"}},
  :status
  {"kick-test!" {:kick :flows-sys},
   :heartbeat
   {:kick
-   [:flow/flow-forever>*running?
+   [:flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+    :flow/openai-image-gen-ladder>:output-revised-prompt
+    :flow/flow-forever>*running?
     :flow/openai-image-gen-ladder>:pop-color
     :flow/openai-image-gen-ladder>:dominant-color
     :flow/flow-forever>:final-math
     :flow/openai-image-gen-ladder>*running?
-    :flow/openai-image-gen-ladder>:output-revised-prompt
-    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
     :flow/live-scratch-flow>*running?]},
   :alert1 {:alerts :alert2}},
  :screen-name "looking-glass-redux2a",
@@ -692,67 +692,69 @@
  :panels-hash 512998987,
  :sessions
  (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
-   "300 hours, 8 minutes, 22 seconds"
-   1080502481]
+   "321 hours, 32 minutes, 12 seconds"
+   1157532309]
    ["vigorous-square-serval-banned-from-thalweg.edn"
-    "294 hours, 46 minutes, 4 seconds"
-    1061164481]
+    "316 hours, 9 minutes, 54 seconds"
+    1138194309]
    ["exciting-globular-mouse-banned-from-maar.edn"
-    "192 hours, 4 minutes, 13 seconds"
-    691453481]
+    "213 hours, 28 minutes, 3 seconds"
+    768483309]
    ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
-    "300 hours, 8 minutes, 22 seconds"
-    1080502481]
+    "321 hours, 32 minutes, 12 seconds"
+    1157532309]
    ["restored-raspberry-mule-of-baymouth-bar.edn"
-    "62 hours, 21 minutes, 48 seconds"
-    224508396]
+    "83 hours, 45 minutes, 38 seconds"
+    301538224]
    ["awesome-prismatic-jay-banned-from-malpaís.edn"
-    "62 hours, 22 minutes, 25 seconds"
-    224545272]
+    "83 hours, 46 minutes, 15 seconds"
+    301575100]
    ["constant-star-shaped-echidna-banned-from-towhead.edn"
-    "276 hours, 39 minutes, 35 seconds"
-    995975481]
+    "298 hours, 3 minutes, 25 seconds"
+    1073005309]
    ["special-globular-coyote-of-oceanic-trench.edn"
-    "300 hours, 8 minutes, 23 seconds"
-    1080503481]
+    "321 hours, 32 minutes, 13 seconds"
+    1157533309]
    ["proud-thin-elk-of-rôche-moutonnée.edn"
-    "300 hours, 8 minutes, 22 seconds"
-    1080502481]
+    "321 hours, 32 minutes, 12 seconds"
+    1157532309]
    ["kind-rhomboidal-lion-of-the-floodplain.edn"
-    "300 hours, 8 minutes, 22 seconds"
-    1080502481]
+    "321 hours, 32 minutes, 12 seconds"
+    1157532309]
    ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
-    "300 hours, 8 minutes, 23 seconds"
-    1080503481]
+    "321 hours, 32 minutes, 13 seconds"
+    1157533309]
    ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
-    "300 hours, 8 minutes, 22 seconds"
-    1080502481]
+    "321 hours, 32 minutes, 12 seconds"
+    1157532309]
    ["courageous-linear-platypus-of-corrie.edn"
-    "62 hours, 42 minutes, 38 seconds"
-    225758413]
+    "84 hours, 6 minutes, 28 seconds"
+    302788241]
    ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
-    "300 hours, 8 minutes, 22 seconds"
-    1080502481]
+    "321 hours, 32 minutes, 12 seconds"
+    1157532309]
    ["ethical-round-oyster-of-glacial-horn.edn"
-    "300 hours, 8 minutes, 22 seconds"
-    1080502481]
+    "321 hours, 32 minutes, 12 seconds"
+    1157532309]
    ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
-    "300 hours, 8 minutes, 22 seconds"
-    1080502481]
+    "321 hours, 32 minutes, 12 seconds"
+    1157532309]
    ["transforming-ivory-clam-of-the-volcanic-field.edn"
-    "116 hours, 41 minutes, 47 seconds"
-    420107481]
+    "138 hours, 5 minutes, 37 seconds"
+    497137309]
    ["remarkable-thin-wombat-banned-from-flyggberg.edn"
-    "242 hours, 19 minutes, 19 seconds"
-    872359481]
-   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "4 seconds" 4245]
+    "263 hours, 43 minutes, 9 seconds"
+    949389309]
+   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn"
+    "1 minute, 8 seconds"
+    68148]
    ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
-    "300 hours, 8 minutes, 22 seconds"
-    1080502481]),
+    "321 hours, 32 minutes, 12 seconds"
+    1157532309]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1162509822,
+ :user-params-hash -1902802587,
  :grid-recos? true,
- :session-hash 1649157065,
+ :session-hash -1848005526,
  :panels
  {:block-11251
   {:name "block-11251",
@@ -1298,16 +1300,16 @@
    :fields 14},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#a1c7d1",
+   :openai-image-gen-ladder>pop-color "#a5b3c2",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-75621-14934.png",
+   "./images/gen/b64-image-65963-90940.png",
    :counting-loop>open-fn-2 44,
    :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
-   "An intricately detailed, hyperrealistic 16:9 digitally-rendered representation of a snowy morning in a traditional New England town skilfully blended with futuristic cyberpunk elements. The town is carpeted with freshly fallen snow amidst a swirling snowstorm, adding a gritty ambience. The buildings emit a warm glow, tinted in shades of soft pastel pink and neon light blue. On the left side of the composition, there's an emphasis on an Irish woman in her early 30s. Her features include a buxom physique, full lips with a larger bottom lip, pert nose, and an expression blending contentment with appealing sophistication. Her long, slightly wet hair from the snowfall drapes over her neck and shoulders, and finely detailed Celtic-inspired tattoos of rabbits and elements from nature adorn her neck, collarbone, and shoulders. The subtly rising morning sun from the horizon casts a gentle light on her, amplifying the serene and slightly mysterious ambiance owing to the pre-dawn lighting. Her full-bodied figure is bathed in the sunlight, creating an aesthetically pleasing interplay of light and shadow on her lavishly tattooed body.",
+   "Render a hyperrealistic, digital image in a 16:9 ratio, portraying a tranquil winter morning in a traditional New England village, which uniquely blends rustic charm with futuristic, cyberpunk themes. The quaint town is cloaked under a layer of fresh, white snow amidst a storm, creating a mildly gritty feel. The architectural designs radiate a soft, inviting glow, reflected in shades of pastel pink and neon light blue. On the left side of the frame, focus on an Irish woman in her early 30s with an attractive buxom body, full, pouty lips with a markedly larger lower lip, an adorable nose, and a clever blend of gratified and subtly seductive facial expressions. Her slightly wet, freely flowing hair pours over her neck and shoulders due to the falling snow. Celtic-inspired tattoos of bunnies and nature-related elements gracefully sprawl across her neck, collarbone, and shoulders. The shyly rising morning sun from the horizon gently illuminates her, enhancing the serene, slightly mystical setting created by the pre-dawn lighting. Her fully shaped, maternal figure basks in the sunlight, resulting in an appealing interplay of light and shadows on her elaborately tattooed body.",
    :live-scratch-flow>*running? false,
    :openai-image-gen-ladder>hiccup-image-box-w-png-vw
    [:v-box
@@ -1342,7 +1344,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#3f515d",
+   :openai-image-gen-ladder>dominant-color "#b4b8bf",
    :flow-forever>final-math nil},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",

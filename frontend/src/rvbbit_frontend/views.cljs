@@ -1219,7 +1219,7 @@
                          :width (px (- single-width 25))
                          :style {:background-color (theme-pull :theme/editor-background-color nil)
                                  :font-size "25px"
-                         ;:padding "9px"
+                                 ;:padding "9px"
                                  :font-weight 700
                                  :color (theme-pull :theme/editor-font-color nil) ;; (theme-pull :theme/editor-outer-rim-color nil)
                                  :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 75)}]]

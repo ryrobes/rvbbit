@@ -123,7 +123,8 @@
         queries (into {} (for [b blocks] (get-in screen-data [:panels b :queries])))]
     (swap! wss/screens-atom assoc screen-name screen-data) ;; update master screen atom for param reactions etc 
     (search/add-or-update-document search/index-writer (str :screen "-" screen-name) 
-                                   {:content screen-data :type :screen 
+                                   {:content screen-name ;screen-data 
+                                    :type :screen 
                                     :row {:file-path f-path :screen-name screen-name :blocks 0 :queries 0}})
     (ut/pp [:updating-screen-meta-for f-path])
     (sql-exec system-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
@@ -143,7 +144,8 @@
                                                                        board? (str "board: " b)
                                                                        :else (get-in screen-data [:panels b :name])))
                                                  _ (search/add-or-update-document search/index-writer (str :block "-" screen-name b)
-                                                                                  {:content (get-in screen-data [:panels b]) :type :block
+                                                                                  {:content (str screen-name " " b " " (get-in screen-data [:panels b :name])) ;(get-in screen-data [:panels b]) 
+                                                                                   :type :block
                                                                                    :row {:file-path f-path :screen-name screen-name 
                                                                                          :block_key (str b) :block_name block-name}})]
                                              ;; do side-effect insert for deeper table?
@@ -180,7 +182,8 @@
                                    :file_path (str f-path)
                                    :body (pr-str flow-data)}]}]
          (search/add-or-update-document search/index-writer (str :flow "-" flow-id)
-                                        {:content flow-data :type :flow
+                                        {:content flow-data 
+                                         :type :flow
                                          :row {:file-path f-path :flow-id flow-id}})
          (sql-exec flows-db (to-sql {:delete-from [:flows] :where [:= :file_path f-path]}))
          (sql-exec flows-db (to-sql insert-sql)))
@@ -308,7 +311,7 @@
 
 
 
-  (defn -main [& args] 
+  (defn -main [& args]
 
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-conn-watcher (watch-connections-folder))
@@ -318,7 +321,7 @@
     (defonce start-flow-watcher (watch-flows-folder))
 
     ;(defonce jvm-monitor (tt/every! 240 2 (bound-fn [] (wss/jvm-memory-used))))
-    
+
   ;"The entry-point for 'lein run'"
   ;;;(ut/pp (surveyor/get-test-conn-meta target-db5))
   ;(lets-give-it-a-whirl target-db8 system-db default-sniff-tests default-field-attributes default-derived-fields default-viz-shapes [:like :table-name "%TESTIMDB%"]) ;; oracle
@@ -473,6 +476,7 @@
                                            (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "status-change-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "data/search-index/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))))
 
@@ -511,6 +515,8 @@
     (def lunchbreak  (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker)))) ;; "reboot" the sniffer worker thread every hour
     (def lunchbreak2 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker2))))
     (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
+
+    (def lucene-commiter (tt/every! 30 2 (bound-fn [] (search/commit-writer search/index-writer))))
 
     (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too much?
 

@@ -2846,7 +2846,7 @@
                             screen? (get-atom-splitter (second sub-path) screen-child-atoms screens-atom)
                             :else (get-atom-splitter (first keypath) flow-child-atoms flow-db/results-atom))]
     (remove-watch atom-to-watch watch-key)
-    (ut/pp [:add-watcher! (first sub-path) client-name flow-key sub-type sub-path keypath])
+    ;(ut/pp [:add-watcher! (first sub-path) client-name flow-key sub-type sub-path keypath])
     (add-watch atom-to-watch watch-key watcher) 
     (swap! atoms-and-watchers assoc-in [client-name flow-key]
            {:created (ut/get-current-timestamp)
@@ -2988,7 +2988,8 @@
         ;;clis (first (keys (get-in @last-values [keypath]))) ;; in case we are a new ""client"" (as is usual)
         lv (get @last-values keypath)]
     
-    (ut/pp [:client-sub! base-type flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key :keypath keypath :client-param-path client-param-path])
+    ;(ut/pp [:client-sub! base-type flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key :keypath keypath :client-param-path client-param-path])
+    (ut/pp [:client-sub! base-type flow-id :keypath keypath :client-param-path client-param-path])
 
     (when (get-in @flow-db/results-atom keypath)
       (ut/pp [:react (get-in @flow-db/results-atom keypath)]))

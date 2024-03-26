@@ -47,9 +47,11 @@
                  [org.clojure/core.cache "1.0.207"]
                  [talltale "0.5.8"]
 
-                 [org.apache.lucene/lucene-core "8.11.3"]
-                 [org.apache.lucene/lucene-analyzers-common "8.11.3"]
-                 [org.apache.lucene/lucene-queryparser "8.11.3"]
+                 [org.apache.lucene/lucene-core "7.5.0"]
+                 [org.apache.lucene/lucene-analyzers-common "7.5.0"]
+                 [org.apache.lucene/lucene-queryparser "7.5.0"]
+
+                 [clucie "0.4.2"]
 
                  [jline "2.14.6"] ;; to detect console width
 

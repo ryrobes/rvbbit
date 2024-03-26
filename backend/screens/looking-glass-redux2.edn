@@ -1,24 +1,924 @@
 {:orders
- {:reco-counts [:table_name :cnt], :flows-sys [:flow_id :file_path :last_modified]},
+ {:recos-sys
+  [:context_hash
+   :combo_hash
+   :connection_id
+   :shape_name
+   :query_map
+   :query_map_str
+   :viz_map
+   :combo_edn
+   :selected_view
+   :table_name
+   :condis
+   :h
+   :w
+   :score],
+  :blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
+  :fields-sys [:field_name :field_type :data_type],
+  :viz-shapes-sys [:combo_edn :recos],
+  :gen-viz-1132 [:rows :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :files-sys [:file_path :screen_name :blocks :queries :ts],
+  :query-preview-1102594305 [:value :id],
+  :query-preview-1008216449 [:rows :is_group_by],
+  :fields
+  [:db_type
+   :connection_id
+   :table_type
+   :db_schema
+   :db_catalog
+   :table_name
+   :field_name
+   :field_type
+   :data_type
+   :context_hash
+   :key_hash
+   :is_group_by
+   :derived_calc
+   :derived_name
+   :updated
+   :run_id],
+  :query-preview81506492 [:value :id],
+  :viz-tables-sys [:table_name :recos],
+  :query-preview1481471205 [:value :id],
+  :viz-shapes0-sys [:shape :recos],
+  :query-preview-633137368 [:rows :derived_calc],
+  :fields-drag-16
+  [:connection_id
+   :context_hash
+   :data_type
+   :db_catalog
+   :db_schema
+   :db_type
+   :derived_calc
+   :derived_name
+   :field_name
+   :field_type
+   :is_group_by
+   :key_hash
+   :run_id
+   :table_name
+   :table_type
+   :updated],
+  :query-preview180000872 [:value :id],
+  :connections-sys [:database_name :connection_id],
+  :query-preview-2108963938 [:rows :table_type],
+  :query-preview1890229330 [:value :id],
+  :gen-viz-555 [:value :id],
+  :reco-counts [:table_name :cnt],
+  :query-preview1408146803 [:rows :data_type],
+  :query-preview918986922 [:value :id],
+  :query-preview-915486563 [:rows :table_name],
+  :query-preview-931857256 [:rows :db_schema]},
  :reco-preview nil,
- :sql-source {},
+ :sql-source
+ {:gen-viz-1132
+  {:select [[[:count 1] :rows] :data_type],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:data_type]},
+  :query-preview-1102594305
+  {:select [[[:count 1] :value] [:context_hash :id]],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:context_hash]},
+  :query-preview-1008216449
+  {:select [[[:count 1] :rows] :is_group_by],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:is_group_by]},
+  :fields {:select [:*], :from [:fields], :limit 111},
+  :query-preview81506492
+  {:select [[[:count 1] :value] [:db_type :id]],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:db_type]},
+  :query-preview1481471205
+  {:select [[[:count 1] :value] [:updated :id]],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:updated]},
+  :query-preview-633137368
+  {:select [[[:count 1] :rows] :derived_calc],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:derived_calc]},
+  :fields-drag-16
+  {:select
+   [:connection_id
+    :context_hash
+    :data_type
+    :db_catalog
+    :db_schema
+    :db_type
+    :derived_calc
+    :derived_name
+    :field_name
+    :field_type
+    :is_group_by
+    :key_hash
+    :run_id
+    :table_name
+    :table_type
+    :updated],
+   :from [[:fields :mm764]]},
+  :query-preview180000872
+  {:select [[[:count 1] :value] [:table_type :id]],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:table_type]},
+  :query-preview-2108963938
+  {:select [[[:count 1] :rows] :table_type],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:table_type]},
+  :query-preview1890229330
+  {:select [[[:count 1] :value] [:derived_name :id]],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:derived_name]},
+  :gen-viz-555
+  {:select [[[:count 1] :value] [:updated :id]],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:updated]},
+  :query-preview1408146803
+  {:select [[[:count 1] :rows] :data_type],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:data_type]},
+  :query-preview918986922
+  {:select [[[:count 1] :value] [:db_catalog :id]],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:db_catalog]},
+  :query-preview-915486563
+  {:select [[[:count 1] :rows] :table_name],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:table_name]},
+  :query-preview-931857256
+  {:select [[[:count 1] :rows] :db_schema],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:db_schema]}},
  :meta
- {:reco-counts {:fields {}, :rowcount 0},
-  :city-drag-26
+ {:recos-sys
   {:fields
-   {:city
+   {:query_map
+    {:data-type "string",
+     :distinct 449,
+     :group-by? true,
+     :commons
+     {"[{:select [[[[:sum :is_group_by]] :is_group_by] :updated], :from [\"query/fields_drag_16\"], :group-by [:updated]}]"
+      8,
+      "[{:select [[[[:sum :rows]] :rows] :updated], :from [\"query/fields_drag_16\"], :group-by [:updated]}]"
+      8,
+      "[{:select [[[[:sum :is_group_by]] :is_group_by] [[:substr :updated 0 11] :day_sqlite_updated]], :from [\"query/fields_drag_16\"], :group-by [[:substr :updated 0 11]]}]"
+      7},
+     :cardinality 46},
+    :shape_name
+    {:data-type "string",
+     :distinct 26,
+     :group-by? true,
+     :commons
+     {"basic_v_bar_color" 144,
+      "basic_h_bar_color" 144,
+      "basic_h_bar_nivo_color" 144},
+     :cardinality 2},
+    :w
+    {:data-type "unknown",
+     :distinct 4,
+     :group-by? true,
+     :commons {nil 901, 9 54, 6 10},
+     :cardinality 0},
+    :combo_edn
+    {:data-type "string",
+     :distinct 146,
+     :group-by? true,
+     :commons
+     {"\"db_type, is_group_by, updated\"" 13,
+      "\"derived_name, is_group_by, updated\"" 13,
+      "\"db_catalog, is_group_by, updated\"" 13},
+     :cardinality 15},
+    :query_map_str
+    {:data-type "string",
+     :distinct 441,
+     :group-by? true,
+     :commons
+     {"\nSELECT (SUM(rows)) AS rows, updated\nFROM 'query/fields_drag_16'\nGROUP BY updated\n"
+      8,
+      "\nSELECT (SUM(is_group_by)) AS is_group_by, updated\nFROM 'query/fields_drag_16'\nGROUP BY updated\n"
+      8,
+      "\nSELECT (SUM(rows)) AS rows, SUBSTR(updated, 0, 11) AS day_sqlite_updated\nFROM 'query/fields_drag_16'\nGROUP BY SUBSTR(updated, 0, 11)\n"
+      7},
+     :cardinality 45},
+    :selected_view
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"" 888, ":reech" 81, ":grid" 4},
+     :cardinality 0},
+    :combo_hash
+    {:data-type "string",
+     :distinct 973,
+     :group-by? true,
+     :commons {"-356194635" 1, "106863025" 1, "1588361115" 1},
+     :cardinality 100},
+    :h
+    {:data-type "unknown",
+     :distinct 5,
+     :group-by? true,
+     :commons {nil 901, 9 27, 5 27},
+     :cardinality 0},
+    :condis
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"" 956,
+      "{:true? [:= 1 1]}" 8,
+      "{:up-or-down? [:> :query-preview/agg.0 :query-preview/agg.1]}" 8},
+     :cardinality 0},
+    :score
+    {:data-type "float",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 579, 48.39999999999999 394},
+     :cardinality 0},
+    :table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"fields_drag_16" 973},
+     :cardinality 0},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"cache.db" 973},
+     :cardinality 0},
+    :context_hash
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"855310931" 973},
+     :cardinality 0},
+    :viz_map
+    {:data-type "string",
+     :distinct 956,
+     :group-by? true,
+     :commons
+     {"[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
+      8,
+      "[:v-box :size \"auto\" :align :center :justify :center :height :panel-height+50-px :gap \"10px\" :children :query-preview-2]"
+      8,
+      "{:lines [:vega-lite {:layer [{:encoding {:x {:field :day_sqlite_updated, :type \"temporal\", :title nil, :sort \"x\"}, :y {:aggregate \"sum\", :field :agg, :title nil, :scale {:zero false}, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale {:scheme \"purples\"}, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"line\", :interpolate \"monotone\", :line true, :point true, :tooltip {:content \"encoding\"}}}], :data {:values :query-preview}, :config {:view {:stroke \"transparent\"}, :line {:strokeWidth 3}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#afafaf\", :titleFont \"Lato\", :titleColor \"#282828\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width :panel-width, :height :half-panel-height, :padding 4, :background \"transparent\"} {:actions false}], :grid [:layout {:panels {:view/*this-block*.lines {:h 0.5, :w 0.99, :root [0 0.5]}, :view/*this-block*.hi2 {:h 0.5, :w 0.5, :root [0 0]}, :empty-h-730 {:h 0.5, :w 0.5, :root [0.5 0]}}}], :hi2 [:box :align :center :justify :center :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"]}"
+      2},
+     :cardinality 98}},
+   :rowcount 973},
+  :blocks-sys
+  {:fields
+   {:block_key
+    {:data-type "string",
+     :distinct 12,
+     :group-by? true,
+     :commons {":block-4550" 1, ":block-6104" 1, ":block-6931" 1},
+     :cardinality 100},
+    :block_name
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons
+     {"drag-from-select-all-fn_history" 3,
+      "drag-from-drag-from-select-all-fn_history" 3,
+      "select-all-fn_history" 1},
+     :cardinality 66},
+    :queries
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {1 9, 0 3},
+     :cardinality 16},
+    :views
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {0 8, 2 3, 27 1},
+     :cardinality 25},
+    :block_data
+    {:data-type "string",
+     :distinct 12,
+     :group-by? true,
+     :commons
+     {"{:h 5, :w 16, :connection-id \"flows-db\", :name \"drag-from-select-all-fn_history\", :queries {:block-drag-34 {:select [:block [[:count 1] :rowcnt] [[:sum :elapsed_ms] :elapsed_ms_sum_205] :start :end [[:+ :end 1] :end_plus] :run_id], :from [[:query/fn-history-drag-20 :xx662]], :group-by [:block :start :end :run_id], :order-by [[:rowcnt :desc]], :where [:and [:not [:like :block \"%/%\"]] [:*when :run-id-drag-36/run_id [:= :run_id :run-id-drag-36/run_id]]], :_last-run \"02:25:31\"}}, :root [19 8], :tab \"cape-cod-vikings\", :selected-view :block-drag-34}"
+      1,
+      "{:name \"block-2068\", :w 5, :selected-view :hi, :root [10 10], :h 4, :queries {}, :tab \"cape-cod-vikings\", :minimized? true, :views {:hi [:box :align :center :justify :center :attr {:id \":block-2068.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}"
+      1,
+      "{:h 7, :w 30, :connection-id \"flows-db\", :name \"select-all-fn_history\", :queries {:fn-history-drag-20 {:select [:base_flow_id :block :channel :data_type :dbgn :dest :elapsed_ms :end :end_ts :flow_id :from_block :path :run_id :start :start_ts :ts :type :value], :from [[:fn_history :qq205]], :where [:*when :base-flow-id-drag-26/base_flow_id [:= :base_flow_id :base-flow-id-drag-26/base_flow_id]], :_last-run \"03:51:14\"}}, :root [5 1], :tab \"cape-cod-vikings\", :selected-view :fn-history-drag-20}"
+      1},
+     :cardinality 100},
+    :view_names
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"" 8,
+      ":hi :stack" 2,
+      ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color"
+      1},
+     :cardinality 33},
+    :query_names
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"" 3, ":gen-viz-715" 1, ":rowcnt-drag-33" 1},
+     :cardinality 83}},
+   :rowcount 12},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 16,
+     :group-by? true,
+     :commons {"field_name" 1, "key_hash" 1, "updated" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"TEXT" 13, "TIMESTAMP" 1, "INTEGER" 1},
+     :cardinality 25},
+    :data_type
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"string" 13, "datetime" 1, "integer" 1},
+     :cardinality 25}},
+   :rowcount 16},
+  :viz-shapes-sys
+  {:fields
+   {:combo_edn
+    {:data-type "string",
+     :distinct 146,
+     :group-by? true,
+     :commons
+     {"\"db_schema, db_type, rows\"" 1,
+      "\"context_hash, data_type, is_group_by\"" 1,
+      "\"data_type, derived_name, is_group_by\"" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 11,
+     :group-by? false,
+     :commons {1 23, 3 22, 8 21},
+     :cardinality 7}},
+   :rowcount 146},
+  :gen-viz-1132
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 7,
+     :group-by? false,
+     :commons {103 1, 575 1, 123 1},
+     :cardinality 100},
+    :data_type
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"unknown" 1, "string" 1, "integer" 1},
+     :cardinality 100}},
+   :rowcount 7},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 24},
+     :cardinality 4},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 24},
+     :cardinality 4},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"system-db" 24},
+     :cardinality 4},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 24},
+     :cardinality 4},
+    :table_name
+    {:data-type "string",
+     :distinct 24,
+     :group-by? true,
+     :commons {"connections" 1, "board_history" 1, "rule_maps_tests" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 15,
+     :group-by? false,
+     :commons {6 4, 5 3, 11 2},
+     :cardinality 62}},
+   :rowcount 24},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 139,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 132,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 94},
+    :blocks
+    {:data-type "integer",
+     :distinct 39,
+     :group-by? true,
+     :commons {3 45, 14 6, 12 6},
+     :cardinality 28},
+    :queries
+    {:data-type "integer",
+     :distinct 32,
+     :group-by? true,
+     :commons {0 54, 6 11, 5 9},
+     :cardinality 23},
+    :ts
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons
+     {"2024-03-26 02:57:16" 35, "2024-03-26 02:57:15" 33, "2024-03-26 02:57:14" 30},
+     :cardinality 4}},
+   :rowcount 139},
+  :query-preview-1102594305
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 28,
+     :group-by? false,
+     :commons {3 11, 12 6, 4 6},
+     :cardinality 41},
+    :id
+    {:data-type "string",
+     :distinct 68,
+     :group-by? false,
+     :commons {"-6825455" 1, "388025726" 1, "-1084717852" 1},
+     :cardinality 100}},
+   :rowcount 68},
+  :query-preview-1008216449
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {939 1},
+     :cardinality 100},
+    :is_group_by
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :fields
+  {:fields
+   {:db_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"SQLite" 500},
+     :cardinality 0},
+    :key_hash
     {:data-type "string",
      :distinct 500,
      :group-by? true,
-     :commons {"ottawa (canada)" 1, "burlington (canada)" 1, "cary" 1},
+     :commons {"-1985693138" 1, "-1544051908" 1, "-536935479" 1},
      :cardinality 100},
-    :rowcnt
+    :db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 500},
+     :cardinality 0},
+    :is_group_by
     {:data-type "integer",
-     :distinct 118,
-     :group-by? false,
-     :commons {27 35, 26 24, 29 23},
-     :cardinality 23}},
+     :distinct 1,
+     :group-by? true,
+     :commons {1 500},
+     :cardinality 0},
+    :table_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"TABLE" 443, "VIEW" 57},
+     :cardinality 0},
+    :run_id
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :updated
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"2024-03-24 23:14:53" 129,
+      "2024-03-24 23:14:51" 122,
+      "2024-03-24 23:14:52" 115},
+     :cardinality 0},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :field_name
+    {:data-type "string",
+     :distinct 233,
+     :group-by? true,
+     :commons {"*" 44, "ts" 14, "connection_id" 13},
+     :cardinality 46},
+    :derived_calc
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :derived_name
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :data_type
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"string" 299, "float" 55, "unknown" 52},
+     :cardinality 1},
+    :field_type
+    {:data-type "string",
+     :distinct 43,
+     :group-by? true,
+     :commons {"TEXT" 217, "INTEGER" 50, "special" 44},
+     :cardinality 8},
+    :table_name
+    {:data-type "string",
+     :distinct 45,
+     :group-by? true,
+     :commons
+     {"bigfoot_sightings_locations" 42, "bigfoot_sightings" 27, "combo_rows" 24},
+     :cardinality 9},
+    :connection_id
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"snifftmp2" 266, "bigfoot-ufos" 126, "met-on-tour" 58},
+     :cardinality 0},
+    :context_hash
+    {:data-type "string",
+     :distinct 45,
+     :group-by? true,
+     :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
+     :cardinality 9}},
    :rowcount 500},
+  :query-preview81506492
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {935 1},
+     :cardinality 100},
+    :id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"SQLite" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :viz-tables-sys
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"fields_drag_16" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {973 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :query-preview1481471205
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 11,
+     :group-by? false,
+     :commons {18 2, 49 1, 80 1},
+     :cardinality 91},
+    :id
+    {:data-type "string",
+     :distinct 12,
+     :group-by? false,
+     :commons
+     {"2024-03-26 02:57:26" 1, "2024-03-26 03:08:56" 1, "2024-03-26 02:57:25" 1},
+     :cardinality 100}},
+   :rowcount 12},
+  :viz-shapes0-sys
+  {:fields
+   {:shape
+    {:data-type "string",
+     :distinct 26,
+     :group-by? false,
+     :commons {"basic_h_bar_avg_color" 1, "basic_h_bar_nivo" 1, "recharts_line" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 11,
+     :group-by? false,
+     :commons {27 6, 4 4, 8 3},
+     :cardinality 42}},
+   :rowcount 26},
+  :query-preview-633137368
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {1 3, 936 1},
+     :cardinality 50},
+    :derived_calc
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"[:substr :field 6 2]" 1,
+      "[:substr :field 0 5]" 1,
+      "[:substr :field 0 11]" 1},
+     :cardinality 100}},
+   :rowcount 4},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -28,51 +928,139 @@
      :commons {80332 1},
      :cardinality 100}},
    :rowcount 1},
-  :duration-hours-drag-43
+  :fields-drag-16
   {:fields
-   {:duration_hours
+   {:db_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"SQLite" 500},
+     :cardinality 0},
+    :key_hash
     {:data-type "string",
      :distinct 500,
      :group-by? true,
-     :commons {"30 min." 1, "3 days" 1, "5-7 min" 1},
+     :commons {"-1985693138" 1, "-1544051908" 1, "-536935479" 1},
      :cardinality 100},
-    :rowcnt
+    :db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 500},
+     :cardinality 0},
+    :is_group_by
     {:data-type "integer",
-     :distinct 162,
-     :group-by? false,
-     :commons {12 29, 13 23, 14 22},
-     :cardinality 32}},
+     :distinct 1,
+     :group-by? true,
+     :commons {1 500},
+     :cardinality 0},
+    :table_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"TABLE" 443, "VIEW" 57},
+     :cardinality 0},
+    :run_id
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :updated
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"2024-03-26 02:57:23" 131,
+      "2024-03-26 02:57:22" 128,
+      "2024-03-26 02:57:20" 112},
+     :cardinality 0},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :field_name
+    {:data-type "string",
+     :distinct 233,
+     :group-by? true,
+     :commons {"*" 44, "ts" 14, "connection_id" 13},
+     :cardinality 46},
+    :derived_calc
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :derived_name
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :data_type
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"string" 299, "float" 55, "unknown" 52},
+     :cardinality 1},
+    :field_type
+    {:data-type "string",
+     :distinct 43,
+     :group-by? true,
+     :commons {"TEXT" 217, "INTEGER" 50, "special" 44},
+     :cardinality 8},
+    :table_name
+    {:data-type "string",
+     :distinct 45,
+     :group-by? true,
+     :commons
+     {"bigfoot_sightings_locations" 42, "bigfoot_sightings" 27, "combo_rows" 24},
+     :cardinality 9},
+    :connection_id
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"snifftmp2" 266, "bigfoot-ufos" 126, "met-on-tour" 58},
+     :cardinality 0},
+    :context_hash
+    {:data-type "string",
+     :distinct 45,
+     :group-by? true,
+     :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
+     :cardinality 9}},
    :rowcount 500},
-  :shape-drag-7
+  :query-preview180000872
   {:fields
-   {:shape
-    {:data-type "string",
-     :distinct 30,
-     :group-by? true,
-     :commons {"formation" 1, "cone" 1, "rectangle" 1},
-     :cardinality 100},
-    :rowcnt
+   {:value
     {:data-type "integer",
-     :distinct 25,
+     :distinct 2,
      :group-by? false,
-     :commons {1 5, 2 2, 1283 1},
-     :cardinality 83}},
-   :rowcount 30},
-  :state-drag-3
-  {:fields
-   {:state
-    {:data-type "string",
-     :distinct 68,
-     :group-by? true,
-     :commons {"nd" 1, "az" 1, "in" 1},
+     :commons {93 1, 842 1},
      :cardinality 100},
-    :rowcnt
-    {:data-type "integer",
-     :distinct 68,
+    :id
+    {:data-type "string",
+     :distinct 2,
      :group-by? false,
-     :commons {183 1, 968 1, 633 1},
+     :commons {"VIEW" 1, "TABLE" 1},
      :cardinality 100}},
-   :rowcount 68},
+   :rowcount 2},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -161,35 +1149,205 @@
      :commons {"us" 411, nil 55, "ca" 17},
      :cardinality 0}},
    :rowcount 500},
-  :flows-sys
+  :query-preview-2108963938
   {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 85,
-     :group-by? true,
-     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
-     :cardinality 97},
-    :file_path
-    {:data-type "string",
-     :distinct 87,
-     :group-by? true,
-     :commons
-     {"./flows/stitches-math.edn" 1,
-      "./flows/hey-rabbit-pathfinder.edn" 1,
-      "./flows/dalle3-create-image-newengland-old.edn" 1},
+   {:rows
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {93 1, 846 1},
      :cardinality 100},
-    :last_modified
+    :table_type
     {:data-type "string",
-     :distinct 17,
+     :distinct 2,
      :group-by? true,
+     :commons {"VIEW" 1, "TABLE" 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :query-preview1890229330
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {1 3, 932 1},
+     :cardinality 50},
+    :id
+    {:data-type "string",
+     :distinct 4,
+     :group-by? false,
      :commons
-     {"2024-03-12 02:37:43" 71, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
-     :cardinality 19}},
-   :rowcount 87}},
+     {"day_sqlite_updated" 1,
+      "by_year_sqlite_updated" 1,
+      "by_month_sqlite_updated" 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :duration-hours-drag-43
+  {:fields
+   {:duration_hours
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"30 min." 1, "3 days" 1, "5-7 min" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 162,
+     :group-by? false,
+     :commons {12 29, 13 23, 14 22},
+     :cardinality 32}},
+   :rowcount 500},
+  :city-drag-26
+  {:fields
+   {:city
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"ottawa (canada)" 1, "burlington (canada)" 1, "cary" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 118,
+     :group-by? false,
+     :commons {27 35, 26 24, 29 23},
+     :cardinality 23}},
+   :rowcount 500},
+  :gen-viz-555
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 11,
+     :group-by? false,
+     :commons {18 2, 49 1, 80 1},
+     :cardinality 91},
+    :id
+    {:data-type "string",
+     :distinct 12,
+     :group-by? false,
+     :commons
+     {"2024-03-26 02:57:26" 1, "2024-03-26 03:08:56" 1, "2024-03-26 02:57:25" 1},
+     :cardinality 100}},
+   :rowcount 12},
+  :reco-counts
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"fields_drag_16" 1},
+     :cardinality 100},
+    :cnt
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {973 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :query-preview1408146803
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 7,
+     :group-by? false,
+     :commons {102 1, 574 1, 122 1},
+     :cardinality 100},
+    :data_type
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"unknown" 1, "string" 1, "integer" 1},
+     :cardinality 100}},
+   :rowcount 7},
+  :query-preview918986922
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {935 1},
+     :cardinality 100},
+    :id
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :state-drag-3
+  {:fields
+   {:state
+    {:data-type "string",
+     :distinct 68,
+     :group-by? true,
+     :commons {"nd" 1, "az" 1, "in" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 68,
+     :group-by? false,
+     :commons {183 1, 968 1, 633 1},
+     :cardinality 100}},
+   :rowcount 68},
+  :query-preview-915486563
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 28,
+     :group-by? false,
+     :commons {3 11, 4 7, 12 6},
+     :cardinality 40},
+    :table_name
+    {:data-type "string",
+     :distinct 69,
+     :group-by? true,
+     :commons {"flows" 1, "flow_history" 1, "connections" 1},
+     :cardinality 100}},
+   :rowcount 69},
+  :shape-drag-7
+  {:fields
+   {:shape
+    {:data-type "string",
+     :distinct 30,
+     :group-by? true,
+     :commons {"formation" 1, "cone" 1, "rectangle" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 25,
+     :group-by? false,
+     :commons {1 5, 2 2, 1283 1},
+     :cardinality 83}},
+   :rowcount 30},
+  :query-preview-931857256
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {939 1},
+     :cardinality 100},
+    :db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 1},
+     :cardinality 100}},
+   :rowcount 1}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys 137},
+  :system-fields-list* {:fields-sys 170},
+  :block-4030 {:fields-drag-16 100},
+  :files-list* {:files-sys 178},
+  :blocks-list* {:blocks-sys 127},
+  :viz-shapes0-list* {:viz-shapes0-sys 155}},
  :runstream-drops nil,
- :data-hash 999356622,
+ :data-hash 1803739192,
  :tabs
- ["through the rabbit hole and out the other side" "sapphire ape" "fat zebra"],
+ ["through the rabbit hole and out the other side"
+  "sapphire ape"
+  "fat zebra"
+  "violet ferret"],
  :selected-cols nil,
  :server
  {:settings
@@ -258,6 +1416,7 @@
     "bigfoot-snapshots"
     "bigfoot-snapshots2"
     "bigfoot-snapshots3"
+    "blackberries"
     "blank-sizzle"
     "blank-sizzle2"
     "blue-pines"
@@ -292,6 +1451,7 @@
     "error-monitor-vanessa3"
     "evil-main-street"
     "fake-books-1"
+    "fake-bricks"
     "fetching-pentagonal-termite-of-tghe-submarine-canyon"
     "final-fantasy-dorchester"
     "fox-hills"
@@ -307,6 +1467,7 @@
     "looking-glass-redux"
     "looking-glass-redux2"
     "looking-glass-redux2a"
+    "looking-glass-redux2aa"
     "luck-of-the-irish"
     "mapbox-test"
     "may-20"
@@ -323,6 +1484,7 @@
     "old-fashioned-christmas"
     "old-town-snow-stars"
     "pensive-look"
+    "pensive-look2"
     "pine-wood-dawn"
     "pink-and-green-elk"
     "pink-dusk-falls"
@@ -380,30 +1542,32 @@
    {:prompt {:value :param/reliable-coral-moose, :source :param, :open? false},
     :style-param {:open? true, :value "vivid"}},
    :open-outputs? true}},
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [304833848 281269496 4294705152],
+ :memory [487704678 412547726 4294705152],
+ :preview-keys
+ ["-2108963938" "-1008216449" "1408146803" "-915486563" "-633137368" "-931857256"],
  :status-data
  {"kick-test!"
   {:kick
    {:data
     [{:sent! "kick-test!",
-      :to :engaging-peach-pronghorn-of-the-impact-crater,
-      :at "2024-03-23 14:51:15",
+      :to :good-cylindrical-ape-exiled-from-calanque,
+      :at "2024-03-25 23:09:38",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-03-23 14:51:15 - query ran in 1 ms."],
-          :name "query-log-:flows-sys",
-          :order 1711219875,
+        [{:content ["2024-03-25 23:09:38 - query ran in 0 ms."],
+          :name "query-log-:gen-viz-1132",
+          :order 1711422578,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
-        :description "query-log-:flows-sys",
+        :description "query-log-:gen-viz-1132",
         :mutates {},
         :options {:actions? false, :pages? false, :search? false},
         :parameters {}}},
-      :payload-kp [:flows-sys "kick-test!"]}
+      :payload-kp [:gen-viz-1132 "kick-test!"]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -412,7 +1576,7 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-03-23 17:15:19",
+      :at "2024-03-25 23:10:13",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -426,7 +1590,7 @@
        {:width "100%", :height :panel-height+50}
        [:>
         :ComposedChart
-        {:data [{:mem 584, :tick 0, :threads 116, :subs 37, :load 4.7880859375}],
+        {:data [{:mem 754, :tick 0, :threads 95, :subs 28, :load 3.12744140625}],
          :margin {:top 5, :bottom 5, :right 30, :left 20}}
         [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
         [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
@@ -469,781 +1633,167 @@
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
+  :reco
+  {:fields-drag-16
+   {:data [[:reco-status :fields-drag-16] 973], :elapsed-ms 4394, :reco-count 973}},
   :file-change
   {:file-changed
    {:data
     [{:path
-      "./live/engaging-peach-pronghorn-of-the-impact-crater/fat zebra/block-10376/block-10376.edn",
+      "./live/good-cylindrical-ape-exiled-from-calanque/basic_h_bar - \"data_type, rows\" - 1177/queries/query-preview1408146803.edn",
       :type :modify,
-      :panel-key :block-10376,
+      :panel-key nil,
       :block-data
-      {:h 7,
-       :w 9,
-       :root [11 7],
-       :views
-       {:param-val
-        [:box
-         :align
-         :center
-         :justify
-         :center
-         :padding
-         "13px"
-         :style
-         {:font-size "45px"}
-         :child
-         [:string :param/brave-white-butterfly]]},
-       :tab "fat zebra",
-       :name "block-10376"}}
+      {:queries
+       {:query-preview1408146803
+        {:select [[[:count 1] :rows] :data_type],
+         :from [:query/fields-drag-16],
+         :group-by [:data_type]}},
+       :tab "basic_h_bar - \"data_type, rows\" - 1177",
+       :name "queries"}}
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
  [:flow/openai-image-gen-ladder>*running?
-  :flow/live-scratch-flow>*running?
-  :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
-  :flow/openai-image-gen-ladder>:output-revised-prompt
-  :flow/flow-forever>*running?
-  :flow/openai-image-gen-ladder>:pop-color
+  :flow/flow-forever>:final-math
   :flow/openai-image-gen-ladder>:dominant-color
-  :flow/flow-forever>:final-math],
- :client-name :engaging-peach-pronghorn-of-the-impact-crater,
- :runstreams-lookups
- {"openai-image-gen-ladder"
-  {:open-inputs
-   {:quality-param {:user-input "hd", :defaults {}, :type :string},
-    :base-save-directory
-    {:user-input "/home/ryanr/rvbbit-out", :defaults {}, :type :string},
-    :size-param {:user-input "1792x1024", :defaults {}, :type :string},
-    :base-web-directory
-    {:user-input "/home/ryanr/rvbbit/frontend/resources/public/images/gen",
-     :defaults {},
-     :type {:out :string}},
-    :prompt
-    {:user-input
-     "A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her body.",
-     :defaults {},
-     :type {:out :string}},
-    :style-param {:user-input "vivid", :defaults {}, :type :string}},
-   :blocks
-   {:oai-api-call
-    {:type :map,
-     :ttype :make-http-call,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "{:created 1711219688, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
-    :node-js-color-thief-script
-    {:type :map,
-     :ttype :sub-flow,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample
-     "{:dominantColor \"#e59198\", :colorPalette [\"#e6c0a4\" \"#40c6c3..."},
-    :dominant-color
-    {:type :string,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "#e59198"},
-    :quality-param
-    {:type :string,
-     :ttype :open-block,
-     :meta
-     {:*
-      {:scrubber
-       {:message "OpenAI image gen quality selector - DALLE3",
-        :values ["hd" "standard"]}}},
-     :last? false,
-     :defaults {},
-     :sample "hd"},
-    :execute-shell-command
-    {:type :map,
-     :ttype :shell-command,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "{:output [], :exception [], :seconds [], :command \"convert /..."},
-    :pop-color
-    {:type :string,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "#e6c0a4"},
-    :base-save-directory
-    {:type :string,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "/home/ryanr/rvbbit-out"},
-    :color-palette
-    {:type :map,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample
-     "{:dominantColor \"#e59198\", :colorPalette [\"#e6c0a4\" \"#40c6c3..."},
-    :size-param
-    {:type :string,
-     :ttype :open-block,
-     :meta
-     {:*
-      {:scrubber
-       {:message "OpenAI image gen size selector - DALLE3",
-        :values ["1024x1024" "1792x1024" "1024x1792"]}}},
-     :last? false,
-     :defaults {},
-     :sample "1792x1024"},
-    :save-base64-to-webp-file
-    {:type :string,
-     :ttype :save-base64-to-webp,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-97563-5288.webp"},
-    :request-body-map
-    {:type :map,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "{:prompt \"PLEASE USE EXACTLY THIS PROMPT: A high-definition,..."},
-    :base-web-directory
-    {:type :string,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "/home/ryanr/rvbbit/frontend/resources/public/images/gen"},
-    :prompt
-    {:type :string,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal..."},
-    :create-png-path
-    {:type :string,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-..."},
-    :hiccup-image-box-w-png-vw
-    {:type :vector,
-     :ttype nil,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "(renderable view)"},
-    :create-convert-command-line
-    {:type :string,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "convert /home/ryanr/rvbbit-out/b64-image-97563-5288.webp /ho..."},
-    :hiccup-image-box-w-png
-    {:type :vector,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "[:v-box :padding \"10px\" :gap \"8px\" :width :width-px :style {..."},
-    :generate-file-path
-    {:type :string,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-97563-5288.webp"},
-    :relative-url-path-for-png-version
-    {:type :string,
-     :ttype :open-fn,
-     :meta nil,
-     :last? true,
-     :defaults {},
-     :sample "./images/gen/b64-image-97563-5288.png"},
-    :http-req-map
-    {:type :map,
-     :ttype :open-block,
-     :meta {},
-     :last? false,
-     :defaults {},
-     :sample "{:headers {\"Authorization\" \"Bearer sk-wdy5fbKL5OOMv0BqmiowT3..."},
-    :just-the-image
-    {:type :string,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "iVBORw0KGgoAAAANSUhEUgAABwAAAAQACAIAAABpndrVAAA552NhQlgAADnn..."},
-    :output-revised-prompt
-    {:type :string,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "Generate a high-definition, vibrant 16:9 digital illustratio..."},
-    :style-param
-    {:type :string,
-     :ttype :open-block,
-     :meta
-     {:*
-      {:scrubber
-       {:message "OpenAI image gen style selector - DALLE3",
-        :values ["vivid" "natural"]}}},
-     :last? false,
-     :defaults {},
-     :sample "vivid"}}}},
- :alt-key-held? false,
+  :flow/openai-image-gen-ladder>:pop-color
+  :flow/flow-forever>*running?
+  :flow/openai-image-gen-ladder>:output-revised-prompt
+  :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+  :flow/live-scratch-flow>*running?],
+ :client-name :good-cylindrical-ape-exiled-from-calanque,
  :openai-api-key "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",
- :window {:w 2374, :h 1567},
+ :window {:w 3056, :h 1523},
  :post-meta
- {:city-drag-26 {:* {:rowcount 19899}},
+ {:gen-viz-1132 {:* {:rowcount 7}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
+  :fields-drag-16
+  {:db_type {:distinct 1},
+   :key_hash {:distinct 657},
+   :* {:rowcount 932},
+   :db_schema {:distinct 1},
+   :is_group_by {:distinct 1},
+   :table_type {:distinct 2},
+   :run_id {:distinct 0},
+   :updated {:distinct 11},
+   :db_catalog {:distinct 0},
+   :field_name {:distinct 274},
+   :derived_calc {:distinct 0},
+   :derived_name {:distinct 0},
+   :data_type {:distinct 7},
+   :field_type {:distinct 44},
+   :table_name {:distinct 68},
+   :connection_id {:distinct 8},
+   :context_hash {:distinct 68}},
+  :ufo-sightings-drag-9 {:* {:rowcount 80332}},
   :duration-hours-drag-43 {:* {:rowcount 8349}},
-  :shape-drag-7 {:* {:rowcount 30}},
+  :city-drag-26 {:* {:rowcount 19899}},
+  :gen-viz-555 {:* {:rowcount 13}},
   :state-drag-3 {:* {:rowcount 68}},
-  :ufo-sightings-drag-9 {:* {:rowcount 80332}}},
+  :shape-drag-7 {:* {:rowcount 30}}},
  :flow-estimates
- {"openai-image-gen-ladder"
-  {:times 44.4, :run-id "c65ea285-2e98-499a-9446-f542de433d40"},
-  "client-keepalive" {:times nil, :run-id "5c9b6469-68c3-4d05-ab1f-fd6e75d93ee3"}},
+ {"client-keepalive" {:times nil, :run-id "0b15dd79-519a-4167-b722-bd9ca519551b"},
+  "openai-image-gen-ladder"
+  {:times 48.4, :run-id "b827b9a8-570f-4eef-b21d-6e67bf9e4d91"}},
  :status
- {"kick-test!" {:kick :flows-sys},
-  :heartbeat {:kick []},
+ {"kick-test!" {:kick :gen-viz-1132},
+  :heartbeat
+  {:kick
+   [:flow/openai-image-gen-ladder>*running?
+    :flow/flow-forever>:final-math
+    :flow/openai-image-gen-ladder>:dominant-color
+    :flow/openai-image-gen-ladder>:pop-color
+    :flow/flow-forever>*running?
+    :flow/openai-image-gen-ladder>:output-revised-prompt
+    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+    :flow/live-scratch-flow>*running?]},
   :alert1 {:alerts :alert2},
+  :reco {:fields-drag-16 :done},
   :file-change {:file-changed :done}},
  :screen-name "looking-glass-redux2",
  :recos-page2 0,
- :selected-tab "fat zebra",
+ :selected-tab "violet ferret",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
- :recos-page 0,
+ :recos-page 4,
  :rs-overrides-hashmap
  {"openai-image-gen-ladder"
   {:prompt
    "A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  \n\nShe has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly.\n\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy look.  \n",
    :style-param "vivid"}},
- :panels-hash -1431633818,
+ :base-sniff-queries {:fields 575237663},
+ :panels-hash 1677481223,
  :sessions
- [["impressive-periwinkle-jay-banned-from-rock-formations.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["vigorous-square-serval-banned-from-thalweg.edn"
-   "273 hours, 15 minutes, 26 seconds"
-   983726634]
-  ["exciting-globular-mouse-banned-from-maar.edn"
-   "170 hours, 33 minutes, 35 seconds"
-   614015634]
-  ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["restored-raspberry-mule-of-baymouth-bar.edn"
-   "40 hours, 51 minutes, 10 seconds"
-   147070549]
-  ["awesome-prismatic-jay-banned-from-malpaís.edn"
-   "40 hours, 51 minutes, 47 seconds"
-   147107425]
-  ["constant-star-shaped-echidna-banned-from-towhead.edn"
-   "255 hours, 8 minutes, 57 seconds"
-   918537634]
-  ["special-globular-coyote-of-oceanic-trench.edn"
-   "278 hours, 37 minutes, 45 seconds"
-   1003065634]
-  ["proud-thin-elk-of-rôche-moutonnée.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["kind-rhomboidal-lion-of-the-floodplain.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
-   "278 hours, 37 minutes, 45 seconds"
-   1003065634]
-  ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["courageous-linear-platypus-of-corrie.edn"
-   "41 hours, 12 minutes, 0 second"
-   148320566]
-  ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["ethical-round-oyster-of-glacial-horn.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["transforming-ivory-clam-of-the-volcanic-field.edn"
-   "95 hours, 11 minutes, 9 seconds"
-   342669634]
-  ["remarkable-thin-wombat-banned-from-flyggberg.edn"
-   "220 hours, 48 minutes, 41 seconds"
-   794921634]
-  ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["satisfactory-narrow-donkey-banned-from-tea-table.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["poised-tan-seal-of-the-potrero.edn"
-   "219 hours, 59 minutes, 43 seconds"
-   791983634]
-  ["remarkable-teal-mallard-of-the-corrie.edn"
-   "89 hours, 11 minutes, 34 seconds"
-   321094343]
-  ["keen-bronze-skunk-of-the-salt-pan.edn"
-   "272 hours, 32 minutes, 30 seconds"
-   981150634]
-  ["glowing-long-grasshopper-of-playa-lake.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["optimistic-carmine-mole-hailing-from-flat.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["adorable-fat-swan-hailing-from-moraine.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["fair-salmon-hawk-hailing-from-malpais.edn" "2 minutes, 46 seconds" 166858]
-  ["famous-burgundy-eel-of-glacier.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["encouraging-octohedral-spider-banned-from-col.edn"
-   "141 hours, 39 minutes, 36 seconds"
-   509976634]
-  ["worthy-amaranth-pheasant-exiled-from-fjord.edn" "2 minutes, 2 seconds" 122230]
-  ["good-bulbous-woodpecker-banned-from-pingo.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["ideal-long-oyster-banned-from-lava.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["brilliant-maroon-otter-banned-from-entrenched-meander.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["attractive-magenta-turtle-exiled-from-hillock.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["favorable-rose-camel-hailing-from-hanging-valley.edn"
-   "2 minutes, 4 seconds"
-   124022]
-  ["moving-elliptic-ferret-banned-from-river.edn"
-   "53 hours, 34 minutes, 31 seconds"
-   192871798]
-  ["valued-ivory-pronghorn-hailing-from-landforms-by-shape.edn"
-   "3 hours, 31 minutes, 9 seconds"
-   12669171]
-  ["dazzling-blush-badger-banned-from-plunge-pool.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["famous-lilac-jay-hailing-from-bluff.edn"
-   "93 hours, 54 minutes, 6 seconds"
-   338046634]
-  ["ethical-orange-buffalo-exiled-from-hornito.edn"
-   "271 hours, 55 minutes, 10 seconds"
-   978910634]
-  ["lovely-cyan-hummingbird-banned-from-stratovolcano.edn"
-   "198 hours, 15 minutes, 22 seconds"
-   713722634]
-  ["victorious-plum-locust-exiled-from-watershed.edn"
-   "181 hours, 37 minutes, 24 seconds"
-   653844634]
-  ["genuine-elliptic-wolf-of-the-oasis.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["supporting-narrow-beaver-banned-from-strath.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["smile-globular-jellyfish-hailing-from-list-of-rock-formations.edn"
-   "95 hours, 29 minutes, 21 seconds"
-   343761634]
-  ["reassuring-fat-dog-banned-from-flat.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["vibrant-champagne-gnat-of-the-volcanic-island.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["classic-icosahedral-gnat-of-salt-flat.edn" "3 minutes, 19 seconds" 199062]
-  ["independent-fat-koala-banned-from-tuya.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["refined-carmine-crow-exiled-from-ejecta-blanket.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["plentiful-pyramidal-sand-dollar-of-arroyo.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["upbeat-fat-dove-exiled-from-marine-terrace.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["cute-amethyst-opossum-hailing-from-cirque.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["ethical-jungle-green-walrus-of-the-submarine-canyon.edn"
-   "94 hours, 19 minutes, 13 seconds"
-   339553634]
-  ["stellar-oval-swan-of-salt-marsh.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["virtuous-cerise-finch-hailing-from-flared-slope.edn"
-   "3 hours, 31 minutes, 8 seconds"
-   12668643]
-  ["upbeat-oval-ox-of-pediplain.edn" "40 hours, 51 minutes, 17 seconds" 147077189]
-  ["clean-pyramidal-human-hailing-from-gulch.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["agreeable-orchid-dove-of-palsa.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["lucky-indigo-bear-of-hornito.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["refreshing-thin-dolphin-of-the-cuesta.edn"
-   "228 hours, 5 minutes, 10 seconds"
-   821110634]
-  ["upright-slate-gray-termite-of-the-central-peak.edn"
-   "200 hours, 30 minutes, 49 seconds"
-   721849634]
-  ["soulful-red-termite-exiled-from-backswamp.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["champion-ovoid-ox-of-the-fault-scarp.edn"
-   "96 hours, 6 minutes, 11 seconds"
-   345971634]
-  ["genuine-bulbous-hedgehog-banned-from-cratered-landscape.edn"
-   "170 hours, 31 minutes, 59 seconds"
-   613919634]
-  ["beaming-cyan-dolphin-hailing-from-pond.edn"
-   "63 hours, 18 minutes, 7 seconds"
-   227887217]
-  ["terrific-round-pheasant-hailing-from-honeycomb-weathering.edn"
-   "255 hours, 10 minutes, 35 seconds"
-   918635634]
-  ["effortless-gray-monkey-exiled-from-monadnock.edn"
-   "145 hours, 19 minutes, 36 seconds"
-   523176634]
-  ["grin-fat-wren-of-thalweg.edn" "278 hours, 37 minutes, 44 seconds" 1003064634]
-  ["accomplished-globular-dove-banned-from-swamp.edn"
-   "218 hours, 7 minutes, 34 seconds"
-   785254634]
-  ["positive-circular-platypus-exiled-from-pit-crater.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["marvelous-sapphire-mosquito-hailing-from-dirt-cone.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["prepared-circular-tiger-of-tidal-marsh.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["prepared-aquamarine-wasp-of-the-geyser.edn"
-   "52 hours, 38 minutes, 17 seconds"
-   189497873]
-  ["refined-rhomboidal-hawk-banned-from-nivation-hollow.edn"
-   "194 hours, 37 minutes, 6 seconds"
-   700626634]
-  ["light-baby-blue-dog-banned-from-sandur.edn"
-   "40 hours, 50 minutes, 5 seconds"
-   147005021]
-  ["keen-periwinkle-butterfly-of-trim-line.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["bountiful-lime-deer-hailing-from-spit.edn"
-   "96 hours, 16 minutes, 19 seconds"
-   346579634]
-  ["vital-octohedral-snake-hailing-from-drumlin.edn"
-   "52 hours, 20 minutes, 3 seconds"
-   188403819]
-  ["instantaneous-rectangular-bird-of-lava.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["meaningful-rhomboidal-kangaroo-banned-from-volcanic-dam.edn"
-   "226 hours, 2 minutes, 17 seconds"
-   813737634]
-  ["handsome-lime-rabbit-of-floodplain.edn"
-   "95 hours, 5 minutes, 53 seconds"
-   342353634]
-  ["sunny-mauve-tiger-hailing-from-permafrost-plateau.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["positive-raspberry-swallow-exiled-from-sound.edn"
-   "180 hours, 25 minutes, 30 seconds"
-   649530634]
-  ["independent-pyramidal-pheasant-banned-from-stratocone.edn"
-   "278 hours, 37 minutes, 45 seconds"
-   1003065634]
-  ["engaging-peach-pronghorn-of-the-impact-crater.edn"
-   "2 minutes, 54 seconds"
-   174318]
-  ["charming-blue-platypus-of-dreikanter.edn"
-   "46 hours, 23 minutes, 35 seconds"
-   167015611]
-  ["favorable-baby-blue-wasp-hailing-from-Carolina-bay.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["fantastic-magenta-hyena-of-the-scarp.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["kind-turquoise-parrot-banned-from-machair.edn"
-   "190 hours, 28 minutes, 29 seconds"
-   685709634]
-  ["worthy-cyan-rat-of-the-tea-table.edn"
-   "203 hours, 1 minute, 17 seconds"
-   730877634]
-  ["friendly-turquoise-yak-exiled-from-pseudocrater.edn"
-   "226 hours, 3 minutes, 12 seconds"
-   813792634]
-  ["ready-cerise-badger-of-the-ria.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["fair-long-mule-exiled-from-watershed.edn"
-   "194 hours, 36 minutes, 54 seconds"
-   700614634]
-  ["agreeable-amaranth-goose-banned-from-stream-pool.edn"
-   "93 hours, 14 minutes, 7 seconds"
-   335647634]
-  ["instinctive-square-nightingale-of-the-hoodoo.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["favorable-icosahedral-opossum-banned-from-archipelago.edn"
-   "200 hours, 29 seconds"
-   720029634]
-  ["kind-pentagonal-gnu-banned-from-v-shaped-valley.edn"
-   "4 minutes, 6 seconds"
-   246010]
-  ["gorgeous-wide-wren-banned-from-etchplain.edn"
-   "276 hours, 9 minutes, 12 seconds"
-   994152634]
-  ["energetic-plum-hyena-of-the-marine-terrace.edn"
-   "225 hours, 55 minutes, 3 seconds"
-   813303634]
-  ["healthy-orchid-otter-of-pseudocrater.edn"
-   "190 hours, 28 minutes, 20 seconds"
-   685700634]
-  ["genuine-slate-gray-gerbil-banned-from-strait.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["kind-lemon-mallard-hailing-from-supervolcano.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["courageous-amber-buffalo-exiled-from-barrier-bar.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["moving-fat-hamster-banned-from-oxbow-lake.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["quick-narrow-jay-of-ria.edn" "278 hours, 37 minutes, 44 seconds" 1003064634]
-  ["affirmative-thin-goat-hailing-from-cinder-cone.edn"
-   "2 minutes, 2 seconds"
-   122478]
-  ["earnest-ultramarine-serval-exiled-from-landforms-by-shape.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["spirited-crimson-weasel-hailing-from-lithalsa.edn"
-   "177 hours, 54 minutes, 22 seconds"
-   640462634]
-  ["spiritual-rectangular-sea-urchin-banned-from-ria.edn"
-   "144 hours, 48 minutes, 55 seconds"
-   521335634]
-  ["protected-linear-owl-hailing-from-raised-beach.edn"
-   "170 hours, 42 minutes, 1 second"
-   614521634]
-  ["accepted-icosahedral-hedgehog-exiled-from-tuff-cone.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["green-periwinkle-gnat-of-shoal.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["intelligent-silver-swallow-banned-from-maar.edn"
-   "220 hours, 52 minutes, 48 seconds"
-   795168634]
-  ["attractive-baby-blue-hummingbird-of-lagoon.edn"
-   "176 hours, 18 minutes, 55 seconds"
-   634735634]
-  ["engaging-spring-green-antelope-of-the-table.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["novel-viridian-magpie-banned-from-moraine.edn"
-   "170 hours, 35 minutes, 0 second"
-   614100634]
-  ["reassuring-rectangular-locust-exiled-from-oceanic-trench.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["willing-puce-fish-of-the-thalweg.edn"
-   "89 hours, 14 minutes, 30 seconds"
-   321270964]
-  ["fine-orange-louse-of-bluff.edn" "278 hours, 37 minutes, 44 seconds" 1003064634]
-  ["instinctive-lilac-chicken-of-the-scree.edn"
-   "177 hours, 56 minutes, 50 seconds"
-   640610634]
-  ["secure-elliptic-locust-hailing-from-badlands.edn"
-   "146 hours, 8 minutes, 56 seconds"
-   526136634]
-  ["zealous-linear-raven-banned-from-lava-spine.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["brilliant-copper-toad-of-the-proglacial-lake.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["safe-conical-bat-exiled-from-marine-terrace.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["effective-spherical-fox-of-the-volcanic-field.edn"
-   "41 hours, 4 minutes, 15 seconds"
-   147855593]
-  ["remarkable-orchid-gull-hailing-from-somma-volcano.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["gorgeous-spring-bud-wallaby-of-the-permafrost-plateau.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["whole-icosahedral-frog-hailing-from-thermokarst.edn"
-   "278 hours, 37 minutes, 45 seconds"
-   1003065634]
-  ["popular-cubic-fox-of-the-mountain.edn"
-   "74 hours, 23 minutes, 43 seconds"
-   267823311]
-  ["plentiful-cylindrical-grasshopper-banned-from-gulch.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["friendly-bulbous-hippopotamus-exiled-from-erg.edn"
-   "177 hours, 17 minutes, 54 seconds"
-   638274634]
-  ["trusting-ivory-alligator-of-crevasse.edn"
-   "41 hours, 12 minutes, 2 seconds"
-   148322074]
-  ["gorgeous-elliptic-pronghorn-banned-from-rock-formations.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["spirited-bulbous-clam-of-the-towhead.edn"
-   "227 hours, 53 minutes, 56 seconds"
-   820436634]
-  ["rejoiceful-burgundy-wasp-banned-from-sand-boil.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["honest-orchid-fish-banned-from-volcanic-crater.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["sunny-puce-grasshopper-of-dry-lake.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["honorable-amethyst-skunk-of-the-calanque.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["affluent-baby-blue-kangaroo-hailing-from-hoodoo.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["classic-round-mole-exiled-from-dirt-cone.edn"
-   "177 hours, 49 minutes, 56 seconds"
-   640196634]
-  ["favorable-lemon-hare-banned-from-watershed.edn"
-   "47 hours, 9 minutes, 18 seconds"
-   169758800]
-  ["open-crimson-bear-of-the-supervolcano.edn"
-   "255 hours, 9 minutes, 2 seconds"
-   918542634]
-  ["earnest-puce-squirrel-of-flared-slope.edn"
-   "244 hours, 26 minutes, 58 seconds"
-   880018634]
-  ["honest-lavender-panda-banned-from-turlough.edn"
-   "94 hours, 58 minutes, 14 seconds"
-   341894634]
-  ["meritorious-long-mule-of-pediplain.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["honest-sapphire-eagle-exiled-from-escarpment.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["honest-icosahedral-boar-of-the-arroyo.edn"
-   "225 hours, 52 minutes, 33 seconds"
-   813153634]
-  ["satisfactory-navy-blue-fly-exiled-from-bar.edn"
-   "219 hours, 35 minutes, 18 seconds"
-   790518634]
-  ["fun-prismatic-deer-of-the-pyroclastic-shield.edn"
-   "3 hours, 31 minutes, 9 seconds"
-   12669559]
-  ["brilliant-linear-monkey-hailing-from-natural-arch.edn"
-   "278 hours, 37 minutes, 45 seconds"
-   1003065634]
-  ["fresh-electric-blue-seal-of-gulch.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["angelic-champagne-parrot-banned-from-inselberg.edn"
-   "41 hours, 12 minutes, 1 second"
-   148321818]
-  ["restored-indigo-pigeon-hailing-from-pyroclastic-shield.edn"
-   "69 hours, 12 minutes, 39 seconds"
-   249159329]
-  ["robust-mauve-ox-of-the-cave.edn" "278 hours, 37 minutes, 44 seconds" 1003064634]
-  ["open-wide-dog-of-the-bluff.edn" "278 hours, 37 minutes, 44 seconds" 1003064634]
-  ["vivacious-rectangular-penguin-hailing-from-lacustrine-terrace.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["healing-rectangular-pig-of-salt-pan.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["beneficial-spherical-ostrich-hailing-from-volcanic-cone.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["sunny-globular-locust-of-wadi.edn" "40 hours, 27 minutes, 54 seconds" 145674861]
-  ["impressive-square-platypus-banned-from-strike-ridge.edn"
-   "96 hours, 16 minutes, 25 seconds"
-   346585634]
-  ["good-hexagonal-hummingbird-banned-from-ait.edn"
-   "223 hours, 40 minutes, 41 seconds"
-   805241634]
-  ["fine-hexagonal-kangaroo-hailing-from-lava-spine.edn"
-   "96 hours, 41 minutes, 57 seconds"
-   348117634]
-  ["famous-square-sand-dollar-hailing-from-yazoo-stream.edn"
-   "276 hours, 6 minutes, 30 seconds"
-   993990634]
-  ["seemly-carmine-skunk-banned-from-outwash-plain.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["light-linear-hedgehog-of-confluence.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["luminous-black-codfish-of-the-dale.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["amazing-ochre-yellow-jacket-of-the-complex-volcano.edn"
-   "194 hours, 41 minutes, 21 seconds"
-   700881634]
-  ["wholesome-thin-bee-hailing-from-tuya.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["secure-taupe-heron-banned-from-tepui.edn"
-   "276 hours, 11 minutes, 2 seconds"
-   994262634]
-  ["stupendous-square-kangaroo-of-submarine-volcano.edn"
-   "43 hours, 53 minutes, 3 seconds"
-   157983569]
-  ["distinguished-harlequin-cheetah-of-the-drumlin.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["honest-wide-mouse-exiled-from-subglacial-mound.edn"
-   "278 hours, 37 minutes, 44 seconds"
-   1003064634]
-  ["soulful-cylindrical-opossum-of-pyroclastic-shield.edn"
-   "48 hours, 50 minutes, 31 seconds"
-   175831285]
-  ["transformative-globular-butterfly-of-tuya.edn"
-   "20 hours, 8 minutes, 34 seconds"
-   72514370]],
+ (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
+   "332 hours, 32 minutes, 49 seconds"
+   1197169945]
+   ["vigorous-square-serval-banned-from-thalweg.edn"
+    "327 hours, 10 minutes, 31 seconds"
+    1177831945]
+   ["exciting-globular-mouse-banned-from-maar.edn"
+    "224 hours, 28 minutes, 40 seconds"
+    808120945]
+   ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
+    "332 hours, 32 minutes, 49 seconds"
+    1197169945]
+   ["restored-raspberry-mule-of-baymouth-bar.edn"
+    "94 hours, 46 minutes, 15 seconds"
+    341175860]
+   ["awesome-prismatic-jay-banned-from-malpaís.edn"
+    "94 hours, 46 minutes, 52 seconds"
+    341212736]
+   ["constant-star-shaped-echidna-banned-from-towhead.edn"
+    "309 hours, 4 minutes, 2 seconds"
+    1112642945]
+   ["special-globular-coyote-of-oceanic-trench.edn"
+    "332 hours, 32 minutes, 50 seconds"
+    1197170945]
+   ["proud-thin-elk-of-rôche-moutonnée.edn"
+    "332 hours, 32 minutes, 49 seconds"
+    1197169945]
+   ["kind-rhomboidal-lion-of-the-floodplain.edn"
+    "332 hours, 32 minutes, 49 seconds"
+    1197169945]
+   ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
+    "332 hours, 32 minutes, 50 seconds"
+    1197170945]
+   ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
+    "332 hours, 32 minutes, 49 seconds"
+    1197169945]
+   ["courageous-linear-platypus-of-corrie.edn"
+    "95 hours, 7 minutes, 5 seconds"
+    342425877]
+   ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
+    "332 hours, 32 minutes, 49 seconds"
+    1197169945]
+   ["ethical-round-oyster-of-glacial-horn.edn"
+    "332 hours, 32 minutes, 49 seconds"
+    1197169945]
+   ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
+    "332 hours, 32 minutes, 49 seconds"
+    1197169945]
+   ["transforming-ivory-clam-of-the-volcanic-field.edn"
+    "149 hours, 6 minutes, 14 seconds"
+    536774945]
+   ["remarkable-thin-wombat-banned-from-flyggberg.edn"
+    "274 hours, 43 minutes, 46 seconds"
+    989026945]
+   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn"
+    "25 minutes, 36 seconds"
+    1536096]
+   ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
+    "332 hours, 32 minutes, 49 seconds"
+    1197169945]),
+ :last-run-throwaway "23:08:56",
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 123687564,
+ :user-params-hash -1098155057,
  :grid-recos? true,
- :session-hash 1736096526,
+ :search-results {":flow" 29, ":client-param" 4, ":block" 8, ":screen" 2},
+ :session-hash 1481939980,
  :panels
  {:block-11251
   {:name "block-11251",
@@ -1362,6 +1912,44 @@
    :name "flow-play-from-runstreams",
    :root [5 18],
    :tab "through the rabbit hole and out the other side"},
+  :block-983
+  {:mad-libs-combo-hash ["1408146803" "fields_drag_16"],
+   :name "basic_h_bar - \"data_type, rows\" - 805",
+   :w 9,
+   :root [16 3],
+   :h 9,
+   :connection-id "system-db",
+   :queries
+   {:gen-viz-1132
+    {:select [[[:count 1] :rows] :data_type],
+     :from [:query/fields-drag-16],
+     :group-by [:data_type]}},
+   :tab "violet ferret",
+   :conditionals nil,
+   :views
+   {:oz
+    [:vega-lite
+     {:layer
+      [{:encoding
+        {:x {:field :data_type, :type "ordinal"},
+         :y {:aggregate "sum", :field :rows, :type "quantitative"},
+         :row {:field nil, :legend nil},
+         :size {:legend nil},
+         :shape {:legend nil},
+         :column {:field nil, :legend nil},
+         :color
+         {:scale :theme/vega-default-color-scheme,
+          :legend nil,
+          :field 1,
+          :type "ordinal"}},
+        :mark {:type "bar", :tooltip {:content "encoding"}}}],
+      :data {:values :gen-viz-1132},
+      :config :theme/vega-defaults,
+      :width "container",
+      :height :panel-height,
+      :padding 4,
+      :background "transparent"}
+     {:actions false}]}},
   :block-8240
   {:drag-meta {:type :open-input},
    :w 7,
@@ -1596,6 +2184,34 @@
    :tab "fat zebra",
    :root [1 2],
    :name "block-5620"},
+  :block-7521
+  {:h 4,
+   :w 5,
+   :root [26 2],
+   :tab "fat zebra",
+   :selected-view :hi,
+   :name "block-7521",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-7521.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
   :block-7262
   {:drag-meta {:type :open-input},
    :w 8,
@@ -1689,6 +2305,33 @@
    :tab "fat zebra",
    :root [26 1],
    :name "block-1927"},
+  :block-4030
+  {:h 7,
+   :w 30,
+   :connection-id "system-db",
+   :name "select-all-fields",
+   :queries
+   {:fields-drag-16
+    {:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}},
+   :root [8 16],
+   :tab "violet ferret"},
   :block-10376
   {:h 8,
    :w 15,
@@ -1771,7 +2414,39 @@
       :state],
      :from [[:ufo_sightings :jj584]]}},
    :root [1 1],
-   :tab "sapphire ape"}},
+   :tab "sapphire ape"},
+  :block-273
+  {:mad-libs-combo-hash ["1481471205" "fields_drag_16"],
+   :name "pie_nivo - \"rows, updated\" - 859",
+   :w 9,
+   :root [7 3],
+   :h 9,
+   :connection-id "system-db",
+   :queries
+   {:gen-viz-555
+    {:select [[[:count 1] :value] [:updated :id]],
+     :from [:query/fields-drag-16],
+     :group-by [:updated]}},
+   :tab "violet ferret",
+   :conditionals nil,
+   :views
+   {:oz
+    [:nivo-pie-chart
+     {:padAngle 0.7,
+      :innerRadius 0.5,
+      :width :panel-width+70,
+      :arcLinkLabelsThickness 4,
+      :borderWidth 2,
+      :cornerRadius 3,
+      :activeOuterRadiusOffset 8,
+      :theme :theme/nivo-defaults,
+      :arcLinkLabelsSkipAngle 10,
+      :click {:c :updated, :y :rows},
+      :arcLabelsSkipAngle 10,
+      :height :panel-height+50,
+      :margin {:top 50, :right 50, :bottom 50, :left 45},
+      :data :gen-viz-555,
+      :arcLinkLabelsTextColor "#ffffff"}]}}},
  :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#ff2050",
@@ -1799,25 +2474,26 @@
    :view_names
    ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
    :query_names ""},
+  :viz-shapes-sys {:combo_edn nil},
   :tables-sys
   {:db_schema "none",
    :db_catalog nil,
-   :connection_id "bigfoot-ufos",
+   :connection_id "system-db",
    :schema_cat nil,
-   :table_name "ufo_sightings",
-   :fields 14},
+   :table_name "fields",
+   :fields 17},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#c3b7b7",
+   :openai-image-gen-ladder>pop-color "#dcc5cb",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-50183-21344.png",
+   "./images/gen/b64-image-60731-30526.png",
    :counting-loop>open-fn-2 44,
    :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
-   "Create a highly detailed 16:9 illustration of a fantastical scene set in a traditional Scottish landscape, giving a sense of otherworldliness. The main character is a young white Scottish woman in her late 20s. She has brunette hair, full pouty lips with a prominent bottom lip, and a slightly upturned nose. Her expression is one of pleasure combined with sultriness. Her long, lustrous hair complements her robust, hyper-curvaceous physique. Celtic-style tattoos adorn her neck, collarbone, and shoulders, featuring designs of rabbits and wilderness imagery. Mysterious blue and pink lights from the forest reflect off her well-rounded figure, enhancing its splendor. She wears a choker ribbon and a lengthy necklace, adding to her burlesque style. She leans against a wall and offers the viewer a flirtatious, coy gaze.",
+   "A meticulously-detailed, hyperrealistic 16:9 digitally-rendered depiction of a snowy morning infused with a blend of rustic New England charm and futuristic cyberpunk flair. The peaceful town is blanketed under a pristine veil of snow amidst a blizzard, lending an ambiance of slight grit. Architectural structures emanate a gentle, captivating glow, tinted in pastel pink and neon-blues. Dominating the left side of the scene is a captivating early thirties Irish woman, with a robust build, full lips, with a larger lower half, an upturned nose, and an expressive visage blending satisfaction and tantalizing sophistication. Her slightly wet hair falls over her neck and shoulders due to the snowfall, adorned with intricate Celtic-inspired tattoos of rabbits and nature scenes on her neck, collarbone, and shoulders. The morning sun peeking over the horizon casts diffused light on her, accentuating the serenity and cryptic ambiance crafted by the pre-dawn lighting. Her fully-figured body bathes in the gentle light, creating an aesthetically pleasing harmony of light and shadow playing about her beautifully tattooed body.",
    :live-scratch-flow>*running? false,
    :openai-image-gen-ladder>hiccup-image-box-w-png-vw
    [:v-box
@@ -1852,7 +2528,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#2b313f",
+   :openai-image-gen-ladder>dominant-color "#71727f",
    :flow-forever>final-math nil},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",
@@ -1864,6 +2540,8 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
+  :user-dropdown-sys {:req-field nil},
+  :viz-tables-sys {:table_name "fields_drag_16"},
   :param
   {:reliable-coral-moose
    ["A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  "
@@ -1876,19 +2554,8 @@
    ["A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly."
     "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."
     ""],
-   :selected-view-data
-   [:box
-    :align
-    :center
-    :justify
-    :center
-    :padding
-    "13px"
-    :style
-    {:font-size "12px"}
-    :child
-    [:string :flow/openai-image-gen-ladder>:output-revised-prompt]],
-   :selected-view [:views :param-val],
+   :selected-view-data nil,
+   :selected-view [nil nil],
    :fabulous-pink-eagle
    ["A classic 1990s American Pizza Hut location, now even more run down and abandoned, takes on a slightly more dystopian aspect with a crucial detail: the building's roof shingles are distinctly red, highlighting the iconic Pizza Hut design. The parking lot is now heavily littered with remnants of bar charts, pie charts, old school dashboards, and shredded Tableau signage, symbolizing the profound death of the 'old world' of business intelligence. This scene is illustrated in a highly stylistic, striking, and dramatic manner, with an intensified essence of decay and the passage of time. The architecture of the Pizza Hut, with its iconic red roof and signage, stands more prominently as a relic amidst an overwhelming detritus of outdated analytics tools. This wider, cinematic view should further emphasize the desolation and dramatic change, adding a more dystopian atmosphere to the landscape. "
     ""
@@ -1913,7 +2580,7 @@
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. "
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
-   :selected-block :block-10376,
+   :selected-block :block-4030,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""
@@ -1924,6 +2591,7 @@
     "The other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene."
     ""
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."]},
+  :viz-shapes0-sys {:shape nil},
   :theme
   {:codemirror-theme "ayu-dark",
    :editor-param-background-color "#000000",
@@ -2028,7 +2696,23 @@
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
-  :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
-  :sys {:selected-tab "fat zebra", :selected-tab-idx 2}},
- :selected-flow "live-scratch-flow",
- :current-url "#/looking-glass-redux2"}
+  :fields-drag-16
+  {:db_type "SQLite",
+   :key_hash "-1950628355",
+   :db_schema "none",
+   :is_group_by 1,
+   :table_type "TABLE",
+   :run_id nil,
+   :updated "2024-03-24 23:14:50",
+   :db_catalog nil,
+   :field_name "*",
+   :derived_calc nil,
+   :derived_name nil,
+   :data_type "unknown",
+   :field_type "special",
+   :table_name "offense_codes",
+   :connection_id "boston-crime",
+   :context_hash "-1806822778"},
+  :connections-sys {:database_name "*cache-db*", :connection_id "system-db"},
+  :sys {:selected-tab "violet ferret", :selected-tab-idx 3}},
+ :selected-flow "live-scratch-flow"}
