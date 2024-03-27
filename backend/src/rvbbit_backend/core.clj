@@ -122,10 +122,10 @@
                                                              :when (= (get v :tab) b)] {k v}))}))
         queries (into {} (for [b blocks] (get-in screen-data [:panels b :queries])))]
     (swap! wss/screens-atom assoc screen-name screen-data) ;; update master screen atom for param reactions etc 
-    (search/add-or-update-document search/index-writer (str :screen "-" screen-name) 
-                                   {:content screen-name ;screen-data 
-                                    :type :screen 
-                                    :row {:file-path f-path :screen-name screen-name :blocks 0 :queries 0}})
+    ;; (search/add-or-update-document search/index-writer (str :screen "-" screen-name) 
+    ;;                                {:content screen-name ;screen-data 
+    ;;                                 :type :screen 
+    ;;                                 :row {:file-path f-path :screen-name screen-name :blocks 0 :queries 0}})
     (ut/pp [:updating-screen-meta-for f-path])
     (sql-exec system-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
     (sql-exec system-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
@@ -143,11 +143,12 @@
                                                  block-name (str (cond theme? (str "(meta: this screen's theme" theme-name ")")
                                                                        board? (str "board: " b)
                                                                        :else (get-in screen-data [:panels b :name])))
-                                                 _ (search/add-or-update-document search/index-writer (str :block "-" screen-name b)
-                                                                                  {:content (str screen-name " " b " " (get-in screen-data [:panels b :name])) ;(get-in screen-data [:panels b]) 
-                                                                                   :type :block
-                                                                                   :row {:file-path f-path :screen-name screen-name 
-                                                                                         :block_key (str b) :block_name block-name}})]
+                                                ;;  _ (search/add-or-update-document search/index-writer (str :block "-" screen-name b)
+                                                ;;                                   {:content (str screen-name " " b " " (get-in screen-data [:panels b :name])) ;(get-in screen-data [:panels b]) 
+                                                ;;                                    :type :block
+                                                ;;                                    :row {:file-path f-path :screen-name screen-name 
+                                                ;;                                          :block_key (str b) :block_name block-name}})
+                                                 ]
                                              ;; do side-effect insert for deeper table?
                                              [f-path screen-name (str b) block-name
                                               (count (keys views))
@@ -181,10 +182,10 @@
                                    :connections (count (get flow-data :connections))
                                    :file_path (str f-path)
                                    :body (pr-str flow-data)}]}]
-         (search/add-or-update-document search/index-writer (str :flow "-" flow-id)
-                                        {:content flow-data 
-                                         :type :flow
-                                         :row {:file-path f-path :flow-id flow-id}})
+        ;;  (search/add-or-update-document search/index-writer (str :flow "-" flow-id)
+        ;;                                 {:content flow-data 
+        ;;                                  :type :flow
+        ;;                                  :row {:file-path f-path :flow-id flow-id}})
          (sql-exec flows-db (to-sql {:delete-from [:flows] :where [:= :file_path f-path]}))
          (sql-exec flows-db (to-sql insert-sql)))
        (catch Exception e (ut/pp [:read-flow-error f-path e]))))
@@ -307,11 +308,27 @@
      file-path)))
 
 
-
+(defn thaw-flow-results []
+  (ut/pp [:thawing-flow-results-atom...])
+  (let [file-path "./data/atoms/flow-db-results-atom.edn"
+        file (io/file file-path)
+        state (if (.exists file)
+                (with-open [rdr (io/reader file)]
+                  (try (edn/read (java.io.PushbackReader. rdr))
+                       (catch Exception e
+                         (do
+                           (ut/pp [:flow-results-thaw-atom-error!!!! file e])
+                           (System/exit 0)))))
+                {})]
+    (reset! flow-db/results-atom state)))
+    
 
 
 
   (defn -main [& args]
+    
+    ;;(ut/thaw-atom {} "./data/atoms/flow-db-results-atom.edn" flow-db/results-atom true)
+    (thaw-flow-results)
 
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-conn-watcher (watch-connections-folder))
@@ -363,6 +380,11 @@
     ;(cruiser/create-sys-tables-if-needed! system-db) ;; sqlite
 
 
+    (defn fridge-child-atom [ttype key]
+      (let [base-dir (str "./data/atoms/" (cstr/replace (str ttype) ":" ""))
+            _ (ext/create-dirs base-dir) ;; just in case...
+            new-child-atom  (ut/thaw-atom {} (str base-dir "/" key "-atom.edn"))]
+        new-child-atom))
 
     (add-watch wss/screens-atom :master-screen-watcher ;; watcher splitter
                (fn [_ _ old-state new-state]
@@ -370,7 +392,9 @@
                  (doseq [key (keys new-state)]
                    (if-let [child-atom (get @wss/screen-child-atoms key)]
                      (swap! child-atom assoc key (get new-state key))
-                     (let [new-child-atom (atom {})]
+                     (let [new-child-atom (atom {})
+                           ;new-child-atom (fridge-child-atom :screens key)
+                           ]
                        (swap! wss/screen-child-atoms assoc key new-child-atom)
                        (swap! new-child-atom assoc key (get new-state key)))))))
 
@@ -379,7 +403,9 @@
                  (doseq [key (keys new-state)]
                    (if-let [child-atom (get @wss/param-child-atoms key)]
                      (swap! child-atom assoc key (get new-state key))
-                     (let [new-child-atom (atom {})]
+                     (let [new-child-atom (atom {})
+                           ;new-child-atom (fridge-child-atom :params key)
+                           ]
                        (swap! wss/param-child-atoms assoc key new-child-atom)
                        (swap! new-child-atom assoc key (get new-state key)))))))
 
@@ -388,7 +414,9 @@
                  (doseq [key (keys new-state)]
                    (if-let [child-atom (get @wss/panel-child-atoms key)]
                      (swap! child-atom assoc key (get new-state key))
-                     (let [new-child-atom (atom {})]
+                     (let [new-child-atom (atom {})
+                           ;new-child-atom (fridge-child-atom :panels key)
+                           ]
                        (swap! wss/panel-child-atoms assoc key new-child-atom)
                        (swap! new-child-atom assoc key (get new-state key)))))))
 
@@ -466,8 +494,12 @@
                                                 (ut/ppa [:shutting-down-system-pools])
                                                 (hik/close-datasource (get system-db :datasource))))
 
-    (shutdown/add-hook! ::clear-cache #(do (ut/ppa [:freezing-system-atom])
+    (shutdown/add-hook! ::clear-cache #(do (ut/ppa [:freezing-system-atoms])
                                            (ut/freeze-atoms)
+                                           (ut/ppa [:freezing-flow-results-atom])
+                                           (with-open [wtr (io/writer "./data/atoms/flow-db-results-atom.edn")]
+                                             (binding [*out* wtr]
+                                               (prn @flow-db/results-atom)))
                                            (ut/ppa [:clearing-cache-db])
                                            (shell/sh "/bin/bash" "-c" (str "rm " "db/cache.db"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "db/flow.db"))
@@ -508,6 +540,7 @@
     (def mon (tt/every! 30 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30 seconds (excessive, lenghten in prod..)
     (instrument-jvm instrument/metric-registry)
     (wss/subscribe-to-session-changes)
+
   ;;(wss/start-thread-worker) ;; used for side-car sniffs
   ;(def worker-thread (wss/start-thread-worker))
   ;(def lunchbreak (tt/every! 90 2 (bound-fn [] (wss/recycle-worker worker-thread)))) ;; "reboot" the sniffer worker thread every 30 mins
@@ -516,7 +549,8 @@
     (def lunchbreak2 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker2))))
     (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
 
-    (def lucene-commiter (tt/every! 30 2 (bound-fn [] (search/commit-writer search/index-writer))))
+    ;;(def lucene-commiter (tt/every! 30 2 (bound-fn [] (search/commit-writer search/index-writer))))
+    (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))
 
     (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too much?
 

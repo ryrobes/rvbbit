@@ -248,48 +248,16 @@
     "wow-board"],
    :openapi-key "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"}},
  :runstreams nil,
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [226097745 204501537 4294705152],
+ :memory [262459529 236679125 4294705152],
  :status-data
- {:file-change
-  {:file-changed
-   {:data
-    [{:path
-      "./live/unwavering-circular-grasshopper-of-the-isthmus/strategic grill locations/hello there!/hello-there-brother.edn",
-      :type :modify,
-      :panel-key :hello-there-brother,
-      :block-data
-      {:h 29,
-       :w 50,
-       :root [1 2],
-       :views
-       {:heya!
-        [:box
-         :align
-         :center
-         :justify
-         :center
-         :style
-         {:font-size "50px",
-          :font-weight 700,
-          :color :theme/editor-outer-rim-color,
-          :padding-top "14px",
-          :opacity 1,
-          :font-family :theme/base-font}
-         :child
-         "hello! 🐇 🍂 🦃"]},
-       :tab "strategic grill locations",
-       :name "hello there!"}}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  :heartbeat
+ {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-03-24 15:31:56",
+      :at "2024-03-26 20:22:34",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -303,57 +271,7 @@
        {:width "100%", :height :panel-height+50}
        [:>
         :ComposedChart
-        {:data
-         [{:mem 1302, :tick 2050, :threads 106, :subs 37, :load 2.95068359375}
-          {:mem 1363, :tick 2051, :threads 106, :subs 37, :load 2.48583984375}
-          {:mem 1644, :tick 2052, :threads 127, :subs 37, :load 2.779296875}
-          {:mem 1920, :tick 2053, :threads 125, :subs 37, :load 3.33984375}
-          {:mem 366, :tick 2054, :threads 148, :subs 37, :load 3.732421875}
-          {:mem 737, :tick 2055, :threads 149, :subs 37, :load 4.2568359375}
-          {:mem 383, :tick 2056, :threads 140, :subs 37, :load 4.08935546875}
-          {:mem 725, :tick 2057, :threads 137, :subs 37, :load 3.55126953125}
-          {:mem 786, :tick 2058, :threads 107, :subs 37, :load 3.58349609375}
-          {:mem 819, :tick 2059, :threads 103, :subs 37, :load 3.59716796875}
-          {:mem 1675, :tick 2060, :threads 121, :subs 37, :load 3.3583984375}
-          {:mem 1734, :tick 2061, :threads 124, :subs 37, :load 2.8681640625}
-          {:mem 1430, :tick 2062, :threads 144, :subs 37, :load 3.43310546875}
-          {:mem 1550, :tick 2063, :threads 143, :subs 37, :load 3.28173828125}
-          {:mem 1994, :tick 2064, :threads 157, :subs 37, :load 3.013671875}
-          {:mem 1141, :tick 2065, :threads 161, :subs 37, :load 3.71826171875}
-          {:mem 1229, :tick 2066, :threads 156, :subs 37, :load 3.40380859375}
-          {:mem 2036, :tick 2067, :threads 154, :subs 37, :load 3.00732421875}
-          {:mem 2066, :tick 2068, :threads 104, :subs 37, :load 3.349609375}
-          {:mem 411, :tick 2069, :threads 104, :subs 37, :load 2.9404296875}
-          {:mem 482, :tick 2070, :threads 107, :subs 37, :load 3.640625}
-          {:mem 520, :tick 2071, :threads 105, :subs 37, :load 3.42578125}
-          {:mem 596, :tick 2072, :threads 112, :subs 37, :load 2.9482421875}
-          {:mem 678, :tick 2073, :threads 114, :subs 37, :load 3.30126953125}
-          {:mem 889, :tick 2074, :threads 108, :subs 37, :load 2.92724609375}
-          {:mem 964, :tick 2075, :threads 108, :subs 37, :load 2.68896484375}
-          {:mem 1031, :tick 2076, :threads 107, :subs 37, :load 2.49951171875}
-          {:mem 1072, :tick 2077, :threads 106, :subs 37, :load 2.72314453125}
-          {:mem 1137, :tick 2078, :threads 103, :subs 37, :load 3.3330078125}
-          {:mem 1207, :tick 2079, :threads 107, :subs 37, :load 3.0703125}
-          {:mem 1237, :tick 2080, :threads 107, :subs 37, :load 3.57373046875}
-          {:mem 1298, :tick 2081, :threads 104, :subs 37, :load 3.1640625}
-          {:mem 1358, :tick 2082, :threads 105, :subs 37, :load 2.91162109375}
-          {:mem 1389, :tick 2083, :threads 105, :subs 37, :load 3.15283203125}
-          {:mem 1811, :tick 2084, :threads 127, :subs 37, :load 3.0419921875}
-          {:mem 482, :tick 2085, :threads 126, :subs 37, :load 2.82470703125}
-          {:mem 634, :tick 2086, :threads 110, :subs 37, :load 2.92431640625}
-          {:mem 731, :tick 2087, :threads 104, :subs 37, :load 3.384765625}
-          {:mem 793, :tick 2088, :threads 105, :subs 37, :load 3.02734375}
-          {:mem 825, :tick 2089, :threads 103, :subs 37, :load 2.6318359375}
-          {:mem 887, :tick 2090, :threads 105, :subs 37, :load 2.54833984375}
-          {:mem 946, :tick 2091, :threads 105, :subs 37, :load 2.5068359375}
-          {:mem 977, :tick 2092, :threads 104, :subs 37, :load 2.61669921875}
-          {:mem 1039, :tick 2093, :threads 105, :subs 37, :load 2.662109375}
-          {:mem 1103, :tick 2094, :threads 108, :subs 37, :load 2.8125}
-          {:mem 1135, :tick 2095, :threads 103, :subs 37, :load 3.4462890625}
-          {:mem 1191, :tick 2096, :threads 101, :subs 37, :load 3.21533203125}
-          {:mem 1174, :tick 2097, :threads 127, :subs 37, :load 3.16748046875}
-          {:mem 1680, :tick 2098, :threads 146, :subs 37, :load 3.10595703125}
-          {:mem 376, :tick 2099, :threads 146, :subs 37, :load 2.85986328125}],
+        {:data [{:mem 619, :tick 0, :threads 92, :subs 37, :load 3.17431640625}],
          :margin {:top 5, :bottom 5, :right 30, :left 20}}
         [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
         [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
@@ -397,96 +315,100 @@
     :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi
-  :flow/live-scratch-flow>*running?
-  :flow/openai-image-gen-ladder>:relative-url-path-for-png-version],
- :client-name :unwavering-circular-grasshopper-of-the-isthmus,
+ [:flow/live-scratch-flow>*running?
+  :client/engaging-peach-pronghorn-of-the-impact-crater>sys>selected-tab
+  :client/good-cylindrical-ape-exiled-from-calanque>param>reliable-coral-moose
+  :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+  :screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi],
+ :client-name :blissful-ivory-bird-banned-from-ravine,
  :openai-api-key "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",
- :window {:w 2576, :h 1668},
+ :window {:w 3173, :h 1710},
  :flow-estimates
- {"client-keepalive" {:times nil, :run-id "3f4b4204-768e-486f-9b05-66237bcdd96b"},
+ {"client-keepalive" {:times nil, :run-id "d2a917ac-c36e-493c-a35a-76ee6f428fb2"},
   "openai-image-gen-ladder"
-  {:times 38.1, :run-id "817e64e7-c55b-495a-8c7a-d86d0227d808"}},
+  {:times 45.1, :run-id "82f1bff4-ea11-4aa1-a199-29d5c537271a"}},
  :status
- {:file-change {:file-changed :done},
-  :heartbeat
+ {:heartbeat
   {:kick
-   [:screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi
-    :flow/live-scratch-flow>*running?
-    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]},
+   [:flow/live-scratch-flow>*running?
+    :client/engaging-peach-pronghorn-of-the-impact-crater>sys>selected-tab
+    :client/good-cylindrical-ape-exiled-from-calanque>param>reliable-coral-moose
+    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+    :screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi]},
   :alert1 {:alerts :alert2}},
  :screen-name "fake-bricks",
  :recos-page2 0,
  :selected-tab "strategic grill locations",
+ :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
  :recos-page 0,
  :rs-overrides-hashmap {},
- :panels-hash -1109877532,
+ :panels-hash 820400522,
  :sessions
  (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
-   "300 hours, 49 minutes, 2 seconds"
-   1082942250]
+   "353 hours, 39 minutes, 15 seconds"
+   1273155081]
    ["vigorous-square-serval-banned-from-thalweg.edn"
-    "295 hours, 26 minutes, 44 seconds"
-    1063604250]
+    "348 hours, 16 minutes, 57 seconds"
+    1253817081]
    ["exciting-globular-mouse-banned-from-maar.edn"
-    "192 hours, 44 minutes, 53 seconds"
-    693893250]
+    "245 hours, 35 minutes, 6 seconds"
+    884106081]
    ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
-    "300 hours, 49 minutes, 2 seconds"
-    1082942250]
+    "353 hours, 39 minutes, 15 seconds"
+    1273155081]
    ["restored-raspberry-mule-of-baymouth-bar.edn"
-    "63 hours, 2 minutes, 28 seconds"
-    226948165]
+    "115 hours, 52 minutes, 40 seconds"
+    417160996]
    ["awesome-prismatic-jay-banned-from-malpaís.edn"
-    "63 hours, 3 minutes, 5 seconds"
-    226985041]
+    "115 hours, 53 minutes, 17 seconds"
+    417197872]
    ["constant-star-shaped-echidna-banned-from-towhead.edn"
-    "277 hours, 20 minutes, 15 seconds"
-    998415250]
+    "330 hours, 10 minutes, 28 seconds"
+    1188628081]
    ["special-globular-coyote-of-oceanic-trench.edn"
-    "300 hours, 49 minutes, 3 seconds"
-    1082943250]
+    "353 hours, 39 minutes, 16 seconds"
+    1273156081]
    ["proud-thin-elk-of-rôche-moutonnée.edn"
-    "300 hours, 49 minutes, 2 seconds"
-    1082942250]
+    "353 hours, 39 minutes, 15 seconds"
+    1273155081]
    ["kind-rhomboidal-lion-of-the-floodplain.edn"
-    "300 hours, 49 minutes, 2 seconds"
-    1082942250]
+    "353 hours, 39 minutes, 15 seconds"
+    1273155081]
    ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
-    "300 hours, 49 minutes, 3 seconds"
-    1082943250]
+    "353 hours, 39 minutes, 16 seconds"
+    1273156081]
    ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
-    "300 hours, 49 minutes, 2 seconds"
-    1082942250]
+    "353 hours, 39 minutes, 15 seconds"
+    1273155081]
    ["courageous-linear-platypus-of-corrie.edn"
-    "63 hours, 23 minutes, 18 seconds"
-    228198182]
+    "116 hours, 13 minutes, 31 seconds"
+    418411013]
    ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
-    "300 hours, 49 minutes, 2 seconds"
-    1082942250]
+    "353 hours, 39 minutes, 15 seconds"
+    1273155081]
    ["ethical-round-oyster-of-glacial-horn.edn"
-    "300 hours, 49 minutes, 2 seconds"
-    1082942250]
+    "353 hours, 39 minutes, 15 seconds"
+    1273155081]
    ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
-    "300 hours, 49 minutes, 2 seconds"
-    1082942250]
+    "353 hours, 39 minutes, 15 seconds"
+    1273155081]
    ["transforming-ivory-clam-of-the-volcanic-field.edn"
-    "117 hours, 22 minutes, 27 seconds"
-    422547250]
+    "170 hours, 12 minutes, 40 seconds"
+    612760081]
    ["remarkable-thin-wombat-banned-from-flyggberg.edn"
-    "242 hours, 59 minutes, 59 seconds"
-    874799250]
-   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "39 seconds" 39096]
+    "295 hours, 50 minutes, 12 seconds"
+    1065012081]
+   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "15 seconds" 15000]
    ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
-    "300 hours, 49 minutes, 2 seconds"
-    1082942250]),
+    "353 hours, 39 minutes, 15 seconds"
+    1273155081]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 728783689,
+ :user-params-hash -1539714520,
  :grid-recos? true,
- :session-hash -704604171,
+ :session-hash 1571325616,
  :panels
  {:hello-there-brother
   {:h 29,
@@ -525,8 +447,66 @@
      :child
      :screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-9212
+  {:h 4,
+   :w 24,
+   :root [7 29],
+   :tab "strategic grill locations",
+   :selected-view :hi,
+   :name "block-9212",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-9212.:hi"}
+     :style
+     {:font-size "16px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:string
+      :client/good-cylindrical-ape-exiled-from-calanque>param>reliable-coral-moose]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-2342
+  {:h 4,
+   :w 5,
+   :root [51 29],
+   :tab "strategic grill locations",
+   :selected-view :hi,
+   :name "block-2342",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-2342.:hi"}
+     :style
+     {:font-size "11px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:string
+      :client/engaging-peach-pronghorn-of-the-impact-crater>sys>selected-tab]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}}},
- :selected-block :hello-there-brother,
+ :selected-block :block-2342,
  :theme-colors-hashmap
  {"float" "#2c728e",
   "boolean" "#f386bf",
@@ -650,15 +630,22 @@
   :flow
   {:live-scratch-flow>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-20481-8805.png",
+   "./images/gen/b64-image-39980-23820.png",
    :looking-glass-redux2>hi! nil,
    :error-monitor-vanessa3>hi! nil,
-   :error-monitor-vanessa3>name "drag-from-select-all-jvm_stddat!s!!"},
+   :error-monitor-vanessa3>name "drag-from-select-all-jvm_stddat!s!!",
+   :openai-image-gen-ladder>prompt
+   "A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  \n\nShe has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly.\n\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy, flirty look.  \n"},
   :param
-  {:selected-view [nil nil],
-   :selected-view-data nil,
+  {:selected-view [:views :hi],
+   :selected-view-data
+   [:box
+    :style
+    {}
+    :child
+    :screen/error-monitor-vanessa3>:panels>:block-1816>:views>hi],
    :jessica "Apple Pie",
-   :selected-block :hello-there-brother},
+   :selected-block :block-2342},
   :screen
   {:error-monitor-vanessa3>name "drag-from-selddddect-addll-jvm_sst??ddat!s!!",
    :error-monitor-vanessa3>:name nil,
@@ -701,5 +688,16 @@
      :color :theme/editor-outer-rim-color}
     :child
     "Jessica!"]},
-  :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"}},
+  :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+  :client
+  {:good-cylindrical-ape-exiled-from-calanque>param>reliable-coral-moose
+   ["A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  "
+    ""
+    "She has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly."
+    ""
+    "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy, flirty look.  "
+    ""],
+   :virtuous-cerise-finch-hailing-from-flared-slope>theme>grid-selected-column-css>background-color
+   "#00000088",
+   :engaging-peach-pronghorn-of-the-impact-crater>sys>selected-tab "fat zebra"}},
  :selected-flow "live-scratch-flow"}

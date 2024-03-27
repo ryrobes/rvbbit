@@ -485,6 +485,14 @@ group by 1, 2) tt on s.client_name = tt.client_name
     value text NULL,
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
+(def create-client-items "create table if not exists client_items
+   (item_key text NULL,
+    item_type text NULL,
+    item_sub_type text NULL,
+    value text NULL,
+    is_live boolean NULL,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
 (defn create-attribute-sample [sample-table-name-str rowset]
   ;; TODO should rewrite this in honeysql, just to be consistent...
   ;(ut/ppln [:sample-table-name-str sample-table-name-str :rowset rowset])

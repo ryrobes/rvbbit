@@ -92,7 +92,7 @@
 
 (defn thaw-atom
   "Thaws an atom from disk or creates a new one if the file doesn't exist."
-  [initial-state file-path]
+  [initial-state file-path & [out?]]
   (let [file (io/file file-path)
         state (if (.exists file)
                 (with-open [rdr (io/reader file)]
@@ -100,7 +100,8 @@
                        (catch Exception e (do (pp [:thaw-atom-error!!!! file e]) (System/exit 0)))))
                 initial-state)
         a (atom state)]
-    (swap! managed-atoms assoc file-path a)
+    (when (not out?) ;; we dont want to manage some of these, do it manually
+      (swap! managed-atoms assoc file-path a))
     a))
 
 (defn serializable? [value]
@@ -111,6 +112,7 @@
   "Freezes all managed atoms to disk."
   []
   (doseq [[file-path a] @managed-atoms]
+    (pp ["  " :freezing-atom file-path])
     (with-open [wtr (io/writer file-path)]
       (binding [*out* wtr]
         (prn @a)))))

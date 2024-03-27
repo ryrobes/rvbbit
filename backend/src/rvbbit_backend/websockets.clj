@@ -2568,15 +2568,15 @@
         these-keys (map make-key kps)]
     (swap! params-atom assoc client-name params) ;; push the actual params
     ;; now we update the lucene index...
-    (doseq [kk (cset/difference ;; trying to only do the ones that are gone to avoid more work than needed, since existing will get overwritten anways
-                (set these-keys)
-                (set (get @client-param-lucene-history client-name)))] ;; clean up ones from last time in case they were deleted
-      (search/delete-document search/index-writer kk))
-    (doseq [kp kps]
-      (let [doc-key (make-key kp)]
-        (search/add-or-update-document search/index-writer doc-key
-                                       {:content (str kp " - " (get params kp)) :type :client-param
-                                        :row {:client-name client-name :keypath kp}})))
+    ;; (doseq [kk (cset/difference ;; trying to only do the ones that are gone to avoid more work than needed, since existing will get overwritten anways
+    ;;             (set these-keys)
+    ;;             (set (get @client-param-lucene-history client-name)))] ;; clean up ones from last time in case they were deleted
+    ;;   (search/delete-document search/index-writer kk))
+    ;; (doseq [kp kps]
+    ;;   (let [doc-key (make-key kp)]
+    ;;     (search/add-or-update-document search/index-writer doc-key
+    ;;                                    {:content (str kp " - " (get params kp)) :type :client-param
+    ;;                                     :row {:client-name client-name :keypath kp}})))
     (swap! client-param-lucene-history assoc client-name these-keys)
     [:got-it!]))
 
@@ -2732,10 +2732,13 @@
 (defonce panel-child-atoms (atom {}))
 (defonce flow-child-atoms (atom {})) ;; flows
 
-(defn get-atom-splitter [key child-atom parent-atom]
+(defn get-atom-splitter [key ttype child-atom parent-atom]
   (if-let [child-atom (get @child-atom key)]
     child-atom
-    (let [new-child-atom (atom {})]
+    (let [;base-dir (str "./data/atoms/" (cstr/replace (str ttype) ":" ""))
+          ;_ (ext/create-dirs base-dir) ;; just in case...
+          ;new-child-atom  (ut/thaw-atom {} (str base-dir "/" key "-atom.edn"))
+          new-child-atom  (atom {})]
       (swap! child-atom assoc key new-child-atom)
       (swap! new-child-atom assoc key (get @parent-atom key))
       (get @child-atom key))))
@@ -2840,11 +2843,11 @@
                             tracker? flow-db/tracker
                             ;:else flow-db/results-atom
                             ;:else (get-or-create-child-atom (first keypath))
-                            panel?  (get-atom-splitter (keyword (second sub-path)) panel-child-atoms panels-atom)
-                            client? (get-atom-splitter (keyword (second sub-path)) param-child-atoms params-atom)
-                            flow? (get-atom-splitter (first keypath) flow-child-atoms flow-db/results-atom)
-                            screen? (get-atom-splitter (second sub-path) screen-child-atoms screens-atom)
-                            :else (get-atom-splitter (first keypath) flow-child-atoms flow-db/results-atom))]
+                            panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
+                            client? (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
+                            flow? (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
+                            screen? (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
+                            :else (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
     (remove-watch atom-to-watch watch-key)
     ;(ut/pp [:add-watcher! (first sub-path) client-name flow-key sub-type sub-path keypath])
     (add-watch atom-to-watch watch-key watcher) 
@@ -2864,7 +2867,7 @@
                         flow-status
                         ;flow-db/results-atom
                         ;(get-or-create-child-atom (first keypath))
-                        (get-atom-splitter (first keypath) flow-child-atoms flow-db/results-atom)
+                        (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
                         )]
     (ut/pp [:removing-watcher keypath client-name sub-type flow-id watch-key])
     (remove-watch atom-to-watch watch-key)
@@ -2987,9 +2990,10 @@
         ;;           :else keypath)
         ;;clis (first (keys (get-in @last-values [keypath]))) ;; in case we are a new ""client"" (as is usual)
         lv (get @last-values keypath)]
-    
+
     ;(ut/pp [:client-sub! base-type flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key :keypath keypath :client-param-path client-param-path])
-    (ut/pp [:client-sub! base-type flow-id :keypath keypath :client-param-path client-param-path])
+    ;(ut/pp [:client-sub! base-type flow-id :keypath keypath :client-param-path client-param-path])
+    (ut/pp [:client-sub! client-name :wants client-param-path])
 
     (when (get-in @flow-db/results-atom keypath)
       (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
@@ -3003,7 +3007,7 @@
                 (= base-type :panel) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
                 :else (get-in @flow-db/results-atom keypath lv) ;; assume flow
                   ;; ^^ SHOULD be the last val (persistently cached), on cold boot @results-atom will be empty anyways
-                ) nil nil nil)
+                )nil nil nil)
 
     ;; push init val, else try cache, else nil!
 
@@ -4883,6 +4887,41 @@
           m
           (keys m)))
 
+(defn param-sql-sync []
+  (let [flow-rows (vec (filter #(and (= (count %) 2) (not= (second %) :opts-map)
+                                     (not (cstr/includes? (str (get % 1 "")) "/")) ;; debatable
+                                     )
+                               (ut/kvpaths @flow-db/results-atom)))
+        flow-rows (for [e flow-rows]
+                    [(str (first e)) ":flow" (str (first e)) (str ":flow/" (cstr/replace (cstr/join ">" e) ":" "")) nil]
+                    ;(conj e (str ":flow/" (cstr/replace (cstr/join ">" e) ":" "")))
+                    )
+        param-rows (filter #(not (cstr/includes? (str %) ">")) (ut/kvpaths @params-atom))
+        live-clients (keys (client-statuses))
+        param-rows (for [e param-rows]
+                     [(cstr/replace (str (first e)) ":" "") ":client" (str (second e)) (str ":client/" (cstr/replace (cstr/join ">" e) ":" "")) (true? (some #(= (first e) %) live-clients))]
+                     ;(conj (conj e (str ":client/" (cstr/replace (cstr/join ">" e) ":" ""))) (some #(= (first e) %) live-clients))
+                     )
+        prows (vec (into param-rows flow-rows))
+        keys (vec (distinct (map first prows)))
+        rows (vec (for [r prows] (zipmap [:item_key :item_type :item_sub_type :value :is_live] r)))
+        delete-sql {:delete-from [:client_items] :where (cons :or (vec (for [k keys] [:= :item_key k])))}
+        ;insert-sql {:insert-into [:client_items] :values rows}
+        ]
+    ;(ut/pp [:flow-results-rows rows])
+    ;; (when (not (empty? rows))
+    ;;   (do (sql-exec flows-db (to-sql {:delete-from [:flow_results]}))
+    ;;       (sql-exec flows-db (to-sql insert-sql))))
+    ;; (ut/pp [flow-rows
+    ;;         (take 30 param-rows)
+    ;;         keys])
+    ;; (ut/pp [:delete delete-sql])
+    (enqueue-task3 (fn []
+                     (sql-exec system-db (to-sql delete-sql))
+                     (doseq [rr (partition-all 100 rows)]
+                       (sql-exec system-db (to-sql {:insert-into [:client_items] :values rr})))))))
+
+
 (defn update-flow-results>sql []
   (let [rows (try (vec (apply concat
                               (for [[flow-id v] (ut/replace-large-base64 (dissoc @flow-db/results-atom "client-keepalive"))]
@@ -5203,9 +5242,9 @@
                        :panels [(count (keys @panel-child-atoms)) (count (keys @panels-atom))]
                        :flow [(count (keys @flow-child-atoms))]}])
     
-    (ut/pp [:lucene 
-            (search/count-documents-by-type search/idx-path) 
-            (search/count-documents search/idx-path)])
+    ;; (ut/pp [:lucene 
+    ;;         (search/count-documents-by-type search/idx-path) 
+    ;;         (search/count-documents search/idx-path)])
 
     ;;(ut/pp [:live-schedules (map #(dissoc % :next-times) @flow-db/live-schedules)])
     ;; (ut/pp {:tables {:fn-history (keys (first @flow-db/fn-history))

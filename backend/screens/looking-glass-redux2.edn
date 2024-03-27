@@ -21,9 +21,10 @@
   :gen-viz-1132 [:rows :data_type],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :client-items-drag-20 [:is_live :item_key :item_sub_type :item_type :ts :value],
+  :rowcnt-drag-7 [:rowcnt_sum],
+  :flows-sys [:flow_id :file_path :last_modified],
   :files-sys [:file_path :screen_name :blocks :queries :ts],
-  :query-preview-1102594305 [:value :id],
-  :query-preview-1008216449 [:rows :is_group_by],
   :fields
   [:db_type
    :connection_id
@@ -41,11 +42,9 @@
    :derived_name
    :updated
    :run_id],
-  :query-preview81506492 [:value :id],
+  :client_items [:item_key :item_type :item_sub_type :value :is_live :ts],
   :viz-tables-sys [:table_name :recos],
-  :query-preview1481471205 [:value :id],
   :viz-shapes0-sys [:shape :recos],
-  :query-preview-633137368 [:rows :derived_calc],
   :fields-drag-16
   [:connection_id
    :context_hash
@@ -63,16 +62,11 @@
    :table_name
    :table_type
    :updated],
-  :query-preview180000872 [:value :id],
   :connections-sys [:database_name :connection_id],
-  :query-preview-2108963938 [:rows :table_type],
-  :query-preview1890229330 [:value :id],
+  :item-type-drag-5 [:item_type :rowcnt],
+  :item-type-drag-0 [:item_type :rowcnt :item_sub_type],
   :gen-viz-555 [:value :id],
-  :reco-counts [:table_name :cnt],
-  :query-preview1408146803 [:rows :data_type],
-  :query-preview918986922 [:value :id],
-  :query-preview-915486563 [:rows :table_name],
-  :query-preview-931857256 [:rows :db_schema]},
+  :reco-counts [:table_name :cnt]},
  :reco-preview nil,
  :sql-source
  {:gen-viz-1132
@@ -97,117 +91,23 @@
       :updated],
      :from [[:fields :mm764]]}],
    :group-by [:data_type]},
-  :query-preview-1102594305
-  {:select [[[:count 1] :value] [:context_hash :id]],
+  :client-items-drag-20
+  {:select [:is_live :item_key :item_sub_type :item_type :ts :value],
+   :from [[:client_items :ii709]],
+   :_last-run "20:15:42"},
+  :rowcnt-drag-7
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
    :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:context_hash]},
-  :query-preview-1008216449
-  {:select [[[:count 1] :rows] :is_group_by],
-   :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:is_group_by]},
+   [[{:select [:item_type [[:count 1] :rowcnt] :item_sub_type],
+      :from
+      [[{:select [:is_live :item_key :item_sub_type :item_type :ts :value],
+         :from [[:client_items :ii709]]}
+        :aa227]],
+      :group-by [:item_type :item_sub_type],
+      :order-by [[:rowcnt :desc]]}
+     :ss589]]},
   :fields {:select [:*], :from [:fields], :limit 111},
-  :query-preview81506492
-  {:select [[[:count 1] :value] [:db_type :id]],
-   :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:db_type]},
-  :query-preview1481471205
-  {:select [[[:count 1] :value] [:updated :id]],
-   :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:updated]},
-  :query-preview-633137368
-  {:select [[[:count 1] :rows] :derived_calc],
-   :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:derived_calc]},
+  :client_items {:select [:*], :from [:client_items], :limit 111},
   :fields-drag-16
   {:select
    [:connection_id
@@ -226,73 +126,26 @@
     :table_name
     :table_type
     :updated],
-   :from [[:fields :mm764]]},
-  :query-preview180000872
-  {:select [[[:count 1] :value] [:table_type :id]],
+   :from [[:fields :mm764]],
+   :_last-run "20:15:34"},
+  :item-type-drag-5
+  {:select [:item_type [[:count 1] :rowcnt]],
    :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:table_type]},
-  :query-preview-2108963938
-  {:select [[[:count 1] :rows] :table_type],
+   [[{:select [:is_live :item_key :item_sub_type :item_type :ts :value],
+      :from [[:client_items :ii709]]}
+     :jj274]],
+   :group-by [:item_type],
+   :order-by [[:rowcnt :desc]]},
+  :item-type-drag-0
+  {:select [:item_type [[:count 1] :rowcnt] :item_sub_type],
    :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:table_type]},
-  :query-preview1890229330
-  {:select [[[:count 1] :value] [:derived_name :id]],
-   :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:derived_name]},
+   [[{:select [:is_live :item_key :item_sub_type :item_type :ts :value],
+      :from [[:client_items :ii709]]}
+     :aa227]],
+   :group-by [:item_type :item_sub_type],
+   :order-by [[:rowcnt :desc]],
+   :col-widths {:item_type 97, :rowcnt 87, :item_sub_type 227},
+   :_last-run "20:15:38"},
   :gen-viz-555
   {:select [[[:count 1] :value] [:updated :id]],
    :from
@@ -314,210 +167,116 @@
       :table_type
       :updated],
      :from [[:fields :mm764]]}],
-   :group-by [:updated]},
-  :query-preview1408146803
-  {:select [[[:count 1] :rows] :data_type],
-   :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:data_type]},
-  :query-preview918986922
-  {:select [[[:count 1] :value] [:db_catalog :id]],
-   :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:db_catalog]},
-  :query-preview-915486563
-  {:select [[[:count 1] :rows] :table_name],
-   :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:table_name]},
-  :query-preview-931857256
-  {:select [[[:count 1] :rows] :db_schema],
-   :from
-   [{:select
-     [:connection_id
-      :context_hash
-      :data_type
-      :db_catalog
-      :db_schema
-      :db_type
-      :derived_calc
-      :derived_name
-      :field_name
-      :field_type
-      :is_group_by
-      :key_hash
-      :run_id
-      :table_name
-      :table_type
-      :updated],
-     :from [[:fields :mm764]]}],
-   :group-by [:db_schema]}},
+   :group-by [:updated]}},
  :meta
  {:recos-sys
   {:fields
    {:query_map
     {:data-type "string",
-     :distinct 449,
+     :distinct 27,
      :group-by? true,
      :commons
-     {"[{:select [[[[:sum :is_group_by]] :is_group_by] :updated], :from [\"query/fields_drag_16\"], :group-by [:updated]}]"
-      8,
-      "[{:select [[[[:sum :rows]] :rows] :updated], :from [\"query/fields_drag_16\"], :group-by [:updated]}]"
-      8,
-      "[{:select [[[[:sum :is_group_by]] :is_group_by] [[:substr :updated 0 11] :day_sqlite_updated]], :from [\"query/fields_drag_16\"], :group-by [[:substr :updated 0 11]]}]"
-      7},
-     :cardinality 46},
+     {"[{:select [[[[:sum :is_group_by]] :is_group_by] :data_type], :from [\"query/fields_drag_16\"], :group-by [:data_type]}]"
+      1,
+      "[{:select [[[[:sum :is_group_by]] :is_group_by] [[:substr :updated 0 5] :by_year_sqlite_updated]], :from [\"query/fields_drag_16\"], :group-by [[:substr :updated 0 5]]}]"
+      1,
+      "[{:select [[[[:sum :rows]] :rows] :db_catalog], :from [\"query/fields_drag_16\"], :group-by [:db_catalog]}]"
+      1},
+     :cardinality 100},
     :shape_name
     {:data-type "string",
-     :distinct 26,
+     :distinct 1,
      :group-by? true,
-     :commons
-     {"basic_v_bar_color" 144,
-      "basic_h_bar_color" 144,
-      "basic_h_bar_nivo_color" 144},
-     :cardinality 2},
+     :commons {"basic_h_bar" 27},
+     :cardinality 3},
     :w
-    {:data-type "unknown",
-     :distinct 4,
+    {:data-type "integer",
+     :distinct 1,
      :group-by? true,
-     :commons {nil 901, 9 54, 6 10},
-     :cardinality 0},
+     :commons {9 27},
+     :cardinality 3},
     :combo_edn
     {:data-type "string",
-     :distinct 146,
+     :distinct 27,
      :group-by? true,
      :commons
-     {"\"db_type, is_group_by, updated\"" 13,
-      "\"derived_name, is_group_by, updated\"" 13,
-      "\"db_catalog, is_group_by, updated\"" 13},
-     :cardinality 15},
+     {"\"day_sqlite_updated*, is_group_by\"" 1,
+      "\"is_group_by, table_type\"" 1,
+      "\"rows, updated\"" 1},
+     :cardinality 100},
     :query_map_str
     {:data-type "string",
-     :distinct 441,
+     :distinct 27,
      :group-by? true,
      :commons
-     {"\nSELECT (SUM(rows)) AS rows, updated\nFROM 'query/fields_drag_16'\nGROUP BY updated\n"
-      8,
-      "\nSELECT (SUM(is_group_by)) AS is_group_by, updated\nFROM 'query/fields_drag_16'\nGROUP BY updated\n"
-      8,
-      "\nSELECT (SUM(rows)) AS rows, SUBSTR(updated, 0, 11) AS day_sqlite_updated\nFROM 'query/fields_drag_16'\nGROUP BY SUBSTR(updated, 0, 11)\n"
-      7},
-     :cardinality 45},
+     {"\nSELECT (SUM(is_group_by)) AS is_group_by, db_schema\nFROM 'query/fields_drag_16'\nGROUP BY db_schema\n"
+      1,
+      "\nSELECT (SUM(is_group_by)) AS is_group_by, derived_name\nFROM 'query/fields_drag_16'\nGROUP BY derived_name\n"
+      1,
+      "\nSELECT (SUM(rows)) AS rows, updated\nFROM 'query/fields_drag_16'\nGROUP BY updated\n"
+      1},
+     :cardinality 100},
     :selected_view
     {:data-type "string",
-     :distinct 3,
+     :distinct 1,
      :group-by? true,
-     :commons {"" 888, ":reech" 81, ":grid" 4},
-     :cardinality 0},
+     :commons {"" 27},
+     :cardinality 3},
     :combo_hash
     {:data-type "string",
-     :distinct 973,
+     :distinct 27,
      :group-by? true,
-     :commons {"-356194635" 1, "106863025" 1, "1588361115" 1},
+     :commons {"197136547" 1, "-2033941762" 1, "-2074670851" 1},
      :cardinality 100},
     :h
-    {:data-type "unknown",
-     :distinct 5,
+    {:data-type "integer",
+     :distinct 1,
      :group-by? true,
-     :commons {nil 901, 9 27, 5 27},
-     :cardinality 0},
+     :commons {5 27},
+     :cardinality 3},
     :condis
     {:data-type "string",
-     :distinct 4,
+     :distinct 1,
      :group-by? true,
-     :commons
-     {"" 956,
-      "{:true? [:= 1 1]}" 8,
-      "{:up-or-down? [:> :query-preview/agg.0 :query-preview/agg.1]}" 8},
-     :cardinality 0},
+     :commons {"" 27},
+     :cardinality 3},
     :score
     {:data-type "float",
      :distinct 2,
      :group-by? true,
-     :commons {0 579, 48.39999999999999 394},
-     :cardinality 0},
+     :commons {48.39999999999999 14, 0 13},
+     :cardinality 7},
     :table_name
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"fields_drag_16" 973},
-     :cardinality 0},
+     :commons {"fields_drag_16" 27},
+     :cardinality 3},
     :connection_id
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"cache.db" 973},
-     :cardinality 0},
+     :commons {"cache.db" 27},
+     :cardinality 3},
     :context_hash
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"855310931" 973},
-     :cardinality 0},
+     :commons {"855310931" 27},
+     :cardinality 3},
     :viz_map
     {:data-type "string",
-     :distinct 956,
+     :distinct 27,
      :group-by? true,
      :commons
-     {"[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
-      8,
-      "[:v-box :size \"auto\" :align :center :justify :center :height :panel-height+50-px :gap \"10px\" :children :query-preview-2]"
-      8,
-      "{:lines [:vega-lite {:layer [{:encoding {:x {:field :day_sqlite_updated, :type \"temporal\", :title nil, :sort \"x\"}, :y {:aggregate \"sum\", :field :agg, :title nil, :scale {:zero false}, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale {:scheme \"purples\"}, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"line\", :interpolate \"monotone\", :line true, :point true, :tooltip {:content \"encoding\"}}}], :data {:values :query-preview}, :config {:view {:stroke \"transparent\"}, :line {:strokeWidth 3}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#afafaf\", :titleFont \"Lato\", :titleColor \"#282828\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width :panel-width, :height :half-panel-height, :padding 4, :background \"transparent\"} {:actions false}], :grid [:layout {:panels {:view/*this-block*.lines {:h 0.5, :w 0.99, :root [0 0.5]}, :view/*this-block*.hi2 {:h 0.5, :w 0.5, :root [0 0]}, :empty-h-730 {:h 0.5, :w 0.5, :root [0.5 0]}}}], :hi2 [:box :align :center :justify :center :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"]}"
-      2},
-     :cardinality 98}},
-   :rowcount 973},
+     {"[:vega-lite {:layer [{:encoding {:x {:field :by_year_sqlite_updated, :type \"ordinal\"}, :y {:aggregate \"sum\", :field :is_group_by, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values \"query/fields_drag_16\"}} {:actions false}]"
+      1,
+      "[:vega-lite {:layer [{:encoding {:x {:field :context_hash, :type \"ordinal\"}, :y {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values \"query/fields_drag_16\"}} {:actions false}]"
+      1,
+      "[:vega-lite {:layer [{:encoding {:x {:field :table_name, :type \"ordinal\"}, :y {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values \"query/fields_drag_16\"}} {:actions false}]"
+      1},
+     :cardinality 100}},
+   :rowcount 27},
   :blocks-sys
   {:fields
    {:block_key
@@ -580,49 +339,49 @@
   {:fields
    {:field_name
     {:data-type "string",
-     :distinct 16,
+     :distinct 6,
      :group-by? true,
-     :commons {"field_name" 1, "key_hash" 1, "updated" 1},
+     :commons {"value" 1, "ts" 1, "item_type" 1},
      :cardinality 100},
     :field_type
     {:data-type "string",
-     :distinct 4,
+     :distinct 3,
      :group-by? true,
-     :commons {"TEXT" 13, "TIMESTAMP" 1, "INTEGER" 1},
-     :cardinality 25},
+     :commons {"TEXT" 4, "TIMESTAMP" 1, "BOOLEAN" 1},
+     :cardinality 50},
     :data_type
     {:data-type "string",
-     :distinct 4,
+     :distinct 3,
      :group-by? true,
-     :commons {"string" 13, "datetime" 1, "integer" 1},
-     :cardinality 25}},
-   :rowcount 16},
+     :commons {"string" 4, "datetime" 1, "boolean" 1},
+     :cardinality 50}},
+   :rowcount 6},
   :viz-shapes-sys
   {:fields
    {:combo_edn
     {:data-type "string",
-     :distinct 146,
+     :distinct 27,
      :group-by? true,
      :commons
-     {"\"db_schema, db_type, rows\"" 1,
-      "\"context_hash, data_type, is_group_by\"" 1,
-      "\"data_type, derived_name, is_group_by\"" 1},
+     {"\"day_sqlite_updated*, is_group_by\"" 1,
+      "\"is_group_by, table_type\"" 1,
+      "\"rows, updated\"" 1},
      :cardinality 100},
     :recos
     {:data-type "integer",
-     :distinct 11,
+     :distinct 1,
      :group-by? false,
-     :commons {1 23, 3 22, 8 21},
-     :cardinality 7}},
-   :rowcount 146},
+     :commons {1 27},
+     :cardinality 3}},
+   :rowcount 27},
   :gen-viz-1132
   {:fields
    {:rows
     {:data-type "integer",
-     :distinct 7,
+     :distinct 6,
      :group-by? false,
-     :commons {103 1, 575 1, 123 1},
-     :cardinality 100},
+     :commons {9 2, 87 1, 551 1},
+     :cardinality 85},
     :data_type
     {:data-type "string",
      :distinct 7,
@@ -636,39 +395,121 @@
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"none" 24},
-     :cardinality 4},
+     :commons {"none" 25},
+     :cardinality 3},
     :db_catalog
     {:data-type "unknown",
      :distinct 1,
      :group-by? true,
-     :commons {nil 24},
-     :cardinality 4},
+     :commons {nil 25},
+     :cardinality 3},
     :connection_id
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"system-db" 24},
-     :cardinality 4},
+     :commons {"system-db" 25},
+     :cardinality 3},
     :schema_cat
     {:data-type "unknown",
      :distinct 1,
      :group-by? false,
-     :commons {nil 24},
-     :cardinality 4},
+     :commons {nil 25},
+     :cardinality 3},
     :table_name
     {:data-type "string",
-     :distinct 24,
+     :distinct 25,
      :group-by? true,
-     :commons {"connections" 1, "board_history" 1, "rule_maps_tests" 1},
+     :commons {"connections" 1, "board_history" 1, "client_items" 1},
      :cardinality 100},
     :fields
     {:data-type "integer",
      :distinct 15,
      :group-by? false,
      :commons {6 4, 5 3, 11 2},
-     :cardinality 62}},
-   :rowcount 24},
+     :cardinality 60}},
+   :rowcount 25},
+  :client-items-drag-20
+  {:fields
+   {:is_live
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {0 260, 1 197, nil 43},
+     :cardinality 0},
+    :item_key
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons
+     {"engaging-peach-pronghorn-of-the-impact-crater" 214,
+      "lucky-olive-fox-hailing-from-volcanic-dam" 197,
+      "fabulous-lemon-rhinoceros-of-the-badlands" 46},
+     :cardinality 1},
+    :item_sub_type
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons {":theme" 287, ":param" 79, "openai-image-gen-ladder" 27},
+     :cardinality 5},
+    :item_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":client" 457, ":flow" 43},
+     :cardinality 0},
+    :ts
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2024-03-27 00:35:12" 500},
+     :cardinality 0},
+    :value
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {":client/engaging-peach-pronghorn-of-the-impact-crater>param>brave-white-butterfly>0"
+      1,
+      ":client/lucky-olive-fox-hailing-from-volcanic-dam>theme>grid-selected-font-color"
+      1,
+      ":client/fabulous-lemon-rhinoceros-of-the-badlands>theme>nivo-defaults>axis>legend>text>fill"
+      1},
+     :cardinality 100}},
+   :rowcount 500},
+  :rowcnt-drag-7
+  {:fields
+   {:rowcnt_sum
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {8892 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 85,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
+     :cardinality 97},
+    :file_path
+    {:data-type "string",
+     :distinct 87,
+     :group-by? true,
+     :commons
+     {"./flows/stitches-math.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1,
+      "./flows/dalle3-create-image-newengland-old.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 71, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
+     :cardinality 19}},
+   :rowcount 87},
   :files-sys
   {:fields
    {:file_path
@@ -707,36 +548,6 @@
      {"2024-03-26 02:57:16" 35, "2024-03-26 02:57:15" 33, "2024-03-26 02:57:14" 30},
      :cardinality 4}},
    :rowcount 139},
-  :query-preview-1102594305
-  {:fields
-   {:value
-    {:data-type "integer",
-     :distinct 28,
-     :group-by? false,
-     :commons {3 11, 12 6, 4 6},
-     :cardinality 41},
-    :id
-    {:data-type "string",
-     :distinct 68,
-     :group-by? false,
-     :commons {"-6825455" 1, "388025726" 1, "-1084717852" 1},
-     :cardinality 100}},
-   :rowcount 68},
-  :query-preview-1008216449
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {939 1},
-     :cardinality 100},
-    :is_group_by
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {1 1},
-     :cardinality 100}},
-   :rowcount 1},
   :fields
   {:fields
    {:db_type
@@ -780,9 +591,9 @@
      :distinct 5,
      :group-by? true,
      :commons
-     {"2024-03-24 23:14:53" 129,
-      "2024-03-24 23:14:51" 122,
-      "2024-03-24 23:14:52" 115},
+     {"2024-03-27 00:35:05" 144,
+      "2024-03-27 00:35:03" 127,
+      "2024-03-27 00:35:04" 119},
      :cardinality 0},
     :db_catalog
     {:data-type "unknown",
@@ -792,9 +603,9 @@
      :cardinality 0},
     :field_name
     {:data-type "string",
-     :distinct 233,
+     :distinct 235,
      :group-by? true,
-     :commons {"*" 44, "ts" 14, "connection_id" 13},
+     :commons {"*" 45, "ts" 14, "connection_id" 12},
      :cardinality 46},
     :derived_calc
     {:data-type "unknown",
@@ -812,17 +623,17 @@
     {:data-type "string",
      :distinct 7,
      :group-by? true,
-     :commons {"string" 299, "float" 55, "unknown" 52},
+     :commons {"string" 298, "float" 55, "unknown" 53},
      :cardinality 1},
     :field_type
     {:data-type "string",
      :distinct 43,
      :group-by? true,
-     :commons {"TEXT" 217, "INTEGER" 50, "special" 44},
+     :commons {"TEXT" 216, "INTEGER" 49, "special" 45},
      :cardinality 8},
     :table_name
     {:data-type "string",
-     :distinct 45,
+     :distinct 46,
      :group-by? true,
      :commons
      {"bigfoot_sightings_locations" 42, "bigfoot_sightings" 27, "combo_rows" 24},
@@ -835,26 +646,59 @@
      :cardinality 0},
     :context_hash
     {:data-type "string",
-     :distinct 45,
+     :distinct 46,
      :group-by? true,
      :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
      :cardinality 9}},
    :rowcount 500},
-  :query-preview81506492
+  :client_items
   {:fields
-   {:value
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {935 1},
+   {:item_key
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons
+     {"engaging-peach-pronghorn-of-the-impact-crater" 214,
+      "lucky-olive-fox-hailing-from-volcanic-dam" 197,
+      "fabulous-lemon-rhinoceros-of-the-badlands" 46},
+     :cardinality 1},
+    :item_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":client" 457, ":flow" 43},
+     :cardinality 0},
+    :item_sub_type
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons {":theme" 287, ":param" 79, "openai-image-gen-ladder" 27},
+     :cardinality 5},
+    :value
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {":client/engaging-peach-pronghorn-of-the-impact-crater>param>brave-white-butterfly>0"
+      1,
+      ":client/lucky-olive-fox-hailing-from-volcanic-dam>theme>grid-selected-font-color"
+      1,
+      ":client/fabulous-lemon-rhinoceros-of-the-badlands>theme>nivo-defaults>axis>legend>text>fill"
+      1},
      :cardinality 100},
-    :id
+    :is_live
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {0 260, 1 197, nil 43},
+     :cardinality 0},
+    :ts
     {:data-type "string",
      :distinct 1,
-     :group-by? false,
-     :commons {"SQLite" 1},
-     :cardinality 100}},
-   :rowcount 1},
+     :group-by? true,
+     :commons {"2024-03-27 00:35:12" 500},
+     :cardinality 0}},
+   :rowcount 500},
   :viz-tables-sys
   {:fields
    {:table_name
@@ -870,22 +714,6 @@
      :commons {973 1},
      :cardinality 100}},
    :rowcount 1},
-  :query-preview1481471205
-  {:fields
-   {:value
-    {:data-type "integer",
-     :distinct 11,
-     :group-by? false,
-     :commons {18 2, 49 1, 80 1},
-     :cardinality 91},
-    :id
-    {:data-type "string",
-     :distinct 12,
-     :group-by? false,
-     :commons
-     {"2024-03-26 02:57:26" 1, "2024-03-26 03:08:56" 1, "2024-03-26 02:57:25" 1},
-     :cardinality 100}},
-   :rowcount 12},
   :viz-shapes0-sys
   {:fields
    {:shape
@@ -901,24 +729,6 @@
      :commons {27 6, 4 4, 8 3},
      :cardinality 42}},
    :rowcount 26},
-  :query-preview-633137368
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? false,
-     :commons {1 3, 936 1},
-     :cardinality 50},
-    :derived_calc
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"[:substr :field 6 2]" 1,
-      "[:substr :field 0 5]" 1,
-      "[:substr :field 0 11]" 1},
-     :cardinality 100}},
-   :rowcount 4},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -971,9 +781,9 @@
      :distinct 5,
      :group-by? true,
      :commons
-     {"2024-03-26 02:57:23" 131,
-      "2024-03-26 02:57:22" 128,
-      "2024-03-26 02:57:20" 112},
+     {"2024-03-27 00:35:05" 144,
+      "2024-03-27 00:35:03" 127,
+      "2024-03-27 00:35:04" 119},
      :cardinality 0},
     :db_catalog
     {:data-type "unknown",
@@ -983,9 +793,9 @@
      :cardinality 0},
     :field_name
     {:data-type "string",
-     :distinct 233,
+     :distinct 235,
      :group-by? true,
-     :commons {"*" 44, "ts" 14, "connection_id" 13},
+     :commons {"*" 45, "ts" 14, "connection_id" 12},
      :cardinality 46},
     :derived_calc
     {:data-type "unknown",
@@ -1003,17 +813,17 @@
     {:data-type "string",
      :distinct 7,
      :group-by? true,
-     :commons {"string" 299, "float" 55, "unknown" 52},
+     :commons {"string" 298, "float" 55, "unknown" 53},
      :cardinality 1},
     :field_type
     {:data-type "string",
      :distinct 43,
      :group-by? true,
-     :commons {"TEXT" 217, "INTEGER" 50, "special" 44},
+     :commons {"TEXT" 216, "INTEGER" 49, "special" 45},
      :cardinality 8},
     :table_name
     {:data-type "string",
-     :distinct 45,
+     :distinct 46,
      :group-by? true,
      :commons
      {"bigfoot_sightings_locations" 42, "bigfoot_sightings" 27, "combo_rows" 24},
@@ -1026,26 +836,11 @@
      :cardinality 0},
     :context_hash
     {:data-type "string",
-     :distinct 45,
+     :distinct 46,
      :group-by? true,
      :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
      :cardinality 9}},
    :rowcount 500},
-  :query-preview180000872
-  {:fields
-   {:value
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? false,
-     :commons {93 1, 842 1},
-     :cardinality 100},
-    :id
-    {:data-type "string",
-     :distinct 2,
-     :group-by? false,
-     :commons {"VIEW" 1, "TABLE" 1},
-     :cardinality 100}},
-   :rowcount 2},
   :connections-sys
   {:fields
    {:database_name
@@ -1149,39 +944,42 @@
      :commons {"us" 411, nil 55, "ca" 17},
      :cardinality 0}},
    :rowcount 500},
-  :query-preview-2108963938
+  :item-type-drag-5
   {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? false,
-     :commons {93 1, 846 1},
-     :cardinality 100},
-    :table_type
+   {:item_type
     {:data-type "string",
      :distinct 2,
      :group-by? true,
-     :commons {"VIEW" 1, "TABLE" 1},
-     :cardinality 100}},
-   :rowcount 2},
-  :query-preview1890229330
-  {:fields
-   {:value
+     :commons {":flow" 1, ":client" 1},
+     :cardinality 100},
+    :rowcnt
     {:data-type "integer",
      :distinct 2,
      :group-by? false,
-     :commons {1 3, 932 1},
-     :cardinality 50},
-    :id
-    {:data-type "string",
-     :distinct 4,
-     :group-by? false,
-     :commons
-     {"day_sqlite_updated" 1,
-      "by_year_sqlite_updated" 1,
-      "by_month_sqlite_updated" 1},
+     :commons {43 1, 8849 1},
      :cardinality 100}},
-   :rowcount 4},
+   :rowcount 2},
+  :item-type-drag-0
+  {:fields
+   {:item_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":client" 28, ":flow" 3},
+     :cardinality 6},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 20,
+     :group-by? false,
+     :commons {27 5, 2 4, 18 3},
+     :cardinality 64},
+    :item_sub_type
+    {:data-type "string",
+     :distinct 31,
+     :group-by? true,
+     :commons {"client-keepalive" 1, ":viz-shapes0-sys2" 1, ":viz-tables-sys" 1},
+     :cardinality 100}},
+   :rowcount 31},
   :duration-hours-drag-43
   {:fields
    {:duration_hours
@@ -1216,63 +1014,19 @@
   {:fields
    {:value
     {:data-type "integer",
-     :distinct 11,
+     :distinct 9,
      :group-by? false,
-     :commons {18 2, 49 1, 80 1},
-     :cardinality 91},
+     :commons {96 1, 30 1, 38 1},
+     :cardinality 100},
     :id
     {:data-type "string",
-     :distinct 12,
+     :distinct 9,
      :group-by? false,
      :commons
-     {"2024-03-26 02:57:26" 1, "2024-03-26 03:08:56" 1, "2024-03-26 02:57:25" 1},
+     {"2024-03-27 00:35:05" 1, "2024-03-27 00:35:09" 1, "2024-03-27 00:35:07" 1},
      :cardinality 100}},
-   :rowcount 12},
-  :reco-counts
-  {:fields
-   {:table_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"fields_drag_16" 1},
-     :cardinality 100},
-    :cnt
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {973 1},
-     :cardinality 100}},
-   :rowcount 1},
-  :query-preview1408146803
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 7,
-     :group-by? false,
-     :commons {102 1, 574 1, 122 1},
-     :cardinality 100},
-    :data_type
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons {"unknown" 1, "string" 1, "integer" 1},
-     :cardinality 100}},
-   :rowcount 7},
-  :query-preview918986922
-  {:fields
-   {:value
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {935 1},
-     :cardinality 100},
-    :id
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? false,
-     :commons {nil 1},
-     :cardinality 100}},
-   :rowcount 1},
+   :rowcount 9},
+  :reco-counts {:fields {}, :rowcount 0},
   :state-drag-3
   {:fields
    {:state
@@ -1288,21 +1042,6 @@
      :commons {183 1, 968 1, 633 1},
      :cardinality 100}},
    :rowcount 68},
-  :query-preview-915486563
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 28,
-     :group-by? false,
-     :commons {3 11, 4 7, 12 6},
-     :cardinality 40},
-    :table_name
-    {:data-type "string",
-     :distinct 69,
-     :group-by? true,
-     :commons {"flows" 1, "flow_history" 1, "connections" 1},
-     :cardinality 100}},
-   :rowcount 69},
   :shape-drag-7
   {:fields
    {:shape
@@ -1317,32 +1056,23 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30},
-  :query-preview-931857256
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {939 1},
-     :cardinality 100},
-    :db_schema
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"none" 1},
-     :cardinality 100}},
-   :rowcount 1}},
+   :rowcount 30}},
  :default-col-widths
- {:system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys 137},
+ {:viz-shapes0-list* {:viz-shapes0-sys 155},
+  :block-8334 {:rowcnt-drag-7 161},
+  :block-4821 {:client-items-drag-0 1461},
+  :block-3166 {:client-items-drag-20 243},
+  :system-connections-list* {:connections-sys 111},
   :system-fields-list* {:fields-sys 170},
   :block-4030 {:fields-drag-16 100},
   :files-list* {:files-sys 178},
   :blocks-list* {:blocks-sys 127},
-  :viz-shapes0-list* {:viz-shapes0-sys 155}},
+  :block-6963 {:item-type-drag-0 137},
+  :block-11291 {:item-type-drag-5 180},
+  :recos-list* {:recos-sys 182},
+  :system-tables-list* {:tables-sys 137}},
  :runstream-drops nil,
- :data-hash 1803739192,
+ :data-hash -1142976496,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -1542,32 +1272,31 @@
    {:prompt {:value :param/reliable-coral-moose, :source :param, :open? false},
     :style-param {:open? true, :value "vivid"}},
    :open-outputs? true}},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [487704678 412547726 4294705152],
- :preview-keys
- ["-2108963938" "-1008216449" "1408146803" "-915486563" "-633137368" "-931857256"],
+ :memory [605449835 481715659 4294705152],
+ :preview-keys ["946717543" "-855037229" "-683028133"],
  :status-data
  {"kick-test!"
   {:kick
    {:data
     [{:sent! "kick-test!",
       :to :good-cylindrical-ape-exiled-from-calanque,
-      :at "2024-03-25 23:09:38",
+      :at "2024-03-26 20:35:30",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-03-25 23:09:38 - query ran in 0 ms."],
-          :name "query-log-:gen-viz-1132",
-          :order 1711422578,
+        [{:content ["2024-03-26 20:35:30 - query ran in 93 ms."],
+          :name "query-log-:city-drag-26",
+          :order 1711499730,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
-        :description "query-log-:gen-viz-1132",
+        :description "query-log-:city-drag-26",
         :mutates {},
         :options {:actions? false, :pages? false, :search? false},
         :parameters {}}},
-      :payload-kp [:gen-viz-1132 "kick-test!"]}
+      :payload-kp [:city-drag-26 "kick-test!"]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -1576,7 +1305,7 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-03-25 23:10:13",
+      :at "2024-03-26 20:46:34",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -1585,51 +1314,27 @@
   :alert1
   {:alerts
    {:data
-    [[[:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data [{:mem 754, :tick 0, :threads 95, :subs 28, :load 3.12744140625}],
-         :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
-        [:> :XAxis {:dataKey :tick, :hide true}]
-        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
-        [:>
-         :YAxis
-         {:yAxisId "right", :hide true, :dataKey :threads, :orientation "right"}]
-        [:>
-         :Bar
-         {:yAxisId "left",
-          :dataKey :mem,
-          :isAnimationActive false,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:string :theme/editor-outer-rim-color "33"]}]
-        [:>
-         :Line
-         {:yAxisId "right",
-          :strokeWidth 4,
-          :type "monotone",
-          :dot false,
-          :dataKey :threads,
-          :isAnimationActive false,
-          :stroke :theme/editor-grid-selected-background-color,
-          :fill :theme/editor-grid-selected-background-color}]
-        [:>
-         :Line
-         {:stroke :theme/block-tab-selected-font-color,
-          :fill :theme/block-tab-selected-font-color,
-          :type "monotone",
-          :yAxisId "right",
-          :dataKey :subs,
-          :strokeWidth 3,
-          :strokeDasharray "5 5",
-          :dot false,
-          :isAnimationActive false}]]]
+    [[[:v-box
+       :justify
+       :center
+       :style
+       {:margin-top "-6px", :color "inherit"}
+       :children
+       [[:box :child "flow openai-image-gen-ladder has finished"]
+        nil
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "41 seconds "]
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "returns: ./images/gen/b64-image-57137-56317.png"]]]
       10
-      4
-      5]
+      1.35
+      9]
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -1640,39 +1345,262 @@
   {:file-changed
    {:data
     [{:path
-      "./live/good-cylindrical-ape-exiled-from-calanque/basic_h_bar - \"data_type, rows\" - 1177/queries/query-preview1408146803.edn",
+      "./live/good-cylindrical-ape-exiled-from-calanque/basic_h_bar - \"by_year_sqlite_updated*, is_group_by\" - 427/views/oz.edn",
       :type :modify,
       :panel-key nil,
       :block-data
-      {:queries
-       {:query-preview1408146803
-        {:select [[[:count 1] :rows] :data_type],
-         :from [:query/fields-drag-16],
-         :group-by [:data_type]}},
-       :tab "basic_h_bar - \"data_type, rows\" - 1177",
-       :name "queries"}}
+      {:views
+       {:oz
+        [:vega-lite
+         {:layer
+          [{:encoding
+            {:x {:field :by_year_sqlite_updated, :type "ordinal"},
+             :y {:aggregate "sum", :field :is_group_by, :type "quantitative"},
+             :row {:field nil, :legend nil},
+             :size {:legend nil},
+             :shape {:legend nil},
+             :column {:field nil, :legend nil},
+             :color
+             {:scale :theme/vega-default-color-scheme,
+              :legend nil,
+              :field 1,
+              :type "ordinal"}},
+            :mark {:type "bar", :tooltip {:content "encoding"}}}],
+          :data {:values :query-preview946717543},
+          :config :theme/vega-defaults,
+          :width "container",
+          :height :panel-height,
+          :padding 4,
+          :background "transparent"}
+         {:actions false}]},
+       :tab "basic_h_bar - \"by_year_sqlite_updated*, is_group_by\" - 427",
+       :name "views"}}
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
  [:flow/openai-image-gen-ladder>*running?
-  :flow/flow-forever>:final-math
-  :flow/openai-image-gen-ladder>:dominant-color
-  :flow/openai-image-gen-ladder>:pop-color
   :flow/flow-forever>*running?
   :flow/openai-image-gen-ladder>:output-revised-prompt
+  :flow/live-scratch-flow>*running?
   :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
-  :flow/live-scratch-flow>*running?],
+  :flow/openai-image-gen-ladder>:pop-color
+  :flow/flow-forever>:final-math
+  :flow/openai-image-gen-ladder>:dominant-color],
  :client-name :good-cylindrical-ape-exiled-from-calanque,
+ :runstreams-lookups
+ {"openai-image-gen-ladder"
+  {:open-inputs
+   {:quality-param {:user-input "hd", :defaults {}, :type :string},
+    :base-save-directory
+    {:user-input "/home/ryanr/rvbbit-out", :defaults {}, :type :string},
+    :size-param {:user-input "1792x1024", :defaults {}, :type :string},
+    :base-web-directory
+    {:user-input "/home/ryanr/rvbbit/frontend/resources/public/images/gen",
+     :defaults {},
+     :type {:out :string}},
+    :prompt
+    {:user-input
+     "A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her body.",
+     :defaults {},
+     :type {:out :string}},
+    :style-param {:user-input "vivid", :defaults {}, :type :string}},
+   :blocks
+   {:oai-api-call
+    {:type :map,
+     :ttype :make-http-call,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "{:created 1711491041, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
+    :node-js-color-thief-script
+    {:type :map,
+     :ttype :sub-flow,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample
+     "{:dominantColor \"#343245\", :colorPalette [\"#2d3148\" \"#cdb9bd..."},
+    :dominant-color
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "#343245"},
+    :quality-param
+    {:type :string,
+     :ttype :open-block,
+     :meta
+     {:*
+      {:scrubber
+       {:message "OpenAI image gen quality selector - DALLE3",
+        :values ["hd" "standard"]}}},
+     :last? false,
+     :defaults {},
+     :sample "hd"},
+    :execute-shell-command
+    {:type :map,
+     :ttype :shell-command,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "{:output [], :exception [], :seconds [], :command \"convert /..."},
+    :pop-color
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "#2d3148"},
+    :base-save-directory
+    {:type :string,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit-out"},
+    :color-palette
+    {:type :map,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample
+     "{:dominantColor \"#343245\", :colorPalette [\"#2d3148\" \"#cdb9bd..."},
+    :size-param
+    {:type :string,
+     :ttype :open-block,
+     :meta
+     {:*
+      {:scrubber
+       {:message "OpenAI image gen size selector - DALLE3",
+        :values ["1024x1024" "1792x1024" "1024x1792"]}}},
+     :last? false,
+     :defaults {},
+     :sample "1792x1024"},
+    :save-base64-to-webp-file
+    {:type :string,
+     :ttype :save-base64-to-webp,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit-out/b64-image-37110-32464.webp"},
+    :request-body-map
+    {:type :map,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "{:prompt \"A high-definition, highly stylized and artistic 16..."},
+    :base-web-directory
+    {:type :string,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit/frontend/resources/public/images/gen"},
+    :prompt
+    {:type :string,
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "A high-definition, highly stylized and artistic 16:9 illustr..."},
+    :create-png-path
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-..."},
+    :hiccup-image-box-w-png-vw
+    {:type :vector,
+     :ttype nil,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "(renderable view)"},
+    :create-convert-command-line
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "convert /home/ryanr/rvbbit-out/b64-image-37110-32464.webp /h..."},
+    :hiccup-image-box-w-png
+    {:type :vector,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "[:v-box :padding \"10px\" :gap \"8px\" :width :width-px :style {..."},
+    :generate-file-path
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "/home/ryanr/rvbbit-out/b64-image-37110-32464.webp"},
+    :relative-url-path-for-png-version
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? true,
+     :defaults {},
+     :sample "./images/gen/b64-image-37110-32464.png"},
+    :http-req-map
+    {:type :map,
+     :ttype :open-block,
+     :meta {},
+     :last? false,
+     :defaults {},
+     :sample "{:headers {\"Authorization\" \"Bearer sk-wdy5fbKL5OOMv0BqmiowT3..."},
+    :just-the-image
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "iVBORw0KGgoAAAANSUhEUgAABwAAAAQACAIAAABpndrVAAA552NhQlgAADnn..."},
+    :output-revised-prompt
+    {:type :string,
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "A high-definition, artistic 16:9 illustration of a fantastic..."},
+    :style-param
+    {:type :string,
+     :ttype :open-block,
+     :meta
+     {:*
+      {:scrubber
+       {:message "OpenAI image gen style selector - DALLE3",
+        :values ["vivid" "natural"]}}},
+     :last? false,
+     :defaults {},
+     :sample "vivid"}}}},
+ :alt-key-held? false,
  :openai-api-key "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",
  :window {:w 3056, :h 1523},
  :post-meta
- {:gen-viz-1132 {:* {:rowcount 7}},
+ {:fields-sys
+  {:*
+   {:rowcount
+    "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}},
+  :gen-viz-1132 {:* {:rowcount 7}},
+  :tables-sys
+  {:*
+   {:rowcount
+    "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}},
+  :client-items-drag-20 {:* {:rowcount 8892}},
+  :rowcnt-drag-7 {:* {:rowcount 1}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
   :fields-drag-16
   {:db_type {:distinct 1},
    :key_hash {:distinct 657},
-   :* {:rowcount 932},
+   :* {:rowcount 916},
    :db_schema {:distinct 1},
    :is_group_by {:distinct 1},
    :table_type {:distinct 2},
@@ -1688,33 +1616,35 @@
    :connection_id {:distinct 8},
    :context_hash {:distinct 68}},
   :ufo-sightings-drag-9 {:* {:rowcount 80332}},
+  :item-type-drag-5 {:* {:rowcount 2}},
+  :item-type-drag-0 {:* {:rowcount 31}},
   :duration-hours-drag-43 {:* {:rowcount 8349}},
   :city-drag-26 {:* {:rowcount 19899}},
-  :gen-viz-555 {:* {:rowcount 13}},
+  :gen-viz-555 {:* {:rowcount 11}},
   :state-drag-3 {:* {:rowcount 68}},
   :shape-drag-7 {:* {:rowcount 30}}},
  :flow-estimates
- {"client-keepalive" {:times nil, :run-id "0b15dd79-519a-4167-b722-bd9ca519551b"},
+ {"client-keepalive" {:times nil, :run-id "aa3e60e6-28d5-44f0-a5fe-e006bfe7eac9"},
   "openai-image-gen-ladder"
-  {:times 48.4, :run-id "b827b9a8-570f-4eef-b21d-6e67bf9e4d91"}},
+  {:times 45.2, :run-id "4870caab-6a6e-4d61-bec2-55c5cbd012d3"}},
  :status
- {"kick-test!" {:kick :gen-viz-1132},
+ {"kick-test!" {:kick :city-drag-26},
   :heartbeat
   {:kick
    [:flow/openai-image-gen-ladder>*running?
-    :flow/flow-forever>:final-math
-    :flow/openai-image-gen-ladder>:dominant-color
-    :flow/openai-image-gen-ladder>:pop-color
     :flow/flow-forever>*running?
     :flow/openai-image-gen-ladder>:output-revised-prompt
+    :flow/live-scratch-flow>*running?
     :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
-    :flow/live-scratch-flow>*running?]},
+    :flow/openai-image-gen-ladder>:pop-color
+    :flow/flow-forever>:final-math
+    :flow/openai-image-gen-ladder>:dominant-color]},
   :alert1 {:alerts :alert2},
   :reco {:fields-drag-16 :done},
   :file-change {:file-changed :done}},
  :screen-name "looking-glass-redux2",
  :recos-page2 0,
- :selected-tab "violet ferret",
+ :selected-tab "fat zebra",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -1723,77 +1653,75 @@
  :rs-overrides-hashmap
  {"openai-image-gen-ladder"
   {:prompt
-   "A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  \n\nShe has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly.\n\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy look.  \n",
+   "A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  \n\nShe has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly.\n\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy, flirty look.  \n",
    :style-param "vivid"}},
- :base-sniff-queries {:fields 575237663},
- :panels-hash 1677481223,
+ :base-sniff-queries {:fields 575237663, :client_items -420792875},
+ :panels-hash 536523939,
  :sessions
  (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
-   "332 hours, 32 minutes, 49 seconds"
-   1197169945]
+   "354 hours, 8 minutes, 26 seconds"
+   1274906071]
    ["vigorous-square-serval-banned-from-thalweg.edn"
-    "327 hours, 10 minutes, 31 seconds"
-    1177831945]
+    "348 hours, 46 minutes, 8 seconds"
+    1255568071]
    ["exciting-globular-mouse-banned-from-maar.edn"
-    "224 hours, 28 minutes, 40 seconds"
-    808120945]
+    "246 hours, 4 minutes, 17 seconds"
+    885857071]
    ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
-    "332 hours, 32 minutes, 49 seconds"
-    1197169945]
+    "354 hours, 8 minutes, 26 seconds"
+    1274906071]
    ["restored-raspberry-mule-of-baymouth-bar.edn"
-    "94 hours, 46 minutes, 15 seconds"
-    341175860]
+    "116 hours, 21 minutes, 51 seconds"
+    418911986]
    ["awesome-prismatic-jay-banned-from-malpaís.edn"
-    "94 hours, 46 minutes, 52 seconds"
-    341212736]
+    "116 hours, 22 minutes, 28 seconds"
+    418948862]
    ["constant-star-shaped-echidna-banned-from-towhead.edn"
-    "309 hours, 4 minutes, 2 seconds"
-    1112642945]
+    "330 hours, 39 minutes, 39 seconds"
+    1190379071]
    ["special-globular-coyote-of-oceanic-trench.edn"
-    "332 hours, 32 minutes, 50 seconds"
-    1197170945]
+    "354 hours, 8 minutes, 27 seconds"
+    1274907071]
    ["proud-thin-elk-of-rôche-moutonnée.edn"
-    "332 hours, 32 minutes, 49 seconds"
-    1197169945]
+    "354 hours, 8 minutes, 26 seconds"
+    1274906071]
    ["kind-rhomboidal-lion-of-the-floodplain.edn"
-    "332 hours, 32 minutes, 49 seconds"
-    1197169945]
+    "354 hours, 8 minutes, 26 seconds"
+    1274906071]
    ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
-    "332 hours, 32 minutes, 50 seconds"
-    1197170945]
+    "354 hours, 8 minutes, 27 seconds"
+    1274907071]
    ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
-    "332 hours, 32 minutes, 49 seconds"
-    1197169945]
+    "354 hours, 8 minutes, 26 seconds"
+    1274906071]
    ["courageous-linear-platypus-of-corrie.edn"
-    "95 hours, 7 minutes, 5 seconds"
-    342425877]
+    "116 hours, 42 minutes, 42 seconds"
+    420162003]
    ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
-    "332 hours, 32 minutes, 49 seconds"
-    1197169945]
+    "354 hours, 8 minutes, 26 seconds"
+    1274906071]
    ["ethical-round-oyster-of-glacial-horn.edn"
-    "332 hours, 32 minutes, 49 seconds"
-    1197169945]
+    "354 hours, 8 minutes, 26 seconds"
+    1274906071]
    ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
-    "332 hours, 32 minutes, 49 seconds"
-    1197169945]
+    "354 hours, 8 minutes, 26 seconds"
+    1274906071]
    ["transforming-ivory-clam-of-the-volcanic-field.edn"
-    "149 hours, 6 minutes, 14 seconds"
-    536774945]
+    "170 hours, 41 minutes, 51 seconds"
+    614511071]
    ["remarkable-thin-wombat-banned-from-flyggberg.edn"
-    "274 hours, 43 minutes, 46 seconds"
-    989026945]
-   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn"
-    "25 minutes, 36 seconds"
-    1536096]
+    "296 hours, 19 minutes, 23 seconds"
+    1066763071]
+   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "34 seconds" 34611]
    ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
-    "332 hours, 32 minutes, 49 seconds"
-    1197169945]),
- :last-run-throwaway "23:08:56",
+    "354 hours, 8 minutes, 26 seconds"
+    1274906071]),
+ :last-run-throwaway "20:10:49",
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1098155057,
+ :user-params-hash -725905599,
  :grid-recos? true,
  :search-results {":flow" 29, ":client-param" 4, ":block" 8, ":screen" 2},
- :session-hash 1481939980,
+ :session-hash 480738063,
  :panels
  {:block-11251
   {:name "block-11251",
@@ -1912,11 +1840,22 @@
    :name "flow-play-from-runstreams",
    :root [5 18],
    :tab "through the rabbit hole and out the other side"},
+  :block-8334
+  {:h 4,
+   :w 4,
+   :connection-id "system-db",
+   :name "drag-from-drag-from-select-all-client_items",
+   :queries
+   {:rowcnt-drag-7
+    {:select [[[:sum :rowcnt] :rowcnt_sum]],
+     :from [[:query/item-type-drag-0 :ss589]]}},
+   :root [27 8],
+   :tab "violet ferret"},
   :block-983
   {:mad-libs-combo-hash ["1408146803" "fields_drag_16"],
    :name "basic_h_bar - \"data_type, rows\" - 805",
    :w 9,
-   :root [16 3],
+   :root [18 3],
    :h 9,
    :connection-id "system-db",
    :queries
@@ -1950,6 +1889,18 @@
       :padding 4,
       :background "transparent"}
      {:actions false}]}},
+  :block-3166
+  {:h 7,
+   :w 30,
+   :connection-id "system-db",
+   :name "select-all-client_items",
+   :queries
+   {:client-items-drag-20
+    {:select [:is_live :item_key :item_sub_type :item_type :ts :value],
+     :from [[:client_items :ii709]],
+     :_last-run "20:15:42"}},
+   :root [9 19],
+   :tab "violet ferret"},
   :block-8240
   {:drag-meta {:type :open-input},
    :w 7,
@@ -2131,6 +2082,21 @@
      :child
      [:string :flow/openai-image-gen-ladder>:dominant-color]]},
    :queries {}},
+  :block-12188
+  {:drag-meta {:type :open-input},
+   :w 15,
+   :selected-view :wholesome-baby-blue-magpie,
+   :h 2,
+   :views
+   {:wholesome-baby-blue-magpie
+    [:open-input
+     {:kp [:param :wholesome-baby-blue-magpie],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [40 29],
+   :name "created very interesting whimsy"},
   :block-7319
   {:h 5,
    :w 8,
@@ -2329,8 +2295,9 @@
       :table_name
       :table_type
       :updated],
-     :from [[:fields :mm764]]}},
-   :root [8 16],
+     :from [[:fields :mm764]],
+     :_last-run "20:15:34"}},
+   :root [9 12],
    :tab "violet ferret"},
   :block-10376
   {:h 8,
@@ -2367,6 +2334,21 @@
    :tab "fat zebra",
    :root [54 1],
    :name "block-1519"},
+  :block-6963
+  {:h 23,
+   :w 9,
+   :connection-id "system-db",
+   :name "drag-from-select-all-client_items",
+   :queries
+   {:item-type-drag-0
+    {:select [:item_type [[:count 1] :rowcnt] :item_sub_type],
+     :from [[:query/client-items-drag-20 :aa227]],
+     :group-by [:item_type :item_sub_type],
+     :order-by [[:rowcnt :desc]],
+     :col-widths {:item_type 97, :rowcnt 87, :item_sub_type 227},
+     :_last-run "20:15:38"}},
+   :root [0 3],
+   :tab "violet ferret"},
   :block-6121
   {:h 2,
    :w 16,
@@ -2415,11 +2397,24 @@
      :from [[:ufo_sightings :jj584]]}},
    :root [1 1],
    :tab "sapphire ape"},
+  :block-11291
+  {:h 5,
+   :w 8,
+   :connection-id "system-db",
+   :name "drag-from-select-all-client_items",
+   :queries
+   {:item-type-drag-5
+    {:select [:item_type [[:count 1] :rowcnt]],
+     :from [[:query/client-items-drag-20 :jj274]],
+     :group-by [:item_type],
+     :order-by [[:rowcnt :desc]]}},
+   :root [39 19],
+   :tab "violet ferret"},
   :block-273
   {:mad-libs-combo-hash ["1481471205" "fields_drag_16"],
    :name "pie_nivo - \"rows, updated\" - 859",
    :w 9,
-   :root [7 3],
+   :root [9 3],
    :h 9,
    :connection-id "system-db",
    :queries
@@ -2447,7 +2442,7 @@
       :margin {:top 50, :right 50, :bottom 50, :left 45},
       :data :gen-viz-555,
       :arcLinkLabelsTextColor "#ffffff"}]}}},
- :selected-block "none!",
+ :selected-block :block-12188,
  :theme-colors-hashmap
  {"float" "#ff2050",
   "boolean" "#8EA2A8",
@@ -2480,20 +2475,20 @@
    :db_catalog nil,
    :connection_id "system-db",
    :schema_cat nil,
-   :table_name "fields",
-   :fields 17},
+   :table_name "client_items",
+   :fields 7},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#dcc5cb",
+   :openai-image-gen-ladder>pop-color "#253e6d",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-60731-30526.png",
+   "./images/gen/b64-image-57137-56317.png",
    :counting-loop>open-fn-2 44,
    :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
-   "A meticulously-detailed, hyperrealistic 16:9 digitally-rendered depiction of a snowy morning infused with a blend of rustic New England charm and futuristic cyberpunk flair. The peaceful town is blanketed under a pristine veil of snow amidst a blizzard, lending an ambiance of slight grit. Architectural structures emanate a gentle, captivating glow, tinted in pastel pink and neon-blues. Dominating the left side of the scene is a captivating early thirties Irish woman, with a robust build, full lips, with a larger lower half, an upturned nose, and an expressive visage blending satisfaction and tantalizing sophistication. Her slightly wet hair falls over her neck and shoulders due to the snowfall, adorned with intricate Celtic-inspired tattoos of rabbits and nature scenes on her neck, collarbone, and shoulders. The morning sun peeking over the horizon casts diffused light on her, accentuating the serenity and cryptic ambiance crafted by the pre-dawn lighting. Her fully-figured body bathes in the gentle light, creating an aesthetically pleasing harmony of light and shadow playing about her beautifully tattooed body.",
+   "Create a high-definition, stylized 16:9 illustration of a scene inspired by the traditional myths of Scotland. A majestic landscape holds a fantastic, other-worldly charm. At the center is a young and beautiful Caucasian woman in her late 20s with brunette hair that flows down gloriously. Her features are defined by full, pouty lips, with the bottom one slightly more prominent, and a slightly upturned nose. Her facial expression is a mix of pleasure and allure. Her body reveals intricate Celtic-style tattoos of rabbits and wilderness that grace her neck, collarbone, and shoulders. A mysterious, abstract play of blue and pink lights reflect off her robust and curvaceous body, enhancing the radiance of her skin. She is adorned with a choker ribbon and a long necklace, leaning against a wall with a wily, flirtatious look towards the viewer.",
    :live-scratch-flow>*running? false,
    :openai-image-gen-ladder>hiccup-image-box-w-png-vw
    [:v-box
@@ -2528,7 +2523,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#71727f",
+   :openai-image-gen-ladder>dominant-color "#3f5783",
    :flow-forever>final-math nil},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",
@@ -2548,14 +2543,14 @@
     ""
     "She has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly."
     ""
-    "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy look.  "
+    "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy, flirty look.  "
     ""],
    :brave-white-butterfly
    ["A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly."
     "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."
     ""],
    :selected-view-data nil,
-   :selected-view [nil nil],
+   :selected-view [nil :*],
    :fabulous-pink-eagle
    ["A classic 1990s American Pizza Hut location, now even more run down and abandoned, takes on a slightly more dystopian aspect with a crucial detail: the building's roof shingles are distinctly red, highlighting the iconic Pizza Hut design. The parking lot is now heavily littered with remnants of bar charts, pie charts, old school dashboards, and shredded Tableau signage, symbolizing the profound death of the 'old world' of business intelligence. This scene is illustrated in a highly stylistic, striking, and dramatic manner, with an intensified essence of decay and the passage of time. The architecture of the Pizza Hut, with its iconic red roof and signage, stands more prominently as a relic amidst an overwhelming detritus of outdated analytics tools. This wider, cinematic view should further emphasize the desolation and dramatic change, adding a more dystopian atmosphere to the landscape. "
     ""
@@ -2570,6 +2565,8 @@
    ["A meticulously-detailed, hyperrealistic 16:9 digitally-rendered depiction of a wintery morning scene set in traditional New England, showcasing a unique mixture of rustic charm and futuristic, cyberpunk elements. The quaint town is enshrouded under a fresh white carpet of snow amidst a flurry storm, which creates an ambiance of slight grittiness. The architectural structures radiate a soft, inviting glow, tinted in hues of pastel pink and neon light blue. To the left side of the composition, a strikingly beautiful Irish woman in her early 30s is emphasised. Her attractive features include a buxom build, full pouty lips with a prominently larger lower lip, a perky nose, and an expression that cleverly combines satisfaction with a hint of alluring sophistication. Her flowing, slightly damp hair cascades over her neck and shoulders due to the falling snow. Intricately designed, Celtic-inspired tattoos of rabbits and scenes from nature beautifully cover her neck, collarbone, and shoulders. The timidly emerging morning sun from the horizon casts a gentle light upon her body, playing up the serene and slightly mysterious atmosphere created by the pre-dawn illumination. Her full, maternal figure basks in the sunlight, creating a visually pleasing interplay of light and shadow on her richly adorned body"],
    :unreal-magenta-frog
    ["A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her ample body."],
+   :wholesome-baby-blue-magpie
+   ["Create a high-definition, stylized 16:9 illustration of a scene inspired by the traditional myths of Scotland. A majestic landscape holds a fantastic, other-worldly charm. At the center is a young and beautiful Caucasian woman in her late 20s with brunette hair that flows down gloriously. Her features are defined by full, pouty lips, with the bottom one slightly more prominent, and a slightly upturned nose. Her facial expression is a mix of pleasure and allure. Her body reveals intricate Celtic-style tattoos of rabbits and wilderness that grace her neck, collarbone, and shoulders. A mysterious, abstract play of blue and pink lights reflect off her robust and curvaceous body, enhancing the radiance of her skin. She is adorned with a choker ribbon and a long necklace, leaning against a wall with a wily, flirtatious look towards the viewer."],
    :composed-azure-fish
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style illustration showcasing a stunning, buxom, robust, and fit yet curvaceous white woman in her late 20s, posing and dressed as the Statue of Liberty, a slightly upturned nose, and a buxom yet slim figure. She holds and AR-15 rifle. She stands majestically at the port of an American New England scene with boats, American flags and cheering crowds with rifles. "
     ""
@@ -2580,7 +2577,7 @@
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. "
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
-   :selected-block :block-4030,
+   :selected-block :block-12188,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""
@@ -2591,7 +2588,7 @@
     "The other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene."
     ""
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."]},
-  :viz-shapes0-sys {:shape nil},
+  :viz-shapes0-sys {:shape "basic_h_bar", :recos 27},
   :theme
   {:codemirror-theme "ayu-dark",
    :editor-param-background-color "#000000",
@@ -2714,5 +2711,6 @@
    :connection_id "boston-crime",
    :context_hash "-1806822778"},
   :connections-sys {:database_name "*cache-db*", :connection_id "system-db"},
-  :sys {:selected-tab "violet ferret", :selected-tab-idx 3}},
- :selected-flow "live-scratch-flow"}
+  :sys {:selected-tab "fat zebra", :selected-tab-idx 2}},
+ :selected-flow "live-scratch-flow",
+ :grid-reco? false}

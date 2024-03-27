@@ -258,6 +258,7 @@
     (sql-exec system-db sqlite-ddl/create-reco-vw)
     (sql-exec system-db sqlite-ddl/create-reco-vw2)
     (sql-exec system-db sqlite-ddl/create-status)
+    (sql-exec system-db sqlite-ddl/create-client-items)
     (sql-exec system-db sqlite-ddl/create-status-vw)))
 
 (defn create-sqlite-flow-sys-tables-if-needed! [flows-db] ;; db-type
@@ -1058,28 +1059,28 @@
             ;;          {:selects-only-aliased selects-only-aliased}
             ;;          {:materialize-group-bys materialize-group-bys}
             ;;          {:selects selects}])
-               (search/add-or-update-document search/index-writer
-                                              (if (= "*" (nth f 6))
-                                                (str :table "-" (nth f 1) "-" (nth f 5))
-                                                (str :field "-" (nth f 1) "-" (nth f 5) "-" (nth f 6)))
-                                              {:content (if (= "*" (nth f 6))
-                                                          (str (nth f 1) " " (nth f 5))
-                                                          (str (nth f 1) " " (nth f 5) " " (nth f 6) " " (try (str (nth f 10)) (catch Exception _ nil))))
-                                               :type (if (= "*" (nth f 6)) :table :field)
-                                               :row {:db_type (nth f 0)
-                                                     :connection_id (nth f 1)
-                                                     :table_type (nth f 2)
-                                                     :db_schema (nth f 3)
-                                                     :db_catalog (nth f 4)
-                                                     :table_name (nth f 5)
-                                                     :field_name (nth f 6)
-                                                     :field_type (nth f 7)
-                                                     :data_type (nth f 8)
-                                                     :derived_calc (try (str (nth f 9)) (catch Exception _ nil))
-                                                     :derived_name (try (str (nth f 10)) (catch Exception _ nil))
-                                                     ;:key_hash (keyhash-from-field-vector f)
-                                                     ;:context_hash (contexthash-from-field-vector f)
-                                                     :is_group_by is-group-by?}})
+              ;;  (search/add-or-update-document search/index-writer
+              ;;                                 (if (= "*" (nth f 6))
+              ;;                                   (str :table "-" (nth f 1) "-" (nth f 5))
+              ;;                                   (str :field "-" (nth f 1) "-" (nth f 5) "-" (nth f 6)))
+              ;;                                 {:content (if (= "*" (nth f 6))
+              ;;                                             (str (nth f 1) " " (nth f 5))
+              ;;                                             (str (nth f 1) " " (nth f 5) " " (nth f 6) " " (try (str (nth f 10)) (catch Exception _ nil))))
+              ;;                                  :type (if (= "*" (nth f 6)) :table :field)
+              ;;                                  :row {:db_type (nth f 0)
+              ;;                                        :connection_id (nth f 1)
+              ;;                                        :table_type (nth f 2)
+              ;;                                        :db_schema (nth f 3)
+              ;;                                        :db_catalog (nth f 4)
+              ;;                                        :table_name (nth f 5)
+              ;;                                        :field_name (nth f 6)
+              ;;                                        :field_type (nth f 7)
+              ;;                                        :data_type (nth f 8)
+              ;;                                        :derived_calc (try (str (nth f 9)) (catch Exception _ nil))
+              ;;                                        :derived_name (try (str (nth f 10)) (catch Exception _ nil))
+              ;;                                        ;:key_hash (keyhash-from-field-vector f)
+              ;;                                        ;:context_hash (contexthash-from-field-vector f)
+              ;;                                        :is_group_by is-group-by?}})
                (sql-exec system-db (to-sql {:delete-from [:fields]
                                             :where [:and
                                                     [:= :db_type (nth f 0)]
