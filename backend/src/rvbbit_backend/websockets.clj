@@ -2251,6 +2251,9 @@
               sample (str ; (str (get-in @flow-status [flow-id :*time-running]) " ")
                       (if over? (str (subs (str return-val) 0 limit) "...")
                           (str return-val)))
+              result-code (cond (cstr/includes? (str return-val) ":error") "error"
+                                (cstr/includes? (str return-val) ":timeout") "timeout"
+                                :else "success")
               sample (if error? (get-in return-val [:error :error] sample) sample)]
           (alert! client-name [:v-box
                            ;:size "auto" :height "60px"
@@ -2296,10 +2299,15 @@
             (when (not (= flow-id "client-keepalive")) ;; no need to track heartbeats..
               (ut/pp [:saving-flow-exec-for flow-id])
               (async/thread (do (ext/create-dirs "./flow-history") ;; just in case
-                                (spit (str "./flow-history/" run-id ".edn") ;; ut/pretty-spit is SO expensive...
-                                      (merge {:sent-flowmap orig-flowmap
-                                              :first-stage-flowmap flowmap}
-                                             output))))) ;; just for the record
+                                (ut/pretty-spit (str "./flow-history/" flow-id "-" run-id "-" result-code ".edn") ;; ut/pretty-spit is SO expensive...
+                                      (ut/replace-large-base64
+                                       (merge
+                                        output
+                                        {:sent-flowmap orig-flowmap
+                                         :first-stage-flowmap flowmap
+                                         :return-maps (select-keys @flow-db/results-atom relevant-keys) ;; in case no-return? is true
+                                         :return-val return-val} ;; in case no-return? is true
+                                        )) 125)))) ;; just for the record
             output)))
     ;; run it!
    ; (ut/pp [:flowmap-returned-val return-val])
