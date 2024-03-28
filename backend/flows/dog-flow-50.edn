@@ -66,31 +66,6 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
-  :dog-flow-50
-  {:y 1700,
-   :w 125,
-   :right-click? true,
-   :icon "zmdi-puzzle-piece",
-   :flow-path "./flows/dog-flow-50.edn",
-   :z 0,
-   :ports {:in {:open-input-1 :any, :open-input :integer}, :out {:out :any}},
-   :h 85,
-   :x 2000,
-   :sub-flow-id "dog-flow-50",
-   :data
-   {:flow-item
-    {:category ":sub-flows",
-     :name "dog-flow-50",
-     :type "dog-flow-50",
-     :icon "zmdi-puzzle-piece",
-     :defaults {:open-input-1 54, :open-input 45},
-     :types {:open-input-1 :integer, :open-input :integer, :out :any},
-     :style nil,
-     :selected-style nil,
-     :inputs [:open-input-1 :open-input],
-     :expandable? true,
-     :required [:open-input-1 :open-input]},
-    :drag-meta {:type "dog-flow-50"}}},
   :open-fn-1_out
   {:y 2925,
    :fn (fn [x] x),
@@ -120,14 +95,37 @@
    :right-click? true,
    :ports {:in {}, :out {:out :integer}},
    :x 2125,
-   :y 1550}},
- :opts {:retry-on-error? true, :retries 5, :close-on-done? true},
- :zoom [-1619.16 -1525.61 1.3],
+   :y 1550},
+  :open-fn-2
+  {:y 1675,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [x y] (* y x)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any, :y :any}, :out {:out :any}},
+   :inputs nil,
+   :h 85,
+   :x 2025,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}}},
+ :zoom [-3437.27 -2688.08 2.275],
  :flow-id "dog-flow-50",
  :flowmaps-connections
  [[:open-input-1 :left-right-math/left-int]
   [:open-input :left-right-math/right-int]
   [:left-right-math :open-fn-1/x]
-  [:open-fn-1 :dog-flow-50/open-input-1]
-  [:open-input-2 :dog-flow-50/open-input]
-  [:dog-flow-50 :done]]}
+  [:open-fn-1 :open-fn-2/x]
+  [:open-input-2 :open-fn-2/y]
+  [:open-fn-2 :done]]}

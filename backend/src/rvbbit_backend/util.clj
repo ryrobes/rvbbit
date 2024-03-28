@@ -1355,3 +1355,12 @@
                               (conj res (conj prev k))))
               result
               m)))
+
+(defn keypaths2
+  ([m] (keypaths [] m ()))
+  ([prev m result]
+   (reduce-kv (fn [res k v] (if (map? v)
+                              (keypaths (conj prev k) v res)
+                              (conj res (conj prev k))))
+              result
+              m)))

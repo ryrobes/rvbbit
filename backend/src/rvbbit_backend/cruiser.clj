@@ -24,7 +24,7 @@
    ;[rvbbit-backend.websockets :as wss]
    [rvbbit-backend.clickhouse-ddl :as clickhouse-ddl]
    [rvbbit-backend.ddl :as sqlite-ddl] ;; needed for hardcoded rowset-sql-query usage
-   [rvbbit-backend.clickhouse-ddl :as ddl]
+   ;[rvbbit-backend.clickhouse-ddl :as ddl]
    ;[rvbbit-backend.ddl :as ddl]
    [rvbbit-backend.util :as ut]
    [rvbbit-backend.surveyor :as surveyor]
@@ -205,28 +205,29 @@
                                         (cstr/replace  "?" ""))) true]}
                 {k (read-string (cstr/replace (str k) #"-" "_"))}))) honey-map))
 
-(defn create-sys-tables-if-needed! [system-db] ;; db-type
-  (ut/pp [:creating-sys-tables])
-  (let [] ; [ddl-ns (if (= db-type :clickhouse) clickhouse-ddl sqlite-ddl )]
-    (sql-exec system-db ddl/create-screens)
-    (sql-exec system-db ddl/create-blocks)
-    (sql-exec system-db ddl/create-tests)
-    (sql-exec system-db ddl/create-fields)
-    (sql-exec system-db ddl/create-connections)
-    (sql-exec system-db ddl/create-attributes)
-    (sql-exec system-db ddl/create-found-fields)
-    (sql-exec system-db ddl/create-combos)
-    (sql-exec system-db ddl/create-combo-rows)
-    (sql-exec system-db ddl/create-rules-table0)
-    (sql-exec system-db ddl/create-rules-table1)
-    (sql-exec system-db ddl/create-rules-table2)
-    (sql-exec system-db ddl/create-rules-table3)
-  ;(sql-exec ut/system-log-db clickhouse-ddl/create-logs)
-    (sql-exec system-db ddl/create-errors)
-    (sql-exec system-db ddl/create-reco-vw)
-    (sql-exec system-db ddl/create-reco-vw2)
-    (sql-exec system-db ddl/create-status)
-    (sql-exec system-db ddl/create-status-vw)))
+;; (defn create-sys-tables-if-needed! [system-db] ;; db-type CLICKHOUSE 
+;;   (ut/pp [:creating-sys-tables])
+;;   (let [] ; [ddl-ns (if (= db-type :clickhouse) clickhouse-ddl sqlite-ddl )]
+;;     (sql-exec system-db ddl/create-screens)
+;;     (sql-exec system-db ddl/create-blocks)
+;;     (sql-exec system-db ddl/create-tests)
+;;     (sql-exec system-db ddl/create-fields)
+;;     (sql-exec system-db ddl/create-connections)
+;;     (sql-exec system-db ddl/create-attributes)
+;;     (sql-exec system-db ddl/create-found-fields)
+;;     (sql-exec system-db ddl/create-combos)
+;;     (sql-exec system-db ddl/create-combo-rows)
+;;     (sql-exec system-db ddl/create-rules-table0)
+;;     (sql-exec system-db ddl/create-rules-table1)
+;;     (sql-exec system-db ddl/create-rules-table2)
+;;     (sql-exec system-db ddl/create-rules-table3)
+;;   ;(sql-exec ut/system-log-db clickhouse-ddl/create-logs)
+;;     (sql-exec system-db ddl/create-errors)
+;;     (sql-exec system-db ddl/create-reco-vw)
+;;     (sql-exec system-db ddl/create-reco-vw2)
+;;     (sql-exec system-db ddl/create-user-subs-vw)
+;;     (sql-exec system-db ddl/create-status)
+;;     (sql-exec system-db ddl/create-status-vw)))
 
 (defn create-sqlite-sys-tables-if-needed! [system-db] ;; db-type
   (ut/pp [:creating-sys-tables])
@@ -251,12 +252,13 @@
     (sql-exec system-db sqlite-ddl/create-rules-table2)
     (sql-exec system-db sqlite-ddl/create-rules-table3)
     (sql-exec system-db sqlite-ddl/create-flow-functions)
-  ;(sql-exec ut/system-log-db clickhouse-ddl/create-logs)
+    ;(sql-exec ut/system-log-db clickhouse-ddl/create-logs)
     (sql-exec system-db sqlite-ddl/create-panel-history)
     (sql-exec system-db sqlite-ddl/create-board-history)
     (sql-exec system-db sqlite-ddl/create-errors)
     (sql-exec system-db sqlite-ddl/create-reco-vw)
     (sql-exec system-db sqlite-ddl/create-reco-vw2)
+    ;;(sql-exec system-db sqlite-ddl/create-user-subs-vw)
     (sql-exec system-db sqlite-ddl/create-status)
     (sql-exec system-db sqlite-ddl/create-client-items)
     (sql-exec system-db sqlite-ddl/create-status-vw)))

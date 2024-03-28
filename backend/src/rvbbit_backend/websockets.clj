@@ -4887,28 +4887,98 @@
           m
           (keys m)))
 
+(defn strunc [s]
+  (let [s (str s)
+        limit 80]
+    (if (and s (> (count s) limit))
+      (subs s 0 limit)
+      s)))
+
 (defn param-sql-sync []
-  (let [flow-rows (vec (filter #(and (= (count %) 2) (not= (second %) :opts-map)
+  (let [display-name (fn [x & [num]] (cstr/join " " (vec (drop (or num 2) x))))
+        flow-rows (vec (filter #(and (= (count %) 2) (not= (second %) :opts-map)
                                      (not (cstr/includes? (str (get % 1 "")) "/")) ;; debatable
                                      )
-                               (ut/kvpaths @flow-db/results-atom)))
+                               (ut/keypaths @flow-db/results-atom)))
         flow-rows (for [e flow-rows]
-                    [(str (first e)) ":flow" (str (first e)) (str ":flow/" (cstr/replace (cstr/join ">" e) ":" "")) nil]
+                    [(str (first e))
+                     "flow-values"
+                     (cstr/replace (str (first e)) ":" "")
+                     (str ":flow/" (cstr/replace (cstr/join ">" e) ":" ""))
+                     nil
+                     (strunc (ut/replace-large-base64 (get-in @flow-db/results-atom e)))
+                     ;(str (vec (drop 1 e)))
+                     (display-name e 1)
+                     ]
                     ;(conj e (str ":flow/" (cstr/replace (cstr/join ">" e) ":" "")))
                     )
-        param-rows (filter #(not (cstr/includes? (str %) ">")) (ut/kvpaths @params-atom))
+        param-rows (filter #(and (not (cstr/includes? (str %) ">"))
+                                 (not (cstr/includes? (str %) "-sys"))
+                                 (not (cstr/includes? (str %) ":sys"))
+                                 (not (cstr/includes? (str %) ":theme")))
+                           (ut/keypaths2 @params-atom))
+        param-rows (vec (distinct (map (fn [x] (vec (take 3 x))) param-rows)))
         live-clients (keys (client-statuses))
         param-rows (for [e param-rows]
-                     [(cstr/replace (str (first e)) ":" "") ":client" (str (second e)) (str ":client/" (cstr/replace (cstr/join ">" e) ":" "")) (true? (some #(= (first e) %) live-clients))]
+                     [(cstr/replace (str (first e)) ":" "")
+                      "client-params"
+                      (cstr/replace (str (second e)) ":" "")
+                      (str ":client/" (cstr/replace (cstr/join ">" e) ":" ""))
+                      (true? (some #(= (first e) %) live-clients))
+                      (strunc (ut/replace-large-base64 (get-in @params-atom e)))
+                      ;(str (vec (drop 2 e)))
+                      (display-name e)]
                      ;(conj (conj e (str ":client/" (cstr/replace (cstr/join ">" e) ":" ""))) (some #(= (first e) %) live-clients))
                      )
-        prows (vec (into param-rows flow-rows))
+        panel-rows (vec (filter #(and 
+                                  (or (= (get % 2) :views)
+                                      (= (get % 2) :queries))
+                                  ;(= (count %) 4)
+                                  ) (ut/kvpaths @panels-atom)))
+        panel-rows (vec (distinct (map (fn [x] (vec (take 4 x))) panel-rows)))
+        panel-rows (vec (filter #(= (count %) 4) panel-rows)) ;; hacking - merge all this once logic gets solidified
+        panel-rows (for [e panel-rows
+                        ;;  :let [block? (or (= (last e) :views)
+                        ;;                   (= (last e) :queries))]
+                         ]
+                     [(cstr/replace (str (first e)) ":" "")
+                      ;;(str "client-" (if block? "panels" (cstr/replace (str (get e 3)) ":" "")))
+                      (str "client-" (cstr/replace (str (get e 2)) ":" ""))
+                      (cstr/replace (str (second e)) ":" "")
+                      (str ":panel/" (cstr/replace (cstr/join ">" e) ":" ""))
+                      (true? (some #(= (first e) %) live-clients))
+                      (strunc (ut/replace-large-base64 (get-in @panels-atom e)))
+                      (display-name e 3)])
+        block-rows  (vec (filter #(and (or (= (count %) 5)
+                                           (or (= (last %) :views)
+                                               (= (last %) :queries)))
+                                       (or (= (get % 3) :views)
+                                           (= (get % 3) :queries))
+                                       (= (second %) :panels))
+                                 (ut/kvpaths @screens-atom)))
+        block-rows (for [e block-rows
+                         :let [block? (or (= (last e) :views)
+                                          (= (last e) :queries))
+                               e (if block? (drop-last e) e)]]
+                     [(cstr/replace (str (first e)) ":" "")
+                      ;;;(str "::" (last e)) ;; 
+                      (str "saved-" (if block? "block" (cstr/replace (str (get e 3)) ":" "")))
+                      (cstr/replace (if block? (str (get e 3)) (str (get e 4))) ":" "")
+                      (str ":screen/" (cstr/replace (cstr/join ">" e) ":" ""))
+                      ;(true? (some #(= (first e) %) live-clients))
+                      nil
+                      (strunc (ut/replace-large-base64 (get-in @screens-atom e)))
+                      ;(str (vec (drop 2 e)))
+                      (display-name e)])
+        prows (vec (distinct (into (into (into param-rows flow-rows) block-rows) panel-rows)))
         keys (vec (distinct (map first prows)))
-        rows (vec (for [r prows] (zipmap [:item_key :item_type :item_sub_type :value :is_live] r)))
+        rows (vec (for [r prows] (zipmap [:item_key :item_type :item_sub_type :value :is_live :sample :display_name] r)))
         delete-sql {:delete-from [:client_items] :where (cons :or (vec (for [k keys] [:= :item_key k])))}
         ;insert-sql {:insert-into [:client_items] :values rows}
         ]
-    ;(ut/pp [:flow-results-rows rows])
+    ;; (ut/pp [:panel-rows (take 75 panel-rows)])
+    ;;(ut/pp [:block-rows (vec (take 75 block-rows))])
+    ;;(ut/pp [:flow-results-rows rows])
     ;; (when (not (empty? rows))
     ;;   (do (sql-exec flows-db (to-sql {:delete-from [:flow_results]}))
     ;;       (sql-exec flows-db (to-sql insert-sql))))
@@ -5031,7 +5101,8 @@
       nil)))
 
 (def channel-counts (atom {}))
-(def stats-shadow (atom []))
+;;(def stats-shadow (atom []))
+(def stats-shadow (ut/thaw-atom [] "./data/atoms/stats-shadow-atom.edn"))
 
 (defn last-x-items [v x]
   (let [start (max 0 (- (count v) x))]

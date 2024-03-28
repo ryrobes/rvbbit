@@ -134,7 +134,7 @@
                                  :columns [:file_path :screen_name :blocks :queries]
                                  :values [[f-path screen-name (count blocks) (count (keys queries))]]}))
     (sql-exec system-db (to-sql {:insert-into [:blocks]
-                                 :columns [:file_path :screen_name :block_key :block_name :views :queries :view_names :query_names :block_data]
+                                 :columns [:file_path :screen_name :block_key :block_name :views :queries :view_names :query_names :block_data :tab_name]
                                  :values (for [b blocks]
                                            (let [theme? (true? (= b :*theme*))
                                                  board? (some #(= b %) boards) ;(cstr/starts-with? (str b) "board/")
@@ -160,7 +160,9 @@
                                                                     :click-param {:param (get params :param)}
                                                                     ;(rel-params (get board-map b) params)
                                                                     })
-                                                    :else (str (get-in screen-data [:panels b])))]))}))
+                                                    :else (str (get-in screen-data [:panels b])))
+                                              (str (get-in screen-data [:panels b :tab]))
+                                              ]))}))
 
     ;(ut/pp (keys screen-data))
     ))
@@ -329,6 +331,7 @@
     
     ;;(ut/thaw-atom {} "./data/atoms/flow-db-results-atom.edn" flow-db/results-atom true)
     (thaw-flow-results)
+    (sql/start-worker-sql) ;; test
 
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-conn-watcher (watch-connections-folder))
@@ -373,6 +376,7 @@
     (sql-exec system-db "drop table if exists errors;")
     (sql-exec system-db "drop view  if exists viz_recos_vw;")
     (sql-exec system-db "drop view  if exists viz_recos_vw2;")
+    (sql-exec system-db "drop view  if exists user_subs_vw;")
     (sql-exec system-db "drop view  if exists latest_status;")
 
     (cruiser/create-sqlite-sys-tables-if-needed! system-db)
@@ -473,19 +477,19 @@
                                     (catch Exception e (ut/pp [:close-error e]))))))
 
     (shutdown/add-hook! ::close-system-pools #(do
-                                              ;; (let [destinations (vec (keys @wss/client-queues))]
-                                              ;;   (doseq [d destinations]
-                                              ;;     (wss/alert! d [:v-box
-                                              ;;                    :justify :center
-                                              ;;                    :style {:opacity 0.7}
-                                              ;;                    :children [[:box
-                                              ;;                                :style {:color :theme/editor-outer-rim-color :font-weight 700}
-                                              ;;                                :child
-                                              ;;                                ;[:speak-always (str "Heads up: R-V-B-B-I-T system going offline.")]
-                                              ;;                                [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]] 10 1 5)))
-                                              ;;(Thread/sleep 3000)
-                                                (do (ut/pp [:shutting-down-lucene-index-writers])
-                                                    (search/close-index-writer search/index-writer))
+                                                (let [destinations (vec (keys @wss/client-queues))]
+                                                  (doseq [d destinations]
+                                                    (wss/alert! d [:v-box
+                                                                   :justify :center
+                                                                   :style {:opacity 0.7}
+                                                                   :children [[:box
+                                                                               :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                                                               :child
+                                                                               ;[:speak-always (str "Heads up: R-V-B-B-I-T system going offline.")]
+                                                                               [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]] 10 1 5)))
+                                                (Thread/sleep 1000)
+                                                ;; (do (ut/pp [:shutting-down-lucene-index-writers])
+                                                ;;     (search/close-index-writer search/index-writer))
                                                 (wss/destroy-websocket-server!)
                                                 (wss/stop-web-server!)
                                                 (wss/stop-worker)

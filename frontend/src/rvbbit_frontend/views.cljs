@@ -122,6 +122,101 @@
                  :size "auto"
                  :child [bricks/magic-table :system-tables-list* [:tables-sys] 9 10 [:db_schema :connection_id :db_catalog]]]]]))
 
+(defn search-panel-metadata []
+  (let [sql-calls {;:connections-sys {:select [[[:case
+                   ;                             [:like :connection_str "%csv%"] "*csv-import-db*"
+                   ;                             [:like :connection_str "%cache%"] "*cache-db*"
+                   ;                             :else :database_name] :database_name]
+                   ;                           :connection_id]
+                   ;                  :from [:connections]}
+                   :searches-types-sys {:select [:item_type] ;; :searches-types-sys/item_type 
+                                        :from [:client_items] :group-by [1]}
+                ;;    :tables-sys {:select [:db_schema :db_catalog :connection_id
+                ;;                          [[:|| :db_catalog "/" :db_schema] :schema_cat] :table_name [[:count 1] :fields]]
+                ;;                 :from [:fields]
+                ;;                 :where [:= :connection_id :connections-sys/connection_id]
+                ;;                 :group-by [:db_schema :db_catalog :connection_id :table_name]
+                ;;                 :order-by [:schema_cat :table_name]}
+                   :searches-sub-types-sys {:select [:item_key :is_live [[:count 1] :items]] ;; :searches-types-sys/item_type 
+                                            :where [:= :item_type :searches-types-sys/item_type]
+                                             ;;:col-widths {:items 70}
+                                             :style-rules {[:* :highlight-4018a]
+                                                           {:logic [:= :is_live 1]
+                                                            :style {;:background-color "#008b8b66"
+                                                                    :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil))
+                                                                    }}}
+                                            :from [:client_items] :group-by [1 2]}}
+        sql-params (into {} (for [k [:searches-types-sys/item_type]]
+                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))]
+    ;;(tap> [:sql-params! sql-params])
+    (dorun (for [[k v] sql-calls]
+             (let [query (walk/postwalk-replace sql-params v)
+                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+               (when (or (not data-exists?) unrun-sql?)
+                 (conn/sql-data [k] query)
+                 (re-frame/dispatch [::bricks/insert-sql-source k query])))))
+    [re-com/h-box
+     :size "auto"
+     :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} ;; rows label under grids THEME
+     :children [[re-com/box
+                 :size "auto"
+                 :child [bricks/magic-table :searches-types-list* [:searches-types-sys] 3 10 []]] ;; last for hiding fields that you STILL want in the click parameter
+                [re-com/box
+                 :size "auto"
+                 :child [bricks/magic-table :searches-sub-types-sys-list* [:searches-sub-types-sys] 9 10 [:is_live]]]]]))
+
+(defn search-panel-metadata-ext []
+  (let [sql-params (into {} (for [k [:searches-types-sys/item_type 
+                                     :searches-rows-sys/value
+                                     :searches-sub-types-sys/item_key]]
+                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+        selected-shortcode (get sql-params :searches-rows-sys/value)
+        sql-calls {;:fields-sys {:select [:field_name :field_type :data_type]
+                   ;             :from [:fields]
+                   ;             :where [:and
+                   ;                     [:= :connection_id :connections-sys/connection_id]
+                   ;                     [:= :table_name :tables-sys/table_name]
+                   ;                     [:<> :field_type "derived"]
+                   ;                     [:<> :field_type "special"]]
+                   ;             :order-by [:field_name]}
+                   :searches-rows-sys {:select [:item_sub_type :display_name :sample :value :is_live] ;; :searches-types-sys/item_type 
+                                       :where [:and 
+                                               [:= :item_key  :searches-sub-types-sys/item_key]
+                                               [:= :item_type :searches-types-sys/item_type]]
+                                                               ;;:col-widths {:items 77}
+                                       :from [:client_items]  }}
+
+        ;gmode @data-browser-system-mode
+        ;attribs? (= gmode :attribs)
+        ;combos? (= gmode :combos)
+        ;grid? (= gmode :data)
+        ]
+
+    (dorun (for [[k v] sql-calls]
+             (let [query (walk/postwalk-replace sql-params v)
+                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+               (when (or (not data-exists?) unrun-sql?)
+                 (conn/sql-data [k] query)))))
+
+    [re-com/h-box
+     :size "auto"
+     :style {:color (str (theme-pull :theme/editor-font-color nil) 35)}
+     :children [[re-com/v-box
+                 :size "auto"
+                 :children
+                 [[re-com/box
+                   :size "auto"
+                   :child [bricks/magic-table :searches-rows-sys-list*
+                           [:searches-rows-sys] 11 (if selected-shortcode 8.5 10) [:value  :is_live]]]
+                  (when selected-shortcode
+                    [re-com/box
+                   ;:align :center :justify :center
+                     :child [bricks/shortcode-box 560 85 (str selected-shortcode " ;; rabbit-code parameter") "clojure"]])
+                  ]]]]))
+
+
 ;(defonce grid-recos? (atom true))
 
 (defn insert-hidden-reco-preview [reco-selected reco-viz reco-query reco-condis combo-name shape-name single?]
@@ -1016,6 +1111,10 @@
                                                              :db_catalog :table_name :connection_id
                                                              :database_version :key_hash :context_has]]]]]]]))
 
+
+
+
+
 (defn editor-panel-metadata-viz []
   (let [sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn]]
                               {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
@@ -1378,7 +1477,7 @@
                                                                                                      :cursor "pointer"}
                                                                                              :attr {:on-click #(reset! db/editor-mode :meta)}]
                                                                                             
-                                                                                            [re-com/box :child (str "search")
+                                                                                            [re-com/box :child (str "subscriptions")
                                                                                              :style {;:opacity (if @file-mode? 0.4 1.0)
                                                                                                      :opacity (if (= @db/editor-mode :search) 1.0 0.4)
                                                                                                      :cursor "pointer"}
@@ -1494,7 +1593,7 @@
                                                    :height (px (- ttl-height 40))]
 
                                              :search [re-com/box 
-                                                      :child [search-panel-left single-width single-height]
+                                                      :child [search-panel-metadata] ;;[search-panel-left single-width single-height]
                                                       :style {:padding-top "10px"}
                                                       :height (px (- ttl-height 40))]
 
@@ -2199,7 +2298,7 @@
                                                  :params [editor-panel-metadata-params single-width single-height :theme]
                                                  :meta [editor-panel-metadata-ext]
                                                  :viz [editor-panel-metadata-viz] ;[re-com/box :child "poop"]
-                                                 :search [search-panel-right single-width single-height]
+                                                 :search [search-panel-metadata-ext] ;;[search-panel-right single-width single-height]
                                                  :vvv [re-com/box
                                                        :size "none"
                                                        :child " " :width "0px"]
@@ -3162,6 +3261,7 @@
         ;editor-ready? (and editor? (not (= selected-block "none!")) (not (nil? selected-block)))
         ;;rr @db/context-modal-pos
         websocket-status (select-keys @(re-frame/subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])
+        online? (true? (= (get websocket-status :status) :connected))
         hh @(re-frame/subscribe [::subs/h])
         ww @(re-frame/subscribe [::subs/w])
         selected-block @(re-frame/subscribe [::bricks/selected-block])
@@ -3241,6 +3341,7 @@
                               ;:transition_NOT "all 0.1s ease-in-out"
                               ;:transform-style "preserve-3d"
                               ;:transform "scale(0.5)"
+                              
                               ;:on-click (fn [x] (tap> [(.-clientX x)
                               ;                         (.-clientY x)]))
                               ;:on-drag mouse-down-handler2
@@ -3303,8 +3404,16 @@
                        :height (px hh)
                        :child [re-com/v-box
                                :size "1"
-                               :style (merge (theme-pull :theme/canvas-background-css nil)
-                                             {:font-family (theme-pull :theme/base-font nil)
+                               :style (let [custom-map (theme-pull :theme/canvas-background-css nil)
+                                            cc (str ;(ut/invert-hex-color 
+                                                     (theme-pull :theme/editor-outer-rim-color nil)
+                                                    ;"#000000"
+                                                    ; )
+                                                    87)]
+                                        (merge custom-map
+                                               {:font-family (theme-pull :theme/base-font nil)
+                                                :transition "filter 4s ease-in-out"
+                                                :filter (when (not online?) "grayscale(100%)")
                                         ;;       :box-shadow (str "inset 0px 0px 400px " (theme-pull :theme/editor-outer-rim-color nil)) ;; talking animation ?
                                         ;;       :box-shadow (let [block-id :audio
                                         ;;                         ;audio-playing? @(re-frame/subscribe [::audio/audio-playing?])
@@ -3314,7 +3423,15 @@
                                         ;;                            ;(theme-pull :theme/editor-outer-rim-color nil)
                                         ;;                            "#000000"
                                         ;;                            )))
-                                              })
+                                               }
+                                                (when (or @bricks/dragging? @bricks/mouse-dragging-panel?) ;; editor? ;;(not online?)
+                                                  {:background-image (str ;"linear-gradient(0deg, " cc " 1px, transparent 1px), linear-gradient(90deg, " cc " 1px, transparent 1px), "
+                                                                          "linear-gradient(0deg, " cc " 2px, transparent 8px), linear-gradient(90deg, " cc " 2px, transparent 8px)" 
+                                                                      (when (get custom-map :background-image) ", ")
+                                                                          (get custom-map :background-image))
+                                                   :background-size (str "50px 50px, 50px 50px"
+                                                                         (when (get custom-map :background-size) ", ")
+                                                                         (get custom-map :background-size))})))
                                ;; {:font-family "Alata" ;"Roboto" ;"Lato"
                               ;;          ;:background-size "50px 50px"
                               ;;          ;:background-image "linear-gradient(to right, #00000055 1px, transparent 1px),linear-gradient(to bottom, #00000055 1px, transparent 1px)"
@@ -3506,8 +3623,8 @@
 
                                           [re-com/box
                                            :size "none"
-                                           :style {:position "fixed" :left 138 :bottom 0 :font-weight 700 :color "#ffffff77"}
-                                           :child (str (get websocket-status :waiting -1))]
+                                           :style {:position "fixed" :left 138 :bottom 0 :font-weight 700 :color (if (not online?) "#ffffff" "#ffffff77")}
+                                           :child (str (get websocket-status :waiting -1) (when (not online?) " (RVBBIT server is offline)"))]
 
                                           (let [mem @(re-frame/subscribe [::bricks/memory])]
                                             [re-com/box

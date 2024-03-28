@@ -5966,6 +5966,7 @@
                      :transition "all 0.6s ease-in-out"
                      :filter      (if overlay? "blur(3px) opacity(88)" "none")
                      :opacity     0.6 :font-size pxlabel}]
+            
             [re-com/box
              :align :center :justify :center
              :child formatted-val
@@ -6011,13 +6012,16 @@
                     ^{:key (str "magic-table-base-" data-keypath)}
                     [re-com.core/simple-v-table
                      :columns (vec (for [c fields]
-                                     (let [cwidth (cond (cstr/ends-with? (str query-key) "-sys") ;; TODO, convert to "native" rabbitsql :col-width keys
+                                     (let [cwidth (cond (cstr/ends-with? (str query-key) "-sys") ;; TODO, convert to "native" rabbitsql :col-width keys system, no more 2 systems
                                                         (cond (some #(= % c) [:queries :fields :views :blocks :recos :combo_hash :schema_cat]) 66
                                                               (= c :database_name) 115
                                                               (= c :description) 550
                                                               (and (= c :name) (cstr/includes? (str query-key) "-fn-")) 145
                                                               (= c :shape_name) 180
                                                               (= c :block_key) 88
+                                                              (= c :items) 70
+                                                              (= c :item_key) 300
+                                                              ;(= c :item_type) 85
                                                               (= c :table_name) 204
                                                               (or (= c :shape) (= c :table)) 204
                                                               (= c :query_map) 282
@@ -6594,7 +6598,7 @@
                                                                                          (get-in stylers [s :style]) {})))
                                         base {}] ;; merge for all
 
-                                    ;(tap> [:poss poss-stylers styler-keys styles])
+                                    ;;(tap> [:poss poss-stylers styler-keys stylers styles])
                                     ;(tap> [:row id column row])
                                     (cond (and (= row clicked-row) has-rabbit-code?)
                                              ;  (= row clicked-row)
@@ -9450,6 +9454,32 @@
                       :detach            true
                       :readOnly          true            ;true
                       :theme             (theme-pull :theme/codemirror-theme nil)}}]]) ;"ayu-mirage" ;"hopscotch"
+
+(defn shortcode-box [width-int height-int value & [syntax]]
+  [re-com/box
+   :size "auto"
+   :width  (px (- width-int 24))
+   :height (px (- height-int 24))
+   :style {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
+           :font-size     "18px"
+           :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 55)
+           :background-color "#00000099"
+           :overflow      "auto"
+           :padding "3px"
+           :border-radius "12px"
+           :font-weight   700}
+   :child [(reagent/adapt-react-class cm/UnControlled)
+           {:value   (str value)
+            :options {:mode              (or syntax "text")
+                      :lineWrapping      true
+                      :lineNumbers       false ; true
+                      :matchBrackets     true
+                      :autoCloseBrackets true
+                      :autofocus         false
+                      :autoScroll        false
+                      :detach            true
+                      :readOnly          true            ;true
+                      :theme             (theme-pull :theme/codemirror-theme nil)}}]])
 
 
 (defn edn-code-box [width-int height-int value & [syntax]]

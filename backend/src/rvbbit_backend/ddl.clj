@@ -3,9 +3,21 @@
    [rvbbit-backend.util :as ut]
    [clojure.string :as cstr]))
 
-(def drop-view1 "drop view if exists viz_recos_vw;")
-(def drop-view2 "drop view if exists viz_recos_vw2;")
-(def drop-view3 "drop view if exists latest_status;")
+;; (def drop-view1 "drop view if exists viz_recos_vw;")
+;; (def drop-view2 "drop view if exists viz_recos_vw2;")
+;; (def drop-view3 "drop view if exists latest_status;")
+
+;; (def create-user-subs-vw "create view user_subs_vw as 
+;;                           SELECT is_live, item_key, item_sub_type, item_type, value, sample FROM client_items
+;;                              union all
+;;                           SELECT NULL AS is_live, 
+;;                           screen_name AS item_key, 
+;;                           block_name AS item_sub_type, 
+;;                           ':block' AS item_type, 
+;;                           ':block/' || item_key '>' || block_name AS value,
+;;                           NULL AS sample
+;;                           FROM blocks
+;;                           ;")
 
 (def create-reco-vw
   "create view viz_recos_vw as 
@@ -113,6 +125,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    view_names text NULL,
    query_names text NULL, 
    block_data text NULL,
+   tab_name text NULL,
    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
    ) ;")
 
@@ -491,6 +504,8 @@ group by 1, 2) tt on s.client_name = tt.client_name
     item_sub_type text NULL,
     value text NULL,
     is_live boolean NULL,
+    sample text NULL,
+    display_name text NULL,
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
 (defn create-attribute-sample [sample-table-name-str rowset]

@@ -93,13 +93,13 @@
 ;;                                            } "system-db")})
 
 
-(def system-db {:datasource @(pool-create {:jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" ; "jdbc:sqlite:db/system.db"
+(def system-db {:datasource @(pool-create {:jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" ; "jdbc:sqlite:db/system.db"
                                            :idle-timeout        600000  ;;;; LAST KNOW GOOD SQLITE 10/25/23 
                                            :max-lifetime       1800000
                                            :auto_vacuum        "FULL"
                                            :cache "shared"} "system-db")})
 
-(def flows-db {:datasource @(pool-create {:jdbc-url "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" ; "jdbc:sqlite:db/system.db"
+(def flows-db {:datasource @(pool-create {:jdbc-url "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" ; "jdbc:sqlite:db/system.db"
                                           :idle-timeout        600000  ;;;; LAST KNOW GOOD SQLITE 10/25/23 
                                           :max-lifetime       1800000
                                           :auto_vacuum        "FULL"
@@ -301,16 +301,57 @@
                           (if extra {:ex extra} {})))
             (insert-error-row! db-spec query e))))))
 
+
+(def task-queue-sql (java.util.concurrent.LinkedBlockingQueue.))
+(def running-sql (atom true))
+(def worker-sql (atom nil)) ; Holds the future of the worker thread
+
+(defn enqueue-task-sql [task]
+  (.put task-queue-sql task))
+
+(defn worker-loop-sql []
+  (loop []
+    (when @running-sql
+      (let [task (.take task-queue-sql)]
+        (task))))
+  (recur))
+
+(defn start-worker-sql []
+  ;(Thread/sleep 3000)
+  (ut/pp [:starting-sync-worker-thread :sql-sync])
+  (reset! running-sql true)
+  (reset! worker-sql (future (worker-loop-sql))))
+
+(defn stop-worker-sql []
+  (reset! running-sql false)
+  (when-let [w @worker-sql]
+    (future-cancel w)
+    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+      (Thread/sleep 60))))
+
+(defn recycle-worker-sql []
+  ;(ut/pp [:REBOOTING-WORKER-THREAD3!!])
+  ;(System/gc) ;;; hehe, fuck it
+  (stop-worker-sql)
+  (start-worker-sql))
+
+
+
+
+
+
 (defn sql-exec [db-spec query & [extra]]
-  (jdbc/with-db-transaction
-    [t-con db-spec {:isolation :read-uncommitted}]
-    (try
-      (jdbc/db-do-commands t-con query)
-      (catch Exception e
-        (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec
-                           :query (try (subs (str query) 0 1000) (catch Throwable _ (str query)))}
-                          (if extra {:ex extra} {})))
-            (insert-error-row! db-spec query e))))))
+  (enqueue-task-sql
+   (fn [] ;; test
+     (jdbc/with-db-transaction
+       [t-con db-spec {:isolation :read-uncommitted}]
+       (try
+         (jdbc/db-do-commands t-con query)
+         (catch Exception e
+           (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec
+                              :query (try (subs (str query) 0 1000) (catch Throwable _ (str query)))}
+                             (if extra {:ex extra} {})))
+               (insert-error-row! db-spec query e))))))))
 
 ;; (defn sql-exec-no-t [db-spec query & [extra]]
 ;;   (jdbc/with-db-connection
