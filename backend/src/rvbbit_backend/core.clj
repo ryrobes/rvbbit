@@ -328,7 +328,7 @@
 
 
   (defn -main [& args]
-    
+
     ;;(ut/thaw-atom {} "./data/atoms/flow-db-results-atom.edn" flow-db/results-atom true)
     (thaw-flow-results)
     (sql/start-worker-sql) ;; test
@@ -916,14 +916,14 @@
   ;;        res (flow/flow-waiter flow/my-network)]
   ;;    (ut/pp [:flow-answer res])))
 
-    (try (wss/flow-atoms>sql) (catch Exception e (ut/pp [:flow-atoms>sql-error (str e)])))
+    ;;(try (wss/flow-atoms>sql) (catch Exception e (ut/pp [:flow-atoms>sql-error (str e)])))
 
 
 
   ;(def rez (atom nil))
   ;(doall (flow/flow flow/my-network {:debug? true :flow-id "yoyoyoy"} wss/rez))
 
-
+    (evl/create-nrepl-server!)
     (wss/create-web-server!)
     (wss/create-websocket-server!)
 

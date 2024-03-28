@@ -21,7 +21,7 @@
 (def repl-port (get rabbit-config :nrepl-port 8181))
 
 (defn create-nrepl-server! []
-  (ut/pp [:*local-nrepl (format "Starting embedded nREPL server @ %d" repl-port)])
+  (ut/pp [:starting-local-nrepl :port repl-port])
   (reset! repl-server (nrepl-server/start-server
                        :port repl-port
                        :bind "127.0.0.1"

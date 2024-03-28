@@ -87,7 +87,10 @@
    :derived_name
    :updated
    :run_id],
-  :client_items [:item_key :item_type :item_sub_type :value :is_live :sample :ts],
+  :searches-types-sys [:item_type],
+  :client_items
+  [:item_key :item_type :item_sub_type :value :is_live :sample :display_name :ts],
+  :searches-rows-sys [:item_sub_type :display_name :sample :value :is_live],
   :viz-tables-sys [:table_name :recos],
   :tmp-1915673905-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
@@ -95,15 +98,6 @@
   :tmp--1739356619-hist-sys
   [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :viz-shapes0-sys [:shape :recos],
-  :viz-shapes
-  [:axes_logic
-   :base_score
-   :connection_id
-   :library_shapes
-   :selected_view
-   :run_id
-   :shape_name
-   :sql_maps],
   :fields-drag-16
   [:connection_id
    :context_hash
@@ -121,8 +115,6 @@
    :table_name
    :table_type
    :updated],
-  :tmp-1580433758-hist-sys
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :blocks
   [:file_path
    :screen_name
@@ -138,6 +130,7 @@
   :connections-sys [:database_name :connection_id],
   :item-type-drag-5 [:item_type :rowcnt],
   :item-type-drag-0 [:item_type :rowcnt :item_sub_type],
+  :searches-sub-types-sys [:item_key :is_live :items :styler_highlight_4018a],
   :gen-viz-555 [:value :id],
   :reco-counts [:table_name :cnt],
   :screens [:file_path :screen_name :blocks :queries :ts],
@@ -257,6 +250,14 @@
    :order-by [[:rowcnt :desc]],
    :col-widths {:item_type 97, :rowcnt 87, :item_sub_type 227},
    :_last-run "20:15:38"},
+  :searches-sub-types-sys
+  {:select [:item_key :is_live [[:count 1] :items]],
+   :where [:= :item_type "client-params"],
+   :style-rules
+   {[:* :highlight-4018a]
+    {:logic [:= :is_live 1], :style {:border "1px solid #379fb5"}}},
+   :from [:client_items],
+   :group-by [1 2]},
   :gen-viz-555
   {:select [[[:count 1] :value] [:updated :id]],
    :from
@@ -452,7 +453,7 @@
   {:fields
    {:field_name
     {:data-type "string",
-     :distinct 7,
+     :distinct 8,
      :group-by? true,
      :commons {"value" 1, "ts" 1, "sample" 1},
      :cardinality 100},
@@ -460,15 +461,15 @@
     {:data-type "string",
      :distinct 3,
      :group-by? true,
-     :commons {"TEXT" 5, "TIMESTAMP" 1, "BOOLEAN" 1},
-     :cardinality 42},
+     :commons {"TEXT" 6, "TIMESTAMP" 1, "BOOLEAN" 1},
+     :cardinality 37},
     :data_type
     {:data-type "string",
      :distinct 3,
      :group-by? true,
-     :commons {"string" 5, "datetime" 1, "boolean" 1},
-     :cardinality 42}},
-   :rowcount 7},
+     :commons {"string" 6, "datetime" 1, "boolean" 1},
+     :cardinality 37}},
+   :rowcount 8},
   :tmp--712501881-hist-sys
   {:fields
    {:kp
@@ -569,7 +570,7 @@
     {:data-type "integer",
      :distinct 6,
      :group-by? false,
-     :commons {9 2, 108 1, 574 1},
+     :commons {9 2, 102 1, 570 1},
      :cardinality 85},
     :data_type
     {:data-type "string",
@@ -612,40 +613,37 @@
      :cardinality 100},
     :fields
     {:data-type "integer",
-     :distinct 16,
+     :distinct 15,
      :group-by? false,
-     :commons {6 4, 5 3, 12 2},
-     :cardinality 63}},
+     :commons {6 4, 5 3, 9 2},
+     :cardinality 60}},
    :rowcount 25},
   :client-items-drag-item-key-5
   {:fields
    {:item_type
     {:data-type "string",
-     :distinct 5,
+     :distinct 6,
      :group-by? true,
-     :commons {":client" 224, ":views" 152, ":queries" 75},
-     :cardinality 0},
+     :commons {"saved-queries" 344, "saved-views" 66, "client-views" 55},
+     :cardinality 1},
     :item_sub_type
     {:data-type "string",
-     :distinct 104,
+     :distinct 328,
      :group-by? true,
-     :commons {":connections-sys" 46, ":sys" 32, ":flows-sys" 31},
-     :cardinality 20},
+     :commons {"heya!" 14, "" 12, "oz" 9},
+     :cardinality 65},
     :item_key
     {:data-type "string",
-     :distinct 128,
+     :distinct 68,
      :group-by? true,
-     :commons
-     {"aaa-run-amok" 17,
-      "SSSSSSuccessful-oval-sea-urchin-of-mountain-range" 15,
-      "bigfoot-snapshots" 14},
-     :cardinality 25},
+     :commons {"chaos-views" 88, "chaos simple" 63, "boston-test-10-3-23" 22},
+     :cardinality 13},
     :rowcnt
     {:data-type "integer",
-     :distinct 6,
+     :distinct 2,
      :group-by? false,
-     :commons {3 155, 2 123, 1 110},
-     :cardinality 1}},
+     :commons {1 413, 2 87},
+     :cardinality 0}},
    :rowcount 500},
   :recos-sys2
   {:fields
@@ -758,45 +756,49 @@
   :client-items-drag-20
   {:fields
    {:is_live
-    {:data-type "unknown",
-     :distinct 1,
+    {:data-type "integer",
+     :distinct 2,
      :group-by? true,
-     :commons {nil 500},
+     :commons {0 338, 1 162},
      :cardinality 0},
     :item_key
     {:data-type "string",
-     :distinct 23,
+     :distinct 15,
      :group-by? true,
      :commons
-     {"pres-sql-test-1" 110, "canvas-scrubber-test1" 61, "poor-touring-me" 43},
-     :cardinality 4},
+     {"good-cylindrical-ape-exiled-from-calanque" 62,
+      "classic-icosahedral-gnat-of-salt-flat" 59,
+      "instinctive-short-clam-of-the-barrier-island" 59},
+     :cardinality 2},
     :item_sub_type
     {:data-type "string",
-     :distinct 125,
+     :distinct 106,
      :group-by? true,
-     :commons {":queries" 162, ":views" 97, ":hi" 34},
-     :cardinality 25},
+     :commons {"block-1913" 12, "block-9369" 12, "block-11251" 12},
+     :cardinality 21},
     :item_type
     {:data-type "string",
-     :distinct 3,
+     :distinct 2,
      :group-by? true,
-     :commons {":block" 259, ":views" 127, ":queries" 114},
+     :commons {"client-views" 327, "client-queries" 173},
      :cardinality 0},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-03-28 01:37:12" 500},
+     :commons {"2024-03-28 05:04:54" 500},
      :cardinality 0},
     :value
     {:data-type "string",
      :distinct 500,
      :group-by? true,
      :commons
-     {":screen/SSuccessful-oval-sea-urchin-of-mountain-range>panels>block-4855>views"
+     {":panel/kind-pentagonal-gnu-banned-from-v-shaped-valley>block-8356>views>hi"
       1,
-      ":screen/aaa-run-amok>panels>block-12249>queries>rowcnt-drag-9" 1,
-      ":screen/pres-sql-test-1>panels>block-2457>views" 1},
+      ":panel/electrifying-pyramidal-platypus-banned-from-depressions>block-2536>views>stack"
+      1,
+      ":panel/lucid-amaranth-leopard-hailing-from-endorheic-basin>block-11530>views>flow-play-runstreamed"
+      1},
      :cardinality 100}},
    :rowcount 500},
   :viz-shapes0-sys2
@@ -962,49 +964,50 @@
      :cardinality 0},
     :item_key
     {:data-type "string",
-     :distinct 14,
+     :distinct 25,
      :group-by? true,
      :commons
-     {"looking-glass-redux2" 100,
-      "night-city-never-sleeps" 79,
-      "error-monitor-vanessa" 68},
-     :cardinality 2},
+     {"error-monitor-vanessa3" 94,
+      "pres-sql-test-1" 89,
+      "canvas-scrubber-test1" 48},
+     :cardinality 5},
     :item_sub_type
     {:data-type "string",
-     :distinct 124,
+     :distinct 162,
      :group-by? true,
-     :commons {":queries" 152, ":views" 109, ":hi" 28},
-     :cardinality 24},
+     :commons {"" 205, "hi" 35, "stack" 29},
+     :cardinality 32},
     :item_type
     {:data-type "string",
      :distinct 3,
      :group-by? true,
-     :commons {":block" 261, ":views" 135, ":queries" 104},
+     :commons {"saved-block" 205, "saved-queries" 148, "saved-views" 147},
      :cardinality 0},
     :sample
     {:data-type "string",
-     :distinct 500,
+     :distinct 384,
      :group-by? true,
      :commons
-     {"[\"looking-glass-redux2\" :panels :block-8805 :queries]" 1,
-      "[\"looking-glass-redux2\" :panels :block-2536 :views :hi]" 1,
-      "[\"night-city-never-sleeps\" :panels :query-preview-block-1977005710:inviz_536 :queries]"
-      1},
-     :cardinality 100},
+     {"[:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]" 28,
+      "[:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 70"
+      14,
+      "[:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:re"
+      13},
+     :cardinality 76},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-03-28 01:37:12" 500},
+     :commons {"2024-03-28 05:04:54" 500},
      :cardinality 0},
     :value
     {:data-type "string",
      :distinct 500,
      :group-by? true,
      :commons
-     {":screen/wonderland-horror-interface>panels>block-7153>views>pulled-val" 1,
-      ":screen/error-monitor-vanessa>panels>block-6532>queries" 1,
-      ":screen/looking-glass-redux2>panels>block-10376>views>param-val" 1},
+     {":screen/canvas-scrubber-test1>panels>block-3523" 1,
+      ":screen/tallica-param-test2>panels>block-7192" 1,
+      ":screen/pres-sql-test-1>panels>block-2057>views>param-val" 1},
      :cardinality 100}},
    :rowcount 500},
   :rowcnt-drag-7
@@ -1013,16 +1016,16 @@
     {:data-type "integer",
      :distinct 1,
      :group-by? false,
-     :commons {15447 1},
+     :commons {6153 1},
      :cardinality 100}},
    :rowcount 1},
   :blocks-drag-44
   {:fields
    {:ts_2
     {:data-type "string",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-03-28 01:36:35" 500},
+     :commons {"2024-03-28 05:02:17" 293, "2024-03-28 05:02:16" 207},
      :cardinality 0},
     :is_live
     {:data-type "unknown",
@@ -1259,9 +1262,9 @@
      :cardinality 0},
     :updated
     {:data-type "string",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-03-28 01:36:39" 500},
+     :commons {"2024-03-28 05:02:21" 407, "2024-03-28 05:02:20" 93},
      :cardinality 0},
     :db_catalog
     {:data-type "unknown",
@@ -1271,9 +1274,9 @@
      :cardinality 0},
     :field_name
     {:data-type "string",
-     :distinct 236,
+     :distinct 237,
      :group-by? true,
-     :commons {"*" 45, "ts" 14, "connection_id" 12},
+     :commons {"*" 44, "ts" 14, "connection_id" 12},
      :cardinality 47},
     :derived_calc
     {:data-type "unknown",
@@ -1291,13 +1294,13 @@
     {:data-type "string",
      :distinct 7,
      :group-by? true,
-     :commons {"string" 298, "float" 55, "unknown" 53},
+     :commons {"string" 299, "float" 55, "unknown" 52},
      :cardinality 1},
     :field_type
     {:data-type "string",
      :distinct 43,
      :group-by? true,
-     :commons {"TEXT" 216, "INTEGER" 49, "special" 45},
+     :commons {"TEXT" 217, "INTEGER" 49, "special" 44},
      :cardinality 8},
     :table_name
     {:data-type "string",
@@ -1319,59 +1322,124 @@
      :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
      :cardinality 9}},
    :rowcount 500},
+  :searches-types-sys
+  {:fields
+   {:item_type
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"saved-views" 1, "saved-queries" 1, "saved-block" 1},
+     :cardinality 100}},
+   :rowcount 7},
   :client_items
   {:fields
    {:item_key
     {:data-type "string",
-     :distinct 23,
+     :distinct 15,
      :group-by? true,
      :commons
-     {"pres-sql-test-1" 110, "canvas-scrubber-test1" 61, "poor-touring-me" 43},
-     :cardinality 4},
+     {"good-cylindrical-ape-exiled-from-calanque" 62,
+      "classic-icosahedral-gnat-of-salt-flat" 59,
+      "instinctive-short-clam-of-the-barrier-island" 59},
+     :cardinality 2},
     :item_type
     {:data-type "string",
-     :distinct 3,
+     :distinct 2,
      :group-by? true,
-     :commons {":block" 259, ":views" 127, ":queries" 114},
+     :commons {"client-views" 327, "client-queries" 173},
      :cardinality 0},
     :item_sub_type
     {:data-type "string",
-     :distinct 125,
+     :distinct 106,
      :group-by? true,
-     :commons {":queries" 162, ":views" 97, ":hi" 34},
-     :cardinality 25},
+     :commons {"block-1913" 12, "block-9369" 12, "block-11251" 12},
+     :cardinality 21},
     :value
     {:data-type "string",
      :distinct 500,
      :group-by? true,
      :commons
-     {":screen/SSuccessful-oval-sea-urchin-of-mountain-range>panels>block-4855>views"
+     {":panel/kind-pentagonal-gnu-banned-from-v-shaped-valley>block-8356>views>hi"
       1,
-      ":screen/aaa-run-amok>panels>block-12249>queries>rowcnt-drag-9" 1,
-      ":screen/pres-sql-test-1>panels>block-2457>views" 1},
+      ":panel/electrifying-pyramidal-platypus-banned-from-depressions>block-2536>views>stack"
+      1,
+      ":panel/lucid-amaranth-leopard-hailing-from-endorheic-basin>block-11530>views>flow-play-runstreamed"
+      1},
      :cardinality 100},
     :is_live
-    {:data-type "unknown",
-     :distinct 1,
+    {:data-type "integer",
+     :distinct 2,
      :group-by? true,
-     :commons {nil 500},
+     :commons {0 338, 1 162},
      :cardinality 0},
     :sample
     {:data-type "string",
-     :distinct 500,
+     :distinct 120,
      :group-by? true,
      :commons
-     {"[\"aaa-run-amok\" :panels :block-111 :views :oz]" 1,
-      "[\"blue-pines\" :panels :hello-there-brother :views]" 1,
-      "[\"bunch of bullshit2\" :panels :block-723 :queries]" 1},
-     :cardinality 100},
+     {"[:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]" 79,
+      "[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"45px\"}"
+      16,
+      "[:box :attr {:id \":block-6121.:hi\"} :style {:font-size \"15px\", :padding-top \"6px"
+      12},
+     :cardinality 23},
+    :display_name
+    {:data-type "string",
+     :distinct 84,
+     :group-by? true,
+     :commons {":hi" 79, ":stack" 79, ":param-val" 47},
+     :cardinality 16},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-03-28 01:37:12" 500},
+     :commons {"2024-03-28 05:04:54" 500},
      :cardinality 0}},
    :rowcount 500},
+  :searches-rows-sys
+  {:fields
+   {:item_sub_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"param" 11},
+     :cardinality 9},
+    :display_name
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons
+     {":selected-block" 1, ":unreal-magenta-frog" 1, ":active-silver-buffalo" 1},
+     :cardinality 100},
+    :sample
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons
+     {"[\"PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highl"
+      2,
+      "[\"A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pr"
+      1,
+      "[:views :quiet-peach-armadillo]" 1},
+     :cardinality 90},
+    :value
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons
+     {":client/awesome-pentagonal-swallow-banned-from-atoll>param>reliable-coral-moose"
+      1,
+      ":client/awesome-pentagonal-swallow-banned-from-atoll>param>selected-view-data"
+      1,
+      ":client/awesome-pentagonal-swallow-banned-from-atoll>param>selected-view" 1},
+     :cardinality 100},
+    :is_live
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 11},
+     :cardinality 9}},
+   :rowcount 11},
   :viz-tables-sys
   {:fields
    {:table_name
@@ -1558,76 +1626,6 @@
      :commons {27 6, 4 4, 8 3},
      :cardinality 42}},
    :rowcount 26},
-  :viz-shapes
-  {:fields
-   {:axes_logic
-    {:data-type "string",
-     :distinct 26,
-     :group-by? true,
-     :commons
-     {"{:x [:and :dimension? [:or :looks-like-date? :looks-like-datetime? :is-date? :is-datetime?]], :y [:measure?]}"
-      3,
-      "{:x [:and :dimension? [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :color [:and :dimension? [:or :low-cardinality? :very-low-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :y [:measure?]}"
-      3,
-      "{:x [:or [:and :dimension? [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]] [:or :looks-like-date? :looks-like-datetime? :is-date? :is-datetime?]], :y [:measure?]}"
-      3},
-     :cardinality 70},
-    :base_score
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {1 37},
-     :cardinality 2},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"system-db" 37},
-     :cardinality 2},
-    :library_shapes
-    {:data-type "string",
-     :distinct 36,
-     :group-by? true,
-     :commons
-     {"[:box :child [:vega-lite {:width \"container\", :height :panel-height+50, :autosize \"none\", :padding {:top 0, :bottom 0, :left 0, :right 0}, :params [{:name \"tx\", :expr \"width/2\"} {:name \"ty\", :expr \"height/2\"} {:name \"zoom_precise\", :value 4, :bind {:input \"range\", :min 2, :max 30, :step 0.05}} {:name \"centerY\", :value 38.76, :bind {:input \"range\", :min -60, :max 60, :step 0.01}} {:name \"centerX\", :value -97.17, :bind {:input \"range\", :min -180, :max 180, :step 0.01}} {:name \"baseTileSize\", :value 256} {:name \"tileUrl\", :value \"https://a.tile.openstreetmap.org/\"} {:name \"zoom\", :expr \"ceil(zoom_precise)\"} {:name \"tilesCount\", :expr \"pow(2,zoom)\"} {:name \"tileSize\", :expr \"baseTileSize*pow(2,zoom_precise-zoom)\"} {:name \"maxTiles\", :expr \"ceil(max(height,width)/tileSize +1)\"} {:name \"basePoint\", :expr \"invert('projection',[0,0])\"} {:name \"dii\", :expr \"((basePoint[0]+180)/360*tilesCount)\"} {:name \"di\", :expr \"floor(dii)\"} {:name \"dx\", :expr \"round((floor(dii)-dii)*tileSize)\"} {:name \"djj\", :expr \"((1-log(tan(basePoint[1]*PI/180) + 1/cos(basePoint[1]*PI/180))/PI)/2 *tilesCount)\"} {:name \"dj\", :expr \"floor(djj)\"} {:name \"dy\", :expr \"round((floor(djj)-djj)*tileSize)\"} {:name \"scale\", :expr \"baseTileSize * pow(2,zoom_precise) / (2 * PI)\"}], :layer [[:if :condi/geo-background? {:data {:name \"tile_list\", :sequence {:start 0, :stop {:signal \"maxTiles\"}, :as \"a\"}}, :transform [{:calculate \"sequence(0,maxTiles)\", :as \"b\"} {:flatten [\"b\"]} {:calculate \"tileUrl+zoom+'/'+(datum.a+di+tilesCount)%tilesCount+'/'+((datum.b+dj))+'.png'\", :as \"url\"} {:calculate \"(datum.a * tileSize + dx)+(tileSize/2)\", :as \"x\"} {:calculate \"(datum.b * tileSize + dy)+(tileSize/2)\", :as \"y\"}], :mark {:type \"image\", :opacity 0.5, :background \"#000000\", :fill \"#000000\", :width {:signal \"tileSize\"}, :height {:signal \"tileSize\"}}, :encoding {:x {:field \"x\", :type \"quantitative\", :scale nil}, :y {:field \"y\", :type \"quantitative\", :scale nil}, :url {:field \"url\", :type \"nominal\"}}} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/us-counties? {:data {:name \"us-counties\", :url \"https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json\", :format {:type \"topojson\", :feature \"counties\"}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}, :mark \"geoshape\", :transform [{:lookup :id, :from {:data {:values :query-preview}, :key :county-field, :fields [:county-field :color-field]}}], :encoding {:color {:field :color-field, :type \"nominal\", :scale {:scheme \"spectral\"}}, :stroke {:value \"#FFA50077\"}, :strokeWidth {:value 2}}, :background \"transparent\"} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/us-states? {:data {:name \"us-states\", :url \"https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json\", :format {:type \"topojson\", :feature \"states\"}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}, :mark \"geoshape\", :encoding {:stroke {:value \"#FFA50077\"}, :strokeWidth {:value 2}}, :background \"transparent\"} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/country-lines? {:data {:name \"world\", :url \"https://vega.github.io/vega-datasets/data/world-110m.json\", :format {:type \"topojson\", :feature \"countries\"}}, :mark \"geoshape\", :encoding {:fill {:value \"#FFA500\"}, :fillOpacity {:value 0.1}, :stroke {:value \"#FFA500\"}, :strokeWidth {:value 2}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}]], :background \"transparent\", :config {:view {:stroke \"transparent\"}}} {:actions false}]]"
-      2,
-      "[:nivo-treemap {:orientLabel false, :labelTextColor \"#000000\", :tile \"squarify\", :identity :name, :labelSkipSize 12, :borderColor \"#000000\", :value :y-field, :enableLabel true, :width :panel-width+70, :parentLabelPosition \"top\", :colors {:scheme \"nivo\"}, :transformation-map {:transform-select [[[:sum :y-field] :y-field] [:x2-field :name]], :from [:data], :nest-by [:x1-field :x2-field]}, :theme :theme/nivo-defaults, :leavesOnly false, :click {:c :x1-field, :x :x2-field, :y :y-field}, :label :name, :parentLabelSize 22, :parentLabelTextColor \"#ffffff\", :enableParentLabel true, :parentLabel \"id\", :height :panel-height+50, :margin {:top 15, :right 5, :bottom 15, :left 15}, :data :query-preview}]"
-      1,
-      "[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
-      1},
-     :cardinality 97},
-    :selected_view
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"" 33, ":reech" 3, ":grid" 1},
-     :cardinality 8},
-    :run_id
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 37},
-     :cardinality 2},
-    :shape_name
-    {:data-type "string",
-     :distinct 37,
-     :group-by? true,
-     :commons
-     {"scatterplot_nivo_color" 1, "point_map_freq" 1, "basic_h_bar_avg_color" 1},
-     :cardinality 100},
-    :sql_maps
-    {:data-type "string",
-     :distinct 23,
-     :group-by? true,
-     :commons
-     {"[{:select [[[[:sum :y-field]] :y-field] :x-field], :from [:table], :group-by [:x-field]}]"
-      8,
-      "[{:select [[[[:sum :y-field]] :y-field] :x-field :color-field], :from [:table], :group-by [:x-field :color-field]}]"
-      5,
-      "[{:select [[[[:sum :y-field]] :agg] :x-field], :from [:table], :order-by [[:x-field :desc]], :group-by [:x-field]} {:select [[[:max [:round [:raw [\"(100 * ((\" :query-preview/agg.0 \".0 - \" :query-preview/agg.1 \".0) / \" :query-preview/agg.0 \".0))\"]] 2]] :diff]]}]"
-      2},
-     :cardinality 62}},
-   :rowcount 37},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -1677,9 +1675,9 @@
      :cardinality 0},
     :updated
     {:data-type "string",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-03-28 01:36:39" 500},
+     :commons {"2024-03-28 05:02:21" 407, "2024-03-28 05:02:20" 93},
      :cardinality 0},
     :db_catalog
     {:data-type "unknown",
@@ -1689,9 +1687,9 @@
      :cardinality 0},
     :field_name
     {:data-type "string",
-     :distinct 236,
+     :distinct 237,
      :group-by? true,
-     :commons {"*" 45, "ts" 14, "connection_id" 12},
+     :commons {"*" 44, "ts" 14, "connection_id" 12},
      :cardinality 47},
     :derived_calc
     {:data-type "unknown",
@@ -1709,13 +1707,13 @@
     {:data-type "string",
      :distinct 7,
      :group-by? true,
-     :commons {"string" 298, "float" 55, "unknown" 53},
+     :commons {"string" 299, "float" 55, "unknown" 52},
      :cardinality 1},
     :field_type
     {:data-type "string",
      :distinct 43,
      :group-by? true,
-     :commons {"TEXT" 216, "INTEGER" 49, "special" 45},
+     :commons {"TEXT" 217, "INTEGER" 49, "special" 44},
      :cardinality 8},
     :table_name
     {:data-type "string",
@@ -1737,89 +1735,6 @@
      :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
      :cardinality 9}},
    :rowcount 500},
-  :tmp-1580433758-hist-sys
-  {:fields
-   {:kp
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"[:block-273 :views :oz]" 4},
-     :cardinality 25},
-    :key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":oz" 4},
-     :cardinality 25},
-    :updated
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"2024-03-28 02:05:45" 1, "2024-03-28 02:09:05" 1, "2024-03-28 02:09:14" 1},
-     :cardinality 100},
-    :type
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":views" 4},
-     :cardinality 25},
-    :panel_key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":block-273" 4},
-     :cardinality 25},
-    :diff_kp
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"([1 :arcLinkLabelsTextColor] [1 :data] [1 :margin :left] [1 :margin :bottom] [1 :margin :right] [1 :margin :top] [1 :margin] [1 :height] [1 :arcLabelsSkipAngle] [1 :click :y] [1 :click :c] [1 :click] [1 :arcLinkLabelsSkipAngle] [1 :theme] [1 :activeOuterRadiusOffset] [1 :cornerRadius] [1 :borderWidth] [1 :arcLinkLabelsThickness] [1 :width] [1 :innerRadius] [1 :padAngle] [1] [0])"
-      1,
-      "()" 1,
-      "([1 :arcLinkLabelsSkipAngle] [1] [0])" 1},
-     :cardinality 100},
-    :client_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {":good-cylindrical-ape-exiled-from-calanque" 4},
-     :cardinality 25},
-    :pre_data
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"nil" 1,
-      "[:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :theme :theme/nivo-defaults, :arcLinkLabelsSkipAngle 10, :click {:c :updated, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :gen-viz-555, :arcLinkLabelsTextColor \"#ffffff\"}]"
-      1,
-      "[:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :arcLinkLabelsSkipAngle 10, :click {:c :updated, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :gen-viz-555, :arcLinkLabelsTextColor \"#ffffff\"}]"
-      1},
-     :cardinality 100},
-    :diff
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"[:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :theme :theme/nivo-defaults, :arcLinkLabelsSkipAngle 10, :click {:c :updated, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :gen-viz-555, :arcLinkLabelsTextColor \"#ffffff\"}]"
-      1,
-      "nil" 1,
-      "[nil {:arcLinkLabelsSkipAngle 15}]" 1},
-     :cardinality 100},
-    :data
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"[:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :theme :theme/nivo-defaults, :arcLinkLabelsSkipAngle 10, :click {:c :updated, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :gen-viz-555, :arcLinkLabelsTextColor \"#ffffff\"}]"
-      1,
-      "[:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :arcLinkLabelsSkipAngle 10, :click {:c :updated, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :gen-viz-555, :arcLinkLabelsTextColor \"#ffffff\"}]"
-      1,
-      "[:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :arcLinkLabelsSkipAngle 15, :click {:c :updated, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :gen-viz-555, :arcLinkLabelsTextColor \"#ffffff\"}]"
-      1},
-     :cardinality 100}},
-   :rowcount 4},
   :blocks
   {:fields
    {:query_names
@@ -1861,9 +1776,9 @@
      :cardinality 87},
     :ts
     {:data-type "string",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-03-28 01:36:35" 500},
+     :commons {"2024-03-28 05:02:17" 293, "2024-03-28 05:02:16" 207},
      :cardinality 0},
     :tab_name
     {:data-type "string",
@@ -2010,38 +1925,68 @@
   {:fields
    {:item_type
     {:data-type "string",
-     :distinct 5,
+     :distinct 7,
      :group-by? true,
-     :commons {":flow" 1, ":views" 1, ":queries" 1},
+     :commons {"flow-values" 1, "client-queries" 1, "client-params" 1},
      :cardinality 100},
     :rowcnt
     {:data-type "integer",
-     :distinct 5,
+     :distinct 7,
      :group-by? false,
-     :commons {44 1, 1503 1, 1529 1},
+     :commons {32 1, 232 1, 494 1},
      :cardinality 100}},
-   :rowcount 5},
+   :rowcount 7},
   :item-type-drag-0
   {:fields
    {:item_type
     {:data-type "string",
-     :distinct 5,
+     :distinct 7,
      :group-by? true,
-     :commons {":queries" 420, ":views" 38, ":client" 36},
-     :cardinality 0},
+     :commons {"saved-queries" 295, "client-views" 86, "client-queries" 61},
+     :cardinality 1},
     :rowcnt
     {:data-type "integer",
-     :distinct 39,
+     :distinct 28,
      :group-by? false,
-     :commons {2 195, 1 159, 3 44},
-     :cardinality 7},
+     :commons {2 210, 1 88, 5 63},
+     :cardinality 5},
     :item_sub_type
     {:data-type "string",
-     :distinct 492,
+     :distinct 461,
      :group-by? true,
-     :commons {":query-11325" 2, ":query-6018" 2, ":query-4704" 2},
-     :cardinality 98}},
+     :commons {"block-11072" 3, "block-510" 3, "block-10980" 3},
+     :cardinality 92}},
    :rowcount 500},
+  :searches-sub-types-sys
+  {:fields
+   {:item_key
+    {:data-type "string",
+     :distinct 47,
+     :group-by? true,
+     :commons
+     {"kind-pentagonal-gnu-banned-from-v-shaped-valley" 1,
+      "enchanting-cobalt-gull-banned-from-inlet" 1,
+      "brave-black-buffalo-hailing-from-bayou" 1},
+     :cardinality 100},
+    :is_live
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 41, 1 6},
+     :cardinality 4},
+    :items
+    {:data-type "integer",
+     :distinct 7,
+     :group-by? false,
+     :commons {11 22, 12 10, 4 8},
+     :cardinality 14},
+    :styler_highlight_4018a
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {0 41, 1 6},
+     :cardinality 4}},
+   :rowcount 47},
   :duration-hours-drag-43
   {:fields
    {:duration_hours
@@ -2076,18 +2021,18 @@
   {:fields
    {:value
     {:data-type "integer",
-     :distinct 5,
+     :distinct 4,
      :group-by? false,
-     :commons {4 1, 51 1, 29 1},
+     :commons {32 1, 25 1, 784 1},
      :cardinality 100},
     :id
     {:data-type "string",
-     :distinct 5,
+     :distinct 4,
      :group-by? false,
      :commons
-     {"2024-03-28 01:36:58" 1, "2024-03-28 01:36:57" 1, "2024-03-28 01:36:56" 1},
+     {"2024-03-28 05:03:19" 1, "2024-03-28 05:03:18" 1, "2024-03-28 05:02:21" 1},
      :cardinality 100}},
-   :rowcount 5},
+   :rowcount 4},
   :reco-counts {:fields {}, :rowcount 0},
   :screens
   {:fields
@@ -2229,10 +2174,18 @@
    :rowcount 30}},
  :default-col-widths
  {:viz-shapes0-list* {:viz-shapes0-sys 155},
-  :block-8334 {:rowcnt-drag-7 161},
+  :block-8334
+  {:rowcnt-drag-7 161,
+   :rowcnt-drag-7-hist-96-1335084588 411,
+   :rowcnt-drag-7-hist-58-1335084588 ##Inf,
+   :rowcnt-drag-7-hist-41-1335084588 ##Inf,
+   :rowcnt-drag-7-hist-74-1335084588 ##Inf,
+   :rowcnt-drag-7-hist-23-1335084588 ##Inf,
+   :rowcnt-drag-7-hist-28-1335084588 ##Inf},
   :block-983 {:gen-viz-1132 255},
   :block-5345 {:blocks-drag-34 110},
   :block-4821 {:client-items-drag-0 1461},
+  :searches-sub-types-sys-list* {:searches-sub-types-sys 205},
   :block-2196 {:boards-drag-21 ##Inf},
   :block-3166 {:client-items-drag-20 243},
   :block-2509 {:blocks-drag-22 106},
@@ -2252,6 +2205,7 @@
   :block-11291 {:item-type-drag-5 180, :item-type-drag-5-hist-42895352128 205},
   :recos-list* {:recos-sys 182},
   :system-tables-list* {:tables-sys 137},
+  :searches-types-list* {:searches-types-sys 111},
   :block-273
   {:gen-viz-555 255,
    :gen-viz-555-hist-24-963766714 205,
@@ -2259,14 +2213,16 @@
    :gen-viz-555-hist-28-963766714 ##Inf,
    :gen-viz-555-hist-31-963766714 205,
    :gen-viz-555-hist-117-963766714 ##Inf,
-   :gen-viz-555-hist-60-963766714 ##Inf}},
+   :gen-viz-555-hist-60-963766714 ##Inf},
+  :searches-rows-sys-list* {:searches-rows-sys 170}},
  :runstream-drops nil,
- :data-hash 1649533410,
+ :data-hash 186730811,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
-  "violet ferret"],
+  "violet ferret"
+  "octohedral alligator"],
  :selected-cols nil,
  :server
  {:settings
@@ -2463,8 +2419,8 @@
    :open-outputs? true}},
  :editor? false,
  :session-modal? false,
- :buffy? true,
- :memory [1109767121 1017256977 4294705152],
+ :buffy? false,
+ :memory [2575232190 2437048370 4294705152],
  :preview-keys ["946717543" "-855037229" "-683028133"],
  :status-data
  {"kick-test!"
@@ -2472,21 +2428,21 @@
    {:data
     [{:sent! "kick-test!",
       :to :good-cylindrical-ape-exiled-from-calanque,
-      :at "2024-03-27 22:08:49",
+      :at "2024-03-28 01:05:11",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-03-27 22:08:49 - query ran in 1 ms."],
-          :name "query-log-:gen-viz-555-hist-60-963766714",
-          :order 1711591729,
+        [{:content ["2024-03-28 01:05:11 - query ran in 66 ms."],
+          :name "query-log-:rowcnt-drag-2",
+          :order 1711602311,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
-        :description "query-log-:gen-viz-555-hist-60-963766714",
+        :description "query-log-:rowcnt-drag-2",
         :mutates {},
         :options {:actions? false, :pages? false, :search? false},
         :parameters {}}},
-      :payload-kp [:gen-viz-555-hist-60-963766714 "kick-test!"]}
+      :payload-kp [:rowcnt-drag-2 "kick-test!"]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -2495,7 +2451,7 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-03-27 22:13:50",
+      :at "2024-03-28 02:22:36",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -2504,101 +2460,27 @@
   :alert1
   {:alerts
    {:data
-    [[[:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data
-         [{:mem 1068, :tick 524, :threads 94, :subs 38, :load 3.13427734375}
-          {:mem 1371, :tick 525, :threads 91, :subs 38, :load 3.89697265625}
-          {:mem 463, :tick 526, :threads 93, :subs 38, :load 3.98876953125}
-          {:mem 749, :tick 527, :threads 93, :subs 38, :load 3.90283203125}
-          {:mem 1044, :tick 528, :threads 92, :subs 38, :load 3.9306640625}
-          {:mem 478, :tick 529, :threads 106, :subs 38, :load 3.625}
-          {:mem 771, :tick 530, :threads 97, :subs 38, :load 3.38232421875}
-          {:mem 1050, :tick 531, :threads 92, :subs 38, :load 4.3154296875}
-          {:mem 1370, :tick 532, :threads 91, :subs 38, :load 4.69384765625}
-          {:mem 773, :tick 533, :threads 101, :subs 38, :load 5.158203125}
-          {:mem 1415, :tick 534, :threads 94, :subs 38, :load 4.94775390625}
-          {:mem 526, :tick 535, :threads 73, :subs 38, :load 4}
-          {:mem 1406, :tick 536, :threads 98, :subs 38, :load 4.26416015625}
-          {:mem 1398, :tick 537, :threads 94, :subs 38, :load 4.607421875}
-          {:mem 1191, :tick 538, :threads 96, :subs 38, :load 4.10546875}
-          {:mem 985, :tick 539, :threads 96, :subs 38, :load 3.857421875}
-          {:mem 520, :tick 540, :threads 90, :subs 38, :load 3.53662109375}
-          {:mem 1111, :tick 541, :threads 92, :subs 38, :load 3.28564453125}
-          {:mem 424, :tick 542, :threads 92, :subs 38, :load 3.15771484375}
-          {:mem 825, :tick 543, :threads 87, :subs 38, :load 2.763671875}
-          {:mem 1412, :tick 544, :threads 112, :subs 38, :load 3.5712890625}
-          {:mem 321, :tick 545, :threads 125, :subs 38, :load 3.5615234375}
-          {:mem 1034, :tick 546, :threads 130, :subs 38, :load 5.271484375}
-          {:mem 764, :tick 547, :threads 97, :subs 38, :load 5.06005859375}
-          {:mem 547, :tick 548, :threads 104, :subs 38, :load 4.82763671875}
-          {:mem 927, :tick 549, :threads 102, :subs 38, :load 4.37744140625}
-          {:mem 848, :tick 550, :threads 101, :subs 38, :load 6.041015625}
-          {:mem 1131, :tick 551, :threads 111, :subs 38, :load 5.0576171875}
-          {:mem 892, :tick 552, :threads 110, :subs 38, :load 4.505859375}
-          {:mem 912, :tick 553, :threads 104, :subs 38, :load 3.5986328125}
-          {:mem 1129, :tick 554, :threads 98, :subs 38, :load 3.06982421875}
-          {:mem 471, :tick 555, :threads 93, :subs 38, :load 3.57080078125}
-          {:mem 853, :tick 556, :threads 92, :subs 38, :load 3.36572265625}
-          {:mem 1233, :tick 557, :threads 90, :subs 38, :load 3.83447265625}
-          {:mem 601, :tick 558, :threads 94, :subs 38, :load 3.6806640625}
-          {:mem 961, :tick 559, :threads 93, :subs 38, :load 4.6240234375}
-          {:mem 543, :tick 560, :threads 90, :subs 38, :load 4.54248046875}
-          {:mem 905, :tick 561, :threads 90, :subs 38, :load 3.65234375}
-          {:mem 1300, :tick 562, :threads 93, :subs 38, :load 3.44482421875}
-          {:mem 627, :tick 563, :threads 92, :subs 38, :load 3.68603515625}
-          {:mem 997, :tick 564, :threads 94, :subs 38, :load 3.52685546875}
-          {:mem 1395, :tick 565, :threads 94, :subs 38, :load 4.0771484375}
-          {:mem 659, :tick 566, :threads 89, :subs 38, :load 3.50048828125}
-          {:mem 1031, :tick 567, :threads 92, :subs 38, :load 3.3173828125}
-          {:mem 344, :tick 568, :threads 96, :subs 38, :load 3.3583984375}
-          {:mem 689, :tick 569, :threads 96, :subs 38, :load 4.01904296875}
-          {:mem 1067, :tick 570, :threads 92, :subs 38, :load 3.68701171875}
-          {:mem 666, :tick 571, :threads 121, :subs 38, :load 2.890625}
-          {:mem 1140, :tick 572, :threads 85, :subs 38, :load 2.97607421875}
-          {:mem 697, :tick 573, :threads 100, :subs 38, :load 4.9814453125}],
-         :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
-        [:> :XAxis {:dataKey :tick, :hide true}]
-        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
-        [:>
-         :YAxis
-         {:yAxisId "right", :hide true, :dataKey :threads, :orientation "right"}]
-        [:>
-         :Bar
-         {:yAxisId "left",
-          :dataKey :mem,
-          :isAnimationActive false,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:string :theme/editor-outer-rim-color "33"]}]
-        [:>
-         :Line
-         {:yAxisId "right",
-          :strokeWidth 4,
-          :type "monotone",
-          :dot false,
-          :dataKey :threads,
-          :isAnimationActive false,
-          :stroke :theme/editor-grid-selected-background-color,
-          :fill :theme/editor-grid-selected-background-color}]
-        [:>
-         :Line
-         {:stroke :theme/block-tab-selected-font-color,
-          :fill :theme/block-tab-selected-font-color,
-          :type "monotone",
-          :yAxisId "right",
-          :dataKey :subs,
-          :strokeWidth 3,
-          :strokeDasharray "5 5",
-          :dot false,
-          :isAnimationActive false}]]]
+    [[[:v-box
+       :justify
+       :center
+       :style
+       {:margin-top "-6px", :color "inherit"}
+       :children
+       [[:box :child "flow openai-image-gen-ladder has finished"]
+        nil
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "51 seconds "]
+        [:box
+         :style
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
+         :child
+         "returns: ./images/gen/b64-image-63796-59734.png"]]]
       10
-      4
-      5]
+      1.35
+      9]
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -2652,14 +2534,14 @@
     :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:flow/live-scratch-flow>*running?
-  :flow/openai-image-gen-ladder>*running?
-  :flow/flow-forever>:final-math
+ [:flow/openai-image-gen-ladder>*running?
   :flow/flow-forever>*running?
+  :flow/live-scratch-flow>*running?
+  :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
   :flow/openai-image-gen-ladder>:output-revised-prompt
   :flow/openai-image-gen-ladder>:pop-color
   :flow/openai-image-gen-ladder>:dominant-color
-  :flow/openai-image-gen-ladder>:relative-url-path-for-png-version],
+  :flow/flow-forever>:final-math],
  :client-name :good-cylindrical-ape-exiled-from-calanque,
  :runstreams-lookups
  {"openai-image-gen-ladder"
@@ -2685,7 +2567,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:created 1711583889, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
+     :sample "{:created 1711592200, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
     :node-js-color-thief-script
     {:type :map,
      :ttype :sub-flow,
@@ -2693,14 +2575,14 @@
      :last? false,
      :defaults {},
      :sample
-     "{:dominantColor \"#6d5459\", :colorPalette [\"#d3aa82\" \"#634751..."},
+     "{:dominantColor \"#1c0f34\", :colorPalette [\"#d2cddb\" \"#4daec9..."},
     :dominant-color
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#6d5459"},
+     :sample "#1c0f34"},
     :quality-param
     {:type :string,
      :ttype :open-block,
@@ -2725,7 +2607,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#d3aa82"},
+     :sample "#d2cddb"},
     :base-save-directory
     {:type :string,
      :ttype :open-block,
@@ -2740,7 +2622,7 @@
      :last? false,
      :defaults {},
      :sample
-     "{:dominantColor \"#6d5459\", :colorPalette [\"#d3aa82\" \"#634751..."},
+     "{:dominantColor \"#1c0f34\", :colorPalette [\"#d2cddb\" \"#4daec9..."},
     :size-param
     {:type :string,
      :ttype :open-block,
@@ -2758,7 +2640,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-2729-56138.webp"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-95023-30912.webp"},
     :request-body-map
     {:type :map,
      :ttype :open-block,
@@ -2800,7 +2682,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "convert /home/ryanr/rvbbit-out/b64-image-2729-56138.webp /ho..."},
+     :sample "convert /home/ryanr/rvbbit-out/b64-image-95023-30912.webp /h..."},
     :hiccup-image-box-w-png
     {:type :vector,
      :ttype :open-fn,
@@ -2814,14 +2696,14 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-2729-56138.webp"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-95023-30912.webp"},
     :relative-url-path-for-png-version
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? true,
      :defaults {},
-     :sample "./images/gen/b64-image-2729-56138.png"},
+     :sample "./images/gen/b64-image-95023-30912.png"},
     :http-req-map
     {:type :map,
      :ttype :open-block,
@@ -2867,10 +2749,10 @@
   {:*
    {:rowcount
     "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}},
-  :client-items-drag-item-key-5 {:* {:rowcount 2753}},
-  :client-items-drag-20 {:* {:rowcount 15447}},
+  :client-items-drag-item-key-5 {:* {:rowcount 2805}},
+  :client-items-drag-20 {:* {:rowcount 6153}},
   :client-items-drag-35
-  {:* {:rowcount 15447},
+  {:* {:rowcount 6153},
    :is_live {:distinct 2},
    :value {:distinct 9124},
    :item_key {:distinct 50},
@@ -2879,12 +2761,20 @@
    :item_sub_type {:distinct 33},
    :item_type {:distinct 2}},
   :rowcnt-drag-7 {:* {:rowcount 1}},
-  :blocks-drag-44 {:* {:rowcount 2330}},
+  :blocks-drag-44 {:* {:rowcount 2332}},
+  :searches-types-sys
+  {:*
+   {:rowcount
+    "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}},
+  :searches-rows-sys
+  {:*
+   {:rowcount
+    "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
   :fields-drag-16
   {:db_type {:distinct 1},
    :key_hash {:distinct 657},
-   :* {:rowcount 1036},
+   :* {:rowcount 1014},
    :db_schema {:distinct 1},
    :is_group_by {:distinct 1},
    :table_type {:distinct 2},
@@ -2900,36 +2790,40 @@
    :connection_id {:distinct 8},
    :context_hash {:distinct 68}},
   :ufo-sightings-drag-9 {:* {:rowcount 80332}},
-  :item-type-drag-5 {:* {:rowcount 5}},
-  :item-type-drag-0 {:* {:rowcount 1216}},
+  :item-type-drag-5 {:* {:rowcount 7}},
+  :item-type-drag-0 {:* {:rowcount 1342}},
+  :searches-sub-types-sys
+  {:*
+   {:rowcount
+    "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}},
   :duration-hours-drag-43 {:* {:rowcount 8349}},
   :city-drag-26 {:* {:rowcount 19899}},
-  :gen-viz-555 {:* {:rowcount 7}},
+  :gen-viz-555 {:* {:rowcount 5}},
   :state-drag-3 {:* {:rowcount 68}},
   :shape-drag-7 {:* {:rowcount 30}}},
  :flow-estimates
- {"client-keepalive" {:times nil, :run-id "cbd5411d-f4ca-46cf-ae83-ab645ad6f674"},
+ {"client-keepalive" {:times nil, :run-id "f24859ec-bd9e-4e58-8a93-f63f21d2c972"},
   "openai-image-gen-ladder"
-  {:times 39.1, :run-id "6c2e09ae-e833-49f8-9382-ddd1c0219bfd"},
+  {:times 46.6, :run-id "d0fe2529-7ab8-4e4c-8472-44118aa6b84e"},
   "dog-flow-50" {:times nil, :run-id "729f26b7-735f-40b6-a41d-51673f867112"}},
  :status
- {"kick-test!" {:kick :gen-viz-555-hist-60-963766714},
+ {"kick-test!" {:kick :rowcnt-drag-2},
   :heartbeat
   {:kick
-   [:flow/live-scratch-flow>*running?
-    :flow/openai-image-gen-ladder>*running?
-    :flow/flow-forever>:final-math
+   [:flow/openai-image-gen-ladder>*running?
     :flow/flow-forever>*running?
+    :flow/live-scratch-flow>*running?
+    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
     :flow/openai-image-gen-ladder>:output-revised-prompt
     :flow/openai-image-gen-ladder>:pop-color
     :flow/openai-image-gen-ladder>:dominant-color
-    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]},
+    :flow/flow-forever>:final-math]},
   :alert1 {:alerts :alert2},
   :reco {:fields-drag-16 :done, :client-items-drag-35 :done},
   :file-change {:file-changed :done}},
  :screen-name "looking-glass-redux2",
  :recos-page2 0,
- :selected-tab "violet ferret",
+ :selected-tab "fat zebra",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -2946,75 +2840,73 @@
   :screens -432100397,
   :blocks 1378492593,
   :boards -1951239355},
- :panels-hash 1988553100,
+ :panels-hash 369186909,
  :sessions
  (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
-   "379 hours, 32 minutes, 28 seconds"
-   1366348361]
+   "383 hours, 45 minutes, 2 seconds"
+   1381502986]
    ["vigorous-square-serval-banned-from-thalweg.edn"
-    "374 hours, 10 minutes, 10 seconds"
-    1347010361]
+    "378 hours, 22 minutes, 44 seconds"
+    1362164986]
    ["exciting-globular-mouse-banned-from-maar.edn"
-    "271 hours, 28 minutes, 19 seconds"
-    977299362]
+    "275 hours, 40 minutes, 53 seconds"
+    992453986]
    ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
-    "379 hours, 32 minutes, 28 seconds"
-    1366348362]
+    "383 hours, 45 minutes, 2 seconds"
+    1381502986]
    ["restored-raspberry-mule-of-baymouth-bar.edn"
-    "141 hours, 45 minutes, 54 seconds"
-    510354277]
+    "145 hours, 58 minutes, 28 seconds"
+    525508901]
    ["awesome-prismatic-jay-banned-from-malpaís.edn"
-    "141 hours, 46 minutes, 31 seconds"
-    510391153]
+    "145 hours, 59 minutes, 5 seconds"
+    525545777]
    ["constant-star-shaped-echidna-banned-from-towhead.edn"
-    "356 hours, 3 minutes, 41 seconds"
-    1281821362]
+    "360 hours, 16 minutes, 15 seconds"
+    1296975986]
    ["special-globular-coyote-of-oceanic-trench.edn"
-    "379 hours, 32 minutes, 29 seconds"
-    1366349362]
+    "383 hours, 45 minutes, 3 seconds"
+    1381503986]
    ["proud-thin-elk-of-rôche-moutonnée.edn"
-    "379 hours, 32 minutes, 28 seconds"
-    1366348362]
+    "383 hours, 45 minutes, 2 seconds"
+    1381502986]
    ["kind-rhomboidal-lion-of-the-floodplain.edn"
-    "379 hours, 32 minutes, 28 seconds"
-    1366348362]
+    "383 hours, 45 minutes, 2 seconds"
+    1381502986]
    ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
-    "379 hours, 32 minutes, 29 seconds"
-    1366349362]
+    "383 hours, 45 minutes, 3 seconds"
+    1381503986]
    ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
-    "379 hours, 32 minutes, 28 seconds"
-    1366348362]
+    "383 hours, 45 minutes, 2 seconds"
+    1381502986]
    ["courageous-linear-platypus-of-corrie.edn"
-    "142 hours, 6 minutes, 44 seconds"
-    511604294]
+    "146 hours, 19 minutes, 18 seconds"
+    526758918]
    ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
-    "379 hours, 32 minutes, 28 seconds"
-    1366348362]
+    "383 hours, 45 minutes, 2 seconds"
+    1381502986]
    ["ethical-round-oyster-of-glacial-horn.edn"
-    "379 hours, 32 minutes, 28 seconds"
-    1366348362]
+    "383 hours, 45 minutes, 2 seconds"
+    1381502986]
    ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
-    "379 hours, 32 minutes, 28 seconds"
-    1366348362]
+    "383 hours, 45 minutes, 2 seconds"
+    1381502986]
    ["transforming-ivory-clam-of-the-volcanic-field.edn"
-    "196 hours, 5 minutes, 53 seconds"
-    705953362]
+    "200 hours, 18 minutes, 27 seconds"
+    721107986]
    ["remarkable-thin-wombat-banned-from-flyggberg.edn"
-    "321 hours, 43 minutes, 25 seconds"
-    1158205362]
-   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn"
-    "18 minutes, 32 seconds"
-    1112822]
+    "325 hours, 55 minutes, 59 seconds"
+    1173359986]
+   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "48 seconds" 48389]
    ["bubbly-ovoid-bee-hailing-from-pull-apart-basin.edn"
-    "379 hours, 32 minutes, 28 seconds"
-    1366348362]),
+    "383 hours, 45 minutes, 2 seconds"
+    1381502986]),
  :last-run-throwaway "21:13:14",
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -2072567900,
+ :user-params-hash -602159772,
  :grid-recos? true,
  :preview-keys2 ["-761914641" "1195443710" "-145356996"],
  :search-results {":flow" 29, ":client-param" 4, ":block" 8, ":screen" 2},
- :session-hash -217692064,
+ :session-hash -218593285,
  :panels
  {:block-11251
   {:name "block-11251",
@@ -3300,6 +3192,26 @@
      {:font-size "45px"}
      :child
      [:string :flow/openai-image-gen-ladder>:pop-color]]},
+   :queries {}},
+  :block-7983
+  {:h 5,
+   :w 11,
+   :tab "octohedral alligator",
+   :root [2 10],
+   :name "block-7983",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]]},
    :queries {}},
   :block-1913
   {:h 2,
@@ -3837,25 +3749,35 @@
    :table_name "client_items",
    :fields 8},
   :viz-shapes0-sys2 {:shape "treemap_nivo_2_levels"},
-  :client-items-drag-35
-  {:is_live nil,
-   :item_key "error-monitor-vanessa",
-   :item_sub_type ":sql-cache-size-drag-0",
-   :item_type ":queries",
-   :sample
-   "[\"error-monitor-vanessa\" :panels :block-12200 :queries :sql-cache-size-drag-0]",
-   :ts "2024-03-28 01:37:12",
-   :value
-   ":screen/error-monitor-vanessa>panels>block-12200>queries>sql-cache-size-drag-0"},
+  :blocks-drag-44
+  {:ts_2 "2024-03-28 05:02:16",
+   :is_live nil,
+   :query_names "",
+   :view_names "",
+   :value "x",
+   :item_type ":screen",
+   :screen_name "winter-theme",
+   :block_data
+   "{:panels {:block-11340 {:h 4, :w 5, :root [15 3], :tab \"bulbous elephant\", :selected-view :hi, :name \"block-11340\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-11340.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-2031 {:h 4, :w 5, :root [20 3], :tab \"bulbous elephant\", :selected-view :hi, :name \"block-2031\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-2031.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}}, :click-param {:param {:nutritious-periwinkle-sheep \"hello from a data board!\", :offense \"VANDALISM\", :float 324.444, :string \"this is string\", :essential-olive-toad \"from clojure boar param\", :poised-spring-bud-fly [\"import sys, random \" \"from datetime import date\" \"\" \"print(\\\"damn son!\\\")\" \"print(random.randrange(1,300))\" \"print('{{:param/nutritious-periwinkle-sheep}}')\" \"\" \"today = date.today()\" \"print(\\\"Today's date:\\\", today)\" \"\" \"####INTERESTING....\" \"\" \"\" \"\" \"\"], :keys 123, :bools true, :keys2 [3 4 5]}}}",
+   :block_key "bulbous elephant",
+   :ts nil,
+   :sample nil,
+   :tab_name "",
+   :file_path "./screens/winter-theme.edn",
+   :block_name "board: bulbous elephant",
+   :item_sub_type ":view",
+   :item_key "winter-theme",
+   :queries 0,
+   :views 0},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#d4a69d",
+   :openai-image-gen-ladder>pop-color "#ceada5",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-35995-89127.png",
+   "./images/gen/b64-image-63796-59734.png",
    :counting-loop>open-fn-2 44,
-   :openai-image-gen-ladder>*running? false,
+   :openai-image-gen-ladder>*running? true,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
    "Craft in high definition, a stylized 16:9 illustration of a scene drawn from the traditional myths from Scotland, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing brunette hair. Identify her with full, somewhat pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage can be seen as a blend of delight and enchantment, while the sight of intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and buxom physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, augmenting the glow of her skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, providing the observer with an alluringly playful glance.",
@@ -3893,7 +3815,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#cb8d8f",
+   :openai-image-gen-ladder>dominant-color "#262e4a",
    :flow-forever>final-math nil},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",
@@ -3907,6 +3829,14 @@
    :ts "2024-02-18 21:40:58"},
   :viz-tables-sys2 {:table_name :client-items-drag-35},
   :user-dropdown-sys {:req-field nil},
+  :searches-types-sys {:item_type "client-params"},
+  :searches-rows-sys
+  {:item_sub_type "param",
+   :display_name ":selected-view",
+   :sample "[:views :quiet-peach-armadillo]",
+   :value
+   ":client/awesome-pentagonal-swallow-banned-from-atoll>param>selected-view",
+   :is_live 0},
   :viz-tables-sys {:table_name "fields_drag_16"},
   :param
   {:reliable-coral-moose
@@ -3924,24 +3854,8 @@
    ["A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly."
     "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."
     ""],
-   :selected-view-data
-   [:nivo-pie-chart
-    {:padAngle 0.7,
-     :innerRadius 0.5,
-     :width :panel-width+70,
-     :arcLinkLabelsThickness 4,
-     :borderWidth 2,
-     :cornerRadius 3,
-     :activeOuterRadiusOffset 8,
-     :theme :theme/nivo-defaults,
-     :arcLinkLabelsSkipAngle 10,
-     :click {:c :updated, :y :rows},
-     :arcLabelsSkipAngle 10,
-     :height :panel-height+50,
-     :margin {:top 50, :right 50, :bottom 50, :left 45},
-     :data :gen-viz-555,
-     :arcLinkLabelsTextColor "#ffffff"}],
-   :selected-view [:views :oz],
+   :selected-view-data nil,
+   :selected-view [nil nil],
    :fabulous-pink-eagle
    ["A classic 1990s American Pizza Hut location, now even more run down and abandoned, takes on a slightly more dystopian aspect with a crucial detail: the building's roof shingles are distinctly red, highlighting the iconic Pizza Hut design. The parking lot is now heavily littered with remnants of bar charts, pie charts, old school dashboards, and shredded Tableau signage, symbolizing the profound death of the 'old world' of business intelligence. This scene is illustrated in a highly stylistic, striking, and dramatic manner, with an intensified essence of decay and the passage of time. The architecture of the Pizza Hut, with its iconic red roof and signage, stands more prominently as a relic amidst an overwhelming detritus of outdated analytics tools. This wider, cinematic view should further emphasize the desolation and dramatic change, adding a more dystopian atmosphere to the landscape. "
     ""
@@ -3970,7 +3884,7 @@
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. "
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
-   :selected-block :block-273,
+   :selected-block :block-353,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""
@@ -4104,7 +4018,12 @@
    :connection_id "boston-crime",
    :context_hash "-1806822778"},
   :connections-sys {:database_name "*cache-db*", :connection_id "system-db"},
-  :sys {:selected-tab "violet ferret", :selected-tab-idx 3}},
+  :sys {:selected-tab "fat zebra", :selected-tab-idx 2},
+  :searches-sub-types-sys
+  {:item_key "awesome-pentagonal-swallow-banned-from-atoll",
+   :is_live 0,
+   :items 11,
+   :styler_highlight_4018a 0}},
  :selected-flow "live-scratch-flow",
  :post-condi
  {:c362-up-or-down? [{:v 0}], :c783-up-or-down? [{:v 0}], :c226-true? [{:v 1}]},
