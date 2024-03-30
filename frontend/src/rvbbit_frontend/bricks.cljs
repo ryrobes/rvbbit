@@ -3230,6 +3230,70 @@
                       :drag-meta {:type       :viz-reco     ;type
                                   :block-name (keyword req-name-str)}})))))
 
+
+(defn item-subscription-spawner-meta []
+  (let [main-row-selected      @(re-frame/subscribe [::conn/clicked-parameter [:searches-rows-sys]]) ;;
+        ;subtype-row-selected   @(re-frame/subscribe [::conn/clicked-parameter [:searches-sub-type-sys]])
+        ;type-row-selected      @(re-frame/subscribe [::conn/clicked-parameter [:searches-type-sys]])
+        ;selected-fields        (vec (map ut/sql-keyword (map :field_name @(re-frame/subscribe [::conn/sql-data [:fields-sys]]))))
+        ttype                  (get main-row-selected :item_type)
+        shortcode              (try (edn/read-string (get main-row-selected :value)) (catch :default _ "shortcode-error!"))
+        rando                (rand-int 45)
+        {:keys [item_type item_sub_type
+                item_key display_name
+                sample is_live block_meta]} main-row-selected
+        panel-map             (try (edn/read-string block_meta) (catch :default _ {}))
+        natural-key           (ut/safe-key (get panel-map :natural-key (keyword (str "sub-" rando))))
+
+
+        ;;panel-map            {} ;; @(re-frame/subscribe [::workspace [source-panel-id]])
+        selected-fields      (vec (keys (get @(re-frame/subscribe [::conn/sql-metadata [name]]) :fields)))
+        selected-fields      (if (empty? selected-fields) [:*] selected-fields)
+        table-name           name
+        view-data            (if (= name :view) (get panel-map :views) (get-in panel-map [:views name]))
+        
+        parent-sql-sql-alias (ut/gen-sql-sql-alias)
+        sql-name-base        (cond
+                               :else (ut/replacer
+                                      (str (ut/unkeyword table-name) "-clone-" rando)
+                                      #"_" "-"))
+        sql-name             (keyword sql-name-base)
+        connection-id        (get panel-map :connection-id)
+
+        drag-meta            {;:source-table     table-name
+                              ;:table-fields     selected-fields
+                              ;:connection-id    connection-id
+                              ;:source-panel-key source-panel-id
+                              :type             ttype}
+        new-panel            (cond
+                               (cstr/ends-with? (str ttype) "-views")
+                               {:h         (get panel-map :h 5)
+                                :w         (get panel-map :w 7)
+                                :drag-meta drag-meta
+                                :views     {:vw1 [:box
+                                                  :size "auto"
+                                                  :child shortcode]}
+                                :name      (str "subscription " item_key display_name rando)}
+
+                               (cstr/ends-with? (str ttype) "-queries")
+                               {:h         (get panel-map :h 5)
+                                :w         (get panel-map :w 7)
+                                :drag-meta drag-meta
+                                :connection-id (get panel-map :connection-id)
+                                :queries     {natural-key shortcode}
+                                :name      (str "subscription " item_key display_name rando)}
+
+                               :else {:h         (get panel-map :h 5)
+                                      :w         (get panel-map :w 7)
+                                      :drag-meta drag-meta
+                                      :views     {natural-key [:box
+                                                               :size "auto"
+                                                               :child [:string shortcode]]}
+                                      :name      (str "subscription " item_key display_name rando)})]
+    ;(tap> [:hmmm panel-map])
+    new-panel))
+
+
 (defn sql-spawner-cloner [type source-panel-id name]
   (let [panel-map            @(re-frame/subscribe [::workspace [source-panel-id]])
         selected-fields      (vec (keys (get @(re-frame/subscribe [::conn/sql-metadata [name]]) :fields)))
@@ -5949,6 +6013,7 @@
               agg?          (not (get-in metadata [:fields label :group-by?]))
               pxlabel       (px (if (< labelsz 20) 20 labelsz))]
           ;(tap> [charw])
+          ^{:key (str "magic-table-callout-parent" query-key)}
           [re-com/v-box
            :size "auto"
            :style {:overflow "hidden"}
@@ -5995,7 +6060,7 @@
                      :filter      (if overlay? "blur(3px) opacity(88)" "none")
                      :font-weight 700}]]])
 
-        ^{:key (str "magic-table-base")}
+        ^{:key (str "magic-table-base-wrapper" query-key)}
         [re-com/v-box
          :style {:margin-top "-8px"}
          :children [(when (and overlay? (not mad-libs?))
@@ -6057,6 +6122,13 @@
                                                                    (/ cwidth brick-size))]
                                                            (cond (= panel-key :system-tables-list*)
                                                                  (draggable (sql-spawner-meta :meta-tables)
+                                                                            "meta-menu"
+                                                                            [re-com/box
+                                                                             :height (px row-height) ;"22px"
+                                                                             :style {:color "#000000"}
+                                                                             :child (str (get % c))])
+                                                                 (= panel-key :searches-rows-sys-list*)
+                                                                 (draggable (item-subscription-spawner-meta )
                                                                             "meta-menu"
                                                                             [re-com/box
                                                                              :height (px row-height) ;"22px"
@@ -11134,10 +11206,12 @@
  (fn [db _]
    (if (not @on-scrubber?) ;; dont want to push updates during scrubbing
      (let [pp (get db :panels)
+           ppr (into {} (for [[k v] pp]
+                 {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace-sub vv)})))}))
            new-h (hash pp)
            client-name (get db :client-name)]
-      ;;;(tap> [:!!!!!!!panels-updated!!!!!! (get db :panels-hash) new-h client-name])
-       (conn/push-panels-to-server pp client-name)
+      ;;(tap> [:!!!!!!!panels-updated!!!!!! (get db :panels-hash) ppr new-h client-name])
+       (conn/push-panels-to-server pp ppr client-name)
        (ut/dispatch-delay 2000 [::refresh-history-log])
        (assoc db :panels-hash new-h)) db)))
 

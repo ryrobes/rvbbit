@@ -22,7 +22,10 @@
                  (keyword? block-map)))
         (catch :default _ false))
     ;; try to save some work
-    (let [valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten block-map)))
+    (let [valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/") 
+                                                    ;(not (cstr/starts-with? (str %) ":query/"))
+                                                    ) 
+                                              (ut/deep-flatten block-map)))
           workspace-params       (into {} (for [k valid-body-params] ;; deref here?
                                             {k @(re-frame/subscribe [::clicked-parameter-key [k]])}))
           value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
@@ -336,7 +339,7 @@
    (let [cmp (cstr/split (ut/unkeyword (nth keypath 0)) "/")
          kkey (keyword (cstr/replace (nth cmp 0) "-parameter" ""))
          vkey (keyword (peek cmp))
-         ;;_ (when (cstr/includes? (str keypath) ":panel") (tap> [:? kkey vkey (get-in db (cons :click-param [kkey vkey]))]))
+;;         _ (when (cstr/includes? (str keypath) ":query") (tap> [:? keypath kkey vkey (get-in db (cons :click-param [kkey vkey]))]))
          val0 (get-in db (cons :click-param [kkey vkey]))
          if-walk-map2           (fn [obody] (let [kps       (ut/extract-patterns obody :if 4)
                                                   logic-kps (into {} (for [v kps]
@@ -383,6 +386,10 @@
                     val)
          ;_ (tap> [:resolver (logic-and-params-fn val nil)])
          contains-params? (contains-namespaced-keyword? val)
+         contains-sql-alias? (cstr/includes? (str val) ":query/")
+         ;_ (when (cstr/includes? (str val) ":query/") (tap> [:? val keypath kkey vkey (get-in db (cons :click-param [kkey vkey]))]))
+         ;_ (when contains-sql-alias? (tap> [:contains-sql-alias? keypath val0 val]))
+         ;_ (when contains-params? (tap> [:contains-params? keypath val0 val]))
          ]
      ;;(tap> [:rec-param (ut/deep-template-find val0)])
     ; (when (cstr/includes? (str val) "theme") 
@@ -394,7 +401,7 @@
      ;(if (nil? val) (str "(nil val)") val)
 
      ;(resolver/logic-and-params val nil)
-     (if contains-params? 
+     (if contains-params? ;; (and contains-params? (not contains-sql-alias?))
        (logic-and-params-fn val nil) ;; process again, no recursion here for now... we want to contain this reaction chain
        val)
      ;val
@@ -845,12 +852,13 @@
                                 :timeout    50000}])
            (re-frame/dispatch [::add-to-sql-history-condi kp hsql kk])))))))
 
-(defn push-panels-to-server [panels-map client-name]
+(defn push-panels-to-server [panels-map resolved-panels-map client-name]
   (let []
     (dorun
      (re-frame/dispatch [::wfx/request   :default
                          {:message    {:kind :current-panels
                                        :panels panels-map
+                                       :resolved-panels resolved-panels-map
                                        ;:ui-keypath kp
                                        ;:honey-sql hsql
                                        ;:connection-id :cache ;connection-id

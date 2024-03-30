@@ -506,6 +506,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     is_live boolean NULL,
     sample text NULL,
     display_name text NULL,
+    block_meta text NULL,
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
 (defn create-attribute-sample [sample-table-name-str rowset]

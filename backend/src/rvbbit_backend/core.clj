@@ -9,6 +9,7 @@
    [flowmaps.examples.simple-flows :as fex]
    [flowmaps.web :as flow-web]
    [flowmaps.db :as flow-db]
+   [clojure.pprint :as ppt]
    ;[rvbbit-backend.flowmaps :as flow]
    [rvbbit-backend.transform :as ts]
    [rvbbit-backend.embeddings :as em]
@@ -16,6 +17,7 @@
    [hikari-cp.core :as hik]
    [clojure.java.shell :as shell]
    [rvbbit-backend.external :as ext]
+   [puget.printer :as puget]
    [clojure.set :as cset]
    [tea-time.core :as tt]
    [clojure.data :as data]
@@ -590,6 +592,7 @@
                              not-started-yet (cset/difference
                                               (set blocks)
                                               (set (into running-blocks done-blocks)))
+                             running-blocks (vec (cset/difference (set blocks) (set (into done-blocks not-started-yet))))
                              res (get-in @flow-db/results-atom [k :done] :nope)
                              running? (or (= res :nope) (ut/chan? res) (= res :skip))
                              done? (not (= res :nope))
@@ -608,8 +611,8 @@
                             ;;       (System/currentTimeMillis))
                              end (try (apply max (or (remove nil? (for [[_ v] (get @flow-db/tracker k)]
                                                                     (get v :end))) [-1]))
-                                      (catch Exception e (do (ut/pp [:exception-in-getting-time-duration k (str e)
-                                                                     (for [[_ v] (get @flow-db/tracker k)] (get v :end))])
+                                      (catch Exception e (do ;(ut/pp [:exception-in-getting-time-duration k (str e)
+                                                             ;        (for [[_ v] (get @flow-db/tracker k)] (get v :end))])
                                                              (System/currentTimeMillis))))
                              elapsed (- end start)
                              human-elapsed (ut/format-duration start end)
@@ -671,7 +674,8 @@
                              :*started-by cname
                              :*channels-open? channels-open?
                              :*channels-open chans-open
-                             :tracker-events (count (get @wss/tracker-history k []))
+                             ;:tracker-events (count (get @wss/tracker-history k []))
+                             :running-blocks running-blocks
                              ;:*result (str res)
                              :*finished (count done-blocks)
                              :*running running-blocks
@@ -687,7 +691,7 @@
             kks (try (keys b) (catch Exception _ nil))]
         (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
 
-          (ut/pp [:trigger-status-changes! kks])
+          ;;(ut/pp [:trigger-status-changes! kks])
 
           (async/thread ;; really expensive logging below. temp
             (let [fp (str "./status-change-logs/" (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":")) "@" (str (System/currentTimeMillis)) ".edn")]
@@ -707,27 +711,50 @@
 
 
 
-    ;; temp, expensive, tracking down some issues
+    ;; expensive, tracking down some issues
     (defn tracker-changed2 [key ref old-state new-state]
       (let [[_ b _] (data/diff old-state new-state)
             kks (try (keys b) (catch Exception _ nil))]
+        
         (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
 
           ;(ut/pp [:tracker-changes! kks])
 
           (async/thread ;; really expensive logging below. temp
-            (let [kks-string (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":"))
-                  block-changed (first (keys (get b (first kks))))
-                  what-changed (first (remove #(= % :in-chan?) (keys (get-in b [(first kks) (first (keys (get b (first kks))))]))))
-                  summary (-> (str block-changed "=" what-changed) (cstr/replace " " "_") (cstr/replace "/" ":"))
-                  fp (str "./tracker-logs/" (str (System/currentTimeMillis)) "@@" kks-string "=" summary ".edn")]
-              (ext/create-dirs "./tracker-logs/")
-              (ut/pretty-spit fp {:kks kks
-                                  :value (ut/replace-large-base64 (get-in @flow-db/results-atom [(first kks) block-changed]))
-                                  ;:res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
-                                  ;:tracker (ut/replace-large-base64 (select-keys @flow-db/tracker kks))
-                                  :diff (ut/replace-large-base64 b)
-                                  :full (ut/replace-large-base64 (get-in @flow-db/results-atom [(first kks)]))} 125)))
+            
+            (let [;kks-string (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":"))
+                  ;block-changed (first (keys (get b (first kks))))
+                  ;what-changed (first (remove #(= % :in-chan?) (keys (get-in b [(first kks) (first (keys (get b (first kks))))]))))
+                  ;summary (-> (str block-changed "=" what-changed) (cstr/replace " " "_") (cstr/replace "/" ":"))
+                  ;fp (str "./tracker-logs/" (str (System/currentTimeMillis)) "@@" kks-string "=" summary ".edn")
+                  ]
+              
+              ;; (ext/create-dirs "./tracker-logs/")
+              ;; (ut/pretty-spit fp {:kks kks
+              ;;                     :value (ut/replace-large-base64 (get-in @flow-db/results-atom [(first kks) block-changed]))
+              ;;                     ;:res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
+              ;;                     ;:tracker (ut/replace-large-base64 (select-keys @flow-db/tracker kks))
+              ;;                     :diff (ut/replace-large-base64 b)
+              ;;                     :full (ut/replace-large-base64 (get-in @flow-db/results-atom [(first kks)]))} 125)
+
+              (ext/create-dirs "./flow-logs/")
+              (doseq [flow-id kks
+                      :let [run-id (str (get-in @flow-db/results-atom [flow-id :run-id]))
+                            fp (str "./flow-logs/" (cstr/replace flow-id "/" "-CALLING-") "--" run-id ".edn")
+                            mst (System/currentTimeMillis)
+                            _ (swap! wss/watchdog-atom assoc flow-id mst)
+                            _ (swap! wss/watchdog-atom assoc flow-id mst)
+                            diffy (get (ut/replace-large-base64 b) flow-id)
+                            diffy-keys (into {} (for [[k v] diffy] {k (first (keys v))}))
+                            _ (swap! wss/last-block-written assoc flow-id diffy-keys)
+                            blocks (keys (get (ut/replace-large-base64 b) flow-id))]]
+                (let [data [[(ut/millis-to-date-string mst) blocks]
+                            {:values (select-keys (ut/replace-large-base64 (get-in @flow-db/results-atom [flow-id])) blocks)
+                             :diff diffy}]
+                      pretty-data (with-out-str (ppt/pprint data))] ; Use clojure.pprint/pprint instead of puget/cprint
+                  (spit fp (str pretty-data "\n") :append true)))
+              
+              ))
 
           (update-stat-atom kks))
       ;(when kks (ut/pp [:flow-finished kks]))

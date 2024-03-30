@@ -917,6 +917,11 @@
 
 ;; (def deep-flatten (memoize deep-flatten-fn))
 
+(defn millis-to-date-string [millis]
+  (let [date (java.util.Date. millis)
+        format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss")]
+    (.format format date)))
+
 (defn deep-flatten [x]
   (if (coll? x)
     (mapcat deep-flatten x)
@@ -1122,6 +1127,20 @@
         (puget/cprint x))
       (finally ;; pass
         ))))
+
+;; (defn safe-cprint [x]
+;;   (locking console-lock
+;;     (try
+;;       (puget/with-options {:width (get-terminal-width)}
+;;         (let [output (str (java.time.LocalDateTime/now) " " (with-out-str (puget/cprint x)))]
+;;           (async/thread (spit "console.log" output :append true)) ; Write to log file asynchronously
+;;           (print output))) ; Print to console
+;;       (catch Throwable t
+;;         (let [error-message (str (java.time.LocalDateTime/now) " Error: " (.getMessage t))]
+;;           (async/thread (spit "console.log" error-message :append true)) ; Write error to log file asynchronously
+;;           (println error-message)))
+;;       (finally ;; pass
+;;         ))))
 
 
 (defn ppln [x]

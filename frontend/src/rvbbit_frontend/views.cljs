@@ -123,27 +123,19 @@
                  :child [bricks/magic-table :system-tables-list* [:tables-sys] 9 10 [:db_schema :connection_id :db_catalog]]]]]))
 
 (defn search-panel-metadata []
-  (let [sql-calls {;:connections-sys {:select [[[:case
-                   ;                             [:like :connection_str "%csv%"] "*csv-import-db*"
-                   ;                             [:like :connection_str "%cache%"] "*cache-db*"
-                   ;                             :else :database_name] :database_name]
-                   ;                           :connection_id]
-                   ;                  :from [:connections]}
-                   :searches-types-sys {:select [:item_type] ;; :searches-types-sys/item_type 
+  (let [client-name (cstr/replace (str @(re-frame/subscribe [::bricks/client-name])) ":" "")
+        sql-calls {:searches-types-sys {:select [:item_type] ;; :searches-types-sys/item_type 
                                         :from [:client_items] :group-by [1]}
-                ;;    :tables-sys {:select [:db_schema :db_catalog :connection_id
-                ;;                          [[:|| :db_catalog "/" :db_schema] :schema_cat] :table_name [[:count 1] :fields]]
-                ;;                 :from [:fields]
-                ;;                 :where [:= :connection_id :connections-sys/connection_id]
-                ;;                 :group-by [:db_schema :db_catalog :connection_id :table_name]
-                ;;                 :order-by [:schema_cat :table_name]}
                    :searches-sub-types-sys {:select [:item_key :is_live [[:count 1] :items]] ;; :searches-types-sys/item_type 
-                                            :where [:= :item_type :searches-types-sys/item_type]
+                                            :where [:and
+                                                    [:not [:= :item_key client-name]]
+                                                    [:= :item_type :searches-types-sys/item_type]]
                                              ;;:col-widths {:items 70}
                                              :style-rules {[:* :highlight-4018a]
                                                            {:logic [:= :is_live 1]
-                                                            :style {;:background-color "#008b8b66"
-                                                                    :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil))
+                                                            :style {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 34)
+                                                                    :color (theme-pull :theme/editor-outer-rim-color nil)
+                                                                    ;:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil))
                                                                     }}}
                                             :from [:client_items] :group-by [1 2]}}
         sql-params (into {} (for [k [:searches-types-sys/item_type]]
@@ -167,31 +159,17 @@
                  :child [bricks/magic-table :searches-sub-types-sys-list* [:searches-sub-types-sys] 9 10 [:is_live]]]]]))
 
 (defn search-panel-metadata-ext []
-  (let [sql-params (into {} (for [k [:searches-types-sys/item_type 
+  (let [sql-params (into {} (for [k [:searches-types-sys/item_type
                                      :searches-rows-sys/value
                                      :searches-sub-types-sys/item_key]]
                               {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
         selected-shortcode (get sql-params :searches-rows-sys/value)
-        sql-calls {;:fields-sys {:select [:field_name :field_type :data_type]
-                   ;             :from [:fields]
-                   ;             :where [:and
-                   ;                     [:= :connection_id :connections-sys/connection_id]
-                   ;                     [:= :table_name :tables-sys/table_name]
-                   ;                     [:<> :field_type "derived"]
-                   ;                     [:<> :field_type "special"]]
-                   ;             :order-by [:field_name]}
-                   :searches-rows-sys {:select [:item_sub_type :display_name :sample :value :is_live] ;; :searches-types-sys/item_type 
-                                       :where [:and 
+        sql-calls {:searches-rows-sys {:select [:item_sub_type :item_type :item_key :display_name :sample :value :is_live :block_meta] ;; :searches-types-sys/item_type 
+                                       :where [:and
                                                [:= :item_key  :searches-sub-types-sys/item_key]
                                                [:= :item_type :searches-types-sys/item_type]]
                                                                ;;:col-widths {:items 77}
-                                       :from [:client_items]  }}
-
-        ;gmode @data-browser-system-mode
-        ;attribs? (= gmode :attribs)
-        ;combos? (= gmode :combos)
-        ;grid? (= gmode :data)
-        ]
+                                       :from [:client_items]}}]
 
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
@@ -209,12 +187,11 @@
                  [[re-com/box
                    :size "auto"
                    :child [bricks/magic-table :searches-rows-sys-list*
-                           [:searches-rows-sys] 11 (if selected-shortcode 8.5 10) [:value  :is_live]]]
+                           [:searches-rows-sys] 11 (if selected-shortcode 8.5 10) [:value :is_live :item_type :block_meta :item_key]]]
                   (when selected-shortcode
                     [re-com/box
                    ;:align :center :justify :center
-                     :child [bricks/shortcode-box 560 85 (str selected-shortcode " ;; rabbit-code parameter") "clojure"]])
-                  ]]]]))
+                     :child [bricks/shortcode-box 560 85 (str selected-shortcode " ;; rabbit-code parameter") "clojure"]])]]]]))
 
 
 ;(defonce grid-recos? (atom true))
@@ -3247,7 +3224,7 @@
                                        [image-component s t h rowcnt items])])]]))
 
 (defn main-panel []
-  (let [editor? @(re-frame/subscribe [::bricks/editor?])
+  (let [editor? (and @(re-frame/subscribe [::bricks/editor?]) (not @bricks/dragging?))
         buffy? @(re-frame/subscribe [::bricks/buffy?])
         flows? @(re-frame/subscribe [::bricks/flow?])
         external? @(re-frame/subscribe [::bricks/external?])
@@ -3425,7 +3402,7 @@
                                         ;;                            )))
                                                }
                                                 (when (or @bricks/dragging? @bricks/mouse-dragging-panel?) ;; editor? ;;(not online?)
-                                                  {:background-image (str ;"linear-gradient(0deg, " cc " 1px, transparent 1px), linear-gradient(90deg, " cc " 1px, transparent 1px), "
+                                                  {:background-image (str ;"linear-gradient(0deg, " cc " 1px, transparent 1px), linear-gradient(90deg, " cc " 1px, transparent 1px)"
                                                                           "linear-gradient(0deg, " cc " 2px, transparent 8px), linear-gradient(90deg, " cc " 2px, transparent 8px)" 
                                                                       (when (get custom-map :background-image) ", ")
                                                                           (get custom-map :background-image))

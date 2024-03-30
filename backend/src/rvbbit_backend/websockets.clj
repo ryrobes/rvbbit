@@ -82,6 +82,8 @@
 (def screens-atom (ut/thaw-atom {} "./data/atoms/screens-atom.edn"))
 ;;(def panels-atom (atom {}))
 (def panels-atom (ut/thaw-atom {} "./data/atoms/panels-atom.edn"))
+(def watchdog-atom (atom {}))
+(def last-block-written (atom {})) ;; kind of wasteful, but it's a small atom and is clean. 
 
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
@@ -1388,9 +1390,10 @@
 (def panel-history (agent nil))
 (set-error-mode! panel-history :continue)
 
-(defmethod wl/handle-request :current-panels [{:keys [panels client-name tabs orders click-param screen-name]}] ;; TODO add these
+(defmethod wl/handle-request :current-panels [{:keys [panels client-name resolved-panels]}] ;; TODO add these
   (ext/write-panels client-name panels) ;; pushn to file system for beholder cascades
-  (swap! panels-atom assoc client-name panels) ;; save to master atom for reactions, etc 
+  (swap! panels-atom assoc client-name resolved-panels) ;; save to master atom for reactions, etc 
+  ;(ut/pp [:panels (get panels :block-7416)])
   (let [prev-hashes (hash-objects (get @last-panels client-name))
         this-hashes (hash-objects panels)
         diffy (data/diff this-hashes prev-hashes)
@@ -1552,7 +1555,7 @@
                                                    :else (ut/format-duration-seconds seconds-ago)))))})));)
 
 (defn flow-statuses []
-  (into {} (for [[k {:keys [*time-running *running? *started-by *finished tracker-events]}] @flow-status
+  (into {} (for [[k {:keys [*time-running *running? *started-by *finished running-blocks]}] @flow-status
                  :let [chans (count (get @flow-db/channels-atom k))
                        chans-open (count
                                    (doall
@@ -1566,12 +1569,17 @@
                                                 ;_ (swap! flow-status assoc-in [k :*channels-open] chans-open)
                                                 ;; ^^ TODO, important should be elsewhere - but is an expensive check, so passively here makes some sense
                                                 ;;_ (swap! channel-counts assoc k {:channels chans :channels-open chans-open}) ;; wtf is this? unused
+                       last-update-seconds (int (/ (- (System/currentTimeMillis) (get @watchdog-atom k)) 1000))
                        ]]
              {k {:time-running *time-running
                  :*running? *running?
-                 :tracker-events tracker-events
+                 ;:tracker-events tracker-events
                  :retries-left (get @restart-map k -1)
                  :*started-by *started-by
+                 :last-update-seconds (when *running? last-update-seconds)
+                 :last-updated (when *running? (ut/format-duration-seconds last-update-seconds))
+                 :last-update (get @last-block-written k)
+                 :running-blocks running-blocks
                  ;:timeouts (count (filter #(= % :timeout) (ut/deep-flatten tracker-events)))
                  ;:skips (count (filter #(= % :skip) (ut/deep-flatten tracker-events)))
                  :channels-open? channels-open?
@@ -2139,7 +2147,7 @@
 (defn flow! [client-name flowmap flow-id opts & [no-return?]]
   (try
     (let [orig-flowmap flowmap
-           _ (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of flowmaps starter overlap
+          _ (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of flowmaps starter overlap
         ;opts (merge {:client-name (str (or (get opts :client-name) client-name :rvbbit))} (or opts {}))) ;; stuff into opts for flow-waiter
           ;user-opts (get opts :opts)
           ;opts (dissoc opts :opts)
@@ -2199,13 +2207,13 @@
                                               finished-flowmap 185)))
           ;;_ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
-
+          _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter
           ;_ (alert! client-name  10 1.35)
           ;_ (push-to-client [:estimate] (ut/avg (get @times-atom flow-id [-1])) client-name -1 :est1 :est2)
           ship-est (fn [client-name] (kick client-name (vec (cons :estimate [])) {flow-id {:times (ut/avg   ;; avg based on last 10 runs, but only if > 1
-                                                                          (vec (take-last 10 (vec (remove #(< % 1)
-                                                                                                (get @times-atom flow-id []))))))
-                                                                  :run-id uuid}} nil nil nil))
+                                                                                                   (vec (take-last 10 (vec (remove #(< % 1)
+                                                                                                                                   (get @times-atom flow-id []))))))
+                                                                                           :run-id uuid}} nil nil nil))
           _ (doseq [client-name (keys (client-statuses))] (ship-est client-name)) ;; send to all clients just in case they care... (TODO make this more relevant)
          ;; _ (ut/pp [:opts!! opts flow-id])
           return-val (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn symbols in the maps
@@ -4935,7 +4943,8 @@
                       (true? (some #(= (first e) %) live-clients))
                       (strunc (ut/replace-large-base64 (get-in @params-atom e)))
                       ;(str (vec (drop 2 e)))
-                      (display-name e)]
+                      (display-name e)
+                      nil]
                      ;(conj (conj e (str ":client/" (cstr/replace (cstr/join ">" e) ":" ""))) (some #(= (first e) %) live-clients))
                      )
         panel-rows (vec (filter #(and 
@@ -4948,6 +4957,7 @@
         panel-rows (for [e panel-rows
                         ;;  :let [block? (or (= (last e) :views)
                         ;;                   (= (last e) :queries))]
+                         :let [param? (= :param (str (get e 2)))]
                          ]
                      [(cstr/replace (str (first e)) ":" "")
                       ;;(str "client-" (if block? "panels" (cstr/replace (str (get e 3)) ":" "")))
@@ -4956,7 +4966,12 @@
                       (str ":panel/" (cstr/replace (cstr/join ">" e) ":" ""))
                       (true? (some #(= (first e) %) live-clients))
                       (strunc (ut/replace-large-base64 (get-in @panels-atom e)))
-                      (display-name e 3)])
+                      (display-name e 3)
+                      (when (not param?) (try (str (ut/replace-large-base64 (-> (get-in @panels-atom (vec (drop-last (drop-last e)))) (dissoc :views) (dissoc :root) 
+                                                                                (assoc :natural-key (get e 3))
+                                                                                (dissoc :tab) (dissoc :queries)))) (catch Exception ee (str ee))))
+                      ;(when (not param?) (str (vec (drop-last e))))
+                      ])
         block-rows  (vec (filter #(and (or (= (count %) 5)
                                            (or (= (last %) :views)
                                                (= (last %) :queries)))
@@ -4977,10 +4992,19 @@
                       nil
                       (strunc (ut/replace-large-base64 (get-in @screens-atom e)))
                       ;(str (vec (drop 2 e)))
-                      (display-name e)])
+                      (display-name e)
+                      (if (not block?)
+                        (try (str (ut/replace-large-base64 (-> (get-in @screens-atom (vec (drop-last (drop-last e)))) (dissoc :views) (dissoc :root) (dissoc :tab) (dissoc :queries) (assoc :natural-key (if block? (get e 3) (get e 4)))))) (catch Exception ee (str ee)))
+                        ;(str (vec e))
+                        (try (str (ut/replace-large-base64 (-> (get-in @screens-atom (vec e)) (dissoc :views) (dissoc :root)
+                                                               (assoc :natural-key (last e))
+                                                               (dissoc :tab) (dissoc :queries)))) (catch Exception ee (str ee))))
+                      ;(when (not block?) (str (vec (drop-last e))))
+                      ])
+        ;prows (vec (filter #(cstr/includes? (str (get % 6) "") "-preview-") (distinct (into (into (into param-rows flow-rows) block-rows) panel-rows))))
         prows (vec (distinct (into (into (into param-rows flow-rows) block-rows) panel-rows)))
         keys (vec (distinct (map first prows)))
-        rows (vec (for [r prows] (zipmap [:item_key :item_type :item_sub_type :value :is_live :sample :display_name] r)))
+        rows (vec (for [r prows] (zipmap [:item_key :item_type :item_sub_type :value :is_live :sample :display_name :block_meta] r)))
         delete-sql {:delete-from [:client_items] :where (cons :or (vec (for [k keys] [:= :item_key k])))}
         ;insert-sql {:insert-into [:client_items] :values rows}
         ]
@@ -4996,7 +5020,7 @@
     ;; (ut/pp [:delete delete-sql])
     (enqueue-task3 (fn []
                      (sql-exec system-db (to-sql delete-sql))
-                     (doseq [rr (partition-all 100 rows)]
+                     (doseq [rr (partition-all 50 rows)]
                        (sql-exec system-db (to-sql {:insert-into [:client_items] :values rr})))))))
 
 
@@ -5296,7 +5320,7 @@
       (println " ")
       ;(ut/print-ansi-art "rrvbbit.ans")
       (ut/print-ansi-art "nname.ans")
-      (ut/pp [:version 0 :march 2024 "Hi."])
+      (ut/pp [:version 0 :april 2024 "Hi."])
       ;(ut/pp "Hi.")
       (println " "))
 
@@ -5316,10 +5340,10 @@
 
     ;(ut/pp [:flow-tracker @flow-db/tracker])
 
-    (ut/pp [:watchers {:screen [(count (keys @screen-child-atoms)) (count (keys @screens-atom))]
-                       :params [(count (keys @param-child-atoms)) (count (keys @params-atom))]
-                       :panels [(count (keys @panel-child-atoms)) (count (keys @panels-atom))]
-                       :flow [(count (keys @flow-child-atoms))]}])
+    ;; (ut/pp [:watchers {:screen [(count (keys @screen-child-atoms)) (count (keys @screens-atom))]
+    ;;                    :params [(count (keys @param-child-atoms)) (count (keys @params-atom))]
+    ;;                    :panels [(count (keys @panel-child-atoms)) (count (keys @panels-atom))]
+    ;;                    :flow [(count (keys @flow-child-atoms))]}])
     
     ;; (ut/pp [:lucene 
     ;;         (search/count-documents-by-type search/idx-path) 
