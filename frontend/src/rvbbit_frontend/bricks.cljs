@@ -3280,7 +3280,8 @@
                                 :w         (get panel-map :w 7)
                                 :drag-meta drag-meta
                                 :connection-id (get panel-map :connection-id)
-                                :queries     {natural-key shortcode}
+                                :queries     {natural-key {:select [:*]
+                                                           :from [shortcode]}}
                                 :name      (str "subscription " item_key display_name rando)}
 
                                :else {:h         (get panel-map :h 5)
