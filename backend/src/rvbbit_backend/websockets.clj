@@ -2894,10 +2894,12 @@
 
 (defn remove-watchers-for-flow [flow-id]
   (doseq [[client-name subs] @atoms-and-watchers
-          :let [matching-subs (filter #(= (:flow-id %) flow-id) (vals subs))
-                _ (ut/pp [:removing (count matching-subs) :watchers :for flow-id])]]
+          :let [matching-subs (filter #(= (:flow-id %) flow-id) (vals subs))]
+          :when (not (empty? matching-subs))]
     (doseq [sub matching-subs]
-      (remove-watcher (:keypath sub) client-name (:sub-type sub) flow-id (key sub)))))
+      (do 
+        (ut/pp [:removing (count matching-subs) :watchers :for flow-id client-name])
+        (remove-watcher (:keypath sub) client-name (:sub-type sub) flow-id (key sub))))))
 
 (defn break-up-flow-key [key]
   (let [ff (cstr/split (-> (str key) (cstr/replace #":" "")) #"/")
@@ -2933,7 +2935,7 @@
 
   (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)))
 
-(defn send-reaction-runner [keypath client-name new-value]
+(defn send-reaction-runner [base-type keypath client-name new-value]
   (let [flow-id (first keypath)]
    (ut/pp [:reaction-runner flow-id keypath client-name ]) ;; (ut/replace-large-base64 new-value)
 
@@ -2959,7 +2961,7 @@
 
 (defonce tracker-client-only (atom {}))
 
-(defn send-tracker-runner [keypath client-name new-value]
+(defn send-tracker-runner [base-type keypath client-name new-value]
   (let [flow-id (first keypath)]
     ;(ut/pp [:reaction-runner-tracker flow-id keypath client-name ]) ;; (ut/replace-large-base64 new-value)
     ;(kick client-name (vec (cons :flow-runner keypath)) new-value nil nil nil)
@@ -3051,7 +3053,7 @@
       (ut/pp [:client-sub-flow-runner flow-id :step-id step-id :client-name client-name])
            ;(ut/pp [:react-flow-runner (get-in @flow-db/results-atom keypath)])
       (add-watcher keypath client-name send-reaction-runner (keyword (str "runner||" flow-id "||" (hash keypath))) :flow-runner flow-id)
-      (add-watcher keypath client-name send-tracker-runner (keyword (str "tracker||" flow-id "||" (hash keypath))) :tracker flow-id)
+      (add-watcher keypath client-name send-tracker-runner  (keyword (str "tracker||" flow-id "||" (hash keypath))) :tracker flow-id)
            ;(kick client-name (vec (cons :flow-runner keypath)) :started nil nil nil) ;; push initial value, if we have one
            ;(kick client-name (vec (cons :tracker keypath)) (get @flow-db/tracker flow-id) nil nil nil) ;; push init tracker state, if exists
            ;[:client-sub-request flow-id :step-id step-id :client-name client-name]

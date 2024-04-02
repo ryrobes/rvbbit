@@ -1,4 +1,132 @@
-{:reco-preview nil,
+{:orders
+ {:blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
+  :fields-sys [:field_name :field_type :data_type],
+  :movies_deets
+  [:movie
+   :year
+   :release_date
+   :director
+   :full_line
+   :poster
+   :timestamp
+   :total_wows_in_movie
+   :_1080p_video],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :all-movies
+  [:movie
+   :year
+   :release_date
+   :director
+   :full_line
+   :poster
+   :timestamp
+   :total_wows_in_movie
+   :_1080p_video],
+  :files-sys [:file_path :screen_name :blocks :queries :ts],
+  :query-8163 [:rowcnt],
+  :connections-sys [:database_name :connection_id],
+  :query-2 [:movie_name],
+  :reco-counts [:table_name :cnt],
+  :gen-viz-841 [:rows :by_year_sqlite_release_date]},
+ :reco-preview nil,
+ :sql-source
+ {:all-movies
+  {:select
+   [:movie
+    :year
+    :release_date
+    :director
+    :full_line
+    :poster
+    :timestamp
+    total_wows_in_movie
+    :_1080p_video],
+   :from
+   [{:data
+     (let [result (http-call
+                    {:url
+                     (str "https://owen-wilson-wow-api.onrender.com/wows/random"),
+                     :query-params {:results 500}})]
+       (println (pr-str (flatten-map (first result))))
+       (vec (for [row result] (flatten-map row))))}]},
+  :gen-viz-841
+  {:select
+   [[[[:count 1]] :rows]
+    [[:substr :release_date 0 5] :by_year_sqlite_release_date]],
+   :from
+   [{:select
+     [:movie
+      :year
+      :release_date
+      :director
+      :full_line
+      :poster
+      :timestamp
+      total_wows_in_movie
+      :_1080p_video],
+     :from
+     [{:data
+       (let [result (http-call
+                      {:url
+                       (str "https://owen-wilson-wow-api.onrender.com/wows/random"),
+                       :query-params {:results 500}})]
+         (println (pr-str (flatten-map (first result))))
+         (vec (for [row result] (flatten-map row))))}]}],
+   :group-by [[:substr :release_date 0 5]]},
+  :query-2
+  {:select [:*],
+   :from
+   [{:data
+     (for
+       [movie
+        (sort
+          (http-call
+            {:url "https://owen-wilson-wow-api.onrender.com/wows/movies"}))]
+       {:movie_name movie})}]},
+  :query-8163
+  {:select [[[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:movie
+       :year
+       :release_date
+       :director
+       :full_line
+       :poster
+       :timestamp
+       :total_wows_in_movie
+       :_1080p_video],
+      :from
+      [{:data
+        (let [result (http-call
+                       {:url
+                        (str
+                          "https://owen-wilson-wow-api.onrender.com/wows/random"),
+                        :query-params {:movie "Hall Pass", :results 40}})]
+          (println (pr-str (flatten-map (first result))))
+          (vec (for [row result] (flatten-map row))))}]}
+     :mm145]]},
+  :movies_deets
+  {:select
+   [:movie
+    :year
+    :release_date
+    :director
+    :full_line
+    :poster
+    :timestamp
+    :total_wows_in_movie
+    :_1080p_video],
+   :from
+   [{:data
+     (let [result (http-call
+                    {:url
+                     (str "https://owen-wilson-wow-api.onrender.com/wows/random"),
+                     :query-params {:movie "Hall Pass", :results 40}})]
+       (println (pr-str (flatten-map (first result))))
+       (vec (for [row result] (flatten-map row))))}]}},
  :meta
  {:connections-sys
   {:fields
@@ -75,37 +203,85 @@
      :commons {42 1, 14 1, 11 1},
      :cardinality 100}},
    :rowcount 9},
-  :reco-counts {:fields {}, :rowcount 0}},
+  :reco-counts
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"offenses_drag_38" 1, "offenses_drag_21" 1},
+     :cardinality 100},
+    :cnt
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {917 2},
+     :cardinality 50}},
+   :rowcount 2},
+  :blocks-sys {:fields {}, :rowcount 0},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 139,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 132,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 94},
+    :blocks
+    {:data-type "integer",
+     :distinct 40,
+     :group-by? true,
+     :commons {3 45, 14 6, 12 6},
+     :cardinality 28},
+    :queries
+    {:data-type "integer",
+     :distinct 32,
+     :group-by? true,
+     :commons {0 54, 6 10, 5 9},
+     :cardinality 23},
+    :ts
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons
+     {"2024-03-30 03:33:07" 60, "2024-03-30 03:33:06" 49, "2024-03-30 03:33:08" 27},
+     :cardinality 4}},
+   :rowcount 139}},
+ :default-col-widths
+ {:block-2107 {:all-movies 100},
+  :system-connections-list* {:connections-sys 111},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-288 {:query-2 311},
+  :block-2582 {:query-8163 100},
+  :files-list* {:files-sys 178},
+  :block-3080 {:movies_deets 134},
+  :blocks-list* {:blocks-sys ##Inf},
+  :system-tables-list* {:tables-sys ##Inf}},
+ :runstream-drops nil,
+ :data-hash 1819126925,
  :tabs ["strategic grill locations"],
  :selected-cols {},
  :server
  {:settings
   {:harvest-on-boot? true,
-   :default "./screens/winter-theme.edn",
+   :default "./screens/looking-glass-redux.edn",
    :eleven-labs-api-key nil,
    :kits
-   {:buffy
-    {:author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :kit-name :buffy,
-     :package-name :grab-bag,
-     :fn (rvbbit-backend.assistants/buffy :query-name),
-     :name "Ask Buffy!",
-     :icon "zmdi-cocktail",
-     :run-on :queries,
-     :description "What does Buffy think about this data? Who knows!"},
-    :outliers
+   {:outliers
     {:description
      "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
      :image-url "images/outliers-image.png",
-     :fn
-     (rabbit-kit-outliers.core/get-outliers
-       :query-name
-       :panel-name
-       :query),
+     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
      :name "Outliers",
      :icon "zmdi-functions",
      :author
@@ -118,13 +294,8 @@
      :kit-name :outliers,
      :package-name :query-basics-1},
     :forecast
-    {:description
-     "WIP: basic timeseries forecasting based on previous values",
-     :fn
-     (rabbit-kit-outliers.core/get-forecast
-       :query-name
-       :panel-name
-       :query),
+    {:description "WIP: basic timeseries forecasting based on previous values",
+     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
      :name "Forecasting",
      :icon "zmdi-brightness-7",
      :author
@@ -135,7 +306,20 @@
      :run-on :queries,
      :repl {:host "127.0.0.1", :port 42999},
      :kit-name :forecast,
-     :package-name :query-basics-1}},
+     :package-name :query-basics-1},
+    :buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"}},
    :graphite-host "127.0.0.1",
    :openapi-org-id nil,
    :debug-level 1,
@@ -147,14 +331,17 @@
     "aaaaah-esday-the-day"
     "aaaaah-wednesday-the-day"
     "aaaah-wednesday-the-day"
+    "alice-puzzle-1"
     "asdasdasdasd"
     "autumn-theme"
     "battle-mage"
     "bigfoot-snapshots"
     "bigfoot-snapshots2"
     "bigfoot-snapshots3"
+    "blackberries"
     "blank-sizzle"
     "blank-sizzle2"
+    "blue-pines"
     "boston-test-10-3-23"
     "broken-jacket"
     "bunch of bullshit"
@@ -166,9 +353,12 @@
     "capecod-viking"
     "chaos simple"
     "chaos-views"
+    "chompers"
+    "claude-testing2"
     "clean-grey-defaults"
     "code-data-literal-stonks-test"
     "conifer-boughs"
+    "counting-lord-of-the-woods"
     "crazy-alice"
     "dark-crested-jackelope"
     "data-literals-test-sunday"
@@ -180,8 +370,10 @@
     "error-monitor"
     "error-monitor-vanessa"
     "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
     "evil-main-street"
     "fake-books-1"
+    "fake-bricks"
     "fetching-pentagonal-termite-of-tghe-submarine-canyon"
     "final-fantasy-dorchester"
     "fox-hills"
@@ -189,12 +381,20 @@
     "green-storm-city"
     "hue-board-1"
     "late-winter-theme"
+    "lavender-side-eye"
     "layout-test-1"
     "layout-test-12"
     "light-theme"
     "literal-data-test"
+    "looking-glass-redux"
+    "looking-glass-redux2"
+    "looking-glass-redux2a"
+    "looking-glass-redux2aa"
     "luck-of-the-irish"
     "mapbox-test"
+    "may-20"
+    "my-goodness"
+    "my-goodness-the-sequel"
     "neverwinter-amy"
     "night-city-never-sleeps"
     "nightcity-cape-cod"
@@ -205,30 +405,42 @@
     "old-defaults"
     "old-fashioned-christmas"
     "old-town-snow-stars"
+    "pensive-look"
+    "pensive-look2"
     "pine-wood-dawn"
+    "pink-and-green-elk"
     "pink-dusk-falls"
     "pinup-rabbit-fields"
     "poor-touring-me"
     "pres-sql-test-1"
     "purple-dusk-old-town"
+    "purple-nightshades"
     "purple-techno-sunset"
     "recharts-test-blocks"
     "refresh-test"
+    "retro-machines"
     "riffle-test"
     "sick-of-your-shit"
     "sizzle-board-1"
     "sneaky-swamp-creatures1"
+    "stop-drawing-dead-dashboards"
     "swamp-nightgown"
     "swamp-reacher"
     "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
     "the-future-soon"
     "the-generated-lass"
     "the-generated-lass-glow"
     "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-outer-blues"
     "trad-hybrid"
     "tweet-bigfoot-is-blurry"
     "tweet-demo-thing-bigfoot-is-blurry"
     "unnamed-screen!"
+    "viking-pastels"
     "weave-test"
     "weave-test1"
     "weave-test122"
@@ -241,64 +453,97 @@
     "winter-theme45"
     "winter-theme47"
     "winter-twin-peaks"
+    "witchy425"
+    "wonderland-horror-interface"
     "wow-board"],
-   :openapi-key
-   "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"}},
+   :openapi-key "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"}},
  :runstreams nil,
- :editor? false,
+ :editor? true,
  :buffy? false,
- :re-pressed.core/keydown
- {:keys nil,
-  :event-keys
-  [[[:viz-yard.bricks/esc-unselect-current] [{:keyCode 27}]]
-   [[:viz-yard.bricks/redo-one]
-    [{:keyCode 90, :ctrlKey true, :shiftKey true}]]
-   [[:viz-yard.bricks/undo-one]
-    [{:keyCode 90, :ctrlKey true, :shiftKey false}]]
-   [[:viz-yard.bricks/toggle-buffy]
-    [{:keyCode 32, :shiftKey true, :ctrlKey false}]]
-   [[:viz-yard.bricks/toggle-editor]
-    [{:keyCode 32, :shiftKey false, :ctrlKey false}]]
-   [[:viz-yard.bricks/toggle-flow]
-    [{:keyCode 32, :shiftKey false, :ctrlKey true}]]
-   [[:viz-yard.bricks/next-panel] [{:keyCode 9}]]
-   [[:viz-yard.bricks/toggle-kick-alert] [{:keyCode 75}]]
-   [[:viz-yard.bricks/toggle-peek] [{:keyCode 80}]]
-   [[:viz-yard.bricks/toggle-lines] [{:keyCode 76}]]
-   [[:viz-yard.bricks/toggle-auto-run] [{:keyCode 79}]]
-   [[:viz-yard.bricks/delete-selected-panel]
-    [{:keyCode 46, :shiftKey true}]]
-   [[:viz-yard.bricks/cycle-column-select false] [{:keyCode 81}]]
-   [[:viz-yard.bricks/cycle-column-select true] [{:keyCode 69}]]
-   [[:viz-yard.audio/start-recording] [{:keyCode 84}]]
-   [[:viz-yard.audio/stop-recording] [{:keyCode 89}]]
-   [[:viz-yard.bricks/stretch-panel :wider]
-    [{:keyCode 68, :shiftKey true}]]
-   [[:viz-yard.bricks/stretch-panel :longer]
-    [{:keyCode 83, :shiftKey true}]]
-   [[:viz-yard.bricks/stretch-panel :narrower]
-    [{:keyCode 65, :shiftKey true}]]
-   [[:viz-yard.bricks/stretch-panel :shorter]
-    [{:keyCode 87, :shiftKey true}]]
-   [[:viz-yard.bricks/panel-depth-up] [{:keyCode 82, :shiftKey true}]]
-   [[:viz-yard.bricks/panel-depth-down]
-    [{:keyCode 70, :shiftKey true}]]
-   [[:viz-yard.bricks/nudge-panel :up] [{:keyCode 87}]]
-   [[:viz-yard.bricks/nudge-panel :down] [{:keyCode 83}]]
-   [[:viz-yard.bricks/nudge-panel :left] [{:keyCode 65}]]
-   [[:viz-yard.bricks/nudge-panel :right] [{:keyCode 68}]]
-   [[:viz-yard.core/alt-key-down] [{:keyCode 67}]]],
-  :clear-keys nil,
-  :always-listen-keys nil,
-  :prevent-default-keys
-  [{:keyCode 32}
-   {:keyCode 46, :shiftKey true}
-   {:keyCode 83, :ctrlKey true}
-   {:keyCode 9}
-   {:keyCode 70, :ctrlKey true}]},
- :client-name :learned-black-ox-hailing-from-tidal-marsh,
+ :memory [234616296 214999672 4294705152],
+ :status-data
+ {"kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :creative-burgundy-serval-exiled-from-barrier-island,
+      :at "2024-04-01 16:45:58",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-04-01 16:45:58 - query ran in 0 ms."],
+          :name "query-log-:flows-drag-13",
+          :order 1712004358,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:flows-drag-13",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:flows-drag-13 "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2024-04-01 16:46:41",
+      :payload nil,
+      :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :alert1
+  {:alerts
+   {:data
+    [[[:v-box
+       :justify
+       :center
+       :style
+       {:opacity 0.7}
+       :children
+       [[:box
+         :style
+         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         :child
+         "successfully saved screen"]
+        [:box
+         :style
+         {:font-weight 700, :font-size "18px"}
+         :child
+         "final-fantasy-dorchester"]
+        [:box
+         :style
+         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         :child
+         "@ /home/ryanr/rvbbit/backend/screens/final-fantasy-dorchester.edn"]]]
+      10
+      1.6
+      8]
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
+ :flow-subs [:flow/live-scratch-flow>*running?],
+ :client-name :creative-burgundy-serval-exiled-from-barrier-island,
  :openai-api-key "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",
- :window {:w 2280, :h 1303},
+ :window {:w 3194, :h 1740},
+ :post-meta
+ {:movies_deets {:* {:rowcount 6}},
+  :query-8163 {:* {:rowcount 1}},
+  :query-2 {:* {:rowcount 29}},
+  :gen-viz-841 {:* {:rowcount 17}},
+  :all-movies {:* {:rowcount 91}},
+  :flow-functions-drag-1 {:* {:rowcount 121}},
+  :flows-drag-13 {:* {:rowcount 87}}},
+ :flow-estimates
+ {"client-keepalive" {:times nil, :run-id "66a9328e-e82c-4cb3-acfb-74977dc7e69a"}},
+ :status
+ {"kick-test!" {:kick :flows-drag-13},
+  :heartbeat {:kick [:flow/live-scratch-flow>*running?]},
+  :alert1 {:alerts :alert2}},
  :screen-name "sick-of-your-shit",
  :recos-page2 0,
  :selected-tab "strategic grill locations",
@@ -306,90 +551,1504 @@
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
  :recos-page 0,
- :re-pollsive.core/polling
- {:rules
-  [{:interval 10,
-    :event [:viz-yard.bricks/dispatch-auto-queries],
-    :poll-when [:viz-yard.bricks/auto-run-and-connected?],
-    :dispatch-event-on-start? false}
-   {:interval 5,
-    :event [:viz-yard.bricks/update-metadata],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 120,
-    :event [:viz-yard.bricks/clean-up-reco-previews],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 2,
-    :event [:viz-yard.bricks/prune-alerts],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 1,
-    :event [:viz-yard.bricks/refresh-runstreams],
-    :poll-when [:viz-yard.bricks/runstream-running?],
-    :dispatch-event-on-start? false}
-   {:interval 1,
-    :event [:viz-yard.bricks/sub-to-flows],
-    :poll-when [:viz-yard.bricks/new-flow-subs?],
-    :dispatch-event-on-start? false}
-   {:interval 1000,
-    :event [:viz-yard.bricks/update-metadata-tabs],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 1,
-    :event [:viz-yard.bricks/update-conditionals],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 4,
-    :event [:viz-yard.bricks/refresh-status],
-    :poll-when [:viz-yard.bricks/bg-status?],
-    :dispatch-event-on-start? false}],
-  :counter 5},
- :re-pressed.core/keyup
- {:keys nil,
-  :event-keys [[[:viz-yard.core/alt-key-up] [{:keyCode 67}]]],
-  :clear-keys nil,
-  :always-listen-keys nil},
+ :repl-output
+ {:all-movies
+  {:ns "rabbit-board.user",
+   :value
+   [[{:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/39zl8hKK4QP1kASldccYyN/7fc8a7c86872abb9fd527a350365beea/Midnight_in_Paris_Wow_3_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6rl512MqIH6r04L4O9jHU2/2d843c19937d770860f17719960d8352/Midnight_in_Paris_Wow_3_360p.mp4",
+      :release_date "2011-05-20",
+      :director "Woody Allen",
+      :full_line "Wow.",
+      :movie "Midnight in Paris",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7BBJiej0qdBbuB3Xvimrae/932bc77c9e9a9918949709f846035541/Midnight_in_Paris_Wow_3_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/2ZcfSCe2dlfoVzYMr4b9nK/d566e5ad044dee56645f3bffc7200d64/Midnight_in_Paris_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5tBiVUM6ef2mARH3OXzP92/8ad999e82b7bff5ac4a07d1b4dcb45f3/Midnight_in_Paris_Wow_3_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7BDkqWADSOxxYOSQGqNRcr/6fc4696de0d8bcafa487ddea97bb6d3b/Midnight_in_Paris_Wow_3.mp3",
+      :current_wow_in_movie 3,
+      :timestamp "00:48:45",
+      :movie_duration "01:33:57",
+      :character "Gil Pender"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3q34qMsvY03UZWY8DXuHqs/35f98e652d326d739e21bd237c520048/Hall_Pass_Wow_4_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/v6tSCvjbln86wLOAlERsv/bb1dbfddcf349ef82bb46df53bd40b0a/Hall_Pass_Wow_4_360p.mp4",
+      :release_date "2011-02-25",
+      :director "Peter Farrelly and Bobby Farrelly",
+      :full_line "Wow.",
+      :movie "Hall Pass",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1C8TPI7yDxxK9qAlMsBGEH/16cfaf8e7333344046aaa4c8afb296b2/Hall_Pass_Wow_4_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6jFEUPmYiKifaTuC2cugm8/22087834d091445fc9393cdd9163a901/Hall_Pass_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2zjDTW0TxCxOc455pcINEl/baaf8f331d29f58641a61baca0942f0b/Hall_Pass_Wow_4_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/5Xc2NTY2HJQjKDiLOPhGzO/a086b30a35aa5c6b9ac994ac6a353b1c/Hall_Pass_Wow_4.mp3",
+      :current_wow_in_movie 4,
+      :timestamp "01:05:12",
+      :movie_duration "01:51:35",
+      :character "Rick Mills"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6kIDoftFyBJOgvCBe5Jr5k/51be6dcd0a40aff052a4215258f6f2cb/Cars_3_Wow_10_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/923BnYGWVuiPpWeM7e6wv/db39600a6bd7c6a807e95d397d129dd4/Cars_3_Wow_10_360p.mp4",
+      :release_date "2017-05-23",
+      :director "Brian Fee",
+      :full_line "Wow. You don't mince words around here, do you?",
+      :movie "Cars 3",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3KJZ435sr6Y5k00AnZdOJ2/2aadc7fbc687b38c3f1536a9efc16cdb/Cars_3_Wow_10_1080p.mp4",
+      :year 2017,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/43fOBsgY8iOJL0dijvFnfl/ea361efc5131a859c173ab5dd3fdfe1e/Cars_3_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5vQtn6ny9J79PNG16jsJMR/1b4804366cfb9206d70472ab9b7f37e6/Cars_3_Wow_10_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3iZaUMMLnxCH1fIqcXpYZ0/78e6ee967cae46e64a6f65c6f451115a/Cars_3_Wow_10.mp3",
+      :current_wow_in_movie 10,
+      :timestamp "01:03:08",
+      :movie_duration "01:42:25",
+      :character "Lighting McQueen"}
+     {:total_wows_in_movie 1,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1Jt8lNgxAhSC6O4hGMwlmo/e6907bf57876150438cf636378393ab3/Zoolander_Wow_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5yUxumsvDYzcUc1KutJv83/a2837f4b4a0573461fd0ba30f381f7de/Zoolander_Wow_360p.mp4",
+      :release_date "2001-09-28",
+      :director "Ben Stiller",
+      :full_line "Wow! How'd that affect you with guys?",
+      :movie "Zoolander",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5T5AaRDnjqBq7DkokRRM7u/d8d69f9b15a92e059889fe67fa397516/Zoolander_Wow_1080p.mp4",
+      :year 2001,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/1zt2u6ntTFiFttCprVf6jK/d944b002359c2f354f5c636566229d94/Zoolander_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3kiBQJFgktksKgke3ceqhX/5bcb40c8f1474bb7e2c368886440b74f/Zoolander_Wow_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/5E7gIINsdQjBa2HtCPDkgL/6bbd5a1812ed7c8b5e82324d199ca579/Zoolander_Wow.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "01:01:08",
+      :movie_duration "01:29:12",
+      :character "Hansel McDonald"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/14m98MSbhWy0hmgGYhfOcP/a627da4b571238583220ca06402df831/Midnight_in_Paris_Wow_6_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3KKZ9loBNLtq2aND54jBne/0e90ec9d9169fe7b1d72c30697cc5798/Midnight_in_Paris_Wow_6_360p.mp4",
+      :release_date "2011-05-20",
+      :director "Woody Allen",
+      :full_line "Wow. I don't know what it is about this city.",
+      :movie "Midnight in Paris",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/sThNLOaMZ9kGYGkqdUqVK/4594113a3c66d44f502f2ade2e64c499/Midnight_in_Paris_Wow_6_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/2ZcfSCe2dlfoVzYMr4b9nK/d566e5ad044dee56645f3bffc7200d64/Midnight_in_Paris_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4mwofBevCQ3RQAux3KRFvT/1e87938601501f11d5e12ad57cf540a7/Midnight_in_Paris_Wow_6_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/1fOW3VrwKZkjZMSkEa8MY9/43e216e2b271a770289d7673629dfd83/Midnight_in_Paris_Wow_6.mp3",
+      :current_wow_in_movie 6,
+      :timestamp "01:16:21",
+      :movie_duration "01:33:57",
+      :character "Gil Pender"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2ZkkHUMoueBBzvyG67Rebd/65fa5decd572d851332e208d16336298/Wedding_Crashers_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1QjUK78uABHEgsH9nNxZjR/944b6f8452283e43d1637e354948ed14/Wedding_Crashers_Wow_2_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line "Wow, that's beautiful.",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6YVH0H5ng4HGV4yHst1JYA/278c794eabbd6708e966ca9ee0f580b9/Wedding_Crashers_Wow_2_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/GyUSh9qZYQ9DU4SvEFJAV/9f2047017e045d95130bcc211fb15424/Wedding_Crashers_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/4JB7eJR8Eyfxdu1G0P0MW0/4b102a855e9683dc6dddd7d086a50e81/Wedding_Crashers_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:30:22",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}
+     {:total_wows_in_movie 2,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5jBrCwue7YyNWATPMsnEM3/3897126fa0cacee7817cb798db85a829/Little_Fockers_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4NRdmxRxOFF7u8uSDCDpbz/f948d2f764468c89f5e37fa2b3804661/Little_Fockers_Wow_1_360p.mp4",
+      :release_date "2010-12-22",
+      :director "Paul Weitz",
+      :full_line "Wow.",
+      :movie "Little Fockers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6sQcwSbOHUtQwSa2AiGVx4/4bd91b3f82378c6cec36003010b6bc7b/Little_Fockers_Wow_1_1080p.mp4",
+      :year 2010,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/2uitJuVd7wiuh57N42VotB/97be419cc8d17405b256bf6f63afd461/Little_Fockers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1MgGCFiDEMuDtZf5pPXZrq/9abb8fedcf84c2aad104a993cab043ef/Little_Fockers_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3B0YwIinFRjyDhg87ubLnm/e7ca0400c19fe1fe118ebc2901dc3518/Little_Fockers_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:26:32",
+      :movie_duration "01:37:40",
+      :character "Kevin Rawley"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/70ioTuxJxr7IzPXOsu8rup/f8929c2da3d5d0732c5448ab611edfab/Wedding_Crashers_Wow_5_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1ucIp9SJYuJK2Vlfop0DNp/bcf9755c771738206286ab530192bf74/Wedding_Crashers_Wow_5_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line "Oh man, I feel like, 'Wow!'",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1YzR1Pzp9xdKpeVx5g3jIr/30e64e2e04052757d25f604b94b2e75f/Wedding_Crashers_Wow_5_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1jMKkwnCZi7RUHViZZTLNC/4f76282a738dc7fd7163d8bbbb3e2477/Wedding_Crashers_Wow_5_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3o4FwZeAcd35eMg8G0LNmj/d2557eeb4cc53addd6efcb82b1543a9c/Wedding_Crashers_Wow_5.mp3",
+      :current_wow_in_movie 5,
+      :timestamp "01:50:19",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}
+     {:total_wows_in_movie 5,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/67gEv3fXOzKu5IsscIYAxw/bf8e18b6543eec4ac1952d6c6845cb8f/The_Internship_Wow_4_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1ZrN3pCfLhimJ2fxxf86n3/43116038f56d789a1514778081c7dcc2/The_Internship_Wow_4_360p.mp4",
+      :release_date "2013-05-29",
+      :director "Shawn Levy",
+      :full_line "You're so cute. It's beautiful. Wow.",
+      :movie "The Internship",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/61gtrYzY8qsD3Onc4hUNdx/e1685933255e13fce8578594dbfc30aa/The_Internship_Wow_4_1080p.mp4",
+      :year 2013,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6XhmTpc1PoiTf0q1nDYMyv/594947f72b4dba7f3c24938a680dd603/The_Internship_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3CQQDswj7JP1UU95KdHZ2x/af3e2709d1b8c730a177a56e0395bce3/The_Internship_Wow_4_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/5Jphk5c8qFsc7ZiWNeJOKQ/80f43d3758ee8730987c6a859ffec667/The_Internship_Wow_4.mp3",
+      :current_wow_in_movie 4,
+      :timestamp "01:26:54",
+      :movie_duration "02:05:02",
+      :character "Nick Campbell"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2DfiudsiNA5n0CR2ibzu38/a405bd61b9c11240aa4dd7e163cc0903/Cars_3_Wow_9_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5hqNcasvZElh5BBsqfIfGe/4290d6abe948dd3748174f7b9ec8e99d/Cars_3_Wow_9_360p.mp4",
+      :release_date "2017-05-23",
+      :director "Brian Fee",
+      :full_line "Wow! If this track could talk.",
+      :movie "Cars 3",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3gPhAoO2LZIm0gzabDjz7Z/a760747d57c79919d11ab0f5d375d941/Cars_3_Wow_9_1080p.mp4",
+      :year 2017,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/43fOBsgY8iOJL0dijvFnfl/ea361efc5131a859c173ab5dd3fdfe1e/Cars_3_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7bPOEzJtYhDXbpOs6kgdkx/c14bae22c91df66464b6618d482d870f/Cars_3_Wow_9_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7dtp0B7f3vxAv7Gx9ojPH/cbd707a4b762e8032ce619c6f8e62cd9/Cars_3_Wow_9.mp3",
+      :current_wow_in_movie 9,
+      :timestamp "01:01:00",
+      :movie_duration "01:42:25",
+      :character "Lighting McQueen"}
+     {:total_wows_in_movie 1,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/14Gt7a5PY24GZXeEUoOaIT/dc84d815d786d21b67e6bc26d076273a/Breakfast_of_Champions_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1FmEgg2L7pWdbBo6pSJwZK/0309aba43e531159db02c38932318785/Breakfast_of_Champions_360p.mp4",
+      :release_date "1999-09-17",
+      :director "Alan Rudolph",
+      :full_line "Kilgore Trout. Wow.",
+      :movie "Breakfast of Champions",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3XRms3VUiccrIuMa9IPvI2/c8e072c07ced11cc8eca854379abac35/Breakfast_of_Champions_1080p.mp4",
+      :year 1999,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/1hfOzFVYk5jjz7uzvSJYdC/aeda61b357bcf8c485be1dc3232f1be5/Breakfast_of_Champions_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1XtsYSf9Kslhb9Ar8SmQHw/62e10025f3e21c08778a6f1444d4b58c/Breakfast_of_Champions_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/1KRkfdHn1wFNjk7PqiG8me/d2cd53c422fcfbb2de87f845b65400bc/Breakfast_of_Champions.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:52:59",
+      :movie_duration "01:49:49",
+      :character "Monte Rapid"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7zBgsjyNyZhQtdjIekFd1I/bf1d93da019975dbc2ec5a9782c19362/Hall_Pass_Wow_5_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1q45fXoDqHYxrW7g6BzJ5f/00271d50308ec83b9a1098cf49f7b580/Hall_Pass_Wow_5_360p.mp4",
+      :release_date "2011-02-25",
+      :director "Peter Farrelly and Bobby Farrelly",
+      :full_line "Wow.",
+      :movie "Hall Pass",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3BgUi9O0hvTJ8cs74hNnCG/708866bf02e75a692b7be57a29a80ad4/Hall_Pass_Wow_5_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6jFEUPmYiKifaTuC2cugm8/22087834d091445fc9393cdd9163a901/Hall_Pass_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/65C0eSsBBVDBwXNObxZgOg/b53e767a35a5bbdb9d2579f6aaba6c5e/Hall_Pass_Wow_5_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7tYiz6vKgOFSoP7TkXAEr/e522d0b8e939153683ec7ca27e87b40c/Hall_Pass_Wow_5.mp3",
+      :current_wow_in_movie 5,
+      :timestamp "01:06:38",
+      :movie_duration "01:51:35",
+      :character "Rick Mills"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2yt9LsglNDGO5LO0vWvpUj/01fdc19bb4783eb9b1e83ddca9e07519/Wedding_Crashers_Wow_3_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/137JOI01wFeHUFsnJ9FkS5/69bf6a1304e98c97f91741ce85b958cc/Wedding_Crashers_Wow_3_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line "Wow, they feel really nice.",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6RmiFel4DrYkergvfHCLF2/6d350fdfab279a7e1a8e9b795a53770e/Wedding_Crashers_Wow_3_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1yvARtmmhwFPqo5UZxafxi/15bea60c834fd35f1c7a0ab23fa6c954/Wedding_Crashers_Wow_3_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/6iY7ytiZxw2ZxMKzEGDxPZ/4cf8ab6c313416576ca45b68676f4536/Wedding_Crashers_Wow_3.mp3",
+      :current_wow_in_movie 3,
+      :timestamp "01:00:21",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}
+     {:total_wows_in_movie 1,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/33kn8W9ZhSZmqWqcT72G6E/d06b51805ddccde2823a7c03c9344e1d/Cars_2_Wow_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2PWdPmfKi3ku1eeBr77Ya/521a4c3c2cf866975ae54f8d03d62582/Cars_2_Wow_360p.mp4",
+      :release_date "2011-06-18",
+      :director "John Lasseter",
+      :full_line "Wow.",
+      :movie "Cars 2",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2kM0aGgsg5gs3YVejP7Vam/c007b0baf9d05bad9c9a7126b21d92b6/Cars_2_Wow_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/76IqehTyoKY0nEOb27KVeN/8da7dc62b18da132b23c4cfa27dfecbf/Cars_2_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4FzP0omfeMThOhuq7JQrdV/78a0f278a11d5496c7e2d541767da103/Cars_2_Wow_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/2Z4SojTGOfI7eivcEqiFRu/56213e128ff5172a598be105f8adffc3/Cars_2_Wow.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:10:53",
+      :movie_duration "01:47:01",
+      :character "Lightning McQueen"}
+     {:total_wows_in_movie 1,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1ISRdFDy96B8KXmrtXSwA3/bddbc613e4407647f11572afcbed58ef/Starsky___Hutch_Wow_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4xmRiImmnvbq2FEE3ZpSSy/1b8571014ba5a92986b783cf166af152/Starsky___Hutch_Wow_360p.mp4",
+      :release_date "2004-03-05",
+      :director "Todd Phillips",
+      :full_line "Wow. This is a nice boat.",
+      :movie "Starsky & Hutch",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2bS8rmacdiaScJTLJ2gdmn/e46675526592912babda9ab2d0481bc7/Starsky___Hutch_Wow_1080p.mp4",
+      :year 2004,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/v47twoX46th0GusPBZxbe/744026a55d2e2931d9d062005065d1d5/Starsky___Hutch_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/Apxj4LmYcCcGNi3e2niCz/5240ad0439cc9abcc90d96d2a97e48a7/Starsky___Hutch_Wow_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3ausSCSm1FfjOdBAe4RZE4/b961140dd002c414672d14bc6341afc0/Starsky___Hutch_Wow.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:21:43",
+      :movie_duration "01:40:30",
+      :character "Ken Hutchinson"}
+     {:total_wows_in_movie 4,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4cAMwJmNPEjQmHhzoe86pM/90de70dc66b891d1690296cd6e4d1c65/Marmaduke_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5XRZ6QtKihvrUjSt6hpkL7/78f57f9e5ff42e6a969e6e6de998d81b/Marmaduke_Wow_2_360p.mp4",
+      :release_date "2010-06-04",
+      :director "Tom Dey",
+      :full_line "Wow. This is Phil's office?",
+      :movie "Marmaduke",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3XjUFC9OLLHAJ1hWEI1bGP/dc39733ed4356320d8abe110c3176369/Marmaduke_Wow_2_1080p.mp4",
+      :year 2010,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/1M4wQc5Rkk9mlcKB5Z4fga/25fef21907983d1d667e7e28c6a0ed14/Marmaduke_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3jLtVaCWBB48lpprBWpHSo/5426fe9c1fa2d6f3f4478089e389854f/Marmaduke_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/1eoQ6zaqTGIOcBguxXp4kb/80dd96f4a2337cf154b7a474c27f1c2d/Marmaduke_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:12:21",
+      :movie_duration "01:28:10",
+      :character "Marmaduke"}
+     {:total_wows_in_movie 3,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/55z94kbUxNFIL0rYb1i2mH/ca0505ca5e2017b663f18cca8af571b2/The_Big_Year_Wow_3_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6moRL0SzmkTGzgEuZeVByI/c63fa33d0992c0594ecbaed4fcd7e891/The_Big_Year_Wow_3_360p.mp4",
+      :release_date "2011-10-14",
+      :director "David Frankel",
+      :full_line "Wow, and here I thought I was the bomb at 728.",
+      :movie "The Big Year",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/uOdKu6VANHZjtwZXeBU8M/bf1f0f44c7bc01faa648a1b97b1205d3/The_Big_Year_Wow_3_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/pCjGOhbTCQVjLRN9zTwIi/ce7cdf4b40f3549326d881697aa468a1/The_Big_Year_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/y9wR96fHZaNnZr367mjyI/1262c2af0400cb1dc8528c3c8e6a83a4/The_Big_Year_Wow_3_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/1dXEYZQP1Fl6CX1roy7ZAH/f31b90a6f961dcc16c16b294f4faf664/The_Big_Year_Wow_3.mp3",
+      :current_wow_in_movie 3,
+      :timestamp "01:08:23",
+      :movie_duration "01:43:09",
+      :character "Kenny Bostick"}
+     {:total_wows_in_movie 1,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/01AEKYe9fuy5dDvtqcGEee/3884ada8f930c59329ca09431446dd18/Father_Figures_Wow_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7Lw9MOxSuUmOKjhDIUBsG3/e645af7ee5043211d2103eca7188f2f2/Father_Figures_Wow_360p.mp4",
+      :release_date "2017-12-13",
+      :director "Lawrence Sher",
+      :full_line
+      "There's a saying in Hawaii that goes a little something like this: 'Ohana makawao hihi Wailuku ukulele aloha adios.'",
+      :movie "Father Figures",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2xYriI4IEehecWGtlZ8kXf/d2cdc17514c8674a14007e34d05609ec/Father_Figures_Wow_1080p.mp4",
+      :year 2017,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/4FLpI0gdI6hgH3ZJEKOOgf/6c8a48542a67d8728fa0769368d9e16a/Father_Figures_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3NA6JsOi7f4XFYRT6Mib69/3f8aba6f0718dfa917e9b92c0993259c/Father_Figures_Wow_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/6a4q7B0EwLknSOoN4vAOQU/564fe702d4ed75a6868fd092552a5120/Father_Figures_Wow.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:06:46",
+      :movie_duration "01:52:50",
+      :character "Kyle Reynolds"}
+     {:total_wows_in_movie 4,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/53RXTPUwA11sohwArW18rX/e06a9174143a598e3a00c810e9f266ee/Marmaduke_Wow_4_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1uiC9TvAv2UyogVDyVnqsI/defd319962ec52cf754ef041acfe4d48/Marmaduke_Wow_4_360p.mp4",
+      :release_date "2010-06-04",
+      :director "Tom Dey",
+      :full_line "Wow.",
+      :movie "Marmaduke",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4MnTATqrpxkz0npyl1cojG/1de6cb4654bf0778468ade8c2db5e179/Marmaduke_Wow_4_1080p.mp4",
+      :year 2010,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/1M4wQc5Rkk9mlcKB5Z4fga/25fef21907983d1d667e7e28c6a0ed14/Marmaduke_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7mDZs5juxvPsLPxciMQpXc/60d4877b53b1479e9518ce1251384a81/Marmaduke_Wow_4_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/6CTECWjXKpX9cQsyAsZucB/0aaa6cc30fd1e98c001a75f57f3f1705/Marmaduke_Wow_4.mp3",
+      :current_wow_in_movie 4,
+      :timestamp "01:19:17",
+      :movie_duration "01:28:10",
+      :character "Marmaduke"}
+     {:total_wows_in_movie 5,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1NqJnEX2TbYThhzur4ggOY/e07a51d31ba6f20e096c883482d50b42/Cars_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6w3qK3e9MUMyiXttLQv43R/eb19d892ba531df43a5b72159bce17e6/Cars_Wow_2_360p.mp4",
+      :release_date "2006-06-09",
+      :director "John Lasseter",
+      :full_line "Wow! What is this place?",
+      :movie "Cars",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5VCHcTVNPc2uKAsr7dwnuP/6219d5d6a40a0e992f2dc5bd541f20ac/Cars_Wow_2_1080p.mp4",
+      :year 2006,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6dsHUil72TJLYqbwYMEjH4/387a2d9994a2f1fb069d970a0f30ba32/Cars_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3LNNKLX5hZlFBtLxdwRmsa/82cb03506ef65f19ab0da4e1c4c78739/Cars_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7pUmg9DogrN8UlgrT4LOZs/b1a4945744e96b2fe06bfc2f1c437e39/Cars_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "01:09:35",
+      :movie_duration "01:56:36",
+      :character "Lightning McQueen"}
+     {:total_wows_in_movie 5,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2t0rkVxOB7MVJVzUtVobAV/c396fd523e190052d4b009081b22423f/The_Internship_Wow_5_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1W9V229ebo4J74HLZGO7pF/f4379d501080fc77221ca8df020a7cd6/The_Internship_Wow_5_360p.mp4",
+      :release_date "2013-05-29",
+      :director "Shawn Levy",
+      :full_line "Wow, a little heart and everything.",
+      :movie "The Internship",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1tZ97B7BWV7WhuYJSRL0aQ/c86ca6ce4c67a0f1f5343e68a7b1f428/The_Internship_Wow_5_1080p.mp4",
+      :year 2013,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6XhmTpc1PoiTf0q1nDYMyv/594947f72b4dba7f3c24938a680dd603/The_Internship_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2QlKc3s0Nf10vMLaKGFhVf/a76e1c99d80b13687ae593ad95837706/The_Internship_Wow_5_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/30nYCeovpGBN5dwVmnTxrf/62c07aaab901bb488bc53ed61d2edffc/The_Internship_Wow_5.mp3",
+      :current_wow_in_movie 5,
+      :timestamp "01:27:38",
+      :movie_duration "02:05:02",
+      :character "Nick Campbell"}
+     {:total_wows_in_movie 4,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/lmj6Wg0NzVCCxEeYZtFEo/b8ce31f27c910714666f61ebe1007985/Shanghai_Knights_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/zHoyxfFdX5eXvjfc9vTHQ/d3b181d3533ae9d99f53cf02cf1f93d3/Shanghai_Knights_Wow_2_360p.mp4",
+      :release_date "2003-02-03",
+      :director "David Dobkin",
+      :full_line "Wow, look at this!",
+      :movie "Shanghai Knights",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5sh5zG45deju3no63NYxjz/7164b7c94e7942216205300158f8ee68/Shanghai_Knights_Wow_2_1080p.mp4",
+      :year 2003,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/4pb4EMrNtfK3x9PyTMLcGl/bd4d6db24a4247b0f33211eeb882c26a/Shanghai_Knights_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/75UZ7QgK2eIKrjPCPNShUk/9d190b694e1b3d47df022eda47d130ad/Shanghai_Knights_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/HY1HVUJwet1h4Dlte0UYI/edb77c0e009d51a8a159764bf7281368/Shanghai_Knights_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:52:05",
+      :movie_duration "01:54:21",
+      :character "Roy O'Bannon"}
+     {:total_wows_in_movie 3,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6ueSFTpQMrDWEdxEA5zHYO/c0f93a4a4897979683a49a53a81b88d2/Marley___Me_Wow_3_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6Qznp0YD0wFdjnKlgo9z3e/3d7cd9060259ec26f884c35ab67751ac/Marley___Me_Wow_3_360p.mp4",
+      :release_date "2008-12-25",
+      :director "David Frankel",
+      :full_line "Four for four. Wow.",
+      :movie "Marley & Me",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/176WMyomQY18M1pY0LGNmv/52974374173d0593cd158aeef0e4db6f/Marley___Me_Wow_3_1080p.mp4",
+      :year 2008,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/1k95TZRiTlZtAOpLjysOnF/69881667de3e849853ee1d4a9d3ab92e/Marley___Me_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6Q5WQNoB30VO2ox92IGes3/d70f73d68b0929f98705a0601cc5b7f7/Marley___Me_Wow_3_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/63iKQz8ZwARtRQGBhWf9rR/155dc25f5d0a98f12c7d4656828b1b2a/Marley___Me_Wow_3.mp3",
+      :current_wow_in_movie 3,
+      :timestamp "00:59:06",
+      :movie_duration "01:55:32",
+      :character "John Grogan"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1h3am3BfJYUm0VXV4uKF9P/e75775ec0621889efd40ce1bc372735a/Cars_3_Wow_4_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6eO8c3ojQA4rWMlE1hMMOa/c3a9ce4c01b2d342b33144c9f90b9e3e/Cars_3_Wow_4_360p.mp4",
+      :release_date "2017-05-23",
+      :director "Brian Fee",
+      :full_line "Wow.",
+      :movie "Cars 3",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7G6jLS5xfYBOepUxkW7R3c/c78d22f63ba51f371a1550834888b9ca/Cars_3_Wow_4_1080p.mp4",
+      :year 2017,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/43fOBsgY8iOJL0dijvFnfl/ea361efc5131a859c173ab5dd3fdfe1e/Cars_3_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/lIhPcmNS5L4DnpY41EpUA/96b0c5b44acf3fe16e68d1e67156d41c/Cars_3_Wow_4_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/6aJuGg3bTjqd20j59vP1Wv/6cb60311194d3a9aa040882911a5f516/Cars_3_Wow_4.mp3",
+      :current_wow_in_movie 4,
+      :timestamp "00:26:11",
+      :movie_duration "01:42:25",
+      :character "Lighting McQueen"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/37JfmMxgY5URkfzGHVFzz6/7b3a2c28337b907156b9d188d915f808/Midnight_in_Paris_Wow_10_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1ADFvq1Y1NNvDPuxE4oeGw/99238d021f9cd98b7599401ec0f89a9e/Midnight_in_Paris_Wow_10_360p.mp4",
+      :release_date "2011-05-20",
+      :director "Woody Allen",
+      :full_line "Wow, what are you doing here?",
+      :movie "Midnight in Paris",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/53qNbwo1bhqRIdsEHPpTgL/83469d1bfc1c01d25aa5b213609ee988/Midnight_in_Paris_Wow_10_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/2ZcfSCe2dlfoVzYMr4b9nK/d566e5ad044dee56645f3bffc7200d64/Midnight_in_Paris_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/35tFTqQO7ZiLnWaxpOGtGd/fde41f2592c8c841dead7fa602dec360/Midnight_in_Paris_Wow_10_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3Zzh5NfDdGzKcccwAvxssg/827fd8154ea1e0bad32805adb176d9f5/Midnight_in_Paris_Wow_10.mp3",
+      :current_wow_in_movie 10,
+      :timestamp "01:28:59",
+      :movie_duration "01:33:57",
+      :character "Gil Pender"}
+     {:total_wows_in_movie 5,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/ppd78TmYD92RqnbmYKsxN/ba8a792db78f21fb28df5168855399a4/The_Haunting_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2RFXb9ZvddbiRAX3wTGLz1/01a1dc79b0f2f36ad1bfe491003250e2/The_Haunting_Wow_1_360p.mp4",
+      :release_date "1999-07-23",
+      :director "Jan de Bont",
+      :full_line "Okay, obsessive indecision. Wow.",
+      :movie "The Haunting",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/10eXG7hCb3ZgZa5uVfTL8x/a879acc0f52d81171804efc904e6b05d/The_Haunting_Wow_1_1080p.mp4",
+      :year 1999,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6Zu7ux0JYrUWk0UC8vxPtj/d0da8bfbad670655779a9921ac514759/The_Haunting_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3LecX00nok4o0vmKUlOpYs/640389e05b9b7a1c8ebd43c90dcd6cbb/The_Haunting_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7l3exXFeBHzBdzFhz5Z6J6/1f3d7996d710a7dae8b657daed912309/The_Haunting_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:23:20",
+      :movie_duration "01:52:37",
+      :character "Luke Sanderson"}
+     {:total_wows_in_movie 3,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4055JbT9kz9GBbBa4OPLMv/f761a386bf51a405494a69f523e32432/Free_Birds_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6Qm5w3lwxMmpq2AwIHalx5/156dae6a6205f980e8d3906fd8541fcb/Free_Birds_Wow_2_360p.mp4",
+      :release_date "2013-11-01",
+      :director "Jimmy Hayward",
+      :full_line "Wow!",
+      :movie "Free Birds",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6Ne8IxCMJgnCBzRG5SjPvt/1e149a72bbb24576b3db74b41ba813ee/Free_Birds_Wow_2_1080p.mp4",
+      :year 2013,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/7MaIGsHazkYQr23iZVVrNr/a7d63846d09edd763a818a82a6b959e3/Free_Birds_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2peYLdR2UTsXZxsrtEDdoJ/3d97b424af96243e3955ac7b5aad6e25/Free_Birds_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/5G8TOg91f3Vq2vnykOWuU4/d5dd129dd15f1782054b07ae527b2833/Free_Birds_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:30:51",
+      :movie_duration "01:31:03",
+      :character "Reggie"}
+     {:total_wows_in_movie 3,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1mX1xE5VgDpkQeTueSuZzX/41850f8b5b38aa76c3131c026fca387a/Marley___Me_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2b6IvSW4MdXrBPheGa8faO/e9f893766d75c311c96d85ffbcd04faf/Marley___Me_Wow_1_360p.mp4",
+      :release_date "2008-12-25",
+      :director "David Frankel",
+      :full_line "Wow. They really gave you a lot of space.",
+      :movie "Marley & Me",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4nhhv7zq9vz1FpCchP4hOY/affe02a7b8d1b597c7ca60b45adaacc5/Marley___Me_Wow_1_1080p.mp4",
+      :year 2008,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/1k95TZRiTlZtAOpLjysOnF/69881667de3e849853ee1d4a9d3ab92e/Marley___Me_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2ggG9a2f5bHhOCMTObD9kF/d7ffc47c4d3f148a24d0fd2c1a312c87/Marley___Me_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/5UNHWK6YJrKFAXboH8rqGe/b071fc733b9647ada4a8cad7550a2e1b/Marley___Me_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:08:04",
+      :movie_duration "01:55:32",
+      :character "John Grogan"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2cDjPOG8tGBvsFuIJM8k6M/267f88f08ebbcfef10e04aaba15b12bc/Cars_3_Wow_7_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/46hAKANrmKVwmSxQjkUFB1/0c5098b914413b501b8e666790d54491/Cars_3_Wow_7_360p.mp4",
+      :release_date "2017-05-23",
+      :director "Brian Fee",
+      :full_line "Wow.",
+      :movie "Cars 3",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3lu3BlImngquNpoKnipXTz/e00297dd076919cbd4ad586a0ed1eae9/Cars_3_Wow_7_1080p.mp4",
+      :year 2017,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/43fOBsgY8iOJL0dijvFnfl/ea361efc5131a859c173ab5dd3fdfe1e/Cars_3_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/rv2ww28lmlvrtXzvUAWuu/62caba98dd13cc5a5fe620e497b144d7/Cars_3_Wow_7_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7Kv7foPuCTFjHDJbl7oVQq/71eb552131d2f91b86071adfd278acaf/Cars_3_Wow_7.mp3",
+      :current_wow_in_movie 7,
+      :timestamp "00:28:17",
+      :movie_duration "01:42:25",
+      :character "Lighting McQueen"}
+     {:total_wows_in_movie 4,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/13KD5BugQh9PFuVnlg1Tz0/aff15774860e37ef1dd99d796eb19da5/Shanghai_Knights_Wow_3_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5p6Aw1VCGpcwLN6zjlEKfD/dced95d07ad71e391c85a712e6ea90b9/Shanghai_Knights_Wow_3_360p.mp4",
+      :release_date "2003-02-03",
+      :director "David Dobkin",
+      :full_line "Hey, I can see our hotel from here! Wow.",
+      :movie "Shanghai Knights",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1Astr9fayq6pkeVYJmdBVU/9e04fa628af74c800e7f43f7a9e0d2e7/Shanghai_Knights_Wow_3_1080p.mp4",
+      :year 2003,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/4pb4EMrNtfK3x9PyTMLcGl/bd4d6db24a4247b0f33211eeb882c26a/Shanghai_Knights_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/qBYwhnty0x84phmWdja6a/3e850e18d50292c991c7a4a6c6ff46c6/Shanghai_Knights_Wow_3_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/6BOieQV4K46p9nm7rFc7eG/cc7465cb72c8fb48ee9fc6b82470d1fd/Shanghai_Knights_Wow_3.mp3",
+      :current_wow_in_movie 3,
+      :timestamp "01:36:17",
+      :movie_duration "01:54:21",
+      :character "Roy O'Bannon"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/16MHGjswnNzaDj3FpIsnjn/c0f135e1ccdd6b2fe14581b90d57a0ad/Midnight_in_Paris_Wow_4_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3N4bkLFsnyW16BExbaWVwp/88125648a77b6f46d0491dfc65919c14/Midnight_in_Paris_Wow_4_360p.mp4",
+      :release_date "2011-05-20",
+      :director "Woody Allen",
+      :full_line
+      "Wow. That's... Th-Th-That's... That's... I'm going to be thinking about that one.",
+      :movie "Midnight in Paris",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2vKvCWuj8RiCs9i3Kcaufa/fe0dcb67c42e7de66885f7d8cac9913b/Midnight_in_Paris_Wow_4_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/2ZcfSCe2dlfoVzYMr4b9nK/d566e5ad044dee56645f3bffc7200d64/Midnight_in_Paris_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/x2UuiVvSy9oUXf4ThliOV/f44fbb0e0dd88926db978bafed52cf91/Midnight_in_Paris_Wow_4_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/4QwGbTbOXVJ1Hcu4M9H97c/506e45bb7aa6c85f5faa161b78108ddd/Midnight_in_Paris_Wow_4.mp3",
+      :current_wow_in_movie 4,
+      :timestamp "00:52:03",
+      :movie_duration "01:33:57",
+      :character "Gil Pender"}
+     {:total_wows_in_movie 5,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7cVSPYGUbn5jm7Lab0lafw/b5071272d7146d70ab1dbf08f4a1319b/The_Internship_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6QCTva7iEh8WRGFRbOL62X/f7cbf460bc7f6841818390b0f5fdcf45/The_Internship_Wow_2_360p.mp4",
+      :release_date "2013-05-29",
+      :director "Shawn Levy",
+      :full_line "Wow!",
+      :movie "The Internship",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2HrgjW55Ubyibrj5jWCONN/8cc67817fcf43821fa808f45f47b771d/The_Internship_Wow_2_1080p.mp4",
+      :year 2013,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6XhmTpc1PoiTf0q1nDYMyv/594947f72b4dba7f3c24938a680dd603/The_Internship_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1quea0uaxZG0XhG2OZHyiN/bc567d11211c484c57df81ebc2738da5/The_Internship_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/2T6B1CgkHRARp0UT9ZTbct/c0019c6d2664f5d2f8baf7b1f95beb6d/The_Internship_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:40:45",
+      :movie_duration "02:05:02",
+      :character "Nick Campbell"}
+     {:total_wows_in_movie 1,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/BElsd8UBlxbnmnovXVTOw/1377b0cfff6a0e9072c5a34e0dc56b32/The_Darjeeling_Limited_Wow_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6f8nr5iOXNlhCg1q6BGbFs/759a3b52920c27b2792325aa30a5d499/The_Darjeeling_Limited_Wow_360p.mp4",
+      :release_date "2007-10-26",
+      :director "Wes Anderson",
+      :full_line "Wow. Right?",
+      :movie "The Darjeeling Limited",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6b9mIMTh39Yvemz0JIysZu/f3ef235f5c098b73a8672eb967e479de/The_Darjeeling_Limited_Wow_1080p.mp4",
+      :year 2007,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/5D2bYaMm3KLD2IyTom9JxR/d73a69706777bebde1dfdd622a6fc60f/The_Darjeeling_Limited_Poster.jpeg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1lfWe2GLqsokdhNPgBRpsH/f18ec4681b41ae19becdc3c9b024b0b2/The_Darjeeling_Limited_Wow_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/59dP22lz2DcIjABVaFm8vu/f644b85fc36ed56b631772a0fdad9650/The_Darjeeling_Limited_Wow.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:25:35",
+      :movie_duration "01:31:46",
+      :character "Francis"}
+     {:total_wows_in_movie 2,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4U29I0GeB3bdEdpIFWIKm8/2d1d91302b9abb6da10a06fc906f6be8/No_Escape_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2jABQHLuz0ELstdE1TZ79i/538e4d4e59700adc56225e7b4a90c15e/No_Escape_Wow_2_360p.mp4",
+      :release_date "2015-08-26",
+      :director "John Erick Dowdle",
+      :full_line "Oh, wow!",
+      :movie "No Escape",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1rJPcqe7LEtctS32Fwr3p1/0fdbbea8c0fd46d8ef062c6792c51834/No_Escape_Wow_2_1080p.mp4",
+      :year 2015,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/R3PGhNHo0k5uhnPM7bqIp/5e2b3723c69f7c70313be19417c6fdba/No_Escape_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2j9Mv6re20qX00ykvTamKG/7b3c6e2d65f7b9565f18654ee10c7717/No_Escape_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3DIDCnZowVtlwkBSAzuuJT/40ddcd7966013e6e8bdc18d933a84ab5/No_Escape_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:11:12",
+      :movie_duration "01:43:06",
+      :character "Jack Dwyer"}
+     {:total_wows_in_movie 5,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1OCimrvhXGGfffHqBKaqz7/52d16b12a2d1a8a264b09364afc4c87c/The_Haunting_Wow_4_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6bwt57tdhBCbhsXZ4i0pce/7f6debc7e52f80c78a618f19c8087985/The_Haunting_Wow_4_360p.mp4",
+      :release_date "1999-07-23",
+      :director "Jan de Bont",
+      :full_line "Wow, I sorta got screwed on the ol' bedroom selection.",
+      :movie "The Haunting",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/01C128tlGJ79vtlFEPc7V9/184759a9ca6fb1ab57114977afccb2ff/The_Haunting_Wow_4_1080p.mp4",
+      :year 1999,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6Zu7ux0JYrUWk0UC8vxPtj/d0da8bfbad670655779a9921ac514759/The_Haunting_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3fR8AigFIp2I1vkSLRhzur/afb0c226daf7806bc9bd9c5e7b008fb4/The_Haunting_Wow_4_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3yvd3DvmY0XUyqWPLUYLqp/1aabc0f7a6b58003ccdaa61469b8d5ee/The_Haunting_Wow_4.mp3",
+      :current_wow_in_movie 4,
+      :timestamp "00:41:34",
+      :movie_duration "01:52:37",
+      :character "Luke Sanderson"}
+     {:total_wows_in_movie 3,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/12gYyFj41c0Gk7RehZYUDy/8c8ce045b51772f0633fb0f370640e32/Bottle_Rocket_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5a9FGGG1uVnVTFwvpx7jPs/5715de0b55338054ad4ed8705462a220/Bottle_Rocket_Wow_2_360p.mp4",
+      :release_date "1996-02-21",
+      :director "Wes Anderson",
+      :full_line "Wow. Wow. Okay, no more fighting.",
+      :movie "Bottle Rocket",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5pEQrv5UtbI4Ad5vpJmjCx/ac57ca6ddf73f5cd216f7c7866e9ed14/Bottle_Rocket_Wow_2_1080p.mp4",
+      :year 1996,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/4EY9GqHtORVXebFYywzgQP/32e3808e156a880c75063f42918390ef/Bottle_Rocket_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/26ZLeqKkZ6Ryt263GS3fAt/47145a93a0ba54cdda1216318b894b79/Bottle_Rocket_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7GFDsVHDOZcss2n2d9R65i/94fdb781dfa2832c98bf7a20c80e57dc/Bottle_Rocket_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "01:04:45",
+      :movie_duration "01:31:44",
+      :character "Dignan"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3Wo9RL1mamg02Pns5W3zwG/618af726e8dfcd759421bd8c52f46a9f/Midnight_in_Paris_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6DyFMgs2ihzeymCMDyLu5S/1fc927aabd5ce67b5e9088b29f0ed711/Midnight_in_Paris_Wow_1_360p.mp4",
+      :release_date "2011-05-20",
+      :director "Woody Allen",
+      :full_line "Hey. Wow.",
+      :movie "Midnight in Paris",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3weUxJRaRS3nvUUeUvsKmK/6d9c3676932dde26e724a0eb0b82ad34/Midnight_in_Paris_Wow_1_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/2ZcfSCe2dlfoVzYMr4b9nK/d566e5ad044dee56645f3bffc7200d64/Midnight_in_Paris_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5rJgjN6kn4QHHiY3r8kWnb/d14645ae07468b7df707e26524afc9bb/Midnight_in_Paris_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/4COpkuLVdprJi4eRffY60d/43087bc0d667361b980c05d67d578e19/Midnight_in_Paris_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:06:30",
+      :movie_duration "01:33:57",
+      :character "Gil Pender"}
+     {:total_wows_in_movie 5,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/BMjno70ex6Jzxtg7f7fNv/1c297dc6304f1fc33dd38e71c71e2056/Cars_Wow_5_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1gSb5BL1olpuTK1m1ZDRtK/2e1420d697371609d73fcb179cfa209d/Cars_Wow_5_360p.mp4",
+      :release_date "2006-06-09",
+      :director "John Lasseter",
+      :full_line "Wow! This organic fuel is great!",
+      :movie "Cars",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6Ebm4kSpdv9Whldj1rxAUR/18587b407d387b5aaef65423bcf08877/Cars_Wow_5_1080p.mp4",
+      :year 2006,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6dsHUil72TJLYqbwYMEjH4/387a2d9994a2f1fb069d970a0f30ba32/Cars_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/tO6kHCn7tBbnD44EOqRy2/dbb4f319654f298e4d570214e11b293c/Cars_Wow_5_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3zL44ud4VEMNoMTu7S4sMh/030d03c7e051258245ff2df23ac1d222/Cars_Wow_5.mp3",
+      :current_wow_in_movie 5,
+      :timestamp "01:23:22",
+      :movie_duration "01:56:36",
+      :character "Lightning McQueen"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6CfdGdfsaCBbhIGHHAW5mg/18c12cfc1863dc884ce80e72e732f4f7/Wedding_Crashers_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/229wCG5GfAZVeLm8jUfc45/b33fcc7837137d2982794a97b5a9f02a/Wedding_Crashers_Wow_1_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line "Wow. Now that you mention it, it is half full.",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4fibOk21s8MpNJpXupYkSU/8c5bf2b49c07c9130834d7f7f75ffcfe/Wedding_Crashers_Wow_1_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7i9vDMY7wBxZSsPNTgGm2s/e48f67df24e83aabb15d39d1d22d86a9/Wedding_Crashers_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/6BrdVsHSUKLo6oA8v4dNiO/91f060d7cc6e6c1038313822e570c8fc/Wedding_Crashers_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:03:03",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}
+     {:total_wows_in_movie 4,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3VyX5OmniKdLM7HCSSEMo7/4e77c7fe0a636531204814ad9fc5e55d/Marmaduke_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3sEgfjKPFx1rFg3XPi1jUf/694edaa7cb9534ef767b0388d15e80b0/Marmaduke_Wow_1_360p.mp4",
+      :release_date "2010-06-04",
+      :director "Tom Dey",
+      :full_line "Oh! Whoa, whoa, wow! Whoa! Hey, I wasn't done with that!",
+      :movie "Marmaduke",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1D3dYblPTkLmPbUWBQBdNx/fe5631d27e0e69662c2e66bea0896eec/Marmaduke_Wow_1_1080p.mp4",
+      :year 2010,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/1M4wQc5Rkk9mlcKB5Z4fga/25fef21907983d1d667e7e28c6a0ed14/Marmaduke_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6VNT6Hkvqw36xCDKUoPpxV/87386160ab6e0e7cc19c9f028269db91/Marmaduke_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3NlG7pugog0bSAFWFrDMqV/194d009df87bbd25f7d89adeff19c338/Marmaduke_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:06:20",
+      :movie_duration "01:28:10",
+      :character "Marmaduke"}
+     {:total_wows_in_movie 3,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/NHZiQ0jNhxjUyc6xnEK3z/2a9a89c35838ba73fe29b44c7c57f0fe/I_Spy_Wow_3_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4oQqmN937slhkYjHlU9Gay/cfe33e0afa6a24b2ccd6efe748010672/I_Spy_Wow_3_360p.mp4",
+      :release_date "2002-10-23",
+      :director "Betty Thomas",
+      :full_line "Wow, sounds like a sweet woman.",
+      :movie "I Spy",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3IGQoSjw72CHCVDXNQjwqv/b58cb041ed2a0b3d759d569b84b38010/I_Spy_Wow_3_1080p.mp4",
+      :year 2002,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6qRNbbZZDNP3iY3sGlmHJp/46861dc3073138713ee9151d0f0a6cc4/I_Spy_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2w3QuJ7Piwn2trIAtb5q7W/523315ef21673cc9a5ec73493caa4fe4/I_Spy_Wow_3_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/L3lRv8vIlHHnWatlWY7Xp/dbff71b4a18f4a507367aaef111f1202/I_Spy_Wow_3.mp3",
+      :current_wow_in_movie 3,
+      :timestamp "00:51:04",
+      :movie_duration "01:36:35",
+      :character "Alexander Scott"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1pXqS5q7zVz2XyR78aLgwr/ce9bd68ee8e1cd162f9a678f5e90d988/Midnight_in_Paris_Wow_8_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1aBBzoY05PkO4ugVZbmcDz/419f94c7166694e62e9e39b01643c026/Midnight_in_Paris_Wow_8_360p.mp4",
+      :release_date "2011-05-20",
+      :director "Woody Allen",
+      :full_line "Wow, it didn't take Gaugin long to start steaming in.",
+      :movie "Midnight in Paris",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5aDODF9NxMU99or8dLPrvG/f47a3624ebbff94bcdfbccfd91d9a784/Midnight_in_Paris_Wow_8_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/2ZcfSCe2dlfoVzYMr4b9nK/d566e5ad044dee56645f3bffc7200d64/Midnight_in_Paris_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2jnrWhZw8SgoyyKO0VPGuU/57e53de03b11c4037c72a188d1fa9971/Midnight_in_Paris_Wow_8_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/2xSXBwWS7KcGf9vmBcmCfU/32c5a1a914ac3aa8874d4d61f95a33dd/Midnight_in_Paris_Wow_8.mp3",
+      :current_wow_in_movie 8,
+      :timestamp "01:20:58",
+      :movie_duration "01:33:57",
+      :character "Gil Pender"}
+     {:total_wows_in_movie 2,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6BdgsGjrXByRtsovqQ08Vs/3d98cc5bbab1de4f4e369d5708aa4320/Drillbit_Taylor_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1mbqxLFQ0SzHMPmWwxbZ34/1f8c1c87523606719a18c622eb96de3b/Drillbit_Taylor_Wow_1_360p.mp4",
+      :release_date "2008-03-21",
+      :director "Steven Brill",
+      :full_line "Wow.",
+      :movie "Drillbit Taylor",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/53V2iNXzMeAoETeK2VhpTU/9993b3f646199435cd154e7f71683aad/Drillbit_Taylor_Wow_1_1080p.mp4",
+      :year 2008,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6GNViJjFw8uVr4YWAIqfDp/a2508829eb231ebc2aa2a147518eaf0c/Drillbit_Taylor_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/61sygEKSvmgIPOgxd0ZGFc/e325db18514415431865288d8d756b9a/Drillbit_Taylor_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/5xUkXNIYy5GmEdWgAeNvhH/03422d4a98ec4f7f9867ae342efad4e6/Drillbit_Taylor_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:29:42",
+      :movie_duration "01:50:10",
+      :character "Drillbit Taylor"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3ybMmQK7Tt3Xs7MNbLyss7/8eca791f2c2ce06146be8844ab9ca511/Midnight_in_Paris_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7CCFtFdh21i1dBaxSImTIg/b35b20f4a393242b143fa094fa938674/Midnight_in_Paris_Wow_2_360p.mp4",
+      :release_date "2011-05-20",
+      :director "Woody Allen",
+      :full_line "Wow. No wonder she wanted to lead.",
+      :movie "Midnight in Paris",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6QiYUjjRwHa0Wn2qaKkH72/b87624851c0ddc6b41fa737e81be9ba9/Midnight_in_Paris_Wow_2_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/2ZcfSCe2dlfoVzYMr4b9nK/d566e5ad044dee56645f3bffc7200d64/Midnight_in_Paris_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1UhPJNAXzgxqE1KvIktMXV/51fa47d9d21a7cf48e1ef3ac35ec4f13/Midnight_in_Paris_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/4pMtMRK3uSK6KNodFS7p2v/7f688b6bc487958d59e7fae635d98df1/Midnight_in_Paris_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:48:24",
+      :movie_duration "01:33:57",
+      :character "Gil Pender"}
+     {:total_wows_in_movie 2,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7tA15W0lgJr7CpJNCf1m4Z/86a953df81d88f5fa79e35aa1e4e4dc1/The_Big_Bounce_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1iKZTtL0qQRDek4y4SduD5/bbd83798b30435b43a2df4c360130d72/The_Big_Bounce_Wow_2_360p.mp4",
+      :release_date "2004-01-30",
+      :director "George Armitage",
+      :full_line "What is it about the produce section? Wow.",
+      :movie "The Big Bounce",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6TPALdqhVTMztHMSw2qOOj/81d512b2ee8b7c05e7e851eae7790d0e/The_Big_Bounce_Wow_2_1080p.mp4",
+      :year 2004,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/4hPpMWXhuXQ8HzLusmcaS5/4c46fa4fa8bce13b06d8b4444f6150ef/The_Big_Bounce_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/dEuiSxnBLWP26YHaWiHbz/599ac6fb7a6aead87e8e6efdab759f74/The_Big_Bounce_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/6pjOYj0xK38VAkPAl1QK7R/a5f083c60ce9e9c4fa93a8be70817d22/The_Big_Bounce_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:58:00",
+      :movie_duration "01:28:10",
+      :character "Jack Ryan"}
+     {:total_wows_in_movie 10,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3dyYcLSEyvceGIZy1LPC7Q/50c8c210a70954d4d15b60f8d0a18baa/Cars_3_Wow_6_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5btioeuoIQIpvROSQq6pCK/84f9688199cbeb18c3b98bb2f0b03f18/Cars_3_Wow_6_360p.mp4",
+      :release_date "2017-05-23",
+      :director "Brian Fee",
+      :full_line "Wow. Pretty fast. Who's the racer?",
+      :movie "Cars 3",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2V4ywf70IlZY51TLRP9Z5h/350c3690fe3f7bc14913f3df747907b9/Cars_3_Wow_6_1080p.mp4",
+      :year 2017,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/43fOBsgY8iOJL0dijvFnfl/ea361efc5131a859c173ab5dd3fdfe1e/Cars_3_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/616Q5irpoQLxGfLcu72DaH/9dab71eb557c0c688c0b86236eb81e9f/Cars_3_Wow_6_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7xFJj9jLccdhpp1MmrFZe/aa949b3a154ac8ff163a3c2fb1a2fd46/Cars_3_Wow_6.mp3",
+      :current_wow_in_movie 6,
+      :timestamp "00:27:25",
+      :movie_duration "01:42:25",
+      :character "Lighting McQueen"}
+     {:total_wows_in_movie 4,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/31HF06vDDGW66QvtYN5Uaf/eb7aafc5c5edfde8087fff12b1b124d9/Shanghai_Knights_Wow_4_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6mFM0HuwIohxkXRN168fHy/f0a9187103721c4fad171979f6bd9eee/Shanghai_Knights_Wow_4_360p.mp4",
+      :release_date "2003-02-03",
+      :director "David Dobkin",
+      :full_line "Wow! That's a good message.",
+      :movie "Shanghai Knights",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/Gtxnnod4iSbNLoRyKiYqy/208667cff34f9151584e0fdac95b875c/Shanghai_Knights_Wow_4_1080p.mp4",
+      :year 2003,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/4pb4EMrNtfK3x9PyTMLcGl/bd4d6db24a4247b0f33211eeb882c26a/Shanghai_Knights_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/11dT7kCePmGuumeWSgyyyp/6b43c568d515034fbac17f80e92e3597/Shanghai_Knights_Wow_4_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/50j8j4QZ9ruslduUazL82Y/cad5fabd2a1080de0609adec4bd7c3ab/Shanghai_Knights_Wow_4.mp3",
+      :current_wow_in_movie 4,
+      :timestamp "01:43:47",
+      :movie_duration "01:54:21",
+      :character "Roy O'Bannon"}
+     {:total_wows_in_movie 1,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/aDlZ1o0U5qjc14UJEQzqh/aad300540e3cd6191b459bb15e939401/You__Me_and_Dupree_Wow_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7d3fdaa00Wje08SBxreP0H/3140fa1cb6e0f670bcd2861c71bd7d37/You__Me_and_Dupree_Wow_360p.mp4",
+      :release_date "2006-07-14",
+      :director "Joe Russo and Anthony Russo",
+      :full_line "Wow. Unbelievable.",
+      :movie "You, Me and Dupree",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/16NFV6C5qgYV3EvpulsprI/d3b10233ea8258ce7e96e8ac28929c9f/You__Me_and_Dupree_Wow_1080p.mp4",
+      :year 2006,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/3I4SJNgyAbgF60cr7xakdX/f66d6a6eae5adb9a38b32add0cd33629/You__Me_and_Dupree.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4IEse4ACFtJgojoGEtBllE/ebc6148ca1d7059f0b9714ffbc786d65/You__Me_and_Dupree_Wow_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/4InRmdCPksnHoD2Lg6ZPeT/342441d66f5e148f58de78dbdc347c5a/You__Me_and_Dupree_Wow.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:41:31",
+      :movie_duration "01:49:24",
+      :character "Dupree"}
+     {:total_wows_in_movie 1,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3ZLiolsGZkiTp3p8aLJb3d/e330311fcaed4716f7a603d058ee8767/Night_at_the_Museum_Secret_of_the_Tomb_Wow_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1ZwmDYe0zdKzsy1MJrANSE/e5e0f5ea1c745baf61b205b6e6574605/Night_at_the_Museum_Secret_of_the_Tomb_Wow_360p.mp4",
+      :release_date "2014-12-11",
+      :director "Shawn Levy",
+      :full_line "Wow. We're a long way from home, boy.",
+      :movie "Night at the Museum: Secret of the Tomb",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/uHF5B0MFoK8H0S40Sqld9/fa9aca4d8c52ebff4ab4f390196ab0f1/Night_at_the_Museum_Secret_of_the_Tomb_Wow_1080p.mp4",
+      :year 2014,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/4cwNnRAOKM1HuAtlH6dscl/52762736d4815c2390619a4009d66d93/Night_at_the_Museum_Secret_of_the_Tomb_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/47qSLctyurmw22A3z7X1YG/8651f02d7e58ebb1eb312a26f732515b/Night_at_the_Museum_Secret_of_the_Tomb_Wow_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/5o3CSC67KEoIojYH0UMghP/fbf9dea48ac1914eb7f7bffca802b012/Night_at_the_Museum_Secret_of_the_Tomb_Wow.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:39:36",
+      :movie_duration "01:37:48",
+      :character "Jedediah Smith"}
+     {:total_wows_in_movie 2,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/jn1LMloOOKwiXvGWW8lPy/887ff4ba73746467e73882d2a8297000/Are_You_Here_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6OM7GZyF7CYCAgEoOS5SYM/e483beecce77eeb392564c0de514fe63/Are_You_Here_Wow_1_360p.mp4",
+      :release_date "2014-08-22",
+      :director "Matthew Weiner",
+      :full_line "Yeah. Wow.",
+      :movie "Are You Here",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4yfb8czMg2zJeSiCPFjyA0/3a34959e1fdb350a2ee08c6941ff7fa2/Are_You_Here_Wow_1_1080p.mp4",
+      :year 2013,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/5MTYDabi9XISR4rMJbUhf6/bc3dd8e30c7662aed5d8db6c6be16af7/Are_You_Here_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7kEqLvpUQQ4qftJPT4H6YK/43fc6430d40cae2d9f26ca7c113d9f28/Are_You_Here_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7oSUcoz1paUMkLTWYC2YEB/d27bd89c4d1fbeacf1676f4401c56143/Are_You_Here_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:26:14",
+      :movie_duration "01:54:05",
+      :character "Steve Dallas"}]],
+   :out
+   ["{:total_wows_in_movie 10, :_480p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/39zl8hKK4QP1kASldccYyN/7fc8a7c86872abb9fd527a350365beea/Midnight_in_Paris_Wow_3_480p.mp4\", :_360p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/6rl512MqIH6r04L4O9jHU2/2d843c19937d770860f17719960d8352/Midnight_in_Paris_Wow_3_360p.mp4\", :release_date \"2011-05-20\", :director \"Woody Allen\", :full_line \"Wow.\", :movie \"Midnight in Paris\", :_1080p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/7BBJiej0qdBbuB3Xvimrae/932bc77c9e9a9918949709f846035541/Midnight_in_Paris_Wow_3_1080p.mp4\", :year 2011, :poster \"https:/images.ctfassets.net/bs8ntwkklfua/2ZcfSCe2dlfoVzYMr4b9nK/d566e5ad044dee56645f3bffc7200d64/Midnight_in_Paris_Poster.jpg\", :_720p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/5tBiVUM6ef2mARH3OXzP92/8ad999e82b7bff5ac4a07d1b4dcb45f3/Midnight_in_Paris_Wow_3_720p.mp4\", :audio \"https:/assets.ctfassets.net/bs8ntwkklfua/7BDkqWADSOxxYOSQGqNRcr/6fc4696de0d8bcafa487ddea97bb6d3b/Midnight_in_Paris_Wow_3.mp3\", :current_wow_in_movie 3, :timestamp \"00:48:45\", :movie_duration \"01:33:57\", :character \"Gil Pender\"}"],
+   :status #{"done"},
+   :meta {:nrepl-conn {:host "127.0.0.1", :port 8181}},
+   :output-lines 1,
+   :values 91},
+  :movies_deets
+  {:ns "rabbit-board.user",
+   :value
+   [[{:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7zBgsjyNyZhQtdjIekFd1I/bf1d93da019975dbc2ec5a9782c19362/Hall_Pass_Wow_5_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1q45fXoDqHYxrW7g6BzJ5f/00271d50308ec83b9a1098cf49f7b580/Hall_Pass_Wow_5_360p.mp4",
+      :release_date "2011-02-25",
+      :director "Peter Farrelly and Bobby Farrelly",
+      :full_line "Wow.",
+      :movie "Hall Pass",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3BgUi9O0hvTJ8cs74hNnCG/708866bf02e75a692b7be57a29a80ad4/Hall_Pass_Wow_5_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6jFEUPmYiKifaTuC2cugm8/22087834d091445fc9393cdd9163a901/Hall_Pass_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/65C0eSsBBVDBwXNObxZgOg/b53e767a35a5bbdb9d2579f6aaba6c5e/Hall_Pass_Wow_5_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7tYiz6vKgOFSoP7TkXAEr/e522d0b8e939153683ec7ca27e87b40c/Hall_Pass_Wow_5.mp3",
+      :current_wow_in_movie 5,
+      :timestamp "01:06:38",
+      :movie_duration "01:51:35",
+      :character "Rick Mills"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4piX1aigVowtsMmFrHNMMB/36ce2596ef7c030190a9235c72ee06a5/Hall_Pass_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5QdPCkTFXc4tgoWMFeKZ10/d331ffef786610dd9f25caf84322586c/Hall_Pass_Wow_2_360p.mp4",
+      :release_date "2011-02-25",
+      :director "Peter Farrelly and Bobby Farrelly",
+      :full_line "\"Wow, you must've really pushed her to get her to this point.\"",
+      :movie "Hall Pass",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/v4i8OtLOreAIlzfyKnG0h/8e8774f7cde53dbee9bafdb765a3408a/Hall_Pass_Wow_2_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6jFEUPmYiKifaTuC2cugm8/22087834d091445fc9393cdd9163a901/Hall_Pass_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1Ld48W7eVzeGCaFtUq9kxq/8b776ca99f65e0e2f188a106971c5d42/Hall_Pass_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7jethDcTeec0ge8SD4eSej/9c825d8be2d05ec763df2434a10576a3/Hall_Pass_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:26:42",
+      :movie_duration "01:51:35",
+      :character "Rick Mills"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/74fQiVcwuT7ePQemGC7ih4/b102922c97c9ff38f47268d648628a22/Hall_Pass_Wow_3_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7mSGl1rSVtGdfSacwnKVsu/e7ac36e5684f6b64978987d2f68c43db/Hall_Pass_Wow_3_360p.mp4",
+      :release_date "2011-02-25",
+      :director "Peter Farrelly and Bobby Farrelly",
+      :full_line
+      "Wow. This is awkward. I feel like I'm at my first junior high mixer. You know? When you don't know what to say.",
+      :movie "Hall Pass",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4QcL02MHJ8ApVkbfN8cP6E/264c28c1e9195d87f0206e143c5ca54a/Hall_Pass_Wow_3_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6jFEUPmYiKifaTuC2cugm8/22087834d091445fc9393cdd9163a901/Hall_Pass_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/15h0sMoIhdeaPDB8qSsUN9/36245f66352b595dc40bc4d9903fa5b3/Hall_Pass_Wow_3_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/2NBIVPDF4o7cy0epTvPOwR/406cd5c17e9b01511f1e350bb96df352/Hall_Pass_Wow_3.mp3",
+      :current_wow_in_movie 3,
+      :timestamp "00:46:55",
+      :movie_duration "01:51:35",
+      :character "Rick Mills"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3q34qMsvY03UZWY8DXuHqs/35f98e652d326d739e21bd237c520048/Hall_Pass_Wow_4_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/v6tSCvjbln86wLOAlERsv/bb1dbfddcf349ef82bb46df53bd40b0a/Hall_Pass_Wow_4_360p.mp4",
+      :release_date "2011-02-25",
+      :director "Peter Farrelly and Bobby Farrelly",
+      :full_line "Wow.",
+      :movie "Hall Pass",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1C8TPI7yDxxK9qAlMsBGEH/16cfaf8e7333344046aaa4c8afb296b2/Hall_Pass_Wow_4_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6jFEUPmYiKifaTuC2cugm8/22087834d091445fc9393cdd9163a901/Hall_Pass_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2zjDTW0TxCxOc455pcINEl/baaf8f331d29f58641a61baca0942f0b/Hall_Pass_Wow_4_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/5Xc2NTY2HJQjKDiLOPhGzO/a086b30a35aa5c6b9ac994ac6a353b1c/Hall_Pass_Wow_4.mp3",
+      :current_wow_in_movie 4,
+      :timestamp "01:05:12",
+      :movie_duration "01:51:35",
+      :character "Rick Mills"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7q4ZMkqndNER6h0DKCkUqY/85a498aaaf9825d207b023c41dd28cd6/Hall_Pass_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4tGd503OwRZ2DYcMkE3Nma/17cdaa22b58e754287efdc629f09a6a9/Hall_Pass_Wow_1_360p.mp4",
+      :release_date "2011-02-25",
+      :director "Peter Farrelly and Bobby Farrelly",
+      :full_line "Wow. That's a biggie. Happy birthday.",
+      :movie "Hall Pass",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/ZBrUvZOgDzQ9FkWyj1dbn/467fde106da208450dc7a266915888aa/Hall_Pass_Wow_1_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6jFEUPmYiKifaTuC2cugm8/22087834d091445fc9393cdd9163a901/Hall_Pass_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/ALGqFBviLDFSaNNHqqjEC/554c2fd092d0588c0609786357df4b3c/Hall_Pass_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7jS4fqmFWEG0ViDyzQC6hc/4e02bbf0ac0dfef2c0fee972c05fd376/Hall_Pass_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:05:08",
+      :movie_duration "01:51:35",
+      :character "Rick Mills"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/54Zd2b5BQrQi4hvZ8IAg8j/9a719307cdf6525257e0dba0afa9ceee/Hall_Pass_Wow_6_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7Jo3JA6zl3vzAiIkriLLOR/5f488e12cdc1c7792484f098732b790d/Hall_Pass_Wow_6_360p.mp4",
+      :release_date "2011-02-25",
+      :director "Peter Farrelly and Bobby Farrelly",
+      :full_line "Wow.",
+      :movie "Hall Pass",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/V9JGQ3qgfufm4vUkzyJYI/6182dce642b9f31ab698d7ab448688bd/Hall_Pass_Wow_6_1080p.mp4",
+      :year 2011,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/6jFEUPmYiKifaTuC2cugm8/22087834d091445fc9393cdd9163a901/Hall_Pass_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/3RkKyI4NFfakkYzUEO83hG/21d29c6b7695d1b072084a92e05b6283/Hall_Pass_Wow_6_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/7mZxDvl1IsR95NAg8mKj0t/43a0b44fd325c1de3f86cf6cec3a80d5/Hall_Pass_Wow_6.mp3",
+      :current_wow_in_movie 6,
+      :timestamp "01:26:28",
+      :movie_duration "01:51:35",
+      :character "Rick Mills"}]],
+   :out
+   ["{:total_wows_in_movie 6, :_480p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/7zBgsjyNyZhQtdjIekFd1I/bf1d93da019975dbc2ec5a9782c19362/Hall_Pass_Wow_5_480p.mp4\", :_360p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/1q45fXoDqHYxrW7g6BzJ5f/00271d50308ec83b9a1098cf49f7b580/Hall_Pass_Wow_5_360p.mp4\", :release_date \"2011-02-25\", :director \"Peter Farrelly and Bobby Farrelly\", :full_line \"Wow.\", :movie \"Hall Pass\", :_1080p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/3BgUi9O0hvTJ8cs74hNnCG/708866bf02e75a692b7be57a29a80ad4/Hall_Pass_Wow_5_1080p.mp4\", :year 2011, :poster \"https:/images.ctfassets.net/bs8ntwkklfua/6jFEUPmYiKifaTuC2cugm8/22087834d091445fc9393cdd9163a901/Hall_Pass_Poster.jpg\", :_720p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/65C0eSsBBVDBwXNObxZgOg/b53e767a35a5bbdb9d2579f6aaba6c5e/Hall_Pass_Wow_5_720p.mp4\", :audio \"https:/assets.ctfassets.net/bs8ntwkklfua/7tYiz6vKgOFSoP7TkXAEr/e522d0b8e939153683ec7ca27e87b40c/Hall_Pass_Wow_5.mp3\", :current_wow_in_movie 5, :timestamp \"01:06:38\", :movie_duration \"01:51:35\", :character \"Rick Mills\"}"],
+   :status #{"done"},
+   :meta {:nrepl-conn {:host "127.0.0.1", :port 8181}},
+   :output-lines 1,
+   :values 6},
+  :query-8163
+  {:ns "rabbit-board.user",
+   :value
+   [[{:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2ZkkHUMoueBBzvyG67Rebd/65fa5decd572d851332e208d16336298/Wedding_Crashers_Wow_2_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1QjUK78uABHEgsH9nNxZjR/944b6f8452283e43d1637e354948ed14/Wedding_Crashers_Wow_2_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line "Wow, that's beautiful.",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6YVH0H5ng4HGV4yHst1JYA/278c794eabbd6708e966ca9ee0f580b9/Wedding_Crashers_Wow_2_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/GyUSh9qZYQ9DU4SvEFJAV/9f2047017e045d95130bcc211fb15424/Wedding_Crashers_Wow_2_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/4JB7eJR8Eyfxdu1G0P0MW0/4b102a855e9683dc6dddd7d086a50e81/Wedding_Crashers_Wow_2.mp3",
+      :current_wow_in_movie 2,
+      :timestamp "00:30:22",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/fxNuYP8zkgH7uKSN23Wk0/c0635c605096b6517c79c760abfc07f9/Wedding_Crashers_Wow_6_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6FsOtKAPhO8ttq2yqrLPJ7/3821538da2330790bb013169bd01f9ab/Wedding_Crashers_Wow_6_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line
+      "Wow, getting a nice preview of what marriage is gonna be like with Ike Turner here.",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6bPOrhYfZOA0D8AWms52Ry/687d879a6ff35bcd446a771b011a6882/Wedding_Crashers_Wow_6_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5DT2lsjyDd5Nhv6EPTtKUo/2d05effbff710cff37aaa0fbe3fc1e1a/Wedding_Crashers_Wow_6_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3R4mpZqOXNEPXdL4B9FeOt/f9d04f53ab3f884005c39e463bfebc4c/Wedding_Crashers_Wow_6.mp3",
+      :current_wow_in_movie 6,
+      :timestamp "01:58:50",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6CfdGdfsaCBbhIGHHAW5mg/18c12cfc1863dc884ce80e72e732f4f7/Wedding_Crashers_Wow_1_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/229wCG5GfAZVeLm8jUfc45/b33fcc7837137d2982794a97b5a9f02a/Wedding_Crashers_Wow_1_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line "Wow. Now that you mention it, it is half full.",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4fibOk21s8MpNJpXupYkSU/8c5bf2b49c07c9130834d7f7f75ffcfe/Wedding_Crashers_Wow_1_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/7i9vDMY7wBxZSsPNTgGm2s/e48f67df24e83aabb15d39d1d22d86a9/Wedding_Crashers_Wow_1_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/6BrdVsHSUKLo6oA8v4dNiO/91f060d7cc6e6c1038313822e570c8fc/Wedding_Crashers_Wow_1.mp3",
+      :current_wow_in_movie 1,
+      :timestamp "00:03:03",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/70ioTuxJxr7IzPXOsu8rup/f8929c2da3d5d0732c5448ab611edfab/Wedding_Crashers_Wow_5_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1ucIp9SJYuJK2Vlfop0DNp/bcf9755c771738206286ab530192bf74/Wedding_Crashers_Wow_5_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line "Oh man, I feel like, 'Wow!'",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1YzR1Pzp9xdKpeVx5g3jIr/30e64e2e04052757d25f604b94b2e75f/Wedding_Crashers_Wow_5_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1jMKkwnCZi7RUHViZZTLNC/4f76282a738dc7fd7163d8bbbb3e2477/Wedding_Crashers_Wow_5_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/3o4FwZeAcd35eMg8G0LNmj/d2557eeb4cc53addd6efcb82b1543a9c/Wedding_Crashers_Wow_5.mp3",
+      :current_wow_in_movie 5,
+      :timestamp "01:50:19",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/2yt9LsglNDGO5LO0vWvpUj/01fdc19bb4783eb9b1e83ddca9e07519/Wedding_Crashers_Wow_3_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/137JOI01wFeHUFsnJ9FkS5/69bf6a1304e98c97f91741ce85b958cc/Wedding_Crashers_Wow_3_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line "Wow, they feel really nice.",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/6RmiFel4DrYkergvfHCLF2/6d350fdfab279a7e1a8e9b795a53770e/Wedding_Crashers_Wow_3_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/1yvARtmmhwFPqo5UZxafxi/15bea60c834fd35f1c7a0ab23fa6c954/Wedding_Crashers_Wow_3_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/6iY7ytiZxw2ZxMKzEGDxPZ/4cf8ab6c313416576ca45b68676f4536/Wedding_Crashers_Wow_3.mp3",
+      :current_wow_in_movie 3,
+      :timestamp "01:00:21",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}
+     {:total_wows_in_movie 6,
+      :_480p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/wwlwgCB7arFuP2LjEJYcZ/cdff01a57064feb8bb30a321bbf651c4/Wedding_Crashers_Wow_4_480p.mp4",
+      :_360p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/5gyoL7ygfEV5k0ljIGvoPX/b4ce054d5c87386590a28429614668ad/Wedding_Crashers_Wow_4_360p.mp4",
+      :release_date "2005-07-15",
+      :director "David Dobkin",
+      :full_line "Wow.",
+      :movie "Wedding Crashers",
+      :_1080p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/15S9Kp3ebc5LY5ayzrg7H3/46ce195d249ccaeeda296c6319b62001/Wedding_Crashers_Wow_4_1080p.mp4",
+      :year 2005,
+      :poster
+      "https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg",
+      :_720p-video
+      "https:/videos.ctfassets.net/bs8ntwkklfua/4vJaQ98fzJUVtEqJY4C7CJ/772be52830dd6aa0336a862897bb35e2/Wedding_Crashers_Wow_4_720p.mp4",
+      :audio
+      "https:/assets.ctfassets.net/bs8ntwkklfua/2k0L7bNPOllxMn7erZiLct/fe86f146fd50b24b39eb59b028296f79/Wedding_Crashers_Wow_4.mp3",
+      :current_wow_in_movie 4,
+      :timestamp "01:43:21",
+      :movie_duration "02:07:01",
+      :character "John Beckwith"}]],
+   :out
+   ["{:total_wows_in_movie 6, :_480p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/2ZkkHUMoueBBzvyG67Rebd/65fa5decd572d851332e208d16336298/Wedding_Crashers_Wow_2_480p.mp4\", :_360p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/1QjUK78uABHEgsH9nNxZjR/944b6f8452283e43d1637e354948ed14/Wedding_Crashers_Wow_2_360p.mp4\", :release_date \"2005-07-15\", :director \"David Dobkin\", :full_line \"Wow, that's beautiful.\", :movie \"Wedding Crashers\", :_1080p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/6YVH0H5ng4HGV4yHst1JYA/278c794eabbd6708e966ca9ee0f580b9/Wedding_Crashers_Wow_2_1080p.mp4\", :year 2005, :poster \"https:/images.ctfassets.net/bs8ntwkklfua/63oBfAAq34Dmki4L22XFmm/95329ef249b17f578d752f4e8e53977c/Wedding_Crashers_Poster.jpg\", :_720p-video \"https:/videos.ctfassets.net/bs8ntwkklfua/GyUSh9qZYQ9DU4SvEFJAV/9f2047017e045d95130bcc211fb15424/Wedding_Crashers_Wow_2_720p.mp4\", :audio \"https:/assets.ctfassets.net/bs8ntwkklfua/4JB7eJR8Eyfxdu1G0P0MW0/4b102a855e9683dc6dddd7d086a50e81/Wedding_Crashers_Wow_2.mp3\", :current_wow_in_movie 2, :timestamp \"00:30:22\", :movie_duration \"02:07:01\", :character \"John Beckwith\"}"],
+   :status #{"done"},
+   :meta {:nrepl-conn {:host "127.0.0.1", :port 8181}},
+   :output-lines 1,
+   :values 6},
+  :query-2
+  {:ns "rabbit-board.user",
+   :value
+   [({:movie_name "Zoolander"}
+      {:movie_name "You, Me and Dupree"}
+      {:movie_name "Wedding Crashers"}
+      {:movie_name "The Internship"}
+      {:movie_name "The Haunting"}
+      {:movie_name "The Darjeeling Limited"}
+      {:movie_name "The Big Year"}
+      {:movie_name "The Big Bounce"}
+      {:movie_name "Starsky & Hutch"}
+      {:movie_name "Shanghai Noon"}
+      {:movie_name "Shanghai Knights"}
+      {:movie_name "No Escape"}
+      {:movie_name "Night at the Museum: Secret of the Tomb"}
+      {:movie_name "Midnight in Paris"}
+      {:movie_name "Meet the Parents"}
+      {:movie_name "Marmaduke"}
+      {:movie_name "Marley & Me"}
+      {:movie_name "Little Fockers"}
+      {:movie_name "I Spy"}
+      {:movie_name "Hall Pass"}
+      {:movie_name "Free Birds"}
+      {:movie_name "Father Figures"}
+      {:movie_name "Drillbit Taylor"}
+      {:movie_name "Cars 3"}
+      {:movie_name "Cars 2"}
+      {:movie_name "Cars"}
+      {:movie_name "Breakfast of Champions"}
+      {:movie_name "Bottle Rocket"}
+      {:movie_name "Are You Here"})],
+   :status #{"done"},
+   :meta {:nrepl-conn {:host "127.0.0.1", :port 8181}},
+   :out [""],
+   :output-lines 0,
+   :values 29}},
+ :rs-overrides-hashmap {},
  :panels-hash 1428528398,
+ :sessions
+ (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
+   "494 hours, 7 minutes, 42 seconds"
+   1778862716]
+   ["vigorous-square-serval-banned-from-thalweg.edn"
+    "488 hours, 45 minutes, 24 seconds"
+    1759524716]
+   ["exciting-globular-mouse-banned-from-maar.edn"
+    "386 hours, 3 minutes, 33 seconds"
+    1389813716]
+   ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
+    "494 hours, 7 minutes, 42 seconds"
+    1778862716]
+   ["restored-raspberry-mule-of-baymouth-bar.edn"
+    "256 hours, 21 minutes, 8 seconds"
+    922868631]
+   ["awesome-prismatic-jay-banned-from-malpaís.edn"
+    "256 hours, 21 minutes, 45 seconds"
+    922905507]
+   ["constant-star-shaped-echidna-banned-from-towhead.edn"
+    "470 hours, 38 minutes, 55 seconds"
+    1694335716]
+   ["special-globular-coyote-of-oceanic-trench.edn"
+    "494 hours, 7 minutes, 43 seconds"
+    1778863716]
+   ["proud-thin-elk-of-rôche-moutonnée.edn"
+    "494 hours, 7 minutes, 42 seconds"
+    1778862716]
+   ["kind-rhomboidal-lion-of-the-floodplain.edn"
+    "494 hours, 7 minutes, 42 seconds"
+    1778862716]
+   ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
+    "494 hours, 7 minutes, 43 seconds"
+    1778863716]
+   ["unreal-ovoid-serval-banned-from-salt-flat.edn"
+    "62 hours, 4 minutes, 24 seconds"
+    223464858]
+   ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
+    "494 hours, 7 minutes, 42 seconds"
+    1778862716]
+   ["courageous-linear-platypus-of-corrie.edn"
+    "256 hours, 41 minutes, 58 seconds"
+    924118648]
+   ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
+    "494 hours, 7 minutes, 42 seconds"
+    1778862716]
+   ["ethical-round-oyster-of-glacial-horn.edn"
+    "494 hours, 7 minutes, 42 seconds"
+    1778862716]
+   ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
+    "494 hours, 7 minutes, 42 seconds"
+    1778862716]
+   ["transforming-ivory-clam-of-the-volcanic-field.edn"
+    "310 hours, 41 minutes, 7 seconds"
+    1118467716]
+   ["remarkable-thin-wombat-banned-from-flyggberg.edn"
+    "436 hours, 18 minutes, 39 seconds"
+    1570719716]
+   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn"
+    "14 minutes, 58 seconds"
+    898664]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :websocket-fx.core/sockets
- {:default
-  {:status :connected,
-   :options
-   {:url "ws://localhost:3030/ws",
-    :format :edn,
-    :on-disconnect
-    [:websocket-fx.core/unsubscribe :default :server-push2],
-    :on-connect
-    [:websocket-fx.core/subscribe
-     :default
-     :server-push2
-     {:message
-      {:kind :server-push2,
-       :client-name :learned-black-ox-hailing-from-tidal-marsh,
-       :ui-keypath [:server],
-       :extras {:hello? true}},
-      :on-message [:viz-yard.http/simple-response]}]},
-   :requests {},
-   :subscriptions
-   {:server-push2
-    {:message
-     {:kind :server-push2,
-      :client-name :learned-black-ox-hailing-from-tidal-marsh,
-      :ui-keypath [:server],
-      :extras {:hello? true}},
-     :on-message [:viz-yard.http/simple-response]}}}},
- :user-params-hash 278685043,
+ :user-params-hash 845941638,
  :grid-recos? true,
  :panels
  {:hello-there-brother
@@ -416,6 +2075,20 @@
      "hello! 🐇 🍂 🦃"]},
    :queries {}}},
  :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#5D4970",
+  "boolean" "#3A2E58",
+  "map" "#EF14CD4",
+  "list" "#847C8E",
+  "string" "#3A2E58",
+  "vector" "#E213A12C",
+  "keyword" "#D7111FB",
+  "rabbit-code" "#C4DCB4",
+  "datetime" "#A494A5",
+  "integer" "#5E5173",
+  "unknown" "#A9ADA5",
+  "date" "#DB111C4",
+  "nil" "#CCE9D7"},
  :click-param
  {:theme
   {:codemirror-theme "ayu-dark",
@@ -442,8 +2115,7 @@
      :titleColor "#ffffff99",
      :stroke "#ffffff99",
      :titleFont "Lato"},
-    :header
-    {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
     :mark {:font "Lato"},
     :title
     {:font "Lato",
@@ -504,18 +2176,15 @@
        :font-family "Instagram Sans",
        :font-weight 700}},
      :ticks
-     {:line {:stroke "#ffffff60"},
-      :text {:fill "#ffffff60", :font-weight 700}}},
-    :grid
-    {:line
-     {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
    :editor-outer-rim-color "#e28191",
    :grid-selected-font-color "#000000",
    :block-title-selected-font-color "#ffffff",
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image "url(images/sick-of-your-shit.png)",
+   {:background-image "url(images/large/sick-of-your-shit.png)",
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-color "#424f57"},
@@ -525,8 +2194,7 @@
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
   :param {:selected-view [nil nil], :selected-view-data nil},
-  :connections-sys
-  {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+  :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
   :tables-sys
   {:db_schema "none",
    :db_catalog nil,
@@ -534,6 +2202,5 @@
    :schema_cat nil,
    :table_name "ufo_sightings",
    :fields 14},
-  :fields-sys
-  {:field_name "date_posted", :field_type "DATE", :data_type "date"}},
+  :fields-sys {:field_name "date_posted", :field_type "DATE", :data_type "date"}},
  :selected-flow "live-scratch-flow"}

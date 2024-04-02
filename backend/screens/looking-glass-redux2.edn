@@ -1,14 +1,619 @@
 {:orders
- {:reco-counts [:table_name :cnt],
-  :connections-sys [:database_name :connection_id],
+ {:recos-sys
+  [:context_hash
+   :combo_hash
+   :connection_id
+   :shape_name
+   :query_map
+   :query_map_str
+   :viz_map
+   :combo_edn
+   :selected_view
+   :table_name
+   :condis
+   :h
+   :w
+   :score],
   :fields-sys [:field_name :field_type :data_type],
+  :tmp--351909852-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :viz-shapes-sys [:combo_edn :recos],
+  :gen-viz-1132 [:rows :data_type],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :flows-sys [:flow_id :file_path :last_modified]},
+  :client-items-drag-item-key-5 [:item_type :item_sub_type :item_key :rowcnt],
+  :recos-sys2
+  [:context_hash
+   :combo_hash
+   :connection_id
+   :shape_name
+   :query_map
+   :query_map_str
+   :viz_map
+   :combo_edn
+   :selected_view
+   :table_name
+   :condis
+   :h
+   :w
+   :score],
+  :client-items-drag-20 [:is_live :item_key :item_sub_type :item_type :ts :value],
+  :viz-shapes0-sys2 [:shape :recos],
+  :client-items-drag-35
+  [:is_live :item_key :item_sub_type :item_type :sample :ts :value],
+  :rowcnt-drag-7 [:rowcnt_sum],
+  :blocks-drag-44
+  [:is_live
+   :item_key
+   :item_sub_type
+   :item_type
+   :ts
+   :value
+   :sample
+   :block_data
+   :block_key
+   :block_name
+   :file_path
+   :queries
+   :query_names
+   :screen_name
+   :tab_name
+   :ts_2
+   :view_names
+   :views],
+  :panel/proud-magenta-skunk-exiled-from-volcanic-arc>block-7369>queries>city-drag-26
+  [:city :rowcnt],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :tmp-888783816-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :viz-tables-sys2 [:table_name :recos],
+  :fields
+  [:db_type
+   :connection_id
+   :table_type
+   :db_schema
+   :db_catalog
+   :table_name
+   :field_name
+   :field_type
+   :data_type
+   :context_hash
+   :key_hash
+   :is_group_by
+   :derived_calc
+   :derived_name
+   :updated
+   :run_id],
+  :client_items
+  [:item_key
+   :item_type
+   :item_sub_type
+   :value
+   :is_live
+   :sample
+   :display_name
+   :block_meta
+   :ts],
+  :viz-tables-sys [:table_name :recos],
+  :viz-shapes-sys2 [:combo_edn :recos],
+  :viz-shapes0-sys [:shape :recos],
+  :rowcnt-drag-2 [:rowcnt_sum],
+  :fields-drag-16
+  [:connection_id
+   :context_hash
+   :data_type
+   :db_catalog
+   :db_schema
+   :db_type
+   :derived_calc
+   :derived_name
+   :field_name
+   :field_type
+   :is_group_by
+   :key_hash
+   :run_id
+   :table_name
+   :table_type
+   :updated],
+  :ufo_sightings
+  [:datetime
+   :city
+   :state
+   :country
+   :shape
+   :duration_seconds
+   :duration_hours
+   :comments
+   :date_posted
+   :latitude
+   :longitude
+   :id
+   :duration_seconds_int],
+  :city-drag-26-1 [:city :rowcnt],
+  :blocks
+  [:file_path
+   :screen_name
+   :block_key
+   :block_name
+   :views
+   :queries
+   :view_names
+   :query_names
+   :block_data
+   :tab_name
+   :ts],
+  :connections-sys [:database_name :connection_id],
+  :ufo-sightings-drag-9
+  [:city
+   :comments
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :id
+   :latitude
+   :longitude
+   :shape
+   :state],
+  :tmp-1909196580-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :item-type-drag-5 [:item_type :rowcnt],
+  :item-type-drag-0 [:item_type :rowcnt :item_sub_type],
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :gen-viz-555 [:value :id],
+  :reco-counts [:table_name :cnt],
+  :state-drag-3 [:state :rowcnt],
+  :shape-drag-7 [:shape :rowcnt]},
  :reco-preview nil,
- :sql-source {},
+ :sql-source
+ {:gen-viz-1132
+  {:select [[[:count 1] :rows] :data_type],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:data_type]},
+  :client-items-drag-item-key-5
+  {:select [:item_type :item_sub_type :item_key [[:count 1] :rowcnt]],
+   :from [[:client_items :mm978]],
+   :group-by [:item_key :item_type :item_sub_type],
+   :order-by [[:rowcnt :desc]],
+   :col-widths {:item_type 90, :item_key 297, :rowcnt 77},
+   :page 3},
+  :client-items-drag-20
+  {:select [:is_live :item_key :item_sub_type :item_type :ts :value],
+   :from [[:client_items :ii709]],
+   :_last-run "20:15:42"},
+  :client-items-drag-35
+  {:select [:is_live :item_key :item_sub_type :item_type :sample :ts :value],
+   :from [[:client_items :ii81]],
+   :_last-run "21:13:22",
+   :page 5},
+  :rowcnt-drag-7
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:item_type [[:count 1] :rowcnt] :item_sub_type],
+      :from
+      [[{:select [:is_live :item_key :item_sub_type :item_type :ts :value],
+         :from [[:client_items :ii709]]}
+        :aa227]],
+      :group-by [:item_type :item_sub_type],
+      :order-by [[:rowcnt :desc]]}
+     :ss589]]},
+  :blocks-drag-44
+  {:select
+   [[nil :is_live]
+    [:screen_name :item_key]
+    [":view" :item_sub_type]
+    [":screen" :item_type]
+    [nil :ts]
+    ["x" :value]
+    [nil :sample]
+    :block_data
+    :block_key
+    :block_name
+    :file_path
+    :queries
+    :query_names
+    :screen_name
+    :tab_name
+    :ts
+    :view_names
+    :views],
+   :from [[:blocks :yy179]]},
+  :panel/proud-magenta-skunk-exiled-from-volcanic-arc>block-7369>queries>city-drag-26
+  {:select [:*],
+   :from
+   [{:select [:*],
+     :from
+     [{:select [:city [[:count 1] :rowcnt]],
+       :from
+       [[{:select
+          [:city
+           :comments
+           :country
+           :date_posted
+           :datetime
+           :duration_hours
+           :duration_seconds
+           :duration_seconds_int
+           :id
+           :latitude
+           :longitude
+           :shape
+           :state],
+          :from [[:ufo_sightings :jj584]],
+          :where [:<> :country "ca"],
+          :order-by [[:shape :desc]]}
+         :ff571]],
+       :group-by [:city],
+       :order-by [[:rowcnt :asc]]}],
+     :page 4,
+     :_last-run "01:28:01",
+     :where [:> :city "phoenix"]}],
+   :limit 111},
+  :fields {:select [:*], :from [:fields], :limit 111},
+  :client_items {:select [:*], :from [:client_items], :limit 111},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :comments
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :id
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :where [:<> :country "ca"],
+         :order-by [[:shape :desc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :asc]]}
+     :yy403]]},
+  :fields-drag-16
+  {:select
+   [:connection_id
+    :context_hash
+    :data_type
+    :db_catalog
+    :db_schema
+    :db_type
+    :derived_calc
+    :derived_name
+    :field_name
+    :field_type
+    :is_group_by
+    :key_hash
+    :run_id
+    :table_name
+    :table_type
+    :updated],
+   :from [[:fields :mm764]],
+   :_last-run "20:15:34"},
+  :ufo_sightings {:select [:*], :from [:ufo_sightings], :limit 111},
+  :city-drag-26-1
+  {:select [:*],
+   :from
+   [{:select [:*],
+     :from
+     [{:select [:city [[:count 1] :rowcnt]],
+       :from
+       [[{:select
+          [:city
+           :comments
+           :country
+           :date_posted
+           :datetime
+           :duration_hours
+           :duration_seconds
+           :duration_seconds_int
+           :id
+           :latitude
+           :longitude
+           :shape
+           :state],
+          :from [[:ufo_sightings :jj584]],
+          :where [:<> :country "ca"],
+          :order-by [[:shape :desc]]}
+         :ff571]],
+       :group-by [:city],
+       :order-by [[:rowcnt :asc]]}],
+     :page 4,
+     :_last-run "01:28:01",
+     :where [:> :city "phoenix"]}]},
+  :blocks {:select [:*], :from [:blocks], :limit 111},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :comments
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :id
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :page 4,
+   :where [:<> :country "ca"],
+   :order-by [[:shape :desc]]},
+  :item-type-drag-5
+  {:select [:item_type [[:count 1] :rowcnt]],
+   :from
+   [[{:select [:is_live :item_key :item_sub_type :item_type :ts :value],
+      :from [[:client_items :ii709]]}
+     :jj274]],
+   :group-by [:item_type],
+   :order-by [[:rowcnt :desc]]},
+  :item-type-drag-0
+  {:select [:item_type [[:count 1] :rowcnt] :item_sub_type],
+   :from
+   [[{:select [:is_live :item_key :item_sub_type :item_type :ts :value],
+      :from [[:client_items :ii709]]}
+     :aa227]],
+   :group-by [:item_type :item_sub_type],
+   :order-by [[:rowcnt :desc]],
+   :col-widths {:item_type 97, :rowcnt 87, :item_sub_type 227},
+   :_last-run "20:15:38"},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :where [:<> :country "ca"],
+      :order-by [[:shape :desc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :where [:<> :country "ca"],
+      :order-by [[:shape :desc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :asc]]},
+  :gen-viz-555
+  {:select [[[:count 1] :value] [:updated :id]],
+   :from
+   [{:select
+     [:connection_id
+      :context_hash
+      :data_type
+      :db_catalog
+      :db_schema
+      :db_type
+      :derived_calc
+      :derived_name
+      :field_name
+      :field_type
+      :is_group_by
+      :key_hash
+      :run_id
+      :table_name
+      :table_type
+      :updated],
+     :from [[:fields :mm764]]}],
+   :group-by [:updated]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :where [:<> :country "ca"],
+      :order-by [[:shape :desc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :comments
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :id
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :where [:<> :country "ca"],
+      :order-by [[:shape :desc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]}},
  :meta
- {:fields-sys
+ {:recos-sys
+  {:fields
+   {:query_map
+    {:data-type "string",
+     :distinct 81,
+     :group-by? true,
+     :commons
+     {"[{:select [[[[:sum :rows]] :rows] :country], :from [\"query/ufo_sightings_drag_9\"], :group-by [:country]}]"
+      6,
+      "[{:select [[[[:sum :duration_seconds_int]] :duration_seconds_int] :shape], :from [\"query/ufo_sightings_drag_9\"], :group-by [:shape]}]"
+      6,
+      "[{:select [[[[:sum :rows]] :rows] :shape], :from [\"query/ufo_sightings_drag_9\"], :group-by [:shape]}]"
+      6},
+     :cardinality 43},
+    :shape_name
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons {"recharts_line" 20, "recharts_area" 20, "recharts_h_bar" 20},
+     :cardinality 13},
+    :w
+    {:data-type "unknown",
+     :distinct 4,
+     :group-by? true,
+     :commons {nil 135, 9 32, 8 16},
+     :cardinality 2},
+    :combo_edn
+    {:data-type "string",
+     :distinct 41,
+     :group-by? true,
+     :commons
+     {"\"country, duration_seconds_int, shape\"" 12,
+      "\"duration_seconds_int, shape\"" 9,
+      "\"country, duration_seconds_int\"" 9},
+     :cardinality 22},
+    :query_map_str
+    {:data-type "string",
+     :distinct 79,
+     :group-by? true,
+     :commons
+     {"\nSELECT (SUM(rows)) AS rows, shape\nFROM 'query/ufo_sightings_drag_9'\nGROUP BY shape\n"
+      6,
+      "\nSELECT (SUM(duration_seconds_int)) AS duration_seconds_int, country\nFROM 'query/ufo_sightings_drag_9'\nGROUP BY country\n"
+      6,
+      "\nSELECT (SUM(duration_seconds_int)) AS duration_seconds_int, shape\nFROM 'query/ufo_sightings_drag_9'\nGROUP BY shape\n"
+      6},
+     :cardinality 42},
+    :selected_view
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"" 117, ":reech" 60, ":grid" 8},
+     :cardinality 1},
+    :combo_hash
+    {:data-type "string",
+     :distinct 185,
+     :group-by? true,
+     :commons {"1092443355" 1, "1591441765" 1, "648065550" 1},
+     :cardinality 100},
+    :h
+    {:data-type "unknown",
+     :distinct 5,
+     :group-by? true,
+     :commons {nil 135, 9 20, 6 16},
+     :cardinality 2},
+    :condis
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"" 166,
+      "{:up-or-down? [:> :query-preview/agg.0 :query-preview/agg.1]}" 16,
+      "{:true? [:= 1 1]}" 2},
+     :cardinality 2},
+    :score
+    {:data-type "float",
+     :distinct 31,
+     :group-by? true,
+     :commons {53.19999999999999 28, 4.8 28, 51.999999999999986 19},
+     :cardinality 16},
+    :table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"ufo_sightings_drag_9" 185},
+     :cardinality 0},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"cache.db" 185},
+     :cardinality 0},
+    :context_hash
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"-776622710" 185},
+     :cardinality 0},
+    :viz_map
+    {:data-type "string",
+     :distinct 174,
+     :group-by? true,
+     :commons
+     {"[:nivo-calendar {:labelTextColor \"#423939\", :emptyColor \"#00000000\", :axisLeft {:tickRotation 0, :legendPosition \"middle\", :legendOffset -65}, :dayBorderColor \"#ffffff10\", :enableLabel false, :motionDamping 10, :axisBottom {:tickRotation 0, :legendPosition \"middle\", :legendOffset 40}, :inner-padding 0, :width :panel-width+70, :monthBorderColor \"#ffffff15\", :colors [\"#2a4858\" \"#294d5d\" \"#275163\" \"#255667\" \"#225b6c\" \"#1e6071\" \"#1a6575\" \"#156a79\" \"#0e6f7d\" \"#057480\" \"#007983\" \"#007e86\" \"#008488\" \"#00898a\" \"#008e8c\" \"#00938d\" \"#00988e\" \"#039d8f\" \"#12a28f\" \"#1ea78f\" \"#28ac8f\" \"#32b18e\" \"#3cb68d\" \"#46bb8c\" \"#50bf8b\" \"#5ac489\" \"#64c987\" \"#6ecd85\" \"#79d283\" \"#83d681\" \"#8eda7f\" \"#99de7c\" \"#a5e27a\" \"#b0e678\" \"#bcea75\" \"#c8ed73\" \"#d4f171\" \"#e0f470\" \"#edf76f\" \"#fafa6e\" \"#fafa6e\" \"#faf568\" \"#faf162\" \"#faec5d\" \"#fae757\" \"#f9e352\" \"#f9de4c\" \"#f9d947\" \"#f9d441\" \"#f9cf3c\" \"#f8cb37\" \"#f8c632\" \"#f8c12c\" \"#f8bc27\" \"#f7b722\" \"#f7b21d\" \"#f6ad17\" \"#f6a811\" \"#f6a30a\" \"#f59e04\" \"#f49800\" \"#f49300\" \"#f38e00\" \"#f28800\" \"#f28300\" \"#f17d00\" \"#f07800\" \"#ef7200\" \"#ee6c00\" \"#ed6600\" \"#ec6000\" \"#eb5a00\" \"#ea5300\" \"#e84c00\" \"#e74500\" \"#e53d00\" \"#e43502\" \"#e22b05\" \"#e11e08\" \"#df0b0b\"], :theme :theme/nivo-defaults, :click {:x :day, :y :value}, :padding 0.1, :enableGridX true, :border-radius 2, :enableGridY true, :height :panel-height+50, :margin {:top 5, :right 5, :bottom 50, :left 45}, :data :query-preview}]"
+      6,
+      "[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
+      2,
+      "{:lines [:vega-lite {:layer [{:encoding {:x {:field :date_posted, :type \"temporal\", :title nil, :sort \"x\"}, :y {:aggregate \"sum\", :field :agg, :title nil, :scale {:zero false}, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale {:scheme \"purples\"}, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"line\", :interpolate \"monotone\", :line true, :point true, :tooltip {:content \"encoding\"}}}], :data {:values :query-preview}, :config {:view {:stroke \"transparent\"}, :line {:strokeWidth 3}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#afafaf\", :titleFont \"Lato\", :titleColor \"#282828\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width :panel-width, :height :half-panel-height, :padding 4, :background \"transparent\"} {:actions false}], :grid [:layout {:panels {:view/*this-block*.lines {:h 0.5, :w 0.99, :root [0 0.5]}, :view/*this-block*.hi2 {:h 0.5, :w 0.5, :root [0 0]}, :empty-h-730 {:h 0.5, :w 0.5, :root [0.5 0]}}}], :hi2 [:box :align :center :justify :center :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"]}"
+      2},
+     :cardinality 94}},
+   :rowcount 185},
+  :fields-sys
   {:fields
    {:field_name
     {:data-type "string",
@@ -29,13 +634,117 @@
      :commons {"string" 7, "datetime" 1, "boolean" 1},
      :cardinality 33}},
    :rowcount 9},
+  :tmp--351909852-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-6016 :views :param-val]" 10},
+     :cardinality 10},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":param-val" 10},
+     :cardinality 10},
+    :updated
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons
+     {"2024-03-30 12:19:44" 1, "2024-03-30 11:27:02" 1, "2024-03-30 03:33:24" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 10},
+     :cardinality 10},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-6016" 10},
+     :cardinality 10},
+    :diff_kp
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"([8 :font-size] [8] [7] [6] [5] [4] [3] [2] [1] [0])" 6,
+      "([10 1] [10 0] [10] [9] [8 :font-size] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      4},
+     :cardinality 20},
+    :client_name
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {":simple-globular-lion-of-tepui" 7,
+      ":good-cylindrical-ape-exiled-from-calanque" 1,
+      ":creative-emerald-gnu-of-the-shore" 1},
+     :cardinality 40},
+    :pre_data
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons
+     {"nil" 4,
+      "[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"16px\"} :child [:string :flow/openai-image-gen-ladder>:output-revised-prompt]]"
+      1,
+      "[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"23px\"} :child [:string :flow/openai-image-gen-ladder>:output-revised-prompt]]"
+      1},
+     :cardinality 69},
+    :diff
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons
+     {"[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"12px\"} :child [:string :flow/openai-image-gen-ladder>:output-revised-prompt]]"
+      3,
+      "[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"16px\"} :child [:string :flow/openai-image-gen-ladder>:output-revised-prompt]]"
+      1,
+      "[nil nil nil nil nil nil nil nil {:font-size \"23px\"}]" 1},
+     :cardinality 80},
+    :data
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons
+     {"[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"12px\"} :child [:string :flow/openai-image-gen-ladder>:output-revised-prompt]]"
+      4,
+      "[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"16px\"} :child [:string :flow/openai-image-gen-ladder>:output-revised-prompt]]"
+      1,
+      "[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"23px\"} :child [:string :flow/openai-image-gen-ladder>:output-revised-prompt]]"
+      1},
+     :cardinality 69}},
+   :rowcount 10},
+  :viz-shapes-sys
+  {:fields
+   {:combo_edn
+    {:data-type "string",
+     :distinct 41,
+     :group-by? true,
+     :commons
+     {"\"country, rows\"" 1,
+      "\"datetime, duration_seconds_int\"" 1,
+      "\"date_posted, rows, shape\"" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 7,
+     :group-by? false,
+     :commons {1 17, 6 8, 8 7},
+     :cardinality 17}},
+   :rowcount 41},
   :gen-viz-1132
   {:fields
    {:rows
     {:data-type "integer",
      :distinct 6,
      :group-by? false,
-     :commons {9 2, 119 1, 595 1},
+     :commons {9 2, 173 1, 831 1},
      :cardinality 85},
     :data_type
     {:data-type "string",
@@ -89,50 +798,164 @@
     {:data-type "string",
      :distinct 6,
      :group-by? true,
-     :commons {"saved-queries" 306, "client-views" 89, "saved-views" 66},
+     :commons {"saved-queries" 208, "client-views" 152, "saved-views" 66},
      :cardinality 1},
     :item_sub_type
     {:data-type "string",
-     :distinct 303,
+     :distinct 248,
      :group-by? true,
-     :commons {"heya!" 14, "" 12, "oz" 9},
-     :cardinality 60},
+     :commons {"heya!" 14, "" 13, "oz" 10},
+     :cardinality 49},
     :item_key
     {:data-type "string",
-     :distinct 75,
+     :distinct 86,
      :group-by? true,
-     :commons {"chaos simple" 63, "chaos-views" 50, "boston-test-10-3-23" 22},
-     :cardinality 15},
+     :commons
+     {"adventurous-peach-leopard-of-stream-pool" 44,
+      "boston-test-10-3-23" 22,
+      "awesome-pentagonal-swallow-banned-from-atoll" 21},
+     :cardinality 17},
     :rowcnt
     {:data-type "integer",
      :distinct 2,
      :group-by? false,
-     :commons {1 375, 2 125},
+     :commons {1 326, 2 174},
      :cardinality 0}},
    :rowcount 500},
+  :recos-sys2
+  {:fields
+   {:query_map
+    {:data-type "string",
+     :distinct 81,
+     :group-by? true,
+     :commons
+     {"[{:select [[[[:sum :rows]] :rows] :country], :from [\"query/ufo_sightings_drag_9\"], :group-by [:country]}]"
+      6,
+      "[{:select [[[[:sum :duration_seconds_int]] :duration_seconds_int] :shape], :from [\"query/ufo_sightings_drag_9\"], :group-by [:shape]}]"
+      6,
+      "[{:select [[[[:sum :rows]] :rows] :shape], :from [\"query/ufo_sightings_drag_9\"], :group-by [:shape]}]"
+      6},
+     :cardinality 43},
+    :shape_name
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons {"recharts_line" 20, "recharts_area" 20, "recharts_h_bar" 20},
+     :cardinality 13},
+    :w
+    {:data-type "unknown",
+     :distinct 4,
+     :group-by? true,
+     :commons {nil 135, 9 32, 8 16},
+     :cardinality 2},
+    :combo_edn
+    {:data-type "string",
+     :distinct 41,
+     :group-by? true,
+     :commons
+     {"\"country, duration_seconds_int, shape\"" 12,
+      "\"duration_seconds_int, shape\"" 9,
+      "\"country, duration_seconds_int\"" 9},
+     :cardinality 22},
+    :query_map_str
+    {:data-type "string",
+     :distinct 79,
+     :group-by? true,
+     :commons
+     {"\nSELECT (SUM(rows)) AS rows, shape\nFROM 'query/ufo_sightings_drag_9'\nGROUP BY shape\n"
+      6,
+      "\nSELECT (SUM(duration_seconds_int)) AS duration_seconds_int, country\nFROM 'query/ufo_sightings_drag_9'\nGROUP BY country\n"
+      6,
+      "\nSELECT (SUM(duration_seconds_int)) AS duration_seconds_int, shape\nFROM 'query/ufo_sightings_drag_9'\nGROUP BY shape\n"
+      6},
+     :cardinality 42},
+    :selected_view
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"" 117, ":reech" 60, ":grid" 8},
+     :cardinality 1},
+    :combo_hash
+    {:data-type "string",
+     :distinct 185,
+     :group-by? true,
+     :commons {"1092443355" 1, "1591441765" 1, "648065550" 1},
+     :cardinality 100},
+    :h
+    {:data-type "unknown",
+     :distinct 5,
+     :group-by? true,
+     :commons {nil 135, 9 20, 6 16},
+     :cardinality 2},
+    :condis
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"" 166,
+      "{:up-or-down? [:> :query-preview/agg.0 :query-preview/agg.1]}" 16,
+      "{:true? [:= 1 1]}" 2},
+     :cardinality 2},
+    :score
+    {:data-type "float",
+     :distinct 31,
+     :group-by? true,
+     :commons {53.19999999999999 28, 4.8 28, 51.999999999999986 19},
+     :cardinality 16},
+    :table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"ufo_sightings_drag_9" 185},
+     :cardinality 0},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"cache.db" 185},
+     :cardinality 0},
+    :context_hash
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"-776622710" 185},
+     :cardinality 0},
+    :viz_map
+    {:data-type "string",
+     :distinct 174,
+     :group-by? true,
+     :commons
+     {"[:nivo-calendar {:labelTextColor \"#423939\", :emptyColor \"#00000000\", :axisLeft {:tickRotation 0, :legendPosition \"middle\", :legendOffset -65}, :dayBorderColor \"#ffffff10\", :enableLabel false, :motionDamping 10, :axisBottom {:tickRotation 0, :legendPosition \"middle\", :legendOffset 40}, :inner-padding 0, :width :panel-width+70, :monthBorderColor \"#ffffff15\", :colors [\"#2a4858\" \"#294d5d\" \"#275163\" \"#255667\" \"#225b6c\" \"#1e6071\" \"#1a6575\" \"#156a79\" \"#0e6f7d\" \"#057480\" \"#007983\" \"#007e86\" \"#008488\" \"#00898a\" \"#008e8c\" \"#00938d\" \"#00988e\" \"#039d8f\" \"#12a28f\" \"#1ea78f\" \"#28ac8f\" \"#32b18e\" \"#3cb68d\" \"#46bb8c\" \"#50bf8b\" \"#5ac489\" \"#64c987\" \"#6ecd85\" \"#79d283\" \"#83d681\" \"#8eda7f\" \"#99de7c\" \"#a5e27a\" \"#b0e678\" \"#bcea75\" \"#c8ed73\" \"#d4f171\" \"#e0f470\" \"#edf76f\" \"#fafa6e\" \"#fafa6e\" \"#faf568\" \"#faf162\" \"#faec5d\" \"#fae757\" \"#f9e352\" \"#f9de4c\" \"#f9d947\" \"#f9d441\" \"#f9cf3c\" \"#f8cb37\" \"#f8c632\" \"#f8c12c\" \"#f8bc27\" \"#f7b722\" \"#f7b21d\" \"#f6ad17\" \"#f6a811\" \"#f6a30a\" \"#f59e04\" \"#f49800\" \"#f49300\" \"#f38e00\" \"#f28800\" \"#f28300\" \"#f17d00\" \"#f07800\" \"#ef7200\" \"#ee6c00\" \"#ed6600\" \"#ec6000\" \"#eb5a00\" \"#ea5300\" \"#e84c00\" \"#e74500\" \"#e53d00\" \"#e43502\" \"#e22b05\" \"#e11e08\" \"#df0b0b\"], :theme :theme/nivo-defaults, :click {:x :day, :y :value}, :padding 0.1, :enableGridX true, :border-radius 2, :enableGridY true, :height :panel-height+50, :margin {:top 5, :right 5, :bottom 50, :left 45}, :data :query-preview}]"
+      6,
+      "[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
+      2,
+      "{:lines [:vega-lite {:layer [{:encoding {:x {:field :date_posted, :type \"temporal\", :title nil, :sort \"x\"}, :y {:aggregate \"sum\", :field :agg, :title nil, :scale {:zero false}, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale {:scheme \"purples\"}, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"line\", :interpolate \"monotone\", :line true, :point true, :tooltip {:content \"encoding\"}}}], :data {:values :query-preview}, :config {:view {:stroke \"transparent\"}, :line {:strokeWidth 3}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#afafaf\", :titleFont \"Lato\", :titleColor \"#282828\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width :panel-width, :height :half-panel-height, :padding 4, :background \"transparent\"} {:actions false}], :grid [:layout {:panels {:view/*this-block*.lines {:h 0.5, :w 0.99, :root [0 0.5]}, :view/*this-block*.hi2 {:h 0.5, :w 0.5, :root [0 0]}, :empty-h-730 {:h 0.5, :w 0.5, :root [0.5 0]}}}], :hi2 [:box :align :center :justify :center :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"]}"
+      2},
+     :cardinality 94}},
+   :rowcount 185},
   :client-items-drag-20
   {:fields
    {:is_live
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {0 271, 1 229},
+     :commons {1 321, 0 179},
      :cardinality 0},
     :item_key
     {:data-type "string",
-     :distinct 16,
+     :distinct 18,
      :group-by? true,
      :commons
-     {"good-cylindrical-ape-exiled-from-calanque" 63,
-      "classic-icosahedral-gnat-of-salt-flat" 59,
-      "instinctive-short-clam-of-the-barrier-island" 59},
+     {"classic-icosahedral-gnat-of-salt-flat" 59,
+      "kind-pentagonal-gnu-banned-from-v-shaped-valley" 57,
+      "adventurous-peach-leopard-of-stream-pool" 56},
      :cardinality 3},
     :item_sub_type
     {:data-type "string",
-     :distinct 126,
+     :distinct 142,
      :group-by? true,
      :commons {"block-1913" 14, "block-9369" 14, "block-11251" 14},
-     :cardinality 25},
+     :cardinality 28},
     :item_type
     {:data-type "string",
      :distinct 2,
@@ -143,7 +966,7 @@
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-03-30 05:33:44" 500},
+     :commons {"2024-04-01 20:38:44" 500},
      :cardinality 0},
     :value
     {:data-type "string",
@@ -152,57 +975,72 @@
      :commons
      {":panel/kind-pentagonal-gnu-banned-from-v-shaped-valley>block-8356>views>hi"
       1,
-      ":panel/electrifying-pyramidal-platypus-banned-from-depressions>block-2536>views>stack"
+      ":panel/adventurous-peach-leopard-of-stream-pool>block-1322>views>reliable-coral-moose"
       1,
-      ":panel/lucid-amaranth-leopard-hailing-from-endorheic-basin>block-11530>views>flow-play-runstreamed"
+      ":panel/electrifying-pyramidal-platypus-banned-from-depressions>block-2536>views>stack"
       1},
      :cardinality 100}},
    :rowcount 500},
+  :viz-shapes0-sys2
+  {:fields
+   {:shape
+    {:data-type "string",
+     :distinct 25,
+     :group-by? false,
+     :commons {"basic_h_bar_avg_color" 1, "basic_h_bar_nivo" 1, "recharts_line" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 8,
+     :group-by? false,
+     :commons {2 7, 4 5, 8 4},
+     :cardinality 31}},
+   :rowcount 25},
   :client-items-drag-35
   {:fields
    {:is_live
-    {:data-type "unknown",
+    {:data-type "integer",
      :distinct 3,
      :group-by? true,
-     :commons {nil 413, 1 49, 0 38},
+     :commons {0 201, nil 174, 1 125},
      :cardinality 0},
     :item_key
     {:data-type "string",
-     :distinct 25,
+     :distinct 24,
      :group-by? true,
      :commons
-     {"pres-sql-test-1" 89,
-      "lucky-olive-fox-hailing-from-volcanic-dam" 49,
+     {"open-elliptic-frog-of-volcanic-island" 59,
+      "lucky-olive-fox-hailing-from-volcanic-dam" 59,
       "canvas-scrubber-test1" 48},
-     :cardinality 5},
+     :cardinality 4},
     :item_sub_type
     {:data-type "string",
-     :distinct 185,
+     :distinct 148,
      :group-by? true,
-     :commons {"" 167, "hi" 34, "stack" 28},
-     :cardinality 37},
+     :commons {"" 70, "hi" 12, "stack" 11},
+     :cardinality 29},
     :item_type
     {:data-type "string",
      :distinct 5,
      :group-by? true,
-     :commons {"saved-block" 167, "saved-views" 128, "saved-queries" 118},
+     :commons {"client-views" 219, "client-queries" 107, "saved-block" 70},
      :cardinality 0},
     :sample
     {:data-type "string",
-     :distinct 369,
+     :distinct 227,
      :group-by? true,
      :commons
-     {"[:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]" 44,
-      "[:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 70"
-      15,
+     {"[:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]" 67,
       "[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"45px\"}"
-      13},
-     :cardinality 73},
+      14,
+      "[:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 70"
+      10},
+     :cardinality 45},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-03-30 05:33:44" 500},
+     :commons {"2024-04-01 20:38:44" 500},
      :cardinality 0},
     :value
     {:data-type "string",
@@ -210,8 +1048,9 @@
      :group-by? true,
      :commons
      {":screen/aaa-run-amok>panels>block-12249>queries>rowcnt-drag-9" 1,
-      ":panel/lucky-olive-fox-hailing-from-volcanic-dam>block-6431>views>stack" 1,
-      ":screen/canvas-scrubber-test1>panels>block-3523" 1},
+      ":panel/excellent-indigo-monkey-exiled-from-proglacial-lake>block-8805>queries>duration-hours-drag-43"
+      1,
+      ":panel/lucky-olive-fox-hailing-from-volcanic-dam>block-6431>views>stack" 1},
      :cardinality 100}},
    :rowcount 500},
   :rowcnt-drag-7
@@ -220,7 +1059,7 @@
     {:data-type "integer",
      :distinct 1,
      :group-by? false,
-     :commons {6444 1},
+     :commons {6952 1},
      :cardinality 100}},
    :rowcount 1},
   :blocks-drag-44
@@ -348,6 +1187,21 @@
      :commons {1 291, 0 133, 2 45},
      :cardinality 1}},
    :rowcount 500},
+  :panel/proud-magenta-skunk-exiled-from-volcanic-arc>block-7369>queries>city-drag-26
+  {:fields
+   {:city
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"running  springs" 1, "robertsdale" 1, "pillager" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1 500},
+     :cardinality 0}},
+   :rowcount 500},
   :flows-sys
   {:fields
    {:flow_id
@@ -373,6 +1227,318 @@
      {"2024-03-12 02:37:43" 71, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
      :cardinality 19}},
    :rowcount 87},
+  :tmp-888783816-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-1548 :views :nutritious-orange-sheep]" 3},
+     :cardinality 33},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":nutritious-orange-sheep" 3},
+     :cardinality 33},
+    :updated
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"2024-03-30 03:33:24" 1, "2024-03-30 06:42:11" 1, "2024-03-30 11:27:02" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 3},
+     :cardinality 33},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-1548" 3},
+     :cardinality 33},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([1 :syntax] [1 :height-int] [1 :width-int] [1 :kp 1] [1 :kp 0] [1 :kp] [1] [0])"
+      3},
+     :cardinality 33},
+    :client_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {":good-cylindrical-ape-exiled-from-calanque" 1,
+      ":creative-emerald-gnu-of-the-shore" 1,
+      ":adventurous-peach-leopard-of-stream-pool" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 3},
+     :cardinality 33},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:open-input {:kp [:param :nutritious-orange-sheep], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"text\"}]"
+      3},
+     :cardinality 33},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:open-input {:kp [:param :nutritious-orange-sheep], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"text\"}]"
+      3},
+     :cardinality 33}},
+   :rowcount 3},
+  :viz-tables-sys2
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"ufo_sightings_drag_9" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {185 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :fields
+  {:fields
+   {:db_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"SQLite" 500},
+     :cardinality 0},
+    :key_hash
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"-1544051908" 1, "-536935479" 1, "786814303" 1},
+     :cardinality 100},
+    :db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 500},
+     :cardinality 0},
+    :is_group_by
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1 500},
+     :cardinality 0},
+    :table_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"TABLE" 444, "VIEW" 56},
+     :cardinality 0},
+    :run_id
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-03-30 03:33:11" 392, "2024-03-30 03:33:10" 108},
+     :cardinality 0},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :field_name
+    {:data-type "string",
+     :distinct 237,
+     :group-by? true,
+     :commons {"*" 44, "ts" 14, "connection_id" 12},
+     :cardinality 47},
+    :derived_calc
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :derived_name
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 500},
+     :cardinality 0},
+    :data_type
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"string" 299, "float" 55, "unknown" 52},
+     :cardinality 1},
+    :field_type
+    {:data-type "string",
+     :distinct 43,
+     :group-by? true,
+     :commons {"TEXT" 217, "INTEGER" 49, "special" 44},
+     :cardinality 8},
+    :table_name
+    {:data-type "string",
+     :distinct 46,
+     :group-by? true,
+     :commons
+     {"bigfoot_sightings_locations" 42, "bigfoot_sightings" 27, "combo_rows" 24},
+     :cardinality 9},
+    :connection_id
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"snifftmp2" 266, "bigfoot-ufos" 126, "met-on-tour" 58},
+     :cardinality 0},
+    :context_hash
+    {:data-type "string",
+     :distinct 46,
+     :group-by? true,
+     :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
+     :cardinality 9}},
+   :rowcount 500},
+  :client_items
+  {:fields
+   {:is_live
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {1 321, 0 179},
+     :cardinality 0},
+    :value
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {":panel/kind-pentagonal-gnu-banned-from-v-shaped-valley>block-8356>views>hi"
+      1,
+      ":panel/adventurous-peach-leopard-of-stream-pool>block-1322>views>reliable-coral-moose"
+      1,
+      ":panel/electrifying-pyramidal-platypus-banned-from-depressions>block-2536>views>stack"
+      1},
+     :cardinality 100},
+    :item_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"client-views" 325, "client-queries" 175},
+     :cardinality 0},
+    :ts
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2024-04-01 20:38:44" 500},
+     :cardinality 0},
+    :sample
+    {:data-type "string",
+     :distinct 154,
+     :group-by? true,
+     :commons
+     {"[:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]" 71,
+      "[:box :align :center :justify :center :padding \"13px\" :style {:font-size \"45px\"}"
+      25,
+      "[:box :attr {:id \":block-6121.:hi\"} :style {:font-size \"15px\", :padding-top \"6px"
+      14},
+     :cardinality 30},
+    :item_sub_type
+    {:data-type "string",
+     :distinct 142,
+     :group-by? true,
+     :commons {"block-1913" 14, "block-9369" 14, "block-11251" 14},
+     :cardinality 28},
+    :display_name
+    {:data-type "string",
+     :distinct 106,
+     :group-by? true,
+     :commons {":hi" 71, ":stack" 71, ":param-val" 56},
+     :cardinality 21},
+    :item_key
+    {:data-type "string",
+     :distinct 18,
+     :group-by? true,
+     :commons
+     {"classic-icosahedral-gnat-of-salt-flat" 59,
+      "kind-pentagonal-gnu-banned-from-v-shaped-valley" 57,
+      "adventurous-peach-leopard-of-stream-pool" 56},
+     :cardinality 3},
+    :block_meta
+    {:data-type "string",
+     :distinct 227,
+     :group-by? true,
+     :commons
+     {"{:h 4, :w 9, :name \"block-7215\", :natural-key :param-val}" 7,
+      "{:h 2, :w 16, :selected-view :hi, :name \"block-1913\", :natural-key :stack}"
+      7,
+      "{:h 3, :w 16, :selected-view :hi, :name \"block-4121\", :natural-key :stack}"
+      7},
+     :cardinality 45}},
+   :rowcount 500},
+  :viz-tables-sys
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"ufo_sightings_drag_9" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {185 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :viz-shapes-sys2
+  {:fields
+   {:combo_edn
+    {:data-type "string",
+     :distinct 41,
+     :group-by? true,
+     :commons
+     {"\"country, rows\"" 1,
+      "\"datetime, duration_seconds_int\"" 1,
+      "\"date_posted, rows, shape\"" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 7,
+     :group-by? false,
+     :commons {1 17, 6 8, 8 7},
+     :cardinality 17}},
+   :rowcount 41},
+  :viz-shapes0-sys
+  {:fields
+   {:shape
+    {:data-type "string",
+     :distinct 25,
+     :group-by? false,
+     :commons {"basic_h_bar_avg_color" 1, "basic_h_bar_nivo" 1, "recharts_line" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 8,
+     :group-by? false,
+     :commons {2 7, 4 5, 8 4},
+     :cardinality 31}},
+   :rowcount 25},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -482,20 +1648,191 @@
      :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
      :cardinality 9}},
    :rowcount 500},
+  :ufo_sightings
+  {:fields
+   {:duration_seconds_int
+    {:data-type "integer",
+     :distinct 46,
+     :group-by? true,
+     :commons {300 55, 60 45, 120 41},
+     :cardinality 9},
+    :comments
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"18 glowing UFOs seen over Phoenix  AZ tonight&#44 10/12/12 8:45PM" 1,
+      "amber fireball descending&#44splits into 3 objects&#44stops&#44they hover above ground with erratic movements"
+      1,
+      "Slow moving bright orange light." 1},
+     :cardinality 100},
+    :city
+    {:data-type "string",
+     :distinct 423,
+     :group-by? true,
+     :commons {"cincinnati" 5, "san diego" 5, "austin" 4},
+     :cardinality 84},
+    :date_posted
+    {:data-type "string",
+     :distinct 115,
+     :group-by? true,
+     :commons {"2013-10-14" 38, "2012-10-30" 31, "2008-10-31" 25},
+     :cardinality 23},
+    :longitude
+    {:data-type "float",
+     :distinct 433,
+     :group-by? true,
+     :commons {-122.3308333 6, -84.4569444 5, -117.1563889 5},
+     :cardinality 86},
+    :state
+    {:data-type "string",
+     :distinct 53,
+     :group-by? true,
+     :commons {"ca" 51, "ny" 35, nil 30},
+     :cardinality 10},
+    :duration_seconds
+    {:data-type "string",
+     :distinct 46,
+     :group-by? true,
+     :commons {"300" 55, "60" 45, "120" 41},
+     :cardinality 9},
+    :duration_hours
+    {:data-type "string",
+     :distinct 225,
+     :group-by? true,
+     :commons {"1 minute" 26, "5 minutes" 24, "30 seconds" 22},
+     :cardinality 44},
+    :id
+    {:data-type "integer",
+     :distinct 500,
+     :group-by? true,
+     :commons {84 1, 390 1, 49 1},
+     :cardinality 100},
+    :shape
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"light" 104, "circle" 50, "triangle" 46},
+     :cardinality 4},
+    :datetime
+    {:data-type "string",
+     :distinct 449,
+     :group-by? true,
+     :commons
+     {"2008-10-10 20:00:00.000000" 4,
+      "1999-10-11 20:15:00.000000" 4,
+      "2007-10-10 22:00:00.000000" 4},
+     :cardinality 89},
+    :latitude
+    {:data-type "string",
+     :distinct 430,
+     :group-by? true,
+     :commons {"47.6063889" 6, "39.1619444" 5, "32.7152778" 5},
+     :cardinality 86},
+    :country
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"us" 411, nil 55, "ca" 17},
+     :cardinality 0}},
+   :rowcount 500},
   :city-drag-26-1
   {:fields
    {:city
     {:data-type "string",
      :distinct 500,
      :group-by? true,
-     :commons {"sheboygan" 1, "walnut creek" 1, "terre haute" 1},
+     :commons {"running  springs" 1, "robertsdale" 1, "pillager" 1},
      :cardinality 100},
     :rowcnt
     {:data-type "integer",
-     :distinct 82,
+     :distinct 1,
      :group-by? true,
-     :commons {9 56, 11 41, 10 34},
-     :cardinality 16}},
+     :commons {1 500},
+     :cardinality 0}},
+   :rowcount 500},
+  :blocks
+  {:fields
+   {:query_names
+    {:data-type "string",
+     :distinct 332,
+     :group-by? true,
+     :commons {"" 163, ":gen-viz-510" 2, ":query-8666" 2},
+     :cardinality 66},
+    :view_names
+    {:data-type "string",
+     :distinct 30,
+     :group-by? true,
+     :commons {":a-row" 167, "" 133, ":hi :stack" 44},
+     :cardinality 5},
+    :screen_name
+    {:data-type "string",
+     :distinct 27,
+     :group-by? true,
+     :commons {"weave-test122" 88, "chaos simple" 64, "error-monitor-vanessa3" 38},
+     :cardinality 5},
+    :block_data
+    {:data-type "string",
+     :distinct 476,
+     :group-by? true,
+     :commons
+     {"{:h 3, :w 12, :root [2 2], :name \"hello there!\", :tab \"strategic grill locations\", :views {:heya! [:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 700, :color :theme/editor-outer-rim-color, :padding-top \"14px\", :opacity 1, :font-family :theme/base-font} :child \"hello! 🐇 🍂 🦃\"]}, :queries {}}"
+      9,
+      "{:panels {:hello-there-brother {:h 3, :w 12, :root [2 2], :name \"hello there!\", :tab \"strategic grill locations\", :views {:heya! [:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 700, :color :theme/editor-outer-rim-color, :padding-top \"14px\", :opacity 1, :font-family :theme/base-font} :child \"hello! 🐇 🍂 🦃\"]}, :queries {}}}, :click-param {:param {:selected-view [nil nil], :selected-view-data nil}}}"
+      7,
+      "{:theme-name \"who ya gonna call?\", :codemirror-theme \"ayu-mirage\", :editor-param-background-color \"#0b1122\", :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#0b031b\", :block-title-font-color \"#ffffff\", :base-block-color \"#0b1122\", :editor-rim-color \"#0b1122\", :vega-default-color-scheme {:scheme \"accent\"}, :editor-grid-selected-font-color \"#ffffff\", :monospaced-font \"IBM Plex Mono\", :editor-grid-selected-background-color \"#FFA50087\", :nivo-defaults {:font-family :theme/base-font, :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family :theme/base-font, :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family :theme/base-font, :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#33ffb7\", :grid-selected-font-color \"#ffffff\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#8879bc\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/fake-brick5.png)\", :background-color \"#47555e\", :background-repeat \"repeat\"}, :editor-font-color \"#ffffff\", :base-font \"Oxygen Mono\", :block-tab-selected-font-color \"#FFA500\", :editor-background-color \"#000000\", :editor-grid-font-color \"#ffffff\"}"
+      6},
+     :cardinality 95},
+    :block_key
+    {:data-type "string",
+     :distinct 436,
+     :group-by? true,
+     :commons
+     {":*theme*" 27, "strategic grill locations" 18, ":hello-there-brother" 14},
+     :cardinality 87},
+    :ts
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2024-03-30 03:33:06" 500},
+     :cardinality 0},
+    :tab_name
+    {:data-type "string",
+     :distinct 27,
+     :group-by? true,
+     :commons
+     {"strategic grill locations" 246, "" 81, "welcome to the party pal" 27},
+     :cardinality 5},
+    :file_path
+    {:data-type "string",
+     :distinct 27,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 88,
+      "./screens/chaos_simple.edn" 64,
+      "./screens/error-monitor-vanessa3.edn" 38},
+     :cardinality 5},
+    :block_name
+    {:data-type "string",
+     :distinct 391,
+     :group-by? true,
+     :commons
+     {"(meta: this screen's theme)" 19,
+      "board: strategic grill locations" 18,
+      "hello there!" 14},
+     :cardinality 78},
+    :queries
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {1 324, 0 163, 2 13},
+     :cardinality 0},
+    :views
+    {:data-type "integer",
+     :distinct 7,
+     :group-by? true,
+     :commons {1 291, 0 133, 2 45},
+     :cardinality 1}},
    :rowcount 500},
   :connections-sys
   {:fields
@@ -600,6 +1937,89 @@
      :commons {"us" 493, "gb" 5, "au" 2},
      :cardinality 0}},
    :rowcount 500},
+  :tmp-1909196580-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-9899 :base]" 13},
+     :cardinality 7},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 13},
+     :cardinality 7},
+    :updated
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons
+     {"2024-03-30 12:20:50" 3, "2024-03-30 12:20:52" 3, "2024-03-30 12:20:07" 2},
+     :cardinality 61},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":base" 13},
+     :cardinality 7},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-9899" 13},
+     :cardinality 7},
+    :diff_kp
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"([:h])" 10,
+      "([:name] [:root 1] [:root 0] [:root] [:tab] [:views :proud-cyan-giraffe 1 :syntax] [:views :proud-cyan-giraffe 1 :height-int] [:views :proud-cyan-giraffe 1 :width-int] [:views :proud-cyan-giraffe 1 :kp 1] [:views :proud-cyan-giraffe 1 :kp 0] [:views :proud-cyan-giraffe 1 :kp] [:views :proud-cyan-giraffe 1] [:views :proud-cyan-giraffe 0] [:views :proud-cyan-giraffe] [:views] [:h] [:selected-view] [:w] [:drag-meta :type] [:drag-meta])"
+      1,
+      "([:views :proud-cyan-giraffe 1 :syntax] [:views :proud-cyan-giraffe 1] [:views :proud-cyan-giraffe 0] [:views :proud-cyan-giraffe] [:views])"
+      1},
+     :cardinality 30},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":adventurous-peach-leopard-of-stream-pool" 13},
+     :cardinality 7},
+    :pre_data
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons
+     {"{:drag-meta {:type :open-input}, :w 6, :selected-view :proud-cyan-giraffe, :h 18, :views {:proud-cyan-giraffe [:open-input {:kp [:param :proud-cyan-giraffe], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"text\"}]}, :tab \"fat zebra\", :root [69 2], :name \"is this spice?\"}"
+      1,
+      "nil" 1,
+      "{:drag-meta {:type :open-input}, :w 6, :selected-view :proud-cyan-giraffe, :h 17, :views {:proud-cyan-giraffe [:open-input {:kp [:param :proud-cyan-giraffe], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"text\"}]}, :tab \"fat zebra\", :root [69 2], :name \"is this spice?\"}"
+      1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons
+     {"{:name \"is this spice?\"}" 1,
+      "{:views {:proud-cyan-giraffe [nil {:syntax \"text\"}]}}" 1,
+      "{:h 16}" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons
+     {"{:drag-meta {:type :open-input}, :w 6, :selected-view :proud-cyan-giraffe, :h 18, :views {:proud-cyan-giraffe [:open-input {:kp [:param :proud-cyan-giraffe], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"text\"}]}, :tab \"fat zebra\", :root [69 2], :name \"is this spice?\"}"
+      1,
+      "{:drag-meta {:type :open-input}, :w 6, :selected-view :proud-cyan-giraffe, :h 17, :views {:proud-cyan-giraffe [:open-input {:kp [:param :proud-cyan-giraffe], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"text\"}]}, :tab \"fat zebra\", :root [69 2], :name \"is this spice?\"}"
+      1,
+      "{:drag-meta {:type :open-input}, :w 6, :selected-view :proud-cyan-giraffe, :h 7, :views {:proud-cyan-giraffe [:open-input {:kp [:param :proud-cyan-giraffe], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"clojure\"}]}, :tab \"fat zebra\", :root [69 2], :name \"block-9899\"}"
+      1},
+     :cardinality 100}},
+   :rowcount 13},
   :item-type-drag-5
   {:fields
    {:item_type
@@ -612,7 +2032,7 @@
     {:data-type "integer",
      :distinct 7,
      :group-by? false,
-     :commons {33 1, 294 1, 593 1},
+     :commons {36 1, 398 1, 728 1},
      :cardinality 100}},
    :rowcount 7},
   :item-type-drag-0
@@ -621,20 +2041,20 @@
     {:data-type "string",
      :distinct 7,
      :group-by? true,
-     :commons {"saved-queries" 262, "client-views" 87, "client-queries" 85},
+     :commons {"saved-queries" 262, "client-queries" 84, "client-views" 82},
      :cardinality 1},
     :rowcnt
     {:data-type "integer",
-     :distinct 30,
+     :distinct 34,
      :group-by? false,
-     :commons {2 240, 5 64, 1 50},
-     :cardinality 5},
+     :commons {2 240, 4 55, 3 46},
+     :cardinality 6},
     :item_sub_type
     {:data-type "string",
-     :distinct 458,
+     :distinct 451,
      :group-by? true,
-     :commons {"block-11072" 3, "block-10980" 3, "block-586" 2},
-     :cardinality 91}},
+     :commons {"block-11072" 3, "block-510" 3, "block-10980" 3},
+     :cardinality 90}},
    :rowcount 500},
   :duration-hours-drag-43
   {:fields
@@ -670,33 +2090,34 @@
   {:fields
    {:value
     {:data-type "integer",
-     :distinct 10,
+     :distinct 15,
      :group-by? false,
-     :commons {4 3, 8 1, 10 1},
-     :cardinality 83},
+     :commons {4 8, 3 5, 5 2},
+     :cardinality 51},
     :id
     {:data-type "string",
-     :distinct 12,
+     :distinct 29,
      :group-by? false,
      :commons
-     {"2024-03-30 03:42:03" 1, "2024-03-30 03:41:31" 1, "2024-03-30 03:36:13" 1},
+     {"2024-03-30 03:42:03" 1, "2024-03-30 05:34:07" 1, "2024-03-30 05:59:27" 1},
      :cardinality 100}},
-   :rowcount 12},
+   :rowcount 29},
   :reco-counts
   {:fields
    {:table_name
     {:data-type "string",
-     :distinct 2,
+     :distinct 3,
      :group-by? true,
-     :commons {"offenses_drag_38" 1, "offenses_drag_21" 1},
+     :commons
+     {"ufo_sightings_drag_9" 1, "offenses_drag_38" 1, "offenses_drag_21" 1},
      :cardinality 100},
     :cnt
     {:data-type "integer",
-     :distinct 1,
+     :distinct 2,
      :group-by? false,
-     :commons {917 2},
-     :cardinality 50}},
-   :rowcount 2},
+     :commons {917 2, 185 1},
+     :cardinality 66}},
+   :rowcount 3},
   :state-drag-3
   {:fields
    {:state
@@ -728,11 +2149,54 @@
      :cardinality 86}},
    :rowcount 29}},
  :default-col-widths
- {:system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys 137},
-  :system-fields-list* {:fields-sys 170}},
+ {:viz-shapes0-list* {:viz-shapes0-sys 155},
+  :block-11609 {:city-drag-26 180},
+  :block-7416 {:rowcnt-drag-2 161},
+  :block-8334 {:rowcnt-drag-7 161},
+  :block-3166 {:client-items-drag-20 243},
+  :block-8805 {:duration-hours-drag-43 180},
+  :block-353 {:blocks-drag-44 100},
+  :system-connections-list* {:connections-sys 111},
+  :block-7304 {:client-items-drag-35 158},
+  :block-7893 {:client-items-drag-item-key-5 152},
+  :system-fields-list* {:fields-sys 170},
+  :block-7319 {:shape-drag-7 180},
+  :block-10434 {:city-drag-26-1 180},
+  :block-3777 {:state-drag-3 180},
+  :block-4030 {:fields-drag-16 100},
+  :block-6963 {:item-type-drag-0 137},
+  :block-1449
+  {:ufo-sightings-drag-9-hist-97-99068511 100,
+   :ufo-sightings-drag-9-hist-112-99068511 100,
+   :ufo-sightings-drag-9-hist-13-99068511 100,
+   :ufo-sightings-drag-9-hist-831788452634 100,
+   :ufo-sightings-drag-9-hist-115-99068511 ##Inf,
+   :ufo-sightings-drag-9-hist-541788452634 100,
+   :ufo-sightings-drag-9-hist-921788452634 100,
+   :ufo-sightings-drag-9-hist-92-99068511 ##Inf,
+   :ufo-sightings-drag-9-hist-86-99068511 100,
+   :ufo-sightings-drag-9-hist-331248846782 100,
+   :ufo-sightings-drag-9-hist-321788452634 100,
+   :ufo-sightings-drag-9-hist-102-99068511 100,
+   :ufo-sightings-drag-9-hist-831248846782 100,
+   :ufo-sightings-drag-9-hist-91788452634 100,
+   :ufo-sightings-drag-9-hist-901788452634 ##Inf,
+   :ufo-sightings-drag-9-hist-381248846782 100,
+   :ufo-sightings-drag-9-hist-331788452634 100,
+   :ufo-sightings-drag-9-hist-151248846782 100,
+   :ufo-sightings-drag-9-hist-34-99068511 100,
+   :ufo-sightings-drag-9-hist-1091788452634 100,
+   :ufo-sightings-drag-9-hist-381788452634 100,
+   :ufo-sightings-drag-9 120,
+   :ufo-sightings-drag-9-hist-701788452634 100,
+   :ufo-sightings-drag-9-hist-100-99068511 100,
+   :ufo-sightings-drag-9-hist-119-99068511 100,
+   :ufo-sightings-drag-9-hist-311788452634 100,
+   :ufo-sightings-drag-9-hist-811788452634 ##Inf},
+  :block-11291 {:item-type-drag-5 180},
+  :system-tables-list* {:tables-sys 137}},
  :runstream-drops nil,
- :data-hash -584840145,
+ :data-hash 1355850478,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -931,33 +2395,36 @@
  {"openai-image-gen-ladder"
   {:open? true,
    :values
-   {:prompt {:value :param/nutritious-orange-sheep, :source :param, :open? false},
+   {:prompt {:value :param/fabulous-pink-eagle, :source :param, :open? false},
     :style-param {:open? true, :value "vivid"}},
    :open-outputs? true}},
+ :lines? true,
  :editor? false,
  :buffy? false,
- :memory [329132583 308637703 4294705152],
+ :memory [486339011 453264895 4294705152],
+ :preview-keys
+ ["1306358328" "-2615471" "913438440" "-1862580327" "425371504" "-1462754077"],
  :status-data
  {"kick-test!"
   {:kick
    {:data
     [{:sent! "kick-test!",
       :to :adventurous-peach-leopard-of-stream-pool,
-      :at "2024-03-30 07:55:33",
+      :at "2024-04-01 17:05:02",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-03-30 07:55:33 - query ran in 1 ms."],
-          :name "query-log-:flows-sys",
-          :order 1711799733,
+        [{:content ["2024-04-01 17:05:02 - query ran in 149 ms."],
+          :name "query-log-:query-preview1306358328",
+          :order 1712005502,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
-        :description "query-log-:flows-sys",
+        :description "query-log-:query-preview1306358328",
         :mutates {},
         :options {:actions? false, :pages? false, :search? false},
         :parameters {}}},
-      :payload-kp [:flows-sys "kick-test!"]}
+      :payload-kp [:query-preview1306358328 "kick-test!"]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -966,7 +2433,7 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-03-31 03:26:26",
+      :at "2024-04-01 20:51:11",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -987,12 +2454,12 @@
          :style
          {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "43 seconds "]
+         "42 seconds "]
         [:box
          :style
          {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "returns: ./images/gen/b64-image-67232-39527.png"]]]
+         "returns: ./images/gen/b64-image-57428-40252.png"]]]
       10
       1.35
       9]
@@ -1024,7 +2491,12 @@
        :name "is this spice?"}}
      nil],
     :elapsed-ms nil,
-    :reco-count nil}}},
+    :reco-count nil}},
+  :reco
+  {:ufo-sightings-drag-9
+   {:data [[:reco-status :ufo-sightings-drag-9] 185],
+    :elapsed-ms 2408,
+    :reco-count 185}}},
  :flow-subs
  [:flow/openai-image-gen-ladder>:pop-color
   :flow/flow-forever>*running?
@@ -1037,6 +2509,7 @@
   :flow/live-scratch-flow>*running?
   :flow/flow-forever>:final-math],
  :client-name :adventurous-peach-leopard-of-stream-pool,
+ :peek? false,
  :runstreams-lookups
  {"openai-image-gen-ladder"
   {:open-inputs
@@ -1061,7 +2534,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:created 1711806723, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
+     :sample "{:created 1712017534, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
     :node-js-color-thief-script
     {:type :map,
      :ttype :sub-flow,
@@ -1069,14 +2542,14 @@
      :last? false,
      :defaults {},
      :sample
-     "{:dominantColor \"#27353c\", :colorPalette [\"#222e32\" \"#bcc7c9..."},
+     "{:dominantColor \"#293444\", :colorPalette [\"#e7acae\" \"#7378da..."},
     :dominant-color
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#27353c"},
+     :sample "#293444"},
     :quality-param
     {:type :string,
      :ttype :open-block,
@@ -1101,7 +2574,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#222e32"},
+     :sample "#e7acae"},
     :base-save-directory
     {:type :string,
      :ttype :open-block,
@@ -1116,7 +2589,7 @@
      :last? false,
      :defaults {},
      :sample
-     "{:dominantColor \"#27353c\", :colorPalette [\"#222e32\" \"#bcc7c9..."},
+     "{:dominantColor \"#293444\", :colorPalette [\"#e7acae\" \"#7378da..."},
     :size-param
     {:type :string,
      :ttype :open-block,
@@ -1134,14 +2607,14 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-92692-2658.webp"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-84232-63219.webp"},
     :request-body-map
     {:type :map,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt \"For testing purposes, use the prompt EXACTLY as is..."},
+     :sample "{:prompt \"PLEASE USE EXACTLY THIS PROMPT: A high-definition,..."},
     :base-web-directory
     {:type :string,
      :ttype :open-block,
@@ -1155,7 +2628,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "For testing purposes, use the prompt EXACTLY as is please:\n\n..."},
+     :sample "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal..."},
     :create-png-path
     {:type :string,
      :ttype :open-fn,
@@ -1176,7 +2649,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "convert /home/ryanr/rvbbit-out/b64-image-92692-2658.webp /ho..."},
+     :sample "convert /home/ryanr/rvbbit-out/b64-image-84232-63219.webp /h..."},
     :hiccup-image-box-w-png
     {:type :vector,
      :ttype :open-fn,
@@ -1190,14 +2663,14 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-92692-2658.webp"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-84232-63219.webp"},
     :relative-url-path-for-png-version
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? true,
      :defaults {},
-     :sample "./images/gen/b64-image-92692-2658.png"},
+     :sample "./images/gen/b64-image-84232-63219.png"},
     :http-req-map
     {:type :map,
      :ttype :open-block,
@@ -1218,7 +2691,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "Create a 16:9 high-definition, artistic representation of a ..."},
+     :sample "Paint a high-definition, hyperreal 16:9 stylized illustratio..."},
     :style-param
     {:type :string,
      :ttype :open-block,
@@ -1230,6 +2703,7 @@
      :last? false,
      :defaults {},
      :sample "vivid"}}}},
+ :alt-key-held? false,
  :openai-api-key "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",
  :window {:w 4186, :h 1605},
  :post-meta
@@ -1252,10 +2726,12 @@
   :shape-drag-7 {:* {:rowcount 29}}},
  :flow-estimates
  {"openai-image-gen-ladder"
-  {:times 38.4, :run-id "2d85b841-e9cd-48a5-a1fe-caac7a8aa57b"},
-  "client-keepalive" {:times nil, :run-id "fe4be5b4-96ab-4219-a16d-454ec6b6a833"}},
+  {:times 38.2, :run-id "da42f147-b40b-4fb0-bf06-8f319e208d5b"},
+  "client-keepalive" {:times nil, :run-id "806d26f6-81e7-4acd-b751-b851f868aa80"},
+  "claude-3-opus-loop1"
+  {:times nil, :run-id "f4497449-4790-4cb3-9fdc-a7ae53277c2e"}},
  :status
- {"kick-test!" {:kick :flows-sys},
+ {"kick-test!" {:kick :query-preview1306358328},
   :heartbeat
   {:kick
    [:flow/openai-image-gen-ladder>:pop-color
@@ -1269,82 +2745,94 @@
     :flow/live-scratch-flow>*running?
     :flow/flow-forever>:final-math]},
   :alert1 {:alerts :alert2},
-  :file-change {:file-changed :done}},
+  :file-change {:file-changed :done},
+  :reco {:ufo-sightings-drag-9 :done}},
  :screen-name "looking-glass-redux2",
- :recos-page2 0,
+ :recos-page2 2,
  :selected-tab "fat zebra",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
- :recos-page 0,
+ :recos-page 6,
  :rs-overrides-hashmap
  {"openai-image-gen-ladder"
   {:prompt
-   "For testing purposes, please use this prompt exactly as is:\n\nCraft in high definition, a stylized 16:9 illustration of a scene drawn from the traditional myths from Scotland, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing brunette hair. Identify her with full, somewhat pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage is a blend of delight and enchantment, while intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and buxom physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, augmenting the glow of her skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, casting an alluringly playful glance.\nHer dark makeup a stark contrast against her pale skin and supple complexion.",
+   "I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS:\n\nPaint a high-definition, hyperreal 16:9 stylized illustration that emphasizes bold features and exaggerated curves, akin to a pinup fashion. The painting should portray a well-built and toned, yet curvaceous Caucasian woman in her late 20s, posing as a persona based on the Statue of Liberty. She should have refined facial features, with a slightly upturned nose, and a slim yet hourglass figure. She should be holding an AR-15 rifle and standing majestically at a harbor in a scene reminiscent of American New England with boats, flags and cheering crowds, each holding their own rifles. The picture should capture her establishing eye contact with the viewer, her confidence and charm accentuated by the dramatic neon lighting that resonates with a Cyberpunk-Vaporwave aesthetic. Her dark hair should stand out against her pale skin, and her playful smile should engage the viewer, contributing to an aura of mystery and charm. Intricate and ornate tattoos depicting symbols of freedom and liberty should decorate her exposed shoulders and collarbone. She wears a choker ribbon and a long necklace. Her captivating body art can continue up to her neck, with each design telling a unique story. The image should reflect a blend of wonder, mystery, pride, and temptation. As the sun rises, let its light play off her body beautifully, emphasizing her full figure and maternal air.\n",
    :style-param "vivid"}},
- :panels-hash -1294699516,
+ :base-sniff-queries
+ {:client_items -420792875,
+  :blocks 1378492593,
+  :fields 575237663,
+  :panel/proud-magenta-skunk-exiled-from-volcanic-arc>block-7369>queries>city-drag-26
+  -1310366424,
+  :ufo_sightings 484893751},
+ :panels-hash -41138982,
  :sessions
  (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
-   "456 hours, 47 minutes, 9 seconds"
-   1644429802]
+   "498 hours, 12 minutes, 50 seconds"
+   1793570700]
    ["vigorous-square-serval-banned-from-thalweg.edn"
-    "451 hours, 24 minutes, 51 seconds"
-    1625091802]
+    "492 hours, 50 minutes, 32 seconds"
+    1774232700]
    ["exciting-globular-mouse-banned-from-maar.edn"
-    "348 hours, 43 minutes, 0 second"
-    1255380802]
+    "390 hours, 8 minutes, 41 seconds"
+    1404521700]
    ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
-    "456 hours, 47 minutes, 9 seconds"
-    1644429802]
-   ["restored-raspberry-mule-of-baymouth-bar.edn" "219 hours, 35 seconds" 788435717]
+    "498 hours, 12 minutes, 50 seconds"
+    1793570700]
+   ["restored-raspberry-mule-of-baymouth-bar.edn"
+    "260 hours, 26 minutes, 16 seconds"
+    937576615]
    ["awesome-prismatic-jay-banned-from-malpaís.edn"
-    "219 hours, 1 minute, 12 seconds"
-    788472593]
+    "260 hours, 26 minutes, 53 seconds"
+    937613491]
    ["constant-star-shaped-echidna-banned-from-towhead.edn"
-    "433 hours, 18 minutes, 22 seconds"
-    1559902802]
+    "474 hours, 44 minutes, 3 seconds"
+    1709043700]
    ["special-globular-coyote-of-oceanic-trench.edn"
-    "456 hours, 47 minutes, 10 seconds"
-    1644430802]
+    "498 hours, 12 minutes, 51 seconds"
+    1793571700]
    ["proud-thin-elk-of-rôche-moutonnée.edn"
-    "456 hours, 47 minutes, 9 seconds"
-    1644429802]
+    "498 hours, 12 minutes, 50 seconds"
+    1793570700]
    ["kind-rhomboidal-lion-of-the-floodplain.edn"
-    "456 hours, 47 minutes, 9 seconds"
-    1644429802]
+    "498 hours, 12 minutes, 50 seconds"
+    1793570700]
    ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
-    "456 hours, 47 minutes, 10 seconds"
-    1644430802]
+    "498 hours, 12 minutes, 51 seconds"
+    1793571700]
    ["unreal-ovoid-serval-banned-from-salt-flat.edn"
-    "24 hours, 43 minutes, 51 seconds"
-    89031944]
+    "66 hours, 9 minutes, 32 seconds"
+    238172842]
    ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
-    "456 hours, 47 minutes, 9 seconds"
-    1644429802]
+    "498 hours, 12 minutes, 50 seconds"
+    1793570700]
    ["courageous-linear-platypus-of-corrie.edn"
-    "219 hours, 21 minutes, 25 seconds"
-    789685734]
+    "260 hours, 47 minutes, 6 seconds"
+    938826632]
    ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
-    "456 hours, 47 minutes, 9 seconds"
-    1644429802]
+    "498 hours, 12 minutes, 50 seconds"
+    1793570700]
    ["ethical-round-oyster-of-glacial-horn.edn"
-    "456 hours, 47 minutes, 9 seconds"
-    1644429802]
+    "498 hours, 12 minutes, 50 seconds"
+    1793570700]
    ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
-    "456 hours, 47 minutes, 9 seconds"
-    1644429802]
+    "498 hours, 12 minutes, 50 seconds"
+    1793570700]
    ["transforming-ivory-clam-of-the-volcanic-field.edn"
-    "273 hours, 20 minutes, 34 seconds"
-    984034802]
+    "314 hours, 46 minutes, 15 seconds"
+    1133175700]
    ["remarkable-thin-wombat-banned-from-flyggberg.edn"
-    "398 hours, 58 minutes, 6 seconds"
-    1436286802]
-   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "41 seconds" 41983]),
+    "440 hours, 23 minutes, 47 seconds"
+    1585427700]
+   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn" "3 seconds" 3497]),
+ :last-run-throwaway "17:05:59",
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1210530332,
+ :user-params-hash -1525940239,
  :grid-recos? true,
- :session-hash 575072693,
+ :preview-keys2 ["928143226" "1561519308" "-625614002" "-380927499"],
+ :session-hash -279593547,
  :panels
  {:block-11251
   {:name "block-11251",
@@ -1660,7 +3148,7 @@
       :syntax "text"}]},
    :tab "fat zebra",
    :root [46 1],
-   :name "block-5866"},
+   :name "BANGER liberty?"},
   :block-7383
   {:h 3,
    :w 7,
@@ -2199,7 +3687,8 @@
      :where [:<> :country "ca"],
      :order-by [[:shape :desc]]}},
    :root [1 1],
-   :tab "sapphire ape"},
+   :tab "sapphire ape",
+   :selected-view :ufo-sightings-drag-9},
   :block-11291
   {:h 5,
    :w 8,
@@ -2244,7 +3733,7 @@
       :margin {:top 50, :right 50, :bottom 50, :left 45},
       :data :gen-viz-555,
       :arcLinkLabelsTextColor "#ffffff"}]}}},
- :selected-block :block-1548,
+ :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#ff2050",
   "boolean" "#8EA2A8",
@@ -2281,7 +3770,7 @@
    :schema_cat nil,
    :table_name "client_items",
    :fields 8},
-  :viz-shapes0-sys2 {:shape "treemap_nivo_2_levels"},
+  :viz-shapes0-sys2 {:shape nil},
   :blocks-drag-44
   {:ts_2 "2024-03-28 05:02:16",
    :is_live nil,
@@ -2304,16 +3793,16 @@
    :views 0},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#c2ada5",
+   :openai-image-gen-ladder>pop-color "#3762c3",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-67232-39527.png",
+   "./images/gen/b64-image-57428-40252.png",
    :counting-loop>open-fn-2 44,
    :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
-   "Craft in high definition, a stylized 16:9 illustration of a scene drawn from the traditional myths from Scotland, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing brunette hair. Identify her with full, somewhat pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage is a blend of delight and enchantment, while intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and buxom physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, augmenting the glow of her skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, casting an alluringly playful glance.",
+   "Craft a high-definition, 16:9 ratio illustration with hyperrealism, and a stylized approach, featuring bold features and exaggerated curves, evoking a pinup fashion vibe. The illustration should center on a physically strong, toned, yet curvaceous Caucasian woman in her late 20s, standing elegantly as a representation of the Statue of Liberty. She should have delicate facial features, with a particularly charming uplifted nose, and an hourglass slim yet robust shape. She should be shown brandishing a historical flintlock rifle, standing assuredly at a quintessentially American New England harbor full of boats, flags, and cheering crowds, each of them holding their own flintlock rifles. The woman should be making eye contact with the viewer, exuding confidence and charisma, further amplified by dramatic neon lighting, imbued with a Cyberpunk-Vaporwave aesthetic. The contrast of her dark hair against her fair skin should be striking. Her enigmatic smile should radiate charm, adding to her air of mystique. Intricate tattoos, symbolizing liberty and freedom, should adorn her revealed shoulders and collarbone. She should be wearing a choker ribbon and a long necklace. Her captivating tattoos can extend up to her neck, each pattern narrating a unique tale. The image should radiate a mix of awe, mystery, national pride, and allure. As the sunrise illuminates the scene, it should cast a beautiful light on her body, highlighting her full physique and her poised, motherly aura.",
    :live-scratch-flow>*running? false,
    :openai-image-gen-ladder>hiccup-image-box-w-png-vw
    [:v-box
@@ -2348,7 +3837,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#1d2948",
+   :openai-image-gen-ladder>dominant-color "#29173f",
    :flow-forever>final-math nil},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",
@@ -2360,7 +3849,7 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
-  :viz-tables-sys2 {:table_name :client-items-drag-35},
+  :viz-tables-sys2 {:table_name :ufo-sightings-drag-9},
   :user-dropdown-sys {:req-field nil},
   :searches-types-sys {:item_type "client-queries"},
   :client
@@ -2377,13 +3866,13 @@
    :is_live 1,
    :block_meta
    "{:h 8, :w 8, :connection-id \"bigfoot-ufos\", :name \"subscription good-cylindrical-ape-exiled-from-calanque:city-drag-2612\", :natural-key :city-drag-26}"},
-  :viz-tables-sys {:table_name "fields_drag_16"},
+  :viz-tables-sys {:table_name "ufo_sightings_drag_9"},
   :param
   {:nutritious-orange-sheep
    ["For testing purposes, please use this prompt exactly as is:"
     ""
     "Craft in high definition, a stylized 16:9 illustration of a scene drawn from the traditional myths from Scotland, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing brunette hair. Identify her with full, somewhat pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage is a blend of delight and enchantment, while intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and buxom physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, augmenting the glow of her skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, casting an alluringly playful glance."
-    "Her dark makeup a stark contrast against her pale skin and supple complexion."],
+    "Her dark makeup a stark contrast against her pale skin and supple complexion, huge lips, sharp nose, buxom, powerful, robust."],
    :reliable-coral-moose
    ["A high-definition, highly stylized and artistic 16:9 illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  "
     ""
@@ -2394,7 +3883,7 @@
    :gorgeous-blush-eagle
    ["For testing purposes, please use this prompt exactly as is:"
     ""
-    "Craft in high definition, a stylized 16:9 illustration of a scene drawn from the traditional myths from Scotland, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing brunette hair. Identify her with full, pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage can be seen as a blend of delight and enchantment, while the sight of intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and buxom physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, augmenting the glow of her skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, providing the observer with an alluringly playful glance."],
+    "Craft in high definition, a stylized 16:9 illustration of a scene drawn from the traditional myths from New England, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing hair. Identify her with full, pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage can be seen as a blend of delight and enchantment, while the sight of intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and nusty overflowing physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, buxom, burlesque, augmenting the glow of her skin. Her dark makeup a contrast to her pale skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, providing the observer with an alluringly playful glance."],
    :brave-white-butterfly
    ["A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her ample and full body radiantly."
     "She is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."
@@ -2403,21 +3892,17 @@
    ["For testing purposes, use the prompt EXACTLY as is please:"
     ""
     "Create a 16:9 high-definition, artistic representation of a fantastical image set against the natural beauty of Scotland's wilderness. The foreground features a captivating Caucasian woman in her late 20s, a brunette with remarkable beauty, a heavily buxom figure, accentuated by the ethereal glow of blue and pink twilight filtered through the dense forest. She has well-defined lips with her lower lip being more pronounced, and a daintily upturned nose. Her hair flows freely, resembling a cascading waterfall. Celtic-style tattoo patterns of rabbits and forest themes decorate her neck, collarbone, and shoulders, intensifying her allure. The interplay of light and shadow highlighting her curves, not unlike the subtle play of moonlight on water. Her attire consists of a delicate ribbon choker with a pendant necklace resting on her form. The woman leans against a stone wall, a playful yet intriguing pose, offering a sly, enticing glance towards the viewer."],
-   :selected-view-data
-   [:open-input
-    {:kp [:param :nutritious-orange-sheep],
-     :width-int :panel-width+100,
-     :height-int :panel-height+80,
-     :syntax "text"}],
+   :selected-view-data nil,
    :proud-cyan-giraffe
    ["For testing purposes, use the prompt EXACTLY as is please:"
     ""
     "This is a 16:9 high-definition, artistic depiction of a dreamlike scene set against the backdrop of Scotland's enchanting wilderness. In the scene, there's a young white Scottish woman, a brunette in her late 20s, her captivating beauty magnified by the glow of the ethereal blue and pink twilight emanating from the dense forest. Her lips are full and luscious, her lower lip more pronounced, and her nose, daintily upturned. This enchanting woman, who exudes both charm and mystery, with her hair flowing like a cascading waterfall. Intricate Celtic-style tattoos of rabbits and forest motifs adorn her neck, collarbone, and shoulders, enhancing her allure. The magical play of light reflecting off her voluptuous curves effortlessly catches the eye. On her neck wrapped a delicate ribbon choker, a long necklace resting against her form. Her pose is casual yet tantalizing, as she leans against a rough-hewn stone wall, her expression playful, casting a sly, inviting glance towards the observer."],
-   :selected-view [:views :nutritious-orange-sheep],
+   :selected-view [nil :*],
    :fabulous-pink-eagle
-   ["A classic 1990s American Pizza Hut location, now even more run down and abandoned, takes on a slightly more dystopian aspect with a crucial detail: the building's roof shingles are distinctly red, highlighting the iconic Pizza Hut design. The parking lot is now heavily littered with remnants of bar charts, pie charts, old school dashboards, and shredded Tableau signage, symbolizing the profound death of the 'old world' of business intelligence. This scene is illustrated in a highly stylistic, striking, and dramatic manner, with an intensified essence of decay and the passage of time. The architecture of the Pizza Hut, with its iconic red roof and signage, stands more prominently as a relic amidst an overwhelming detritus of outdated analytics tools. This wider, cinematic view should further emphasize the desolation and dramatic change, adding a more dystopian atmosphere to the landscape. "
+   ["I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS:"
     ""
-    "The surrounding area has a distinct cyberpunk vibe to it with pink and blue neon dramatic lighting - further showing that the restaurant and these data analysis tools are lost in time."],
+    "Paint a high-definition, hyperreal 16:9 stylized illustration that emphasizes bold features and exaggerated curves, akin to a pinup fashion. The painting should portray a well-built and toned, yet curvaceous Caucasian woman in her late 20s, posing as a persona based on the Statue of Liberty. She should have refined facial features, with a slightly upturned nose, and a slim yet hourglass figure. She should be holding an AR-15 rifle and standing majestically at a harbor in a scene reminiscent of American New England with boats, flags and cheering crowds, each holding their own rifles. The picture should capture her establishing eye contact with the viewer, her confidence and charm accentuated by the dramatic neon lighting that resonates with a Cyberpunk-Vaporwave aesthetic. Her dark hair should stand out against her pale skin, and her playful smile should engage the viewer, contributing to an aura of mystery and charm. Intricate and ornate tattoos depicting symbols of freedom and liberty should decorate her exposed shoulders and collarbone. She wears a choker ribbon and a long necklace. Her captivating body art can continue up to her neck, with each design telling a unique story. The image should reflect a blend of wonder, mystery, pride, and temptation. As the sun rises, let its light play off her body beautifully, emphasizing her full figure and maternal air."
+    ""],
    :good-electric-blue-toad
    ["A high-definition, hyperreal, vibrant 16:9 image of a snowy New England landscape in America, captured just before dawn during an intense snowstorm, masterfully merging aspects of traditional aesthetics and cyberpunk themes. The town is coated in a thick layer of snow, with structures radiating soft pink and neon blue light contributing to the slightly gritty ambiance. "
     ""
@@ -2446,7 +3931,7 @@
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. "
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
-   :selected-block :block-1548,
+   :selected-block :block-5866,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""
@@ -2457,7 +3942,7 @@
     "The other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene."
     ""
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque."]},
-  :viz-shapes0-sys {:shape "basic_h_bar", :recos 27},
+  :viz-shapes0-sys {:shape nil, :recos 27},
   :theme
   {:codemirror-theme "ayu-dark",
    :editor-param-background-color "#000000",
@@ -2629,4 +4114,12 @@
    :is_live 1,
    :items 8,
    :styler_highlight_4018a 1}},
- :selected-flow "live-scratch-flow"}
+ :selected-flow "live-scratch-flow",
+ :post-condi
+ {:c803-up-or-down? [{:v 0}],
+  :c493-up-or-down? [{:v 0}],
+  :c875-up-or-down? [{:v 0}],
+  :c97-up-or-down? [{:v 0}],
+  :c866-up-or-down? [{:v 0}],
+  :c351-up-or-down? [{:v 0}],
+  :c67-up-or-down? [{:v 0}]}}

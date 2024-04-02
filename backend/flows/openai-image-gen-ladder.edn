@@ -27,6 +27,15 @@
      :expandable? true,
      :required [:req-map]},
     :drag-meta {:type :make-http-call}}},
+  :prompt-5
+  {:w 125,
+   :h 60,
+   :z 0,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input ""},
+   :right-click? true,
+   :ports {:in {}, :out {:out :string}},
+   :x 2150,
+   :y 650},
   :node-js-color-thief-script
   {:y 1775,
    :description
@@ -290,7 +299,7 @@
      :target :flow_id,
      :row-num 4}}},
   :dominant-color
-  {:y 2075,
+  {:y 2100,
    :fn (fn [x] x),
    :w 125,
    :raw-fn (fn [x] x),
@@ -310,6 +319,29 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
+  :shell-command-1
+  {:y 2600,
+   :w 350,
+   :right-click? true,
+   :icon "zmdi-washing-machine",
+   :z 0,
+   :ports {:in {:command :string}, :out {:out :any}},
+   :h 110,
+   :x 2475,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :name ":shell-command",
+     :type :shell-command,
+     :icon "zmdi-washing-machine",
+     :defaults {:command "ls -la"},
+     :types {:command :string, :out :any},
+     :style {:color "#ffdd3c"},
+     :selected-style {:color "#ffdd3c"},
+     :inputs [:command],
+     :expandable? true,
+     :required [:command]},
+    :drag-meta {:type :shell-command}}},
   :quality-param
   {:y 1000,
    :description
@@ -326,6 +358,30 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen quality selector - DALLE3", :values ["hd" "standard"]}}}},
     :user-input "hd"}},
+  :open-fn-1
+  {:y 2100,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [_] (str "/tmp/rand-exif-" (rand-int 123454) ".txt")),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:_ :any}, :out {:out :string}},
+   :inputs nil,
+   :h 110,
+   :x 2575,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
   :execute-shell-command
   {:y 1950,
    :description
@@ -372,6 +428,15 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
+  :prompt-2
+  {:w 125,
+   :h 60,
+   :z 0,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input ""},
+   :right-click? true,
+   :ports {:in {}, :out {:out :string}},
+   :x 1925,
+   :y 575},
   :base-save-directory
   {:w 150,
    :h 60,
@@ -402,6 +467,30 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
+  :stringify-exif-map
+  {:y 2100,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn (fn [x bang img-path] (pr-str x)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any, :bang :any, :img-path :any}, :out {:out :string}},
+   :inputs nil,
+   :h 110,
+   :x 2350,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
   :size-param
   {:y 950,
    :description
@@ -419,11 +508,58 @@
      :meta
      {:* {:scrubber {:message "OpenAI image gen size selector - DALLE3", :values ["1024x1024" "1792x1024" "1024x1792"]}}}},
     :user-input "1792x1024"}},
+  :prompt-jukebox
+  {:y 900,
+   :fn (fn [x] x),
+   :w 150,
+   :raw-fn (fn [& x] (rand-nth (remove (fn [xx] (empty? (clojure.string/trim xx))) x))),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x+ :any}, :out {:out :string}},
+   :inputs nil,
+   :h 85,
+   :x 1850,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :write-file-1
+  {:y 2275,
+   :w 125,
+   :right-click? true,
+   :icon "zmdi-file-text",
+   :z 0,
+   :ports {:in {:full-path :string, :file-data :string}, :out {:out :string}},
+   :h 85,
+   :x 2475,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :name ":write-file",
+     :type :write-file,
+     :icon "zmdi-file-text",
+     :defaults nil,
+     :types {:full-path :string, :file-data :string, :out :string},
+     :style nil,
+     :selected-style nil,
+     :inputs [:full-path :file-data],
+     :expandable? true,
+     :required nil},
+    :drag-meta {:type :write-file}}},
   :save-base64-to-webp-file
   {:y 1675,
    :description
    ["Decoding and saving as a binary file to the local file system. Here to a sub-dir of my Ubuntu home directory."],
-   :w 350,
+   :w 250,
    :right-click? true,
    :icon "zmdi-broken-image",
    :z 0,
@@ -444,6 +580,15 @@
      :expandable? true,
      :required [:b64-data :file-path]},
     :drag-meta {:type :save-base64-to-webp}}},
+  :prompt-4
+  {:w 125,
+   :h 60,
+   :z 0,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input ""},
+   :right-click? true,
+   :ports {:in {}, :out {:out :string}},
+   :x 2125,
+   :y 575},
   :request-body-map
   {:w 175,
    :h 60,
@@ -488,15 +633,15 @@
     :flow-item {:expandable? true},
     :user-input "/home/ryanr/rvbbit/frontend/resources/public/images/gen"}},
   :prompt
-  {:y 850,
+  {:y 575,
    :w 300,
    :right-click? true,
    :types nil,
    :z 0,
    :ports {:in {}, :out {:out {:out :string}}},
    :inputs nil,
-   :h 110,
-   :x 1850,
+   :h 160,
+   :x 1600,
    :data
    {:drag-meta {:type :open-block},
     :flow-item {:expandable? true},
@@ -532,11 +677,13 @@
    :description ["Our 'convert' finished command line. Note, 'convert' is already in my PATH."],
    :fn (fn [x] x),
    :w 350,
-   :raw-fn (fn [x y] (str "convert " y " " x)),
+   :raw-fn (fn [x y] (str "cp " y " " x)),
    :right-click? true,
    :icon "zmdi-functions",
+   :types nil,
    :z 0,
    :ports {:in {:x :any, :y :any}, :out {:out :string}},
+   :inputs nil,
    :h 85,
    :x 1925,
    :data
@@ -554,7 +701,7 @@
   {:y 2250,
    :description ["Take all the strings from earlier and compose a singular view element with them."],
    :fn (fn [x] [:box :child (str x)]),
-   :w 550,
+   :w 600,
    :raw-fn
    (fn [x bg-color color _]
      (let [x (clojure.string/replace (str x) "/home/ryanr/rvbbit/frontend/resources/public" ".")]
@@ -589,7 +736,7 @@
      :idx9 :keyword,
      :idx0 :keyword}},
    :inputs nil,
-   :h 360,
+   :h 385,
    :x 1800,
    :view (fn [x] x),
    :data
@@ -607,11 +754,13 @@
   {:y 1300,
    :fn (fn [x] x),
    :w 350,
-   :raw-fn (fn [base-dir] (str base-dir "/b64-image-" (rand-int 99999) "-" (rand-int 99999) ".webp")),
+   :raw-fn (fn [base-dir] (str base-dir "/b64-image-" (rand-int 99999) "-" (rand-int 99999) ".png")),
    :right-click? true,
    :icon "zmdi-functions",
+   :types nil,
    :z 0,
    :ports {:in {:base-dir :any}, :out {:out :string}},
+   :inputs nil,
    :h 85,
    :x 2100,
    :data
@@ -626,15 +775,17 @@
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
   :relative-url-path-for-png-version
-  {:y 2675,
+  {:y 2825,
    :fn (fn [x] (get-in x [10 0 2])),
    :w 275,
-   :raw-fn (fn [x] (get-in x [10 0 2])),
+   :raw-fn (fn [x bang] (get-in x [10 0 2])),
    :icon "zmdi-functions",
+   :types nil,
    :z 0,
-   :ports {:in {:x :any}, :out {:out :string}},
+   :ports {:in {:x :any, :bang :any}, :out {:out :string}},
+   :inputs nil,
    :h 85,
-   :x 1925,
+   :x 2150,
    :data
    {:flow-item
     {:category ":rabbit-base",
@@ -646,6 +797,39 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
+  :exif-map
+  {:y 1800,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn (fn [prompt revised] {:prompt-asked prompt, :revised-prompt revised}),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:prompt :any, :revised :any}, :out {:out :any}},
+   :inputs nil,
+   :h 110,
+   :x 2350,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :prompt-3
+  {:w 125,
+   :h 60,
+   :z 0,
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input ""},
+   :right-click? true,
+   :ports {:in {}, :out {:out :string}},
+   :x 1950,
+   :y 650},
   :http-req-map
   {:y 1225,
    :description ["Request map for the HTTP call. Headers, Method, URL, and the call body map."],
@@ -664,6 +848,30 @@
      :method :post,
      :url "https://api.openai.com/v1/images/generations",
      :body :req-body*}}},
+  :write-exif-to-image-command
+  {:y 2475,
+   :fn (fn [x] x),
+   :w 625,
+   :raw-fn (fn [x img-path] (str "exiftool -overwrite_original -Comment=\"$(cat " x ")\" " img-path)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any, :img-path :any}, :out {:out :string}},
+   :inputs nil,
+   :h 85,
+   :x 2475,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
   :just-the-image
   {:y 1450,
    :description ["Using a GET-IN to extract just the base64 image string from the JSON return map."],
@@ -686,8 +894,29 @@
      :types {:x :any, :out :any},
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
+  :write-file-1_file-path
+  {:y 2375,
+   :fn (fn [x] (get-in x [:file-path])),
+   :w 125,
+   :raw-fn (fn [x] (get-in x [:file-path])),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 85,
+   :x 2475,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] (get-in x [:file-path])),
+     :name ":open-fn",
+     :raw-fn (fn [x] (get-in x [:file-path])),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
   :output-revised-prompt
-  {:y 1450,
+  {:y 1475,
    :description
    ["OpenAI runs our prompt through an additional model to generate a more flowery and fleshed out description to try and generate a more interesting image. "
     ""
@@ -698,8 +927,8 @@
    :icon "zmdi-functions",
    :z 0,
    :ports {:in {:x :any}, :out {:out :string}},
-   :h 210,
-   :x 2150,
+   :h 160,
+   :x 2250,
    :data
    {:flow-item
     {:category ":rabbit-base",
@@ -727,8 +956,7 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
- :opts {:retries 400, :retry-on-error? true, :close-on-done? true},
- :zoom [-87.42 -418.75 0.6],
+ :zoom [-861.89 -1422.01 0.95],
  :flow-id "openai-image-gen-ladder",
  :flowmaps-connections
  [[:http-req-map/* :oai-api-call/req-map]
@@ -753,8 +981,26 @@
   [:base-save-directory :generate-file-path/base-dir]
   [:base-web-directory :create-png-path/base-web-dir]
   [:base-save-directory :create-png-path/base-dir]
-  [:prompt :request-body-map/prompty*]
   [:request-body-map/* :http-req-map/req-body*]
   [:size-param :request-body-map/size*]
   [:style-param :request-body-map/style*]
-  [:quality-param :request-body-map/quality*]]}
+  [:quality-param :request-body-map/quality*]
+  [:prompt-jukebox :request-body-map/prompty*]
+  [:output-revised-prompt :exif-map/revised]
+  [:prompt-jukebox :exif-map/prompt]
+  [:exif-map :stringify-exif-map/x]
+  [:execute-shell-command/command :stringify-exif-map/bang]
+  [:save-base64-to-webp-file :stringify-exif-map/img-path]
+  [:prompt :prompt-jukebox/x+]
+  [:prompt-3 :prompt-jukebox/x+]
+  [:prompt-2 :prompt-jukebox/x+]
+  [:prompt-5 :prompt-jukebox/x+]
+  [:prompt-4 :prompt-jukebox/x+]
+  [:stringify-exif-map :write-file-1/file-data]
+  [:open-fn-1 :write-file-1/full-path]
+  [:execute-shell-command/command :open-fn-1/_]
+  [:write-file-1 :write-file-1_file-path/x]
+  [:save-base64-to-webp-file :write-exif-to-image-command/img-path]
+  [:write-file-1_file-path :write-exif-to-image-command/x]
+  [:write-exif-to-image-command :shell-command-1/command]
+  [:shell-command-1 :relative-url-path-for-png-version/bang]]}
