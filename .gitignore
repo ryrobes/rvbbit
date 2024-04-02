@@ -38,5 +38,6 @@ flow-logs/
 .lsp/
 *.log
 *.code-workspace
+.directory
 
 

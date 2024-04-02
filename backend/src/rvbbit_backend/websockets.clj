@@ -2245,6 +2245,7 @@
         ;_ (swap! assoc-in flow-db/results-atom [])
         ;output (walkl/postwalk-replace {:} output)
           ;output (ut/deep-remove-keys output [:b64_json222])
+          _ (ut/pp [:returned*** flow-id (cstr/includes? (str return-val) ":error") restarts restarts-left? opts user-opts])
           ]
       (do
         (swap! restart-map assoc flow-id (inc (get @restart-map flow-id 0)))

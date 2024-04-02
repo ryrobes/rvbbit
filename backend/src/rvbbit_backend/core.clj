@@ -658,7 +658,7 @@
                              _ (swap! last-look assoc k done?)
                              _ (when run-sql? (swap! saved-uids conj run-id))
                              _ (when (and run-sql? (not error?) done?) ;; TEMP REMOVE FOR CHANNEL PUSHING - causes flow to stay in "running" status?
-                                 (ut/delay-execution 60000 (fn [] (wss/remove-watchers-for-flow (str k)))))
+                                 (ut/delay-execution 4000 (fn [] (wss/remove-watchers-for-flow (str k)))))
                             ;chans (count (get @flow-db/channels-atom k))
                            ;_ (when done? (ut/delay-execution 5000 (fn [] (swap! wss/flow-status assoc-in [k :*running?] false))))
                              chans-open (count

@@ -1,4 +1,5 @@
-{:flowmaps
+{ :opts {:close-on-done? true, :retry-on-error? true, :retries 405},
+:flowmaps
  {:oai-api-call
   {:y 1325,
    :description
