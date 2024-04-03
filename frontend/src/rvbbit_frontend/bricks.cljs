@@ -521,6 +521,8 @@
       :dispatch-n [[::wfx/unsubscribe http/socket-id :server-push2]
                    [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)]]})))
 
+(defn sql-alias-replace-sub [query] @(re-frame/subscribe [::sql-alias-replace-sub query]))
+
 (re-frame.core/reg-event-fx
  ::save
  (fn [{:keys [db]} _]
@@ -529,6 +531,8 @@
          flowmaps @(re-frame/subscribe [:rvbbit-frontend.flows/flowmap-raw])
          flowmaps-connections @(re-frame/subscribe [:rvbbit-frontend.flows/flowmap-connections])
          screen-name (get db :screen-name)
+         resolved-queries (into {} (for [[qk q] (apply merge (for [[_ p] (get db :panels)] (get p :queries)))] {qk (sql-alias-replace-sub q)}))
+        ;;  resolved-queries (for [[qk q] (apply merge (for [[_ p] (get db :panels)] (get p :queries)))] {qk q})
          flow? (get db :flow? false)]
      (tap> [:saving (if flow? :flow :screen)])
      (if flow?
@@ -536,11 +540,13 @@
         :dispatch [::http/save-flow
                    {:flowmaps flowmaps
                     :zoom @db/pan-zoom-offsets
+                    :opts (get-in db [:flows (get db :selected-flow) :opts]
+                                  {:retry-on-error? false :retries 5 :close-on-done? true})
                     :flow-id flow-id
                     :flowmaps-connections flowmaps-connections}
                    flow-id]
         :dispatch-later [{:ms 3000, :dispatch [::conn/clear-query-history :flows-sys]}]}
-       {:dispatch [::http/save :skinny screen-name]}))))
+       {:dispatch [::http/save :skinny screen-name resolved-queries]}))))
 
 (re-frame/reg-sub
  ::current-params ;; for snapshot comparisons
@@ -629,6 +635,37 @@
  (fn [db [_ panel-key1 panel-key2]]
    (= (get-in db [:panels panel-key1 :tab] "")
       (get-in db [:panels panel-key2 :tab] ""))))
+
+(defn partition-keywords [keywords]
+  (let [str-keywords (map str keywords)]
+    (group-by #(cstr/includes? % "||") str-keywords)))
+
+(re-frame/reg-sub
+ ::partitioned-subs ;; in order to abuse re-frame subscription caching
+ (fn [db _]
+   (partition-keywords (get db :flow-subs []))))
+
+(re-frame/reg-sub
+ ::flow-watcher-subs
+ :<- [::partitioned-subs]
+ (fn [subs _]
+   (get subs true [])))
+
+(re-frame/reg-sub
+ ::server-subs
+ :<- [::partitioned-subs]
+ (fn [subs _]
+   (get subs false [])))
+
+(re-frame/reg-sub
+ ::flow-watcher-subs-grouped
+ :<- [::flow-watcher-subs]
+ (fn [subs _]
+   (if (empty? subs)
+     {}
+     (->> subs
+          (map #(second (cstr/split (str %) "||")))
+          frequencies))))
 
 (re-frame/reg-sub
  ::tabs
@@ -3755,7 +3792,7 @@
          res (get-in db (vec (into [:panels panel-key :views view-key] vw-kf)) {})]
      (if (map? res) res {}))))
 
-(defn sql-alias-replace-sub [query] @(re-frame/subscribe [::sql-alias-replace-sub query]))
+
 
 (re-frame/reg-event-db
  ::execute-pill-drop
@@ -6129,7 +6166,7 @@
                                                                              :style {:color "#000000"}
                                                                              :child (str (get % c))])
                                                                  (= panel-key :searches-rows-sys-list*)
-                                                                 (draggable (item-subscription-spawner-meta )
+                                                                 (draggable (item-subscription-spawner-meta)
                                                                             "meta-menu"
                                                                             [re-com/box
                                                                              :height (px row-height) ;"22px"
@@ -7300,19 +7337,21 @@
  ::views
  (fn [db [_ panel-key]]
    (let [views      (get-in db [:panels panel-key :views] {})
-         queries    (get-in db [:panels panel-key :queries] {})
+         ;queries    (get-in db [:panels panel-key :queries] {})
          oz-layers  (vec
                      (remove empty?
                              (remove nil? (for [[_ v] views]
                                             (when
                                              (try (= :vega-lite (first v))
-                                                  (catch :default e false))
+                                                  (catch :default _ false))
                                              {:encoding (get-in v [1 :layer 0 :encoding])
                                               :data     (get-in v [1 :data])
                                               :mark     (get-in v [1 :layer 0 :mark])})))))
          oz-layers? (>= (count oz-layers) 2)
-         tab-rules? (and (not (nil? (get-in db [:panels panel-key :tab-rules])))
-                         (>= (+ (count queries) (count views)) 2))]
+         tab-rules? false ;; very old feature... need to revisit or remove completely
+         ;(and (not (nil? (get-in db [:panels panel-key :tab-rules])))
+         ;                (>= (+ (count queries) (count views)) 2))
+         ]
       ;(tap> [:pp panel-key oz-layers? (count oz-layers) (assoc-in vega-lite-shell [1 :layer] oz-layers) oz-layers])
      (if (map? views)
        (merge views                                        ;(get-in db [:panels panel-key :views])
@@ -11585,6 +11624,7 @@
                          is-pinned?          @(re-frame/subscribe [::is-pinned? brick-vec-key])
                          col-selected?       @(re-frame/subscribe [::column-selected-any-field? brick-vec-key selected-view])
                          views               @(re-frame/subscribe [::views brick-vec-key])
+                         views               (if (keyword? views) (rs views) views)
                         ; reco-statuses       @(re-frame/subscribe [::queries-reco-status brick-vec-key]) ;; in for reactions
                          all-views           (if single-view? [] (vec (keys views)))
                           ;multiple-oz-views? @(re-frame/subscribe [::multiple-oz-views? brick-vec-key])

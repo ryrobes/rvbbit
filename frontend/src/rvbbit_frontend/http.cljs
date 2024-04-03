@@ -646,13 +646,14 @@
 
 (re-frame/reg-event-fx
  ::save
- (fn [{:keys [db]} [_ save-type screen-name]]
+ (fn [{:keys [db]} [_ save-type screen-name resolved-queries]]
    (let [method :post
          url (str url-base "/save")
          pp (doall (for [r (filter #(cstr/starts-with? (str %) ":reco-preview") (keys (get-in db [:panels])))] r))
          pl (keys (get db :panels))
          client-name (get db :client-name)
          p0 (cset/difference (set pl) (set pp))
+        ;;  _ (tap> [:resolved-queries resolved-queries])
 
          ;; (assoc db :panels (select-keys (get db :panels) p0)
      ;(tap> p0)
@@ -660,21 +661,21 @@
 
          ;prevs (for [r (filter #(cstr/starts-with? (str %) ":reco-preview") (keys (get-in db [:panels])))] [:panels r])
          base-keys (filter (comp not namespace) (keys db))
-         request {:image (if (= save-type :skinny)
-                           (-> db ;; dehydrated... as it were
-                               ;(ut/dissoc-in prevs)
-                               (select-keys base-keys)
-                               (dissoc :query-history)
-                               (dissoc :query-history-condi)
-                               (dissoc :query-history-meta)
-                               (dissoc :flow-results)
-                               (dissoc :data)
-                               (dissoc :flows) ;;; mostly ephemeral with the UI....
-                               (dissoc :http-reqs)
-                               (dissoc :sql-str)
-                               (dissoc :file-changed)
-                               (assoc :panels (select-keys (get db :panels) p0)))
-                           db) ;; else :fat
+         image (if (= save-type :skinny)
+                 (-> db ;; dehydrated... as it were
+                     (select-keys base-keys)
+                     (dissoc :query-history)
+                     (dissoc :query-history-condi)
+                     (dissoc :query-history-meta)
+                     (dissoc :flow-results)
+                     (dissoc :data)
+                     (dissoc :flows) ;;; mostly ephemeral with the UI....
+                     (dissoc :http-reqs)
+                     (dissoc :sql-str)
+                     (dissoc :file-changed)
+                     (assoc :panels (select-keys (get db :panels) p0)))
+                 db)
+         request {:image (assoc image :resolved-queries resolved-queries)
                   :client-name client-name
                   :screen-name screen-name}
          _ (tap> [:saving screen-name])]
@@ -851,7 +852,7 @@
  ::success-http-load-flowset
  (fn [db [_ result]]
    (let [old-status (get-in db [:http-reqs :load-flowset])
-         new-db (get result :image)]
+         new-db (dissoc (get result :image) :resolved-queries)]
      (-> db
          (assoc-in [:http-reqs :load-flowset]
                    (merge old-status

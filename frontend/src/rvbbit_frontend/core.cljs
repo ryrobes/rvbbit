@@ -39,9 +39,10 @@
                        (fn [_] (debounced-update)))))
 
 (def client-name
-  (let [quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
-        names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) (rand-nth quals) (tales/landform)]]
-    (keyword (cstr/replace (cstr/join "-" names) " " "-"))))
+  (let [;quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
+        names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) ;(rand-nth quals) (tales/landform)
+               ]]
+    (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
 (re-frame/reg-event-db
  ::alt-key-down

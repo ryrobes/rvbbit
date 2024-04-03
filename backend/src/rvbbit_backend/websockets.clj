@@ -990,6 +990,8 @@
 
 
 
+
+
 ;;; ORIGINAL HUMAN VERSION
 
 
@@ -1867,8 +1869,8 @@
                            :else client-name)]
     (doseq [cid destinations]
       (let [sub-task (if (= sub-task :heartbeat) (vec (keys (get @atoms-and-watchers cid {}))) sub-task)]
-        (when false ;(not (= task-id :heartbeat))
-          (ut/pp [:kick! ui-keypath data cid queue-id task-id sub-task]))
+        ;; (when true ; false ;(not (= task-id :heartbeat))
+        ;;   (ut/pp [:kick! ui-keypath data cid queue-id task-id sub-task]))
         (push-to-client ui-keypath data cid queue-id task-id sub-task)))
     ;data
     :sent!))
@@ -2154,6 +2156,7 @@
           ;instance-id (get opts :instance-id)
           ;opts (if (get opts :client-name) opts (merge {:client-name client-name} opts)) ;; stuff into opts for flow-waiter
           ;opts (merge {:client-name client-name} opts)
+          _ (ut/pp [:flow!-passed-opts flow-id opts])
           flowmap (if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
                     (let [raw (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
                                    (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
@@ -2165,9 +2168,9 @@
                       ;(ut/pp fmap)
                       fmap)
                     flowmap)
-          _ (async/thread (do (ext/create-dirs "./flow-history/src-maps-pre") ;; TEMP FOR DEBUGGING - expensive
-                              (ut/pretty-spit (str "./flow-history/src-maps-pre/" flow-id ".edn") ;; ut/pretty-spit is SO expensive...
-                                              flowmap 185)))
+          ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps-pre") ;; TEMP FOR DEBUGGING PRE PROCESSED MAPS
+          ;;                     (ut/pretty-spit (str "./flow-history/src-maps-pre/" flow-id ".edn") ;; expensive...
+          ;;                                     flowmap 185)))
           user-opts (get flowmap :opts (get opts :opts))
           opts (assoc opts :opts user-opts) ;; kinda weird, but we need to account for saved opts or live interactive opts
           ;;_ (ut/pp [:flow!-opts opts user-opts])
@@ -2202,9 +2205,9 @@
           opts (merge opts (select-keys (get opts :opts {}) [:close-on-done? :debug? :timeout]))
           opts (merge {:client-name client-name} opts)
           finished-flowmap (assoc finished-flowmap :opts opts)
-          _ (async/thread (do (ext/create-dirs "./flow-history/src-maps") ;; TEMP FOR DEBUGGING - expensive
-                              (ut/pretty-spit (str "./flow-history/src-maps/" flow-id ".edn") ;; ut/pretty-spit is SO expensive...
-                                              finished-flowmap 185)))
+          ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps") ;; TEMP FOR DEBUGGING POST PROCESSED MAPS
+          ;;                     (ut/pretty-spit (str "./flow-history/src-maps/" flow-id ".edn") ;; expensive...
+          ;;                                     finished-flowmap 185)))
           ;;_ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
           _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter
@@ -2245,7 +2248,7 @@
         ;_ (swap! assoc-in flow-db/results-atom [])
         ;output (walkl/postwalk-replace {:} output)
           ;output (ut/deep-remove-keys output [:b64_json222])
-          _ (ut/pp [:returned*** flow-id (cstr/includes? (str return-val) ":error") restarts restarts-left? opts user-opts])
+          ;; _ (ut/pp [:returned*** flow-id (cstr/includes? (str return-val) ":error") restarts restarts-left? opts user-opts])
           ]
       (do
         (swap! restart-map assoc flow-id (inc (get @restart-map flow-id 0)))
@@ -2445,7 +2448,9 @@
 (defmethod wl/handle-request :run-flow [{:keys [client-name flowmap flow-id opts no-return?]}]
   (ut/pp [:running-flow-map-from client-name])
   ;; set running flow from client-name/flow-id
-  (flow! client-name flowmap flow-id opts true))
+  (when (not (get-in (flow-statuses) [flow-id :*running?] false))
+  ;; ^^  dont let the web kick off a double run, in case their client state gets fucked up and accidentally allows it (it shouldnt, but still)
+    (flow! client-name flowmap flow-id opts true)))
 
 (defn flow-kill! [flow-id client-name]
   (future
@@ -2488,12 +2493,25 @@
     (flow-kill! flow-id client-name))
   [:assassin-sent!])
 
+(defn boomerang-client-subs [cid]
+  (let [sub-task (vec (keys (get @atoms-and-watchers cid {})))]
+    (push-to-client [:kick] {:at "", :payload nil, :payload-kp [:heartbeat :heartbeat], :sent! :heartbeat, :to :all}
+                    cid -1 :heartbeat sub-task)))
+
+(declare remove-watchers-for-flow)
+
+(defmethod wl/handle-request :remove-flow-watcher [{:keys [client-name flow-id]}]
+  (ut/pp [::remove-flow-watcher flow-id :from client-name :!])
+  (remove-watchers-for-flow flow-id client-name)
+  ;; (ut/delay-execution 2000 (fn [] (boomerang-client-subs client-name)))
+  (boomerang-client-subs client-name)
+  [:watcers-removed!])
+
 (defmethod wl/handle-request :search-groups [{:keys [client-name search-str max-hits]}]
   (ut/pp [:search-for search-str :from client-name])
-  (let [results (search/search-index search/idx-path search-str )]
+  (let [results (search/search-index search/idx-path search-str)]
     ;(group-by :type (for [[k v] results] (merge {:docid k} v)))
-    (frequencies (map :type (for [[k v] results] (merge {:docid k} v))))
-    ))
+    (frequencies (map :type (for [[k v] results] (merge {:docid k} v))))))
 
 (defmethod wl/handle-request :search [{:keys [client-name search-str max-hits hit-type]}]
   (ut/pp [:search-for search-str :from client-name])
@@ -2502,7 +2520,7 @@
 
 (defmethod wl/handle-request :session-snaps [{:keys [client-name]}]
   ;(ut/pp [:get-session-snaps :from client-name :!])
-  (take 20 (ut/get-file-vectors-with-time-diff "./snaps/" "edn")))
+  (take 9 (sort-by second (ut/get-file-vectors-with-time-diff "./snaps/" "edn"))))
 
 ;; (defmethod wl/handle-request :save-snap [{:keys [client-name image]}] ;; too big for websockets, fucks everything all up
 ;;   (ut/pp [:saving-image-snap :from client-name])
@@ -2879,28 +2897,35 @@
 ;;(def client-subscriptions (atom {}))
 
 (defn remove-watcher [keypath client-name sub-type flow-id flow-key]
-  (let [watch-key (str client-name "-" (str keypath) "-" sub-type "-" flow-key)
-        atom-to-watch (if (cstr/includes? (str keypath) ":*")
-                        flow-status
-                        ;flow-db/results-atom
-                        ;(get-or-create-child-atom (first keypath))
-                        (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
-                        )]
+  (try (let [watch-key (str client-name "-" (str keypath) "-" sub-type "-" flow-key)
+            ;;  _ (ut/pp [:removing-watcher-try!!! keypath client-name sub-type flow-id flow-key])
+             atom-to-watch (if (cstr/includes? (str keypath) ":*")
+                             flow-status
+                             ;flow-db/results-atom
+                             ;(get-or-create-child-atom (first keypath))
+                             (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
     (ut/pp [:removing-watcher keypath client-name sub-type flow-id watch-key])
     (remove-watch atom-to-watch watch-key)
     ;; (swap! client-subscriptions update keypath (partial remove #(= % client-name)))
     ;; (when (empty? (get @client-subscriptions keypath))
     ;;   (swap! client-subscriptions dissoc keypath))
-    (swap! atoms-and-watchers ut/dissoc-in [client-name flow-key])))
+    (swap! atoms-and-watchers ut/dissoc-in [client-name flow-key])) (catch Throwable e (ut/pp [:remove-watcher e]))))
 
-(defn remove-watchers-for-flow [flow-id]
-  (doseq [[client-name subs] @atoms-and-watchers
+(defn remove-watchers-for-flow [flow-id & [client-name]]
+  (doseq [[c-name subs] @atoms-and-watchers
           :let [matching-subs (filter #(= (:flow-id %) flow-id) (vals subs))]
-          :when (not (empty? matching-subs))]
+          :when (not (empty? matching-subs))
+                ;(and
+                ; (not (empty? matching-subs))
+                ; (if client-name (= c-name client-name) true))
+          ]
+    (ut/pp [:matching-subs c-name matching-subs])
     (doseq [sub matching-subs]
       (do 
-        (ut/pp [:removing (count matching-subs) :watchers :for flow-id client-name])
-        (remove-watcher (:keypath sub) client-name (:sub-type sub) flow-id (key sub))))))
+        (ut/pp [:removing (count matching-subs) :watchers :for flow-id c-name [[(:keypath sub) c-name (:sub-type sub) flow-id (:flow-key sub)]]])
+        (remove-watcher (:keypath sub) c-name (:sub-type sub) flow-id (:flow-key sub))))))
+
+;; remove-watcher [keypath client-name sub-type flow-id flow-key]
 
 (defn break-up-flow-key [key]
   (let [ff (cstr/split (-> (str key) (cstr/replace #":" "")) #"/")
@@ -3046,6 +3071,8 @@
 ;;            [:client-sub-request flow-id :step-id step-id :client-name client-name]))))
 
 
+
+
 (defmethod wl/handle-request :sub-to-running-values [{:keys [client-name flow-keys]}]
   ;; get a list of all block to listen to for the running session. remove all these watchers on session end
   (ut/pp [:sub-to-running-values client-name flow-keys])
@@ -3058,7 +3085,11 @@
            ;(kick client-name (vec (cons :flow-runner keypath)) :started nil nil nil) ;; push initial value, if we have one
            ;(kick client-name (vec (cons :tracker keypath)) (get @flow-db/tracker flow-id) nil nil nil) ;; push init tracker state, if exists
            ;[:client-sub-request flow-id :step-id step-id :client-name client-name]
-      ))[:copy-that client-name])
+      (boomerang-client-subs client-name)))
+  [:copy-that client-name])
+
+ 
+
 
 (defmethod wl/handle-request :open-ai-push [{:keys [kind convo panels client-name]}]
   ;(ext/write-panels client-name panels)
@@ -4913,7 +4944,7 @@
       (subs s 0 limit)
       s)))
 
-(defn param-sql-sync []
+(defn param-sql-sync [] ;; placeholder function, will not scale - output is correct however
   (let [display-name (fn [x & [num]] (cstr/join " " (vec (drop (or num 2) x))))
         flow-rows (vec (filter #(and (= (count %) 2) (not= (second %) :opts-map)
                                      (not (cstr/includes? (str (get % 1 "")) "/")) ;; debatable
@@ -4985,23 +5016,28 @@
         block-rows (for [e block-rows
                          :let [block? (or (= (last e) :views)
                                           (= (last e) :queries))
-                               e (if block? (drop-last e) e)]]
+                               e (if block? (drop-last e) e)
+                               sample (if (not block?)
+                                        (try (ut/replace-large-base64 (-> (get-in @screens-atom (vec (drop-last (drop-last e)))) (dissoc :views) (dissoc :root) (dissoc :tab) (dissoc :queries)
+                                                                          (assoc :natural-key (if block? (get e 3) (get e 4)))))
+                                             (catch Exception ee (str ee)))
+                                        (try (ut/replace-large-base64 (-> (get-in @screens-atom (vec e)) (dissoc :views) (dissoc :root)
+                                                                          (assoc :natural-key (last e))
+                                                                          (dissoc :tab) (dissoc :queries)))
+                                             (catch Exception ee (str ee))))]]
                      [(cstr/replace (str (first e)) ":" "")
                       ;;;(str "::" (last e)) ;; 
                       (str "saved-" (if block? "block" (cstr/replace (str (get e 3)) ":" "")))
-                      (cstr/replace (if block? (str (get e 3)) (str (get e 4))) ":" "")
+                      (cstr/replace (if block?
+                                      (str (get sample :name (str (get e 3)))) ;; (str (get e 3))
+                                      (str (get e 4))) ":" "")
                       (str ":screen/" (cstr/replace (cstr/join ">" e) ":" ""))
                       ;(true? (some #(= (first e) %) live-clients))
                       nil
                       (strunc (ut/replace-large-base64 (get-in @screens-atom e)))
                       ;(str (vec (drop 2 e)))
                       (display-name e)
-                      (if (not block?)
-                        (try (str (ut/replace-large-base64 (-> (get-in @screens-atom (vec (drop-last (drop-last e)))) (dissoc :views) (dissoc :root) (dissoc :tab) (dissoc :queries) (assoc :natural-key (if block? (get e 3) (get e 4)))))) (catch Exception ee (str ee)))
-                        ;(str (vec e))
-                        (try (str (ut/replace-large-base64 (-> (get-in @screens-atom (vec e)) (dissoc :views) (dissoc :root)
-                                                               (assoc :natural-key (last e))
-                                                               (dissoc :tab) (dissoc :queries)))) (catch Exception ee (str ee))))
+                      (str sample)
                       ;(when (not block?) (str (vec (drop-last e))))
                       ])
         ;prows (vec (filter #(cstr/includes? (str (get % 6) "") "-preview-") (distinct (into (into (into param-rows flow-rows) block-rows) panel-rows))))
@@ -5453,16 +5489,9 @@
 
 (defn create-websocket-server! []
   (ut/ppa [:starting-websocket-server :port websocket-port])
-  (.start websocket-server)
-  ;(reset! websocket-server (jetty/run-jetty web-handler ring-options))
-  )
-
-;; (defn destroy-websocket-server! [] ;; old and ungraceful
-;;   (ut/ppa [:*websocket (format "stopping websocket server @ %d" websocket-port)])
-;;   (.stop websocket-server))
+  (.start websocket-server))
 
 (defn destroy-websocket-server! []
-  ;(ut/ppa [:*websocket (format "stopping websocket server @ %d" websocket-port)])
   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
   (.stop websocket-server)
   (let [timeout-ms 10000
@@ -5474,27 +5503,47 @@
       (ut/ppa [:killing-websocket-server! (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
       (.destroy websocket-server))))
 
+;; (defn destroy-websocket-server! []
+;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
+;;   (let [connector (first (.getConnectors websocket-server))]
+;;     (.shutdown connector)
+;;     (let [timeout-ms 10000
+;;           start-time (System/currentTimeMillis)]
+;;       (while (and (.isRunning connector)
+;;                   (< (- (System/currentTimeMillis) start-time) timeout-ms))
+;;         (Thread/sleep 300))
+;;       (when (.isRunning connector)
+;;         (ut/ppa [:killing-websocket-server! (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
+;;         (.stop connector)))))
+
+;; (defn destroy-websocket-server! []
+;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
+;;   (let [connector (first (.getConnectors websocket-server))
+;;         executor (-> websocket-server
+;;                      (.getBean org.eclipse.jetty.util.thread.ThreadPool)
+;;                      .getExecutor)]
+;;     (try
+;;       ; Stop accepting new connections
+;;       (.shutdown connector)
+;;       ; Initiate graceful shutdown of the executor
+;;       (.shutdown executor)
+;;       (let [timeout-ms 10000]
+;;         (if (.awaitTermination executor timeout-ms TimeUnit/MILLISECONDS)
+;;           (ut/ppa [:websocket-server-shutdown-gracefully])
+;;           (do
+;;             (ut/ppa [:websocket-server-shutdown-timeout])
+;;             (.shutdownNow executor)
+;;             (.stop connector))))
+;;       (catch Exception e
+;;         (ut/ppa [:error-during-websocket-server-shutdown e])
+;;         ; Handle the exception appropriately
+;;         ))))
+
 (defn restart-websocket-server! []
   (let [cache-size (count @sql-cache)]
-    ;(println (format "(re)starting websocket server @ %d ...\n  " websocket-port))
     (jvm-memory-used)
     (ut/ppa [:resstarting-websocket-server :port websocket-port])
     (.stop websocket-server)
-    ;(.reset ^MultiFn wl/handle-subscription)
-
-    ;(.reset ^MultiFn wl/handle-subscription) ;; reset and avoid long running hangs?
-    ;(defmethod wl/handle-subscription :server-push2 [data] ;;; ??? why does this fix it?
-    ;  (let [results (async/chan)]
-    ;    (async/go-loop []
-    ;      (async/<! (async/timeout 100))
-    ;      (when (async/>! results (async/<!! external-changes))
-    ;        (recur)))
-    ;    results))
-    ;; (when (> cache-size 0)
-    ;;   (do (ut/ppa [:*cache (format "Clearing %d queries out of @sql-cache atom" (count @sql-cache))])
-    ;;       (reset! sql-cache {})
-    ;;       (jvm-memory-used)))
-
     (.start websocket-server)))
 
 ;;  (rvbbit-backend.websockets/create-websocket-server!)

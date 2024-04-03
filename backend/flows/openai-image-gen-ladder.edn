@@ -1,5 +1,4 @@
-{ :opts {:close-on-done? true, :retry-on-error? true, :retries 405},
-:flowmaps
+{:flowmaps
  {:oai-api-call
   {:y 1325,
    :description
@@ -957,7 +956,8 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
- :zoom [-861.89 -1422.01 0.95],
+ :opts {:close-on-done? true, :retry-on-error? true, :retries 404},
+ :zoom [-785 -862 0.925],
  :flow-id "openai-image-gen-ladder",
  :flowmaps-connections
  [[:http-req-map/* :oai-api-call/req-map]

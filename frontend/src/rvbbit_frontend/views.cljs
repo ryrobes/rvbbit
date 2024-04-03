@@ -125,10 +125,14 @@
 (defn search-panel-metadata []
   (let [client-name (cstr/replace (str @(re-frame/subscribe [::bricks/client-name])) ":" "")
         sql-calls {:searches-types-sys {:select [:item_type] ;; :searches-types-sys/item_type 
+                                        :where [:and [:not [:like :item_sub_type "%preview%"]]
+                                                [:not [:= :item_type "saved-block"]]]
                                         :from [:client_items] :group-by [1]}
                    :searches-sub-types-sys {:select [:item_key :is_live [[:count 1] :items]] ;; :searches-types-sys/item_type 
                                             :where [:and
                                                     [:not [:= :item_key client-name]]
+                                                    [:not [:like :item_sub_type "%preview%"]] 
+                                                    [:not [:= :item_type "saved-block"]]
                                                     [:= :item_type :searches-types-sys/item_type]]
                                              ;;:col-widths {:items 70}
                                              :style-rules {[:* :highlight-4018a]
@@ -166,6 +170,8 @@
         selected-shortcode (get sql-params :searches-rows-sys/value)
         sql-calls {:searches-rows-sys {:select [:item_sub_type :item_type :item_key :display_name :sample :value :is_live :block_meta] ;; :searches-types-sys/item_type 
                                        :where [:and
+                                               [:not [:like :item_sub_type "%preview%"]]
+                                               [:not [:= :item_type "saved-block"]]
                                                [:= :item_key  :searches-sub-types-sys/item_key]
                                                [:= :item_type :searches-types-sys/item_type]]
                                                                ;;:col-widths {:items 77}
@@ -3223,6 +3229,8 @@
                                                  t (get ss 1)]]
                                        [image-component s t h rowcnt items])])]]))
 
+
+
 (defn main-panel []
   (let [editor? (and @(re-frame/subscribe [::bricks/editor?]) (not @bricks/dragging?))
         buffy? @(re-frame/subscribe [::bricks/buffy?])
@@ -3245,8 +3253,11 @@
         selected-tab @(re-frame/subscribe [::bricks/selected-tab])
         selected-block? (true? (not (or (nil? selected-block) (= selected-block "none!"))))
         screen-name (ut/unkeyword @(re-frame/subscribe [::bricks/screen-name]))
-        bricks-high (+ (js/Math.floor (/ hh bricks/brick-size)) 1)
-        bricks-wide (+ (js/Math.floor (/ ww bricks/brick-size)) 1)
+        client-name @(re-frame/subscribe [::bricks/client-name]) 
+        ;bricks-high (+ (js/Math.floor (/ hh bricks/brick-size)) 1)
+        ;bricks-wide (+ (js/Math.floor (/ ww bricks/brick-size)) 1)
+        flow-watcher-subs-grouped @(re-frame/subscribe [::bricks/flow-watcher-subs-grouped])
+        server-subs @(re-frame/subscribe [::bricks/server-subs])
         ;lines? true ;false
         coords (if lines? ;; expensive otherwise
                  (let [subq-mapping (if lines? @(re-frame/subscribe [::bricks/subq-mapping]) {})
@@ -3598,10 +3609,38 @@
                                                      :color "red"
                                                      :font-size "22px"}])
 
-                                          [re-com/box
+                                          [re-com/h-box
                                            :size "none"
-                                           :style {:position "fixed" :left 138 :bottom 0 :font-weight 700 :color (if (not online?) "#ffffff" "#ffffff77")}
-                                           :child (str (get websocket-status :waiting -1) (when (not online?) " (RVBBIT server is offline)"))]
+                                           :gap "8px"
+                                           :style {:position "fixed" :left 138 :bottom 0 :font-weight 700
+                                                   :color (if (not online?) "#ffffff" "#ffffff77")
+                                                   :font-family (theme-pull :theme/monospaced-font nil)}
+                                           :children [[re-com/box :size "none"
+                                                       ;:style {:mid-width "167px"}
+                                                       :child (str (get websocket-status :waiting -1)
+                                                                   (str ", " (ut/nf (count server-subs)))
+                                                                   (when (not online?) " (RVBBIT server is offline)"))]
+                                                      (when (ut/ne? flow-watcher-subs-grouped)
+                                                        [re-com/h-box
+                                                         :style {:padding-left "10px" :font-size "12px"}
+                                                         :gap "8px"
+                                                         :children (for [[kk cnt] flow-watcher-subs-grouped]
+                                                                     [re-com/h-box
+                                                                      :style {:background-color (theme-pull :theme/editor-outer-rim-color nil)
+                                                                              :padding-left "6px"
+                                                                              :border-radius "5px 5px 0px 0px"
+                                                                              :padding-right "6px"
+                                                                              :color (theme-pull :theme/editor-background-color nil)}
+                                                                      :gap "5px"
+                                                                      :children [[re-com/box :child (str kk)]
+                                                                                 [re-com/box :style {:opacity 0.5} :child (str cnt)]
+                                                                                 [re-com/md-icon-button :md-icon-name "zmdi-close"
+                                                                                  :style {:cursor "pointer" :color "white" :font-size "15px" :height "10px" :margin-top "-3px"}
+                                                                                  :on-click #(do (tap> [:remove-flow-watchers client-name kk])
+                                                                                                 (re-frame/dispatch [::wfx/request :default
+                                                                                                                     {:message    {:kind :remove-flow-watcher
+                                                                                                                                   :client-name client-name
+                                                                                                                                   :flow-id kk}}]))]]])])]]
 
                                           (let [mem @(re-frame/subscribe [::bricks/memory])]
                                             [re-com/box

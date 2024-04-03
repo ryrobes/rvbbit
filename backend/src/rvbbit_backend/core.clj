@@ -104,6 +104,13 @@
         ;;                  (catch Exception e (ut/pp [:read-screen-error!!!!! f-path e]) {}))
         screen-data (read-screen f-path)
         screen-name (get screen-data :screen-name "unnamed-screen!")
+        resolved-queries (get screen-data :resolved-queries)
+        screen-data (if (not (empty? resolved-queries))
+                      (assoc screen-data :panels
+                             (into {}
+                                   (for [[k v] (get screen-data :panels)]
+                                     {k (assoc v :queries (select-keys resolved-queries (keys (get v :queries))))}))) 
+                      screen-data)
         theme-map (get-in screen-data [:click-param :theme])
         has-theme? (and (not (nil? theme-map)) (not (empty? theme-map)))
         theme-name (if (and has-theme? (not (nil? (get theme-map :theme-name))))
@@ -657,8 +664,8 @@
 
                              _ (swap! last-look assoc k done?)
                              _ (when run-sql? (swap! saved-uids conj run-id))
-                             _ (when (and run-sql? (not error?) done?) ;; TEMP REMOVE FOR CHANNEL PUSHING - causes flow to stay in "running" status?
-                                 (ut/delay-execution 4000 (fn [] (wss/remove-watchers-for-flow (str k)))))
+                            ;;  _ (when (and run-sql? (not error?) done?) ;; TEMP REMOVE FOR CHANNEL PUSHING - causes flow to stay in "running" status?
+                            ;;      (ut/delay-execution 4000 (fn [] (wss/remove-watchers-for-flow (str k)))))
                             ;chans (count (get @flow-db/channels-atom k))
                            ;_ (when done? (ut/delay-execution 5000 (fn [] (swap! wss/flow-status assoc-in [k :*running?] false))))
                              chans-open (count

@@ -166,6 +166,11 @@
       (aset bytes i (.charCodeAt binary-string i)))
     bytes))
 
+(defn ne? [x]
+  (if (seqable? x)
+    (boolean (seq x))
+    true))
+
 (defn base64-to-blob [base64-content content-type]
   (let [byte-array (base64-to-uint8-array base64-content)
         options (clj->js {:type content-type})]

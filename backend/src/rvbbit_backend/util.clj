@@ -634,10 +634,16 @@
   (try (-> ch class .getName (= "clojure.core.async.impl.channels.ManyToManyChannel"))
        (catch Exception _ false)))
 
+;; (defn generate-name []
+;;   (let [quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from" "from"]
+;;         names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) (rand-nth quals) (tales/landform)]]
+;;     (cstr/replace (clojure.string/join "-" names) " " "-")))
+
 (defn generate-name []
-  (let [quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from" "from"]
-        names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) (rand-nth quals) (tales/landform)]]
-    (cstr/replace (clojure.string/join "-" names) " " "-")))
+  (let [;quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
+        names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) ;(rand-nth quals) (tales/landform)
+               ]]
+    (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45))))
 
 (defn channel-open? [ch]
   (async/offer! ch nil))

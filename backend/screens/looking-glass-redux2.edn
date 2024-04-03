@@ -2475,7 +2475,7 @@
  :lines? true,
  :editor? false,
  :buffy? false,
- :memory [497792556 462453760 4294705152],
+ :memory [497486719 447470587 4294705152],
  :preview-keys
  ["1306358328" "-2615471" "913438440" "-1862580327" "425371504" "-1462754077"],
  :status-data
@@ -2507,7 +2507,7 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-04-02 00:19:52",
+      :at "2024-04-02 22:02:48",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -2522,56 +2522,56 @@
        [:>
         :ComposedChart
         {:data
-         [{:mem 911, :tick 15087, :threads 126, :subs 152, :load 3.73291015625}
-          {:mem 1946, :tick 15088, :threads 129, :subs 152, :load 4.49560546875}
-          {:mem 1546, :tick 15089, :threads 128, :subs 152, :load 5.02294921875}
-          {:mem 2994, :tick 15090, :threads 117, :subs 152, :load 5.28173828125}
-          {:mem 1242, :tick 15091, :threads 118, :subs 152, :load 4.568359375}
-          {:mem 2975, :tick 15092, :threads 118, :subs 152, :load 4.564453125}
-          {:mem 1783, :tick 15093, :threads 109, :subs 152, :load 4.09326171875}
-          {:mem 853, :tick 15094, :threads 136, :subs 152, :load 3.40380859375}
-          {:mem 2682, :tick 15095, :threads 121, :subs 152, :load 3.16357421875}
-          {:mem 1535, :tick 15096, :threads 114, :subs 152, :load 2.8466796875}
-          {:mem 3188, :tick 15097, :threads 112, :subs 152, :load 2.875}
-          {:mem 1084, :tick 15098, :threads 121, :subs 152, :load 2.92529296875}
-          {:mem 2778, :tick 15099, :threads 116, :subs 152, :load 2.5595703125}
-          {:mem 3059, :tick 15100, :threads 119, :subs 152, :load 3.22265625}
-          {:mem 3407, :tick 15101, :threads 122, :subs 152, :load 2.86669921875}
-          {:mem 3265, :tick 15102, :threads 119, :subs 152, :load 2.82861328125}
-          {:mem 2798, :tick 15103, :threads 132, :subs 152, :load 3.1435546875}
-          {:mem 2316, :tick 15104, :threads 141, :subs 152, :load 3.0625}
-          {:mem 2643, :tick 15105, :threads 137, :subs 152, :load 4.5703125}
-          {:mem 1878, :tick 15106, :threads 127, :subs 152, :load 3.97216796875}
-          {:mem 687, :tick 15107, :threads 124, :subs 152, :load 3.1943359375}
-          {:mem 2372, :tick 15108, :threads 118, :subs 152, :load 3.46337890625}
-          {:mem 1073, :tick 15109, :threads 121, :subs 152, :load 3.0537109375}
-          {:mem 2816, :tick 15110, :threads 123, :subs 152, :load 2.79248046875}
-          {:mem 1598, :tick 15111, :threads 119, :subs 152, :load 2.67041015625}
-          {:mem 3250, :tick 15112, :threads 121, :subs 152, :load 2.52587890625}
-          {:mem 2038, :tick 15113, :threads 120, :subs 152, :load 2.58984375}
-          {:mem 782, :tick 15114, :threads 116, :subs 152, :load 2.67333984375}
-          {:mem 2837, :tick 15115, :threads 123, :subs 152, :load 2.3271484375}
-          {:mem 1785, :tick 15116, :threads 120, :subs 152, :load 2.71484375}
-          {:mem 3473, :tick 15117, :threads 115, :subs 152, :load 2.6103515625}
-          {:mem 2180, :tick 15118, :threads 119, :subs 152, :load 2.517578125}
-          {:mem 958, :tick 15119, :threads 119, :subs 152, :load 2.87890625}
-          {:mem 2640, :tick 15120, :threads 116, :subs 152, :load 2.53125}
-          {:mem 1372, :tick 15121, :threads 117, :subs 152, :load 2.533203125}
-          {:mem 3107, :tick 15122, :threads 118, :subs 152, :load 2.447265625}
-          {:mem 1917, :tick 15123, :threads 114, :subs 152, :load 2.40771484375}
-          {:mem 635, :tick 15124, :threads 116, :subs 152, :load 2.884765625}
-          {:mem 2346, :tick 15125, :threads 116, :subs 152, :load 2.58203125}
-          {:mem 1084, :tick 15126, :threads 112, :subs 152, :load 2.60107421875}
-          {:mem 3013, :tick 15127, :threads 118, :subs 152, :load 2.66162109375}
-          {:mem 1875, :tick 15128, :threads 120, :subs 152, :load 3.51220703125}
-          {:mem 635, :tick 15129, :threads 116, :subs 152, :load 3.8857421875}
-          {:mem 2828, :tick 15130, :threads 126, :subs 152, :load 5.06005859375}
-          {:mem 1421, :tick 15131, :threads 123, :subs 152, :load 4.94580078125}
-          {:mem 1799, :tick 15132, :threads 118, :subs 152, :load 4.95166015625}
-          {:mem 3442, :tick 15133, :threads 112, :subs 152, :load 4.35546875}
-          {:mem 2234, :tick 15134, :threads 116, :subs 152, :load 3.87939453125}
-          {:mem 1352, :tick 15135, :threads 127, :subs 152, :load 4.31201171875}
-          {:mem 854, :tick 15136, :threads 103, :subs 51, :load 5.0322265625}],
+         [{:mem 561, :tick 17541, :threads 101, :subs 129, :load 5.41552734375}
+          {:mem 2187, :tick 17542, :threads 99, :subs 129, :load 4.02734375}
+          {:mem 1873, :tick 17543, :threads 98, :subs 129, :load 3.697265625}
+          {:mem 1636, :tick 17544, :threads 104, :subs 129, :load 3.5791015625}
+          {:mem 1376, :tick 17545, :threads 109, :subs 129, :load 3.1630859375}
+          {:mem 1063, :tick 17546, :threads 104, :subs 129, :load 3.619140625}
+          {:mem 806, :tick 17547, :threads 108, :subs 199, :load 3.41162109375}
+          {:mem 564, :tick 17548, :threads 105, :subs 47, :load 4.16455078125}
+          {:mem 896, :tick 17549, :threads 99, :subs 47, :load 3.69384765625}
+          {:mem 1188, :tick 17550, :threads 101, :subs 47, :load 4.1650390625}
+          {:mem 1107, :tick 17551, :threads 106, :subs 59, :load 3.62646484375}
+          {:mem 1084, :tick 17552, :threads 101, :subs 59, :load 3.92236328125}
+          {:mem 1438, :tick 17553, :threads 102, :subs 59, :load 3.3271484375}
+          {:mem 980, :tick 17554, :threads 125, :subs 59, :load 3.34521484375}
+          {:mem 1411, :tick 17555, :threads 109, :subs 129, :load 3.90576171875}
+          {:mem 514, :tick 17556, :threads 101, :subs 129, :load 3}
+          {:mem 842, :tick 17557, :threads 106, :subs 129, :load 2.9775390625}
+          {:mem 1175, :tick 17558, :threads 101, :subs 129, :load 3.1064453125}
+          {:mem 1536, :tick 17559, :threads 105, :subs 129, :load 2.54931640625}
+          {:mem 548, :tick 17560, :threads 107, :subs 129, :load 3.3056640625}
+          {:mem 755, :tick 17561, :threads 111, :subs 47, :load 4.18017578125}
+          {:mem 866, :tick 17562, :threads 105, :subs 47, :load 4.29541015625}
+          {:mem 1240, :tick 17563, :threads 99, :subs 55, :load 3.38818359375}
+          {:mem 599, :tick 17564, :threads 100, :subs 59, :load 3.8701171875}
+          {:mem 886, :tick 17565, :threads 95, :subs 59, :load 3.9638671875}
+          {:mem 1044, :tick 17566, :threads 103, :subs 59, :load 3.6650390625}
+          {:mem 890, :tick 17567, :threads 104, :subs 59, :load 4.017578125}
+          {:mem 403, :tick 17568, :threads 100, :subs 59, :load 3.47802734375}
+          {:mem 915, :tick 17569, :threads 106, :subs 47, :load 4.15234375}
+          {:mem 652, :tick 17570, :threads 102, :subs 117, :load 3.64697265625}
+          {:mem 485, :tick 17571, :threads 98, :subs 117, :load 3.2685546875}
+          {:mem 616, :tick 17572, :threads 120, :subs 199, :load 3.41943359375}
+          {:mem 433, :tick 17573, :threads 111, :subs 199, :load 3.830078125}
+          {:mem 739, :tick 17574, :threads 104, :subs 47, :load 4.244140625}
+          {:mem 772, :tick 17575, :threads 101, :subs 187, :load 4.30078125}
+          {:mem 567, :tick 17576, :threads 107, :subs 187, :load 4.13427734375}
+          {:mem 974, :tick 17577, :threads 117, :subs 199, :load 4.2607421875}
+          {:mem 809, :tick 17578, :threads 113, :subs 199, :load 3.8056640625}
+          {:mem 1285, :tick 17579, :threads 102, :subs 199, :load 4.0244140625}
+          {:mem 778, :tick 17580, :threads 105, :subs 199, :load 3.6259765625}
+          {:mem 2393, :tick 17581, :threads 97, :subs 199, :load 3.9052734375}
+          {:mem 1353, :tick 17582, :threads 98, :subs 199, :load 3.75}
+          {:mem 3009, :tick 17583, :threads 103, :subs 199, :load 4.21533203125}
+          {:mem 657, :tick 17584, :threads 107, :subs 47, :load 5.17333984375}
+          {:mem 678, :tick 17585, :threads 102, :subs 47, :load 4.22314453125}
+          {:mem 636, :tick 17586, :threads 100, :subs 47, :load 3.43017578125}
+          {:mem 798, :tick 17587, :threads 107, :subs 47, :load 3.25439453125}
+          {:mem 1192, :tick 17588, :threads 104, :subs 59, :load 2.9091796875}
+          {:mem 622, :tick 17589, :threads 123, :subs 59, :load 2.8623046875}
+          {:mem 455, :tick 17590, :threads 105, :subs 47, :load 4.92041015625}],
          :margin {:top 5, :bottom 5, :right 30, :left 20}}
         [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
         [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
@@ -2962,14 +2962,25 @@
   :shape-drag-7 {:* {:rowcount 29}}},
  :flow-estimates
  {"openai-image-gen-ladder"
-  {:times 44.3, :run-id "11f9ef99-4c66-4c38-94e4-7fe23062d70e"},
-  "client-keepalive" {:times nil, :run-id "4961bdbe-0d2b-46b2-9daa-879f4604c8e7"},
+  {:times 46.9, :run-id "b8158672-8ab9-49a8-8afe-86aebdffb12c"},
+  "client-keepalive" {:times nil, :run-id "b294ff69-fdcb-4d63-9f37-46e958664963"},
   "claude-3-opus-loop1"
   {:times nil, :run-id "f4497449-4790-4cb3-9fdc-a7ae53277c2e"},
   "left-right-math" {:times nil, :run-id "555194bd-dbac-46ad-abda-5b04f9ad2005"}},
  :status
  {"kick-test!" {:kick :query-preview1306358328},
-  :heartbeat {:kick []},
+  :heartbeat
+  {:kick
+   [:flow/openai-image-gen-ladder>:pop-color
+    :flow/flow-forever>*running?
+    :flow/openai-image-gen-ladder>:output-revised-prompt
+    :flow/openai-image-gen-ladder>:dominant-color
+    :panel/proud-magenta-skunk-exiled-from-volcanic-arc>block-7369>queries>city-drag-26
+    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+    :flow/openai-image-gen-ladder>*running?
+    :client/proud-magenta-skunk-exiled-from-volcanic-arc>city-drag-26>city
+    :flow/live-scratch-flow>*running?
+    :flow/flow-forever>:final-math]},
   :alert1 {:alerts :alert2},
   :file-change {:file-changed :done},
   :reco {:ufo-sightings-drag-9 :done}},
@@ -3003,72 +3014,68 @@
   :ufo_sightings 484893751},
  :panels-hash -765390397,
  :sessions
- (["impressive-periwinkle-jay-banned-from-rock-formations.edn"
-   "501 hours, 42 minutes, 16 seconds"
-   1806136689]
-   ["vigorous-square-serval-banned-from-thalweg.edn"
-    "496 hours, 19 minutes, 58 seconds"
-    1786798690]
-   ["exciting-globular-mouse-banned-from-maar.edn"
-    "393 hours, 38 minutes, 7 seconds"
-    1417087690]
-   ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
-    "501 hours, 42 minutes, 16 seconds"
-    1806136690]
-   ["restored-raspberry-mule-of-baymouth-bar.edn"
-    "263 hours, 55 minutes, 42 seconds"
-    950142605]
-   ["awesome-prismatic-jay-banned-from-malpaís.edn"
-    "263 hours, 56 minutes, 19 seconds"
-    950179481]
-   ["constant-star-shaped-echidna-banned-from-towhead.edn"
-    "478 hours, 13 minutes, 29 seconds"
-    1721609690]
-   ["special-globular-coyote-of-oceanic-trench.edn"
-    "501 hours, 42 minutes, 17 seconds"
-    1806137690]
-   ["proud-thin-elk-of-rôche-moutonnée.edn"
-    "501 hours, 42 minutes, 16 seconds"
-    1806136690]
-   ["kind-rhomboidal-lion-of-the-floodplain.edn"
-    "501 hours, 42 minutes, 16 seconds"
-    1806136690]
-   ["trusting-cubic-eagle-hailing-from-salt-pan.edn"
-    "501 hours, 42 minutes, 17 seconds"
-    1806137690]
-   ["unreal-ovoid-serval-banned-from-salt-flat.edn"
-    "69 hours, 38 minutes, 58 seconds"
-    250738832]
-   ["meaningful-turquoise-fly-hailing-from-lithalsa.edn"
-    "501 hours, 42 minutes, 16 seconds"
-    1806136690]
-   ["courageous-linear-platypus-of-corrie.edn"
-    "264 hours, 16 minutes, 32 seconds"
-    951392622]
-   ["thrilling-rhomboidal-eagle-of-the-v-shaped-valley.edn"
-    "501 hours, 42 minutes, 16 seconds"
-    1806136690]
-   ["ethical-round-oyster-of-glacial-horn.edn"
-    "501 hours, 42 minutes, 16 seconds"
-    1806136690]
-   ["healthy-rhomboidal-grasshopper-of-drainage-basin.edn"
-    "501 hours, 42 minutes, 16 seconds"
-    1806136690]
-   ["transforming-ivory-clam-of-the-volcanic-field.edn"
-    "318 hours, 15 minutes, 41 seconds"
-    1145741690]
-   ["remarkable-thin-wombat-banned-from-flyggberg.edn"
-    "443 hours, 53 minutes, 13 seconds"
-    1597993690]
-   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn"
-    "2 minutes, 43 seconds"
-    163716]),
+ (["upbeat-red-goose-of-submarine-canyon.edn" "1 second" 1158]
+   ["okay-prismatic-grasshopper-hailing-from-exhumed-river-channel.edn"
+    "118 hours, 7 minutes, 3 seconds"
+    425223662]
+   ["blissful-ivory-bird-banned-from-ravine.edn"
+    "143 hours, 29 minutes, 30 seconds"
+    516570219]
+   ["quick-circular-eagle-banned-from-karst-fenster.edn"
+    "147 hours, 48 minutes, 28 seconds"
+    532108750]
+   ["electrifying-pyramidal-platypus-banned-from-depressions.edn"
+    "16 hours, 36 minutes, 18 seconds"
+    59778568]
+   ["engaging-sapphire-frog-of-the-stratovolcano.edn"
+    "169 hours, 21 minutes, 14 seconds"
+    609674785]
+   ["ready-azure-snake-17.edn" "2 minutes, 8 seconds" 128577]
+   ["awesome-pentagonal-swallow-banned-from-atoll.edn"
+    "201 hours, 48 minutes, 22 seconds"
+    726502485]
+   ["skillful-square-peafowl-hailing-from-lacustrine-terrace.edn"
+    "201 hours, 54 minutes, 39 seconds"
+    726879907]
+   ["cool-magenta-mole-hailing-from-glen.edn"
+    "22 hours, 56 minutes, 48 seconds"
+    82608126]
+   ["excellent-indigo-monkey-exiled-from-proglacial-lake.edn"
+    "220 hours, 54 minutes, 50 seconds"
+    795290321]
+   ["instinctive-short-clam-of-the-barrier-island.edn"
+    "222 hours, 30 minutes, 39 seconds"
+    801039358]
+   ["unwavering-circular-grasshopper-of-the-isthmus.edn"
+    "222 hours, 31 minutes, 33 seconds"
+    801093095]
+   ["hearty-coral-sea-urchin-of-cut-bank.edn"
+    "222 hours, 31 minutes, 34 seconds"
+    801094186]
+   ["remarkable-rectangular-armadillo-exiled-from-pingo.edn"
+    "238 hours, 34 minutes, 15 seconds"
+    858855713]
+   ["classic-icosahedral-gnat-of-salt-flat.edn"
+    "239 hours, 27 minutes, 4 seconds"
+    862024834]
+   ["fair-salmon-hawk-hailing-from-malpais.edn"
+    "239 hours, 29 minutes, 39 seconds"
+    862179682]
+   ["engaging-peach-pronghorn-of-the-impact-crater.edn"
+    "239 hours, 30 minutes, 8 seconds"
+    862208382]
+   ["worthy-amaranth-pheasant-exiled-from-fjord.edn"
+    "239 hours, 41 minutes, 44 seconds"
+    862904279]
+   ["favorable-rose-camel-hailing-from-hanging-valley.edn"
+    "239 hours, 41 minutes, 46 seconds"
+    862906151]),
  :last-run-throwaway "17:05:59",
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1857952542,
+ :user-params-hash -25187279,
  :grid-recos? true,
  :preview-keys2 ["928143226" "1561519308" "-625614002" "-380927499"],
- :session-hash -161766435,
+ :session-hash 1121881252,
  :panels
  {:block-11251
   {:name "block-11251",
@@ -4001,8 +4008,7 @@
   "date" "#6A6391",
   "nil" "#ff8222"},
  :click-param
- {nil {nil nil},
-  :blocks-sys
+ {:blocks-sys
   {:block_key ":*theme*",
    :block_name "(meta: this screen's theme)",
    :queries 0,
@@ -4045,16 +4051,16 @@
    :views 0},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#152c4f",
+   :openai-image-gen-ladder>pop-color "#3a405c",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-60948-80738.png",
+   "./images/gen/b64-image-70289-1886.png",
    :counting-loop>open-fn-2 44,
    :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
-   "Craft in high definition, a stylized 16:9 illustration of a scene drawn from the traditional myths from Scotland, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing brunette hair. Identify her with full, somewhat pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage is a blend of delight and enchantment, while intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and buxom physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, augmenting the glow of her skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, casting an alluringly playful glance.",
+   "Create a detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, blending rustic charm with cyberpunk aesthetics. The town is under a heavy snowstorm, freshly covered in snow, with buildings glowing softly in hues of pink and neon light blue, setting a slightly edgy atmosphere. To the left of the frame stands a vibrant Irish woman in her early 30s, characterized by a full-figured build, full pouty lips, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the snow, falls over her neck and shoulders and intricate Celtic-inspired tattoos showcasing rabbits and wilderness cover her neck, collarbone, and shoulders. The rising sun casts a light on her, enhancing the serene and slightly mysterious pre-dawn lighting.",
    :live-scratch-flow>*running? false,
    :openai-image-gen-ladder>hiccup-image-box-w-png-vw
    [:v-box
@@ -4089,7 +4095,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#1b2c4c",
+   :openai-image-gen-ladder>dominant-color "#525679",
    :flow-forever>final-math nil},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",

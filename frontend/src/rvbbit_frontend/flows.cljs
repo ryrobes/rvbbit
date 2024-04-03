@@ -629,6 +629,7 @@
                                            [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
                   running-subs (vec (for [k (keys (get server-flowmap :components))] [flow-id k]))
                   running-subs (vec (into running-subs running-view-subs))
+                  watched? (ut/ne? (get @(re-frame/subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
                   fstr (str "running flow " flow-id)
                   w (/ (count fstr) 4.1)]
               (reset! editor-tooltip-atom (str flow-id " is running"))
@@ -638,11 +639,12 @@
               (swap! db/running-blocks assoc flow-id (vec (keys flowmap)))
               (tap> [:flowmap-send-it flowmap server-flowmap running-subs])
               (reset! http/subsequent-runs [])
-              (re-frame/dispatch [::wfx/request :default
-                                  {:message    {:kind :sub-to-running-values
-                                                :flow-keys running-subs
-                                                :client-name client-name}
-                                   :timeout    15000000}])
+              (when (not watched?)
+                (re-frame/dispatch [::wfx/request :default
+                                    {:message    {:kind :sub-to-running-values
+                                                  :flow-keys running-subs
+                                                  :client-name client-name}
+                                     :timeout    15000000}]))
             ;;  (re-frame/dispatch [::audio/text-to-speech11 :audio :speak "/home/ryanr/fight-like-hell.mp3" true])
               (re-frame/dispatch [::wfx/request :default
                                   {:message    {:kind :run-flow
@@ -5277,7 +5279,7 @@
  ::opts-map
  (fn [db _]
    (get-in db [:flows (get db :selected-flow) :opts]
-           {:retry-on-error? true :retries 5 :close-on-done? true})))
+           {:retry-on-error? false :retries 5 :close-on-done? true})))
 
 (declare gantt-container)
 
@@ -8035,6 +8037,7 @@
         hh @(re-frame/subscribe [::subs/h]) ;; to ensure we get refreshed when the browser changes
         ww @(re-frame/subscribe [::subs/w])
         flow-id @(re-frame/subscribe [::selected-flow])
+        watched? (ut/ne? (get @(re-frame/subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
         zoom-unlocked? @(re-frame/subscribe [::zoom-unlocked?])
         flowmaps @(re-frame/subscribe [::flowmap-raw])
        ;; flowmappp [@(re-frame/subscribe [::flowmap]) @ports-react-render]
@@ -8920,7 +8923,7 @@
                                                                                :font-weight 700
                                                                                :overflow "hidden"}])]]
 
-                                                               [re-com/box
+                                                               [re-com/h-box
                                                                 :style {:position "fixed"
                                                                         :top 34 :right 23
                                                                         :opacity 0.33
@@ -8928,7 +8931,30 @@
                                                                         :font-weight 700
                                                                         :color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                         :font-size "29px"}
-                                                                :child (str flow-id)]
+                                                                :gap "10px"
+                                                                :children [[re-com/md-icon-button :src (at)
+                                                                            :md-icon-name (if watched? "zmdi-eye" "zmdi-eye-off")
+                                                                            :on-click #(if watched?
+                                                                                         (re-frame/dispatch [::wfx/request :default
+                                                                                                             {:message    {:kind :remove-flow-watcher
+                                                                                                                           :client-name @(re-frame/subscribe [::conn/client-name])
+                                                                                                                           :flow-id flow-id}}])
+                                                                                         (let [flowmap @(re-frame/subscribe [::flowmap])
+                                                                                               ;flow-id @(re-frame/subscribe [::selected-flow])
+                                                                                               flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
+                                                                                               client-name @(re-frame/subscribe [::conn/client-name])
+                                                                                               server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)
+                                                                                               running-view-subs (vec (for [[k v] (get server-flowmap :components) :when (get v :view)]
+                                                                                                                        [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
+                                                                                               running-subs (vec (for [k (keys (get server-flowmap :components))] [flow-id k]))
+                                                                                               running-subs (vec (into running-subs running-view-subs))]
+                                                                                           (re-frame/dispatch [::wfx/request :default
+                                                                                                               {:message    {:kind :sub-to-running-values
+                                                                                                                             :flow-keys running-subs
+                                                                                                                             :client-name client-name}
+                                                                                                                :timeout    15000000}])))
+                                                                            :style {:cursor "pointer" :margin-top "8px"}]
+                                                                           [re-com/box :child (str flow-id)]]]
 
                                                                [re-com/box
                                                                 :child [re-com/md-icon-button :src (at)
