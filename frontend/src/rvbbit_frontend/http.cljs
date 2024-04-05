@@ -1028,6 +1028,73 @@
                    :on-success      [::success-http-load-flow]
                    :on-failure      [::failure-http-load-flow]}})))
 
+
+
+
+
+
+(re-frame/reg-event-db
+ ::failure-http-load-flow-history
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :load-flow-history])]
+     (assoc-in db [:http-reqs :load-flow-history] ; comp key from ::get-http-data
+               (merge old-status
+                      {:status "failed"
+                       :ended-unix (.getTime (js/Date.))
+                       :message result})))))
+
+(re-frame/reg-event-db
+ ::success-http-load-flow-history
+ (fn [db [_ result]]
+   (let [old-status (get-in db [:http-reqs :load-flow-history])
+         new-db (get result :image)
+         flowmaps (get new-db :flowmaps)
+         opts (get new-db :opts)
+         flow-id (get new-db :flow-id)
+         coords (get new-db :zoom db/based)
+         _ (tap> coords)
+         flowmaps-connections (get new-db :flowmaps-connections)]
+     ;(set-zoom-pan (if (empty? coords) db/based coords))
+     ;(set-zoom-pan coords)
+     (-> db
+         ;(assoc :zoom-start coords)
+         (assoc-in [:http-reqs :load-flow-history]
+                   (merge old-status
+                          {:result result
+                           :ended-unix (.getTime (js/Date.))
+                           :status "success"}))
+         (assoc-in [:flows flow-id :map] flowmaps)
+         (assoc-in [:flows flow-id :opts] opts)
+         (assoc-in [:flows flow-id :connections] flowmaps-connections)
+         (assoc-in [:flow-results :tracker] (get result :tracker))
+         (assoc-in [:flow-results :return-map] (get result :return-map))
+         (assoc-in [:flow-results :return-maps] (get result :return-maps))
+         (assoc :selected-flow flow-id)))))
+
+(re-frame/reg-event-fx
+ ::load-flow-history
+ (fn [{:keys [db]} [_ run-id]]
+   (let [url (str url-base "/load-flow-history")
+         method :get
+         request {:run-id run-id}] ;; TODO, sketchy w/o checking
+     {:db   (assoc-in db [:http-reqs :load-flow-history]
+                      {:status "running"
+                       :url url
+                       :start-unix (.getTime (js/Date.))})
+      :http-xhrio {:method          method
+                   :uri             url
+                   :params          request
+                   :timeout         28000
+                   :format          (ajax-edn/edn-request-format)
+                   :response-format (ajax-edn/edn-response-format)
+                   :on-success      [::success-http-load-flow-history]
+                   :on-failure      [::failure-http-load-flow-history]}})))
+
+
+
+
+
+
 (re-frame/reg-event-db
  ::failure-http-load-flow-alias
  (fn [db [_ result]]

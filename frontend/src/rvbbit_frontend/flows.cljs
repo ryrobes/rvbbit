@@ -72,7 +72,7 @@
 (defonce title-edit-idx (reagent/atom nil))
 (defonce drop-toggle? (reagent/atom false))
 (def snap-to-grid 25)
-
+(defonce flow-editor-system-mode (reagent/atom ["flows running" 600]))
 (defonce channel-holster (reagent/atom {}))
 
 (def canvas-width 7500)
@@ -650,6 +650,11 @@
                                   {:message    {:kind :run-flow
                                                 :flow-id flow-id
                                                 :no-return? true ;;false ; true ;false ;true  ;; if we arent subbing to running values, we need to return dump
+                                                :file-image {:flowmaps @(re-frame/subscribe [::flowmap-raw])
+                                                             :opts @(re-frame/subscribe [::opts-map])
+                                                             :zoom @db/pan-zoom-offsets
+                                                             :flow-id flow-id
+                                                             :flowmaps-connections flowmaps-connections}
                                                 :opts {:increment-id? false
                                                        :opts opts-map}
                                                 :flowmap server-flowmap
@@ -4298,14 +4303,18 @@
   (let [open? (true? (get-in @flow-details-block-container-atom [flow-id bid title :open?]
                              (not
                               (or (cstr/ends-with? (str title) "*")
-                                  (cstr/ends-with? (str title) "browser")))))]
+                                  (cstr/ends-with? (str title) "browser")))))
+        flow-select @(re-frame/subscribe [::selected-flow-block])
+        sys? (nil? flow-select)
+        dyn-width (if (not sys?) 600 (last @flow-editor-system-mode))]
     ;;(tap> [:panel-deets open? title flow-id bid])
     ;;(tap> [:dbg? (cstr/includes? (str title) "debugger")])
     [re-com/v-box
      ;:padding "2px"
-     :width "586px"
+     :width (px (- dyn-width 15)) ;; "586px"
      :style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
              :font-size "12px"
+             :transition "width 0.2s"
              :border-radius "7px"
              :background-color (str (theme-pull :theme/editor-rim-color nil) "18")}
      :children [[re-com/h-box
@@ -4541,7 +4550,7 @@
                      :style {;:border "1px solid pink"
                              :overflow "auto"}
                      :child [re-com/v-box
-                             :width (px ccw) ;"455px" ;:height (px (+ 600 (* 6 bricks/brick-size)))
+                             :width (px ccw)
                              :height "380px"
                              :size "none" :align :center :justify :between
                              :children [[re-com/h-box :width "440px"
@@ -4575,7 +4584,7 @@
                                     :style {;:border "1px solid pink"
                                             :overflow "auto"}
                                     :child [re-com/v-box
-                                            :width "495px" ;:height (px (+ 600 (* 6 bricks/brick-size)))
+                                            :width "495px"
                                             :height "400px"
                                             :size "auto" :align :center :justify :between
                                             :children [[re-com/h-box :width "490px"
@@ -4657,7 +4666,7 @@
                                      :style {;:border "1px solid pink"
                                              :overflow "auto"}
                                      :child [re-com/v-box
-                                             :width "495px" ;:height (px (+ 600 (* 6 bricks/brick-size)))
+                                             :width "495px"
                                              :height "368px"
                                              :size "none" :align :center :justify :center
                                              :children [[re-com/h-box :width "490px"
@@ -4784,18 +4793,15 @@
        :size "none"
        :height            "45px"
        :width (px w)
-       :align :center :justify :center
+       :align :center
+       :justify :end
        :attr {:on-double-click #(when (not read-only-flow?) (reset! title-edit-idx (str flow-id)))}
-       :style {;:text-decoration "underline"
-                           ;:margin-top "-5px"
-               :cursor "pointer"
-               :padding-left "8px"
-                           ;:margin-right "13px"
-                           ;:border "2px solid lime"
-                           ;:border (str "2px solid #00000000")
+       :style {:cursor "pointer"
+               :padding-right "12px"
+               :padding-top "1px"
+               :border "2px solid transparent"
                :font-size "30px"}
        :child (str flow-id)]
-
       [re-com/input-text
        :src (at)
        :model             (str flow-id)
@@ -4805,22 +4811,12 @@
                                (reset! title-edit-idx nil))
        :validation-regex  flow-id-regex
        :change-on-blur?   true
-
-       :style  {;:font-size "20px"
-                                                   ;:margin-top "28px"
-                :border (str "2px dashed " (theme-pull :theme/editor-outer-rim-color nil))
+       :style  {:border (str "2px dashed " (theme-pull :theme/editor-outer-rim-color nil))
                 :font-size "30px"
                 :text-decoration "underline"
                 :color (theme-pull :theme/editor-outer-rim-color nil)
-                                                                  ;:font-weight 700
                 :font-style "underline"
-                                                   ;:border "0px solid black"
-                                                   ;:padding "8px"
-                :text-align "center"
-                                                            ; :float "right"
-                                                                ;:margin-top "10px"
-                                                                ;:padding-top "10px"
-                                                      ;          :text-align "right"
+                :text-align "right"
                 :background-color "#00000000"}])))
 
 (defn run-history-bar [flow-id flow-select]
@@ -4858,13 +4854,14 @@
                       :fill    :theme/editor-outer-rim-color}]]]}
            5.5 11]])
 
-(defn settings-block [flow-id]
+(defn settings-block [flow-id ttype]
   (let [flow-select @(re-frame/subscribe [::selected-flow-block])
         flowmaps @(re-frame/subscribe [::flowmap-raw])
+        dyn-width (last @flow-editor-system-mode)
         ;flow-id @(re-frame/subscribe [::selected-flow])
         read-only-flow? (true? (cstr/includes? flow-id "/"))]
     (cond
-      (= @editor-mode :run-history)
+      (= ttype :run-history)
       (let [viz1 {:queries
                   {:gen-viz-1090
                    {:select   [[[[:count 1]] :value]
@@ -4885,7 +4882,7 @@
                                        :legendPosition "middle"
                                        :legendOffset   40}
                           :inner-padding 0
-                          :width 564
+                          :width (- dyn-width 60)
                           :monthBorderColor "#ffffff15"
                           :colors ["#2a4858" "#294d5d" "#275163"
                                    "#255667" "#225b6c" "#1e6071"
@@ -4915,7 +4912,7 @@
                                    "#e53d00" "#e43502" "#e22b05"
                                    "#e11e08" "#df0b0b"]
                                   ;:theme :theme/nivo-defaults
-                          :click {:x :day :y :value}
+                          :click {:x :flow-day :y :value}
                           :padding 0.1
                           :enableGridX true
                           :border-radius 2
@@ -4923,79 +4920,153 @@
                           :height 210
                           :margin {:top 0 :right 5 :bottom 80 :left 45}
                           :data :gen-viz-1090}]}
-            grid1 {:select
-                   [;:base_flow_id
-                    :flow_id
-                    :run_id
-                                ;[[:min :start_ts] :start]
-                    [[:max :end_ts] :end]
-                    [[:count 1] :evts]
-                                ;[[:count [:distinct :run_id]] :runs]
-                                ;; [[:avg [:round
-                    [[:round [:*
-                              [:- [:julianday [:max :end_ts]]
-                               [:julianday [:min :start_ts]]] 86400] 2] :seconds]
-                                ;;  :avg_mins]
-                                ;; [;[:avg ;[:round
-                                ;;         [:- [:max :end_ts]
-                                ;;          [:min :start_ts]]
-                                ;;        ; 2
-                                ;;        ; ]
-                                ;; ; ]
-                                ;; :avg_mins]
-                    ]
+            vselected? @(re-frame/subscribe [::conn/clicked-parameter-key [:virtual-panel/flow-day]])
+            grid-menu {:select
+                       [:flow_id
+                        [[:count [:distinct :run_id]] :runs]]
+                       :connection-id "flows-db"
+                       :col-widths {:runs 50 :flow_id 215}
+                       :group-by [1]
+                       :where (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
+                       :order-by [[1 :asc]]
+                       :from [[:flow_history :tt336aa]]}
+            gm-kw (str "kick-" (hash grid-menu))
+            ;viz-kw (str "kick-" (hash viz1))
+            selected? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str gm-kw "/flow_id"))]])
 
+            ;; grid1 {:select
+            ;;        [:flow_id
+            ;;         :run_id
+            ;;         [[:max :end_ts] :end]
+            ;;         [[:count 1] :evts]
+            ;;         [[:round [:*
+            ;;                   [:- [:julianday [:max :end_ts]]
+            ;;                    [:julianday [:min :start_ts]]] 86400] 2] :seconds]]
+            ;;        :connection-id "flows-db"
+            ;;        :group-by [1 2]
+            ;;        :col-widths {:seconds 80 :evts 70 :flow_id 350}
+            ;;        :where [:and 
+            ;;                (if selected? [:= :flow_id (keyword (str gm-kw "/flow_id"))] [:= 1 1])
+            ;;                (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])]
+            ;;        :order-by [[3 :desc]]
+            ;;        :from [[:channel_history :tt336]]}
+            grid1 {:select
+                   [:flow_id
+                    :run_id :start_ts 
+                    :elapsed_seconds
+                    :human_elapsed
+                    [[:case [:= :in_error 1] "error" :else "success"] :result]
+                    ]
                    :connection-id "flows-db"
                    :group-by [1 2]
-                   :order-by [[3 :desc]]
-                   :from [[:channel_history :tt336]]}]
+                   :col-widths { :flow_id 320 :elapsed_seconds 115 :run_id 70 :human_elapsed 140 :result 65 :start_ts 145}
+                   :where [:and
+                           (if selected? [:= :flow_id (keyword (str gm-kw "/flow_id"))] [:= 1 1])
+                           (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])]
+                   :order-by [[:start_ts :desc]]
+                   :from [[:flow_history :tt336a]]}
+            grid-kw (str "kick-" (hash grid1))
+            run-selected? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str gm-kw "/flow_id"))]])
+            grid2 {:select
+                   [:*]
+                   :connection-id "flows-db"
+                   ;:group-by [1 2]
+                   :col-widths {:value 500}
+                   :where (if run-selected? [:= :run_id (keyword (str grid-kw "/run_id"))] [:= 1 0])
+                   :order-by [[:start_ts :desc]]
+                   :from [[:fn_history :tt87336]]}
+            grid2-kw (str "kick-" (hash grid2))]
+
         [re-com/v-box
                  ;:align :center
                  ;:justify :center
-         :height "430px"
+                 ;:height "430px"
                  ;:style {:border "1px solid white"}
-         :gap "10px"
+                 ;:gap "10px"
          :children [[re-com/box
                      :size "none"
-                     :width "595px"
-                     :height "125px"
+                     :width (px dyn-width)
+                     :height "175px"
                      :style {:font-size "15px"}
-                                     ;:border "1px solid white" ;:margin-top "-30px"
+                     :child [buffy/render-honey-comb-fragments viz1 (/ dyn-width 50) 22]]
+                    [re-com/h-box
+                     :children
+                     [[re-com/box
+                       :size "none"
+                       ;:width "595px"
+                       :height "275px"
+                       :align :center :justify :center
+                       :style {:font-size "15px"}
+                       :child [buffy/render-honey-comb-fragments grid-menu (* (/ dyn-width 50) 0.25) 6]]
+                      [re-com/box
+                       :size "none"
+                       ;:width "595px"
+                       :height "275px"
+                       :align :center :justify :center
+                       :style {:font-size "15px"}
+                       :child [buffy/render-honey-comb-fragments grid1 (* (/ dyn-width 50) 0.75) 6]]]]
+                    ;; [buffy/render-honey-comb-fragments [:box :child [:string (keyword (str grid-kw "/flow_id"))]]  (- (/ dyn-width 50) 1) 6]
+                    [buffy/render-honey-comb-fragments [:h-box :size "auto"
+                                                        :justify :between :align :center
+                                                        :gap "10px" :padding "8px"
+                                                        :children
+                                                        ["filters: "
+                                                         [:string :virtual-panel/flow-day]
+                                                         [:string (keyword (str gm-kw "/flow_id"))]
+                                                         [:string [(keyword (str grid-kw "/run_id")) " "]]]]  (- (/ dyn-width 50) 1) 6]
 
-                     :child [buffy/render-honey-comb-fragments viz1 12 12]]
-                                ;; [re-com/box
-                                ;;  :align :center :justify :center
-                                ;;  :child "hey hey hye"]
+                    (let [run-id @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])]
+                      [re-com/box 
+                       :style {:cursor "pointer"}
+                       :attr {:on-click #(re-frame/dispatch [::http/load-flow-history run-id])}
+                       :child (str run-id)])
+
                     [re-com/box
                      :size "none"
-                     :width "595px"
-                     :height "275px"
-                             ;:padding "10px"
+                     ;:width "595px"
+                     ;:height "275px"
                      :align :center :justify :center
                      :style {:font-size "15px"}
-                                     ;:border "1px solid white"
+                     :child [buffy/render-honey-comb-fragments grid2 (- (/ dyn-width 50) 1) 10]]
 
-                     :child [buffy/render-honey-comb-fragments grid1 11 6]]]])
-      (= @editor-mode :flow-browser)
+                    ;[re-com/box :child (str @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value")) ]]))]
+                    (let [pval @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]])
+                          blk @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/block"))]])
+                          flw @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/flow_id"))]])
+                          pval (try (edn/read-string pval) (catch :default _ (pr-str pval)))]
+                      [re-com/box
+                       :height "300px" :size "none"
+                       :style {;:border "1px solid white" 
+                               :overflow "auto"}
+                       :child (when pval
+                                (if (or (map? pval) (vector? pval))
+                                  [map-boxes2 pval
+                                   blk
+                                   (str flw " / " blk)
+                                   [] :output (if (vector? pval) "vector" "map") true]
+                                  [re-com/box :child (pr-str @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]]))]))])]])
+
+      (= ttype :flow-browser)
       [re-com/h-box
              ;:gap "6px"
        :children [[re-com/box
                    :size "auto"
-                   :child [bricks/magic-table :flow-list* [:flows-sys] 12 9 []]]]]
-      (= @editor-mode :part-browser)
+                   :child [bricks/magic-table :flow-list* [:flows-sys] 12 19 []]]]]
+
+      (= ttype :part-browser)
       [re-com/h-box
              ;:gap "6px"
        :children [[re-com/box
                    :size "auto"
                            ;:style {:margin-left "-10px"}
                    :child ;[bricks/magic-table :system-connections-list* [:connections-sys] 3 9 [:database_name]]
-                   [bricks/magic-table :flow-cat-list* [:flow-fn-categories-sys] 3 9 []]]
+                   [bricks/magic-table :flow-cat-list* [:flow-fn-categories-sys] 3 19 []]]
                   [re-com/box
                    :size "auto"
                            ;:style {:margin-left "-10px"}
-                   :child [bricks/magic-table :flow-fn-list* [:flow-fn-sys] 9 9 [:full_map :category]]]]]
+                   :child [bricks/magic-table :flow-fn-list* [:flow-fn-sys] 9 19 [:full_map :category]]]]]
 
-      (= @editor-mode :debug)
+      (= ttype :debug)
       (if flow-select
                 ;[code-box 480 400 (get @(re-frame/subscribe [::flowmap]) @flow-select)]
         [re-com/box :child [(if read-only-flow? code-box code-box-rw) 600 440
@@ -5006,7 +5077,7 @@
                     ;[re-com/box :child "no block selected"]
         [code-box 600 450 flowmaps nil])
 
-      (= @editor-mode :scheduler)
+      (= ttype :scheduler)
       (let [grid1 {:select [:flow_id :override :schedule :ts]
                            ;:where [:= :flow_id (str flow-id)]
                    :connection-id "flows-db"
@@ -5187,93 +5258,96 @@
 
       :else [re-com/box :child (str "unknown editor mode: " @editor-mode)])))
 
-(defn server-flows []
+(defn server-flows [hh]
   (let [ss @(re-frame/subscribe [::bricks/flow-statuses])
         ss (vec (sort-by first (for [[k v] ss] [k v])))] ;; since maps wont keep key order in cljs, vectorize it
-    [re-com/v-box
-     :padding "3px"
-     :style {;:border "1px dashed white"
-             :color (theme-pull :theme/editor-outer-rim-color nil)}
-     ;:gap "4px"
-     :children (for [[fid v] ss
-                     :let [time-running (get v :*time-running)
-                           open-channels (get v :channels-open?)
-                           channels (get v :channels-open)
-                           started-by (get v :*started-by)
-                           process? (get v :process?)
-                           command (get v :command)
-                           tracker-events (get v :tracker-events)
-                           running? (get v :*running?)]]
-                 [re-com/v-box
-                  :style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) (if running? 77 22))
-                          :background-color (when running? (str (theme-pull :theme/editor-outer-rim-color nil) 15))
-                          :filter (when running? "brightness(200%)")}
-                  :children
-                  [[re-com/h-box
-                    :padding "4px"
-                    :height "35px"
-                    :align :center
-                    :justify :between
+    [re-com/box
+     :height (px hh)
+     :style {:overflow "auto"}
+     :child [re-com/v-box
+             :padding "3px"
+             :style {;:border "1px dashed white"
+                     :color (theme-pull :theme/editor-outer-rim-color nil)}
+             :gap "11px"
+             :children (for [[fid v] ss
+                             :let [time-running (get v :*time-running)
+                                   open-channels (get v :channels-open?)
+                                   channels (get v :channels-open)
+                                   started-by (get v :*started-by)
+                                   process? (get v :process?)
+                                   command (get v :command)
+                                   tracker-events (get v :tracker-events)
+                                   running? (get v :*running?)]]
+                         [re-com/v-box
+                          :style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) (if running? 77 22))
+                                  :background-color (when running? (str (theme-pull :theme/editor-outer-rim-color nil) 15))
+                                  :filter (when running? "brightness(200%)")}
+                          :children
+                          [[re-com/h-box
+                            :padding "4px"
+                            :height "35px"
+                            :align :center
+                            :justify :between
                    ;:style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 22)}
-                    :children [[re-com/box :child (if (cstr/includes? (str fid) "/")
-                                                    (let [spl (cstr/split (str fid) #"/")
-                                                          parent (first spl)
-                                                          sub (last spl)]
-                                                      [re-com/v-box
-                                                       :children [[re-com/box :child (str "(sub-flow called from) " parent) :style {:font-size "9px"}]
-                                                                  [re-com/box :child (str sub)]]])
-                                                    (str fid))
-                                :width "50%"
-                                :style {:padding-left "4px"
-                                        :font-size "15px"
-                                        :font-weight 700}]
+                            :children [[re-com/box :child (if (cstr/includes? (str fid) "/")
+                                                            (let [spl (cstr/split (str fid) #"/")
+                                                                  parent (first spl)
+                                                                  sub (last spl)]
+                                                              [re-com/v-box
+                                                               :children [[re-com/box :child (str "(sub-flow called from) " parent) :style {:font-size "9px"}]
+                                                                          [re-com/box :child (str sub)]]])
+                                                            (str fid))
+                                        :width "50%"
+                                        :style {:padding-left "4px"
+                                                :font-size "15px"
+                                                :font-weight 700}]
                              ;[re-com/box :child (str open-channels) :width "33%"]
-                               [re-com/box
-                                :child (cond running? (str "running (" channels " chans)")
-                                             open-channels (str "idling (" channels " chans)")
-                                             :else "stopped")
+                                       [re-com/box
+                                        :child (cond running? (str "running (" channels " chans)")
+                                                     open-channels (str "idling (" channels " chans)")
+                                                     :else "stopped")
 
-                                :width "34%"]
+                                        :width "34%"]
                                ;[re-com/box :child (str time-running) :width "30%"]
-                               (if (not process?)
+                                       (if (not process?)
 
-                                 [re-com/md-icon-button
-                                  :style {:font-size "20px"
+                                         [re-com/md-icon-button
+                                          :style {:font-size "20px"
                                 ;:font-size "10px"
                                       ;:color pcolor
                                       ;:margin-right "8px"
-                                          }
-                                  :md-icon-name "zmdi-open-in-browser"]
-                                 [re-com/gap :size "20px"])
-                               [re-com/md-icon-button
-                                :style {:font-size "20px"
+                                                  }
+                                          :md-icon-name "zmdi-open-in-browser"]
+                                         [re-com/gap :size "20px"])
+                                       [re-com/md-icon-button
+                                        :style {:font-size "20px"
                                       ;:color pcolor
                                       ;:margin-right "8px"
-                                        }
-                                :on-click #(re-frame/dispatch [::wfx/request :default
-                                                               {:message    {:kind :kill-flow
-                                                                             :flow-id fid
-                                                                             :process? process?
-                                                                             :client-name @(re-frame/subscribe [::bricks/client-name])}
-                                                                :timeout    15000000}])
-                                :md-icon-name "zmdi-stop"]]]
+                                                }
+                                        :on-click #(re-frame/dispatch [::wfx/request :default
+                                                                       {:message    {:kind :kill-flow
+                                                                                     :flow-id fid
+                                                                                     :process? process?
+                                                                                     :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                                                        :timeout    15000000}])
+                                        :md-icon-name "zmdi-stop"]]]
 
-                   [re-com/h-box
-                    :padding "4px"
-                    :height "35px"
-                    :align :center
-                    :style {:font-size "10px" :padding-right "20px"}
-                    :justify :between
+                           [re-com/h-box
+                            :padding "4px"
+                            :height "35px"
+                            :align :center
+                            :style {:font-size "10px" :padding-right "20px"}
+                            :justify :between
                    ;:style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 22)}
-                    :children [[re-com/box :child (if process? (str "(external process) " command)
-                                                      (str "started by: " started-by))
+                            :children [[re-com/box :child (if process? (str "(external process) " command)
+                                                              (str "started by: " started-by))
 
-                                :style {:padding-left "4px"
-                                        :font-weight 300}]
+                                        :style {:padding-left "4px"
+                                                :font-weight 300}]
                              ;[re-com/box :child (str open-channels) :width "33%"]
 
                               ;[re-com/box :child (str tracker-events " events")  ]
-                               ]]]])]))
+                                       ]]]])]]))
 
 (re-frame/reg-sub
  ::opts-map
@@ -5283,17 +5357,25 @@
 
 (declare gantt-container)
 
+
+
 (defn flow-editor [w h]
-  (let [react-hack [@editor-mode @trig-atom-test]
+  (let [react-hack [@editor-mode @trig-atom-test @flow-editor-system-mode]
         sql-params (into {} (for [k [:flow-fn-categories-sys/category]]
                               {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
-        flow-select @(re-frame/subscribe [::selected-flow-block])
+        ;flow-select @(re-frame/subscribe [::selected-flow-block])
         ;flowmaps @(re-frame/subscribe [::flowmap-raw])
         flow-id @(re-frame/subscribe [::selected-flow])
-        blocks @(re-frame/subscribe [::flowmap])
-        orderb (vec (sort-by str (keys blocks)))
-        opts-map @(re-frame/subscribe [::opts-map])
-        gantt? @(re-frame/subscribe [::bricks/flow-gantt?])
+        ;blocks @(re-frame/subscribe [::flowmap])
+        ;orderb (vec (sort-by str (keys blocks)))
+        ;opts-map @(re-frame/subscribe [::opts-map])
+        ;gantt? @(re-frame/subscribe [::bricks/flow-gantt?])
+        dyn-width (last @flow-editor-system-mode)
+        o-modes [["flows running" 800]
+                 ["flow browser" 600]
+                 ["flow parts" 600]
+                 ["scheduler" 990]
+                 ["flow history" 1200]]
         ;read-only-flow? (true? (cstr/includes? flow-id "/"))
         ;flow-id-regex #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores, hypens, numbers
         sql-calls {:flow-fn-categories-sys {:select [:category]
@@ -5333,6 +5415,7 @@
              ;:border-right (str "1px solid " "#00000098")
             ;; :backdrop-filter "blur(1px)"
              :position "fixed"
+             :transition "width 0.3s"
              :left 0 ;:top 0
              :overflow "auto"
              ;:margin-top "-1px"
@@ -5351,67 +5434,180 @@
                  :width (px w)
                  :align :start :justify :between
                  :style {:padding-top "5px"
+                         :transition "width 0.3s"
                          :color (theme-pull :theme/editor-outer-rim-color nil)
                          :font-size "16px"
                          :font-weight 700
                          :padding-left "12px"}
-                 :children [[re-com/box
-                            ; :size "auto"
+                 :children [[re-com/h-box
                              :align :center
-                             :height "40px"
-                             :style {:font-size "14px"
-                                     ;;:border "1px solid white"
-                                     }
-                             :child "flow settings"]
-                            ;; [re-com/h-box
-                            ;;  ;:size "auto"
-                            ;;  :justify :center
-                            ;;  :align :center
-                            ;;  :height "40px"
-                            ;;  :gap "9px"
-                            ;;  :style {:font-size "12px" :border "1px solid white"}
-                            ;;  :children [[re-com/checkbox
-                            ;;              ;:style {:margin-top "-2px"}
-                            ;;              :model true :on-change #()]
-                            ;;             [re-com/box :child  "retry on error?"]
-                            ;;             [re-com/single-dropdown
-                            ;;              :style {:height "40px"
-                            ;;                      :font-zie "10px" :border "1px solid white"}
-                            ;;              :choices [{:label "1" :id 1} {:label "2" :id 2} {:label "3" :id 3}]
-                            ;;              :model 1
-                            ;;              :on-change #()]]]
+                             :justify :center
+                             ;:height "50px"
+                             :style {:font-size "14px"}
+                             :size "auto"
+                             :children (for [o o-modes
+                                             :let [selected? (= o @flow-editor-system-mode)]]
+                                         [re-com/box
+                                          :height "50px"
+                                          :align :center
+                                          :justify :center
+                                          :size "auto"
+                                          :attr (when (not selected?) {:on-click #(reset! flow-editor-system-mode o)})
+                                          :style {;:border "1px solid white"
+                                                  :cursor "pointer" ;; (when (not selected?) "pointer")
+                                                  :text-decoration (when selected? "underline")
+                                                  :background-color (if selected?
+                                                                      (str (theme-pull :theme/editor-outer-rim-color nil) 55)
+                                                                      "#00000000")}
+                                          :child (str (first o))])]
                             [re-com/gap :size "10px"]]]
-                ;[re-com/gap :size "5px"]
+
+                [re-com/gap :size "8px"]
 
                 ;; [flow-details-block-container "last run gantt" flow-id flow-select
                 ;;  [run-gantt-chart "system"]
                 ;;  "zmdi-view-web"]
 
-                [edit-flow-title flow-id w]
+                ;; [edit-flow-title flow-id w]
 
                 ;; [flow-details-block-container "run history bar" flow-id flow-select
                 ;;  [run-history-bar "system"]
                 ;;  "zmdi-view-web"]
 
-                [flow-details-block-container "options*" :system :system
-                 [code-box-options flow-id 580 nil opts-map]
-                 "zmdi-code"]
+                ;; [flow-details-block-container "options*" :system :system
+                ;;  [code-box-options flow-id 580 nil opts-map]
+                ;;  "zmdi-code"]
 
-                (when (not gantt?)
-                  [flow-details-block-container "in-line flow gantt" :system :system
-                   [gantt-container flow-id orderb true 570 nil ;366
-                    ]"zmdi-chart-donut"])
+                ;; (when (not gantt?)
+                ;;   [flow-details-block-container "in-line flow gantt" :system :system
+                ;;    [gantt-container flow-id orderb true 570 nil ;366
+                ;;     ]"zmdi-chart-donut"])
 
-                [flow-details-block-container "server flow statuses" :system :system
-                 [server-flows] ; flow-id orderb true 570 nil ;366
-                 "zmdi-dns"]
+
+
+                (cond (= (first @flow-editor-system-mode) "flows running")
+
+                      [flow-details-block-container "server flow statuses" :system :system
+                       [re-com/box 
+                        ;:style {:border "1px solid white"}
+                        :height "960px"
+                        :child [server-flows]] ; flow-id orderb true 570 nil ;366
+                       "zmdi-dns"]
+
+                      (= (first @flow-editor-system-mode) "flow browser")
+
+                      [flow-details-block-container "selected module*" :system :system
+                       [settings-block flow-id :flow-browser] "zmdi-chart-donut"]
+
+                      (= (first @flow-editor-system-mode) "flow parts")
+
+                      [flow-details-block-container "selected module*" :system :system
+                       [settings-block flow-id :part-browser] "zmdi-chart-donut"]
+
+                      :else [re-com/box :child "got nothing"])
+
+
+                (cond (some #(= (first @flow-editor-system-mode) %) ["flow browser" "flow parts"])
+
+                      [flow-details-block-container "server flow statuses" :system :system
+                       [server-flows 300] ; flow-id orderb true 570 nil ;366
+                       "zmdi-dns"]
+
+                      (= (first @flow-editor-system-mode) "scheduler")
+
+                      [flow-details-block-container "selected module*" :system :system
+                       [settings-block flow-id :scheduler] "zmdi-chart-donut"]
+
+                      (= (first @flow-editor-system-mode) "flow history")
+
+                      [flow-details-block-container "selected module*" :system :system
+                       [settings-block flow-id :run-history] "zmdi-chart-donut"]
+
+                      (= (first @flow-editor-system-mode) "flows running")
+
+                      [re-com/v-box
+                       :children
+                       [(let [qq1 {:queries
+                                   {:gen-viz-192
+                                    {:select   [[[[:sum :threads]] :threads] :ts]
+                                     :from     [{:select   [[:thread_count :threads] :ts
+                                                            [:used_memory_mb :used_mb]
+                                                            [:ws_peers :clients]
+                                                            :sys_load]
+                                                 :limit 45
+                                                 :order-by [[:ts :desc]]
+                                                 :from     [[:jvm_stats :rr70]]}]
+                                     :group-by [:ts]}}
+                                   :view
+                                   [:> :ResponsiveContainer
+                                    {:width (/ dyn-width 2) :height 200}
+                                    [:> :AreaChart
+                                     {:data   :gen-viz-192
+                                      :margin {:top 5 :bottom 25 :right 30 :left 20}}
+                                     [:> :CartesianGrid
+                                      {:strokeDasharray "1 4" :opacity 0.33}]
+                                     [:> :Tooltip] ;[:> :XAxis {:dataKey :ts}]
+                                     [:> :Area
+                                      {:type      "monotone"
+                                       :dataKey   :threads
+                                       :isAnimationActive false
+                                       :stroke  (str (theme-pull :theme/editor-outer-rim-color nil)) ;;"#8884d8"
+                                       :fill    (str (theme-pull :theme/editor-outer-rim-color nil) 55) ;;"#8884d8"
+                                       :activeDot {:r 8}}]]]}
+                              qq2 {:queries
+                                   {:gen-viz-545
+                                    {:select   [[[[:sum :used_mb]] :threads] :ts]
+                                     :from     [{:select   [[:thread_count :threads] :ts
+                                                            [:used_memory_mb :used_mb]
+                                                            [:ws_peers :clients]
+                                                            :sys_load]
+                                                 :limit 45
+                                                 :order-by [[:ts :desc]]
+                                                 :from     [[:jvm_stats :rr70]]}]
+                                     :group-by [:ts]}}
+                                   :view [:> :ResponsiveContainer
+                                          {:width (/ dyn-width 2) :height 200}
+                                          [:> :BarChart
+                                           {:data   :gen-viz-545
+                                            :margin {:top 5 :bottom 25 :right 30 :left 20}}
+                                           [:> :CartesianGrid
+                                            {:strokeDasharray "1 4" :opacity 0.33}]
+                                           [:> :Tooltip] ;[:> :XAxis {:dataKey :ts}]
+                                           [:> :Bar
+                                            {:dataKey :threads
+                                             :isAnimationActive false
+                                             :stroke  (str (theme-pull :theme/editor-outer-rim-color nil)) ;;"#8884d8"
+                                             :fill    (str (theme-pull :theme/editor-outer-rim-color nil) 55) ;;"#8884d8"
+                                             }]]]}]
+                          [re-com/h-box :children
+                           [[re-com/v-box
+                             :width "50%"
+                             :children  [[re-com/box :child "threads"  :align :center :justify :center :size "auto" :style {:opacity 0.7}]
+                                         [re-com/box :child [buffy/render-honey-comb-fragments qq1 (/ dyn-width 50) 2]]]]
+                            [re-com/v-box
+                             :width "50%"
+                             :children  [[re-com/box :child "memory"  :align :center :justify :center :size "auto" :style {:opacity 0.7}]
+                                         [re-com/box :child [buffy/render-honey-comb-fragments qq2 (/ dyn-width 50) 2]]]]]])
+                        [re-com/box
+                         :style {:padding-left "12px"}
+                         :child (let [qq {:select   [:ts [:thread_count :threads]
+                                                     [:used_memory_mb :used_mb]
+                                                     :sys_load [:ws_peers :clients]]
+                                          :connection-id "system-db"
+                                          :limit 1
+                                          :order-by [[:ts :desc]]
+                                          :from     [[:jvm_stats :rr70]]}]
+                                  [buffy/render-honey-comb-fragments qq (/ dyn-width 50) 3])]]]
+
+                      :else nil)
 
 ;                [run-gantt-chart flow-id]
                 ;; [edit-flow-title flow-id w]
 ;;                [settings-block flow-id]
 
-                [flow-details-block-container "selected module*" :system :system
-                 [settings-block flow-id] "zmdi-chart-donut"]]
+                ;; [flow-details-block-container "selected module*" :system :system
+                ;;  [settings-block flow-id] "zmdi-chart-donut"]
+                ]
 
                 ;; [run-history-bar flow-id]
      ]))
@@ -7041,42 +7237,23 @@
         flow-select @(re-frame/subscribe [::selected-flow-block])
         ;running? (is-running? :* flow-id)
         ;panel-width (- panel-width 28) ;; modded
-        browser-panel-width 600
+        sys-panel-width (or (last @flow-editor-system-mode) 900)
+        browser-panel-width (if (nil? flow-select) sys-panel-width 600)
         gantt? @(re-frame/subscribe [::bricks/flow-gantt?])
+        ;sys-panel? (true? (nil? flow-select))
         ;browser-panel-height (- details-panel-height 42)
         ;read-only-flow? (true? (cstr/includes? flow-id "/"))
         ;flow-id-regex #"(.|\s)*\S(.|\s)*"
         ;flow-id-regex #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores, hypens, numbers
         ;cch (px (- details-panel-height 70))
+
         full-height (+ details-panel-height panel-height -40)]
 
     ;; (when (and (not @dragging-port?) (not @db/dragging-flow-editor?) (not @bricks/dragging-editor?) (not @dragging?) (not @bricks/dragging?))
     ;;   (reagent.core/next-tick #(smooth-scroll-to-element "scrolly-boy" (str flow-select))))
 
     [re-com/v-box
-     :children [;; [re-com/h-box
-                ;;  :width (px panel-width)
-                ;;  :size "none" ;:height "38px"
-                ;;  :style {:padding-left "4px"
-                ;;          :font-size "18px"
-                ;;         ;:margin-top "-10px"
-                ;;         ;:border "1px solid yellow"
-                ;;          :padding-right "4px"}
-                ;;  :justify :between
-                ;;  :children [[re-com/box
-                ;;              :child (if (and (empty? @editor-tooltip-atom) running?) (str :flow-name " is running")
-                ;;                         (str (or @editor-tooltip-atom "r")))
-                ;;               ;:max-width (px (- panel-width 300))
-                ;;              :size "none" :height "30px"
-                ;;              :width "300px" :align :end :justify :end
-                ;;              :style ;(merge
-                ;;              {;:border "2px solid green"
-                ;;               :position "fixed"
-                ;;               :bottom (if @(re-frame/subscribe [::bricks/flow-editor?]) 3 10)
-                ;;               :left (if @(re-frame/subscribe [::bricks/flow-editor?]) 293 (- panel-width 345))
-                ;;               :overflow "hidden"}]]]
-
-                [re-com/h-box
+     :children [[re-com/h-box
                  :children [;[re-com/gap :size "8px"]
                             (when (and @(re-frame/subscribe [::bricks/flow-editor?]) (not flow-select))
                               [re-com/box
@@ -7109,22 +7286,13 @@
                                     single-scrubber? (and (or (= ttype :open-block) (= ttype :open-input))
                                                           (not (nil? (get-in port-meta [:* :scrubber]))))
                                     flow-select @(re-frame/subscribe [::selected-flow-block]) ;; dupe here from above to force re-render
-                                    ;; _ (tap> [:single-scrubber? flow-select single-scrubber?
-                                    ;;          @(re-frame/subscribe [::bricks/keypaths-in-flow flow-select true])
-                                    ;;          port-meta (get-in port-meta [:*] )])
-                                    ]
+                                    opts-map @(re-frame/subscribe [::opts-map])]
                                ;; (tap> [:ss @(re-frame/subscribe [::bricks/keypaths-in-flow flow-select])])
-                                ;; [re-com/box
-                                ;;  :style {:position "fixed"
-                                ;;          :border "1px solid lime"
-                                ;;          :left 10 :top 430}
-                                ;;  :child [flow-details-block 540 577 flow-select body]]
-                                ;; :style {:background "linear-gradient(0deg, transparent 85%, black 100%)"}
-                                ;; :background "linear-gradient(180deg, black 15%, transparent 100%)"
+
                                 [re-com/v-box
                                  :align :center
                                  :height (px full-height)
-                                 :width "600px"
+                                 :width (px browser-panel-width)
                                  :size "none"
                                  :style {:font-size "15px"
                                          :background-color "#00000088"}
@@ -7133,14 +7301,6 @@
                                  :children
                                  [[re-com/h-box
                                    :children [[block-renamer flow-select]
-
-
-
-                                              ;[re-com/md-icon-button :md-icon-name "zmdi-pizza"]
-                                              ;[re-com/box :child (str flow-select)]
-                                              ;[re-com/box :child "fixed block header"]
-
-
                                               [re-com/h-box
                                                :gap "8px"
                                                :children
@@ -7181,9 +7341,13 @@
                                  ;:width "610px"
                                    :children [;[re-com/box :child (str "debug some shit: "  ttype open?)]
 
+                                              [flow-details-block-container "flow options*" :system :system
+                                               [code-box-options flow-id 570 nil opts-map]
+                                               "zmdi-code"]
+
                                               (when (not gantt?)
                                                 [flow-details-block-container "in-line flow gantt*" :system :system
-                                                 [gantt-container flow-id orderb true 570] "zmdi-chart-donut"])
+                                                 [gantt-container flow-id orderb true 580] "zmdi-chart-donut"])
 
                                               ;; [flow-details-block-container "test gantt" flow-id flow-select
                                               ;;  [gantt-chart (get-in @(re-frame/subscribe [::http/flow-results]) [:tracker flow-id]) 560 flow-id] "zmdi-comment-alt-text"]
@@ -7217,12 +7381,14 @@
                                                 [flow-details-block-container
                                                  (if (= ttype :open-fn) "code editor" "code / value editor")
                                                  flow-id flow-select
-                                                 [flow-code-editor-block 580 378 fmap flow-select ttype flow-id]
+                                                 [flow-code-editor-block
+                                                  (- browser-panel-width 20) ;; 580 
+                                                  378 fmap flow-select ttype flow-id]
                                                  (if (= ttype :open-fn)
                                                    "zmdi-functions"
                                                    "zmdi-view-subtitles")]
 
-                                                (when (not (empty? desc))
+                                                (when (ut/ne? desc) ;; (not (empty? desc))
                                                   [flow-details-block-container
                                                    "flow block description"
                                                    flow-id flow-select
@@ -7238,7 +7404,9 @@
                                                 [flow-details-block-container
                                                  "view editor*"
                                                  flow-id flow-select
-                                                 [code-box-view 580 nil fmap flow-select flow-id]
+                                                 [code-box-view
+                                                  (- browser-panel-width 20) ;; 580
+                                                  nil fmap flow-select flow-id]
                                                  "zmdi-functions"])
 
                                               (when rabbit-code-view?
@@ -7256,7 +7424,9 @@
                                                ["zmdi-circle" "zmdi-long-arrow-right"]]
 
                                               [flow-details-block-container "output value(s)" flow-id flow-select
-                                               [output-viewer 580 378 flow-id flow-select nil]
+                                               [output-viewer
+                                                (- browser-panel-width 20) ;; 580
+                                                378 flow-id flow-select nil]
                                                "zmdi-view-web"]
 
                                               ;;[map-boxes2 return-val :sub-flows-used nil [] :output "vector"]
@@ -7278,14 +7448,8 @@
 
                                               (when (= ttype :open-fn)
                                                 [flow-details-block-container "save as a flow block*" flow-id flow-select
-                                               [save-custom-block flow-id flow-select]
-                                               "fa-solid fa-cube"])
-
-
-                                              ;[flow-details-block top-px 580 flow-select body false]
-                                              ;[flow-details-block top-px 580 flow-select body true]
-                                              ;; debug-box [flow-select raw-fmap]
-
+                                                 [save-custom-block flow-id flow-select]
+                                                 "fa-solid fa-cube"])
 
                                               [flow-details-block-container "flow block map - debugger*" flow-id flow-select
                                                [debug-box flow-select
@@ -7312,36 +7476,26 @@
 
                                               [flow-details-block-container "connections - debugger*" flow-id flow-select
                                                [re-com/box ;;; edit-conns
-                                                :child [code-box-rwc 580 nil
+                                                :child [code-box-rwc
+                                                        (- browser-panel-width 20) ;; 580
+                                                        nil
                                                         (str @(re-frame/subscribe [::flowmap-connections]))]]
                                                "zmdi-bug"]
 
-
-
-
-                                              [re-com/gap :size "10px"]
-
-                                              ]]]]))
-                                              ;; [re-com/h-box
-                                              ;;  :justify :between
-                                              ;;  :children [[re-com/box :child "weird footer? THE END" :size "auto" :justify :start :padding "5px"]
-                                              ;;             [re-com/box :child (str flow-select) :size "auto" :justify :end :padding "5px"]]
-                                              ;;  :align :center :justify :center
-                                              ;;  :size "none" :height "30px"
-                                              ;;  :width "580px" :style {:border "1px solid darkcyan"}]
-
-                                            ;[flow-details-block top-px 580 flow-select body true]
-
+                                              [re-com/gap :size "10px"]]]]]))
 
                             [re-com/v-box
-                             :gap (if (or gantt? flow-select) "10px" "20px")
+                             :gap "10px" ;; (if (or gantt? flow-select) "10px" "20px")
                              :size "none"
                              :height (px full-height) ; (px browser-panel-height)
                              :style {:background-color "#00000099"
                                      :border-radius "0px 16px 0px 0px"
                                      :position "fixed"
-                                     :left (if @(re-frame/subscribe [::bricks/flow-editor?]) 600 0)
+                                     :left (if @(re-frame/subscribe [::bricks/flow-editor?]) 
+                                             browser-panel-width
+                                             0)
                                      :backdrop-filter "blur(3px)"
+                                     :transition "all 0.3s"
                                      :top -1 ;28
                                      :padding-top "10px"
                                      :padding-right (if (not @(re-frame/subscribe [::bricks/flow-editor?])) "5px" "inherit")
@@ -7363,6 +7517,8 @@
                                                        :height "15px"
                                                        :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
                                                        :font-size "33px"}]
+                                              
+                                              ;(when (and gantt? sys-panel?) [re-com/gap :size "1px"])
 
                                               [re-com/md-icon-button :src (at)
                                                :md-icon-name "zmdi-chart"
@@ -7388,136 +7544,78 @@
 
                                              (if (or flow-select gantt?)
                                                (block-icons blocks flow-id flow-select)
+                                               [] ;; old menu buttons.... deprecated in lieu of top text label buttons
+                                        ;;        [[re-com/md-icon-button :src (at)
+                                        ;;          :md-icon-name "zmdi-view-list"
+                                        ;; ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
+                                        ;;          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow browser"))
+                                        ;;                 :on-click #(reset! editor-mode :flow-browser)
+                                        ;;                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
+                                        ;;          :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
+                                        ;;                  :opacity (when (not (= :flow-browser @editor-mode)) 0.33)
+                                        ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
+                                        ;;                  :cursor "pointer"
+                                        ;;                  :height "15px"
+                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :font-size "19px"}]
+                                        ;;         [re-com/md-icon-button :src (at)
+                                        ;;          :md-icon-name "zmdi-shape"
+                                        ;; ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
+                                        ;;          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow part browser"))
+                                        ;;                 :on-click #(reset! editor-mode :part-browser)
+                                        ;;                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
+                                        ;;          :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
+                                        ;;                  :opacity (when (not (= :part-browser @editor-mode)) 0.33)
+                                        ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
+                                        ;;                  :cursor "pointer"
+                                        ;;                  :height "15px"
+                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :font-size "19px"}]
+                                        ;;         [re-com/md-icon-button :src (at)
+                                        ;;          :md-icon-name "zmdi-time-interval"
+                                        ;; ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
+                                        ;;          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow scheduler"))
+                                        ;;                 :on-click #(reset! editor-mode :scheduler)
+                                        ;;                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
+                                        ;;          :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
+                                        ;;                  :opacity (when (not (= :scheduler @editor-mode)) 0.33)
+                                        ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
+                                        ;;                  :cursor "pointer"
+                                        ;;                  :height "15px"
+                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :font-size "19px"}]
+                                        ;;         [re-com/md-icon-button :src (at)
+                                        ;;          :md-icon-name "zmdi-view-subtitles"
+                                        ;; ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
+                                        ;;          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "run history"))
+                                        ;;                 :on-click #(reset! editor-mode :run-history)
+                                        ;;                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
+                                        ;;          :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
+                                        ;;                  :opacity (when (not (= :run-history @editor-mode)) 0.33)
+                                        ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
+                                        ;;                  :cursor "pointer"
+                                        ;;                  :height "15px"
+                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :font-size "19px"}]
 
-                                               [[re-com/md-icon-button :src (at)
-                                                 :md-icon-name "zmdi-view-list"
-                                        ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
-                                                 :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow browser"))
-                                                        :on-click #(reset! editor-mode :flow-browser)
-                                                        :on-mouse-leave #(reset! editor-tooltip-atom nil)}
-                                                 :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
-                                                         :opacity (when (not (= :flow-browser @editor-mode)) 0.33)
-                                                         :color (theme-pull :theme/editor-outer-rim-color nil)
-                                                         :cursor "pointer"
-                                                         :height "15px"
-                                                         :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
-                                                         :font-size "19px"}]
-                                                [re-com/md-icon-button :src (at)
-                                                 :md-icon-name "zmdi-shape"
-                                        ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
-                                                 :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow part browser"))
-                                                        :on-click #(reset! editor-mode :part-browser)
-                                                        :on-mouse-leave #(reset! editor-tooltip-atom nil)}
-                                                 :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
-                                                         :opacity (when (not (= :part-browser @editor-mode)) 0.33)
-                                                         :color (theme-pull :theme/editor-outer-rim-color nil)
-                                                         :cursor "pointer"
-                                                         :height "15px"
-                                                         :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
-                                                         :font-size "19px"}]
-                                                [re-com/md-icon-button :src (at)
-                                                 :md-icon-name "zmdi-time-interval"
-                                        ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
-                                                 :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow scheduler"))
-                                                        :on-click #(reset! editor-mode :scheduler)
-                                                        :on-mouse-leave #(reset! editor-tooltip-atom nil)}
-                                                 :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
-                                                         :opacity (when (not (= :scheduler @editor-mode)) 0.33)
-                                                         :color (theme-pull :theme/editor-outer-rim-color nil)
-                                                         :cursor "pointer"
-                                                         :height "15px"
-                                                         :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
-                                                         :font-size "19px"}]
-                                                [re-com/md-icon-button :src (at)
-                                                 :md-icon-name "zmdi-view-subtitles"
-                                        ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
-                                                 :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "run history"))
-                                                        :on-click #(reset! editor-mode :run-history)
-                                                        :on-mouse-leave #(reset! editor-tooltip-atom nil)}
-                                                 :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
-                                                         :opacity (when (not (= :run-history @editor-mode)) 0.33)
-                                                         :color (theme-pull :theme/editor-outer-rim-color nil)
-                                                         :cursor "pointer"
-                                                         :height "15px"
-                                                         :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
-                                                         :font-size "19px"}]
-
-                                                [re-com/md-icon-button :src (at)
-                                                 :md-icon-name "zmdi-bug"
-                                        ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
-                                                 :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow block debug editor"))
-                                                        :on-click #(reset! editor-mode :debug)
-                                                        :on-mouse-leave #(reset! editor-tooltip-atom nil)}
-                                                 :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
-                                                         :opacity (when (not (= :debug @editor-mode)) 0.33)
-                                                         :color (theme-pull :theme/editor-outer-rim-color nil)
-                                                         :cursor "pointer"
-                                                         :height "15px"
-                                                         :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
-                                                         :font-size "19px"}]]))]]]]
-
-
-                                ;;        [re-com/md-icon-button :src (at)
-                                ;;         :md-icon-name "zmdi-view-list"
-                                ;;         ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
-                                ;;         :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "server-side flow browser"))
-                                ;;                :on-click #(reset! editor-mode :server-flows)
-                                ;;                :on-mouse-leave #(reset! editor-tooltip-atom nil)}
-                                ;;         :style {;:background-color (theme-pull :theme/editor-rim-color nil) ;"#00000000"
-                                ;;                 :opacity (when (not (= :server-flows @editor-mode)) 0.33)
-                                ;;                 :color (theme-pull :theme/editor-outer-rim-color nil)
-                                ;;                 :cursor "pointer"
-                                ;;                 :height "15px"
-                                ;;                 :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
-                                ;;                 :font-size "19px"}]
-
-
-;; commented out accordian
-                      ;;       (if (not (= :run-history @editor-mode))
-
-                      ;;         [re-com/h-box
-                      ;;          :attr {:id "scrolly-boy"}
-                      ;;  ;:on-mouse-enter #(add-wheel-listener "scrolly-boy")
-                      ;;  ;:on-mouse-leave #(remove-wheel-listener "scrolly-boy")
-
-                      ;;          :size "none"
-                      ;;          :style {:overflow "scroll"
-                      ;;                  :padding-left "8px"}
-                      ;;          :width (px (- panel-width (if @(re-frame/subscribe [::bricks/flow-editor?]) browser-panel-width 0) 12))
-                      ;;          :align :center :justify :start
-                      ;;          :gap "5px"
-                      ;;          :children [[re-com/h-box
-                      ;;                      :gap "6px"
-                      ;;                      :children (for [id block-keys
-                      ;;                                      :let [body (get @(re-frame/subscribe [::flowmap]) id)]]
-                      ;;                                  [flow-details-block cch id body])]]]
-
-                      ;;         (let [qq1 {:select [:base_flow_id :block :channel
-                      ;;                             :data_type :dbgn :dest :elapsed_ms
-                      ;;                             :end :end_ts :flow_id :from_block
-                      ;;                             :path :start :start_ts :ts :type
-                      ;;                             :value]
-                      ;;                    :connection-id "flows-db"
-                      ;;                    :order-by [[8 :desc]]
-                      ;;                    :from   [[:fn_history :rr582]]}]
-                      ;;           [re-com/v-box
-                      ;;            :size "none" ;:padding "25px"
-                      ;;            :gap "14px"
-                      ;;            :width (px (- panel-width 611))
-                      ;;            :height (px browser-panel-height)
-                      ;;            :style {:border "1px solid white" ;:margin-top "16px"
-                      ;;                    :padding-left "14px"}
-                      ;;            :children [[re-com/box
-                      ;;                        :height "56px" :width (px (- panel-width 650))
-                      ;;                        :style {:border "1px solid purple"}
-                      ;;                        :child [buffy/render-honey-comb-fragments (waffles [] (- panel-width 650)) 21.75 2]]
-                      ;;                       [buffy/render-honey-comb-fragments qq1 21.75 8]]]))
-
+                                        ;;         [re-com/md-icon-button :src (at)
+                                        ;;          :md-icon-name "zmdi-bug"
+                                        ;;          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow block debug editor"))
+                                        ;;                 :on-click #(reset! editor-mode :debug)
+                                        ;;                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
+                                        ;;          :style {:opacity (when (not (= :debug @editor-mode)) 0.33)
+                                        ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
+                                        ;;                  :cursor "pointer"
+                                        ;;                  :height "15px"
+                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :font-size "19px"}]]
+                                               ))]]]]
 
      :size "none"
      :align :center :justify :center
      :style {:z-index 200
             ;:id "scrolly-boy"
+             :transition "width 0.3s"
              :font-family (theme-pull :theme/base-font nil)
              :color (theme-pull :theme/editor-font-color nil)
             ;:background-color (str (theme-pull :theme/editor-background-color nil) 99) ; "#000000"
@@ -7528,17 +7626,8 @@
              :position "fixed"
              :top 28} ;(- panel-height 8)
              ;:left 13
-
-
-            ;:margin-left "-6px"
-            ;:border-radius "0px 0px 16px 16px"
-            ;:border-left (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
-            ;:border-right (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
-            ;:border-bottom (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
-
-     :height (px full-height) ; (px details-panel-height)
-   ;:width (px (- panel-width 12))
-     :width (if @(re-frame/subscribe [::bricks/flow-editor?]) (px 600)
+     :height (px full-height)
+     :width (if @(re-frame/subscribe [::bricks/flow-editor?]) (px browser-panel-width)
                 ;(px panel-width)
                 (px 45))]))
 
@@ -8050,8 +8139,7 @@
         running? @(re-frame/subscribe [::is-running? :* flow-id true])
         chans-open? @(re-frame/subscribe [::bricks/flow-channels-open? flow-id])
         has-done? (has-done?)
-        ;single-panel-size 600
-        panel-height (* (.-innerHeight js/window) hpct) ;;600 ;;(* hh 0.65) ;;400
+        panel-height (* (.-innerHeight js/window) hpct) 
         ;; _ (tap> [:sizes ww hh
         ;;          (.-innerWidth js/window)
         ;;          (.-innerHeight js/window)])
@@ -8202,52 +8290,6 @@
                                                              :opacity   0.33
                                                              :cursor    "pointer"}]]]]
 
-
-
-
-
-                                       ;;(get-in @(re-frame/subscribe [::http/flow-results]) [flow-id :return-maps])
-
-                                      ;;  (if (not @title-edit-idx)
-                                      ;;    [re-com/box
-                                      ;;     :padding "8px"
-                                      ;;     :attr {:on-double-click #(reset! title-edit-idx (str flow-id))}
-                                      ;;     :style {;:text-decoration "underline"
-                                      ;;             :margin-top "28px"
-                                      ;;             :cursor "pointer"
-                                      ;;             ;:border "1px solid lime"
-                                      ;;             :font-size "38px"}
-                                      ;;     :child (str flow-id)]
-
-                                      ;;    [re-com/input-text
-                                      ;;     :src (at)
-                                      ;;     :model             (str flow-id)
-                                      ;;     :width             "600px"
-                                      ;;  ; :height            "30px"
-                                      ;;     :on-change         #(do (re-frame/dispatch [::set-selected-flow %])
-                                      ;;                             (reset! title-edit-idx nil))
-                                      ;;     :validation-regex  flow-id-regex
-                                      ;;     :change-on-blur?   true
-
-                                      ;;     :style  {;:font-size "20px"
-                                      ;;              :margin-top "28px"
-                                      ;;              :border (str "2px dashed " (theme-pull :theme/editor-outer-rim-color nil))
-                                      ;;              :font-size "38px"
-                                      ;;              :text-decoration "underline"
-                                      ;;              :color (theme-pull :theme/editor-outer-rim-color nil)
-                                      ;;                  ;:font-weight 700
-                                      ;;              :font-style "underline"
-                                      ;;            ;:border "0px solid black"
-                                      ;;              :padding "8px"
-                                      ;;              :text-align "right"
-                                      ;;            ; :float "right"
-                                      ;;                ;:margin-top "10px"
-                                      ;;                ;:padding-top "10px"
-                                      ;;      ;          :text-align "right"
-                                      ;;              :background-color "#00000000"
-                                      ;;              ;:color (theme-pull :theme/editor-font-color nil)
-                                      ;;      ;          :padding-top "1px"
-                                      ;;              }])
 
 
                             :size "none"
@@ -8472,8 +8514,8 @@
                                                                           :children [[rc/catch
                                                                                       [flow-grid panel-width ppanel-height x y flowmaps-connections flow-id flow-map]]
 
-                                                                                     (let [ph 600
-                                                                                           pw (* (.-innerWidth js/window) 0.7)
+                                                                                     (let [;ph 6-0-0 ;; siz hundo
+                                                                                           ;pw (* (.-innerWidth js/window) 0.7)
                                                                                            [xx yy] @detached-coords]
                                                                                  ;offsets @db/pan-zoom-offsets
                                                                                  ;tx (first offsets)
@@ -8500,205 +8542,6 @@
 ;)
 
 
-
-
-
-                                                        ;;        [re-com/box
-                                                        ;;         :child [re-com/md-icon-button :src (at)
-                                                        ;;                 :md-icon-name "zmdi-pizza"
-                                                        ;;                 :tooltip "  toggle floating editor panel (SPACE)"
-                                                        ;;                 :style {:color "#ffffff"
-                                                        ;;                         :cursor "pointer"
-                                                        ;;                         :margin-top "-2px"
-                                                        ;;                         :padding-left "2px"
-                                                        ;;                         :font-size "15px"}
-                                                        ;;                 :attr {:on-click #(re-frame/dispatch [::bricks/toggle-editor])}]
-                                                        ;;         :width "20px"
-                                                        ;;         :height "20px"
-                                                        ;;         :style {:position "fixed"
-                                                        ;;                 :z-index 98
-                                                        ;;                 :top (- panel-height 33) :left 0
-                                                        ;;                 :background-color "#00000022"
-                                                        ;;                 :color "white"}]
-
-                                                        ;;        [re-com/box
-                                                        ;;         :child [re-com/md-icon-button :src (at)
-                                                        ;;                 :md-icon-name "zmdi-layers"
-                                                        ;;                 :tooltip "show lineage / sub-query lines? (L)"
-                                                        ;;                 :style {:color "#ffffff"
-                                                        ;;                         :cursor "pointer"
-                                                        ;;                         :margin-top "-2px"
-                                                        ;;                         :padding-left "2px"
-                                                        ;;                         :font-size "15px"}
-                                                        ;;                 :attr {:on-click #(re-frame/dispatch [::bricks/toggle-lines])}]
-                                                        ;;         :width "20px"
-                                                        ;;         :height "20px"
-                                                        ;;         :style {:position "fixed"
-                                                        ;;                 :z-index 98
-                                                        ;;                 :border-radius "0px 7px 0px 0px"
-                                                        ;;                 :top (- panel-height 33)
-                                                        ;;                 :left 23
-                                                        ;;                 :background-color "#00000022"
-                                                        ;;                 :color "white"}]
-
-                                                        ;;        [re-com/box
-                                                        ;;         :child [re-com/md-icon-button :src (at)
-                                                        ;;                 :md-icon-name "zmdi-eye"
-                                                        ;;                 :tooltip "toggle peek mode (P)"
-                                                        ;;                 :style {:color "#ffffff"
-                                                        ;;                         :cursor "pointer"
-                                                        ;;                         :margin-top "-2px"
-                                                        ;;                         :padding-left "2px"
-                                                        ;;                         :font-size "15px"}
-                                                        ;;                 :attr {:on-click #(re-frame/dispatch [::bricks/toggle-peek])}]
-                                                        ;;         :width "20px"
-                                                        ;;         :height "20px"
-                                                        ;;         :style {:position "fixed"
-                                                        ;;                 :z-index 98
-                                                        ;;                 :border-radius "0px 7px 0px 0px"
-                                                        ;;                 :top (- panel-height 33)
-                                                        ;;                 :left 46
-                                                        ;;                 :background-color "#00000022"
-                                                        ;;                 :color "white"}]
-
-                                                        ;;        [re-com/box
-                                                        ;;         :child [re-com/md-icon-button :src (at)
-                                                        ;;                 :md-icon-name "zmdi-refresh-sync"
-                                                        ;;                 :tooltip "toggle auto-refresh (O)"
-                                                        ;;                 :style {:color "#ffffff"
-                                                        ;;                         :cursor "pointer"
-                                                        ;;                         :margin-top "-2px"
-                                                        ;;                         :padding-left "2px"
-                                                        ;;                         :font-size "15px"}
-                                                        ;;                 :attr {:on-click #(re-frame/dispatch [::bricks/toggle-auto-run])}]
-                                                        ;;         :width "20px"
-                                                        ;;         :height "20px"
-                                                        ;;         :style {:position "fixed"
-                                                        ;;                 :z-index 98
-                                                        ;;                 :border-radius "0px 7px 0px 0px"
-                                                        ;;                 :top (- panel-height 33)
-                                                        ;;                 :left 69
-                                                        ;;                 :background-color "#00000022"
-                                                        ;;                 :color "white"}]
-
-                                                        ;;        [re-com/box
-                                                        ;;         :child [re-com/md-icon-button :src (at)
-                                                        ;;                 :md-icon-name "zmdi-developer-board"
-                                                        ;;                 :tooltip "  toggle external editing"
-                                                        ;;                 :style {;:;color (if external? "red" "#ffffff")
-                                                        ;;                         :cursor "pointer"
-                                                        ;;                         :margin-top "-2px"
-                                                        ;;                         :padding-left "2px"
-                                                        ;;                         :font-size "15px"}
-                                                        ;;                 :attr {:on-click #(re-frame/dispatch [::bricks/toggle-external])}]
-                                                        ;;         :width "20px"
-                                                        ;;         :height "20px"
-                                                        ;;         :style {:position "fixed"
-                                                        ;;                 :z-index 98
-                                                        ;;                 :top (- panel-height 33)
-                                                        ;;                 :left 92
-                                                        ;;                 :background-color "#00000022"
-                                                        ;;                 :color "white"}]
-
-                                                        ;;        [re-com/box
-                                                        ;;         :child [re-com/md-icon-button :src (at)
-                                                        ;;                 :md-icon-name "zmdi-close"
-                                                        ;;                 :tooltip "un-select block (ESC)"
-                                                        ;;                 :style {:color "#ffffff"
-                                                        ;;                         :cursor "pointer"
-                                                        ;;                         :margin-top "-2px"
-                                                        ;;                         :padding-left "2px"
-                                                        ;;                         :font-size "15px"}
-                                                        ;;                 :attr {:on-click #(re-frame/dispatch [::bricks/select-block "none!"])}]
-                                                        ;;         :width "20px"
-                                                        ;;         :height "20px"
-                                                        ;;         :style {:position "fixed"
-                                                        ;;                 :z-index 98
-                                                        ;;                 :border-radius "0px 7px 0px 0px"
-                                                        ;;                 :top (- panel-height 33)
-                                                        ;;                 :left 115
-                                                        ;;                 :background-color "#00000022"
-                                                        ;;                 :color "white"}]
-
-                                                        ;;        (when @(re-frame/subscribe [::audio/audio-playing?])
-                                                        ;;          [re-com/md-icon-button :src (at)
-                                                        ;;           :md-icon-name "zmdi-speaker"
-                                                        ;;           :style {;:margin-top "4px"
-                                                        ;;                   :position "fixed" :left 138 :bottom 0
-                                                        ;;                   :color "red"
-                                                        ;;                   :font-size "22px"}])
-
-                                                        ;;        (when @(re-frame/subscribe [::audio/recording?])
-                                                        ;;          [re-com/md-icon-button :src (at)
-                                                        ;;           :md-icon-name "zmdi-mic"
-                                                        ;;           :style {;:margin-top "-0px"
-                                                        ;;                   :position "fixed" :left 161 :bottom 0
-                                                        ;;                   :color "red"
-                                                        ;;                   :font-size "22px"}])
-
-                                                        ;;        [re-com/box
-                                                        ;;         :size "none"
-                                                        ;;         :style {:position "fixed" :left 138
-                                                        ;;                 :top (- panel-height 33)
-                                                        ;;                 :font-weight 700 :color "#ffffff77"}
-                                                        ;;         :child (str 45 " " @bricks/over-flow? " " @dragging-port?)]
-
-                                                        ;;        [re-com/box
-                                                        ;;         :child [re-com/md-icon-button :src (at)
-                                                        ;;                 :md-icon-name "zmdi-save"
-                                                        ;;                 :tooltip "save board (Ctrl-S)"
-                                                        ;;                 :style {:color "#ffffff"
-                                                        ;;                         :cursor "pointer"
-                                                        ;;                         :margin-top "-2px"
-                                                        ;;                         :padding-left "2px"
-                                                        ;;                         :font-size "15px"}]
-                                                        ;;         :width "20px"
-                                                        ;;         :height "20px"
-                                                        ;;         :style {:position "fixed"
-                                                        ;;                 :z-index 98
-                                                        ;;                 :border-radius "0px 7px 0px 0px"
-                                                        ;;                 :top (- panel-height 33)
-                                                        ;;                 :right 23
-                                                        ;;                 :background-color "#00000022"
-                                                        ;;                 :color "white"}]
-
-                                                        ;;        [re-com/box
-                                                        ;;         :child [re-com/md-icon-button :src (at)
-                                                        ;;                 :md-icon-name "zmdi-file-plus"
-                                                        ;;                 :tooltip "save board *w data*"
-                                                        ;;                 :style {:color "#ffffff"
-                                                        ;;                         :cursor "pointer"
-                                                        ;;                         :margin-top "-2px"
-                                                        ;;                         :padding-left "2px"
-                                                        ;;                         :font-size "15px"}]
-                                                        ;;         :width "20px"
-                                                        ;;         :height "20px"
-                                                        ;;         :style {:position "fixed"
-                                                        ;;                 :z-index 98
-                                                        ;;                 :border-radius "0px 7px 0px 0px"
-                                                        ;;                 :top (- panel-height 33)
-                                                        ;;                 :right 0
-                                                        ;;                 :background-color "#00000022"
-                                                        ;;                 :color "white"}]
-
-                                                              ;;  [re-com/box
-                                                              ;;   :child [re-com/md-icon-button :src (at)
-                                                              ;;           :md-icon-name (if @flow-details-panel?
-                                                              ;;                           "zmdi-chevron-up"
-                                                              ;;                           "zmdi-chevron-down")
-                                                              ;;           :style {:color (str (theme-pull :theme/editor-outer-rim-color nil))
-                                                              ;;                   :cursor "pointer"
-                                                              ;;                   :font-size "35px"}
-                                                              ;;           :on-click #(reset! flow-details-panel? (not @flow-details-panel?))]
-                                                              ;;   :style {:position "fixed"
-                                                              ;;           :opacity 0.45
-                                                              ;;           :z-index 98
-                                                              ;;           :top (- panel-height 45)
-                                                              ;;           :right (/ panel-width 2)
-                                                              ;;           :background-color "#00000022"
-                                                              ;;           :color "white"}]
-
-
                                                                [re-com/h-box
                                                                 :gap "6px"
                                                                 ;:size "1"
@@ -8709,7 +8552,10 @@
                                                                         ;:border "1px solid green"
                                                                         :height "60px"
 
-                                                                        :left (if @(re-frame/subscribe [::bricks/flow-editor?]) 640 45)
+                                                                        :left (if @(re-frame/subscribe [::bricks/flow-editor?]) 
+                                                                                ;;640
+                                                                                (+ (last @flow-editor-system-mode) 40)
+                                                                                45)
                                                                         :bottom 0}
                                                                 :children [(when has-done?
                                                                              (if (or running? chans-open?)
@@ -8823,7 +8669,7 @@
                                                                                              :on-mouse-leave #(reset! editor-tooltip-atom nil)}
                                                                                       :on-click #(do
                                                                                                    (re-frame/dispatch [::http/save-flow
-                                                                                                                       {:flowmaps flowmaps
+                                                                                                                       {:flowmaps flowmaps ;; @(re-frame/subscribe [::flowmap-raw])
                                                                                                                         :opts @(re-frame/subscribe [::opts-map])
                                                                                                                         :zoom @db/pan-zoom-offsets
                                                                                                                         :flow-id flow-id
@@ -8857,9 +8703,6 @@
                                                                                       :style {:color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                                               :cursor "pointer"
                                                                                               :filter "drop-shadow(0.25rem 0.35rem 0.4rem rgba(0, 0, 0, 0.44))"
-
-                                                                                  ;:margin-top "-5px"
-                                                                                  ;:padding-left "2px"
                                                                                               :font-size "43px"}]
 
                                                                               :style {;:position "fixed"
@@ -8932,7 +8775,8 @@
                                                                         :color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                         :font-size "29px"}
                                                                 :gap "10px"
-                                                                :children [[re-com/md-icon-button :src (at)
+                                                                :children [[edit-flow-title flow-id 450]
+                                                                           [re-com/md-icon-button :src (at)
                                                                             :md-icon-name (if watched? "zmdi-eye" "zmdi-eye-off")
                                                                             :on-click #(if watched?
                                                                                          (re-frame/dispatch [::wfx/request :default
@@ -8953,8 +8797,10 @@
                                                                                                                              :flow-keys running-subs
                                                                                                                              :client-name client-name}
                                                                                                                 :timeout    15000000}])))
-                                                                            :style {:cursor "pointer" :margin-top "8px"}]
-                                                                           [re-com/box :child (str flow-id)]]]
+                                                                            :style {:cursor "pointer" :margin-top "8px" :font-size "30px"}]
+                                                                           ;[re-com/box :child (str flow-id)]
+                                                                           
+                                                                           ]]
 
                                                                [re-com/box
                                                                 :child [re-com/md-icon-button :src (at)

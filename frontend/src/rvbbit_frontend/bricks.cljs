@@ -5216,7 +5216,9 @@
 (re-frame/reg-sub
  ::custom-col-widths
  (fn [db [_ panel-key query-key]]
-   (get-in db [:panels panel-key :queries query-key :col-widths] {})))
+   (get-in db [:panels panel-key :queries query-key :col-widths] 
+           (get-in db [:sql-source query-key :col-widths] {})) ;; custom queries that have no home in the panel...
+   ))
 
 (re-frame/reg-sub
  ::custom-rows
@@ -6133,7 +6135,9 @@
                                                               (and (some #(= % c) [:screen_name :block_name])
                                                                    (not (= data-keypath [:blocks-sys]))) 385
                                                               :else equal-width-final)
-                                                        (and (some #(= % c) (keys custom-col-widths)) (not non-panel?))
+                                                        (and (some #(= % c) (keys custom-col-widths)) 
+                                                             ;(not non-panel?)
+                                                             )
                                                         (get custom-col-widths c) ;; :col-wdiths keys exists in honey
                                                         :else equal-width-final)
                                            row-num-fn (fn [row] (try (.indexOf @rowset row)

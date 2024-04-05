@@ -1251,6 +1251,11 @@
                                          (format-duration-seconds (/ tt 1000)) tt]))]
     files-with-time-diff))
 
+(defn ne? [x]
+  (if (seqable? x)
+    (boolean (seq x))
+    true))
+
 (defn flatten-map [m]
   (for [[category items] m
         [name item] items]

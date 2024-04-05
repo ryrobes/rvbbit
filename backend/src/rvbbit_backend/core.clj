@@ -13,6 +13,7 @@
    ;[rvbbit-backend.flowmaps :as flow]
    [rvbbit-backend.transform :as ts]
    [rvbbit-backend.embeddings :as em]
+   [clj-time.format :as f]
    ;[websocket-layer.core :as wl]
    [hikari-cp.core :as hik]
    [clojure.java.shell :as shell]
@@ -30,7 +31,7 @@
    [rvbbit-backend.websockets :as wss]
    [rvbbit-backend.search :as search]
    [rvbbit-backend.cruiser :as cruiser]
-   [rvbbit-backend.util :as ut]
+   [rvbbit-backend.util :as ut :refer [ne?]]
    [rvbbit-backend.evaluator :as evl]
    [rvbbit-backend.config :as config]
    [rvbbit-backend.assistants :as ass]
@@ -46,6 +47,7 @@
    [clj-time.jdbc]
    [clj-http.client :as client]) ;; enables joda jdbc time returns
   (:import [java.util Date]
+           
            java.nio.file.Files
            java.nio.file.Paths
            java.nio.file.attribute.FileTime
@@ -612,6 +614,11 @@
                              start (try (apply min (or (for [[_ v] (get @flow-db/tracker k)]
                                                          (get v :start)) [-1]))
                                         (catch Exception _ (System/currentTimeMillis)))
+                            ;;  start-ts (-> start
+                            ;;               (clj-time.coerce/from-long)
+                            ;;               (f/unparse (f/formatter "yyyy-MM-dd HH:mm:ss")))
+                             start-ts (-> (f/formatter "yyyy-MM-dd HH:mm:ss")
+                                          (f/unparse (clj-time.coerce/from-long start)))
                             ;;start (for [[_ v] (get @flow-db/tracker k)] (get v :start))
                             ;; end (if done?
                             ;;       (try (apply max (or (for [[_ v] (get @flow-db/tracker k)] (get v :end)) [-1])) (catch Exception _ 0))
@@ -647,6 +654,7 @@
                                    (let [row {:client_name client-name
                                               :flow_id (str k)
                                               :started start ;(get-in @flow-db/results-atom [k :start])
+                                              :start_ts start-ts
                                               :ended end ;(get-in @flow-db/results-atom [k :end])
                                               :run_id run-id
                                               :parent-run_id parent-run-id

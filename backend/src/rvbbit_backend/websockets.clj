@@ -27,7 +27,7 @@
             [io.pedestal.http :as server]
             [taskpool.taskpool :as tp]
             [clojure.edn :as edn]
-            [rvbbit-backend.util :as ut]
+            [rvbbit-backend.util :as ut :refer [ne?]]
             [io.pedestal.http.route :as route]
             ;[clojure.core.ex-info :refer [Throwable->map]]
             [hikari-cp.core :as hik]
@@ -2146,7 +2146,7 @@
 
 
 
-(defn flow! [client-name flowmap flow-id opts & [no-return?]]
+(defn flow! [client-name flowmap file-image flow-id opts & [no-return?]]
   (try
     (let [orig-flowmap flowmap
           _ (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of flowmaps starter overlap
@@ -2157,32 +2157,36 @@
           ;opts (if (get opts :client-name) opts (merge {:client-name client-name} opts)) ;; stuff into opts for flow-waiter
           ;opts (merge {:client-name client-name} opts)
           _ (ut/pp [:flow!-passed-opts flow-id opts])
-          flowmap (if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
-                    (let [raw (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
-                                   (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
-                                                          {})))
-                          flowmaps (process-flow-map (get raw :flowmaps))
-                          connections (get raw :flowmaps-connections)
-                          fmap (process-flowmap2 flowmaps connections flow-id)
-                          fmap (merge fmap {:opts (get raw :opts)})]
+          oo-flowmap (if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
+                       (let [raw (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
+                                      (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
+                                                             {})))
+                             flowmaps (process-flow-map (get raw :flowmaps))
+                             connections (get raw :flowmaps-connections)
+                             fmap (process-flowmap2 flowmaps connections flow-id)
+                             fmap (merge fmap {:opts (get raw :opts)})]
                       ;(ut/pp fmap)
-                      fmap)
-                    flowmap)
+                         fmap)
+                       flowmap)
+          file-image (or file-image
+                         (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
+                              (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
+                                                     {}))))
           ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps-pre") ;; TEMP FOR DEBUGGING PRE PROCESSED MAPS
           ;;                     (ut/pretty-spit (str "./flow-history/src-maps-pre/" flow-id ".edn") ;; expensive...
           ;;                                     flowmap 185)))
-          user-opts (get flowmap :opts (get opts :opts))
+          user-opts (get oo-flowmap :opts (get opts :opts))
           opts (assoc opts :opts user-opts) ;; kinda weird, but we need to account for saved opts or live interactive opts
           ;;_ (ut/pp [:flow!-opts opts user-opts])
           walk-map (into {} (for [[k v] (get @params-atom client-name)] {(keyword (str "param/" (cstr/replace (str k) ":" ""))) v}))
         ;; _ (ut/pp [:applying-walk-map walk-map])
         ;; pre-run subbing in params and other contextual values for offline running... (:server / :calliope will have own, etc)
-          flowmap (walk/postwalk-replace walk-map flowmap)
+          flowmap (walk/postwalk-replace walk-map oo-flowmap)
           uid (get opts :instance-id (str flow-id))  ;(ut/generate-name)
           post-id (if (get opts :increment-id? false) ;; if auto increment idx, lets use that for lookups...
                     (str uid "-" (count (filter #(cstr/starts-with? % uid) (keys @flow-db/channel-history))))
                     uid)
-          run-id (get-in @flow-db/results-atom [flow-id :run-id] "no-run-id")
+;;          run-id (get-in @flow-db/results-atom [flow-id :run-id] "no-run-id")
           uuid (str (java.util.UUID/randomUUID))
         ;;_ (ut/pp [:incoming-flowmap flowmap])
         ;; eval the flowmap to get the compiled functions in there rather than just un-read symbols
@@ -2230,7 +2234,7 @@
        ; return-map (get @flow-db/results-atom uid)
           relevant-keys (vec (filter #(cstr/starts-with? (str %) (str post-id)) (keys @flow-db/results-atom)))
           working-data-ref (into {} (for [[k v] (select-keys @flow-db/working-data relevant-keys)] {k (get v :description)}))
-
+          run-id (get-in @flow-db/results-atom [flow-id :run-id] "no-run-id")
           output {:client-name client-name
                   :flow-id flow-id
                   :run-id run-id
@@ -2304,22 +2308,32 @@
             (async/thread
               (do (Thread/sleep 10000)
                   ;(swap! flow-status assoc-in [flow-id :*running?] true) ;; just to keep the UI from thinking it's done
-                  (flow! client-name orig-flowmap flow-id opts))))
+                  (flow! client-name orig-flowmap file-image flow-id opts))))
+          
           (when (not error?) (swap! restart-map dissoc flow-id)) ;; reset the counter on success
 
           (do
             (when (not (= flow-id "client-keepalive")) ;; no need to track heartbeats..
-              (ut/pp [:saving-flow-exec-for flow-id])
-              (async/thread (do (ext/create-dirs "./flow-history") ;; just in case
-                                (ut/pretty-spit (str "./flow-history/" flow-id "-" run-id "-" result-code ".edn") ;; ut/pretty-spit is SO expensive...
-                                      (ut/replace-large-base64
-                                       (merge
-                                        output
-                                        {:sent-flowmap orig-flowmap
-                                         :first-stage-flowmap flowmap
-                                         :return-maps (select-keys @flow-db/results-atom relevant-keys) ;; in case no-return? is true
-                                         :return-val return-val} ;; in case no-return? is true
-                                        )) 125)))) ;; just for the record
+              (ut/pp [:saving-flow-exec-for flow-id result-code run-id])
+              ;(async/thread 
+                (do (ext/create-dirs "./flow-history") ;; just in case
+                                (spit ;; ut/pretty-spit
+                                 ;;(str "./flow-history/" flow-id "-" run-id "-" result-code ".edn") ;; ut/pretty-spit is SO expensive...
+                                 (str "./flow-history/" run-id ".edn")
+                                 (ut/replace-large-base64
+                                  (merge
+                                   output
+                                   {:image file-image ;; as unprocessed as we can w/o being a file path
+                                    :first-stage-flowmap flowmap
+                                    ;:tracker {}
+                                    :return-map (get @flow-db/results-atom post-id)
+                                    :return-maps (select-keys @flow-db/results-atom relevant-keys) ;; in case no-return? is true
+                                    :return-val return-val} ;; in case no-return? is true
+                                   )) 
+                                 ;125
+                                 ))
+               ; )
+              ) ;; just for the record
             output)))
     ;; run it!
    ; (ut/pp [:flowmap-returned-val return-val])
@@ -2362,7 +2376,7 @@
               (let [opts (merge opts {:schedule-started (str time)})]
                 ;(flow flowmap opts chan-out override)
                 (ut/pp [:*sched-run flow-id :at (str time)])
-                (flow! client-name flowmap flow-id opts)))
+                (flow! client-name flowmap nil flow-id opts)))
             {:on-finished (fn [] (ut/pp [:schedule-finished! opts time-seq1]))
              :error-handler (fn [e] (ut/pp [:scheduler-error e]))})] ;; if custom time list, just send it.
       ;; save channel ref for closing later w unschedule!
@@ -2445,12 +2459,12 @@
   ;; set running flow from client-name/flow-id
   (get-flow-open-ports flowmap flow-id client-name))
 
-(defmethod wl/handle-request :run-flow [{:keys [client-name flowmap flow-id opts no-return?]}]
+(defmethod wl/handle-request :run-flow [{:keys [client-name flowmap file-image flow-id opts no-return?]}]
   (ut/pp [:running-flow-map-from client-name])
   ;; set running flow from client-name/flow-id
   (when (not (get-in (flow-statuses) [flow-id :*running?] false))
   ;; ^^  dont let the web kick off a double run, in case their client state gets fucked up and accidentally allows it (it shouldnt, but still)
-    (flow! client-name flowmap flow-id opts true)))
+    (flow! client-name flowmap file-image flow-id opts true)))
 
 (defn flow-kill! [flow-id client-name]
   (future
@@ -2659,10 +2673,10 @@
           :let [match? (cstr/starts-with? (cstr/replace (cstr/lower-case voice-text) "," "") k)]
           :when match?]
     ;(materialize-flowmap :server flow-id flow-id {})
-    (flow! client-name flow-id flow-id {:increment-id? false
-                                        :close-on-done? true ; false ;true
-                                        :debug? false
-                                        :overrides {trigger-word-insert voice-text}})))
+    (flow! client-name flow-id flow-id nil {:increment-id? false
+                                            :close-on-done? true ; false ;true
+                                            :debug? false
+                                            :overrides {trigger-word-insert voice-text}})))
 
 (defmethod wl/handle-request :get-status [{:keys [client-name]}]
   (ut/pp [:client-status-check-from client-name])
@@ -4906,8 +4920,18 @@
     (ut/ppln [:loading-flow-from-file file-path])
     (send-edn-success {:image flow-data-file})))
 
+;; (str "./flow-history/" run-id ".edn")
 
+(defn load-flow-history [request]
+  
+  (let [run-id (or (get-in request [:edn-params :run-id])
+                   (get-in request [:query-params :run-id]))
 
+        file-path (str "./flow-history/" run-id ".edn")
+        _ (ut/pp [:load-flow-history file-path])
+        flow-data-file (edn/read-string (slurp file-path))]
+    (ut/ppln [:loading-flow-history-from-file file-path])
+    (send-edn-success flow-data-file)))
 
 
 ;(rinst/instrument websocket-server)
@@ -4931,7 +4955,8 @@
   (reduce (fn [acc k]
             (if (not (contains? (set exclude-keys) k))
               (let [v (get m k) ;; double quoted strings in SQL is not ideal
-                    serializer (if (or (map? v) (vector? v)) pr-str str)]
+                    serializer (if (or (map? v) (vector? v)) pr-str str)
+                    ]
                 (update acc k (fn [_] (serializer v))))
               acc))
           m
@@ -5330,8 +5355,8 @@
         ;;                     :fill :theme/editor-outer-rim-color}]]]
          ; open_flow_channels (or (apply + (for [[_ v] @flow-db/channels-atom] (count v))) 0)
         insert-sql {:insert-into [:jvm_stats]
-                    :columns [:used_memory_mb :thread_count :sql_cache_size :ws_peers :open_flow_channels :queries_run :internal_queries_run :sniffs_run]
-                    :values [[mm thread-count (count @sql-cache) (count @wl/sockets) -1 @q-calls @q-calls2 @cruiser/sniffs]]}]
+                    :columns [:used_memory_mb :thread_count :sql_cache_size :ws_peers :open_flow_channels :queries_run :internal_queries_run :sniffs_run :sys_load]
+                    :values [[mm thread-count (count @sql-cache) (count @wl/sockets) -1 @q-calls @q-calls2 @cruiser/sniffs sys-load]]}]
     (swap! stats-cnt inc)
     (sql-exec system-db (to-sql insert-sql))
     ;(ut/pp @queue-status)
@@ -5563,6 +5588,7 @@
               ;["/load-session" :get (conj common-interceptors `load-screen)]
               ["/audio" :post (conj common-interceptors `get-audio)]
               ["/load-flow" :get (conj common-interceptors `load-flow)]
+              ["/load-flow-history" :get (conj common-interceptors `load-flow-history)]
               ;["/home" :get (conj common-interceptors `home-page)]
               })
 

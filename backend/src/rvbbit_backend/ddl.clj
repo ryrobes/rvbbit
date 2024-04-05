@@ -418,6 +418,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     queries_run integer NULL,
     internal_queries_run integer NULL,
     sniffs_run integer NULL,
+    sys_load real NULL,
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
 (def create-flows
@@ -439,6 +440,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    client_name text NULL,
    in_error boolean NULL,
    started integer NULL,
+   start_ts text NULL,
    ended integer NULL,
    elapsed real NULL,
    elapsed_seconds real NULL,
