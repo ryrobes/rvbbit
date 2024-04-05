@@ -6720,7 +6720,7 @@
  (fn [db _]
    (get-in db [:re-pollsive.core/polling :counter])))
 
-(defonce last-gantt (reagent/atom {}))
+
 (defonce stopper (reagent/atom false))
 
 ;; (defn gantt-chart [data svg-width flow-id]
@@ -6740,22 +6740,22 @@
 
 ;;     (when
 ;;            (and (not (empty? transformed-data))
-;;                (not (= transformed-data (get @last-gantt flow-id))))
+;;                (not (= transformed-data (get @db/last-gantt flow-id))))
 
 ;;         ;; (tap> [:gantt "updating" counter (zero? (mod counter 5))
 ;;         ;;           (or (and running? (zero? (mod counter 5)))
 ;;         ;;               (and (not (empty? transformed-data))
-;;         ;;                    (not (= transformed-data (get @last-gantt flow-id)))))
+;;         ;;                    (not (= transformed-data (get @db/last-gantt flow-id)))))
 ;;         ;;           running?
-;;         ;;           (= transformed-data (get @last-gantt flow-id))
+;;         ;;           (= transformed-data (get @db/last-gantt flow-id))
 ;;         ;;           flow-id])
 ;;         ;(tap> [:gantt "updating" ])
-;;            (swap! last-gantt assoc flow-id transformed-data))
+;;            (swap! db/last-gantt assoc flow-id transformed-data))
 
 ;(def last-duration (reagent/atom nil))
 
 
-(def last-update (reagent/atom 0))
+
 
 ;; (defn transform-data [data svg-width flow-id]
 ;;   (let [log-scale? @gantt-log ;false ;true
@@ -6805,13 +6805,13 @@
 ;;     ;; (tap> [:gantt-data data])
 ;;     (when
 ;;      (and (not (empty? transformed-data))
-;;           (not (= transformed-data (get @last-gantt flow-id)))
-;;           (if running? (>= (- current-time @last-update) 1000) true))
+;;           (not (= transformed-data (get @db/last-gantt flow-id)))
+;;           (if running? (>= (- current-time @db/last-update) 1000) true))
 
-;;       (reset! last-update current-time)
-;;       (swap! last-gantt assoc flow-id transformed-data))
+;;       (reset! db/last-update current-time)
+;;       (swap! db/last-gantt assoc flow-id transformed-data))
 
-;;       (let [transformed-data (get @last-gantt flow-id)
+;;       (let [transformed-data (get @db/last-gantt flow-id)
 ;;             flow-select @(re-frame/subscribe [::selected-flow-block])]
 ;;         [:svg {:width "110%"
 ;;                :height (str (+ 20 (* height (count transformed-data)) (* gap (dec (count transformed-data)))) "px")}
@@ -6987,18 +6987,18 @@
         grouped-by-step (ordered-group grouped-by-step orderb)
         has-data? (and (not (empty? transformed-data))
                        ;(not (empty? (vals grouped-by-step)))
-                       (not (= grouped-by-step (get @last-gantt flow-id {})))
-                       (if running? (>= (- current-time @last-update) 1000) true))]
+                       (not (= grouped-by-step (get @db/last-gantt flow-id {})))
+                       (if running? (>= (- current-time @db/last-update) 1000) true))]
 
     ;; (tap> [:t-group has-data? grouped-by-step transformed-data])
 
-    (when has-data?
-      (reset! last-update current-time)
-      (swap! last-gantt assoc flow-id grouped-by-step))
+    (when (or has-data? (empty? (get @db/last-gantt flow-id {})))
+      (reset! db/last-update current-time)
+      (swap! db/last-gantt assoc flow-id grouped-by-step))
 
     ;; Render SVG
     (let [flow-select @(re-frame/subscribe [::selected-flow-block])
-          grouped-by-stepc (get @last-gantt flow-id {})]
+          grouped-by-stepc (get @db/last-gantt flow-id {})]
       [:svg {:width "110%"
              :height (str (+ 20 (* height (count grouped-by-stepc)) (* gap (dec (count grouped-by-stepc)))) "px")}
        (try
@@ -7038,7 +7038,7 @@
         pw (* pw 0.33)
         gw (* 0.46 pw)
         left 35 top 73
-        react! [@(re-frame/subscribe [::http/flow-results]) @gantt-log @last-update]
+        react! [@(re-frame/subscribe [::http/flow-results]) @gantt-log @db/last-update]
         bg-height (+ (* (count orderb) 37) 36)
         running? @(re-frame/subscribe [::is-running? :* flow-id])
         ;data (get-in @(re-frame/subscribe [::http/flow-results]) [:tracker flow-id] {})
@@ -7046,7 +7046,7 @@
         ddata (apply concat (for [[_ v] data] v))
         ;;_ (tap> [:ddata ddata])
         sstart (apply min (for [{:keys [start]} ddata] start))
-        eend (if running? (.now js/Date) ;@last-update
+        eend (if running? (.now js/Date) ;@db/last-update
                  (apply max (for [{:keys [end]} ddata] end)))
         duration (str (ut/nf (- eend sstart)) " ms")
         bdr (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))]

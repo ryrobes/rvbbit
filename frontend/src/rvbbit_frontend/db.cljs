@@ -31,6 +31,9 @@
 
 (defonce kick-alert (reagent/atom false))
 
+(defonce last-gantt (reagent/atom {}))
+(def last-update (reagent/atom 0))
+
 (def zoomer (reagent/atom nil))
 
 (defonce flow-browser-panel? (reagent/atom true))

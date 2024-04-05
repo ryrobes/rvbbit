@@ -2325,7 +2325,7 @@
                                    output
                                    {:image file-image ;; as unprocessed as we can w/o being a file path
                                     :first-stage-flowmap flowmap
-                                    ;:tracker {}
+                                    ;;:tracker (get @tracker-history flow-id [])
                                     :return-map (get @flow-db/results-atom post-id)
                                     :return-maps (select-keys @flow-db/results-atom relevant-keys) ;; in case no-return? is true
                                     :return-val return-val} ;; in case no-return? is true

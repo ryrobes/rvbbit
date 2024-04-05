@@ -1056,6 +1056,8 @@
          flowmaps-connections (get new-db :flowmaps-connections)]
      ;(set-zoom-pan (if (empty? coords) db/based coords))
      ;(set-zoom-pan coords)
+     ;(swap! db/last-gantt assoc flow-id {})
+     ;(reset! db/last-update 0)
      (-> db
          ;(assoc :zoom-start coords)
          (assoc-in [:http-reqs :load-flow-history]
@@ -1066,7 +1068,7 @@
          (assoc-in [:flows flow-id :map] flowmaps)
          (assoc-in [:flows flow-id :opts] opts)
          (assoc-in [:flows flow-id :connections] flowmaps-connections)
-         (assoc-in [:flow-results :tracker] (get result :tracker))
+         (assoc-in [:flow-results :tracker] (get result :tracker-history))
          (assoc-in [:flow-results :return-map] (get result :return-map))
          (assoc-in [:flow-results :return-maps] (get result :return-maps))
          (assoc :selected-flow flow-id)))))
