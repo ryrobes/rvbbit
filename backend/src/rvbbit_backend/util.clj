@@ -1041,7 +1041,8 @@
   (cond
     (string? data) (if (and (is-base64? data) (> (count data) 3000)) "**huge base64 string**" data)
     (map? data) (into {} (map (fn [[k v]] [k (replace-large-base64 v)]) data))
-    (coll? data) (mapv replace-large-base64 data)
+    (vector? data) (mapv replace-large-base64 data)
+    (list? data) (doall (map replace-large-base64 data)) ;; use doall to realize the lazy sequence
     :else data))
 
 (defn limited [x & [flow-limit]]

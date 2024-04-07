@@ -8039,16 +8039,24 @@
  ::clean-up-reco-previews
  (fn [db [_]]
    (let [ks1      (vec (apply concat (for [k (keys (get-in db [:panels]))] (keys (get-in db [:panels k :queries])))))
-         sys-ks   (vec (filter #(or (cstr/ends-with? (str %) "-sys") (cstr/ends-with? (str %) "-sys2")) (keys (get db :data))))
+         sys-ks   (vec (filter #(or (cstr/ends-with? (str %) "-sys")
+                                    (cstr/ends-with? (str %) "-sys2")
+                                    (cstr/ends-with? (str %) "-sys*")) (keys (get db :data))))
+         ;;buffy-fragments (vec (filter #(cstr/ends-with? (str %) "-sys*") (keys (get db :data))))
          base-ks  (into (vec (keys (get db :base-sniff-queries))) [:reco-counts]) ;; why is reco-counts in here?
          ks       (into base-ks (into ks1 sys-ks))
          ks-all   (keys (get db :data)) ;;; hmmm, curious why I did this initially...
          keepers  (vec (filter #(not (cstr/starts-with? (str %) ":query-preview")) ks))
          client-name (get db :client-name)
          ;bye      (filter #(cstr/starts-with? (str %) ":query-preview") ks)
-         bye      (vec (cset/difference (set ks) (set ks-all)))
-         run-it?  (and (nil? @mad-libs-view) (not (= @db/editor-mode :vvv)) (not (= (count ks-all) (count ks))))]
-     ;;(tap> [:clean-up-on-isle-4 client-name run-it? :before (count ks-all) :after (count ks) :remove bye  :keep keepers])
+        ;;  bye      (vec (cset/difference (set ks) (set ks-all)))
+         run-it?  (or (and (nil? @mad-libs-view) (not (= @db/editor-mode :vvv)) (not (= (count ks-all) (count ks))))
+                      ;(> (count (filter #(cstr/ends-with? (str %) "-sys*") keepers)) 0)
+                      (and (get db :flows?) (get db :flow-editor?)) 
+                      )
+         ]
+     
+    ;; (tap> [:clean-up-on-isle-4 client-name run-it? :before (count ks-all) :after (count ks) :remove bye  :keep keepers])
     ;;  (tap> [:ut-atom-sizes
     ;;         (count (keys @ut/replacer-atom)) (count (keys @ut/clean-sql-atom))
     ;;         (count (keys @ut/deep-flatten-atom)) (count (keys @ut/format-map-atom))
@@ -8088,7 +8096,9 @@
            (assoc :post-meta (select-keys (get db :post-meta) keepers))
            (assoc :sql-str (select-keys (get db :sql-str) keepers))
            (assoc :sql-source (select-keys (get db :sql-source) keepers))
-           (assoc :query-history (select-keys (get db :query-history) keepers))
+           (assoc :query-history (select-keys (get db :query-history)
+                                              (filter #(not (cstr/ends-with? (str %) "-sys*")) keepers)))
+                                              ;; we DO want to rerun the buffy fragments used in flow UI
            (assoc :click-param (into {} (for [[k v] (get db :click-param)
                                               :when (and (not (cstr/starts-with? (str k) ":kit-"))
                                                          (not (nil? k))
@@ -9622,6 +9632,26 @@
                       :readOnly          true            ;true
                       :theme             (theme-pull :theme/codemirror-theme nil)}}]]) ;"ayu-mirage" ;"hopscotch"
 
+;; (re-frame/reg-sub
+;;  ::flowmap-raw ;; dupe from flows.cljs - combine with new lower namespace  TODO
+;;  (fn [db]
+;;    (let [fmaps (get-in db [:flows (get db :selected-flow) :map] {})
+;;          fmaps (into {} (for [[k v] fmaps
+;;                               :when (get v :w)]
+;;                           {k v}))]
+;;      fmaps)))
+
+;; (re-frame/reg-sub
+;;  ::opts-map ;; dupe from flows.cljs - combine with new lower namespace  TODO
+;;  (fn [db _]
+;;    (get-in db [:flows (get db :selected-flow) :opts]
+;;            {:retry-on-error? false :retries 5 :close-on-done? true})))
+
+;; (re-frame/reg-sub
+;;  ::flowmap-connections ;; dupe from flows.cljs - combine with new lower namespace  TODO
+;;  (fn [db]
+;;    (vec (get-in db [:flows (get db :selected-flow) :connections] []))))
+
 
 (defonce progress-bars (reagent.core/atom {}))
 (defonce progress-loops (reagent.core/atom {}))
@@ -10109,6 +10139,11 @@
                                                                                                                                        (merge base-opts
                                                                                                                                               {:overrides overrides})
                                                                                                                                        base-opts)
+                                                                                                                              ;;  :file-image {:flowmaps @(re-frame/subscribe [::flowmap-raw])
+                                                                                                                              ;;               :opts @(re-frame/subscribe [::opts-map])
+                                                                                                                              ;;               :zoom @db/pan-zoom-offsets
+                                                                                                                              ;;               :flow-id flow-id
+                                                                                                                              ;;               :flowmaps-connections @(re-frame/subscribe [::flowmap-connections])}
                                                                                                                                :client-name client-name
                                                                                                                                :keypath [:panels panel-key :views selected-view]}
                                                                                                                   :on-response [::http/socket-response]
@@ -10573,6 +10608,11 @@
                                                               :flowmap flow-id
                                                               :no-return? true
                                                               :opts (merge base-opts {:overrides overrides})
+                                                              ;; :file-image {:flowmaps @(re-frame/subscribe [::flowmap-raw])
+                                                              ;;              :opts @(re-frame/subscribe [::opts-map])
+                                                              ;;              :zoom @db/pan-zoom-offsets
+                                                              ;;              :flow-id flow-id
+                                                              ;;              :flowmaps-connections @(re-frame/subscribe [::flowmap-connections])}
                                                               :client-name client-name
                                                               :keypath [:panels panel-key :views selected-view]}
                                                  :on-response [::http/socket-response]
@@ -10743,7 +10783,9 @@
                                                                       (get-in v [:from 0])))))))
         base-table-sniffs      (into {} (for [t base-tables]
                                           ;(when (keyword? t)
-                                          {t {:select [:*] :from [t] :limit 111}}))
+                                          {t {:select [:*] 
+                                              :connection-id (if (some #(= t %) ["channel_history" "fn_history" "flows_history"]) "flows-db" "system-db")
+                                              :from [t] :limit 111}}))
 
         templated-strings-vals (ut/deep-template-find body)
         templates?              (not (empty? templated-strings-vals))

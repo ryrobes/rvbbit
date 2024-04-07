@@ -318,11 +318,19 @@
 
 (def is-large-base64-atom (atom {}))
 
+;; (defn replace-large-base64-fn [data]
+;;   (cond
+;;     (string? data) (if (and (is-base64? data) (> (count data) 3000)) "**huge base64 string**" data)
+;;     (map? data) (into {} (map (fn [[k v]] [k (replace-large-base64-fn v)]) data))
+;;     (coll? data) (mapv replace-large-base64-fn data)
+;;     :else data))
+
 (defn replace-large-base64-fn [data]
   (cond
     (string? data) (if (and (is-base64? data) (> (count data) 3000)) "**huge base64 string**" data)
     (map? data) (into {} (map (fn [[k v]] [k (replace-large-base64-fn v)]) data))
-    (coll? data) (mapv replace-large-base64-fn data)
+    (vector? data) (mapv replace-large-base64-fn data)
+    (list? data) (doall (map replace-large-base64-fn data)) ;; dont want to covert lists to vectors like old version above!!
     :else data))
 
 (defn replace-large-base64 [data]

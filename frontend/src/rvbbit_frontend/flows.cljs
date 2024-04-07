@@ -72,7 +72,7 @@
 (defonce title-edit-idx (reagent/atom nil))
 (defonce drop-toggle? (reagent/atom false))
 (def snap-to-grid 25)
-(defonce flow-editor-system-mode (reagent/atom ["flows running" 600]))
+(defonce flow-editor-system-mode (reagent/atom ["flows running" 800]))
 (defonce channel-holster (reagent/atom {}))
 
 (def canvas-width 7500)
@@ -4311,7 +4311,7 @@
     ;;(tap> [:dbg? (cstr/includes? (str title) "debugger")])
     [re-com/v-box
      ;:padding "2px"
-     :width (px (- dyn-width 15)) ;; "586px"
+     :width "100%" ;(px (- dyn-width 15)) ;; "586px"
      :style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
              :font-size "12px"
              :transition "width 0.2s"
@@ -4854,16 +4854,20 @@
                       :fill    :theme/editor-outer-rim-color}]]]}
            5.5 11]])
 
+(defonce last-loaded-run-id (reagent/atom nil))
+
 (defn settings-block [flow-id ttype]
   (let [flow-select @(re-frame/subscribe [::selected-flow-block])
         flowmaps @(re-frame/subscribe [::flowmap-raw])
         dyn-width (last @flow-editor-system-mode)
+        panel-height (* (.-innerHeight js/window) 0.50)
+        panel-height-bricks (/ panel-height bricks/brick-size)
         ;flow-id @(re-frame/subscribe [::selected-flow])
         read-only-flow? (true? (cstr/includes? flow-id "/"))]
     (cond
       (= ttype :run-history)
       (let [viz1 {:queries
-                  {:gen-viz-1090
+                  {:gen-viz-1090aa
                    {:select   [[[[:count 1]] :value]
                                [[:substr :start_ts 0 11] :day]]
                     :connection-id "flows-db"
@@ -4919,7 +4923,7 @@
                           :enableGridY true
                           :height 210
                           :margin {:top 0 :right 5 :bottom 80 :left 45}
-                          :data :gen-viz-1090}]}
+                          :data :gen-viz-1090aa}]}
             vselected? @(re-frame/subscribe [::conn/clicked-parameter-key [:virtual-panel/flow-day]])
             grid-menu {:select
                        [:flow_id
@@ -4930,8 +4934,8 @@
                        :where (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
                        :order-by [[1 :asc]]
                        :from [[:flow_history :tt336aa]]}
-            gm-kw (str "kick-" (hash grid-menu))
-            ;viz-kw (str "kick-" (hash viz1))
+            gm-kw (str "kick-" (hash grid-menu) "-sys*")
+            ;viz-kw (str "kick-" (hash viz1) "-sys*")
             selected? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str gm-kw "/flow_id"))]])
 
             ;; grid1 {:select
@@ -4952,30 +4956,46 @@
             ;;        :from [[:channel_history :tt336]]}
             grid1 {:select
                    [:flow_id
-                    :run_id :start_ts 
+                    :run_id :start_ts
                     :elapsed_seconds
                     :human_elapsed
-                    [[:case [:= :in_error 1] "error" :else "success"] :result]
-                    ]
+                    [[:case [:= :in_error 1] "error" :else "success"] :result]]
                    :connection-id "flows-db"
                    :group-by [1 2]
-                   :col-widths { :flow_id 320 :elapsed_seconds 115 :run_id 70 :human_elapsed 140 :result 65 :start_ts 145}
+                   :style-rules {[:* :highlight-8369aaa1]
+                                 {:logic [:= :in_error 1]
+                                  :style
+                                  {:background-color "#FF000011"
+                                   :border "1px solid #FF000077"}}}
+                   :col-widths {:flow_id 320 :elapsed_seconds 115 :run_id 70 :human_elapsed 140 :result 65 :start_ts 145}
                    :where [:and
                            (if selected? [:= :flow_id (keyword (str gm-kw "/flow_id"))] [:= 1 1])
                            (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])]
                    :order-by [[:start_ts :desc]]
                    :from [[:flow_history :tt336a]]}
-            grid-kw (str "kick-" (hash grid1))
-            run-selected? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str gm-kw "/flow_id"))]])
-            grid2 {:select
-                   [:*]
+            grid-kw (str "kick-" (hash grid1) "-sys*")
+            selected-run-id @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])
+            run-selected? (not (nil? selected-run-id))
+            grid2 {:select [:*]
                    :connection-id "flows-db"
-                   ;:group-by [1 2]
                    :col-widths {:value 500}
                    :where (if run-selected? [:= :run_id (keyword (str grid-kw "/run_id"))] [:= 1 0])
                    :order-by [[:start_ts :desc]]
                    :from [[:fn_history :tt87336]]}
-            grid2-kw (str "kick-" (hash grid2))]
+            grid3 {:select [:*]
+                   :connection-id "flows-db"
+                   :col-widths {:value 500}
+                   :where (if run-selected? [:= :run_id (keyword (str grid-kw "/run_id"))] [:= 1 0])
+                   :order-by [[:start_ts :desc]]
+                   :from [[:channel_history :tt87336]]}
+            grid2-kw (str "kick-" (hash grid2) "-sys*")
+            ]
+
+        (when (and (not= @last-loaded-run-id selected-run-id) (not (nil? selected-run-id)))
+        ;; ^^ if is is changed and not nil - swap the loaded flow !!!
+          (reset! last-loaded-run-id selected-run-id)
+          ;;(js/alert (str selected-run-id))
+          (re-frame/dispatch [::http/load-flow-history selected-run-id]))
 
         [re-com/v-box
                  ;:align :center
@@ -4988,63 +5008,97 @@
                      :width (px dyn-width)
                      :height "175px"
                      :style {:font-size "15px"}
-                     :child [buffy/render-honey-comb-fragments viz1 (/ dyn-width 50) 22]]
+                     :child [buffy/render-honey-comb-fragments viz1 (/ dyn-width 50) 22 true]]
                     [re-com/h-box
                      :children
                      [[re-com/box
                        :size "none"
                        ;:width "595px"
-                       :height "275px"
+                       ;:height "275px"
                        :align :center :justify :center
                        :style {:font-size "15px"}
-                       :child [buffy/render-honey-comb-fragments grid-menu (* (/ dyn-width 50) 0.25) 6]]
+                       :child [buffy/render-honey-comb-fragments grid-menu (* (/ dyn-width 50) 0.25) 10 true]]
                       [re-com/box
                        :size "none"
                        ;:width "595px"
-                       :height "275px"
+                       ;:height "275px"
                        :align :center :justify :center
                        :style {:font-size "15px"}
-                       :child [buffy/render-honey-comb-fragments grid1 (* (/ dyn-width 50) 0.75) 6]]]]
+                       :child [buffy/render-honey-comb-fragments grid1 (* (/ dyn-width 50) 0.75) 10 true]]]]
                     ;; [buffy/render-honey-comb-fragments [:box :child [:string (keyword (str grid-kw "/flow_id"))]]  (- (/ dyn-width 50) 1) 6]
                     [buffy/render-honey-comb-fragments [:h-box :size "auto"
                                                         :justify :between :align :center
                                                         :gap "10px" :padding "8px"
                                                         :children
-                                                        ["filters: "
+                                                        [;"filters: "
                                                          [:string :virtual-panel/flow-day]
                                                          [:string (keyword (str gm-kw "/flow_id"))]
-                                                         [:string [(keyword (str grid-kw "/run_id")) " "]]]]  (- (/ dyn-width 50) 1) 6]
+                                                         [:string [(keyword (str grid-kw "/run_id")) " "]]]]  (- (/ dyn-width 50) 1) 6 true]
 
-                    (let [run-id @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])]
-                      [re-com/box 
-                       :style {:cursor "pointer"}
-                       :attr {:on-click #(re-frame/dispatch [::http/load-flow-history run-id])}
-                       :child (str run-id)])
+                    ;; [re-com/box :child (str "flow value, overrides, inputs (even if static)" selected-run-id)]
 
-                    [re-com/box
-                     :size "none"
-                     ;:width "595px"
-                     ;:height "275px"
-                     :align :center :justify :center
-                     :style {:font-size "15px"}
-                     :child [buffy/render-honey-comb-fragments grid2 (- (/ dyn-width 50) 1) 10]]
+                    ;; (let [run-id @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])]
+                    ;;   [re-com/box
+                    ;;    :style {:cursor "pointer"}
+                    ;;    :attr {:on-click #(re-frame/dispatch [::http/load-flow-history run-id])}
+                    ;;    :child (str run-id)])
+
+                    [re-com/gap :size "10px"]
+
+                    (when run-selected?
+                      [flow-details-block-container "flow block results log*" :system :system
+                       [re-com/box
+                        :size "none"
+                      ;:width "595px"
+                      ;:height "275px"
+                        :align :center :justify :center
+                        :style {:font-size "15px"}
+                        :child [buffy/render-honey-comb-fragments grid2
+                                (- (/ dyn-width 50) 1)
+                                (/ panel-height-bricks 2) ;; 10
+                                true]] ; flow-id orderb true 570 nil ;366
+                       "zmdi-dns"])
+
+                    (when run-selected?
+                      [re-com/gap :size "10px"])
+
+                    (when run-selected?
+                      [flow-details-block-container "flow channel results log*" :system :system
+                       [re-com/box
+                        :size "none"
+                      ;:width "595px"
+                      ;:height "275px"
+                        :align :center :justify :center
+                        :style {:font-size "15px"}
+                        :child [buffy/render-honey-comb-fragments grid3
+                                (- (/ dyn-width 50) 1)
+                                (/ panel-height-bricks 2) ;;10
+                                true]] ; flow-id orderb true 570 nil ;366
+                       "zmdi-dns"])
+
+                    [re-com/gap :size "10px"]
+
+                    ;; [re-com/box :child (str panel-height-bricks " " panel-height)]
+
 
                     ;[re-com/box :child (str @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value")) ]]))]
+
                     (let [pval @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]])
                           blk @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/block"))]])
                           flw @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/flow_id"))]])
                           pval (try (edn/read-string pval) (catch :default _ (pr-str pval)))]
-                      [re-com/box
-                       :height "300px" :size "none"
-                       :style {;:border "1px solid white" 
-                               :overflow "auto"}
-                       :child (when pval
-                                (if (or (map? pval) (vector? pval))
-                                  [map-boxes2 pval
-                                   blk
-                                   (str flw " / " blk)
-                                   [] :output (if (vector? pval) "vector" "map") true]
-                                  [re-com/box :child (pr-str @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]]))]))])]])
+                      (when pval
+                        [re-com/box
+                         :height "300px" :size "none"
+                         :style {;:border "1px solid white" 
+                                 :overflow "auto"}
+                         :child (when pval
+                                  (if (or (map? pval) (vector? pval))
+                                    [map-boxes2 pval
+                                     blk
+                                     (str flw " / " blk)
+                                     [] :output (if (vector? pval) "vector" "map") true]
+                                    [re-com/box :child (pr-str @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]]))]))]))]])
 
       (= ttype :flow-browser)
       [re-com/h-box
@@ -5378,6 +5432,7 @@
                  ["flow history" 1200]]
         ;read-only-flow? (true? (cstr/includes? flow-id "/"))
         ;flow-id-regex #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores, hypens, numbers
+
         sql-calls {:flow-fn-categories-sys {:select [:category]
                                             :from [:flow_functions]
                                             :group-by [1]}
@@ -5496,12 +5551,12 @@
 
                       (= (first @flow-editor-system-mode) "flow browser")
 
-                      [flow-details-block-container "selected module*" :system :system
+                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
                        [settings-block flow-id :flow-browser] "zmdi-chart-donut"]
 
                       (= (first @flow-editor-system-mode) "flow parts")
 
-                      [flow-details-block-container "selected module*" :system :system
+                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
                        [settings-block flow-id :part-browser] "zmdi-chart-donut"]
 
                       :else [re-com/box :child "got nothing"])
@@ -5515,12 +5570,12 @@
 
                       (= (first @flow-editor-system-mode) "scheduler")
 
-                      [flow-details-block-container "selected module*" :system :system
+                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
                        [settings-block flow-id :scheduler] "zmdi-chart-donut"]
 
                       (= (first @flow-editor-system-mode) "flow history")
 
-                      [flow-details-block-container "selected module*" :system :system
+                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
                        [settings-block flow-id :run-history] "zmdi-chart-donut"]
 
                       (= (first @flow-editor-system-mode) "flows running")
@@ -6713,7 +6768,7 @@
 ;;                :raw-duration duration-ms}))
 ;;           sorted-data-pairs)))
 
-(defonce gantt-log (reagent/atom true))
+(defonce gantt-log (reagent/atom false))
 
 (re-frame/reg-sub
  ::ccounter
@@ -6990,9 +7045,11 @@
                        (not (= grouped-by-step (get @db/last-gantt flow-id {})))
                        (if running? (>= (- current-time @db/last-update) 1000) true))]
 
-    ;; (tap> [:t-group has-data? grouped-by-step transformed-data])
+    ;;(tap> [:t-group data transformed-data grouped-by-step has-data? (= -1 @db/last-update) (empty? (get @db/last-gantt flow-id {})) grouped-by-step transformed-data])
 
-    (when (or has-data? (empty? (get @db/last-gantt flow-id {})))
+    (when (or has-data? ;;true 
+              (= -1 @db/last-update)
+              (empty? (get @db/last-gantt flow-id {})))
       (reset! db/last-update current-time)
       (swap! db/last-gantt assoc flow-id grouped-by-step))
 
@@ -7038,7 +7095,7 @@
         pw (* pw 0.33)
         gw (* 0.46 pw)
         left 35 top 73
-        react! [@(re-frame/subscribe [::http/flow-results]) @gantt-log @db/last-update]
+        react! [@(re-frame/subscribe [::http/flow-results]) @gantt-log @db/last-update @(re-frame/subscribe [::http/flow-results-tracker flow-id])]
         bg-height (+ (* (count orderb) 37) 36)
         running? @(re-frame/subscribe [::is-running? :* flow-id])
         ;data (get-in @(re-frame/subscribe [::http/flow-results]) [:tracker flow-id] {})
@@ -7050,6 +7107,8 @@
                  (apply max (for [{:keys [end]} ddata] end)))
         duration (str (ut/nf (- eend sstart)) " ms")
         bdr (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))]
+    
+    ;; (tap> [:gantt-container flow-id data orderb in-sidebar? pw max-height   sstart eend duration bdr])
 
     (if in-sidebar?
 
@@ -8140,6 +8199,7 @@
         chans-open? @(re-frame/subscribe [::bricks/flow-channels-open? flow-id])
         has-done? (has-done?)
         panel-height (* (.-innerHeight js/window) hpct) 
+        flow-select @(re-frame/subscribe [::selected-flow-block])
         ;; _ (tap> [:sizes ww hh
         ;;          (.-innerWidth js/window)
         ;;          (.-innerHeight js/window)])
@@ -8263,17 +8323,23 @@
                                        [re-com/h-box
                                         :gap "2px"
                                         :children  [[re-com/h-box
-                                                     :children (for [[v [file-path name]] (get @(re-frame/subscribe [::http/flow-results]) :run-refs [])]
+                                                     :children (for [[v [file-path name]] 
+                                                                     (into 
+                                                                      (for [[k v] @(re-frame/subscribe [::http/flows])] [k nil])
+                                                                      (get @(re-frame/subscribe [::http/flow-results]) :run-refs []))
+                                                                     ;(get @(re-frame/subscribe [::http/flows]) :run-refs [])
+                                                                     ]
                                                                  [re-com/box :child (str v)
                                                     ;;  :attr {:on-click #(do (swap! chat-mode assoc kp c)
                                                     ;;                        (swap! kit-mode assoc kp v))}
-                                                                  :attr {:on-click #(let [sub-flow-exec? (not (nil? file-path))]
+                                                                  :attr {:on-click #(let [sub-flow-exec? (and (string? file-path) (not (nil? file-path)))]
                                                                                       (if sub-flow-exec?
                                                                                         (re-frame/dispatch [::http/load-flow-w-alias file-path v])
                                                                                         (re-frame/dispatch [::set-selected-flow (str v)]))
-                                                                                      (js/setTimeout (fn []
-                                                                                                       (.zoomToElement @db/zoomer @(re-frame/subscribe [::get-flow-brick]) 0.8))
-                                                                                                     1000))}
+                                                                                      ;; (js/setTimeout (fn []
+                                                                                      ;;                  (.zoomToElement @db/zoomer @(re-frame/subscribe [::get-flow-brick]) 0.8))
+                                                                                      ;;                1000)
+                                                                                      )}
 
                                                                   :style (if (= (str v) (str flow-id))
                                                              ; {:background-color (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500") :color "black"}
@@ -8554,7 +8620,9 @@
 
                                                                         :left (if @(re-frame/subscribe [::bricks/flow-editor?]) 
                                                                                 ;;640
-                                                                                (+ (last @flow-editor-system-mode) 40)
+                                                                                (if (nil? flow-select)
+                                                                                  (+ (last @flow-editor-system-mode) 40)
+                                                                                  640)
                                                                                 45)
                                                                         :bottom 0}
                                                                 :children [(when has-done?

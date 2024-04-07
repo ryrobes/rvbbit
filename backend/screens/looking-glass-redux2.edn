@@ -1,9 +1,115 @@
 {:orders
- {:reco-counts [:table_name :cnt], :flows-sys [:flow_id :file_path :last_modified]},
+ {:reco-counts [:table_name :cnt],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :tmp--477652816-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :connections-sys [:database_name :connection_id],
+  :fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :tmp-748772413-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated]},
  :reco-preview nil,
  :sql-source {},
  :meta
- {:gen-viz-1132
+ {:fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"is_live" 1, "sample" 1, "block_meta" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"TEXT" 7, "TIMESTAMP" 1, "BOOLEAN" 1},
+     :cardinality 33},
+    :data_type
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"string" 7, "datetime" 1, "boolean" 1},
+     :cardinality 33}},
+   :rowcount 9},
+  :tmp--477652816-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-5919 :views :healthy-cerise-crane]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":healthy-cerise-crane" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-04-05 09:00:56" 1, "2024-04-05 09:01:05" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-5919" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"([1 :syntax] [1 :height-int] [1 :width-int] [1 :kp 1] [1 :kp 0] [1 :kp] [1] [0])"
+      1,
+      "([1 :syntax] [1] [0])" 1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":prominent-baby-blue-skunk-8" 2},
+     :cardinality 50},
+    :pre_data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"nil" 1,
+      "[:open-input {:kp [:param :healthy-cerise-crane], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"clojure\"}]"
+      1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[:open-input {:kp [:param :healthy-cerise-crane], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"clojure\"}]"
+      1,
+      "[nil {:syntax \"text\"}]" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[:open-input {:kp [:param :healthy-cerise-crane], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"clojure\"}]"
+      1,
+      "[:open-input {:kp [:param :healthy-cerise-crane], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"text\"}]"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
+  :gen-viz-1132
   {:fields
    {:rows
     {:data-type "integer",
@@ -18,6 +124,45 @@
      :commons {"unknown" 1, "string" 1, "integer" 1},
      :cardinality 100}},
    :rowcount 7},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 25},
+     :cardinality 3},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 25},
+     :cardinality 3},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"system-db" 25},
+     :cardinality 3},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 25},
+     :cardinality 3},
+    :table_name
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons {"connections" 1, "board_history" 1, "client_items" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 15,
+     :group-by? false,
+     :commons {6 4, 5 3, 11 2},
+     :cardinality 60}},
+   :rowcount 25},
   :client-items-drag-item-key-5
   {:fields
    {:item_type
@@ -291,13 +436,13 @@
   {:fields
    {:flow_id
     {:data-type "string",
-     :distinct 85,
+     :distinct 86,
      :group-by? true,
      :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
      :cardinality 97},
     :file_path
     {:data-type "string",
-     :distinct 87,
+     :distinct 88,
      :group-by? true,
      :commons
      {"./flows/stitches-math.edn" 1,
@@ -306,12 +451,88 @@
      :cardinality 100},
     :last_modified
     {:data-type "string",
-     :distinct 17,
+     :distinct 18,
      :group-by? true,
      :commons
      {"2024-03-12 02:37:43" 71, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
-     :cardinality 19}},
-   :rowcount 87},
+     :cardinality 20}},
+   :rowcount 88},
+  :tmp-748772413-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-10627 :views :supporting-tan-bear]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":supporting-tan-bear" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-04-06 13:44:06" 1, "2024-04-06 13:44:13" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-10627" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"([1 :syntax] [1 :height-int] [1 :width-int] [1 :kp 1] [1 :kp 0] [1 :kp] [1] [0])"
+      1,
+      "([1 :syntax] [1] [0])" 1},
+     :cardinality 100},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":prominent-baby-blue-skunk-8" 2},
+     :cardinality 50},
+    :pre_data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"nil" 1,
+      "[:open-input {:kp [:param :supporting-tan-bear], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"clojure\"}]"
+      1},
+     :cardinality 100},
+    :diff
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[:open-input {:kp [:param :supporting-tan-bear], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"clojure\"}]"
+      1,
+      "[nil {:syntax \"text\"}]" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"[:open-input {:kp [:param :supporting-tan-bear], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"clojure\"}]"
+      1,
+      "[:open-input {:kp [:param :supporting-tan-bear], :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"text\"}]"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -436,6 +657,21 @@
      :commons {1 500},
      :cardinality 0}},
    :rowcount 500},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -637,8 +873,12 @@
      :commons {1 5, 199 1, 1092 1},
      :cardinality 86}},
    :rowcount 29}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys 137},
+  :system-fields-list* {:fields-sys 170}},
  :runstream-drops nil,
- :data-hash 870727889,
+ :data-hash 1752014930,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -837,29 +1077,29 @@
  {"openai-image-gen-ladder"
   {:open? true,
    :values
-   {:prompt {:value :param/active-silver-buffalo, :source :param, :open? false},
+   {:prompt {:value :param/spiritual-peach-boar, :source :param, :open? false},
     :style-param {:open? true, :value "vivid"},
-    :prompt-2 {:value :param/quiet-peach-armadillo, :source :param},
-    :prompt-3 {:value :param/gorgeous-blush-eagle, :source :param},
-    :prompt-4 {:value :param/reliable-coral-moose, :source :param},
-    :prompt-5 {:value :param/skillful-viridian-falcon, :source :param}},
+    :prompt-2 {:value :param/supporting-tan-bear, :source :param},
+    :prompt-3 {:value nil, :source nil},
+    :prompt-4 {:value nil, :source nil},
+    :prompt-5 {:value nil, :source nil}},
    :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [500420543 434373639 4294705152],
+ :memory [737393960 630511616 4294705152],
  :status-data
  {"kick-test!"
   {:kick
    {:data
     [{:sent! "kick-test!",
-      :to :respected-icosahedral-clam-1,
-      :at "2024-04-02 23:53:22",
+      :to :prominent-baby-blue-skunk-8,
+      :at "2024-04-05 04:45:12",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-04-02 23:53:22 - query ran in 0 ms."],
+        [{:content ["2024-04-05 04:45:12 - query ran in 0 ms."],
           :name "query-log-:flows-sys",
-          :order 1712116402,
+          :order 1712306712,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
@@ -876,7 +1116,7 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-04-04 16:51:52",
+      :at "2024-04-06 22:17:03",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -897,12 +1137,12 @@
          :style
          {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "45 seconds "]
+         "39 seconds "]
         [:box
          :style
          {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "returns: ./images/gen/b64-image-96139-22472.png"]]]
+         "returns: ./images/gen/b64-image-13503-94204.png"]]]
       10
       1.35
       9]
@@ -920,7 +1160,7 @@
   :client/proud-magenta-skunk-exiled-from-volcanic-arc>city-drag-26>city
   :flow/live-scratch-flow>*running?
   :flow/flow-forever>:final-math],
- :client-name :respected-icosahedral-clam-1,
+ :client-name :prominent-baby-blue-skunk-8,
  :runstreams-lookups
  {"openai-image-gen-ladder"
   {:open-inputs
@@ -949,14 +1189,14 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:created 1712116285, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
+     :sample "{:created 1712410700, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
     :prompt-5
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "USE EXACTLY THIS PROMPT: A highly detailed illustration show..."},
+     :sample "USE EXACTLY THIS PROMPT: A highly detailed highly stylized &..."},
     :node-js-color-thief-script
     {:type :map,
      :ttype :sub-flow,
@@ -964,14 +1204,14 @@
      :last? false,
      :defaults {},
      :sample
-     "{:dominantColor \"#c5a8b0\", :colorPalette [\"#c6abb2\" \"#071825..."},
+     "{:dominantColor \"#2a2639\", :colorPalette [\"#1f1e2e\" \"#bd6b9b..."},
     :dominant-color
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#c5a8b0"},
+     :sample "#2a2639"},
     :shell-command-1
     {:type :map,
      :ttype :shell-command,
@@ -996,7 +1236,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/tmp/rand-exif-107377.txt"},
+     :sample "/tmp/rand-exif-75334.txt"},
     :execute-shell-command
     {:type :map,
      :ttype :shell-command,
@@ -1010,14 +1250,14 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#c6abb2"},
+     :sample "#1f1e2e"},
     :prompt-2
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "A meticulously-detailed, hyperrealistic 16:9 digitally-rende..."},
+     :sample "For testing purposes, please use this prompt exactly as is:\n..."},
     :base-save-directory
     {:type :string,
      :ttype :open-block,
@@ -1032,14 +1272,14 @@
      :last? false,
      :defaults {},
      :sample
-     "{:dominantColor \"#c5a8b0\", :colorPalette [\"#c6abb2\" \"#071825..."},
+     "{:dominantColor \"#2a2639\", :colorPalette [\"#1f1e2e\" \"#bd6b9b..."},
     :stringify-exif-map
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt-asked \"USE EXACTLY THIS PROMPT: A highly detailed i..."},
+     :sample "{:prompt-asked \"a beautiful, young woman, of irish descent, ..."},
     :size-param
     {:type :string,
      :ttype :open-block,
@@ -1057,35 +1297,35 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "USE EXACTLY THIS PROMPT: A highly detailed illustration show..."},
+     :sample "a beautiful, young woman, of irish descent, standing in a dy..."},
     :write-file-1
     {:type :map,
      :ttype :write-file,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:status :ok, :file-path \"/tmp/rand-exif-107377.txt\"}"},
+     :sample "{:status :ok, :file-path \"/tmp/rand-exif-75334.txt\"}"},
     :save-base64-to-webp-file
     {:type :string,
      :ttype :save-base64-to-webp,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-98743-14901.png"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-47683-74556.png"},
     :prompt-4
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "A high-definition, highly stylized and artistic 16:9 illustr..."},
+     :sample "USE EXACTLY THIS PROMPT: A highly detailed illustration show..."},
     :request-body-map
     {:type :map,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt \"USE EXACTLY THIS PROMPT: A highly detailed illustr..."},
+     :sample "{:prompt \"a beautiful, young woman, of irish descent, standi..."},
     :base-web-directory
     {:type :string,
      :ttype :open-block,
@@ -1099,7 +1339,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "For testing purposes, use the prompt EXACTLY as is please:\n\n..."},
+     :sample "a beautiful, young woman, of irish descent, standing in a dy..."},
     :create-png-path
     {:type :string,
      :ttype :open-fn,
@@ -1120,7 +1360,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "cp /home/ryanr/rvbbit-out/b64-image-98743-14901.png /home/ry..."},
+     :sample "cp /home/ryanr/rvbbit-out/b64-image-47683-74556.png /home/ry..."},
     :hiccup-image-box-w-png
     {:type :vector,
      :ttype :open-fn,
@@ -1134,28 +1374,28 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-98743-14901.png"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-47683-74556.png"},
     :relative-url-path-for-png-version
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? true,
      :defaults {},
-     :sample "./images/gen/b64-image-98743-14901.png"},
+     :sample "./images/gen/b64-image-47683-74556.png"},
     :exif-map
     {:type :map,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt-asked \"USE EXACTLY THIS PROMPT: A highly detailed i..."},
+     :sample "{:prompt-asked \"a beautiful, young woman, of irish descent, ..."},
     :prompt-3
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "For testing purposes, please use this prompt exactly as is:\n..."},
+     :sample "A high-definition, hyperrealistic 16:9 image of a New Englan..."},
     :http-req-map
     {:type :map,
      :ttype :open-block,
@@ -1183,14 +1423,14 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/tmp/rand-exif-107377.txt"},
+     :sample "/tmp/rand-exif-75334.txt"},
     :output-revised-prompt
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "A highly detailed illustration showcasing a stunning, young,..."},
+     :sample "Detailed image of a beautiful, young Irish woman in her late..."},
     :style-param
     {:type :string,
      :ttype :open-block,
@@ -1203,30 +1443,30 @@
      :defaults {},
      :sample "vivid"}}}},
  :openai-api-key "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",
- :window {:w 4473, :h 1605},
+ :window {:w 5205, :h 1605},
  :post-meta
  {:gen-viz-1132 {:* {:rowcount 7}},
-  :client-items-drag-item-key-5 {:* {:rowcount 3425}},
-  :client-items-drag-20 {:* {:rowcount 7351}},
-  :client-items-drag-35 {:* {:rowcount 7351}},
+  :client-items-drag-item-key-5 {:* {:rowcount 5422}},
+  :client-items-drag-20 {:* {:rowcount 8309}},
+  :client-items-drag-35 {:* {:rowcount 8309}},
   :rowcnt-drag-7 {:* {:rowcount 1}},
-  :blocks-drag-44 {:* {:rowcount 2341}},
+  :blocks-drag-44 {:* {:rowcount 2345}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
-  :fields-drag-16 {:* {:rowcount 936}},
+  :fields-drag-16 {:* {:rowcount 1004}},
   :city-drag-26-1 {:* {:rowcount 3755}},
   :ufo-sightings-drag-9 {:* {:rowcount 67662}},
   :item-type-drag-5 {:* {:rowcount 7}},
-  :item-type-drag-0 {:* {:rowcount 1577}},
+  :item-type-drag-0 {:* {:rowcount 2731}},
   :duration-hours-drag-43 {:* {:rowcount 7103}},
   :city-drag-26 {:* {:rowcount 12346}},
-  :gen-viz-555 {:* {:rowcount 4}},
+  :gen-viz-555 {:* {:rowcount 7}},
   :state-drag-3 {:* {:rowcount 59}},
   :shape-drag-7 {:* {:rowcount 29}}},
  :flow-estimates
- {"openai-image-gen-ladder"
-  {:times 46, :run-id "227c411a-0341-47d9-a705-c3a7117b7c09"},
-  "client-keepalive" {:times nil, :run-id "bcd75d4b-12bf-41b8-b480-b748d96cce93"},
-  "quick-maths-v2" {:times nil, :run-id "3a688ea4-7212-4112-ba67-ad9bca6db0ec"}},
+ {"client-keepalive" {:times nil, :run-id "2772692f-ebd6-4b13-8ef8-d46ae4e48f6e"},
+  "openai-image-gen-ladder"
+  {:times 38.4, :run-id "484854eb-36af-4b25-bd1f-24c1bf4156cb"},
+  "flow-forever" {:times 4.1, :run-id "c184687c-d129-43c9-b090-f16a8300b081"}},
  :status
  {"kick-test!" {:kick :flows-sys},
   :heartbeat
@@ -1253,72 +1493,41 @@
  :rs-overrides-hashmap
  {"openai-image-gen-ladder"
   {:prompt
-   "PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. \n\nShe should have intricate tattoos but still be recognizably Alice, with features and attire that hint at her Alice in Wonderland identity. \n\nShe's engaged in a complex interaction with a wall filled with cut-out shapes, where she is fitting a piece into place. \n\nThe other side of the wall is operated by a whimsical machine, inserting and retracting shapes. The setting is a gritty urban environment with colorful neon lights providing atmospheric illumination, reminiscent of a Cyberpunk 2077 scene.\n\nShe is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque.",
+   "a beautiful, young white woman, of irish or scottish descent, standing in a dystopian cyberpunk  northeast America overgrown by a new england forest. late 20s. dark and moody with neon pinks, purples, and light blues, stormy, rainy ambiance, close up looking at the camera. long hair. high quality, highly detailed, intricate neck tattoos. gritty and atmospheric. cyberpunk and vaporwave aesthetic. almost as if she is tempting or daring you to come join her world. rabbit necklace. intricate rabbit tattoos. plump and pouty lips. volumptous. pinup style illustration.",
    :style-param "vivid",
    :prompt-2
-   "A meticulously-detailed, hyperrealistic 16:9 highly stylized & exaggerated pinup pinup noir femme fatale Playboy  style cyberpunk illustration of a wintery morning scene set in traditional New England, showcasing a unique mixture of rustic charm and futuristic, cyberpunk elements. The quaint town is enshrouded under a fresh white carpet of snow amidst a flurry storm, which creates an ambiance of slight grittiness. The architectural structures radiate a soft, inviting glow, tinted in hues of pastel pink and neon light blue. To the left side of the composition, a strikingly beautiful Irish woman in her early 30s is emphasised. Her attractive features include a buxom build, full pouty lips with a prominently larger lower lip, a perky nose, and an expression that cleverly combines satisfaction with a hint of alluring sophistication. Her flowing, slightly damp hair cascades over her neck and shoulders due to the falling snow. Intricately designed, Celtic-inspired tattoos of rabbits and scenes from nature beautifully cover her neck, collarbone, and shoulders. The timidly emerging morning sun from the horizon casts a gentle light upon her body, playing up the serene and slightly mysterious atmosphere created by the pre-dawn illumination. Her full, maternal figure basks in the sunlight, creating a visually pleasing interplay of light and shadow on her richly adorned body.  In a pinup style.",
-   :prompt-3
-   "For testing purposes, please use this prompt exactly as is:\n\nCraft in high definition, a stylized 16:9highly stylized & exaggerated pinup noir femme fatale Playboy  style cyberpunk illustration of a scene drawn from the traditional myths from New England, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing hair. Identify her with full, pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage can be seen as a blend of delight and enchantment, while the sight of intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and nusty overflowing physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, buxom, burlesque, augmenting the glow of her skin. Her dark makeup a contrast to her pale skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, providing the observer with an alluringly playful glance. In a pinup style.",
-   :prompt-4
-   "A high-definition, highly stylized and artistic 16:9 highly stylized & exaggerated pinup pinup noir femme fatale  Playboy style cyberpunk illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  \n\nShe has gloriously long hair. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest shine off her buxom body radiantly.\n\nShe is very buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. Burlesque. Flirty, Leaning up against a wall, and shooting the camera a coy, flirty look. In a pinup style.\n",
-   :prompt-5
-   "USE EXACTLY THIS PROMPT: A highly detailed highly stylized & exaggerated pinup noir femme fatale Playboy  style cyberpunk illustration showcasing a stunning, young, robust, and powerfully built Swedish woman in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen donning a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly.  In a pinup style."}},
- :panels-hash -620128720,
+   "a beautiful, buxom young white woman, of irish or scorrish descent, standing in a dystopian cyberpunk northeast America new england forest. late 20s. dark and moody with neon pinks, purples, and light blues, midnight. close up looking at the camera. long hair. high quality, highly detailed, intricate neck tattoos. gritty and atmospheric. cyberpunk and vaporwave aesthetic. sultry temptress. large rabbit necklace. intricate rabbit tattoos. plump and pouty lips. volumptous. pinup style illustration."}},
+ :panels-hash -47122056,
  :sessions
- (["fetching-chartreuse-locust-10.edn" "1 minute, 36 seconds" 96068]
-   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn"
-    "1 minute, 40 seconds"
-    100128]
+ (["free-ivory-echidna-of-dune-system.edn" "100 hours, 39 seconds" 360039342]
+   ["proud-magenta-skunk-exiled-from-volcanic-arc.edn"
+    "100 hours, 58 minutes, 32 seconds"
+    363512798]
+   ["good-cylindrical-ape-exiled-from-calanque.edn"
+    "101 hours, 6 minutes, 17 seconds"
+    363977827]
+   ["enchanting-cobalt-gull-banned-from-inlet.edn"
+    "101 hours, 6 minutes, 3 seconds"
+    363963344]
+   ["electrifying-pyramidal-platypus-banned-from-depressions.edn"
+    "112 hours, 55 minutes, 26 seconds"
+    406526155]
+   ["cool-magenta-mole-hailing-from-glen.edn"
+    "119 hours, 15 minutes, 55 seconds"
+    429355713]
    ["lucky-olive-fox-hailing-from-volcanic-dam.edn"
-    "127 hours, 10 minutes, 19 seconds"
-    457819099]
+    "180 hours, 35 minutes, 50 seconds"
+    650150695]
    ["creative-emerald-gnu-of-the-shore.edn"
-    "129 hours, 25 minutes, 28 seconds"
-    465928086]
+    "182 hours, 50 minutes, 59 seconds"
+    658259682]
    ["unreal-ovoid-serval-banned-from-salt-flat.edn"
-    "134 hours, 10 minutes, 53 seconds"
-    483053742]
-   ["honored-linear-owl-hailing-from-wadi.edn"
-    "134 hours, 40 minutes, 8 seconds"
-    484808274]
-   ["legendary-globular-frog-banned-from-plunge-pool.edn"
-    "134 hours, 41 minutes, 9 seconds"
-    484869753]
-   ["moving-elliptic-woodpecker-exiled-from-river.edn"
-    "137 hours, 48 minutes, 11 seconds"
-    496091959]
-   ["vibrant-burgundy-grasshopper-exiled-from-towhead.edn"
-    "140 hours, 5 minutes, 24 seconds"
-    504324213]
-   ["okay-prismatic-grasshopper-hailing-from-exhumed-river-channel.edn"
-    "161 hours, 39 seconds"
-    579639653]
-   ["simple-globular-lion-of-tepui.edn" "17 hours, 13 minutes, 38 seconds" 62018347]
-   ["open-elliptic-frog-of-volcanic-island.edn"
-    "17 hours, 2 minutes, 45 seconds"
-    61365742]
-   ["blissful-ivory-bird-banned-from-ravine.edn"
-    "186 hours, 23 minutes, 6 seconds"
-    670986210]
-   ["sparkling-hexagonal-bee-38.edn" "19 hours, 44 minutes, 42 seconds" 71082248]
-   ["upbeat-red-goose-of-submarine-canyon.edn" "19 minutes, 54 seconds" 1194673]
-   ["quick-circular-eagle-banned-from-karst-fenster.edn"
-    "190 hours, 42 minutes, 4 seconds"
-    686524741]
-   ["respected-icosahedral-clam-1.edn" "2 minutes, 26 seconds" 146472]
-   ["engaging-sapphire-frog-of-the-stratovolcano.edn"
-    "212 hours, 14 minutes, 50 seconds"
-    764090777]
-   ["awesome-pentagonal-swallow-banned-from-atoll.edn"
-    "244 hours, 41 minutes, 58 seconds"
-    880918476]
-   ["skillful-square-peafowl-hailing-from-lacustrine-terrace.edn"
-    "244 hours, 48 minutes, 15 seconds"
-    881295898]),
+    "187 hours, 36 minutes, 25 seconds"
+    675385338]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -300580243,
+ :user-params-hash 1405435513,
  :grid-recos? true,
- :session-hash 705996400,
+ :session-hash -1945057490,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -2140,6 +2349,21 @@
    :root [39 12],
    :tab "violet ferret",
    :selected-view :client-items-drag-35},
+  :block-5919
+  {:drag-meta {:type :open-input},
+   :w 6,
+   :selected-view :healthy-cerise-crane,
+   :h 16,
+   :views
+   {:healthy-cerise-crane
+    [:open-input
+     {:kp [:param :healthy-cerise-crane],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [90 1],
+   :name "block-5919"},
   :block-7893
   {:h 12,
    :w 13,
@@ -2371,6 +2595,36 @@
      :_last-run "20:15:34"}},
    :root [9 12],
    :tab "violet ferret"},
+  :block-7836
+  {:drag-meta {:type :open-input},
+   :w 6,
+   :selected-view :earnest-taupe-raccoon,
+   :h 12,
+   :views
+   {:earnest-taupe-raccoon
+    [:open-input
+     {:kp [:param :earnest-taupe-raccoon],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [90 17],
+   :name "block-7836"},
+  :block-2745
+  {:drag-meta {:type :open-input},
+   :w 6,
+   :selected-view :spiritual-peach-boar,
+   :h 16,
+   :views
+   {:spiritual-peach-boar
+    [:open-input
+     {:kp [:param :spiritual-peach-boar],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [96 1],
+   :name "block-2745"},
   :block-10376
   {:h 8,
    :w 15,
@@ -2501,6 +2755,21 @@
      :order-by [[:rowcnt :desc]]}},
    :root [39 19],
    :tab "violet ferret"},
+  :block-10627
+  {:drag-meta {:type :open-input},
+   :w 6,
+   :selected-view :supporting-tan-bear,
+   :h 12,
+   :views
+   {:supporting-tan-bear
+    [:open-input
+     {:kp [:param :supporting-tan-bear],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [96 17],
+   :name "block-10627"},
   :block-10777
   {:drag-meta {:type :open-input},
    :w 9,
@@ -2607,16 +2876,16 @@
    :views 0},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#dab696",
+   :openai-image-gen-ladder>pop-color "#d7799c",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-96139-22472.png",
+   "./images/gen/b64-image-13503-94204.png",
    :counting-loop>open-fn-2 44,
-   :openai-image-gen-ladder>*running? true,
+   :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
-   "Create an elaborate, noir, and exaggerated cyberpunk themed illustration. The subject should be a muscular, Swedish woman in her early 30s, recognized by her full-face and long, thick Viking braids. She's standing proudly amidst a Northeast American forest, particularly illustrating the picturesque New England wilderness at dusk. Her intense and captivating gaze meets the camera, emphasized by dramatic cyberpunk-vaporwave aesthetic lighting and her dark, mysterious eye makeup. An intriguingly mischievous smile enhances her allure. Intricate tattoos lavish her shoulders and collarbone, extending to her neck and forming an engaging narrative. She is also adorning a necklace with a rabbit pendant and the rabbit motifs are subtly integrated into her tattoos. The illustration should portray a balance between wonder, mystery, and allure. As dawn breaks, the sunlight illuminates her form compellingly and the image should carry the essence of a pinup style.",
+   "A striking image capturing a young Caucasian woman in her late 20s, possibly of Irish or Scottish heritage. She is standing amidst a dystopian cyberpunk setting of a forest in northeast New England, USA, under the cloak of midnight. The scene is imbued with moody tones of neon pinks, purples, and light blues. The woman is presented in a close-up shot, looking directly at the camera. Her long hair falls freely and she sports highly detailed, intricate neck tattoos, adding a gritty layer to the atmosphere. The aesthetic blends cyberpunk and vaporwave elements. She carries an aura of a sultry temptress. A large necklace shaped like a rabbit adorns her, complimenting the intricate rabbit tattoos. Her lips are plump and pouty, contributing to the overall pinup style illustration. The woman is portrayed as having a voluptuous figure.",
    :live-scratch-flow>*running? false,
    :openai-image-gen-ladder>hiccup-image-box-w-png-vw
    [:v-box
@@ -2651,8 +2920,8 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#242737",
-   :flow-forever>final-math nil},
+   :openai-image-gen-ladder>dominant-color "#303964",
+   :flow-forever>final-math 683.5},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",
    :file_path "./flows/openai-image-gen-ladder.edn",
@@ -2687,6 +2956,8 @@
     ""
     "Craft in high definition, a stylized 16:9 illustration of a scene drawn from the traditional myths from Scotland, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing brunette hair. Identify her with full, somewhat pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage is a blend of delight and enchantment, while intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and buxom physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, augmenting the glow of her skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, casting an alluringly playful glance."
     "Her dark makeup a stark contrast against her pale skin and supple complexion, huge lips, sharp nose, buxom, powerful, robust."],
+   :spiritual-peach-boar
+   ["a beautiful, young white woman, of irish or scottish descent, standing in a dystopian cyberpunk  northeast America overgrown by a new england forest. late 20s. dark and moody with neon pinks, purples, and light blues, stormy, rainy ambiance, close up looking at the camera. long hair. high quality, highly detailed, intricate neck tattoos. gritty and atmospheric. cyberpunk and vaporwave aesthetic. almost as if she is tempting or daring you to come join her world. rabbit necklace. intricate rabbit tattoos. plump and pouty lips. volumptous. pinup style illustration."],
    :reliable-coral-moose
    ["A high-definition, highly stylized and artistic 16:9 highly stylized & exaggerated pinup pinup noir femme fatale  Playboy style cyberpunk illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  "
     ""
@@ -2708,19 +2979,18 @@
     "Create a 16:9 high-definition, highly stylized & exaggerated pinup noir femme fatale Playboy  style cyberpunk illustration set against the natural beauty of Scotland's wilderness. The foreground features a captivating Caucasian woman in her late 20s, a brunette with remarkable beauty, a heavily buxom figure, accentuated by the ethereal glow of blue and pink twilight filtered through the dense forest. She has well-defined lips with her lower lip being more pronounced, and a daintily upturned nose. Her hair flows freely, resembling a cascading waterfall. Celtic-style tattoo patterns of rabbits and forest themes decorate her neck, collarbone, and shoulders, intensifying her allure. The interplay of light and shadow highlighting her curves, not unlike the subtle play of moonlight on water. Her attire consists of a delicate ribbon choker with a pendant necklace resting on her form. The woman leans against a stone wall, a playful yet intriguing pose, offering a sly, enticing glance towards the viewer. In a pinup style."],
    :enchanting-magenta-prairie-dog
    ["A high-definition, hyperreal, vivid 16:9 illustration of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene carries a slightly gritty atmosphere, with the town blanketed in snow and buildings emitting gentle pink and neon light blue illuminations. On the left side of the frame, a young and beautiful Irish woman, clearly in her early 30s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression on her large mouth - buxom and robust. Pin-up. Her long hair, slightly dampened with snow accumulated on it and her face, amplifies the intensity of the snowfall. She is adorned with intricate Celtic-style tattoos of rabbits and wilderness over her neck, collarbone, and shoulders. The pre-dawn light instills a serene yet enigmatic ambiance to the scene, emphasizing the synergy between the natural world and technological influence. As the sun rises, its light gleams off her body radiantly"],
-   :selected-view-data
-   [:open-input
-    {:kp [:param :enchanting-magenta-prairie-dog],
-     :width-int :panel-width+100,
-     :height-int :panel-height+80,
-     :syntax "clojure"}],
+   :selected-view-data nil,
    :skillful-viridian-falcon
    ["USE EXACTLY THIS PROMPT: A highly detailed highly stylized & exaggerated pinup noir femme fatale Playboy  style cyberpunk illustration showcasing a stunning, young, robust, and powerfully built Swedish woman in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen donning a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly.  In a pinup style."],
    :proud-cyan-giraffe
    ["For testing purposes, use the prompt EXACTLY as is please:"
     ""
     "This is a 16:9 high-definition, highly stylized & exaggerated pinup noir femme fatale Playboy  style cyberpunk illustration of a dreamlike scene set against the backdrop of Scotland's enchanting wilderness. In the scene, there's a young white Scottish woman, a brunette in her late 20s, her captivating beauty magnified by the glow of the ethereal blue and pink twilight emanating from the dense forest. Her lips are full and luscious, her lower lip more pronounced, and her nose, daintily upturned. This enchanting woman, who exudes both charm and mystery, with her hair flowing like a cascading waterfall. Intricate Celtic-style tattoos of rabbits and forest motifs adorn her neck, collarbone, and shoulders, enhancing her allure. The magical play of light reflecting off her voluptuous curves effortlessly catches the eye. On her neck wrapped a delicate ribbon choker, a long necklace resting against her form. Her pose is casual yet tantalizing, as she leans against a rough-hewn stone wall, her expression playful, casting a sly, inviting glance towards the observer."],
-   :selected-view [:views :enchanting-magenta-prairie-dog],
+   :healthy-cerise-crane
+   ["USE EXACTLY THIS PROMPT: A highly detailed illustration showcasing a stunning, young, robust, and powerfully built Swedish woman in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen donning a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly."],
+   :supporting-tan-bear
+   ["a beautiful, buxom young white woman, of irish or scorrish descent, standing in a dystopian cyberpunk northeast America new england forest. late 20s. dark and moody with neon pinks, purples, and light blues, midnight. close up looking at the camera. long hair. high quality, highly detailed, intricate neck tattoos. gritty and atmospheric. cyberpunk and vaporwave aesthetic. sultry temptress. large rabbit necklace. intricate rabbit tattoos. plump and pouty lips. volumptous. pinup style illustration."],
+   :selected-view [nil nil],
    :fabulous-pink-eagle
    ["I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS:"
     ""
@@ -2744,6 +3014,8 @@
    ["For testing purposes, please use this prompt exactly as is:"
     ""
     "Create a high-definition, stylized 16:9 highly stylized & exaggerated pinup pinup noir femme fatale Playboy  style cyberpunk illustration of a scene inspired by the traditional myths of Scotland. A majestic landscape holds a fantastic, other-worldly charm. At the center is a young and beautiful Caucasian woman in her late 20s with brunette hair that flows down gloriously. Her features are defined by full, pouty lips, with the bottom one slightly more prominent, and a slightly upturned nose. Her facial expression is a mix of pleasure and allure. Her body reveals intricate Celtic-style tattoos of rabbits and wilderness that grace her neck, collarbone, and shoulders - a magically buxom build. A mysterious, abstract play of blue and pink lights reflect off her robust and curvaceous body, enhancing the radiance of her skin. She is adorned with a choker ribbon and a long necklace, leaning against a wall with a wily, flirtatious look towards the viewer."],
+   :earnest-taupe-raccoon
+   ["A high-definition, hyperrealistic 16:9 image of a New England scene in the United States, just before dawn amidst a heavy snowstorm. This scene combines both traditional architectural elements and the essence of cyberpunk, creating a slightly gritty atmosphere. The town is adorned with snow, and buildings emit soft pink and neon light blue glows, demonstrating the blend of past and future. To the left of the frame, a youthful yet mature Irish woman, in her late 20s, poses expressively. She boasts full lips, a slightly upturned nose, and hair dappled with snowflakes, emphasizing the severity of the winter weather. Her skin is festooned with intricate Celtic-style tattoos of rabbits and wilderness on her neck, collarbone, shoulders, making her a representation of nature in the heart of technology. The light of the impending dawn casts a serene yet mysterious ambiance to the scene, signifying the fusion of the natural world and the influences of technology."],
    :composed-azure-fish
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup pinup noir femme fatale Playboy  style illustration showcasing a stunning, buxom, robust, and fit yet curvaceous white woman in her late 20s, posing and dressed as the Statue of Liberty, a slightly upturned nose, and a buxom yet slim figure. She holds and AR-15 rifle. She stands majestically at the port of an American New England scene with boats, American flags and cheering crowds with rifles. "
     ""
@@ -2754,7 +3026,7 @@
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. "
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
-   :selected-block :block-4862,
+   :selected-block :block-10627,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""

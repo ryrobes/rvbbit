@@ -335,6 +335,26 @@
  (fn [db _]
    (get db :client-name)))
 
+;; (re-frame/reg-sub
+;;  ::flowmap-raw ;; dupe from flows.cljs - combine with new lower namespace  TODO
+;;  (fn [db]
+;;    (let [fmaps (get-in db [:flows (get db :selected-flow) :map] {})
+;;          fmaps (into {} (for [[k v] fmaps
+;;                               :when (get v :w)]
+;;                           {k v}))]
+;;      fmaps)))
+
+;; (re-frame/reg-sub
+;;  ::opts-map ;; dupe from flows.cljs - combine with new lower namespace  TODO
+;;  (fn [db _]
+;;    (get-in db [:flows (get db :selected-flow) :opts]
+;;            {:retry-on-error? false :retries 5 :close-on-done? true})))
+
+;; (re-frame/reg-sub
+;;  ::flowmap-connections ;; dupe from flows.cljs - combine with new lower namespace  TODO
+;;  (fn [db]
+;;    (vec (get-in db [:flows (get db :selected-flow) :connections] []))))
+
 (defn start-flow [flow-id]
   (let [client-name @(re-frame/subscribe [::client-name])
         base-opts {:increment-id? false}
@@ -350,6 +370,11 @@
                                               (merge base-opts
                                                      {:overrides overrides})
                                               base-opts)
+                                      ;; :file-image {:flowmaps @(re-frame/subscribe [::flowmap-raw])
+                                      ;;              :opts @(re-frame/subscribe [::opts-map])
+                                      ;;              :zoom @db/pan-zoom-offsets
+                                      ;;              :flow-id flow-id
+                                      ;;              :flowmaps-connections @(re-frame/subscribe [::flowmap-connections])}
                                       :client-name client-name}
                          :on-response [::http/socket-response]
                          :on-timeout [::http/timeout-response]

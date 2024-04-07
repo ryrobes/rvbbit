@@ -2468,7 +2468,7 @@
 
 (defn flow-kill! [flow-id client-name]
   (future
-    (Thread/sleep 5000) ; wait for 5 seconds for the rest to die so we dont get overwritten by a dying thread
+    ;;(Thread/sleep 1000) ; wait for 5 seconds for the rest to die so we dont get overwritten by a dying thread
     (swap! flow-status assoc flow-id {:*done? true
                                       :*result (str "killed-by-user-" client-name)
                                       :*finished -1
@@ -3020,7 +3020,7 @@
 
       (when true ;running? ;; true ;(and new? running?) ;; (not= tracker last-tracker)
         (swap! tracker-client-only assoc flow-id tracker)
-        (swap! tracker-history assoc flow-id (vec (conj (get @tracker-history flow-id []) tracker))) ;; for loop step history saving..
+        ;; doing this in core? ;; (swap! tracker-history assoc flow-id (vec (conj (get @tracker-history flow-id []) tracker))) ;; for loop step history saving..
         (kick client-name (vec (cons :tracker keypath)) tracker nil nil nil)
         (kick client-name (vec (cons :condis keypath)) condis nil nil nil)))))
 
@@ -4923,10 +4923,8 @@
 ;; (str "./flow-history/" run-id ".edn")
 
 (defn load-flow-history [request]
-  
   (let [run-id (or (get-in request [:edn-params :run-id])
                    (get-in request [:query-params :run-id]))
-
         file-path (str "./flow-history/" run-id ".edn")
         _ (ut/pp [:load-flow-history file-path])
         flow-data-file (edn/read-string (slurp file-path))]

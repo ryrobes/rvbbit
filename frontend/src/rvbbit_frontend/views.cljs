@@ -3011,6 +3011,11 @@
                                                     (merge base-opts
                                                            {:overrides overrides})
                                                     base-opts)
+                                        ;;     :file-image {:flowmaps @(re-frame/subscribe [::bricks/flowmap-raw])
+                                        ;;                  :opts @(re-frame/subscribe [::bricks/opts-map])
+                                        ;;                  :zoom @db/pan-zoom-offsets
+                                        ;;                  :flow-id flow-id
+                                        ;;                  :flowmaps-connections @(re-frame/subscribe [::bricks/flowmap-connections])}
                                             :client-name client-name}
                                :on-response [::http/socket-response]
                                :on-timeout [::http/timeout-response]

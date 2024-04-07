@@ -229,6 +229,7 @@
    :reco-preview nil
    :editor? false
    :buffy? false
+   :flow-editor? true
    :grid-recos? true
    :openai-api-key     "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"
    :openai-org-id      "org-YLngjih2M4oju0tnnZtKCAYg"

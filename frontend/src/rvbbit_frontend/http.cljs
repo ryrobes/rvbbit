@@ -255,6 +255,11 @@
    (get db :flow-results {})))
 
 (re-frame/reg-sub
+ ::flows 
+ (fn [db _]
+   (get db :flows {})))
+
+(re-frame/reg-sub
  ::flow-results-tracker
  (fn [db [_ flow-id]]
    (get-in db [:flow-results :tracker flow-id] {})))
@@ -1054,10 +1059,11 @@
          coords (get new-db :zoom db/based)
          _ (tap> coords)
          flowmaps-connections (get new-db :flowmaps-connections)]
+     (tap> [:load-flow-history result])
      ;(set-zoom-pan (if (empty? coords) db/based coords))
      ;(set-zoom-pan coords)
      ;(swap! db/last-gantt assoc flow-id {})
-     ;(reset! db/last-update 0)
+     (reset! db/last-update -1)
      (-> db
          ;(assoc :zoom-start coords)
          (assoc-in [:http-reqs :load-flow-history]
@@ -1068,7 +1074,7 @@
          (assoc-in [:flows flow-id :map] flowmaps)
          (assoc-in [:flows flow-id :opts] opts)
          (assoc-in [:flows flow-id :connections] flowmaps-connections)
-         (assoc-in [:flow-results :tracker] (get result :tracker-history))
+         (assoc-in [:flow-results :tracker flow-id] (get result :tracker-history)) ;;(get-in result [:tracker flow-id]))
          (assoc-in [:flow-results :return-map] (get result :return-map))
          (assoc-in [:flow-results :return-maps] (get result :return-maps))
          (assoc :selected-flow flow-id)))))

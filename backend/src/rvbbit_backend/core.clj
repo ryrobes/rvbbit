@@ -517,10 +517,10 @@
                                                (prn @flow-db/results-atom)))
                                            (ut/ppa [:clearing-cache-db])
                                            (shell/sh "/bin/bash" "-c" (str "rm " "db/cache.db"))
-                                           (shell/sh "/bin/bash" "-c" (str "rm " "db/flow.db"))
-                                           (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps/*"))
-                                           (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps-pre/*"))
-                                           (shell/sh "/bin/bash" "-c" (str "rm " "flow-history/*"))
+                                           ;(shell/sh "/bin/bash" "-c" (str "rm " "db/flow.db"))
+                                           ;(shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps/*"))
+                                           ;(shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps-pre/*"))
+                                           ;(shell/sh "/bin/bash" "-c" (str "rm " "flow-history/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "status-change-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "data/search-index/*"))
@@ -625,8 +625,11 @@
                             ;;       (System/currentTimeMillis))
                              end (try (apply max (or (remove nil? (for [[_ v] (get @flow-db/tracker k)]
                                                                     (get v :end))) [-1]))
-                                      (catch Exception e (do ;(ut/pp [:exception-in-getting-time-duration k (str e)
-                                                             ;        (for [[_ v] (get @flow-db/tracker k)] (get v :end))])
+                                      (catch Exception e (do (ut/pp [:exception-in-getting-time-duration!! k (str e)
+                                                                     (for [[_ v] (get @flow-db/tracker k)] (get v :end))
+                                                                     (get @flow-db/tracker k)
+                                                                     :start start 
+                                                                     ])
                                                            (System/currentTimeMillis))))
                              elapsed (- end start)
                              human-elapsed (ut/format-duration start end)
@@ -725,6 +728,15 @@
   ;(add-watch flow-db/tracker :tracker-watch update-stat-atom) ;; tracker could be too much...
 
 
+(defn log-tracker [kks]
+  (doseq [flow-id kks]
+    (let [orig-tracker (get @flow-db/tracker flow-id)
+          tracker (into {} (for [[k v] orig-tracker ;; remove condi non-starts. dont send to client. data noise. neccessary noise for reactions, but noise
+                                 :when (not (get v :in-chan?))]
+                             {k v}))]
+      (swap! wss/tracker-history assoc flow-id (vec (conj (get @wss/tracker-history flow-id []) tracker))) ;; for loop step history saving..
+      )))
+
 
     ;; expensive, tracking down some issues
     (defn tracker-changed2 [key ref old-state new-state]
@@ -771,6 +783,7 @@
               
               ))
 
+          (log-tracker kks)
           (update-stat-atom kks))
       ;(when kks (ut/pp [:flow-finished kks]))
         ))
@@ -943,11 +956,11 @@
   ;; (wss/schedule! [:seconds 30] (wss/materialize-flowmap :server "map-pull-test2" "map-pull-test2" {})
   ;;                {:debug? false :close-on-done? true :increment-id? false :flow-id "map-pull-test2"})
 
-  ;; (wss/schedule! [:seconds 10] "crow-flow-201"
-  ;;                {:close-on-done? true :increment-id? false :flow-id "crow-flow-201" :debug? false})
+  (wss/schedule! [:seconds 300] "crow-flow-201a"
+                 {:close-on-done? true :increment-id? false :flow-id "crow-flow-201" :debug? false})
 
-  ;; (wss/schedule! [:minutes 2] "counting-loop"
-  ;;                {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
+  (wss/schedule! [:minutes 2] "counting-loop"
+                 {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
 
   ;(ut/pp [:flow-answer1 (wss/flow-waiter ff "boot-test")])
   ;(ut/pp [:flow-answer2 (flow-waiter fex/looping-net)])
