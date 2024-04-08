@@ -758,9 +758,7 @@
      (assoc-in db [:http-reqs :save-snap] ; comp key from ::get-http-data
                (merge old-status
                       {:status "failed"
-                       :ended-unix (.getTime (js/Date.))
-                       ;:message (ut/replace-large-base64 result)
-                       })))))
+                       :ended-unix (.getTime (js/Date.))})))))
 
 (re-frame/reg-event-db
  ::success-http-save-snap
@@ -768,10 +766,7 @@
    (let [old-status (get-in db [:http-reqs :save-snap])]
      (assoc-in db [:http-reqs :save-snap] ; comp key from ::get-http-data
                (merge old-status
-                      {;:keys (count result)
-                       ;:cleared-undo (undo/clear-history!)
-                       ;:result (select-keys result [:status :flowset])
-                       :ended-unix (.getTime (js/Date.))
+                      {:ended-unix (.getTime (js/Date.))
                        :status "success"})))))
 
 (re-frame/reg-event-fx
@@ -781,7 +776,6 @@
          url (str url-base "/save-snap")
          client-name (get db :client-name)
          compund-keys (vec (into (for [k (keys db) :when (cstr/includes? (str k) "/")] k) [:http-reqs]))
-        ; _ (tap> [:compund-keys compund-keys])
          request {:image image
                   :session (ut/deselect-keys db compund-keys)
                   :client-name client-name}]
@@ -798,6 +792,58 @@
                    :response-format (ajax-edn/edn-response-format)
                    :on-success      [::success-http-save-snap]
                    :on-failure      [::failure-http-save-snap]}})))
+
+
+
+
+
+
+(re-frame/reg-event-db
+ ::failure-http-save-screen-snap
+ (fn [db [_]]
+   (let [old-status (get-in db [:http-reqs :save-screen-snap])]
+     (assoc-in db [:http-reqs :save-screen-snap] ; comp key from ::get-http-data
+               (merge old-status
+                      {:status "failed"
+                       :ended-unix (.getTime (js/Date.))})))))
+
+(re-frame/reg-event-db
+ ::success-http-save-screen-snap
+ (fn [db [_]]
+   (let [old-status (get-in db [:http-reqs :save-screen-snap])]
+     (assoc-in db [:http-reqs :save-screen-snap] ; comp key from ::get-http-data
+               (merge old-status
+                      {:ended-unix (.getTime (js/Date.))
+                       :status "success"})))))
+
+(re-frame/reg-event-fx
+ ::save-screen-snap
+ (fn [{:keys [db]} [_ image]]
+   (let [method :post
+         url (str url-base "/save-screen-snap")
+         client-name (get db :client-name)
+         request {:image image
+                  :client-name client-name}]
+     (tap> [:save-screen-snap!])
+     {:db   (assoc-in db [:http-reqs :save-screen-snap]
+                      {:status "running"
+                       :url url
+                       :start-unix (.getTime (js/Date.))})
+      :http-xhrio {:method          method
+                   :uri             url
+                   :params          request
+                   :timeout         28000
+                   :format          (ajax-edn/edn-request-format)
+                   :response-format (ajax-edn/edn-response-format)
+                   :on-success      [::success-http-save-screen-snap]
+                   :on-failure      [::failure-http-save-screen-snap]}})))
+
+
+
+
+
+
+
 
 (re-frame/reg-event-db
  ::failure-http-save-csv

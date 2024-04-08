@@ -13,7 +13,9 @@
    ;[rvbbit-backend.flowmaps :as flow]
    [rvbbit-backend.transform :as ts]
    [rvbbit-backend.embeddings :as em]
+   [clj-time.coerce :as tcc]
    [clj-time.format :as f]
+   [clj-time.core :as t]
    ;[websocket-layer.core :as wl]
    [hikari-cp.core :as hik]
    [clojure.java.shell :as shell]
@@ -617,8 +619,13 @@
                             ;;  start-ts (-> start
                             ;;               (clj-time.coerce/from-long)
                             ;;               (f/unparse (f/formatter "yyyy-MM-dd HH:mm:ss")))
-                             start-ts (-> (f/formatter "yyyy-MM-dd HH:mm:ss")
-                                          (f/unparse (clj-time.coerce/from-long start)))
+                            ;;  start-ts (-> (f/formatter "yyyy-MM-dd HH:mm:ss")
+                            ;;               (f/unparse (clj-time.coerce/from-long start)))
+                            ;;  start-ts (-> (f/formatter "yyyy-MM-dd HH:mm:ss")
+                            ;;               (f/unparse (-> start
+                            ;;                              tcc/from-long
+                            ;;                              tcc/to-date-time)))
+                             start-ts (ut/millis-to-date-string start)
                             ;;start (for [[_ v] (get @flow-db/tracker k)] (get v :start))
                             ;; end (if done?
                             ;;       (try (apply max (or (for [[_ v] (get @flow-db/tracker k)] (get v :end)) [-1])) (catch Exception _ 0))
@@ -628,9 +635,8 @@
                                       (catch Exception e (do (ut/pp [:exception-in-getting-time-duration!! k (str e)
                                                                      (for [[_ v] (get @flow-db/tracker k)] (get v :end))
                                                                      (get @flow-db/tracker k)
-                                                                     :start start 
-                                                                     ])
-                                                           (System/currentTimeMillis))))
+                                                                     :start start])
+                                                             (System/currentTimeMillis))))
                              elapsed (- end start)
                              human-elapsed (ut/format-duration start end)
                              run-id (str (get-in @flow-db/results-atom [k :run-id]))

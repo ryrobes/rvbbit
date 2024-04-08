@@ -4872,6 +4872,20 @@
     (catch Exception e (ut/pp [:save-snap-error e])))
   (send-edn-success {:status "snap-saved" :flow (first (get request :edn-params))}))
 
+(defn save-screen-snap [request]
+  (try
+    ;(time
+    (let [image (get-in request [:edn-params :image])
+          ;session (get-in request [:edn-params :session])
+          client-name (get-in request [:edn-params :client-name] "unknown")
+          client-name (cstr/replace (str client-name) ":" "")
+          file-path (str "./screen-snaps/" client-name ".jpg")
+          ifile-path (str "/home/ryanr/rvbbit/frontend/resources/public/screen-snaps/" client-name ".jpg")]
+      (ut/save-base64-to-jpeg image file-path)
+      (ut/save-base64-to-jpeg image ifile-path));)
+    (catch Exception e (ut/pp [:save-snap-error e])))
+  (send-edn-success {:status "screen-snap-saved" :flow (first (get request :edn-params))}))
+
 (defn save-flow [request]
   (time (do
           (let [screen-name (get-in request [:edn-params :flow-id]) ;(ut/generate-name) ; (get-in request [:edn-params :screen-name])
@@ -5581,6 +5595,7 @@
               ["/save" :post (conj common-interceptors `save)]
               ["/save-flow" :post (conj common-interceptors `save-flow)]
               ["/save-snap" :post (conj common-interceptors `save-snap)]
+              ["/save-screen-snap" :post (conj common-interceptors `save-screen-snap)]
               ["/save-csv" :post (conj common-interceptors `save-csv)]
               ["/load" :get (conj common-interceptors `load-screen)]
               ;["/load-session" :get (conj common-interceptors `load-screen)]

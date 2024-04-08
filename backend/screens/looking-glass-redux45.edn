@@ -1,0 +1,3851 @@
+{:orders
+ {:flow-fn-sys
+  [:name :full_map :description :inputs :icon :input_types :output_types :category],
+  :blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
+  :fields-sys [:field_name :field_type :data_type],
+  :flow-history-calendar-sys*-kick--1605498699-sys* [:value :day],
+  :flow-history-calendar-sys*-kick-2061281782-sys* [:value :day],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :kick-1956261319-sys*
+  [:flow_id
+   :run_id
+   :start_ts
+   :elapsed_seconds
+   :human_elapsed
+   :result
+   :styler_highlight_8369aaa1],
+  :flow-history-calendar-sys*-kick--638271848-sys* [:value :day],
+  :fflows-sys [:category :description :name :file_path :full_map :icon],
+  :kick-1032365412-sys*
+  [:flow_id
+   :run_id
+   :start_ts
+   :elapsed_seconds
+   :human_elapsed
+   :result
+   :styler_highlight_8369aaa1],
+  :gen-viz-797 [:rows :date_posted],
+  :fn_history (:query_error),
+  :kick-817820299-sys*
+  [:flow_id
+   :run_id
+   :start_ts
+   :elapsed_seconds
+   :human_elapsed
+   :result
+   :styler_highlight_8369aaa1],
+  :flow-history-calendar-sys*-kick-1718416168-sys* [:value :day],
+  :kick-1902413898-sys* [:flow_id :runs],
+  :flow-history-calendar-sys*-kick-2046795275-sys* [:value :day],
+  :flow-history-calendar-sys*-kick--1350504626-sys* [:value :day],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :files-sys [:file_path :screen_name :blocks :queries :ts],
+  :gen-viz-94 [:diff],
+  :jvm_stats
+  [:used_memory_mb
+   :thread_count
+   :sql_cache_size
+   :ws_peers
+   :open_flow_channels
+   :queries_run
+   :internal_queries_run
+   :sniffs_run
+   :sys_load
+   :ts],
+  :flow-history-calendar-sys*-kick--602842691-sys* [:value :day],
+  :flow-history-calendar-sys*-kick--1886327336-sys* [:value :day],
+  :kick--803095015-sys*
+  [:flow_id
+   :run_id
+   :start_ts
+   :elapsed_seconds
+   :human_elapsed
+   :result
+   :styler_highlight_8369aaa1],
+  :kick-536936593-sys*
+  [:flow_id
+   :run_id
+   :base_flow_id
+   :channel
+   :block
+   :data_type
+   :end_ts
+   :start_ts
+   :dbgn
+   :elapsed_ms
+   :from_block
+   :dest
+   :end
+   :path
+   :view
+   :start
+   :type
+   :value
+   :ts],
+  :kick--1050509848-sys*
+  [:flow_id
+   :run_id
+   :start_ts
+   :elapsed_seconds
+   :human_elapsed
+   :result
+   :styler_highlight_8369aaa1],
+  :kick-229696881-sys*
+  [:flow_id
+   :run_id
+   :start_ts
+   :elapsed_seconds
+   :human_elapsed
+   :result
+   :styler_highlight_8369aaa1],
+  :fflowparts-sys [:category :description :name :file_path :full_map :icon],
+  :gen-viz-1090aa-kick-884921685-sys* [:value :day],
+  :flow-history-calendar-sys*-kick-453525236-sys* [:value :day],
+  :kick-1730504593-sys*
+  [:flow_id
+   :run_id
+   :base_flow_id
+   :channel
+   :data_type
+   :dest
+   :end_ts
+   :start_ts
+   :end
+   :path
+   :start
+   :type
+   :value
+   :ts],
+  :flow-history-calendar-sys*-kick-1502284699-sys* [:value :day],
+  :flow-history-calendar-sys*-kick-857044689-sys* [:value :day],
+  :kick--1461987886-sys*
+  [:flow_id
+   :run_id
+   :start_ts
+   :elapsed_seconds
+   :human_elapsed
+   :result
+   :styler_highlight_8369aaa1],
+  :flow_history (:query_error),
+  :flow-history-calendar-sys*-kick--870876492-sys* [:value :day],
+  :rowcnt-drag-2 [:rowcnt_sum],
+  :gen-viz-828 [:agg :date_posted],
+  :flow-history-calendar-sys*-kick-777264278-sys* [:value :day],
+  :ufo_sightings (:query_error),
+  :flow-history-calendar-sys*-kick-493401148-sys* [:value :day],
+  :flow-fn-categories-sys [:category],
+  :flow-history-calendar-sys*-kick-1139482539-sys* [:value :day],
+  :flow-history-calendar-sys*-kick--1339174324-sys* [:value :day],
+  :gen-viz-84 [:rows :country],
+  :connections-sys [:database_name :connection_id],
+  :ufo-sightings-drag-9
+  [:city
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :latitude
+   :longitude
+   :shape
+   :state
+   :country
+   :styler_highlight_row
+   :styler_highlight_fl_row
+   :styler_highlight_fl_col],
+  :flow-history-calendar-sys*-kick-2049516982-sys* [:value :day],
+  :flow-history-calendar-sys*-kick-133975733-sys* [:value :day],
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :reco-counts [:table_name :cnt],
+  :channel_history (:query_error),
+  :state-drag-3 [:state :rowcnt],
+  :flow-history-calendar-sys*-kick-749155497-sys* [:value :day],
+  :shape-drag-7 [:shape :rowcnt],
+  :kick-1655906383-sys*
+  [:flow_id
+   :run_id
+   :start_ts
+   :elapsed_seconds
+   :human_elapsed
+   :result
+   :styler_highlight_8369aaa1],
+  :kick--700645921-sys*
+  [:flow_id
+   :run_id
+   :start_ts
+   :elapsed_seconds
+   :human_elapsed
+   :result
+   :styler_highlight_8369aaa1],
+  :flow-fn-all-sys [:name]},
+ :reco-preview nil,
+ :flow? false,
+ :sql-source
+ {:flow-history-calendar-sys*-kick--1605498699-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :flow-history-calendar-sys*-kick-2061281782-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :kick-1956261319-sys*
+  {:select
+   [:flow_id
+    :run_id
+    :start_ts
+    :elapsed_seconds
+    :human_elapsed
+    [[:case [:= :in_error 1] "error" :else "success"] :result]],
+   :connection-id "flows-db",
+   :group-by [1 2],
+   :style-rules
+   {[:* :highlight-8369aaa1]
+    {:logic [:= :in_error 1],
+     :style {:background-color "#FF000011", :opacity 0.3}}},
+   :col-widths
+   {:flow_id 320,
+    :elapsed_seconds 115,
+    :run_id 70,
+    :human_elapsed 140,
+    :result 65,
+    :start_ts 145},
+   :where [:and [:= :flow_id "openai-image-gen-ladder"] [:= 1 1]],
+   :order-by [[:start_ts :desc]],
+   :from [[:flow_history :tt336a]]},
+  :flow-history-calendar-sys*-kick--638271848-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :kick-1032365412-sys*
+  {:select
+   [:flow_id
+    :run_id
+    :start_ts
+    :elapsed_seconds
+    :human_elapsed
+    [[:case [:= :in_error 1] "error" :else "success"] :result]],
+   :connection-id "flows-db",
+   :group-by [1 2],
+   :style-rules
+   {[:* :highlight-8369aaa1]
+    {:logic [:= :in_error 1],
+     :style {:background-color "#FF000019", :opacity 0.77}}},
+   :col-widths
+   {:flow_id 320,
+    :elapsed_seconds 115,
+    :run_id 70,
+    :human_elapsed 140,
+    :result 65,
+    :start_ts 145},
+   :where [:and [:= :flow_id "openai-image-gen-ladder"] [:= 1 1]],
+   :order-by [[:start_ts :desc]],
+   :from [[:flow_history :tt336a]]},
+  :gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state
+      :country],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :fn_history
+  {:select [:*], :connection-id "system-db", :from [:fn_history], :limit 111},
+  :kick-817820299-sys*
+  {:select
+   [:flow_id
+    :run_id
+    :start_ts
+    :elapsed_seconds
+    :human_elapsed
+    [[:case [:= :in_error 1] "error" :else "success"] :result]],
+   :connection-id "flows-db",
+   :group-by [1 2],
+   :style-rules
+   {[:* :highlight-8369aaa1]
+    {:logic [:= :in_error 1],
+     :style {:background-color "#FF000011", :border "1px solid #FF000077"}}},
+   :col-widths
+   {:flow_id 320,
+    :elapsed_seconds 115,
+    :run_id 70,
+    :human_elapsed 140,
+    :result 65,
+    :start_ts 145},
+   :where [:and [:= :flow_id "openai-image-gen-ladder"] [:= 1 1]],
+   :order-by [[:start_ts :desc]],
+   :from [[:flow_history :tt336a]]},
+  :flow-history-calendar-sys*-kick-1718416168-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :kick-1902413898-sys*
+  {:select [:flow_id [[:count [:distinct :run_id]] :runs]],
+   :connection-id "flows-db",
+   :col-widths {:runs 50, :flow_id 215},
+   :group-by [1],
+   :where [:= 1 1],
+   :order-by [[1 :asc]],
+   :from [[:flow_history :tt336aa]]},
+  :flow-history-calendar-sys*-kick-2046795275-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :flow-history-calendar-sys*-kick--1350504626-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state
+      :country],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
+  :flow-history-calendar-sys*-kick--602842691-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :flow-history-calendar-sys*-kick--1886327336-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :kick--803095015-sys*
+  {:select
+   [:flow_id
+    :run_id
+    :start_ts
+    :elapsed_seconds
+    :human_elapsed
+    [[:case [:= :in_error 1] "error" :else "success"] :result]],
+   :connection-id "flows-db",
+   :group-by [1 2],
+   :style-rules
+   {[:* :highlight-8369aaa1]
+    {:logic [:= :in_error 1],
+     :style {:background-color "#FF000021", :opacity 0.4}}},
+   :col-widths
+   {:flow_id 320,
+    :elapsed_seconds 115,
+    :run_id 70,
+    :human_elapsed 140,
+    :result 65,
+    :start_ts 145},
+   :where [:and [:= 1 1] [:= 1 1]],
+   :order-by [[:start_ts :desc]],
+   :from [[:flow_history :tt336a]]},
+  :kick-536936593-sys*
+  {:select [:*],
+   :connection-id "flows-db",
+   :col-widths {:value 500},
+   :where [:= :run_id "1d8c0c87-00cc-43cc-a240-a4799ad5a30a"],
+   :order-by [[:start_ts :desc]],
+   :from [[:fn_history :tt87336]]},
+  :kick--1050509848-sys*
+  {:select
+   [:flow_id
+    :run_id
+    :start_ts
+    :elapsed_seconds
+    :human_elapsed
+    [[:case [:= :in_error 1] "error" :else "success"] :result]],
+   :connection-id "flows-db",
+   :group-by [1 2],
+   :style-rules
+   {[:* :highlight-8369aaa1]
+    {:logic [:= :in_error 1], :style {:opacity 0.4, :font-style "italic"}}},
+   :col-widths
+   {:flow_id 320,
+    :elapsed_seconds 115,
+    :run_id 70,
+    :human_elapsed 140,
+    :result 65,
+    :start_ts 145},
+   :where [:and [:= :flow_id "openai-image-gen-ladder"] [:= 1 1]],
+   :order-by [[:start_ts :desc]],
+   :from [[:flow_history :tt336a]]},
+  :kick-229696881-sys*
+  {:select
+   [:flow_id
+    :run_id
+    :start_ts
+    :elapsed_seconds
+    :human_elapsed
+    [[:case [:= :in_error 1] "error" :else "success"] :result]],
+   :connection-id "flows-db",
+   :group-by [1 2],
+   :style-rules
+   {[:* :highlight-8369aaa1]
+    {:logic [:= :in_error 1], :style {:background-color "#FF000019"}}},
+   :col-widths
+   {:flow_id 320,
+    :elapsed_seconds 115,
+    :run_id 70,
+    :human_elapsed 140,
+    :result 65,
+    :start_ts 145},
+   :where [:and [:= :flow_id "openai-image-gen-ladder"] [:= 1 1]],
+   :order-by [[:start_ts :desc]],
+   :from [[:flow_history :tt336a]]},
+  :gen-viz-1090aa-kick-884921685-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :flow-history-calendar-sys*-kick-453525236-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :kick-1730504593-sys*
+  {:select [:*],
+   :connection-id "flows-db",
+   :col-widths {:value 500},
+   :where [:= :run_id "1d8c0c87-00cc-43cc-a240-a4799ad5a30a"],
+   :order-by [[:start_ts :desc]],
+   :from [[:channel_history :tt87336]]},
+  :flow-history-calendar-sys*-kick-1502284699-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :flow-history-calendar-sys*-kick-857044689-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :kick--1461987886-sys*
+  {:select
+   [:flow_id
+    :run_id
+    :start_ts
+    :elapsed_seconds
+    :human_elapsed
+    [[:case [:= :in_error 1] "error" :else "success"] :result]],
+   :connection-id "flows-db",
+   :group-by [1 2],
+   :style-rules
+   {[:* :highlight-8369aaa1]
+    {:logic [:= :in_error 1],
+     :style {:background-color "#FF000010", :opacity 0.3}}},
+   :col-widths
+   {:flow_id 320,
+    :elapsed_seconds 115,
+    :run_id 70,
+    :human_elapsed 140,
+    :result 65,
+    :start_ts 145},
+   :where [:and [:= :flow_id "openai-image-gen-ladder"] [:= 1 1]],
+   :order-by [[:start_ts :desc]],
+   :from [[:flow_history :tt336a]]},
+  :flow_history
+  {:select [:*], :connection-id "system-db", :from [:flow_history], :limit 111},
+  :flow-history-calendar-sys*-kick--870876492-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state
+          :country],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state
+      :country],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :flow-history-calendar-sys*-kick-777264278-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :flow-history-calendar-sys*-kick-493401148-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :flow-history-calendar-sys*-kick-1139482539-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :flow-history-calendar-sys*-kick--1339174324-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state
+      :country],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state
+    :country],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]],
+   :col-widths {:datetime 170, :state 80},
+   :deep-meta? true,
+   :cache? true,
+   :refresh-every 120,
+   :style-rules
+   {[:* :highlight-row]
+    {:logic [:> :duration_seconds "300"],
+     :style {:background-color "#008b8b66", :border "1px solid #00000000"}},
+    [:* :highlight-fl-row]
+    {:logic [:> :duration_seconds "300"],
+     :style
+     {:font-size "28px", :font-weight 500, :font-family "Pastor of Muppets"}},
+    [:state :highlight-fl-col]
+    {:logic [:= :state "fl"], :style {:background-color "red", :color "black"}}}},
+  :flow-history-calendar-sys*-kick-2049516982-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :flow-history-calendar-sys*-kick-133975733-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state
+       :country],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state
+       :country],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :channel_history
+  {:select [:*], :connection-id "system-db", :from [:channel_history], :limit 111},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state
+       :country],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :flow-history-calendar-sys*-kick-749155497-sys*
+  {:select [[[[:count 1]] :value] [[:substr :start_ts 0 11] :day]],
+   :connection-id "flows-db",
+   :from [[:fn_history :cc393]],
+   :group-by [[:substr :start_ts 0 11]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state
+       :country],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]},
+  :kick-1655906383-sys*
+  {:select
+   [:flow_id
+    :run_id
+    :start_ts
+    :elapsed_seconds
+    :human_elapsed
+    [[:case [:= :in_error 1] "error" :else "success"] :result]],
+   :connection-id "flows-db",
+   :group-by [1 2],
+   :style-rules
+   {[:* :highlight-8369aaa1]
+    {:logic [:= :in_error 1],
+     :style {:background-color "#FF000011", :border "1px solid #FF000077"}}},
+   :col-widths
+   {:flow_id 320,
+    :elapsed_seconds 115,
+    :run_id 70,
+    :human_elapsed 140,
+    :result 65,
+    :start_ts 145},
+   :where [:and [:= 1 1] [:= 1 1]],
+   :order-by [[:start_ts :desc]],
+   :from [[:flow_history :tt336a]]},
+  :kick--700645921-sys*
+  {:select
+   [:flow_id
+    :run_id
+    :start_ts
+    :elapsed_seconds
+    :human_elapsed
+    [[:case [:= :in_error 1] "error" :else "success"] :result]],
+   :connection-id "flows-db",
+   :group-by [1 2],
+   :style-rules
+   {[:* :highlight-8369aaa1]
+    {:logic [:= :in_error 1],
+     :style {:background-color "#FF000021", :opacity 0.4}}},
+   :col-widths
+   {:flow_id 320,
+    :elapsed_seconds 115,
+    :run_id 70,
+    :human_elapsed 140,
+    :result 65,
+    :start_ts 145},
+   :where [:and [:= :flow_id "openai-image-gen-ladder"] [:= 1 1]],
+   :order-by [[:start_ts :desc]],
+   :from [[:flow_history :tt336a]]}},
+ :meta
+ {:flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 122,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100},
+    :full_map
+    {:data-type "string",
+     :distinct 122,
+     :group-by? true,
+     :commons
+     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"calliope-outliers\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/calliope-outliers.edn\", :defaults {:open-input-1 \"Good evening, Ryan. If you have  a minute - I have some updates for you.  First of all, I found some outliers in the errors_log table that you should be aware of.\", :open-input {:connection-id \"boston-crime\", :select [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA :SHOOTING :STREET :UCR_PART :YEAR], :from [[:offenses :jj935]], :style-rules {[:* :higlight-683042327] {:logic [:and false], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}}, :types {:open-input-1 :string, :open-input :map, :out :any}, :inputs [:open-input-1 :open-input], :required [:open-input-1 :open-input]}"
+      1},
+     :cardinality 100},
+    :description
+    {:data-type "string",
+     :distinct 34,
+     :group-by? true,
+     :commons
+     {"" 87, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 27},
+    :inputs
+    {:data-type "string",
+     :distinct 65,
+     :group-by? true,
+     :commons
+     {"[:open-input-1 :open-input]" 10,
+      "[:value1 :value2]" 7,
+      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
+     :cardinality 53},
+    :icon
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"zmdi-puzzle-piece" 87, "zmdi-pizza" 4, "zmdi-file-text" 3},
+     :cardinality 17},
+    :input_types
+    {:data-type "string",
+     :distinct 56,
+     :group-by? true,
+     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
+     :cardinality 45},
+    :output_types
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {":any" 60, "" 20, ":boolean" 11},
+     :cardinality 11},
+    :category
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {":sub-flows" 87, ":rabbit-base" 18, ":clojure-base" 16},
+     :cardinality 3}},
+   :rowcount 122},
+  :blocks-sys
+  {:fields
+   {:block_key
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {":hello-there-brother" 1, "strategic grill locations" 1, ":block-6857" 1},
+     :cardinality 100},
+    :block_name
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"hello there!" 1, "board: strategic grill locations" 1, "block-6857" 1},
+     :cardinality 100},
+    :queries
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 5},
+     :cardinality 20},
+    :views
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {1 3, 0 1, 27 1},
+     :cardinality 60},
+    :block_data
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"{:h 3, :w 12, :root [3 3], :name \"hello there!\", :tab \"strategic grill locations\", :views {:heya! [:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 700, :color :theme/editor-outer-rim-color, :padding-top \"14px\", :opacity 1, :font-family :theme/base-font} :child \"hello! 🐇 🍂 🦞\"]}, :queries {}}"
+      1,
+      "{:panels {:hello-there-brother {:h 3, :w 12, :root [3 3], :name \"hello there!\", :tab \"strategic grill locations\", :views {:heya! [:box :align :center :justify :center :style {:font-size \"50px\", :font-weight 700, :color :theme/editor-outer-rim-color, :padding-top \"14px\", :opacity 1, :font-family :theme/base-font} :child \"hello! 🐇 🍂 🦞\"]}, :queries {}}, :block-4599 {:drag-meta {:type :open-input}, :w 9, :selected-view :upstanding-crimson-frog, :h 3, :views {:upstanding-crimson-frog [:open-input {:kp [:param :upstanding-crimson-frog], :style {:font-size \"27px\"}, :width-int :panel-width+100, :height-int :panel-height+80, :syntax \"clojure\"}]}, :tab \"strategic grill locations\", :root [3 7], :name \"block-4599\"}, :block-6857 {:h 5, :w 6, :tab \"strategic grill locations\", :root [3 11], :name \"block-6857\", :views {:pulled-val [:box :style {} :child [:data-viewer :flow/quick-maths-v2>:random-vector-full-of-stuff_idx6_out]]}, :queries {}}}, :click-param {:param {:selected-view [nil nil], :selected-view-data nil, :selected-block :block-6857, :upstanding-crimson-frog \"new parameter value!\"}}}"
+      1,
+      "{:h 5, :w 6, :tab \"strategic grill locations\", :root [3 11], :name \"block-6857\", :views {:pulled-val [:box :style {} :child [:data-viewer :flow/quick-maths-v2>:random-vector-full-of-stuff_idx6_out]]}, :queries {}}"
+      1},
+     :cardinality 100},
+    :view_names
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {":heya!" 1, "" 1, ":pulled-val" 1},
+     :cardinality 100},
+    :query_names
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 5},
+     :cardinality 20}},
+   :rowcount 5},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons {"state" 1, "comments" 1, "datetime" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"DECIMAL" 2, "VARCHAR(9)" 2, "VARCHAR(2)" 2},
+     :cardinality 76},
+    :data_type
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"string" 8, "float" 2, "integer" 1},
+     :cardinality 38}},
+   :rowcount 13},
+  :flow-history-calendar-sys*-kick--1605498699-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118384 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-history-calendar-sys*-kick-2061281782-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118534 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 9},
+     :cardinality 11},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 9},
+     :cardinality 11},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"bigfoot-ufos" 9},
+     :cardinality 11},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 9},
+     :cardinality 11},
+    :table_name
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"us_states" 1, "ufo_sightings_vw" 1, "test_me" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? false,
+     :commons {42 1, 14 1, 11 1},
+     :cardinality 100}},
+   :rowcount 9},
+  :kick-1956261319-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 288},
+     :cardinality 0},
+    :run_id
+    {:data-type "string",
+     :distinct 288,
+     :group-by? true,
+     :commons
+     {"31bcf56b-fc6e-4982-ac46-76333e9c1a2a" 1,
+      "4149658f-046f-4a9d-a9a9-1c77d871e21e" 1,
+      "ca231258-6e4d-4b30-a568-4733b9df64c5" 1},
+     :cardinality 100},
+    :start_ts
+    {:data-type "string",
+     :distinct 288,
+     :group-by? false,
+     :commons
+     {"2024-04-07 10:01:29" 1, "2024-04-07 07:24:53" 1, "2024-04-07 08:51:12" 1},
+     :cardinality 100},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 161,
+     :group-by? false,
+     :commons {0 65, -0.001 64, 41.703 1},
+     :cardinality 55},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 24,
+     :group-by? false,
+     :commons {"less than a second" 65, "-1 second" 64, "42 seconds" 24},
+     :cardinality 8},
+    :result
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"success" 159, "error" 129},
+     :cardinality 0},
+    :styler_highlight_8369aaa1
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {0 159, 1 129},
+     :cardinality 0}},
+   :rowcount 288},
+  :flow-history-calendar-sys*-kick--638271848-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118147 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :fflows-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":flow" 88},
+     :cardinality 1},
+    :description
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 88},
+     :cardinality 1},
+    :name
+    {:data-type "string",
+     :distinct 86,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
+     :cardinality 97},
+    :file_path
+    {:data-type "string",
+     :distinct 88,
+     :group-by? true,
+     :commons
+     {"./flows/stitches-math.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1,
+      "./flows/dalle3-create-image-newengland-old.edn" 1},
+     :cardinality 100},
+    :full_map
+    {:data-type "string",
+     :distinct 87,
+     :group-by? true,
+     :commons
+     {"{:flowmaps {:open-input {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :user-input \"feed me, seymour!!\"}, :z 0, :ports {:out {:out :string}}, :x 1169.1345454545453, :y 1210.6763636363637}}, :flow-id \"clam-flow-851\", :flowmaps-connections [[:open-input :done]]}"
+      2,
+      "{:flowmaps {:kick-1 {:w 200, :h 100, :x 3449.707608604431, :y 1367.7343490600585, :z 0, :data {:flow-item {:description \"Push items to the client UI.\", :category \":rabbit-base\", :fn (fn [destination name sub-task & args] (rvbbit-backend.websockets/kick destination name sub-task args)), :name \":kick\", :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :sub-task :flow-id, :name :flow-id}, :types {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :out :any}, :input_types \"[[:keyword :vector :list :set] :string [:string :keyword]]\", :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :name :sub-task :value-3 :value-4], :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Push items to the client UI.\\\", :fn (fn [destination name sub-task & args] (rvbbit-backend.websockets/kick destination name sub-task args)), :type :kick, :icon \\\"images/pink-rabbit-head.png\\\", :defaults {:destination :client-name, :sub-task :flow-id, :name :flow-id}, :types {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :out :any}, :style {:color \\\"#fc0fc0\\\"}, :selected-style {:color \\\"#fc0fc0\\\"}, :inputs [:destination :name :sub-task], :expandable? true, :required [:destination :name :sub-task]}\", :required [:destination :name :sub-task]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [357.3567810058594 157.34896850585938], :h 6, :connection-id nil, :queries {:name-drag-40 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :nn284]], :where [:= :name \":kick\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":kick\", :param-field :name, :source-panel-key :flow-fn-list*, :type :kick, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 6}}, :icon \"images/pink-rabbit-head.png\", :ports {:in {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :value-3 :any, :value-4 :any}, :out {:error :string, :* {:error \"java.lang.IllegalArgumentException: Don't know how to create ISeq from: java.lang.Long\"}}}}, :open-input-1 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"feed me, seymour!\"}, :z 0, :ports {:in {}, :out {:out :string}}, :x 2736.8722753576326, :y 1370.837915698902}, :open-input-3 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input :base}, :z 0, :ports {:out {:out :keyword}}, :x 2764.800122707993, :y 1561.5292232684237}, :kick-2 {:w 200, :h 100, :x 3412.0444202088465, :y 1642.0587967722038, :z 0, :data {:flow-item {:description \"Push items to the client UI.\", :category \":rabbit-base\", :fn (fn [destination name sub-task & args] (rvbbit-backend.websockets/kick destination name sub-task args)), :name \":kick\", :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :sub-task :flow-id, :name :flow-id}, :types {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :out :any}, :input_types \"[[:keyword :vector :list :set] :string [:string :keyword]]\", :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :name :sub-task :value-3 :value-4 :value-5 :value-6], :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Push items to the client UI.\\\", :fn (fn [destination name sub-task & args] (rvbbit-backend.websockets/kick destination name sub-task args)), :type :kick, :icon \\\"images/pink-rabbit-head.png\\\", :defaults {:destination :client-name, :sub-task :flow-id, :name :flow-id}, :types {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :out :any}, :style {:color \\\"#fc0fc0\\\"}, :selected-style {:color \\\"#fc0fc0\\\"}, :inputs [:destination :name :sub-task], :expandable? true, :required [:destination :name :sub-task]}\", :required [:destination :name :sub-task]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [1096.4557304382324 275.4192810058594], :h 6, :connection-id nil, :queries {:name-drag-19 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :tt488]], :where [:= :name \":kick\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":kick\", :param-field :name, :source-panel-key :flow-fn-list*, :type :kick, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 6}}, :icon \"images/pink-rabbit-head.png\", :ports {:in {:destination [:keyword :vector :list :set], :name :string, :sub-task [:string :keyword], :value-3 :any, :value-4 :any, :value-5 :any, :value-6 :any}, :out {:error :string, :* {:error \"java.lang.IllegalArgumentException: Don't know how to create ISeq from: java.lang.Long\"}}}}, :open-input-5 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"nope!\"}, :z 0, :ports {:out {:out :string}}, :x 2720.677470934069, :y 1741.4885174725507}, :open-input {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"kick-test\"}, :z 0, :ports {:out {:out :string}}, :x 3004.6165799724517, :y 1592.9840098822297}, :open-input-4 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"3853.75\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"1099.883942741233\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"4\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:YEAR]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]], :view-output? false, :width 350}, :z 0, :ports {:out {:idx7 :keyword, :idx5 :keyword, :* [:v-box :size \"auto\" :width \"490px\" :style {:font-size \"13px\", :opacity 0.33} :children [[:h-box :size \"auto\" :justify :between :children [[:box :child \":mean\"] [:box :child \"3853.75\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":standard-deviation\"] [:box :child \"1099.883942741233\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":sample-size\"] [:box :child \"4\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":fields\"] [:box :child \"[:YEAR]\" :style {:font-weight 400}]]] [:h-box :size \"auto\" :justify :between :children [[:box :child \":calc-used\"] [:box :child \"[:percentiles [0.01 0.99]]\" :style {:font-weight 400}]]]]], :idx2 :string, :idx4 :string, :idx1 :keyword, :idx6 :map, :idx3 :keyword, :idx8 :vector, :idx0 :keyword}}, :x 3020.2006378998626, :y 1715.8480772276178}, :open-input-2 {:w 200, :h 60, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input :ufo-sightings-drag-44}, :z 0, :ports {:out {:out :keyword}}, :x 2759.2156427639634, :y 1475.5767468808303}}, :flow-id \"kick-test-1-3-24\", :flowmaps-connections [[:open-input-1 :kick-1/value-3] [:open-input :kick-1/name] [:kick-1 :done] [:open-input-3 :kick-1/sub-task] [:open-input-2 :kick-2/sub-task] [:open-input-4 :kick-2/value-3] [:open-input-5 :kick-2/value-4] [:open-input-1 :kick-2/value-5]]}"
+      1,
+      "{:flowmaps {:open-fn-13 {:y 1824.6140314275567, :fn (fn [x] x), :w 200, :raw-fn (fn [hex-colors] (vec (let [hex-to-rgb (fn [hex] (map (fn [idx] (Integer/parseInt (subs hex idx (+ idx 2)) 16)) [1 3 5])) brightness (fn [rgb] (let [[r g b] rgb] (+ (* 0.299 r) (* 0.587 g) (* 0.114 b))))] (sort-by (comp brightness hex-to-rgb) hex-colors)))), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:idx7 :string, :idx5 :string, :* :vector, :idx2 :string, :idx4 :string, :idx1 :string, :idx6 :string, :idx3 :string, :idx8 :string, :idx0 :string}}, :h 100, :x 4508.6715997869305, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? false, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :second-lightest {:y 1972.8225287543403, :fn (fn [x] x), :w 200, :raw-fn (fn [x] (last (drop-last x))), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 5305.513375289351, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-fn-8 {:y 1289.3273225170874, :fn (fn [x] x), :w 200, :raw-fn (fn [x y] (str (clojure.string/replace x \"/home/ryanr/rvbbit/frontend/resources/public/\" \"url(\") \")\")), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any, :value-1 :any}, :out {:out :any}}, :h 100, :x 4066.4052582891677, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? false, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :alert!-2 {:w 200, :h 100, :x 5313.887965339137, :y 1188.6692051877603, :z 0, :data {:flow-item {:description \"Send a pop-up notification to a client (or :all clients)\", :category \":rabbit-base\", :fn (fn [destination content w h duration] (rvbbit-backend.websockets/alert! destination content w h duration)), :name \":alert!\", :icon \"zmdi-alert-polygon\", :defaults {:destination :client-name, :content \"Alert!\", :w 10, :h 1, :duration 6}, :types {:destination :keyword, :content :any, :out :any, :w :integer, :h :integer, :duration :integer}, :input_types \"[:keyword :any :integer :integer :integer]\", :style {:color \"#FDFD96\"}, :selected-style {:color \"#FDFD96\"}, :inputs \"[:destination :content :w :h :duration]\", :output_types \":any\", :full_map \"{:description \\\"Send a pop-up notification to a client (or :all clients)\\\", :fn (fn [destination content w h duration] (rvbbit-backend.websockets/alert! destination content w h duration)), :inputs [:destination :content :w :h :duration], :icon \\\"zmdi-alert-polygon\\\", :style {:color \\\"#FDFD96\\\"}, :selected-style {:color \\\"#FDFD96\\\"}, :defaults {:destination :client-name, :content \\\"Alert!\\\", :w 10, :h 1, :duration 6}, :types {:destination :keyword, :content :any, :out :any, :w :integer, :h :integer, :duration :integer}}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [1154 188], :h 6, :connection-id nil, :queries {:name-drag-34 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :qq253]], :where [:= :name \":alert!\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":alert!\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 0}}, :icon \"zmdi-alert-polygon\", :ports {:in {:destination :keyword, :content :any, :w :integer, :h :integer, :duration :integer}, :out {:out :any}}}, :open-fn-7 {:y 1558.8995291537408, :fn (fn [x] x), :w 200, :raw-fn (fn [x y] (str \"convert \" x \" \" y)), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any, :value-1 :any}, :out {:out :any}}, :h 100, :x 3365.9914373132146, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :shell-command-1 {:w 200, :h 100, :x 3657.4198481531157, :y 1353.6626850116338, :z 0, :data {:flow-item {:description \"Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs\", :category \":rabbit-base\", :fn (fn [command] (rvbbit-backend.websockets/run-shell-command command)), :name \":shell-command\", :icon \"zmdi-washing-machine\", :defaults {:command \"ls -la\"}, :types {:command :string, :out :any}, :input_types \"[:string]\", :style {:color \"#ffdd3c\"}, :selected-style {:color \"#ffdd3c\"}, :inputs \"[:command]\", :output_types \":any\", :full_map \"{:description \\\"Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs\\\", :fn (fn [command] (rvbbit-backend.websockets/run-shell-command command)), :icon \\\"zmdi-washing-machine\\\", :defaults {:command \\\"ls -la\\\"}, :types {:command :string, :out :any}, :style {:color \\\"#ffdd3c\\\"}, :selected-style {:color \\\"#ffdd3c\\\"}, :inputs [:command], :required [:command]}\", :required [:command]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [890 244], :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-37 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :vv683]], :where [:= :name \":shell-command\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":shell-command\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 7}}, :icon \"zmdi-washing-machine\", :ports {:in {:command :string}, :out {:output :vector, :exception :vector, :seconds :vector, :command :string, :* :map}}}, :lightest1 {:y 1798.000480143229, :fn (fn [x] x), :w 200, :raw-fn (fn [x] (last x)), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 5290.254224537037, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :gradient1 {:y 1779.8277822989005, :fn (fn [x] x), :w 200, :raw-fn (fn [x y] (vec (rvbbit-backend.util/generate-gradient x y 8))), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any, :value-1 :any}, :out {:idx7 :string, :idx5 :string, :* :vector, :idx2 :string, :idx4 :string, :idx1 :string, :idx6 :string, :idx3 :string, :idx0 :string}}, :h 100, :x 5737.372641782406, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-fn-1 {:y 1416.240407986111, :fn (fn [x] x), :w 200, :raw-fn (fn [x] x), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:headers :map, :method :keyword, :url :string, :body :map, :* :map}}, :h 100, :x 1314.2310474537035, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-fn-2 {:y 1472.904453412224, :fn (fn [x] x), :w 200, :raw-fn (fn [x] x), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:idx0 :map, :* :vector}}, :h 100, :x 1850.385489430147, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :darkest1 {:y 1499.4197961877892, :fn (fn [x] x), :w 200, :raw-fn (fn [x] (first x)), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 5274.040574363425, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-input-1 {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"vivid\"}, :z 0, :ports {:out {:out :string}}, :x -113.35663248697915, :y 1226.1349690755208}, :open-input-3 {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input {:width 13, :height 8, :duration 9}}, :z 0, :ports {:out {:width :integer, :height :integer, :duration :integer, :* :map}}, :x 4554.520222267909, :y 1374.7628150627627}, :alert!-1 {:w 240, :h 100, :x 5282.577773321242, :y 1355.4901399717228, :z 0, :data {:flow-item {:description \"Send a pop-up notification to a client (or :all clients)\", :category \":rabbit-base\", :fn (fn [destination content w h duration] (rvbbit-backend.websockets/alert! destination content w h duration)), :name \":alert!\", :icon \"zmdi-alert-polygon\", :defaults {:destination :client-name, :content \"Alert!\", :w 10, :h 1, :duration 6}, :types {:destination :keyword, :content :any, :out :any, :w :integer, :h :integer, :duration :integer}, :input_types \"[:keyword :any :integer :integer :integer]\", :style {:color \"#FDFD96\"}, :selected-style {:color \"#FDFD96\"}, :inputs \"[:destination :content :w :h :duration]\", :output_types \":any\", :full_map \"{:description \\\"Send a pop-up notification to a client (or :all clients)\\\", :fn (fn [destination content w h duration] (rvbbit-backend.websockets/alert! destination content w h duration)), :inputs [:destination :content :w :h :duration], :icon \\\"zmdi-alert-polygon\\\", :style {:color \\\"#FDFD96\\\"}, :selected-style {:color \\\"#FDFD96\\\"}, :defaults {:destination :client-name, :content \\\"Alert!\\\", :w 10, :h 1, :duration 6}, :types {:destination :keyword, :content :any, :out :any, :w :integer, :h :integer, :duration :integer}}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [676 74], :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-17 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :yy463]], :where [:= :name \":alert!\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":alert!\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 0}}, :icon \"zmdi-alert-polygon\", :ports {:in {:destination :keyword, :content :any, :w :integer, :h :integer, :duration :integer}, :out {:out :any}}}, :make-data-colors {:y 1837.9007893880205, :fn (fn [x] x), :w 200, :raw-fn (fn [x y] (zipmap [\"float\" \"boolean\" \"map\" \"list\" \"string\" \"vector\" \"keyword\" \"rabbit-code\" \"datetime\" \"integer\" \"unknown\" \"date\" \"nil\"] (shuffle (into y x)))), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any, :value-1 :any}, :out {\"float\" :string, \"boolean\" :string, \"map\" :string, \"list\" :string, :* :map, \"string\" :string, \"vector\" :string, \"keyword\" :string, \"rabbit-code\" :string, \"datetime\" :string, \"integer\" :string, \"unknown\" :string, \"date\" :string, \"nil\" :string}}, :h 100, :x 6211.317592592592, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :in-prompt {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"A high-definition, hyperreal, vivid 16:9 image of a New England scene in America, just before dawn during a heavy snowstorm, blending traditional and cyberpunk elements. The scene has a slightly gritty atmosphere, with the town covered in snow and buildings emitting soft pink and neon light blue glows. On the left side of the frame, a young and beautiful Irish-looking woman, clearly in her late 20s, with pouty full lips (with the bottom lip being prominent) and a slightly upturned nose, poses with a pleased expression yet mischievious on her large mouth. Her long hair is slightly wet, with snow collecting on it and her face, emphasizing the heavy snowfall. She has intricate Celtic-style tattoos of rabbits and wilderness on her neck, collarbone, and shoulders. The pre-dawn light adds a serene yet mysterious feel to the scene, underscoring the fusion of the natural world and technological influence.\", :width 750}, :z 0, :ports {:out {:out :string}}, :x 727.2187565983952, :y 1028.1476308461783}, :open-fn-6 {:y 1360.8546035354202, :fn (fn [x] x), :w 200, :raw-fn (fn [x] (clojure.string/replace (clojure.string/replace x \".webp\" \".png\") \"/home/ryanr/rvbbit-out\" \"/home/ryanr/rvbbit/frontend/resources/public/images/gen\")), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 3182.757763012036, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? true, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :ssecond-darkest {:y 1644.5442626953125, :fn (fn [x] x), :w 200, :raw-fn (fn [x] (second x)), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 5294.654181134259, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :node-color-thief-js {:y 1781.755455824908, :sub-flow {:flow-id \"node-color-thief-js\", :file-path \"./flows/node-color-thief-js.edn\", :map {:image-path {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \" /home/ryanr/rvbbit/frontend/resources/public/images/shannon45.png\"}, :z 0, :ports {:out {:out :string}}, :x 948.9116738809121, :y 1074.148015202703}, :shell-command-1 {:w 200, :h 100, :x 1758.4411167689732, :y 1117.7292503720237, :z 0, :data {:flow-item {:description \"Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs\", :category \":rabbit-base\", :fn (fn [command] (rvbbit-backend.websockets/run-shell-command command)), :name \":shell-command\", :icon \"zmdi-washing-machine\", :defaults {:command \"ls -la\"}, :types {:command :string, :out :any}, :input_types \"[:string]\", :style {:color \"#ffdd3c\"}, :selected-style {:color \"#ffdd3c\"}, :inputs \"[:command]\", :output_types \":any\", :full_map \"{:description \\\"Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs\\\", :fn (fn [command] (rvbbit-backend.websockets/run-shell-command command)), :icon \\\"zmdi-washing-machine\\\", :defaults {:command \\\"ls -la\\\"}, :types {:command :string, :out :any}, :style {:color \\\"#ffdd3c\\\"}, :selected-style {:color \\\"#ffdd3c\\\"}, :inputs [:command], :required [:command]}\", :required [:command]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [539.1770935058594 176.171875], :h 6, :connection-id nil, :queries {:name-drag-42 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :cc59]], :where [:= :name \":shell-command\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":shell-command\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 6}}, :icon \"zmdi-washing-machine\", :ports {:in {:command :string}, :out {:output :vector, :exception :vector, :seconds :vector, :command :string, :* :map}}}, :clojure-string-join-1 {:w 200, :h 100, :x 1348.4940418061756, :y 1136.4640299479165, :z 0, :data {:flow-item {:description \"Clojure.string's join function.\", :category \":clojure-base\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :name \":clojure-string-join\", :icon \"zmdi-group\", :defaults {:delimiter \" \"}, :types {:delimiter :string, :out :string}, :input_types \"[:string]\", :inputs \"[:delimiter]\", :output_types \":string\", :expandable? true, :full_map \"{:description \\\"Clojure.string's join function.\\\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :inputs [:delimiter], :required [:delimiter], :defaults {:delimiter \\\" \\\"}, :expandable? true, :icon \\\"zmdi-group\\\", :types {:delimiter :string, :out :string}}\", :required [:delimiter]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [540.1770935058594 279.171875], :h 6, :connection-id nil, :queries {:name-drag-12 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ww526]], :where [:= :name \":clojure-string-join\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":clojure-string-join\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 15}}, :icon \"zmdi-group\", :ports {:in {:delimiter :string, :value-1 :any, :value-2 :any}, :out {:out :string}}}, :shell-command-in {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"cd /home/ryanr/color-thief-project ; node ./colorThief2.js\"}, :z 0, :ports {:out {:out :string}}, :x 960.0851863779922, :y 1224.4579849567817}, :join-output-as-string {:y 1158.848120777027, :fn (fn [x] x), :w 200, :raw-fn (fn [x] (clojure.string/join \" \" x)), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 2212.3248878272807, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :json-to-edn {:w 200, :h 100, :x 2685.7088668823244, :y 1151.33984375, :z 0, :data {:flow-item {:description \"Convert a JSON string to Clojure EDN\", :category \":rabbit-base\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :name \":json-to-edn\", :icon \"zmdi-file-text\", :types {:json-string :string, :out :any}, :input_types \"[:string]\", :inputs \"[:json-string]\", :output_types \":any\", :full_map \"{:description \\\"Convert a JSON string to Clojure EDN\\\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :inputs [:json-string], :icon \\\"zmdi-file-text\\\", :types {:json-string :string, :out :any}}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [1297.1770935058594 207.171875], :h 6, :connection-id nil, :queries {:name-drag-41 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :uu284]], :where [:= :name \":json-to-edn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":json-to-edn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 7}}, :icon \"zmdi-file-text\", :ports {:in {:json-string :string}, :out {:dominantColor :string, :colorPalette :vector, :* :map}}}}, :connections [[:shell-command-in :clojure-string-join-1/value-1] [:image-path :clojure-string-join-1/value-2] [:clojure-string-join-1 :shell-command-1/command] [:shell-command-1/output :join-output-as-string/value] [:join-output-as-string :json-to-edn/json-string] [:json-to-edn :done]]}, :flow-id \"node-color-thief-js\", :w 200, :icon \"zmdi-puzzle-piece\", :z 0, :ports {:in {:image-path :string, :shell-command-in :string}, :out {:dominantColor :string, :colorPalette :vector, :* :map}}, :h 100, :file-path \"./flows/node-color-thief-js.edn\", :x 3288.9801815257347, :data {:flow-item nil, :name \"drag-from-\", :w 5, :source-panel :flow-list*, :root [678.71875 344.6979217529297], :h 6, :connection-id nil, :view-output? false, :queries {:flow-id-drag-5 {:select [:flow_id :file_path :last_modified], :from [[:query/flows-sys :cc208]], :where [:= :flow_id \"node-color-thief-js\"]}}, :drag-meta {:data-type \"string\", :done-block :json-to-edn, :source-query :flows-sys, :param-full \"node-color-thief-js\", :param-field :flow_id, :source-panel-key :flow-list*, :type :sub-flow, :param-table :flows-sys, :source-table :query/flows-sys, :connection-id nil, :target :flow_id, :row-num 4}}}, :open-fn-9 {:y 1308.2844527633101, :fn (fn [x] x), :w 200, :raw-fn (fn [& x] \"vivid\"), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any, :value-1 :any}, :out {:error :string, :* :map}}, :h 100, :x 343.7386610243055, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? false, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-input {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input {:headers :value-2, :method :post, :url :value-3, :body {:prompt :value-0, :n 1, :size \"1792x1024\", :style :value-4, :response_format \"b64_json\", :model \"dall-e-3\", :quality :value-1}}}, :z 0, :ports {:out {:headers :map, :method :keyword, :url :string, :body :map, :* :map}, :in {:value-0 :any, :value-1 :any, :value-2 :any, :value-3 :any, :value-4 :any}}, :x 1309.4404009650732, :y 1191.9339613970587}, :dom-color1 {:y 1627.0126651539522, :fn (fn [x] x), :w 200, :raw-fn (fn [x] x), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 4034.728400735294, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-fn-11 {:y 1794.0621538947612, :fn (fn [x] x), :w 200, :raw-fn (fn [x] x), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:idx7 :string, :idx5 :string, :* :vector, :idx2 :string, :idx4 :string, :idx1 :string, :idx6 :string, :idx3 :string, :idx8 :string, :idx0 :string}}, :h 100, :x 4061.411247702206, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-fn-3 {:y 1343.2759061925549, :fn (fn [x] x), :w 200, :raw-fn (fn [x] x), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:revised_prompt :string, :b64_json :string, :* :map}}, :h 100, :x 2270.161167279412, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? false, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :quality {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"hd\"}, :z 0, :ports {:out {:out :string}}, :x 734.1538809317127, :y 1194.2060836226851}, :open-fn-4 {:y 1246.006547277114, :fn (fn [x] x), :w 200, :raw-fn (fn [x] x), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 2784.174551930146, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? false, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-fn-12 {:y 1624.2565088104782, :fn (fn [x] x), :w 200, :raw-fn (fn [x] [:v-box :children [[:img {:src (str (clojure.string/replace x \"/home/ryanr/rvbbit/frontend/resources/public/\" \"\")), :width \"600px\", :style {:border-radius \"10px\"}}]]]), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:idx0 :keyword, :idx1 :keyword, :idx2 :vector, :* :vector}}, :h 100, :x 4505.923477619014, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? false, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-fn-5 {:y 1551.3756304572612, :fn (fn [x] x), :w 200, :raw-fn (fn [x] x), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 2821.4617187500003, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? false, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :upper-mid {:y 2136.9676296657985, :fn (fn [x] x), :w 200, :raw-fn (fn [x] (get x 6)), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 5306.102387152777, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :http-call-1 {:w 200, :h 100, :x 1747.3439280790442, :y 1235.2979650160846, :z 0, :data {:flow-item {:description \"Basic HTTP call primitive\", :category \":rabbit-base\", :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)), :name \":http-call\", :icon \"zmdi-http\", :defaults {:req-map {:url \"https://owen-wilson-wow-api.onrender.com/wows/random\", :query-params {:movie \"Wedding Crashers\", :results 40}}}, :types {:req-map :map, :out :any}, :input_types \"[:map]\", :style {:color \"#7BB696\"}, :selected-style {:color \"#7BB696\"}, :inputs \"[:req-map]\", :output_types \":any\", :expandable? false, :full_map \"{:description \\\"Basic HTTP call primitive\\\", :fn (fn [req-map] (rvbbit-backend.websockets/http-call req-map)), :icon \\\"zmdi-http\\\", :defaults {:req-map {:url \\\"https://owen-wilson-wow-api.onrender.com/wows/random\\\", :query-params {:movie \\\"Wedding Crashers\\\", :results 40}}}, :types {:req-map :map, :out :any}, :style {:color \\\"#7BB696\\\"}, :selected-style {:color \\\"#7BB696\\\"}, :inputs [:req-map], :expandable? false, :required [:req-map]}\", :required [:req-map]}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :root [864.1770935058594 199.171875], :h 6, :connection-id nil, :view-output? false, :queries {:name-drag-27 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ff241]], :where [:= :name \":http-call\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":http-call\", :param-field :name, :source-panel-key :flow-fn-list*, :type :where, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}, :icon \"zmdi-http\", :ports {:in {:req-map :map}, :out {:created :integer, :data :rowset, :* :map}}}, :open-fn-14 {:y 1182.8275316519948, :fn (fn [x] x), :w 200, :raw-fn (fn [x] [:box :child (str x) :size \"none\" :width \"500px\" :style {:font-size \"9px\", :overflow \"auto\"}] nil), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 4444.901514382471, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :gradient2 {:y 2042.9487506763357, :fn (fn [x] x), :w 200, :raw-fn (fn [x y] (vec (rvbbit-backend.util/generate-gradient x y 8))), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any, :value-1 :any}, :out {:idx7 :string, :idx5 :string, :* :vector, :idx2 :string, :idx4 :string, :idx1 :string, :idx6 :string, :idx3 :string, :idx0 :string}}, :h 100, :x 5749.094478297879, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :mid-high {:y 2301.8376654547615, :fn (fn [x] x), :w 200, :raw-fn (fn [x] (get x 4)), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:out :any}}, :h 100, :x 5740.51254354941, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}, :open-input-2 {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"natural\"}, :z 0, :ports {:out {:out :string}}, :x -111.46861165364578, :y 1444.116943359375}, :headers-map {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}}, :z 0, :ports {:out {\"Authorization\" :string, \"Content-Type\" :string, :* :map}}, :x 786.0028392650462, :y 1522.4280164930553}, :url-str {:w 200, :h 100, :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input \"https://api.openai.com/v1/images/generations\", :view-output? true}, :z 0, :ports {:out {:out :string}}, :x 768.1744249131942, :y 1362.70009765625}, :open-fn-10 {:y 2127.723868324454, :fn (fn [x] x), :w 200, :raw-fn (fn [x] x), :right-click? true, :icon \"zmdi-functions\", :z 0, :ports {:in {:value :any}, :out {:dominantColor :string, :colorPalette :vector, :* :map}}, :h 100, :x 4055.738221356873, :data {:flow-item {:description \"Write you own Clojure function! Godspeed!\", :category \":rabbit-base\", :fn (fn [x] x), :name \":open-fn\", :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :input_types \"[:any]\", :inputs \"[:value]\", :output_types \":any\", :expandable? true, :full_map \"{:description \\\"Write you own Clojure function! Godspeed!\\\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \\\"zmdi-functions\\\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}\"}, :name \"drag-from-\", :w 5, :source-panel :flow-fn-list*, :h 6, :connection-id nil, :view-output? false, :queries {:name-drag-25 {:select [:name :full_map :description :inputs :icon :input_types :output_types :category], :from [[:query/flow-fn-sys :ii11]], :where [:= :name \":open-fn\"]}}, :drag-meta {:data-type \"string\", :source-query :flow-fn-sys, :param-full \":open-fn\", :param-field :name, :source-panel-key :flow-fn-list*, :type :open-fn, :param-table :flow-fn-sys, :source-table :query/flow-fn-sys, :connection-id nil, :target :name, :row-num 5}}}}, :flow-id \"dalle3-create-image\", :flowmaps-connections [[:in-prompt :open-input/value-0] [:quality :open-input/value-1] [:headers-map/* :open-input/value-2] [:url-str :open-input/value-3] [:open-input/* :open-fn-1/value] [:open-fn-1/* :http-call-1/req-map] [:http-call-1/data :open-fn-2/value] [:open-fn-2/idx0 :open-fn-3/value] [:open-fn-3/revised_prompt :open-fn-4/value] [:open-fn-3/b64_json :open-fn-5/value] [:open-fn-5 :open-fn-6/value] [:open-fn-5 :open-fn-7/value] [:open-fn-6 :open-fn-7/value-1] [:open-fn-7 :shell-command-1/command] [:open-fn-6 :done] [:open-fn-6 :open-fn-8/value] [:open-input-1 :open-fn-9/value] [:open-input-2 :open-fn-9/value-1] [:open-fn-9 :open-input/value-4] [:open-fn-5 :node-color-thief-js/image-path] [:node-color-thief-js/* :open-fn-10/value] [:node-color-thief-js/colorPalette :open-fn-11/value] [:node-color-thief-js/dominantColor :dom-color1/value] [:open-fn-11 :open-fn-13/value] [:open-fn-13 :darkest1/value] [:open-fn-13 :lightest1/value] [:open-fn-13 :ssecond-darkest/value] [:open-fn-13 :second-lightest/value] [:open-fn-13 :mid-high/value] [:open-fn-13 :upper-mid/value] [:ssecond-darkest :gradient1/value] [:upper-mid :gradient1/value-1] [:lightest1 :gradient2/value] [:ssecond-darkest :gradient2/value-1] [:gradient1 :make-data-colors/value] [:gradient2 :make-data-colors/value-1] [:open-fn-6 :open-fn-12/value] [:open-fn-12 :alert!-1/content] [:open-input-3/width :alert!-1/w] [:open-input-3/height :alert!-1/h] [:open-input-3/duration :alert!-1/duration] [:open-fn-4 :open-fn-14/value] [:open-fn-14 :alert!-2/content] [:open-input-3/width :alert!-2/w] [:open-input-3/height :alert!-2/h] [:open-input-3/duration :alert!-2/duration] [:shell-command-1/* :open-fn-8/value-1]]}"
+      1},
+     :cardinality 98},
+    :icon
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"zmdi-developer-board" 88},
+     :cardinality 1}},
+   :rowcount 88},
+  :kick-1032365412-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 288},
+     :cardinality 0},
+    :run_id
+    {:data-type "string",
+     :distinct 288,
+     :group-by? true,
+     :commons
+     {"31bcf56b-fc6e-4982-ac46-76333e9c1a2a" 1,
+      "4149658f-046f-4a9d-a9a9-1c77d871e21e" 1,
+      "ca231258-6e4d-4b30-a568-4733b9df64c5" 1},
+     :cardinality 100},
+    :start_ts
+    {:data-type "string",
+     :distinct 288,
+     :group-by? false,
+     :commons
+     {"2024-04-07 10:01:29" 1, "2024-04-07 07:24:53" 1, "2024-04-07 08:51:12" 1},
+     :cardinality 100},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 161,
+     :group-by? false,
+     :commons {0 65, -0.001 64, 41.703 1},
+     :cardinality 55},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 24,
+     :group-by? false,
+     :commons {"less than a second" 65, "-1 second" 64, "42 seconds" 24},
+     :cardinality 8},
+    :result
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"success" 159, "error" 129},
+     :cardinality 0},
+    :styler_highlight_8369aaa1
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {0 159, 1 129},
+     :cardinality 0}},
+   :rowcount 288},
+  :gen-viz-797
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 230,
+     :group-by? false,
+     :commons {76 5, 146 4, 116 4},
+     :cardinality 72},
+    :date_posted
+    {:data-type "string",
+     :distinct 317,
+     :group-by? true,
+     :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
+     :cardinality 100}},
+   :rowcount 317},
+  :fn_history
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: fn_history)" 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :kick-817820299-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 288},
+     :cardinality 0},
+    :run_id
+    {:data-type "string",
+     :distinct 288,
+     :group-by? true,
+     :commons
+     {"31bcf56b-fc6e-4982-ac46-76333e9c1a2a" 1,
+      "4149658f-046f-4a9d-a9a9-1c77d871e21e" 1,
+      "ca231258-6e4d-4b30-a568-4733b9df64c5" 1},
+     :cardinality 100},
+    :start_ts
+    {:data-type "string",
+     :distinct 288,
+     :group-by? false,
+     :commons
+     {"2024-04-07 10:01:29" 1, "2024-04-07 07:24:53" 1, "2024-04-07 08:51:12" 1},
+     :cardinality 100},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 161,
+     :group-by? false,
+     :commons {0 65, -0.001 64, 41.703 1},
+     :cardinality 55},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 24,
+     :group-by? false,
+     :commons {"less than a second" 65, "-1 second" 64, "42 seconds" 24},
+     :cardinality 8},
+    :result
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"success" 159, "error" 129},
+     :cardinality 0},
+    :styler_highlight_8369aaa1
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {0 159, 1 129},
+     :cardinality 0}},
+   :rowcount 288},
+  :flow-history-calendar-sys*-kick-1718416168-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118310 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :kick-1902413898-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"openai-image-gen-ladder/node-js-color-thief-script" 1,
+      "openai-image-gen-ladder" 1,
+      "crow-flow-201" 1},
+     :cardinality 100},
+    :runs
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? false,
+     :commons {240 1, 599 1, 277 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :flow-history-calendar-sys*-kick-2046795275-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118310 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-history-calendar-sys*-kick--1350504626-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118310 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 86,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
+     :cardinality 97},
+    :file_path
+    {:data-type "string",
+     :distinct 88,
+     :group-by? true,
+     :commons
+     {"./flows/stitches-math.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1,
+      "./flows/dalle3-create-image-newengland-old.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 19,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 70, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
+     :cardinality 21}},
+   :rowcount 88},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 139,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 132,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 94},
+    :blocks
+    {:data-type "integer",
+     :distinct 41,
+     :group-by? true,
+     :commons {3 45, 14 6, 12 6},
+     :cardinality 29},
+    :queries
+    {:data-type "integer",
+     :distinct 32,
+     :group-by? true,
+     :commons {0 54, 5 9, 6 9},
+     :cardinality 23},
+    :ts
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"2024-04-07 06:59:35" 62, "2024-04-07 06:59:36" 35, "2024-04-07 06:59:37" 29},
+     :cardinality 3}},
+   :rowcount 139},
+  :gen-viz-94
+  {:fields
+   {:diff
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :jvm_stats
+  {:fields
+   {:queries_run
+    {:data-type "integer",
+     :distinct 25,
+     :group-by? true,
+     :commons {51 4, 94 1, 71 1},
+     :cardinality 89},
+    :sql_cache_size
+    {:data-type "integer",
+     :distinct 6,
+     :group-by? true,
+     :commons {10 9, 16 6, 14 6},
+     :cardinality 21},
+    :ts
+    {:data-type "string",
+     :distinct 28,
+     :group-by? true,
+     :commons
+     {"2024-04-07 07:02:44" 1, "2024-04-07 07:13:14" 1, "2024-04-07 07:07:44" 1},
+     :cardinality 100},
+    :sniffs_run
+    {:data-type "integer",
+     :distinct 6,
+     :group-by? true,
+     :commons {14 9, 22 6, 17 6},
+     :cardinality 21},
+    :sys_load
+    {:data-type "float",
+     :distinct 28,
+     :group-by? true,
+     :commons {3.12255859375 1, 3.28857421875 1, 5.1904296875 1},
+     :cardinality 100},
+    :used_memory_mb
+    {:data-type "integer",
+     :distinct 28,
+     :group-by? true,
+     :commons {965 1, 441 1, 795 1},
+     :cardinality 100},
+    :thread_count
+    {:data-type "integer",
+     :distinct 17,
+     :group-by? true,
+     :commons {126 3, 120 3, 112 3},
+     :cardinality 60},
+    :internal_queries_run
+    {:data-type "integer",
+     :distinct 10,
+     :group-by? true,
+     :commons {6 6, 2 5, 8 4},
+     :cardinality 35},
+    :open_flow_channels
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {-1 28},
+     :cardinality 3},
+    :ws_peers
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {16 28},
+     :cardinality 3}},
+   :rowcount 28},
+  :flow-history-calendar-sys*-kick--602842691-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118502 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-history-calendar-sys*-kick--1886327336-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118147 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :kick--803095015-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"openai-image-gen-ladder" 200, "counting-loop" 176, "crow-flow-201" 70},
+     :cardinality 0},
+    :run_id
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"31bcf56b-fc6e-4982-ac46-76333e9c1a2a" 1,
+      "ba7a2d21-ab05-4712-b61d-ea98beff55b1" 1,
+      "dd32988c-8fc9-4c1a-b806-2e844e77ca39" 1},
+     :cardinality 100},
+    :start_ts
+    {:data-type "string",
+     :distinct 464,
+     :group-by? false,
+     :commons
+     {"2024-04-07 12:59:39" 2, "2024-04-07 15:19:39" 2, "2024-04-07 13:29:39" 2},
+     :cardinality 92},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 110,
+     :group-by? false,
+     :commons {0.003 78, 0 74, -0.001 73},
+     :cardinality 21},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 19,
+     :group-by? false,
+     :commons {"less than a second" 374, "-1 second" 73, "43 seconds" 11},
+     :cardinality 3},
+    :result
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"success" 353, "error" 147},
+     :cardinality 0},
+    :styler_highlight_8369aaa1
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {0 353, 1 147},
+     :cardinality 0}},
+   :rowcount 500},
+  :kick-536936593-sys*
+  {:fields
+   {:from_block
+    {:data-type "string",
+     :distinct 61,
+     :group-by? true,
+     :commons
+     {":static" 10,
+      ":save-base64-to-webp-file" 4,
+      ":execute-shell-command-command" 3},
+     :cardinality 77},
+    :path
+    {:data-type "unknown",
+     :distinct 11,
+     :group-by? true,
+     :commons
+     {nil 69,
+      "[:from_block :static :style-param]" 1,
+      "[:from_block :static :prompt-4]" 1},
+     :cardinality 13},
+    :block
+    {:data-type "string",
+     :distinct 79,
+     :group-by? true,
+     :commons
+     {":node-js-color-thief-script" 1,
+      ":base-save-directory" 1,
+      ":hiccup-image-box-w-png" 1},
+     :cardinality 100},
+    :elapsed_ms
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? true,
+     :commons {0 59, 1 11, 2 3},
+     :cardinality 11},
+    :end_ts
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"2024-04-07 09:34:48" 33, "2024-04-07 09:34:07" 30, "2024-04-07 09:34:49" 15},
+     :cardinality 5},
+    :run_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"1d8c0c87-00cc-43cc-a240-a4799ad5a30a" 79},
+     :cardinality 1},
+    :value
+    {:data-type "string",
+     :distinct 26,
+     :group-by? true,
+     :commons
+     {"/home/ryanr/rvbbit-out/b64-image-56282-44349.png" 8,
+      "" 8,
+      "cp /home/ryanr/rvbbit-out/b64-image-56282-44349.png /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-56282-44349.png"
+      6},
+     :cardinality 32},
+    :start
+    {:data-type "integer",
+     :distinct 62,
+     :group-by? true,
+     :commons {1712496888854 4, 1712496888897 3, 1712496847891 2},
+     :cardinality 78},
+    :channel
+    {:data-type "string",
+     :distinct 79,
+     :group-by? true,
+     :commons
+     {"[:node-js-color-thief-script-dominantColor/in]" 1,
+      "[:stringify-exif-map/img-path]" 1,
+      "[:prompt-jukebox/x+2]" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":function" 79},
+     :cardinality 1},
+    :base_flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 79},
+     :cardinality 1},
+    :ts
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-04-07 13:34:51" 49, "2024-04-07 13:34:11" 30},
+     :cardinality 2},
+    :flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 79},
+     :cardinality 1},
+    :start_ts
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"2024-04-07 09:34:48" 35, "2024-04-07 09:34:07" 31, "2024-04-07 09:34:49" 13},
+     :cardinality 3},
+    :data_type
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"string" 59, "map" 18, "vector" 2},
+     :cardinality 3},
+    :end
+    {:data-type "integer",
+     :distinct 66,
+     :group-by? true,
+     :commons {1712496888854 4, 1712496847886 2, 1712496889583 2},
+     :cardinality 83},
+    :dest
+    {:data-type "string",
+     :distinct 79,
+     :group-by? true,
+     :commons
+     {":node-js-color-thief-script" 1,
+      ":base-save-directory" 1,
+      ":hiccup-image-box-w-png" 1},
+     :cardinality 100},
+    :dbgn
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 79},
+     :cardinality 1},
+    :view
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"" 68,
+      nil 10,
+      "[:v-box :padding \"10px\" :gap \"8px\" :width :width-px :style {:background-color \"#233e4c\", :border-radius \"20px\", :font-size \"12px\", :font-weight 700, :color \"#1b2d39\"} :children [[:box :child \"./images/gen/b64-image-56282-44349.png\"] [:box :size \"auto\" :child [:img {:src \"./images/gen/b64-image-56282-44349.png\", :style {:border-radius \"30px\"}}]]]]"
+      1},
+     :cardinality 3}},
+   :rowcount 79},
+  :kick--1050509848-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 500},
+     :cardinality 0},
+    :run_id
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"31bcf56b-fc6e-4982-ac46-76333e9c1a2a" 1,
+      "df6b5c02-e1d3-462e-9b71-ff9aa32d70fd" 1,
+      "8fcb4a73-0f85-4abe-bd41-4cc2f0a28206" 1},
+     :cardinality 100},
+    :start_ts
+    {:data-type "string",
+     :distinct 500,
+     :group-by? false,
+     :commons
+     {"2024-04-07 15:42:33" 1, "2024-04-08 02:06:32" 1, "2024-04-07 10:01:29" 1},
+     :cardinality 100},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 163,
+     :group-by? false,
+     :commons {-0.001 177, 0 160, -0.002 2},
+     :cardinality 32},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 24,
+     :group-by? false,
+     :commons {"-1 second" 179, "less than a second" 160, "43 seconds" 22},
+     :cardinality 4},
+    :result
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"error" 339, "success" 161},
+     :cardinality 0},
+    :styler_highlight_8369aaa1
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {1 339, 0 161},
+     :cardinality 0}},
+   :rowcount 500},
+  :kick-229696881-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 288},
+     :cardinality 0},
+    :run_id
+    {:data-type "string",
+     :distinct 288,
+     :group-by? true,
+     :commons
+     {"31bcf56b-fc6e-4982-ac46-76333e9c1a2a" 1,
+      "4149658f-046f-4a9d-a9a9-1c77d871e21e" 1,
+      "ca231258-6e4d-4b30-a568-4733b9df64c5" 1},
+     :cardinality 100},
+    :start_ts
+    {:data-type "string",
+     :distinct 288,
+     :group-by? false,
+     :commons
+     {"2024-04-07 10:01:29" 1, "2024-04-07 07:24:53" 1, "2024-04-07 08:51:12" 1},
+     :cardinality 100},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 161,
+     :group-by? false,
+     :commons {0 65, -0.001 64, 41.703 1},
+     :cardinality 55},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 24,
+     :group-by? false,
+     :commons {"less than a second" 65, "-1 second" 64, "42 seconds" 24},
+     :cardinality 8},
+    :result
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"success" 159, "error" 129},
+     :cardinality 0},
+    :styler_highlight_8369aaa1
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {0 159, 1 129},
+     :cardinality 0}},
+   :rowcount 288},
+  :fflowparts-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {":sub-flows" 87, ":rabbit-base" 18, ":clojure-base" 16},
+     :cardinality 3},
+    :description
+    {:data-type "string",
+     :distinct 34,
+     :group-by? true,
+     :commons
+     {"" 87, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 27},
+    :name
+    {:data-type "string",
+     :distinct 122,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100},
+    :file_path
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"" 120, "./flows/a-random-wow.edn" 1, "./flows/node-color-thief-js.edn" 1},
+     :cardinality 2},
+    :full_map
+    {:data-type "string",
+     :distinct 122,
+     :group-by? true,
+     :commons
+     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"calliope-outliers\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/calliope-outliers.edn\", :defaults {:open-input-1 \"Good evening, Ryan. If you have  a minute - I have some updates for you.  First of all, I found some outliers in the errors_log table that you should be aware of.\", :open-input {:connection-id \"boston-crime\", :select [:DAY_OF_WEEK :DISTRICT :HOUR :INCIDENT_NUMBER :Lat :Location :Long :MONTH :OCCURRED_ON_DATE :OFFENSE_CODE :OFFENSE_CODE_GROUP :OFFENSE_DESCRIPTION :REPORTING_AREA :SHOOTING :STREET :UCR_PART :YEAR], :from [[:offenses :jj935]], :style-rules {[:* :higlight-683042327] {:logic [:and false], :style {:background-color \"#008b8b66\", :border \"1px solid #00000000\"}}}}}, :types {:open-input-1 :string, :open-input :map, :out :any}, :inputs [:open-input-1 :open-input], :required [:open-input-1 :open-input]}"
+      1},
+     :cardinality 100},
+    :icon
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"zmdi-puzzle-piece" 87, "zmdi-pizza" 4, "zmdi-file-text" 3},
+     :cardinality 17}},
+   :rowcount 122},
+  :gen-viz-1090aa-kick-884921685-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {117974 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-history-calendar-sys*-kick-453525236-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118310 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :kick-1730504593-sys*
+  {:fields
+   {:path
+    {:data-type "unknown",
+     :distinct 2,
+     :group-by? true,
+     :commons {nil 166, "[:creating-channels :*]" 93},
+     :cardinality 0},
+    :end_ts
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"2024-04-07 09:34:07" 127,
+      "2024-04-07 09:34:49" 90,
+      "2024-04-07 09:34:48" 42},
+     :cardinality 1},
+    :run_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"1d8c0c87-00cc-43cc-a240-a4799ad5a30a" 259},
+     :cardinality 0},
+    :value
+    {:data-type "string",
+     :distinct 27,
+     :group-by? true,
+     :commons
+     {"" 101, ":done" 73, "/home/ryanr/rvbbit-out/b64-image-56282-44349.png" 12},
+     :cardinality 10},
+    :start
+    {:data-type "integer",
+     :distinct 120,
+     :group-by? true,
+     :commons {1712496847881 93, 1712496889722 4, 1712496847905 3},
+     :cardinality 46},
+    :channel
+    {:data-type "string",
+     :distinct 166,
+     :group-by? true,
+     :commons
+     {"[:prompt :prompt-jukebox/x+0]" 2,
+      "[:create-png-path :create-convert-command-line/x]" 2,
+      "[:relative-url-path-for-png-version/bang :relative-url-path-for-png-version]"
+      2},
+     :cardinality 64},
+    :type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":channel" 166, nil 93},
+     :cardinality 0},
+    :base_flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 259},
+     :cardinality 0},
+    :ts
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-04-07 13:34:51" 132, "2024-04-07 13:34:11" 127},
+     :cardinality 0},
+    :flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 259},
+     :cardinality 0},
+    :start_ts
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons
+     {"2024-04-07 09:34:07" 127,
+      "2024-04-07 09:34:49" 90,
+      "2024-04-07 09:34:48" 42},
+     :cardinality 1},
+    :data_type
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"boot" 93, "keyword" 73, "string" 69},
+     :cardinality 1},
+    :end
+    {:data-type "integer",
+     :distinct 119,
+     :group-by? true,
+     :commons {1712496847881 93, 1712496888853 4, 1712496889722 4},
+     :cardinality 45},
+    :dest
+    {:data-type "string",
+     :distinct 74,
+     :group-by? true,
+     :commons {nil 93, ":prompt-jukebox" 6, ":hiccup-image-box-w-png" 5},
+     :cardinality 28}},
+   :rowcount 259},
+  :flow-history-calendar-sys*-kick-1502284699-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118502 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-history-calendar-sys*-kick-857044689-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118310 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :kick--1461987886-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 288},
+     :cardinality 0},
+    :run_id
+    {:data-type "string",
+     :distinct 288,
+     :group-by? true,
+     :commons
+     {"31bcf56b-fc6e-4982-ac46-76333e9c1a2a" 1,
+      "4149658f-046f-4a9d-a9a9-1c77d871e21e" 1,
+      "ca231258-6e4d-4b30-a568-4733b9df64c5" 1},
+     :cardinality 100},
+    :start_ts
+    {:data-type "string",
+     :distinct 288,
+     :group-by? false,
+     :commons
+     {"2024-04-07 10:01:29" 1, "2024-04-07 07:24:53" 1, "2024-04-07 08:51:12" 1},
+     :cardinality 100},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 161,
+     :group-by? false,
+     :commons {0 65, -0.001 64, 41.703 1},
+     :cardinality 55},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 24,
+     :group-by? false,
+     :commons {"less than a second" 65, "-1 second" 64, "42 seconds" 24},
+     :cardinality 8},
+    :result
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"success" 159, "error" 129},
+     :cardinality 0},
+    :styler_highlight_8369aaa1
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {0 159, 1 129},
+     :cardinality 0}},
+   :rowcount 288},
+  :flow_history
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: flow_history)"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
+  :flow-history-calendar-sys*-kick--870876492-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118310 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :rowcnt-drag-2
+  {:fields
+   {:rowcnt_sum
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {80332 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :gen-viz-828
+  {:fields
+   {:agg
+    {:data-type "integer",
+     :distinct 230,
+     :group-by? false,
+     :commons {76 5, 146 4, 116 4},
+     :cardinality 72},
+    :date_posted
+    {:data-type "string",
+     :distinct 317,
+     :group-by? true,
+     :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
+     :cardinality 100}},
+   :rowcount 317},
+  :flow-history-calendar-sys*-kick-777264278-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118190 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings)"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
+  :flow-history-calendar-sys*-kick-493401148-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118310 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {":sub-flows" 1, ":rabbit-base" 1, ":owen-wilson" 1},
+     :cardinality 100}},
+   :rowcount 4},
+  :flow-history-calendar-sys*-kick-1139482539-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118503 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-history-calendar-sys*-kick--1339174324-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {11831 1, 137895 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"2024-04-08" 1, "2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :gen-viz-84
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 6,
+     :group-by? false,
+     :commons {65114 1, 1905 1, 105 1},
+     :cardinality 100},
+    :country
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons {"us" 1, "gb" 1, "de" 1},
+     :cardinality 100}},
+   :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
+  :ufo-sightings-drag-9
+  {:fields
+   {:duration_seconds_int
+    {:data-type "integer",
+     :distinct 54,
+     :group-by? true,
+     :commons {120 53, 180 45, 300 45},
+     :cardinality 10},
+    :styler_highlight_fl_row
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 316, 1 184},
+     :cardinality 0},
+    :city
+    {:data-type "string",
+     :distinct 157,
+     :group-by? true,
+     :commons {"akron" 41, "abilene" 32, "aberdeen" 19},
+     :cardinality 31},
+    :date_posted
+    {:data-type "string",
+     :distinct 194,
+     :group-by? true,
+     :commons {"2001-08-05" 20, "2008-10-31" 12, "2009-12-12" 11},
+     :cardinality 38},
+    :longitude
+    {:data-type "float",
+     :distinct 178,
+     :group-by? true,
+     :commons {-81.5191667 41, 138.598633 37, -99.7327778 30},
+     :cardinality 35},
+    :state
+    {:data-type "string",
+     :distinct 45,
+     :group-by? true,
+     :commons {nil 120, "oh" 48, "tx" 39},
+     :cardinality 9},
+    :duration_seconds
+    {:data-type "string",
+     :distinct 54,
+     :group-by? true,
+     :commons {"120" 53, "300" 45, "180" 45},
+     :cardinality 10},
+    :duration_hours
+    {:data-type "string",
+     :distinct 225,
+     :group-by? true,
+     :commons {"2 minutes" 21, "3 minutes" 18, "1 minute" 18},
+     :cardinality 44},
+    :styler_highlight_fl_col
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 499, 1 1},
+     :cardinality 0},
+    :shape
+    {:data-type "string",
+     :distinct 22,
+     :group-by? true,
+     :commons {"light" 103, "triangle" 62, "fireball" 49},
+     :cardinality 4},
+    :datetime
+    {:data-type "string",
+     :distinct 492,
+     :group-by? true,
+     :commons
+     {"1989-06-04 22:30:00.000000" 3,
+      "2010-05-29 21:50:00.000000" 2,
+      "2006-11-30 12:17:00.000000" 2},
+     :cardinality 98},
+    :latitude
+    {:data-type "string",
+     :distinct 178,
+     :group-by? true,
+     :commons {"41.0813889" 41, "-34.928661" 37, "32.4486111" 30},
+     :cardinality 35},
+    :country
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons {"us" 288, nil 113, "au" 37},
+     :cardinality 1},
+    :styler_highlight_row
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 316, 1 184},
+     :cardinality 0}},
+   :rowcount 500},
+  :flow-history-calendar-sys*-kick-2049516982-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118147 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :flow-history-calendar-sys*-kick-133975733-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118503 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :duration-hours-drag-43
+  {:fields
+   {:duration_hours
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"30 min." 1, "3 days" 1, "5-7 min" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 162,
+     :group-by? false,
+     :commons {12 29, 13 23, 14 22},
+     :cardinality 32}},
+   :rowcount 500},
+  :city-drag-26
+  {:fields
+   {:city
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"ottawa (canada)" 1, "burlington (canada)" 1, "cary" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 118,
+     :group-by? false,
+     :commons {27 35, 26 24, 29 23},
+     :cardinality 23}},
+   :rowcount 500},
+  :reco-counts {:fields {}, :rowcount 0},
+  :channel_history
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: channel_history)"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
+  :state-drag-3
+  {:fields
+   {:state
+    {:data-type "string",
+     :distinct 68,
+     :group-by? true,
+     :commons {"nd" 1, "az" 1, "in" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 68,
+     :group-by? false,
+     :commons {183 1, 968 1, 633 1},
+     :cardinality 100}},
+   :rowcount 68},
+  :flow-history-calendar-sys*-kick-749155497-sys*
+  {:fields
+   {:value
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {118138 1},
+     :cardinality 100},
+    :day
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"2024-04-07" 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :shape-drag-7
+  {:fields
+   {:shape
+    {:data-type "string",
+     :distinct 30,
+     :group-by? true,
+     :commons {"formation" 1, "cone" 1, "rectangle" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 25,
+     :group-by? false,
+     :commons {1 5, 2 2, 1283 1},
+     :cardinality 83}},
+   :rowcount 30},
+  :kick-1655906383-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons {"counting-loop" 7, "crow-flow-201" 3, "openai-image-gen-ladder" 2},
+     :cardinality 28},
+    :run_id
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons
+     {"4437b0cc-e972-414f-bb98-1a508ea347cb" 1,
+      "305b39f5-1bbb-4844-ab92-16ffc7c34704" 1,
+      "150c4960-541c-449f-ae62-b0ff5dda36e8" 1},
+     :cardinality 100},
+    :start_ts
+    {:data-type "string",
+     :distinct 12,
+     :group-by? false,
+     :commons
+     {"2024-04-07 06:59:39" 2, "2024-04-07 07:09:39" 2, "2024-04-07 07:07:39" 1},
+     :cardinality 85},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 10,
+     :group-by? false,
+     :commons {0.005 3, 0.003 3, 0.027 1},
+     :cardinality 71},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"less than a second" 12, "45 seconds" 2},
+     :cardinality 14},
+    :result
+    {:data-type "string",
+     :distinct 1,
+     :group-by? false,
+     :commons {"success" 14},
+     :cardinality 7},
+    :styler_highlight_8369aaa1
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {0 14},
+     :cardinality 7}},
+   :rowcount 14},
+  :kick--700645921-sys*
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"openai-image-gen-ladder" 500},
+     :cardinality 0},
+    :run_id
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"31bcf56b-fc6e-4982-ac46-76333e9c1a2a" 1,
+      "8fcb4a73-0f85-4abe-bd41-4cc2f0a28206" 1,
+      "58ac8a01-b8dd-4e1b-92ea-2bcfef25d120" 1},
+     :cardinality 100},
+    :start_ts
+    {:data-type "string",
+     :distinct 500,
+     :group-by? false,
+     :commons
+     {"2024-04-07 15:42:33" 1, "2024-04-08 02:06:32" 1, "2024-04-07 10:01:29" 1},
+     :cardinality 100},
+    :elapsed_seconds
+    {:data-type "float",
+     :distinct 177,
+     :group-by? false,
+     :commons {-0.001 166, 0 157, -0.002 2},
+     :cardinality 35},
+    :human_elapsed
+    {:data-type "string",
+     :distinct 24,
+     :group-by? false,
+     :commons {"-1 second" 168, "less than a second" 157, "43 seconds" 23},
+     :cardinality 4},
+    :result
+    {:data-type "string",
+     :distinct 2,
+     :group-by? false,
+     :commons {"error" 325, "success" 175},
+     :cardinality 0},
+    :styler_highlight_8369aaa1
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {1 325, 0 175},
+     :cardinality 0}},
+   :rowcount 500},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 122,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100}},
+   :rowcount 122}},
+ :default-col-widths
+ {:virtual-panel
+  {:kick-1956261319-sys* 143,
+   :kick-1032365412-sys* 143,
+   :kick-817820299-sys* 143,
+   :kick-1902413898-sys* 130,
+   :kick--1764769189 152,
+   :kick--803095015-sys* 143,
+   :kick-536936593-sys* 100,
+   :kick--1050509848-sys* 143,
+   :kick-229696881-sys* 143,
+   :kick-1730504593-sys* 100,
+   :kick--1461987886-sys* 143,
+   :kick-1655906383-sys* 143,
+   :kick--700645921-sys* 143},
+  :block-11609 {:city-drag-26 180},
+  :block-7416 {:rowcnt-drag-2 161},
+  :block-8805 {:duration-hours-drag-43 180},
+  :system-connections-list* {:connections-sys 111},
+  :system-fields-list* {:fields-sys 170},
+  :block-7319 {:shape-drag-7 180},
+  :block-3777 {:state-drag-3 180},
+  :files-list* {:files-sys 178},
+  :blocks-list* {:blocks-sys 127},
+  :block-1449 {:ufo-sightings-drag-9 141},
+  :system-tables-list* {:tables-sys 137}},
+ :runstream-drops nil,
+ :data-hash -1491206933,
+ :tabs
+ ["through the rabbit hole and out the other side"
+  "sapphire ape"
+  "fat zebra"
+  "burgundy platypus"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/looking-glass-redux.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description "WIP: basic timeseries forecasting based on previous values",
+     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1},
+    :buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"}},
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "aaaaah-esday-the-day"
+    "aaaaah-wednesday-the-day"
+    "aaaah-wednesday-the-day"
+    "alice-puzzle-1"
+    "asdasdasdasd"
+    "autumn-theme"
+    "battle-mage"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "blackberries"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "blue-pines"
+    "boston-test-10-3-23"
+    "broken-jacket"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "capecod-viking"
+    "chaos simple"
+    "chaos-views"
+    "chompers"
+    "claude-testing2"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "counting-lord-of-the-woods"
+    "crazy-alice"
+    "dark-crested-jackelope"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "desktops-and-broomsticks"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
+    "evil-main-street"
+    "fake-books-1"
+    "fake-bricks"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
+    "glass-fish-board-test"
+    "green-storm-city"
+    "hue-board-1"
+    "late-winter-theme"
+    "lavender-side-eye"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "looking-glass-redux"
+    "looking-glass-redux2"
+    "looking-glass-redux2a"
+    "looking-glass-redux2aa"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "may-20"
+    "my-goodness"
+    "my-goodness-the-sequel"
+    "neverwinter-amy"
+    "night-city-never-sleeps"
+    "nightcity-cape-cod"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "old-fashioned-christmas"
+    "old-town-snow-stars"
+    "pensive-look"
+    "pensive-look2"
+    "pine-wood-dawn"
+    "pink-and-green-elk"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "purple-dusk-old-town"
+    "purple-nightshades"
+    "purple-techno-sunset"
+    "recharts-test-blocks"
+    "refresh-test"
+    "retro-machines"
+    "riffle-test"
+    "sick-of-your-shit"
+    "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "stop-drawing-dead-dashboards"
+    "swamp-nightgown"
+    "swamp-reacher"
+    "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-outer-blues"
+    "trad-hybrid"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "viking-pastels"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "winter-twin-peaks"
+    "witchy425"
+    "wonderland-horror-interface"
+    "wow-board"],
+   :openapi-key "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"}},
+ :runstreams
+ {"flow-forever" {:open? false, :open-outputs? true},
+  "crow-flow-201" {:open? false, :open-outputs? true},
+  "crow-flow-201a" {:open? false, :open-outputs? true},
+  "counting-loop" {:open? true, :open-outputs? true}},
+ :editor? false,
+ :buffy? false,
+ :memory [1808940388 1699146892 4294705152],
+ :sched {:ufo-sightings-drag-9 79625},
+ :status-data
+ {"kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :honored-prismatic-rhinoceros-2,
+      :at "2024-04-08 01:57:09",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-04-08 01:57:09 - query ran in 84 ms."],
+          :name "query-log-:kick--1050509848-sys*",
+          :order 1712555829,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:kick--1050509848-sys*",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:kick--1050509848-sys* "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2024-04-08 01:58:22",
+      :payload nil,
+      :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :alert1
+  {:alerts
+   {:data
+    [[[:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data
+         [{:mem 4870, :tick 32198, :threads 122, :subs 76, :load 5.76416015625}
+          {:mem 3118, :tick 32199, :threads 126, :subs 76, :load 5.3505859375}
+          {:mem 5701, :tick 32200, :threads 127, :subs 76, :load 5.15673828125}
+          {:mem 3872, :tick 32201, :threads 126, :subs 76, :load 4.189453125}
+          {:mem 2747, :tick 32202, :threads 126, :subs 76, :load 5.0986328125}
+          {:mem 5147, :tick 32203, :threads 117, :subs 76, :load 5.58251953125}
+          {:mem 1160, :tick 32204, :threads 117, :subs 76, :load 5.14404296875}
+          {:mem 3411, :tick 32205, :threads 136, :subs 76, :load 5.4208984375}
+          {:mem 1191, :tick 32206, :threads 130, :subs 76, :load 6.13720703125}
+          {:mem 3733, :tick 32207, :threads 121, :subs 76, :load 6.03173828125}
+          {:mem 5589, :tick 32208, :threads 117, :subs 76, :load 5.3076171875}
+          {:mem 1606, :tick 32209, :threads 116, :subs 76, :load 4.44580078125}
+          {:mem 5247, :tick 32210, :threads 118, :subs 76, :load 4.90625}
+          {:mem 1768, :tick 32211, :threads 118, :subs 76, :load 5.2041015625}
+          {:mem 3646, :tick 32212, :threads 124, :subs 76, :load 4.96484375}
+          {:mem 5494, :tick 32213, :threads 116, :subs 76, :load 5.67333984375}
+          {:mem 3341, :tick 32214, :threads 122, :subs 76, :load 5.8623046875}
+          {:mem 5722, :tick 32215, :threads 128, :subs 76, :load 5.74267578125}
+          {:mem 1706, :tick 32216, :threads 119, :subs 76, :load 6.19189453125}
+          {:mem 3613, :tick 32217, :threads 119, :subs 76, :load 5.55224609375}
+          {:mem 1422, :tick 32218, :threads 128, :subs 76, :load 6.40625}
+          {:mem 3827, :tick 32219, :threads 123, :subs 76, :load 5.64013671875}
+          {:mem 5732, :tick 32220, :threads 118, :subs 76, :load 5.33740234375}
+          {:mem 1781, :tick 32221, :threads 116, :subs 76, :load 5.67626953125}
+          {:mem 777, :tick 32222, :threads 127, :subs 76, :load 6.53857421875}
+          {:mem 4471, :tick 32223, :threads 123, :subs 76, :load 6.2578125}
+          {:mem 6399, :tick 32224, :threads 125, :subs 76, :load 7.2724609375}
+          {:mem 5308, :tick 32225, :threads 125, :subs 76, :load 7.4443359375}
+          {:mem 4969, :tick 32226, :threads 144, :subs 76, :load 7.2138671875}
+          {:mem 1452, :tick 32227, :threads 137, :subs 76, :load 7.08984375}
+          {:mem 3799, :tick 32228, :threads 136, :subs 76, :load 7.3759765625}
+          {:mem 1851, :tick 32229, :threads 136, :subs 76, :load 8.22802734375}
+          {:mem 1627, :tick 32230, :threads 138, :subs 76, :load 6.84619140625}
+          {:mem 4187, :tick 32231, :threads 131, :subs 76, :load 6.31884765625}
+          {:mem 2685, :tick 32232, :threads 128, :subs 76, :load 6.1181640625}
+          {:mem 5056, :tick 32233, :threads 129, :subs 76, :load 5.2373046875}
+          {:mem 4863, :tick 32234, :threads 132, :subs 76, :load 5.32666015625}
+          {:mem 3035, :tick 32235, :threads 133, :subs 76, :load 6.60107421875}
+          {:mem 1168, :tick 32236, :threads 135, :subs 76, :load 5.48779296875}
+          {:mem 4024, :tick 32237, :threads 130, :subs 76, :load 4.8994140625}
+          {:mem 1834, :tick 32238, :threads 123, :subs 76, :load 3.66357421875}
+          {:mem 4267, :tick 32239, :threads 126, :subs 76, :load 5.3525390625}
+          {:mem 6083, :tick 32240, :threads 122, :subs 76, :load 5.236328125}
+          {:mem 2099, :tick 32241, :threads 113, :subs 76, :load 4.767578125}
+          {:mem 5789, :tick 32242, :threads 126, :subs 76, :load 5.50146484375}
+          {:mem 2270, :tick 32243, :threads 121, :subs 76, :load 4.33935546875}
+          {:mem 4214, :tick 32244, :threads 120, :subs 76, :load 4.77734375}
+          {:mem 6087, :tick 32245, :threads 116, :subs 76, :load 4.85546875}
+          {:mem 3820, :tick 32246, :threads 121, :subs 76, :load 4.27978515625}
+          {:mem 873, :tick 32247, :threads 115, :subs 52, :load 5.828125}],
+         :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
+        [:> :XAxis {:dataKey :tick, :hide true}]
+        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
+        [:>
+         :YAxis
+         {:yAxisId "right", :hide true, :dataKey :threads, :orientation "right"}]
+        [:>
+         :Bar
+         {:yAxisId "left",
+          :dataKey :mem,
+          :isAnimationActive false,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:string :theme/editor-outer-rim-color "33"]}]
+        [:>
+         :Line
+         {:yAxisId "right",
+          :strokeWidth 4,
+          :type "monotone",
+          :dot false,
+          :dataKey :threads,
+          :isAnimationActive false,
+          :stroke :theme/editor-grid-selected-background-color,
+          :fill :theme/editor-grid-selected-background-color}]
+        [:>
+         :Line
+         {:stroke :theme/block-tab-selected-font-color,
+          :fill :theme/block-tab-selected-font-color,
+          :type "monotone",
+          :yAxisId "right",
+          :dataKey :subs,
+          :strokeWidth 3,
+          :strokeDasharray "5 5",
+          :dot false,
+          :isAnimationActive false}]]]
+      10
+      4
+      5]
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
+ :flow-subs
+ [:flow/flow-forever>*running?
+  :flow/openai-image-gen-ladder>*running?
+  :flow/counting-loop>*running?
+  :flow/crow-flow-201a>*running?
+  :flow/crow-flow-201>*running?
+  :flow/flow-forever>:final-math],
+ :client-name :honored-prismatic-rhinoceros-2,
+ :flow-gantt? false,
+ :alt-key-held? false,
+ :flow-editor? true,
+ :openai-api-key "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",
+ :window {:w 2460, :h 1474},
+ :post-meta
+ {:gen-viz-797 {:* {:rowcount 317}},
+  :gen-viz-94 {:* {:rowcount 1}},
+  :rowcnt-drag-2 {:* {:rowcount 1}},
+  :gen-viz-828 {:* {:rowcount 317}},
+  :gen-viz-84 {:* {:rowcount 6}},
+  :ufo-sightings-drag-9
+  {:* {:rowcount 80332},
+   :duration_seconds_int {:distinct 536},
+   :city {:distinct 19898},
+   :date_posted {:distinct 317},
+   :longitude {:distinct 19455},
+   :state {:distinct 67},
+   :duration_seconds {:distinct 537},
+   :duration_hours {:distinct 8349},
+   :shape {:distinct 29},
+   :datetime {:distinct 69434},
+   :latitude {:distinct 18445},
+   :country {:distinct 5}},
+  :duration-hours-drag-43 {:* {:rowcount 8349}},
+  :city-drag-26 {:* {:rowcount 19899}},
+  :state-drag-3 {:* {:rowcount 68}},
+  :shape-drag-7 {:* {:rowcount 30}}},
+ :flow-estimates
+ {"counting-loop" {:times 6, :run-id "e2f58e54-1370-42f6-9cdc-7a33d7f802fd"},
+  "client-keepalive" {:times nil, :run-id "d28c19b0-000e-42a2-b847-9f26d45ed3ef"},
+  "openai-image-gen-ladder"
+  {:times 44.4, :run-id "e007b3a5-86fc-4847-aafc-1d2b99289067"},
+  "crow-flow-201" {:times nil, :run-id "75811643-8d4e-460b-8ca2-443ea2c13c4e"}},
+ :status
+ {"kick-test!" {:kick :kick--1050509848-sys*},
+  :heartbeat
+  {:kick
+   [:flow/flow-forever>*running?
+    :flow/openai-image-gen-ladder>*running?
+    :flow/counting-loop>*running?
+    :flow/crow-flow-201a>*running?
+    :flow/crow-flow-201>*running?
+    :flow/flow-forever>:final-math]},
+  :alert1 {:alerts :alert2}},
+ :screen-name "looking-glass-redux45",
+ :recos-page2 0,
+ :selected-tab "sapphire ape",
+ :col-names nil,
+ :snapshots nil,
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :alerts [],
+ :recos-page 0,
+ :rs-overrides-hashmap
+ {"flow-forever" nil,
+  "crow-flow-201" nil,
+  "crow-flow-201a" nil,
+  "counting-loop" nil},
+ :base-sniff-queries
+ {:ufo_sightings 484893751,
+  :jvm_stats 1498154063,
+  :fn_history -521895456,
+  :flow_history -1964522657,
+  :channel_history -1549851234},
+ :panels-hash -933472700,
+ :sessions
+ (["honored-prismatic-rhinoceros-2.edn" "1 minute, 56 seconds" 116537]
+   ["sparkling-hexagonal-bee-38.edn" "100 hours, 43 minutes, 28 seconds" 362608350]
+   ["efficient-prismatic-parrot-18.edn"
+    "116 hours, 22 minutes, 13 seconds"
+    418933735]
+   ["ready-azure-snake-17.edn" "116 hours, 25 minutes, 31 seconds" 419131462]
+   ["transformative-oval-raven-19.edn"
+    "116 hours, 34 minutes, 39 seconds"
+    419679095]
+   ["intellectual-octohedral-jay-8.edn"
+    "119 hours, 27 minutes, 40 seconds"
+    430060373]
+   ["famous-linear-echidna-4.edn" "119 hours, 31 minutes, 51 seconds" 430311663]
+   ["virtuous-blush-rabbit-27.edn" "119 hours, 55 minutes, 5 seconds" 431705288]
+   ["heavenly-wide-horse-37.edn" "12 seconds" 12769]),
+ :last-run-throwaway "01:21:41",
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :user-params-hash 1681531413,
+ :grid-recos? true,
+ :session-hash -370910924,
+ :resolved-queries
+ {:gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state
+      :country],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state
+      :country],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state
+          :country],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state
+      :country],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state
+      :country],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state
+    :country],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]],
+   :col-widths {:datetime 170, :state 80},
+   :deep-meta? true,
+   :cache? true,
+   :refresh-every 120,
+   :style-rules
+   {[:* :highlight-row]
+    {:logic [:> :duration_seconds "300"],
+     :style {:background-color "#008b8b66", :border "1px solid #00000000"}},
+    [:* :highlight-fl-row]
+    {:logic [:> :duration_seconds "300"],
+     :style
+     {:font-size "28px", :font-weight 500, :font-family "Pastor of Muppets"}},
+    [:state :highlight-fl-col]
+    {:logic [:= :state "fl"], :style {:background-color "red", :color "black"}}}},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state
+       :country],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state
+       :country],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state
+       :country],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state
+       :country],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]}},
+ :panels
+ {:block-414
+  {:mad-libs-combo-hash ["572062609" "ufo_sightings_drag_9"],
+   :name "basic_timeseries - \"date_posted, rows\" - 769",
+   :w 9,
+   :root [5 13],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-797
+    {:select [[[:count 1] :rows] :date_posted],
+     :from [:query/ufo-sightings-drag-9],
+     :group-by [:date_posted]}},
+   :tab "sapphire ape",
+   :conditionals nil,
+   :views
+   {:oz
+    [:vega-lite
+     {:layer
+      [{:encoding
+        {:x {:field :date_posted, :type "temporal", :sort "x"},
+         :y {:aggregate "sum", :field :rows, :type "quantitative"},
+         :row {:field nil, :legend nil},
+         :size {:legend nil},
+         :shape {:legend nil},
+         :column {:field nil, :legend nil},
+         :color
+         {:scale :theme/vega-default-color-scheme,
+          :legend nil,
+          :field nil,
+          :type "ordinal"}},
+        :mark
+        {:type "area",
+         :interpolate "monotone",
+         :point "transparent",
+         :tooltip {:content "encoding"}}}],
+      :data {:values :gen-viz-797},
+      :config :theme/vega-defaults,
+      :width "container",
+      :height :panel-height,
+      :padding 4,
+      :background "transparent"}
+     {:actions false}]}},
+  :block-11251
+  {:name "block-11251",
+   :w 6,
+   :selected-view :hi,
+   :root [5 7],
+   :h 2,
+   :queries {},
+   :tab "through the rabbit hole and out the other side",
+   :minimized? true,
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11251.:hi"}
+     :style
+     {:font-size "14px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:push ["flow-forever" ":open-input" 21555]]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-11609
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:city-drag-26
+    {:select [:city [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :ff571]],
+     :group-by [:city],
+     :order-by [[:rowcnt :desc]]}},
+   :root [1 8],
+   :tab "sapphire ape"},
+  :block-7416
+  {:h 5,
+   :w 4,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-drag-from-select-all-ufo_sightings",
+   :queries
+   {:rowcnt-drag-2
+    {:select [[[:sum :rowcnt] :rowcnt_sum]], :from [[:query/city-drag-26 :yy403]]}},
+   :root [1 13],
+   :tab "sapphire ape"},
+  :block-11530
+  {:h 2,
+   :w 9,
+   :views
+   {:flow-play-runstreamed
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "25px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:run-flow ["flow-forever" "run flow 'flow-forever'" :runstream-overrides]]]},
+   :name "flow-play-from-runstreams",
+   :root [5 18],
+   :tab "through the rabbit hole and out the other side"},
+  :block-204
+  {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
+   :name "compound_trend_1 - \"date_posted, rows\" - 1141",
+   :w 10,
+   :root [23 13],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-828
+    {:select [[[[:count 1]] :agg] :date_posted],
+     :from [:query/ufo-sightings-drag-9],
+     :order-by [[:date_posted :desc]],
+     :group-by [:date_posted]},
+    :gen-viz-94
+    {:select
+     [[[:max
+        [:round
+         [:raw
+          ["(100 * (("
+           :query-preview/agg.0
+           ".0 - "
+           :query-preview/agg.1
+           ".0) / "
+           :query-preview/agg.0
+           ".0))"]]
+         2]]
+       :diff]],
+     :from [:query/ufo-sightings-drag-9]}},
+   :tab "sapphire ape",
+   :conditionals {:c345-up-or-down? [:> :query-preview/agg.0 :query-preview/agg.1]},
+   :views
+   {:oz
+    [:v-box
+     :size
+     "auto"
+     :height
+     :half-panel-height-px
+     :style
+     {:padding-left "8px", :padding-right "8px"}
+     :children
+     [[:h-box
+       :justify
+       :between
+       :children
+       [[:box
+         :padding
+         "16px"
+         :child
+         [:number :query-preview/agg.0]
+         :style
+         {:font-size "39px", :color "#ffffff"}]
+        [:h-box
+         :padding
+         "13px"
+         :size
+         "auto"
+         :children
+         [[:icon
+           :md-icon-name
+           [:if :condi/c345-up-or-down? "zmdi-chevron-up" "zmdi-chevron-down"]
+           :style
+           {:font-size "55px",
+            :color [:if :condi/c345-up-or-down? "#20f323" "#f36464"],
+            :opacity 0.5,
+            :margin-top "8px"}]
+          [:box
+           :child
+           [:percent :query-preview-2/diff.0]
+           :style
+           {:font-size "25px", :padding "15px"}]]]]]
+      [:box
+       :style
+       {:margin-top "-10px"}
+       :size
+       "auto"
+       :child
+       [:vega-lite
+        {:layer
+         [{:encoding
+           {:x {:field :date_posted, :type "temporal", :title nil, :sort "x"},
+            :y
+            {:aggregate "sum",
+             :field :agg,
+             :title nil,
+             :scale {:zero false},
+             :type "quantitative"},
+            :row {:field nil, :legend nil},
+            :size {:legend nil},
+            :shape {:legend nil},
+            :column {:field nil, :legend nil},
+            :color
+            {:scale {:scheme "purples"}, :legend nil, :field 1, :type "ordinal"}},
+           :mark
+           {:type "line",
+            :interpolate "monotone",
+            :line true,
+            :point true,
+            :tooltip {:content "encoding"}}}],
+         :data {:values :gen-viz-828},
+         :config
+         {:view {:stroke "transparent"},
+          :line {:strokeWidth 3},
+          :axis
+          {:domainColor "#ffffff22",
+           :grid true,
+           :font "Lato",
+           :labelColor "#afafaf",
+           :titleFont "Lato",
+           :titleColor "#282828",
+           :labelFont "Lato",
+           :domain false,
+           :gridColor "#ffffff22",
+           :tickColor "#ffffff22",
+           :axisFont "Lato"},
+          :legend
+          {:labelFont "Lato",
+           :legendFont "Lato",
+           :labelColor "#ffffff99",
+           :titleColor "#ffffff99",
+           :stroke "#ffffff99",
+           :titleFont "Lato"},
+          :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+          :mark {:font "Lato"},
+          :title
+          {:font "Lato",
+           :subtitleFont "Lato",
+           :labelFont "Lato",
+           :titleFont "Lato",
+           :titleColor "#ffffff99"}},
+         :width :panel-width,
+         :height :half-panel-height,
+         :padding 4,
+         :background "transparent"}
+        {:actions false}]]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:padding-top "133px", :font-size "20px"}
+       :child
+       [:string [:date_posted " vs " :rows]]]]]}},
+  :block-2536
+  {:h 2,
+   :w 16,
+   :root [0 1],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-2536",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-6121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Did you ever need a flow to stop and present an operator with some choices? Static or dynamic we need help to continue processing. How about this ALSO happening headlessly & seamlessly with your data UI?"]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-8805
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:duration-hours-drag-43
+    {:select [:duration_hours [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :cc350]],
+     :group-by [:duration_hours],
+     :order-by [[:rowcnt :desc]]}},
+   :root [25 8],
+   :tab "sapphire ape"},
+  :block-94
+  {:mad-libs-combo-hash ["1561519308" "ufo_sightings_drag_9"],
+   :name "basic_v_bar - \"country, rows\" - 559",
+   :w 9,
+   :root [14 13],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-84
+    {:select [[[:count 1] :rows] :country],
+     :from [:query/ufo-sightings-drag-9],
+     :group-by [:country]}},
+   :tab "sapphire ape",
+   :conditionals nil,
+   :views
+   {:oz
+    [:vega-lite
+     {:layer
+      [{:encoding
+        {:y {:field :country, :type "ordinal"},
+         :x {:aggregate "sum", :field :rows, :type "quantitative"},
+         :row {:field nil, :legend nil},
+         :size {:legend nil},
+         :shape {:legend nil},
+         :column {:field nil, :legend nil},
+         :color
+         {:scale :theme/vega-default-color-scheme,
+          :legend nil,
+          :field 1,
+          :type "ordinal"}},
+        :mark {:type "bar", :tooltip {:content "encoding"}}}],
+      :data {:values :gen-viz-84},
+      :config :theme/vega-defaults,
+      :width "container",
+      :height :panel-height,
+      :padding 4,
+      :background "transparent"}
+     {:actions false}]}},
+  :block-1913
+  {:h 2,
+   :w 16,
+   :root [0 15],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-1913",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-4121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Pretty cool, if you ask me. Regular Dashboards are, like, totally lame - reactive flow-powered data boards...  thats where its at."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-9369
+  {:h 3,
+   :w 16,
+   :root [0 11],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-9369",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-9363.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-7319
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:shape-drag-7
+    {:select [:shape [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :hh354]],
+     :group-by [:shape],
+     :order-by [[:rowcnt :desc]]}},
+   :root [9 8],
+   :tab "sapphire ape"},
+  :block-4121
+  {:h 3,
+   :w 16,
+   :root [0 7],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-4121",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-4121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-7215
+  {:h 4,
+   :w 9,
+   :tab "through the rabbit hole and out the other side",
+   :root [5 20],
+   :name "block-7215",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "88px"}
+     :child
+     [:string :flow/flow-forever>:final-math]]},
+   :queries {}},
+  :block-3777
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:state-drag-3
+    {:select [:state [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :uu58]],
+     :group-by [:state],
+     :order-by [[:rowcnt :desc]]}},
+   :root [17 8],
+   :tab "sapphire ape"},
+  :block-6121
+  {:h 2,
+   :w 16,
+   :root [0 4],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-6121",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-6121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Here you can see that while running the flow interactively, we get the dialog push, as well as the ability to manipulate the options on the flow directly."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-1449
+  {:h 7,
+   :w 32,
+   :connection-id "bigfoot-ufos",
+   :name "select-all-ufo_sightings",
+   :queries
+   {:ufo-sightings-drag-9
+    {:select
+     [:city
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state
+      :country],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]],
+     :col-widths {:datetime 170, :state 80},
+     :deep-meta? true,
+     :cache? true,
+     :refresh-every 120,
+     :style-rules
+     {[:* :highlight-row]
+      {:logic [:> :duration_seconds "300"],
+       :style {:background-color "#008b8b66", :border "1px solid #00000000"}},
+      [:* :highlight-fl-row]
+      {:logic [:> :duration_seconds "300"],
+       :style
+       {:font-size "28px", :font-weight 500, :font-family "Pastor of Muppets"}},
+      [:state :highlight-fl-col]
+      {:logic [:= :state "fl"],
+       :style {:background-color "red", :color "black"}}}}},
+   :root [1 1],
+   :tab "sapphire ape",
+   :selected-view :ufo-sightings-drag-9}},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#b60039",
+  "boolean" "#13283E",
+  "map" "#536D82",
+  "list" "#1F374E",
+  "string" "#00aeff",
+  "vector" "#6B6B87",
+  "keyword" "#C6DDAE",
+  "rabbit-code" "#3E5970",
+  "datetime" "#94939A",
+  "integer" "#eb02f3",
+  "unknown" "#D510BBB",
+  "date" "#A2AFB7",
+  "nil" "#13283E"},
+ :click-param
+ {:blocks-sys
+  {:block_key ":*theme*",
+   :block_name "(meta: this screen's theme)",
+   :queries 0,
+   :views 27,
+   :block_data
+   "{:codemirror-theme \"ayu-dark\", :editor-param-background-color \"#000000\", :base-block-style {:backdrop-filter \"blur(2px) brightness(70%) \"}, :vega-defaults {:view {:stroke \"transparent\"}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#ffffff88\", :titleFont \"Lato\", :titleColor \"#ffffff99\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :grid-selected-column-css {:background-color \"#00000088\", :filter \"brightness(200%)\"}, :base-block-color-selected \"#00030a\", :block-title-font-color \"#ffffff\", :base-block-color \"#05041182\", :editor-rim-color \"#297fb8\", :base-block-filter-selected \"drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)\", :vega-default-color-scheme {:scheme \"pastel2\"}, :data-colors {\"float\" \"#2A3959\", \"boolean\" \"#13283E\", \"map\" \"#536D82\", \"list\" \"#1F374E\", \"string\" \"#484F71\", \"vector\" \"#6B6B87\", \"keyword\" \"#C6DDAE\", \"rabbit-code\" \"#3E5970\", \"datetime\" \"#94939A\", \"integer\" \"#2D485F\", \"unknown\" \"#D510BBB\", \"date\" \"#A2AFB7\", \"nil\" \"#13283E\"}, :editor-grid-selected-font-color \"#000000\", :monospaced-font \"JetBrains Mono\", :editor-grid-selected-background-color \"#b8b2bb\", :nivo-defaults {:font-family \"Instagram Sans\", :labels {:text {:fill \"#ffffff\", :font-size \"16px\", :font-family \"Instagram Sans\", :font-weight 700}}, :tooltip {:container {:background \"#000\", :color \"#ffffff\", :text {:fill \"#eeeeee\"}, :fontSize \"18px\", :borderRadius \"4px\", :boxShadow \"0 1px 2px rgba(0, 0, 0, 0.55)\", :padding \"5px 9px\"}, :basic {:whiteSpace \"pre\", :display \"flex\", :alignItems \"center\"}, :tableCell {:padding \"3px 5px\"}}, :axis {:legend {:text {:fill \"#ffffff\", :font-size \"14px\", :font-family \"Instagram Sans\", :font-weight 700}}, :ticks {:line {:stroke \"#ffffff60\"}, :text {:fill \"#ffffff60\", :font-weight 700}}}, :grid {:line {:stroke \"#ffffff\", :strokeWidth 0, :strokeDasharray \"0 0\"}}}, :editor-outer-rim-color \"#297fb8\", :grid-selected-font-color \"#000000\", :block-title-selected-font-color \"#ffffff\", :grid-selected-background-color \"#a3d3ff\", :grid-font-color \"#ffffff\", :canvas-background-css {:background-image \"url(images/large/b64-decoded-9884793-8k-4k.png)\", :transition \"all 0.8s ease-in-out\", :background-size \"cover\", :background-color \"#424f57\"}, :editor-font-color \"#ffffff\", :base-font \"Instagram Sans\", :block-tab-selected-font-color \"#c9d1ff\", :editor-background-color \"#000006\", :editor-grid-font-color \"#ffffff\"}",
+   :view_names
+   ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color",
+   :query_names ""},
+  :tables-sys
+  {:db_schema "none",
+   :db_catalog nil,
+   :connection_id "bigfoot-ufos",
+   :schema_cat nil,
+   :table_name "ufo_sightings",
+   :fields 14},
+  :kick-817820299-sys*
+  {:flow_id "openai-image-gen-ladder",
+   :run_id "1d8c0c87-00cc-43cc-a240-a4799ad5a30a",
+   :start_ts "2024-04-07 13:34:07",
+   :elapsed_seconds 41.788,
+   :human_elapsed "41 seconds",
+   :result "success",
+   :styler_highlight_8369aaa1 0},
+  :kick-1902413898-sys* {:flow_id "openai-image-gen-ladder", :runs 370},
+  :flow
+  {:counting-loop>open-fn-1 nil,
+   :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
+   :crow-flow-201>*running? false,
+   :counting-loop>open-fn-2 44,
+   :openai-image-gen-ladder>*running? false,
+   :crow-flow-201a>*running? false,
+   :live-scratch-flow>*running? false,
+   :counting-loop>*running? false,
+   :counting-loop>open-fn-3 45,
+   :flow-forever>*running? false,
+   :counting-loop>final-value 44,
+   :flow-forever>final-math 683.5},
+  :flows-sys
+  {:flow_id "counting-loop",
+   :file_path "./flows/counting-loop.edn",
+   :last_modified "2024-03-12 02:37:43"},
+  :files-sys
+  {:file_path "./screens/blackberries.edn",
+   :screen_name "blackberries",
+   :blocks 5,
+   :queries 0,
+   :ts "2024-04-07 06:59:35"},
+  :viz-tables-sys2 {:table_name :ufo-sightings-drag-9},
+  :searches-types-sys {:item_type "saved-queries"},
+  :searches-rows-sys
+  {:item_sub_type "gen-viz-950",
+   :item_type "saved-queries",
+   :item_key "SSuccessful-oval-sea-urchin-of-mountain-range",
+   :display_name ":block-568 :queries :gen-viz-950",
+   :sample
+   "{:select [:f2], :from [:query/literes3a], :group-by [:f2], :order-by [:f2]}",
+   :value
+   ":screen/SSuccessful-oval-sea-urchin-of-mountain-range>panels>block-568>queries>gen-viz-950",
+   :is_live nil,
+   :block_meta
+   "{:name \"v_param_buttons - f2 - 553\", :w 9, :h 9, :natural-key :gen-viz-950, :connection-id nil, :conditionals nil}"},
+  :param
+  {:selected-view [nil nil],
+   :selected-view-data nil,
+   :my-strring "STRINGY!",
+   :selected-block :block-1449},
+  :theme
+  {:codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(25%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#05041182",
+   :editor-rim-color "#297fb8",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#b60039",
+    "boolean" "#13283E",
+    "map" "#536D82",
+    "list" "#1F374E",
+    "string" "#00aeff",
+    "vector" "#6B6B87",
+    "keyword" "#C6DDAE",
+    "rabbit-code" "#3E5970",
+    "datetime" "#94939A",
+    "integer" "#eb02f3",
+    "unknown" "#D510BBB",
+    "date" "#A2AFB7",
+    "nil" "#13283E"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "Fira Code",
+   :editor-grid-selected-background-color "#b8b2bb",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#297fb8",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/large/b64-decoded-9884793-8k-4k.png)",
+    :transition "all 0.8s ease-in-out",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Instagram Sans",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+  :ufo-sightings-drag-9
+  {:duration_seconds_int 300,
+   :styler_highlight_fl_row 0,
+   :city nil,
+   :date_posted "2001-02-18",
+   :longitude -96.865702,
+   :state "tx",
+   :duration_seconds "300",
+   :duration_hours "5 minutes",
+   :styler_highlight_fl_col 0,
+   :shape "sphere",
+   :datetime "2001-01-03 15:00:00.000000",
+   :latitude "32.823887",
+   :country nil,
+   :styler_highlight_row 0},
+  :kick-1902413898-sys*.* {},
+  :sys {:selected-tab "sapphire ape", :selected-tab-idx 1},
+  :searches-sub-types-sys
+  {:item_key "looking-glass-redux2",
+   :is_live nil,
+   :items 17,
+   :styler_highlight_4018a 0}},
+ :selected-flow "openai-image-gen-ladder",
+ :flow-statuses
+ {"crow-flow-201"
+  {:last-updated nil,
+   :blocks_finished 9,
+   :channels 0,
+   :channels-open 0,
+   :*started-by :rvbbit-scheduler,
+   :time-running "less than a second",
+   :last-update {:done :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "counting-loop"
+  {:last-updated nil,
+   :blocks_finished 13,
+   :channels 0,
+   :channels-open 0,
+   :*started-by :rvbbit-scheduler,
+   :time-running "6 seconds",
+   :last-update {:final-value/x :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []}},
+ :post-condi {:c345-up-or-down? [{:v 0}]}}

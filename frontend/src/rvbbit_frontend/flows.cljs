@@ -4866,15 +4866,78 @@
         read-only-flow? (true? (cstr/includes? flow-id "/"))]
     (cond
       (= ttype :run-history)
-      (let [viz1 {:queries
-                  {:gen-viz-1090aa
-                   {:select   [[[[:count 1]] :value]
+      (let [caller @(re-frame/subscribe [::conn/clicked-parameter-key [:virtual-panel/client_name]])
+            status @(re-frame/subscribe [::conn/clicked-parameter-key [:virtual-panel/return_status]])
+            dropdown1 {:view [:dropdown
+                              {:choices :gen-viz-812aaa
+                               :width   "300px"
+                               :placeholder "(all callers)"
+                               :style   {:padding-top "8px"
+                                         :border-radius "8px" ;:background-color "#ffffff" :color "#'000000"
+                                         :color "#ffffff75"
+                                         :outline (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)}
+                               :model   :virtual-panel/client_name
+                               :field   :client_name}]
+                       :queries {:gen-viz-812aaa {:select   [[:client_name :id]
+                                                             [:client_name :label]]
+                                                  :connection-id "flows-db"
+                                                  :from     [{:select   [:client_name]
+                                                              :from     [[:flow_history :uu9]]
+                                                              :group-by [1]}]
+                                                  :group-by [:client_name]
+                                                  :order-by [:client_name]}}}
+            dropdown2 [:dropdown
+                       {:choices [{:id 1 :label "error"} {:id 0 :label "success"} {:id -1 :label "timeout"}]
+                        :width   "200px"
+                        :placeholder "(all return statuses)"
+                        :style   {:padding-top "8px"
+                                  :border-radius "8px" ;:background-color "#ffffff" :color "#'000000"
+                                  :color "#ffffff75"
+                                  :outline (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 33)}
+                        :model   :virtual-panel/return_status
+                        :field   :return_status}]
+            waffle1 {:view [:nivo-waffle-chart
+                            {:total 10000 ;:waffle-totals10000 ; :query-preview-2/ttl.0
+                             :rows 2
+                             :columns 12
+                      ;:colors :theme/vega-default-color-scheme ;{:scheme "pastel2"}
+                      ;:colors {:scheme "pastel2"}
+                             :colors (vec (reverse (for [e (range 25)] (str (theme-pull :theme/editor-outer-rim-color nil) (- 99 (* e 3))))))
+                             :padding 1
+                             :borderRadius 1
+                             :width 700
+                             :theme :theme/nivo-defaults
+                             :click {:c :waffle-hour}
+                             :height 50
+                             :margin {:top 5 :right 5 :bottom 0 :left 5}
+                             :data :waffle-hour ;;[{:id "Hey1" :value 23} {:id "Hey2" :value 1223} {:id "Hey3" :value 1243} {:id "Hey4" :value 1623}]
+                             }]
+                     :queries {:waffle-hour {:select        [[[:cast
+                                                               [:substr :start_ts 11 3]
+                                                               :text] :id]
+                                                             [[[:count 1]] :value]]
+                                             :connection-id "flows-db"
+                                             :from          [[:fn_history :cc393]]
+                                             :group-by      [1]}
+                               :waffle-totals {:select [[:sum :value] :summy] :from [{:select        [[[:cast
+                                                                                                        [:substr :start_ts 11 3]
+                                                                                                        :text] :id]
+                                                                                                      [[[:count 1]] :value]]
+                                                                                      :connection-id "flows-db"
+                                                                                      :from          [[:fn_history :cc393]]
+                                                                                      :group-by      [1]}]}}}
+            viz1 {:queries
+                  {:flow-history-calendar-sys*
+                   {:select   [[[[:count [:distinct :run_id]]] :value]
                                [[:substr :start_ts 0 11] :day]]
                     :connection-id "flows-db"
-                    :from     [[:fn_history :cc393]]
+                    :from     [[:flow_history :cc393]]
+                    :where [:and
+                            (if caller [:= :client_name (str caller)] [:= 1 1]) ;; since we automatically read-string keywords in most cases. TODO handle this mixed logic better
+                            (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
                     :group-by [[:substr :start_ts 0 11]]}}
                   :view [:nivo-calendar
-                         {;:labelTextColor "#ffffff" ;"#423939"
+                         {:labelTextColor "#ffffff" ;"#423939"
                           :emptyColor "#00000000"
                           :axisLeft {:tickRotation   0
                                      :legendPosition "middle"
@@ -4886,44 +4949,45 @@
                                        :legendPosition "middle"
                                        :legendOffset   40}
                           :inner-padding 0
-                          :width (- dyn-width 60)
+                          :width (- dyn-width 30)
                           :monthBorderColor "#ffffff15"
-                          :colors ["#2a4858" "#294d5d" "#275163"
-                                   "#255667" "#225b6c" "#1e6071"
-                                   "#1a6575" "#156a79" "#0e6f7d"
-                                   "#057480" "#007983" "#007e86"
-                                   "#008488" "#00898a" "#008e8c"
-                                   "#00938d" "#00988e" "#039d8f"
-                                   "#12a28f" "#1ea78f" "#28ac8f"
-                                   "#32b18e" "#3cb68d" "#46bb8c"
-                                   "#50bf8b" "#5ac489" "#64c987"
-                                   "#6ecd85" "#79d283" "#83d681"
-                                   "#8eda7f" "#99de7c" "#a5e27a"
-                                   "#b0e678" "#bcea75" "#c8ed73"
-                                   "#d4f171" "#e0f470" "#edf76f"
-                                   "#fafa6e" "#fafa6e" "#faf568"
-                                   "#faf162" "#faec5d" "#fae757"
-                                   "#f9e352" "#f9de4c" "#f9d947"
-                                   "#f9d441" "#f9cf3c" "#f8cb37"
-                                   "#f8c632" "#f8c12c" "#f8bc27"
-                                   "#f7b722" "#f7b21d" "#f6ad17"
-                                   "#f6a811" "#f6a30a" "#f59e04"
-                                   "#f49800" "#f49300" "#f38e00"
-                                   "#f28800" "#f28300" "#f17d00"
-                                   "#f07800" "#ef7200" "#ee6c00"
-                                   "#ed6600" "#ec6000" "#eb5a00"
-                                   "#ea5300" "#e84c00" "#e74500"
-                                   "#e53d00" "#e43502" "#e22b05"
-                                   "#e11e08" "#df0b0b"]
-                                  ;:theme :theme/nivo-defaults
+                          ;; :colors ["#2a4858" "#294d5d" "#275163"
+                          ;;          "#255667" "#225b6c" "#1e6071"
+                          ;;          "#1a6575" "#156a79" "#0e6f7d"
+                          ;;          "#057480" "#007983" "#007e86"
+                          ;;          "#008488" "#00898a" "#008e8c"
+                          ;;          "#00938d" "#00988e" "#039d8f"
+                          ;;          "#12a28f" "#1ea78f" "#28ac8f"
+                          ;;          "#32b18e" "#3cb68d" "#46bb8c"
+                          ;;          "#50bf8b" "#5ac489" "#64c987"
+                          ;;          "#6ecd85" "#79d283" "#83d681"
+                          ;;          "#8eda7f" "#99de7c" "#a5e27a"
+                          ;;          "#b0e678" "#bcea75" "#c8ed73"
+                          ;;          "#d4f171" "#e0f470" "#edf76f"
+                          ;;          "#fafa6e" "#fafa6e" "#faf568"
+                          ;;          "#faf162" "#faec5d" "#fae757"
+                          ;;          "#f9e352" "#f9de4c" "#f9d947"
+                          ;;          "#f9d441" "#f9cf3c" "#f8cb37"
+                          ;;          "#f8c632" "#f8c12c" "#f8bc27"
+                          ;;          "#f7b722" "#f7b21d" "#f6ad17"
+                          ;;          "#f6a811" "#f6a30a" "#f59e04"
+                          ;;          "#f49800" "#f49300" "#f38e00"
+                          ;;          "#f28800" "#f28300" "#f17d00"
+                          ;;          "#f07800" "#ef7200" "#ee6c00"
+                          ;;          "#ed6600" "#ec6000" "#eb5a00"
+                          ;;          "#ea5300" "#e84c00" "#e74500"
+                          ;;          "#e53d00" "#e43502" "#e22b05"
+                          ;;          "#e11e08" "#df0b0b"]
+                          :colors (vec (reverse (for [e (range 25)] (str (theme-pull :theme/editor-outer-rim-color nil) (- 99 (* e 3))))))
+                          :theme :theme/nivo-defaults
                           :click {:x :flow-day :y :value}
                           :padding 0.1
                           :enableGridX true
                           :border-radius 2
                           :enableGridY true
-                          :height 210
-                          :margin {:top 0 :right 5 :bottom 80 :left 45}
-                          :data :gen-viz-1090aa}]}
+                          :height 245
+                          :margin {:top 0 :right 5 :bottom 20 :left 25}
+                          :data :flow-history-calendar-sys*}]}
             vselected? @(re-frame/subscribe [::conn/clicked-parameter-key [:virtual-panel/flow-day]])
             grid-menu {:select
                        [:flow_id
@@ -4931,7 +4995,9 @@
                        :connection-id "flows-db"
                        :col-widths {:runs 50 :flow_id 215}
                        :group-by [1]
-                       :where (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
+                       :where [:and (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
+                               (if caller [:= :client_name (str caller)] [:= 1 1])
+                               (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
                        :order-by [[1 :asc]]
                        :from [[:flow_history :tt336aa]]}
             gm-kw (str "kick-" (hash grid-menu) "-sys*")
@@ -4965,21 +5031,34 @@
                    :style-rules {[:* :highlight-8369aaa1]
                                  {:logic [:= :in_error 1]
                                   :style
-                                  {:background-color "#FF000011"
-                                   :border "1px solid #FF000077"}}}
+                                  {;:background-color "#FF000021"
+                                   :opacity 0.4
+                                   :font-style "italic"
+                                   ;:border "1px solid #FF000077"
+                                   }}}
                    :col-widths {:flow_id 320 :elapsed_seconds 115 :run_id 70 :human_elapsed 140 :result 65 :start_ts 145}
                    :where [:and
                            (if selected? [:= :flow_id (keyword (str gm-kw "/flow_id"))] [:= 1 1])
-                           (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])]
+                           (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
+                           (if caller [:= :client_name (str caller)] [:= 1 1]) ;; since we automatically read-string keywords in most cases. TODO handle this mixed case better
+                           (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
                    :order-by [[:start_ts :desc]]
                    :from [[:flow_history :tt336a]]}
+            callout1  {:select [[[:count [:distinct :run_id]] :cnt]]
+                       :connection-id "flows-db"
+                       :where [:and
+                               (if selected? [:= :flow_id (keyword (str gm-kw "/flow_id"))] [:= 1 1])
+                               (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
+                               (if caller [:= :client_name (str caller)] [:= 1 1]) ;; since we automatically read-string keywords in most cases. TODO handle this mixed case better
+                               (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
+                       :from [[:flow_history :tt336a]]}
             grid-kw (str "kick-" (hash grid1) "-sys*")
             selected-run-id @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])
             run-selected? (not (nil? selected-run-id))
             grid2 {:select [:*]
                    :connection-id "flows-db"
                    :col-widths {:value 500}
-                   :where (if run-selected? [:= :run_id (keyword (str grid-kw "/run_id"))] [:= 1 0])
+                   :where [:and (if run-selected? [:= :run_id (keyword (str grid-kw "/run_id"))] [:= 1 0])]
                    :order-by [[:start_ts :desc]]
                    :from [[:fn_history :tt87336]]}
             grid3 {:select [:*]
@@ -4988,8 +5067,7 @@
                    :where (if run-selected? [:= :run_id (keyword (str grid-kw "/run_id"))] [:= 1 0])
                    :order-by [[:start_ts :desc]]
                    :from [[:channel_history :tt87336]]}
-            grid2-kw (str "kick-" (hash grid2) "-sys*")
-            ]
+            grid2-kw (str "kick-" (hash grid2) "-sys*")]
 
         (when (and (not= @last-loaded-run-id selected-run-id) (not (nil? selected-run-id)))
         ;; ^^ if is is changed and not nil - swap the loaded flow !!!
@@ -5003,12 +5081,29 @@
                  ;:height "430px"
                  ;:style {:border "1px solid white"}
                  ;:gap "10px"
-         :children [[re-com/box
+         :children [[re-com/h-box
+                     :size "auto"
+                     :height "60px"
+                     :width "750px" 
+                     ;:width "100%"
+                     :justify :between 
+                     :align :center 
+                     :gap "40px"
+                     :style {:font-size "15px" 
+                             ;:border "1px solid yellow"
+                             }
+                     :children [;[re-com/box :child [buffy/render-honey-comb-fragments dropdown1 5 2 true] :width "235px"]
+                                [buffy/render-honey-comb-fragments dropdown1 5 2 true]
+                                [buffy/render-honey-comb-fragments dropdown2 4 2 true]
+                                [re-com/box :child ""]
+                                ;[buffy/render-honey-comb-fragments callout1 4 2 true]
+                                ]]
+                    [re-com/box
                      :size "none"
-                     :width (px dyn-width)
-                     :height "175px"
+                     ;:width (px dyn-width)
+                     :height "255px"
                      :style {:font-size "15px"}
-                     :child [buffy/render-honey-comb-fragments viz1 (/ dyn-width 50) 22 true]]
+                     :child [buffy/render-honey-comb-fragments viz1 (/ dyn-width 50) 24 true]]
                     [re-com/h-box
                      :children
                      [[re-com/box
@@ -5559,7 +5654,8 @@
                       [flow-details-block-container (first @flow-editor-system-mode) :system :system
                        [settings-block flow-id :part-browser] "zmdi-chart-donut"]
 
-                      :else [re-com/box :child "got nothing"])
+                      ;:else [re-com/box :child "got nothing"]
+                      )
 
 
                 (cond (some #(= (first @flow-editor-system-mode) %) ["flow browser" "flow parts"])

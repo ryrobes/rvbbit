@@ -1080,34 +1080,34 @@
    {:prompt {:value :param/spiritual-peach-boar, :source :param, :open? false},
     :style-param {:open? true, :value "vivid"},
     :prompt-2 {:value :param/supporting-tan-bear, :source :param},
-    :prompt-3 {:value nil, :source nil},
+    :prompt-3 {:value :param/quiet-peach-armadillo, :source :param},
     :prompt-4 {:value nil, :source nil},
     :prompt-5 {:value nil, :source nil}},
    :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [737393960 630511616 4294705152],
+ :memory [2893238613 2604176965 4294705152],
  :status-data
  {"kick-test!"
   {:kick
    {:data
     [{:sent! "kick-test!",
       :to :prominent-baby-blue-skunk-8,
-      :at "2024-04-05 04:45:12",
+      :at "2024-04-07 03:10:45",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-04-05 04:45:12 - query ran in 0 ms."],
-          :name "query-log-:flows-sys",
-          :order 1712306712,
+        [{:content ["2024-04-07 03:10:45 - query ran in 155 ms."],
+          :name "query-log-:rowcnt-drag-2",
+          :order 1712473845,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
-        :description "query-log-:flows-sys",
+        :description "query-log-:rowcnt-drag-2",
         :mutates {},
         :options {:actions? false, :pages? false, :search? false},
         :parameters {}}},
-      :payload-kp [:flows-sys "kick-test!"]}
+      :payload-kp [:rowcnt-drag-2 "kick-test!"]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -1116,7 +1116,7 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-04-06 22:17:03",
+      :at "2024-04-07 03:24:24",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -1125,27 +1125,101 @@
   :alert1
   {:alerts
    {:data
-    [[[:v-box
-       :justify
-       :center
-       :style
-       {:margin-top "-6px", :color "inherit"}
-       :children
-       [[:box :child "flow openai-image-gen-ladder has finished"]
-        nil
-        [:box
-         :style
-         {:font-weight 700, :font-size "10px", :opacity 0.7}
-         :child
-         "39 seconds "]
-        [:box
-         :style
-         {:font-weight 700, :font-size "10px", :opacity 0.7}
-         :child
-         "returns: ./images/gen/b64-image-13503-94204.png"]]]
+    [[[:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data
+         [{:mem 804, :tick 29445, :threads 110, :subs 156, :load 4.50390625}
+          {:mem 822, :tick 29446, :threads 116, :subs 156, :load 4.13330078125}
+          {:mem 961, :tick 29447, :threads 118, :subs 156, :load 4.0009765625}
+          {:mem 1352, :tick 29448, :threads 119, :subs 156, :load 2.96435546875}
+          {:mem 1199, :tick 29449, :threads 105, :subs 156, :load 2.95703125}
+          {:mem 648, :tick 29450, :threads 106, :subs 156, :load 2.537109375}
+          {:mem 662, :tick 29451, :threads 109, :subs 156, :load 3.55517578125}
+          {:mem 1484, :tick 29452, :threads 116, :subs 156, :load 2.92919921875}
+          {:mem 824, :tick 29453, :threads 108, :subs 156, :load 2.66552734375}
+          {:mem 1068, :tick 29454, :threads 116, :subs 156, :load 3.833984375}
+          {:mem 873, :tick 29455, :threads 135, :subs 156, :load 3.6767578125}
+          {:mem 1565, :tick 29456, :threads 125, :subs 156, :load 5.5771484375}
+          {:mem 935, :tick 29457, :threads 111, :subs 150, :load 4.62060546875}
+          {:mem 1462, :tick 29458, :threads 123, :subs 150, :load 3.73486328125}
+          {:mem 1507, :tick 29459, :threads 117, :subs 150, :load 4.369140625}
+          {:mem 503, :tick 29460, :threads 119, :subs 150, :load 3.3994140625}
+          {:mem 1101, :tick 29461, :threads 116, :subs 150, :load 3.73681640625}
+          {:mem 1492, :tick 29462, :threads 114, :subs 150, :load 3.462890625}
+          {:mem 1330, :tick 29463, :threads 117, :subs 150, :load 3.31396484375}
+          {:mem 891, :tick 29464, :threads 121, :subs 150, :load 3.99658203125}
+          {:mem 667, :tick 29465, :threads 117, :subs 150, :load 3.576171875}
+          {:mem 1157, :tick 29466, :threads 127, :subs 150, :load 3.58154296875}
+          {:mem 1066, :tick 29467, :threads 129, :subs 162, :load 3.34521484375}
+          {:mem 857, :tick 29468, :threads 115, :subs 162, :load 3.73583984375}
+          {:mem 705, :tick 29469, :threads 118, :subs 80, :load 3.45068359375}
+          {:mem 1262, :tick 29470, :threads 113, :subs 80, :load 4.5009765625}
+          {:mem 1041, :tick 29471, :threads 112, :subs 80, :load 6.06982421875}
+          {:mem 563, :tick 29472, :threads 121, :subs 80, :load 4.86181640625}
+          {:mem 1334, :tick 29473, :threads 117, :subs 80, :load 5.63330078125}
+          {:mem 685, :tick 29474, :threads 118, :subs 80, :load 4.755859375}
+          {:mem 818, :tick 29475, :threads 143, :subs 80, :load 4.5830078125}
+          {:mem 1551, :tick 29476, :threads 127, :subs 80, :load 5.50341796875}
+          {:mem 883, :tick 29477, :threads 116, :subs 80, :load 4.31201171875}
+          {:mem 1476, :tick 29478, :threads 115, :subs 88, :load 3.9052734375}
+          {:mem 1527, :tick 29479, :threads 124, :subs 88, :load 3.30224609375}
+          {:mem 956, :tick 29480, :threads 122, :subs 88, :load 3.8896484375}
+          {:mem 557, :tick 29481, :threads 115, :subs 88, :load 3.77734375}
+          {:mem 1119, :tick 29482, :threads 126, :subs 88, :load 3.25341796875}
+          {:mem 1050, :tick 29483, :threads 120, :subs 88, :load 3.2080078125}
+          {:mem 579, :tick 29484, :threads 120, :subs 88, :load 2.6005859375}
+          {:mem 1178, :tick 29485, :threads 127, :subs 88, :load 3.4208984375}
+          {:mem 1598, :tick 29486, :threads 122, :subs 88, :load 3.435546875}
+          {:mem 1451, :tick 29487, :threads 124, :subs 88, :load 3.34619140625}
+          {:mem 829, :tick 29488, :threads 125, :subs 88, :load 3.830078125}
+          {:mem 1408, :tick 29489, :threads 116, :subs 88, :load 3.51611328125}
+          {:mem 665, :tick 29490, :threads 119, :subs 88, :load 3.47509765625}
+          {:mem 548, :tick 29491, :threads 127, :subs 88, :load 3.8076171875}
+          {:mem 1160, :tick 29492, :threads 126, :subs 88, :load 3.37841796875}
+          {:mem 649, :tick 29493, :threads 129, :subs 88, :load 3.06298828125}
+          {:mem 965, :tick 29494, :threads 118, :subs 49, :load 5.1904296875}],
+         :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
+        [:> :XAxis {:dataKey :tick, :hide true}]
+        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
+        [:>
+         :YAxis
+         {:yAxisId "right", :hide true, :dataKey :subs, :orientation "right"}]
+        [:>
+         :Bar
+         {:yAxisId "left",
+          :dataKey :mem,
+          :isAnimationActive false,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:string :theme/editor-outer-rim-color "33"]}]
+        [:>
+         :Line
+         {:yAxisId "right",
+          :strokeWidth 4,
+          :type "monotone",
+          :dot false,
+          :dataKey :threads,
+          :isAnimationActive false,
+          :stroke :theme/editor-grid-selected-background-color,
+          :fill :theme/editor-grid-selected-background-color}]
+        [:>
+         :Line
+         {:stroke :theme/block-tab-selected-font-color,
+          :fill :theme/block-tab-selected-font-color,
+          :type "monotone",
+          :yAxisId "right",
+          :dataKey :subs,
+          :strokeWidth 3,
+          :strokeDasharray "5 5",
+          :dot false,
+          :isAnimationActive false}]]]
       10
-      1.35
-      9]
+      4
+      5]
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
@@ -1446,29 +1520,34 @@
  :window {:w 5205, :h 1605},
  :post-meta
  {:gen-viz-1132 {:* {:rowcount 7}},
-  :client-items-drag-item-key-5 {:* {:rowcount 5422}},
-  :client-items-drag-20 {:* {:rowcount 8309}},
-  :client-items-drag-35 {:* {:rowcount 8309}},
+  :client-items-drag-item-key-5 {:* {:rowcount 5792}},
+  :client-items-drag-20 {:* {:rowcount 9157}},
+  :client-items-drag-35 {:* {:rowcount 9157}},
   :rowcnt-drag-7 {:* {:rowcount 1}},
-  :blocks-drag-44 {:* {:rowcount 2345}},
+  :blocks-drag-44 {:* {:rowcount 2349}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
-  :fields-drag-16 {:* {:rowcount 1004}},
+  :fields-drag-16 {:* {:rowcount 961}},
   :city-drag-26-1 {:* {:rowcount 3755}},
   :ufo-sightings-drag-9 {:* {:rowcount 67662}},
   :item-type-drag-5 {:* {:rowcount 7}},
-  :item-type-drag-0 {:* {:rowcount 2731}},
+  :item-type-drag-0 {:* {:rowcount 2752}},
   :duration-hours-drag-43 {:* {:rowcount 7103}},
   :city-drag-26 {:* {:rowcount 12346}},
-  :gen-viz-555 {:* {:rowcount 7}},
+  :gen-viz-555 {:* {:rowcount 9}},
   :state-drag-3 {:* {:rowcount 59}},
   :shape-drag-7 {:* {:rowcount 29}}},
  :flow-estimates
- {"client-keepalive" {:times nil, :run-id "2772692f-ebd6-4b13-8ef8-d46ae4e48f6e"},
+ {"client-keepalive" {:times nil, :run-id "dfa486d1-56d1-4a21-805a-7a60be32a6e5"},
   "openai-image-gen-ladder"
-  {:times 38.4, :run-id "484854eb-36af-4b25-bd1f-24c1bf4156cb"},
-  "flow-forever" {:times 4.1, :run-id "c184687c-d129-43c9-b090-f16a8300b081"}},
+  {:times 43.6, :run-id "bca13cee-b8a7-4273-9fdc-8094f0cb495e"},
+  "flow-forever" {:times 4.1, :run-id "c184687c-d129-43c9-b090-f16a8300b081"},
+  "hare-flow-359" {:times nil, :run-id "bdddedb3-e15b-42be-ad52-4a25f8638566"},
+  "crow-flow-201" {:times nil, :run-id "6e2d8dc4-e557-48af-b001-110a1d210c3f"},
+  "loop-time1!" {:times nil, :run-id "f8a1492b-8637-4d2d-8f3c-fdfb06ebca68"},
+  "counting-loop" {:times 6, :run-id "90ec38c7-9d6d-48f2-af19-b0f750c75008"},
+  "crow-flow-201a" {:times nil, :run-id "c6444b8d-bbaa-4b42-bf86-b3b95d87fb26"}},
  :status
- {"kick-test!" {:kick :flows-sys},
+ {"kick-test!" {:kick :rowcnt-drag-2},
   :heartbeat
   {:kick
    [:flow/openai-image-gen-ladder>:pop-color
@@ -1496,38 +1575,34 @@
    "a beautiful, young white woman, of irish or scottish descent, standing in a dystopian cyberpunk  northeast America overgrown by a new england forest. late 20s. dark and moody with neon pinks, purples, and light blues, stormy, rainy ambiance, close up looking at the camera. long hair. high quality, highly detailed, intricate neck tattoos. gritty and atmospheric. cyberpunk and vaporwave aesthetic. almost as if she is tempting or daring you to come join her world. rabbit necklace. intricate rabbit tattoos. plump and pouty lips. volumptous. pinup style illustration.",
    :style-param "vivid",
    :prompt-2
-   "a beautiful, buxom young white woman, of irish or scorrish descent, standing in a dystopian cyberpunk northeast America new england forest. late 20s. dark and moody with neon pinks, purples, and light blues, midnight. close up looking at the camera. long hair. high quality, highly detailed, intricate neck tattoos. gritty and atmospheric. cyberpunk and vaporwave aesthetic. sultry temptress. large rabbit necklace. intricate rabbit tattoos. plump and pouty lips. volumptous. pinup style illustration."}},
+   "a beautiful, buxom young white woman, of irish or scorrish descent, standing in a dystopian cyberpunk northeast America new england forest. late 20s. dark and moody with neon pinks, purples, and light blues, midnight. close up looking at the camera. long hair. high quality, highly detailed, intricate neck tattoos. gritty and atmospheric. cyberpunk and vaporwave aesthetic. sultry temptress. large rabbit necklace. intricate rabbit tattoos. plump and pouty lips. volumptous. pinup style illustration.",
+   :prompt-3
+   "A meticulously-detailed, hyperrealistic 16:9 highly stylized & exaggerated pinup pinup noir femme fatale Playboy  style cyberpunk illustration of a wintery morning scene set in traditional New England, showcasing a unique mixture of rustic charm and futuristic, cyberpunk elements. The quaint town is enshrouded under a fresh white carpet of snow amidst a flurry storm, which creates an ambiance of slight grittiness. The architectural structures radiate a soft, inviting glow, tinted in hues of pastel pink and neon light blue. To the left side of the composition, a strikingly beautiful Irish woman in her early 30s is emphasised. Her attractive features include a buxom build, full pouty lips with a prominently larger lower lip, a perky nose, and an expression that cleverly combines satisfaction with a hint of alluring sophistication. Her flowing, slightly damp hair cascades over her neck and shoulders due to the falling snow. Intricately designed, Celtic-inspired tattoos of rabbits and scenes from nature beautifully cover her neck, collarbone, and shoulders. The timidly emerging morning sun from the horizon casts a gentle light upon her body, playing up the serene and slightly mysterious atmosphere created by the pre-dawn illumination. Her full, maternal figure basks in the sunlight, creating a visually pleasing interplay of light and shadow on her richly adorned body.  In a pinup style."}},
  :panels-hash -47122056,
  :sessions
- (["free-ivory-echidna-of-dune-system.edn" "100 hours, 39 seconds" 360039342]
-   ["proud-magenta-skunk-exiled-from-volcanic-arc.edn"
-    "100 hours, 58 minutes, 32 seconds"
-    363512798]
-   ["good-cylindrical-ape-exiled-from-calanque.edn"
-    "101 hours, 6 minutes, 17 seconds"
-    363977827]
-   ["enchanting-cobalt-gull-banned-from-inlet.edn"
-    "101 hours, 6 minutes, 3 seconds"
-    363963344]
-   ["electrifying-pyramidal-platypus-banned-from-depressions.edn"
-    "112 hours, 55 minutes, 26 seconds"
-    406526155]
-   ["cool-magenta-mole-hailing-from-glen.edn"
-    "119 hours, 15 minutes, 55 seconds"
-    429355713]
-   ["lucky-olive-fox-hailing-from-volcanic-dam.edn"
-    "180 hours, 35 minutes, 50 seconds"
-    650150695]
-   ["creative-emerald-gnu-of-the-shore.edn"
-    "182 hours, 50 minutes, 59 seconds"
-    658259682]
-   ["unreal-ovoid-serval-banned-from-salt-flat.edn"
-    "187 hours, 36 minutes, 25 seconds"
-    675385338]),
+ (["composed-prismatic-koala-28.edn" "1 hour, 20 minutes, 18 seconds" 4818842]
+   ["adorable-rhomboidal-raven-13.edn" "1 hour, 21 minutes, 45 seconds" 4905481]
+   ["polished-jade-wolf-42.edn" "1 hour, 33 minutes, 21 seconds" 5601538]
+   ["fair-pyramidal-duck-hailing-from-barchan.edn"
+    "1 hour, 45 minutes, 13 seconds"
+    6313631]
+   ["creative-burgundy-serval-exiled-from-barrier-island.edn"
+    "1 hour, 53 minutes, 14 seconds"
+    6794277]
+   ["proud-plum-wolf-banned-from-positive-landforms.edn"
+    "1 hour, 53 minutes, 17 seconds"
+    6797393]
+   ["poised-rectangular-wallaby-banned-from-yazoo-stream.edn"
+    "1 hour, 53 minutes, 17 seconds"
+    6797513]
+   ["nice-oval-sheep-exiled-from-exhumed-river-channel.edn"
+    "1 hour, 53 minutes, 9 seconds"
+    6789153]
+   ["adorable-conical-human-15.edn" "1 minute, 47 seconds" 107953]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1405435513,
+ :user-params-hash -1871170174,
  :grid-recos? true,
- :session-hash -1945057490,
+ :session-hash -1707370091,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -2876,16 +2951,16 @@
    :views 0},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#d7799c",
+   :openai-image-gen-ladder>pop-color "#d3c698",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-13503-94204.png",
+   "./images/gen/b64-image-16672-5291.png",
    :counting-loop>open-fn-2 44,
    :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
-   "A striking image capturing a young Caucasian woman in her late 20s, possibly of Irish or Scottish heritage. She is standing amidst a dystopian cyberpunk setting of a forest in northeast New England, USA, under the cloak of midnight. The scene is imbued with moody tones of neon pinks, purples, and light blues. The woman is presented in a close-up shot, looking directly at the camera. Her long hair falls freely and she sports highly detailed, intricate neck tattoos, adding a gritty layer to the atmosphere. The aesthetic blends cyberpunk and vaporwave elements. She carries an aura of a sultry temptress. A large necklace shaped like a rabbit adorns her, complimenting the intricate rabbit tattoos. Her lips are plump and pouty, contributing to the overall pinup style illustration. The woman is portrayed as having a voluptuous figure.",
+   "Depict a highly detailed scene. This scene should evoke the spirit of certain stylistic elements from late 1940s American illustrations that were characterized by exaggerated and stylized depictions of women, however, should not be considered an exact representation. The image portrays a strong, young, robust, Swedish woman in her early 30s, who possesses a full face and long, thick Viking-style braids. She poses proudly in the midst of a Northeast American forest, with the particular charm of New England nature at dusk. She locks gaze with the viewer, her confidence and allure amplified by the dramatic futuristic and nostalgic aesthetic lighting and her dark eye makeup. A mysterious and alluring smile graces her lips. Her shoulders and collarbone carry detailed and intricate tattoos, adding to the overall enigma. These extended to her neck, with each design telling a unique story. An accessory also adorns her - a necklace with a pendant in the shape of a rabbit. Similar rabbit motifs are woven into her tattoos. This image captures a blend of wonder, mystery, and allure. As the sun rises, its rays create a radiant glow on her body.",
    :live-scratch-flow>*running? false,
    :openai-image-gen-ladder>hiccup-image-box-w-png-vw
    [:v-box
@@ -2920,7 +2995,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#303964",
+   :openai-image-gen-ladder>dominant-color "#0e2b33",
    :flow-forever>final-math 683.5},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",

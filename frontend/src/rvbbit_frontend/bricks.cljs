@@ -131,7 +131,7 @@
 
 (re-frame/reg-event-db
  ::take-screenshot
- (fn [db _]
+ (fn [db [_ & [save?]]]
    (let [element (js/document.getElementById "base-canvas")
          session-hash (hash [(get db :panels)
                              (get db :click-param)])]
@@ -142,15 +142,19 @@
               ;(reset! screenshot dataUrl)
                 (when (not (nil? dataUrl))
                   ;(tap> [:push-snap? (get db :client-name)])
-                  (re-frame/dispatch [::http/save-snap dataUrl]))))
+                  (re-frame/dispatch [(if save? 
+                                        ::http/save-screen-snap
+                                        ::http/save-snap) dataUrl]))))
             (fn [error]
               (tap> ["Error taking screenshot:" error])))
 
-     (re-frame/dispatch [::wfx/request :default
-                         {:message    {:kind :session-snaps
-                                       :client-name (get db :client-name)}
-                          :on-response [::save-sessions]
-                          :timeout    500000}])
+     (when (not save?)
+       (re-frame/dispatch [::wfx/request :default
+                           {:message    {:kind :session-snaps
+                                         :client-name (get db :client-name)}
+                            :on-response [::save-sessions]
+                            :timeout    500000}]))
+     
      (assoc db :session-hash session-hash))))
 
 (defn mouse-active-recently? [seconds]
@@ -546,7 +550,8 @@
                     :flowmaps-connections flowmaps-connections}
                    flow-id]
         :dispatch-later [{:ms 3000, :dispatch [::conn/clear-query-history :flows-sys]}]}
-       {:dispatch [::http/save :skinny screen-name resolved-queries]}))))
+       {:dispatch [::http/save :skinny screen-name resolved-queries]
+        :dispatch-later [{:ms 100 :dispatch [::take-screenshot true]}]}))))
 
 (re-frame/reg-sub
  ::current-params ;; for snapshot comparisons
@@ -2235,7 +2240,8 @@
         selected-kp (if (nil? (first selected-kp)) nil selected-kp)
         key selected-kp
         font-size (if (nil? key) 13 17)
-        code-width (if (nil? key) (- width-int 24) (- width-int 130))]
+        code-width (if (nil? key) (- width-int 24) (- width-int 130))
+        ]
     ;(tap> [:code-panel key selected-kp])
     [re-com/box
      :size "none"
@@ -8041,7 +8047,8 @@
    (let [ks1      (vec (apply concat (for [k (keys (get-in db [:panels]))] (keys (get-in db [:panels k :queries])))))
          sys-ks   (vec (filter #(or (cstr/ends-with? (str %) "-sys")
                                     (cstr/ends-with? (str %) "-sys2")
-                                    (cstr/ends-with? (str %) "-sys*")) (keys (get db :data))))
+                                    (cstr/ends-with? (str %) "-sys*")
+                                    ) (keys (get db :data))))
          ;;buffy-fragments (vec (filter #(cstr/ends-with? (str %) "-sys*") (keys (get db :data))))
          base-ks  (into (vec (keys (get db :base-sniff-queries))) [:reco-counts]) ;; why is reco-counts in here?
          ks       (into base-ks (into ks1 sys-ks))
@@ -8052,8 +8059,7 @@
         ;;  bye      (vec (cset/difference (set ks) (set ks-all)))
          run-it?  (or (and (nil? @mad-libs-view) (not (= @db/editor-mode :vvv)) (not (= (count ks-all) (count ks))))
                       ;(> (count (filter #(cstr/ends-with? (str %) "-sys*") keepers)) 0)
-                      (and (get db :flows?) (get db :flow-editor?)) 
-                      )
+                      (and (get db :flow?) (get db :flow-editor?)))
          ]
      
     ;; (tap> [:clean-up-on-isle-4 client-name run-it? :before (count ks-all) :after (count ks) :remove bye  :keep keepers])
@@ -9019,7 +9025,9 @@
                                          m-pair  (into {} (for [[k v] m-pair2]
                                                             (when (not (nil? v)) {k v})))]
                                      (tap> [:nivo-click-params (js->clj %) m-pair])
-                                     (re-frame/dispatch [::conn/click-parameter [panel-key] m-pair])))
+                                     (doseq [[m1 m2] m-pair]
+                                       (re-frame/dispatch [::conn/click-parameter [panel-key m1] m2]))
+                                     ))
         edn-mass           (if (and (= nivo-fn nivo-calendar/Calendar)
                                     ;(get-in edn-mass [:data 0 :day])
                                     (not (get edn-mass :to)) (not (get edn-mass :from)))
@@ -9371,16 +9379,38 @@
 
      :children boxes]))
 
-(defn dropdown [{:keys [choices field panel-key width style]}]
+(defn dropdown [{:keys [choices field panel-key width button-style style placeholder]}]
   ;(tap> [:dropdown? [choices @(re-frame/subscribe [::conn/clicked-parameter-key [:block-36/season]]) field]])
-  [re-com/single-dropdown
-   :style (if (nil? style) {} style)
-   :parts {:chosen-drop {:style {:overflow "visible"}}}
-   ;:max-height "700px"
-   :choices choices
-   :model @(re-frame/subscribe [::conn/clicked-parameter-key [(try (keyword (str (name panel-key) "/" (name field))) (catch :default _ :error/error))]]) ;(reagent/atom model)
-   :width width
-   :on-change #(re-frame/dispatch [::conn/click-parameter [panel-key] {field %}])])
+  
+  (let [choice @(re-frame/subscribe [::conn/clicked-parameter-key [(try (keyword (str (name panel-key) "/" (name field))) (catch :default _ :error/error))]])
+        choice (if (string? (get-in choices [0 :id])) (str choice) choice)
+        choice (if (and (string? choice) (empty? (cstr/trim choice))) nil choice) ;; in case we get a blank string it wont register as not selected for the placeholder
+        ;; choices (if all (conj all choices) choices)
+        ;choices (vec (conj {:id nil :label (str placeholder)} choices))
+        ;; _ (tap> [:dropdown? panel-key choice  choices field  width style field])
+        width (if (string? width) (try (edn/read-string (cstr/replace width "px" "")) (catch :default _ 100)) width)
+        ]
+    [re-com/h-box
+     :size "auto" :justify :between :align :center 
+     :children [[re-com/md-icon-button
+                 ;:on-click #(re-frame/dispatch [::conn/click-parameter [panel-key] {field nil}])
+                 :on-click #(re-frame/dispatch [::conn/click-parameter [panel-key field] nil])
+                 :style (merge {:font-size "19px" :width "30px" :margin-top "8px" :opacity 0.33} button-style)
+                 :md-icon-name "zmdi-close"]
+                [re-com/single-dropdown
+                 :style (if (nil? style) {} style)
+                 :parts {:chosen-drop {:style {:overflow "visible"}}
+                         ;:chosen-results {:style {:color "#ffffff" 
+                         ;                         :background-color "#eeeeee"}}
+                         }
+                 ;:max-height "700px"
+                 :placeholder (str placeholder)
+                 :choices choices
+                 :model choice ;(re-frame/subscribe [::conn/clicked-parameter-key [(try (keyword (str (name panel-key) "/" (name field))) (catch :default _ :error/error))]]) ;(reagent/atom model)
+                 :width (px (- width 30))
+                 :on-change ;#(re-frame/dispatch [::conn/click-parameter [panel-key] {field %}])
+                 #(re-frame/dispatch [::conn/click-parameter [panel-key field] %])
+                 ]]]))
 
 ;; notes for inline render.
 ;; insert a fake block just like preview, expire them quickly

@@ -39,5 +39,6 @@ flow-logs/
 *.log
 *.code-workspace
 .directory
+screen-snaps/
 
 
