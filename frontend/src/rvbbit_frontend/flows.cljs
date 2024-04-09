@@ -5124,10 +5124,12 @@
                     [buffy/render-honey-comb-fragments [:h-box :size "auto"
                                                         :justify :between :align :center
                                                         :gap "10px" :padding "8px"
+                                                        :style {:font-size "19px" :opacity 0.33 :font-weight 700}
                                                         :children
                                                         [;"filters: "
                                                          [:string :virtual-panel/flow-day]
-                                                         [:string (keyword (str gm-kw "/flow_id"))]
+                                                         [:string [(keyword (str gm-kw "/flow_id")) " "]]
+                                                         caller  
                                                          [:string [(keyword (str grid-kw "/run_id")) " "]]]]  (- (/ dyn-width 50) 1) 6 true]
 
                     ;; [re-com/box :child (str "flow value, overrides, inputs (even if static)" selected-run-id)]
@@ -5150,7 +5152,7 @@
                         :style {:font-size "15px"}
                         :child [buffy/render-honey-comb-fragments grid2
                                 (- (/ dyn-width 50) 1)
-                                (/ panel-height-bricks 2) ;; 10
+                                (- (/ panel-height-bricks 2) 1) ;; 10
                                 true]] ; flow-id orderb true 570 nil ;366
                        "zmdi-dns"])
 
@@ -5167,7 +5169,7 @@
                         :style {:font-size "15px"}
                         :child [buffy/render-honey-comb-fragments grid3
                                 (- (/ dyn-width 50) 1)
-                                (/ panel-height-bricks 2) ;;10
+                                (- (/ panel-height-bricks 2) 1) ;;10
                                 true]] ; flow-id orderb true 570 nil ;366
                        "zmdi-dns"])
 

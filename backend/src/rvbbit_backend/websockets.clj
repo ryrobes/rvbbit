@@ -2216,12 +2216,18 @@
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
           _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter
           ;_ (alert! client-name  10 1.35)
-          ;_ (push-to-client [:estimate] (ut/avg (get @times-atom flow-id [-1])) client-name -1 :est1 :est2)
+
+          _ (push-to-client [:estimate] (ut/avg (get @times-atom flow-id [-1])) client-name -1 :est1 :est2)
+
+          
           ship-est (fn [client-name] (kick client-name (vec (cons :estimate [])) {flow-id {:times (ut/avg   ;; avg based on last 10 runs, but only if > 1
                                                                                                    (vec (take-last 10 (vec (remove #(< % 1)
                                                                                                                                    (get @times-atom flow-id []))))))
                                                                                            :run-id uuid}} nil nil nil))
-          _ (doseq [client-name (keys (client-statuses))] (ship-est client-name)) ;; send to all clients just in case they care... (TODO make this more relevant)
+          ;;_ (doseq [client-name (keys (client-statuses))] (ship-est client-name)) ;; send to all clients just in case they care... (TODO make this more relevant)
+          _ (ship-est client-name)
+
+
          ;; _ (ut/pp [:opts!! opts flow-id])
           return-val (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn symbols in the maps
           ;return-val (submit-named-task-and-wait uid (flow-waiter (eval finished-flowmap) uid opts))
@@ -5413,6 +5419,7 @@
     ;(ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
 
     ;(ut/pp [:times-atom (into {} (for [[k v] @times-atom] {k [(count v) :samples (int (ut/avg v)) :avg-seconds]}))])
+    ;; (ut/pp [:times-atom @times-atom])
 
     ;(ut/pp [:flow-tracker @flow-db/tracker])
 
