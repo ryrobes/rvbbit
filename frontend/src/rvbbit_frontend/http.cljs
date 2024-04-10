@@ -821,9 +821,9 @@
  (fn [{:keys [db]} [_ image]]
    (let [method :post
          url (str url-base "/save-screen-snap")
-         client-name (get db :client-name)
+         screen-name (get db :screen-name)
          request {:image image
-                  :client-name client-name}]
+                  :screen-name screen-name}]
      (tap> [:save-screen-snap!])
      {:db   (assoc-in db [:http-reqs :save-screen-snap]
                       {:status "running"
@@ -1105,7 +1105,7 @@
          coords (get new-db :zoom db/based)
          _ (tap> coords)
          flowmaps-connections (get new-db :flowmaps-connections)]
-     (tap> [:load-flow-history result])
+     ;;(tap> [:load-flow-history result])
      ;(set-zoom-pan (if (empty? coords) db/based coords))
      ;(set-zoom-pan coords)
      ;(swap! db/last-gantt assoc flow-id {})
@@ -1127,10 +1127,11 @@
 
 (re-frame/reg-event-fx
  ::load-flow-history
- (fn [{:keys [db]} [_ run-id]]
+ (fn [{:keys [db]} [_ run-id start-ts]]
    (let [url (str url-base "/load-flow-history")
          method :get
-         request {:run-id run-id}] ;; TODO, sketchy w/o checking
+         request {:run-id run-id
+                  :start-ts start-ts}] ;; TODO, sketchy w/o checking
      {:db   (assoc-in db [:http-reqs :load-flow-history]
                       {:status "running"
                        :url url

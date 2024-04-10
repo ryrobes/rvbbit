@@ -696,12 +696,21 @@
 
 (def data-colors @(re-frame/subscribe [::data-colors])) ;; kinda weird usage
 
+(re-frame/reg-sub
+ ::sql-source
+ (fn [db [_ kkey]]
+   (get-in db [:sql-source kkey] {})))
 
 (defn sql-deep-meta [keypath honey-sql connection-id & [deeps?]]
   ;(tap> [:sql-deep-meta keypath (str (first keypath)) (cstr/starts-with? (str (first keypath)) ":query-preview" )])
   (when (not (cstr/starts-with? (str (first keypath)) ":query-preview")) ;; lets not sniff rando recos, ok?
     (let [fields (get @(re-frame/subscribe [::sql-metadata keypath]) :fields [])
-          connection-id (if (nil? connection-id) "cache.db" connection-id)
+          ;;_ (when (cstr/includes? (str keypath) ":kick") (tap> [:deep-meta keypath honey-sql]))
+          honey-sql (if (empty? (ut/clean-sql-from-ui-keys honey-sql)) 
+                      @(re-frame/subscribe [::sql-source (first keypath)]) honey-sql) 
+          ;; ^^ kicks dont get passed honey-sql map correctly, so we look it up
+          connection-id (or (get honey-sql :connection-id) 
+                            (if (nil? connection-id) "cache.db" connection-id))
           deep-meta? (or deeps? (get honey-sql :deep-meta?))
           ;; honey-sql (-> honey-sql
           ;;               (dissoc :page)
@@ -714,6 +723,7 @@
           ;;               (dissoc :clicked-row-height)
           ;;               (dissoc :style-rules))
           honey-sql (ut/clean-sql-from-ui-keys honey-sql)]
+      (when (cstr/includes? (str keypath) ":kick") (tap> [:deep-meta? keypath fields honey-sql connection-id]))
    ; (dorun
       (doseq
       ;(for 

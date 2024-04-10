@@ -2112,7 +2112,7 @@
  (fn [db [_ params]]
    (true? (= params (get db :click-param {})))))
 
-(defn render-honey-comb-fragments [c & [w h sys?]] ;; TODO REPLACE WITH bricks/honeycomb-fragments
+(defn render-honey-comb-fragments [c & [w h sys-name]] ;; TODO REPLACE WITH bricks/honeycomb-fragments
   (let [panel-key :virtual-panel ;:block-4752 ;:hello-there-brother
         key :virtual-view ;:view ;:ufo-country ;:heya!
         type (cond (vector? c) :view
@@ -2128,7 +2128,9 @@
                                  ;h 9
                                  ]
                              [bricks/honeycomb panel-key :virtual-view w h view nil])
-          (= type :query) (let [temp-key (get data_d :_query-id (keyword (str "kick-" (hash c) (when sys? "-sys*"))))
+          (= type :query) (let [temp-key (get data_d :_query-id (keyword 
+                                                                 (if sys-name (str sys-name)
+                                                                     (str "kick-" (hash c)))))
                                 query {temp-key (-> data_d ;(get data_d :queries)
                                                     (dissoc :cache?)
                                                     (dissoc :refresh-every))}
@@ -2149,7 +2151,9 @@
           (= type :both)    (let [queries (get data_d :queries)
                                   ;temp-key (keyword (str "kick-" (hash c)))
                                   qkeys (into {} (for [q (keys queries)]
-                                                   {q (keyword (str (ut/replacer (str q) #":" "") "-kick-" (hash data_d) (when sys? "-sys*")))}))
+                                                   {q (keyword (if sys-name 
+                                                                 (str (ut/replacer (str q) #":" "") "-" sys-name)
+                                                                 (str (ut/replacer (str q) #":" "") "-kick-" (hash data_d))))}))
                                   ndata (walk/postwalk-replace qkeys data_d)
                                   h (get data_d :_h (or h 11))
                                   w (get data_d :_w (or w 9))

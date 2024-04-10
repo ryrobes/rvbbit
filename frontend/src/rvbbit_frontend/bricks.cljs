@@ -8054,7 +8054,7 @@
          ks       (into base-ks (into ks1 sys-ks))
          ks-all   (keys (get db :data)) ;;; hmmm, curious why I did this initially...
          keepers  (vec (filter #(not (cstr/starts-with? (str %) ":query-preview")) ks))
-         client-name (get db :client-name)
+         ;; client-name (get db :client-name)
          ;bye      (filter #(cstr/starts-with? (str %) ":query-preview") ks)
         ;;  bye      (vec (cset/difference (set ks) (set ks-all)))
          run-it?  (or (and (nil? @mad-libs-view) (not (= @db/editor-mode :vvv)) (not (= (count ks-all) (count ks))))
@@ -8096,7 +8096,10 @@
        (-> db
            (ut/dissoc-in [:panels nil]) ;; garbage keys created by external edit with bad files
            (assoc :panels (select-keys (get db :panels) (filter #(not (cstr/starts-with? (str %) ":query-preview")) (keys (get db :panels)))))
-           (assoc :data (select-keys (get db :data) keepers))
+           (assoc :data (select-keys (get db :data) 
+                                     ;;(filter #(not (cstr/ends-with? (str %) "-sys*")) keepers)
+                                     keepers
+                                     ))
            (assoc :meta (select-keys (get db :meta) keepers))
            (assoc :orders (select-keys (get db :orders) keepers))
            (assoc :post-meta (select-keys (get db :post-meta) keepers))

@@ -655,8 +655,11 @@
                                                              :zoom @db/pan-zoom-offsets
                                                              :flow-id flow-id
                                                              :flowmaps-connections flowmaps-connections}
-                                                :opts {:increment-id? false
-                                                       :opts opts-map}
+                                                :opts (merge
+                                                       {:increment-id? false
+                                                        :opts opts-map}
+                                                       (when (ut/ne? (get opts-map :overrides)) ;; per fab overrides should only happen in the flow editor.... (?) TODO revisit
+                                                         {:overrides (get opts-map :overrides)}))
                                                 :flowmap server-flowmap
                                                 :client-name client-name}
                                    :on-response [::socket-response-flow]
@@ -5000,7 +5003,7 @@
                                (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
                        :order-by [[1 :asc]]
                        :from [[:flow_history :tt336aa]]}
-            gm-kw (str "kick-" (hash grid-menu) "-sys*")
+            gm-kw "grid-menu-sys*" ;; (str "kick-" (hash grid-menu) "-sys*")
             ;viz-kw (str "kick-" (hash viz1) "-sys*")
             selected? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str gm-kw "/flow_id"))]])
 
@@ -5023,8 +5026,9 @@
             grid1 {:select
                    [:flow_id
                     :run_id :start_ts
-                    :elapsed_seconds
+                    [:elapsed_seconds :seconds]
                     :human_elapsed
+                    [[:case [:= "nil" :overrides] "No" :else "Yes"] :overrides]
                     [[:case [:= :in_error 1] "error" :else "success"] :result]]
                    :connection-id "flows-db"
                    :group-by [1 2]
@@ -5036,7 +5040,7 @@
                                    :font-style "italic"
                                    ;:border "1px solid #FF000077"
                                    }}}
-                   :col-widths {:flow_id 320 :elapsed_seconds 115 :run_id 70 :human_elapsed 140 :result 65 :start_ts 145}
+                   :col-widths {:flow_id 280 :seconds 80 :overrides 70 :run_id 70 :human_elapsed 140 :result 65 :start_ts 145}
                    :where [:and
                            (if selected? [:= :flow_id (keyword (str gm-kw "/flow_id"))] [:= 1 1])
                            (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
@@ -5052,8 +5056,9 @@
                                (if caller [:= :client_name (str caller)] [:= 1 1]) ;; since we automatically read-string keywords in most cases. TODO handle this mixed case better
                                (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
                        :from [[:flow_history :tt336a]]}
-            grid-kw (str "kick-" (hash grid1) "-sys*")
+            grid-kw "grid1-sys*" ;;(str "kick-" (hash grid1) "-sys*")
             selected-run-id @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])
+            selected-start-ts @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/start_ts"))]])
             run-selected? (not (nil? selected-run-id))
             grid2 {:select [:*]
                    :connection-id "flows-db"
@@ -5067,13 +5072,14 @@
                    :where (if run-selected? [:= :run_id (keyword (str grid-kw "/run_id"))] [:= 1 0])
                    :order-by [[:start_ts :desc]]
                    :from [[:channel_history :tt87336]]}
-            grid2-kw (str "kick-" (hash grid2) "-sys*")]
+            grid2-kw "grid2-sys*" ;; (str "kick-" (hash grid2) "-sys*")
+            ]
 
         (when (and (not= @last-loaded-run-id selected-run-id) (not (nil? selected-run-id)))
         ;; ^^ if is is changed and not nil - swap the loaded flow !!!
           (reset! last-loaded-run-id selected-run-id)
           ;;(js/alert (str selected-run-id))
-          (re-frame/dispatch [::http/load-flow-history selected-run-id]))
+          (re-frame/dispatch [::http/load-flow-history selected-run-id selected-start-ts]))
 
         [re-com/v-box
                  ;:align :center
@@ -5084,26 +5090,24 @@
          :children [[re-com/h-box
                      :size "auto"
                      :height "60px"
-                     :width "750px" 
+                     :width "750px"
                      ;:width "100%"
-                     :justify :between 
-                     :align :center 
+                     :justify :between
+                     :align :center
                      :gap "40px"
-                     :style {:font-size "15px" 
+                     :style {:font-size "15px"
                              ;:border "1px solid yellow"
                              }
                      :children [;[re-com/box :child [buffy/render-honey-comb-fragments dropdown1 5 2 true] :width "235px"]
-                                [buffy/render-honey-comb-fragments dropdown1 5 2 true]
-                                [buffy/render-honey-comb-fragments dropdown2 4 2 true]
-                                [re-com/box :child ""]
-                                ;[buffy/render-honey-comb-fragments callout1 4 2 true]
-                                ]]
+                                [buffy/render-honey-comb-fragments dropdown1 5 2 "dropdown1-sys*"]
+                                [buffy/render-honey-comb-fragments dropdown2 4 2 "dropdown2-sys*"]
+                                [re-com/box :child ""]]]
                     [re-com/box
                      :size "none"
                      ;:width (px dyn-width)
                      :height "255px"
                      :style {:font-size "15px"}
-                     :child [buffy/render-honey-comb-fragments viz1 (/ dyn-width 50) 24 true]]
+                     :child [buffy/render-honey-comb-fragments viz1 (/ dyn-width 50) 24 "viz1-sys*"]]
                     [re-com/h-box
                      :children
                      [[re-com/box
@@ -5112,25 +5116,25 @@
                        ;:height "275px"
                        :align :center :justify :center
                        :style {:font-size "15px"}
-                       :child [buffy/render-honey-comb-fragments grid-menu (* (/ dyn-width 50) 0.25) 10 true]]
+                       :child [buffy/render-honey-comb-fragments grid-menu (* (/ dyn-width 50) 0.25) 10 "grid-menu-sys*"]]
                       [re-com/box
                        :size "none"
                        ;:width "595px"
                        ;:height "275px"
                        :align :center :justify :center
                        :style {:font-size "15px"}
-                       :child [buffy/render-honey-comb-fragments grid1 (* (/ dyn-width 50) 0.75) 10 true]]]]
-                    ;; [buffy/render-honey-comb-fragments [:box :child [:string (keyword (str grid-kw "/flow_id"))]]  (- (/ dyn-width 50) 1) 6]
+                       :child [buffy/render-honey-comb-fragments grid1 (* (/ dyn-width 50) 0.75) 10 "grid1-sys*"]]]]
                     [buffy/render-honey-comb-fragments [:h-box :size "auto"
                                                         :justify :between :align :center
                                                         :gap "10px" :padding "8px"
                                                         :style {:font-size "19px" :opacity 0.33 :font-weight 700}
                                                         :children
                                                         [;"filters: "
+                                                         ;;[:string :grid-menu-sys*/runs.0] ;; can add later
                                                          [:string :virtual-panel/flow-day]
                                                          [:string [(keyword (str gm-kw "/flow_id")) " "]]
-                                                         caller  
-                                                         [:string [(keyword (str grid-kw "/run_id")) " "]]]]  (- (/ dyn-width 50) 1) 6 true]
+                                                         caller
+                                                         [:string [(keyword (str grid-kw "/run_id")) " "]]]]  (- (/ dyn-width 50) 1) 6 "filter-row-sys*"]
 
                     ;; [re-com/box :child (str "flow value, overrides, inputs (even if static)" selected-run-id)]
 
@@ -5153,7 +5157,7 @@
                         :child [buffy/render-honey-comb-fragments grid2
                                 (- (/ dyn-width 50) 1)
                                 (- (/ panel-height-bricks 2) 1) ;; 10
-                                true]] ; flow-id orderb true 570 nil ;366
+                                "grid2-sys*"]] ; flow-id orderb true 570 nil ;366
                        "zmdi-dns"])
 
                     (when run-selected?
@@ -5170,7 +5174,7 @@
                         :child [buffy/render-honey-comb-fragments grid3
                                 (- (/ dyn-width 50) 1)
                                 (- (/ panel-height-bricks 2) 1) ;;10
-                                true]] ; flow-id orderb true 570 nil ;366
+                                "grid3-sys*"]] ; flow-id orderb true 570 nil ;366
                        "zmdi-dns"])
 
                     [re-com/gap :size "10px"]
@@ -8264,6 +8268,26 @@
    (reset! drop-toggle? (not @drop-toggle?))
    db))
 
+(re-frame/reg-event-db
+ ::unload-flow
+ (fn [db [_ flow-id]]
+   (-> db
+       (ut/dissoc-in [:flows flow-id])
+       (ut/dissoc-in [:flow-results :condis flow-id])
+       (ut/dissoc-in [:flow-results :return-maps flow-id])
+       (ut/dissoc-in [:flow-runner flow-id]))))
+
+(re-frame/reg-sub
+ ::flow-drop-down?
+ (fn [db _]
+   (get db :flow-drop-down? false)))
+
+(re-frame/reg-event-db
+ ::toggle-flow-drop-down
+ (fn [db _]
+   (assoc db :flow-drop-down? (not (get db :flow-drop-down? false)))))
+
+
 (re-frame/reg-sub
  ::zoom-unlocked?
  (fn [db _]
@@ -8285,6 +8309,7 @@
         flow-id @(re-frame/subscribe [::selected-flow])
         watched? (ut/ne? (get @(re-frame/subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
         zoom-unlocked? @(re-frame/subscribe [::zoom-unlocked?])
+        flow-drop-down? @(re-frame/subscribe [::flow-drop-down?])
         flowmaps @(re-frame/subscribe [::flowmap-raw])
        ;; flowmappp [@(re-frame/subscribe [::flowmap]) @ports-react-render]
         flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
@@ -8419,40 +8444,102 @@
                                       ;;                :padding "4px"])]
 
                                        [re-com/h-box
-                                        :gap "2px"
-                                        :children  [[re-com/h-box
-                                                     :children (for [[v [file-path name]] 
-                                                                     (into 
-                                                                      (for [[k v] @(re-frame/subscribe [::http/flows])] [k nil])
-                                                                      (get @(re-frame/subscribe [::http/flow-results]) :run-refs []))
-                                                                     ;(get @(re-frame/subscribe [::http/flows]) :run-refs [])
-                                                                     ]
-                                                                 [re-com/box :child (str v)
-                                                    ;;  :attr {:on-click #(do (swap! chat-mode assoc kp c)
-                                                    ;;                        (swap! kit-mode assoc kp v))}
-                                                                  :attr {:on-click #(let [sub-flow-exec? (and (string? file-path) (not (nil? file-path)))]
-                                                                                      (if sub-flow-exec?
-                                                                                        (re-frame/dispatch [::http/load-flow-w-alias file-path v])
-                                                                                        (re-frame/dispatch [::set-selected-flow (str v)]))
-                                                                                      ;; (js/setTimeout (fn []
-                                                                                      ;;                  (.zoomToElement @db/zoomer @(re-frame/subscribe [::get-flow-brick]) 0.8))
-                                                                                      ;;                1000)
-                                                                                      )}
+                                        :gap "6px"
+                                        :children  [;; [re-com/h-box
+                                                    ;;  :children (for [[v [file-path name]] 
+                                                    ;;                  (into 
+                                                    ;;                   (for [[k v] @(re-frame/subscribe [::http/flows])] [k nil])
+                                                    ;;                   (get @(re-frame/subscribe [::http/flow-results]) :run-refs []))
+                                                    ;;                  ;(get @(re-frame/subscribe [::http/flows]) :run-refs [])
+                                                    ;;                  ]
+                                                    ;;              [re-com/box :child (str v)
+                                                    ;; ;;  :attr {:on-click #(do (swap! chat-mode assoc kp c)
+                                                    ;; ;;                        (swap! kit-mode assoc kp v))}
+                                                    ;;               :attr {:on-click #(let [sub-flow-exec? (and (string? file-path) (not (nil? file-path)))]
+                                                    ;;                                   (if sub-flow-exec?
+                                                    ;;                                     (re-frame/dispatch [::http/load-flow-w-alias file-path v])
+                                                    ;;                                     (re-frame/dispatch [::set-selected-flow (str v)]))
+                                                    ;;                                   ;; (js/setTimeout (fn []
+                                                    ;;                                   ;;                  (.zoomToElement @db/zoomer @(re-frame/subscribe [::get-flow-brick]) 0.8))
+                                                    ;;                                   ;;                1000)
+                                                    ;;                                   )}
 
-                                                                  :style (if (= (str v) (str flow-id))
-                                                             ; {:background-color (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500") :color "black"}
-                                                                           {:text-decoration "underline"}
-                                                                           {:cursor "pointer" :opacity 0.6})
-                                                                  :padding "4px"])]
+                                                    ;;               :style (if (= (str v) (str flow-id))
+                                                    ;;          ; {:background-color (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500") :color "black"}
+                                                    ;;                        {:text-decoration "underline"}
+                                                    ;;                        {:cursor "pointer" :opacity 0.6})
+                                                    ;;               :padding "4px"])]
 
-                                                   ; [re-com/box :child "_"]
+
+
+
+                                                    [re-com/md-icon-button
+                                                     
+                                                     :style {;:font-size "13px"
+                                                             ;:margin-top "-16px"
+                                                             :width "28px"
+                                                             ;:margin-right "8px"
+                                                               ;:color pcolor
+                                                             }
+                                                     :on-click #(re-frame/dispatch [::toggle-flow-drop-down])
+                                                     :md-icon-name (if flow-drop-down? "zmdi-chevron-up" "zmdi-chevron-down")]
 
                                                     [re-com/md-icon-button
                                                      :md-icon-name "zmdi-window-minimize"
                                                      :on-click #(re-frame/dispatch [::bricks/toggle-flow])
                                                      :style {:font-size "15px"
                                                              :opacity   0.33
-                                                             :cursor    "pointer"}]]]]
+                                                             :cursor    "pointer"}]
+
+                                                    (when flow-drop-down?
+                                                      [re-com/v-box
+                                                       :padding "8px"
+                                                       :size "auto" ;:width "400px"
+                                                     ;:height "500px"
+                                                       :style {:background-color "#000000"
+                                                               :color (theme-pull :theme/editor-outer-rim-color nil)
+                                                               :position "fixed"
+                                                               :z-index 900
+                                                               :border-radius "0px 0px 0px 12px"
+                                                               :border-left (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil))
+                                                               :border-bottom (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil))
+                                                               :top 24 ;(px y) ;(+ y 70))
+                                                               :font-size "19px"
+                                                               :right 0}
+                                                       :children (for [[v [file-path name]]
+                                                                       (vec (distinct
+                                                                             (into
+                                                                              (for [[k v] @(re-frame/subscribe [::http/flows])] [k nil])
+                                                                            ;(get @(re-frame/subscribe [::http/flow-results]) :run-refs [])
+                                                                              )))
+                                                                       :let [selected? (= (str v) (str flow-id))]]
+                                                                   [re-com/h-box
+                                                                    :gap "10px" :justify :between
+                                                                    :children [[re-com/box :child (str v)]
+                                                                               [re-com/md-icon-button :src (at)
+                                                                                :md-icon-name "zmdi-close"
+                                                                                :on-click #(re-frame/dispatch [::unload-flow (str v)])
+                                                                                :style {;:color bcolor
+                                                                                        :cursor "pointer"
+                                                                                        :height "12px"
+                                                                                        :font-size "16px"}]]
+                                                                    :attr {:on-click #(let [sub-flow-exec? (and (string? file-path) (not (nil? file-path)))]
+                                                                                        (if sub-flow-exec?
+                                                                                          (re-frame/dispatch [::http/load-flow-w-alias file-path v])
+                                                                                          (re-frame/dispatch [::set-selected-flow (str v)])))}
+
+                                                                    :style (if selected?
+                                                                             {:text-decoration "underline"
+                                                                              :font-weight 700
+                                                                              :border-radius "8px"
+                                                                              :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 40)}
+                                                                             {:cursor "pointer" :opacity 0.6})
+                                                                    :padding "4px"])])]]
+
+                                                             
+                                                             
+                                                             
+                                                             ]
 
 
 
@@ -8941,7 +9028,7 @@
                                                                         :color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                         :font-size "29px"}
                                                                 :gap "10px"
-                                                                :children [[edit-flow-title flow-id 450]
+                                                                :children [[edit-flow-title flow-id 1450]
                                                                            [re-com/md-icon-button :src (at)
                                                                             :md-icon-name (if watched? "zmdi-eye" "zmdi-eye-off")
                                                                             :on-click #(if watched?

@@ -575,6 +575,7 @@
 
     (def last-look (atom {}))
     (def saved-uids (atom []))
+  
 
     (defn update-stat-atom [kks]
       (let [;flows (if (or (nil? flows) (empty? flows))
@@ -592,6 +593,7 @@
                             ;;           :status! (get @flow-db/status k)
                             ;;           :tracker! (get @flow-db/tracker k)])
                             ;; condis (get-in @flow-db/status [k :condis])
+                             
                              cc (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf? doing way too much work here
                              blocks (get-in @flow-db/working-data [k :components-list])
                              running-blocks (vec (for [[k v] (get @flow-db/tracker k)
@@ -608,42 +610,35 @@
                              running? (or (= res :nope) (ut/chan? res) (= res :skip))
                              done? (not (= res :nope))
                              error? (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
-
-                            ;;_ (ut/pp [k :*running? running? done? res error?])
-
-                            ;;res (ut/deep-remove-keys res [:b64_json]) ;; just in case. 5mb strings as no bueno
-
-                             start (try (apply min (or (for [[_ v] (get @flow-db/tracker k)]
-                                                         (get v :start)) [-1]))
+                             start (try (apply min (or (for [[_ v] (get @flow-db/tracker k)] (get v :start)) [-1]))
                                         (catch Exception _ (System/currentTimeMillis)))
-                            ;;  start-ts (-> start
-                            ;;               (clj-time.coerce/from-long)
-                            ;;               (f/unparse (f/formatter "yyyy-MM-dd HH:mm:ss")))
-                            ;;  start-ts (-> (f/formatter "yyyy-MM-dd HH:mm:ss")
-                            ;;               (f/unparse (clj-time.coerce/from-long start)))
-                            ;;  start-ts (-> (f/formatter "yyyy-MM-dd HH:mm:ss")
-                            ;;               (f/unparse (-> start
-                            ;;                              tcc/from-long
-                            ;;                              tcc/to-date-time)))
                              start-ts (ut/millis-to-date-string start)
-                            ;;start (for [[_ v] (get @flow-db/tracker k)] (get v :start))
-                            ;; end (if done?
-                            ;;       (try (apply max (or (for [[_ v] (get @flow-db/tracker k)] (get v :end)) [-1])) (catch Exception _ 0))
-                            ;;       (System/currentTimeMillis))
                              end (try (apply max (or (remove nil? (for [[_ v] (get @flow-db/tracker k)]
                                                                     (get v :end))) [-1]))
-                                      (catch Exception e (do (ut/pp [:exception-in-getting-time-duration!! k (str e)
-                                                                     (for [[_ v] (get @flow-db/tracker k)] (get v :end))
-                                                                     (get @flow-db/tracker k)
-                                                                     :start start])
+                                      (catch Exception e (do ;(ut/pp [:exception-in-getting-time-duration!! k (str e)
+                                                             ;        (for [[_ v] (get @flow-db/tracker k)] (get v :end))
+                                                             ;        (get @flow-db/tracker k)
+                                                             ;        (get @flow-db/last-tracker k)
+                                                             ;        [:last-good-time? (get @wss/last-times k) (vec (take-last 10 (get @wss/last-times k)))]
+                                                             ;        @wss/last-times
+                                                             ;        :start start])
                                                              (System/currentTimeMillis))))
-                             elapsed (- end start)
+                            ;;  elapsed (if (or error? (empty? (get @flow-db/tracker k)))
+                            ;;            (- (System/currentTimeMillis) (get-in @wss/last-times [k :start]))
+                            ;;            (- end start))
+                             start (if error? (get-in @wss/last-times [k :start]) start)
+                             end (if error? (System/currentTimeMillis) end)
+                             elapsed (try (- end start) (catch Throwable e (do (ut/pp [:elapsed-error?? k e :start start :end end]) 0)))
+                             ;;_ (when (and (get @flow-db/tracker k) (> elapsed 1) (not (nil? elapsed))) (swap! last-times assoc k elapsed))
+                             ;;_ (swap! wss/last-times assoc k (conj (take-last 10 (remove #(<= % 0) (get @wss/last-times k []))) elapsed))
+                             _ (swap! wss/last-times assoc-in [k :end] (System/currentTimeMillis))
                              human-elapsed (ut/format-duration start end)
                              run-id (str (get-in @flow-db/results-atom [k :run-id]))
                              parent-run-id (str (get-in @flow-db/results-atom [k :parent-run-id]))
                             ;; _ (ut/pp [:uid (str (get-in @flow-db/results-atom [k :run-id]))
                             ;;           (str (get-in @flow-db/results-atom [k :opts-map :client-id] "n/a"))
                             ;;           done? (get @last-look k)])
+                             overrides (get-in @flow-db/subflow-overrides [k run-id])
                              cname (get-in @flow-db/results-atom [k :opts-map :client-name]
                                            (get @wss/orig-caller k :rvbbit-scheduler))
                              client-name (str cname)
@@ -668,6 +663,7 @@
                                               :run_id run-id
                                               :parent-run_id parent-run-id
                                               :elapsed elapsed
+                                              :overrides (pr-str overrides)
                                               :elapsed_seconds (float (/ elapsed 1000))
                                               :in_error (cstr/includes? (str res) ":error")
                                               :human_elapsed (str human-elapsed)}
@@ -700,6 +696,7 @@
                              :*channels-open chans-open
                              ;:tracker-events (count (get @wss/tracker-history k []))
                              :running-blocks running-blocks
+                             :overrides overrides
                              ;:*result (str res)
                              :*finished (count done-blocks)
                              :*running running-blocks
@@ -962,10 +959,10 @@
   ;; (wss/schedule! [:seconds 30] (wss/materialize-flowmap :server "map-pull-test2" "map-pull-test2" {})
   ;;                {:debug? false :close-on-done? true :increment-id? false :flow-id "map-pull-test2"})
 
-  (wss/schedule! [:seconds 300] "crow-flow-201a"
-                 {:close-on-done? true :increment-id? false :flow-id "crow-flow-201" :debug? false})
+  (wss/schedule! [:minutes 20] "crow-flow-201a"
+                 {:close-on-done? true :increment-id? false :flow-id "crow-flow-201a" :debug? false})
 
-  (wss/schedule! [:minutes 2] "counting-loop"
+  (wss/schedule! [:minutes 20] "counting-loop"
                  {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
 
   ;(ut/pp [:flow-answer1 (wss/flow-waiter ff "boot-test")])

@@ -445,6 +445,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    elapsed real NULL,
    elapsed_seconds real NULL,
    human_elapsed text NULL,
+   overrides text NULL,
    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
    ) ;")
 

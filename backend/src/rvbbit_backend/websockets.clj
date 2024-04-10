@@ -1557,7 +1557,7 @@
                                                    :else (ut/format-duration-seconds seconds-ago)))))})));)
 
 (defn flow-statuses []
-  (into {} (for [[k {:keys [*time-running *running? *started-by *finished running-blocks]}] @flow-status
+  (into {} (for [[k {:keys [*time-running *running? *started-by *finished overrides running-blocks]}] @flow-status
                  :let [chans (count (get @flow-db/channels-atom k))
                        chans-open (count
                                    (doall
@@ -1582,6 +1582,7 @@
                  :last-updated (when *running? (ut/format-duration-seconds last-update-seconds))
                  :last-update (get @last-block-written k)
                  :running-blocks running-blocks
+                 :block-overrides (vec (keys overrides))
                  ;:timeouts (count (filter #(= % :timeout) (ut/deep-flatten tracker-events)))
                  ;:skips (count (filter #(= % :skip) (ut/deep-flatten tracker-events)))
                  :channels-open? channels-open?
@@ -2144,12 +2145,13 @@
 
 ;; (tap> "Hello, world!")
 
-
+ (def last-times (atom {})) ;; stopgap for error times TODO, april 2024
 
 (defn flow! [client-name flowmap file-image flow-id opts & [no-return?]]
   (try
     (let [orig-flowmap flowmap
           _ (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of flowmaps starter overlap
+         orig-opts opts ;; contains overrides
         ;opts (merge {:client-name (str (or (get opts :client-name) client-name :rvbbit))} (or opts {}))) ;; stuff into opts for flow-waiter
           ;user-opts (get opts :opts)
           ;opts (dissoc opts :opts)
@@ -2159,7 +2161,7 @@
           _ (ut/pp [:flow!-passed-opts flow-id opts])
           oo-flowmap (if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
                        (let [raw (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
-                                      (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
+                                      (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk-oo-flowmap-flow! flow-id client-name])
                                                              {})))
                              flowmaps (process-flow-map (get raw :flowmaps))
                              connections (get raw :flowmaps-connections)
@@ -2170,7 +2172,8 @@
                        flowmap)
           file-image (or file-image
                          (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
-                              (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
+                              (catch Exception _ (do (when (not= flow-id "client-keepalive") ;; since no file exists and its not from a client, it has not real "file-image" map
+                                                       (ut/pp [:error-reading-flow-from-disk-file-image-flow! flow-id client-name]))
                                                      {}))))
           ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps-pre") ;; TEMP FOR DEBUGGING PRE PROCESSED MAPS
           ;;                     (ut/pretty-spit (str "./flow-history/src-maps-pre/" flow-id ".edn") ;; expensive...
@@ -2213,8 +2216,10 @@
           ;;                     (ut/pretty-spit (str "./flow-history/src-maps/" flow-id ".edn") ;; expensive...
           ;;                                     finished-flowmap 185)))
           ;;_ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
+          _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter          
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
-          _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter
+          _ (swap! last-times assoc-in [flow-id :start] (System/currentTimeMillis))
+          ;;_ (swap! last-times assoc flow-id []) 
           ;_ (alert! client-name  10 1.35)
 
           _ (push-to-client [:estimate] (ut/avg (get @times-atom flow-id [-1])) client-name -1 :est1 :est2)
@@ -2224,8 +2229,8 @@
                                                                                                    (vec (take-last 10 (vec (remove #(< % 1)
                                                                                                                                    (get @times-atom flow-id []))))))
                                                                                            :run-id uuid}} nil nil nil))
-          ;;_ (doseq [client-name (keys (client-statuses))] (ship-est client-name)) ;; send to all clients just in case they care... (TODO make this more relevant)
-          _ (ship-est client-name)
+          _ (doseq [client-name (keys (client-statuses))] (ship-est client-name)) ;; send to all clients just in case they care... (TODO make this more relevant)
+          ;;_ (ship-est client-name)
 
 
          ;; _ (ut/pp [:opts!! opts flow-id])
@@ -2329,7 +2334,9 @@
                                  (ut/replace-large-base64
                                   (merge
                                    output
-                                   {:image file-image ;; as unprocessed as we can w/o being a file path
+                                   {;;:image file-image ;; as unprocessed as we can w/o being a file path
+                                    ;;:orig-opts orig-opts ;; needed for overrides
+                                    :image (assoc file-image :opts (merge (get file-image :opts) (select-keys orig-opts [:overrides])))
                                     :first-stage-flowmap flowmap
                                     ;;:tracker (get @tracker-history flow-id [])
                                     :return-map (get @flow-db/results-atom post-id)
@@ -2364,7 +2371,7 @@
         client-name :rvbbit-scheduler
         raw (if (string? flowmap)
               (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
-                   (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flowmap client-name])
+                   (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk-raw-schedule flowmap client-name])
                                           {}))) {})
         user-opts (get raw :opts)
         opts (merge {:client-name client-name} opts user-opts)
@@ -2407,7 +2414,7 @@
                   (slurp (if (cstr/ends-with? (cstr/lower-case flowmap) ".edn")
                            flowmap ;; file path, use as is
                            (str "./flows/" flowmap ".edn"))))
-                 (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk flow-id client-name])
+                 (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk-raw-open-ports flow-id client-name])
                                         {})))
         [flowmap raw-conns] [(if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
                                (let [flowmaps (process-flow-map (get raw :flowmaps))
@@ -4883,10 +4890,10 @@
     ;(time
     (let [image (get-in request [:edn-params :image])
           ;session (get-in request [:edn-params :session])
-          client-name (get-in request [:edn-params :client-name] "unknown")
-          client-name (cstr/replace (str client-name) ":" "")
-          file-path (str "./screen-snaps/" client-name ".jpg")
-          ifile-path (str "/home/ryanr/rvbbit/frontend/resources/public/screen-snaps/" client-name ".jpg")]
+          screen-name (get-in request [:edn-params :screen-name] "unknown")
+          ;;screen-name (cstr/replace (str screen-name) ":" "")
+          file-path (str "./screen-snaps/" screen-name ".jpg")
+          ifile-path (str "/home/ryanr/rvbbit/frontend/resources/public/screen-snaps/" screen-name ".jpg")]
       (ut/save-base64-to-jpeg image file-path)
       (ut/save-base64-to-jpeg image ifile-path));)
     (catch Exception e (ut/pp [:save-snap-error e])))
@@ -4945,10 +4952,15 @@
 (defn load-flow-history [request]
   (let [run-id (or (get-in request [:edn-params :run-id])
                    (get-in request [:query-params :run-id]))
+        start-ts (or (get-in request [:edn-params :start-ts])
+                     (get-in request [:query-params :start-ts]))
         file-path (str "./flow-history/" run-id ".edn")
         _ (ut/pp [:load-flow-history file-path])
-        flow-data-file (edn/read-string (slurp file-path))]
-    (ut/ppln [:loading-flow-history-from-file file-path])
+        flow-data-file (edn/read-string (slurp file-path))
+        flow-id (get flow-data-file :flow-id)
+        hist-flow-id (str flow-id " " start-ts)
+        flow-data-file (walk/postwalk-replace {flow-id hist-flow-id} flow-data-file)]
+    (ut/ppln [:loading-flow-history-from-file file-path flow-id hist-flow-id])
     (send-edn-success flow-data-file)))
 
 
