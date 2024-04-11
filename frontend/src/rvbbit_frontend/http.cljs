@@ -144,7 +144,7 @@
          sub-key (get result :sub-key) ;; including .step
         ; client-name (get db :client-name)
          value (get result :value)]
-     (tap> [:subbed-to-server-value result])
+     ;(tap> [:subbed-to-server-value result])
      (assoc-in db [:click-param base-key sub-key] value))))
 
 (re-frame/reg-event-db
@@ -340,10 +340,16 @@
       ;;             (= client-name :whole-coffee-pronghorn-hailing-from-natural-arch))
       ;;    (tap> [:payload! (get db :client-name) result]))
 
-       (when server-sub?
-         (tap> [:server-sub-in! (get result :task-id) (get result :status)]))
+      ;;  (when server-sub?
+      ;;    (tap> [:server-sub-in! (get result :task-id) (get result :status)]))
+       
+       (when (and (not heartbeat?) (cstr/starts-with? (str client-name) ":spirited"))
+         (tap> [:payload! client-name task-id result]))
 
        (when heartbeat?
+         (when (or (cstr/starts-with? (str client-name) ":spirited")
+                   ;(cstr/starts-with? (str client-name) ":stirr")
+                   ) (tap> [:heartbeat! client-name task-id result]))
          (re-frame/dispatch [::wfx/request :default
                              {:message    {:kind :ack
                                            :flow-subs (get db :flow-subs)

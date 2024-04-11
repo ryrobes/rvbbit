@@ -2919,7 +2919,7 @@
    (let [pp (get-in db [:click-param]) ;; was param
          new-h (hash pp)
          client-name (get db :client-name)]
-     (tap> [:push-params! client-name (keys pp)])
+     ;;(tap> [:push-params! client-name (keys pp)])
      (re-frame/dispatch [::wfx/request   :default ;; just a push, no response handling
                          {:message      {:kind         :sync-client-params
                                          :params-map   pp

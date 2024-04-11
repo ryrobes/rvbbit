@@ -146,9 +146,13 @@
 ;;     (.getWidth (TerminalFactory/get))
 ;;     (catch Throwable _ 85)))
 
+;; (defn avg [nums]
+;;   (when (seq nums)
+;;     (/ (reduce + nums) (count nums))))
+
 (defn avg [nums]
   (when (seq nums)
-    (/ (reduce + nums) (count nums))))
+    (Math/round (/ (reduce + nums) (double (count nums))))))
 
 (defn get-system-load-average []
   (let [os-bean (java.lang.management.ManagementFactory/getOperatingSystemMXBean)]

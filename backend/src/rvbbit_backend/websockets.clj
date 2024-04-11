@@ -87,6 +87,10 @@
 (def latest-run-id (ut/thaw-atom {} "./data/atoms/latest-run-id-atom.edn"))
 (def shutting-down? (atom false))
 
+(def ack-scoreboard (atom {}))
+(def ping-ts (atom {}))
+(def client-latency (atom {}))
+
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
 ;; (defonce flow-running-tasks (atom {}))
@@ -973,7 +977,7 @@
 ;;       results)
 ;;     (catch Throwable e (ut/pp [:server-push2-subscription-err!! (str e) data]))))
 
-(def ack-scoreboard (atom {}))
+
 
 (defn inc-score! [client-name key & [ts?]]
   (swap! ack-scoreboard assoc-in [client-name key]
@@ -984,6 +988,9 @@
 (defmethod wl/handle-request :ack [{:keys [client-name flow-subs]}]
   ;(ut/pp [:thank-you-from client-name])
   (inc-score! client-name :ack)
+  (swap! client-latency assoc client-name
+         (vec (conj (get @client-latency client-name [])
+                    (try (- (System/currentTimeMillis) (get @ping-ts client-name)) (catch Exception _ -2)))))
   (swap! ack-scoreboard assoc-in [client-name :client-sub-list] flow-subs)
   (swap! ack-scoreboard assoc-in [client-name :client-subs] (count flow-subs))
   (inc-score! client-name :last-ack true)
@@ -1007,10 +1014,10 @@
 (defmethod wl/handle-subscription :server-push2 [{:keys [kind ui-keypath client-name] :as data}]
   (when (not (get @client-queues client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 100))] ;; was 10
+  (let [results (async/chan 900)] ;; was (async/sliding-buffer 100)
     (try
       (async/go-loop []
-        (async/<! (async/timeout 50)) ;; was 600 ?
+        (async/<! (async/timeout 30)) ;; was 600 ?
         (if-let [queue-atom (get @client-queues client-name (atom clojure.lang.PersistentQueue/EMPTY))]
           (let [item (ut/dequeue! queue-atom)]
             (if item
@@ -1551,6 +1558,7 @@
                                                   (get-in v [:last-ack 0] 0)) 1000))
                            never? (nil? (get-in v [:last-ack 0]))]
                        (-> v
+                           (assoc :client-latency (ut/avg (get @client-latency k [])))
                            (assoc :server-subs (count (keys (get @atoms-and-watchers k))))
                            (assoc :last-seen-seconds (if never? -1 seconds-ago))
                            (dissoc :client-sub-list)
@@ -1871,9 +1879,11 @@
                            (keyword? client-name) [client-name]
                            :else client-name)]
     (doseq [cid destinations]
-      (let [sub-task (if (= sub-task :heartbeat) (vec (keys (get @atoms-and-watchers cid {}))) sub-task)]
+      (let [hb? (= sub-task :heartbeat)
+            sub-task (if hb? (vec (keys (get @atoms-and-watchers cid {}))) sub-task)]
         ;; (when true ; false ;(not (= task-id :heartbeat))
         ;;   (ut/pp [:kick! ui-keypath data cid queue-id task-id sub-task]))
+        (when hb? (swap! ping-ts assoc cid (System/currentTimeMillis)))
         (push-to-client ui-keypath data cid queue-id task-id sub-task)))
     ;data
     :sent!))
@@ -2226,12 +2236,18 @@
           base-flow-id (if (cstr/includes? (str flow-id) "-SHD-") (first (cstr/split flow-id #"-SHD-")) flow-id) ;; if history run, only for estimates for now
           prev-times (get @times-atom base-flow-id [-1])
 
-          _ (push-to-client [:estimate] (ut/avg prev-times) client-name -1 :est1 :est2)
+          ;; _ (push-to-client [:estimate] (ut/avg prev-times) client-name -1 :est1 :est2)
 
-          ship-est (fn [client-name] (kick client-name (vec (cons :estimate [])) {flow-id {:times (ut/avg   ;; avg based on last 10 runs, but only if > 1
-                                                                                                   (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))
-                                                                                           :run-id uuid}} nil nil nil))
-          _ (doseq [client-name (keys (client-statuses))] (ship-est client-name)) ;; send to all clients just in case they care... (TODO make this more relevant)
+          ship-est (fn [client-name]
+                     (let [times (ut/avg   ;; avg based on last 10 runs, but only if > 1
+                                  (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
+                       (when (not (nil? times))
+                         (kick client-name [:estimate] {flow-id {:times times
+                                                                 :run-id uuid}} nil nil nil))))
+          
+          _ (when (not= flow-id "client-keepalive")
+              (doseq [client-name (keys (client-statuses))] (ship-est client-name))) ;; send to all clients just in case they care... (TODO make this more relevant)
+
           ;;_ (ship-est client-name)
 
 
@@ -2401,10 +2417,11 @@
         ch (chime/chime-at
             times-unlimited ;; [] chime time seq, https://github.com/jarohen/chime#recurring-schedules
             (fn [time]
-              (let [opts (merge opts {:schedule-started (str time)})]
+              (when (not @shutting-down?)
+                (let [opts (merge opts {:schedule-started (str time)})]
                 ;(flow flowmap opts chan-out override)
-                (ut/pp [:*sched-run flow-id :at (str time)])
-                (flow! client-name flowmap nil flow-id opts)))
+                  (ut/pp [:*scheduled-run! flow-id :at (str time)])
+                  (flow! client-name flowmap nil flow-id opts))))
             {:on-finished (fn [] (ut/pp [:schedule-finished! opts time-seq1]))
              :error-handler (fn [e] (ut/pp [:scheduler-error e]))})] ;; if custom time list, just send it.
       ;; save channel ref for closing later w unschedule!
@@ -3041,7 +3058,7 @@
           ;new? (not (some #(= % tracker) (get @tracker-history flow-id [])))
           ;new? (not= tracker (get @tracker-client-only flow-id []))
           condis (get-in @flow-db/status [flow-id :condis])
-          ;running? (get @flow-status flow-id :*running?)
+          running? (get @flow-status flow-id :*running?)
           ]
 
       ;;(println (str keypath " is new? " new? tracker))
@@ -3049,8 +3066,13 @@
       (when true ;running? ;; true ;(and new? running?) ;; (not= tracker last-tracker)
         (swap! tracker-client-only assoc flow-id tracker)
         ;; doing this in core? ;; (swap! tracker-history assoc flow-id (vec (conj (get @tracker-history flow-id []) tracker))) ;; for loop step history saving..
-        (kick client-name (vec (cons :tracker keypath)) tracker nil nil nil)
-        (kick client-name (vec (cons :condis keypath)) condis nil nil nil)))))
+
+        (when (not running?) ;; test to stop thrash... worth it?
+          (kick client-name (vec (cons :tracker keypath)) tracker nil nil nil))
+
+        (when (not (empty? condis)) 
+          (kick client-name (vec (cons :condis keypath)) condis nil nil nil))
+        ))))
 
 ;; :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
 
@@ -3147,7 +3169,9 @@
            ;(kick client-name (vec (cons :flow-runner keypath)) :started nil nil nil) ;; push initial value, if we have one
            ;(kick client-name (vec (cons :tracker keypath)) (get @flow-db/tracker flow-id) nil nil nil) ;; push init tracker state, if exists
            ;[:client-sub-request flow-id :step-id step-id :client-name client-name]
-        (boomerang-client-subs client-name))))
+        ;;(boomerang-client-subs client-name)
+        ))
+    (boomerang-client-subs client-name))
   [:copy-that client-name])
 
  
@@ -4486,11 +4510,15 @@
           ;;        ))))
 
                               (do ;(swap! sql-cache assoc req-hash output)
-                                (kick client-name "kick-test!" (first ui-keypath)
-                                      "query-log"
-                                      (str "query-log-" (first ui-keypath))
-                                      (str "query-log-" (first ui-keypath))
-                                      [(str (ut/get-current-timestamp) " - query ran in " query-ms " ms.")])
+                                
+                                (when (and (not (cstr/starts-with? (str (first ui-keypath)) ":kick"))
+                                           (not (cstr/includes? (str (first ui-keypath)) "-sys")))
+                                  (kick client-name "kick-test!" (first ui-keypath)
+                                        "query-log"
+                                        (str "query-log-" (first ui-keypath))
+                                        (str "query-log-" (first ui-keypath))
+                                        [(str (ut/get-current-timestamp) " - query ran in " query-ms " ms.")]))
+                                
                                 (when client-cache? (insert-into-cache req-hash output)) ;; no point to cache things that are :cache?false
                                 output)))))
                        (catch Exception e
@@ -5002,7 +5030,12 @@
         flow-id (get flow-data-file :flow-id)
         hist-flow-id (if runner? flow-id (str flow-id "-SHD-" start-ts))
         flow-data-file (if runner? flow-data-file ;; literal null from JSON conversion. odd.
-                           (walk/postwalk-replace {flow-id hist-flow-id} flow-data-file))]
+                           (walk/postwalk-replace {flow-id hist-flow-id} flow-data-file))
+        flow-data-file (if (and runner? running?) ;; add some history if we have it, since its still running
+                         (merge flow-data-file {:return-maps (select-keys @flow-db/results-atom [flow-id])
+                                                :tracker-history (ut/accumulate-unique-runs (get @tracker-history flow-id []))})
+                         flow-data-file)
+        ]
     (ut/ppln [:loading-flow-history-from-file (when runner? :as-runner!) file-path flow-id hist-flow-id])
     (send-edn-success flow-data-file)))
 
@@ -5461,6 +5494,8 @@
         (ut/pp [:version 0 :april 2024 "Hi."])
       ;(ut/pp "Hi.")
         (println " "))
+
+      (ut/pp [:client-latency (into {} (for [[k v] @client-latency] {k (vec (take-last 10 v))}))])
 
       (ut/pp [:flow-status (flow-statuses)])
 
