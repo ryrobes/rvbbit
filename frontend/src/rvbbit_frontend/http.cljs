@@ -242,12 +242,20 @@
 
 (re-frame/reg-event-db
  ::set-flow-results ;; temp from converting from atom to app-db
- (fn [db [_ data kkey]]
-   (if kkey
-     (assoc-in db (if (vector? kkey)
-                    (vec (into [:flow-results] kkey))
-                    [:flow-results kkey]) data)
-     (assoc db :flow-results data))))
+ (fn [db [_ data kkey & [flow-id]]]
+   (cond kkey
+         (assoc-in db (if (vector? kkey)
+                        (vec (into [:flow-results] kkey))
+                        [:flow-results kkey]) data)
+
+         (and (= data {:status :started}) flow-id)
+         (-> db
+             (assoc :flow-results (merge (get db :flow-results) data))
+             (ut/dissoc-in [:flow-results :return-maps flow-id])
+             ;(ut/dissoc-in [:flow-results :return-map])
+             (ut/dissoc-in [:flow-results :tracker flow-id]))
+
+         :else (assoc db :flow-results data))))
 
 (re-frame/reg-sub
  ::flow-results
@@ -356,9 +364,9 @@
                h (get-in result [:data 0 2] 1)
                duration (get-in result [:data 0 3] 6)]
 
-           (when (and (cstr/includes? (str fstr) "has finished")
-                      (get db :buffy?) not-sys-stats?) ;; refresh runstream samples when DONE
-             (ut/dispatch-delay 200 [::refresh-runstreams]))
+          ;;  (when (and (cstr/includes? (str fstr) "has finished") ;; complete refresh, causes a UI flash. disabling for now.
+          ;;             (get db :buffy?) not-sys-stats?) ;; refresh runstream samples when DONE
+          ;;    (ut/dispatch-delay 200 [::refresh-runstreams]))
 
            (ut/dispatch-delay 400 [::insert-alert
                                    [:h-box
@@ -454,8 +462,9 @@
              flow-runner-sub? (let [rtn (get result :status)
                                     mp-key (walk/postwalk-replace {:flow-runner :return-map} task-id)
                                     mp-key [(first mp-key) (last mp-key)] ;; remove flow-id
-                                    mps-key (vec (walk/postwalk-replace {:flow-runner :return-maps} task-id))]
-                                ;;(tap> [:sub rtn task-id mp-key mps-key])
+                                    mps-key (vec (walk/postwalk-replace {:flow-runner :return-maps} task-id))
+                                    return-maps (get-in db [:flow-results :return-maps] {})]
+                                ;;;(tap> [:sub-return-maps! task-id mp-key mps-key rtn (vec (drop 1  mps-key)) return-maps])
                                 (if (= rtn :started)
                                   (assoc-in db task-id rtn)
                                   ;; (do ;(swap! db/flow-results assoc-in mp-key rtn)
@@ -466,8 +475,9 @@
                                   ;;   ;  (assoc-in db task-id rtn)
 
                                   (-> db
-                                      (assoc-in (vec (into [:flow-results] mp-key)) rtn)
-                                      (assoc-in (vec (into [:flow-results] mps-key)) rtn)
+                                      ;(assoc-in (vec (into [:flow-results] mp-key)) rtn)
+                                      (assoc-in [:flow-results :return-maps] ;; (vec (into [:flow-results] mps-key)) 
+                                                (assoc-in return-maps (vec (drop 1  mps-key)) rtn)) ;; keeping the rest of the map intact
                                       (assoc-in task-id rtn))
 
                                   ;;  )
@@ -1121,8 +1131,8 @@
          (assoc-in [:flows flow-id :opts] opts)
          (assoc-in [:flows flow-id :connections] flowmaps-connections)
          (assoc-in [:flow-results :tracker flow-id] (get result :tracker-history)) ;;(get-in result [:tracker flow-id]))
-         (assoc-in [:flow-results :return-map] (get result :return-map))
-         (assoc-in [:flow-results :return-maps] (get result :return-maps))
+         ;(assoc-in [:flow-results :return-map] (get result :return-map)) ;; is this even used anymore? TODO
+         (assoc-in [:flow-results :return-maps] (merge (get-in db [:flow-results :return-maps] {}) (get result :return-maps)))
          (assoc :selected-flow flow-id)))))
 
 (re-frame/reg-event-fx
@@ -1130,8 +1140,12 @@
  (fn [{:keys [db]} [_ run-id start-ts]]
    (let [url (str url-base "/load-flow-history")
          method :get
-         request {:run-id run-id
-                  :start-ts start-ts}] ;; TODO, sketchy w/o checking
+         request (merge 
+                  {:run-id run-id
+                  :start-ts start-ts}
+                  (when (nil? start-ts) 
+                    {:runner? true}))] 
+     ;(tap> [:req request])
      {:db   (assoc-in db [:http-reqs :load-flow-history]
                       {:status "running"
                        :url url

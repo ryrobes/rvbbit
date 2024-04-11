@@ -158,6 +158,7 @@
      (-> db
         ;(assoc-in [:flows flow-id] curr-flow)
         ;(ut/dissoc-in [:flows curr-flow-id])
+         (dissoc :selected-flow-block)
          (assoc :selected-flow flow-id)))))
 
 (re-frame/reg-event-db
@@ -342,7 +343,7 @@
    (swap! db/real-running-blocks assoc flow-id [])
 
    (-> db
-       (assoc-in [:flow-results :tracker] tracker)
+       (assoc-in [:flow-results :tracker flow-id] tracker)
        (assoc-in [:flow-results :status] :done))
 
   ;;  (re-frame/dispatch [::wfx/request :default
@@ -398,7 +399,7 @@
      (-> db
          ;;(assoc-in [:flow-results :status] :done)
          ;;(assoc-in [:flow-results :tracker] (get result :tracker))
-         (assoc-in [:flow-results :tracker] (get result :tracker-history))
+         (assoc-in [:flow-results :tracker flow-id] (get result :tracker-history))
          (assoc-in [:flow-results :run-refs] (get result :run-refs))))))
 
 (re-frame/reg-event-db
@@ -635,13 +636,14 @@
               (reset! editor-tooltip-atom (str flow-id " is running"))
            ;(swap! db/flow-results assoc flow-id {:status :started})
             ;(reset! db/flow-results {:status :started})
-              (re-frame/dispatch [::http/set-flow-results {:status :started}])
+              (re-frame/dispatch [::http/set-flow-results {:status :started} nil flow-id])
               (swap! db/running-blocks assoc flow-id (vec (keys flowmap)))
               (tap> [:flowmap-send-it flowmap server-flowmap running-subs])
               (reset! http/subsequent-runs [])
               (when (not watched?)
                 (re-frame/dispatch [::wfx/request :default
                                     {:message    {:kind :sub-to-running-values
+                                                  :flow-id flow-id 
                                                   :flow-keys running-subs
                                                   :client-name client-name}
                                      :timeout    15000000}]))
@@ -668,7 +670,8 @@
               (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
             ;;  (re-frame/dispatch [::conn/click-parameter ;; kinda cheating, but feels better
             ;;                      [:flow (keyword (str flow-id ">*running?"))] true])
-              (dissoc db :flow-runner))))))
+              (ut/dissoc-in db [:flow-runner flow-id])
+              )))))
 
 (re-frame/reg-sub
  ::flow-runner
@@ -682,8 +685,8 @@
                      ;@flowmaps-connections
 
 (defn is-running? [bid flow-id & [only?]]
-  (let [started? @(re-frame/subscribe [::flow-runner flow-id bid])
-        rblocks (get @db/running-blocks flow-id [])
+  (let [;started? @(re-frame/subscribe [::flow-runner flow-id bid])
+        ;rblocks (get @db/running-blocks flow-id [])
         chans-open? @(re-frame/subscribe [::bricks/flow-channels-open? flow-id])
         server-running? (or (if only? false
                                 chans-open?)
@@ -1292,6 +1295,7 @@
                                       (= selected-i [z1 z1a]) (= selected-o [z2 z2a])))
                  condi-path? (cstr/starts-with? (str z1a) ":cond-path")
                  push-path? (cstr/starts-with? (str z1a) ":push-path")
+                 uid-hash (hash [x1 y1 x2 y2 involved? color z1 z2 z1a z2a])
                  ;running? (is-running? z1 flow-id)
                  react! [@db/running-blocks]
                  flow-running? @(re-frame/subscribe [::is-running? :* flow-id])
@@ -1314,6 +1318,7 @@
 
            ;; (tap> [:coords coords])
             ; (tap> [:lines z1 z2 same-tab? @(re-frame/subscribe [::what-tab z1]) @(re-frame/subscribe [::what-tab z2])])
+             ^{:key (str uid-hash)}
              [:path {:stroke-width 7 ;(if selected? 11 6) ;(if involved? 16 13)
                      :stroke       (if (or selected? involved?) color (str color 75)) ;(if (or involved? nothing-selected?)
                     ;;  :opacity      (if not-selected? 1.0
@@ -4992,17 +4997,42 @@
                           :margin {:top 0 :right 5 :bottom 20 :left 25}
                           :data :flow-history-calendar-sys*}]}
             vselected? @(re-frame/subscribe [::conn/clicked-parameter-key [:virtual-panel/flow-day]])
+            ;; grid-menu {:select [:flow-id :runs] ;; union is not materilizing correctly?
+            ;;            :col-widths {:runs 45 :flow_id 220}
+            ;;            :from [{:union-all 
+            ;;                    [{:select
+            ;;                      [:flow_id
+            ;;                       [[:count [:distinct :run_id]] :runs]]
+            ;;                      :connection-id "flows-db"
+            ;;                      ;:col-widths {:runs 50 :flow_id 215}
+            ;;                      :group-by [1]
+            ;;                      :where [:and (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
+            ;;                              (if caller [:= :client_name (str caller)] [:= 1 1])
+            ;;                              (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
+            ;;                      :order-by [[1 :asc]]
+            ;;                      :from [[:flow_history :tt336aa]]}
+            ;;                     {:select
+            ;;                      [["all" :flow-id]
+            ;;                       [[:count [:distinct :run_id]] :runs]]
+            ;;                      :connection-id "flows-db"
+            ;;                      ;:col-widths {:runs 50 :flow_id 215}
+            ;;                      :group-by [1]
+            ;;                      :where [:and (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
+            ;;                              (if caller [:= :client_name (str caller)] [:= 1 1])
+            ;;                              (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
+            ;;                      :from [[:flow_history :tt336aaaa]]}]}]}
             grid-menu {:select
                        [:flow_id
                         [[:count [:distinct :run_id]] :runs]]
                        :connection-id "flows-db"
-                       :col-widths {:runs 50 :flow_id 215}
+                       :col-widths {:runs 45 :flow_id 220}
                        :group-by [1]
                        :where [:and (if vselected? [:= [:substr :start_ts 0 11] :virtual-panel/flow-day] [:= 1 1])
                                (if caller [:= :client_name (str caller)] [:= 1 1])
                                (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
                        :order-by [[1 :asc]]
                        :from [[:flow_history :tt336aa]]}
+            
             gm-kw "grid-menu-sys*" ;; (str "kick-" (hash grid-menu) "-sys*")
             ;viz-kw (str "kick-" (hash viz1) "-sys*")
             selected? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str gm-kw "/flow_id"))]])
@@ -5425,13 +5455,13 @@
                      :color (theme-pull :theme/editor-outer-rim-color nil)}
              :gap "11px"
              :children (for [[fid v] ss
-                             :let [time-running (get v :*time-running)
+                             :let [;time-running (get v :*time-running)
                                    open-channels (get v :channels-open?)
                                    channels (get v :channels-open)
                                    started-by (get v :*started-by)
                                    process? (get v :process?)
                                    command (get v :command)
-                                   tracker-events (get v :tracker-events)
+                                   ;tracker-events (get v :tracker-events)
                                    running? (get v :*running?)]]
                          [re-com/v-box
                           :style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) (if running? 77 22))
@@ -5472,6 +5502,22 @@
                                       ;:color pcolor
                                       ;:margin-right "8px"
                                                   }
+                                          ;;:on-click #(do (re-frame/dispatch [::http/load-flow-history fid nil]))
+                                          :on-click #(let [flowmap @(re-frame/subscribe [::flowmap])
+                                                           flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
+                                                           client-name @(re-frame/subscribe [::conn/client-name])
+                                                           server-flowmap (process-flowmap2 flowmap flowmaps-connections fid)
+                                                           running-view-subs (vec (for [[k v] (get server-flowmap :components) :when (get v :view)]
+                                                                                    [fid (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
+                                                           running-subs (vec (for [k (keys (get server-flowmap :components))] [fid k]))
+                                                           running-subs (vec (into running-subs running-view-subs))]
+                                                       (re-frame/dispatch [::http/load-flow-history fid nil])
+                                                       (re-frame/dispatch [::wfx/request :default
+                                                                           {:message    {:kind :sub-to-running-values
+                                                                                         :flow-id fid 
+                                                                                         :flow-keys [] ;;running-subs
+                                                                                         :client-name client-name}
+                                                                            :timeout    15000000}]))
                                           :md-icon-name "zmdi-open-in-browser"]
                                          [re-com/gap :size "20px"])
                                        [re-com/md-icon-button
@@ -8268,14 +8314,41 @@
    (reset! drop-toggle? (not @drop-toggle?))
    db))
 
+;; (re-frame/reg-event-db
+;;  ::unload-flow
+;;  (fn [db [_ flow-id]]
+;;    (re-frame/dispatch [::wfx/request :default
+;;                        {:message    {:kind :remove-flow-watcher ;; just in case we are super-subbed...
+;;                                      :client-name @(re-frame/subscribe [::conn/client-name])
+;;                                      :flow-id flow-id}}])
+;;    (-> db
+;;        (ut/dissoc-in [:flows flow-id])
+;;        (ut/dissoc-in [:flow-results :condis flow-id])
+;;        (ut/dissoc-in [:flow-results :tracker flow-id])
+;;        (ut/dissoc-in [:flow-results :return-maps flow-id])
+;;        (ut/dissoc-in [:flow-runner flow-id]))))
+
+;; re-frame "purity". heh...
+
 (re-frame/reg-event-db
- ::unload-flow
+ ::unload-flow-db
  (fn [db [_ flow-id]]
    (-> db
        (ut/dissoc-in [:flows flow-id])
        (ut/dissoc-in [:flow-results :condis flow-id])
+       (ut/dissoc-in [:flow-results :tracker flow-id])
        (ut/dissoc-in [:flow-results :return-maps flow-id])
        (ut/dissoc-in [:flow-runner flow-id]))))
+
+(re-frame/reg-event-fx
+ ::unload-flow
+ (fn [{:keys [db]} [_ flow-id]]
+   {:db (re-frame/dispatch [::unload-flow-db flow-id])
+    :dispatch [::wfx/request :default
+               {:message    {:kind :remove-flow-watcher ;; just in case we are super-subbed...
+                             :client-name @(re-frame/subscribe [::conn/client-name])
+                             :flow-id flow-id}}]}))
+
 
 (re-frame/reg-sub
  ::flow-drop-down?
@@ -8507,15 +8580,21 @@
                                                                :font-size "19px"
                                                                :right 0}
                                                        :children (for [[v [file-path name]]
-                                                                       (vec (distinct
-                                                                             (into
-                                                                              (for [[k v] @(re-frame/subscribe [::http/flows])] [k nil])
+                                                                       (vec (sort
+                                                                                     (distinct
+                                                                                      (into
+                                                                                       (for [[k v] @(re-frame/subscribe [::http/flows])] [k nil])
                                                                             ;(get @(re-frame/subscribe [::http/flow-results]) :run-refs [])
-                                                                              )))
+                                                                                       ))))
                                                                        :let [selected? (= (str v) (str flow-id))]]
                                                                    [re-com/h-box
                                                                     :gap "10px" :justify :between
-                                                                    :children [[re-com/box :child (str v)]
+                                                                    :children [[re-com/box
+                                                                                :attr {:on-click #(let [sub-flow-exec? (and (string? file-path) (not (nil? file-path)))]
+                                                                                                    (if sub-flow-exec?
+                                                                                                      (re-frame/dispatch [::http/load-flow-w-alias file-path v])
+                                                                                                      (re-frame/dispatch [::set-selected-flow (str v)])))}
+                                                                                :child (str v)]
                                                                                [re-com/md-icon-button :src (at)
                                                                                 :md-icon-name "zmdi-close"
                                                                                 :on-click #(re-frame/dispatch [::unload-flow (str v)])
@@ -8523,10 +8602,7 @@
                                                                                         :cursor "pointer"
                                                                                         :height "12px"
                                                                                         :font-size "16px"}]]
-                                                                    :attr {:on-click #(let [sub-flow-exec? (and (string? file-path) (not (nil? file-path)))]
-                                                                                        (if sub-flow-exec?
-                                                                                          (re-frame/dispatch [::http/load-flow-w-alias file-path v])
-                                                                                          (re-frame/dispatch [::set-selected-flow (str v)])))}
+                                                                    
 
                                                                     :style (if selected?
                                                                              {:text-decoration "underline"
@@ -9048,6 +9124,7 @@
                                                                                            (re-frame/dispatch [::wfx/request :default
                                                                                                                {:message    {:kind :sub-to-running-values
                                                                                                                              :flow-keys running-subs
+                                                                                                                             :flow-id flow-id 
                                                                                                                              :client-name client-name}
                                                                                                                 :timeout    15000000}])))
                                                                             :style {:cursor "pointer" :margin-top "8px" :font-size "30px"}]

@@ -482,6 +482,40 @@
      cruiser/default-field-attributes
      cruiser/default-derived-fields
      cruiser/default-viz-shapes)
+    
+
+        (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+    
+    (tt/start!)
+    (def mon (tt/every! 30 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30 seconds (excessive, lenghten in prod..)
+    (instrument-jvm instrument/metric-registry)
+    (wss/subscribe-to-session-changes)
+    
+      ;;(wss/start-thread-worker) ;; used for side-car sniffs
+      ;(def worker-thread (wss/start-thread-worker))
+      ;(def lunchbreak (tt/every! 90 2 (bound-fn [] (wss/recycle-worker worker-thread)))) ;; "reboot" the sniffer worker thread every 30 mins
+    
+    (def lunchbreak  (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker)))) ;; "reboot" the sniffer worker thread every hour
+    (def lunchbreak2 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker2))))
+    (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
+    
+        ;;(def lucene-commiter (tt/every! 30 2 (bound-fn [] (search/commit-writer search/index-writer))))
+    (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))
+    
+    (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too much?
+    
+    (def purge (tt/every! 30 2 (bound-fn [] (wss/purge-dead-client-watchers))))
+    
+    (def last-look (atom {}))
+    (def saved-uids (atom []))
+
+
+    (shutdown/add-hook! ::the-pool-is-now-closing
+                        #(do (tt/stop!)
+                             (wss/stop-worker)
+                             (wss/stop-worker2)
+                             (wss/stop-worker3)
+                             (reset! wss/shutting-down? true)))
 
     (shutdown/add-hook! ::the-pool-is-now-closed
                         #(doseq [[conn-name conn] @wss/conn-map]
@@ -551,31 +585,8 @@
   ;;(io/delete-file "./live/" :recursive true)
 
 
-    (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
 
-    (tt/start!)
-    (def mon (tt/every! 30 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30 seconds (excessive, lenghten in prod..)
-    (instrument-jvm instrument/metric-registry)
-    (wss/subscribe-to-session-changes)
 
-  ;;(wss/start-thread-worker) ;; used for side-car sniffs
-  ;(def worker-thread (wss/start-thread-worker))
-  ;(def lunchbreak (tt/every! 90 2 (bound-fn [] (wss/recycle-worker worker-thread)))) ;; "reboot" the sniffer worker thread every 30 mins
-
-    (def lunchbreak  (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker)))) ;; "reboot" the sniffer worker thread every hour
-    (def lunchbreak2 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker2))))
-    (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
-
-    ;;(def lucene-commiter (tt/every! 30 2 (bound-fn [] (search/commit-writer search/index-writer))))
-    (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))
-
-    (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too much?
-
-    (def purge (tt/every! 30 2 (bound-fn [] (wss/purge-dead-client-watchers))))
-
-    (def last-look (atom {}))
-    (def saved-uids (atom []))
-  
 
     (defn update-stat-atom [kks]
       (let [;flows (if (or (nil? flows) (empty? flows))
@@ -593,7 +604,7 @@
                             ;;           :status! (get @flow-db/status k)
                             ;;           :tracker! (get @flow-db/tracker k)])
                             ;; condis (get-in @flow-db/status [k :condis])
-                             
+
                              cc (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf? doing way too much work here
                              blocks (get-in @flow-db/working-data [k :components-list])
                              running-blocks (vec (for [[k v] (get @flow-db/tracker k)
@@ -622,7 +633,7 @@
                                                              ;        [:last-good-time? (get @wss/last-times k) (vec (take-last 10 (get @wss/last-times k)))]
                                                              ;        @wss/last-times
                                                              ;        :start start])
-                                                             (System/currentTimeMillis))))
+                                                           (System/currentTimeMillis))))
                             ;;  elapsed (if (or error? (empty? (get @flow-db/tracker k)))
                             ;;            (- (System/currentTimeMillis) (get-in @wss/last-times [k :start]))
                             ;;            (- end start))
@@ -731,34 +742,34 @@
   ;(add-watch flow-db/tracker :tracker-watch update-stat-atom) ;; tracker could be too much...
 
 
-(defn log-tracker [kks]
-  (doseq [flow-id kks]
-    (let [orig-tracker (get @flow-db/tracker flow-id)
-          tracker (into {} (for [[k v] orig-tracker ;; remove condi non-starts. dont send to client. data noise. neccessary noise for reactions, but noise
-                                 :when (not (get v :in-chan?))]
-                             {k v}))]
-      (swap! wss/tracker-history assoc flow-id (vec (conj (get @wss/tracker-history flow-id []) tracker))) ;; for loop step history saving..
-      )))
+    (defn log-tracker [kks]
+      (doseq [flow-id kks]
+        (let [orig-tracker (get @flow-db/tracker flow-id)
+              tracker (into {} (for [[k v] orig-tracker ;; remove condi non-starts. dont send to client. data noise. neccessary noise for reactions, but noise
+                                     :when (not (get v :in-chan?))]
+                                 {k v}))]
+          (swap! wss/tracker-history assoc flow-id (vec (conj (get @wss/tracker-history flow-id []) tracker))) ;; for loop step history saving..
+          )))
 
 
     ;; expensive, tracking down some issues
     (defn tracker-changed2 [key ref old-state new-state]
       (let [[_ b _] (data/diff old-state new-state)
             kks (try (keys b) (catch Exception _ nil))]
-        
+
         (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
 
           ;(ut/pp [:tracker-changes! kks])
 
           (async/thread ;; really expensive logging below. temp
-            
+
             (let [;kks-string (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":"))
                   ;block-changed (first (keys (get b (first kks))))
                   ;what-changed (first (remove #(= % :in-chan?) (keys (get-in b [(first kks) (first (keys (get b (first kks))))]))))
                   ;summary (-> (str block-changed "=" what-changed) (cstr/replace " " "_") (cstr/replace "/" ":"))
                   ;fp (str "./tracker-logs/" (str (System/currentTimeMillis)) "@@" kks-string "=" summary ".edn")
                   ]
-              
+
               ;; (ext/create-dirs "./tracker-logs/")
               ;; (ut/pretty-spit fp {:kks kks
               ;;                     :value (ut/replace-large-base64 (get-in @flow-db/results-atom [(first kks) block-changed]))
@@ -782,9 +793,7 @@
                             {:values (select-keys (ut/replace-large-base64 (get-in @flow-db/results-atom [flow-id])) blocks)
                              :diff diffy}]
                       pretty-data (with-out-str (ppt/pprint data))] ; Use clojure.pprint/pprint instead of puget/cprint
-                  (spit fp (str pretty-data "\n") :append true)))
-              
-              ))
+                  (spit fp (str pretty-data "\n") :append true)))))
 
           (log-tracker kks)
           (update-stat-atom kks))
@@ -959,11 +968,11 @@
   ;; (wss/schedule! [:seconds 30] (wss/materialize-flowmap :server "map-pull-test2" "map-pull-test2" {})
   ;;                {:debug? false :close-on-done? true :increment-id? false :flow-id "map-pull-test2"})
 
-  (wss/schedule! [:minutes 20] "crow-flow-201a"
-                 {:close-on-done? true :increment-id? false :flow-id "crow-flow-201a" :debug? false})
+    (wss/schedule! [:minutes 20] "crow-flow-201a"
+                   {:close-on-done? true :increment-id? false :flow-id "crow-flow-201a" :debug? false})
 
-  (wss/schedule! [:minutes 20] "counting-loop"
-                 {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
+    (wss/schedule! [:minutes 20] "counting-loop"
+                   {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
 
   ;(ut/pp [:flow-answer1 (wss/flow-waiter ff "boot-test")])
   ;(ut/pp [:flow-answer2 (flow-waiter fex/looping-net)])
