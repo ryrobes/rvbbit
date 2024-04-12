@@ -236,6 +236,7 @@
     ;(sql-exec system-db sqlite-ddl/drop-view2)
     ;(sql-exec system-db sqlite-ddl/drop-view3)
     (sql-exec system-db sqlite-ddl/create-jvm-stats)
+    (sql-exec system-db sqlite-ddl/create-client-stats)
     (sql-exec system-db sqlite-ddl/create-kits)
     (sql-exec system-db sqlite-ddl/create-screens)
     (sql-exec system-db sqlite-ddl/create-blocks)

@@ -1194,8 +1194,8 @@
 
 
 (defn ui-debugger []
-  (let [bw 33 bh 11
-        ttl-height (* bh bricks/brick-size)
+  (let [;bw 33 bh 11
+        ;ttl-height (* bh bricks/brick-size)
         sched @(re-frame/subscribe [::bricks/query-schedule])
         params (merge sched
                       {"client-name" @(re-frame/subscribe [::bricks/client-name])
@@ -1219,15 +1219,13 @@
                        "bricks/on-block?" @bricks/on-block?
                        "bricks/dragging-editor?" @bricks/dragging-editor?
                        "bricks/over-block?" @bricks/over-block?
-                       "bricks/new-block-atom" @bricks/new-block-atom
-                ;"[::wfx/pending-requests http/socket-id]" @(re-frame/subscribe [::wfx/pending-requests http/socket-id])
-                       })
+                       "bricks/new-block-atom" @bricks/new-block-atom})
         atom-sizes (ut/calculate-atom-sizes {:replacer-atom ut/replacer-atom
                                              ;:db/flow-results db/flow-results
                                              :db/scrubbers db/scrubbers
                                              :ut/is-base64-atom ut/is-base64-atom
                                              :tu/is-large-base64-atom ut/is-large-base64-atom
-                                             :websocket-fx.core/CONNECTIONS websocket-fx.core/CONNECTIONS
+                                             ;:websocket-fx.core/CONNECTIONS websocket-fx.core/CONNECTIONS
                                              :re-frame.db/app-db re-frame.db/app-db
                                              :ut/clean-sql-atom ut/clean-sql-atom
                                              :ut/deep-flatten-atom ut/deep-flatten-atom
@@ -1235,7 +1233,6 @@
                                              :ut/body-set-atom ut/body-set-atom
                                              :ut/data-typer-atom ut/data-typer-atom
                                              :ut/coord-cache ut/coord-cache})
-        ;; _ (tap> [:atom-sizes? atom-sizes])
         params (merge params atom-sizes)
         params (vec (for [[k v] params] [k (str k) v]))] ;; fake middle key since they are NOT all keywords or strings and cant be naturally sorted
     [re-com/box

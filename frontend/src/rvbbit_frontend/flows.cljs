@@ -405,8 +405,8 @@
 (re-frame/reg-event-db
  ::timeout-response
  (fn [db [_ result what-req]]
-   (let []
-     (tap> [:websocket-timeout! result what-req])
+   (let [client-name (get db :client-name)]
+     (tap> [:websocket-timeout! client-name result what-req])
      db)))
 
 (defn process-flow-map [fmap]  ;;; IF CHANGING LOGIC HERE, ALSO CHANGE IN THE SERVER VERSION
@@ -698,23 +698,52 @@
       (and (some #(= bid %) rrblocks)
            server-running?))))
 
+;; (re-frame/reg-sub
+;;  ::is-running?
+;;  (fn [_ [_ bid flow-id & [only?]]]
+;;    (if only?
+;;      (is-running? bid flow-id true)
+;;      (is-running? bid flow-id))))
+
+;; (re-frame/reg-sub
+;;  ::is-waiting?
+;;  (fn [_ [_ bid flow-id]]
+;;    (let [started? @(re-frame/subscribe [::flow-runner flow-id bid])
+;;          rblocks (get @db/running-blocks flow-id [])
+;;          rrblocks (get @db/real-running-blocks flow-id [])]
+;;      (and
+;;       (some #(= bid %) rblocks)
+;;       (not (some #(= bid %) rrblocks))
+;;       started?))))
+
+
+
 (re-frame/reg-sub
  ::is-running?
- (fn [_ [_ bid flow-id & [only?]]]
-   (if only?
-     (is-running? bid flow-id true)
-     (is-running? bid flow-id))))
+ (fn [db [_ bid flow-id & [only?]]]
+   (let [;chans-open? @(re-frame/subscribe [::bricks/flow-channels-open? flow-id])
+         flow-running? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]])
+         running (get-in db [:flow-results :tracker-blocks flow-id :running-blocks])]
+     (cond (= bid :*) flow-running?
+           ;;only? flow-running?
+           :else (true?
+                  (and flow-running?
+                       (some #(= bid %) running)))))))
 
 (re-frame/reg-sub
  ::is-waiting?
- (fn [_ [_ bid flow-id]]
-   (let [started? @(re-frame/subscribe [::flow-runner flow-id bid])
-         rblocks (get @db/running-blocks flow-id [])
-         rrblocks (get @db/real-running-blocks flow-id [])]
-     (and
-      (some #(= bid %) rblocks)
-      (not (some #(= bid %) rrblocks))
-      started?))))
+ (fn [db [_ bid flow-id]]
+   (let [waiting (get-in db [:flow-results :tracker-blocks flow-id :waiting-blocks])
+         flow-running? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]])]
+     (true? (and flow-running?
+                 (some #(= bid %) waiting))))))
+
+(re-frame/reg-sub
+ ::is-done?
+ (fn [db [_ bid flow-id]]
+   (let [done (get-in db [:flow-results :tracker-blocks flow-id :done-blocks])]
+     (true? (some #(= bid %) done)))))
+
 
 (def tentacle-pos (reagent/atom [0 0]))
 (def tentacle-start (reagent/atom [0 0]))
@@ -1301,7 +1330,8 @@
                  flow-running? @(re-frame/subscribe [::is-running? :* flow-id])
                  running? (and flow-running? @(re-frame/subscribe [::is-running? z2 flow-id]))
                  waiting? (and flow-running? @(re-frame/subscribe [::is-waiting? z2 flow-id]))
-                 opacity (if (or running? selected?) 1.0 0.5)]
+                 opacity 1.0 ;(if (or running? selected?) 1.0 0.5)
+                 done? (and flow-running? @(re-frame/subscribe [::is-done? z2 flow-id]))]
 
                 ;;  (when true ;(cstr/starts-with? (str z1a) ":push-path") ;; (or (= z1 :open-fn-1) (= z2 :open-fn-1))
                 ;;    (tap> [:cc push-path? waiting? selected? selected-i selected-o  z1 z1a z2 z2a]))
@@ -1319,25 +1349,29 @@
            ;; (tap> [:coords coords])
             ; (tap> [:lines z1 z2 same-tab? @(re-frame/subscribe [::what-tab z1]) @(re-frame/subscribe [::what-tab z2])])
              ^{:key (str uid-hash)}
-             [:path {:stroke-width 7 ;(if selected? 11 6) ;(if involved? 16 13)
+             [:path {:stroke-width (if (or done? running?) 10 7) ;(if selected? 11 6) ;(if involved? 16 13)
                      :stroke       (if (or selected? involved?) color (str color 75)) ;(if (or involved? nothing-selected?)
                     ;;  :opacity      (if not-selected? 1.0
                     ;;                    (if (or involved? selected?) 1.0 0.2)
 
                     ;;                    )
-                     :opacity (if (and (not running?) (or push-path? condi-path?))
-                                (- opacity 0.22)
-                                opacity)
+                     :opacity (cond 
+                                running? 1.0
+                                waiting? 0.3
+                                done? 1.0
+                                (and (not running?) (or push-path? condi-path?)) (- opacity 0.22)
+                                :else opacity)
                     ; :transition "all 0.2s ease-in-out"
                     ;:style      {:animation "rotate linear infinite"}
                     ;:animation "rotate linear infinite"
                     ;:z-index 20
-                     :class        (when running? "flow-right") ;;(some #(= z1 %) @db/running-blocks)
+                    :class        (when running? "flow-right") ;;(some #(= z1 %) @db/running-blocks)
                      ;:class        (when (some #(= z1 %) @db/running-blocks) "flow-right") ;;(some #(= z1 %) @db/running-blocks)
                     ;(if (nil? color) "pink" color) "#E6E6FA")
                     ;:fill         "#ffffff33" ;"none"
                      ;:stroke-dasharray (if waiting? "10,15" (when condi-path? "15,10")) ;; TODO, kinda weird logic
-                     :stroke-dasharray (cond waiting? "10,15"
+                     :stroke-dasharray (cond running? "4,12"
+                                             waiting? "10,15"
                                              condi-path? "15,10"
                                              push-path? "5,5"
                                              :else nil)
@@ -1346,7 +1380,7 @@
                                            push-path? "butt"
                                            :else "round")
                      :fill         "none" ;;(str color 45) ;; could be a cool "running effect"
-                     :filter       (if selected? (str "brightness(200%) drop-shadow(2px 1px 4px " color ")")
+                     :filter       (if (or running? selected?) (str "brightness(200%) drop-shadow(2px 1px 4px " color ")")
                                        (str "drop-shadow(2px 1px 4px #000000)"))
                     ;:d            (ut/curved-path-h x1 y1 x2 y2)
                      :d            (ut/curved-path-v x1 y1 x2 y2)}]))))
@@ -5798,6 +5832,7 @@
                                                      :sys_load [:ws_peers :clients]]
                                           :connection-id "system-db"
                                           :limit 1
+                                          ;;:where [:= :ts {:select [[:max :ts] :ts] :from [[:jvm_stats :rr70yy]]}]
                                           :order-by [[:ts :desc]]
                                           :from     [[:jvm_stats :rr70]]}]
                                   [buffy/render-honey-comb-fragments qq (/ dyn-width 50) 3])]]]
@@ -8887,7 +8922,7 @@
                                                                                 45)
                                                                         :bottom 0}
                                                                 :children [(when has-done?
-                                                                             (if (or running? chans-open?)
+                                                                             (if running? ;; (or running? chans-open?)
                                                                                [re-com/box
                                                                                 :child [re-com/md-icon-button :src (at)
                                                                                         :md-icon-name "zmdi-refresh-sync"
@@ -9081,8 +9116,9 @@
 
 
                                                                              [re-com/box
-                                                                              :child (if (and (empty? @editor-tooltip-atom) running?) (str :flow-name " is running")
-                                                                                         (str (or @editor-tooltip-atom "")))
+                                                                              :child (str (or @editor-tooltip-atom ""))
+                                                                              ;:child (if (and (empty? @editor-tooltip-atom) running?) (str :flow-name " is running")
+                                                                              ;           (str (or @editor-tooltip-atom "")))
                                                                               :size "none"
                                                                               :height "80%"
                                                                               :width (px (- (if @(re-frame/subscribe [::bricks/flow-editor?])

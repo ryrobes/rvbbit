@@ -86,6 +86,8 @@
 (def last-block-written (atom {})) ;; kind of wasteful, but it's a small atom and is clean. 
 (def latest-run-id (ut/thaw-atom {} "./data/atoms/latest-run-id-atom.edn"))
 (def shutting-down? (atom false))
+(defonce tracker-client-only (atom {}))
+(def acc-trackers (atom {}))
 
 (def ack-scoreboard (atom {}))
 (def ping-ts (atom {}))
@@ -1014,10 +1016,10 @@
 (defmethod wl/handle-subscription :server-push2 [{:keys [kind ui-keypath client-name] :as data}]
   (when (not (get @client-queues client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan 900)] ;; was (async/sliding-buffer 100)
+  (let [results (async/chan (async/sliding-buffer 200))] ;; was (async/sliding-buffer 450)
     (try
       (async/go-loop []
-        (async/<! (async/timeout 30)) ;; was 600 ?
+        (async/<! (async/timeout 70)) ;; was 600 ?
         (if-let [queue-atom (get @client-queues client-name (atom clojure.lang.PersistentQueue/EMPTY))]
           (let [item (ut/dequeue! queue-atom)]
             (if item
@@ -1558,6 +1560,7 @@
                                                   (get-in v [:last-ack 0] 0)) 1000))
                            never? (nil? (get-in v [:last-ack 0]))]
                        (-> v
+                           (assoc :queue-size (count @(get @client-queues k)))
                            (assoc :client-latency (ut/avg (get @client-latency k [])))
                            (assoc :server-subs (count (keys (get @atoms-and-watchers k))))
                            (assoc :last-seen-seconds (if never? -1 seconds-ago))
@@ -2231,6 +2234,8 @@
           _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter          
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
           _ (swap! last-times assoc-in [flow-id :start] (System/currentTimeMillis))
+          _ (swap! tracker-client-only assoc flow-id {})
+          _ (swap! acc-trackers assoc flow-id [])
           ;;_ (swap! last-times assoc flow-id []) 
           ;_ (alert! client-name  10 1.35)
           base-flow-id (if (cstr/includes? (str flow-id) "-SHD-") (first (cstr/split flow-id #"-SHD-")) flow-id) ;; if history run, only for estimates for now
@@ -3044,7 +3049,25 @@
       (swap! ack-scoreboard dissoc k)     ;; remove client client board
       )))
 
-(defonce tracker-client-only (atom {}))
+(defn accumulate-unique-runs [data]
+  (let [merge-runs (fn [runs run]
+                     (let [run-start (:start run)
+                           run-end (:end run)]
+                       (cond
+                         ; If run with same start and end exists, return runs as is.
+                         (some #(and (= (:start %) run-start)
+                                     (= (:end %) run-end)) runs) runs
+                         ; If run with same start exists without an end, replace if current has an end.
+                         (some #(and (= (:start %) run-start) (nil? (:end %)) run-end) runs)
+                         (conj (vec (remove #(and (= (:start %) run-start) (nil? (:end %))) runs)) run)
+                         ; Otherwise, add run.
+                         :else (conj runs run))))]
+    (reduce (fn [acc entry]
+              (reduce (fn [inner-acc [block-id run]]
+                        (update inner-acc block-id (fn [runs]
+                                                     (merge-runs (or runs []) run))))
+                      acc (into [] entry)))
+            {} data)))
 
 (defn send-tracker-runner [base-type keypath client-name new-value]
   (let [flow-id (first keypath)]
@@ -3059,20 +3082,48 @@
           ;new? (not= tracker (get @tracker-client-only flow-id []))
           condis (get-in @flow-db/status [flow-id :condis])
           running? (get @flow-status flow-id :*running?)
+          first-tracker? (empty? (get-in @tracker-client-only [flow-id client-name]))
           ]
 
       ;;(println (str keypath " is new? " new? tracker))
 
       (when true ;running? ;; true ;(and new? running?) ;; (not= tracker last-tracker)
-        (swap! tracker-client-only assoc flow-id tracker)
+        (swap! tracker-client-only assoc-in [flow-id client-name] tracker)
         ;; doing this in core? ;; (swap! tracker-history assoc flow-id (vec (conj (get @tracker-history flow-id []) tracker))) ;; for loop step history saving..
 
-        (when (not running?) ;; test to stop thrash... worth it?
-          (kick client-name (vec (cons :tracker keypath)) tracker nil nil nil))
+        (when false ;; DEPRECATED ;(not running?) ;; test to stop thrash... worth it?
+          (kick client-name (vec (cons :tracker keypath)) 
+                (if first-tracker? 
+                  (assoc tracker :*start! [{}])
+                  tracker)
+                nil nil nil))
 
-        (when (not (empty? condis)) 
+        (when (not (empty? condis))  ;; still need this little guy tho
           (kick client-name (vec (cons :condis keypath)) condis nil nil nil))
         ))))
+
+
+
+(defn send-acc-tracker-runner [base-type keypath client-name new-value]
+  (let [flow-id (first keypath)
+        orig-tracker (get @flow-db/tracker flow-id)
+        tracker (into {} (for [[k v] orig-tracker ;; remove condi non-starts. dont send to client. data noise. neccessary noise for reactions, but noise
+                               :when (not (get v :in-chan?))]
+                           {k v}))
+        all-tracks (vec (conj (get @acc-trackers flow-id []) tracker))
+        acc-tracker (accumulate-unique-runs all-tracks)]
+    (swap! acc-trackers assoc flow-id all-tracks) ;; for next acc 
+    (kick client-name (vec (cons :acc-tracker keypath))
+          acc-tracker
+          nil nil nil)))
+
+(defn send-tracker-block-runner [base-type keypath client-name new-value]
+  (let [flow-id (first keypath)]
+    (let []
+      (kick client-name (vec (cons :tracker-blocks keypath))
+            (select-keys (get @flow-status flow-id) [:running-blocks :done-blocks :waiting-blocks])
+            nil nil nil))))
+
 
 ;; :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
 
@@ -3164,8 +3215,10 @@
       (let [[flow-id step-id] keypath]
         (ut/pp [:client-sub-flow-runner flow-id :step-id step-id :client-name client-name])
            ;(ut/pp [:react-flow-runner (get-in @flow-db/results-atom keypath)])
-        (add-watcher keypath client-name send-reaction-runner (keyword (str "runner||" flow-id "||" (hash keypath))) :flow-runner flow-id)
-        (add-watcher keypath client-name send-tracker-runner  (keyword (str "tracker||" flow-id "||" (hash keypath))) :tracker flow-id)
+        (add-watcher keypath client-name send-reaction-runner       (keyword (str "runner||" flow-id "||" (hash keypath))) :flow-runner flow-id)
+        (add-watcher keypath client-name send-tracker-runner        (keyword (str "tracker||" flow-id "||" (hash keypath))) :tracker flow-id)
+        (add-watcher keypath client-name send-tracker-block-runner  (keyword (str "blocks||" flow-id "||" (hash keypath))) :tracker flow-id)
+        (add-watcher keypath client-name send-acc-tracker-runner    (keyword (str "acc-tracker||" flow-id "||" (hash keypath))) :tracker flow-id)
            ;(kick client-name (vec (cons :flow-runner keypath)) :started nil nil nil) ;; push initial value, if we have one
            ;(kick client-name (vec (cons :tracker keypath)) (get @flow-db/tracker flow-id) nil nil nil) ;; push init tracker state, if exists
            ;[:client-sub-request flow-id :step-id step-id :client-name client-name]
@@ -3994,7 +4047,10 @@
 
 (defn query-runstream [kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key]
   (doall
-   (let [has-rql? (try (true? (some #(or (= % :*render*) (= % :*read-edn*) (= % :*code*)) (ut/deep-flatten honey-sql))) (catch Exception _ false))
+   (let [honey-sql (if (get honey-sql :limit) ;; this is a crap solution since we can't introspect the top level query to get dims and measures, etc... TODO, selective limit pruning
+                     {:select [:*] :from [honey-sql]}
+                     honey-sql)
+         has-rql? (try (true? (some #(or (= % :*render*) (= % :*read-edn*) (= % :*code*)) (ut/deep-flatten honey-sql))) (catch Exception _ false))
          data-call? (true? (and (not has-rql?)
                                 (not (empty? (first (filter #(= (last %) :data) (ut/kvpaths honey-sql)))))))
          ;; used for simple blocking in code-execution and data literals table insertion chicken/egg issue
@@ -5461,10 +5517,18 @@
         ;;                     :stroke :theme/editor-outer-rim-color
         ;;                     :fill :theme/editor-outer-rim-color}]]]
          ; open_flow_channels (or (apply + (for [[_ v] @flow-db/channels-atom] (count v))) 0)
+          ack-scoreboard (into {} (for [[k v] (client-statuses)
+                                        :when (not= (get v :last-seen-seconds) -1)]
+                                    {k (ut/deselect-keys v [:booted :last-ack :last-push])}))
+          cli-rows (vec (for [[k v] ack-scoreboard] (merge {:client-name (str k)} v)))
+          ;_ (ut/pp [:cli-rows cli-rows])
+          insert-cli {:insert-into [:client_stats] :values cli-rows}
           insert-sql {:insert-into [:jvm_stats]
                       :columns [:used_memory_mb :thread_count :sql_cache_size :ws_peers :open_flow_channels :queries_run :internal_queries_run :sniffs_run :sys_load]
                       :values [[mm thread-count (count @sql-cache) (count @wl/sockets) -1 @q-calls @q-calls2 @cruiser/sniffs sys-load]]}]
       (swap! stats-cnt inc)
+      (do (sql-exec system-db (to-sql {:delete-from [:client_stats]}))
+          (sql-exec system-db (to-sql insert-cli)))
       (sql-exec system-db (to-sql insert-sql))
     ;(ut/pp @queue-status)
       ;; (ut/pp {:client-sub-queues (into {} (for [[k v] @client-queues]
@@ -5503,9 +5567,7 @@
                                     {k {:time-running (- (or end (System/currentTimeMillis)) start)
                                         :*running? *running?}}))])
 
-      (ut/pp [:ack-scoreboard (into {} (for [[k v] (client-statuses)
-                                             :when (not= (get v :last-seen-seconds) -1)]
-                                         {k (ut/deselect-keys v [:booted :last-ack :last-push])}))])
+      (ut/pp [:ack-scoreboard ack-scoreboard])
 
     ;(ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
 

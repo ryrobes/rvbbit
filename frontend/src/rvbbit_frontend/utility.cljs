@@ -344,12 +344,14 @@
 (defn calculate-atom-sizes [atom-map]
   (into {}
         (for [[name a] atom-map]
-          (let [size-bytes (-> @a
+          (try 
+            (let [size-bytes (-> @a
                                pr-str
                                .-length)
                 size-mb (/ size-bytes 1048576.0)]
 
-            {name [size-bytes :bytes size-mb :mb (try (count (keys @a)) (catch :default _ -1)) :keys]}))))
+            {name [size-bytes :bytes size-mb :mb (try (count (keys @a)) (catch :default _ -1)) :keys]})
+            (catch :default e {name [:error (str e)]})))))
 
 (defn template-find [s]
   (let [s (str s)

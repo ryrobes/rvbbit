@@ -409,6 +409,18 @@ group by 1, 2) tt on s.client_name = tt.client_name
 ;; use the existing insert-queue?
 
 ;; :used_memory_mb :thread_count :sql_cache_size
+(def create-client-stats "create table if not exists client_stats
+   (client_name text NULL,
+    ack integer NULL,
+    client_latency integer NULL,
+    client_subs integer NULL,
+    last_seen text NULL,
+    push integer NULL,
+    queue_size integer NULL,
+    server_subs integer NULL,     
+    last_seen_seconds integer NULL,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
 (def create-jvm-stats "create table if not exists jvm_stats
    (used_memory_mb integer NULL, 
     thread_count integer NULL, 

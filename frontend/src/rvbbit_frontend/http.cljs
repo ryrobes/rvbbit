@@ -150,8 +150,8 @@
 (re-frame/reg-event-db
  ::timeout-response
  (fn [db [_ result what-req]]
-   (let []
-     (tap> [:websocket-timeout! result what-req])
+   (let [client-name (get db :client-name)]
+     (tap> [:websocket-timeout! client-name result what-req])
      db)))
 
 (re-frame/reg-event-db
@@ -292,7 +292,7 @@
                       acc (into [] entry)))
             {} data)))
 
-(defonce subsequent-runs (reagent/atom []))
+(defonce subsequent-runs (atom [])) ;; no need for a ratom, not rendering related
 
 (re-frame/reg-event-db
  ::simple-response
@@ -313,7 +313,7 @@
            kick? (= ui-keypath :kick)
            heartbeat? (= task-id :heartbeat)
            alert? (= task-id :alert1)
-           not-sys-stats? (not (cstr/includes? (str (get result :data)) "[sys-stats]"))
+           ;not-sys-stats? (not (cstr/includes? (str (get result :data)) "[sys-stats]"))
            server-sub? (and kick? (or (= (get-in result [:task-id 0]) :flow)
                                       (= (get-in result [:task-id 0]) :screen)
                                       (= (get-in result [:task-id 0]) :ext-param)
@@ -321,10 +321,12 @@
                                       (= (get-in result [:task-id 0]) :client)) 
                             (not heartbeat?)) ;; server mutate only for click-param
            flow-runner-sub? (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?)) ;; server mutate only for click-param
-           flow-runner-tracker? (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
+           ;flow-runner-tracker? (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
+           flow-runner-tracker-blocks? (and kick? (= (get-in result [:task-id 0]) :tracker-blocks) (not heartbeat?))
+           flow-runner-acc-tracker? (and kick? (= (get-in result [:task-id 0]) :acc-tracker) (not heartbeat?))
            condi-tracker? (and kick? (= (get-in result [:task-id 0]) :condis) (not heartbeat?))
            estimate? (and kick? (= (get-in result [:task-id 0]) :estimate) (not heartbeat?))
-           refresh? (or (not (empty? (get-in result [:data 0 :payload])))
+           refresh? (or (ut/ne? (get-in result [:data 0 :payload]))
                         ;;; ^^ calliope test TEMP
                         (and payload-kp
                              (try (= (first (vals @db/chat-mode)) ui-keypath) (catch :default _ false))))]
@@ -343,11 +345,11 @@
       ;;  (when server-sub?
       ;;    (tap> [:server-sub-in! (get result :task-id) (get result :status)]))
        
-       (when (and (not heartbeat?) (cstr/starts-with? (str client-name) ":spirited"))
+       (when (and (not heartbeat?) (cstr/starts-with? (str client-name) ":trust"))
          (tap> [:payload! client-name task-id result]))
 
        (when heartbeat?
-         (when (or (cstr/starts-with? (str client-name) ":spirited")
+         (when (or (cstr/starts-with? (str client-name) ":trust")
                    ;(cstr/starts-with? (str client-name) ":stirr")
                    ) (tap> [:heartbeat! client-name task-id result]))
          (re-frame/dispatch [::wfx/request :default
@@ -393,9 +395,9 @@
                   (= (get result :task-id) "evening-ryan-3456"))
                   ;(not (some #(= (hash result) %) @last-hash))
 
-         (do (swap! last-hash conj (hash result))
-             (tap> [:rr result])
-             (re-frame/dispatch [::refresh-kits])))
+         (swap! last-hash conj (hash result))
+         (tap> [:rr result])
+         (re-frame/dispatch [::refresh-kits]))
 
       ;;  (when (or flow-runner-sub? flow-runner-tracker?)
       ;;    (tap> [(if flow-runner-tracker?
@@ -413,55 +415,69 @@
 
              condi-tracker? (assoc-in db [:flow-results :condis (get-in result [:task-id 1])] (get result :status))
 
-             (and ;(get db :flow-gantt?) ;; no need if view isnt up!
-                  ;(not (= (get @(re-frame/subscribe [::flow-results]) :status) :done)) ;; or channel running? we want animations!
-              (get db :flow?)
-              flow-runner-tracker?)
+             flow-runner-tracker-blocks? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
+                                               flow-id (get-in result [:task-id 1])
+                                               filtered-blocks (into {} (for [[k v] (get result :status)] {k (vec (cset/intersection (set block-keys) (set v)))}))]
+                                           (assoc-in db [:flow-results :tracker-blocks flow-id] filtered-blocks))
 
-             (let [flow-id (get-in result [:task-id 1])
-                                        ;ui-keypath (get-in result [:ui-keypath])
-                   block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
-                   expected (into {} (for [e block-keys]
-                                       {e {:start (+ (.now js/Date) 1000) :fake? true}}
-                                       ; {e {}}
-                                       ))
-                   pstatus (select-keys (get result :status) block-keys)
-                  ;;  _ (swap! subsequent-runs assoc flow-id
-                  ;;           (vec (conj (get @subsequent-runs flow-id) (get result :status))))
-                   _ (when (not (empty? pstatus)) (swap! subsequent-runs conj pstatus))
-                   status  (merge expected pstatus)
-                   ;status (get result :status)
-                  ; _ (tap> [:s pstatus expected status @subsequent-runs])
-                  ; _ (tap> [:subruns? (accumulate-unique-runs @subsequent-runs)])
-                   tracker-history (accumulate-unique-runs @subsequent-runs)
-                   rr (vec (for [[k v] tracker-history
-                                 :when (and
-                                        (not (get (last v) :in-chan?))
-                                        (nil? (get (last v) :end)))] k))
-                  ;;  rrr (for [[k v] status
-                  ;;            :when (nil? (get (last v) :end))] k)
-                   running (vec (->> status
-                                     (filter (fn [[_ v]]
-                                               (and true ;(not (get v :in-chan?))
-                                                    (nil? (:end v)))))
-                                     (map first)))
-                  ;;  rrunning (vec (->> pstatus
-                  ;;                     (filter (fn [[k v]] (nil? (:end v))))
-                  ;;                     (map first)))
-                   ;;_ (tap> [:sss rr status tracker-history running ])
-                   ]
+             flow-runner-acc-tracker? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
+                                            flow-id (get-in result [:task-id 1])
+                                            trackers (select-keys (get result :status) block-keys)]
+                                        ;(tap> [:flow-runner-acc-tracker trackers])
+                                        (assoc-in db [:flow-results :tracker flow-id] trackers))
 
-               (swap! db/running-blocks assoc flow-id running)
-               (swap! db/real-running-blocks assoc flow-id rr)
-                ; _ (tap> [:running? running])
-               ;;(swap! db/flow-results assoc-in [:tracker flow-id] status)
-               ;(re-frame/dispatch [::set-flow-results status [:tracker flow-id]])
-               (let []
-                 (if (not (empty? tracker-history))
-                   (assoc-in db [:flow-results :tracker flow-id]
-                         ;status
-                         ;(into {} (for [[k v] status] {k [v]}))
-                             tracker-history) db)))
+            ;;  (and ;(get db :flow-gantt?) ;; no need if view isnt up!
+            ;;       ;(not (= (get @(re-frame/subscribe [::flow-results]) :status) :done)) ;; or channel running? we want animations!
+            ;;   false ;; hjere we go boys
+            ;;   (get db :flow?)
+            ;;   flow-runner-tracker?)
+
+            ;;  (let [start-tracker? (get-in result [:status :*start!]) ;;(and (get-in result [:status :*start!]) (not (empty? subsequent-runs)))
+            ;;        _ (when start-tracker? (reset! subsequent-runs [])) ;; since piggyback watched flows dont get explicity start/stop signals from the client (since we didnt call it)
+            ;;        flow-id (get-in result [:task-id 1])
+            ;;                             ;ui-keypath (get-in result [:ui-keypath])
+            ;;        block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
+            ;;        expected (into {} (for [e block-keys]
+            ;;                            {e {:start (+ (.now js/Date) 1000) :fake? true}}
+            ;;                            ; {e {}}
+            ;;                            ))
+            ;;        pstatus (select-keys (get result :status) block-keys)
+            ;;       ;;  _ (swap! subsequent-runs assoc flow-id
+            ;;       ;;           (vec (conj (get @subsequent-runs flow-id) (get result :status))))
+            ;;        _ (when (ut/ne? pstatus) (swap! subsequent-runs conj pstatus))
+            ;;        status  (merge expected pstatus)
+            ;;        ;status (get result :status)
+            ;;       ; _ (tap> [:s pstatus expected status @subsequent-runs])
+            ;;       ; _ (tap> [:subruns? (accumulate-unique-runs @subsequent-runs)])
+            ;;        tracker-history (accumulate-unique-runs @subsequent-runs)
+            ;;        rr (vec (for [[k v] tracker-history
+            ;;                      :when (and
+            ;;                             (not (get (last v) :in-chan?))
+            ;;                             (nil? (get (last v) :end)))] k))
+            ;;       ;;  rrr (for [[k v] status
+            ;;       ;;            :when (nil? (get (last v) :end))] k)
+            ;;        running (vec (->> status
+            ;;                          (filter (fn [[_ v]]
+            ;;                                    (and true ;(not (get v :in-chan?))
+            ;;                                         (nil? (:end v)))))
+            ;;                          (map first)))
+            ;;       ;;  rrunning (vec (->> pstatus
+            ;;       ;;                     (filter (fn [[k v]] (nil? (:end v))))
+            ;;       ;;                     (map first)))
+            ;;        ;;_ (tap> [:sss rr status tracker-history running ])
+            ;;        ]
+
+            ;;    (swap! db/running-blocks assoc flow-id running)
+            ;;    (swap! db/real-running-blocks assoc flow-id rr)
+            ;;     ; _ (tap> [:running? running])
+            ;;    ;;(swap! db/flow-results assoc-in [:tracker flow-id] status)
+            ;;    ;(re-frame/dispatch [::set-flow-results status [:tracker flow-id]])
+            ;;    (let []
+            ;;      (if (not (empty? tracker-history))
+            ;;        (assoc-in db [:flow-results :tracker flow-id]
+            ;;              ;status
+            ;;              ;(into {} (for [[k v] status] {k [v]}))
+            ;;                  tracker-history) db)))
 
              estimate?        (assoc db :flow-estimates (merge (get db :flow-estimates) (get result :status)))
 
@@ -536,8 +552,8 @@
 (re-frame/reg-event-db
  ::timeout-response
  (fn [db [_ result what-req]]
-   (let []
-     (tap> [:websocket-timeout! result what-req])
+   (let [client-name (get db :client-name)]
+     (tap> [:websocket-timeout! client-name result what-req])
      db)))
 
 (re-frame/reg-event-db

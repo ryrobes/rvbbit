@@ -337,7 +337,23 @@
                 {})]
     (reset! flow-db/results-atom state)))
     
+(defn start-services []
+  (do
+    (ut/pp [:starting-services...])
+    (evl/create-nrepl-server!)
+    (wss/create-web-server!)
+    (wss/create-websocket-server!)
+    (evl/create-nrepl-server!)))
 
+(defn delayed-start [ms f]
+  (Thread. #(do (Thread/sleep ms) (f))))
+
+(defn delay-execution [ms f]
+  (let [thread (Thread. (fn []
+                          (Thread/sleep ms)
+                          (f)))]
+    (.start thread)
+    thread))
 
 
   (defn -main [& args]
@@ -397,11 +413,11 @@
     ;(cruiser/create-sys-tables-if-needed! system-db) ;; sqlite
 
 
-    (defn fridge-child-atom [ttype key]
-      (let [base-dir (str "./data/atoms/" (cstr/replace (str ttype) ":" ""))
-            _ (ext/create-dirs base-dir) ;; just in case...
-            new-child-atom  (ut/thaw-atom {} (str base-dir "/" key "-atom.edn"))]
-        new-child-atom))
+    ;; (defn fridge-child-atom [ttype key]
+    ;;   (let [base-dir (str "./data/atoms/" (cstr/replace (str ttype) ":" ""))
+    ;;         _ (ext/create-dirs base-dir) ;; just in case...
+    ;;         new-child-atom  (ut/thaw-atom {} (str base-dir "/" key "-atom.edn"))]
+    ;;     new-child-atom))
 
     (add-watch wss/screens-atom :master-screen-watcher ;; watcher splitter
                (fn [_ _ old-state new-state]
@@ -482,30 +498,30 @@
      cruiser/default-field-attributes
      cruiser/default-derived-fields
      cruiser/default-viz-shapes)
-    
 
-        (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
-    
+
+    (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+
     (tt/start!)
     (def mon (tt/every! 30 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30 seconds (excessive, lenghten in prod..)
-    (instrument-jvm instrument/metric-registry)
+    ;(instrument-jvm instrument/metric-registry)
     (wss/subscribe-to-session-changes)
-    
+
       ;;(wss/start-thread-worker) ;; used for side-car sniffs
       ;(def worker-thread (wss/start-thread-worker))
       ;(def lunchbreak (tt/every! 90 2 (bound-fn [] (wss/recycle-worker worker-thread)))) ;; "reboot" the sniffer worker thread every 30 mins
-    
+
     (def lunchbreak  (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker)))) ;; "reboot" the sniffer worker thread every hour
     (def lunchbreak2 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker2))))
     (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
-    
+
         ;;(def lucene-commiter (tt/every! 30 2 (bound-fn [] (search/commit-writer search/index-writer))))
     (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))
-    
+
     (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too much?
-    
+
     (def purge (tt/every! 30 2 (bound-fn [] (wss/purge-dead-client-watchers))))
-    
+
     (def last-look (atom {}))
     (def saved-uids (atom []))
 
@@ -613,9 +629,9 @@
                              done-blocks (vec (for [[k v] (get @flow-db/tracker k)
                                                     :when (not (nil? (get v :end)))]
                                                 k))
-                             not-started-yet (cset/difference
-                                              (set blocks)
-                                              (set (into running-blocks done-blocks)))
+                             not-started-yet (vec (cset/difference
+                                                   (set blocks)
+                                                   (set (into running-blocks done-blocks))))
                              running-blocks (vec (cset/difference (set blocks) (set (into done-blocks not-started-yet))))
                              res (get-in @flow-db/results-atom [k :done] :nope)
                              running? (or (= res :nope) (ut/chan? res) (= res :skip))
@@ -706,7 +722,11 @@
                              :*channels-open? channels-open?
                              :*channels-open chans-open
                              ;:tracker-events (count (get @wss/tracker-history k []))
+
                              :running-blocks running-blocks
+                             :done-blocks done-blocks
+                             :waiting-blocks not-started-yet
+
                              :overrides overrides
                              ;:*result (str res)
                              :*finished (count done-blocks)
@@ -714,7 +734,7 @@
                              :*done done-blocks
                              :*ms-elapsed elapsed
                              :*time-running (str human-elapsed)
-                             :*not-started (vec not-started-yet)
+                             :*not-started not-started-yet
                              :*open-channels (get cc k)
                              :*running? running?}}))))))
 
@@ -859,7 +879,7 @@
 
 
     (ut/pp {:settings config/settings})
-    (ut/pp {:kits-loaded config/kits})
+    ;; (ut/pp {:kits-loaded config/kits})
 
 
   ;; (defn create-windows-test []
@@ -990,11 +1010,37 @@
   ;(def rez (atom nil))
   ;(doall (flow/flow flow/my-network {:debug? true :flow-id "yoyoyoy"} wss/rez))
 
-    (evl/create-nrepl-server!)
-    (wss/create-web-server!)
-    (wss/create-websocket-server!)
 
-    (evl/create-nrepl-server!)
+  ;;  (defn delay-execution [ms f]
+  ;;    (future (do (Thread/sleep ms) (f nil))))
+
+  ;;   (ut/pp [:waiting-for-background-systems...])
+  ;;   @(delay-execution
+  ;;    30000
+  ;;    (fn [_]
+  ;;      (evl/create-nrepl-server!)
+  ;;      (wss/create-web-server!)
+  ;;      (wss/create-websocket-server!)
+  ;;      (evl/create-nrepl-server!)))
+
+;; (defn delay-execution [ms f]
+;;   (.start (Thread. (fn [] (Thread/sleep ms) (f)))))
+
+;; (def delayed-startup (delay (do
+;;                               (evl/create-nrepl-server!)
+;;                               (wss/create-web-server!)
+;;                               (wss/create-websocket-server!)
+;;                               (evl/create-nrepl-server!))))
+
+;; (ut/pp [:waiting-for-background-systems...])
+;; (delay-execution 30000 #(force delayed-startup))
+
+    (ut/pp [:waiting-for-background-systems...])
+    ;; (delayed-start 30000 start-services)
+
+    (let [fut (future (Thread/sleep 40000) (start-services))]
+      (println "Main completed.")
+      @fut)
 
     (println " ")
 

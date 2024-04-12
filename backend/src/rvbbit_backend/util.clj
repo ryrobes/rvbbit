@@ -1105,8 +1105,11 @@
 ;;         (catch Exception _
 ;;           (println (str :error-inserting-log! :error-inserting-log! log caller)))))))
 
+;; (defn delay-execution [ms f]
+;;   (future (Thread/sleep ms) (f)))
+
 (defn delay-execution [ms f]
-  (future (Thread/sleep ms) (f)))
+  (future (do (Thread/sleep ms) (f))))
 
 ;; (defn ppln [x]
 ;;   (if (>= debug-level 2)
