@@ -744,6 +744,12 @@
    (let [done (get-in db [:flow-results :tracker-blocks flow-id :done-blocks])]
      (true? (some #(= bid %) done)))))
 
+(re-frame/reg-sub
+ ::is-error?
+ (fn [db [_ bid flow-id]]
+   (let [err (get-in db [:flow-results :tracker-blocks flow-id :error-blocks])]
+     (true? (some #(= bid %) err)))))
+
 
 (def tentacle-pos (reagent/atom [0 0]))
 (def tentacle-start (reagent/atom [0 0]))
@@ -1330,6 +1336,7 @@
                  flow-running? @(re-frame/subscribe [::is-running? :* flow-id])
                  running? (and flow-running? @(re-frame/subscribe [::is-running? z2 flow-id]))
                  waiting? (and flow-running? @(re-frame/subscribe [::is-waiting? z2 flow-id]))
+                 error?   @(re-frame/subscribe [::is-error? z2 flow-id])
                  opacity 1.0 ;(if (or running? selected?) 1.0 0.5)
                  done? (and flow-running? @(re-frame/subscribe [::is-done? z2 flow-id]))]
 
@@ -1358,6 +1365,7 @@
                      :opacity (cond 
                                 running? 1.0
                                 waiting? 0.3
+                                error? 0.25
                                 done? 1.0
                                 (and (not running?) (or push-path? condi-path?)) (- opacity 0.22)
                                 :else opacity)
@@ -1371,13 +1379,15 @@
                     ;:fill         "#ffffff33" ;"none"
                      ;:stroke-dasharray (if waiting? "10,15" (when condi-path? "15,10")) ;; TODO, kinda weird logic
                      :stroke-dasharray (cond running? "4,12"
-                                             waiting? "10,15"
+                                             (or error? waiting?) "10,15"
+                                             ;error? "16,16"
                                              condi-path? "15,10"
                                              push-path? "5,5"
                                              :else nil)
                     ; :stroke-linecap (if (not selected?) "round" "square")
                      :stroke-linecap (cond condi-path? "butt"
                                            push-path? "butt"
+                                           ;;error? "butt"
                                            :else "round")
                      :fill         "none" ;;(str color 45) ;; could be a cool "running effect"
                      :filter       (if (or running? selected?) (str "brightness(200%) drop-shadow(2px 1px 4px " color ")")
@@ -2666,13 +2676,15 @@
   (let [hovered?      (and (= bid (first @port-hover))
                            (not @dragging-flow?))
         ;ccolor (hsl->hex (complement bcolor))
+        running? @(re-frame/subscribe [::is-running? bid flow-id])
+        bcolor (if running? (theme-pull :theme/editor-outer-rim-color nil) bcolor)
         shades-color (try (vec (for  [s (shades bcolor)] (hsl->hex s))) (catch :default _ ["#ffffff"]))
         ;triad-color (vec (for  [s (triad bcolor)] (hsl->hex s)))
         syntax @(re-frame/subscribe [::syntax bid])
         tetrad-color (try (vec (for  [s (tetrad bcolor)] (hsl->hex s))) (catch :default _ ["#ffffff"])) ;; bad colors will crash it.
         mouse-down-fn #(mouse-down-handler-block % bid)
         ;running? (is-running? bid flow-id)
-        running? @(re-frame/subscribe [::is-running? bid flow-id])
+        
         tbid (let [cc (/ w 7) ;; px to char width
                    llen (count (str bid))]
                ;;(tap> [:tbid cc bid w])
@@ -2727,6 +2739,7 @@
                                                 (first tetrad-color))
                                        :cursor "pointer"
                                        :margin-top "4px"
+                                       ;:filter "scale(1.6)"
 ;                                       :transform-origin "21.5px 22px"
                                        :transform-origin "11px 11px"
                                        ;:filter "drop-shadow(0.25rem 0.35rem 0.4rem rgba(0, 0, 0, 0.44))"
@@ -2911,13 +2924,14 @@
                                  hover-involved? (true? (some #(= % bid) (get-in @flow-details-block-container-atom [flow-id :involved])))
                            ;running?        (is-running? bid flow-id)
                                  running?         @(re-frame/subscribe [::is-running? bid flow-id])
+                                 error?        @(re-frame/subscribe [::is-error? bid flow-id])
                            ;_ (tap> [:inny? (get-in @flow-details-block-container-atom [flow-id :involved])])
                            ;; python?         (= (get data :syntax) "python")
                            ;; styler          (get-in data [:flow-item :style] {})
                                  did             (str "flow-brick-" bid)
                            ;; override-value  (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps (str flow-id) bid])
                            ;; value           (if override-value override-value (get data :user-input))
-                                 shake?          false ;(and playing? (some #(= % bid) @involved))
+                            ;;     shake?          false ;(and playing? (some #(= % bid) @involved))
                          ;;styler-selected (get-in data [:flow-item :style-selected] {})
                            ;; error? (get value :error false)
                            ;; bcolor (try
@@ -2941,13 +2955,16 @@
                                :on-mouse-enter #(reset! flow-hover bid)
                                :on-mouse-over  #(when (not (= @flow-hover bid)) (reset! flow-hover bid))
                                :on-mouse-leave #(reset! flow-hover nil)}
-                        :class (when shake? "rotate-fast")
+                        ;;:class (when running? "pulse infinite")
                         :style {:position "fixed"
                                 :z-index 610
                                 :border-radius "5px"
-                                :filter (when (and (not (nil? selected-bid)) (not running?))
-                                          (when (and (not hover-involved?)
-                                                     (not selected?)) "brightness(45%)")) ;(str "drop-shadow(2px 1px 4px #000000)")
+                                :filter (if running?
+                                          "brightness(145%)"
+                                          (when (and (not (nil? selected-bid)) (not running?))
+                                            (when (and (not hover-involved?)
+                                                       (not selected?)) "brightness(45%)")))
+                                ;(str "drop-shadow(2px 1px 4px #000000)")
                           ;:filter (when selected? (str "brightness(200%) drop-shadow(2px 1px 4px " bcolor ")"))
                           ;:transform (when selected? "scale(1.1)")
                           ;:opacity (when (not selected?) 1.0 0.3)
@@ -2971,8 +2988,10 @@
 
                                 :user-select "none"
                                 :border (str "3px " (if selected? "dashed" "solid") " " bcolor (if selected? "" 45))
-                                :background-color (str bcolor (if (or hover-involved?
-                                                                      selected?) 75 35))
+                                :background-color (cond running?  (theme-pull :theme/editor-outer-rim-color nil)
+                                                        ;error? "#00000045"
+                                                    :else (str bcolor (if (or hover-involved?
+                                                                      selected?) 75 35)))
                                 :width (px w)
                                 :height (px h)
                                 :left x :top y}
@@ -7191,7 +7210,10 @@
                   end (if running? (if (nil? end) (+ (.now js/Date) 1000) end) end)
                   start (if running? (if (nil? start) (.now js/Date) start) start)
                   duration-ms (- end start)
-                  duration-ms (if (>= duration-ms 0) duration-ms 1)
+                  duration-ms (cond
+                                (>= duration-ms 999999999999) -1 ;duration-ms
+                                (> duration-ms 0) duration-ms
+                                :else 1)
                   scaled-duration (if log-scale?
                                     (Math/log1p (+ duration-ms 1))
                                     duration-ms)
@@ -7223,7 +7245,7 @@
         ;; Group runs by step - here we lose our correct order!
         grouped-by-step (group-by :step transformed-data)
         grouped-by-step (ordered-group grouped-by-step orderb)
-        has-data? (and (not (empty? transformed-data))
+        has-data? (and (ut/ne? transformed-data)
                        ;(not (empty? (vals grouped-by-step)))
                        (not (= grouped-by-step (get @db/last-gantt flow-id {})))
                        (if running? (>= (- current-time @db/last-update) 1000) true))]

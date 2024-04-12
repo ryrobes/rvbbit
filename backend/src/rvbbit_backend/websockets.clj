@@ -88,6 +88,7 @@
 (def shutting-down? (atom false))
 (defonce tracker-client-only (atom {}))
 (def acc-trackers (atom {}))
+(def temp-error-blocks (atom {}))
 
 (def ack-scoreboard (atom {}))
 (def ping-ts (atom {}))
@@ -2236,6 +2237,7 @@
           _ (swap! last-times assoc-in [flow-id :start] (System/currentTimeMillis))
           _ (swap! tracker-client-only assoc flow-id {})
           _ (swap! acc-trackers assoc flow-id [])
+          _ (swap! temp-error-blocks assoc flow-id [])
           ;;_ (swap! last-times assoc flow-id []) 
           ;_ (alert! client-name  10 1.35)
           base-flow-id (if (cstr/includes? (str flow-id) "-SHD-") (first (cstr/split flow-id #"-SHD-")) flow-id) ;; if history run, only for estimates for now
@@ -3121,7 +3123,7 @@
   (let [flow-id (first keypath)]
     (let []
       (kick client-name (vec (cons :tracker-blocks keypath))
-            (select-keys (get @flow-status flow-id) [:running-blocks :done-blocks :waiting-blocks])
+            (select-keys (get @flow-status flow-id) [:running-blocks :done-blocks :error-blocks :waiting-blocks])
             nil nil nil))))
 
 

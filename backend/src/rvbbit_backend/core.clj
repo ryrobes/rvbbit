@@ -633,10 +633,12 @@
                                                    (set blocks)
                                                    (set (into running-blocks done-blocks))))
                              running-blocks (vec (cset/difference (set blocks) (set (into done-blocks not-started-yet))))
+
                              res (get-in @flow-db/results-atom [k :done] :nope)
                              running? (or (= res :nope) (ut/chan? res) (= res :skip))
                              done? (not (= res :nope))
                              error? (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
+                             _ (when error? (swap! wss/temp-error-blocks assoc k not-started-yet))
                              start (try (apply min (or (for [[_ v] (get @flow-db/tracker k)] (get v :start)) [-1]))
                                         (catch Exception _ (System/currentTimeMillis)))
                              start-ts (ut/millis-to-date-string start)
@@ -726,6 +728,7 @@
                              :running-blocks running-blocks
                              :done-blocks done-blocks
                              :waiting-blocks not-started-yet
+                             :error-blocks (get @wss/temp-error-blocks k [])
 
                              :overrides overrides
                              ;:*result (str res)

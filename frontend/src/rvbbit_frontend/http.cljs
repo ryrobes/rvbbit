@@ -345,8 +345,8 @@
       ;;  (when server-sub?
       ;;    (tap> [:server-sub-in! (get result :task-id) (get result :status)]))
        
-       (when (and (not heartbeat?) (cstr/starts-with? (str client-name) ":trust"))
-         (tap> [:payload! client-name task-id result]))
+      ;;  (when (and (not heartbeat?) (cstr/starts-with? (str client-name) ":trust"))
+      ;;    (tap> [:payload! client-name task-id result]))
 
        (when heartbeat?
          (when (or (cstr/starts-with? (str client-name) ":trust")
@@ -418,13 +418,20 @@
              flow-runner-tracker-blocks? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
                                                flow-id (get-in result [:task-id 1])
                                                filtered-blocks (into {} (for [[k v] (get result :status)] {k (vec (cset/intersection (set block-keys) (set v)))}))]
+                                          ;;  (when (cstr/starts-with? (str client-name) ":trust")
+                                          ;;    (tap> [:flow-runner-tracker-blocks filtered-blocks]))
                                            (assoc-in db [:flow-results :tracker-blocks flow-id] filtered-blocks))
 
              flow-runner-acc-tracker? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
                                             flow-id (get-in result [:task-id 1])
                                             trackers (select-keys (get result :status) block-keys)]
-                                        ;(tap> [:flow-runner-acc-tracker trackers])
-                                        (assoc-in db [:flow-results :tracker flow-id] trackers))
+                                        ;; (when (cstr/starts-with? (str client-name) ":trust") 
+                                        ;;   (tap> [:flow-runner-acc-tracker trackers]))
+                                        (-> db 
+                                            (ut/dissoc-in (if (or (empty? trackers) (= (count (keys trackers)) 1)) ;; TODO this could wipe an early value - have server send the wipe command instead
+                                                            [:flow-results :return-maps flow-id]
+                                                            [:skip-me :yo :yo]))
+                                            (assoc-in [:flow-results :tracker flow-id] trackers)))
 
             ;;  (and ;(get db :flow-gantt?) ;; no need if view isnt up!
             ;;       ;(not (= (get @(re-frame/subscribe [::flow-results]) :status) :done)) ;; or channel running? we want animations!
