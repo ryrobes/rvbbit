@@ -146,10 +146,10 @@
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
       :dispatch-event-on-start? false}
 
-     {:interval                 30
-      :event                    [::bricks/take-screenshot]
-      :poll-when                [::bricks/is-mouse-active?]
-      :dispatch-event-on-start? false}
+    ;;  {:interval                 30
+    ;;   :event                    [::bricks/take-screenshot]
+    ;;   :poll-when                [::bricks/is-mouse-active?]
+    ;;   :dispatch-event-on-start? false}
 
      {:interval                 5
       :event                    [::bricks/update-flow-statuses]

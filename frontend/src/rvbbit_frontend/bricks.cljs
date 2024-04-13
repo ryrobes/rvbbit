@@ -11848,7 +11848,7 @@
                                                        (if selected? "scale(0.7)" ; nil ;"scale(0.85)"
                                                            "scale(0.7)"))
                                ; :transition       "all 0.2s ease-in-out"
-                                   :transform-style  "preserve-3d"
+                                   :transform-style  "preserve-3d" ;; important for tab embedding!
 
                                    :box-shadow (when (= brick-vec-key @db/speaking)
                                                  (let [block-id brick-vec-key ;:audio
@@ -12066,7 +12066,8 @@
                                                                      :md-icon-name (if is-pinned? "zmdi-pin-off" "zmdi-pin")
                                                                      :on-click #(do (re-frame/dispatch [::toggle-pin-block brick-vec-key])
                                                                                   ;(re-frame/dispatch [::select-block "none!"])
-                                                                                    (do)) ;(reset! over-block? false)
+                                                                                    ;(do)
+                                                                                    ) ;(reset! over-block? false)
                                                                                       ;(re-frame/dispatch [::conn/click-parameter [:user-sys] nil])
 
                                                                      :style {:font-size "15px"
@@ -12151,9 +12152,12 @@
                                          ^{:key (str "brick-" brick-vec-key "-dragger")}
                                          [re-com/box :child " " :style {:background-color "#58A27933"}]
                                          ^{:key (str "brick-" brick-vec-key "-honeycomb-box")}
-                                         [rc/catch (if viz-reco?
+                                         (if @dragging-block ;; @dragging? ;; dragging-block 
+                                           [re-com/box :child " "]
+                                           [rc/catch (if viz-reco?
                                                      [honeycomb brick-vec-key selected-view]
-                                                     [honeycomb brick-vec-key])])]
+                                                     [honeycomb brick-vec-key])])
+                                         )]
                                                    ;(honeycomb brick-vec-key)
 
 

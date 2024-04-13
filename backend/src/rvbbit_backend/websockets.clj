@@ -699,7 +699,7 @@
         columns (keys (first rowset-fixed))
         values (vec (for [r rowset-fixed] (vals r)))
         ;table-name-str  "csvfile" ;(ut/unkeyword table-name)
-        ddl-str (clickhouse-ddl/create-attribute-sample table-name rowset-fixed)
+        ddl-str (ddl/create-attribute-sample table-name rowset-fixed)
        ; insert-sql (to-sql {:insert-into [:csvfile]
        ;                     :columns columns
        ;                     :values values})
