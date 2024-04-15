@@ -287,6 +287,13 @@
 ;;       (boolean (re-matches #"^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$" substring)))
 ;;     false))
 
+(defn remove-underscored [m] ;; used for temp keys and UI keys in queries and such
+  (into {} (for [[k v] m
+                 :when (not (and (keyword? k) (cstr/starts-with? (name k) "_")))]
+             (if (map? v)
+               [k (remove-underscored v)]
+               [k v]))))
+
 
 (defn bytes-to-mb [bytes]
   (let [mb (/ bytes 1048576.0)
@@ -344,13 +351,13 @@
 (defn calculate-atom-sizes [atom-map]
   (into {}
         (for [[name a] atom-map]
-          (try 
+          (try
             (let [size-bytes (-> @a
-                               pr-str
-                               .-length)
-                size-mb (/ size-bytes 1048576.0)]
+                                 pr-str
+                                 .-length)
+                  size-mb (/ size-bytes 1048576.0)]
 
-            {name [size-bytes :bytes size-mb :mb (try (count (keys @a)) (catch :default _ -1)) :keys]})
+              {name [size-bytes :bytes size-mb :mb (try (count (keys @a)) (catch :default _ -1)) :keys]})
             (catch :default e {name [:error (str e)]})))))
 
 (defn template-find [s]

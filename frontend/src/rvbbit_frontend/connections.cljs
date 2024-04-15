@@ -279,7 +279,7 @@
                                              :rando (rand-int 1234234525)}}
                        :on-response [::http/socket-response]
                        :on-timeout [::http/timeout-response]
-                       :timeout    500000}]))
+                       :timeout    50000}]))
 
 (re-frame/reg-sub
  ::field-count

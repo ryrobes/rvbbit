@@ -171,10 +171,10 @@
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
       :dispatch-event-on-start? false}
 
-    ;;  {:interval                 1200
-    ;;   :event                    [::bricks/resub!] ;[::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]
-    ;;   ;:poll-when                [::subs/get-the :auto-run-enabled?]
-    ;;   :dispatch-event-on-start? false}
+     {:interval                 1200
+      :event                    [::bricks/resub!] ;[::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]
+      :poll-when                [::bricks/lost-server-connection?]
+      :dispatch-event-on-start? false}
 
     ;;  {:interval                 2
     ;;   :event                    [::bricks/check-status]

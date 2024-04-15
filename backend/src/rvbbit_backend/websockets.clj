@@ -3039,7 +3039,7 @@
   (let [cc (dissoc (client-statuses) :rvbbit-scheduler)]
     (doseq [[k {:keys [last-seen-seconds]}] cc
             :let [subs (get @atoms-and-watchers k)]
-            :when (> last-seen-seconds 600)]
+            :when (> last-seen-seconds 6000)]
 
       (ut/pp [:dead-client :cleaning-up k])
       ;(ut/pp [:***DEAD-CLIENT-SUBS***! subs])

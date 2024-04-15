@@ -356,7 +356,7 @@
                              {:message    {:kind :ack
                                            :flow-subs (get db :flow-subs)
                                            :client-name (get db :client-name)}
-                              :timeout    500000}]))
+                              :timeout    50000}]))
 
      ;(assoc-in db [:post-meta ui-keypath field name] new-map)
      ;(ut/dissoc-in db [:query-history])

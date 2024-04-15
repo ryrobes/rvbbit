@@ -43,7 +43,7 @@
 (defn transform-pre-deep-nest
   [dsl data]
   (if (get @transform-cache [(hash dsl) (hash data)])
-    (do (tap> [:transform-cache-for dsl (take 2 data)])
+    (do ;(tap> [:transform-cache-for dsl (take 2 data)])
         (get @transform-cache [(hash dsl) (hash data)]))
 
     (let [{:keys [transform-select from fill-gaps? pivot-by order-nest-by nest-by]} dsl
@@ -171,7 +171,7 @@
 (defn transform
   [dsl data]
   (if (get @transform-cache [(hash dsl) (hash data)])
-    (do (tap> [:transform-cache-for dsl (take 2 data)])
+    (do ;(tap> [:transform-cache-for dsl (take 2 data)])
         (get @transform-cache [(hash dsl) (hash data)]))
 
     (let [{:keys [transform-select from fill-gaps? pivot-by order-nest-by nest-by]} dsl

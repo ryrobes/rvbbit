@@ -507,14 +507,46 @@
  (fn [db _]
    (get-in db [:snapshots :params] {})))
 
+;; (re-frame/reg-event-db
+;;  ::resub!
+;;  (fn [db _]
+;;    (tap> [:initiating-resub-for (get db :client-name)])
+;;    (let [client-name (get db :client-name)]
+;;      (re-frame/dispatch [::wfx/unsubscribe http/socket-id :server-push2])
+;;      (re-frame/dispatch [::wfx/disconnect http/socket-id])
+
+;;      (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])
+;;      (re-frame/dispatch [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)])
+;;      db)))
+
 (re-frame/reg-event-db
  ::resub!
  (fn [db _]
-   (tap> [:initiating-resub-for (get db :client-name)])
+   (tap> [:initiating-resub-for! (get db :client-name)])
    (let [client-name (get db :client-name)]
      (re-frame/dispatch [::wfx/unsubscribe http/socket-id :server-push2])
-     (re-frame/dispatch [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)])
+     (re-frame/dispatch [::wfx/disconnect http/socket-id])
+
+     (go
+       (<! (async/timeout 3000)) ; wait for 3 seconds
+       (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])
+       (re-frame/dispatch [::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]))
      db)))
+
+;; (re-frame/reg-sub
+;;  ::lost-server-connection?
+;;  (fn [db _]
+;;    (let [last-heartbeat (get-in db [:status-data :heartbeat :kick :data 0 :at] "none!")] ;;; returns  "2024-04-14 05:46:43"
+     
+;;      )))
+
+(re-frame/reg-sub
+ ::lost-server-connection?
+ (fn [db _]
+   (let [last-heartbeat (get-in db [:status-data :heartbeat :kick :data 0 :at] "none!") ;;; returns "2024-04-14 05:46:43"
+         last-heartbeat-time (js/Date. last-heartbeat)
+         three-minutes-ago (js/Date. (- (js/Date.now) (* 3 60 1000)))]
+     (< last-heartbeat-time three-minutes-ago))))
 
 (re-frame.core/reg-event-fx
  ::resub!-fx ;; test fx version 2/4/24
@@ -5586,7 +5618,7 @@
              (let [query        (walk/postwalk-replace sql-params v)
                    data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql?   @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
-               (tap> [:mad-libs-sql k query])
+               ;(tap> [:mad-libs-sql k query])
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
 
@@ -11327,7 +11359,7 @@
      (let [pp (get db :panels)
            ppr (into {} (for [[k v] pp]
                  {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace-sub vv)})))}))
-           new-h (hash pp)
+           new-h (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
       ;;(tap> [:!!!!!!!panels-updated!!!!!! (get db :panels-hash) ppr new-h client-name])
        (conn/push-panels-to-server pp ppr client-name)
@@ -11538,10 +11570,10 @@
   (let [;reaction-hack! @hover-square ;; seems less expensive than doall-for ?
         ;reaction-hack2! @edit-mode?
         ;editor? @(re-frame/subscribe [::get-in [:editor?]])
-        external? @(re-frame/subscribe [::external?]) ;;; imp?
+        ;;external? @(re-frame/subscribe [::external?]) ;;; imp?
         ;reaction-hack! (when @dragging? @hover-square) ;; seems less expensive than doall-for ?
         panels-hash1    @(re-frame/subscribe [::panels-hash])
-        panels-hash2    (hash @(re-frame/subscribe [::panels]))
+        panels-hash2    (hash (ut/remove-underscored @(re-frame/subscribe [::panels])))
         [tab-x tab-y]   (if tab
                           (let [tt @(re-frame/subscribe [::tab-recenter tab])]
                             [(get tt 0 0) (get tt 1 0)])

@@ -883,7 +883,7 @@
                                      :client-name (get db :client-name)}
                         :on-response [::runstream-item]
                         ;:on-timeout [::http/timeout-response]
-                        :timeout    500000}])
+                        :timeout    50000}])
    db))
 
 (re-frame/reg-event-db
@@ -2227,7 +2227,7 @@
                                      :client-name (get db :client-name)}
                         ;:on-response [::refresh-kits] ;; unneeded if we delete local and remote. "feels" faster this way
                         ;:on-timeout [::http/timeout-response]
-                        :timeout    500000}])
+                        :timeout    50000}])
    (assoc-in db [:data :kit-results-sys] (vec (filter #(not (= (get % :id) id)) (get-in db [:data :kit-results-sys]))))))
 
 (def mutation-log (reagent/atom []))
