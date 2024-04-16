@@ -213,9 +213,8 @@
                         :block-title-selected-font-color "#ffffff"
                         :grid-selected-background-color "#8879bc"
                         :grid-font-color "#ffffff"
-                        :canvas-background-css {:background-image
-                                                "url(images/fake-brick5.png)"
-                                               ; :transition "all 0.6s ease-in-out"
+                        :canvas-background-css {:background-image "url(images/fake-brick5.png)"
+                                                :transition "all 0.6s ease-in-out"
                                                 :background-color "#47555e"
                                                 :background-repeat "repeat"}
                         :editor-font-color "#ffffff"
@@ -225,8 +224,7 @@
                         :editor-grid-font-color "#ffffff"}))
 
 (def default-db
-  {;:name "re-frame"
-   :reco-preview nil
+  {:reco-preview nil
    :editor? false
    :buffy? false
    :flow-editor? true
@@ -407,20 +405,20 @@
         ;;                    ;:connection-id []
         ;;                    }
 
-            :hello-there-brother {:h 3
-                                  :w 12
-                                  :root [2 2]
-                                  :name "hello there!"
-                                  :tab "strategic grill locations"
-                                  :views {:heya! [:box :align :center :justify :center :style
-                                                  {:font-size "50px"
-                                                   :font-weight 700
-                                                   :color :theme/editor-outer-rim-color
-                                                   :padding-top "14px"
-                                                   :opacity 1
-                                                   :font-family :theme/base-font} :child
-                                                  "hello! 🐇 🍂 🦃"]}
-                                  :queries {}}
+        ;;     :hello-there-brother {:h 3
+        ;;                           :w 12
+        ;;                           :root [2 2]
+        ;;                           :name "hello there!"
+        ;;                           :tab "strategic grill locations"
+        ;;                           :views {:heya! [:box :align :center :justify :center :style
+        ;;                                           {:font-size "50px"
+        ;;                                            :font-weight 700
+        ;;                                            :color :theme/editor-outer-rim-color
+        ;;                                            :padding-top "14px"
+        ;;                                            :opacity 1
+        ;;                                            :font-family :theme/base-font} :child
+        ;;                                           "hello! 🐇 🍂 🦃"]}
+        ;;                           :queries {}}
 
         ;;     :field-list {:h 18 :w 9
         ;;                  :root [28 6]

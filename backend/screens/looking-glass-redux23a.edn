@@ -1,16 +1,6 @@
 {:orders
- {:reco-counts [:table_name :cnt],
-  :connections-sys [:database_name :connection_id],
-  :fields-sys [:field_name :field_type :data_type],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :flows-sys [:flow_id :file_path :last_modified],
-  :tmp--1430155478-hist-sys
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :tmp--319927303-hist-sys
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated]},
+ {:flows-sys [:flow_id :file_path :last_modified], :reco-counts [:table_name :cnt]},
  :reco-preview nil,
- :sql-source {},
  :meta
  {:fields-sys
   {:fields
@@ -452,7 +442,7 @@
      :distinct 20,
      :group-by? true,
      :commons
-     {"2024-03-12 02:37:43" 69, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
+     {"2024-03-12 02:37:43" 69, "2024-03-14 07:50:09" 1, "2024-04-12 05:48:12" 1},
      :cardinality 22}},
    :rowcount 88},
   :rowcnt-drag-2
@@ -795,12 +785,8 @@
      :commons {1 5, 199 1, 1092 1},
      :cardinality 86}},
    :rowcount 29}},
- :default-col-widths
- {:system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys 137},
-  :system-fields-list* {:fields-sys 170}},
  :runstream-drops nil,
- :data-hash 1325566485,
+ :data-hash -1903901535,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -927,6 +913,7 @@
     "looking-glass-redux"
     "looking-glass-redux2"
     "looking-glass-redux23a"
+    "looking-glass-redux23abb"
     "looking-glass-redux2a"
     "looking-glass-redux2aa"
     "looking-glass-redux45"
@@ -976,6 +963,8 @@
     "the-generated-lass-ne"
     "the-generated-lass-sgt"
     "the-generated-lassff"
+    "the-memo"
+    "the-memo2"
     "the-outer-blues"
     "trad-hybrid"
     "tweet-bigfoot-is-blurry"
@@ -1010,144 +999,40 @@
     :prompt-5 {:value nil, :source nil}},
    :open-outputs? true}},
  :editor? false,
- :session-modal? false,
- :buffy? true,
- :memory [584482244 535164428 4294705152],
+ :buffy? false,
+ :memory [592845905 563011289 4294705152],
  :status-data
  {"kick-test!"
   {:kick
    {:data
     [{:sent! "kick-test!",
-      :to :commendable-thin-mole-14,
-      :at "2024-04-10 02:27:47",
+      :to :handsome-elliptic-mule-32,
+      :at "2024-04-16 06:45:07",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-04-10 02:27:47 - query ran in 1 ms."],
-          :name "query-log-:flows-sys",
-          :order 1712730467,
+        [{:content ["2024-04-16 06:45:07 - query ran in 148 ms."],
+          :name "query-log-:city-drag-26",
+          :order 1713264307,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
-        :description "query-log-:flows-sys",
+        :description "query-log-:city-drag-26",
         :mutates {},
         :options {:actions? false, :pages? false, :search? false},
         :parameters {}}},
-      :payload-kp [:flows-sys "kick-test!"]}
+      :payload-kp [:city-drag-26 "kick-test!"]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
-  :est1
-  {:estimate {:data [2.6184421602994474 nil], :elapsed-ms nil, :reco-count nil}},
   :heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-04-11 06:06:55",
+      :at "2024-04-16 06:45:26",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  :alert1
-  {:alerts
-   {:data
-    [[[:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data
-         [{:mem 2125, :tick 41125, :threads 112, :subs 58, :load 2.876953125}
-          {:mem 2864, :tick 41126, :threads 109, :subs 58, :load 2.78173828125}
-          {:mem 2855, :tick 41127, :threads 119, :subs 58, :load 3.2275390625}
-          {:mem 2569, :tick 41128, :threads 118, :subs 58, :load 3.4970703125}
-          {:mem 1210, :tick 41129, :threads 115, :subs 58, :load 3.4658203125}
-          {:mem 2096, :tick 41130, :threads 113, :subs 58, :load 3.24609375}
-          {:mem 2895, :tick 41131, :threads 108, :subs 58, :load 3.177734375}
-          {:mem 2475, :tick 41132, :threads 103, :subs 58, :load 3.87939453125}
-          {:mem 1304, :tick 41133, :threads 107, :subs 58, :load 4.42236328125}
-          {:mem 2566, :tick 41134, :threads 107, :subs 58, :load 5.31298828125}
-          {:mem 2901, :tick 41135, :threads 104, :subs 58, :load 5.15771484375}
-          {:mem 2374, :tick 41136, :threads 107, :subs 58, :load 4.82421875}
-          {:mem 1240, :tick 41137, :threads 117, :subs 58, :load 4.50244140625}
-          {:mem 1871, :tick 41138, :threads 115, :subs 58, :load 3.8388671875}
-          {:mem 2204, :tick 41139, :threads 99, :subs 58, :load 3.50634765625}
-          {:mem 2570, :tick 41140, :threads 100, :subs 58, :load 3.01513671875}
-          {:mem 1430, :tick 41141, :threads 109, :subs 58, :load 2.8935546875}
-          {:mem 2107, :tick 41142, :threads 103, :subs 58, :load 2.873046875}
-          {:mem 2686, :tick 41143, :threads 112, :subs 58, :load 2.7490234375}
-          {:mem 1672, :tick 41144, :threads 110, :subs 58, :load 2.85009765625}
-          {:mem 1976, :tick 41145, :threads 102, :subs 58, :load 2.45654296875}
-          {:mem 2734, :tick 41146, :threads 110, :subs 58, :load 2.62890625}
-          {:mem 2699, :tick 41147, :threads 109, :subs 58, :load 2.7099609375}
-          {:mem 1241, :tick 41148, :threads 109, :subs 58, :load 2.85888671875}
-          {:mem 2598, :tick 41149, :threads 110, :subs 58, :load 2.67431640625}
-          {:mem 1551, :tick 41150, :threads 107, :subs 58, :load 2.56201171875}
-          {:mem 2331, :tick 41151, :threads 105, :subs 58, :load 2.748046875}
-          {:mem 2376, :tick 41152, :threads 109, :subs 58, :load 2.984375}
-          {:mem 1936, :tick 41153, :threads 110, :subs 58, :load 3.0283203125}
-          {:mem 2720, :tick 41154, :threads 107, :subs 58, :load 2.97802734375}
-          {:mem 1387, :tick 41155, :threads 115, :subs 58, :load 2.68310546875}
-          {:mem 2208, :tick 41156, :threads 113, :subs 58, :load 2.5439453125}
-          {:mem 2573, :tick 41157, :threads 102, :subs 58, :load 2.56884765625}
-          {:mem 2010, :tick 41158, :threads 109, :subs 46, :load 4.51220703125}
-          {:mem 2091, :tick 41159, :threads 140, :subs 52, :load 3.93603515625}
-          {:mem 1395, :tick 41160, :threads 122, :subs 123, :load 3.36083984375}
-          {:mem 1188, :tick 41161, :threads 114, :subs 131, :load 3.4306640625}
-          {:mem 2056, :tick 41162, :threads 115, :subs 141, :load 3.82666015625}
-          {:mem 1864, :tick 41163, :threads 111, :subs 141, :load 3.77392578125}
-          {:mem 1024, :tick 41164, :threads 110, :subs 141, :load 4.17236328125}
-          {:mem 1665, :tick 41165, :threads 109, :subs 141, :load 4.34326171875}
-          {:mem 1465, :tick 41166, :threads 110, :subs 141, :load 4.0703125}
-          {:mem 1857, :tick 41167, :threads 111, :subs 141, :load 4.1474609375}
-          {:mem 1744, :tick 41168, :threads 103, :subs 141, :load 3.818359375}
-          {:mem 2778, :tick 41169, :threads 102, :subs 141, :load 3.34130859375}
-          {:mem 1782, :tick 41170, :threads 102, :subs 141, :load 3.74853515625}
-          {:mem 1378, :tick 41171, :threads 107, :subs 141, :load 4.1884765625}
-          {:mem 1064, :tick 41172, :threads 105, :subs 141, :load 5.46728515625}
-          {:mem 1452, :tick 41173, :threads 107, :subs 141, :load 4.70654296875}
-          {:mem 1921, :tick 41174, :threads 110, :subs 46, :load 4.13134765625}],
-         :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
-        [:> :XAxis {:dataKey :tick, :hide true}]
-        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
-        [:>
-         :YAxis
-         {:yAxisId "right", :hide true, :dataKey :subs, :orientation "right"}]
-        [:>
-         :Bar
-         {:yAxisId "left",
-          :dataKey :mem,
-          :isAnimationActive false,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:string :theme/editor-outer-rim-color "33"]}]
-        [:>
-         :Line
-         {:yAxisId "right",
-          :strokeWidth 4,
-          :type "monotone",
-          :dot false,
-          :dataKey :threads,
-          :isAnimationActive false,
-          :stroke :theme/editor-grid-selected-background-color,
-          :fill :theme/editor-grid-selected-background-color}]
-        [:>
-         :Line
-         {:stroke :theme/block-tab-selected-font-color,
-          :fill :theme/block-tab-selected-font-color,
-          :type "monotone",
-          :yAxisId "right",
-          :dataKey :subs,
-          :strokeWidth 3,
-          :strokeDasharray "5 5",
-          :dot false,
-          :isAnimationActive false}]]]
-      10
-      4
-      5]
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
@@ -1162,7 +1047,7 @@
   :client/proud-magenta-skunk-exiled-from-volcanic-arc>city-drag-26>city
   :flow/live-scratch-flow>*running?
   :flow/flow-forever>:final-math],
- :client-name :commendable-thin-mole-14,
+ :client-name :handsome-elliptic-mule-32,
  :runstreams-lookups
  {"openai-image-gen-ladder"
   {:open-inputs
@@ -1186,12 +1071,12 @@
     :style-param {:user-input "vivid", :defaults {}, :type :string}},
    :blocks
    {:oai-api-call
-    {:type {:created :integer, :data :rowset, :* :map},
+    {:type :map,
      :ttype :make-http-call,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "{:created 1713263283, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
     :prompt-5
     {:type :string,
      :ttype :open-block,
@@ -1200,26 +1085,27 @@
      :defaults {},
      :sample ""},
     :node-js-color-thief-script
-    {:type {:dominantColor :string, :colorPalette :vector, :* :map},
+    {:type :map,
      :ttype :sub-flow,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample
+     "{:dominantColor \"#3b417c\", :colorPalette [\"#85bed4\" \"#dcd0d3..."},
     :dominant-color
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "#3b417c"},
     :shell-command-1
-    {:type {:out :any},
+    {:type :map,
      :ttype :shell-command,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "{:output [\"    1 image files updated\"], :exception [], :seco..."},
     :quality-param
     {:type :string,
      :ttype :open-block,
@@ -1232,27 +1118,26 @@
      :defaults {},
      :sample "hd"},
     :open-fn-1
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "/tmp/rand-exif-62251.txt"},
     :execute-shell-command
-    {:type
-     {:output :list, :exception :list, :seconds :list, :command :string, :* :map},
+    {:type :map,
      :ttype :shell-command,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "{:output [], :exception [], :seconds [], :command \"cp /home/..."},
     :pop-color
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "#85bed4"},
     :prompt-2
     {:type :string,
      :ttype :open-block,
@@ -1268,19 +1153,20 @@
      :defaults {},
      :sample "/home/ryanr/rvbbit-out"},
     :color-palette
-    {:type {:dominantColor :string, :colorPalette :vector, :* :map},
+    {:type :map,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample
+     "{:dominantColor \"#3b417c\", :colorPalette [\"#85bed4\" \"#dcd0d3..."},
     :stringify-exif-map
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "{:prompt-asked \"Please use this prompt EXACTLY as is with NO..."},
     :size-param
     {:type :string,
      :ttype :open-block,
@@ -1300,19 +1186,19 @@
      :defaults {},
      :sample "Please use this prompt EXACTLY as is with NO changes at all ..."},
     :write-file-1
-    {:type {:out :string},
+    {:type :map,
      :ttype :write-file,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "{:status :ok, :file-path \"/tmp/rand-exif-62251.txt\"}"},
     :save-base64-to-webp-file
-    {:type {:out :string},
+    {:type :string,
      :ttype :save-base64-to-webp,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-46706-53944.png"},
     :prompt-4
     {:type :string,
      :ttype :open-block,
@@ -1342,73 +1228,61 @@
      :defaults {},
      :sample "Please use this prompt EXACTLY as is with NO changes at all ..."},
     :create-png-path
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-..."},
     :hiccup-image-box-w-png-vw
-    {:type nil,
+    {:type :vector,
      :ttype nil,
      :meta nil,
      :last? false,
      :defaults {},
      :sample "(renderable view)"},
     :create-convert-command-line
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "cp /home/ryanr/rvbbit-out/b64-image-46706-53944.png /home/ry..."},
     :hiccup-image-box-w-png
-    {:type
-     {:idx7 :keyword,
-      :idx5 :keyword,
-      :* :vector,
-      :idx2 :string,
-      :idx4 :string,
-      :idx1 :keyword,
-      :idx6 :keyword,
-      :idx3 :keyword,
-      :idx10 :vector,
-      :idx8 :map,
-      :idx9 :keyword,
-      :idx0 :keyword},
+    {:type :vector,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "[:v-box :padding \"10px\" :gap \"8px\" :width :width-px :style {..."},
     :generate-file-path
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-13039-17670.png"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-46706-53944.png"},
     :relative-url-path-for-png-version
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? true,
      :defaults {},
-     :sample "no sample data"},
+     :sample "./images/gen/b64-image-46706-53944.png"},
     :exif-map
-    {:type {:out :any},
+    {:type :map,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "{:prompt-asked \"Please use this prompt EXACTLY as is with NO..."},
     :prompt-3
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample ""},
+     :sample "Please use this prompt EXACTLY as is with NO changes at all ..."},
     :http-req-map
     {:type :map,
      :ttype :open-block,
@@ -1417,33 +1291,33 @@
      :defaults {},
      :sample "{:headers {\"Authorization\" \"Bearer sk-wdy5fbKL5OOMv0BqmiowT3..."},
     :write-exif-to-image-command
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "exiftool -overwrite_original -Comment=\"$(cat /tmp/rand-exif-..."},
     :just-the-image
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "iVBORw0KGgoAAAANSUhEUgAABwAAAAQACAIAAABpndrVAAA552NhQlgAADnn..."},
     :write-file-1_file-path
-    {:type {:out :any},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "/tmp/rand-exif-62251.txt"},
     :output-revised-prompt
-    {:type {:out :string},
+    {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "no sample data"},
+     :sample "Generate a high-definition, fantasy-inspired illustration in..."},
     :style-param
     {:type :string,
      :ttype :open-block,
@@ -1457,64 +1331,27 @@
      :sample "vivid"}}}},
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 5756, :h 1606},
+ :window {:w 4663, :h 1614},
  :post-meta
  {:gen-viz-1132 {:* {:rowcount 7}},
-  :client-items-drag-item-key-5 {:* {:rowcount 0}},
-  :client-items-drag-20 {:* {:rowcount 0}},
-  :client-items-drag-35
-  {:*
-   {:rowcount
-    "[SQLITE_LOCKED_SHAREDCACHE]  Contention with a different database connection that shares the cache (database table is locked: client_items)"}},
-  :rowcnt-drag-7
-  {:*
-   {:rowcount
-    "[SQLITE_LOCKED_SHAREDCACHE]  Contention with a different database connection that shares the cache (database table is locked: client_items)"}},
-  :blocks-drag-44 {:* {:rowcount 2455}},
+  :client-items-drag-item-key-5 {:* {:rowcount 8947}},
+  :client-items-drag-20 {:* {:rowcount 15362}},
+  :client-items-drag-35 {:* {:rowcount 15362}},
+  :rowcnt-drag-7 {:* {:rowcount 1}},
+  :blocks-drag-44 {:* {:rowcount 2593}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
-  :fields-drag-16 {:* {:rowcount 887}},
+  :fields-drag-16 {:* {:rowcount 1076}},
   :city-drag-26-1 {:* {:rowcount 3755}},
   :ufo-sightings-drag-9 {:* {:rowcount 67662}},
-  :item-type-drag-5
-  {:*
-   {:rowcount
-    "[SQLITE_LOCKED_SHAREDCACHE]  Contention with a different database connection that shares the cache (database table is locked: client_items)"}},
-  :item-type-drag-0
-  {:*
-   {:rowcount
-    "[SQLITE_LOCKED_SHAREDCACHE]  Contention with a different database connection that shares the cache (database table is locked: client_items)"}},
+  :item-type-drag-5 {:* {:rowcount 7}},
+  :item-type-drag-0 {:* {:rowcount 2885}},
   :duration-hours-drag-43 {:* {:rowcount 7103}},
   :city-drag-26 {:* {:rowcount 12346}},
-  :gen-viz-555 {:* {:rowcount 10}},
+  :gen-viz-555 {:* {:rowcount 9}},
   :state-drag-3 {:* {:rowcount 59}},
   :shape-drag-7 {:* {:rowcount 29}}},
- :flow-estimates
- {"crow-flow-201a-2024-04-11-013510"
-  {:times nil, :run-id "89bbd411-3e5f-44ab-ba69-994ace21a2d2"},
-  "openai-image-gen-ladder"
-  {:times 42.2, :run-id "d9801c17-3767-40d0-89e4-d59fa103b179"},
-  "crow-flow-201a" {:times nil, :run-id "7acf2985-b77e-47b9-942c-6620e4d4331b"},
-  "crow-flow-201a-2024-04-11-014006"
-  {:times nil, :run-id "3611fea0-c685-4013-a52b-779196af6937"},
-  "openai-image-gen-ladder-2024-04-11-012551"
-  {:times nil, :run-id "37025d5d-860e-4d50-a382-346e4f061464"},
-  "counting-loop-2024-04-11-010604"
-  {:times nil, :run-id "f8130ffa-6ab8-4308-a5b9-e9a0b9929c7d"},
-  "openai-image-gen-ladder 2024-04-11 00:16:11"
-  {:times nil, :run-id "b5b5a704-4b73-4a7a-bdf6-cfb1b4dbbcd9"},
-  "openai-image-gen-ladder 2024-04-10 22:47:00"
-  {:times nil, :run-id "720503b3-6891-409c-86d3-fd6515c7559a"},
-  "openai-image-gen-ladder 2024-04-11 00:04:39"
-  {:times 43, :run-id "3a25a376-dc07-4b1a-aead-231f64a3615f"},
-  "openai-image-gen-ladder 2024-04-10 23:50:01"
-  {:times nil, :run-id "822e4d24-b934-4b9c-a819-20863c53e84e"},
-  "counting-loop" {:times 6, :run-id "0e0c8f2e-3de7-4d76-868d-74760ecd3293"},
-  "openai-image-gen-ladder-2024-04-10-232058"
-  {:times nil, :run-id "ee53cafe-0b33-45c5-8116-f1551cdd72e6"},
-  "client-keepalive" {:times nil, :run-id "5c4370bb-9fe8-4e47-92b7-fa852055d6f6"}},
  :status
- {"kick-test!" {:kick :flows-sys},
-  :est1 {:estimate :est2},
+ {"kick-test!" {:kick :city-drag-26},
   :heartbeat
   {:kick
    [:flow/openai-image-gen-ladder>:pop-color
@@ -1526,12 +1363,10 @@
     :flow/openai-image-gen-ladder>*running?
     :client/proud-magenta-skunk-exiled-from-volcanic-arc>city-drag-26>city
     :flow/live-scratch-flow>*running?
-    :flow/flow-forever>:final-math]},
-  :alert1 {:alerts :alert2}},
+    :flow/flow-forever>:final-math]}},
  :screen-name "looking-glass-redux23a",
  :recos-page2 0,
  :selected-tab "fat zebra",
- :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
@@ -1545,23 +1380,34 @@
    "Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:\n\nCreate a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork is inspired by the pinup noir femme fatale and cyberpunk aesthetics, having a strong burlesque influence.",
    :prompt-3
    "Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:\n\nCraft in high definition, a stylized 16:9highly stylized & exaggerated pinup style cyberpunk illustration of a scene drawn from the traditional myths from New England, which embraces an other-worldly charm in a majestic environment. \n\nPosition at the heart of this landscape, a late 20s buxom Caucasian woman with beautifully flowing hair. Identify her with full, pouty lips and a nose that gently upturns. Her visage can be seen as a blend of delight and enchantment, while the sight of intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and busty overflowing physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, buxom, burlesque, augmenting the glow of her skin. Her dark makeup a contrast to her pale skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, providing the observer with an alluringly playful glance."}},
- :panels-hash 1463751689,
+ :panels-hash 1609003647,
  :sessions
- (["friendly-star-shaped-prairie-dog-10.edn"
-   "1 hour, 13 minutes, 12 seconds"
-   4392900]
-   ["favorable-periwinkle-rat-16.edn" "1 hour, 52 minutes, 4 seconds" 6724149]
-   ["impressive-triangular-quail-2.edn" "1 hour, 8 minutes, 46 seconds" 4126260]
-   ["beaming-gray-opossum-6.edn" "1 minute, 37 seconds" 97722]
-   ["polished-jade-wolf-42.edn" "100 hours, 17 minutes, 25 seconds" 361045548]
-   ["composed-prismatic-koala-28.edn" "100 hours, 4 minutes, 22 seconds" 360262852]
-   ["adorable-rhomboidal-raven-13.edn" "100 hours, 5 minutes, 49 seconds" 360349491]
-   ["glamorous-indigo-ox-10.edn" "143 hours, 0 second" 514800854]
-   ["genius-wide-parrot-28.edn" "143 hours, 22 minutes, 53 seconds" 516173327]),
+ (["favorable-periwinkle-rat-16.edn" "100 hours, 7 minutes, 37 seconds" 360457907]
+   ["stirring-hexagonal-hummingbird-26.edn"
+    "101 hours, 48 minutes, 56 seconds"
+    366536511]
+   ["spirited-circular-platypus-8.edn"
+    "102 hours, 50 minutes, 36 seconds"
+    370236092]
+   ["pretty-magenta-goat-24.edn" "114 hours, 24 minutes, 21 seconds" 411861356]
+   ["intuitive-amaranth-opossum-39.edn"
+    "115 hours, 16 minutes, 54 seconds"
+    415014579]
+   ["prominent-Persian-blue-hippopotamus-39.edn"
+    "116 hours, 5 minutes, 35 seconds"
+    417935824]
+   ["beautiful-prismatic-ostrich-23.edn"
+    "120 hours, 41 minutes, 37 seconds"
+    434497840]
+   ["handsome-conical-pronghorn-24.edn"
+    "121 hours, 4 minutes, 19 seconds"
+    435859087]
+   ["impressive-triangular-quail-2.edn"
+    "121 hours, 47 minutes, 22 seconds"
+    438442355]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1541183365,
+ :user-params-hash -279983560,
  :grid-recos? true,
- :session-hash -2000523142,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -2764,6 +2610,21 @@
    :tab "fat zebra",
    :root [54 1],
    :name "block-1519"},
+  :block-4633
+  {:drag-meta {:type :open-input},
+   :w 6,
+   :selected-view :constant-blush-quail,
+   :h 2,
+   :views
+   {:constant-blush-quail
+    [:open-input
+     {:kp [:param :constant-blush-quail],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "fat zebra",
+   :root [79 24],
+   :name "og winter enhanced"},
   :block-6963
   {:h 23,
    :w 9,
@@ -2925,7 +2786,7 @@
      :child
      [:string :param/intellectual-tan-eel]]},
    :queries {}}},
- :selected-block "none!",
+ :selected-block :block-4633,
  :theme-colors-hashmap
  {"float" "#ff2050",
   "boolean" "#8EA2A8",
@@ -2942,7 +2803,8 @@
   "date" "#6A6391",
   "nil" "#ff8222"},
  :click-param
- {:blocks-sys
+ {nil {nil nil},
+  :blocks-sys
   {:block_key ":*theme*",
    :block_name "(meta: this screen's theme)",
    :queries 0,
@@ -2985,13 +2847,13 @@
    :views 0},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#cfc0b3",
+   :openai-image-gen-ladder>pop-color "#85bed4",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-47511-6694.png",
+   "./images/gen/b64-image-46706-53944.png",
    :counting-loop>open-fn-2 44,
-   :openai-image-gen-ladder>*running? true,
+   :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
    "Generate a high-definition, fantasy-inspired illustration in a 16:9 ratio. The scene is set in an otherworldly, yet characteristically New England small town during winter. The main figure is a Caucasian woman in her late 20s, with a robust, hyper curvaceous physique. She sports a sultry yet pleased expression, with long hair, full lips, and a slightly upturned nose. Intricate Celtic-style tattoos of rabbits and wilderness decorate her neck, collarbone, and shoulders. Her body emanates mysterious blue and pink lights. She's wearing a choker ribbon and a long necklace, encapsulating a confident, playful aura as she shares a sly glance with the viewer. This piece is influenced by pinup noir femme fatale and cyberpunk aesthetics, channeling a strong burlesque vibe.",
@@ -3029,7 +2891,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#204b62",
+   :openai-image-gen-ladder>dominant-color "#3b417c",
    :flow-forever>final-math 533.5},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",
@@ -3065,6 +2927,10 @@
     ""
     "Craft in high definition, a stylized 16:9 illustration of a scene drawn from the traditional myths from Scotland, which embraces an other-worldly charm in a majestic environment. Position at the heart of this landscape, a late 20s Caucasian woman with beautifully flowing brunette hair. Identify her with full, somewhat pouty lips, where the lower one is slightly more pronounced, and a nose that gently upturns. Her visage is a blend of delight and enchantment, while intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and buxom physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, augmenting the glow of her skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, casting an alluringly playful glance."
     "Her dark makeup a stark contrast against her pale skin and supple complexion, huge lips, sharp nose, buxom, powerful, robust."],
+   :constant-blush-quail
+   ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:"
+    ""
+    "Create a 16:9 hyperrealistic illustration showcasing a winter morning in a traditional New England town with elements of cyberpunk aesthetics. The town is covered in fresh snow, and the architecture is warmly lit with a slight gritty feeling. The buildings are glowing with pastel pink and neon light blue. On the left side, emphasize a well-built, beautiful busty Irish-descendant woman in her early 30s with a larger lower lip, a perky nose, and an expression of satisfaction merging with sophistication. She has flowing hair, slightly damp from the falling snow. Detailed, nature-based, rabbit-themed, Celtic-inspired tattoos cover her neck, collarbone, and shoulders. As the morning sun emerges from the horizon, it casts a gentle light on her, making her hyper curvaceous and buxom figure glow with a serene and mysterious atmosphere while creating an enticing interplay of light and shadow on her tattooed body."],
    :reliable-coral-moose
    ["A high-definition, highly stylized and artistic 16:9 highly stylized & exaggerated pinup pinup noir femme fatale  Playboy style cyberpunk illustration of a scene in Scotland. The scene is fantastic and other worldly, but still traditional. A young and beautiful white scottish woman, brunette, and clearly in her late 20s, with full pouty lips (the bottom one being prominent) and a slightly upturned nose, offers a pleased yet sultry expression.  "
     ""
@@ -3102,7 +2968,7 @@
    ["  Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Florida beach during summer. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long hair, full pouty lips, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she casts a coy glance at the viewer. This artwork is inspired by pinup art, having a strong burlesque influence. "],
    :selected-view-data
    [:open-input
-    {:kp [:param :gorgeous-blush-eagle],
+    {:kp [:param :constant-blush-quail],
      :width-int :panel-width+100,
      :height-int :panel-height+80,
      :syntax "text"}],
@@ -3118,7 +2984,7 @@
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:"
     ""
     "Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork is inspired by the pinup noir femme fatale and cyberpunk aesthetics, having a strong burlesque influence."],
-   :selected-view [:views :gorgeous-blush-eagle],
+   :selected-view [:views :constant-blush-quail],
    :fabulous-pink-eagle
    ["I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS:"
     ""
@@ -3154,7 +3020,7 @@
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. "
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
-   :selected-block :block-10918,
+   :selected-block :block-4633,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""

@@ -942,7 +942,8 @@
  ::success-http-load-flowset
  (fn [db [_ result]]
    (let [old-status (get-in db [:http-reqs :load-flowset])
-         new-db (dissoc (get result :image) :resolved-queries)]
+         new-db (dissoc (get result :image) :resolved-queries)
+         new-db (ut/remove-temp-keys new-db)]
      (-> db
          (assoc-in [:http-reqs :load-flowset]
                    (merge old-status

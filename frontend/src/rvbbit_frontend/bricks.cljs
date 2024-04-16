@@ -3036,25 +3036,30 @@
         sql-name             (keyword sql-name-base)
         general-field        {:h             6
                               :w             5
-                              :flow-item     flow-item ;; only if needed
-                              :drag-meta     {:type             :where
-                                              :param-full       (get selected-field field-name) ;{field-name (get selected-field field-name)}
-                                              :param-table      (first data-keypath) ; table
-                                              :param-field      field-name
-                                              :target           field-name
-                                              :row-num          row-num
-                                              :connection-id    (get panel-map :connection-id)
-                                              :data-type        field-data-type
-                                              :source-table     parent-sql-alias
-                                              :source-query     (first data-keypath)
-                                              :source-panel-key source-panel-key}
+                              :flow-item     (select-keys flow-item [:category :name :type :icon :defaults :types :style :selected-style :inputs :expandable? :required])
+                              :drag-meta     (if flow-item
+                                               {:type (try (edn/read-string (get flow-item :name)) (catch :default _ (get flow-item :name)))}
+                                               {:type             :where
+                                                :param-full       (get selected-field field-name) ;{field-name (get selected-field field-name)}
+                                                :param-table      (first data-keypath) ; table
+                                                :param-field      field-name
+                                                :target           field-name
+                                                :row-num          row-num
+                                                :connection-id    (get panel-map :connection-id)
+                                                :data-type        field-data-type
+                                                :source-table     parent-sql-alias
+                                                :source-query     (first data-keypath)
+                                                :source-panel-key source-panel-key})
                               :source-panel  source-panel-key
                               :connection-id (get panel-map :connection-id)
                               :name          (str "drag-from-" (get panel-map :name))
                               :queries       {sql-name
                                               {:select selected-fields ;[:*]
                                                :from   [[parent-sql-alias parent-sql-sql-alias]]
-                                               :where  [:= field-name (get selected-field field-name)]}}}]
+                                               :where  [:= field-name (get selected-field field-name)]}}}
+        general-field (if flow-item
+                        (select-keys general-field [:h :w :flow-item :drag-meta   ])
+                        general-field)]
                                                ;:group-by [field-name]
                                                ;:order-by [[:rowcnt :desc]]
 

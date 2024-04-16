@@ -1571,7 +1571,7 @@
                                                    :else (ut/format-duration-seconds seconds-ago)))))})));)
 
 (defn flow-statuses []
-  (into {} (for [[k {:keys [*time-running *running? *started-by *finished overrides running-blocks]}] @flow-status
+  (into {} (for [[k {:keys [*time-running *running? *started-by *finished overrides started running-blocks]}] @flow-status
                  :let [chans (count (get @flow-db/channels-atom k))
                        chans-open (count
                                    (doall
@@ -1586,7 +1586,9 @@
                                                 ;; ^^ TODO, important should be elsewhere - but is an expensive check, so passively here makes some sense
                                                 ;;_ (swap! channel-counts assoc k {:channels chans :channels-open chans-open}) ;; wtf is this? unused
                        last-update-seconds (int (/ (- (System/currentTimeMillis) (get @watchdog-atom k)) 1000))
-                       ]]
+                       human-elapsed (if *running?
+                                       (ut/format-duration started (System/currentTimeMillis))
+                                       *time-running)]]
              {k {:time-running *time-running
                  :*running? *running?
                  ;:tracker-events tracker-events
@@ -1597,6 +1599,7 @@
                  :last-update (get @last-block-written k)
                  :running-blocks running-blocks
                  :block-overrides (vec (keys overrides))
+                 :since-start (str human-elapsed)
                  ;:timeouts (count (filter #(= % :timeout) (ut/deep-flatten tracker-events)))
                  ;:skips (count (filter #(= % :skip) (ut/deep-flatten tracker-events)))
                  :channels-open? channels-open?
@@ -3203,9 +3206,10 @@
         ;flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
         ;client-name @(re-frame/subscribe [::conn/client-name])
         ;server-flowmap (process-flowmap2 flowmap flowmaps-connections fid)
-        running-view-subs (vec (for [[k v] (get server-flowmap :components) :when (get v :view)]
+        comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
+        running-view-subs (vec (for [[k v] comps :when (get v :view)]
                                  [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
-        running-subs (vec (for [k (keys (get server-flowmap :components))] [flow-id k]))
+        running-subs (vec (for [k (keys comps)] [flow-id k]))
         running-subs (vec (into running-subs running-view-subs))]
     running-subs))
 
@@ -5679,12 +5683,32 @@
   {:port                 websocket-port
    :join?                false
    :async?               true
-   :max-threads          250
-   :max-idle-time        10000
+   :max-threads          450
+   ;:max-idle-time        10000
    :websockets           ws-endpoints
    :allow-null-path-info true})
 
+;; (defn websocket-server []
+;;   (jetty/run-jetty #'web-handler ring-options))
+
+
+;; (defonce websocket-server (atom nil))
+
+;; (defn create-websocket-server! []
+;;   ;(ut/ppa [:CALLED!])
+;;   (when (nil? @websocket-server)
+;;     (reset! websocket-server (jetty/run-jetty #'web-handler ring-options)))
+;;   (.start @websocket-server))
+
+;; (defn websocket-server []
+;;   (jetty/run-jetty web-handler ring-options))
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (.start (websocket-server)))
+
 (defonce websocket-server (jetty/run-jetty #'web-handler ring-options))
+;; (defonce websocket-server (delay (do (Thread/sleep 30000) (jetty/run-jetty #'web-handler ring-options))))
 
 (defn create-websocket-server! []
   (ut/ppa [:starting-websocket-server :port websocket-port])
@@ -5702,48 +5726,12 @@
       (ut/ppa [:killing-websocket-server! (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
       (.destroy websocket-server))))
 
-;; (defn destroy-websocket-server! []
-;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
-;;   (let [connector (first (.getConnectors websocket-server))]
-;;     (.shutdown connector)
-;;     (let [timeout-ms 10000
-;;           start-time (System/currentTimeMillis)]
-;;       (while (and (.isRunning connector)
-;;                   (< (- (System/currentTimeMillis) start-time) timeout-ms))
-;;         (Thread/sleep 300))
-;;       (when (.isRunning connector)
-;;         (ut/ppa [:killing-websocket-server! (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
-;;         (.stop connector)))))
-
-;; (defn destroy-websocket-server! []
-;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
-;;   (let [connector (first (.getConnectors websocket-server))
-;;         executor (-> websocket-server
-;;                      (.getBean org.eclipse.jetty.util.thread.ThreadPool)
-;;                      .getExecutor)]
-;;     (try
-;;       ; Stop accepting new connections
-;;       (.shutdown connector)
-;;       ; Initiate graceful shutdown of the executor
-;;       (.shutdown executor)
-;;       (let [timeout-ms 10000]
-;;         (if (.awaitTermination executor timeout-ms TimeUnit/MILLISECONDS)
-;;           (ut/ppa [:websocket-server-shutdown-gracefully])
-;;           (do
-;;             (ut/ppa [:websocket-server-shutdown-timeout])
-;;             (.shutdownNow executor)
-;;             (.stop connector))))
-;;       (catch Exception e
-;;         (ut/ppa [:error-during-websocket-server-shutdown e])
-;;         ; Handle the exception appropriately
-;;         ))))
-
-(defn restart-websocket-server! []
-  (let [cache-size (count @sql-cache)]
-    (jvm-memory-used)
-    (ut/ppa [:resstarting-websocket-server :port websocket-port])
-    (.stop websocket-server)
-    (.start websocket-server)))
+;; (defn restart-websocket-server! []
+;;   (let [cache-size (count @sql-cache)]
+;;     (jvm-memory-used)
+;;     (ut/ppa [:resstarting-websocket-server :port websocket-port])
+;;     (.stop websocket-server)
+;;     (.start websocket-server)))
 
 ;;  (rvbbit-backend.websockets/create-websocket-server!)
 ;;  (rvbbit-backend.websockets/create-web-server!)

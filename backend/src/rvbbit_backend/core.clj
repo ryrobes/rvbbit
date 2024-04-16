@@ -9,6 +9,7 @@
    [flowmaps.examples.simple-flows :as fex]
    [flowmaps.web :as flow-web]
    [flowmaps.db :as flow-db]
+   [ring.adapter.jetty9 :as jetty]
    [clojure.pprint :as ppt]
    ;[rvbbit-backend.flowmaps :as flow]
    [rvbbit-backend.transform :as ts]
@@ -336,24 +337,35 @@
                            (System/exit 0)))))
                 {})]
     (reset! flow-db/results-atom state)))
-    
+
+
+  
 (defn start-services []
-  (do
-    (ut/pp [:starting-services...])
-    (evl/create-nrepl-server!)
-    (wss/create-web-server!)
-    (wss/create-websocket-server!)
-    (evl/create-nrepl-server!)))
+  (ut/pp [:starting-services...])
+  (evl/create-nrepl-server!)
+  (wss/create-web-server!)
+  (wss/create-websocket-server!)
+  ;; (do (ut/pp [:STYING??!])
+  ;;   (reset! wss/websocket-server (jetty/run-jetty wss/web-handler wss/ring-options))
+  ;; (.start @wss/websocket-server))
+  (evl/create-nrepl-server!))
 
 (defn delayed-start [ms f]
   (Thread. #(do (Thread/sleep ms) (f))))
 
+;; (defn delay-execution [ms f]
+;;   (let [thread (Thread. (fn []
+;;                           (Thread/sleep ms)
+;;                           (f)))]
+;;     (.start thread)
+;;     thread))
+
 (defn delay-execution [ms f]
-  (let [thread (Thread. (fn []
-                          (Thread/sleep ms)
-                          (f)))]
-    (.start thread)
-    thread))
+   (let [thread (Thread. (fn []
+                           (Thread/sleep ms)
+                           (f)))]
+   (.start thread)
+   thread))
 
 
   (defn -main [& args]
@@ -731,6 +743,7 @@
                              :error-blocks (get @wss/temp-error-blocks k [])
 
                              :overrides overrides
+                             :started start
                              ;:*result (str res)
                              :*finished (count done-blocks)
                              :*running running-blocks
@@ -994,7 +1007,7 @@
     (wss/schedule! [:minutes 20] "crow-flow-201a"
                    {:close-on-done? true :increment-id? false :flow-id "crow-flow-201a" :debug? false})
 
-    (wss/schedule! [:minutes 20] "counting-loop"
+    (wss/schedule! [:minutes 30] "counting-loop"
                    {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
 
   ;(ut/pp [:flow-answer1 (wss/flow-waiter ff "boot-test")])
@@ -1041,9 +1054,12 @@
     (ut/pp [:waiting-for-background-systems...])
     ;; (delayed-start 30000 start-services)
 
-    (let [fut (future (Thread/sleep 40000) (start-services))]
-      (println "Main completed.")
-      @fut)
+    (let [fut (future  (Thread/sleep 15000) (start-services))
+          ;fut2 (future (Thread/sleep 15000) (wss/create-websocket-server!))
+          ]
+      ;[@fut @fut2]
+      @fut
+      )
 
     (println " ")
 

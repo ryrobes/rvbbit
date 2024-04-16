@@ -626,9 +626,10 @@
                   opts-map (get-in db [:flows flow-id :opts] {})
                   server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)
                  ;running-subs (vec (conj (for [k (keys (get server-flowmap :components))] [flow-id k]) [flow-id :*running?]))
-                  running-view-subs (vec (for [[k v] (get server-flowmap :components) :when (get v :view)]
+                  comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
+                  running-view-subs (vec (for [[k v] comps :when (get v :view)]
                                            [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
-                  running-subs (vec (for [k (keys (get server-flowmap :components))] [flow-id k]))
+                  running-subs (vec (for [k (keys comps)] [flow-id k]))
                   running-subs (vec (into running-subs running-view-subs))
                   watched? (ut/ne? (get @(re-frame/subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
                   fstr (str "running flow " flow-id)
@@ -2072,7 +2073,7 @@
 
 (defn add-block [x y & [body bid no-select?]]
   (let [;bid (if bid bid (keyword (str "open-input-" (count @(re-frame/subscribe [::flowmap])))))
-        _ (tap> [:bid bid])
+        _ (tap> [:add-block bid])
         bid (keyword (cstr/replace (str (gn bid)) #"/" "-"))
         bid (if bid bid :open-input)
         _ (tap> [:ADD-pre-safe-bid bid])
@@ -2498,7 +2499,7 @@
                            has-default? (when input? (not (nil? (get defaults k))))
                            filled? (if input?
                                      @(re-frame/subscribe [::get-incoming-port bid :in k])
-                                     (not (empty? @(re-frame/subscribe [::get-outgoing-port bid (if input? :in :out) k]))))
+                                     (ut/ne? @(re-frame/subscribe [::get-outgoing-port bid (if input? :in :out) k])))
                           ;;  _ (when (= bid :unpack-results-map) (tap> [:filler @(re-frame/subscribe [::get-outgoing-port bid :out k]) bid k]))
                            ;ptype @(re-frame/subscribe  [::port-color flow-id (or ibid bid) (or ivk k) :data-type])
                            multi? (cstr/ends-with? (str k) "+")
@@ -2683,6 +2684,8 @@
         syntax @(re-frame/subscribe [::syntax bid])
         tetrad-color (try (vec (for  [s (tetrad bcolor)] (hsl->hex s))) (catch :default _ ["#ffffff"])) ;; bad colors will crash it.
         mouse-down-fn #(mouse-down-handler-block % bid)
+        opts-map @(re-frame/subscribe [::opts-map])
+        has-override? (ut/ne? (get-in opts-map [:overrides bid]))
         ;running? (is-running? bid flow-id)
         
         tbid (let [cc (/ w 7) ;; px to char width
@@ -2728,7 +2731,21 @@
                                        :justify :between :align :center
                                        :children (for [e [(if (first @sniffy-sniff) :in-port :out-port) (get @sniffy-sniff 1)]]
                                                    [re-com/box :child (str e)])]
-                                      (if hovered? (last @port-hover) (str tbid)))]
+                                      (if hovered?
+                                        (last @port-hover)
+                                          ;; (str tbid)
+                                        
+                                        (if has-override?
+                                          [re-com/h-box
+                                           :width "100%"
+                                           :gap "6px" :align :center :justify :between
+                                           :children [[re-com/box :child (str tbid)]
+                                                      [re-com/box :child "*" :style {:color (last shades-color)
+                                                                                     :font-weight 700
+                                                                                     :font-size "18px"
+                                                                                     :margin-top "3px"}]]]
+                                          (str tbid))
+                                        ))]
 
                             (if running?
                               [re-com/md-icon-button :src (at)
@@ -3004,7 +3021,6 @@
                                       :style {:position "fixed"
                                               :z-index 985
                                               :size "none"
-                                       ;:background-color "blue"
                                               :cursor "se-resize" ;; (theme-pull :theme/editor-outer-rim-color nil)
                                               :border-right (str "5px solid " bcolor)
                                               :border-bottom (str "5px solid " bcolor)
@@ -3017,7 +3033,6 @@
                                       :style {:position "fixed"
                                               :z-index 985
                                               :size "none"
-                                       ;:background-color "blue"
                                               :left (- (+ x w) 17)
                                               :top (- y 2)}
                                       :height "12px" :width "12px"
@@ -4271,7 +4286,7 @@
 (defn code-box-rwo [width-int height-int value bid & [syntax]]
   (let [syntax (or (if (= syntax "raw (clojure)") "clojure" syntax) "clojure") ;; Error: true is not ISeqable
         stringify? (not (= syntax "clojure"))
-        _ (tap> [:code-box-rwo bid syntax stringify? value])
+        ;_ (tap> [:code-box-rwo bid syntax stringify? value])
         value (if (and stringify? (empty? value)) " " value) ;; just in case we get in a bad way with raw text edit...
         ]
         ;; value (if (and stringify?
@@ -4299,8 +4314,8 @@
 
                                     (let [ddata (ut/cm-deep-values %)
                                           inputs (ut/template-find (str ddata))
-                                          _ (tap> [:code-box-rwo_template-find inputs])
-                                          _ (tap> [:code-box-rwo_saving-string ddata inputs])
+                                          ;_ (tap> [:code-box-rwo_template-find inputs])
+                                          ;_ (tap> [:code-box-rwo_saving-string ddata inputs])
                                           input-map (into {} (for [e (range (count inputs))
                                                                    :let [name (keyword (cstr/replace (str (ut/unkeyword (get inputs e))) "/" "-"))]]
                                                                {name :any}))]
@@ -4315,7 +4330,7 @@
 
                                     (try (let [ddata (read-string (cstr/join " " (ut/cm-deep-values %)))
                                                dtype (ut/data-typer ddata)
-                                               _ (tap> [:code-box-rwo_write-clj ddata dtype])
+                                               ;_ (tap> [:code-box-rwo_write-clj ddata dtype])
                                                ports {;:in (get-in v [:ports :in])
                                                       :out {:out (keyword dtype)}}
                                      ;;_ (tap> [:fn-to-inputs (function-to-inputs ddata)])
@@ -5507,13 +5522,16 @@
              :style {;:border "1px dashed white"
                      :color (theme-pull :theme/editor-outer-rim-color nil)}
              :gap "11px"
-             :children (for [[fid v] ss
+             :children (for [[fid v] ss ;; could use key destructuring, but some keys are weird. meh, its fine w explicity bindings
                              :let [;time-running (get v :*time-running)
                                    open-channels (get v :channels-open?)
                                    channels (get v :channels-open)
                                    started-by (get v :*started-by)
                                    process? (get v :process?)
                                    command (get v :command)
+                                   since-start (get v :since-start)
+                                   running-blocks (get v :running-blocks)
+                                   last-updated (get v :last-updated)
                                    ;tracker-events (get v :tracker-events)
                                    running? (get v :*running?)]]
                          [re-com/v-box
@@ -5541,7 +5559,7 @@
                                                 :font-weight 700}]
                              ;[re-com/box :child (str open-channels) :width "33%"]
                                        [re-com/box
-                                        :child (cond running? (str "running (" channels " chans)")
+                                        :child (cond running? (str "running " (cstr/join " " running-blocks) " (" channels " chans) " )
                                                      open-channels (str "idling (" channels " chans)")
                                                      :else "stopped")
 
@@ -5556,14 +5574,16 @@
                                       ;:margin-right "8px"
                                                   }
                                           ;;:on-click #(do (re-frame/dispatch [::http/load-flow-history fid nil]))
-                                          :on-click #(let [flowmap @(re-frame/subscribe [::flowmap])
-                                                           flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
+                                          :on-click #(let [;flowmap @(re-frame/subscribe [::flowmap])
+                                                           ;flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
                                                            client-name @(re-frame/subscribe [::conn/client-name])
-                                                           server-flowmap (process-flowmap2 flowmap flowmaps-connections fid)
-                                                           running-view-subs (vec (for [[k v] (get server-flowmap :components) :when (get v :view)]
-                                                                                    [fid (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
-                                                           running-subs (vec (for [k (keys (get server-flowmap :components))] [fid k]))
-                                                           running-subs (vec (into running-subs running-view-subs))]
+                                                           ;server-flowmap (process-flowmap2 flowmap flowmaps-connections fid)
+                                                           ;comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
+                                                           ;running-view-subs (vec (for [[k v] comps :when (get v :view)]
+                                                           ;                         [fid (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
+                                                           ;running-subs (vec (for [k (keys comps)] [fid k]))
+                                                           ;running-subs (vec (into running-subs running-view-subs))
+                                                           ]
                                                        (re-frame/dispatch [::http/load-flow-history fid nil])
                                                        (re-frame/dispatch [::wfx/request :default
                                                                            {:message    {:kind :sub-to-running-values
@@ -5598,6 +5618,8 @@
 
                                         :style {:padding-left "4px"
                                                 :font-weight 300}]
+                                      ;;  (when (and running? (not process?)) [re-com/box :child (str "last step update "last-updated)])
+                                       (when (not process?) [re-com/box :child (str since-start)])
                              ;[re-com/box :child (str open-channels) :width "33%"]
 
                               ;[re-com/box :child (str tracker-events " events")  ]
@@ -6715,6 +6737,8 @@
   (let [read-only-flow? (true? (cstr/includes? (str flow-select) "/"))
         bcolor @(re-frame/subscribe [::port-color flow-id flow-select])
         btype @(re-frame/subscribe [::port-color flow-id flow-select nil :data-type])
+        opts-map @(re-frame/subscribe [::opts-map])
+        has-override? (ut/ne? (get-in opts-map [:overrides flow-select]))
         bg-shade "#00000055"]
     ;(tap> [:fmap? flow-select fmap ttype flow-id])
 
@@ -6736,7 +6760,16 @@
         [re-com/v-box :size "none"
         ;:width (px (- w 8)) ;:height (px h)
          ;:style {:border "1px solid yellow"}
-         :children [[re-com/box
+         :children [(when has-override? [re-com/box 
+                                         :justify :end :align :center 
+                                         :style {:background-color (theme-pull :theme/editor-outer-rim-color nil)
+                                                 :color (ut/choose-text-color (theme-pull :theme/editor-outer-rim-color nil))
+                                                 :font-size "14px"
+                                                 :font-weight 700
+                                                 :padding "4px"
+                                                 :border-radius "9px"}
+                                         :child "Note! This is overridden at run time! See flow options :overrides map above."])
+                    [re-com/box
                      :style {:border-radius "9px"
                              :padding-top "8px"
                              :padding-bottom "8px"
@@ -8227,6 +8260,8 @@
     ;(tap> [:spawner @(re-frame/subscribe [::flow-parts-lookup :clojure-base/*])])
     (add-block snapped-x snapped-y block-body bname)))
 
+;;; add-block [x y & [body bid no-select?]]
+
 (def lookup-val (reagent/atom nil))
 
 (defn lookup-modal []
@@ -8296,7 +8331,7 @@
                                                                          :style {:font-weight 700
                                                                                  :font-size "12px"}
                                                                          :child (str (get ss :name))]]]
-                                                            (when (not (empty? (get ss :description)))
+                                                            (when (ut/ne?(get ss :description))
                                                               [re-com/box
                                                                :style {:font-size "7px"}
                                                                :child (str (get ss :description))])]]
@@ -8348,8 +8383,9 @@
                                  :font-weight 700
                                  :border-radius "8px"
                                  :cursor "pointer"}
-                         :attr {:on-click #(do (spawn-open-input-block @lookup-val)
-                                               (reset! lookup-modal? false))}]
+                         :attr {:on-click #(do  (tap> [:adding-block :spawn-open-input-block @lookup-val])
+                                                (spawn-open-input-block @lookup-val)
+                                                (reset! lookup-modal? false))}]
 
                         [re-com/box
                          :child [re-com/md-icon-button
@@ -8451,8 +8487,10 @@
         running? @(re-frame/subscribe [::is-running? :* flow-id true])
         chans-open? @(re-frame/subscribe [::bricks/flow-channels-open? flow-id])
         has-done? (has-done?)
-        panel-height (* (.-innerHeight js/window) hpct) 
+        panel-height (* (.-innerHeight js/window) hpct)
         flow-select @(re-frame/subscribe [::selected-flow-block])
+        opts-map @(re-frame/subscribe [::opts-map])
+        has-override? (ut/ne? (get opts-map :overrides))
         ;; _ (tap> [:sizes ww hh
         ;;          (.-innerWidth js/window)
         ;;          (.-innerHeight js/window)])
@@ -9157,8 +9195,9 @@
                                                                 :style {:position "fixed"
                                                                         :top 34 :right 23
                                                                         :opacity 0.33
-                                                                        :filter "drop-shadow(0.25rem 0.35rem 0.4rem rgba(0, 0, 0, 0.44))"
+                                                                        ;:filter "drop-shadow(0.25rem 0.35rem 0.4rem rgba(0, 0, 0, 0.44))"
                                                                         :font-weight 700
+                                                                        ;:background-color "#000000"
                                                                         :color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                         :font-size "29px"}
                                                                 :gap "10px"
@@ -9175,9 +9214,10 @@
                                                                                                flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
                                                                                                client-name @(re-frame/subscribe [::conn/client-name])
                                                                                                server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)
-                                                                                               running-view-subs (vec (for [[k v] (get server-flowmap :components) :when (get v :view)]
+                                                                                               comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
+                                                                                               running-view-subs (vec (for [[k v] comps :when (get v :view)]
                                                                                                                         [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
-                                                                                               running-subs (vec (for [k (keys (get server-flowmap :components))] [flow-id k]))
+                                                                                               running-subs (vec (for [k (keys comps)] [flow-id k]))
                                                                                                running-subs (vec (into running-subs running-view-subs))]
                                                                                            (re-frame/dispatch [::wfx/request :default
                                                                                                                {:message    {:kind :sub-to-running-values
@@ -9189,6 +9229,24 @@
                                                                            ;[re-com/box :child (str flow-id)]
                                                                            
                                                                            ]]
+                                                               
+                                                               (when has-override? 
+                                                                 [re-com/h-box 
+                                                                  :align :center :justify :center 
+                                                                  :gap "5px"
+                                                                  :style {:position "fixed"
+                                                                          :font-size "18px"
+                                                                          :font-weight 700
+                                                                          :opacity 0.45
+                                                                          ;:filter "drop-shadow(0.25rem 0.35rem 0.4rem rgba(0, 0, 0, 0))"
+                                                                          :color (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                                          :top 63 :right 79}
+                                                                  :children [[re-com/box 
+                                                                              :style {:font-size "32px"
+                                                                                      :margin-top "6px"}
+                                                                              :child "*"]
+                                                                             [re-com/box :child "includes overrides, check 'flow options' map"]]])
+
 
                                                                [re-com/box
                                                                 :child [re-com/md-icon-button :src (at)
