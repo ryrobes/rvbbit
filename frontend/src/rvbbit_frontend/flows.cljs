@@ -5,6 +5,7 @@
    [re-com.core :as re-com :refer [at]]
    [re-com.util :refer [px]]
    [rvbbit-frontend.connections :as conn]
+   [rvbbit-frontend.rules :as rl]
    [re-catch.core :as rc]
    [rvbbit-frontend.utility :as ut]
    [rvbbit-frontend.buffy :as buffy]
@@ -72,7 +73,7 @@
 (defonce title-edit-idx (reagent/atom nil))
 (defonce drop-toggle? (reagent/atom false))
 ;(def db/snap-to-grid 25)
-(defonce flow-editor-system-mode (reagent/atom ["flows running" 800]))
+;; (defonce db/flow-editor-system-mode (reagent/atom ["flows running" 800]))
 (defonce channel-holster (reagent/atom {}))
 
 (def canvas-width 7500)
@@ -4359,7 +4360,7 @@
                                   (cstr/ends-with? (str title) "browser")))))
         flow-select @(re-frame/subscribe [::selected-flow-block])
         sys? (nil? flow-select)
-        dyn-width (if (not sys?) 600 (last @flow-editor-system-mode))]
+        dyn-width (if (not sys?) 600 (last @db/flow-editor-system-mode))]
     ;;(tap> [:panel-deets open? title flow-id bid])
     ;;(tap> [:dbg? (cstr/includes? (str title) "debugger")])
     [re-com/v-box
@@ -4912,7 +4913,7 @@
 (defn settings-block [flow-id ttype]
   (let [flow-select @(re-frame/subscribe [::selected-flow-block])
         flowmaps @(re-frame/subscribe [::flowmap-raw])
-        dyn-width (last @flow-editor-system-mode)
+        dyn-width (last @db/flow-editor-system-mode)
         panel-height (* (.-innerHeight js/window) 0.50)
         panel-height-bricks (/ panel-height bricks/brick-size)
         ;flow-id @(re-frame/subscribe [::selected-flow])
@@ -5613,7 +5614,7 @@
 
 
 (defn flow-editor [w h]
-  (let [react-hack [@editor-mode @trig-atom-test @flow-editor-system-mode]
+  (let [react-hack [@editor-mode @trig-atom-test @db/flow-editor-system-mode]
         sql-params (into {} (for [k [:flow-fn-categories-sys/category]]
                               {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
         ;flow-select @(re-frame/subscribe [::selected-flow-block])
@@ -5623,12 +5624,12 @@
         ;orderb (vec (sort-by str (keys blocks)))
         ;opts-map @(re-frame/subscribe [::opts-map])
         ;gantt? @(re-frame/subscribe [::bricks/flow-gantt?])
-        dyn-width (last @flow-editor-system-mode)
+        dyn-width (last @db/flow-editor-system-mode)
         o-modes [["flows running" 800]
                  ["flow browser" 600]
                  ["flow parts" 600]
                  ["scheduler" 990]
-                 ["when-this" 990]
+                 ["rules" 990]
                  ["flow history" 1200]]
         ;read-only-flow? (true? (cstr/includes? flow-id "/"))
         ;flow-id-regex #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores, hypens, numbers
@@ -5701,13 +5702,13 @@
                              :style {:font-size "14px"}
                              :size "auto"
                              :children (for [o o-modes
-                                             :let [selected? (= o @flow-editor-system-mode)]]
+                                             :let [selected? (= o @db/flow-editor-system-mode)]]
                                          [re-com/box
                                           :height "50px"
                                           :align :center
                                           :justify :center
                                           :size "auto"
-                                          :attr (when (not selected?) {:on-click #(reset! flow-editor-system-mode o)})
+                                          :attr (when (not selected?) {:on-click #(reset! db/flow-editor-system-mode o)})
                                           :style {;:border "1px solid white"
                                                   :cursor "pointer" ;; (when (not selected?) "pointer")
                                                   :text-decoration (when selected? "underline")
@@ -5740,7 +5741,7 @@
 
 
 
-                (cond (= (first @flow-editor-system-mode) "flows running")
+                (cond (= (first @db/flow-editor-system-mode) "flows running")
 
                       [flow-details-block-container "server flow statuses" :system :system
                        [re-com/box 
@@ -5749,42 +5750,44 @@
                         :child [server-flows]] ; flow-id orderb true 570 nil ;366
                        "zmdi-dns"]
 
-                      (= (first @flow-editor-system-mode) "flow browser")
+                      (= (first @db/flow-editor-system-mode) "flow browser")
 
-                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
+                      [flow-details-block-container (first @db/flow-editor-system-mode) :system :system
                        [settings-block flow-id :flow-browser] "zmdi-chart-donut"]
 
-                      (= (first @flow-editor-system-mode) "flow parts")
+                      (= (first @db/flow-editor-system-mode) "flow parts")
 
-                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
+                      [flow-details-block-container (first @db/flow-editor-system-mode) :system :system
                        [settings-block flow-id :part-browser] "zmdi-chart-donut"]
 
                       ;:else [re-com/box :child "got nothing"]
                       )
 
 
-                (cond (some #(= (first @flow-editor-system-mode) %) ["flow browser" "flow parts"])
+                (cond (some #(= (first @db/flow-editor-system-mode) %) ["flow browser" "flow parts"])
 
                       [flow-details-block-container "server flow statuses" :system :system
                        [server-flows 300] ; flow-id orderb true 570 nil ;366
                        "zmdi-dns"]
 
-                      (= (first @flow-editor-system-mode) "scheduler")
+                      (= (first @db/flow-editor-system-mode) "scheduler")
 
-                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
+                      [flow-details-block-container (first @db/flow-editor-system-mode) :system :system
                        [settings-block flow-id :scheduler] "zmdi-chart-donut"]
 
-                      (= (first @flow-editor-system-mode) "when-this")
+                      (= (first @db/flow-editor-system-mode) "rules")
 
-                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
-                       [settings-block flow-id :scheduler] "zmdi-chart-donut"]
+                      ;; [flow-details-block-container (first @db/flow-editor-system-mode) :system :system
+                      ;;  [rl/rules-panel ] 
+                      ;;  "zmdi-chart-donut"]
+                      [rl/rules-panel]
 
-                      (= (first @flow-editor-system-mode) "flow history")
+                      (= (first @db/flow-editor-system-mode) "flow history")
 
-                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
+                      [flow-details-block-container (first @db/flow-editor-system-mode) :system :system
                        [settings-block flow-id :run-history] "zmdi-chart-donut"]
 
-                      (= (first @flow-editor-system-mode) "flows running")
+                      (= (first @db/flow-editor-system-mode) "flows running")
 
                       [re-com/v-box
                        :children
@@ -7517,7 +7520,7 @@
         flow-select @(re-frame/subscribe [::selected-flow-block])
         ;running? (is-running? :* flow-id)
         ;panel-width (- panel-width 28) ;; modded
-        sys-panel-width (or (last @flow-editor-system-mode) 900)
+        sys-panel-width (or (last @db/flow-editor-system-mode) 900)
         browser-panel-width (if (nil? flow-select) sys-panel-width 600)
         gantt? @(re-frame/subscribe [::bricks/flow-gantt?])
         ;sys-panel? (true? (nil? flow-select))
@@ -8452,7 +8455,7 @@
   (let [[x y] @db/flow-detached-coords
         x-px (px x)
         y-px (px y)
-        [wpct hpct] [0.85 0.50]
+        [wpct hpct] db/flow-panel-pcts ;; [0.85 0.50]
         panel-width (* (.-innerWidth js/window) wpct)
         hh @(re-frame/subscribe [::subs/h]) ;; to ensure we get refreshed when the browser changes
         ww @(re-frame/subscribe [::subs/w])
@@ -8961,7 +8964,7 @@
                                                                         :left (if @(re-frame/subscribe [::bricks/flow-editor?]) 
                                                                                 ;;640
                                                                                 (if (nil? flow-select)
-                                                                                  (+ (last @flow-editor-system-mode) 40)
+                                                                                  (+ (last @db/flow-editor-system-mode) 40)
                                                                                   640)
                                                                                 45)
                                                                         :bottom 0}

@@ -63,10 +63,12 @@
 (defonce kit-mode (reagent/atom {["none!" nil nil] :runstreams}))
 (defonce kit-keys (reagent/atom {}))
 (defonce chat-mode (reagent/atom {["none!" nil nil] :runstreams}))
+(defonce flow-editor-system-mode (reagent/atom ["flows running" 800]))
 
 (defonce flow-results (reagent/atom {}))
 
 (def active-tmp-history (reagent/atom nil))
+(def flow-panel-pcts [0.85 0.50])
 
 (defonce based [-785 -862 0.925])
 (defonce pan-zoom-offsets (reagent/atom based))
