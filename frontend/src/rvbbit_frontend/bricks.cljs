@@ -507,31 +507,38 @@
  (fn [db _]
    (get-in db [:snapshots :params] {})))
 
+(re-frame/reg-event-db
+ ::resub!
+ (fn [db _]
+   (tap> [:initiating-resub-for (get db :client-name)])
+   (let [client-name (get db :client-name)
+         new-client-name (ut/gen-client-name) ;; (keyword (str (cstr/replace (str client-name) ":" "") "-resub*-" (rand-int 12345)))
+         ]
+     
+     (re-frame/dispatch [::wfx/unsubscribe http/socket-id :server-push2])
+     (re-frame/dispatch [::wfx/disconnect http/socket-id])
+
+     (re-frame/dispatch [::set-client-name new-client-name]) ;; helps?
+     (tap> [:initiating-resub-for-new new-client-name])
+
+     (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])
+     (re-frame/dispatch [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)])
+     (tap> [:initiating-resub-for-new new-client-name :done?])
+     db)))
+
 ;; (re-frame/reg-event-db
 ;;  ::resub!
 ;;  (fn [db _]
-;;    (tap> [:initiating-resub-for (get db :client-name)])
+;;    (tap> [:initiating-resub-for! (get db :client-name)])
 ;;    (let [client-name (get db :client-name)]
 ;;      (re-frame/dispatch [::wfx/unsubscribe http/socket-id :server-push2])
 ;;      (re-frame/dispatch [::wfx/disconnect http/socket-id])
 
-;;      (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])
-;;      (re-frame/dispatch [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)])
+;;      (go
+;;        (<! (async/timeout 3000)) ; wait for 3 seconds
+;;        (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])
+;;        (re-frame/dispatch [::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]))
 ;;      db)))
-
-(re-frame/reg-event-db
- ::resub!
- (fn [db _]
-   (tap> [:initiating-resub-for! (get db :client-name)])
-   (let [client-name (get db :client-name)]
-     (re-frame/dispatch [::wfx/unsubscribe http/socket-id :server-push2])
-     (re-frame/dispatch [::wfx/disconnect http/socket-id])
-
-     (go
-       (<! (async/timeout 3000)) ; wait for 3 seconds
-       (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])
-       (re-frame/dispatch [::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]))
-     db)))
 
 ;; (re-frame/reg-sub
 ;;  ::lost-server-connection?
@@ -1133,6 +1140,7 @@
 (re-frame/reg-event-db
  ::set-client-name
  (fn [db [_ client-name]]
+   (set! (.-title js/document) (str "Rabbit (" client-name ")"))
    (assoc-in db [:client-name] client-name)))
 
 (re-frame/reg-sub
@@ -1945,6 +1953,7 @@
     ;(tap> [:param-drop (first body)])
     ;(when (and (not (nil? root)) (not (nil? height)) (nil? @dyn-dropper-hover)
     ;           (not (nil? width)) (>= height 2) (>= width 2))
+      ;;(tap> [:insert? [new-keyw] base-map])
       (re-frame/dispatch [::update-workspace [new-keyw] base-map])
     ;  )
       (reset! hover-square nil))))
@@ -3021,7 +3030,13 @@
         ;agg? ;(and (= type :meta-fields)
         ;(or (= "integer" field-data-type)
         ;    (= "float" field-data-type));)
-        flow-item            (when (= (first data-keypath) :flow-fn-sys) (try (merge
+        flow-item? (= (first data-keypath) :flow-fn-sys)
+        new-flow-map (when flow-item? (let [pval @(re-frame/subscribe [::conn/clicked-parameter [:flow-fn-sys]])
+                                            modded (conn/spawn-open-input-block pval)
+                                            body (get modded 2)]
+                                        ;(tap> [:new-flow-map-on-old modded])
+                                        body))
+        flow-item            (when flow-item? (try (merge
                                                                                (-> (edn/read-string
                                                                                     (get selected-field :full_map)))
                                                                                          ;(dissoc :view)
@@ -3057,8 +3072,12 @@
                                               {:select selected-fields ;[:*]
                                                :from   [[parent-sql-alias parent-sql-sql-alias]]
                                                :where  [:= field-name (get selected-field field-name)]}}}
-        general-field (if flow-item
-                        (select-keys general-field [:h :w :flow-item :drag-meta   ])
+        general-field (if flow-item?
+                        ;;(select-keys general-field [:h :w :flow-item :drag-meta   ])
+                        (let [inputs (vec (keys (get-in new-flow-map [:ports :in])))
+                              flow-item (assoc (get-in new-flow-map [:data :flow-item]) :inputs inputs)
+                              drag-meta (get-in new-flow-map [:data :drag-meta])] ;; re-re-package for the canvas inserter TODO: ALL THIS NONSENSE
+                          (-> new-flow-map (dissoc :data) (assoc :flow-item flow-item) (assoc :drag-meta drag-meta)))
                         general-field)]
                                                ;:group-by [field-name]
                                                ;:order-by [[:rowcnt :desc]]
@@ -6247,6 +6266,15 @@
                                                                              :height (px row-height) ;"22px"
                                                                              :style {:color "#000000"}
                                                                              :child (str (get % c))])
+                                                                ;;  (= panel-key :flow-fn-list*)
+                                                                ;;  (draggable (let [lookup-val []
+                                                                ;;                   pval (conn/spawn-open-input-block lookup-val)]
+                                                                ;;               (apply conn/add-flow-block pval))
+                                                                ;;             "meta-menu"
+                                                                ;;             [re-com/box
+                                                                ;;              :height (px row-height) ;"22px"
+                                                                ;;              :style {:color "#000000"}
+                                                                ;;              :child (str (get % c))])
 
                                                                  (and (= (get-in metadata [:fields c :data-type]) "rabbit-code") true)
                                                                  (draggable (sql-spawner-where :where panel-map data-keypath c panel-key row-num)
@@ -10178,7 +10206,8 @@
                                                    overrides (if runstreamed?
                                                                @(re-frame/subscribe [::runstream-overrides flow-id])
                                                                overrides)
-                                                   overrides? (not (empty? overrides))]
+                                                   overrides? (ut/ne? overrides)]
+                                               
                                                [re-com/h-box
                                                 :size "auto"
                                                 :children [[re-com/box :child (str tt)]
@@ -10200,6 +10229,7 @@
                                                                         :on-click (fn [] (when (not running?) ;(not (some (fn [x] (= x text)) @db/speech-log))
                                                                                            (let [fstr (str "running flow " flow-id (when overrides? " (with overrides)"))
                                                                                                  w (/ (count fstr) 4.1)]
+                                                                                             (tap> [:fuck-me flow-id client-name overrides])
                                                                                              (re-frame/dispatch [::wfx/request :default
                                                                                                                  {:message    {:kind :run-flow
                                                                                                                                :flow-id flow-id

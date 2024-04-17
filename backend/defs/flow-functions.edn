@@ -218,9 +218,9 @@
                               :message-name :string
                               :thread-desc :string
                               :out :any}}}
- :owen-wilson {:wow! {:file-path "./flows/a-random-wow.edn"
-                      :icon "zmdi-pizza"
-                      :description "A random Owen Wilson quote from the Wedding Crashers movie."}}
+;;  :owen-wilson {:wow! {:file-path "./flows/a-random-wow.edn"
+;;                       :icon "zmdi-pizza"
+;;                       :description "A random Owen Wilson quote from the Wedding Crashers movie."}}
  :clojure-base {:count {:description "Clojure count function, takes a sequence and returns an integer of the number of items."
                         ;:view (fn [_])
                         :fn count

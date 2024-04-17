@@ -1014,6 +1014,8 @@
     (ut/pp [:new-client-is-alive! client-name])
     (swap! client-queues assoc client-name new-queue-atom)))
 
+;; ARGGGGHHHHHHHHHHHHH {inhale} ARGGGGHHHHHHHHHHHHH
+;; I fucking hate this, but it works pretty well. so fuck me, I guess?
 (defmethod wl/handle-subscription :server-push2 [{:keys [kind ui-keypath client-name] :as data}]
   (when (not (get @client-queues client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
@@ -2249,11 +2251,15 @@
           ;; _ (push-to-client [:estimate] (ut/avg prev-times) client-name -1 :est1 :est2)
 
           ship-est (fn [client-name]
-                     (let [times (ut/avg   ;; avg based on last 10 runs, but only if > 1
+                     (try 
+                       (let [times (ut/avg   ;; avg based on last 10 runs, but only if > 1
                                   (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
                        (when (not (nil? times))
                          (kick client-name [:estimate] {flow-id {:times times
-                                                                 :run-id uuid}} nil nil nil))))
+                                                                 :run-id uuid}} nil nil nil)))
+                       (catch Exception e (ut/pp [:error-shipping-estimates
+                                                  (Throwable->map e)
+                                                  (str e)]) 0)))
           
           _ (when (not= flow-id "client-keepalive")
               (doseq [client-name (keys (client-statuses))] (ship-est client-name))) ;; send to all clients just in case they care... (TODO make this more relevant)

@@ -10,17 +10,19 @@
    [rvbbit-frontend.flows :as flows]
    [rvbbit-frontend.config :as config]
    [rvbbit-frontend.subs :as subs]
-   [talltale.core :as tales]
    [rvbbit-frontend.http :as http]
    [rvbbit-frontend.db :as db]
+   [rvbbit-frontend.utility :as ut]
    [clojure.string :as cstr]
-   [cljs-time.core]
+   ;[cljs-time.core]
    [websocket-fx.core :as wfx]
    [re-pollsive.core :as poll]))
 
 (defn dev-setup []
   (when config/debug?
     (println "dev mode")))
+
+(def client-name (ut/gen-client-name))
 
 (defn debounce [f wait]
   (let [timeout-id (atom nil)]
@@ -37,12 +39,6 @@
   (let [debounced-update (debounce update-mouse-activity 1000)] ;; 1000 milliseconds = 1 second
     (.addEventListener js/window "mousemove"
                        (fn [_] (debounced-update)))))
-
-(def client-name
-  (let [;quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
-        names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) ;(rand-nth quals) (tales/landform)
-               ]]
-    (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
 (re-frame/reg-event-db
  ::alt-key-down
@@ -171,7 +167,7 @@
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
       :dispatch-event-on-start? false}
 
-     {:interval                 1200
+     {:interval                 15 ;; more?
       :event                    [::bricks/resub!] ;[::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]
       :poll-when                [::bricks/lost-server-connection?]
       :dispatch-event-on-start? false}
@@ -227,7 +223,8 @@
 (def g-key-down? (atom false))
 
 (defn init []
-  (set! (.-title js/document) (str "Rabbit (" client-name ")"))
+  ;; (set! (.-title js/document) (str "Rabbit (" client-name ")"))
+  (set! (.-title js/document) (str "Rabbit is dreaming..."))
   (re-frame/dispatch-sync [::events/initialize-db])
   (re-frame/dispatch [::bricks/set-client-name client-name])
   (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])

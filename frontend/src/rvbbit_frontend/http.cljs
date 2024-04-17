@@ -47,6 +47,7 @@
         host-without-port (clojure.string/replace host #":\d+$" "")
         ws-port "3030"
         url (str protocol "://" host-without-port ":" ws-port "/ws")]
+    (tap> [:http-ws-connect-url! url])
     {:url    url
      :format :edn
      :on-disconnect [::wfx/unsubscribe socket-id :server-push2]
@@ -493,7 +494,7 @@
                                     mp-key [(first mp-key) (last mp-key)] ;; remove flow-id
                                     mps-key (vec (walk/postwalk-replace {:flow-runner :return-maps} task-id))
                                     return-maps (get-in db [:flow-results :return-maps] {})]
-                                ;;;(tap> [:sub-return-maps! task-id mp-key mps-key rtn (vec (drop 1  mps-key)) return-maps])
+                                ;;(tap> [:sub-return-maps! task-id rtn mp-key mps-key (vec (drop 1  mps-key)) return-maps])
                                 (if (= rtn :started)
                                   (assoc-in db task-id rtn)
                                   ;; (do ;(swap! db/flow-results assoc-in mp-key rtn)

@@ -5,6 +5,7 @@
             [reagent.core :as reagent]
             [re-frame.core :as re-frame]
             [re-com.util :refer [px]]
+            [talltale.core :as tales]
             [cljs.core.async :as async :refer [<! timeout]]
             [cljs.tools.reader :refer [read-string]]
             [re-com.validate :refer [string-or-hiccup? alert-type? vector-of-maps?]]
@@ -13,6 +14,13 @@
    [goog.i18n NumberFormat]
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))
+
+
+(defn gen-client-name []
+  (let [;quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
+        names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) ;(rand-nth quals) (tales/landform)
+               ]]
+    (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
 (defn format-duration-seconds [seconds]
   (let [hours (int (/ seconds 3600))
@@ -75,6 +83,15 @@
 (defn make-tab-name []
   (str (str (rand-nth [(tales/shape) (tales/quality) (tales/color)]) " " (tales/animal))))
 
+
+
+(defn get-all-values [m k]
+  (if (map? m)
+    (into [] (concat
+              (when (contains? m k) [(get m k)])
+              (mapcat #(get-all-values % k) (vals m))))
+    []))
+
 (defn has-nested-map-values? [x]
   (try (let [aa (some true?
                       (vec (if (and (or (list? x) (vector? x)) (not (empty? x)) (vector-of-maps? x))
@@ -83,6 +100,38 @@
                                  (or (map?    (get (first x) k))
                                      (vector? (get (first x) k)))) false) false)))]
          (if aa true false)) (catch :default _ true)))
+
+(defn function-to-inputs [lookup-map] 
+  (let [ordered (atom [])
+        ;_ (tap> [:function-to-inputs-w lookup-map])
+        port-map (if (or (vector? lookup-map) (map? lookup-map) (list? lookup-map))
+                   (try
+                    ;;  (into {} (for [e (take-while #(not= "&" (str %)) (second (get lookup-map :fn))) ;; quit before optional params ??
+                    ;;                 :let [kk (keyword (str e))
+                    ;;                       _ (swap! ordered conj kk)]]
+                    ;;             {kk (get-in lookup-map [:types kk] :any)}))
+                     (let [input (cond (map? lookup-map)  (second (get lookup-map :fn))
+                                       (list? lookup-map)  (second lookup-map)
+                                       :else lookup-map)
+                           after-ampersand? (atom false)]
+                       (into {} (for [e input
+                                      :let [kko (keyword (str e))
+                                            kk (if @after-ampersand?
+                                                 (keyword (str e "+"))
+                                                 (keyword (str e)))
+                                            _ (do (when (= "&" (str e)) (reset! after-ampersand? true))
+                                                  (swap! ordered conj kk))]]
+                                  (when-not (= "&" (str e))
+                                    {kk (get-in lookup-map [:types kko] :any)}))))
+                     (catch :default _ {:value :any}))
+                   (try ;; passed a raw list
+                     (into {} (for [e (take-while #(not= "&" (str %)) (second lookup-map)) ;; quit before optional params ??
+                                    :let [kk (keyword (str e))
+                                          _ (swap! ordered conj kk)]]
+                                {kk :any})) ;; we dont know what types yet
+                     (catch :default _ {:value :any})))]
+    ;(tap> [:ordered-arities @ordered (map? lookup-map)])
+    port-map))
 
 ;; (defn unique-block-id-helper [base-name counter all-names]
 ;;   (let [new-name (if (= counter 0)
@@ -725,6 +774,9 @@
   (let [base-kp (pop keypath)
         last-kp (last keypath)]
     (update-in map-in base-kp dissoc last-kp)))
+
+(defn dissoc-in-many [m keypaths]
+  (reduce (fn [m keypath] (dissoc-in m keypath)) m keypaths))
 
 ;; (defn deep-flatten [x]
 ;;   (if (coll? x)

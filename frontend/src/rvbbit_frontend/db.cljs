@@ -17,6 +17,7 @@
 (def pause-alerts (reagent/atom false))
 (def speech-log (reagent/atom []))
 (def last-mouse-activity (atom nil))
+(def snap-to-grid 25)
 
 (def running-blocks (reagent/atom {}))
 (def real-running-blocks (reagent/atom {}))
@@ -73,6 +74,13 @@
 (def zooming? (reagent/atom false))
 (def zoomer-state (reagent/atom nil))
 ;(defonce context-drop-pos (reagent/atom [0 0]))
+
+(defonce flow-detached-coords
+  (reagent/atom (let [hh (.-innerHeight js/window) ;; starting size set on load
+                      ww (.-innerWidth js/window) ;; starting size set on load
+                      topper (* hh 0.06)
+                      lefty (* ww 0.06)]
+                  [lefty topper])))
 
 
 (def data-colors {"string"        "#5dc963" ; "#abdc32" ; "#feb733"

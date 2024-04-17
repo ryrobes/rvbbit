@@ -71,7 +71,7 @@
 ;(def flow-id (reagent/atom "live-scratch-flow"))
 (defonce title-edit-idx (reagent/atom nil))
 (defonce drop-toggle? (reagent/atom false))
-(def snap-to-grid 25)
+;(def db/snap-to-grid 25)
 (defonce flow-editor-system-mode (reagent/atom ["flows running" 800]))
 (defonce channel-holster (reagent/atom {}))
 
@@ -119,12 +119,12 @@
 ;;(def db/running-blocks (reagent/atom {}))
 (defonce editor-mode (reagent/atom :flow-browser))
 
-(defonce detached-coords
-  (reagent/atom (let [hh (.-innerHeight js/window) ;; starting size set on load
-                      ww (.-innerWidth js/window) ;; starting size set on load
-                      topper (* hh 0.06)
-                      lefty (* ww 0.06)]
-                  [lefty topper])))
+;; (defonce detached-coords
+;;   (reagent/atom (let [hh (.-innerHeight js/window) ;; starting size set on load
+;;                       ww (.-innerWidth js/window) ;; starting size set on load
+;;                       topper (* hh 0.06)
+;;                       lefty (* ww 0.06)]
+;;                   [lefty topper])))
 
 (re-frame/reg-sub
  ::flowmap-raw
@@ -186,7 +186,7 @@
          inputs (keys (get-in db [:flows curr-flow-id :map old-bid :ports :in]))
          outputs (keys (get-in db [:flows curr-flow-id :map old-bid :ports :out]))
          new-bid (keyword new-bid)
-         new-bid (ut/safe-key new-bid @(re-frame/subscribe [::reserved-type-keywords]))
+         new-bid (ut/safe-key new-bid @(re-frame/subscribe [::conn/reserved-type-keywords]))
          input-replacements (into {}
                                   (for [k inputs] {(keyword (str (ut/unkeyword old-bid) "/" (ut/unkeyword k)))
                                                    (keyword (str (ut/unkeyword new-bid) "/" (ut/unkeyword k)))}))
@@ -269,7 +269,7 @@
           off-y (:y offset)
           x      (- start-x off-x)
           y      (- start-y off-y)]
-      (reset! detached-coords [x y]))))
+      (reset! db/flow-detached-coords [x y]))))
 
 (defn mouse-up-handler [on-move]
   (fn [evt] ;; removed "me" wtf? why did that even work? TODO check other implementations of this fn
@@ -627,11 +627,14 @@
                   server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)
                  ;running-subs (vec (conj (for [k (keys (get server-flowmap :components))] [flow-id k]) [flow-id :*running?]))
                   comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
+                  curr-flow-subs (get db :flow-subs)
                   running-view-subs (vec (for [[k v] comps :when (get v :view)]
                                            [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
                   running-subs (vec (for [k (keys comps)] [flow-id k]))
                   running-subs (vec (into running-subs running-view-subs))
+                  
                   watched? (ut/ne? (get @(re-frame/subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
+                  _ (tap> [:comps comps running-subs watched?])
                   fstr (str "running flow " flow-id)
                   w (/ (count fstr) 4.1)]
               (reset! editor-tooltip-atom (str flow-id " is running"))
@@ -641,16 +644,21 @@
               (swap! db/running-blocks assoc flow-id (vec (keys flowmap)))
               (tap> [:flowmap-send-it flowmap server-flowmap running-subs])
               (reset! http/subsequent-runs [])
-              (when (not watched?)
+              (when true 
+              ;;  (or (not watched?) 
+              ;;      (not= (count (vec (filter #(cstr/includes? (str %) (str "blocks||" flow-id "||")) curr-flow-subs))) ;;; not granular enough, remove on and add one, still same
+              ;;            (count (vec (map last running-subs)))))
+              ;; we need to add new blocks if we are building. TODO selectivly re-sub, or not (dupes should be fine server-side)
+                ;;(tap> [:resub? (vec (filter #(cstr/includes? (str %) (str "blocks||" flow-id "||")) curr-flow-subs)) (vec (map last running-subs))])
                 (re-frame/dispatch [::wfx/request :default
                                     {:message    {:kind :sub-to-running-values
-                                                  :flow-id flow-id 
+                                                  :flow-id flow-id
                                                   :flow-keys running-subs
                                                   :client-name client-name}
                                      :timeout    15000000}]))
             ;;  (re-frame/dispatch [::audio/text-to-speech11 :audio :speak "/home/ryanr/fight-like-hell.mp3" true])
               (re-frame/dispatch [::wfx/request :default
-                                  {:message    {:kind :run-flow
+                                  {:message    {:kind :run-flow 
                                                 :flow-id flow-id
                                                 :no-return? true ;;false ; true ;false ;true  ;; if we arent subbing to running values, we need to return dump
                                                 :file-image {:flowmaps @(re-frame/subscribe [::flowmap-raw])
@@ -1261,7 +1269,7 @@
 (defn generate-tentacle-coord22 []
   (let [[x2 y2] (translate-x-y @tentacle-pos)
         [x1 y1] (translate-x-y @tentacle-start)
-        [xx yy] @detached-coords
+        [xx yy] @db/flow-detached-coords
         dcolor  (get (theme-pull :theme/data-colors db/data-colors)
                      (gn (last @dragged-port))
                      (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500"))
@@ -1275,7 +1283,7 @@
 (defn generate-tentacle-coord []
   (let [[x2 y2] @tentacle-pos
         [x1 y1] @tentacle-start
-        [xx yy] @detached-coords
+        [xx yy] @db/flow-detached-coords
         dcolor  (get (theme-pull :theme/data-colors db/data-colors)
                      (gn (last @dragged-port))
                      (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500"))
@@ -1413,7 +1421,7 @@
 ;;           off-y (:y offset)
 ;;           x      (- start-x off-x)
 ;;           y      (- start-y off-y)]
-;;       ;(reset! detached-coords [x y])
+;;       ;(reset! db/flow-detached-coords [x y])
 ;;       (swap! flowmaps assoc bid (->
 ;;                                  (get @(re-frame/subscribe [::flowmap]) bid)
 ;;                                  (assoc :x (+ (- x xx 78)))
@@ -1436,8 +1444,8 @@
  (fn [db [_ bid kkey vval]]
    (tap> [:update bid (get db :selected-flow-block) kkey vval])
    (let [bid (get db :selected-flow-block)
-         pin? (= kkey [:ports :in]) ;; function-to-inputs :args+ overrides
-         ;;f2i (function-to-inputs lookup-map)
+         pin? (= kkey [:ports :in]) ;; ut/function-to-inputs :args+ overrides
+         ;;f2i (ut/function-to-inputs lookup-map)
          arg-walks (if pin?
                      (into {}
                            (for [e (keys vval)
@@ -1459,15 +1467,13 @@
                                               (get-in db [:flows (get db :selected-flow) :map bid :inputs]))))
          (assoc-in db (vec (into [:flows (get db :selected-flow) :map bid] kkey)) vval))))))
 
-(re-frame/reg-event-db
- ::update-flowmap-key2 ;;; test, just used for add block
- (undoable)
- (fn [db [_ bid kkey vval]]
-   ;(tap> [:update bid (get db :selected-flow-block)  kkey vval])
-   (let [] ; [bid (get db :selected-flow-block)] ;; override due to slow reacting?
-     (if (nil? kkey) ;; fulll body update
-       (assoc-in db [:flows (get db :selected-flow) :map bid] vval)
-       (assoc-in db [:flows (get db :selected-flow) :map bid kkey] vval)))))
+;; (re-frame/reg-event-db
+;;  ::update-flowmap-key2 ;;; test, just used for add block
+;;  (undoable)
+;;  (fn [db [_ bid kkey vval]]
+;;    (if (nil? kkey) ;; fulll body update
+;;      (assoc-in db [:flows (get db :selected-flow) :map bid] vval)
+;;      (assoc-in db [:flows (get db :selected-flow) :map bid kkey] vval))))
 
 (re-frame/reg-event-db
  ::update-flowmap-key-others
@@ -1588,12 +1594,6 @@
  ::select-block
  (undoable)
  (fn [db [_ bid]]
-   ;(tap> [:selecting-block bid])
-  ;(zoom-to-element (str "flow-brick-" bid) 100)
-  ;(reset-zoom-and-pan)
- ;;  (center-zoom-and-pan)
- ;;  (when-let [z @db/zoomer]
- ;;    (.setTransform z 100 100 2 0.5))
    (assoc db :selected-flow-block bid)))
 
 (re-frame/reg-event-db
@@ -1618,7 +1618,7 @@
 ;;   (fn [evt]
 ;;     (let [raw-x (.-clientX evt)
 ;;           raw-y (.-clientY evt)
-;;           [xx yy] @detached-coords
+;;           [xx yy] @db/flow-detached-coords
 ;;           zoom-multi (get @db/pan-zoom-offsets 2)
 ;;           bx (* 3 zoom-multi) ;; border offset of container
 ;;           by (* 18.25 zoom-multi) ;; border offset of container
@@ -1637,7 +1637,7 @@
 ;;     (fn [evt]
 ;;       (let [raw-x (.-clientX evt)
 ;;             raw-y (.-clientY evt)
-;;             [xx yy] @detached-coords
+;;             [xx yy] @db/flow-detached-coords
 ;;             zoom-multi (get @db/pan-zoom-offsets 2)
 ;;             bx (* 3 zoom-multi) ;; border offset of container
 ;;             by (* 18.25 zoom-multi) ;; border offset of container
@@ -1649,7 +1649,7 @@
 ;;             off-y (/ (+ (:y offset) yy) zoom-multi)
 ;;             x      (- (- (/ raw-x zoom-multi) (/ zoom-offset-x zoom-multi)) off-x)
 ;;             y      (- (- (/ raw-y zoom-multi) (/ zoom-offset-y zoom-multi)) off-y)
-;;             grid-size snap-to-grid ;20
+;;             grid-size db/snap-to-grid ;20
 ;;             snapped-x (* grid-size (Math/round (/ x grid-size)))
 ;;             snapped-y (* grid-size (Math/round (/ y grid-size)))]
 ;;         ;(tap> [:snapper bid snapped-x snapped-y])
@@ -1663,7 +1663,7 @@
     (fn [evt]
       (let [raw-x (.-clientX evt)
             raw-y (.-clientY evt)
-            [xx yy] @detached-coords
+            [xx yy] @db/flow-detached-coords
             zoom-multi (get @db/pan-zoom-offsets 2)
             bx (* 3 zoom-multi) ;; border offset of container
             by (* 18.25 zoom-multi) ;; border offset of container
@@ -1675,7 +1675,7 @@
             off-y (/ (+ (:y offset) yy) zoom-multi)
             x      (- (- (/ raw-x zoom-multi) (/ zoom-offset-x zoom-multi)) off-x)
             y      (- (- (/ raw-y zoom-multi) (/ zoom-offset-y zoom-multi)) off-y)
-            grid-size snap-to-grid ;20
+            grid-size db/snap-to-grid ;20
             snapped-x (* grid-size (Math/round (/ x grid-size)))
             snapped-y (* grid-size (Math/round (/ y grid-size)))
             bounded-x (min (max snapped-x 0) (- canvas-width grid-size))
@@ -1692,7 +1692,7 @@
 (defn tag-tentacle-pos [evt]
   (let [raw-x (.-clientX evt)
         raw-y (.-clientY evt)
-        [xx yy] @detached-coords
+        [xx yy] @db/flow-detached-coords
         offset {:x 0 :y 0}
         zoom-multi (get @db/pan-zoom-offsets 2)
         bx 0;(* 3 zoom-multi) ;; border offset of container
@@ -1712,11 +1712,11 @@
  ;; (let [zm (get @db/pan-zoom-offsets 2)
  ;;       x (.-clientX evt)
  ;;       y (.-clientY evt)
- ;;       [xx yy] @detached-coords
+ ;;       [xx yy] @db/flow-detached-coords
  ;;       x (- x (* 25 zm))
  ;;       ]
  ;;   (reset! tentacle-pos [x y]))
-  (let [;[xx yy] @detached-coords
+  (let [;[xx yy] @db/flow-detached-coords
        ;zoom-offset-x (get @db/pan-zoom-offsets 0)
        ;zoom-offset-y (get @db/pan-zoom-offsets 1)
        ;zoom-multi (get @db/pan-zoom-offsets 2)
@@ -1777,7 +1777,7 @@
 
 ;; [raw-x (.-clientX evt)
 ;;  raw-y (.-clientY evt)
-;;  [xx yy] @detached-coords
+;;  [xx yy] @db/flow-detached-coords
 ;;  zoom-multi (get @db/pan-zoom-offsets 2)
 ;;  bx (* 3 zoom-multi) ;; border offset of container
 ;;  by (* 18.25 zoom-multi) ;; border offset of container
@@ -1839,7 +1839,7 @@
             sy              (- (/ sy zoom-multi) (/ zoom-offset-y zoom-multi))
             w               (+ sw (- pos-x sx))
             h               (+ sh (- pos-y sy))
-            grid-size       snap-to-grid ;20
+            grid-size       db/snap-to-grid ;20
             snapped-w       (* grid-size (Math/round (/ w grid-size)))
             snapped-h       (* grid-size (Math/round (/ h grid-size)))
             wmax            (if (< snapped-w min-w) min-w snapped-w)
@@ -1889,7 +1889,7 @@
                   :src-bid bid :src-pid (if input-pid input-pid pid)
                   :param-table :flow
                   :param-field param-field}})
-         [xx yy] @detached-coords]
+         [xx yy] @db/flow-detached-coords]
 
      {:type          :flow-port
    ;:on-drag (debounce #(tag-screen-position %) 100)
@@ -2001,37 +2001,7 @@
 ;;       :size "auto"
 ;;       :child element]] element))
 
-(defn function-to-inputs [lookup-map]
-  (let [ordered (atom [])
-        _ (tap> [:lookup-map lookup-map])
-        port-map (if (or (vector? lookup-map) (map? lookup-map) (list? lookup-map))
-                   (try
-                    ;;  (into {} (for [e (take-while #(not= "&" (str %)) (second (get lookup-map :fn))) ;; quit before optional params ??
-                    ;;                 :let [kk (keyword (str e))
-                    ;;                       _ (swap! ordered conj kk)]]
-                    ;;             {kk (get-in lookup-map [:types kk] :any)}))
-                     (let [input (cond (map? lookup-map)  (second (get lookup-map :fn))
-                                       (list? lookup-map)  (second lookup-map)
-                                       :else lookup-map)
-                           after-ampersand? (atom false)]
-                       (into {} (for [e input
-                                      :let [kko (keyword (str e))
-                                            kk (if @after-ampersand?
-                                                 (keyword (str e "+"))
-                                                 (keyword (str e)))
-                                            _ (do (when (= "&" (str e)) (reset! after-ampersand? true))
-                                                  (swap! ordered conj kk))]]
-                                  (when-not (= "&" (str e))
-                                    {kk (get-in lookup-map [:types kko] :any)}))))
-                     (catch :default _ {:value :any}))
-                   (try ;; passed a raw list
-                     (into {} (for [e (take-while #(not= "&" (str %)) (second lookup-map)) ;; quit before optional params ??
-                                    :let [kk (keyword (str e))
-                                          _ (swap! ordered conj kk)]]
-                                {kk :any})) ;; we dont know what types yet
-                     (catch :default _ {:value :any})))]
-    ;(tap> [:ordered-arities @ordered (map? lookup-map)])
-    port-map))
+
 
 (defn ifnil [x n] (if (nil? x) n x))
 
@@ -2052,54 +2022,54 @@
     (re-frame/dispatch [::update-flowmap-connections new-connections])
     conns-count))
 
-(defn get-all-values [m k]
-  (if (map? m)
-    (into [] (concat
-              (when (contains? m k) [(get m k)])
-              (mapcat #(get-all-values % k) (vals m))))
-    []))
+;; (defn get-all-values [m k]
+;;   (if (map? m)
+;;     (into [] (concat
+;;               (when (contains? m k) [(get m k)])
+;;               (mapcat #(get-all-values % k) (vals m))))
+;;     []))
 
 ;; Usage:
 ;; (get-all-values your-map :type)
 
-(re-frame/reg-sub
- ::reserved-type-keywords ;; @(re-frame/subscribe [::reserved-type-keywords])
- (fn [db]
-   (let [lib-keys (try (vec (map edn/read-string (map :name (get-in db [:data :flow-fn-all-sys])))) (catch :default _ []))]
-     (vec (into lib-keys
-                (into
-                 (keys (get-in db [:flows (get db :selected-flow) :map]))
-                 (vec (distinct (get-all-values (get-in db [:flows (get db :selected-flow)]) :type)))))))))
+;; (re-frame/reg-sub
+;;  ::conn/reserved-type-keywords ;; @(re-frame/subscribe [::conn/reserved-type-keywords])
+;;  (fn [db]
+;;    (let [lib-keys (try (vec (map edn/read-string (map :name (get-in db [:data :flow-fn-all-sys])))) (catch :default _ []))]
+;;      (vec (into lib-keys
+;;                 (into
+;;                  (keys (get-in db [:flows (get db :selected-flow) :map]))
+;;                  (vec (distinct (get-all-values (get-in db [:flows (get db :selected-flow)]) :type)))))))))
 
-(defn add-block [x y & [body bid no-select?]]
-  (let [;bid (if bid bid (keyword (str "open-input-" (count @(re-frame/subscribe [::flowmap])))))
-        _ (tap> [:add-block bid])
-        bid (keyword (cstr/replace (str (gn bid)) #"/" "-"))
-        bid (if bid bid :open-input)
-        _ (tap> [:ADD-pre-safe-bid bid])
-        safe-keys-reserved @(re-frame/subscribe [::reserved-type-keywords])
-        bid (ut/safe-key bid safe-keys-reserved)
-        _ (tap> [:ADD-post-safe-bid bid])
-        zoom-multi (get @db/pan-zoom-offsets 2)
-        zoom-offset-x (get @db/pan-zoom-offsets 0)
-        zoom-offset-y (get @db/pan-zoom-offsets 1)
-        drop-x      (- (/ x zoom-multi) (/ zoom-offset-x zoom-multi))
-        drop-y      (- (/ y zoom-multi) (/ zoom-offset-y zoom-multi))
-        grid-size snap-to-grid
-        drop-x       (* grid-size (Math/round (/ drop-x grid-size)))
-        drop-y       (* grid-size (Math/round (/ drop-y grid-size)))
-        body (if body (if (or (cstr/includes? (str bid) "open-input")
-                              (cstr/includes? (str bid) "open-fn")
-                              (get body :right-click? false))
-                        (merge body {:x drop-x :y drop-y :z 0}) body) ;; override for right click open block
-                 {:w 200 :h 50
-                  :x drop-x :y drop-y :z 0
-                  :ports {:in {:in :string}
-                          :out {:out :string}}})]
-   ;(tap> [:adding-flow-block bid x y @(re-frame/subscribe [::flowmap])])
-   ;(swap! flowmaps assoc bid body)
-    (when (not no-select?) (re-frame/dispatch [::select-block bid]))
-    (re-frame/dispatch [::update-flowmap-key2 bid nil body])))
+;; (defn conn/add-flow-block [x y & [body bid no-select?]]
+;;   (let [;bid (if bid bid (keyword (str "open-input-" (count @(re-frame/subscribe [::flowmap])))))
+;;         _ (tap> [:conn/add-flow-block bid])
+;;         bid (keyword (cstr/replace (str (gn bid)) #"/" "-"))
+;;         bid (if bid bid :open-input)
+;;         _ (tap> [:ADD-pre-safe-bid bid])
+;;         safe-keys-reserved @(re-frame/subscribe [::conn/reserved-type-keywords])
+;;         bid (ut/safe-key bid safe-keys-reserved)
+;;         _ (tap> [:ADD-post-safe-bid bid])
+;;         zoom-multi (get @db/pan-zoom-offsets 2)
+;;         zoom-offset-x (get @db/pan-zoom-offsets 0)
+;;         zoom-offset-y (get @db/pan-zoom-offsets 1)
+;;         drop-x      (- (/ x zoom-multi) (/ zoom-offset-x zoom-multi))
+;;         drop-y      (- (/ y zoom-multi) (/ zoom-offset-y zoom-multi))
+;;         grid-size db/snap-to-grid
+;;         drop-x       (* grid-size (Math/round (/ drop-x grid-size)))
+;;         drop-y       (* grid-size (Math/round (/ drop-y grid-size)))
+;;         body (if body (if (or (cstr/includes? (str bid) "open-input")
+;;                               (cstr/includes? (str bid) "open-fn")
+;;                               (get body :right-click? false))
+;;                         (merge body {:x drop-x :y drop-y :z 0}) body) ;; override for right click open block
+;;                  {:w 200 :h 50
+;;                   :x drop-x :y drop-y :z 0
+;;                   :ports {:in {:in :string}
+;;                           :out {:out :string}}})]
+;;    ;(tap> [:adding-flow-block bid x y @(re-frame/subscribe [::flowmap])])
+;;    ;(swap! flowmaps assoc bid body)
+;;     (when (not no-select?) (re-frame/dispatch [::select-block bid]))
+;;     (re-frame/dispatch [::update-flowmap-key2 bid nil body])))
 
 (defn remove-block [bid]
   (let [flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
@@ -2226,7 +2196,11 @@
                                         (try (last @dragged-port) ;; in case of nil, etc
                                              (catch :default _ nil)))
                                      (= (val %) :any))
-                                inputs)] (keys filtered-inputs)))
+                                inputs)]
+    ;(tap> [:valid-drop-ports (last @dragged-port) inputs filtered-inputs ])
+    (if (= :any (last @dragged-port))
+      (keys inputs) ;; if we dont know what it is (like a fresh open-fn) just allow whatever 
+      (keys filtered-inputs))))
 
 (defn code-box [width-int height-int value & [syntax]]
   (let [syntax (or (if (= syntax "raw (clojure)") "clojure" syntax) "clojure")]
@@ -3063,7 +3037,7 @@
 ;; (defn flow-grid2 [ww hh xx yy flowmaps-connections flow-id flow-map]
 ;;   (let [ww (- ww 16)
 ;;         hh (- hh 37)
-;;         [xx yy] @detached-coords
+;;         [xx yy] @db/flow-detached-coords
 ;;        ;flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
 ;;        ;flow-id @(re-frame/subscribe [::selected-flow])
 ;;        ;flow-map @(re-frame/subscribe [::flowmap])
@@ -3086,7 +3060,7 @@
 ;;                                     (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500")))]
 
 ;;    ;(tap> [:done-block done-block flow-map])
-;;    ;(tap> [:reserved-type-keywords @(re-frame/subscribe [::reserved-type-keywords])])
+;;    ;(tap> [:reserved-type-keywords @(re-frame/subscribe [::conn/reserved-type-keywords])])
 ;;    ;(tap> [:generate-coords coords])
 ;;    ;(tap> [:db/flow-results @(re-frame/subscribe [::http/flow-results])])
 
@@ -3568,16 +3542,19 @@
 
 (def last-loaded (atom nil))
 
-(defn flow-droppable [types-vec root element]
- ;(tap> [:dropped?  @port-hover types-vec root @bricks/dragging-body element ])
-  (if true ;(not @dragging-port?)                                                  ; @dragging?
+(defn flow-droppable [types-vec root element] 
+;; ^^ TODO this is deprecated due to the superior & simplier conn/spawn-open-input-block that is used in the right-click modal
+;; HOWEVER, it is very much hacked deep into the draggable/droppable system, a refactor will have to wait. 
+;; we will have to deal with this fucking shit for now.
+ ;(tap> [:we-dropped?  @port-hover types-vec root @bricks/dragging-body element])
+  (if true ;(not @dragging-port?)  ;; for. fucks. sake.
     [(reagent/adapt-react-class rdnd/Droppable)
      {:types   types-vec
      ;:on-drag #(tag-screen-position %)
       :on-drag-enter #(when (or (and (= (get-in @bricks/dragging-body [:drag-meta :source-query]) :flows-sys)
                                      @drop-toggle?)
-                                (not (empty? (get-in @bricks/dragging-body [:flow-item :file-path]))))
-                        (let [inc-path (if (not (empty? (get-in @bricks/dragging-body [:flow-item :file-path])))
+                                (ut/ne? (get-in @bricks/dragging-body [:flow-item :file-path])))
+                        (let [inc-path (if (ut/ne? (get-in @bricks/dragging-body [:flow-item :file-path]))
                                          (get-in @bricks/dragging-body [:flow-item :file-path])
                                          @(re-frame/subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]]))
                               inc-loaded @(re-frame/subscribe [::sub-flow-loaded?])]
@@ -3788,16 +3765,16 @@
                                     sub-flow-drop? (ut/safe-key
                                                     (try (edn/read-string (get sub-flow :flow-id)) (catch :default _ :name-issue!))
                                                  ;(vec (keys @(re-frame/subscribe [::flowmap])))
-                                                    @(re-frame/subscribe [::reserved-type-keywords]))
+                                                    @(re-frame/subscribe [::conn/reserved-type-keywords]))
 
                                     flow-item (ut/safe-key
                                                (try (edn/read-string (get flow-item :name)) (catch :default _ :name-issue!))
                                             ;(vec (keys @(re-frame/subscribe [::flowmap])))
-                                               @(re-frame/subscribe [::reserved-type-keywords]))
+                                               @(re-frame/subscribe [::conn/reserved-type-keywords]))
 
                                     :else (or (get-in rooted-data [:drag-meta :source-table])
                                               (get-in rooted-data [:drag-meta :param-full])))
-                          safe-keys-reserved @(re-frame/subscribe [::reserved-type-keywords])
+                          safe-keys-reserved @(re-frame/subscribe [::conn/reserved-type-keywords])
                           src-block (cstr/replace (str (get-in rooted-data [:drag-meta :src-bid])) ":" "")
                           src-port (cstr/replace (str (get-in rooted-data [:drag-meta :src-pid])) ":" "")
                           check-port-drop (cond
@@ -3827,7 +3804,7 @@
 
                    ; (get rooted-data :file_path) ;; (get @(re-frame/subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
                         :else (do ;;(tap> [:flow-inherits-drag-body? @bricks/dragging-body data drop-x drop-y flow-body flow-id check-port-drop])
-                                (add-block drop-x drop-y flow-body (if from-port? check-port-drop flow-id) browser-pull?)
+                                (conn/add-flow-block drop-x drop-y flow-body (if from-port? check-port-drop flow-id) browser-pull?)
                                 (when from-port?
                                   (if port-meta? ;; in to out
                                     (connect-ports ;(keyword (if (= src-port "out") src-block (str src-block "/" src-port)))
@@ -4068,7 +4045,7 @@
                                           (str value))
                   :onBlur #(try
                              (let [new-vals (read-string (cstr/join " " (ut/cm-deep-values %)))
-                                   fin (function-to-inputs new-vals)]
+                                   fin (ut/function-to-inputs new-vals)]
                               ;;  ports (try (second new-vals)
                               ;;             (catch :default _ (do (tap> [:error-making-arity-to-ports bid value new-vals]) [])))
 
@@ -4333,7 +4310,7 @@
                                                ;_ (tap> [:code-box-rwo_write-clj ddata dtype])
                                                ports {;:in (get-in v [:ports :in])
                                                       :out {:out (keyword dtype)}}
-                                     ;;_ (tap> [:fn-to-inputs (function-to-inputs ddata)])
+                                     ;;_ (tap> [:fn-to-inputs (ut/function-to-inputs ddata)])
                                                ports (cond (= dtype "map")
                                                            {:out (assoc (into {} (for [[k v] ddata] {k (keyword (ut/data-typer v))})) :* :map)}
                                                            (or (= dtype "vector") (= dtype "rowset")) ; = dtype "vector")
@@ -5317,7 +5294,7 @@
                   [re-com/box
                    :size "auto"
                            ;:style {:margin-left "-10px"}
-                   :child [bricks/magic-table :flow-fn-list* [:flow-fn-sys] 9 19 [:full_map :category]]]]]
+                   :child [bricks/magic-table :flow-fn-list* [:flow-fn-sys] 9 19 [:full_map :category :file_path]]]]]
 
       (= ttype :debug)
       (if flow-select
@@ -5531,7 +5508,7 @@
                                    command (get v :command)
                                    since-start (get v :since-start)
                                    running-blocks (get v :running-blocks)
-                                   last-updated (get v :last-updated)
+                                   ;last-updated (get v :last-updated)
                                    ;tracker-events (get v :tracker-events)
                                    running? (get v :*running?)]]
                          [re-com/v-box
@@ -5651,6 +5628,7 @@
                  ["flow browser" 600]
                  ["flow parts" 600]
                  ["scheduler" 990]
+                 ["when-this" 990]
                  ["flow history" 1200]]
         ;read-only-flow? (true? (cstr/includes? flow-id "/"))
         ;flow-id-regex #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores, hypens, numbers
@@ -5661,7 +5639,7 @@
                    :flow-fn-all-sys {:select [:name]
                                      :from [:flow_functions]
                                      :group-by [1]}
-                   :flow-fn-sys {:select [:name :full_map :description :inputs :icon :input_types :output_types :category]
+                   :flow-fn-sys {:select [:name :description :full_map :inputs :icon :input_types :output_types :category]
                                  :from [:flow_functions]
                                  :col-widths {:name 215 :description 500}
                                  :where (if (get sql-params :flow-fn-categories-sys/category)
@@ -5792,6 +5770,11 @@
                        "zmdi-dns"]
 
                       (= (first @flow-editor-system-mode) "scheduler")
+
+                      [flow-details-block-container (first @flow-editor-system-mode) :system :system
+                       [settings-block flow-id :scheduler] "zmdi-chart-donut"]
+
+                      (= (first @flow-editor-system-mode) "when-this")
 
                       [flow-details-block-container (first @flow-editor-system-mode) :system :system
                        [settings-block flow-id :scheduler] "zmdi-chart-donut"]
@@ -6127,7 +6110,7 @@
         ;flow-select @(re-frame/subscribe [::selected-flow-block])
         ;connections @(re-frame/subscribe [::flowmap-connections])
         reactions! [@(re-frame/subscribe [::http/flow-results]) @sniffy-sniff @port-hover2]
-        [xx yy] @detached-coords
+        [xx yy] @db/flow-detached-coords
         selected (get-in @flow-details-block-container-atom [flow-id bid :port-panel type])
         connections @(re-frame/subscribe [::flowmap-connections-parsed bid])
         defaults  (when (= type :in) @(re-frame/subscribe [::input-defaults bid]))
@@ -8117,150 +8100,150 @@
        flow-parts-key
        flow-parts))))
 
-(defn spawn-open-input-block [starting-val] ;;; need to simplify and merge logic from flow-droppable (flows, params, etc)
-  (let [starting-val (try (edn/read-string starting-val) (catch :default _ starting-val))
-        dtype (keyword (ut/data-typer starting-val))
-        try-read (fn [x] (try (edn/read-string x) (catch :default _ x)))
-        [x y] @detached-coords
-        flow?  (= (get starting-val :category) ":flow") ;; also packaged flows... not raws... how to?
-        sub-flow?  (= (get starting-val :category) ":sub-flows")
-        part-key? (true? (and (map? starting-val) (not flow?)
-                              (not (nil? (get starting-val :category)))
-                              (not (nil? (get starting-val :name)))
-                              (not (nil? (get starting-val :full_map)))))
-        lookup-map (if part-key? ;; (or part-key? flow?)
-                    ;; (merge starting-val (try-read (get starting-val :full_map)))
-                     (try (merge
-                           (-> (edn/read-string
-                                (get starting-val :full_map)))
-                           starting-val)
-                          (catch :default _ {}))
-                     {})
-        _ (tap> [:full-lookup-map part-key? flow? starting-val lookup-map])
-        raw-fn?         (and (= dtype :list)
-                             (= (first starting-val) 'fn))
+;; (defn spawn-open-input-block [starting-val] ;;; need to simplify and merge logic from flow-droppable (flows, params, etc)
+;;   (let [starting-val (try (edn/read-string starting-val) (catch :default _ starting-val))
+;;         dtype (keyword (ut/data-typer starting-val))
+;;         try-read (fn [x] (try (edn/read-string x) (catch :default _ x)))
+;;         [x y] @db/flow-detached-coords
+;;         flow?  (= (get starting-val :category) ":flow") ;; also packaged flows... not raws... how to?
+;;         sub-flow?  (= (get starting-val :category) ":sub-flows")
+;;         part-key? (true? (and (map? starting-val) (not flow?)
+;;                               (not (nil? (get starting-val :category)))
+;;                               (not (nil? (get starting-val :name)))
+;;                               (not (nil? (get starting-val :full_map)))))
+;;         lookup-map (if part-key? ;; (or part-key? flow?)
+;;                     ;; (merge starting-val (try-read (get starting-val :full_map)))
+;;                      (try (merge
+;;                            (-> (edn/read-string
+;;                                 (get starting-val :full_map)))
+;;                            starting-val)
+;;                           (catch :default _ {}))
+;;                      {})
+;;         _ (tap> [:full-lookup-map part-key? flow? starting-val lookup-map])
+;;         raw-fn?         (and (= dtype :list)
+;;                              (= (first starting-val) 'fn))
 
-        _ (when flow? (re-frame/dispatch [::http/load-sub-flow (get starting-val :file_path)]))
-        sub-flow (when flow? @(re-frame/subscribe [::sub-flow-incoming]))
-        open-block-body {:w 125 :h 60 :z 0
-                         :data {:drag-meta {:type :open-block}
-                                :flow-item {:expandable? true}
-                                :user-input starting-val}
-                         :right-click? true  ;; important for add-block to get current coords
-                         :ports {:in {}
-                                 :out {:out dtype}}}
-        flow-as-fn (if flow?
-                     (try
-                       (let [blocks     (set (keys (get sub-flow :map)))
-                             base-conns (set (for [[_ v2] (get sub-flow :connections)] (keyword (gns v2))))
-                             no-inputs (cset/difference blocks base-conns)
-                             flow-inputs (into {}
-                                               (for [i no-inputs]
-                                                 {i
-                                                  (get-in sub-flow [:map i :ports :out (first (keys (get-in sub-flow [:map i :ports :out])))])}))
-                             done-block (try (first (first (filter (fn [x] (= (second x) :done)) (get sub-flow :connections))))
-                                             (catch :default _ :error))]
-                         (tap> [:sub-flow-build no-inputs base-conns])
-                         {:w 200 :h 100 :z 0
-                          :data (-> {} ;; (edn/read-string (get starting-val :full_map)) ;;rooted-data
-                                    (assoc-in [:drag-meta :done-block] done-block)
-                                    (assoc-in [:drag-meta :type] :sub-flow))
-                          :sub-flow sub-flow
-                          :file-path (get starting-val :file_path)
-                          :flow-id (get sub-flow :flow-id)
-                          :icon "zmdi-puzzle-piece"
-                          :ports {:in flow-inputs ;(dissoc (get flow-item :types) :out)
-                                  :out (get-in sub-flow [:map done-block :ports :out])}})
-                       (catch :default _ {})) {})
-        other-fn (let [f2i (function-to-inputs lookup-map)
-                       arg-walks (into {}
-                                       (for [e (keys f2i)
-                                             :when (cstr/ends-with? (str e) "+")]
-                                         {(-> (str e)
-                                              (cstr/replace "+" "")
-                                              (cstr/replace ":" "")
-                                              keyword) e}))]
-                   (merge
-                    (if sub-flow? {:flow-path (get lookup-map :flow-path)  ;; for unpacking later
-                                   :sub-flow-id (get lookup-map :flow-id)})
-                    {:w 125 :h 60 :z 0
-                     :data
-                     {:flow-item
-                      {:category (get lookup-map :category) ;; important for lookup server-side! (string fine)
-                       :type (if (not sub-flow?) (try-read (get lookup-map :name)) (get lookup-map :name))  ;; important for client render (expects keyword)
-                       :name (get lookup-map :name)  ;; important for lookup server-side! (string fine)
-                       :icon (get lookup-map :icon)
-                       :inputs (walk/postwalk-replace arg-walks (get lookup-map :inputs))
-                       :defaults (get lookup-map :defaults)
-                       :types (walk/postwalk-replace arg-walks (get lookup-map :types))
-                       :style (get lookup-map :style)
-                       :selected-style (get lookup-map :selected-style)
-                       :expandable? true
-                       :required (get lookup-map :required)}
-                      :drag-meta {:type (if (not sub-flow?) (try-read (get lookup-map :name)) (get lookup-map :name))}}
-                     :right-click? true ;; important for add-block to get current coords
-                     :ports {:in
-                          ;; (try
-                          ;;       (into {} (for [e (second (get lookup-map :fn))
-                          ;;                      :let [kk (keyword (str e))]]
-                          ;;                  {kk (get-in lookup-map [:types kk] :any)}))
-                          ;;       (catch :default _ {:value :any}))
+;;         _ (when flow? (re-frame/dispatch [::http/load-sub-flow (get starting-val :file_path)]))
+;;         sub-flow (when flow? @(re-frame/subscribe [::sub-flow-incoming]))
+;;         open-block-body {:w 125 :h 60 :z 0
+;;                          :data {:drag-meta {:type :open-block}
+;;                                 :flow-item {:expandable? true}
+;;                                 :user-input starting-val}
+;;                          :right-click? true  ;; important for conn/add-flow-block to get current coords
+;;                          :ports {:in {}
+;;                                  :out {:out dtype}}}
+;;         flow-as-fn (if flow?
+;;                      (try
+;;                        (let [blocks     (set (keys (get sub-flow :map)))
+;;                              base-conns (set (for [[_ v2] (get sub-flow :connections)] (keyword (gns v2))))
+;;                              no-inputs (cset/difference blocks base-conns)
+;;                              flow-inputs (into {}
+;;                                                (for [i no-inputs]
+;;                                                  {i
+;;                                                   (get-in sub-flow [:map i :ports :out (first (keys (get-in sub-flow [:map i :ports :out])))])}))
+;;                              done-block (try (first (first (filter (fn [x] (= (second x) :done)) (get sub-flow :connections))))
+;;                                              (catch :default _ :error))]
+;;                          (tap> [:sub-flow-build no-inputs base-conns])
+;;                          {:w 200 :h 100 :z 0
+;;                           :data (-> {} ;; (edn/read-string (get starting-val :full_map)) ;;rooted-data
+;;                                     (assoc-in [:drag-meta :done-block] done-block)
+;;                                     (assoc-in [:drag-meta :type] :sub-flow))
+;;                           :sub-flow sub-flow
+;;                           :file-path (get starting-val :file_path)
+;;                           :flow-id (get sub-flow :flow-id)
+;;                           :icon "zmdi-puzzle-piece"
+;;                           :ports {:in flow-inputs ;(dissoc (get flow-item :types) :out)
+;;                                   :out (get-in sub-flow [:map done-block :ports :out])}})
+;;                        (catch :default _ {})) {})
+;;         other-fn (let [f2i (ut/function-to-inputs lookup-map)
+;;                        arg-walks (into {}
+;;                                        (for [e (keys f2i)
+;;                                              :when (cstr/ends-with? (str e) "+")]
+;;                                          {(-> (str e)
+;;                                               (cstr/replace "+" "")
+;;                                               (cstr/replace ":" "")
+;;                                               keyword) e}))]
+;;                    (merge
+;;                     (if sub-flow? {:flow-path (get lookup-map :flow-path)  ;; for unpacking later
+;;                                    :sub-flow-id (get lookup-map :flow-id)})
+;;                     {:w 125 :h 60 :z 0
+;;                      :data
+;;                      {:flow-item
+;;                       {:category (get lookup-map :category) ;; important for lookup server-side! (string fine)
+;;                        :type (if (not sub-flow?) (try-read (get lookup-map :name)) (get lookup-map :name))  ;; important for client render (expects keyword)
+;;                        :name (get lookup-map :name)  ;; important for lookup server-side! (string fine)
+;;                        :icon (get lookup-map :icon)
+;;                        :inputs (walk/postwalk-replace arg-walks (get lookup-map :inputs))
+;;                        :defaults (get lookup-map :defaults)
+;;                        :types (walk/postwalk-replace arg-walks (get lookup-map :types))
+;;                        :style (get lookup-map :style)
+;;                        :selected-style (get lookup-map :selected-style)
+;;                        :expandable? true
+;;                        :required (get lookup-map :required)}
+;;                       :drag-meta {:type (if (not sub-flow?) (try-read (get lookup-map :name)) (get lookup-map :name))}}
+;;                      :right-click? true ;; important for conn/add-flow-block to get current coords
+;;                      :ports {:in
+;;                           ;; (try
+;;                           ;;       (into {} (for [e (second (get lookup-map :fn))
+;;                           ;;                      :let [kk (keyword (str e))]]
+;;                           ;;                  {kk (get-in lookup-map [:types kk] :any)}))
+;;                           ;;       (catch :default _ {:value :any}))
 
-                             (if sub-flow?
-                               (select-keys (get lookup-map :types) (get lookup-map :inputs))
-                               f2i)
+;;                              (if sub-flow?
+;;                                (select-keys (get lookup-map :types) (get lookup-map :inputs))
+;;                                f2i)
 
-                             :out {:out (get-in lookup-map [:types :out] :any)}}
-                     :icon (get lookup-map :icon)}))
-        open-fn-body (let [;port-map (try
-                           ;           (into {} (for [e (second starting-val)]
-                           ;                      {(keyword (str e)) :any}))
-                           ;           (catch :default _ {:value :any}))
-                           port-map (try (function-to-inputs (second starting-val)) (catch :default _ {:value :any}))
-                           ;; (fn [aa bb & ff] (+ aa bb))
-                          ;;  arg-walks (into {}
-                          ;;                  (for [e (keys port-map)
-                          ;;                        :when (cstr/ends-with? (str e) "+")]
-                          ;;                    {(-> (str e)
-                          ;;                         (cstr/replace "+" "")
-                          ;;                         (cstr/replace ":" "")
-                          ;;                         keyword) e}))
-                           ]
-                       {:fn starting-val
-                        :w 125 :h 60 :z 0
-                        :raw-fn starting-val
-                        :icon "zmdi-functions"
-                        :right-click? true  ;; important for add-block to get current coords
-                        :ports {:in port-map
-                                :out {:out :any}}
-                        :data
-                        {:flow-item
-                         {:category ":rabbit-base"
-                          :fn starting-val
-                          :name ":open-fn"
-                          :raw-fn starting-val
-                          :type :open-fn
-                          :icon "zmdi-functions"
-                          :types (merge port-map {:out :any})
-                          :expandable? true
-                          :drag-meta {:type :open-fn}}}})
-        grid-size snap-to-grid
-        sx (- (first @db/context-modal-pos) x 10)
-        sy (- (last @db/context-modal-pos) y 33)
-        snapped-x       (* grid-size (Math/round (/ sx grid-size)))
-        snapped-y       (* grid-size (Math/round (/ sy grid-size)))
-        block-body (cond raw-fn? open-fn-body
-                         part-key? other-fn
-                         flow? flow-as-fn
-                         :else open-block-body)
-        bname (cond raw-fn? :open-fn
-                    part-key? (try-read (get lookup-map :name)) ;;:test ;(get lookup-map )
-                    flow? (try-read (get sub-flow :flow-id))
-                    :else :open-input)]
-    ;(tap> [:spawner @(re-frame/subscribe [::flow-parts-lookup :clojure-base/*])])
-    (add-block snapped-x snapped-y block-body bname)))
+;;                              :out {:out (get-in lookup-map [:types :out] :any)}}
+;;                      :icon (get lookup-map :icon)}))
+;;         open-fn-body (let [;port-map (try
+;;                            ;           (into {} (for [e (second starting-val)]
+;;                            ;                      {(keyword (str e)) :any}))
+;;                            ;           (catch :default _ {:value :any}))
+;;                            port-map (try (ut/function-to-inputs (second starting-val)) (catch :default _ {:value :any}))
+;;                            ;; (fn [aa bb & ff] (+ aa bb))
+;;                           ;;  arg-walks (into {}
+;;                           ;;                  (for [e (keys port-map)
+;;                           ;;                        :when (cstr/ends-with? (str e) "+")]
+;;                           ;;                    {(-> (str e)
+;;                           ;;                         (cstr/replace "+" "")
+;;                           ;;                         (cstr/replace ":" "")
+;;                           ;;                         keyword) e}))
+;;                            ]
+;;                        {:fn starting-val
+;;                         :w 125 :h 60 :z 0
+;;                         :raw-fn starting-val
+;;                         :icon "zmdi-functions"
+;;                         :right-click? true  ;; important for conn/add-flow-block to get current coords
+;;                         :ports {:in port-map
+;;                                 :out {:out :any}}
+;;                         :data
+;;                         {:flow-item
+;;                          {:category ":rabbit-base"
+;;                           :fn starting-val
+;;                           :name ":open-fn"
+;;                           :raw-fn starting-val
+;;                           :type :open-fn
+;;                           :icon "zmdi-functions"
+;;                           :types (merge port-map {:out :any})
+;;                           :expandable? true
+;;                           :drag-meta {:type :open-fn}}}})
+;;         grid-size db/snap-to-grid
+;;         sx (- (first @db/context-modal-pos) x 10)
+;;         sy (- (last @db/context-modal-pos) y 33)
+;;         snapped-x       (* grid-size (Math/round (/ sx grid-size)))
+;;         snapped-y       (* grid-size (Math/round (/ sy grid-size)))
+;;         block-body (cond raw-fn? open-fn-body
+;;                          part-key? other-fn
+;;                          flow? flow-as-fn
+;;                          :else open-block-body)
+;;         bname (cond raw-fn? :open-fn
+;;                     part-key? (try-read (get lookup-map :name)) ;;:test ;(get lookup-map )
+;;                     flow? (try-read (get sub-flow :flow-id))
+;;                     :else :open-input)]
+;;     ;(tap> [:spawner @(re-frame/subscribe [::flow-parts-lookup :clojure-base/*])])
+;;     (conn/add-flow-block snapped-x snapped-y block-body bname)))
 
-;;; add-block [x y & [body bid no-select?]]
+;;; conn/add-flow-block [x y & [body bid no-select?]]
 
 (def lookup-val (reagent/atom nil))
 
@@ -8268,7 +8251,7 @@
   (let [[left top] @db/context-modal-pos
         ;;val (reagent/atom nil)
         ;react! [@lookup-val]
-        [xx yy] @detached-coords
+        [xx yy] @db/flow-detached-coords
         left (- left xx)
         top (- top yy)
         flow-parts @(re-frame/subscribe [::flow-parts-lookup])
@@ -8383,9 +8366,10 @@
                                  :font-weight 700
                                  :border-radius "8px"
                                  :cursor "pointer"}
-                         :attr {:on-click #(do  (tap> [:adding-block :spawn-open-input-block @lookup-val])
-                                                (spawn-open-input-block @lookup-val)
-                                                (reset! lookup-modal? false))}]
+                         :attr {:on-click #(let [lval (conn/spawn-open-input-block @lookup-val)]
+                                             (tap> [:adding-block :conn/spawn-open-input-block @lookup-val :w lval])
+                                             (apply conn/add-flow-block lval) ;; being passed [snapped-x snapped-y block-body bname]
+                                             (reset! lookup-modal? false))}]
 
                         [re-com/box
                          :child [re-com/md-icon-button
@@ -8465,7 +8449,7 @@
    (assoc db :alt-key-held? (not (get db :alt-key-held?)))))
 
 (defn flow-panel []
-  (let [[x y] @detached-coords
+  (let [[x y] @db/flow-detached-coords
         x-px (px x)
         y-px (px y)
         [wpct hpct] [0.85 0.50]
@@ -8785,7 +8769,7 @@
                                                                                                               :types {:x :any :out :any}
                                                                                                               :expandable? true
                                                                                                               :drag-meta {:type :open-fn}}}}]
-                                                                           (add-block (- (first @db/context-modal-pos) x 10)
+                                                                           (conn/add-flow-block (- (first @db/context-modal-pos) x 10)
                                                                                       (- (last @db/context-modal-pos) y 33) block-body :open-fn)))
                                                                        #_{:clj-kondo/ignore [:unresolved-symbol]}
                                                                        (.preventDefault %)))
@@ -8803,7 +8787,7 @@
                                                   ;;                                             :ports {;;;:in {:in :string}
                                                   ;;                                                     :in {}
                                                   ;;                                                     :out {:out :string}}}]
-                                                  ;;                        (add-block (- (first @db/context-modal-pos) x 10)
+                                                  ;;                        (conn/add-flow-block (- (first @db/context-modal-pos) x 10)
                                                   ;;                                   (- (last @db/context-modal-pos) y 33) open-block-body :open-input)))
                                                   ;;                    #_{:clj-kondo/ignore [:unresolved-symbol]}
                                                   ;;                    (.preventDefault event))
@@ -8938,7 +8922,7 @@
 
                                                                                      (let [;ph 6-0-0 ;; siz hundo
                                                                                            ;pw (* (.-innerWidth js/window) 0.7)
-                                                                                           [xx yy] @detached-coords]
+                                                                                           [xx yy] @db/flow-detached-coords]
                                                                                  ;offsets @db/pan-zoom-offsets
                                                                                  ;tx (first offsets)
                                                                                  ;ty (second offsets)
