@@ -59,13 +59,13 @@
  (fn [db [_ content adding]]
    (tap> [:edit? content adding])
    (let [curr (get-in db [:rules-map (get db :selected-rule) :rule])]
-     (assoc-in db [:rules-map (get db :selected-rule)] 
-               {:rule (walk/postwalk-replace 
-                       {content 
-                        (vec (conj content (if (vector? adding) adding [adding])))
-                        ;(vec (cons adding content))
-                        ;[adding content]
-                        } curr)}))))
+     (assoc-in db [:rules-map (get db :selected-rule) :rule] 
+               (walk/postwalk-replace
+                {content
+                 (vec (conj content (if (vector? adding) adding [adding])))
+                                       ;(vec (cons adding content))
+                                       ;[adding content]
+                 }curr)))))
 
 (re-frame/reg-event-db
  ::edit-rule-drop-kill
@@ -73,8 +73,8 @@
  (fn [db [_ content]]
    (let [curr (get-in db [:rules-map (get db :selected-rule) :rule])]
      (tap> [:kill-nested? content :from curr])
-     (assoc-in db [:rules-map (get db :selected-rule)]
-               {:rule (ut/remove-subvec curr content)}))))
+     (assoc-in db [:rules-map (get db :selected-rule) :rule]
+               (ut/remove-subvec curr content)))))
 
 (re-frame/reg-event-db
  ::edit-rule-drop2
@@ -82,9 +82,9 @@
  (fn [db [_ content adding]]
    (tap> [:edit2? content adding])
    (let [curr (get-in db [:rules-map (get db :selected-rule) :rule])]
-     (assoc-in db [:rules-map (get db :selected-rule)]
-               {:rule (walk/postwalk-replace 
-                       {content (vec (conj content adding))} curr)}))))
+     (assoc-in db [:rules-map (get db :selected-rule) :rule]
+               (walk/postwalk-replace
+                {content (vec (conj content adding))} curr)))))
 
 (defn draggable-item [element type data]
   [(reagent/adapt-react-class rdnd/Draggable)
@@ -293,7 +293,7 @@
  ::edit-rule
  (undoable)
  (fn [db [_ rule]]
-   (assoc-in db [:rules-map (get db :selected-rule)] {:rule rule})))
+   (assoc-in db [:rules-map (get db :selected-rule) :rule] rule)))
 
 (re-frame/reg-event-db
  ::delete-rule
@@ -419,13 +419,52 @@
  (fn [db _]
    (get-in db [:rules-map (get db :selected-rule) :flow-id])))
 
+(re-frame/reg-sub
+ ::rule-open-inputs
+ (fn [db _]
+   (get-in db [:rules-map (get db :selected-rule) :open-inputs])))
+
 (re-frame/reg-event-db
  ::edit-rule-flow-id
  (undoable)
  (fn [db [_ flow-id]]
-   ;(assoc-in db [:rules-map (get db :selected-rule)] {:rule rule})
-   (assoc-in db [:rules-map (get db :selected-rule) :flow-id] flow-id)
-   ))
+   (assoc-in db [:rules-map (get db :selected-rule) :flow-id] flow-id)))
+
+(re-frame/reg-event-db
+ ::open-blocks
+ ;;(undoable)
+ (fn [db [_ result]]
+   (-> db
+       (assoc-in [:rules-map (get db :selected-rule) :open-inputs] (get result :open-inputs))
+       (assoc-in [:rules-map (get db :selected-rule) :blocks] (get result :blocks)))))
+
+;; (re-frame/reg-event-db
+;;  ::refresh-open-blocks
+;;  ;;(undoable)
+;;  (fn [db [_ flow-id]]
+;;    ;(tap> [:refresh-runstream-panel (keys (get db :runstreams))])
+;;    (re-frame/dispatch [::wfx/request :default
+;;                        {:message    {:kind :get-flow-open-ports
+;;                                      :flow-id flow-id
+;;                                      :flowmap flow-id
+;;                                      :client-name (get db :client-name)}
+;;                         :on-response [::open-blocks]
+;;                         :timeout    500000}])
+;;    db))
+
+(re-frame/reg-event-fx
+ ::refresh-open-blocks
+ (fn [{:keys [db]} [_ flow-id]]
+   {:db db
+    :dispatch [::wfx/request :default
+               {:message    {:kind :get-flow-open-ports
+                             :flow-id flow-id
+                             :flowmap flow-id
+                             :client-name (get db :client-name)}
+                :on-response [::open-blocks]
+                :timeout    500000}]}))
+
+(defonce mode-atom (reagent/atom "when logic"))
 
 (defn flow-box [hh]
   (let [server-flows (map :flow_id @(re-frame/subscribe [::conn/sql-data [:flows-sys]]))
@@ -433,10 +472,13 @@
                                :from [:flows]
                                :connection-id "flows-db"
                                :order-by [[3 :desc]]}}
+        open-inputs @(re-frame/subscribe [::rule-open-inputs])
+        react! [@mode-atom]
         ;rules @(re-frame/subscribe [::rules-map])
         ;selected-rule @(re-frame/subscribe [::selected-rule])
         ;rule-vec (get-in rules [selected-rule :rule])
         ;flow-id (get-in rules [selected-rule :flow-id])
+        ww (* (- (last @db/flow-editor-system-mode) 14) 0.318)
         fid @(re-frame/subscribe [::rule-flow-id])
         ]
 
@@ -451,21 +493,21 @@
     [re-com/v-box
      ;:style {:font-family   (theme-pull :theme/monospaced-font nil)}
      :padding "6px"
-     :children [[re-com/box 
+     :children [[re-com/box
                  :padding "6px"
                  ;:style {:font-family   (theme-pull :theme/monospaced-font nil)}
                  :child "flow to run when rules are met:"]
                 (if fid
                   [re-com/h-box
                    :align :center
-                   :justify :between 
+                   :justify :between
                    :padding "6px"
                    :width "320px"
                    :height "35px"
                    :style {:border "1px solid #ffffff33"
                            :font-family   (theme-pull :theme/monospaced-font nil)}
                    :children [[re-com/box :child (str fid)]
-                              [re-com/box 
+                              [re-com/box
                                :style {:cursor "pointer"}
                                :attr {:on-click #(re-frame/dispatch [::edit-rule-flow-id nil])}
                                :child "x"]]]
@@ -476,7 +518,9 @@
                                         [re-com/box
                                          :style {:color "#000000"}
                                          :child (str (get ss :label))])
-                   :on-change #(re-frame/dispatch [::edit-rule-flow-id (get % :id)])
+                   :on-change #(do
+                                 (re-frame/dispatch [::refresh-open-blocks (get % :id)])
+                                 (re-frame/dispatch [::edit-rule-flow-id (get % :id)]))
                    :rigid? true
                    :style {:font-family   (theme-pull :theme/monospaced-font nil)}
                    :width "320px"
@@ -493,7 +537,45 @@
                                                     (every? (fn [word]
                                                               (matches-word label word))
                                                             words)))
-                                                flow-parts))))])]
+                                                flow-parts))))])
+                [re-com/gap :size "5px"]
+                [re-com/h-box
+                 ;:size "auto" 
+                 :justify :between :align :center
+                 :children (for [btn ["input values" "when logic"]]
+                             [re-com/v-box
+                              :height "50px"
+                              :align :center :justify :center 
+                              :size "auto"
+                              :style (merge
+                                      {:border "1px solid pink"
+                                       :cursor "pointer"}
+                                      (if (= btn @mode-atom)
+                                        {:background-color "rgba(0, 0, 255, 0.3)"}
+                                        {:background-color "rgba(0, 0, 0, 0.1)"}))
+                              :attr {:on-click #(reset! mode-atom btn)}
+                              :children [[re-com/box :child "configure"] 
+                                         [re-com/box :child (str btn)]]])]
+                ;; [re-com/box
+                ;;  :size "none"
+                ;;  :height (px (- hh 88))
+                ;;  :style {:overflow "auto"
+                ;;          :border "1px solid pink"}
+                ;;  :child [re-com/v-box
+                ;;          :children (for [seg (partition-all 2 open-inputs)]
+                ;;                      [re-com/h-box
+                ;;                       ;:padding "6px"
+                ;;                       :justify :between :align :center
+                ;;                       :children (for [[k v] seg]
+                ;;                                   [re-com/v-box
+                ;;                                    ;:size "auto"
+                ;;                                    :width (px (* ww 0.5))
+                ;;                                    :style {:border "1px solid orange"
+                ;;                                            :padding "6px"}
+                ;;                                    :children [[re-com/box :child (str k)]
+                ;;                                               [re-com/box :child (str (get v :type))]
+                ;;                                               ]])])]]
+                ]
      :style {:border "2px solid maroon"}
      :height (px hh)]))
 
@@ -507,7 +589,7 @@
         rule-vec (get-in rules [selected-rule :rule])
         react! [@selectors-open]
         ;fid @(re-frame/subscribe [::rule-flow-id])
-        flow-box-hh 200]
+        flow-box-hh 148]
     [re-com/v-box
      ;:padding "6px"
      :gap "6px"
@@ -524,10 +606,14 @@
        :gap "6px"
        :children [[selector-panel "operators" operators {} 5]
                   [selector-panel "conditions" conditions {} 3]
-                  [selector-panel "time items" time-items {}]
-
+                  [selector-panel "time items" time-items {} 2]
+                  
+                  [selector-panel "parameters" time-items {} 2]
+                  [selector-panel "flow values" time-items {} 2]
+                  [selector-panel "clients" time-items {} 2]
                   
                   ]]]]))
+
 
 (re-frame/reg-event-db
  ::rename-rule
