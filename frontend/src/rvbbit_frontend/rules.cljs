@@ -155,7 +155,8 @@
                                                          (map #(visualize-clause % (inc lvl) contents) contents))
                                          :gap "10px"
                                          :style {:border "1px solid #ccc" :padding "5px"
-                                                 :font-size "17px"
+                                                 ;:font-size "17px"
+                                                 :font-weight 700
                                                  :margin-left (str (* lvl 10) "px")}]
 
                                         [hover-tools body]]]))
@@ -176,7 +177,8 @@
            ;:padding "6px"
            :style (merge
                    (when hovered? {:background-color "rgba(0, 0, 255, 0.3)"})
-                   {:font-size "17px"
+                   {;:font-size "17px"
+                    :font-weight 300
                     :margin-left (str (* level 10) "px")})
          ;:justify :between  
            :align :center ;:padding "6px"
@@ -202,6 +204,7 @@
              :font-size     "17px"
              :overflow      "auto"
              :border-radius "12px"
+             :background-color "#000000"
              ;:border "1px solid yellow"
              :font-weight   700}
      :child [(reagent/adapt-react-class cm/UnControlled)
@@ -411,22 +414,120 @@
                                          :font-family   (theme-pull :theme/monospaced-font nil)}
                                  :child (str item)] :operator item])]))]]))
 
+(re-frame/reg-sub
+ ::rule-flow-id
+ (fn [db _]
+   (get-in db [:rules-map (get db :selected-rule) :flow-id])))
+
+(re-frame/reg-event-db
+ ::edit-rule-flow-id
+ (undoable)
+ (fn [db [_ flow-id]]
+   ;(assoc-in db [:rules-map (get db :selected-rule)] {:rule rule})
+   (assoc-in db [:rules-map (get db :selected-rule) :flow-id] flow-id)
+   ))
+
+(defn flow-box [hh]
+  (let [server-flows (map :flow_id @(re-frame/subscribe [::conn/sql-data [:flows-sys]]))
+        sql-calls {:flows-sys {:select [:flow_id :file_path :last_modified]
+                               :from [:flows]
+                               :connection-id "flows-db"
+                               :order-by [[3 :desc]]}}
+        ;rules @(re-frame/subscribe [::rules-map])
+        ;selected-rule @(re-frame/subscribe [::selected-rule])
+        ;rule-vec (get-in rules [selected-rule :rule])
+        ;flow-id (get-in rules [selected-rule :flow-id])
+        fid @(re-frame/subscribe [::rule-flow-id])
+        ]
+
+    (dorun (for [[k query] sql-calls]
+             (let [data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+               (when (or (not data-exists?) unrun-sql?)
+                 (if (get query :connection-id)
+                   (conn/sql-data [k] query (get query :connection-id))
+                   (conn/sql-data [k] query))))))
+
+    [re-com/v-box
+     ;:style {:font-family   (theme-pull :theme/monospaced-font nil)}
+     :padding "6px"
+     :children [[re-com/box 
+                 :padding "6px"
+                 ;:style {:font-family   (theme-pull :theme/monospaced-font nil)}
+                 :child "flow to run when rules are met:"]
+                (if fid
+                  [re-com/h-box
+                   :align :center
+                   :justify :between 
+                   :padding "6px"
+                   :width "320px"
+                   :height "35px"
+                   :style {:border "1px solid #ffffff33"
+                           :font-family   (theme-pull :theme/monospaced-font nil)}
+                   :children [[re-com/box :child (str fid)]
+                              [re-com/box 
+                               :style {:cursor "pointer"}
+                               :attr {:on-click #(re-frame/dispatch [::edit-rule-flow-id nil])}
+                               :child "x"]]]
+                  [re-com/typeahead
+                   :suggestion-to-string (fn [item]
+                                           (str (get item :label)))
+                   :render-suggestion (fn [ss _] ;; render in dropdown
+                                        [re-com/box
+                                         :style {:color "#000000"}
+                                         :child (str (get ss :label))])
+                   :on-change #(re-frame/dispatch [::edit-rule-flow-id (get % :id)])
+                   :rigid? true
+                   :style {:font-family   (theme-pull :theme/monospaced-font nil)}
+                   :width "320px"
+                   :change-on-blur? true
+                   :placeholder (or fid "search for a server flow to run...")
+                                   ;:style {:color "#000000"}
+                   :data-source (fn [x]
+                                  (let [flow-parts (vec (map (fn [n] {:id n :label n}) server-flows))
+                                        words (cstr/split (cstr/lower-case (cstr/trim x)) #" ")
+                                        matches-word (fn [field word] (cstr/includes? (cstr/lower-case (str field)) word))]
+                                    (if (or (nil? x) (empty? x)) flow-parts
+                                        (filter (fn [item]
+                                                  (let [label (get item :label)]
+                                                    (every? (fn [word]
+                                                              (matches-word label word))
+                                                            words)))
+                                                flow-parts))))])]
+     :style {:border "2px solid maroon"}
+     :height (px hh)]))
+
 
 (defn left-col [ph]
   (let [operators @(re-frame/subscribe [::operators])
         conditions @(re-frame/subscribe [::conditions])
         time-items @(re-frame/subscribe [::time-items])
-        react! [@selectors-open]]
+        rules @(re-frame/subscribe [::rules-map])
+        selected-rule @(re-frame/subscribe [::selected-rule])
+        rule-vec (get-in rules [selected-rule :rule])
+        react! [@selectors-open]
+        ;fid @(re-frame/subscribe [::rule-flow-id])
+        flow-box-hh 200]
     [re-com/v-box
-     :padding "6px"
-     :width "35%"
-     :height (px (- ph 50))
-     :style {:border "1px solid yellow"
-             :overflow "auto"}
+     ;:padding "6px"
      :gap "6px"
-     :children [[selector-panel "operators" operators {} 5]
-                [selector-panel "conditions" conditions {} 3]
-                [selector-panel "time items" time-items {}]]]))
+     :width "35%"
+     :children
+     [(when selected-rule
+        [flow-box (- flow-box-hh 10)])
+      [re-com/v-box
+       :padding "6px"
+       ;:width "35%"
+       :height (px (- ph (if selected-rule (+ flow-box-hh 50) 50)))
+       :style {:border "1px solid yellow"
+               :overflow "auto"}
+       :gap "6px"
+       :children [[selector-panel "operators" operators {} 5]
+                  [selector-panel "conditions" conditions {} 3]
+                  [selector-panel "time items" time-items {}]
+
+                  
+                  ]]]]))
 
 (re-frame/reg-event-db
  ::rename-rule
@@ -479,9 +580,9 @@
         selected-rule @(re-frame/subscribe [::selected-rule])
         rule-vec (get-in rules [selected-rule :rule])]
     [re-com/v-box
-     :padding "6px"
+     ;:padding "6px"
      :width "65%"
-     :style {:border "1px solid lime"}
+     ;:style {:border "1px solid lime"}
      :children [(when selected-rule
                   [re-com/v-box
                    :style {:font-family   (theme-pull :theme/monospaced-font nil)
@@ -538,7 +639,8 @@
      :width (px (- (last @db/flow-editor-system-mode) 14))
      :size "none"
      :height (px ph)
-     :style {:border "1px solid cyan"}
+     :style {:border "1px solid cyan"
+             :background-color (str (theme-pull :theme/editor-rim-color nil) "18")}
      :children [[re-com/h-box
                  :padding "6px"
                  :justify :between :align :center 
