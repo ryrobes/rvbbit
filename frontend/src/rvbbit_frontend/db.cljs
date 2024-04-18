@@ -30,6 +30,9 @@
 (defonce bad-form? (reagent/atom false))
 (defonce bad-form-msg (reagent/atom nil))
 
+(defonce bad-form-rules? (reagent/atom false))
+(defonce bad-form-msg-rules (reagent/atom nil))
+
 (defonce kick-alert (reagent/atom false))
 
 (defonce last-gantt (reagent/atom {}))

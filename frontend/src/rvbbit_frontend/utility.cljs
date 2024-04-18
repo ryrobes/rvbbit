@@ -22,6 +22,10 @@
                ]]
     (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
+(defn gen-rule-name []
+  (let [names [(tales/quality) (tales/animal)]]
+    (cstr/lower-case (str (cstr/join " " names) " rule"))))
+
 (defn format-duration-seconds [seconds]
   (let [hours (int (/ seconds 3600))
         minutes (int (mod (/ seconds 60) 60))
@@ -766,6 +770,14 @@
                   result))
               conditions)
         else-result)))
+
+(defn remove-subvec [v subvec]
+  (clojure.walk/postwalk
+   (fn [x]
+     (if (and (coll? x) (not= x subvec))
+       (into (empty x) (remove #(= % subvec) x))
+       x))
+   v))
 
 (defn all-uppers? [s]
   (= s (cstr/upper-case s)))
