@@ -5628,12 +5628,12 @@
         o-modes [["flows running" 800]
                  ["flow browser" 600]
                  ["flow parts" 600]
-                 ["scheduler" 990]
+                 ["metrics" 990]
+                 ["KPIs" 990]
                  ["rules" 990]
                  ["flow history" 1200]]
         ;read-only-flow? (true? (cstr/includes? flow-id "/"))
         ;flow-id-regex #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores, hypens, numbers
-
         sql-calls {:flow-fn-categories-sys {:select [:category]
                                             :from [:flow_functions]
                                             :group-by [1]}

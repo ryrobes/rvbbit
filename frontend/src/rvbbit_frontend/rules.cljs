@@ -374,22 +374,32 @@
 
 (defonce selectors-open (reagent/atom []))
 
-(defn selector-panel [name items & [style wide?]]
+(defn selector-panel [name items icon & [style wide?]]
   (let [open? (some #(= name %) @selectors-open)
         partition? (integer? wide?)]
     [re-com/v-box
      :padding "6px"
      :style (merge {:border "1px solid yellow"} style)
-     :children [[re-com/box
+     :children [[re-com/h-box
                  :height "28px"
                  :style {:cursor "pointer"}
+                 :justify :between :align :center
                  :attr {:on-click #(if open?
                                      (reset! selectors-open (remove (fn [x] (= x name)) @selectors-open))
                                      (swap! selectors-open conj name))}
-                 :child name]
+                 :children [[re-com/box
+                             :style {:font-size "19px"}
+                             :child name]
+                            [re-com/md-icon-button :src (at)
+                             :md-icon-name icon
+                             :style {;:color (if open?
+                                     ;         (str (theme-pull :theme/editor-outer-rim-color nil) 99)
+                                     ;         (str (theme-pull :theme/editor-outer-rim-color nil) 45))
+                                     :font-size "14px"}]]]
                 (when open?
-                  (if partition? 
+                  (if partition?
                     [re-com/v-box
+                     :style {:margin-top "6px"}
                      :children (for [seg (partition-all wide? items)]
                                  [re-com/h-box ;;:size "auto"
                                   :children (for [item seg
@@ -404,15 +414,15 @@
                                                         :font-family   (theme-pull :theme/monospaced-font nil)}
                                                 :child (str item)] :operator item])])]
                     [(if wide?
-                     re-com/h-box
-                     re-com/v-box)
-                   :children (for [item items]
-                               [draggable-item
-                                [re-com/box
-                                 :padding "6px"
-                                 :style {:border "1px solid purple"
-                                         :font-family   (theme-pull :theme/monospaced-font nil)}
-                                 :child (str item)] :operator item])]))]]))
+                       re-com/h-box
+                       re-com/v-box)
+                     :children (for [item items]
+                                 [draggable-item
+                                  [re-com/box
+                                   :padding "6px"
+                                   :style {:border "1px solid purple"
+                                           :font-family   (theme-pull :theme/monospaced-font nil)}
+                                   :child (str item)] :operator item])]))]]))
 
 (re-frame/reg-sub
  ::rule-flow-id
@@ -506,7 +516,13 @@
                    :height "35px"
                    :style {:border "1px solid #ffffff33"
                            :font-family   (theme-pull :theme/monospaced-font nil)}
-                   :children [[re-com/box :child (str fid)]
+                   :children [[re-com/box 
+                               :style {:overflow "hidden"
+                                       ;:border "1px solid yellow"
+                                       :font-size "17px"
+                                       :white-space "nowrap"
+                                       :max-width "292px"}
+                               :child (str fid)]
                               [re-com/box
                                :style {:cursor "pointer"}
                                :attr {:on-click #(re-frame/dispatch [::edit-rule-flow-id nil])}
@@ -604,13 +620,16 @@
        :style {:border "1px solid yellow"
                :overflow "auto"}
        :gap "6px"
-       :children [[selector-panel "operators" operators {} 5]
-                  [selector-panel "conditions" conditions {} 3]
-                  [selector-panel "time items" time-items {} 2]
+       :children [[selector-panel "operators" operators "zmdi-puzzle-piece" {} 5]
+                  [selector-panel "conditions" conditions "zmdi-puzzle-piece" {} 3]
+                  [selector-panel "time items" time-items "zmdi-calendar-alt" {} 2]
                   
-                  [selector-panel "parameters" time-items {} 2]
-                  [selector-panel "flow values" time-items {} 2]
-                  [selector-panel "clients" time-items {} 2]
+                  [selector-panel "parameters" time-items "zmdi-shape" {} 2]
+                  [selector-panel "flow values" time-items "zmdi-shape" {} 2]
+                  [selector-panel "clients" time-items "zmdi-desktop-mac" {} 2]
+
+                  [selector-panel "metrics" time-items "zmdi-equalizer" {} 2]
+                  [selector-panel "KPIs" time-items "zmdi-traffic" {} 2]
                   
                   ]]]]))
 
