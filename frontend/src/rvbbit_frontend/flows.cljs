@@ -5,7 +5,7 @@
    [re-com.core :as re-com :refer [at]]
    [re-com.util :refer [px]]
    [rvbbit-frontend.connections :as conn]
-   [rvbbit-frontend.rules :as rl]
+   [rvbbit-frontend.signals :as sig]
    [re-catch.core :as rc]
    [rvbbit-frontend.utility :as ut]
    [rvbbit-frontend.buffy :as buffy]
@@ -5630,6 +5630,7 @@
                  ["flow parts" 600]
                  ["metrics" 990]
                  ["KPIs" 990]
+                 ["signals" 990]
                  ["rules" 990]
                  ["flow history" 1200]]
         ;read-only-flow? (true? (cstr/includes? flow-id "/"))
@@ -5775,12 +5776,12 @@
                       [flow-details-block-container (first @db/flow-editor-system-mode) :system :system
                        [settings-block flow-id :scheduler] "zmdi-chart-donut"]
 
-                      (= (first @db/flow-editor-system-mode) "rules")
+                      (= (first @db/flow-editor-system-mode) "signals")
 
                       ;; [flow-details-block-container (first @db/flow-editor-system-mode) :system :system
-                      ;;  [rl/rules-panel ] 
+                      ;;  [sig/rules-panel ] 
                       ;;  "zmdi-chart-donut"]
-                      [rl/rules-panel]
+                      [sig/signals-panel]
 
                       (= (first @db/flow-editor-system-mode) "flow history")
 
@@ -5864,7 +5865,7 @@
                                           :from     [[:jvm_stats :rr70]]}]
                                   [buffy/render-honey-comb-fragments qq (/ dyn-width 50) 3])]]]
 
-                      :else nil)
+                      :else [re-com/box :child "oops"])
 
 ;                [run-gantt-chart flow-id]
                 ;; [edit-flow-title flow-id w]

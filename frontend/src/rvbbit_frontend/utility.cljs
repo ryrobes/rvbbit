@@ -11,6 +11,7 @@
             [re-com.validate :refer [string-or-hiccup? alert-type? vector-of-maps?]]
             [zprint.core :as zp])
   (:import
+
    [goog.i18n NumberFormat]
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))
@@ -22,9 +23,11 @@
                ]]
     (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
-(defn gen-rule-name []
+(defn gen-signal-name []
   (let [names [(tales/quality) (tales/animal)]]
-    (cstr/lower-case (str (cstr/join " " names) " rule"))))
+    (cstr/lower-case (str (cstr/join "-" names) "-signal"))))
+
+
 
 (defn format-duration-seconds [seconds]
   (let [hours (int (/ seconds 3600))

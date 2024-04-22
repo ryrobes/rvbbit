@@ -1,0 +1,8 @@
+{:hourly? {:signal [:changed? :time/hour]},
+ :fun-gorilla
+ {:signal [:and [:= 1 1] [:= 9 9] [:or [:= 2 1] [:< 9 4]]]},
+ :cool-raccoon-signal {:signal [:and [:= :day 1] [:= :hour 9]]},
+ :genius-gnat-signal {:signal [:and [:= :day 1] [:= :hour 9]]},
+ :optimistic-sheep-signal
+ {:signal [:and [:= :day 1] [:= :hour 9] [:signal/hourly?]]},
+ :fair-armadillo-signal {:signal [:and [:= :day 1] [:= :hour 9]]}}

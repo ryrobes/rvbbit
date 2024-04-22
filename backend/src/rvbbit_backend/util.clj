@@ -35,6 +35,8 @@
            [java.io File]
            [java.awt Color]
            [jline TerminalFactory]
+           [java.time.format TextStyle]
+           [java.util Locale]
            ;;[org.apache.commons.codec.binary Base64]
           ;;  (java.awt.image BufferedImage)
           ;;  (javax.imageio ImageIO)
@@ -90,6 +92,26 @@
     (doseq [line (line-seq reader)]
       (println line))))
 
+(defn current-datetime-parts []
+  (try
+    (let [now (java.time.ZonedDateTime/now)
+          day-of-week (.getDayOfWeek now)
+          month (.getMonth now)
+          formatter (java.time.format.DateTimeFormatter/ofPattern "a" java.util.Locale/US)
+          am-pm (.format formatter now)]
+      {:year (.getYear now)
+       :month (.getMonthValue now)
+       :month-name (.name month)
+       :day (.getDayOfMonth now)
+       :day-of-week-int (.getValue day-of-week)
+       :day-of-week (.name day-of-week)
+       :hour (.getHour now)
+       :minute (.getMinute now)
+       :second (.getSecond now)
+       :quarter (inc (quot (.getMonthValue now) 4))
+       :am-pm am-pm})
+    (catch Throwable e {:time-atom-error (str "Error! " e)})))
+
 (defn thaw-atom
   "Thaws an atom from disk or creates a new one if the file doesn't exist."
   [initial-state file-path & [out?]]
@@ -115,7 +137,9 @@
     (pp ["  " :freezing-atom file-path])
     (with-open [wtr (io/writer file-path)]
       (binding [*out* wtr]
-        (prn @a)))))
+        (if (cstr/includes? (str file-path) "signals")
+          (clojure.pprint/pprint @a)
+          (prn @a))))))
 
 ;; (defn freeze-atoms ;; slow as all hell
 ;;   "Freezes all managed atoms to disk."

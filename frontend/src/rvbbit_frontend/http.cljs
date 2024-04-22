@@ -317,6 +317,7 @@
            ;not-sys-stats? (not (cstr/includes? (str (get result :data)) "[sys-stats]"))
            server-sub? (and kick? (or (= (get-in result [:task-id 0]) :flow)
                                       (= (get-in result [:task-id 0]) :screen)
+                                      (= (get-in result [:task-id 0]) :time)
                                       (= (get-in result [:task-id 0]) :ext-param)
                                       (= (get-in result [:task-id 0]) :panel)
                                       (= (get-in result [:task-id 0]) :client)) 
@@ -335,7 +336,8 @@
          ;new-map (if (= new-map '(1)) [{:sql :error :recvd (:result result)}] new-map)
            ;sys-queries (filter #(cstr/ends-with? (str %) "-sys") (keys (get db :query-history)))
 
-       ;(tap> [:payload! (get db :client-name) result])
+      ;;  (when (= client-name :easy-cerulean-camel-32)
+      ;;    (tap> [:payload! (get db :client-name) result]))
 
       ;;  (when estimate? (tap> [:estimate! (get db :client-name) result]))
 

@@ -320,10 +320,11 @@
          panels (create-runner-listeners (get db :panels))
          drop-refs (vec (distinct (vals @drop-last-tracker-refs)))
          sflow (get db :selected-flow)
-         current-flow-open (when (not (empty? sflow)) (keyword (str "flow/" sflow ">*running?")))
+         current-flow-open (when (ut/ne? sflow) (keyword (str "flow/" sflow ">*running?")))
          flow-refs (vec (distinct
                          (conj (filter #(or (cstr/starts-with? (str %) ":flow/")
                                             (cstr/starts-with? (str %) ":screen/")
+                                            (cstr/starts-with? (str %) ":time/")
                                             (cstr/starts-with? (str %) ":ext-param/")
                                             (cstr/starts-with? (str %) ":panel/")
                                             (cstr/starts-with? (str %) ":client/"))

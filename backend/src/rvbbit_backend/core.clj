@@ -534,6 +534,8 @@
 
     (def purge (tt/every! 30 2 (bound-fn [] (wss/purge-dead-client-watchers))))
 
+    (def timekeeper (tt/every! 1 20 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
+
     (def last-look (atom {}))
     (def saved-uids (atom []))
 

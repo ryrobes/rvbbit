@@ -1,16 +1,7 @@
-{:orders
- {:reco-counts [:table_name :cnt],
-  :flows-sys [:flow_id :file_path :last_modified],
-  :connections-sys [:database_name :connection_id],
-  :fields-sys [:field_name :field_type :data_type],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
+{:orders {:reco-counts [:table_name :cnt]},
  :reco-preview nil,
- :sql-source {},
  :meta
- {:fields-sys {:fields {}, :rowcount 0},
-  :tables-sys {:fields {}, :rowcount 0},
-  :gen-viz-797
+ {:gen-viz-797
   {:fields
    {:rows
     {:data-type "integer",
@@ -25,31 +16,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :flows-sys
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 86,
-     :group-by? true,
-     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
-     :cardinality 97},
-    :file_path
-    {:data-type "string",
-     :distinct 88,
-     :group-by? true,
-     :commons
-     {"./flows/stitches-math.edn" 1,
-      "./flows/hey-rabbit-pathfinder.edn" 1,
-      "./flows/dalle3-create-image-newengland-old.edn" 1},
-     :cardinality 100},
-    :last_modified
-    {:data-type "string",
-     :distinct 20,
-     :group-by? true,
-     :commons
-     {"2024-03-12 02:37:43" 69, "2024-03-14 07:50:09" 1, "2024-04-12 05:48:12" 1},
-     :cardinality 22}},
-   :rowcount 88},
   :gen-viz-94
   {:fields
    {:diff
@@ -98,21 +64,6 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -246,12 +197,8 @@
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
    :rowcount 30}},
- :default-col-widths
- {:system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
- :data-hash -164006479,
+ :data-hash 0,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -453,28 +400,28 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [416126279 390716579 4294705152],
+ :memory [476167660 441017056 4294705152],
  :status-data
  {"kick-test!"
   {:kick
    {:data
     [{:sent! "kick-test!",
-      :to :bountiful-maroon-pig-41,
-      :at "2024-04-16 10:06:03",
+      :to :easy-cerulean-camel-32,
+      :at "2024-04-22 17:21:01",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-04-16 10:06:03 - query ran in 174 ms."],
-          :name "query-log-:gen-viz-797",
-          :order 1713276363,
+        [{:content ["2024-04-22 17:21:01 - query ran in 191 ms."],
+          :name "query-log-:rowcnt-drag-2",
+          :order 1713820861,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
-        :description "query-log-:gen-viz-797",
+        :description "query-log-:rowcnt-drag-2",
         :mutates {},
         :options {:actions? false, :pages? false, :search? false},
         :parameters {}}},
-      :payload-kp [:gen-viz-797 "kick-test!"]}
+      :payload-kp [:rowcnt-drag-2 "kick-test!"]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -483,310 +430,20 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-04-16 10:08:44",
+      :at "2024-04-22 17:20:59",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
-    :reco-count nil}},
-  :alert1
-  {:alerts
-   {:data
-    [[[:v-box
-       :justify
-       :center
-       :style
-       {:opacity 0.7}
-       :children
-       [[:box
-         :style
-         {:font-weight 700, :font-size "11px", :opacity 0.6}
-         :child
-         "successfully saved screen"]
-        [:box
-         :style
-         {:font-weight 700, :font-size "18px"}
-         :child
-         "looking-glass-redux"]
-        [:box
-         :style
-         {:font-weight 700, :font-size "11px", :opacity 0.6}
-         :child
-         "@ /home/ryanr/rvbbit/backend/screens/looking-glass-redux.edn"]]]
-      10
-      1.6
-      8]
-     nil],
-    :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:flow/flow-forever>*running?
+ [:flow/flow-forever>:final-math
   :flow/live-scratch-flow>*running?
-  :flow/counting-loop>*running?
-  :flow/crow-flow-201a>*running?
-  :flow/crow-flow-201>*running?
-  :flow/flow-forever>:final-math],
- :client-name :bountiful-maroon-pig-41,
- :runstreams-lookups
- {"crow-flow-201a"
-  {:open-inputs
-   {:open-input {:user-input 233, :defaults {}, :type {:out :integer}}},
-   :blocks
-   {:open-fn-7
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "380877"},
-    :open-fn-2
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "380877"},
-    :open-input
-    {:type :integer,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "233"},
-    :open-fn-4
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? true,
-     :defaults {},
-     :sample "381110"}}},
-  "counting-loop"
-  {:open-inputs {:seed-value {:user-input 1, :defaults {}, :type :integer}},
-   :blocks
-   {:sleep-then-pass
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "32"},
-    :final-value
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? true,
-     :defaults {},
-     :sample "33"},
-    :open-fn-2
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "33"},
-    :last-even
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "32"},
-    :seed-value
-    {:type :integer,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "1"},
-    :last-odd
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "33"}}},
-  "crow-flow-201"
-  {:open-inputs {:open-input {:user-input :go, :defaults {}, :type :keyword}},
-   :blocks
-   {:open-fn-8
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :open-fn-7
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "84937"},
-    :open-fn-1
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :open-fn-2
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "84937"},
-    :open-fn-6
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :open-fn-9
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :open-input
-    {:type :integer,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "233"},
-    :open-fn-3
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :open-fn-4
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "85170"},
-    :open-fn-5
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :open-fn-10
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? true,
-     :defaults {},
-     :sample "no sample data"}}},
-  "flow-forever"
-  {:open-inputs
-   {:dialog-width {:user-input 10, :defaults {}, :type {:out :integer}},
-    :duration-to-show {:user-input 600, :defaults {}, :type :integer},
-    :some-input-int {:user-input 333, :defaults {}, :type {:out :integer}},
-    :another-input-int {:user-input 234.5, :defaults {}, :type {:out :float}},
-    :dialog-height {:user-input 3, :defaults {}, :type :integer}},
-   :blocks
-   {:dialog-ui-box
-    {:type :vector,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "[:v-box :gap \"10px\" :size \"auto\" :height :height-px :width :..."},
-    :dialog-width
-    {:type :integer,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "10"},
-    :final-math
-    {:type :float,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "683.5"},
-    :render-the-answer
-    {:type :vector,
-     :ttype :open-fn,
-     :meta nil,
-     :last? true,
-     :defaults {},
-     :sample "[:box :style {:font-size \"55px\"} :child \"683.5\"]"},
-    :user-value-in
-    {:type :integer,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "65"},
-    :dialog-pushed
-    {:type :keyword,
-     :ttype :alert!,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample ":alerted!"},
-    :render-the-choice
-    {:type :vector,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "[:box :style {:font-size \"33px\"} :child \"chose 65\"]"},
-    :more-math
-    {:type :float,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "618.5"},
-    :duration-to-show
-    {:type :integer,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "600"},
-    :some-math
-    {:type :float,
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "612.5"},
-    :some-input-int
-    {:type :integer,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "333"},
-    :another-input-int
-    {:type :float,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "234.5"},
-    :dialog-height
-    {:type :integer,
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "3"}}}},
+  :flow/flow-forever>*running?],
+ :client-name :easy-cerulean-camel-32,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2671, :h 1616},
+ :window {:w 2378, :h 1662},
  :post-meta
  {:gen-viz-797 {:* {:rowcount 317}},
   :gen-viz-94 {:* {:rowcount 1}},
@@ -798,19 +455,13 @@
   :city-drag-26 {:* {:rowcount 19899}},
   :state-drag-3 {:* {:rowcount 68}},
   :shape-drag-7 {:* {:rowcount 30}}},
- :flow-estimates
- {"counting-loop" {:times 6, :run-id "75256ce8-a7f9-4e15-9d4e-5fcd35331cfa"}},
  :status
- {"kick-test!" {:kick :gen-viz-797},
+ {"kick-test!" {:kick :rowcnt-drag-2},
   :heartbeat
   {:kick
-   [:flow/flow-forever>*running?
+   [:flow/flow-forever>:final-math
     :flow/live-scratch-flow>*running?
-    :flow/counting-loop>*running?
-    :flow/crow-flow-201a>*running?
-    :flow/crow-flow-201>*running?
-    :flow/flow-forever>:final-math]},
-  :alert1 {:alerts :alert2}},
+    :flow/flow-forever>*running?]}},
  :screen-name "looking-glass-redux",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
@@ -821,33 +472,22 @@
  :rs-overrides-hashmap {"flow-forever" nil},
  :panels-hash 1961268104,
  :sessions
- (["terrific-byzantium-pheasant-25.edn"
-   "102 hours, 18 minutes, 31 seconds"
-   368311449]
-   ["reassuring-triangular-eagle-26.edn"
-    "102 hours, 22 minutes, 41 seconds"
-    368561161]
-   ["favorable-periwinkle-rat-16.edn" "103 hours, 28 minutes, 32 seconds" 372512747]
-   ["stirring-hexagonal-hummingbird-26.edn"
-    "105 hours, 9 minutes, 51 seconds"
-    378591351]
-   ["spirited-circular-platypus-8.edn"
-    "106 hours, 11 minutes, 30 seconds"
-    382290932]
-   ["pretty-magenta-goat-24.edn" "117 hours, 45 minutes, 16 seconds" 423916196]
-   ["intuitive-amaranth-opossum-39.edn"
-    "118 hours, 37 minutes, 49 seconds"
-    427069419]
-   ["prominent-Persian-blue-hippopotamus-39.edn"
-    "119 hours, 26 minutes, 30 seconds"
-    429990664]
-   ["beautiful-prismatic-ostrich-23.edn"
-    "124 hours, 2 minutes, 32 seconds"
-    446552680]),
+ (["vital-bulbous-mosquito-0.edn" "101 hours, 57 minutes, 22 seconds" 367042243]
+   ["refined-round-llama-8.edn" "103 hours, 59 minutes, 28 seconds" 374368756]
+   ["beaming-gray-opossum-6.edn" "155 hours, 18 minutes, 28 seconds" 559108360]
+   ["commendable-thin-mole-14.edn" "2 minutes, 25 seconds" 145482]
+   ["cute-star-shaped-raccoon-3.edn" "2 minutes, 26 seconds" 146987]
+   ["remarkable-navy-blue-whale-9.edn" "2 minutes, 42 seconds" 162274]
+   ["certain-icosahedral-hound-19.edn"
+    "203 hours, 47 minutes, 28 seconds"
+    733648288]
+   ["adorable-desert-lark-5.edn" "22 hours, 50 minutes, 23 seconds" 82223070]
+   ["meritorious-hexagonal-louse-7.edn"
+    "230 hours, 11 minutes, 55 seconds"
+    828715579]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1793231576,
+ :user-params-hash 971283022,
  :grid-recos? true,
- :session-hash 853506959,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1560,7 +1200,12 @@
   "date" "#6A6391",
   "nil" "#68beff"},
  :click-param
- {:flow {:crow-flow-201a>*running? false, :counting-loop>*running? false},
+ {:flow
+  {:crow-flow-201a>*running? false,
+   :counting-loop>*running? false,
+   :flow-forever>final-math 683.5,
+   :live-scratch-flow>*running? false,
+   :flow-forever>*running? false},
   :param
   {:selected-view [nil nil], :selected-view-data nil, :selected-block :block-1449},
   :theme
@@ -1681,6 +1326,7 @@
    :shape "circle",
    :datetime "1956-10-10 21:00:00.000000",
    :latitude "28.9783333",
-   :country "us"}},
+   :country "us"},
+  nil {nil nil}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

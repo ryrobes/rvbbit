@@ -94,6 +94,9 @@
 (def ping-ts (atom {}))
 (def client-latency (atom {}))
 
+(def signals-atom (ut/thaw-atom {} "./defs/signals.edn"))
+(def time-atom (ut/thaw-atom {} "./data/atoms/time-atom.edn"))
+
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
 ;; (defonce flow-running-tasks (atom {}))
@@ -2661,13 +2664,23 @@
    ;:channels (get @flow-db/channels-atom flow-id)
    :flow-id flow-id})
 
+(defmethod wl/handle-request :signals-map [{:keys [client-name]}]
+  (ut/pp [:get-signals-map client-name])
+  (let [bm {}]
+    @signals-atom))
+
+(defmethod wl/handle-request :save-signals-map [{:keys [client-name signals-map]}]
+  (ut/pp [:saving-signals-map client-name])
+  (let [bm {}]
+    (reset! signals-atom signals-map)))
+
 (defmethod wl/handle-request :save-custom-flow-block [{:keys [client-name name block-map]}]
   (ut/pp [:saving-custom-flow-block client-name :for name])
   (let [bm {name block-map}]
     (ut/pp [:saving-new-custom-block bm])))
 
 ;;(def client-param-lucene-history (atom {}))
-(def client-param-lucene-history (ut/thaw-atom {} "./data/atoms/client-param-lucene-history-atom.edn"))
+;; (def client-param-lucene-history (ut/thaw-atom {} "./data/atoms/client-param-lucene-history-atom.edn"))
 
 (defmethod wl/handle-request :sync-client-params [{:keys [client-name params-map]}]
   ;; (ut/pp [:sync-client-params-from client-name (keys (or (dissoc params-map nil) {}))])
@@ -2687,7 +2700,7 @@
     ;;     (search/add-or-update-document search/index-writer doc-key
     ;;                                    {:content (str kp " - " (get params kp)) :type :client-param
     ;;                                     :row {:client-name client-name :keypath kp}})))
-    (swap! client-param-lucene-history assoc client-name these-keys)
+    ;(swap! client-param-lucene-history assoc client-name these-keys)
     [:got-it!]))
 
 (defmethod wl/handle-request :run-flow2 [{:keys [client-name flowmap flow-id]}]
@@ -2941,7 +2954,9 @@
         panel?   (= base-type :panel)
         ;param?  (= base-type :ext-param)
         screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
+        time?    (= base-type :time)
         keypath  (cond ;flow? keypath 
+                   time?   (vec (rest keypath))
                    screen? (vec (rest sub-path))
                    panel?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                    client? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -2953,6 +2968,7 @@
                             tracker? flow-db/tracker
                             ;:else flow-db/results-atom
                             ;:else (get-or-create-child-atom (first keypath))
+                            time?   time-atom
                             panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                             client? (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
                             flow? (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -3163,7 +3179,9 @@
 
     ;(ut/pp [:client-sub! base-type flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key :keypath keypath :client-param-path client-param-path])
     ;(ut/pp [:client-sub! base-type flow-id :keypath keypath :client-param-path client-param-path])
-    (ut/pp [:client-sub! client-name :wants client-param-path])
+    (ut/pp [:client-sub! client-name :wants base-type client-param-path 
+            keypath
+            ])
 
     (when (get-in @flow-db/results-atom keypath)
       (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
@@ -3172,12 +3190,13 @@
 
     (kick client-name [base-type client-param-path]
           (cond (cstr/includes? (str flow-key) "*running?") false
+                (= base-type :time)   (get @time-atom client-param-path)
                 (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
                 (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
                 (= base-type :panel) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
                 :else (get-in @flow-db/results-atom keypath lv) ;; assume flow
                   ;; ^^ SHOULD be the last val (persistently cached), on cold boot @results-atom will be empty anyways
-                )nil nil nil)
+                ) nil nil nil)
 
     ;; push init val, else try cache, else nil!
 
@@ -5580,6 +5599,8 @@
                                         :*running? *running?}}))])
 
       (ut/pp [:ack-scoreboard ack-scoreboard])
+
+      (ut/pp [:date-map @time-atom])
 
     ;(ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
 
