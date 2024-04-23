@@ -73,6 +73,7 @@
    ))
 
 (defonce flow-status (atom {}))
+(defonce signal-parts-atom (atom []))
 (def stats-cnt (atom 0))
 (def restart-map (atom {}))
 (def orig-caller (atom {}))
@@ -2893,7 +2894,7 @@
 
 (defn make-watcher [keypath flow-key client-name handler-fn & [no-save]]
   (fn [kkey atom old-state new-state]
-    (let [client-name :all ;; test
+    (let [client-name :all ;; test, no need for individual cache for clients. kinda pointless ATM
           old-value (get-in old-state keypath)
           new-value (get-in new-state keypath)
           sub-path (break-up-flow-key-ext flow-key)
@@ -3028,29 +3029,75 @@
 ;;;  :client-reaction-push! ["error-monitor-vanessa3" :panels :block-899 :name] :fair-salmon-hawk-hailing-from-malpais "drag-from-select-all-jvm_stddat!s!!" :error-monitor-vanessa3>name]
 ;;; [:client-reaction-push! ["error-monitor-vanessa3" :panels :block-899 :name] :fair-salmon-hawk-hailing-from-malpais "drag-from-seldect-all-jvm_sstddat!s!!" :error-monitor-vanessa3>name]
 
+(defn process-signals-reaction [base-type keypath new-value client-param-path]
+  (let [re-con-key (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
+        valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))
+        signals-map (select-keys @signals-atom valid-signals)
+        signals-resolve-map (for [[k {:keys [signal]}] signals-map]
+                      {k (let [cmpkeys (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten signal)))
+                               vvals (select-keys (get-in @atoms-and-watchers [:rvbbit-signals]) cmpkeys)]
+                           ;[cmpkeys vvals]
+                           (into {} (for [[k {:keys [keypath]}] vvals] {k (get @last-values keypath)})) ;; keypath is used as the actual key here, btw
+                           )})]
+    ;; use signals-resolve-map to materialized values and the SQL run it FROM DUAL
+    (ut/pp [:process-signal-sub-data base-type keypath new-value client-param-path valid-signals signals-map signals-resolve-map])))
 
 (defn send-reaction [base-type keypath client-name new-value]
-(let [flow-client-param-path (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
-      other-client-param-path (keyword (cstr/replace (cstr/join ">" keypath) ":" "")) ;;(keyword (cstr/join ">" keypath))
-      client-param-path (if (= base-type :flow) 
-                          flow-client-param-path 
-                          other-client-param-path)]
-  
-  (ut/pp [:client-reaction-push! base-type keypath client-name new-value client-param-path])
+ (let [flow-client-param-path (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+       other-client-param-path (keyword (cstr/replace (cstr/join ">" keypath) ":" "")) ;;(keyword (cstr/join ">" keypath))
+       client-param-path (if (= base-type :flow)
+                           flow-client-param-path
+                           other-client-param-path)
+       signal? (= client-name :rvbbit-signals)]
 
-  (async/thread ;; really expensive logging below. temp
-    (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
-          b? (boolean? new-value)
-          fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value)) ".edn")]
-      (ext/create-dirs "./reaction-logs/")
-      (ut/pretty-spit fp {:client-name client-name
-                          :keypath keypath
-                          :value (ut/replace-large-base64 new-value)
-                          :last-vals (ut/replace-large-base64 (get @last-values-per client-name))
-                          :subs-at-time (keys (get @atoms-and-watchers client-name))
-                          :flow-child-atoms (keys @flow-child-atoms)} 125)))
+   (ut/pp [(if signal?
+             :signal-reaction-process!
+             :client-reaction-push!) base-type keypath client-name new-value client-param-path])
 
-  (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)))
+   (async/thread ;; really expensive logging below. temp
+     (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
+           b? (boolean? new-value)
+           fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value)) ".edn")]
+       (ext/create-dirs "./reaction-logs/")
+       (ut/pretty-spit fp {:client-name client-name
+                           :keypath keypath
+                           :value (ut/replace-large-base64 new-value)
+                           :last-vals (ut/replace-large-base64 (get @last-values-per client-name))
+                           :subs-at-time (keys (get @atoms-and-watchers client-name))
+                           :flow-child-atoms (keys @flow-child-atoms)} 125)))
+
+   (if (not signal?)
+     (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)
+     (process-signals-reaction base-type keypath new-value client-param-path))))
+
+
+
+;; (defn send-signal [base-type keypath client-name new-value]
+;;    (let [flow-client-param-path (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+;;          other-client-param-path (keyword (cstr/replace (cstr/join ">" keypath) ":" "")) ;;(keyword (cstr/join ">" keypath))
+;;          client-param-path (if (= base-type :flow)
+;;                              flow-client-param-path
+;;                              other-client-param-path)]
+
+;;      (ut/pp [:signal-push! base-type keypath client-name new-value client-param-path])
+
+;;     ;; (async/thread ;; really expensive logging below. temp
+;;     ;;   (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
+;;     ;;         b? (boolean? new-value)
+;;     ;;         fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value)) ".edn")]
+;;     ;;     (ext/create-dirs "./reaction-logs/")
+;;     ;;     (ut/pretty-spit fp {:client-name client-name
+;;     ;;                         :keypath keypath
+;;     ;;                         :value (ut/replace-large-base64 new-value)
+;;     ;;                         :last-vals (ut/replace-large-base64 (get @last-values-per client-name))
+;;     ;;                         :subs-at-time (keys (get @atoms-and-watchers client-name))
+;;     ;;                         :flow-child-atoms (keys @flow-child-atoms)} 125)))
+
+;;     ;; (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)\
+;;      ))
+
+
+
 
 (defn send-reaction-runner [base-type keypath client-name new-value]
   (let [flow-id (first keypath)]
@@ -3151,6 +3198,53 @@
             (select-keys (get @flow-status flow-id) [:running-blocks :done-blocks :error-blocks :waiting-blocks])
             nil nil nil))))
 
+(defn sub-to-value [client-name flow-key & [signal?]]
+  (let [[flow-id step-id] (break-up-flow-key flow-key)
+        signal? (true? signal?)
+        keypath [flow-id step-id]
+        sub-path (break-up-flow-key-ext flow-key)
+        base-type (first sub-path)
+       ;screen? (cstr/starts-with? (str flow-key) ":screen/")
+        flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+        other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
+        client-param-path (if (= base-type :flow)
+                            flow-client-param-path
+                            other-client-param-path)
+          ;; keypath (cond ;flow? keypath 
+          ;;           screen? (vec (rest sub-path))
+          ;;           :else keypath)
+          ;;clis (first (keys (get-in @last-values [keypath]))) ;; in case we are a new ""client"" (as is usual)
+        lv (get @last-values keypath)]
+
+      ;(ut/pp [:client-sub! base-type flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key :keypath keypath :client-param-path client-param-path])
+      ;(ut/pp [:client-sub! base-type flow-id :keypath keypath :client-param-path client-param-path])
+
+    (ut/pp [:client-sub! (if signal? :signal! :regular!) client-name :wants base-type client-param-path keypath])
+
+    (when (get-in @flow-db/results-atom keypath)
+      (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
+
+    ;; (if signal?
+    ;;   (add-watcher keypath client-name send-signal flow-key :param-sub)
+    ;;   (add-watcher keypath client-name send-reaction flow-key :param-sub))
+    (add-watcher keypath client-name send-reaction flow-key :param-sub)
+
+        ;; (add-watcher keypath client-name send-reaction flow-key :param-sub)
+
+    (when (not signal?)
+      (kick client-name [base-type client-param-path]
+            (cond (cstr/includes? (str flow-key) "*running?") false
+                  (= base-type :time)   (get @time-atom client-param-path)
+                  (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
+                  (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+                  (= base-type :panel) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+                  :else (get-in @flow-db/results-atom keypath lv) ;; assume flow
+                    ;; ^^ SHOULD be the last val (persistently cached), on cold boot @results-atom will be empty anyways
+                  ) nil nil nil))
+
+      ;; push init val, else try cache, else nil!
+
+    [:client-sub-request flow-id :step-id step-id :client-name client-name]))
 
 ;; :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
 
@@ -3161,46 +3255,7 @@
   ;; need to revisit this. might not work as scale. use sep atoms per flow perhaps, or something like javelin's cells? except on CLJ
   ;; or if we wanted to skip real-time reactions, we could just run it every X seconds and push the result to the client
   ;; OR a watcher that updates OTHER atoms based on results-atom changes, and then we can just watch those atoms instead... [big brain]
-  (let [[flow-id step-id] (break-up-flow-key flow-key)
-        keypath [flow-id step-id]
-        sub-path (break-up-flow-key-ext flow-key)
-        base-type (first sub-path)
-        ;screen? (cstr/starts-with? (str flow-key) ":screen/")
-        flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
-        other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
-        client-param-path (if (= base-type :flow)
-                            flow-client-param-path
-                            other-client-param-path)
-        ;; keypath (cond ;flow? keypath 
-        ;;           screen? (vec (rest sub-path))
-        ;;           :else keypath)
-        ;;clis (first (keys (get-in @last-values [keypath]))) ;; in case we are a new ""client"" (as is usual)
-        lv (get @last-values keypath)]
-
-    ;(ut/pp [:client-sub! base-type flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key :keypath keypath :client-param-path client-param-path])
-    ;(ut/pp [:client-sub! base-type flow-id :keypath keypath :client-param-path client-param-path])
-    (ut/pp [:client-sub! client-name :wants base-type client-param-path 
-            keypath
-            ])
-
-    (when (get-in @flow-db/results-atom keypath)
-      (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
-
-    (add-watcher keypath client-name send-reaction flow-key :param-sub)
-
-    (kick client-name [base-type client-param-path]
-          (cond (cstr/includes? (str flow-key) "*running?") false
-                (= base-type :time)   (get @time-atom client-param-path)
-                (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
-                (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
-                (= base-type :panel) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
-                :else (get-in @flow-db/results-atom keypath lv) ;; assume flow
-                  ;; ^^ SHOULD be the last val (persistently cached), on cold boot @results-atom will be empty anyways
-                ) nil nil nil)
-
-    ;; push init val, else try cache, else nil!
-
-    [:client-sub-request flow-id :step-id step-id :client-name client-name]))
+  (doall (sub-to-value client-name flow-key)))
 
 
 ;; (defmethod wl/handle-request :sub-to-running-values [{:keys [client-name flow-keys]}]
@@ -3215,6 +3270,43 @@
 ;;            ;(kick client-name (vec (cons :tracker keypath)) (get @flow-db/tracker flow-id) nil nil nil) ;; push init tracker state, if exists
 ;;            [:client-sub-request flow-id :step-id step-id :client-name client-name]))))
 
+(defn remove-watchers-for-flow22 [flow-id & [client-name]]
+  (doseq [[c-name subs] @atoms-and-watchers
+          :let [matching-subs (filter #(= (:flow-id %) flow-id) (vals subs))]
+          :when (not (empty? matching-subs))
+                ;(and
+                ; (not (empty? matching-subs))
+                ; (if client-name (= c-name client-name) true))
+          ]
+    (ut/pp [:matching-subs c-name matching-subs])
+    (doseq [sub matching-subs]
+      (do
+        (ut/pp [:removing (count matching-subs) :watchers :for flow-id c-name [[(:keypath sub) c-name (:sub-type sub) flow-id (:flow-key sub)]]])
+        (remove-watcher (:keypath sub) c-name (:sub-type sub) flow-id (:flow-key sub))))))
+
+
+
+
+
+(defn reload-signals-subs []
+  (let [parts (vec (for [[signal-name {:keys [signal]}] @signals-atom]
+                     [signal-name (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) ;; get all valid reolvable compound keywords in the signal :where def
+                                               (ut/deep-flatten signal)))]))
+        curr-keyparts (vec (keys (get @atoms-and-watchers :rvbbit-signals)))
+        all-keyparts (vec (distinct (ut/deep-flatten (map last parts))))
+        to-remove (vec (cset/difference (set curr-keyparts) (set all-keyparts)))]
+
+    (reset! signal-parts-atom parts) ;; faster than running it every time - since we need it for reaction lookups in send-reaction, + is ONLY reset when rules are modified
+
+    (ut/pp [:reload-signals-subs! parts curr-keyparts all-keyparts {:remove! to-remove}])
+
+    (doseq [rm to-remove] ;; clean up ones we dont need to watch anymore
+      (let [{:keys [sub-type keypath flow-key]} (get-in @atoms-and-watchers [:rvbbit-signals rm])]
+        (remove-watcher keypath :rvbbit-signals sub-type nil flow-key)))
+
+    (doseq [kk all-keyparts] ;; re-add them all - TODO, only add new ones (however, they get removed before they get added, so it's a nil regardless)
+      (sub-to-value :rvbbit-signals kk true)))
+  )
 
 (defn gen-flow-keys [flow-id client-name]
   (let [ppath (if (cstr/ends-with? (cstr/lower-case flow-id) ".edn")
@@ -5602,7 +5694,10 @@
 
       (ut/pp [:date-map @time-atom])
 
-    ;(ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
+    ;; (ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
+      (ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (vec (keys v))})])
+      (ut/pp [:signals-watcher (get @atoms-and-watchers :rvbbit-signals)])
+      (ut/pp [:signals-watcher-values (get @last-values-per :rvbbit-signals)])
 
     ;(ut/pp [:times-atom (into {} (for [[k v] @times-atom] {k [(count v) :samples (int (ut/avg v)) :avg-seconds]}))])
     ;; (ut/pp [:times-atom @times-atom])

@@ -130,16 +130,29 @@
   (and (not (clojure.string/includes? (pr-str value) "#object"))
        (not (clojure.string/includes? (pr-str value) "#error"))))
 
+;; (defn freeze-atoms
+;;   "Freezes all managed atoms to disk."
+;;   []
+;;   (doseq [[file-path a] @managed-atoms]
+;;     (pp ["  " :freezing-atom file-path])
+;;     (with-open [wtr (io/writer file-path)]
+;;       (binding [*out* wtr]
+;;         (if (cstr/includes? (str file-path) "signals")
+;;           (clojure.pprint/pprint @a)
+;;           (prn @a))))))
+
 (defn freeze-atoms
   "Freezes all managed atoms to disk."
   []
-  (doseq [[file-path a] @managed-atoms]
-    (pp ["  " :freezing-atom file-path])
-    (with-open [wtr (io/writer file-path)]
-      (binding [*out* wtr]
-        (if (cstr/includes? (str file-path) "signals")
-          (clojure.pprint/pprint @a)
-          (prn @a))))))
+  (doall
+   (pmap (fn [[file-path a]]
+           (pp ["  " :freezing-atom file-path])
+           (with-open [wtr (io/writer file-path)]
+             (binding [*out* wtr]
+               (if (cstr/includes? (str file-path) "signals")
+                 (clojure.pprint/pprint @a)
+                 (prn @a)))))
+         @managed-atoms)))
 
 ;; (defn freeze-atoms ;; slow as all hell
 ;;   "Freezes all managed atoms to disk."

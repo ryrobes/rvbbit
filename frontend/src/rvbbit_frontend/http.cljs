@@ -336,8 +336,8 @@
          ;new-map (if (= new-map '(1)) [{:sql :error :recvd (:result result)}] new-map)
            ;sys-queries (filter #(cstr/ends-with? (str %) "-sys") (keys (get db :query-history)))
 
-      ;;  (when (= client-name :easy-cerulean-camel-32)
-      ;;    (tap> [:payload! (get db :client-name) result]))
+       (when (cstr/starts-with? (str client-name) ":sunny")
+         (tap> [:payload! (get db :client-name) result]))
 
       ;;  (when estimate? (tap> [:estimate! (get db :client-name) result]))
 

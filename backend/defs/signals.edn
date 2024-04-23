@@ -1,8 +1,24 @@
 {:hourly? {:signal [:changed? :time/hour]},
  :fun-gorilla
- {:signal [:and [:= 1 1] [:= 9 9] [:or [:= 2 1] [:< 9 4]]]},
- :cool-raccoon-signal {:signal [:and [:= :day 1] [:= :hour 9]]},
- :genius-gnat-signal {:signal [:and [:= :day 1] [:= :hour 9]]},
+ {:signal
+  [:and
+   [:=
+    :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
+    "jessica"]
+   [:= 21 21]
+   [:= 9 9]
+   [:or [:= 2 1] [:< 9 4]]]},
+ :cool-raccoon-signal
+ {:signal
+  [:and [:= :time/day 1] [:= :time/second 45] [:= :time/hour 9]]},
+ :genius-gnat-signal {:signal [:and [:= :time/day 1] [:time/second]]},
  :optimistic-sheep-signal
- {:signal [:and [:= :day 1] [:= :hour 9] [:signal/hourly?]]},
- :fair-armadillo-signal {:signal [:and [:= :day 1] [:= :hour 9]]}}
+ {:signal
+  [:and
+   [:= :day 1]
+   [:= :hour 9]
+   [:changed?
+    :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]
+   [:signal/hourly?]]},
+ :fair-armadillo-signal
+ {:signal [:and [:= :time/day 1] [:= :time/hour 9]]}}

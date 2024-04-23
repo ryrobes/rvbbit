@@ -465,12 +465,18 @@
                        (swap! wss/panel-child-atoms assoc key new-child-atom)
                        (swap! new-child-atom assoc key (get new-state key)))))))
 
+    (add-watch wss/signals-atom :master-signal-def-watcher ;; watcher signals defs
+               (fn [_ _ old-state new-state]
+                 ;;(ut/pp [:SCREEN-WATCHER-ACTIVATE!])
+                 (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....])
+                 (wss/reload-signals-subs)
+                 ))
+
+    (wss/reload-signals-subs) ;; run once on boot
     (update-all-screen-meta)
     (update-all-flow-meta)
 
-  ;(when harvest-on-boot?
-    (update-all-conn-meta)
-  ;)
+
 
     (cruiser/insert-current-rules! system-db "system-db" 0
                                    cruiser/default-sniff-tests
@@ -484,32 +490,36 @@
                                     {:custom @wss/custom-flow-blocks}
                                     {:sub-flows @wss/sub-flow-blocks}))
 
-    (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
-     "system-db"
-     system-db
-     system-db
-     cruiser/default-sniff-tests
-     cruiser/default-field-attributes
-     cruiser/default-derived-fields
-     cruiser/default-viz-shapes)
+  ;(when harvest-on-boot?
+    ;(update-all-conn-meta)
+  ;)
 
-    (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
-     "flows-db"
-     flows-db
-     system-db
-     cruiser/default-sniff-tests
-     cruiser/default-field-attributes
-     cruiser/default-derived-fields
-     cruiser/default-viz-shapes)
+    ;; (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
+    ;;  "system-db"
+    ;;  system-db
+    ;;  system-db
+    ;;  cruiser/default-sniff-tests
+    ;;  cruiser/default-field-attributes
+    ;;  cruiser/default-derived-fields
+    ;;  cruiser/default-viz-shapes)
 
-    (cruiser/lets-give-it-a-whirl-no-viz  ;;; force cache-db as a conn, takes a sec
-     "cache.db"
-     wss/cache-db
-     system-db
-     cruiser/default-sniff-tests
-     cruiser/default-field-attributes
-     cruiser/default-derived-fields
-     cruiser/default-viz-shapes)
+    ;; (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
+    ;;  "flows-db"
+    ;;  flows-db
+    ;;  system-db
+    ;;  cruiser/default-sniff-tests
+    ;;  cruiser/default-field-attributes
+    ;;  cruiser/default-derived-fields
+    ;;  cruiser/default-viz-shapes)
+
+    ;; (cruiser/lets-give-it-a-whirl-no-viz  ;;; force cache-db as a conn, takes a sec
+    ;;  "cache.db"
+    ;;  wss/cache-db
+    ;;  system-db
+    ;;  cruiser/default-sniff-tests
+    ;;  cruiser/default-field-attributes
+    ;;  cruiser/default-derived-fields
+    ;;  cruiser/default-viz-shapes)
 
 
     (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
@@ -534,7 +544,7 @@
 
     (def purge (tt/every! 30 2 (bound-fn [] (wss/purge-dead-client-watchers))))
 
-    (def timekeeper (tt/every! 1 20 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
+    (def timekeeper (tt/every! 1 3 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
 
     (def last-look (atom {}))
     (def saved-uids (atom []))
@@ -1060,8 +1070,7 @@
           ;fut2 (future (Thread/sleep 15000) (wss/create-websocket-server!))
           ]
       ;[@fut @fut2]
-      @fut
-      )
+      @fut)
 
     (println " ")
 
