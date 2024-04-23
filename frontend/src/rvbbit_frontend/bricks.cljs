@@ -9916,11 +9916,16 @@
                                 ;;  :get-in (fn [[m kp]]
                                 ;;            (tap> [:get-in panel-key m kp])
                                 ;;            (get-in m kp))
+                                 :left-pad (fn [[num len]]
+                                             (let [num-str (str num)
+                                                   padded-num (.padStart num-str len "0")]
+                                               padded-num))
+
 
                                  :string (fn [args]
-                                            (if (vector? args)
-                                              (cstr/join "" (apply str args))
-                                              (str args)))
+                                           (if (vector? args)
+                                             (cstr/join "" (apply str args))
+                                             (str args)))
 
                                  :data-viewer (fn [x] [re-com/box
                                                        :width (px (- ww 10))
@@ -10208,7 +10213,7 @@
                                                                @(re-frame/subscribe [::runstream-overrides flow-id])
                                                                overrides)
                                                    overrides? (ut/ne? overrides)]
-                                               
+
                                                [re-com/h-box
                                                 :size "auto"
                                                 :children [[re-com/box :child (str tt)]

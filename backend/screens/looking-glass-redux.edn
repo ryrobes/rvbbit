@@ -1,7 +1,15 @@
-{:orders {:reco-counts [:table_name :cnt]},
+{:orders
+ {:reco-counts [:table_name :cnt],
+  :connections-sys [:database_name :connection_id],
+  :fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
  :reco-preview nil,
+ :sql-source {},
  :meta
- {:gen-viz-797
+ {:fields-sys {:fields {}, :rowcount 0},
+  :tables-sys {:fields {}, :rowcount 0},
+  :gen-viz-797
   {:fields
    {:rows
     {:data-type "integer",
@@ -64,6 +72,21 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -197,14 +220,18 @@
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
    :rowcount 30}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys ##Inf},
+  :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
- :data-hash 0,
+ :data-hash -1292778655,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"],
- :selected-cols {},
+ :selected-cols nil,
  :server
  {:settings
   {:harvest-on-boot? true,
@@ -400,7 +427,7 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [476167660 441017056 4294705152],
+ :memory [737489183 651146935 4294705152],
  :status-data
  {"kick-test!"
   {:kick
@@ -430,16 +457,152 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-04-22 17:20:59",
+      :at "2024-04-22 23:09:52",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
+    :reco-count nil}},
+  :alert1
+  {:alerts
+   {:data
+    [[[:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data
+         [{:mem 2399, :tick 74074, :threads 118, :subs 352, :load 2.28564453125}
+          {:mem 1624, :tick 74075, :threads 118, :subs 352, :load 2.4599609375}
+          {:mem 4787, :tick 74076, :threads 119, :subs 352, :load 2.13037109375}
+          {:mem 4230, :tick 74077, :threads 115, :subs 352, :load 1.85595703125}
+          {:mem 3407, :tick 74078, :threads 113, :subs 352, :load 2.01318359375}
+          {:mem 3295, :tick 74079, :threads 116, :subs 352, :load 2.42236328125}
+          {:mem 1955, :tick 74080, :threads 115, :subs 352, :load 1.86083984375}
+          {:mem 1648, :tick 74081, :threads 120, :subs 352, :load 2.46728515625}
+          {:mem 4892, :tick 74082, :threads 118, :subs 352, :load 2.53125}
+          {:mem 4073, :tick 74083, :threads 133, :subs 352, :load 2.53759765625}
+          {:mem 4742, :tick 74084, :threads 126, :subs 352, :load 2.8115234375}
+          {:mem 3423, :tick 74085, :threads 123, :subs 352, :load 2.32763671875}
+          {:mem 2055, :tick 74086, :threads 109, :subs 352, :load 2.072265625}
+          {:mem 4772, :tick 74087, :threads 109, :subs 352, :load 2.27734375}
+          {:mem 3490, :tick 74088, :threads 110, :subs 352, :load 2.44482421875}
+          {:mem 2141, :tick 74089, :threads 110, :subs 352, :load 2.4033203125}
+          {:mem 5021, :tick 74090, :threads 105, :subs 352, :load 2.1376953125}
+          {:mem 4098, :tick 74091, :threads 115, :subs 352, :load 2.13525390625}
+          {:mem 2998, :tick 74092, :threads 115, :subs 352, :load 2.70458984375}
+          {:mem 2660, :tick 74093, :threads 113, :subs 352, :load 2.34716796875}
+          {:mem 2320, :tick 74094, :threads 117, :subs 352, :load 2.173828125}
+          {:mem 1546, :tick 74095, :threads 118, :subs 352, :load 2.0966796875}
+          {:mem 4692, :tick 74096, :threads 117, :subs 352, :load 2.1162109375}
+          {:mem 3481, :tick 74097, :threads 115, :subs 352, :load 2.458984375}
+          {:mem 4079, :tick 74098, :threads 121, :subs 352, :load 2.50244140625}
+          {:mem 2785, :tick 74099, :threads 121, :subs 352, :load 2.30322265625}
+          {:mem 1473, :tick 74100, :threads 108, :subs 352, :load 2.1142578125}
+          {:mem 4596, :tick 74101, :threads 115, :subs 352, :load 1.99462890625}
+          {:mem 3676, :tick 74102, :threads 111, :subs 352, :load 2.0234375}
+          {:mem 4178, :tick 74103, :threads 148, :subs 352, :load 1.93994140625}
+          {:mem 3033, :tick 74104, :threads 135, :subs 352, :load 1.73681640625}
+          {:mem 2146, :tick 74105, :threads 115, :subs 352, :load 1.58154296875}
+          {:mem 5331, :tick 74106, :threads 113, :subs 352, :load 1.9150390625}
+          {:mem 1884, :tick 74107, :threads 120, :subs 352, :load 1.9033203125}
+          {:mem 1342, :tick 74108, :threads 124, :subs 352, :load 2.04248046875}
+          {:mem 1499, :tick 74109, :threads 134, :subs 352, :load 1.93505859375}
+          {:mem 4271, :tick 74110, :threads 128, :subs 352, :load 3.072265625}
+          {:mem 3959, :tick 74111, :threads 120, :subs 352, :load 2.53564453125}
+          {:mem 4448, :tick 74112, :threads 130, :subs 352, :load 2.34912109375}
+          {:mem 3302, :tick 74113, :threads 122, :subs 352, :load 2.0830078125}
+          {:mem 2003, :tick 74114, :threads 109, :subs 352, :load 1.83544921875}
+          {:mem 4707, :tick 74115, :threads 110, :subs 352, :load 1.5732421875}
+          {:mem 3372, :tick 74116, :threads 105, :subs 352, :load 2.01123046875}
+          {:mem 2066, :tick 74117, :threads 108, :subs 352, :load 2.1767578125}
+          {:mem 1288, :tick 74118, :threads 112, :subs 352, :load 1.9873046875}
+          {:mem 4645, :tick 74119, :threads 114, :subs 352, :load 2.34033203125}
+          {:mem 3326, :tick 74120, :threads 114, :subs 352, :load 2.2099609375}
+          {:mem 2028, :tick 74121, :threads 112, :subs 352, :load 1.99267578125}
+          {:mem 4699, :tick 74122, :threads 106, :subs 352, :load 1.9541015625}
+          {:mem 3397, :tick 74123, :threads 109, :subs 352, :load 1.89404296875}],
+         :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
+        [:> :XAxis {:dataKey :tick, :hide true}]
+        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
+        [:>
+         :YAxis
+         {:yAxisId "right", :hide true, :dataKey :subs, :orientation "right"}]
+        [:>
+         :Bar
+         {:yAxisId "left",
+          :dataKey :mem,
+          :isAnimationActive false,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:string :theme/editor-outer-rim-color "33"]}]
+        [:>
+         :Line
+         {:yAxisId "right",
+          :strokeWidth 4,
+          :type "monotone",
+          :dot false,
+          :dataKey :threads,
+          :isAnimationActive false,
+          :stroke :theme/editor-grid-selected-background-color,
+          :fill :theme/editor-grid-selected-background-color}]
+        [:>
+         :Line
+         {:stroke :theme/block-tab-selected-font-color,
+          :fill :theme/block-tab-selected-font-color,
+          :type "monotone",
+          :yAxisId "right",
+          :dataKey :subs,
+          :strokeWidth 3,
+          :strokeDasharray "5 5",
+          :dot false,
+          :isAnimationActive false}]]]
+      10
+      4
+      5]
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  [:time :hour]
+  {:kick
+   {:data
+    [{:sent! [:time :hour],
+      :to :easy-cerulean-camel-32,
+      :at "2024-04-22 17:28:22",
+      :payload nil}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  [:time :second]
+  {:kick
+   {:data
+    [{:sent! [:time :second],
+      :to :easy-cerulean-camel-32,
+      :at "2024-04-22 17:29:08",
+      :payload nil}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  [:time :year]
+  {:kick
+   {:data
+    [{:sent! [:time :year],
+      :to :easy-cerulean-camel-32,
+      :at "2024-04-22 17:30:15",
+      :payload nil}
+     nil],
+    :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:flow/flow-forever>:final-math
+ [:flow/flow-forever>*running?
+  :flow/flow-forever>:final-math
+  :time/minute
+  :time/hour
+  :time/month-name
   :flow/live-scratch-flow>*running?
-  :flow/flow-forever>*running?],
+  :time/second
+  :time/day],
  :client-name :easy-cerulean-camel-32,
  :flow-editor? true,
  :openai-api-key "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",
@@ -455,22 +618,36 @@
   :city-drag-26 {:* {:rowcount 19899}},
   :state-drag-3 {:* {:rowcount 68}},
   :shape-drag-7 {:* {:rowcount 30}}},
+ :flow-estimates
+ {"openai-image-gen-ladder"
+  {:times 49, :run-id "7bdb6491-24a4-4aa6-887c-fbb35be3fd3f"},
+  "counting-loop" {:times 6, :run-id "8aeb60e2-f633-4433-9927-792703735b2b"}},
  :status
  {"kick-test!" {:kick :rowcnt-drag-2},
   :heartbeat
   {:kick
-   [:flow/flow-forever>:final-math
+   [:flow/flow-forever>*running?
+    :flow/flow-forever>:final-math
+    :time/minute
+    :time/hour
+    :time/month-name
     :flow/live-scratch-flow>*running?
-    :flow/flow-forever>*running?]}},
+    :time/second
+    :time/day]},
+  :alert1 {:alerts :alert2},
+  [:time :hour] {:kick 17},
+  [:time :second] {:kick 8},
+  [:time :year] {:kick 2024}},
  :screen-name "looking-glass-redux",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
+ :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :panels-hash 1961268104,
+ :panels-hash 78694097,
  :sessions
  (["vital-bulbous-mosquito-0.edn" "101 hours, 57 minutes, 22 seconds" 367042243]
    ["refined-round-llama-8.edn" "103 hours, 59 minutes, 28 seconds" 374368756]
@@ -486,8 +663,9 @@
     "230 hours, 11 minutes, 55 seconds"
     828715579]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 971283022,
+ :user-params-hash 1687714585,
  :grid-recos? true,
+ :session-hash 1962028562,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -682,7 +860,35 @@
    :group-by [:shape],
    :order-by [[:rowcnt :desc]]}},
  :panels
- {:block-414
+ {:block-11586
+  {:h 6,
+   :w 17,
+   :root [29 1],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-11586",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11586.:hi"}
+     :style
+     {:font-size "167px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:string [:time/month-name " " :time/day]]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-414
   {:mad-libs-combo-hash ["572062609" "ufo_sightings_drag_9"],
    :name "basic_timeseries - \"date_posted, rows\" - 769",
    :w 9,
@@ -799,6 +1005,34 @@
    :name "flow-play-from-runstreams",
    :root [5 18],
    :tab "through the rabbit hole and out the other side"},
+  :block-1194
+  {:h 10,
+   :w 11,
+   :root [27 21],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-1194",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-1194.:hi"}
+     :style
+     {:font-size "303px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:left-pad [:time/second 2]]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
   :block-204
   {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
    :name "compound_trend_1 - \"date_posted, rows\" - 1141",
@@ -942,6 +1176,34 @@
        {:padding-top "133px", :font-size "20px"}
        :child
        [:string [:date_posted " vs " :rows]]]]]}},
+  :block-11814
+  {:h 10,
+   :w 12,
+   :root [14 21],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-11814",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11814.:hi"}
+     :style
+     {:font-size "303px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:left-pad [:time/minute 2]]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
   :block-2536
   {:h 2,
    :w 16,
@@ -1065,6 +1327,31 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-1827
+  {:h 10,
+   :w 12,
+   :views
+   {:view-clone
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11814.:hi"}
+     :style
+     {:font-size "303px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:left-pad [:time/hour 2]]]},
+   :name "clone-hi29",
+   :root [1 21],
+   :tab "star-shaped wallaby"},
   :block-7319
   {:h 5,
    :w 8,
@@ -1207,7 +1494,26 @@
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
   :param
-  {:selected-view [nil nil], :selected-view-data nil, :selected-block :block-1449},
+  {:selected-view [:views :hi],
+   :selected-view-data
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :attr
+    {:id ":block-1194.:hi"}
+    :style
+    {:font-size "303px",
+     :font-weight 700,
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family :theme/base-font}
+    :child
+    [:string :time/second]],
+   :selected-block :block-1194},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -1327,6 +1633,6 @@
    :datetime "1956-10-10 21:00:00.000000",
    :latitude "28.9783333",
    :country "us"},
-  nil {nil nil}},
+  :time {:month 4, :minute 10, :hour 23, :month-name "APRIL", :second 2, :day 22}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}
