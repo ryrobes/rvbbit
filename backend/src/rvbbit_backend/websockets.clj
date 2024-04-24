@@ -34,7 +34,7 @@
             [clojure.string :as cstr]
             [rvbbit-backend.transform :as ts]
             [rvbbit-backend.pivot :as pivot]
-            [rvbbit-backend.sql :as sql :refer [sql-exec sql-query sql-query-one system-db flows-db insert-error-row! to-sql pool-create]]
+            [rvbbit-backend.sql :as sql :refer [sql-exec sql-query sql-query-one system-db ghost-db flows-db insert-error-row! to-sql pool-create]]
             [clojure.data.csv :as csv]
             [csv-map.core :as ccsv]
             [clojure.core.cache :as cache]
@@ -3033,14 +3033,22 @@
   (let [re-con-key (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
         valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))
         signals-map (select-keys @signals-atom valid-signals)
-        signals-resolve-map (for [[k {:keys [signal]}] signals-map]
-                      {k (let [cmpkeys (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten signal)))
-                               vvals (select-keys (get-in @atoms-and-watchers [:rvbbit-signals]) cmpkeys)]
-                           ;[cmpkeys vvals]
-                           (into {} (for [[k {:keys [keypath]}] vvals] {k (get @last-values keypath)})) ;; keypath is used as the actual key here, btw
-                           )})]
+        signals-resolve-map (into {} (for [[k {:keys [signal]}] signals-map]
+                                       {k (let [cmpkeys (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten signal)))
+                                                vvals (select-keys (get-in @atoms-and-watchers [:rvbbit-signals]) cmpkeys)]
+                                            (into {} (for [[k {:keys [keypath]}] vvals] {k (get @last-values keypath)})) ;; keypath is used as the actual key here, btw
+                                            )}))
+        signals-resolved (into {} (for [[k v] signals-map] {k (walk/postwalk-replace (get signals-resolve-map k) (get v :signal))}))]
     ;; use signals-resolve-map to materialized values and the SQL run it FROM DUAL
-    (ut/pp [:process-signal-sub-data base-type keypath new-value client-param-path valid-signals signals-map signals-resolve-map])))
+    (ut/pp [:process-signal-sub-data base-type keypath new-value client-param-path valid-signals signals-map signals-resolve-map 
+            {:resolved? signals-resolved}
+            {:runs? 
+             (into {}
+                   (for [[kk vv] signals-resolved
+                         :let [honey-sql-str (to-sql {:select [[1 :vv]] :where vv})]]
+                     {[kk vv] (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))}))
+             }
+            ])))
 
 (defn send-reaction [base-type keypath client-name new-value]
  (let [flow-client-param-path (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))

@@ -105,6 +105,11 @@
                                           :auto_vacuum        "FULL"
                                           :cache "shared"} "flows-db")})
 
+(def ghost-db {:datasource @(pool-create {:jdbc-url "jdbc:sqlite:file:./db/ghost.db?cache=shared&journal_mode=WAL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" &mode=memory ; "jdbc:sqlite:db/system.db"
+                                           :idle-timeout        600000  ;;;; LAST KNOW GOOD SQLITE 10/25/23 
+                                           :max-lifetime       1800000
+                                           :cache "shared"} "ghost-db")})
+
 
 ;; (def system-db {:datasource @(pool-create {:jdbc-url "jdbc:h2:mem:systemdb;DATABASE_TO_UPPER=FALSE" ;"jdbc:sqlite:db/system.db"
 ;;                                            ;:cache "shared"

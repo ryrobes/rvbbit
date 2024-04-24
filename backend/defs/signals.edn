@@ -10,7 +10,7 @@
    [:or [:= 2 1] [:< 9 4]]]},
  :cool-raccoon-signal
  {:signal
-  [:and [:= :time/day 1] [:= :time/second 45] [:= :time/hour 9]]},
+  [:and [:= :time/day 23] [:= :time/second 45] [:= :time/hour 22]]},
  :genius-gnat-signal {:signal [:and [:= :time/day 1] [:time/second]]},
  :optimistic-sheep-signal
  {:signal
@@ -21,4 +21,5 @@
     :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]
    [:signal/hourly?]]},
  :fair-armadillo-signal
- {:signal [:and [:= :time/day 1] [:= :time/hour 9]]}}
+ {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+ :worthy-fish-signal {:signal [:and [:= :time/day 23] [:= 22 22]]}}
