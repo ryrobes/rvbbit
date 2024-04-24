@@ -81,6 +81,10 @@
 (def custom-flow-blocks (ut/thaw-atom {} "./data/atoms/custom-flow-blocks-atom.edn"))
 ;(def screens-atom (atom {}))
 (def screens-atom (ut/thaw-atom {} "./data/atoms/screens-atom.edn"))
+(def last-signals-atom (ut/thaw-atom {} "./data/atoms/last-signals-atom.edn"))
+(def last-signals-history-atom (ut/thaw-atom {} "./data/atoms/last-signals-history-atom.edn"))
+(def last-signal-value-atom (ut/thaw-atom {} "./data/atoms/last-signal-value-atom.edn"))
+(def last-signals-atom-stamp (ut/thaw-atom {} "./data/atoms/last-signals-atom-stamp.edn"))
 ;;(def panels-atom (atom {}))
 (def panels-atom (ut/thaw-atom {} "./data/atoms/panels-atom.edn"))
 (def watchdog-atom (atom {}))
@@ -2956,7 +2960,9 @@
         ;param?  (= base-type :ext-param)
         screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
         time?    (= base-type :time)
+        signal?  (= base-type :signal)
         keypath  (cond ;flow? keypath 
+                   signal? (vec (rest keypath))
                    time?   (vec (rest keypath))
                    screen? (vec (rest sub-path))
                    panel?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -2969,6 +2975,7 @@
                             tracker? flow-db/tracker
                             ;:else flow-db/results-atom
                             ;:else (get-or-create-child-atom (first keypath))
+                            signal? last-signals-atom ;; no need to split for now, will keep an eye on it
                             time?   time-atom
                             panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                             client? (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
@@ -3029,26 +3036,136 @@
 ;;;  :client-reaction-push! ["error-monitor-vanessa3" :panels :block-899 :name] :fair-salmon-hawk-hailing-from-malpais "drag-from-select-all-jvm_stddat!s!!" :error-monitor-vanessa3>name]
 ;;; [:client-reaction-push! ["error-monitor-vanessa3" :panels :block-899 :name] :fair-salmon-hawk-hailing-from-malpais "drag-from-seldect-all-jvm_sstddat!s!!" :error-monitor-vanessa3>name]
 
-(defn process-signals-reaction [base-type keypath new-value client-param-path]
-  (let [re-con-key (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
-        valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))
-        signals-map (select-keys @signals-atom valid-signals)
+(defn process-signal [signal-name]
+  (let [signals-map (select-keys @signals-atom [signal-name])
+        signals-parts-map (into {} (for [[k {:keys [signal]}] signals-map] {k (vec (distinct (ut/where-dissect signal)))}))
+        resolve-changed-fn (fn [obody sigk] (let [kps       (ut/extract-patterns obody :changed? 2)
+                                                  logic-kps (into {} (for [v kps]
+                                                                       (let [[_ & ss] v
+                                                                               ;[[flow-id bid value alert?]] this
+                                                                             ss (first ss)
+                                                                               ;kp (get-in @atoms-and-watchers [:rvbbit-signals ss :keypath])
+                                                                             v2 (get-in @last-signal-value-atom [sigk ss]) ;; should be the last time we evaluated this in THIS context.. ;; (get @last-values kp)
+                                                                             new [:not [:= v2 ss]] ;; has it changed from the last time WE (context is important) looked at it?
+                                                                               ;;_ (ut/pp [:resolve-changed-fn ss kp kps obody new])
+                                                                             ]
+                                                                         {v new}))) ;; compare against the last LITERAL value, not it's truthiness
+                                                  ]
+                                              (walk/postwalk-replace logic-kps obody)))
         signals-resolve-map (into {} (for [[k {:keys [signal]}] signals-map]
                                        {k (let [cmpkeys (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten signal)))
                                                 vvals (select-keys (get-in @atoms-and-watchers [:rvbbit-signals]) cmpkeys)]
-                                            (into {} (for [[k {:keys [keypath]}] vvals] {k (get @last-values keypath)})) ;; keypath is used as the actual key here, btw
+                                            (into {} (for [[k {:keys [keypath]}] vvals
+                                                           :let [v3 (get @last-values keypath)
+                                                                        ;_ (swap! last-signal-value-atom assoc k v3)
+]] ;; extra cache for last value due to diff update cadence on last-values... TODO
+                                                       {k v3})) ;; keypath is used as the actual key here, btw
                                             )}))
-        signals-resolved (into {} (for [[k v] signals-map] {k (walk/postwalk-replace (get signals-resolve-map k) (get v :signal))}))]
+        signals-resolved (into {} (for [[k v] signals-map]
+                                    {k (walk/postwalk-replace (get signals-resolve-map k) (resolve-changed-fn (get v :signal) k))}))
+        parts-work (into {} ;; important side effects / will transition to a doseq after debugging phase
+                         (for [[kk vv] signals-parts-map]
+                           {kk (into {} (for [vvv vv
+                                              :let [rvv (walk/postwalk-replace (get signals-resolve-map kk) (resolve-changed-fn vvv kk))
+                                                    honey-sql-str (to-sql {:select [[1 :vv]] :where rvv})
+                                                           ;; need to calculate last-value from atom compared to new/curr-value to resolve [:changed? :val]
+                                                    result (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))
+                                                    part-key (keyword (str "part-" (cstr/replace (str kk) ":" "") "-" (ut/index-of vv vvv)))
+                                                    ;;_ (ut/pp [:part-key kk part-key vvv])
+
+                                                    _ (when (not= result (get @last-signals-atom part-key))  ;; no need for dupe histories
+                                                        (swap! last-signals-history-atom assoc part-key
+                                                               (vec (conj (get @last-signals-history-atom part-key) [result (System/currentTimeMillis)]))))
+                                                    _ (when (not= result (get @last-signals-atom vvv)) ;; no need for dupe histories
+                                                        (swap! last-signals-history-atom assoc vvv
+                                                               (vec (conj (get @last-signals-history-atom vvv) [result (System/currentTimeMillis)]))))
+                                                    _ (swap! last-signals-atom-stamp assoc vvv (System/currentTimeMillis))
+                                                    _ (swap! last-signals-atom assoc vvv result)
+                                                    _ (swap! last-signals-atom assoc part-key result)]] ;; last time we resolved this signal, will be used to stop re-runs on the same signal
+
+                                          {[vvv rvv] result}))}))
+        full-parts-work (into {} ;; important side effects / will transition to a doseq after debugging phase
+                              (for [[kk vv] signals-resolved
+                                    :let [honey-sql-str (to-sql {:select [[1 :vv]] :where vv})
+                                          result (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))
+                                          
+                                          _ (when (not= result (get @last-signals-atom kk))  ;; no need for dupe histories
+                                              (swap! last-signals-history-atom assoc kk
+                                                     (vec (conj (get @last-signals-history-atom kk) [result (System/currentTimeMillis)]))))
+                                          _ (swap! last-signals-atom assoc kk result)
+                                          _ (swap! last-signals-atom-stamp assoc kk (System/currentTimeMillis))]]
+                                {[kk vv] result}))]
+    (doseq [[k v] signals-resolve-map]
+      (doseq [[kk vv] v]
+        (swap! last-signal-value-atom assoc-in [k kk] vv))) ;; when all done, set "last-value" so future :changed statements work - has to be PER signal, else we miss some                                
+    ))
+
+(defn process-signals-reaction [base-type keypath new-value client-param-path]
+  ;; (ut/pp [:process-signals-reaction! base-type keypath new-value client-param-path])
+  (let [re-con-key (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
+        valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))
+
+        ;; signals-map (select-keys @signals-atom valid-signals)
+        ;; signals-parts-map (into {} (for [[k {:keys [signal]}] signals-map] {k (vec (distinct (ut/where-dissect signal)))}))
+        ;; resolve-changed-fn (fn [obody sigk] (let [kps       (ut/extract-patterns obody :changed? 2)
+        ;;                                      logic-kps (into {} (for [v kps]
+        ;;                                                           (let [[_ & ss] v
+        ;;                                                                 ;[[flow-id bid value alert?]] this
+        ;;                                                                 ss (first ss)
+        ;;                                                                 ;kp (get-in @atoms-and-watchers [:rvbbit-signals ss :keypath])
+        ;;                                                                 v2 (get-in @last-signal-value-atom [sigk ss]) ;; should be the last time we evaluated this in THIS context.. ;; (get @last-values kp)
+        ;;                                                                 new [:not [:= v2 ss]] ;; has it changed from the last time WE (context is important) looked at it?
+        ;;                                                                 ;;_ (ut/pp [:resolve-changed-fn ss kp kps obody new])
+        ;;                                                                 ]
+        ;;                                                             {v new}))) ;; compare against the last LITERAL value, not it's truthiness
+        ;; ]
+        ;;                                  (walk/postwalk-replace logic-kps obody)))
+        ;; signals-resolve-map (into {} (for [[k {:keys [signal]}] signals-map]
+        ;;                                {k (let [cmpkeys (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten signal)))
+        ;;                                         vvals (select-keys (get-in @atoms-and-watchers [:rvbbit-signals]) cmpkeys)]
+        ;;                                     (into {} (for [[k {:keys [keypath]}] vvals
+        ;;                                                    :let [v3 (get @last-values keypath)
+        ;;                                                          ;_ (swap! last-signal-value-atom assoc k v3)
+        ;;                                                          ]] ;; extra cache for last value due to diff update cadence on last-values... TODO
+        ;;                                                {k v3})) ;; keypath is used as the actual key here, btw
+        ;;                                     )}))
+        ;; signals-resolved (into {} (for [[k v] signals-map] 
+        ;;                             {k (walk/postwalk-replace (get signals-resolve-map k) (resolve-changed-fn (get v :signal) k))}))
+        ;; parts-work (into {} ;; important side effects / will transition to a doseq after debugging phase
+        ;;                  (for [[kk vv] signals-parts-map]
+        ;;                    {kk (into {} (for [vvv vv
+        ;;                                       :let [rvv (walk/postwalk-replace (get signals-resolve-map kk) (resolve-changed-fn vvv kk))
+        ;;                                             honey-sql-str (to-sql {:select [[1 :vv]] :where rvv})
+        ;;                                             ;; need to calculate last-value from atom compared to new/curr-value to resolve [:changed? :val]
+        ;;                                             result (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))
+        ;;                                             part-key (keyword (str "part-" (cstr/replace (str kk) ":" "") "-" (ut/index-of vv vvv)))
+        ;;                                             _ (ut/pp [:part-key kk part-key vvv])
+        ;;                                             _ (swap! last-signals-atom assoc vvv result)
+        ;;                                             _ (swap! last-signals-atom assoc part-key result)
+        ;;                                             _ (swap! last-signals-atom-stamp assoc vvv (System/currentTimeMillis))]] ;; last time we resolved this signal, will be used to stop re-runs on the same signal
+
+        ;;                                   {[vvv rvv] result}))}))
+        ;; full-parts-work (into {} ;; important side effects / will transition to a doseq after debugging phase
+        ;;                       (for [[kk vv] signals-resolved
+        ;;                             :let [honey-sql-str (to-sql {:select [[1 :vv]] :where vv})
+        ;;                                   result (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))
+        ;;                                   _ (swap! last-signals-atom assoc kk result)
+        ;;                                   _ (swap! last-signals-atom-stamp assoc kk (System/currentTimeMillis))]]
+        ;;                         {[kk vv] result}))
+        ]
+
+    (doseq [signal valid-signals] ;; run in parallel later perhaps
+      (process-signal signal))
     ;; use signals-resolve-map to materialized values and the SQL run it FROM DUAL
-    (ut/pp [:process-signal-sub-data base-type keypath new-value client-param-path valid-signals signals-map signals-resolve-map 
-            {:resolved? signals-resolved}
-            {:runs? 
-             (into {}
-                   (for [[kk vv] signals-resolved
-                         :let [honey-sql-str (to-sql {:select [[1 :vv]] :where vv})]]
-                     {[kk vv] (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))}))
-             }
-            ])))
+
+    ;; (ut/pp [:process-signal-sub-data base-type keypath new-value client-param-path valid-signals signals-map
+    ;;         {:where-parts parts-work}
+    ;;         {:runs? full-parts-work}])
+
+            ;; (doseq [[k v] signals-resolve-map] 
+            ;;   (doseq [[kk vv] v]
+            ;;     (swap! last-signal-value-atom assoc-in [k kk] vv))) ;; when all done, set "last-value" so future :changed statements work - has to be PER signal, else we miss some
+    ))
 
 (defn send-reaction [base-type keypath client-name new-value]
  (let [flow-client-param-path (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
@@ -3243,6 +3360,7 @@
       (kick client-name [base-type client-param-path]
             (cond (cstr/includes? (str flow-key) "*running?") false
                   (= base-type :time)   (get @time-atom client-param-path)
+                  (= base-type :signal) (get @last-signals-atom client-param-path)
                   (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
                   (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
                   (= base-type :panel) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
@@ -3313,7 +3431,15 @@
         (remove-watcher keypath :rvbbit-signals sub-type nil flow-key)))
 
     (doseq [kk all-keyparts] ;; re-add them all - TODO, only add new ones (however, they get removed before they get added, so it's a nil regardless)
-      (sub-to-value :rvbbit-signals kk true)))
+      (sub-to-value :rvbbit-signals kk true))
+    
+    (reset! last-signals-atom (select-keys @last-signals-atom (vec (filter #(not (cstr/includes? (str %) "/part-")) (keys @last-signals-atom))))) ;; clear cache of parts, since their indexes might change
+
+    (doseq [signal (keys @signals-atom)] ;; (re)process everythiung since we just got updated
+      (ut/pp [:re-processing-signal signal])
+      (process-signal signal))
+    
+    )
   )
 
 (defn gen-flow-keys [flow-id client-name]

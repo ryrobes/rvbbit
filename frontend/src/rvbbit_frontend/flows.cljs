@@ -6173,7 +6173,8 @@
                                         :padding "4px"]]]]
                           (for [[vk vv] (if (= type :in) (sort-map-keys (vec (or inputs-vec (sort-by str (keys v)))) v)
                                           ;v
-                                            (sort-map-keys (try (sort-by str (keys v)) (catch :default e (do (tap> [:fucking-sorting-error e :flows.cljs :ln 4216 (keys v)]) (keys v)))) v))
+                                            (sort-map-keys (try (sort-by str (keys v)) 
+                                                                (catch :default e (do (tap> [:fucking-sorting-error e :flows.cljs :ln 4216 (keys v)]) (keys v)))) v))
 
                                 :let [select-vec [bid vk]
                                       selected? (or (and @sniffy-sniff (= @port-hover2 bid)

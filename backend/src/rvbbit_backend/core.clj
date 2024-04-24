@@ -369,6 +369,17 @@
 
 
   (defn -main [& args]
+    
+    ;; (def where [:and
+    ;;             [:or [:= :time/day 22] [:or [:= 88 88] [:= :time/day 23]]]
+    ;;             [:=
+    ;;              :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+    ;;              "./images/gen/b64-image-12972-98621.png"]
+    ;;             [:<> :time/second 45]
+    ;;             [:= :time/hour 22]])
+    
+    ;; (ut/pp [:where (ut/where-dissect where)])
+    ;; (System/exit 0)
 
     ;;(ut/thaw-atom {} "./data/atoms/flow-db-results-atom.edn" flow-db/results-atom true)
     (thaw-flow-results)

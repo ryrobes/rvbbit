@@ -27,6 +27,7 @@
            java.time.LocalDate
            java.time.ZoneId
            java.time.format.DateTimeFormatter
+           ;[java.nio.charset.Charset Charset]
            [java.time LocalTime Duration Instant ZonedDateTime ZoneId Period DayOfWeek]
            [java.text SimpleDateFormat]
            [java.util Date TimeZone Calendar]
@@ -37,6 +38,8 @@
            [jline TerminalFactory]
            [java.time.format TextStyle]
            [java.util Locale]
+           [java.security MessageDigest]
+           [java.util Base64]
            ;;[org.apache.commons.codec.binary Base64]
           ;;  (java.awt.image BufferedImage)
           ;;  (javax.imageio ImageIO)
@@ -92,25 +95,99 @@
     (doseq [line (line-seq reader)]
       (println line))))
 
+(defn index-of [coll item]
+  (first (keep-indexed #(when (= %2 item) %1) coll)))
+
+;; (defn sha-256 [s]
+;;   (let [hash (MessageDigest/getInstance "SHA-256")
+;;         encoder (Base64/getEncoder)
+;;         bytes (.getBytes s "UTF-16")]
+;;     (.update hash bytes)
+;;     (-> (.digest hash)
+;;         (.encodeToString encoder)
+;;         (cstr/replace "/" "_"))))
+
+;; (defn current-datetime-parts []
+;;   (try
+;;     (let [now (java.time.ZonedDateTime/now)
+;;           day-of-week (.getDayOfWeek now)
+;;           month (.getMonth now)
+;;           formatter (java.time.format.DateTimeFormatter/ofPattern "EEEE, MMMM d h:mma" java.util.Locale/US)
+;;           formatter-seconds (java.time.format.DateTimeFormatter/ofPattern "EEEE, MMMM d h:mm:ssa" java.util.Locale/US)
+;;           now-str (.format formatter now)
+;;           now-seconds-str (.format formatter-seconds now)
+;;           day (.getDayOfMonth now)
+;;           nth (case (mod day 10)
+;;                 1 (if (= day 11) "th" "st")
+;;                 2 (if (= day 12) "th" "nd")
+;;                 3 (if (= day 13) "th" "rd")
+;;                 "th")]
+;;       {:year (.getYear now)
+;;        :month (.getMonthValue now)
+;;        :month-name (.name month)
+;;        :day day
+;;        :day-of-week-int (.getValue day-of-week)
+;;        :day-of-week (.name day-of-week)
+;;        :hour (.getHour now)
+;;        :minute (.getMinute now)
+;;        :second (.getSecond now)
+;;        :quarter (inc (quot (.getMonthValue now) 4))
+;;        :am-pm (if (< (.getHour now) 12) "AM" "PM")
+;;        :now now-str
+;;        :now-seconds now-seconds-str
+;;        :nth nth})
+;;     (catch Throwable e {:time-atom-error (str "Error! " e)})))
+
 (defn current-datetime-parts []
   (try
     (let [now (java.time.ZonedDateTime/now)
           day-of-week (.getDayOfWeek now)
           month (.getMonth now)
-          formatter (java.time.format.DateTimeFormatter/ofPattern "a" java.util.Locale/US)
-          am-pm (.format formatter now)]
+          day (.getDayOfMonth now)
+          nth (case (mod day 10)
+                1 (if (= day 11) "th" "st")
+                2 (if (= day 12) "th" "nd")
+                3 (if (= day 13) "th" "rd")
+                "th")
+          formatter (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "' h:mma") java.util.Locale/US)
+          formatter-seconds (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "' h:mm:ssa") java.util.Locale/US)
+          now-str (.format formatter now)
+          now-seconds-str (.format formatter-seconds now)]
       {:year (.getYear now)
        :month (.getMonthValue now)
        :month-name (.name month)
-       :day (.getDayOfMonth now)
+       :day day
        :day-of-week-int (.getValue day-of-week)
        :day-of-week (.name day-of-week)
        :hour (.getHour now)
        :minute (.getMinute now)
        :second (.getSecond now)
        :quarter (inc (quot (.getMonthValue now) 4))
-       :am-pm am-pm})
+       :am-pm (if (< (.getHour now) 12) "AM" "PM")
+       :now now-str
+       :now-seconds now-seconds-str
+       :nth nth})
     (catch Throwable e {:time-atom-error (str "Error! " e)})))
+
+;; (defn break-out-parts [clause]
+;;   (cond
+;;     (not (coll? clause)) [clause]
+;;     (some #{:and :or} (take 1 clause)) (cons clause (mapcat break-out-parts (rest clause)))
+;;     :else (cons clause (mapcat break-out-parts (rest clause)))))
+
+;; (defn where-dissect [clause]
+;;   (let [parts (break-out-parts clause)]
+;;     (cons clause (remove #(= clause %) parts))))
+
+(defn break-out-parts [clause]
+  (cond
+    (not (vector? clause)) []
+    (some #{:and :or} (take 1 clause)) (cons clause (mapcat break-out-parts (rest clause)))
+    :else (cons clause (mapcat break-out-parts (rest clause)))))
+
+(defn where-dissect [clause]
+  (let [parts (break-out-parts clause)]
+    (cons clause (remove #(= clause %) parts))))
 
 (defn thaw-atom
   "Thaws an atom from disk or creates a new one if the file doesn't exist."

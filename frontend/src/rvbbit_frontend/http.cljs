@@ -318,6 +318,7 @@
            server-sub? (and kick? (or (= (get-in result [:task-id 0]) :flow)
                                       (= (get-in result [:task-id 0]) :screen)
                                       (= (get-in result [:task-id 0]) :time)
+                                      (= (get-in result [:task-id 0]) :signal)
                                       (= (get-in result [:task-id 0]) :ext-param)
                                       (= (get-in result [:task-id 0]) :panel)
                                       (= (get-in result [:task-id 0]) :client)) 

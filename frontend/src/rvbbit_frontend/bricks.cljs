@@ -325,19 +325,33 @@
                          (conj (filter #(or (cstr/starts-with? (str %) ":flow/")
                                             (cstr/starts-with? (str %) ":screen/")
                                             (cstr/starts-with? (str %) ":time/")
+                                            (cstr/starts-with? (str %) ":signal/")
                                             (cstr/starts-with? (str %) ":ext-param/")
                                             (cstr/starts-with? (str %) ":panel/")
                                             (cstr/starts-with? (str %) ":client/"))
-                                       (filter keyword? 
-                                               (into 
+                                       (filter keyword?
+                                               (into
                                                 (ut/deep-flatten panels)
                                                 (ut/deep-flatten (get-all-values (get db :click-param))) ;; do we have params in params? 
-                                                )
-                                               ))
+                                                )))
                                current-flow-open)))
+         signals-mode? (and (= (get @db/flow-editor-system-mode 0) "signals") (get db :flows?))
+         signal-ui-refs (when signals-mode? (vec (for [ss (keys (get db :signals-map))] (keyword (str "signal/" (cstr/replace (str ss) ":" ""))))))
+         signal-ui-part-refs (when (and (get db :selected-signal) signals-mode?)
+                               (let [pps (ut/where-dissect (get-in db [:signals-map (get db :selected-signal) :signal]))]
+                                 (vec (for [pp pps]
+                                        (keyword (str "signal/part-"
+                                                      (cstr/replace (str (get db :selected-signal)) ":" "") "-"
+                                                      (.indexOf pps pp)))))))
+         signal-subs (if signals-mode? (vec (into signal-ui-refs signal-ui-part-refs)) [])
+         _ (when (ut/ne? signal-subs) (tap> [:signal-subs  signal-subs]))
+        ;; _ (tap> [:signal-subs signal-subs])
+
          theme-refs (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/") (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))]
      ;(tap> [:flow-refs flow-refs])
-     (vec (distinct (into drop-refs (into runstream-refs (into runstreams (into theme-refs flow-refs)))))))))
+     ;;(vec (distinct (into signal-subs (into drop-refs (into runstream-refs (into runstreams (into theme-refs flow-refs)))))))
+     (vec (distinct (concat signal-subs drop-refs runstream-refs runstreams theme-refs flow-refs)))
+     )))
 
 (re-frame/reg-sub
  ::get-new-flow-subs
@@ -10235,7 +10249,7 @@
                                                                         :on-click (fn [] (when (not running?) ;(not (some (fn [x] (= x text)) @db/speech-log))
                                                                                            (let [fstr (str "running flow " flow-id (when overrides? " (with overrides)"))
                                                                                                  w (/ (count fstr) 4.1)]
-                                                                                             (tap> [:fuck-me flow-id client-name overrides])
+                                                                                             ;(tap> [:fuck-me flow-id client-name overrides])
                                                                                              (re-frame/dispatch [::wfx/request :default
                                                                                                                  {:message    {:kind :run-flow
                                                                                                                                :flow-id flow-id

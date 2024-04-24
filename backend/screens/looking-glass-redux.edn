@@ -1,13 +1,93 @@
 {:orders
- {:reco-counts [:table_name :cnt],
-  :connections-sys [:database_name :connection_id],
+ {:flow-fn-sys
+  [:name :description :full_map :inputs :icon :input_types :output_types :category],
   :fields-sys [:field_name :field_type :data_type],
   :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :jvm_stats
+  [:used_memory_mb
+   :thread_count
+   :sql_cache_size
+   :ws_peers
+   :open_flow_channels
+   :queries_run
+   :internal_queries_run
+   :sniffs_run
+   :sys_load
+   :ts],
+  :flow-fn-categories-sys [:category],
+  :connections-sys [:database_name :connection_id],
+  :reco-counts [:table_name :cnt],
+  :flow-fn-all-sys [:name]},
  :reco-preview nil,
- :sql-source {},
+ :flow? false,
+ :sql-source
+ {:jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111}},
  :meta
- {:fields-sys {:fields {}, :rowcount 0},
+ {:flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 121,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100},
+    :description
+    {:data-type "string",
+     :distinct 33,
+     :group-by? true,
+     :commons
+     {"" 87, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 27},
+    :full_map
+    {:data-type "string",
+     :distinct 121,
+     :group-by? true,
+     :commons
+     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
+      1},
+     :cardinality 100},
+    :inputs
+    {:data-type "string",
+     :distinct 65,
+     :group-by? true,
+     :commons
+     {"[:open-input-1 :open-input]" 10,
+      "[:value1 :value2]" 7,
+      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
+     :cardinality 53},
+    :icon
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"zmdi-puzzle-piece" 87, "zmdi-pizza" 3, "zmdi-file-text" 3},
+     :cardinality 17},
+    :input_types
+    {:data-type "string",
+     :distinct 56,
+     :group-by? true,
+     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
+     :cardinality 46},
+    :output_types
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {":any" 63, "" 15, ":boolean" 12},
+     :cardinality 11},
+    :category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 87, ":rabbit-base" 18, ":clojure-base" 16},
+     :cardinality 2}},
+   :rowcount 121},
+  :fields-sys {:fields {}, :rowcount 0},
   :tables-sys {:fields {}, :rowcount 0},
   :gen-viz-797
   {:fields
@@ -24,6 +104,31 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 86,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
+     :cardinality 97},
+    :file_path
+    {:data-type "string",
+     :distinct 88,
+     :group-by? true,
+     :commons
+     {"./flows/stitches-math.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1,
+      "./flows/dalle3-create-image-newengland-old.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 20,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 69, "2024-03-14 07:50:09" 1, "2024-04-12 05:48:12" 1},
+     :cardinality 22}},
+   :rowcount 88},
   :gen-viz-94
   {:fields
    {:diff
@@ -31,6 +136,69 @@
      :distinct 1,
      :group-by? false,
      :commons {},
+     :cardinality 100}},
+   :rowcount 1},
+  :jvm_stats
+  {:fields
+   {:queries_run
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {4 1},
+     :cardinality 100},
+    :sql_cache_size
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {4 1},
+     :cardinality 100},
+    :ts
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"2024-04-23 19:56:51" 1},
+     :cardinality 100},
+    :sniffs_run
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {4 1},
+     :cardinality 100},
+    :sys_load
+    {:data-type "float",
+     :distinct 1,
+     :group-by? true,
+     :commons {4.224609375 1},
+     :cardinality 100},
+    :used_memory_mb
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1897 1},
+     :cardinality 100},
+    :thread_count
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {100 1},
+     :cardinality 100},
+    :internal_queries_run
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1 1},
+     :cardinality 100},
+    :open_flow_channels
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {-1 1},
+     :cardinality 100},
+    :ws_peers
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {201 1},
      :cardinality 100}},
    :rowcount 1},
   :rowcnt-drag-2
@@ -57,6 +225,15 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
+     :cardinality 100}},
+   :rowcount 3},
   :gen-viz-84
   {:fields
    {:rows
@@ -72,21 +249,7 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
+  :connections-sys {:fields {}, :rowcount 0},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -219,13 +382,24 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30}},
+   :rowcount 30},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 121,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100}},
+   :rowcount 121}},
  :default-col-widths
- {:system-connections-list* {:connections-sys 111},
+ {:virtual-panel {:kick--1764769189 152},
+  :system-connections-list* {:connections-sys ##Inf},
   :system-tables-list* {:tables-sys ##Inf},
   :system-fields-list* {:fields-sys ##Inf}},
+ :selected-signal :cool-raccoon-signal,
  :runstream-drops nil,
- :data-hash -1292778655,
+ :data-hash 217329978,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -427,28 +601,28 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [737489183 651146935 4294705152],
+ :memory [1359242252 1108415820 4294705152],
  :status-data
  {"kick-test!"
   {:kick
    {:data
     [{:sent! "kick-test!",
-      :to :easy-cerulean-camel-32,
-      :at "2024-04-22 17:21:01",
+      :to :adventurous-rectangular-penguin-38,
+      :at "2024-04-23 15:57:07",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-04-22 17:21:01 - query ran in 191 ms."],
-          :name "query-log-:rowcnt-drag-2",
-          :order 1713820861,
+        [{:content ["2024-04-23 15:57:07 - query ran in 1 ms."],
+          :name "query-log-:jvm_stats",
+          :order 1713902227,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
-        :description "query-log-:rowcnt-drag-2",
+        :description "query-log-:jvm_stats",
         :mutates {},
         :options {:actions? false, :pages? false, :search? false},
         :parameters {}}},
-      :payload-kp [:rowcnt-drag-2 "kick-test!"]}
+      :payload-kp [:jvm_stats "kick-test!"]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -457,7 +631,7 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-04-22 23:09:52",
+      :at "2024-04-24 13:43:33",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -472,56 +646,56 @@
        [:>
         :ComposedChart
         {:data
-         [{:mem 2399, :tick 74074, :threads 118, :subs 352, :load 2.28564453125}
-          {:mem 1624, :tick 74075, :threads 118, :subs 352, :load 2.4599609375}
-          {:mem 4787, :tick 74076, :threads 119, :subs 352, :load 2.13037109375}
-          {:mem 4230, :tick 74077, :threads 115, :subs 352, :load 1.85595703125}
-          {:mem 3407, :tick 74078, :threads 113, :subs 352, :load 2.01318359375}
-          {:mem 3295, :tick 74079, :threads 116, :subs 352, :load 2.42236328125}
-          {:mem 1955, :tick 74080, :threads 115, :subs 352, :load 1.86083984375}
-          {:mem 1648, :tick 74081, :threads 120, :subs 352, :load 2.46728515625}
-          {:mem 4892, :tick 74082, :threads 118, :subs 352, :load 2.53125}
-          {:mem 4073, :tick 74083, :threads 133, :subs 352, :load 2.53759765625}
-          {:mem 4742, :tick 74084, :threads 126, :subs 352, :load 2.8115234375}
-          {:mem 3423, :tick 74085, :threads 123, :subs 352, :load 2.32763671875}
-          {:mem 2055, :tick 74086, :threads 109, :subs 352, :load 2.072265625}
-          {:mem 4772, :tick 74087, :threads 109, :subs 352, :load 2.27734375}
-          {:mem 3490, :tick 74088, :threads 110, :subs 352, :load 2.44482421875}
-          {:mem 2141, :tick 74089, :threads 110, :subs 352, :load 2.4033203125}
-          {:mem 5021, :tick 74090, :threads 105, :subs 352, :load 2.1376953125}
-          {:mem 4098, :tick 74091, :threads 115, :subs 352, :load 2.13525390625}
-          {:mem 2998, :tick 74092, :threads 115, :subs 352, :load 2.70458984375}
-          {:mem 2660, :tick 74093, :threads 113, :subs 352, :load 2.34716796875}
-          {:mem 2320, :tick 74094, :threads 117, :subs 352, :load 2.173828125}
-          {:mem 1546, :tick 74095, :threads 118, :subs 352, :load 2.0966796875}
-          {:mem 4692, :tick 74096, :threads 117, :subs 352, :load 2.1162109375}
-          {:mem 3481, :tick 74097, :threads 115, :subs 352, :load 2.458984375}
-          {:mem 4079, :tick 74098, :threads 121, :subs 352, :load 2.50244140625}
-          {:mem 2785, :tick 74099, :threads 121, :subs 352, :load 2.30322265625}
-          {:mem 1473, :tick 74100, :threads 108, :subs 352, :load 2.1142578125}
-          {:mem 4596, :tick 74101, :threads 115, :subs 352, :load 1.99462890625}
-          {:mem 3676, :tick 74102, :threads 111, :subs 352, :load 2.0234375}
-          {:mem 4178, :tick 74103, :threads 148, :subs 352, :load 1.93994140625}
-          {:mem 3033, :tick 74104, :threads 135, :subs 352, :load 1.73681640625}
-          {:mem 2146, :tick 74105, :threads 115, :subs 352, :load 1.58154296875}
-          {:mem 5331, :tick 74106, :threads 113, :subs 352, :load 1.9150390625}
-          {:mem 1884, :tick 74107, :threads 120, :subs 352, :load 1.9033203125}
-          {:mem 1342, :tick 74108, :threads 124, :subs 352, :load 2.04248046875}
-          {:mem 1499, :tick 74109, :threads 134, :subs 352, :load 1.93505859375}
-          {:mem 4271, :tick 74110, :threads 128, :subs 352, :load 3.072265625}
-          {:mem 3959, :tick 74111, :threads 120, :subs 352, :load 2.53564453125}
-          {:mem 4448, :tick 74112, :threads 130, :subs 352, :load 2.34912109375}
-          {:mem 3302, :tick 74113, :threads 122, :subs 352, :load 2.0830078125}
-          {:mem 2003, :tick 74114, :threads 109, :subs 352, :load 1.83544921875}
-          {:mem 4707, :tick 74115, :threads 110, :subs 352, :load 1.5732421875}
-          {:mem 3372, :tick 74116, :threads 105, :subs 352, :load 2.01123046875}
-          {:mem 2066, :tick 74117, :threads 108, :subs 352, :load 2.1767578125}
-          {:mem 1288, :tick 74118, :threads 112, :subs 352, :load 1.9873046875}
-          {:mem 4645, :tick 74119, :threads 114, :subs 352, :load 2.34033203125}
-          {:mem 3326, :tick 74120, :threads 114, :subs 352, :load 2.2099609375}
-          {:mem 2028, :tick 74121, :threads 112, :subs 352, :load 1.99267578125}
-          {:mem 4699, :tick 74122, :threads 106, :subs 352, :load 1.9541015625}
-          {:mem 3397, :tick 74123, :threads 109, :subs 352, :load 1.89404296875}],
+         [{:mem 1559, :tick 78633, :threads 97, :subs 71, :load 3.88671875}
+          {:mem 1222, :tick 78634, :threads 96, :subs 67, :load 5.7294921875}
+          {:mem 1588, :tick 78635, :threads 103, :subs 67, :load 4.869140625}
+          {:mem 1182, :tick 78636, :threads 98, :subs 67, :load 3.9453125}
+          {:mem 786, :tick 78637, :threads 89, :subs 68, :load 3.91845703125}
+          {:mem 2319, :tick 78638, :threads 88, :subs 71, :load 3.37255859375}
+          {:mem 1974, :tick 78639, :threads 89, :subs 71, :load 3.4638671875}
+          {:mem 1623, :tick 78640, :threads 95, :subs 71, :load 3.09716796875}
+          {:mem 1263, :tick 78641, :threads 94, :subs 71, :load 3.7958984375}
+          {:mem 984, :tick 78642, :threads 89, :subs 71, :load 3.67822265625}
+          {:mem 2559, :tick 78643, :threads 93, :subs 71, :load 3.5234375}
+          {:mem 1830, :tick 78644, :threads 95, :subs 67, :load 4.79931640625}
+          {:mem 999, :tick 78645, :threads 98, :subs 67, :load 4.44775390625}
+          {:mem 1542, :tick 78646, :threads 98, :subs 67, :load 4.3408203125}
+          {:mem 1978, :tick 78647, :threads 91, :subs 68, :load 4.259765625}
+          {:mem 1149, :tick 78648, :threads 102, :subs 71, :load 3.87841796875}
+          {:mem 1641, :tick 78649, :threads 94, :subs 71, :load 3.81298828125}
+          {:mem 2072, :tick 78650, :threads 93, :subs 71, :load 4.48974609375}
+          {:mem 1047, :tick 78651, :threads 91, :subs 71, :load 3.95068359375}
+          {:mem 1527, :tick 78652, :threads 91, :subs 71, :load 3.6064453125}
+          {:mem 1944, :tick 78653, :threads 92, :subs 71, :load 2.83544921875}
+          {:mem 864, :tick 78654, :threads 89, :subs 71, :load 2.72265625}
+          {:mem 1445, :tick 78655, :threads 87, :subs 71, :load 2.66357421875}
+          {:mem 1948, :tick 78656, :threads 90, :subs 71, :load 2.30810546875}
+          {:mem 787, :tick 78657, :threads 99, :subs 67, :load 4.7626953125}
+          {:mem 1464, :tick 78658, :threads 104, :subs 67, :load 4.69189453125}
+          {:mem 2050, :tick 78659, :threads 96, :subs 67, :load 3.56787109375}
+          {:mem 1134, :tick 78660, :threads 89, :subs 68, :load 2.9404296875}
+          {:mem 2664, :tick 78661, :threads 93, :subs 67, :load 5.26171875}
+          {:mem 1747, :tick 78662, :threads 100, :subs 67, :load 4.546875}
+          {:mem 1440, :tick 78663, :threads 94, :subs 67, :load 3.80029296875}
+          {:mem 1400, :tick 78664, :threads 109, :subs 68, :load 3.6240234375}
+          {:mem 1065, :tick 78665, :threads 100, :subs 71, :load 2.783203125}
+          {:mem 846, :tick 78666, :threads 90, :subs 71, :load 2.95068359375}
+          {:mem 2607, :tick 78667, :threads 92, :subs 71, :load 2.60546875}
+          {:mem 2268, :tick 78668, :threads 92, :subs 71, :load 2.53759765625}
+          {:mem 1923, :tick 78669, :threads 87, :subs 71, :load 2.919921875}
+          {:mem 1601, :tick 78670, :threads 93, :subs 71, :load 2.87451171875}
+          {:mem 1245, :tick 78671, :threads 90, :subs 71, :load 2.77685546875}
+          {:mem 924, :tick 78672, :threads 89, :subs 71, :load 2.564453125}
+          {:mem 2670, :tick 78673, :threads 90, :subs 71, :load 2.14013671875}
+          {:mem 2342, :tick 78674, :threads 88, :subs 71, :load 2.08056640625}
+          {:mem 2004, :tick 78675, :threads 88, :subs 71, :load 1.85791015625}
+          {:mem 1668, :tick 78676, :threads 90, :subs 71, :load 2.01171875}
+          {:mem 1317, :tick 78677, :threads 90, :subs 71, :load 2.361328125}
+          {:mem 1009, :tick 78678, :threads 94, :subs 71, :load 2.1474609375}
+          {:mem 740, :tick 78679, :threads 95, :subs 71, :load 2.71630859375}
+          {:mem 2463, :tick 78680, :threads 92, :subs 71, :load 2.64306640625}
+          {:mem 2149, :tick 78681, :threads 89, :subs 71, :load 2.478515625}
+          {:mem 1141, :tick 78682, :threads 95, :subs 67, :load 4.0966796875}],
          :margin {:top 5, :bottom 5, :right 30, :left 20}}
         [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
         [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
@@ -529,7 +703,7 @@
         [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
         [:>
          :YAxis
-         {:yAxisId "right", :hide true, :dataKey :subs, :orientation "right"}]
+         {:yAxisId "right", :hide true, :dataKey :threads, :orientation "right"}]
         [:>
          :Bar
          {:yAxisId "left",
@@ -563,81 +737,53 @@
       5]
      nil],
     :elapsed-ms nil,
-    :reco-count nil}},
-  [:time :hour]
-  {:kick
-   {:data
-    [{:sent! [:time :hour],
-      :to :easy-cerulean-camel-32,
-      :at "2024-04-22 17:28:22",
-      :payload nil}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  [:time :second]
-  {:kick
-   {:data
-    [{:sent! [:time :second],
-      :to :easy-cerulean-camel-32,
-      :at "2024-04-22 17:29:08",
-      :payload nil}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  [:time :year]
-  {:kick
-   {:data
-    [{:sent! [:time :year],
-      :to :easy-cerulean-camel-32,
-      :at "2024-04-22 17:30:15",
-      :payload nil}
-     nil],
-    :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:flow/flow-forever>*running?
-  :flow/flow-forever>:final-math
+ [:time/nth
+  :time/now-seconds
+  :flow/flow-forever>*running?
+  :time/now
   :time/minute
   :time/hour
   :time/month-name
+  :time/day
   :flow/live-scratch-flow>*running?
   :time/second
-  :time/day],
- :client-name :easy-cerulean-camel-32,
+  :flow/flow-forever>:final-math],
+ :client-name :adventurous-rectangular-penguin-38,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2378, :h 1662},
+ :window {:w 2333, :h 1598},
  :post-meta
- {:gen-viz-797 {:* {:rowcount 317}},
-  :gen-viz-94 {:* {:rowcount 1}},
-  :rowcnt-drag-2 {:* {:rowcount 1}},
-  :gen-viz-828 {:* {:rowcount 317}},
-  :gen-viz-84 {:* {:rowcount 6}},
-  :ufo-sightings-drag-9 {:* {:rowcount 80332}},
-  :duration-hours-drag-43 {:* {:rowcount 8349}},
-  :city-drag-26 {:* {:rowcount 19899}},
-  :state-drag-3 {:* {:rowcount 68}},
-  :shape-drag-7 {:* {:rowcount 30}}},
+ {:gen-viz-797 {:* {:rowcount "execution error"}},
+  :gen-viz-94 {:* {:rowcount "execution error"}},
+  :rowcnt-drag-2 {:* {:rowcount "execution error"}},
+  :gen-viz-828 {:* {:rowcount "execution error"}},
+  :gen-viz-84 {:* {:rowcount "execution error"}},
+  :ufo-sightings-drag-9 {:* {:rowcount "execution error"}},
+  :duration-hours-drag-43 {:* {:rowcount "execution error"}},
+  :city-drag-26 {:* {:rowcount "execution error"}},
+  :state-drag-3 {:* {:rowcount "execution error"}},
+  :shape-drag-7 {:* {:rowcount "execution error"}}},
  :flow-estimates
  {"openai-image-gen-ladder"
-  {:times 49, :run-id "7bdb6491-24a4-4aa6-887c-fbb35be3fd3f"},
-  "counting-loop" {:times 6, :run-id "8aeb60e2-f633-4433-9927-792703735b2b"}},
+  {:times 42, :run-id "cf2a5c72-5ced-48f0-82b8-4a273c99863b"},
+  "counting-loop" {:times 6, :run-id "931dfe65-0851-4998-bf6b-5785577601dd"}},
  :status
- {"kick-test!" {:kick :rowcnt-drag-2},
+ {"kick-test!" {:kick :jvm_stats},
   :heartbeat
   {:kick
-   [:flow/flow-forever>*running?
-    :flow/flow-forever>:final-math
+   [:time/now-seconds
+    :flow/flow-forever>*running?
+    :time/now
     :time/minute
     :time/hour
     :time/month-name
+    :time/day
     :flow/live-scratch-flow>*running?
     :time/second
-    :time/day]},
-  :alert1 {:alerts :alert2},
-  [:time :hour] {:kick 17},
-  [:time :second] {:kick 8},
-  [:time :year] {:kick 2024}},
+    :flow/flow-forever>:final-math]},
+  :alert1 {:alerts :alert2}},
  :screen-name "looking-glass-redux",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
@@ -647,25 +793,39 @@
  :alerts [],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :panels-hash 78694097,
+ :base-sniff-queries {:jvm_stats 1498154063},
+ :panels-hash 1629550127,
  :sessions
- (["vital-bulbous-mosquito-0.edn" "101 hours, 57 minutes, 22 seconds" 367042243]
-   ["refined-round-llama-8.edn" "103 hours, 59 minutes, 28 seconds" 374368756]
-   ["beaming-gray-opossum-6.edn" "155 hours, 18 minutes, 28 seconds" 559108360]
-   ["commendable-thin-mole-14.edn" "2 minutes, 25 seconds" 145482]
-   ["cute-star-shaped-raccoon-3.edn" "2 minutes, 26 seconds" 146987]
-   ["remarkable-navy-blue-whale-9.edn" "2 minutes, 42 seconds" 162274]
-   ["certain-icosahedral-hound-19.edn"
-    "203 hours, 47 minutes, 28 seconds"
-    733648288]
-   ["adorable-desert-lark-5.edn" "22 hours, 50 minutes, 23 seconds" 82223070]
-   ["meritorious-hexagonal-louse-7.edn"
-    "230 hours, 11 minutes, 55 seconds"
-    828715579]),
+ (["ethical-orange-buffalo-exiled-from-hornito.edn"
+   "1014 hours, 31 minutes, 36 seconds"
+   3652296009]
+   ["vigorous-square-serval-banned-from-thalweg.edn"
+    "1015 hours, 51 minutes, 52 seconds"
+    3657112009]
+   ["keen-bronze-skunk-of-the-salt-pan.edn"
+    "1015 hours, 8 minutes, 56 seconds"
+    3654536009]
+   ["famous-square-sand-dollar-hailing-from-yazoo-stream.edn"
+    "1018 hours, 42 minutes, 56 seconds"
+    3667376009]
+   ["gorgeous-wide-wren-banned-from-etchplain.edn"
+    "1018 hours, 45 minutes, 38 seconds"
+    3667538009]
+   ["secure-taupe-heron-banned-from-tepui.edn"
+    "1018 hours, 47 minutes, 28 seconds"
+    3667648009]
+   ["impressive-periwinkle-jay-banned-from-rock-formations.edn"
+    "1021 hours, 14 minutes, 10 seconds"
+    3676450009]
+   ["affluent-chocolate-hawk-exiled-from-volcanic-island.edn"
+    "1021 hours, 14 minutes, 10 seconds"
+    3676450009]
+   ["proud-thin-elk-of-rôche-moutonnée.edn"
+    "1021 hours, 14 minutes, 10 seconds"
+    3676450009]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1687714585,
+ :user-params-hash -914890415,
  :grid-recos? true,
- :session-hash 1962028562,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -861,9 +1021,9 @@
    :order-by [[:rowcnt :desc]]}},
  :panels
  {:block-11586
-  {:h 6,
-   :w 17,
-   :root [29 1],
+  {:h 5,
+   :w 20,
+   :root [26 1],
    :tab "star-shaped wallaby",
    :selected-view :hi,
    :name "block-11586",
@@ -885,7 +1045,7 @@
       :color :theme/editor-outer-rim-color,
       :font-family :theme/base-font}
      :child
-     [:string [:time/month-name " " :time/day]]],
+     [:string [:time/month-name " " :time/day :time/nth]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
   :block-414
@@ -972,6 +1132,34 @@
      :order-by [[:rowcnt :desc]]}},
    :root [1 8],
    :tab "sapphire ape"},
+  :block-3341
+  {:h 3,
+   :w 21,
+   :root [1 17],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-3341",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3341.:hi"}
+     :style
+     {:font-size "66px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:string :time/now]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
   :block-7416
   {:h 5,
    :w 4,
@@ -1471,6 +1659,35 @@
    :tab "sapphire ape",
    :selected-view :ufo-sightings-drag-9}},
  :selected-block "none!",
+ :signals-map
+ {:hourly? {:signal [:changed? :time/hour]},
+  :fun-gorilla
+  {:signal
+   [:and
+    [:=
+     :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
+     "jessica"]
+    [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
+    [:or [:= 2 1] [:< 9 4]]]},
+  :cool-raccoon-signal
+  {:signal
+   [:and
+    [:or [:= :time/day 22] [:or [:= 88 88] [:= :time/day 23]]]
+    [:=
+     :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
+     "./images/gen/b64-image-12972-98621.png"]
+    [:<> :time/second 45]
+    [:= :time/hour 22]]},
+  :genius-gnat-signal {:signal [:and [:= :time/day 1] [:time/second]]},
+  :optimistic-sheep-signal
+  {:signal
+   [:and
+    [:= :day 1]
+    [:= :hour 9]
+    [:changed? :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]
+    [:signal/hourly?]]},
+  :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+  :worthy-fish-signal {:signal [:and [:= :time/day 23] [:= 22 22]]}},
  :theme-colors-hashmap
  {"float" "#ff2050",
   "boolean" "#8EA2A8",
@@ -1494,26 +1711,7 @@
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
   :param
-  {:selected-view [:views :hi],
-   :selected-view-data
-   [:box
-    :align
-    :center
-    :justify
-    :center
-    :attr
-    {:id ":block-1194.:hi"}
-    :style
-    {:font-size "303px",
-     :font-weight 700,
-     :padding-top "6px",
-     :padding-left "14px",
-     :margin-top "-8px",
-     :color :theme/editor-outer-rim-color,
-     :font-family :theme/base-font}
-    :child
-    [:string :time/second]],
-   :selected-block :block-1194},
+  {:selected-view [nil nil], :selected-view-data nil, :selected-block :block-11586},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -1633,6 +1831,46 @@
    :datetime "1956-10-10 21:00:00.000000",
    :latitude "28.9783333",
    :country "us"},
-  :time {:month 4, :minute 10, :hour 23, :month-name "APRIL", :second 2, :day 22}},
+  :time
+  {:month-name "APRIL",
+   :day 24,
+   :hour 13,
+   :now "Wednesday, April 24 1:43PM",
+   :second 57,
+   :now-seconds "Wednesday, April 24 1:43:57PM",
+   :nth "th",
+   :month 4,
+   :minute 43}},
  :selected-flow "live-scratch-flow",
+ :flow-statuses
+ {"crow-flow-201a"
+  {:last-updated nil,
+   :blocks_finished 9,
+   :block-overrides [],
+   :channels 0,
+   :channels-open 0,
+   :since-start "less than a second",
+   :*started-by :rvbbit-scheduler,
+   :time-running "less than a second",
+   :last-update {:done :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "counting-loop"
+  {:last-updated nil,
+   :blocks_finished 13,
+   :block-overrides [],
+   :channels 0,
+   :channels-open 0,
+   :since-start "6 seconds",
+   :*started-by :rvbbit-scheduler,
+   :time-running "6 seconds",
+   :last-update {:final-value/x :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []}},
  :post-condi {:c345-up-or-down? [{:v 0}]}}

@@ -1,17 +1,33 @@
-{:hourly? {:signal [:changed? :time/hour]},
- :fun-gorilla
+{:fun-gorilla
  {:signal
   [:and
    [:=
     :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
     "jessica"]
-   [:= 21 21]
-   [:= 9 9]
+   [:changed? :time/second]
+   [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
    [:or [:= 2 1] [:< 9 4]]]},
+ :worthy-fish-signal
+ {:signal
+  [:or [:= :time/day 23] [:changed? :time/minute] [:= 221 22]]},
+ :hourly? {:signal [:changed? :time/hour]},
  :cool-raccoon-signal
  {:signal
-  [:and [:= :time/day 23] [:= :time/second 45] [:= :time/hour 22]]},
- :genius-gnat-signal {:signal [:and [:= :time/day 1] [:time/second]]},
+  [:and
+   [:or [:= :time/day 22] [:or [:= 88 88] [:= :time/day 23]]]
+   [:= :time/second 45]]},
+ :fair-armadillo-signal
+ {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+ :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
+ :elegant-grasshopper-signal
+ {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+ :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+ :exciting-cheetah-signal
+ {:signal [:and [:= :day 1] [:= "cheecse" "cheese"] [:= :hour 9]]},
+ :genius-gnat-signal
+ {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
+ :special-lion-signal
+ {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
  :optimistic-sheep-signal
  {:signal
   [:and
@@ -20,6 +36,6 @@
    [:changed?
     :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]
    [:signal/hourly?]]},
- :fair-armadillo-signal
- {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
- :worthy-fish-signal {:signal [:and [:= :time/day 23] [:= 22 22]]}}
+ :glowing-bat-signal
+ {:signal
+  [:and [:= :time/day 1] [:changed? :time/second] [:= :time/hour 9]]}}

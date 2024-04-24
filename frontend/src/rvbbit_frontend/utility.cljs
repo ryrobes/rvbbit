@@ -9,6 +9,9 @@
             [cljs.core.async :as async :refer [<! timeout]]
             [cljs.tools.reader :refer [read-string]]
             [re-com.validate :refer [string-or-hiccup? alert-type? vector-of-maps?]]
+            [goog.crypt.Hash :as Hash]
+            [goog.crypt.Sha256 :as Sha256]
+            [goog.crypt.base64 :as base64]
             [zprint.core :as zp])
   (:import
 
@@ -16,6 +19,15 @@
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))
 
+(defn sha-256 [s]
+  (let [hash (goog.crypt.Sha256.)
+        bytes (apply str (mapv cljs.core/char s))]
+    (.update hash bytes)
+    (cstr/replace (str (base64/encodeByteArray (.digest hash))) "/" "")))
+
+
+
+;;(tap> [:sha256 (sha-256 "hello")])
 
 (defn gen-client-name []
   (let [;quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
@@ -27,7 +39,15 @@
   (let [names [(tales/quality) (tales/animal)]]
     (cstr/lower-case (str (cstr/join "-" names) "-signal"))))
 
+(defn break-out-parts [clause]
+  (cond
+    (not (vector? clause)) []
+    (some #{:and :or} (take 1 clause)) (cons clause (mapcat break-out-parts (rest clause)))
+    :else (cons clause (mapcat break-out-parts (rest clause)))))
 
+(defn where-dissect [clause]
+  (let [parts (break-out-parts clause)]
+    (cons clause (remove #(= clause %) parts))))
 
 (defn format-duration-seconds [seconds]
   (let [hours (int (/ seconds 3600))

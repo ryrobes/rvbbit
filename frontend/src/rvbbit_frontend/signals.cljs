@@ -125,8 +125,13 @@
 
 (def hover-tools-atom (reagent/atom nil))
    
-(defn hover-tools [coll]
-  (let [hovered? (= @hover-tools-atom coll)]
+(defn hover-tools [coll full-coll]
+  (let [hovered? (= @hover-tools-atom coll)
+        idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
+        selected-signal @(re-frame/subscribe [::selected-signal])
+        sigkw (keyword (str "signal/part-" (cstr/replace (str selected-signal) ":" "") "-" idx))
+        vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])
+        vv (if (nil? vv) "err!" vv)]
     [re-com/h-box
      :attr {:on-mouse-enter #(reset! hover-tools-atom coll)
             :on-mouse-over #(when (not= @hover-tools-atom coll)
@@ -134,13 +139,14 @@
             :on-mouse-leave #(reset! hover-tools-atom nil)}
     ;;  :style (when hovered? {:background-color "rgba(0, 0, 255, 0.3)"})
      :children [[kill-nest coll]
-                [re-com/box :padding "6px" :child "true"]]]))
+                [re-com/box :padding "6px" :child (str vv)]]]))
 
  
 (defn visualize-clause
-  [clause level & [contents]]
+  [clause level & [contents full-clause]]
   (let [is-operator? (fn [c] (and (vector? c) (keyword? (first c))
                                   (contains? #{:and :or :not} (first c))))
+        ;_ (tap> [:clause contents])
         render-operator (fn [operator contents lvl]
                           (let [body (vec (cons operator contents))
                                 hovered? (= @hover-tools-atom body)]
@@ -152,18 +158,20 @@
                              :children [[re-com/v-box
                                          :size "auto" :width (px (- 540 (* lvl 35)))
                                          :children (cons [droppable-area [re-com/box :child (str operator)] [:operator] contents operator]
-                                                         (map #(visualize-clause % (inc lvl) contents) contents))
+                                                         (map #(visualize-clause % (inc lvl) contents full-clause) contents))
                                          :gap "10px"
                                          :style {:border "1px solid #ccc" :padding "5px"
                                                  ;:font-size "17px"
                                                  :font-weight 700
                                                  :margin-left (str (* lvl 10) "px")}]
 
-                                        [hover-tools body]]]))
+                                        [hover-tools body full-clause]]]))
         render-condition (fn [condition level contents]
                            (let [bbox [re-com/h-box
                                        :children [[re-com/box :child (str condition) :size "auto"]]
                                        :style {:border "1px solid blue"
+                                               ;:overflow "hidden"
+                                               :max-width 230
                                                :padding "5px"}]
                                  bbox (if (= level 0) [re-com/box ;; TODO if is only one, looks weird 
                                                        ;:margin "6px"
@@ -180,6 +188,8 @@
            :style (merge
                    (when hovered? {:background-color "rgba(0, 0, 255, 0.3)"})
                    {;:font-size "17px"
+                    ;:overflow "hidden"
+                    ;:max-width 200
                     :font-weight 300
                     :margin-left (str (* level 10) "px")})
          ;:justify :between  
@@ -187,11 +197,11 @@
            :children
            [[re-com/h-box
            ;:size "auto"
-             :children (map #(visualize-clause % level clause) clause)
+             :children (map #(visualize-clause % level clause full-clause) clause)
              :gap "10px"
              :style {:border "1px solid #ccc" :padding "5px"}]
             ;;[re-com/box :padding "6px" :child (if (= lw 456) "false" "true")]
-            [hover-tools clause]
+            [hover-tools clause full-clause]
             ]])) ; Keep pairings on the same row
       (render-condition clause level contents))))
 
@@ -308,6 +318,10 @@
 (defn signals-list [ph signals selected-signal]
   (let [;signals @(re-frame/subscribe [::signals-map])
         ;selected-signal @(re-frame/subscribe [::selected-signal])
+        results (into {} (for [[name _] signals]
+                      (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
+                            vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])]
+                        {name vv})))
         ]
     [re-com/v-box
      :children
@@ -332,7 +346,9 @@
        :size "none"
        ;:height (px (- ph 94))
        :children (for [[name {:keys [signal]}] signals
-                       :let [selected? (= name selected-signal)]]
+                       :let [selected? (= name selected-signal)
+                             sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
+                             vv (get results name)]]
                    
                    [draggable-item
                     [re-com/v-box
@@ -352,13 +368,15 @@
                                  :justify :between
                                  :height "25px"
                                  :children [[re-com/box :child (str name)]
-                                            [re-com/box :child "true" :style {:font-weight 700}]]]
+                                            [re-com/box 
+                                             :child (str (if (nil? vv) "err!" vv))
+                                             :style {:font-weight 700}]]]
                                 [re-com/box :child
                                  ;;   (if selected?
                                  ;;     (visualize-clause signal 0)
                                  ;;     (str signal))
                                  (str signal)]]]
-                                 :operator (keyword (str "signal/" (cstr/replace (str name) ":" "")))
+                                 :operator sigkw
                                  ])]]]))
 
 
@@ -639,28 +657,28 @@
        :align :center :justify :between
        :style {:border "1px solid orange"}
        :children [[re-com/input-text
-                :src (at)
-                :model             searcher-atom
-                :width             "93%"
-                :on-change #(reset! searcher-atom (let [vv (str %) ;; (cstr/trim (str %))
-                                                        ]
-                                                    (if (empty? vv) nil vv)))
+                   :src (at)
+                   :model             searcher-atom
+                   :width             "93%"
+                   :on-change #(reset! searcher-atom (let [vv (str %) ;; (cstr/trim (str %))
+                                                           ]
+                                                       (if (empty? vv) nil vv)))
                ;:validation-regex  flow-id-regex
-                :placeholder "(search filter)"
-                :change-on-blur?   false
-                :style  {:text-decoration (when (ut/ne? @searcher-atom) "underline")
-                         :color "inherit"
+                   :placeholder "(search filter)"
+                   :change-on-blur?   false
+                   :style  {:text-decoration (when (ut/ne? @searcher-atom) "underline")
+                            :color "inherit"
                         ;:margin-top "3px"
                         ;:margin-left "-4px"
-                         :text-align "center"
-                         :background-color "#00000000"}]
-               [re-com/box 
-                :style {;:border "1px solid maroon"
-                        :opacity (if @searcher-atom 1.0 0.45)
-                        :cursor "pointer"}
-                :width "20px" :align :center :justify :center
-                :attr {:on-click #(reset! searcher-atom nil)}
-                :child "x"]]]
+                            :text-align "center"
+                            :background-color "#00000000"}]
+                  [re-com/box
+                   :style {;:border "1px solid maroon"
+                           :opacity (if @searcher-atom 1.0 0.45)
+                           :cursor "pointer"}
+                   :width "20px" :align :center :justify :center
+                   :attr {:on-click #(reset! searcher-atom nil)}
+                   :child "x"]]]
       [re-com/v-box
        :padding "6px"
        ;:width "35%"
@@ -671,19 +689,17 @@
                :overflow "auto"}
        :gap "6px"
        :children [[selector-panel "signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
-                  
+
                   [selector-panel "operators" (filter-results @searcher-atom operators) "zmdi-puzzle-piece" {} 5]
                   [selector-panel "conditions" (filter-results @searcher-atom conditions) "zmdi-puzzle-piece" {} 3]
                   [selector-panel "time items" (filter-results @searcher-atom time-items) "zmdi-calendar-alt" {} 2]
-                  
+
                   [selector-panel "parameters" (filter-results @searcher-atom time-items) "zmdi-shape" {} 2]
                   [selector-panel "flow values" (filter-results @searcher-atom time-items) "zmdi-shape" {} 2]
                   [selector-panel "clients" (filter-results @searcher-atom time-items) "zmdi-desktop-mac" {} 2]
 
                   [selector-panel "metrics" (filter-results @searcher-atom time-items) "zmdi-equalizer" {} 2]
-                  [selector-panel "KPIs" (filter-results @searcher-atom time-items) "zmdi-traffic" {} 2]
-                  
-                  ]]]]))
+                  [selector-panel "KPIs" (filter-results @searcher-atom time-items) "zmdi-traffic" {} 2]]]]]))
 
 
 (re-frame/reg-event-db
@@ -742,7 +758,16 @@
 (defn right-col [ph]
   (let [signals @(re-frame/subscribe [::signals-map])
         selected-signal @(re-frame/subscribe [::selected-signal])
-        signal-vec (get-in signals [selected-signal :signal])]
+        signal-vec (get-in signals [selected-signal :signal])
+        signal-vec-parts (vec (ut/where-dissect signal-vec))
+        
+        results (into {} (for [idx (range (count signal-vec-parts))]
+                           (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
+                                 name (get signal-vec-parts idx)
+                                 vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])]
+                             {name vv})))
+        
+        ]
     ;; (tap> [:right-col ph signals selected-signal signal-vec @db/flow-editor-system-mode])
     [re-com/v-box
      :width "65%"
@@ -766,7 +791,7 @@
                                        :padding "6px"
                                        :font-size "20px"}
                                :child (str @db/bad-form-msg-signals)]
-                              [rc/catch (visualize-clause signal-vec 0)]
+                              [rc/catch (visualize-clause signal-vec 0 nil signal-vec)]
                               ;[re-com/box :child "yo"]
                               )]
                     [re-com/box
