@@ -147,7 +147,13 @@
             :on-mouse-leave #(reset! hover-tools-atom nil)}
     ;;  :style (when hovered? {:background-color "rgba(0, 0, 255, 0.3)"})
      :children [[kill-nest coll]
-                [re-com/box :padding "6px" :child (str vv)]]]))
+                [re-com/box :padding "6px" 
+                 :style (merge 
+                         {;:border "1px solid yellow" 
+                          :font-size "12px"}
+                         (when (not (true? vv)) {:opacity 0.45}))
+                 :width "45px"
+                 :child (str vv)]]]))
 
  
 (defn visualize-clause
@@ -160,11 +166,17 @@
                                 hovered? (= @hover-tools-atom body)]
                             [re-com/h-box
                              :style (merge
-                                     {:border "1px solid transparent"}
+                                     {:transition "all 0.2s"
+                                      :border "1px solid transparent"}
                                      (when hovered?
                                        {:border "1px solid red"}
                                       ;{:background-color "rgba(0, 0, 255, 0.3)"}
-                                       ))
+                                       )
+                                     (when (is-true? body full-clause) 
+                                       ;{:filter "brightness(233%)"}
+                                       {:transform "scale(1.03)"}
+                                       )
+                                     )
                            ;:justify :between
                              :align :center 
                              :padding "6px"
@@ -177,7 +189,10 @@
                                                  {:border "1px solid #ccc" :padding "5px"
                                                  ;:font-size "17px"
                                                  :font-weight 700
-                                                 :margin-left (str (* lvl 10) "px")}
+                                                 :margin-left (if (is-true? body full-clause)
+                                                                (str (* lvl 11) "px")
+                                                                (str (* lvl 10) "px"))
+                                                  }
                                                  (when (is-true? body full-clause)
                                                    {:background-color "rgba(0, 0, 255, 0.3)"}))]
 
@@ -202,16 +217,22 @@
           [re-com/h-box
            ;:padding "6px"
            :style (merge
-                   {:border "1px solid transparent"}
+                   {:transition "all 0.2s"
+                    :border "1px solid transparent"}
                    (when hovered? 
                      ;;{:background-color "rgba(0, 0, 255, 0.3)"}
                      {:border "1px solid red"}
                          )
+                   (when (is-true? clause full-clause)
+                                                          ;{:filter "brightness(233%)"}
+                     {:transform "scale(1.03)"})
                    {;:font-size "17px"
                     ;:overflow "hidden"
                     ;:max-width 200
                     :font-weight 300
-                    :margin-left (str (* level 10) "px")})
+                    :margin-left (if (is-true? clause full-clause)
+                                  (str (* level 11) "px")
+                                  (str (* level 10) "px"))})
          ;:justify :between  
            :align :center ;:padding "6px"
            :children
