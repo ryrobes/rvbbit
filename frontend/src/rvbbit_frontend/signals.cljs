@@ -124,6 +124,14 @@
                        (re-frame/dispatch [::edit-signal-drop-kill op]))}])
 
 (def hover-tools-atom (reagent/atom nil))
+
+(defn is-true? [coll full-coll] 
+  (let [idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
+        selected-signal @(re-frame/subscribe [::selected-signal])
+        sigkw (keyword (str "signal/part-" (cstr/replace (str selected-signal) ":" "") "-" idx))
+        vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])
+        ;;vv (if (nil? vv) "err!" vv)
+        ] vv))
    
 (defn hover-tools [coll full-coll]
   (let [hovered? (= @hover-tools-atom coll)
@@ -151,7 +159,12 @@
                           (let [body (vec (cons operator contents))
                                 hovered? (= @hover-tools-atom body)]
                             [re-com/h-box
-                             :style (when hovered? {:background-color "rgba(0, 0, 255, 0.3)"})
+                             :style (merge
+                                     {:border "1px solid transparent"}
+                                     (when hovered?
+                                       {:border "1px solid red"}
+                                      ;{:background-color "rgba(0, 0, 255, 0.3)"}
+                                       ))
                            ;:justify :between
                              :align :center 
                              :padding "6px"
@@ -160,10 +173,13 @@
                                          :children (cons [droppable-area [re-com/box :child (str operator)] [:operator] contents operator]
                                                          (map #(visualize-clause % (inc lvl) contents full-clause) contents))
                                          :gap "10px"
-                                         :style {:border "1px solid #ccc" :padding "5px"
+                                         :style (merge 
+                                                 {:border "1px solid #ccc" :padding "5px"
                                                  ;:font-size "17px"
                                                  :font-weight 700
-                                                 :margin-left (str (* lvl 10) "px")}]
+                                                 :margin-left (str (* lvl 10) "px")}
+                                                 (when (is-true? body full-clause)
+                                                   {:background-color "rgba(0, 0, 255, 0.3)"}))]
 
                                         [hover-tools body full-clause]]]))
         render-condition (fn [condition level contents]
@@ -186,7 +202,11 @@
           [re-com/h-box
            ;:padding "6px"
            :style (merge
-                   (when hovered? {:background-color "rgba(0, 0, 255, 0.3)"})
+                   {:border "1px solid transparent"}
+                   (when hovered? 
+                     ;;{:background-color "rgba(0, 0, 255, 0.3)"}
+                     {:border "1px solid red"}
+                         )
                    {;:font-size "17px"
                     ;:overflow "hidden"
                     ;:max-width 200
@@ -359,7 +379,7 @@
                      :style {:border (if selected?
                                        "1px dashed cyan"
                                        "1px solid blue")
-                             :background-color (if selected?
+                             :background-color (if (or selected? (true? vv))
                                                  "rgba(0, 0, 255, 0.3)"
                                                  "rgba(0, 0, 0, 0.1)")
                              :cursor "pointer"}
@@ -755,12 +775,32 @@
                 :text-align "center"
                 :background-color "#00000000"}])))
 
+(re-frame/reg-event-db
+ ::run-signals-history
+ (fn [db _]
+   (re-frame/dispatch
+    [::wfx/request :default
+     {:message    {:kind :signals-history
+                   :signal-name (get db :selected-signal)
+                   :client-name @(re-frame/subscribe [::bricks/client-name])}
+      :on-response [::signals-history-response]
+      :timeout    15000000}])
+   db))
+
+(re-frame/reg-sub
+ ::run-signals-history?
+ (fn [db _]
+   (and (get db :flow?) 
+        (not (nil? (get db :selected-signal)))
+        (= (get @ db/flow-editor-system-mode 0) "signals"))))
+
+
 (defn right-col [ph]
   (let [signals @(re-frame/subscribe [::signals-map])
         selected-signal @(re-frame/subscribe [::selected-signal])
         signal-vec (get-in signals [selected-signal :signal])
         signal-vec-parts (vec (ut/where-dissect signal-vec))
-        
+        signals-history @(re-frame/subscribe [::signals-history])
         results (into {} (for [idx (range (count signal-vec-parts))]
                            (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
                                  name (get signal-vec-parts idx)
@@ -768,6 +808,16 @@
                              {name vv})))
         
         ]
+    
+    (re-frame/dispatch
+     [::wfx/request :default
+      {:message    {:kind :signals-history
+                    :signal-name selected-signal
+                    :client-name @(re-frame/subscribe [::bricks/client-name])}
+       :on-response [::signals-history-response]
+       :timeout    15000000}])
+    
+
     ;; (tap> [:right-col ph signals selected-signal signal-vec @db/flow-editor-system-mode])
     [re-com/v-box
      :width "65%"
@@ -811,11 +861,47 @@
                  :padding "6px"
                  :align :center :justify :center
                  :style {:border "1px solid lime"}
-                 ;:height (px (- (* ph 0.3) 20))
-                 :child (str (or @hover-tools-atom 
+                 :height (px (- (* ph 0.3) 48))
+                 :child ;(or @hover-tools-atom 
                                  (if (not (nil? selected-signal))
-                                   "signal-graph"
-                                   "last x signals true")))]
+                                   
+                                   [re-com/v-box 
+                                    :size "auto"
+                                    :children (for [[e vv] signals-history] 
+                                                [re-com/h-box
+                                                 :style (merge
+                                                         {:border "1px solid blue"}
+                                                         (when (= e @hover-tools-atom)
+                                                           {:border "1px solid red"
+                                                            ;:background-color "red"
+                                                            }))
+                                                 :attr {:on-mouse-enter #(reset! hover-tools-atom e)
+                                                        :on-mouse-over #(when (not= @hover-tools-atom e)
+                                                                          (reset! hover-tools-atom e))
+                                                        :on-mouse-leave #(reset! hover-tools-atom nil)}
+                                                 :size "auto"
+                                                 :width "600px"
+                                                 :children (for [[ee tt] vv]
+                                                             [re-com/box
+                                                              :size "none" 
+                                                              :width "30px"
+                                                              :align :center :justify :center
+                                                              :style (merge {:border "1px solid blue"
+                                                                             :font-family  (theme-pull :theme/monospaced-font nil)
+                                                                             :font-size "10px"}
+                                                                            (when (true? ee) 
+                                                                              {:background-color "blue"})
+                                                                            )
+                                                              :child ;;(str ee)
+                                                              (str 
+                                                               ;(subs (str tt) 17 19)
+                                                               (-> tt js/Date. .toISOString (subs 17 19))
+                                                               )
+                                                              ])])]
+
+                                   "last x signals true"
+                                   
+                                   )]
                 
                 ]]))
 
@@ -833,12 +919,26 @@
      (tap> [:signals-map-in result])
      (assoc db :signals-map result))))
 
+(re-frame/reg-event-db
+ ::signals-history-response
+ (fn [db [_ result]]
+   (let []
+     (tap> [:signals-history-in result])
+     (assoc db :signals-history result))))
+
+(re-frame/reg-sub
+ ::signals-history
+ (fn [db _]
+   (get db :signals-history)))
+
 (defn signals-panel []
   (let [[_ hpct] db/flow-panel-pcts ;; [0.85 0.50]
         hh @(re-frame/subscribe [::subs/h]) ;; we want the reaction 
         panel-height (* hh hpct)
         details-panel-height (/ panel-height 1.25) ;; batshit math from flow.cljs panel parent
         ppanel-height (+ panel-height details-panel-height)
+        
+        selected-signal @(re-frame/subscribe [::selected-signal])
         signals-map @(re-frame/subscribe [::signals-map])
         get-signals-map-evt-vec [::wfx/request :default
                                  {:message    {:kind :signals-map
@@ -870,6 +970,18 @@
                                          :child "pull from server?"]
                                         ;[re-com/box :child "(diff than the server!)"]
                                         ]]
+                            
+                            [re-com/box
+                             :attr {:on-click #(re-frame/dispatch
+                                                [::wfx/request :default
+                                                 {:message    {:kind :signals-history
+                                                               :signal-name selected-signal
+                                                               :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                                               :on-response [::signals-history-response]
+                                                  :timeout    15000000}])}
+                             :style {:cursor "pointer"}
+                             :child "get history"]
+
                             [re-com/box
                              :attr {:on-click #(re-frame/dispatch
                                                 [::wfx/request :default

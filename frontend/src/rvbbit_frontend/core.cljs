@@ -12,6 +12,7 @@
    [rvbbit-frontend.subs :as subs]
    [rvbbit-frontend.http :as http]
    [rvbbit-frontend.db :as db]
+   [rvbbit-frontend.signals :as signals]
    [rvbbit-frontend.utility :as ut]
    [clojure.string :as cstr]
    ;[cljs-time.core]
@@ -165,6 +166,11 @@
      {:interval                 5
       :event                    [::bricks/get-memory-usage]
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
+      :dispatch-event-on-start? false}
+     
+     {:interval                 1
+      :event                    [::signals/run-signals-history]
+      :poll-when                [::signals/run-signals-history?]
       :dispatch-event-on-start? false}
 
     ;;  {:interval                 15 ;; more?

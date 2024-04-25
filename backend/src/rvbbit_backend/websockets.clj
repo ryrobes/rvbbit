@@ -2674,6 +2674,19 @@
   (let [bm {}]
     @signals-atom))
 
+(defmethod wl/handle-request :signals-history [{:keys [client-name signal-name]}]
+  (ut/pp [:get-signals-history client-name :for signal-name])
+  (let [cc (get-in @signals-atom [signal-name :signal])
+        ccw (vec (ut/where-dissect cc))]
+    ;(ut/pp [:signals-history signal-name ccw])
+    ;(ut/pp [:hist-keys (keys @last-signals-history-atom)])
+    ;; (into {} (for [[k hist] (select-keys @last-signals-history-atom ccw)]
+    ;;   {k (vec (map first (take-last 10 (sort-by last hist))))}
+    ;;   ))
+    (select-keys @last-signals-history-atom ccw)
+    )
+  )
+
 (defmethod wl/handle-request :save-signals-map [{:keys [client-name signals-map]}]
   (ut/pp [:saving-signals-map client-name])
   (let [bm {}]
@@ -3061,6 +3074,7 @@
 ]] ;; extra cache for last value due to diff update cadence on last-values... TODO
                                                        {k v3})) ;; keypath is used as the actual key here, btw
                                             )}))
+        nowah (System/currentTimeMillis) ;; want to have a consistent timestamp for this reaction event
         signals-resolved (into {} (for [[k v] signals-map]
                                     {k (walk/postwalk-replace (get signals-resolve-map k) (resolve-changed-fn (get v :signal) k))}))
         parts-work (into {} ;; important side effects / will transition to a doseq after debugging phase
@@ -3073,13 +3087,19 @@
                                                     part-key (keyword (str "part-" (cstr/replace (str kk) ":" "") "-" (ut/index-of vv vvv)))
                                                     ;;_ (ut/pp [:part-key kk part-key vvv])
 
-                                                    _ (when (not= result (get @last-signals-atom part-key))  ;; no need for dupe histories
+                                                    _ (when true ;(not= result (get @last-signals-atom part-key))  ;; no need for dupe histories
+                                                        ;; (swap! last-signals-history-atom assoc part-key
+                                                        ;;        (vec (conj (take-last 9 (sort-by last (get @last-signals-history-atom part-key))) [result nowah])))
                                                         (swap! last-signals-history-atom assoc part-key
-                                                               (vec (conj (get @last-signals-history-atom part-key) [result (System/currentTimeMillis)]))))
-                                                    _ (when (not= result (get @last-signals-atom vvv)) ;; no need for dupe histories
+                                                               (into (vec (take-last 19 (sort-by second (get @last-signals-history-atom part-key)))) [[result nowah]]))
+                                                        )
+                                                    _ (when true ;(not= result (get @last-signals-atom vvv)) ;; no need for dupe histories
+                                                        ;; (swap! last-signals-history-atom assoc vvv
+                                                        ;;        (vec (conj (take-last 9 (sort-by last (get @last-signals-history-atom vvv))) [result nowah])))
                                                         (swap! last-signals-history-atom assoc vvv
-                                                               (vec (conj (get @last-signals-history-atom vvv) [result (System/currentTimeMillis)]))))
-                                                    _ (swap! last-signals-atom-stamp assoc vvv (System/currentTimeMillis))
+                                                               (into (vec (take-last 19 (sort-by second (get @last-signals-history-atom vvv)))) [[result nowah]]))
+                                                        )
+                                                    _ (swap! last-signals-atom-stamp assoc vvv nowah)
                                                     _ (swap! last-signals-atom assoc vvv result)
                                                     _ (swap! last-signals-atom assoc part-key result)]] ;; last time we resolved this signal, will be used to stop re-runs on the same signal
 
@@ -3089,11 +3109,14 @@
                                     :let [honey-sql-str (to-sql {:select [[1 :vv]] :where vv})
                                           result (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))
                                           
-                                          _ (when (not= result (get @last-signals-atom kk))  ;; no need for dupe histories
+                                          _ (when true ;(not= result (get @last-signals-atom kk))  ;; no need for dupe histories
+                                              ;(swap! last-signals-history-atom assoc kk
+                                              ;       (vec (conj (take-last 9 (sort-by last (get @last-signals-history-atom kk))) [result nowah])))
                                               (swap! last-signals-history-atom assoc kk
-                                                     (vec (conj (get @last-signals-history-atom kk) [result (System/currentTimeMillis)]))))
+                                                     (into (vec (take-last 19 (sort-by second (get @last-signals-history-atom kk)))) [[result nowah]]))
+                                              )
                                           _ (swap! last-signals-atom assoc kk result)
-                                          _ (swap! last-signals-atom-stamp assoc kk (System/currentTimeMillis))]]
+                                          _ (swap! last-signals-atom-stamp assoc kk nowah)]]
                                 {[kk vv] result}))]
     (doseq [[k v] signals-resolve-map]
       (doseq [[kk vv] v]
