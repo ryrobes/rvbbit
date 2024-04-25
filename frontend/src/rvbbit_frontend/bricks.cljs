@@ -344,7 +344,7 @@
                                                       (cstr/replace (str (get db :selected-signal)) ":" "") "-"
                                                       (.indexOf pps pp)))))))
          signal-subs (if signals-mode? (vec (into signal-ui-refs signal-ui-part-refs)) [])
-         _ (when (ut/ne? signal-subs) (tap> [:signal-subs  signal-subs]))
+         ;;_ (when (ut/ne? signal-subs) (tap> [:signal-subs  signal-subs]))
         ;; _ (tap> [:signal-subs signal-subs])
 
          theme-refs (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/") (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))]

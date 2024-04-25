@@ -2674,16 +2674,25 @@
   (let [bm {}]
     @signals-atom))
 
+(defonce client-helper-atom (atom {}))
+
 (defmethod wl/handle-request :signals-history [{:keys [client-name signal-name]}]
   (ut/pp [:get-signals-history client-name :for signal-name])
   (let [cc (get-in @signals-atom [signal-name :signal])
-        ccw (vec (ut/where-dissect cc))]
+        ccw (vec (ut/where-dissect cc))
+        history (select-keys (get @last-signals-history-atom signal-name) ccw)
+        last-payload (get-in @client-helper-atom [client-name signal-name])
+        is-new? (not= last-payload history)]
     ;(ut/pp [:signals-history signal-name ccw])
     ;(ut/pp [:hist-keys (keys @last-signals-history-atom)])
     ;; (into {} (for [[k hist] (select-keys @last-signals-history-atom ccw)]
     ;;   {k (vec (map first (take-last 10 (sort-by last hist))))}
     ;;   ))
-    (select-keys @last-signals-history-atom ccw)
+    (if is-new? 
+      (do 
+        (swap! client-helper-atom assoc-in [client-name signal-name] history)
+        history) 
+      :no-updates)
     )
   )
 
@@ -3088,16 +3097,12 @@
                                                     ;;_ (ut/pp [:part-key kk part-key vvv])
 
                                                     _ (when true ;(not= result (get @last-signals-atom part-key))  ;; no need for dupe histories
-                                                        ;; (swap! last-signals-history-atom assoc part-key
-                                                        ;;        (vec (conj (take-last 9 (sort-by last (get @last-signals-history-atom part-key))) [result nowah])))
-                                                        (swap! last-signals-history-atom assoc part-key
-                                                               (into (vec (take-last 19 (sort-by second (get @last-signals-history-atom part-key)))) [[result nowah]]))
+                                                        (swap! last-signals-history-atom assoc-in [kk part-key]
+                                                               (into (vec (take-last 19 (sort-by second (get-in @last-signals-history-atom [kk part-key])))) [[result nowah]]))
                                                         )
                                                     _ (when true ;(not= result (get @last-signals-atom vvv)) ;; no need for dupe histories
-                                                        ;; (swap! last-signals-history-atom assoc vvv
-                                                        ;;        (vec (conj (take-last 9 (sort-by last (get @last-signals-history-atom vvv))) [result nowah])))
-                                                        (swap! last-signals-history-atom assoc vvv
-                                                               (into (vec (take-last 19 (sort-by second (get @last-signals-history-atom vvv)))) [[result nowah]]))
+                                                        (swap! last-signals-history-atom assoc-in [kk vvv]
+                                                               (into (vec (take-last 19 (sort-by second (get-in @last-signals-history-atom [kk vvv])))) [[result nowah]]))
                                                         )
                                                     _ (swap! last-signals-atom-stamp assoc vvv nowah)
                                                     _ (swap! last-signals-atom assoc vvv result)
@@ -3110,10 +3115,8 @@
                                           result (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))
                                           
                                           _ (when true ;(not= result (get @last-signals-atom kk))  ;; no need for dupe histories
-                                              ;(swap! last-signals-history-atom assoc kk
-                                              ;       (vec (conj (take-last 9 (sort-by last (get @last-signals-history-atom kk))) [result nowah])))
-                                              (swap! last-signals-history-atom assoc kk
-                                                     (into (vec (take-last 19 (sort-by second (get @last-signals-history-atom kk)))) [[result nowah]]))
+                                              (swap! last-signals-history-atom assoc-in [kk kk]
+                                                     (into (vec (take-last 19 (sort-by second (get-in @last-signals-history-atom [kk kk])))) [[result nowah]]))
                                               )
                                           _ (swap! last-signals-atom assoc kk result)
                                           _ (swap! last-signals-atom-stamp assoc kk nowah)]]
@@ -3127,6 +3130,7 @@
   ;; (ut/pp [:process-signals-reaction! base-type keypath new-value client-param-path])
   (let [re-con-key (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
         valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))
+        _ (tap> [:signal-processing (vec valid-signals)])
 
         ;; signals-map (select-keys @signals-atom valid-signals)
         ;; signals-parts-map (into {} (for [[k {:keys [signal]}] signals-map] {k (vec (distinct (ut/where-dissect signal)))}))

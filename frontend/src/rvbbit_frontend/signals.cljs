@@ -943,9 +943,13 @@
 (re-frame/reg-event-db
  ::signals-history-response
  (fn [db [_ result]]
-   (let []
-     (tap> [:signals-history-in result])
-     (assoc db :signals-history result))))
+   (if (not (= result :no-updates))
+     (let []
+       (tap> [:signals-history-in result])
+       (assoc db :signals-history result))
+     (let []
+       (tap> [:nothing-new-in-signal-history :skipping])
+       db))))
 
 (re-frame/reg-sub
  ::signals-history
