@@ -117,7 +117,13 @@
    element])
 
 (defn kill-nest [op]
-  [re-com/box :child "x" :padding "6px"
+  [re-com/box :child 
+   [re-com/md-icon-button :src (at)
+    :md-icon-name "zmdi-close"
+    :style {:font-size "14px" 
+            :opacity 0.3
+            :padding-right "5px"}]
+   ;:padding "6px"
    :style {:cursor "pointer"}
    :attr {:on-click #(do
                        (tap> [:kill-nested op])
@@ -132,6 +138,9 @@
         vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])
         ;;vv (if (nil? vv) "err!" vv)
         ] vv))
+
+(declare highlight-code)
+(declare unhighlight-code)
    
 (defn hover-tools [coll full-coll]
   (let [hovered? (= @hover-tools-atom coll)
@@ -140,20 +149,35 @@
         sigkw (keyword (str "signal/part-" (cstr/replace (str selected-signal) ":" "") "-" idx))
         vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])
         vv (if (nil? vv) "err!" vv)]
+    ;(tap> [:coll-hover coll])
     [re-com/h-box
      :attr {:on-mouse-enter #(reset! hover-tools-atom coll)
-            :on-mouse-over #(when (not= @hover-tools-atom coll)
-                              (reset! hover-tools-atom coll))
-            :on-mouse-leave #(reset! hover-tools-atom nil)}
+            ;; :on-mouse-over #(when (not= @hover-tools-atom coll)
+            ;;                   (highlight-code (str coll))
+            ;;                   (reset! hover-tools-atom coll))
+            :on-mouse-over #(do
+                              ;(tap> "on-mouse-over")
+                              (when true ;(not= @hover-tools-atom coll)
+                                ;(tap> "before highlight-code")
+                                (highlight-code (str coll))
+                                ;(tap> "after highlight-code")
+                                (reset! hover-tools-atom coll)))
+            :on-mouse-leave #(do 
+                               (unhighlight-code)
+                               (reset! hover-tools-atom nil))}
     ;;  :style (when hovered? {:background-color "rgba(0, 0, 255, 0.3)"})
-     :children [[kill-nest coll]
-                [re-com/box :padding "6px" 
-                 :style (merge 
+     ;:style {:border "1px solid black"}
+     :align :center :justify :between
+     :children [[re-com/box :padding "6px"
+                 :style (merge
                          {;:border "1px solid yellow" 
                           :font-size "12px"}
-                         (when (not (true? vv)) {:opacity 0.45}))
-                 :width "45px"
-                 :child (str vv)]]]))
+                         (when (not (true? vv)) {:opacity 0.2})
+                         (when (true? vv) {:font-weight 700}))
+                 :width "40px"
+                 :child (str vv)]
+                [kill-nest coll]
+                ]]))
 
  
 (defn visualize-clause
@@ -169,24 +193,32 @@
                                      {:transition "all 0.2s"
                                       :border "1px solid transparent"}
                                      (when hovered?
-                                       {:border "1px solid red"}
+                                       {;:border "1px solid red"
+                                        :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 44)
+                                        :filter "invert(133%)"}
                                       ;{:background-color "rgba(0, 0, 255, 0.3)"}
                                        )
                                      (when (is-true? body full-clause) 
                                        ;{:filter "brightness(233%)"}
-                                       {:transform "scale(1.03)"}
+                                       {;:background-color (theme-pull :theme/editor-outer-rim-color nil)
+                                        ;:transform "scale(1.03)"
+                                        }
                                        )
                                      )
                            ;:justify :between
                              :align :center 
                              :padding "6px"
+                             :justify :between 
                              :children [[re-com/v-box
                                          :size "auto" :width (px (- 540 (* lvl 35)))
                                          :children (cons [droppable-area [re-com/box :child (str operator)] [:operator] contents operator]
                                                          (map #(visualize-clause % (inc lvl) contents full-clause) contents))
                                          :gap "10px"
                                          :style (merge 
-                                                 {:border "1px solid #ccc" :padding "5px"
+                                                 {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 45) 
+                                                  :padding "5px"
+                                                  :border-radius "8px"
+                                                  :background-color (str (theme-pull :theme/editor-outer-rim-color nil) "08")
                                                  ;:font-size "17px"
                                                  :font-weight 700
                                                  :margin-left (if (is-true? body full-clause)
@@ -194,13 +226,16 @@
                                                                 (str (* lvl 10) "px"))
                                                   }
                                                  (when (is-true? body full-clause)
-                                                   {:background-color "rgba(0, 0, 255, 0.3)"}))]
+                                                   {:border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 99)
+                                                    :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 44)}))]
 
                                         [hover-tools body full-clause]]]))
         render-condition (fn [condition level contents]
                            (let [bbox [re-com/h-box
                                        :children [[re-com/box :child (str condition) :size "auto"]]
-                                       :style {:border "1px solid blue"
+                                       :style {;:border "1px solid blue"
+                                               :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
+                                               :border-radius "8px"
                                                ;:overflow "hidden"
                                                :max-width 230
                                                :padding "5px"}]
@@ -218,14 +253,22 @@
            ;:padding "6px"
            :style (merge
                    {:transition "all 0.2s"
+                    :border-radius "8px"
                     :border "1px solid transparent"}
                    (when hovered? 
                      ;;{:background-color "rgba(0, 0, 255, 0.3)"}
-                     {:border "1px solid red"}
+                     {;;:border "1px solid red"
+                      :background-color (theme-pull :theme/editor-outer-rim-color nil)
+                      :filter "invert(133%)"
+                      }
                          )
                    (when (is-true? clause full-clause)
                                                           ;{:filter "brightness(233%)"}
-                     {:transform "scale(1.03)"})
+                     {
+                      ;:transform "scale(1.03)"
+                      :border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 99)
+                      :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 44)
+                      })
                    {;:font-size "17px"
                     ;:overflow "hidden"
                     ;:max-width 200
@@ -233,22 +276,32 @@
                     :margin-left (if (is-true? clause full-clause)
                                   (str (* level 11) "px")
                                   (str (* level 10) "px"))})
-         ;:justify :between  
+           :justify :between  
            :align :center ;:padding "6px"
            :children
            [[re-com/h-box
            ;:size "auto"
+             
              :children (map #(visualize-clause % level clause full-clause) clause)
              :gap "10px"
-             :style {:border "1px solid #ccc" :padding "5px"}]
+             :style {;:border "1px solid #ccc" 
+                     :border-radius "8px"
+                     :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
+                     :background-color (str (theme-pull :theme/editor-outer-rim-color nil) "08")
+                     :padding "5px"}]
             ;;[re-com/box :padding "6px" :child (if (= lw 456) "false" "true")]
             [hover-tools clause full-clause]
             ]])) ; Keep pairings on the same row
       (render-condition clause level contents))))
 
+(def cm-instance (atom nil))
+(def markers (atom []))
+
+(declare highlight-code)
 
 (defn code-box [width-int height-int value]
-  (let []
+  (let [] ;;[react! [@cm-instance @markers]]
+    ;(tap> [:width-int width-int]) ;; 634.4 
     [re-com/box
      :size "none"
      ;:width (px (- width-int 24))
@@ -261,9 +314,11 @@
              ;:border "1px solid yellow"
              :font-weight   700}
      :child [(reagent/adapt-react-class cm/UnControlled)
-             {:value   (ut/format-map (- width-int 95)
+             {:value   (ut/format-map 640 ;; (- width-int 95)
                                       (str value))
-              ;;:onBlur  #(re-frame/dispatch [::edit-signal (read-string (cstr/join " " (ut/cm-deep-values %)))])
+              ;:value  (str value)
+              :onBeforeChange (fn [editor data value]
+                                (reset! cm-instance editor))
               :onBlur  #(let [parse        (try (read-string
                                                  (cstr/join " " (ut/cm-deep-values %)))
                                                 (catch :default e [:cannot-parse (str (.-message e))]))
@@ -280,11 +335,11 @@
                                 (not (vector? parse))
                                 (do (reset! db/bad-form-signals? true)
                                     (reset! db/bad-form-msg-signals "Needs to be a vector / honey-sql where clause format"))
-
+ 
                                 :else (do (reset! db/bad-form-signals? false)
                                           (re-frame/dispatch [::edit-signal parse]))))
               :options {:mode              "clojure"
-                        :lineWrapping      true
+                        ;:lineWrapping      true
                         :lineNumbers       false ;true
                         :matchBrackets     true
                         :autoCloseBrackets true
@@ -293,6 +348,46 @@
                         :detach            true
                         :readOnly          false
                         :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
+
+
+(defn highlight-code [code]
+  (when-let [editor @cm-instance]
+    (let [doc (.getDoc editor)
+          code (ut/format-map 640 ;; 539 ;;(- 634.4 95) 
+                              (str code))
+          _ (tap> [:highlighted-code code])]
+      ;; Clear existing markers
+      (doseq [marker @markers]
+        (.clear marker))
+      (reset! markers [])
+      (let [code-lines (clojure.string/split-lines code)
+            start-line (loop [line 0]
+                         (when (< line (.lineCount doc))
+                           (if (clojure.string/includes? (.getLine doc line) (first code-lines))
+                             line
+                             (recur (inc line)))))
+            end-line (loop [line start-line]
+                       (when (< line (.lineCount doc))
+                         (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+                           line
+                           (recur (inc line)))))
+            start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+            end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+            marker (try
+                     (.markText doc
+                                #js {:line start-line, :ch start-ch}
+                                #js {:line end-line, :ch end-ch}
+                                #js {:css (str "filter: invert(233%); color: white; font-weight: 700; background-color: teal; padding: 4px;" )})
+                     (catch :default e (tap> [:marker-error (str e)])))]
+        (swap! markers conj marker)))))
+
+(defn unhighlight-code []
+  (when-let [editor @cm-instance]
+    (let [doc (.getDoc editor)]
+      (doseq [marker @markers]
+        (when marker
+          (.clear marker)))
+      (reset! markers []))))
 
 (re-frame/reg-sub
  ::signals-map
@@ -356,6 +451,31 @@
          (assoc-in [:signals-map signal-name :signal] [:and [:= :day 1] [:= :hour 9]])
          (assoc :selected-signal signal-name)))))
 
+(defn code-box-smol [width-int height-int value & [syntax]]
+  [re-com/box
+   :size "auto"
+     ;:width "100%" ;(px (- width-int 24))
+     ;:height (px (- height-int 24))
+   :style {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
+           :font-size     "11px"
+           :overflow      "auto"
+           :border-radius "12px"
+           :font-weight   700}
+   :child [(reagent/adapt-react-class cm/UnControlled)
+           {:value   (ut/format-map 350 ;; (- width-int 95)
+                                    (str value))
+            :options {:mode              "clojure"
+                      :lineWrapping      true
+                      :lineNumbers       false ; true
+                      :matchBrackets     true
+                      :autoCloseBrackets true
+                      :autofocus         false
+                      :autoScroll        false
+                      :detach            true
+                      :readOnly          true            ;true
+                      :theme             (theme-pull :theme/codemirror-theme nil)}}]]) ;"ayu-mirage" ;"hopscotch"
+
+
 (defn signals-list [ph signals selected-signal]
   (let [;signals @(re-frame/subscribe [::signals-map])
         ;selected-signal @(re-frame/subscribe [::selected-signal])
@@ -381,7 +501,7 @@
                     [re-com/gap :size "5px"])]]
       [re-com/v-box
        :padding "6px"
-       :style {:border "1px solid red"
+       :style {;:border "1px solid red"
                :overflow "auto"}
        :gap "6px"
        :size "none"
@@ -398,25 +518,39 @@
                      :width "100%"
                      :attr {:on-double-click #(re-frame/dispatch [::select-signal (if selected? nil name)])}
                      :style {:border (if selected?
-                                       "1px dashed cyan"
-                                       "1px solid blue")
-                             :background-color (if (or selected? (true? vv))
-                                                 "rgba(0, 0, 255, 0.3)"
-                                                 "rgba(0, 0, 0, 0.1)")
+                                       (str "3px dashed " (theme-pull :theme/editor-outer-rim-color nil) 99)
+                                       (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) "28")
+                                       )
+                             :background-color (cond selected? ;;(or selected? (true? vv))
+                                                     (str (theme-pull :theme/editor-outer-rim-color nil) 65) ;; "rgba(0, 0, 255, 0.3)"
+
+                                                     (true? vv)
+                                                     (str (theme-pull :theme/editor-outer-rim-color nil) 30) ;; "rgba(0, 0, 255, 0.3)"
+
+                                                     :else "rgba(0, 0, 0, 0.1)")
                              :cursor "pointer"}
                      :children [[re-com/h-box
                                  :style {:font-size "19px"}
                                  :justify :between
                                  :height "25px"
-                                 :children [[re-com/box :child (str name)]
-                                            [re-com/box 
+                                 :children [[re-com/box 
+                                             :style {:font-size "18px"
+                                                     :font-weight 700}
+                                             :child (str name)]
+                                            [re-com/box
                                              :child (str (if (nil? vv) "err!" vv))
-                                             :style {:font-weight 700}]]]
-                                [re-com/box :child
-                                 ;;   (if selected?
-                                 ;;     (visualize-clause signal 0)
-                                 ;;     (str signal))
-                                 (str signal)]]]
+                                             :style {:font-weight 700
+                                                     :font-size "17px"
+                                                     :opacity (if (true? vv) 1.0 0.2)}]]]
+                                (when true ;;(not selected?)
+                                  [re-com/box
+                                   :padding "4px"
+                                   :style {;:opacity 0.33
+                                           :font-size "11px"
+                                           :border-radius "7px"
+                                           :background-color "#00000099"
+                                           :font-family  (theme-pull :theme/monospaced-font nil)}
+                                   :child [code-box-smol 60 60 (str signal) "clojure"]])]]
                                  :operator sigkw
                                  ])]]]))
 
@@ -433,16 +567,18 @@
         partition? (integer? wide?)]
     [re-com/v-box
      :padding "6px"
-     :style (merge {:border "1px solid yellow"} style)
+     :style (merge {:border (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 55)
+                    :border-radius "4px"}
+                   style)
      :children [[re-com/h-box
                  :height "28px"
-                 :style {:cursor "pointer"}
+                 :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}
                  :justify :between :align :center
                  :attr {:on-click #(if open?
                                      (reset! selectors-open (remove (fn [x] (= x name)) @selectors-open))
                                      (swap! selectors-open conj name))}
                  :children [[re-com/h-box
-                             :style {:font-size "19px"}
+                             :style {:font-size "22px"}
                              :gap "8px" :align :center :justify :center 
                              :children [[re-com/box :child name]
                                         [re-com/box
@@ -454,6 +590,7 @@
                              :style {;:color (if open?
                                      ;         (str (theme-pull :theme/editor-outer-rim-color nil) 99)
                                      ;         (str (theme-pull :theme/editor-outer-rim-color nil) 45))
+                                     :color (theme-pull :theme/editor-outer-rim-color nil)
                                      :font-size "14px"}]]]
                 (when open?
                   (if (= name "signals")
@@ -471,15 +608,17 @@
                        :style {:margin-top "6px"}
                        :children (for [seg (partition-all wide? items)]
                                    [re-com/h-box ;;:size "auto"
+                                    :align :center :justify :center 
                                     :children (for [item seg
                                                     :let [pw (* (- (last @db/flow-editor-system-mode) 70) 0.35)
-                                                          width (/ pw wide?)]]
+                                                          width (- (/ pw wide?) 10)]]
                                                 [draggable-item
                                                  [re-com/box
                                                   :width (px width)
                                                 ;;:size "auto"
                                                   :padding "6px"
                                                   :style {:border "1px solid purple"
+                                                          :background-color "#DA70D624"
                                                           :font-family   (theme-pull :theme/monospaced-font nil)}
                                                   :child (str item)] :operator item])])]
                       [(if wide?
@@ -583,7 +722,7 @@
                    :padding "6px"
                    :width "320px"
                    :height "35px"
-                   :style {:border "1px solid #ffffff33"
+                   :style {;:border "1px solid #ffffff33"
                            :font-family   (theme-pull :theme/monospaced-font nil)}
                    :children [[re-com/box 
                                :style {:overflow "hidden"
@@ -633,7 +772,7 @@
                               :align :center :justify :center 
                               :size "auto"
                               :style (merge
-                                      {:border "1px solid pink"
+                                      {;:border "1px solid pink"
                                        :cursor "pointer"}
                                       (if (= btn @mode-atom)
                                         {:background-color "rgba(0, 0, 255, 0.3)"}
@@ -661,7 +800,7 @@
                 ;;                                               [re-com/box :child (str (get v :type))]
                 ;;                                               ]])])]]
                 ]
-     :style {:border "2px solid maroon"}
+     ;:style {:border "2px solid maroon"}
      :height (px hh)]))
 
 (defonce searcher-atom (reagent/atom nil))
@@ -696,7 +835,7 @@
        :padding "6px"
        :height "50px"
        :align :center :justify :between
-       :style {:border "1px solid orange"}
+       ;:style {:border "1px solid orange"}
        :children [[re-com/input-text
                    :src (at)
                    :model             searcher-atom
@@ -711,6 +850,7 @@
                             :color "inherit"
                         ;:margin-top "3px"
                         ;:margin-left "-4px"
+                            :outline "none"
                             :text-align "center"
                             :background-color "#00000000"}]
                   [re-com/box
@@ -726,12 +866,12 @@
        :height (px (- ph 100 ;; 50
                       ;(if selected-signal (+ flow-box-hh 50) 50)
                       ))
-       :style {:border "1px solid yellow"
+       :style {;:border "1px solid yellow"
                :overflow "auto"}
        :gap "6px"
-       :children [[selector-panel "signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
+       :children [
 
-                  [selector-panel "operators" (filter-results @searcher-atom operators) "zmdi-puzzle-piece" {} 5]
+                  [selector-panel "operators" (filter-results @searcher-atom operators) "zmdi-puzzle-piece" {} 3]
                   [selector-panel "conditions" (filter-results @searcher-atom conditions) "zmdi-puzzle-piece" {} 3]
                   [selector-panel "time items" (filter-results @searcher-atom time-items) "zmdi-calendar-alt" {} 2]
 
@@ -740,7 +880,11 @@
                   [selector-panel "clients" (filter-results @searcher-atom time-items) "zmdi-desktop-mac" {} 2]
 
                   [selector-panel "metrics" (filter-results @searcher-atom time-items) "zmdi-equalizer" {} 2]
-                  [selector-panel "KPIs" (filter-results @searcher-atom time-items) "zmdi-traffic" {} 2]]]]]))
+                  [selector-panel "KPIs" (filter-results @searcher-atom time-items) "zmdi-traffic" {} 2]
+                  
+                  [selector-panel "signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
+                  
+                  ]]]]))
 
 
 (re-frame/reg-event-db
@@ -768,12 +912,13 @@
        :height  "45px"
        :width (px w)
        :align :center
-       :justify :end
+       :justify :start
        :attr {:on-double-click #(reset! title-edit-idx (str signal-name))}
        :style {:cursor "pointer"
                :padding-right "12px"
                :padding-top "1px"
                :border "2px solid transparent"
+               ;:border "2px solid yellow"
                :font-size "26px"}
        :child (str signal-name)]
       [re-com/input-text
@@ -793,7 +938,7 @@
                 :text-decoration "underline"
                 :color (theme-pull :theme/editor-outer-rim-color nil)
                 :font-style "underline"
-                :text-align "center"
+                :text-align "left"
                 :background-color "#00000000"}])))
 
 (re-frame/reg-event-db
@@ -826,17 +971,15 @@
                            (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
                                  name (get signal-vec-parts idx)
                                  vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])]
-                             {name vv})))
-        
-        ]
+                             {name vv})))]
     
-    (re-frame/dispatch
-     [::wfx/request :default
-      {:message    {:kind :signals-history
-                    :signal-name selected-signal
-                    :client-name @(re-frame/subscribe [::bricks/client-name])}
-       :on-response [::signals-history-response]
-       :timeout    15000000}])
+    ;; (re-frame/dispatch
+    ;;  [::wfx/request :default
+    ;;   {:message    {:kind :signals-history
+    ;;                 :signal-name selected-signal
+    ;;                 :client-name @(re-frame/subscribe [::bricks/client-name])}
+    ;;    :on-response [::signals-history-response]
+    ;;    :timeout    15000000}])
     
 
     ;; (tap> [:right-col ph signals selected-signal signal-vec @db/flow-editor-system-mode])
@@ -844,16 +987,41 @@
      :width "65%"
      :children [(when selected-signal
                   [re-com/v-box
-                   :style {:font-family   (theme-pull :theme/monospaced-font nil)
-                           :border "1px solid pink"}
+                   :style {;:font-family   (theme-pull :theme/monospaced-font nil)
+                           ;:border "1px solid pink"
+                           }
                    :height (px (* ph 0.7))
                    :padding "6px"
                    :children
-                   [[edit-signal-name selected-signal (* (- (last @db/flow-editor-system-mode) 70) 0.65)]
+                   [(let [ww (* (- (last @db/flow-editor-system-mode) 70) 0.65)]
+                      [re-com/h-box
+                       :justify :between :align :center
+                       :children
+                       [[edit-signal-name selected-signal (* ww 0.9)]
+                        [re-com/box 
+                         :align :center :justify :center
+                         :style {;:border "1px solid yellow"
+                                 :font-size "22px"
+                                 :font-weight 700}
+                         :height "100%"
+                         :width (px (* ww 0.1))
+                         :child "true"]]])
+
+                    [re-com/box
+                     :style {;:border "1px solid orange"
+                             }
+                     :height (px (- (* (* ph 0.7) 0.25) 12)) ;; "24%" 
+                     :padding "6px"
+                     :child [code-box
+                             (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
+                             (- (* (* ph 0.7) 0.25) 5) ;; (* ph 0.25) 
+                             (str signal-vec)]]
+
                     [re-com/box
                      :height (px (- (* (* ph 0.7) 0.75) 50)) :size "none"
                      :padding "6px"
-                     :style {:border "1px solid pink" :overflow "auto"}
+                     :style {;:border "1px solid pink" 
+                             :overflow "auto"}
                      :child (if @db/bad-form-signals?
                               [re-com/box
                                :size "auto"
@@ -864,15 +1032,7 @@
                                :child (str @db/bad-form-msg-signals)]
                               [rc/catch (visualize-clause signal-vec 0 nil signal-vec)]
                               ;[re-com/box :child "yo"]
-                              )]
-                    [re-com/box
-                     :style {:border "1px solid orange"}
-                     :height (px (- (* (* ph 0.7) 0.25) 12)) ;; "24%" 
-                     :padding "6px"
-                     :child [code-box
-                             (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
-                             (- (* (* ph 0.7) 0.25) 5) ;; (* ph 0.25) 
-                             (str signal-vec)]]]])
+                              )]]])
                 
                 ;; [signals-list (if selected-signal
                 ;;               (* ph 0.3)
@@ -881,25 +1041,32 @@
                 [re-com/box 
                  :padding "6px"
                  :align :center :justify :center
-                 :style {:border "1px solid lime"}
+                 ;:style {:border "1px solid lime"}
                  :height (px (- (* ph 0.3) 48))
                  :child ;(or @hover-tools-atom 
                                  (if (not (nil? selected-signal))
                                    
                                    [re-com/v-box 
                                     :size "auto"
-                                    :children (for [[e vv] signals-history] 
+                                    :children (for [[e vv] (sort-by #(count (pr-str (last %))) signals-history)
+                                                    ;:let (for [[ee vvv] signals-history] [(count (str))])
+                                                    ] 
                                                 [re-com/h-box
                                                  :style (merge
-                                                         {:border "1px solid blue"}
+                                                         {;:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil))
+                                                          }
                                                          (when (= e @hover-tools-atom)
-                                                           {:border "1px solid red"
+                                                           {;:border "1px solid red"
+                                                           :filter "invert(233%)"
                                                             ;:background-color "red"
                                                             }))
                                                  :attr {:on-mouse-enter #(reset! hover-tools-atom e)
-                                                        :on-mouse-over #(when (not= @hover-tools-atom e)
+                                                        :on-mouse-over #(when true ;(not= @hover-tools-atom e)
+                                                                          (highlight-code (str e))
                                                                           (reset! hover-tools-atom e))
-                                                        :on-mouse-leave #(reset! hover-tools-atom nil)}
+                                                        :on-mouse-leave #(do 
+                                                                           (unhighlight-code)
+                                                                           (reset! hover-tools-atom nil))}
                                                  :size "auto"
                                                  :width "600px"
                                                  :children (for [[ee tt] vv]
@@ -907,11 +1074,12 @@
                                                               :size "none" 
                                                               :width "30px"
                                                               :align :center :justify :center
-                                                              :style (merge {:border "1px solid blue"
+                                                              :style (merge {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
                                                                              :font-family  (theme-pull :theme/monospaced-font nil)
+                                                                             :color "#000000"
                                                                              :font-size "10px"}
                                                                             (when (true? ee) 
-                                                                              {:background-color "blue"})
+                                                                              {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 65)})
                                                                             )
                                                               :child ;;(str ee)
                                                               (str 
@@ -945,10 +1113,10 @@
  (fn [db [_ result]]
    (if (not (= result :no-updates))
      (let []
-       (tap> [:signals-history-in result])
+       ;;(tap> [:signals-history-in result])
        (assoc db :signals-history result))
      (let []
-       (tap> [:nothing-new-in-signal-history :skipping])
+       ;;(tap> [:nothing-new-in-signal-history :skipping])
        db))))
 
 (re-frame/reg-sub
@@ -982,13 +1150,15 @@
      :width (px (- (last @db/flow-editor-system-mode) 14))
      :size "none"
      :height (px ph)
-     :style {:border "1px solid cyan"
+     :style {;;:border "1px solid cyan"
+             :border-radius "8px"
              :background-color (str (theme-pull :theme/editor-rim-color nil) "18")}
      :children [[re-com/h-box
                  :padding "6px"
                  :justify :between :align :center 
                  :children [[re-com/h-box 
                              :gap "8px"
+                             :style {:opacity 0.15}
                              :children [[re-com/box 
                                          :attr {:on-click #(re-frame/dispatch get-signals-map-evt-vec)}
                                          :style {:cursor "pointer"}
@@ -1004,7 +1174,7 @@
                                                                :client-name @(re-frame/subscribe [::bricks/client-name])}
                                                                :on-response [::signals-history-response]
                                                   :timeout    15000000}])}
-                             :style {:cursor "pointer"}
+                             :style {:cursor "pointer" :opacity 0.15}
                              :child "get history"]
 
                             [re-com/box
@@ -1016,7 +1186,7 @@
                                                   ;:on-response [::signals-map-response]
                                                   ;:on-timeout  [::timeout-response :get-signals]
                                                   :timeout    15000000}])}
-                             :style {:cursor "pointer"}
+                             :style {:cursor "pointer" :opacity 0.15}
                              :child "push this signal set to server?"]]]
                 [re-com/gap :size "5px"]
                 [re-com/h-box :children [[left-col ph]

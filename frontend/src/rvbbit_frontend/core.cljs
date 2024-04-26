@@ -240,6 +240,12 @@
                        :on-response [::http/simple-response-boot-no-load] ;; just get settings
                        :on-timeout [::http/timeout-response [:boot :get-settings]]
                        :timeout    15000}])
+  (re-frame/dispatch [::wfx/request :default
+                      {:message    {:kind :signals-map
+                                    :client-name @(re-frame/subscribe [::bricks/client-name])}
+                       :on-response [::signals/signals-map-response]
+                       ;;:on-timeout  [::timeout-response :get-signals]
+                       :timeout    15000000}])
   (track-mouse-activity)
   (let [press-fn (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event thrash
                    ;; still kind of fucky though
