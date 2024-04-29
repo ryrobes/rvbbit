@@ -501,36 +501,35 @@
                                     {:custom @wss/custom-flow-blocks}
                                     {:sub-flows @wss/sub-flow-blocks}))
 
-  ;(when harvest-on-boot?
-    ;(update-all-conn-meta)
-  ;)
+  (when harvest-on-boot?
+    (update-all-conn-meta))
 
-    ;; (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
-    ;;  "system-db"
-    ;;  system-db
-    ;;  system-db
-    ;;  cruiser/default-sniff-tests
-    ;;  cruiser/default-field-attributes
-    ;;  cruiser/default-derived-fields
-    ;;  cruiser/default-viz-shapes)
+    (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
+     "system-db"
+     system-db
+     system-db
+     cruiser/default-sniff-tests
+     cruiser/default-field-attributes
+     cruiser/default-derived-fields
+     cruiser/default-viz-shapes)
 
-    ;; (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
-    ;;  "flows-db"
-    ;;  flows-db
-    ;;  system-db
-    ;;  cruiser/default-sniff-tests
-    ;;  cruiser/default-field-attributes
-    ;;  cruiser/default-derived-fields
-    ;;  cruiser/default-viz-shapes)
+    (cruiser/lets-give-it-a-whirl-no-viz  ;;; force flows-db as a conn, takes a sec
+     "flows-db"
+     flows-db
+     system-db
+     cruiser/default-sniff-tests
+     cruiser/default-field-attributes
+     cruiser/default-derived-fields
+     cruiser/default-viz-shapes)
 
-    ;; (cruiser/lets-give-it-a-whirl-no-viz  ;;; force cache-db as a conn, takes a sec
-    ;;  "cache.db"
-    ;;  wss/cache-db
-    ;;  system-db
-    ;;  cruiser/default-sniff-tests
-    ;;  cruiser/default-field-attributes
-    ;;  cruiser/default-derived-fields
-    ;;  cruiser/default-viz-shapes)
+    (cruiser/lets-give-it-a-whirl-no-viz  ;;; force cache-db as a conn, takes a sec
+     "cache.db"
+     wss/cache-db
+     system-db
+     cruiser/default-sniff-tests
+     cruiser/default-field-attributes
+     cruiser/default-derived-fields
+     cruiser/default-viz-shapes)
 
 
     (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))

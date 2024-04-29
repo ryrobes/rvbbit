@@ -2,8 +2,8 @@
  {:http-call-1
   {:w 200,
    :h 100,
-   :x 1709.279153029983,
-   :y 1000.8783394478462,
+   :x 1000,
+   :y 1075,
    :z 0,
    :data
    {:flow-item
@@ -34,15 +34,7 @@
     :connection-id nil,
     :queries
     {:name-drag-9
-     {:select
-      [:name
-       :full_map
-       :description
-       :inputs
-       :icon
-       :input_types
-       :output_types
-       :category],
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
       :from [[:query/flow-fn-sys :vv675]],
       :where [:= :name ":http-call"]}},
     :drag-meta
@@ -93,18 +85,16 @@
    :data
    {:drag-meta {:type :open-block},
     :flow-item {:expandable? true},
-    :user-input
-    {:url
-     "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/lights"}},
+    :user-input {:url "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/lights"}},
    :z 0,
    :ports {:out {:url :string, :* :map}},
-   :x 960.9506585198478,
-   :y 1133.4026050464524},
+   :x 1000,
+   :y 900},
   :http-call-2
   {:w 200,
    :h 100,
-   :x 1221.620216652199,
-   :y 1378.4553638599536,
+   :x 1250,
+   :y 1075,
    :z 0,
    :data
    {:flow-item
@@ -135,15 +125,7 @@
     :connection-id nil,
     :queries
     {:name-drag-31
-     {:select
-      [:name
-       :full_map
-       :description
-       :inputs
-       :icon
-       :input_types
-       :output_types
-       :category],
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
       :from [[:query/flow-fn-sys :jj149]],
       :where [:= :name ":http-call"]}},
     :drag-meta
@@ -161,34 +143,19 @@
    :icon "zmdi-http",
    :ports
    {:in {:req-map :map},
-    :out
-    {:* :map,
-     :10 :map,
-     :4 :map,
-     :7 :map,
-     :1 :map,
-     :8 :map,
-     :9 :map,
-     :2 :map,
-     :5 :map,
-     :200 :map,
-     :3 :map,
-     :6 :map}}},
+    :out {:* :map, :10 :map, :4 :map, :7 :map, :1 :map, :8 :map, :9 :map, :2 :map, :5 :map, :200 :map, :3 :map, :6 :map}}},
   :open-input-1
   {:w 200,
    :h 100,
    :data
    {:drag-meta {:type :open-block},
     :flow-item {:expandable? true},
-    :user-input
-    {:url
-     "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/groups"}},
+    :user-input {:url "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/groups"}},
    :z 0,
    :ports {:out {:url :string, :* :map}},
-   :x 776.9734718605323,
-   :y 1434.3287037037035}},
+   :x 1250,
+   :y 900}},
+ :zoom [-120.66 -787.02 1.075],
+ :opts nil,
  :flow-id "hue-lights-api",
- :flowmaps-connections
- [[:open-input/* :http-call-1/req-map]
-  [:http-call-1 :done]
-  [:open-input-1/* :http-call-2/req-map]]}
+ :flowmaps-connections [[:open-input/* :http-call-1/req-map] [:http-call-1 :done] [:open-input-1/* :http-call-2/req-map]]}

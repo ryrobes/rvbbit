@@ -996,12 +996,15 @@
            [(System/currentTimeMillis) (ut/get-current-timestamp)]
            (inc (get-in @ack-scoreboard [client-name key] 0)))))
 
-(defmethod wl/handle-request :ack [{:keys [client-name flow-subs]}]
+(defmethod wl/handle-request :ack [{:keys [client-name memory flow-subs]}]
   ;(ut/pp [:thank-you-from client-name])
   (inc-score! client-name :ack)
   (swap! client-latency assoc client-name
          (vec (conj (get @client-latency client-name [])
                     (try (- (System/currentTimeMillis) (get @ping-ts client-name)) (catch Exception _ -2)))))
+  (let [ins-sql {:insert-into [:client-memory] :values [(assoc memory :mem_used_mb (ut/bytes-to-mb (get memory :mem_used)))]}]
+    (sql-exec system-db (to-sql ins-sql)))
+  (swap! ack-scoreboard assoc-in [client-name :memory] (ut/bytes-to-mb (get memory :mem_used)))
   (swap! ack-scoreboard assoc-in [client-name :client-sub-list] flow-subs)
   (swap! ack-scoreboard assoc-in [client-name :client-subs] (count flow-subs))
   (inc-score! client-name :last-ack true)

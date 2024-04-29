@@ -6,24 +6,23 @@
     "jessica"]
    [:changed? :time/second]
    [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
-   [:or [:= 2 1] [:< 9 4]]]},
- :worthy-fish-signal
- {:signal
-  [:or [:= :time/day 23] [:changed? :time/minute] [:= 221 22]]},
- :hourly? {:signal [:or [:changed? :time/hour] [:= :time/minute -1]]},
- :cool-raccoon-signal
+   [:or [:= 2 1] [:< 9 4]]
+   [:signal/worthy-fish-signal]]},
+ :cool-raccoon-signal-yo
  {:signal
   [:or
    [:=
-    :client/honest-ultramarine-mole-1>param>light-brown-swallow
+    :client/imaginative-green-owl-24>param>:my-dash-killswitch?
     true]
    [:and
     [:or [:> :time/hour 12] [:< :time/hour 6]]
     [:or
-     [:= :time/second 45]
-     [:= :time/second 15]
+     [:= :time/second 10]
+     [:= :time/second 20]
      [:= :time/second 35]
      [:= :time/second 25]]]]},
+ :worthy-fish-signal {:signal [:or [:= :time/day 22] [:= 221 22]]},
+ :hourly? {:signal [:or [:changed? :time/hour] [:= :time/minute -1]]},
  :fair-armadillo-signal
  {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
  :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},

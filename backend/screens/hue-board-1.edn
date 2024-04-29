@@ -1,39 +1,53 @@
 {:orders
- {:blocks-sys
-  [:block_key
-   :block_name
-   :queries
-   :views
-   :block_data
-   :view_names
-   :query_names],
+ {:flow-fn-sys
+  [:name :description :full_map :inputs :icon :input_types :output_types :category],
+  :blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
   :fields-sys [:field_name :field_type :data_type],
   :tables-sys
-  [:db_schema
-   :db_catalog
-   :connection_id
-   :schema_cat
-   :table_name
-   :fields],
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
   :query-9307 [:ttl_lights],
+  :flows-sys [:flow_id :file_path :last_modified],
   :files-sys [:file_path :screen_name :blocks :queries :ts],
+  :jvm_stats
+  [:used_memory_mb
+   :thread_count
+   :sql_cache_size
+   :ws_peers
+   :open_flow_channels
+   :queries_run
+   :internal_queries_run
+   :sniffs_run
+   :sys_load
+   :ts],
+  :runstream-chart-hue-change-group-color [:elapsed :started],
   :light-groups
-  [:group_id :group_name :all_on :any_on :styler_highlight_2520],
+  [:group_id :group_name :all_on :any_on :lights :styler_highlight_2520],
+  :flow-fn-categories-sys [:category],
   :connections-sys [:database_name :connection_id],
   :reco-counts [:table_name :cnt],
   :single-lights
-  [:light_id
-   :light_name
-   :xy
-   :hue
-   :hex
-   :brightness
-   :is_on
-   :styler_highlight_253320],
-  :query-4557 [:ttl_groups]},
+  [:light_id :light_name :xy :hue :hex :brightness :is_on :styler_highlight_253320],
+  :query-4557 [:ttl_groups],
+  :flow-fn-all-sys [:name]},
  :reco-preview nil,
+ :flow? false,
  :sql-source
- {:query-4557
+ {:jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
+  :runstream-chart-hue-change-group-color
+  {:select [[[[:min :elapsed]] :elapsed] :started],
+   :refresh-every 2,
+   :cache? false,
+   :connection-id "flows-db",
+   :from
+   [{:select
+     [:client_name :elapsed :ended :flow_id :human_elapsed :in_error :started :ts],
+     :from [[:flow_history :mm134]],
+     :where [:= :flow_id "hue-change-group-color"]}],
+   :group-by [:started],
+   :_last-run "15:55:00"},
+  :query-4557
   {:select [[[:count 1] :ttl_groups]],
    :from
    [[{:select [:*],
@@ -48,17 +62,17 @@
                      {:group-id k,
                       :group-name (get v :name),
                       :all-on (get-in v [:state :all_on]),
-                      :any-on (get-in v [:state :any_on])}))]
+                      :any-on (get-in v [:state :any_on]),
+                      :lights (str (get v :lights))}))]
           (println (str ss 3))
           ss)}]}
      :tt334]]},
   :single-lights
   {:select [:*],
    :cache? false,
-   :refresh-every 10,
+   :refresh-every 1,
    :style-rules
-   {[:* :highlight-253320]
-    {:logic [:= :is_on "0"], :style {:opacity 0.322}}},
+   {[:* :highlight-253320] {:logic [:= :is_on "0"], :style {:opacity 0.322}}},
    :from
    [{:data
      (let [ss (vec
@@ -76,12 +90,12 @@
                    :is_on (get-in v [:state :on])}))]
        (println (str ss 2))
        ss)}],
-   :_last-run "09:45:13",
-   :col-widths {:is_on 71, :brightness 81, :light_id 91}},
+   :col-widths {:is_on 71, :brightness 81, :light_id 91},
+   :_last-run "15:55:01"},
   :light-groups
   {:select [:*],
    :cache? false,
-   :refresh-every 10,
+   :refresh-every 1,
    :from
    [{:data
      (let [ss (vec
@@ -93,13 +107,13 @@
                   {:group-id k,
                    :group-name (get v :name),
                    :all-on (get-in v [:state :all_on]),
-                   :any-on (get-in v [:state :any_on])}))]
+                   :any-on (get-in v [:state :any_on]),
+                   :lights (str (get v :lights))}))]
        (println (str ss 3))
        ss)}],
    :style-rules
-   {[:* :highlight-2520]
-    {:logic [:= :any_on "0"], :style {:opacity 0.33}}},
-   :_last-run "09:45:13"},
+   {[:* :highlight-2520] {:logic [:= :any_on "0"], :style {:opacity 0.33}}},
+   :_last-run "15:55:01"},
   :query-9307
   {:select [[[:count 1] :ttl_lights]],
    :from
@@ -122,114 +136,77 @@
           (println (str ss 2))
           ss)}]}
      :qq929]]}},
+ :audio-playing? false,
+ :skip-me {:yo nil},
  :meta
  {:flow-fn-sys
   {:fields
    {:name
     {:data-type "string",
-     :distinct 11,
+     :distinct 18,
      :group-by? true,
      :commons {":write-file" 1, ":json-to-edn" 1, ":get-colors" 1},
      :cardinality 100},
-    :full_map
-    {:data-type "string",
-     :distinct 11,
-     :group-by? true,
-     :commons
-     {"{:file-path \"./flows/node-color-thief-js.edn\", :icon \"zmdi-gradient\", :description \"Take an image local path and generate a color palette map from it.\"}"
-      1,
-      "{:description \"Write file content to the server. Useful in chaining together operations.\", :fn (fn [full-path file-data] (rvbbit-backend.websockets/write-local-file full-path file-data)), :inputs [:full-path :file-data], :icon \"zmdi-file-text\", :types {:full-path :string, :file-data :string, :out :string}}"
-      1,
-      "{:description \"Push items to the client UI.\", :fn (fn [destination ref item-key thread-id message-name thread-desc & args] (rvbbit-backend.websockets/kick destination ref item-key thread-id message-name thread-desc args)), :type :kick, :icon \"images/pink-rabbit-head.png\", :defaults {:destination :client-name, :item-key \":base\", :thread-id :flow-id, :message-name \"Unnamed Message\", :thread-desc :flow-id, :ref :flow-id}, :types {:destination [:keyword :vector :list :set], :ref :string, :item-key :keyword, :thread-id :string, :message-name :string, :thread-desc :string, :out :any}, :pill-name \"content\", :style {:color \"#fc0fc0\"}, :selected-style {:color \"#fc0fc0\"}, :inputs [:destination :ref :item-key :thread-id :message-name :thread-desc], :expandable? true, :required [:destination :ref :item-key :thread-id :message-name :thread-desc]}"
-      1},
-     :cardinality 100},
     :description
     {:data-type "string",
-     :distinct 11,
+     :distinct 17,
      :group-by? true,
      :commons
-     {"Get top 50 color frequencies from an image in hex form." 1,
-      "Write file content to the server. Useful in chaining together operations."
+     {"Basic HTTP call primitive" 2,
+      "Get top 50 color frequencies from an image in hex form." 1,
+      "Send dialog content to a client - given a vector of choices, will render buttons"
+      1},
+     :cardinality 94},
+    :full_map
+    {:data-type "string",
+     :distinct 18,
+     :group-by? true,
+     :commons
+     {"{:description \"Convert a JSON string to Clojure EDN\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :inputs [:json-string], :icon \"zmdi-file-text\", :types {:json-string :string, :out :any}}"
       1,
-      "Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs"
+      "{:file-path \"./flows/node-color-thief-js.edn\", :icon \"zmdi-gradient\", :description \"Take an image local path and generate a color palette map from it.\"}"
+      1,
+      "{:description \"Read file content from the server. Useful in chaining together operations.\", :fn (fn [full-path] (rvbbit-backend.websockets/read-local-file full-path)), :inputs [:full-path], :icon \"zmdi-file-text\", :types {:full-path :string, :out :string}}"
       1},
      :cardinality 100},
     :inputs
     {:data-type "string",
+     :distinct 15,
+     :group-by? true,
+     :commons
+     {"[:destination :content :w :h :duration]" 3,
+      "[:req-map]" 2,
+      "[:full-path :file-data]" 1},
+     :cardinality 83},
+    :icon
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"zmdi-file-text" 3, "zmdi-alert-polygon" 3, "zmdi-dns" 2},
+     :cardinality 55},
+    :input_types
+    {:data-type "string",
      :distinct 11,
      :group-by? true,
      :commons
-     {"[:full-path :file-data]" 1,
-      "[:destination :ref :item-key :thread-id :message-name :thread-desc]"
-      1,
-      "[:query]" 1},
-     :cardinality 100},
-    :icon
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons {"zmdi-file-text" 3, "zmdi-dns" 2, "zmdi-gradient" 2},
-     :cardinality 63},
-    :input_types
-    {:data-type "string",
-     :distinct 8,
-     :group-by? true,
-     :commons {"[:string]" 4, "[:rowset]" 1, "[]" 1},
-     :cardinality 72},
+     {"[:string]" 5, "[:keyword :any :integer :integer :integer]" 3, "[:map]" 2},
+     :cardinality 61},
     :output_types
     {:data-type "string",
      :distinct 5,
      :group-by? true,
-     :commons {":any" 5, ":string" 3, ":keyword" 1},
-     :cardinality 45},
+     :commons {":any" 12, ":string" 3, ":keyword" 1},
+     :cardinality 27},
     :category
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":rabbit-base" 11},
-     :cardinality 9}},
-   :rowcount 11},
+     :commons {":rabbit-base" 18},
+     :cardinality 5}},
+   :rowcount 18},
   :blocks-sys {:fields {}, :rowcount 0},
   :fields-sys {:fields {}, :rowcount 0},
-  :tables-sys
-  {:fields
-   {:db_schema
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"none" 2},
-     :cardinality 50},
-    :db_catalog
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? true,
-     :commons {nil 2},
-     :cardinality 50},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"boston-crime" 2},
-     :cardinality 50},
-    :schema_cat
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? false,
-     :commons {nil 2},
-     :cardinality 50},
-    :table_name
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"offenses" 1, "offense_codes" 1},
-     :cardinality 100},
-    :fields
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? false,
-     :commons {18 1, 3 1},
-     :cardinality 100}},
-   :rowcount 2},
+  :tables-sys {:fields {}, :rowcount 0},
   :query-9307
   {:fields
    {:ttl_lights
@@ -243,69 +220,144 @@
   {:fields
    {:flow_id
     {:data-type "string",
-     :distinct 43,
+     :distinct 88,
      :group-by? true,
      :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
-     :cardinality 95},
+     :cardinality 97},
     :file_path
     {:data-type "string",
-     :distinct 45,
+     :distinct 90,
      :group-by? true,
      :commons
-     {"./flows/hue-change-group-color.edn" 1,
-      "./flows/dalle3-create-image-rvbbit4aa.edn" 1,
-      "./flows/dalle3-create-image-newenglandv.edn" 1},
+     {"./flows/stitches-math.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1,
+      "./flows/dalle3-create-image-newengland-old.edn" 1},
      :cardinality 100},
     :last_modified
     {:data-type "string",
-     :distinct 45,
+     :distinct 24,
      :group-by? true,
      :commons
-     {"2024-01-09 03:16:41" 1,
-      "2023-12-31 20:10:21" 1,
-      "2024-01-06 18:53:33" 1},
-     :cardinality 100}},
-   :rowcount 45},
+     {"2024-03-12 02:37:43" 67, "2024-03-14 07:50:09" 1, "2024-04-12 05:48:12" 1},
+     :cardinality 26}},
+   :rowcount 90},
   :files-sys
   {:fields
    {:file_path
     {:data-type "string",
-     :distinct 76,
+     :distinct 145,
      :group-by? true,
      :commons
      {"./screens/weave-test122.edn" 1,
-      "./screens/sizzle-board-1.edn" 1,
-      "./screens/boston-test-10-3-23.edn" 1},
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
      :cardinality 100},
     :screen_name
     {:data-type "string",
-     :distinct 72,
+     :distinct 138,
      :group-by? true,
      :commons
-     {"unnamed-screen!" 4, "tallica-param-test2" 2, "light-theme" 1},
-     :cardinality 94},
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 95},
     :blocks
     {:data-type "integer",
-     :distinct 37,
+     :distinct 45,
      :group-by? true,
-     :commons {14 5, 12 5, 15 5},
-     :cardinality 48},
+     :commons {3 45, 6 7, 12 6},
+     :cardinality 31},
     :queries
     {:data-type "integer",
      :distinct 32,
      :group-by? true,
-     :commons {5 9, 0 8, 11 6},
-     :cardinality 42},
+     :commons {0 54, 5 10, 6 9},
+     :cardinality 22},
     :ts
     {:data-type "string",
-     :distinct 3,
+     :distinct 5,
      :group-by? true,
      :commons
-     {"2024-01-22 18:19:38" 45,
-      "2024-01-22 18:19:39" 19,
-      "2024-01-22 18:19:37" 12},
+     {"2024-04-26 19:02:43" 46, "2024-04-26 19:02:44" 42, "2024-04-26 19:02:45" 38},
      :cardinality 3}},
-   :rowcount 76},
+   :rowcount 145},
+  :jvm_stats
+  {:fields
+   {:queries_run
+    {:data-type "integer",
+     :distinct 82,
+     :group-by? true,
+     :commons {1151 3, 177 1, 791 1},
+     :cardinality 97},
+    :sql_cache_size
+    {:data-type "integer",
+     :distinct 5,
+     :group-by? true,
+     :commons {6 41, 7 38, 5 3},
+     :cardinality 5},
+    :ts
+    {:data-type "string",
+     :distinct 84,
+     :group-by? true,
+     :commons
+     {"2024-04-26 19:22:53" 1, "2024-04-26 19:41:53" 1, "2024-04-26 19:28:23" 1},
+     :cardinality 100},
+    :sniffs_run
+    {:data-type "integer",
+     :distinct 6,
+     :group-by? true,
+     :commons {4 41, 6 25, 5 13},
+     :cardinality 7},
+    :sys_load
+    {:data-type "float",
+     :distinct 84,
+     :group-by? true,
+     :commons {4.35888671875 1, 6.06982421875 1, 4.19091796875 1},
+     :cardinality 100},
+    :used_memory_mb
+    {:data-type "integer",
+     :distinct 81,
+     :group-by? true,
+     :commons {1934 2, 1927 2, 1973 2},
+     :cardinality 96},
+    :thread_count
+    {:data-type "integer",
+     :distinct 28,
+     :group-by? true,
+     :commons {114 8, 116 8, 115 6},
+     :cardinality 33},
+    :internal_queries_run
+    {:data-type "integer",
+     :distinct 27,
+     :group-by? true,
+     :commons {17 24, 36 17, 19 7},
+     :cardinality 32},
+    :open_flow_channels
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {-1 84},
+     :cardinality 1},
+    :ws_peers
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {10 84},
+     :cardinality 1}},
+   :rowcount 84},
+  :runstream-chart-hue-change-group-color
+  {:fields
+   {:elapsed
+    {:data-type "float",
+     :distinct 40,
+     :group-by? false,
+     :commons {97 2, 83 2, 154 2},
+     :cardinality 90},
+    :started
+    {:data-type "integer",
+     :distinct 44,
+     :group-by? true,
+     :commons {1714157478233 1, 1714156920370 1, 1714155434715 1},
+     :cardinality 100}},
+   :rowcount 44},
   :light-groups
   {:fields
    {:group_id
@@ -324,7 +376,7 @@
     {:data-type "string",
      :distinct 2,
      :group-by? true,
-     :commons {"0" 6, "1" 5},
+     :commons {"1" 6, "0" 5},
      :cardinality 18},
     :any_on
     {:data-type "string",
@@ -332,6 +384,15 @@
      :group-by? true,
      :commons {"1" 6, "0" 5},
      :cardinality 18},
+    :lights
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons
+     {"[\"20\" \"21\"]" 1,
+      "[\"15\" \"29\"]" 1,
+      "[\"7\" \"25\" \"13\" \"6\" \"8\" \"9\" \"14\"]" 1},
+     :cardinality 100},
     :styler_highlight_2520
     {:data-type "integer",
      :distinct 2,
@@ -343,26 +404,12 @@
   {:fields
    {:category
     {:data-type "string",
-     :distinct 3,
+     :distinct 4,
      :group-by? true,
-     :commons {":rabbit-base" 1, ":owen-wilson" 1, ":clojure-base" 1},
+     :commons {":sub-flows" 1, ":sub-flow" 1, ":rabbit-base" 1},
      :cardinality 100}},
-   :rowcount 3},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
+   :rowcount 4},
+  :connections-sys {:fields {}, :rowcount 0},
   :reco-counts {:fields {}, :rowcount 0},
   :single-lights
   {:fields
@@ -380,29 +427,28 @@
      :cardinality 100},
     :xy
     {:data-type "string",
-     :distinct 12,
+     :distinct 11,
      :group-by? true,
-     :commons
-     {"[0.3896 0.2967]" 4, "[0.4583 0.4099]" 3, "[0.5016 0.4151]" 3},
-     :cardinality 47},
+     :commons {"[0.704 0.296]" 5, "[0.6915 0.3083]" 4, "" 3},
+     :cardinality 43},
     :hue
     {:data-type "integer",
      :distinct 10,
      :group-by? true,
-     :commons {55700 6, 12754 4, 7675 3},
+     :commons {0 9, nil 3, 7675 2},
      :cardinality 40},
     :hex
     {:data-type "string",
      :distinct 10,
      :group-by? true,
-     :commons {"#ff00e5" 6, "#d4ff00" 4, "#ffc300" 3},
+     :commons {"#ff0000" 9, "#00000000" 3, "#ffb300" 2},
      :cardinality 40},
     :brightness
     {:data-type "integer",
-     :distinct 9,
+     :distinct 8,
      :group-by? true,
-     :commons {77 7, 4 5, 196 4},
-     :cardinality 36},
+     :commons {4 9, 77 7, nil 2},
+     :cardinality 31},
     :is_on
     {:data-type "string",
      :distinct 2,
@@ -429,56 +475,45 @@
   {:fields
    {:name
     {:data-type "string",
-     :distinct 28,
+     :distinct 123,
      :group-by? true,
-     :commons {":=" 1, ":>=" 1, ":write-file" 1},
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
      :cardinality 100}},
-   :rowcount 28}},
+   :rowcount 123}},
  :default-col-widths
- {:block-11833 {:query-4557 211},
+ {:virtual-panel {:kick--1764769189 152},
+  :block-4897 {:runstream-chart-hue-change-group-color 255},
+  :block-11833 {:query-4557 211},
   :block-6084 {:single-lights 100},
-  :system-connections-list* {:connections-sys 111},
+  :system-connections-list* {:connections-sys ##Inf},
   :system-fields-list* {:fields-sys ##Inf},
-  :block-11365 {:light-groups 115},
+  :block-11365 {:light-groups 100},
   :files-list* {:files-sys 178},
   :blocks-list* {:blocks-sys ##Inf},
-  :system-tables-list* {:tables-sys 137},
+  :system-tables-list* {:tables-sys ##Inf},
   :block-1074 {:query-9307 211}},
- :data-hash 2009421702,
+ :runstream-drops nil,
+ :data-hash -961897388,
  :tabs
  ["hue-philips-desktop"
   "pyramidal eagle"
   "fantastic walrus"
-  "baby-blue skunk"],
+  "baby-blue skunk"
+  "cerulean fox"
+  "bulbous gull"],
+ :auto-run? true,
  :selected-cols nil,
  :server
  {:settings
   {:harvest-on-boot? true,
-   :default "./screens/winter-theme.edn",
+   :default "./screens/looking-glass-redux.edn",
    :eleven-labs-api-key nil,
    :kits
-   {:buffy
-    {:author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :kit-name :buffy,
-     :package-name :grab-bag,
-     :fn (rvbbit-backend.assistants/buffy :query-name),
-     :name "Ask Buffy!",
-     :icon "zmdi-cocktail",
-     :run-on :queries,
-     :description "What does Buffy think about this data? Who knows!"},
-    :outliers
+   {:outliers
     {:description
      "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
      :image-url "images/outliers-image.png",
-     :fn
-     (rabbit-kit-outliers.core/get-outliers
-       :query-name
-       :panel-name
-       :query),
+     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
      :name "Outliers",
      :icon "zmdi-functions",
      :author
@@ -491,13 +526,8 @@
      :kit-name :outliers,
      :package-name :query-basics-1},
     :forecast
-    {:description
-     "WIP: basic timeseries forecasting based on previous values",
-     :fn
-     (rabbit-kit-outliers.core/get-forecast
-       :query-name
-       :panel-name
-       :query),
+    {:description "WIP: basic timeseries forecasting based on previous values",
+     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
      :name "Forecasting",
      :icon "zmdi-brightness-7",
      :author
@@ -508,7 +538,20 @@
      :run-on :queries,
      :repl {:host "127.0.0.1", :port 42999},
      :kit-name :forecast,
-     :package-name :query-basics-1}},
+     :package-name :query-basics-1},
+    :buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"}},
    :graphite-host "127.0.0.1",
    :openapi-org-id nil,
    :debug-level 1,
@@ -517,62 +560,125 @@
     "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
     "SSuccessful-oval-sea-urchin-of-mountain-range"
     "aaa-run-amok"
+    "aaaaah-esday-the-day"
+    "aaaaah-wednesday-the-day"
+    "aaaah-wednesday-the-day"
+    "alice-puzzle-1"
     "asdasdasdasd"
     "autumn-theme"
+    "battle-mage"
     "bigfoot-snapshots"
     "bigfoot-snapshots2"
     "bigfoot-snapshots3"
+    "blackberries"
     "blank-sizzle"
     "blank-sizzle2"
+    "blue-pines"
     "boston-test-10-3-23"
+    "broken-jacket"
     "bunch of bullshit"
     "bunch of bullshit2"
     "bunch of bullshit4"
     "caliope"
     "calliope"
     "canvas-scrubber-test1"
+    "capecod-viking"
     "chaos simple"
     "chaos-views"
+    "chompers"
+    "claude-testing2"
     "clean-grey-defaults"
     "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "counting-lord-of-the-woods"
+    "crazy-alice"
+    "dark-crested-jackelope"
     "data-literals-test-sunday"
     "data-literals-test-sundaydd"
     "demo-dark-pumpkin-bkgrd-sept23"
     "demo-light-bkgrd-sept23"
     "demo-lime-green-slime"
+    "desktops-and-broomsticks"
     "error-monitor"
     "error-monitor-vanessa"
     "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
+    "evil-main-street"
     "fake-books-1"
+    "fake-bricks"
     "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
     "glass-fish-board-test"
+    "green-storm-city"
     "hue-board-1"
+    "late-winter-theme"
+    "lavender-side-eye"
     "layout-test-1"
     "layout-test-12"
     "light-theme"
     "literal-data-test"
+    "looking-glass-redux"
+    "looking-glass-redux2"
+    "looking-glass-redux23a"
+    "looking-glass-redux23abb"
+    "looking-glass-redux2a"
+    "looking-glass-redux2aa"
+    "looking-glass-redux45"
+    "looking-glass-redux79"
     "luck-of-the-irish"
     "mapbox-test"
+    "may-20"
+    "my-goodness"
+    "my-goodness-the-sequel"
+    "neverwinter-amy"
     "night-city-never-sleeps"
+    "nightcity-cape-cod"
     "nivo-getting-better!"
     "nivo-hacking-2023"
     "nivo-hacking-2023333"
     "nivo-hacking-october-2nd"
     "old-defaults"
+    "old-fashioned-christmas"
+    "old-town-snow-stars"
+    "pensive-look"
+    "pensive-look2"
+    "pine-wood-dawn"
+    "pink-and-green-elk"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
     "poor-touring-me"
     "pres-sql-test-1"
+    "purple-dusk-old-town"
+    "purple-nightshades"
+    "purple-techno-sunset"
     "recharts-test-blocks"
     "refresh-test"
+    "retro-machines"
     "riffle-test"
+    "sick-of-your-shit"
     "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "stop-drawing-dead-dashboards"
+    "swamp-nightgown"
+    "swamp-reacher"
     "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
     "the-future-soon"
     "the-generated-lass"
     "the-generated-lass-glow"
     "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-memo"
+    "the-memo2"
+    "the-outer-blues"
+    "trad-hybrid"
     "tweet-bigfoot-is-blurry"
     "tweet-demo-thing-bigfoot-is-blurry"
     "unnamed-screen!"
+    "viking-pastels"
     "weave-test"
     "weave-test1"
     "weave-test122"
@@ -584,26 +690,34 @@
     "winter-theme33"
     "winter-theme45"
     "winter-theme47"
+    "winter-twin-peaks"
+    "witchy425"
+    "wonderland-horror-interface"
     "wow-board"],
-   :openapi-key
-   "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"}},
- :runstreams nil,
- :editor? false,
+   :openapi-key "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"}},
+ :runstreams
+ {"hue-change-group-color" {:open? true, :open-outputs? true},
+  "hue-lights-api" {:open? true}},
+ :editor? true,
  :buffy? false,
- :sched {:single-lights 3613, :light-groups 3613},
+ :memory [860723506 595180934 4294705152],
+ :sched
+ {:runstream-chart-hue-change-group-color 740,
+  :single-lights 740,
+  :light-groups 740},
  :status-data
  {"kick-test!"
   {:kick
    {:data
     [{:sent! "kick-test!",
-      :to :secure-circular-bear-of-outwash-fan,
-      :at "2024-01-22 16:11:25",
+      :to :unwavering-cubic-porpoise-42,
+      :at "2024-04-26 15:55:01",
       :payload
       {:query-log
        {:data
-        [{:content ["2024-01-22 16:11:25 - query ran in 0 ms."],
+        [{:content ["2024-04-26 15:55:01 - query ran in 0 ms."],
           :name "query-log-:light-groups",
-          :order 1705957885,
+          :order 1714161301,
           :parameters {},
           :forced-mutates {},
           :step-mutates {}}],
@@ -620,239 +734,235 @@
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-01-22 16:11:31",
+      :at "2024-04-26 15:54:33",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
-  :file-change
-  {:file-changed
+  :alert1
+  {:alerts
    {:data
-    [{:path
-      "./live/secure-circular-bear-of-outwash-fan/hue-philips-desktop/block-2576/block-2576.edn",
-      :type :modify,
-      :panel-key nil,
-      :block-data
-      {:block-2576 {:h 3, :w 12, :root [24 12]},
-       :views
-       {:param-val
-        [:box
-         :align
-         :center
-         :justify
-         :center
-         :padding
-         "13px"
-         :style
-         {:font-size "45px"}
-         :child
-         [:case
-          [:sys/selected-tab-idx
-           0
-           "url(images/sneaky4.png)"
-           1
-           "url(images/gen/b64-decoded-1156592.png)"
-           ""]]]},
-       :tab "hue-philips-desktop",
-       :name "block-2576"}}
+    [[[:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data
+         [{:mem 917, :tick 84501, :threads 120, :subs 160, :load 3.98486328125}
+          {:mem 1277, :tick 84502, :threads 120, :subs 160, :load 3.830078125}
+          {:mem 2056, :tick 84503, :threads 125, :subs 164, :load 3.71484375}
+          {:mem 1108, :tick 84504, :threads 127, :subs 164, :load 3.48193359375}
+          {:mem 1721, :tick 84505, :threads 127, :subs 164, :load 3.1953125}
+          {:mem 1168, :tick 84506, :threads 126, :subs 164, :load 3.23583984375}
+          {:mem 1536, :tick 84507, :threads 126, :subs 164, :load 3.1103515625}
+          {:mem 2072, :tick 84508, :threads 117, :subs 164, :load 3.30859375}
+          {:mem 2112, :tick 84509, :threads 132, :subs 164, :load 2.8935546875}
+          {:mem 2443, :tick 84510, :threads 149, :subs 164, :load 3.78662109375}
+          {:mem 1380, :tick 84511, :threads 134, :subs 164, :load 4.18701171875}
+          {:mem 2354, :tick 84512, :threads 124, :subs 164, :load 3.7001953125}
+          {:mem 887, :tick 84513, :threads 119, :subs 164, :load 3.8408203125}
+          {:mem 1365, :tick 84514, :threads 116, :subs 164, :load 3.27880859375}
+          {:mem 1577, :tick 84515, :threads 115, :subs 164, :load 3.43408203125}
+          {:mem 1840, :tick 84516, :threads 116, :subs 164, :load 3.67529296875}
+          {:mem 1958, :tick 84517, :threads 116, :subs 164, :load 3.232421875}
+          {:mem 1927, :tick 84518, :threads 115, :subs 164, :load 4.66015625}
+          {:mem 2082, :tick 84519, :threads 115, :subs 164, :load 3.60107421875}
+          {:mem 2211, :tick 84520, :threads 114, :subs 164, :load 4.35888671875}
+          {:mem 2367, :tick 84521, :threads 111, :subs 164, :load 4.09228515625}
+          {:mem 883, :tick 84522, :threads 112, :subs 164, :load 3.4375}
+          {:mem 1260, :tick 84523, :threads 110, :subs 164, :load 3.4267578125}
+          {:mem 1469, :tick 84524, :threads 110, :subs 164, :load 3.7841796875}
+          {:mem 1684, :tick 84525, :threads 110, :subs 164, :load 4.19091796875}
+          {:mem 965, :tick 84526, :threads 120, :subs 164, :load 4.0517578125}
+          {:mem 1375, :tick 84527, :threads 119, :subs 164, :load 3.49853515625}
+          {:mem 2176, :tick 84528, :threads 118, :subs 164, :load 3.09619140625}
+          {:mem 1617, :tick 84529, :threads 126, :subs 164, :load 3.10400390625}
+          {:mem 1879, :tick 84530, :threads 120, :subs 167, :load 2.8037109375}
+          {:mem 948, :tick 84531, :threads 124, :subs 180, :load 2.904296875}
+          {:mem 1392, :tick 84532, :threads 120, :subs 180, :load 2.6484375}
+          {:mem 1670, :tick 84533, :threads 116, :subs 180, :load 2.54052734375}
+          {:mem 1274, :tick 84534, :threads 118, :subs 183, :load 2.92041015625}
+          {:mem 1680, :tick 84535, :threads 124, :subs 219, :load 3.0205078125}
+          {:mem 2321, :tick 84536, :threads 126, :subs 219, :load 3.052734375}
+          {:mem 1068, :tick 84537, :threads 126, :subs 219, :load 2.60693359375}
+          {:mem 1750, :tick 84538, :threads 120, :subs 219, :load 2.3505859375}
+          {:mem 1522, :tick 84539, :threads 126, :subs 219, :load 2.7060546875}
+          {:mem 931, :tick 84540, :threads 125, :subs 219, :load 2.35888671875}
+          {:mem 1158, :tick 84541, :threads 124, :subs 219, :load 2.65771484375}
+          {:mem 2265, :tick 84542, :threads 125, :subs 219, :load 2.72509765625}
+          {:mem 999, :tick 84543, :threads 117, :subs 219, :load 2.30810546875}
+          {:mem 1536, :tick 84544, :threads 118, :subs 219, :load 2.8671875}
+          {:mem 1822, :tick 84545, :threads 117, :subs 219, :load 2.46435546875}
+          {:mem 2265, :tick 84546, :threads 115, :subs 219, :load 2.94970703125}
+          {:mem 1032, :tick 84547, :threads 114, :subs 219, :load 2.44140625}
+          {:mem 1535, :tick 84548, :threads 113, :subs 219, :load 2.478515625}
+          {:mem 1903, :tick 84549, :threads 113, :subs 219, :load 2.97802734375}
+          {:mem 1883, :tick 84550, :threads 120, :subs 219, :load 2.9150390625}],
+         :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
+        [:> :XAxis {:dataKey :tick, :hide true}]
+        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
+        [:>
+         :YAxis
+         {:yAxisId "right", :hide true, :dataKey :subs, :orientation "right"}]
+        [:>
+         :Bar
+         {:yAxisId "left",
+          :dataKey :mem,
+          :isAnimationActive false,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:string :theme/editor-outer-rim-color "33"]}]
+        [:>
+         :Line
+         {:yAxisId "right",
+          :strokeWidth 4,
+          :type "monotone",
+          :dot false,
+          :dataKey :threads,
+          :isAnimationActive false,
+          :stroke :theme/editor-grid-selected-background-color,
+          :fill :theme/editor-grid-selected-background-color}]
+        [:>
+         :Line
+         {:stroke :theme/block-tab-selected-font-color,
+          :fill :theme/block-tab-selected-font-color,
+          :type "monotone",
+          :yAxisId "right",
+          :dataKey :subs,
+          :strokeWidth 3,
+          :strokeDasharray "5 5",
+          :dot false,
+          :isAnimationActive false}]]]
+      10
+      4
+      5]
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
- :re-pressed.core/keydown
- {:keys
-  [{:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 32}
-   {:altKey false,
-    :ctrlKey true,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 189}
-   {:altKey false,
-    :ctrlKey true,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 189}
-   {:altKey false,
-    :ctrlKey true,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 189}
-   {:altKey false,
-    :ctrlKey true,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 187}
-   {:altKey false,
-    :ctrlKey true,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 187}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey true,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey true,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey true,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey true,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 87}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 27}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 32}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 32}],
-  :event-keys
-  [[[:viz-yard.bricks/esc-unselect-current] [{:keyCode 27}]]
-   [[:viz-yard.bricks/redo-one]
-    [{:keyCode 90, :ctrlKey true, :shiftKey true}]]
-   [[:viz-yard.bricks/undo-one]
-    [{:keyCode 90, :ctrlKey true, :shiftKey false}]]
-   [[:viz-yard.bricks/toggle-buffy]
-    [{:keyCode 32, :shiftKey true, :ctrlKey false}]]
-   [[:viz-yard.bricks/toggle-editor]
-    [{:keyCode 32, :shiftKey false, :ctrlKey false}]]
-   [[:viz-yard.bricks/toggle-flow]
-    [{:keyCode 32, :shiftKey false, :ctrlKey true}]]
-   [[:viz-yard.bricks/next-panel] [{:keyCode 9}]]
-   [[:viz-yard.bricks/toggle-kick-alert] [{:keyCode 75}]]
-   [[:viz-yard.bricks/toggle-peek] [{:keyCode 80}]]
-   [[:viz-yard.bricks/toggle-lines] [{:keyCode 76}]]
-   [[:viz-yard.bricks/toggle-auto-run] [{:keyCode 79}]]
-   [[:viz-yard.bricks/delete-selected-panel]
-    [{:keyCode 46, :shiftKey true}]]
-   [[:viz-yard.bricks/cycle-column-select false] [{:keyCode 81}]]
-   [[:viz-yard.bricks/cycle-column-select true] [{:keyCode 69}]]
-   [[:viz-yard.audio/start-recording] [{:keyCode 84}]]
-   [[:viz-yard.audio/stop-recording] [{:keyCode 89}]]
-   [[:viz-yard.bricks/stretch-panel :wider]
-    [{:keyCode 68, :shiftKey true}]]
-   [[:viz-yard.bricks/stretch-panel :longer]
-    [{:keyCode 83, :shiftKey true}]]
-   [[:viz-yard.bricks/stretch-panel :narrower]
-    [{:keyCode 65, :shiftKey true}]]
-   [[:viz-yard.bricks/stretch-panel :shorter]
-    [{:keyCode 87, :shiftKey true}]]
-   [[:viz-yard.bricks/panel-depth-up] [{:keyCode 82, :shiftKey true}]]
-   [[:viz-yard.bricks/panel-depth-down]
-    [{:keyCode 70, :shiftKey true}]]
-   [[:viz-yard.bricks/nudge-panel :up] [{:keyCode 87}]]
-   [[:viz-yard.bricks/nudge-panel :down] [{:keyCode 83}]]
-   [[:viz-yard.bricks/nudge-panel :left] [{:keyCode 65}]]
-   [[:viz-yard.bricks/nudge-panel :right] [{:keyCode 68}]]],
-  :clear-keys nil,
-  :always-listen-keys nil,
-  :prevent-default-keys
-  [{:keyCode 32}
-   {:keyCode 46, :shiftKey true}
-   {:keyCode 83, :ctrlKey true}
-   {:keyCode 9}
-   {:keyCode 70, :ctrlKey true}]},
  :flow-subs
- [:flow/gpt35-color-parser>*running?
-  :flow/hue-change-group-color>*running?],
- :client-name :secure-circular-bear-of-outwash-fan,
+ [:runner||hue-change-group-color||-334521120
+  :runner||hue-change-group-color||2073680204
+  :acc-tracker||hue-change-group-color||-334521120
+  :runner||hue-change-group-color||1353601644
+  :time/nth
+  :runner||hue-change-group-color||-1824055341
+  :blocks||hue-change-group-color||-334521120
+  :blocks||hue-change-group-color||1353601644
+  :flow/hue-lights-api>*running?
+  :acc-tracker||hue-change-group-color||-557229129
+  :tracker||hue-change-group-color||2073680204
+  :flow/hue-change-group-color>*running?
+  :tracker||hue-change-group-color||916273701
+  :runner||hue-change-group-color||-557229129
+  :runner||hue-change-group-color||-1817105151
+  :flow/flow-forever>*running?
+  :blocks||hue-change-group-color||-557229129
+  :tracker||hue-change-group-color||-334521120
+  :tracker||hue-change-group-color||-814547804
+  :blocks||hue-change-group-color||-1824055341
+  :acc-tracker||hue-change-group-color||-1817105151
+  :time/now
+  :acc-tracker||hue-change-group-color||2073680204
+  :tracker||hue-change-group-color||-876956508
+  :blocks||hue-change-group-color||-814547804
+  :blocks||hue-change-group-color||2073680204
+  :time/minute
+  :time/hour
+  :time/month-name
+  :flow/gpt35-color-parser>*running?
+  :runner||hue-change-group-color||916273701
+  :runner||hue-change-group-color||-876956508
+  :acc-tracker||hue-change-group-color||-1824055341
+  :acc-tracker||hue-change-group-color||1353601644
+  :tracker||hue-change-group-color||-557229129
+  :tracker||hue-change-group-color||-1824055341
+  :time/day
+  :blocks||hue-change-group-color||-1817105151
+  :blocks||hue-change-group-color||-876956508
+  :flow/live-scratch-flow>*running?
+  :tracker||hue-change-group-color||-1817105151
+  :time/second
+  :flow/flow-forever>:final-math
+  :runner||hue-change-group-color||-814547804
+  :acc-tracker||hue-change-group-color||-814547804
+  :blocks||hue-change-group-color||916273701
+  :acc-tracker||hue-change-group-color||-876956508
+  :tracker||hue-change-group-color||1353601644
+  :acc-tracker||hue-change-group-color||916273701],
+ :client-name :unwavering-cubic-porpoise-42,
+ :flow-gantt? false,
+ :alt-key-held? false,
+ :flow-editor? true,
  :openai-api-key "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",
- :window {:w 1907, :h 1159},
+ :window {:w 2333, :h 1636},
  :post-meta
- {:query-4557 {:* {:rowcount 1}},
+ {:runstream-chart-hue-change-group-color {:* {:rowcount 44}},
+  :query-4557 {:* {:rowcount 1}},
   :single-lights {:* {:rowcount 25}},
   :light-groups {:* {:rowcount 11}},
   :query-9307 {:* {:rowcount 1}}},
+ :flow-estimates
+ {"hue-change-group-color"
+  {:times 1, :run-id "37170ff8-9d85-491a-b5b8-244517e1a72d"}},
  :status
  {"kick-test!" {:kick :light-groups},
   :heartbeat
   {:kick
-   [:flow/gpt35-color-parser>*running?
-    :flow/hue-change-group-color>*running?]},
-  :file-change {:file-changed :done}},
+   [:runner||hue-change-group-color||-334521120
+    :runner||hue-change-group-color||2073680204
+    :acc-tracker||hue-change-group-color||-334521120
+    :runner||hue-change-group-color||1353601644
+    :time/nth
+    :runner||hue-change-group-color||-1824055341
+    :blocks||hue-change-group-color||-334521120
+    :blocks||hue-change-group-color||1353601644
+    :flow/hue-lights-api>*running?
+    :acc-tracker||hue-change-group-color||-557229129
+    :tracker||hue-change-group-color||2073680204
+    :flow/hue-change-group-color>*running?
+    :tracker||hue-change-group-color||916273701
+    :runner||hue-change-group-color||-557229129
+    :runner||hue-change-group-color||-1817105151
+    :flow/flow-forever>*running?
+    :blocks||hue-change-group-color||-557229129
+    :tracker||hue-change-group-color||-334521120
+    :tracker||hue-change-group-color||-814547804
+    :blocks||hue-change-group-color||-1824055341
+    :acc-tracker||hue-change-group-color||-1817105151
+    :time/now
+    :acc-tracker||hue-change-group-color||2073680204
+    :tracker||hue-change-group-color||-876956508
+    :blocks||hue-change-group-color||-814547804
+    :blocks||hue-change-group-color||2073680204
+    :time/minute
+    :time/hour
+    :time/month-name
+    :flow/gpt35-color-parser>*running?
+    :runner||hue-change-group-color||916273701
+    :runner||hue-change-group-color||-876956508
+    :acc-tracker||hue-change-group-color||-1824055341
+    :acc-tracker||hue-change-group-color||1353601644
+    :tracker||hue-change-group-color||-557229129
+    :tracker||hue-change-group-color||-1824055341
+    :time/day
+    :blocks||hue-change-group-color||-1817105151
+    :blocks||hue-change-group-color||-876956508
+    :flow/live-scratch-flow>*running?
+    :tracker||hue-change-group-color||-1817105151
+    :time/second
+    :flow/flow-forever>:final-math
+    :runner||hue-change-group-color||-814547804
+    :acc-tracker||hue-change-group-color||-814547804
+    :blocks||hue-change-group-color||916273701
+    :acc-tracker||hue-change-group-color||-876956508
+    :tracker||hue-change-group-color||1353601644
+    :acc-tracker||hue-change-group-color||916273701]},
+  :alert1 {:alerts :alert2}},
  :screen-name "hue-board-1",
  :recos-page2 0,
- :selected-tab "hue-philips-desktop",
+ :selected-tab "cerulean fox",
  :col-names nil,
  :snapshots
  {:params
@@ -938,8 +1048,7 @@
      :theme
      {:codemirror-theme "the-matrix",
       :editor-param-background-color "#000000",
-      :base-block-style
-      {:backdrop-filter "blur(2px) brightness(70%) "},
+      :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
       :vega-defaults
       {:view {:stroke "transparent"},
        :axis
@@ -961,8 +1070,7 @@
         :titleColor "#ffffff99",
         :stroke "#ffffff99",
         :titleFont "Lato"},
-       :header
-       {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+       :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
        :mark {:font "Lato"},
        :title
        {:font "Lato",
@@ -1013,8 +1121,7 @@
          :borderRadius "4px",
          :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
          :padding "5px 9px"},
-        :basic
-        {:whiteSpace "pre", :display "flex", :alignItems "center"},
+        :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
         :tableCell {:padding "3px 5px"}},
        :axis
        {:legend
@@ -1024,11 +1131,8 @@
           :font-family :theme/base-font,
           :font-weight 700}},
         :ticks
-        {:line {:stroke "#ffffff60"},
-         :text {:fill "#ffffff60", :font-weight 700}}},
-       :grid
-       {:line
-        {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+        {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+       :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
       :editor-outer-rim-color "#40d6ff",
       :grid-selected-font-color "#000000",
       :block-title-selected-font-color "#ffffff",
@@ -1045,12 +1149,10 @@
       :block-tab-selected-font-color "#c9d1ff",
       :editor-background-color "#000006",
       :editor-grid-font-color "#ffffff"},
-     :ufo-sightings-drag-22.*
-     {:duration_hours ["1-2 hrs" "20 seconds"]},
+     :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
      :kick--1668167951 nil,
      :kit-query--10577285230-agg nil,
-     :connections-sys
-     {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+     :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
      :kit-query-20835852960-agg nil,
      :narratives
      {:base>narrative-22>theme :cyberpunk,
@@ -1064,9 +1166,7 @@
       :base>narrative-22>mappy {:map 34}},
      :kits-sys
      {:enabled
-      [[:query-basics-1 :buffy]
-       [:query-basics-1 :outliers]
-       [:grab-bag :buffy]]}}},
+      [[:query-basics-1 :buffy] [:query-basics-1 :outliers] [:grab-bag :buffy]]}}},
    "m1"
    {:ts "Mon Dec 11 2023 01:22:35 GMT-0500 (Eastern Standard Time)",
     :menu? true,
@@ -1201,8 +1301,7 @@
      :theme
      {:codemirror-theme "the-matrix",
       :editor-param-background-color "#000000",
-      :base-block-style
-      {:backdrop-filter "blur(2px) brightness(70%) "},
+      :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
       :vega-defaults
       {:view {:stroke "transparent"},
        :axis
@@ -1224,8 +1323,7 @@
         :titleColor "#ffffff99",
         :stroke "#ffffff99",
         :titleFont "Lato"},
-       :header
-       {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+       :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
        :mark {:font "Lato"},
        :title
        {:font "Lato",
@@ -1276,8 +1374,7 @@
          :borderRadius "4px",
          :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
          :padding "5px 9px"},
-        :basic
-        {:whiteSpace "pre", :display "flex", :alignItems "center"},
+        :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
         :tableCell {:padding "3px 5px"}},
        :axis
        {:legend
@@ -1287,11 +1384,8 @@
           :font-family :theme/base-font,
           :font-weight 700}},
         :ticks
-        {:line {:stroke "#ffffff60"},
-         :text {:fill "#ffffff60", :font-weight 700}}},
-       :grid
-       {:line
-        {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+        {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+       :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
       :editor-outer-rim-color "#40d6ff",
       :grid-selected-font-color "#000000",
       :block-title-selected-font-color "#ffffff",
@@ -1307,12 +1401,10 @@
       :block-tab-selected-font-color "#c9d1ff",
       :editor-background-color "#000006",
       :editor-grid-font-color "#ffffff"},
-     :ufo-sightings-drag-22.*
-     {:duration_hours ["1-2 hrs" "20 seconds"]},
+     :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
      :kick--1668167951 nil,
      :kit-query--10577285230-agg nil,
-     :connections-sys
-     {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+     :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
      :kit-query-20835852960-agg nil,
      :narratives
      {:base>narrative-22>theme :cyberpunk,
@@ -1488,8 +1580,7 @@
      :theme
      {:codemirror-theme "the-matrix",
       :editor-param-background-color "#000000",
-      :base-block-style
-      {:backdrop-filter "blur(2px) brightness(70%) "},
+      :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
       :vega-defaults
       {:view {:stroke "transparent"},
        :axis
@@ -1511,8 +1602,7 @@
         :titleColor "#ffffff99",
         :stroke "#ffffff99",
         :titleFont "Lato"},
-       :header
-       {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+       :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
        :mark {:font "Lato"},
        :title
        {:font "Lato",
@@ -1563,8 +1653,7 @@
          :borderRadius "4px",
          :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
          :padding "5px 9px"},
-        :basic
-        {:whiteSpace "pre", :display "flex", :alignItems "center"},
+        :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
         :tableCell {:padding "3px 5px"}},
        :axis
        {:legend
@@ -1574,11 +1663,8 @@
           :font-family :theme/base-font,
           :font-weight 700}},
         :ticks
-        {:line {:stroke "#ffffff60"},
-         :text {:fill "#ffffff60", :font-weight 700}}},
-       :grid
-       {:line
-        {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+        {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+       :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
       :editor-outer-rim-color "#40d6ff",
       :grid-selected-font-color "#000000",
       :block-title-selected-font-color "#ffffff",
@@ -1594,12 +1680,10 @@
       :block-tab-selected-font-color "#c9d1ff",
       :editor-background-color "#000006",
       :editor-grid-font-color "#ffffff"},
-     :ufo-sightings-drag-22.*
-     {:duration_hours ["1-2 hrs" "20 seconds"]},
+     :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
      :kick--1668167951 nil,
      :kit-query--10577285230-agg nil,
-     :connections-sys
-     {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+     :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
      :kit-query-20835852960-agg nil,
      :narratives
      {:base>narrative-22>theme :cyberpunk,
@@ -1775,8 +1859,7 @@
      :theme
      {:codemirror-theme "the-matrix",
       :editor-param-background-color "#000000",
-      :base-block-style
-      {:backdrop-filter "blur(2px) brightness(70%) "},
+      :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
       :vega-defaults
       {:view {:stroke "transparent"},
        :axis
@@ -1798,8 +1881,7 @@
         :titleColor "#ffffff99",
         :stroke "#ffffff99",
         :titleFont "Lato"},
-       :header
-       {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+       :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
        :mark {:font "Lato"},
        :title
        {:font "Lato",
@@ -1850,8 +1932,7 @@
          :borderRadius "4px",
          :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
          :padding "5px 9px"},
-        :basic
-        {:whiteSpace "pre", :display "flex", :alignItems "center"},
+        :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
         :tableCell {:padding "3px 5px"}},
        :axis
        {:legend
@@ -1861,11 +1942,8 @@
           :font-family :theme/base-font,
           :font-weight 700}},
         :ticks
-        {:line {:stroke "#ffffff60"},
-         :text {:fill "#ffffff60", :font-weight 700}}},
-       :grid
-       {:line
-        {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+        {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+       :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
       :editor-outer-rim-color "#40d6ff",
       :grid-selected-font-color "#000000",
       :block-title-selected-font-color "#ffffff",
@@ -1881,12 +1959,10 @@
       :block-tab-selected-font-color "#c9d1ff",
       :editor-background-color "#000006",
       :editor-grid-font-color "#ffffff"},
-     :ufo-sightings-drag-22.*
-     {:duration_hours ["1-2 hrs" "20 seconds"]},
+     :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
      :kick--1668167951 nil,
      :kit-query--10577285230-agg nil,
-     :connections-sys
-     {:database_name "SQLite", :connection_id "bigfoot-ufos"},
+     :connections-sys {:database_name "SQLite", :connection_id "bigfoot-ufos"},
      :kit-query-20835852960-agg nil,
      :narratives
      {:base>narrative-22>theme :cyberpunk,
@@ -1994,8 +2070,7 @@
      :theme
      {:codemirror-theme "the-matrix",
       :editor-param-background-color "#000000",
-      :base-block-style
-      {:backdrop-filter "blur(2px) brightness(70%) "},
+      :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
       :vega-defaults
       {:view {:stroke "transparent"},
        :axis
@@ -2017,8 +2092,7 @@
         :titleColor "#ffffff99",
         :stroke "#ffffff99",
         :titleFont "Lato"},
-       :header
-       {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+       :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
        :mark {:font "Lato"},
        :title
        {:font "Lato",
@@ -2069,8 +2143,7 @@
          :borderRadius "4px",
          :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
          :padding "5px 9px"},
-        :basic
-        {:whiteSpace "pre", :display "flex", :alignItems "center"},
+        :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
         :tableCell {:padding "3px 5px"}},
        :axis
        {:legend
@@ -2080,11 +2153,8 @@
           :font-family :theme/base-font,
           :font-weight 700}},
         :ticks
-        {:line {:stroke "#ffffff60"},
-         :text {:fill "#ffffff60", :font-weight 700}}},
-       :grid
-       {:line
-        {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+        {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+       :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
       :editor-outer-rim-color "#40d6ff",
       :grid-selected-font-color "#000000",
       :block-title-selected-font-color "#ffffff",
@@ -2101,12 +2171,10 @@
       :block-tab-selected-font-color "#c9d1ff",
       :editor-background-color "#000006",
       :editor-grid-font-color "#ffffff"},
-     :ufo-sightings-drag-22.*
-     {:duration_hours ["1-2 hrs" "20 seconds"]},
+     :ufo-sightings-drag-22.* {:duration_hours ["1-2 hrs" "20 seconds"]},
      :kick--1668167951 nil,
      :kit-query--10577285230-agg nil,
-     :connections-sys
-     {:database_name "SQLite", :connection_id "boston-crime"},
+     :connections-sys {:database_name "SQLite", :connection_id "boston-crime"},
      :kit-query-20835852960-agg nil,
      :narratives
      {:base>narrative-22>theme :cyberpunk,
@@ -2126,84 +2194,178 @@
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
  :recos-page 0,
- :re-pollsive.core/polling
- {:rules
-  [{:interval 10,
-    :event [:viz-yard.bricks/dispatch-auto-queries],
-    :poll-when [:viz-yard.bricks/auto-run-and-connected?],
-    :dispatch-event-on-start? false}
-   {:interval 5,
-    :event [:viz-yard.bricks/update-metadata],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 120,
-    :event [:viz-yard.bricks/clean-up-reco-previews],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 2,
-    :event [:viz-yard.bricks/prune-alerts],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 1,
-    :event [:viz-yard.bricks/sub-to-flows],
-    :poll-when [:viz-yard.bricks/new-flow-subs?],
-    :dispatch-event-on-start? false,
-    :started-at nil,
-    :stopped-time-since-last-poll -1,
-    :started-before? true}
-   {:interval 1000,
-    :event [:viz-yard.bricks/update-metadata-tabs],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 1,
-    :event [:viz-yard.bricks/update-conditionals],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 4,
-    :event [:viz-yard.bricks/refresh-status],
-    :poll-when [:viz-yard.bricks/bg-status?],
-    :dispatch-event-on-start? false}],
-  :counter 3634},
- :panels-hash -541497371,
+ :flow-runner
+ {"hue-change-group-color"
+  {:ask-buffy-1 :timeout,
+   :open-fn-1 [9252 254],
+   :open-fn-2
+   "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/groups/4/action",
+   :group-id "4",
+   :open-input
+   {:method :put,
+    :body {:hue 9252, :on true, :sat 254},
+    :url
+    "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/groups/4/action"},
+   :on-switch true,
+   :room-name "Main Office",
+   :ccolor "#ffd800",
+   :http-call-1
+   [{:success {:groups4actionon true}}
+    {:success {:groups4actionhue 9252}}
+    {:success {:groups4actionsat 254}}]}},
+ :repl-output
+ {:single-lights
+  {:nrepl-conn {:host "127.0.0.1", :port 8181},
+   :cause "",
+   :err-data "",
+   :error "Connection refused",
+   :output-lines 0,
+   :values 0},
+  :light-groups
+  {:nrepl-conn {:host "127.0.0.1", :port 8181},
+   :cause "",
+   :err-data "",
+   :error "Connection refused",
+   :output-lines 0,
+   :values 0}},
+ :rs-overrides-hashmap {"hue-change-group-color" nil, "hue-lights-api" nil},
+ :base-sniff-queries {:jvm_stats 1498154063},
+ :panels-hash -1920535042,
+ :sessions
+ (["healthy-orchid-otter-of-pseudocrater.edn"
+   "1004 hours, 55 minutes, 37 seconds"
+   3617737355]
+   ["kind-turquoise-parrot-banned-from-machair.edn"
+    "1004 hours, 55 minutes, 46 seconds"
+    3617746355]
+   ["fair-long-mule-exiled-from-watershed.edn"
+    "1009 hours, 4 minutes, 11 seconds"
+    3632651355]
+   ["refined-rhomboidal-hawk-banned-from-nivation-hollow.edn"
+    "1009 hours, 4 minutes, 23 seconds"
+    3632663355]
+   ["amazing-ochre-yellow-jacket-of-the-complex-volcano.edn"
+    "1009 hours, 8 minutes, 38 seconds"
+    3632918356]
+   ["lovely-cyan-hummingbird-banned-from-stratovolcano.edn"
+    "1012 hours, 42 minutes, 39 seconds"
+    3645759355]
+   ["favorable-icosahedral-opossum-banned-from-archipelago.edn"
+    "1014 hours, 27 minutes, 46 seconds"
+    3652066355]
+   ["upright-slate-gray-termite-of-the-central-peak.edn"
+    "1014 hours, 58 minutes, 6 seconds"
+    3653886355]
+   ["worthy-cyan-rat-of-the-tea-table.edn"
+    "1017 hours, 28 minutes, 34 seconds"
+    3662914355]),
+ :last-run-throwaway "15:47:24",
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :websocket-fx.core/sockets
- {:default
-  {:status :connected,
-   :options
-   {:url "ws://localhost:3030/ws",
-    :format :edn,
-    :on-disconnect
-    [:websocket-fx.core/unsubscribe :default :server-push2],
-    :on-connect
-    [:websocket-fx.core/subscribe
-     :default
-     :server-push2
-     {:message
-      {:kind :server-push2,
-       :client-name :secure-circular-bear-of-outwash-fan,
-       :ui-keypath [:server],
-       :extras {:hello? true}},
-      :on-message [:viz-yard.http/simple-response]}]},
-   :requests {},
-   :subscriptions
-   {:server-push2
-    {:message
-     {:kind :server-push2,
-      :client-name :secure-circular-bear-of-outwash-fan,
-      :ui-keypath [:server],
-      :extras {:hello? true}},
-     :on-message [:viz-yard.http/simple-response]}}}},
+ :user-params-hash -1794848155,
  :grid-recos? true,
+ :session-hash -2937340,
+ :resolved-queries
+ {:runstream-chart-hue-change-group-color
+  {:select [[[[:min :elapsed]] :elapsed] :started],
+   :refresh-every 2,
+   :cache? false,
+   :connection-id "flows-db",
+   :from
+   [{:select
+     [:client_name :elapsed :ended :flow_id :human_elapsed :in_error :started :ts],
+     :from [[:flow_history :mm134]],
+     :where [:= :flow_id "hue-change-group-color"]}],
+   :group-by [:started],
+   :_last-run "15:55:00"},
+  :query-4557
+  {:select [[[:count 1] :ttl_groups]],
+   :from
+   [[{:select [:*],
+      :from
+      [{:data
+        (let [ss (vec
+                   (for
+                     [[k v]
+                      (http-call
+                        {:url
+                         "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/groups"})]
+                     {:group-id k,
+                      :group-name (get v :name),
+                      :all-on (get-in v [:state :all_on]),
+                      :any-on (get-in v [:state :any_on]),
+                      :lights (str (get v :lights))}))]
+          (println (str ss 3))
+          ss)}]}
+     :tt334]]},
+  :single-lights
+  {:select [:*],
+   :cache? false,
+   :refresh-every 1,
+   :style-rules
+   {[:* :highlight-253320] {:logic [:= :is_on "0"], :style {:opacity 0.322}}},
+   :from
+   [{:data
+     (let [ss (vec
+                (for
+                  [[k v]
+                   (http-call
+                     {:url
+                      "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/lights"})]
+                  {:light-id k,
+                   :light-name (get v :name),
+                   :xy (str (get-in v [:state :xy])),
+                   :hue (get-in v [:state :hue]),
+                   :hex (str (hue-to-hex (get-in v [:state :hue]))),
+                   :brightness (get-in v [:state :bri]),
+                   :is_on (get-in v [:state :on])}))]
+       (println (str ss 2))
+       ss)}],
+   :col-widths {:is_on 71, :brightness 81, :light_id 91},
+   :_last-run "15:55:01"},
+  :light-groups
+  {:select [:*],
+   :cache? false,
+   :refresh-every 1,
+   :from
+   [{:data
+     (let [ss (vec
+                (for
+                  [[k v]
+                   (http-call
+                     {:url
+                      "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/groups"})]
+                  {:group-id k,
+                   :group-name (get v :name),
+                   :all-on (get-in v [:state :all_on]),
+                   :any-on (get-in v [:state :any_on]),
+                   :lights (str (get v :lights))}))]
+       (println (str ss 3))
+       ss)}],
+   :style-rules
+   {[:* :highlight-2520] {:logic [:= :any_on "0"], :style {:opacity 0.33}}},
+   :_last-run "15:55:01"},
+  :query-9307
+  {:select [[[:count 1] :ttl_lights]],
+   :from
+   [[{:select [:*],
+      :from
+      [{:data
+        (let [ss (vec
+                   (for
+                     [[k v]
+                      (http-call
+                        {:url
+                         "http://10.174.1.174/api/sqOjLm0JhoioAbwhwPm6ZlHiuCAx-KnQEYwAZOWL/lights"})]
+                     {:light-id k,
+                      :light-name (get v :name),
+                      :xy (str (get-in v [:state :xy])),
+                      :hue (get-in v [:state :hue]),
+                      :hex (str (hue-to-hex (get-in v [:state :hue]))),
+                      :brightness (get-in v [:state :bri]),
+                      :is_on (get-in v [:state :on])}))]
+          (println (str ss 2))
+          ss)}]}
+     :qq929]]}},
  :panels
  {:block-2835
   {:h 2,
@@ -2234,15 +2396,13 @@
         :font-family :theme/base-font}
        :child
        "philips hue simple control board"]]],
-    :stack
-    [:layout
-     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
   :block-3452
   {:h 2,
    :w 10,
    :tab "hue-philips-desktop",
-   :root [15 17],
+   :root [15 19],
    :name "block-3452",
    :views
    {:param-val
@@ -2258,6 +2418,59 @@
      :child
      [:scrubber [:param :on-switch]]]},
    :queries {}},
+  :block-4897
+  {:h 4,
+   :w 9,
+   :connection-id nil,
+   :name "runstream-chart-hue-change-group-color",
+   :queries
+   {:runstream-chart-hue-change-group-color
+    {:select [[[[:min :elapsed]] :elapsed] :started],
+     :refresh-every 2,
+     :cache? false,
+     :connection-id "flows-db",
+     :from
+     [{:select
+       [:client_name
+        :elapsed
+        :ended
+        :flow_id
+        :human_elapsed
+        :in_error
+        :started
+        :ts],
+       :from [[:flow_history :mm134]],
+       :where [:= :flow_id "hue-change-group-color"]}],
+     :group-by [:started],
+     :_last-run "15:55:00"}},
+   :views
+   {:reech
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :BarChart
+      {:data :runstream-chart-hue-change-group-color,
+       :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+      [:> :Tooltip]
+      [:> :XAxis {:dataKey :started}]
+      [:>
+       :Bar
+       {:dataKey :elapsed,
+        :stroke :theme/editor-outer-rim-color,
+        :fill :theme/editor-outer-rim-color}]]]},
+   :root [24 3],
+   :tab "cerulean fox"},
+  :block-981
+  {:w 23,
+   :selected-view :vv,
+   :name "hue-philips-desktop",
+   :h 20,
+   :ghosted? false,
+   :views {:vv [:grid "hue-philips-desktop"]},
+   :root [1 3],
+   :tab "cerulean fox"},
   :block-11833
   {:name "block-11833",
    :w 5,
@@ -2267,8 +2480,7 @@
    :connection-id nil,
    :queries
    {:query-4557
-    {:select [[[:count 1] :ttl_groups]],
-     :from [[:query/light-groups :tt334]]}},
+    {:select [[[:count 1] :ttl_groups]], :from [[:query/light-groups :tt334]]}},
    :tab "hue-philips-desktop",
    :views
    {:hi
@@ -2289,9 +2501,7 @@
       :font-family :theme/base-font}
      :child
      "hi!"],
-    :stack
-    [:layout
-     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
   :block-6084
   {:last-run 78,
    :name "block-6084",
@@ -2303,10 +2513,9 @@
    {:single-lights
     {:select [:*],
      :cache? false,
-     :refresh-every 10,
+     :refresh-every 1,
      :style-rules
-     {[:* :highlight-253320]
-      {:logic [:= :is_on "0"], :style {:opacity 0.322}}},
+     {[:* :highlight-253320] {:logic [:= :is_on "0"], :style {:opacity 0.322}}},
      :from
      [{:data
        (let [ss (vec
@@ -2324,8 +2533,8 @@
                      :is_on (get-in v [:state :on])}))]
          (println (str ss 2))
          ss)}],
-     :_last-run "09:45:13",
-     :col-widths {:is_on 71, :brightness 81, :light_id 91}}},
+     :col-widths {:is_on 71, :brightness 81, :light_id 91},
+     :_last-run "15:55:01"}},
    :tab "hue-philips-desktop",
    :views
    {:hi
@@ -2346,9 +2555,27 @@
       :font-family :theme/base-font}
      :child
      "hi!"],
-    :stack
-    [:layout
-     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-2081
+  {:h 2,
+   :w 10,
+   :tab "hue-philips-desktop",
+   :root [15 15],
+   :name "block-2081",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "30px", :color :param/ccolor, :font-weight 700}
+     :child
+     [:string ["Changing " :light-groups/group_name " to..."]]]},
+   :queries {}},
   :block-11365
   {:last-run 68,
    :name "block-11365",
@@ -2360,7 +2587,7 @@
    {:light-groups
     {:select [:*],
      :cache? false,
-     :refresh-every 10,
+     :refresh-every 1,
      :from
      [{:data
        (let [ss (vec
@@ -2372,13 +2599,13 @@
                     {:group-id k,
                      :group-name (get v :name),
                      :all-on (get-in v [:state :all_on]),
-                     :any-on (get-in v [:state :any_on])}))]
+                     :any-on (get-in v [:state :any_on]),
+                     :lights (str (get v :lights))}))]
          (println (str ss 3))
          ss)}],
      :style-rules
-     {[:* :highlight-2520]
-      {:logic [:= :any_on "0"], :style {:opacity 0.33}}},
-     :_last-run "09:45:13"}},
+     {[:* :highlight-2520] {:logic [:= :any_on "0"], :style {:opacity 0.33}}},
+     :_last-run "15:55:01"}},
    :tab "hue-philips-desktop",
    :views
    {:hi
@@ -2399,11 +2626,90 @@
       :font-family :theme/base-font}
      :child
      "hi!"],
-    :stack
-    [:layout
-     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-3526
+  {:h 9,
+   :w 12,
+   :root [33 2],
+   :tab "cerulean fox",
+   :selected-view :hi,
+   :name "block-3526",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3526.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:web-cam]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-428
+  {:h 3,
+   :w 12,
+   :tab "cerulean fox",
+   :root [33 11],
+   :name "block-428",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :light-groups/lights]]},
+   :queries {}},
+  :block-2862
+  {:pinned? true,
+   :name "SEATTLE 1989 Live",
+   :w 34,
+   :selected-view :hi,
+   :root [2 1],
+   :h 29,
+   :queries {},
+   :tab "bulbous gull",
+   :minimized? false,
+   :views
+   {:hi
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:background-color "#25243587",
+      :padding-top "12px",
+      :padding-bottom "12px",
+      :border-radius "9px"}
+     :child
+     [:iframe
+      {:src "https://www.youtube.com/embed/caznxOmRByU?si=z3eK0wtdYR_vsJlf",
+       :width 1650,
+       :height 1365,
+       :frameborder 0,
+       :autoplay false,
+       :encrypted-media true}]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
   :block-1434
-  {:h 10,
+  {:h 12,
    :w 13,
    :tab "hue-philips-desktop",
    :root [2 11],
@@ -2446,7 +2752,7 @@
        "run gpt35-color-parser"
        {:user-sentence :param/voice}]]]},
    :name "flow-play",
-   :root [15 19],
+   :root [15 21],
    :tab "hue-philips-desktop"},
   :block-6207
   {:h 2,
@@ -2469,12 +2775,13 @@
      :child
      [:run-flow
       ["hue-change-group-color"
-       "run hue-change-group-color"
+       "go!"
        {:group-id :light-groups/group_id,
+        :room-name :light-groups/group_name,
         :on-switch :param/on-switch,
         :ccolor :param/ccolor}]]]},
    :name "flow-play",
-   :root [15 15],
+   :root [15 17],
    :tab "hue-philips-desktop"},
   :block-6636
   {:h 4,
@@ -2502,9 +2809,7 @@
       :font-family :theme/base-font}
      :child
      [:string :sys/selected-tab-idx]],
-    :stack
-    [:layout
-     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
   :block-2961
   {:h 4,
@@ -2538,9 +2843,7 @@
        1
        "url(images/gen/b64-decoded-1156592.png)"
        ""]]],
-    :stack
-    [:layout
-     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
   :block-1074
   {:name "block-1074",
@@ -2551,8 +2854,7 @@
    :connection-id nil,
    :queries
    {:query-9307
-    {:select [[[:count 1] :ttl_lights]],
-     :from [[:query/single-lights :qq929]]}},
+    {:select [[[:count 1] :ttl_lights]], :from [[:query/single-lights :qq929]]}},
    :tab "hue-philips-desktop",
    :views
    {:hi
@@ -2573,11 +2875,63 @@
       :font-family :theme/base-font}
      :child
      "hi!"],
-    :stack
-    [:layout
-     {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}},
- :hidden-tabs [],
- :selected-block "none!",
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}},
+ :selected-block :block-2862,
+ :signals-map
+ {:fun-gorilla
+  {:signal
+   [:and
+    [:=
+     :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
+     "jessica"]
+    [:changed? :time/second]
+    [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
+    [:or [:= 2 1] [:< 9 4]]
+    [:signal/worthy-fish-signal]]},
+  :cool-raccoon-signal-yo
+  {:signal
+   [:or
+    [:= :client/honest-ultramarine-mole-1>param>light-brown-swallow true]
+    [:and
+     [:or [:> :time/hour 12] [:< :time/hour 6]]
+     [:or [:= :time/second 20] [:= :time/second 35] [:= :time/second 25]]]]},
+  :worthy-fish-signal {:signal [:or [:= :time/day 22] [:= 221 22]]},
+  :hourly? {:signal [:or [:changed? :time/hour] [:= :time/minute -1]]},
+  :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+  :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
+  :elegant-grasshopper-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+  :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+  :exciting-cheetah-signal
+  {:signal [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
+  :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
+  :special-lion-signal
+  {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
+  :optimistic-sheep-signal
+  {:signal
+   [:and
+    [:= :time/day 1]
+    [:= :time/hour 9]
+    [:changed? :time/minute]
+    [:changed? :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]]},
+  :glowing-bat-signal
+  {:signal [:and [:= :time/day 1] [:changed? :time/second] [:= :time/hour 9]]}},
+ :theme-colors-hashmap
+ {"float" "#2c728e",
+  "boolean" "#f386bf",
+  "map" "#00FFFF",
+  "list" "#c32148",
+  "string" "#7de8b9",
+  "rowset" "#DAF7A6",
+  "any" "#c3ec52",
+  "vector" "#008080",
+  "keyword" "#add8e6",
+  "rabbit-code" "#FC0FC0",
+  "datetime" "#472d7b",
+  "integer" "#12e3ff",
+  "unknown" "#ffcf99",
+  "date" "#3b528b",
+  "rabbitsql" "#FC0FC0",
+  "nil" "#eeeeee"},
  :click-param
  {:flow-fn-sys
   {:name ":http-call",
@@ -2590,17 +2944,35 @@
    :output_types ":any",
    :category ":rabbit-base"},
   :flow
-  {:gpt35-color-parser>*running? nil,
-   :hue-change-group-color>*running? nil},
+  {:gpt35-color-parser>*running? false,
+   :hue-change-group-color>*running? false,
+   :hue-lights-api>*running? false,
+   :hue-change-group-color-SHD-2024-04-26-141616>*running? false,
+   :pheasant-flow-254>*running? false,
+   :openai-image-gen-ladder>*running? false,
+   :ask-buffy-1>*running? false},
   :flows-sys
-  {:flow_id "gpt35-color-parser",
-   :file_path "./flows/gpt35-color-parser.edn",
-   :last_modified "2024-01-12 01:08:05"},
+  {:flow_id "ask-buffy-1",
+   :file_path "./flows/ask-buffy-1.edn",
+   :last_modified "2024-04-26 15:24:30"},
+  :time {:second 1, :now "Friday, April 26th 3:55PM", :minute 55, :hour 15},
+  :grid1-sys*
+  {:flow_id "hue-change-group-color",
+   :run_id "c215c8a8-cc7f-4aa4-bbcb-579f5e033dc9",
+   :start_ts "2024-04-26 14:16:16",
+   :seconds 0.054,
+   :human_elapsed "less than a second",
+   :overrides "No",
+   :result "success",
+   :styler_highlight_8369aaa1 0},
   :param
-  {:ccolor "#0ce5fd",
+  {:selected-view-data nil,
+   :tt :sys/selected-tab,
+   :selected-view [nil :*],
    :keys 2342,
-   :sdtring "sfdfsdfsdf",
+   :bools true,
    :on-switch true,
+   :ccolor "#ffd800",
    :bg
    [:case
     [:sys/selected-tab-idx
@@ -2611,10 +2983,9 @@
      2
      "url(images/gen/b64-decoded-4014350.png)"
      "url(images/cigar-bunny-colorful.png)"]],
-   :tt :sys/selected-tab,
-   :bools true},
+   :selected-block :block-2862},
   :theme
-  {:codemirror-theme "ayu-dark",
+  {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
    :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
    :vega-defaults
@@ -2638,8 +3009,7 @@
      :titleColor "#ffffff99",
      :stroke "#ffffff99",
      :titleFont "Lato"},
-    :header
-    {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
     :mark {:font "Lato"},
     :title
     {:font "Lato",
@@ -2703,11 +3073,8 @@
        :font-family :theme/base-font,
        :font-weight 700}},
      :ticks
-     {:line {:stroke "#ffffff60"},
-      :text {:fill "#ffffff60", :font-weight 700}}},
-    :grid
-    {:line
-     {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
    :editor-outer-rim-color "#40d6ff",
    :grid-selected-font-color "#000000",
    :block-title-selected-font-color "#ffffff",
@@ -2718,14 +3085,15 @@
     [:case
      [:sys/selected-tab-idx
       0
-      "url(images/sneaky4.png)"
+      "url(images/large/sneaky4.png)"
       1
-      "url(images/gen/b64-decoded-6904633.png)"
+      "url(images/large/gen/b64-decoded-6904633.png)"
       2
       "url(images/gen/b64-decoded-4014350.png)"
-      "url(images/cigar-bunny-colorful.png)"]],
+      3
+      "url(images/large/cigar-bunny-colorful.png)"
+      "url(images/large/morg1-localup.png)"]],
     :transition "all 1.8s ease-in-out",
-    :background-blend-mode "multiply",
     :background-size "cover",
     :background-color "#424f57"},
    :editor-font-color "#ffffff",
@@ -2736,11 +3104,118 @@
   :light-groups
   {:group_id "4",
    :group_name "Main Office",
-   :all_on "0",
-   :any_on "0",
-   :styler_highlight_2520 1},
+   :all_on "1",
+   :any_on "1",
+   :lights "[\"26\" \"12\" \"11\" \"27\"]",
+   :styler_highlight_2520 0},
   :flow-fn-categories-sys {:category ":rabbit-base"},
-  :connections-sys
-  {:database_name "SQLite", :connection_id "boston-crime"},
-  :sys {:selected-tab "hue-philips-desktop", :selected-tab-idx 0}},
- :selected-flow "live-scratch-flow"}
+  :connections-sys {:database_name "SQLite", :connection_id "boston-crime"},
+  :sys {:selected-tab "cerulean fox", :selected-tab-idx 4}},
+ :selected-flow "hue-change-group-color",
+ :flow-statuses
+ {"crow-flow-201a"
+  {:last-updated nil,
+   :blocks_finished 9,
+   :block-overrides [],
+   :channels 0,
+   :channels-open 0,
+   :since-start "less than a second",
+   :*started-by :rvbbit-scheduler,
+   :time-running "less than a second",
+   :last-update {:done :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "counting-loop"
+  {:last-updated nil,
+   :blocks_finished 13,
+   :block-overrides [],
+   :channels 0,
+   :channels-open 0,
+   :since-start "6 seconds",
+   :*started-by :rvbbit-scheduler,
+   :time-running "6 seconds",
+   :last-update {:done :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "openai-image-gen-ladder"
+  {:last-updated nil,
+   :blocks_finished 83,
+   :block-overrides [:prompt :style-param :prompt-2 :prompt-3],
+   :channels 0,
+   :channels-open 0,
+   :since-start "50 seconds",
+   :*started-by :agreeable-silver-sand-dollar-27,
+   :time-running "50 seconds",
+   :last-update {:done :start},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "hue-change-group-color"
+  {:last-updated nil,
+   :blocks_finished 23,
+   :block-overrides [:group-id :room-name :on-switch :ccolor],
+   :channels 0,
+   :channels-open 0,
+   :since-start "1 second",
+   :*started-by :special-prismatic-koala-37,
+   :time-running "1 second",
+   :last-update {:ask-buffy-1 :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "openai-image-gen-ladder/node-js-color-thief-script"
+  {:last-updated nil,
+   :blocks_finished 16,
+   :block-overrides [:image-path],
+   :channels 0,
+   :channels-open 0,
+   :since-start "less than a second",
+   :*started-by :agreeable-silver-sand-dollar-27,
+   :time-running "less than a second",
+   :last-update {:done :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "ask-buffy-1"
+  {:last-updated nil,
+   :blocks_finished 24,
+   :block-overrides [:prompt :style-param :prompt-2],
+   :channels 0,
+   :channels-open 0,
+   :since-start "2 seconds",
+   :*started-by :special-prismatic-koala-37,
+   :time-running "2 seconds",
+   :last-update {:done :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "hue-change-group-color/ask-buffy-1"
+  {:last-updated nil,
+   :blocks_finished 24,
+   :block-overrides [:the-color :the-room],
+   :channels 0,
+   :channels-open 0,
+   :since-start "1 second",
+   :*started-by :special-prismatic-koala-37,
+   :time-running "1 second",
+   :last-update {:done :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []}},
+ :post-condi {:c345-up-or-down? [{:v 0}]}}

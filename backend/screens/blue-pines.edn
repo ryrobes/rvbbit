@@ -1,127 +1,89 @@
 {:orders
- {:connections-sys [:database_name :connection_id],
-  :fields-sys [:field_name :field_type :data_type],
-  :tables-sys
-  [:db_schema
-   :db_catalog
-   :connection_id
-   :schema_cat
-   :table_name
-   :fields],
-  :reco-counts [:table_name :cnt]},
+ {:jvm_stats
+  [:used_memory_mb
+   :thread_count
+   :sql_cache_size
+   :ws_peers
+   :open_flow_channels
+   :queries_run
+   :internal_queries_run
+   :sniffs_run
+   :sys_load
+   :ts],
+  :reco-counts [:table_name :cnt],
+  :blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
+  :files-sys [:file_path :screen_name :blocks :queries :ts]},
  :reco-preview nil,
+ :flow? false,
+ :sql-source
+ {:jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111}},
  :meta
- {:connections-sys
+ {:reco-counts {:fields {}, :rowcount 0},
+  :blocks-sys {:fields {}, :rowcount 0},
+  :files-sys
   {:fields
-   {:database_name
+   {:file_path
     {:data-type "string",
-     :distinct 3,
+     :distinct 145,
      :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
-  :fields-sys
-  {:fields
-   {:field_name
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"state" 1, "comments" 1, "datetime" 1},
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
      :cardinality 100},
-    :field_type
+    :screen_name
     {:data-type "string",
-     :distinct 10,
+     :distinct 138,
      :group-by? true,
-     :commons {"DECIMAL" 2, "VARCHAR(9)" 2, "VARCHAR(2)" 2},
-     :cardinality 76},
-    :data_type
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons {"string" 8, "float" 2, "integer" 1},
-     :cardinality 38}},
-   :rowcount 13},
-  :tables-sys
-  {:fields
-   {:db_schema
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"none" 9},
-     :cardinality 11},
-    :db_catalog
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? true,
-     :commons {nil 9},
-     :cardinality 11},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"bigfoot-ufos" 9},
-     :cardinality 11},
-    :schema_cat
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? false,
-     :commons {nil 9},
-     :cardinality 11},
-    :table_name
-    {:data-type "string",
-     :distinct 9,
-     :group-by? true,
-     :commons {"us_states" 1, "ufo_sightings_vw" 1, "test_me" 1},
-     :cardinality 100},
-    :fields
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 95},
+    :blocks
     {:data-type "integer",
-     :distinct 9,
-     :group-by? false,
-     :commons {42 1, 14 1, 11 1},
-     :cardinality 100}},
-   :rowcount 9},
-  :reco-counts {:fields {}, :rowcount 0}},
+     :distinct 44,
+     :group-by? true,
+     :commons {3 45, 6 7, 14 6},
+     :cardinality 30},
+    :queries
+    {:data-type "integer",
+     :distinct 32,
+     :group-by? true,
+     :commons {0 54, 5 9, 6 9},
+     :cardinality 22},
+    :ts
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"2024-04-25 18:17:25" 52, "2024-04-25 18:17:26" 49, "2024-04-25 18:17:27" 34},
+     :cardinality 2}},
+   :rowcount 145}},
  :default-col-widths
- {:system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys 137},
-  :system-fields-list* {:fields-sys 170}},
- :data-hash 1277417971,
+ {:virtual-panel {:kick--1764769189 152},
+  :flow-list* {:flows-sys 187},
+  :system-connections-list* {:connections-sys ##Inf},
+  :system-tables-list* {:tables-sys ##Inf},
+  :system-fields-list* {:fields-sys ##Inf},
+  :files-list* {:files-sys 178},
+  :blocks-list* {:blocks-sys ##Inf}},
+ :selected-signal :fun-gorilla,
+ :runstream-drops nil,
+ :data-hash -1383492270,
  :tabs ["strategic grill locations"],
- :selected-cols nil,
+ :selected-cols {},
  :server
  {:settings
   {:harvest-on-boot? true,
-   :default "./screens/winter-theme.edn",
+   :default "./screens/looking-glass-redux.edn",
    :eleven-labs-api-key nil,
    :kits
-   {:buffy
-    {:author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :kit-name :buffy,
-     :package-name :grab-bag,
-     :fn (rvbbit-backend.assistants/buffy :query-name),
-     :name "Ask Buffy!",
-     :icon "zmdi-cocktail",
-     :run-on :queries,
-     :description "What does Buffy think about this data? Who knows!"},
-    :outliers
+   {:outliers
     {:description
      "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
      :image-url "images/outliers-image.png",
-     :fn
-     (rabbit-kit-outliers.core/get-outliers
-       :query-name
-       :panel-name
-       :query),
+     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
      :name "Outliers",
      :icon "zmdi-functions",
      :author
@@ -134,13 +96,8 @@
      :kit-name :outliers,
      :package-name :query-basics-1},
     :forecast
-    {:description
-     "WIP: basic timeseries forecasting based on previous values",
-     :fn
-     (rabbit-kit-outliers.core/get-forecast
-       :query-name
-       :panel-name
-       :query),
+    {:description "WIP: basic timeseries forecasting based on previous values",
+     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
      :name "Forecasting",
      :icon "zmdi-brightness-7",
      :author
@@ -151,7 +108,20 @@
      :run-on :queries,
      :repl {:host "127.0.0.1", :port 42999},
      :kit-name :forecast,
-     :package-name :query-basics-1}},
+     :package-name :query-basics-1},
+    :buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"}},
    :graphite-host "127.0.0.1",
    :openapi-org-id nil,
    :debug-level 1,
@@ -163,14 +133,17 @@
     "aaaaah-esday-the-day"
     "aaaaah-wednesday-the-day"
     "aaaah-wednesday-the-day"
+    "alice-puzzle-1"
     "asdasdasdasd"
     "autumn-theme"
     "battle-mage"
     "bigfoot-snapshots"
     "bigfoot-snapshots2"
     "bigfoot-snapshots3"
+    "blackberries"
     "blank-sizzle"
     "blank-sizzle2"
+    "blue-pines"
     "boston-test-10-3-23"
     "broken-jacket"
     "bunch of bullshit"
@@ -182,9 +155,12 @@
     "capecod-viking"
     "chaos simple"
     "chaos-views"
+    "chompers"
+    "claude-testing2"
     "clean-grey-defaults"
     "code-data-literal-stonks-test"
     "conifer-boughs"
+    "counting-lord-of-the-woods"
     "crazy-alice"
     "dark-crested-jackelope"
     "data-literals-test-sunday"
@@ -196,8 +172,10 @@
     "error-monitor"
     "error-monitor-vanessa"
     "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
     "evil-main-street"
     "fake-books-1"
+    "fake-bricks"
     "fetching-pentagonal-termite-of-tghe-submarine-canyon"
     "final-fantasy-dorchester"
     "fox-hills"
@@ -205,13 +183,24 @@
     "green-storm-city"
     "hue-board-1"
     "late-winter-theme"
+    "lavender-side-eye"
     "layout-test-1"
     "layout-test-12"
     "light-theme"
     "literal-data-test"
+    "looking-glass-redux"
+    "looking-glass-redux2"
+    "looking-glass-redux23a"
+    "looking-glass-redux23abb"
+    "looking-glass-redux2a"
+    "looking-glass-redux2aa"
+    "looking-glass-redux45"
+    "looking-glass-redux79"
     "luck-of-the-irish"
     "mapbox-test"
+    "may-20"
     "my-goodness"
+    "my-goodness-the-sequel"
     "neverwinter-amy"
     "night-city-never-sleeps"
     "nightcity-cape-cod"
@@ -223,7 +212,9 @@
     "old-fashioned-christmas"
     "old-town-snow-stars"
     "pensive-look"
+    "pensive-look2"
     "pine-wood-dawn"
+    "pink-and-green-elk"
     "pink-dusk-falls"
     "pinup-rabbit-fields"
     "poor-touring-me"
@@ -233,18 +224,25 @@
     "purple-techno-sunset"
     "recharts-test-blocks"
     "refresh-test"
+    "retro-machines"
     "riffle-test"
     "sick-of-your-shit"
     "sizzle-board-1"
     "sneaky-swamp-creatures1"
+    "stop-drawing-dead-dashboards"
     "swamp-nightgown"
     "swamp-reacher"
     "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
     "the-future-soon"
     "the-generated-lass"
     "the-generated-lass-glow"
     "the-generated-lass-ne"
     "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-memo"
+    "the-memo2"
     "the-outer-blues"
     "trad-hybrid"
     "tweet-bigfoot-is-blurry"
@@ -264,202 +262,545 @@
     "winter-theme47"
     "winter-twin-peaks"
     "witchy425"
+    "wonderland-horror-interface"
     "wow-board"],
-   :openapi-key
-   "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"}},
+   :openapi-key "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"}},
+ :runstreams nil,
  :editor? true,
  :buffy? false,
- :memory [252820499 229436607 4294705152],
+ :memory [837040956 652559700 4294705152],
  :status-data
- {:heartbeat
+ {"kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :joyful-rhomboidal-shark-24,
+      :at "2024-04-26 13:26:58",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-04-26 13:26:58 - query ran in 2 ms."],
+          :name "query-log-:jvm_stats",
+          :order 1714152418,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:jvm_stats",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:jvm_stats "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-02-13 05:41:05",
+      :at "2024-04-26 13:40:45",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
+    :reco-count nil}},
+  :alert1
+  {:alerts
+   {:data
+    [[[:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data
+         [{:mem 2210, :tick 84232, :threads 97, :subs 73, :load 1.70068359375}
+          {:mem 2774, :tick 84233, :threads 102, :subs 73, :load 1.56689453125}
+          {:mem 3224, :tick 84234, :threads 101, :subs 73, :load 1.4228515625}
+          {:mem 2195, :tick 84235, :threads 99, :subs 73, :load 1.32373046875}
+          {:mem 2768, :tick 84236, :threads 106, :subs 73, :load 1.693359375}
+          {:mem 3297, :tick 84237, :threads 105, :subs 73, :load 2.00732421875}
+          {:mem 2235, :tick 84238, :threads 101, :subs 73, :load 1.95654296875}
+          {:mem 2803, :tick 84239, :threads 106, :subs 73, :load 2.14599609375}
+          {:mem 3268, :tick 84240, :threads 103, :subs 73, :load 2.193359375}
+          {:mem 2661, :tick 84241, :threads 108, :subs 73, :load 2.388671875}
+          {:mem 2407, :tick 84242, :threads 112, :subs 73, :load 2.41845703125}
+          {:mem 2778, :tick 84243, :threads 110, :subs 73, :load 2.03125}
+          {:mem 2219, :tick 84244, :threads 107, :subs 73, :load 2.26318359375}
+          {:mem 3089, :tick 84245, :threads 110, :subs 73, :load 2.509765625}
+          {:mem 3107, :tick 84246, :threads 121, :subs 73, :load 2.63134765625}
+          {:mem 2413, :tick 84247, :threads 122, :subs 73, :load 2.6103515625}
+          {:mem 2227, :tick 84248, :threads 111, :subs 73, :load 2.39453125}
+          {:mem 3266, :tick 84249, :threads 110, :subs 73, :load 2.63623046875}
+          {:mem 2625, :tick 84250, :threads 111, :subs 73, :load 3.0390625}
+          {:mem 2552, :tick 84251, :threads 111, :subs 73, :load 3.1611328125}
+          {:mem 2078, :tick 84252, :threads 105, :subs 73, :load 3.25830078125}
+          {:mem 3283, :tick 84253, :threads 122, :subs 83, :load 2.42431640625}
+          {:mem 3157, :tick 84254, :threads 119, :subs 83, :load 2.4765625}
+          {:mem 2193, :tick 84255, :threads 115, :subs 83, :load 2.20458984375}
+          {:mem 2113, :tick 84256, :threads 109, :subs 83, :load 2.744140625}
+          {:mem 2776, :tick 84257, :threads 122, :subs 83, :load 2.69580078125}
+          {:mem 3546, :tick 84258, :threads 123, :subs 83, :load 3.0068359375}
+          {:mem 2866, :tick 84259, :threads 100, :subs 83, :load 2.798828125}
+          {:mem 2175, :tick 84260, :threads 100, :subs 83, :load 2.79150390625}
+          {:mem 3286, :tick 84261, :threads 120, :subs 93, :load 3.298828125}
+          {:mem 2711, :tick 84262, :threads 115, :subs 117, :load 3.12060546875}
+          {:mem 2144, :tick 84263, :threads 112, :subs 117, :load 2.7412109375}
+          {:mem 3026, :tick 84264, :threads 110, :subs 117, :load 3.31201171875}
+          {:mem 2427, :tick 84265, :threads 110, :subs 117, :load 3.0029296875}
+          {:mem 3320, :tick 84266, :threads 110, :subs 117, :load 2.6640625}
+          {:mem 2700, :tick 84267, :threads 111, :subs 117, :load 2.65771484375}
+          {:mem 3614, :tick 84268, :threads 107, :subs 117, :load 2.41552734375}
+          {:mem 2989, :tick 84269, :threads 106, :subs 117, :load 1.9248046875}
+          {:mem 2273, :tick 84270, :threads 104, :subs 117, :load 1.75244140625}
+          {:mem 3154, :tick 84271, :threads 107, :subs 117, :load 1.6669921875}
+          {:mem 2468, :tick 84272, :threads 108, :subs 117, :load 1.75146484375}
+          {:mem 3339, :tick 84273, :threads 102, :subs 117, :load 1.52783203125}
+          {:mem 2701, :tick 84274, :threads 102, :subs 117, :load 1.5263671875}
+          {:mem 2173, :tick 84275, :threads 107, :subs 119, :load 1.380859375}
+          {:mem 3130, :tick 84276, :threads 107, :subs 123, :load 1.35498046875}
+          {:mem 2540, :tick 84277, :threads 107, :subs 123, :load 1.33984375}
+          {:mem 2808, :tick 84278, :threads 117, :subs 123, :load 1.298828125}
+          {:mem 2650, :tick 84279, :threads 114, :subs 123, :load 1.486328125}
+          {:mem 2902, :tick 84280, :threads 115, :subs 123, :load 1.79931640625}
+          {:mem 2348, :tick 84281, :threads 113, :subs 123, :load 1.89599609375}],
+         :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
+        [:> :XAxis {:dataKey :tick, :hide true}]
+        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
+        [:>
+         :YAxis
+         {:yAxisId "right", :hide true, :dataKey :subs, :orientation "right"}]
+        [:>
+         :Bar
+         {:yAxisId "left",
+          :dataKey :mem,
+          :isAnimationActive false,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:string :theme/editor-outer-rim-color "33"]}]
+        [:>
+         :Line
+         {:yAxisId "right",
+          :strokeWidth 4,
+          :type "monotone",
+          :dot false,
+          :dataKey :threads,
+          :isAnimationActive false,
+          :stroke :theme/editor-grid-selected-background-color,
+          :fill :theme/editor-grid-selected-background-color}]
+        [:>
+         :Line
+         {:stroke :theme/block-tab-selected-font-color,
+          :fill :theme/block-tab-selected-font-color,
+          :type "monotone",
+          :yAxisId "right",
+          :dataKey :subs,
+          :strokeWidth 3,
+          :strokeDasharray "5 5",
+          :dot false,
+          :isAnimationActive false}]]]
+      10
+      4
+      5]
+     nil],
+    :elapsed-ms nil,
     :reco-count nil}}},
- :re-pressed.core/keydown
- {:keys
-  [{:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 32}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 27}],
-  :event-keys
-  [[[:viz-yard.bricks/esc-unselect-current] [{:keyCode 27}]]
-   [[:viz-yard.bricks/redo-one]
-    [{:keyCode 90, :ctrlKey true, :shiftKey true}]]
-   [[:viz-yard.bricks/undo-one]
-    [{:keyCode 90, :ctrlKey true, :shiftKey false}]]
-   [[:viz-yard.bricks/toggle-buffy]
-    [{:keyCode 32, :shiftKey true, :ctrlKey false}]]
-   [[:viz-yard.bricks/toggle-editor]
-    [{:keyCode 32, :shiftKey false, :ctrlKey false}]]
-   [[:viz-yard.bricks/toggle-flow]
-    [{:keyCode 32, :shiftKey false, :ctrlKey true}]]
-   [[:viz-yard.bricks/next-panel] [{:keyCode 9}]]
-   [[:viz-yard.bricks/toggle-kick-alert] [{:keyCode 75}]]
-   [[:viz-yard.bricks/toggle-peek] [{:keyCode 80}]]
-   [[:viz-yard.bricks/toggle-lines] [{:keyCode 76}]]
-   [[:viz-yard.bricks/toggle-auto-run] [{:keyCode 79}]]
-   [[:viz-yard.bricks/delete-selected-panel]
-    [{:keyCode 46, :shiftKey true}]]
-   [[:viz-yard.bricks/cycle-column-select false] [{:keyCode 81}]]
-   [[:viz-yard.bricks/cycle-column-select true] [{:keyCode 69}]]
-   [[:viz-yard.audio/start-recording] [{:keyCode 84}]]
-   [[:viz-yard.audio/stop-recording] [{:keyCode 89}]]
-   [[:viz-yard.bricks/stretch-panel :wider]
-    [{:keyCode 68, :shiftKey true}]]
-   [[:viz-yard.bricks/stretch-panel :longer]
-    [{:keyCode 83, :shiftKey true}]]
-   [[:viz-yard.bricks/stretch-panel :narrower]
-    [{:keyCode 65, :shiftKey true}]]
-   [[:viz-yard.bricks/stretch-panel :shorter]
-    [{:keyCode 87, :shiftKey true}]]
-   [[:viz-yard.bricks/panel-depth-up] [{:keyCode 82, :shiftKey true}]]
-   [[:viz-yard.bricks/panel-depth-down]
-    [{:keyCode 70, :shiftKey true}]]
-   [[:viz-yard.bricks/save]
-    [{:keyCode 83, :shiftKey false, :ctrlKey true}]]
-   [[:viz-yard.bricks/nudge-panel :up] [{:keyCode 87}]]
-   [[:viz-yard.bricks/nudge-panel :down] [{:keyCode 83}]]
-   [[:viz-yard.bricks/nudge-panel :left] [{:keyCode 65}]]
-   [[:viz-yard.bricks/nudge-panel :right] [{:keyCode 68}]]
-   [[:viz-yard.core/alt-key-toggle] [{:keyCode 86}]]
-   [[:viz-yard.core/alt-key-down] [{:keyCode 67}]]],
-  :clear-keys nil,
-  :always-listen-keys nil,
-  :prevent-default-keys
-  [{:keyCode 32}
-   {:keyCode 86}
-   {:keyCode 46, :shiftKey true}
-   {:keyCode 83, :ctrlKey true}
-   {:keyCode 83, :shiftKey false, :ctrlKey true}
-   {:keyCode 9}
-   {:keyCode 70, :ctrlKey true}]},
- :flow-subs [],
- :client-name :zealous-icosahedral-quail-of-the-drumlin,
+ :flow-subs
+ [:signal/part-fun-gorilla-5
+  :time/nth
+  :signal/part-fun-gorilla-7
+  :signal/part-fun-gorilla-0
+  :signal/part-fun-gorilla-9
+  :signal/nice-coyote-signal
+  :flow/flow-forever>*running?
+  :signal/glowing-bat-signal
+  :signal/exciting-cheetah-signal
+  :signal/brave-ape-signal
+  :signal/part-fun-gorilla-6
+  :signal/cool-raccoon-signal-yo
+  :time/now
+  :signal/part-fun-gorilla-3
+  :signal/worthy-fish-signal
+  :signal/part-worthy-fish-signal-2
+  :signal/part-fun-gorilla-4
+  :time/minute
+  :time/hour
+  :signal/part-fun-gorilla-8
+  :time/month-name
+  :signal/part-fun-gorilla-1
+  :signal/part-fun-gorilla-2
+  :signal/special-lion-signal
+  :signal/part-worthy-fish-signal-1
+  :time/day
+  :signal/optimistic-sheep-signal
+  :signal/part-worthy-fish-signal-3
+  :flow/live-scratch-flow>*running?
+  :signal/part-fun-gorilla-10
+  :signal/elegant-grasshopper-signal
+  :signal/part-fun-gorilla-11
+  :signal/fun-gorilla
+  :time/second
+  :flow/flow-forever>:final-math
+  :signal/genius-gnat-signal
+  :signal/hourly?
+  :signal/part-worthy-fish-signal-0
+  :signal/fair-armadillo-signal],
+ :client-name :joyful-rhomboidal-shark-24,
+ :signals-history
+ {[:signal/worthy-fish-signal]
+  [[false 1714152919180]
+   [false 1714152920178]
+   [false 1714152921174]
+   [false 1714152922173]
+   [false 1714152923176]
+   [false 1714152924176]
+   [false 1714152925173]
+   [false 1714152926173]
+   [false 1714152927175]
+   [false 1714152928175]
+   [false 1714152929177]
+   [false 1714152930179]
+   [false 1714152931174]
+   [false 1714152932174]
+   [false 1714152933174]
+   [false 1714152934174]
+   [false 1714152935212]
+   [false 1714152936173]
+   [false 1714152937188]
+   [false 1714152938188]],
+  [:= 21 21]
+  [[true 1714152919180]
+   [true 1714152920178]
+   [true 1714152921174]
+   [true 1714152922173]
+   [true 1714152923176]
+   [true 1714152924176]
+   [true 1714152925173]
+   [true 1714152926173]
+   [true 1714152927175]
+   [true 1714152928175]
+   [true 1714152929177]
+   [true 1714152930179]
+   [true 1714152931174]
+   [true 1714152932174]
+   [true 1714152933174]
+   [true 1714152934174]
+   [true 1714152935212]
+   [true 1714152936173]
+   [true 1714152937188]
+   [true 1714152938188]],
+  [:= 1 2]
+  [[false 1714152919180]
+   [false 1714152920178]
+   [false 1714152921174]
+   [false 1714152922173]
+   [false 1714152923176]
+   [false 1714152924176]
+   [false 1714152925173]
+   [false 1714152926173]
+   [false 1714152927175]
+   [false 1714152928175]
+   [false 1714152929177]
+   [false 1714152930179]
+   [false 1714152931174]
+   [false 1714152932174]
+   [false 1714152933174]
+   [false 1714152934174]
+   [false 1714152935212]
+   [false 1714152936173]
+   [false 1714152937188]
+   [false 1714152938188]],
+  [:=
+   :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
+   "jessica"]
+  [[false 1714152919180]
+   [false 1714152920178]
+   [false 1714152921174]
+   [false 1714152922173]
+   [false 1714152923176]
+   [false 1714152924176]
+   [false 1714152925173]
+   [false 1714152926173]
+   [false 1714152927175]
+   [false 1714152928175]
+   [false 1714152929177]
+   [false 1714152930179]
+   [false 1714152931174]
+   [false 1714152932174]
+   [false 1714152933174]
+   [false 1714152934174]
+   [false 1714152935212]
+   [false 1714152936173]
+   [false 1714152937188]
+   [false 1714152938188]],
+  [:or [:= 1 2] [:= 9 9]]
+  [[true 1714152919180]
+   [true 1714152920178]
+   [true 1714152921174]
+   [true 1714152922173]
+   [true 1714152923176]
+   [true 1714152924176]
+   [true 1714152925173]
+   [true 1714152926173]
+   [true 1714152927175]
+   [true 1714152928175]
+   [true 1714152929177]
+   [true 1714152930179]
+   [true 1714152931174]
+   [true 1714152932174]
+   [true 1714152933174]
+   [true 1714152934174]
+   [true 1714152935212]
+   [true 1714152936173]
+   [true 1714152937188]
+   [true 1714152938188]],
+  [:changed? :time/second]
+  [[true 1714152919180]
+   [true 1714152920178]
+   [true 1714152921174]
+   [true 1714152922173]
+   [true 1714152923176]
+   [true 1714152924176]
+   [true 1714152925173]
+   [true 1714152926173]
+   [true 1714152927175]
+   [true 1714152928175]
+   [true 1714152929177]
+   [true 1714152930179]
+   [true 1714152931174]
+   [true 1714152932174]
+   [true 1714152933174]
+   [true 1714152934174]
+   [true 1714152935212]
+   [true 1714152936173]
+   [true 1714152937188]
+   [true 1714152938188]],
+  [:= 2 1]
+  [[false 1714152919180]
+   [false 1714152920178]
+   [false 1714152921174]
+   [false 1714152922173]
+   [false 1714152923176]
+   [false 1714152924176]
+   [false 1714152925173]
+   [false 1714152926173]
+   [false 1714152927175]
+   [false 1714152928175]
+   [false 1714152929177]
+   [false 1714152930179]
+   [false 1714152931174]
+   [false 1714152932174]
+   [false 1714152933174]
+   [false 1714152934174]
+   [false 1714152935212]
+   [false 1714152936173]
+   [false 1714152937188]
+   [false 1714152938188]],
+  [:= 9 9]
+  [[true 1714152919180]
+   [true 1714152920178]
+   [true 1714152921174]
+   [true 1714152922173]
+   [true 1714152923176]
+   [true 1714152924176]
+   [true 1714152925173]
+   [true 1714152926173]
+   [true 1714152927175]
+   [true 1714152928175]
+   [true 1714152929177]
+   [true 1714152930179]
+   [true 1714152931174]
+   [true 1714152932174]
+   [true 1714152933174]
+   [true 1714152934174]
+   [true 1714152935212]
+   [true 1714152936173]
+   [true 1714152937188]
+   [true 1714152938188]],
+  [:and
+   [:=
+    :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
+    "jessica"]
+   [:changed? :time/second]
+   [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
+   [:or [:= 2 1] [:< 9 4]]
+   [:signal/worthy-fish-signal]]
+  [[false 1714152919180]
+   [false 1714152920178]
+   [false 1714152921174]
+   [false 1714152922173]
+   [false 1714152923176]
+   [false 1714152924176]
+   [false 1714152925173]
+   [false 1714152926173]
+   [false 1714152927175]
+   [false 1714152928175]
+   [false 1714152929177]
+   [false 1714152930179]
+   [false 1714152931174]
+   [false 1714152932174]
+   [false 1714152933174]
+   [false 1714152934174]
+   [false 1714152935212]
+   [false 1714152936173]
+   [false 1714152937188]
+   [false 1714152938188]],
+  [:or [:= 2 1] [:< 9 4]]
+  [[false 1714152919180]
+   [false 1714152920178]
+   [false 1714152921174]
+   [false 1714152922173]
+   [false 1714152923176]
+   [false 1714152924176]
+   [false 1714152925173]
+   [false 1714152926173]
+   [false 1714152927175]
+   [false 1714152928175]
+   [false 1714152929177]
+   [false 1714152930179]
+   [false 1714152931174]
+   [false 1714152932174]
+   [false 1714152933174]
+   [false 1714152934174]
+   [false 1714152935212]
+   [false 1714152936173]
+   [false 1714152937188]
+   [false 1714152938188]],
+  [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
+  [[true 1714152919180]
+   [true 1714152920178]
+   [true 1714152921174]
+   [true 1714152922173]
+   [true 1714152923176]
+   [true 1714152924176]
+   [true 1714152925173]
+   [true 1714152926173]
+   [true 1714152927175]
+   [true 1714152928175]
+   [true 1714152929177]
+   [true 1714152930179]
+   [true 1714152931174]
+   [true 1714152932174]
+   [true 1714152933174]
+   [true 1714152934174]
+   [true 1714152935212]
+   [true 1714152936173]
+   [true 1714152937188]
+   [true 1714152938188]],
+  [:< 9 4]
+  [[false 1714152919180]
+   [false 1714152920178]
+   [false 1714152921174]
+   [false 1714152922173]
+   [false 1714152923176]
+   [false 1714152924176]
+   [false 1714152925173]
+   [false 1714152926173]
+   [false 1714152927175]
+   [false 1714152928175]
+   [false 1714152929177]
+   [false 1714152930179]
+   [false 1714152931174]
+   [false 1714152932174]
+   [false 1714152933174]
+   [false 1714152934174]
+   [false 1714152935212]
+   [false 1714152936173]
+   [false 1714152937188]
+   [false 1714152938188]]},
+ :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2039, :h 1131},
- :status {:heartbeat {:kick []}},
+ :window {:w 2333, :h 1636},
+ :post-meta {},
+ :flow-estimates
+ {"openai-image-gen-ladder"
+  {:times 42, :run-id "9c9b829c-35c0-4a40-afed-43d9b3dbb785"}},
+ :status
+ {"kick-test!" {:kick :jvm_stats},
+  :heartbeat
+  {:kick
+   [:signal/part-fun-gorilla-5
+    :time/nth
+    :signal/part-fun-gorilla-7
+    :signal/part-fun-gorilla-0
+    :signal/part-fun-gorilla-9
+    :signal/nice-coyote-signal
+    :flow/flow-forever>*running?
+    :signal/glowing-bat-signal
+    :signal/exciting-cheetah-signal
+    :signal/brave-ape-signal
+    :signal/part-fun-gorilla-6
+    :signal/cool-raccoon-signal-yo
+    :time/now
+    :signal/part-fun-gorilla-3
+    :signal/worthy-fish-signal
+    :signal/part-worthy-fish-signal-2
+    :signal/part-fun-gorilla-4
+    :time/minute
+    :time/hour
+    :signal/part-fun-gorilla-8
+    :time/month-name
+    :signal/part-fun-gorilla-1
+    :signal/part-fun-gorilla-2
+    :signal/special-lion-signal
+    :signal/part-worthy-fish-signal-1
+    :time/day
+    :signal/optimistic-sheep-signal
+    :signal/part-worthy-fish-signal-3
+    :flow/live-scratch-flow>*running?
+    :signal/part-fun-gorilla-10
+    :signal/elegant-grasshopper-signal
+    :signal/part-fun-gorilla-11
+    :signal/fun-gorilla
+    :time/second
+    :flow/flow-forever>:final-math
+    :signal/genius-gnat-signal
+    :signal/hourly?
+    :signal/part-worthy-fish-signal-0
+    :signal/fair-armadillo-signal]},
+  :alert1 {:alerts :alert2}},
  :screen-name "blue-pines",
  :recos-page2 0,
  :selected-tab "strategic grill locations",
- :col-names nil,
+ :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
  :recos-page 0,
- :re-pollsive.core/polling
- {:rules
-  [{:interval 10,
-    :event [:viz-yard.bricks/dispatch-auto-queries],
-    :poll-when [:viz-yard.bricks/auto-run-and-connected?],
-    :dispatch-event-on-start? false}
-   {:interval 5,
-    :event [:viz-yard.bricks/update-metadata],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 120,
-    :event [:viz-yard.bricks/clean-up-reco-previews],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 2,
-    :event [:viz-yard.bricks/prune-alerts],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 5,
-    :event [:viz-yard.bricks/get-memory-usage],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 2,
-    :event [:viz-yard.bricks/refresh-runstreams],
-    :poll-when [:viz-yard.bricks/runstream-running?],
-    :dispatch-event-on-start? false}
-   {:interval 1,
-    :event [:viz-yard.bricks/sub-to-flows],
-    :poll-when [:viz-yard.bricks/new-flow-subs?],
-    :dispatch-event-on-start? false}
-   {:interval 1000,
-    :event [:viz-yard.bricks/update-metadata-tabs],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 1,
-    :event [:viz-yard.bricks/update-conditionals],
-    :dispatch-event-on-start? false,
-    :started-at 0,
-    :stopped-time-since-last-poll nil,
-    :started-before? true}
-   {:interval 4,
-    :event [:viz-yard.bricks/refresh-status],
-    :poll-when [:viz-yard.bricks/bg-status?],
-    :dispatch-event-on-start? false}],
-  :counter 24},
  :rs-overrides-hashmap {},
- :re-pressed.core/keyup
- {:keys
-  [{:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 32}
-   {:altKey false,
-    :ctrlKey false,
-    :metaKey false,
-    :shiftKey false,
-    :keyCode 27}],
-  :event-keys [[[:viz-yard.core/alt-key-up] [{:keyCode 67}]]],
-  :clear-keys nil,
-  :always-listen-keys nil},
+ :base-sniff-queries {:jvm_stats 1498154063},
  :panels-hash 1428528398,
+ :sessions
+ (["healthy-orchid-otter-of-pseudocrater.edn"
+   "1002 hours, 39 minutes, 44 seconds"
+   3609584897]
+   ["kind-turquoise-parrot-banned-from-machair.edn"
+    "1002 hours, 39 minutes, 53 seconds"
+    3609593897]
+   ["fair-long-mule-exiled-from-watershed.edn"
+    "1006 hours, 48 minutes, 18 seconds"
+    3624498897]
+   ["refined-rhomboidal-hawk-banned-from-nivation-hollow.edn"
+    "1006 hours, 48 minutes, 30 seconds"
+    3624510897]
+   ["amazing-ochre-yellow-jacket-of-the-complex-volcano.edn"
+    "1006 hours, 52 minutes, 45 seconds"
+    3624765897]
+   ["lovely-cyan-hummingbird-banned-from-stratovolcano.edn"
+    "1010 hours, 26 minutes, 46 seconds"
+    3637606897]
+   ["favorable-icosahedral-opossum-banned-from-archipelago.edn"
+    "1012 hours, 11 minutes, 53 seconds"
+    3643913897]
+   ["upright-slate-gray-termite-of-the-central-peak.edn"
+    "1012 hours, 42 minutes, 13 seconds"
+    3645733897]
+   ["worthy-cyan-rat-of-the-tea-table.edn"
+    "1015 hours, 12 minutes, 41 seconds"
+    3654761897]),
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :websocket-fx.core/sockets
- {:default
-  {:status :connected,
-   :options
-   {:url "ws://localhost:3030/ws",
-    :format :edn,
-    :on-disconnect
-    [:websocket-fx.core/unsubscribe :default :server-push2],
-    :on-connect
-    [:websocket-fx.core/subscribe
-     :default
-     :server-push2
-     {:message
-      {:kind :server-push2,
-       :client-name :zealous-icosahedral-quail-of-the-drumlin,
-       :ui-keypath [:server],
-       :extras {:hello? true}},
-      :on-message [:viz-yard.http/simple-response]}]},
-   :requests {},
-   :subscriptions
-   {:server-push2
-    {:message
-     {:kind :server-push2,
-      :client-name :zealous-icosahedral-quail-of-the-drumlin,
-      :ui-keypath [:server],
-      :extras {:hello? true}},
-     :on-message [:viz-yard.http/simple-response]}}}},
- :user-params-hash 278685043,
+ :user-params-hash -1457270403,
  :grid-recos? true,
+ :resolved-queries {},
  :panels
  {:hello-there-brother
   {:h 3,
@@ -484,9 +825,62 @@
      :child
      "hello! 🐇 🍂 🦃"]},
    :queries {}}},
+ :selected-block "none!",
+ :signals-map
+ {:fun-gorilla
+  {:signal
+   [:and
+    [:=
+     :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
+     "jessica"]
+    [:changed? :time/second]
+    [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
+    [:or [:= 2 1] [:< 9 4]]
+    [:signal/worthy-fish-signal]]},
+  :cool-raccoon-signal-yo
+  {:signal
+   [:or
+    [:= :client/honest-ultramarine-mole-1>param>light-brown-swallow true]
+    [:and
+     [:or [:> :time/hour 12] [:< :time/hour 6]]
+     [:or [:= :time/second 20] [:= :time/second 35] [:= :time/second 25]]]]},
+  :worthy-fish-signal {:signal [:or [:= :time/day 22] [:= 221 22]]},
+  :hourly? {:signal [:or [:changed? :time/hour] [:= :time/minute -1]]},
+  :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+  :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
+  :elegant-grasshopper-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+  :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+  :exciting-cheetah-signal
+  {:signal [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
+  :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
+  :special-lion-signal
+  {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
+  :optimistic-sheep-signal
+  {:signal
+   [:and
+    [:= :time/day 1]
+    [:= :time/hour 9]
+    [:changed? :time/minute]
+    [:changed? :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]]},
+  :glowing-bat-signal
+  {:signal [:and [:= :time/day 1] [:changed? :time/second] [:= :time/hour 9]]}},
+ :theme-colors-hashmap
+ {"float" "#2A3959",
+  "boolean" "#13283E",
+  "map" "#536D82",
+  "list" "#1F374E",
+  "string" "#484F71",
+  "vector" "#6B6B87",
+  "keyword" "#C6DDAE",
+  "rabbit-code" "#3E5970",
+  "datetime" "#94939A",
+  "integer" "#2D485F",
+  "unknown" "#D510BBB",
+  "date" "#A2AFB7",
+  "nil" "#13283E"},
  :click-param
  {:theme
-  {:codemirror-theme "ayu-dark",
+  {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
    :base-block-style {:backdrop-filter "blur(2px) brightness(70%) "},
    :vega-defaults
@@ -510,8 +904,7 @@
      :titleColor "#ffffff99",
      :stroke "#ffffff99",
      :titleFont "Lato"},
-    :header
-    {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
     :mark {:font "Lato"},
     :title
     {:font "Lato",
@@ -572,18 +965,15 @@
        :font-family "Instagram Sans",
        :font-weight 700}},
      :ticks
-     {:line {:stroke "#ffffff60"},
-      :text {:fill "#ffffff60", :font-weight 700}}},
-    :grid
-    {:line
-     {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
    :editor-outer-rim-color "#297fb8",
    :grid-selected-font-color "#000000",
    :block-title-selected-font-color "#ffffff",
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image "url(images/b64-decoded-9884793-8k-4k.png)",
+   {:background-image "url(images/large/b64-decoded-9884793-8k-4k.png)",
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-color "#424f57"},
@@ -593,13 +983,68 @@
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
   :param {:selected-view [nil nil], :selected-view-data nil},
-  :connections-sys
-  {:database_name "SQLite", :connection_id "bigfoot-ufos"},
-  :tables-sys
-  {:db_schema "none",
-   :db_catalog nil,
-   :connection_id "bigfoot-ufos",
-   :schema_cat nil,
-   :table_name "ufo_sightings",
-   :fields 14}},
- :selected-flow "live-scratch-flow"}
+  :time {:second 4, :now "Friday, April 26th 1:41PM", :minute 41},
+  :signal {:nice-coyote-signal false, :genius-gnat-signal false}},
+ :selected-flow "live-scratch-flow",
+ :flow-statuses
+ {"crow-flow-201a"
+  {:last-updated nil,
+   :blocks_finished 9,
+   :block-overrides [],
+   :channels 0,
+   :channels-open 0,
+   :since-start "less than a second",
+   :*started-by :rvbbit-scheduler,
+   :time-running "less than a second",
+   :last-update {:done :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "counting-loop"
+  {:last-updated nil,
+   :blocks_finished 13,
+   :block-overrides [],
+   :channels 0,
+   :channels-open 0,
+   :since-start "6 seconds",
+   :*started-by :rvbbit-scheduler,
+   :time-running "6 seconds",
+   :last-update {:sleep-then-pass :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
+  "openai-image-gen-ladder"
+  {:last-updated "3 seconds",
+   :blocks_finished 31,
+   :block-overrides [:prompt :style-param :prompt-2 :prompt-3],
+   :channels 93,
+   :channels-open 93,
+   :since-start "3 seconds",
+   :*started-by :agreeable-silver-sand-dollar-27,
+   :time-running "less than a second",
+   :last-update {:oai-api-call :start},
+   :*running? true,
+   :last-update-seconds 3,
+   :channels-open? true,
+   :retries-left 1,
+   :running-blocks [:oai-api-call]},
+  "openai-image-gen-ladder/node-js-color-thief-script"
+  {:last-updated nil,
+   :blocks_finished 16,
+   :block-overrides [:image-path],
+   :channels 0,
+   :channels-open 0,
+   :since-start "less than a second",
+   :*started-by :yummy-gold-weasel-1,
+   :time-running "less than a second",
+   :last-update {:done :end},
+   :*running? false,
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []}},
+ :post-condi {:c345-up-or-down? [{:v 0}]}}

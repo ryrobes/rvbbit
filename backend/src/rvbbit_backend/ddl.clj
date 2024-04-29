@@ -415,6 +415,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     client_latency integer NULL,
     client_subs integer NULL,
     last_seen text NULL,
+    memory text NULL,
     push integer NULL,
     queue_size integer NULL,
     server_subs integer NULL,     
@@ -522,6 +523,16 @@ group by 1, 2) tt on s.client_name = tt.client_name
     sample text NULL,
     display_name text NULL,
     block_meta text NULL,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+
+(def create-client-memory "create table if not exists client_memory
+   (mem_time text NULL,
+    client_name text NULL,
+    packets integer NULL,
+    mem_limit integer NULL,
+    mem_used integer NULL,
+    mem_used_mb text NULL, 
+    mem_total integer NULL,
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
 (defn create-attribute-sample [sample-table-name-str rowset]

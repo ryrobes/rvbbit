@@ -604,8 +604,11 @@
                     :flowmaps-connections flowmaps-connections}
                    flow-id]
         :dispatch-later [{:ms 3000, :dispatch [::conn/clear-query-history :flows-sys]}]}
+       
        {:dispatch [::http/save :skinny screen-name resolved-queries]
-        :dispatch-later [{:ms 100 :dispatch [::take-screenshot true]}]}))))
+        :dispatch-later [{:ms 100 :dispatch [::take-screenshot true]}]
+        }
+       ))))
 
 (re-frame/reg-sub
  ::current-params ;; for snapshot comparisons
@@ -1452,14 +1455,37 @@
  (fn [db]
    (get db :drop-type)))
 
+;; (re-frame/reg-event-db
+;;  ::get-memory-usage
+;;  (fn [db]
+;;    (let [mem (when (exists? js/window.performance.memory)
+;;                [(.-totalJSHeapSize js/window.performance.memory)
+;;                 (.-usedJSHeapSize js/window.performance.memory)
+;;                 (.-jsHeapSizeLimit js/window.performance.memory)])
+;;          mem-row {:time (str (.toISOString (js/Date.)))
+;;                   :total (first mem)
+;;                   :used (second mem)
+;;                   :limit (last mem)}]
+;;      (-> db 
+;;          (assoc-in [:data :memory-sys] (vec (conj (get-in db [:data :memory-sys] []) mem-row )))
+;;          (assoc :memory mem)))))
+
 (re-frame/reg-event-db
  ::get-memory-usage
  (fn [db]
    (let [mem (when (exists? js/window.performance.memory)
                [(.-totalJSHeapSize js/window.performance.memory)
                 (.-usedJSHeapSize js/window.performance.memory)
-                (.-jsHeapSizeLimit js/window.performance.memory)])]
-     (assoc db :memory mem))))
+                (.-jsHeapSizeLimit js/window.performance.memory)])
+        ;;  mem-row {:time (str (.toISOString (js/Date.)))
+        ;;           :total (first mem)
+        ;;           :used (second mem)
+        ;;           :limit (last mem)}
+         ;memory-sys (vec (take-last 200 (conj (get-in db [:data :memory-sys] []) mem-row)))
+         ]
+     (-> db
+         ;(assoc-in [:data :memory-sys] memory-sys)
+         (assoc :memory mem)))))
 
 (re-frame/reg-sub
  ::memory
@@ -10061,6 +10087,7 @@
                                 ;;              (let [date (js/Date. unixTime)]
                                 ;;                (.toLocaleString date))))
 
+                                 :read-edn (fn [x] (try (edn/read-string x) (catch :default _ x)))
 
                                  :open-input (fn [args]
                                                [re-com/box
@@ -10988,15 +11015,19 @@
     ;(tap> [:doruns (merge sql-calls base-table-sniffs)])
     ;(tap> [:base-tables base-tables])
     (doseq [[k v] (merge sql-calls base-table-sniffs)] ;; base-table-sniffs allow us to get metadata for the root tables quietly
-      (let [query        (sql-alias-replace-sub v)
+      (let [
+            query        (sql-alias-replace-sub v)
                    ;last-known-fields (vec (keys (get @(re-frame/subscribe [::conn/sql-metadata [k]]) :fields))) ;; only used for :*all= ATM
             data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
             unrun-sql?   @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])
-            connection-id (get query :connection-id connection-id)] ;; override w query connection-id
+            connection-id (get query :connection-id connection-id)
+            ;; query (walk/postwalk-replace {:read-edn (fn [x] (try (edn/read-string x) (catch :default _ x)))} query)
+            ] ;; override w query connection-id
+            
                    ;query (assoc query :last-know-fields last-known-fields)
 
 
-               ;(tap> [:query-all-clicked k data-exists? unrun-sql? query])
+              ;;  (tap> [:query-all-clicked k data-exists? unrun-sql? query])
 
         (when (or (not data-exists?) unrun-sql?)
           (do
@@ -11269,6 +11300,13 @@
    (if (get db :peek?)
      false
      (get-in db [:panels panel-key :ghosted?] false))))
+
+(re-frame/reg-sub
+ ::un-fired-cross-breed?
+ (fn [db [_ panel-key]]
+   (true?
+    (and (ut/ne? (get-in db [:panels panel-key :cross-breed]))
+         (empty? (get-in db [:panels panel-key :cross-breed :children]))))))
 
 (re-frame/reg-sub
  ::no-ui?
@@ -11621,6 +11659,49 @@
     ;;    (tap> [:running-flow-view panel-key view   running?   finds]))
      running?)))
 
+
+(re-frame/reg-event-db
+ ::cross-breed 
+ (undoable)
+ (fn [db [_ panel-id]]
+   (let [panel-body (get-in db [:panels panel-id])
+         cross-data (get panel-body :cross-breed)
+         times (get cross-data :num 10)
+         new-tab-name (ut/gen-tab-name)
+         skeleton (fn [bid new-tab-name idx]
+                    (let [pidx (+ 2 idx)
+                          h 2]
+                      {:h             h
+                       :w             7
+                       :root          [1 (* pidx h)]
+                       :tab           new-tab-name
+                       :selected-view :hii
+                       :name          (str bid)
+                       :views         {:hii [:box :align :center :justify :center
+                                             :attr {:id (str bid ":crossed")} :style
+                                             {:font-size "22px"
+                                              :font-weight 700
+                                              :padding-top "6px"
+                                              :padding-left "14px"
+                                              :margin-top "-8px"
+                                              :color :theme/editor-outer-rim-color
+                                              :font-family :theme/base-font} :child
+                                             (str bid "!")]}
+                       :queries       {}}))
+         panel-map (into {}
+                         (for [idx (range times)]
+                           (let [bid (keyword (str "block-cross-" idx))
+                                 bid (ut/safe-key bid)]
+                             {bid (skeleton bid new-tab-name idx)})))
+         new-panel-map (assoc-in panel-body [:cross-breed :children] (vec (keys panel-map)))
+         panel-map (assoc panel-map panel-id new-panel-map)
+         panels (merge (get db :panels) panel-map)]
+
+         (assoc db :panels panels)
+     
+     )))
+
+
 (defn grid [& [tab]]
   (let [;reaction-hack! @hover-square ;; seems less expensive than doall-for ?
         ;reaction-hack2! @edit-mode?
@@ -11722,7 +11803,10 @@
                                                      pixel-width (* (count (str name)) charpx)
                                                      panel-width (- (* w brick-size) 50)]
                                                  (if (> pixel-width panel-width) (str (subs name 0 (/ panel-width charpx)) "...") name)))
-                          ;panel-clone-map  (re-frame/subscribe [::panel-map brick-vec-key])  ;; questionable
+                          ;panel-clone-map   (re-frame/subscribe [::panel-map brick-vec-key])  ;; questionable
+                         cross-breed?        @(re-frame/subscribe [::un-fired-cross-breed? brick-vec-key])
+                         _                   (when cross-breed? ;; TODO , move this side-effect elsewhere - its relatively safe here, but feels gross none-the-less
+                                               (re-frame/dispatch [::cross-breed brick-vec-key]))
                          block-width         (if root? (+ 1 (* brick-size (if (= w 0) (- bricks-wide 1) w))) brick-size)
                          block-height        (if root? (+ 1 (* brick-size (if (= h 0) (- bricks-high 1) h))) brick-size)
                          selected?           (= brick-vec-key selected-block)

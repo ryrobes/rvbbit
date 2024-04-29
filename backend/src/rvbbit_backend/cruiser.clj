@@ -262,6 +262,7 @@
     ;;(sql-exec system-db sqlite-ddl/create-user-subs-vw)
     (sql-exec system-db sqlite-ddl/create-status)
     (sql-exec system-db sqlite-ddl/create-client-items)
+    (sql-exec system-db sqlite-ddl/create-client-memory)
     (sql-exec system-db sqlite-ddl/create-status-vw)))
 
 (defn create-sqlite-flow-sys-tables-if-needed! [flows-db] ;; db-type

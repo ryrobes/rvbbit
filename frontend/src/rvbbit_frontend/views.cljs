@@ -3231,6 +3231,19 @@
                                                  t (get ss 1)]]
                                        [image-component s t h rowcnt items])])]]))
 
+(defonce last-connected (reagent/atom nil))
+
+(re-frame/reg-sub ;; helps stop re-sub blips during heavy packets
+ ::online?
+ (fn [db _]
+   (let [websocket-status @(re-frame/subscribe [::http/websocket-status]) ;;;(get-in db [::http/websocket-status])
+         status (get websocket-status :status)
+         grace-period 5000]
+     (when (= status :connected)
+       (reset! last-connected (js/Date.now)))
+     (or (= status :connected)
+         (and @last-connected
+              (> (- (js/Date.now) @last-connected) grace-period))))))
 
 
 (defn main-panel []
@@ -3248,7 +3261,7 @@
         ;editor-ready? (and editor? (not (= selected-block "none!")) (not (nil? selected-block)))
         ;;rr @db/context-modal-pos
         websocket-status (select-keys @(re-frame/subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])
-        online? (true? (= (get websocket-status :status) :connected))
+        online? @(re-frame/subscribe [::online?]) ;;(true? (= (get websocket-status :status) :connected))
         hh @(re-frame/subscribe [::subs/h])
         ww @(re-frame/subscribe [::subs/w])
         selected-block @(re-frame/subscribe [::bricks/selected-block])

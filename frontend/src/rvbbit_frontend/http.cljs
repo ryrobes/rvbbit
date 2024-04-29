@@ -294,6 +294,7 @@
             {} data)))
 
 (defonce subsequent-runs (atom [])) ;; no need for a ratom, not rendering related
+(defonce packets-received (atom 0))
 
 (re-frame/reg-event-db
  ::simple-response
@@ -321,7 +322,7 @@
                                       (= (get-in result [:task-id 0]) :signal)
                                       (= (get-in result [:task-id 0]) :ext-param)
                                       (= (get-in result [:task-id 0]) :panel)
-                                      (= (get-in result [:task-id 0]) :client)) 
+                                      (= (get-in result [:task-id 0]) :client))
                             (not heartbeat?)) ;; server mutate only for click-param
            flow-runner-sub? (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?)) ;; server mutate only for click-param
            ;flow-runner-tracker? (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
@@ -333,6 +334,9 @@
                         ;;; ^^ calliope test TEMP
                         (and payload-kp
                              (try (= (first (vals @db/chat-mode)) ui-keypath) (catch :default _ false))))]
+
+       (swap! packets-received inc)
+
          ;res-meta (:result-meta result)
          ;new-map (if (= new-map '(1)) [{:sql :error :recvd (:result result)}] new-map)
            ;sys-queries (filter #(cstr/ends-with? (str %) "-sys") (keys (get db :query-history)))
@@ -348,17 +352,29 @@
 
       ;;  (when server-sub?
       ;;    (tap> [:server-sub-in! (get result :task-id) (get result :status)]))
-       
+
       ;;  (when (and (not heartbeat?) (cstr/starts-with? (str client-name) ":trust"))
       ;;    (tap> [:payload! client-name task-id result]))
 
        (when heartbeat?
          (when (or (cstr/starts-with? (str client-name) ":trust")
                    ;(cstr/starts-with? (str client-name) ":stirr")
-                   ) (tap> [:heartbeat! client-name task-id result]))
+                   )(tap> [:heartbeat! client-name task-id result]))
          (re-frame/dispatch [::wfx/request :default
                              {:message    {:kind :ack
+                                           :memory (let [mem (when (exists? js/window.performance.memory)
+                                                               [(.-totalJSHeapSize js/window.performance.memory)
+                                                                (.-usedJSHeapSize js/window.performance.memory)
+                                                                (.-jsHeapSizeLimit js/window.performance.memory)])
+                                                         mem-row {:mem_time (str (.toISOString (js/Date.)))
+                                                                  :mem_total (first mem)
+                                                                  :packets @packets-received
+                                                                  :mem_used (second mem)
+                                                                  :client-name (str client-name)
+                                                                  :mem_limit (last mem)}]
+                                                     mem-row)
                                            :flow-subs (get db :flow-subs)
+                                           ;;:memory (get-in db [:data :memory])
                                            :client-name (get db :client-name)}
                               :timeout    50000}]))
 
@@ -431,7 +447,7 @@
                                             trackers (select-keys (get result :status) block-keys)]
                                         ;; (when (cstr/starts-with? (str client-name) ":trust") 
                                         ;;   (tap> [:flow-runner-acc-tracker trackers]))
-                                        (-> db 
+                                        (-> db
                                             (ut/dissoc-in (if (or (empty? trackers) (= (count (keys trackers)) 1)) ;; TODO this could wipe an early value - have server send the wipe command instead
                                                             [:flow-results :return-maps flow-id]
                                                             [:skip-me :yo :yo]))
@@ -716,6 +732,7 @@
                      (dissoc :query-history-condi)
                      (dissoc :query-history-meta)
                      (dissoc :flow-results)
+                     (dissoc :webcam-feed)
                      (dissoc :data)
                      (dissoc :flows) ;;; mostly ephemeral with the UI....
                      (dissoc :http-reqs)
@@ -726,7 +743,7 @@
          request {:image (assoc image :resolved-queries resolved-queries)
                   :client-name client-name
                   :screen-name screen-name}
-         _ (tap> [:saving screen-name])]
+         _ (tap> [:saving screen-name "!" request])]
      {:db   (assoc-in db [:http-reqs :save-flowset]
                       {:status "running"
                        :url url
@@ -947,7 +964,8 @@
  (fn [db [_ result]]
    (let [old-status (get-in db [:http-reqs :load-flowset])
          new-db (dissoc (get result :image) :resolved-queries)
-         new-db (ut/remove-temp-keys new-db)]
+         ;;new-db (ut/remove-temp-keys new-db)
+         ]
      (-> db
          (assoc-in [:http-reqs :load-flowset]
                    (merge old-status

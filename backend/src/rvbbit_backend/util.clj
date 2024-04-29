@@ -420,10 +420,28 @@
   (let [[r g b] (hex-to-rgb hex)
         [h s l] (rgb-to-hsl r g b)
         hue-scaled (* h (/ 65535 360))] ; Scale hue to Philips Hue range
-    [(int hue-scaled) (int s)])) ; Scale saturation to [0, 254]
+    [(int hue-scaled) 
+     ;(int s)
+     254
+     ])) ; Scale saturation to [0, 254]
+
+;; (defn bytes-to-mb [bytes]
+;;   (let [mb (/ bytes 1048576.0)
+;;         formatted-mb0 (-> mb
+;;                           (.toFixed 0)
+;;                           js/parseFloat
+;;                           str
+;;                           (.toLocaleString js/Intl.NumberFormat "en-US"))
+;;         ;formatted-mb (* 1.8 formatted-mb0)
+;;         ]
+;;     ;(str (nf formatted-mb) "MB, (" (nf formatted-mb0) "MB)")
+;;     (str (nf formatted-mb0) "MB")))
 
 
-
+(defn bytes-to-mb [bytes]
+  (let [mb (/ bytes 1048576.0)
+        formatted-mb0 (format "%.0f" mb)]
+    (str formatted-mb0 "MB")))
 
 ;; Example usage
 ;(hex-to-cie "#ff0000")  ;; For red color

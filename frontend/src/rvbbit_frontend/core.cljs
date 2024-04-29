@@ -151,7 +151,7 @@
      {:interval                 5
       :event                    [::bricks/update-flow-statuses]
       :poll-when                [::bricks/update-flow-statuses?]
-      :dispatch-event-on-start? false}
+      :dispatch-event-on-start? true}
 
      {:interval                 120
       :event                    [::bricks/clean-up-reco-previews]

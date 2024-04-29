@@ -39,6 +39,10 @@
   (let [names [(tales/quality) (tales/animal)]]
     (cstr/lower-case (str (cstr/join "-" names) "-signal"))))
 
+(defn gen-tab-name []
+  (let [names [(tales/quality) (tales/animal)]]
+    (cstr/lower-case (str (cstr/join "-" names) "-" (rand-int 55)))))
+
 (defn break-out-parts [clause]
   (cond
     (not (vector? clause)) []
@@ -370,6 +374,24 @@
                [k (remove-underscored v)]
                [k v]))))
 
+;; (defn remove-temp-keys [coll]
+;;   (cond
+;;     (map? coll)
+;;     (into {} (for [[k v] coll
+;;                    :when (and (not (nil? k))
+;;                               (not (and (keyword? k)
+;;                                         (or (cstr/ends-with? (name k) "sys")
+;;                                             (cstr/ends-with? (name k) "sys2")
+;;                                             (cstr/ends-with? (name k) "sys*")
+;;                                             (= k :virtual-panel)
+;;                                             (cstr/starts-with? (name k) ":kick")))))]
+;;                [k (remove-temp-keys v)]))
+
+;;     (coll? coll)
+;;     (into (empty coll) (map remove-temp-keys coll))
+
+;;     :else coll))
+
 (defn remove-temp-keys [coll]
   (cond
     (map? coll)
@@ -384,10 +406,9 @@
                [k (remove-temp-keys v)]))
 
     (coll? coll)
-    (into (empty coll) (map remove-temp-keys coll))
+    (map remove-temp-keys coll)
 
     :else coll))
-
 
 (defn bytes-to-mb [bytes]
   (let [mb (/ bytes 1048576.0)
