@@ -150,7 +150,7 @@
         vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])
         vv (if (nil? vv) "err!" vv)]
     ;(tap> [:coll-hover coll])
-    [re-com/h-box
+    [re-com/v-box
      :attr {:on-mouse-enter #(reset! hover-tools-atom coll)
             ;; :on-mouse-over #(when (not= @hover-tools-atom coll)
             ;;                   (highlight-code (str coll))
@@ -167,14 +167,18 @@
                                (reset! hover-tools-atom nil))}
     ;;  :style (when hovered? {:background-color "rgba(0, 0, 255, 0.3)"})
      ;:style {:border "1px solid black"}
-     :align :center :justify :between
-     :children [[re-com/box :padding "6px"
+     :align :center :justify :center 
+     :width "40px"
+     ;:padding "10px"
+     :children [[re-com/box 
+                 ;:padding "6px"
                  :style (merge
                          {;:border "1px solid yellow" 
                           :font-size "12px"}
                          (when (not (true? vv)) {:opacity 0.2})
-                         (when (true? vv) {:font-weight 700}))
-                 :width "40px"
+                         ;(when (true? vv) {:font-weight 700})
+                         )
+                 ;:width "33px"
                  :child (str vv)]
                 [kill-nest coll]
                 ]]))
@@ -190,8 +194,9 @@
                                 hovered? (= @hover-tools-atom body)]
                             [re-com/h-box
                              :style (merge
-                                     {:transition "all 0.2s"
-                                      :border "1px solid transparent"}
+                                     {;:transition "all 0.2s"
+                                      ;:border "1px solid transparent"
+                                      }
                                      (when hovered?
                                        {;:border "1px solid red"
                                         :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 44)
@@ -207,15 +212,15 @@
                                      )
                            ;:justify :between
                              :align :center 
-                             :padding "6px"
+                             ;:padding "6px"
                              :justify :between 
                              :children [[re-com/v-box
                                          :size "auto" :width (px (- 540 (* lvl 35)))
                                          :children (cons [droppable-area [re-com/box :child (str operator)] [:operator] contents operator]
                                                          (map #(visualize-clause % (inc lvl) contents full-clause) contents))
-                                         :gap "10px"
+                                         :gap "8px"
                                          :style (merge 
-                                                 {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 45) 
+                                                 {:border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 45) 
                                                   :padding "5px"
                                                   :border-radius "8px"
                                                   :background-color (str (theme-pull :theme/editor-outer-rim-color nil) "08")
@@ -234,7 +239,7 @@
                            (let [bbox [re-com/h-box
                                        :children [[re-com/box :child (str condition) :size "auto"]]
                                        :style {;:border "1px solid blue"
-                                               :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
+                                               :border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
                                                :border-radius "8px"
                                                ;:overflow "hidden"
                                                :max-width 230
@@ -252,9 +257,11 @@
           [re-com/h-box
            ;:padding "6px"
            :style (merge
-                   {:transition "all 0.2s"
-                    :border-radius "8px"
-                    :border "1px solid transparent"}
+                   {;:transition "all 0.2s"
+                    ;:border-radius "8px"
+                    :border "3px solid transparent"
+                    ;:border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
+                    }
                    (when hovered? 
                      ;;{:background-color "rgba(0, 0, 255, 0.3)"}
                      {;;:border "1px solid red"
@@ -266,6 +273,7 @@
                                                           ;{:filter "brightness(233%)"}
                      {
                       ;:transform "scale(1.03)"
+                      :border-radius "8px"
                       :border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 99)
                       :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 44)
                       })
@@ -286,7 +294,7 @@
              :gap "10px"
              :style {;:border "1px solid #ccc" 
                      :border-radius "8px"
-                     :border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
+                     :border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 25)
                      :background-color (str (theme-pull :theme/editor-outer-rim-color nil) "08")
                      :padding "5px"}]
             ;;[re-com/box :padding "6px" :child (if (= lw 456) "false" "true")]
@@ -882,6 +890,7 @@
                   [selector-panel "metrics" (filter-results @searcher-atom time-items) "zmdi-equalizer" {} 2]
                   [selector-panel "KPIs" (filter-results @searcher-atom time-items) "zmdi-traffic" {} 2]
                   
+                  [selector-panel "instanced signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
                   [selector-panel "signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
                   
                   ]]]]))
@@ -1005,7 +1014,8 @@
                                  :font-weight 700}
                          :height "100%"
                          :width (px (* ww 0.1))
-                         :child "true"]]])
+                         :child (str @(re-frame/subscribe [::conn/clicked-parameter-key 
+                                                      [(keyword (str "signal/" (cstr/replace (str selected-signal) ":" "")))]]))]]])
 
                     [re-com/box
                      :style {;:border "1px solid orange"

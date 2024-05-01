@@ -1566,6 +1566,11 @@
 (def last-values (ut/thaw-atom {} "./data/atoms/last-values.edn"))
 (def last-values-per (ut/thaw-atom {} "./data/atoms/last-values-per.edn"))
 
+(defmethod wl/handle-request :client-ui [{:keys [client-name atom-name value]}]
+(swap! params-atom assoc-in [client-name (keyword atom-name)] value)
+  (ut/pp [:client-ui-atom client-name atom-name value])
+  {}) ;; send nothing
+
 (defn client-statuses []
   (into {}
         ;(remove (fn [[_ v]] (= -1 (:last-seen-seconds v))) ;; just take out any dead ones for now
@@ -2680,7 +2685,7 @@
 (defonce client-helper-atom (atom {}))
 
 (defmethod wl/handle-request :signals-history [{:keys [client-name signal-name]}]
-  (ut/pp [:get-signals-history client-name :for signal-name])
+  ;;(ut/pp [:get-signals-history client-name :for signal-name])
   (let [cc (get-in @signals-atom [signal-name :signal])
         ccw (vec (ut/where-dissect cc))
         history (select-keys (get @last-signals-history-atom signal-name) ccw)
@@ -2930,16 +2935,17 @@
           base-type (first sub-path)
           ;param-key (-> (str watch-key) (cstr/replace ":flow/" "") (cstr/replace ":" "") keyword)
           ;param-value (get-in @params-atom [client-name :flow param-key])
-          ;last-value (get-in @last-values-per [client-name keypath])
+          last-value (get-in @last-values-per [client-name keypath])
           all-clients-subbed (for [c (keys @atoms-and-watchers)
                                    :when (some #(= % flow-key) (keys (get @atoms-and-watchers c)))] c)]
       ;; (ut/pp [:mkk-watcher flow-key client-name keypath (not= old-value new-value)])
       (when ;(or
              (and (not (nil? new-value))
-                  (or ;(not= last-value new-value) 
+                  ;(or ;(not= last-value new-value) 
                       (not= old-value new-value)
-                      ;(not= param-value new-value) ;; the actual last seen value on client...
-                      )
+                      ;(not= last-value new-value) ;; the actual last seen value on client...
+                   ;(boolean? new-value)
+                   ;   )
                 ; (or (not= old-value new-value) 
                 ;     ;(some #(cstr/starts-with? (str %) ":*") keypath)
                 ;     )
@@ -2969,6 +2975,28 @@
 
 ;;; [:add-watcher! :fair-salmon-hawk-hailing-from-malpais :screen/error-monitor-vanessa3>:panels>:block-494>:name :param-sub [:screen "error-monitor-vanessa3" :panels :block-494 :name]]
 ;;; [:add-watcher! :screen :fair-salmon-hawk-hailing-from-malpais :screen/error-monitor-vanessa3>:panels>:block-899>:name :param-sub [:screen "error-monitor-vanessa3" :panels :block-899 :name] ("error-monitor-vanessa3" :panels :block-899 :name)]
+
+(defn get-atom-from-keys [base-type sub-type sub-path keypath]
+  (let [status? (cstr/includes? (str keypath) ":*")
+        tracker? (= sub-type :tracker)
+        flow?    (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
+        client?  (= base-type :client)
+        panel?   (= base-type :panel)
+                ;param?  (= base-type :ext-param)
+        screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
+        time?    (= base-type :time)
+        signal?  (= base-type :signal)]
+    (cond status? flow-status
+          tracker? flow-db/tracker
+                              ;:else flow-db/results-atom
+                              ;:else (get-or-create-child-atom (first keypath))
+          signal? last-signals-atom ;; no need to split for now, will keep an eye on it
+          time?   time-atom
+          panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
+          client? (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
+          flow? (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
+          screen? (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
+          :else (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))))
 
 (defn add-watcher [keypath client-name fn flow-key sub-type & [flow-id]] ;; flow id optional is for unsub stuff later (NOT reduntant)
   (let [;;client-name :all ;; test
@@ -3013,6 +3041,9 @@
     (swap! atoms-and-watchers assoc-in [client-name flow-key]
            {:created (ut/get-current-timestamp)
             :sub-type sub-type
+            :sub-path sub-path
+            :base-type base-type
+            ;:atom atom-to-watch ;; ?
             :flow-key flow-key
             :watch-key watch-key
             :flow-id flow-id
@@ -3080,8 +3111,10 @@
         signals-resolve-map (into {} (for [[k {:keys [signal]}] signals-map]
                                        {k (let [cmpkeys (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten signal)))
                                                 vvals (select-keys (get-in @atoms-and-watchers [:rvbbit-signals]) cmpkeys)]
-                                            (into {} (for [[k {:keys [keypath]}] vvals
-                                                           :let [v3 (get @last-values keypath)
+                                            (into {} (for [[k {:keys [base-type sub-type sub-path keypath]}] vvals
+                                                           :let [;;_ (when (not= base-type :time) (ut/pp [:resolver-map!!? k base-type sub-type sub-path keypath]))
+                                                                 ;;v3 (get @last-values keypath) ;; we dont want last-values we want the value NOW!
+                                                                 v3 (get-in @(get-atom-from-keys base-type sub-type sub-path keypath) keypath (get @last-values keypath) )
                                                                         ;_ (swap! last-signal-value-atom assoc k v3)
 ]] ;; extra cache for last value due to diff update cadence on last-values... TODO
                                                        {k v3})) ;; keypath is used as the actual key here, btw
@@ -3130,7 +3163,7 @@
     ))
 
 (defn process-signals-reaction [base-type keypath new-value client-param-path]
-  ;; (ut/pp [:process-signals-reaction! base-type keypath new-value client-param-path])
+  (when (not (= base-type :time)) (ut/pp [:process-signals-reaction! base-type keypath new-value client-param-path]))
   (let [re-con-key (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
         valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))
         _ (tap> [:signal-processing (vec valid-signals)])
@@ -3205,9 +3238,10 @@
                            other-client-param-path)
        signal? (= client-name :rvbbit-signals)]
 
-   (ut/pp [(if signal?
-             :signal-reaction-process!
-             :client-reaction-push!) base-type keypath client-name new-value client-param-path])
+   (when (not (= base-type :time)) ;; temp to eliminate console spam
+     (ut/pp [(if signal?
+               :signal-reaction-process!
+               :client-reaction-push!) base-type keypath client-name new-value client-param-path]))
 
    (async/thread ;; really expensive logging below. temp
      (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
@@ -5961,7 +5995,8 @@
    :body    "<html><head></head><body>youre never going to see this, bro</body></html>"})
 
 (def ws-endpoints
-  {"/ws" (net/websocket-handler {:encoding :edn})})
+  {"/ws" (net/websocket-handler {:encoding :edn ;; :transit-json ;; :edn
+                                 })})
 
 (def websocket-port 3030)
 

@@ -2,7 +2,7 @@
  {:signal
   [:and
    [:=
-    :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
+    :client/cute-prismatic-human-7>click-param>param>jessica
     "jessica"]
    [:changed? :time/second]
    [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
@@ -11,17 +11,15 @@
  :cool-raccoon-signal-yo
  {:signal
   [:or
-   [:=
-    :client/imaginative-green-owl-24>param>:my-dash-killswitch?
-    true]
+   [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
    [:and
     [:or [:> :time/hour 12] [:< :time/hour 6]]
     [:or
      [:= :time/second 10]
      [:= :time/second 20]
-     [:= :time/second 35]
+     [:= :time/second 45]
      [:= :time/second 25]]]]},
- :worthy-fish-signal {:signal [:or [:= :time/day 22] [:= 221 22]]},
+ :worthy-fish-signal {:signal [:or [:= :time/hour 16] [:= 221 22]]},
  :hourly? {:signal [:or [:changed? :time/hour] [:= :time/minute -1]]},
  :fair-armadillo-signal
  {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
@@ -34,6 +32,8 @@
   [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
  :genius-gnat-signal
  {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
+ :dragging-to-potential-cross-breed?
+ {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
  :special-lion-signal
  {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
  :optimistic-sheep-signal

@@ -82,6 +82,35 @@
 (defonce mad-libs-top? (reagent/atom true))
 (def swap-layers? (reagent/atom false))
 
+;; (re-frame/reg-event-db
+;;  ::ship-atom
+;;  (fn [db [_ atom-name aval]]
+;;    (re-frame/dispatch [::wfx/request :default
+;;                        {:message    {:kind :client-ui
+;;                                      :atom-name atom-name
+;;                                      :value aval
+;;                                      :client-name (get db :client-name)}
+;;                         :timeout    500000}]) db))
+
+(re-frame/reg-event-fx
+ ::ship-atom
+ (fn [{:keys [db]} [_ atom-name aval]]
+   (tap> [:setting :atom-name atom-name aval])
+   {:dispatch [::wfx/request :default
+               {:message    {:kind :client-ui
+                             :atom-name atom-name
+                             :value aval ;; (if (false? aval) nil aval)
+                             :client-name (get db :client-name)}
+                :timeout    500000}]}))
+
+(defn watch-fn [key ref old-state new-state]
+  ;(println "Atom changed from" old-state "to" new-state)
+  (re-frame/dispatch [::ship-atom key new-state])
+  )
+
+(add-watch dragging? "dragging?" watch-fn)
+(add-watch dragging-body "dragging-body" watch-fn)
+
 (defonce drop-last-tracker (reagent/atom {}))
 (defonce drop-last-tracker-refs (reagent/atom {}))
 

@@ -49,7 +49,7 @@
         url (str protocol "://" host-without-port ":" ws-port "/ws")]
     (tap> [:http-ws-connect-url! url])
     {:url    url
-     :format :edn
+     :format :edn ;;:transit-json
      :on-disconnect [::wfx/unsubscribe socket-id :server-push2]
      :on-connect [::wfx/subscribe socket-id :server-push2 (subscription x)]}))
 
