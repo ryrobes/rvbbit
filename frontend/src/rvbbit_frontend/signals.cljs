@@ -488,10 +488,9 @@
   (let [;signals @(re-frame/subscribe [::signals-map])
         ;selected-signal @(re-frame/subscribe [::selected-signal])
         results (into {} (for [[name _] signals]
-                      (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
-                            vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])]
-                        {name vv})))
-        ]
+                           (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
+                                 vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])]
+                             {name vv})))]
     [re-com/v-box
      :children
      [[re-com/h-box
@@ -540,25 +539,32 @@
                      :children [[re-com/h-box
                                  :style {:font-size "19px"}
                                  :justify :between
-                                 :height "25px"
+                                 ;:height "25px"
+
                                  :children [[re-com/box 
-                                             :style {:font-size "18px"
+                                             :style {:font-size "16px"
+                                                     ;:border "1px solid yellow"
                                                      :font-weight 700}
+                                             ;:width "200px"
+                                             :padding "6px"
+                                             :size "auto"
                                              :child (str name)]
                                             [re-com/box
+                                             :align :center :justify :center
                                              :child (str (if (nil? vv) "err!" vv))
                                              :style {:font-weight 700
                                                      :font-size "17px"
                                                      :opacity (if (true? vv) 1.0 0.2)}]]]
-                                (when true ;;(not selected?)
-                                  [re-com/box
-                                   :padding "4px"
-                                   :style {;:opacity 0.33
-                                           :font-size "11px"
-                                           :border-radius "7px"
-                                           :background-color "#00000099"
-                                           :font-family  (theme-pull :theme/monospaced-font nil)}
-                                   :child [code-box-smol 60 60 (str signal) "clojure"]])]]
+                                ;; (when true ;;(not selected?)
+                                ;;   [re-com/box
+                                ;;    :padding "4px"
+                                ;;    :style {;:opacity 0.33
+                                ;;            :font-size "11px"
+                                ;;            :border-radius "7px"
+                                ;;            :background-color "#00000099"
+                                ;;            :font-family  (theme-pull :theme/monospaced-font nil)}
+                                ;;    :child [code-box-smol 60 60 (str signal) "clojure"]])
+                                ]]
                                  :operator sigkw
                                  ])]]]))
 
@@ -890,8 +896,12 @@
                   [selector-panel "metrics" (filter-results @searcher-atom time-items) "zmdi-equalizer" {} 2]
                   [selector-panel "KPIs" (filter-results @searcher-atom time-items) "zmdi-traffic" {} 2]
                   
-                  [selector-panel "instanced signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
+                  ;[selector-panel "instanced signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
+                  [re-com/gap :size "20px"]
+
                   [selector-panel "signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
+                  [selector-panel "rules" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
+                  [selector-panel "solvers" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
                   
                   ]]]]))
 
@@ -968,6 +978,18 @@
    (and (get db :flow?) 
         (not (nil? (get db :selected-signal)))
         (= (get @ db/flow-editor-system-mode 0) "signals"))))
+
+(defn history-mouse-enter [e]
+  (reset! hover-tools-atom e))
+
+(defn history-mouse-over [e]
+  (when true ;; todo to short-circuit
+    (highlight-code (str e))
+    (reset! hover-tools-atom e)))
+
+(defn history-mouse-leave []
+  (unhighlight-code)
+  (reset! hover-tools-atom nil))
 
 
 (defn right-col [ph]
@@ -1048,59 +1070,50 @@
                 ;;               (* ph 0.3)
                 ;;               ph) signals selected-signal]
 
-                [re-com/box 
+                [re-com/box
                  :padding "6px"
                  :align :center :justify :center
                  ;:style {:border "1px solid lime"}
                  :height (px (- (* ph 0.3) 48))
-                 :child ;(or @hover-tools-atom 
-                                 (if (not (nil? selected-signal))
-                                   
-                                   [re-com/v-box 
-                                    :size "auto"
-                                    :children (for [[e vv] (sort-by #(count (pr-str (last %))) signals-history)
-                                                    ;:let (for [[ee vvv] signals-history] [(count (str))])
-                                                    ] 
-                                                [re-com/h-box
-                                                 :style (merge
-                                                         {;:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil))
-                                                          }
-                                                         (when (= e @hover-tools-atom)
-                                                           {;:border "1px solid red"
-                                                           :filter "invert(233%)"
-                                                            ;:background-color "red"
-                                                            }))
-                                                 :attr {:on-mouse-enter #(reset! hover-tools-atom e)
-                                                        :on-mouse-over #(when true ;(not= @hover-tools-atom e)
-                                                                          (highlight-code (str e))
-                                                                          (reset! hover-tools-atom e))
-                                                        :on-mouse-leave #(do 
-                                                                           (unhighlight-code)
-                                                                           (reset! hover-tools-atom nil))}
-                                                 :size "auto"
-                                                 :width "600px"
-                                                 :children (for [[ee tt] vv]
-                                                             [re-com/box
-                                                              :size "none" 
-                                                              :width "30px"
-                                                              :align :center :justify :center
-                                                              :style (merge {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
-                                                                             :font-family  (theme-pull :theme/monospaced-font nil)
-                                                                             :color "#000000"
-                                                                             :font-size "10px"}
-                                                                            (when (true? ee) 
-                                                                              {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 65)})
-                                                                            )
-                                                              :child ;;(str ee)
-                                                              (str 
-                                                               ;(subs (str tt) 17 19)
-                                                               (-> tt js/Date. .toISOString (subs 17 19))
-                                                               )
-                                                              ])])]
+                 :child (if (not (nil? selected-signal))
 
-                                   "last x signals true"
-                                   
-                                   )]
+                          [re-com/v-box
+                           :size "auto"
+                           :children (for [[e vv] (sort-by #(count (pr-str (last %))) signals-history)
+                                                    ;:let (for [[ee vvv] signals-history] [(count (str))])
+                                           ]
+                                       ^{:key (str selected-signal "h-box")}
+                                       [re-com/h-box
+                                        :style (when (= e @hover-tools-atom)
+                                                 {:filter "invert(233%)"})
+                                        :attr {;:on-mouse-enter #(reset! hover-tools-atom e)
+                                                        ;:on-mouse-over #(when true ;(not= @hover-tools-atom e)
+                                                        ;                   (highlight-code (str e))
+                                                        ;                   (reset! hover-tools-atom e))
+                                                        ; :on-mouse-leave #(do 
+                                                        ;                    (unhighlight-code)
+                                                        ;                    (reset! hover-tools-atom nil))
+                                               :on-mouse-enter #(history-mouse-enter e)
+                                               :on-mouse-over #(history-mouse-over e)
+                                               :on-mouse-leave history-mouse-leave}
+                                        :size "auto"
+                                        :width "600px"
+                                        :children (for [[ee tt] vv
+                                                        :let [sec (-> tt js/Date. .toISOString (subs 17 19))]]
+                                                    ^{:key (str selected-signal "child-boxes" e ee tt)}
+                                                    [re-com/box
+                                                     :size "none"
+                                                     :width "30px"
+                                                     :align :center :justify :center
+                                                     :style (merge {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
+                                                                    :font-family  (theme-pull :theme/monospaced-font nil)
+                                                                    :color "#000000"
+                                                                    :font-size "10px"}
+                                                                   (when (true? ee)
+                                                                     {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 65)}))
+                                                     :child (str sec)])])]
+
+                          "(no signal selected)")]
                 
                 ]]))
 

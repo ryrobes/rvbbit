@@ -15,6 +15,7 @@
    [rvbbit-frontend.signals :as signals]
    [rvbbit-frontend.utility :as ut]
    [clojure.string :as cstr]
+   [day8.re-frame.undo :as undo]
    ;[cljs-time.core]
    [websocket-fx.core :as wfx]
    [re-pollsive.core :as poll]))
@@ -121,6 +122,8 @@
                              {:keyCode 9}
                              {:keyCode 70 :ctrlKey true}]}]))
 
+
+
 (defn dispatch-keyup-rules []
   (re-frame/dispatch-sync
    [::rp/set-keyup-rules
@@ -129,13 +132,61 @@
      [[[::alt-key-up] [{:keyCode 67}]]]}]))
      ;:prevent-default-keys  [{:keyCode 32} {:keyCode 83 :ctrlKey true} {:keyCode 9} {:keyCode 70 :ctrlKey true}]  
 
+(re-frame/reg-sub
+ ::memory-usage-breached-threshold?
+ (fn [db _]
+   (let [{:keys [_ used ttl-heap]} (get db :memory)]
+     (> (/ used ttl-heap) 0.75))))
+
+(defonce root-key (reagent.core/atom (cljs.core/random-uuid)))
+
+(defn root []
+  (fn []
+    [[:div {:key @root-key} [views/main-panel]]]))
+
+(defn clear-cache-and-reload! [] ;;; TEST!
+  (re-frame/clear-subscription-cache!)
+  (swap! root-key (cljs.core/random-uuid))
+  (let [root-el (.getElementById js/document "app")]
+    (rdom/unmount-component-at-node root-el)
+    (rdom/render [root] root-el)))
+
+;; (defn clear-cache-and-reload! [] ;;; TEST!
+;;   (re-frame/clear-subscription-cache!)
+;;   (let [root-el (.getElementById js/document "app")]
+;;     (rdom/unmount-component-at-node root-el)
+;;     (rdom/render [views/main-panel] root-el)))
+
+;; (re-frame/reg-event-db
+;;  ::purge-sub-cache!
+;;  (fn [db]
+;;    (let [client-name (get db :client-name)
+;;          {:keys [total used _]} (get db :memory)
+;;          pct-used (/ used total)
+;;          pct-used-str (str (.. pct-used (toFixed 1)) "%")]
+;;      (tap> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
+;;      (clear-cache-and-reload!)
+;;      db)))
+
+(re-frame/reg-event-db
+ ::purge-sub-cache!
+ (fn [db]
+   (let [client-name (get db :client-name)
+         [total used heap] (get db :memory)]
+     (tap> [:debug "total memory:" (ut/bytes-to-mb total) "used memory:" (ut/bytes-to-mb used) "heap:" (ut/bytes-to-mb heap)])
+     (let [pct-used (/ used total)
+           pct-used-str (str (.. pct-used (toFixed 1)) "%")]
+       (tap> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
+       (clear-cache-and-reload!)
+       db))))
+
 
 (defn dispatch-poller-rules []
   (re-frame/dispatch
    [::poll/set-rules
     [{:interval                 10 ;; 1 terrible idea. test
       :event                    [::bricks/dispatch-auto-queries]
-      :poll-when                [::bricks/auto-run-and-connected?]
+      :poll-when                [::bricks/auto-run-and-connected?] 
       :dispatch-event-on-start? false}
 
      {:interval                 5
@@ -172,6 +223,11 @@
       :event                    [::signals/run-signals-history]
       :poll-when                [::signals/run-signals-history?]
       :dispatch-event-on-start? false}
+     
+    ;;  {:interval                 240
+    ;;   :event                    [::purge-sub-cache!]
+    ;;   ;:poll-when                [::memory-usage-breached-threshold?]
+    ;;   :dispatch-event-on-start? false}     
 
     ;;  {:interval                 15 ;; more?
     ;;   :event                    [::bricks/resub!] ;[::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]
@@ -246,6 +302,9 @@
                        :on-response [::signals/signals-map-response]
                        ;;:on-timeout  [::timeout-response :get-signals]
                        :timeout    15000000}])
+  (undo/undo-config!
+   {:harvest-fn  (fn [ratom] (select-keys @ratom [:panels :signals-map :flows]))
+    :reinstate-fn (fn [ratom value] (swap! ratom merge value))})
   (track-mouse-activity)
   (let [press-fn (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event thrash
                    ;; still kind of fucky though

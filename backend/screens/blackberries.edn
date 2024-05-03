@@ -1,36 +1,21 @@
 {:orders
  {:flow-fn-sys
   [:name :description :full_map :inputs :icon :input_types :output_types :category],
-  :query-preview-inviz-109073643:inviz_1161 [:mem_used :ts],
   :fields-sys [:field_name :field_type :data_type],
-  :query-preview-inviz1569890868:inviz_1161 [:mem_used :ts],
   :client_memory
-  [:mem_time :client_name :packets :mem_limit :mem_used :mem_total :ts],
-  :query-preview-inviz-219100167:inviz_1161 [:mem_used :ts],
-  :client-name-drag-14 [:client_name :rowcnt :inviz_1161 :mem_used_avg_20],
+  [:mem_time
+   :client_name
+   :packets
+   :mem_limit
+   :mem_used
+   :mem_used_mb
+   :mem_total
+   :ts],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
   :query-3213 [:rowcnt],
-  :data/memory (:query_error),
-  :recos-sys2
-  [:context_hash
-   :combo_hash
-   :connection_id
-   :shape_name
-   :query_map
-   :query_map_str
-   :viz_map
-   :combo_edn
-   :selected_view
-   :table_name
-   :condis
-   :h
-   :w
-   :score],
-  :viz-shapes0-sys2 [:shape :recos],
-  :query-preview-inviz-1995211992:inviz_1161 [:mem_used :ts],
+  :new-query [:mem_used :ts_hour],
   :flows-sys [:flow_id :file_path :last_modified],
-  :viz-tables-sys2 [:table_name :recos],
   :jvm_stats
   [:used_memory_mb
    :thread_count
@@ -42,161 +27,66 @@
    :sniffs_run
    :sys_load
    :ts],
-  :memory (:query_error),
-  :query-preview-inviz130541677:inviz_1161 [:mem_used :ts],
-  :query-preview-inviz1465113379:inviz_1161 [:mem_used :ts],
-  :viz-shapes-sys2 [:combo_edn :recos],
-  :query-preview-inviz95852087:inviz_1161 [:mem_used :ts],
-  :query-preview-inviz-2139831509:inviz_1161 [:mem_used :ts],
   :flow-fn-categories-sys [:category],
   :connections-sys [:database_name :connection_id],
   :reco-counts [:table_name :cnt],
-  :query-preview-inviz1094020852:inviz_1161 [:mem_used :ts],
   :client-memory-drag-36
   [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
   :gen-viz-516 [:mem_used :ts],
-  :query-preview-inviz-1637939235:inviz_1161 [:mem_used :ts],
-  :flow-fn-all-sys [:name]},
+  :flow-fn-all-sys [:name],
+  :packets-drag-15 [:packets_sum]},
  :reco-preview nil,
  :flow? false,
  :sql-source
- {:query-preview-inviz-109073643:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":essential-taupe-beaver-29" :client_name]},
-  :query-preview-inviz1569890868:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":affirmative-rectangular-crow-32" :client_name]},
-  :client_memory
+ {:client_memory
   {:select [:*], :connection-id "system-db", :from [:client_memory], :limit 111},
-  :query-preview-inviz-219100167:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":supporting-chartreuse-magpie-18" :client_name]},
-  :client-name-drag-14
-  {:select
-   [:client_name
-    [[:count 1] :rowcnt]
-    [[:*render*
-      {:queries
-       {:gen-viz-609
-        {:select [[[[:sum :mem_used]] :mem_used] :ts],
-         :from
-         [{:select
-           [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-           :from [[:client_memory :ee183]]}],
-         :group-by [:ts],
-         :where [:= :client_name :_client_name]}},
-       :view
-       [:>
-        :ResponsiveContainer
-        {:width 900, :height 150}
-        [:>
-         :LineChart
-         {:data :gen-viz-609, :margin {:top 5, :bottom 5, :right 30, :left 20}}
-         [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-         [:> :Tooltip]
-         [:> :XAxis {:dataKey :ts}]
-         [:>
-          :Line
-          {:type "monotone",
-           :dataKey :mem_used,
-           :stroke "#8884d8",
-           :activeDot {:r 8},
-           :isAnimationActive false}]]]}]
-     :inviz_1161]
-    [[:avg :mem_used] :mem_used_avg_20]],
-   :from
-   [[{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-      :from [[:client_memory :ee183]]}
-     :rr180]],
-   :group-by [:client_name 3],
-   :order-by [[:rowcnt :desc]],
-   :row-height 100,
-   :col-widths {:inviz_1161 200},
-   :_last-run "14:03:42"},
-  :query-3213
-  {:select [[[:count 1] :rowcnt]],
-   :from
-   [[{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-      :from [[:client_memory :ee183]]}
-     :zz616]]},
-  :data/memory {:select [:*], :connection-id "system-db", :from [nil], :limit 111},
-  :query-preview-inviz-1995211992:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":imaginative-green-owl-24" :client_name]},
   :jvm_stats
   {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
-  :memory {:select [:*], :connection-id "system-db", :from [:memory], :limit 111},
-  :query-preview-inviz130541677:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":okay-amber-buffalo-9" :client_name]},
-  :query-preview-inviz1465113379:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":intellectual-circular-pig-14" :client_name]},
-  :query-preview-inviz95852087:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":unwavering-cubic-porpoise-42" :client_name]},
-  :query-preview-inviz-2139831509:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":blissful-baby-blue-serval-7" :client_name]},
-  :query-preview-inviz1094020852:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":adorable-cubic-hedgehog-22" :client_name]},
   :client-memory-drag-36
   {:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
    :from [[:client_memory :ee183]],
    :refresh-every 20,
    :cache? false,
-   :_last-run "17:07:40"},
+   :_last-run "23:29:18"},
+  :new-query
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 300,
+   :group-by [2],
+   :_last-run "23:29:18",
+   :refresh-every 10,
+   :from
+   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
+     :from [[:client_memory :ee183]]}],
+   :order-by [[2 :desc]],
+   :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 15] :ts_hour]]},
+  :query-3213
+  {:select [[[:count 1] :rowcnt]],
+   :refresh-every 20,
+   :cache? false,
+   :from
+   [[{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
+      :from [[:client_memory :ee183]]}
+     :zz616]],
+   :_last-run "23:29:18"},
   :gen-viz-516
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 300,
+   :group-by [2],
+   :_last-run "23:29:18",
+   :refresh-every 20,
    :from
    [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
      :from [[:client_memory :ee183]]}],
-   :where [:= :client_name ":imaginative-green-owl-24"],
-   :group-by [:ts]},
-  :query-preview-inviz-1637939235:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
+   :order-by [[2 :desc]],
+   :select [[[[:sum :mem_used]] :mem_used] :ts]},
+  :packets-drag-15
+  {:select [[[:sum :packets] :packets_sum]],
    :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":agreeable-silver-sand-dollar-27" :client_name]}},
+   [[{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
+      :from [[:client_memory :ee183]]}
+     :oo850]]}},
  :meta
  {:flow-fn-sys
   {:fields
@@ -204,447 +94,183 @@
     {:data-type "string",
      :distinct 123,
      :group-by? true,
-     :commons {"ask-buffy-1" 9, "hue-change-group-color" 6, ":=" 1},
-     :cardinality 90},
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100},
     :description
     {:data-type "string",
      :distinct 33,
      :group-by? true,
      :commons
-     {"" 102, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
-     :cardinality 24},
+     {"" 89, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 26},
     :full_map
     {:data-type "string",
-     :distinct 131,
+     :distinct 123,
      :group-by? true,
      :commons
-     {"{:description nil, :fn (), :flow-id \"ask-buffy-1\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/ask-buffy-1.edn\", :defaults {:the-color \"#ffffff\", :the-room \"Living Room\"}, :types {:the-color :string, :the-room :string, :out nil}, :inputs [:the-color :the-room], :required [:the-color :the-room]}"
-      3,
-      "{:description nil, :fn (), :flow-id \"hue-change-group-color\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/hue-change-group-color.edn\", :defaults {:group-id 200, :on-switch nil, :ccolor nil}, :types {:group-id :integer, :on-switch :boolean, :ccolor :string, :out nil}, :inputs [:group-id :on-switch :ccolor], :required [:group-id :on-switch :ccolor]}"
-      3,
-      "{:description nil, :fn (), :flow-id \"hue-change-group-color\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/hue-change-group-color.edn\", :defaults {:group-id 200, :on-switch nil, :room-name \"Living Room\", :ccolor nil}, :types {:group-id :integer, :on-switch :boolean, :room-name :string, :ccolor :string, :out nil}, :inputs [:group-id :on-switch :room-name :ccolor], :required [:group-id :on-switch :room-name :ccolor]}"
-      2},
-     :cardinality 96},
+     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
+      1},
+     :cardinality 100},
     :inputs
     {:data-type "string",
-     :distinct 70,
+     :distinct 66,
      :group-by? true,
      :commons
-     {"[:open-input-1 :open-input]" 11,
+     {"[:open-input-1 :open-input]" 10,
       "[:value1 :value2]" 7,
       "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
-     :cardinality 51},
+     :cardinality 53},
     :icon
     {:data-type "string",
      :distinct 21,
      :group-by? true,
-     :commons {"zmdi-puzzle-piece" 102, "zmdi-pizza" 3, "zmdi-file-text" 3},
-     :cardinality 15},
+     :commons {"zmdi-puzzle-piece" 89, "zmdi-pizza" 3, "zmdi-file-text" 3},
+     :cardinality 17},
     :input_types
     {:data-type "string",
-     :distinct 61,
+     :distinct 56,
      :group-by? true,
      :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
-     :cardinality 44},
+     :cardinality 45},
     :output_types
     {:data-type "string",
      :distinct 14,
      :group-by? true,
-     :commons {":any" 63, "" 29, ":boolean" 12},
-     :cardinality 10},
+     :commons {":any" 63, "" 18, ":boolean" 12},
+     :cardinality 11},
     :category
     {:data-type "string",
-     :distinct 4,
+     :distinct 3,
      :group-by? true,
-     :commons {":sub-flows" 88, ":rabbit-base" 18, ":clojure-base" 16},
+     :commons {":sub-flows" 89, ":rabbit-base" 18, ":clojure-base" 16},
      :cardinality 2}},
-   :rowcount 136},
-  :query-preview-inviz-109073643:inviz_1161
+   :rowcount 123},
+  :fields-sys {:fields {}, :rowcount 0},
+  :client_memory
   {:fields
-   {:mem_used
-    {:data-type "integer",
-     :distinct 264,
-     :group-by? false,
-     :commons {337256180 1, 329208971 1, 350483654 1},
-     :cardinality 100},
-    :ts
+   {:mem_time
     {:data-type "string",
-     :distinct 264,
+     :distinct 104,
      :group-by? true,
      :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
-     :cardinality 100}},
-   :rowcount 264},
-  :fields-sys
-  {:fields
-   {:field_name
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons {"ts" 1, "packets" 1, "mem_used" 1},
-     :cardinality 100},
-    :field_type
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"INTEGER" 4, "TEXT" 2, "TIMESTAMP" 1},
-     :cardinality 42},
-    :data_type
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"integer" 4, "string" 2, "datetime" 1},
-     :cardinality 42}},
-   :rowcount 7},
-  :query-preview-inviz1569890868:inviz_1161
-  {:fields
-   {:mem_used
-    {:data-type "integer",
-     :distinct 264,
-     :group-by? false,
-     :commons {328796794 1, 399548575 1, 359050072 1},
-     :cardinality 100},
-    :ts
-    {:data-type "string",
-     :distinct 264,
-     :group-by? true,
-     :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
-     :cardinality 100}},
-   :rowcount 264},
-  :client_memory {:fields {}, :rowcount 0},
-  :query-preview-inviz-219100167:inviz_1161
-  {:fields
-   {:mem_used
-    {:data-type "integer",
-     :distinct 264,
-     :group-by? false,
-     :commons {635989604 1, 398253447 1, 369782060 1},
-     :cardinality 100},
-    :ts
-    {:data-type "string",
-     :distinct 264,
-     :group-by? true,
-     :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
-     :cardinality 100}},
-   :rowcount 264},
-  :client-name-drag-14
-  {:fields
-   {:client_name
+     {"2024-04-30T20:13:06.612Z" 2,
+      "2024-04-30T20:13:51.636Z" 2,
+      "2024-04-30T20:16:06.572Z" 2},
+     :cardinality 93},
+    :client_name
     {:data-type "string",
      :distinct 10,
      :group-by? true,
      :commons
-     {":agreeable-silver-sand-dollar-27" 1,
-      ":okay-amber-buffalo-9" 1,
-      ":imaginative-green-owl-24" 1},
-     :cardinality 100},
-    :rowcnt
+     {":agreeable-silver-sand-dollar-27" 12,
+      ":okay-amber-buffalo-9" 11,
+      ":adorable-cubic-hedgehog-22" 11},
+     :cardinality 9},
+    :packets
     {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {18 10},
-     :cardinality 10},
-    :inviz_1161
-    {:data-type "rabbit-code",
-     :distinct 10,
-     :group-by? false,
-     :commons
-     {[:*render*
-       {:queries
-        {:gen-viz-609
-         {:select [[[[:sum :mem_used]] :mem_used] :ts],
-          :from
-          [{:select
-            [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-            :from [[:client_memory :ee183]]}],
-          :group-by [:ts],
-          :where [:= ":essential-taupe-beaver-29" :client_name]}},
-        :view
-        [:>
-         :ResponsiveContainer
-         {:width 300, :height 150}
-         [:>
-          :LineChart
-          {:data :gen-viz-609, :margin {:top 5, :bottom 5, :right 30, :left 20}}
-          [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-          [:> :Tooltip]
-          [:> :XAxis {:dataKey :ts}]
-          [:>
-           :Line
-           {:type "monotone",
-            :dataKey :mem_used,
-            :stroke "#8884d8",
-            :activeDot {:r 8},
-            :isAnimationActive false}]]]}]
-      1,
-      [:*render*
-       {:queries
-        {:gen-viz-609
-         {:select [[[[:sum :mem_used]] :mem_used] :ts],
-          :from
-          [{:select
-            [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-            :from [[:client_memory :ee183]]}],
-          :group-by [:ts],
-          :where [:= ":imaginative-green-owl-24" :client_name]}},
-        :view
-        [:>
-         :ResponsiveContainer
-         {:width 300, :height 150}
-         [:>
-          :LineChart
-          {:data :gen-viz-609, :margin {:top 5, :bottom 5, :right 30, :left 20}}
-          [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-          [:> :Tooltip]
-          [:> :XAxis {:dataKey :ts}]
-          [:>
-           :Line
-           {:type "monotone",
-            :dataKey :mem_used,
-            :stroke "#8884d8",
-            :activeDot {:r 8},
-            :isAnimationActive false}]]]}]
-      1,
-      [:*render*
-       {:queries
-        {:gen-viz-609
-         {:select [[[[:sum :mem_used]] :mem_used] :ts],
-          :from
-          [{:select
-            [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-            :from [[:client_memory :ee183]]}],
-          :group-by [:ts],
-          :where [:= ":okay-amber-buffalo-9" :client_name]}},
-        :view
-        [:>
-         :ResponsiveContainer
-         {:width 300, :height 150}
-         [:>
-          :LineChart
-          {:data :gen-viz-609, :margin {:top 5, :bottom 5, :right 30, :left 20}}
-          [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-          [:> :Tooltip]
-          [:> :XAxis {:dataKey :ts}]
-          [:>
-           :Line
-           {:type "monotone",
-            :dataKey :mem_used,
-            :stroke "#8884d8",
-            :activeDot {:r 8},
-            :isAnimationActive false}]]]}]
-      1},
+     :distinct 110,
+     :group-by? true,
+     :commons {10031 2, 16384 1, 10314 1},
+     :cardinality 99},
+    :mem_limit
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {4294705152 89, 2172649472 22},
+     :cardinality 1},
+    :mem_used
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {495801533 1, 577666155 1, 559962739 1},
      :cardinality 100},
-    :mem_used_avg_20
-    {:data-type "float",
-     :distinct 10,
-     :group-by? false,
-     :commons {3.677294710555556E8 1, 4.111858471666667E8 1, 3.520816242222222E8 1},
-     :cardinality 100}},
-   :rowcount 10},
+    :mem_used_mb
+    {:data-type "string",
+     :distinct 86,
+     :group-by? true,
+     :commons {"3497" 3, "524" 3, "474" 3},
+     :cardinality 77},
+    :mem_total
+    {:data-type "integer",
+     :distinct 110,
+     :group-by? true,
+     :commons {563070886 2, 616185965 1, 635737143 1},
+     :cardinality 99},
+    :ts
+    {:data-type "string",
+     :distinct 19,
+     :group-by? true,
+     :commons
+     {"2024-04-30 20:12:21" 10, "2024-04-30 20:13:51" 10, "2024-04-30 20:14:36" 10},
+     :cardinality 17}},
+   :rowcount 111},
   :tables-sys
   {:fields
    {:db_schema
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"none" 27},
-     :cardinality 3},
+     :commons {"none" 23},
+     :cardinality 4},
     :db_catalog
     {:data-type "unknown",
      :distinct 1,
      :group-by? true,
-     :commons {nil 27},
-     :cardinality 3},
+     :commons {nil 23},
+     :cardinality 4},
     :connection_id
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"system-db" 27},
-     :cardinality 3},
+     :commons {"system-db" 23},
+     :cardinality 4},
     :schema_cat
     {:data-type "unknown",
      :distinct 1,
      :group-by? false,
-     :commons {nil 27},
-     :cardinality 3},
+     :commons {nil 23},
+     :cardinality 4},
     :table_name
     {:data-type "string",
-     :distinct 27,
+     :distinct 23,
      :group-by? true,
      :commons {"connections" 1, "board_history" 1, "client_items" 1},
      :cardinality 100},
     :fields
     {:data-type "integer",
-     :distinct 16,
+     :distinct 15,
      :group-by? false,
-     :commons {6 4, 5 3, 11 3},
-     :cardinality 59}},
-   :rowcount 27},
+     :commons {6 4, 5 2, 12 2},
+     :cardinality 65}},
+   :rowcount 23},
   :query-3213
   {:fields
    {:rowcnt
     {:data-type "integer",
      :distinct 1,
      :group-by? false,
-     :commons {20 1},
+     :commons {24051 1},
      :cardinality 100}},
    :rowcount 1},
-  :data/memory
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (near \"NULL\": syntax error)"
-      1},
-     :cardinality 100}},
-   :rowcount 2},
-  :recos-sys2
-  {:fields
-   {:query_map
-    {:data-type "string",
-     :distinct 18,
-     :group-by? true,
-     :commons
-     {"[{:select [[[[:sum :rows]] :rows] :client_name], :from [\"query/client_memory_drag_36\"], :group-by [:client_name]}]"
-      6,
-      "[{:select [[[[:sum :rows]] :rows] :client_name :ts], :from [\"query/client_memory_drag_36\"], :group-by [:client_name :ts]}]"
-      3,
-      "[{:select [[[[:avg :packets]] :packets] :client_name], :from [\"query/client_memory_drag_36\"], :group-by [:client_name]}]"
-      2},
-     :cardinality 62},
-    :shape_name
-    {:data-type "string",
-     :distinct 29,
-     :group-by? true,
-     :commons
-     {"scatterplot_nivo_color" 1, "basic_h_bar_avg_color" 1, "basic_h_bar_nivo" 1},
-     :cardinality 100},
-    :w
-    {:data-type "unknown",
-     :distinct 4,
-     :group-by? true,
-     :commons {nil 24, 8 2, 9 2},
-     :cardinality 13},
-    :combo_edn
-    {:data-type "string",
-     :distinct 12,
-     :group-by? true,
-     :commons
-     {"\"client_name, rows\"" 7, "\"client_name, rows, ts\"" 5, "\"rows, ts\"" 4},
-     :cardinality 41},
-    :query_map_str
-    {:data-type "string",
-     :distinct 17,
-     :group-by? true,
-     :commons
-     {"\nSELECT (SUM(rows)) AS rows, client_name\nFROM 'query/client_memory_drag_36'\nGROUP BY client_name\n"
-      6,
-      "\nSELECT (SUM(rows)) AS rows, client_name, ts\nFROM 'query/client_memory_drag_36'\nGROUP BY client_name, ts\n"
-      3,
-      "\nSELECT client_name\nFROM 'query/client_memory_drag_36'\nGROUP BY client_name\nORDER BY client_name ASC\n"
-      2},
-     :cardinality 58},
-    :selected_view
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"" 25, ":reech" 3, ":grid" 1},
-     :cardinality 10},
-    :combo_hash
-    {:data-type "string",
-     :distinct 29,
-     :group-by? true,
-     :commons {"-1017931896" 1, "1219195485" 1, "-1492960433" 1},
-     :cardinality 100},
-    :h
-    {:data-type "unknown",
-     :distinct 5,
-     :group-by? true,
-     :commons {nil 24, 6 2, 2 1},
-     :cardinality 17},
-    :condis
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"" 25,
-      "{:up-or-down? [:> :query-preview/agg.0 :query-preview/agg.1]}" 2,
-      "{:true? [:= 1 1]}" 1},
-     :cardinality 13},
-    :score
-    {:data-type "float",
-     :distinct 2,
-     :group-by? true,
-     :commons {48.39999999999999 17, 0 12},
-     :cardinality 6},
-    :table_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"client_memory_drag_36" 29},
-     :cardinality 3},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"cache.db" 29},
-     :cardinality 3},
-    :context_hash
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"-165820641" 29},
-     :cardinality 3},
-    :viz_map
-    {:data-type "string",
-     :distinct 29,
-     :group-by? true,
-     :commons
-     {"[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
-      1,
-      "[:nivo-bar-chart {:labelTextColor \"#423939\", :axisLeft {:tickRotation 0, :legendPosition \"middle\", :legendOffset -65}, :indexBy :client_name, :layout \"vertical\", :enableLabel false, :axisBottom {:tickRotation 0, :legendPosition \"middle\", :legendOffset 40}, :inner-padding 0, :width :panel-width+70, :colors :theme/vega-default-color-scheme, :theme :theme/nivo-defaults, :colorBy \"id\", :click {:x :client_name, :y :rows}, :groupMode \"stacked\", :keys [:rows], :padding 0.1, :enableGridX true, :border-radius 2, :enableGridY true, :height :panel-height+50, :margin {:top 5, :right 5, :bottom 50, :left 45}, :data :query-preview}]"
-      1,
-      "[:vega-lite {:layer [{:encoding {:x {:field :client_name, :type \"ordinal\"}, :y {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :field :ts, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values \"query/client_memory_drag_36\"}} {:actions false}]"
-      1},
-     :cardinality 100}},
-   :rowcount 29},
-  :viz-shapes0-sys2
-  {:fields
-   {:shape
-    {:data-type "string",
-     :distinct 29,
-     :group-by? false,
-     :commons
-     {"scatterplot_nivo_color" 1, "basic_h_bar_avg_color" 1, "basic_h_bar_nivo" 1},
-     :cardinality 100},
-    :recos
-    {:data-type "integer",
-     :distinct 10,
-     :group-by? false,
-     :commons {10 9, 29 6, 8 4},
-     :cardinality 34}},
-   :rowcount 29},
-  :query-preview-inviz-1995211992:inviz_1161
+  :new-query
   {:fields
    {:mem_used
-    {:data-type "integer",
-     :distinct 264,
+    {:data-type "float",
+     :distinct 5,
      :group-by? false,
-     :commons {1698643183 1, 1420349504 1, 1867525366 1},
+     :commons {74967371 1, 1.4669311084615386E8 1, 1.9889927946153846E8 1},
      :cardinality 100},
-    :ts
+    :ts_hour
     {:data-type "string",
-     :distinct 264,
+     :distinct 5,
      :group-by? true,
-     :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
+     :commons {"2024-05-02 02:4" 1, "2024-05-02 02:5" 1, "2024-05-02 03:0" 1},
      :cardinality 100}},
-   :rowcount 264},
+   :rowcount 5},
   :flows-sys
   {:fields
    {:flow_id
@@ -670,72 +296,57 @@
      {"2024-03-12 02:37:43" 67, "2024-03-14 07:50:09" 1, "2024-04-12 05:48:12" 1},
      :cardinality 26}},
    :rowcount 90},
-  :viz-tables-sys2
-  {:fields
-   {:table_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"client_memory_drag_36" 1},
-     :cardinality 100},
-    :recos
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {434 1},
-     :cardinality 100}},
-   :rowcount 1},
   :jvm_stats
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 99,
+     :distinct 3,
      :group-by? true,
-     :commons {1352 9, 1151 3, 1178 3},
-     :cardinality 89},
+     :commons {6 102, 3 7, 0 2},
+     :cardinality 2},
     :sql_cache_size
     {:data-type "integer",
-     :distinct 6,
+     :distinct 2,
      :group-by? true,
-     :commons {6 41, 7 38, 15 27},
-     :cardinality 5},
+     :commons {1 109, 0 2},
+     :cardinality 1},
     :ts
     {:data-type "string",
      :distinct 111,
      :group-by? true,
      :commons
-     {"2024-04-26 19:47:53" 1, "2024-04-26 19:44:53" 1, "2024-04-26 19:22:53" 1},
+     {"2024-04-30 20:27:41" 1, "2024-04-30 20:13:11" 1, "2024-04-30 20:45:11" 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 8,
+     :distinct 2,
      :group-by? true,
-     :commons {4 41, 6 25, 12 24},
-     :cardinality 7},
+     :commons {1 109, 0 2},
+     :cardinality 1},
     :sys_load
     {:data-type "float",
-     :distinct 111,
+     :distinct 110,
      :group-by? true,
-     :commons {4.35888671875 1, 6.06982421875 1, 4.19091796875 1},
-     :cardinality 100},
+     :commons {4.05615234375 2, 4.73779296875 1, 5.09716796875 1},
+     :cardinality 99},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 105,
+     :distinct 108,
      :group-by? true,
-     :commons {1934 2, 1536 2, 1927 2},
-     :cardinality 94},
+     :commons {1690 2, 1528 2, 1234 2},
+     :cardinality 97},
     :thread_count
     {:data-type "integer",
-     :distinct 32,
+     :distinct 25,
      :group-by? true,
-     :commons {114 9, 120 8, 117 8},
-     :cardinality 28},
+     :commons {112 11, 111 10, 103 9},
+     :cardinality 22},
     :internal_queries_run
     {:data-type "integer",
-     :distinct 39,
+     :distinct 2,
      :group-by? true,
-     :commons {17 24, 36 17, 105 9},
-     :cardinality 35},
+     :commons {1 109, 0 2},
+     :cardinality 1},
     :open_flow_channels
     {:data-type "integer",
      :distinct 1,
@@ -749,108 +360,15 @@
      :commons {10 111},
      :cardinality 0}},
    :rowcount 111},
-  :memory
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: memory)" 1},
-     :cardinality 100}},
-   :rowcount 2},
-  :query-preview-inviz130541677:inviz_1161
-  {:fields
-   {:mem_used
-    {:data-type "integer",
-     :distinct 264,
-     :group-by? false,
-     :commons {375879587 1, 403375987 1, 423957650 1},
-     :cardinality 100},
-    :ts
-    {:data-type "string",
-     :distinct 264,
-     :group-by? true,
-     :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
-     :cardinality 100}},
-   :rowcount 264},
-  :query-preview-inviz1465113379:inviz_1161
-  {:fields
-   {:mem_used
-    {:data-type "integer",
-     :distinct 264,
-     :group-by? false,
-     :commons {339419527 1, 393306991 1, 375523926 1},
-     :cardinality 100},
-    :ts
-    {:data-type "string",
-     :distinct 264,
-     :group-by? true,
-     :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
-     :cardinality 100}},
-   :rowcount 264},
-  :viz-shapes-sys2
-  {:fields
-   {:combo_edn
-    {:data-type "string",
-     :distinct 77,
-     :group-by? true,
-     :commons
-     {"\"mem_limit, mem_used, packets, ts\"" 1,
-      "\"day_sqlite_ts*, mem_total, ts\"" 1,
-      "\"client_name, day_sqlite_ts*, packets\"" 1},
-     :cardinality 100},
-    :recos
-    {:data-type "integer",
-     :distinct 9,
-     :group-by? false,
-     :commons {6 23, 2 15, 1 14},
-     :cardinality 11}},
-   :rowcount 77},
-  :query-preview-inviz95852087:inviz_1161
-  {:fields
-   {:mem_used
-    {:data-type "integer",
-     :distinct 264,
-     :group-by? false,
-     :commons {2671191031 1, 2737935575 1, 2751021429 1},
-     :cardinality 100},
-    :ts
-    {:data-type "string",
-     :distinct 264,
-     :group-by? true,
-     :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
-     :cardinality 100}},
-   :rowcount 264},
-  :query-preview-inviz-2139831509:inviz_1161
-  {:fields
-   {:mem_used
-    {:data-type "integer",
-     :distinct 264,
-     :group-by? false,
-     :commons {465628630 1, 442946770 1, 430107314 1},
-     :cardinality 100},
-    :ts
-    {:data-type "string",
-     :distinct 264,
-     :group-by? true,
-     :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
-     :cardinality 100}},
-   :rowcount 264},
   :flow-fn-categories-sys
   {:fields
    {:category
     {:data-type "string",
-     :distinct 4,
+     :distinct 3,
      :group-by? true,
-     :commons {":sub-flows" 1, ":sub-flow" 1, ":rabbit-base" 1},
+     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
      :cardinality 100}},
-   :rowcount 4},
+   :rowcount 3},
   :connections-sys
   {:fields
    {:database_name
@@ -866,37 +384,7 @@
      :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
      :cardinality 100}},
    :rowcount 10},
-  :reco-counts
-  {:fields
-   {:table_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"client_memory_drag_36" 1},
-     :cardinality 100},
-    :cnt
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {434 1},
-     :cardinality 100}},
-   :rowcount 1},
-  :query-preview-inviz1094020852:inviz_1161
-  {:fields
-   {:mem_used
-    {:data-type "integer",
-     :distinct 264,
-     :group-by? false,
-     :commons {406928788 1, 410542384 1, 404372917 1},
-     :cardinality 100},
-    :ts
-    {:data-type "string",
-     :distinct 264,
-     :group-by? true,
-     :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
-     :cardinality 100}},
-   :rowcount 264},
+  :reco-counts {:fields {}, :rowcount 0},
   :client-memory-drag-36
   {:fields
    {:client_name
@@ -906,7 +394,7 @@
      :commons
      {":agreeable-silver-sand-dollar-27" 50,
       ":okay-amber-buffalo-9" 50,
-      ":imaginative-green-owl-24" 50},
+      ":adorable-cubic-hedgehog-22" 50},
      :cardinality 1},
     :mem_limit
     {:data-type "integer",
@@ -916,71 +404,55 @@
      :cardinality 0},
     :mem_time
     {:data-type "string",
-     :distinct 456,
+     :distinct 472,
      :group-by? true,
      :commons
-     {"2024-04-27T17:51:43.396Z" 3,
-      "2024-04-27T18:23:58.387Z" 3,
-      "2024-04-27T17:50:58.364Z" 3},
-     :cardinality 91},
+     {"2024-04-30T20:40:51.623Z" 2,
+      "2024-04-30T20:46:06.638Z" 2,
+      "2024-04-30T20:37:06.594Z" 2},
+     :cardinality 94},
     :mem_total
     {:data-type "integer",
-     :distinct 485,
+     :distinct 490,
      :group-by? true,
-     :commons {504695736 4, 414228815 3, 456149050 3},
-     :cardinality 97},
+     :commons {563070886 3, 625776674 2, 626824235 2},
+     :cardinality 98},
     :mem_used
     {:data-type "integer",
      :distinct 500,
      :group-by? true,
-     :commons {524707257 1, 1867525366 1, 433969252 1},
+     :commons {534837297 1, 495801533 1, 3416903830 1},
      :cardinality 100},
     :packets
     {:data-type "integer",
-     :distinct 250,
+     :distinct 479,
      :group-by? true,
-     :commons {128 7, 160 6, 133 6},
-     :cardinality 50},
+     :commons {9911 2, 10115 2, 9913 2},
+     :cardinality 95},
     :ts
     {:data-type "string",
-     :distinct 56,
+     :distinct 90,
      :group-by? true,
      :commons
-     {"2024-04-27 18:26:13" 10, "2024-04-27 18:07:28" 10, "2024-04-27 18:19:28" 10},
-     :cardinality 11}},
+     {"2024-04-30 20:38:36" 10, "2024-04-30 20:19:51" 10, "2024-04-30 20:18:21" 10},
+     :cardinality 18}},
    :rowcount 500},
   :gen-viz-516
   {:fields
    {:mem_used
     {:data-type "integer",
-     :distinct 18,
-     :group-by? false,
-     :commons {1867525366 1, 2022648791 1, 2089511484 1},
+     :distinct 54,
+     :group-by? true,
+     :commons {299256809 1, 229486975 1, 138393970 1},
      :cardinality 100},
     :ts
     {:data-type "string",
-     :distinct 18,
+     :distinct 54,
      :group-by? true,
      :commons
-     {"2024-04-27 17:59:58" 1, "2024-04-27 17:50:58" 1, "2024-04-27 17:57:43" 1},
+     {"2024-05-02 03:06:21" 1, "2024-05-02 02:52:06" 1, "2024-05-02 03:05:36" 1},
      :cardinality 100}},
-   :rowcount 18},
-  :query-preview-inviz-1637939235:inviz_1161
-  {:fields
-   {:mem_used
-    {:data-type "integer",
-     :distinct 264,
-     :group-by? false,
-     :commons {524707257 1, 433969252 1, 459972752 1},
-     :cardinality 100},
-    :ts
-    {:data-type "string",
-     :distinct 264,
-     :group-by? true,
-     :commons
-     {"2024-04-27 18:26:13" 1, "2024-04-27 20:42:43" 1, "2024-04-27 19:14:58" 1},
-     :cardinality 100}},
-   :rowcount 264},
+   :rowcount 54},
   :flow-fn-all-sys
   {:fields
    {:name
@@ -989,22 +461,29 @@
      :group-by? true,
      :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
      :cardinality 100}},
-   :rowcount 123}},
+   :rowcount 123},
+  :packets-drag-15
+  {:fields
+   {:packets_sum
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {329267048 1},
+     :cardinality 100}},
+   :rowcount 1}},
  :default-col-widths
  {:virtual-panel {:kick--1764769189 152},
   :block-3108 {:client-memory-drag-36 158},
-  :block-9695 {:new-query 255},
   :system-connections-list* {:connections-sys 111},
-  :system-fields-list* {:fields-sys 170},
-  :block-8935 {:query-3213 461},
-  :block-7375 {:new-query 255},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-2178 {:new-query 255},
+  :block-8935 {:query-3213 261},
   :block-653 {:gen-viz-516 255},
-  :block-827 {:gen-viz-1169 255},
-  :system-tables-list* {:tables-sys 137},
-  :block-3638 {:client-name-drag-14 252}},
+  :block-9365 {:packets-drag-15 161},
+  :system-tables-list* {:tables-sys 137}},
  :selected-signal :cool-raccoon-signal-yo,
  :runstream-drops nil,
- :data-hash 1660184735,
+ :data-hash 692264056,
  :tabs ["strategic grill locations" "bountiful bird"],
  :auto-run? true,
  :selected-cols nil,
@@ -1200,146 +679,73 @@
     "wonderland-horror-interface"
     "wow-board"],
    :openapi-key "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"}},
- :runstreams
- {"quick-maths-v2" {:open? true, :open-outputs? true},
-  "openai-image-gen-ladder" {:open? true}},
+ :runstreams {},
  :editor? false,
  :buffy? false,
- :memory [1883890778 1362031794 4294705152],
- :sched {:client-memory-drag-36 69912},
+ :memory [268554107 237868099 4294705152],
+ :sched
+ {:gen-viz-516 2358,
+  :client-memory-drag-36 2358,
+  :query-3213 2358,
+  :new-query 2348},
  :status-data
- {:heartbeat
+ {"kick-test!"
+  {:kick
+   {:data
+    [{:sent! "kick-test!",
+      :to :truthful-desert-leopard-0,
+      :at "2024-05-01 23:28:19",
+      :payload
+      {:query-log
+       {:data
+        [{:content ["2024-05-01 23:28:19 - query ran in 6 ms."],
+          :name "query-log-:gen-viz-516",
+          :order 1714620499,
+          :parameters {},
+          :forced-mutates {},
+          :step-mutates {}}],
+        :description "query-log-:gen-viz-516",
+        :mutates {},
+        :options {:actions? false, :pages? false, :search? false},
+        :parameters {}}},
+      :payload-kp [:gen-viz-516 "kick-test!"]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-04-27 17:07:28",
+      :at "2024-05-01 23:28:06",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  "kick-test!"
-  {:kick
-   {:data
-    [{:sent! "kick-test!",
-      :to :imaginative-green-owl-24,
-      :at "2024-04-27 17:07:40",
-      :payload
-      {:query-log
-       {:data
-        [{:content ["2024-04-27 17:07:40 - query ran in 7 ms."],
-          :name "query-log-:client-memory-drag-36",
-          :order 1714252060,
-          :parameters {},
-          :forced-mutates {},
-          :step-mutates {}}],
-        :description "query-log-:client-memory-drag-36",
-        :mutates {},
-        :options {:actions? false, :pages? false, :search? false},
-        :parameters {}}},
-      :payload-kp [:client-memory-drag-36 "kick-test!"]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
   :alert1
   {:alerts
    {:data
-    [[[:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data
-         [{:mem 1196, :tick 87430, :threads 120, :subs 106, :load 2.94482421875}
-          {:mem 1894, :tick 87431, :threads 118, :subs 106, :load 2.5380859375}
-          {:mem 1126, :tick 87432, :threads 121, :subs 106, :load 2.38623046875}
-          {:mem 1253, :tick 87433, :threads 125, :subs 106, :load 2.71728515625}
-          {:mem 1921, :tick 87434, :threads 120, :subs 106, :load 2.22802734375}
-          {:mem 1237, :tick 87435, :threads 119, :subs 106, :load 2.68603515625}
-          {:mem 1885, :tick 87436, :threads 119, :subs 106, :load 2.630859375}
-          {:mem 1962, :tick 87437, :threads 126, :subs 106, :load 3.3203125}
-          {:mem 1133, :tick 87438, :threads 124, :subs 106, :load 3.10888671875}
-          {:mem 1813, :tick 87439, :threads 120, :subs 106, :load 2.93505859375}
-          {:mem 1053, :tick 87440, :threads 123, :subs 106, :load 3.375}
-          {:mem 1213, :tick 87441, :threads 131, :subs 106, :load 3.08251953125}
-          {:mem 1870, :tick 87442, :threads 126, :subs 106, :load 2.861328125}
-          {:mem 1168, :tick 87443, :threads 120, :subs 106, :load 2.5087890625}
-          {:mem 1847, :tick 87444, :threads 120, :subs 106, :load 2.33935546875}
-          {:mem 1928, :tick 87445, :threads 124, :subs 106, :load 2.89404296875}
-          {:mem 1151, :tick 87446, :threads 123, :subs 106, :load 2.5185546875}
-          {:mem 1882, :tick 87447, :threads 121, :subs 106, :load 3.294921875}
-          {:mem 1080, :tick 87448, :threads 119, :subs 106, :load 2.88720703125}
-          {:mem 1323, :tick 87449, :threads 126, :subs 106, :load 3.6689453125}
-          {:mem 2020, :tick 87450, :threads 123, :subs 106, :load 2.99609375}
-          {:mem 1305, :tick 87451, :threads 120, :subs 106, :load 2.5634765625}
-          {:mem 1988, :tick 87452, :threads 120, :subs 106, :load 2.41064453125}
-          {:mem 2086, :tick 87453, :threads 126, :subs 106, :load 2.54296875}
-          {:mem 1272, :tick 87454, :threads 119, :subs 106, :load 2.6083984375}
-          {:mem 2007, :tick 87455, :threads 120, :subs 106, :load 2.27880859375}
-          {:mem 1273, :tick 87456, :threads 121, :subs 106, :load 2.0458984375}
-          {:mem 1475, :tick 87457, :threads 122, :subs 106, :load 2.29638671875}
-          {:mem 2152, :tick 87458, :threads 120, :subs 106, :load 2.03173828125}
-          {:mem 1533, :tick 87459, :threads 120, :subs 106, :load 2.013671875}
-          {:mem 848, :tick 87460, :threads 120, :subs 106, :load 2.13427734375}
-          {:mem 1022, :tick 87461, :threads 126, :subs 106, :load 2.4853515625}
-          {:mem 1742, :tick 87462, :threads 123, :subs 106, :load 2.4462890625}
-          {:mem 1028, :tick 87463, :threads 119, :subs 106, :load 2.51171875}
-          {:mem 1752, :tick 87464, :threads 119, :subs 106, :load 3.0693359375}
-          {:mem 1931, :tick 87465, :threads 130, :subs 106, :load 3.587890625}
-          {:mem 1139, :tick 87466, :threads 125, :subs 106, :load 4.013671875}
-          {:mem 1883, :tick 87467, :threads 122, :subs 106, :load 3.41064453125}
-          {:mem 1173, :tick 87468, :threads 122, :subs 106, :load 2.83154296875}
-          {:mem 1366, :tick 87469, :threads 129, :subs 106, :load 2.76318359375}
-          {:mem 2054, :tick 87470, :threads 123, :subs 106, :load 2.912109375}
-          {:mem 1421, :tick 87471, :threads 121, :subs 106, :load 2.5283203125}
-          {:mem 2039, :tick 87472, :threads 119, :subs 106, :load 2.43603515625}
-          {:mem 2167, :tick 87473, :threads 128, :subs 106, :load 2.60693359375}
-          {:mem 1415, :tick 87474, :threads 128, :subs 106, :load 2.408203125}
-          {:mem 2119, :tick 87475, :threads 128, :subs 106, :load 2.1630859375}
-          {:mem 1445, :tick 87476, :threads 127, :subs 106, :load 2.48193359375}
-          {:mem 1810, :tick 87477, :threads 144, :subs 106, :load 2.611328125}
-          {:mem 1193, :tick 87478, :threads 125, :subs 106, :load 2.544921875}
-          {:mem 1975, :tick 87479, :threads 119, :subs 106, :load 2.37353515625}],
-         :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
-        [:> :XAxis {:dataKey :tick, :hide true}]
-        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
-        [:>
-         :YAxis
-         {:yAxisId "right", :hide true, :dataKey :threads, :orientation "right"}]
-        [:>
-         :Bar
-         {:yAxisId "left",
-          :dataKey :mem,
-          :isAnimationActive false,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:string :theme/editor-outer-rim-color "33"]}]
-        [:>
-         :Line
-         {:yAxisId "right",
-          :strokeWidth 4,
-          :type "monotone",
-          :dot false,
-          :dataKey :threads,
-          :isAnimationActive false,
-          :stroke :theme/editor-grid-selected-background-color,
-          :fill :theme/editor-grid-selected-background-color}]
-        [:>
-         :Line
-         {:stroke :theme/block-tab-selected-font-color,
-          :fill :theme/block-tab-selected-font-color,
-          :type "monotone",
-          :yAxisId "right",
-          :dataKey :subs,
-          :strokeWidth 3,
-          :strokeDasharray "5 5",
-          :dot false,
-          :isAnimationActive false}]]]
+    [[[:v-box
+       :justify
+       :center
+       :style
+       {:opacity 0.7}
+       :children
+       [[:box
+         :style
+         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         :child
+         "successfully saved screen"]
+        [:box :style {:font-weight 700, :font-size "18px"} :child "blackberries"]
+        [:box
+         :style
+         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         :child
+         "@ /home/ryanr/rvbbit/backend/screens/blackberries.edn"]]]
       10
-      4
-      5]
+      1.6
+      8]
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -1347,492 +753,460 @@
   {:file-changed
    {:data
     [{:path
-      "./live/imaginative-green-owl-24/treemap_nivo_2_levels - \"client_name, rows, ts\" - 1221/views/oz.edn",
+      "./live/truthful-desert-leopard-0/strategic grill locations/block-2178/block-2178.edn",
       :type :modify,
       :panel-key nil,
       :block-data
-      {:views
-       {:oz
-        [:nivo-treemap
-         {:orientLabel false,
-          :labelTextColor "#000000",
-          :tile "squarify",
-          :identity :name,
-          :labelSkipSize 12,
-          :borderColor "#000000",
-          :value :rows,
-          :enableLabel true,
-          :width :panel-width+70,
-          :parentLabelPosition "top",
-          :colors {:scheme "nivo"},
-          :transformation-map
-          {:transform-select [[[:sum :rows] :rows] [:ts :name]],
-           :from [:data],
-           :nest-by [:client_name :ts]},
-          :theme :theme/nivo-defaults,
-          :leavesOnly false,
-          :click {:c :client_name, :x :ts, :y :rows},
-          :label :name,
-          :parentLabelSize 22,
-          :parentLabelTextColor "#ffffff",
-          :enableParentLabel true,
-          :parentLabel "id",
-          :height :panel-height+50,
-          :margin {:top 15, :right 5, :bottom 15, :left 15},
-          :data :query-preview-1585788168}]},
-       :tab "treemap_nivo_2_levels - \"client_name, rows, ts\" - 1221",
-       :name "views"}}
+      {:block-2178 {:h 5, :w 11, :root [1 6], :selected-view :hi},
+       :views
+       {:stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}],
+        :hi
+        [:box
+         :align
+         :center
+         :justify
+         :center
+         :attr
+         {:id ":block-2178.:hi"}
+         :style
+         {:font-size "106px",
+          :font-weight 700,
+          :padding-top "6px",
+          :padding-left "14px",
+          :margin-top "-8px",
+          :color :theme/editor-outer-rim-color,
+          :font-family :theme/base-font}
+         :child
+         "hi!"]},
+       :tab "strategic grill locations",
+       :name "block-2178"}}
      nil],
     :elapsed-ms nil,
-    :reco-count nil}},
-  :reco
-  {:client-memory-drag-36
-   {:data [[:reco-status :client-memory-drag-36] 434],
-    :elapsed-ms 2152,
-    :reco-count 434}}},
+    :reco-count nil}}},
  :flow-subs
- [:signal/part-cool-raccoon-signal-yo-0
-  :flow/quick-maths-v2>*running?
+ [:signal/part-fun-gorilla-5
+  :signal/part-cool-raccoon-signal-yo-0
+  :signal/part-fun-gorilla-7
+  :signal/part-fun-gorilla-0
   :flow/counting-loop>*running?
   :signal/part-cool-raccoon-signal-yo-3
+  :signal/part-fun-gorilla-9
   :signal/nice-coyote-signal
   :signal/part-cool-raccoon-signal-yo-5
   :signal/part-cool-raccoon-signal-yo-2
   :signal/glowing-bat-signal
   :signal/exciting-cheetah-signal
   :signal/brave-ape-signal
+  :signal/part-fun-gorilla-6
   :signal/cool-raccoon-signal-yo
+  :time/now
+  :signal/part-fun-gorilla-3
   :signal/worthy-fish-signal
+  :signal/dragging-to-potential-cross-breed?
+  :signal/part-fun-gorilla-4
   :signal/part-cool-raccoon-signal-yo-7
   :signal/part-cool-raccoon-signal-yo-4
+  :signal/part-fun-gorilla-8
   :signal/part-cool-raccoon-signal-yo-10
+  :signal/cool-raccoon-story-yo
   :signal/part-cool-raccoon-signal-yo-1
+  :signal/part-fun-gorilla-1
   :flow/openai-image-gen-ladder>*running?
+  :signal/part-fun-gorilla-2
   :signal/part-cool-raccoon-signal-yo-8
   :signal/special-lion-signal
   :signal/optimistic-sheep-signal
   :flow/live-scratch-flow>*running?
+  :signal/part-fun-gorilla-10
   :signal/part-cool-raccoon-signal-yo-9
   :signal/elegant-grasshopper-signal
+  :signal/part-fun-gorilla-11
   :signal/fun-gorilla
+  :time/second
   :signal/genius-gnat-signal
   :signal/hourly?
   :signal/part-cool-raccoon-signal-yo-6
   :signal/fair-armadillo-signal],
- :client-name :imaginative-green-owl-24,
+ :client-name :truthful-desert-leopard-0,
  :signals-history
- {[:> :time/hour 12]
-  [[true 1714240643314]
-   [true 1714240644315]
-   [true 1714240645317]
-   [true 1714240646319]
-   [true 1714240647314]
-   [true 1714240648314]
-   [true 1714240649316]
-   [true 1714240650316]
-   [true 1714240651317]
-   [true 1714240652316]
-   [true 1714240653315]
-   [true 1714240654316]
-   [true 1714240655317]
-   [true 1714240656318]
-   [true 1714240657316]
-   [true 1714240658316]
-   [true 1714240659314]
-   [true 1714240660315]
-   [true 1714240661316]
-   [true 1714240662316]],
-  [:or [:> :time/hour 12] [:< :time/hour 6]]
-  [[true 1714240643314]
-   [true 1714240644315]
-   [true 1714240645317]
-   [true 1714240646319]
-   [true 1714240647314]
-   [true 1714240648314]
-   [true 1714240649316]
-   [true 1714240650316]
-   [true 1714240651317]
-   [true 1714240652316]
-   [true 1714240653315]
-   [true 1714240654316]
-   [true 1714240655317]
-   [true 1714240656318]
-   [true 1714240657316]
-   [true 1714240658316]
-   [true 1714240659314]
-   [true 1714240660315]
-   [true 1714240661316]
-   [true 1714240662316]],
-  [:= :time/second 10]
-  [[false 1714240643314]
-   [false 1714240644315]
-   [false 1714240645317]
-   [false 1714240646319]
-   [false 1714240647314]
-   [false 1714240648314]
-   [false 1714240649316]
-   [false 1714240650316]
-   [false 1714240651317]
-   [false 1714240652316]
-   [false 1714240653315]
-   [false 1714240654316]
-   [false 1714240655317]
-   [false 1714240656318]
-   [false 1714240657316]
-   [false 1714240658316]
-   [false 1714240659314]
-   [false 1714240660315]
-   [false 1714240661316]
-   [false 1714240662316]],
-  [:< :time/hour 6]
-  [[false 1714240643314]
-   [false 1714240644315]
-   [false 1714240645317]
-   [false 1714240646319]
-   [false 1714240647314]
-   [false 1714240648314]
-   [false 1714240649316]
-   [false 1714240650316]
-   [false 1714240651317]
-   [false 1714240652316]
-   [false 1714240653315]
-   [false 1714240654316]
-   [false 1714240655317]
-   [false 1714240656318]
-   [false 1714240657316]
-   [false 1714240658316]
-   [false 1714240659314]
-   [false 1714240660315]
-   [false 1714240661316]
-   [false 1714240662316]],
-  [:= :client/imaginative-green-owl-24>param>:my-dash-killswitch? true]
-  [[false 1714240643314]
-   [false 1714240644315]
-   [false 1714240645317]
-   [false 1714240646319]
-   [false 1714240647314]
-   [false 1714240648314]
-   [false 1714240649316]
-   [false 1714240650316]
-   [false 1714240651317]
-   [false 1714240652316]
-   [false 1714240653315]
-   [false 1714240654316]
-   [false 1714240655317]
-   [false 1714240656318]
-   [false 1714240657316]
-   [false 1714240658316]
-   [false 1714240659314]
-   [false 1714240660315]
-   [false 1714240661316]
-   [false 1714240662316]],
-  [:= :time/second 20]
-  [[false 1714240643314]
-   [false 1714240644315]
-   [false 1714240645317]
-   [false 1714240646319]
-   [false 1714240647314]
-   [false 1714240648314]
-   [false 1714240649316]
-   [false 1714240650316]
-   [false 1714240651317]
-   [false 1714240652316]
-   [false 1714240653315]
-   [false 1714240654316]
-   [false 1714240655317]
-   [false 1714240656318]
-   [false 1714240657316]
-   [false 1714240658316]
-   [false 1714240659314]
-   [false 1714240660315]
-   [false 1714240661316]
-   [false 1714240662316]],
-  [:and
+ {[:and
    [:or [:> :time/hour 12] [:< :time/hour 6]]
    [:or
     [:= :time/second 10]
     [:= :time/second 20]
-    [:= :time/second 35]
+    [:= :time/second 45]
     [:= :time/second 25]]]
-  [[false 1714240643314]
-   [false 1714240644315]
-   [false 1714240645317]
-   [true 1714240646319]
-   [false 1714240647314]
-   [false 1714240648314]
-   [false 1714240649316]
-   [false 1714240650316]
-   [false 1714240651317]
-   [false 1714240652316]
-   [false 1714240653315]
-   [false 1714240654316]
-   [false 1714240655317]
-   [true 1714240656318]
-   [false 1714240657316]
-   [false 1714240658316]
-   [false 1714240659314]
-   [false 1714240660315]
-   [false 1714240661316]
-   [false 1714240662316]],
+  [[true 1714619325560]
+   [false 1714619326559]
+   [false 1714619327558]
+   [false 1714619328556]
+   [false 1714619329557]
+   [false 1714619330557]
+   [false 1714619331557]
+   [false 1714619332559]
+   [false 1714619333559]
+   [false 1714619334558]
+   [false 1714619335558]
+   [false 1714619336558]
+   [false 1714619337558]
+   [false 1714619338558]
+   [false 1714619339558]
+   [false 1714619340557]
+   [false 1714619341558]
+   [false 1714619342558]
+   [false 1714619343558]
+   [false 1714619344558]],
+  [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
+  [[false 1714619325560]
+   [false 1714619326559]
+   [false 1714619327558]
+   [false 1714619328556]
+   [false 1714619329557]
+   [false 1714619330557]
+   [false 1714619331557]
+   [false 1714619332559]
+   [false 1714619333559]
+   [false 1714619334558]
+   [false 1714619335558]
+   [false 1714619336558]
+   [false 1714619337558]
+   [false 1714619338558]
+   [false 1714619339558]
+   [false 1714619340557]
+   [false 1714619341558]
+   [false 1714619342558]
+   [false 1714619343558]
+   [false 1714619344558]],
+  [:= :time/second 45]
+  [[true 1714619325560]
+   [false 1714619326559]
+   [false 1714619327558]
+   [false 1714619328556]
+   [false 1714619329557]
+   [false 1714619330557]
+   [false 1714619331557]
+   [false 1714619332559]
+   [false 1714619333559]
+   [false 1714619334558]
+   [false 1714619335558]
+   [false 1714619336558]
+   [false 1714619337558]
+   [false 1714619338558]
+   [false 1714619339558]
+   [false 1714619340557]
+   [false 1714619341558]
+   [false 1714619342558]
+   [false 1714619343558]
+   [false 1714619344558]],
+  [:> :time/hour 12]
+  [[true 1714619325560]
+   [true 1714619326559]
+   [true 1714619327558]
+   [true 1714619328556]
+   [true 1714619329557]
+   [true 1714619330557]
+   [true 1714619331557]
+   [true 1714619332559]
+   [true 1714619333559]
+   [true 1714619334558]
+   [true 1714619335558]
+   [true 1714619336558]
+   [true 1714619337558]
+   [true 1714619338558]
+   [true 1714619339558]
+   [true 1714619340557]
+   [true 1714619341558]
+   [true 1714619342558]
+   [true 1714619343558]
+   [true 1714619344558]],
+  [:or [:> :time/hour 12] [:< :time/hour 6]]
+  [[true 1714619325560]
+   [true 1714619326559]
+   [true 1714619327558]
+   [true 1714619328556]
+   [true 1714619329557]
+   [true 1714619330557]
+   [true 1714619331557]
+   [true 1714619332559]
+   [true 1714619333559]
+   [true 1714619334558]
+   [true 1714619335558]
+   [true 1714619336558]
+   [true 1714619337558]
+   [true 1714619338558]
+   [true 1714619339558]
+   [true 1714619340557]
+   [true 1714619341558]
+   [true 1714619342558]
+   [true 1714619343558]
+   [true 1714619344558]],
+  [:= :time/second 10]
+  [[false 1714619325560]
+   [false 1714619326559]
+   [false 1714619327558]
+   [false 1714619328556]
+   [false 1714619329557]
+   [false 1714619330557]
+   [false 1714619331557]
+   [false 1714619332559]
+   [false 1714619333559]
+   [false 1714619334558]
+   [false 1714619335558]
+   [false 1714619336558]
+   [false 1714619337558]
+   [false 1714619338558]
+   [false 1714619339558]
+   [false 1714619340557]
+   [false 1714619341558]
+   [false 1714619342558]
+   [false 1714619343558]
+   [false 1714619344558]],
+  [:< :time/hour 6]
+  [[false 1714619325560]
+   [false 1714619326559]
+   [false 1714619327558]
+   [false 1714619328556]
+   [false 1714619329557]
+   [false 1714619330557]
+   [false 1714619331557]
+   [false 1714619332559]
+   [false 1714619333559]
+   [false 1714619334558]
+   [false 1714619335558]
+   [false 1714619336558]
+   [false 1714619337558]
+   [false 1714619338558]
+   [false 1714619339558]
+   [false 1714619340557]
+   [false 1714619341558]
+   [false 1714619342558]
+   [false 1714619343558]
+   [false 1714619344558]],
+  [:= :time/second 20]
+  [[false 1714619325560]
+   [false 1714619326559]
+   [false 1714619327558]
+   [false 1714619328556]
+   [false 1714619329557]
+   [false 1714619330557]
+   [false 1714619331557]
+   [false 1714619332559]
+   [false 1714619333559]
+   [false 1714619334558]
+   [false 1714619335558]
+   [false 1714619336558]
+   [false 1714619337558]
+   [false 1714619338558]
+   [false 1714619339558]
+   [false 1714619340557]
+   [false 1714619341558]
+   [false 1714619342558]
+   [false 1714619343558]
+   [false 1714619344558]],
   [:or
    [:= :time/second 10]
    [:= :time/second 20]
-   [:= :time/second 35]
+   [:= :time/second 45]
    [:= :time/second 25]]
-  [[false 1714240643314]
-   [false 1714240644315]
-   [false 1714240645317]
-   [true 1714240646319]
-   [false 1714240647314]
-   [false 1714240648314]
-   [false 1714240649316]
-   [false 1714240650316]
-   [false 1714240651317]
-   [false 1714240652316]
-   [false 1714240653315]
-   [false 1714240654316]
-   [false 1714240655317]
-   [true 1714240656318]
-   [false 1714240657316]
-   [false 1714240658316]
-   [false 1714240659314]
-   [false 1714240660315]
-   [false 1714240661316]
-   [false 1714240662316]],
+  [[true 1714619325560]
+   [false 1714619326559]
+   [false 1714619327558]
+   [false 1714619328556]
+   [false 1714619329557]
+   [false 1714619330557]
+   [false 1714619331557]
+   [false 1714619332559]
+   [false 1714619333559]
+   [false 1714619334558]
+   [false 1714619335558]
+   [false 1714619336558]
+   [false 1714619337558]
+   [false 1714619338558]
+   [false 1714619339558]
+   [false 1714619340557]
+   [false 1714619341558]
+   [false 1714619342558]
+   [false 1714619343558]
+   [false 1714619344558]],
   [:= :time/second 25]
-  [[false 1714240643314]
-   [false 1714240644315]
-   [false 1714240645317]
-   [true 1714240646319]
-   [false 1714240647314]
-   [false 1714240648314]
-   [false 1714240649316]
-   [false 1714240650316]
-   [false 1714240651317]
-   [false 1714240652316]
-   [false 1714240653315]
-   [false 1714240654316]
-   [false 1714240655317]
-   [false 1714240656318]
-   [false 1714240657316]
-   [false 1714240658316]
-   [false 1714240659314]
-   [false 1714240660315]
-   [false 1714240661316]
-   [false 1714240662316]],
-  [:= :time/second 35]
-  [[false 1714240643314]
-   [false 1714240644315]
-   [false 1714240645317]
-   [false 1714240646319]
-   [false 1714240647314]
-   [false 1714240648314]
-   [false 1714240649316]
-   [false 1714240650316]
-   [false 1714240651317]
-   [false 1714240652316]
-   [false 1714240653315]
-   [false 1714240654316]
-   [false 1714240655317]
-   [true 1714240656318]
-   [false 1714240657316]
-   [false 1714240658316]
-   [false 1714240659314]
-   [false 1714240660315]
-   [false 1714240661316]
-   [false 1714240662316]],
+  [[false 1714619325560]
+   [false 1714619326559]
+   [false 1714619327558]
+   [false 1714619328556]
+   [false 1714619329557]
+   [false 1714619330557]
+   [false 1714619331557]
+   [false 1714619332559]
+   [false 1714619333559]
+   [false 1714619334558]
+   [false 1714619335558]
+   [false 1714619336558]
+   [false 1714619337558]
+   [false 1714619338558]
+   [false 1714619339558]
+   [false 1714619340557]
+   [false 1714619341558]
+   [false 1714619342558]
+   [false 1714619343558]
+   [false 1714619344558]],
   [:or
-   [:= :client/imaginative-green-owl-24>param>:my-dash-killswitch? true]
+   [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
    [:and
     [:or [:> :time/hour 12] [:< :time/hour 6]]
     [:or
      [:= :time/second 10]
      [:= :time/second 20]
-     [:= :time/second 35]
+     [:= :time/second 45]
      [:= :time/second 25]]]]
-  [[false 1714240643314]
-   [false 1714240644315]
-   [false 1714240645317]
-   [true 1714240646319]
-   [false 1714240647314]
-   [false 1714240648314]
-   [false 1714240649316]
-   [false 1714240650316]
-   [false 1714240651317]
-   [false 1714240652316]
-   [false 1714240653315]
-   [false 1714240654316]
-   [false 1714240655317]
-   [true 1714240656318]
-   [false 1714240657316]
-   [false 1714240658316]
-   [false 1714240659314]
-   [false 1714240660315]
-   [false 1714240661316]
-   [false 1714240662316]]},
+  [[true 1714619325560]
+   [false 1714619326559]
+   [false 1714619327558]
+   [false 1714619328556]
+   [false 1714619329557]
+   [false 1714619330557]
+   [false 1714619331557]
+   [false 1714619332559]
+   [false 1714619333559]
+   [false 1714619334558]
+   [false 1714619335558]
+   [false 1714619336558]
+   [false 1714619337558]
+   [false 1714619338558]
+   [false 1714619339558]
+   [false 1714619340557]
+   [false 1714619341558]
+   [false 1714619342558]
+   [false 1714619343558]
+   [false 1714619344558]]},
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2333, :h 1636},
+ :window {:w 3401, :h 1738},
  :post-meta
- {:client-memory-drag-36 {:* {:rowcount 2630}},
-  :query-3213 {:* {:rowcount 1}},
-  :gen-viz-516 {:* {:rowcount 18}},
-  :client-name-drag-14 {:* {:rowcount 10}},
-  :connections-sys
+ {:client-memory-drag-36 {:* {:rowcount 24051}},
+  :new-query
   {:*
    {:rowcount
-    "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}}},
+    "[SQLITE_ERROR] SQL error or missing database (near \"*\": syntax error)"}},
+  :query-3213 {:* {:rowcount 1}},
+  :gen-viz-516
+  {:*
+   {:rowcount
+    "[SQLITE_ERROR] SQL error or missing database (near \"*\": syntax error)"}},
+  :packets-drag-15 {:* {:rowcount 1}}},
  :flow-estimates
- {"openai-image-gen-ladder"
-  {:times 40, :run-id "9a7b85c9-bfde-479f-913e-b14c37124df6"},
-  "counting-loop" {:times 6, :run-id "6c5da41f-5a76-41c1-b320-a0fcaff9b108"}},
+ {"counting-loop" {:times 6, :run-id "1c7a9567-ebb2-4401-98cf-af105e4bf4cd"}},
  :status
- {:heartbeat
+ {"kick-test!" {:kick :gen-viz-516},
+  :heartbeat
   {:kick
-   [:signal/part-cool-raccoon-signal-yo-0
-    :flow/quick-maths-v2>*running?
+   [:signal/part-fun-gorilla-5
+    :signal/part-cool-raccoon-signal-yo-0
+    :signal/part-fun-gorilla-7
+    :signal/part-fun-gorilla-0
     :flow/counting-loop>*running?
     :signal/part-cool-raccoon-signal-yo-3
+    :signal/part-fun-gorilla-9
     :signal/nice-coyote-signal
     :signal/part-cool-raccoon-signal-yo-5
     :signal/part-cool-raccoon-signal-yo-2
     :signal/glowing-bat-signal
     :signal/exciting-cheetah-signal
     :signal/brave-ape-signal
+    :signal/part-fun-gorilla-6
     :signal/cool-raccoon-signal-yo
+    :time/now
+    :signal/part-fun-gorilla-3
     :signal/worthy-fish-signal
+    :signal/dragging-to-potential-cross-breed?
+    :signal/part-fun-gorilla-4
     :signal/part-cool-raccoon-signal-yo-7
     :signal/part-cool-raccoon-signal-yo-4
+    :signal/part-fun-gorilla-8
     :signal/part-cool-raccoon-signal-yo-10
+    :signal/cool-raccoon-story-yo
     :signal/part-cool-raccoon-signal-yo-1
+    :signal/part-fun-gorilla-1
     :flow/openai-image-gen-ladder>*running?
+    :signal/part-fun-gorilla-2
     :signal/part-cool-raccoon-signal-yo-8
     :signal/special-lion-signal
     :signal/optimistic-sheep-signal
     :flow/live-scratch-flow>*running?
+    :signal/part-fun-gorilla-10
     :signal/part-cool-raccoon-signal-yo-9
     :signal/elegant-grasshopper-signal
+    :signal/part-fun-gorilla-11
     :signal/fun-gorilla
+    :time/second
     :signal/genius-gnat-signal
     :signal/hourly?
     :signal/part-cool-raccoon-signal-yo-6
     :signal/fair-armadillo-signal]},
-  "kick-test!" {:kick :client-memory-drag-36},
   :alert1 {:alerts :alert2},
-  :file-change {:file-changed :done},
-  :reco {:client-memory-drag-36 :done}},
+  :file-change {:file-changed :done}},
  :screen-name "blackberries",
- :recos-page2 1,
+ :recos-page2 0,
  :selected-tab "strategic grill locations",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
  :recos-page 0,
- :rs-overrides-hashmap {"quick-maths-v2" nil, "openai-image-gen-ladder" nil},
- :base-sniff-queries
- {:jvm_stats 1498154063,
-  :memory 998429613,
-  :data/memory 2108308443,
-  :client_memory -1981695802},
- :panels-hash 1719186483,
+ :rs-overrides-hashmap {},
+ :base-sniff-queries {:client_memory -1981695802, :jvm_stats 1498154063},
+ :panels-hash 462629317,
  :sessions
- (["positive-raspberry-swallow-exiled-from-sound.edn"
-   "1000 hours, 50 minutes, 37 seconds"
-   3603037468]
-   ["victorious-plum-locust-exiled-from-watershed.edn"
-    "1002 hours, 2 minutes, 31 seconds"
-    3607351468]
-   ["healthy-orchid-otter-of-pseudocrater.edn"
-    "1010 hours, 53 minutes, 27 seconds"
-    3639207468]
-   ["kind-turquoise-parrot-banned-from-machair.edn"
-    "1010 hours, 53 minutes, 36 seconds"
-    3639216468]
-   ["fair-long-mule-exiled-from-watershed.edn"
-    "1015 hours, 2 minutes, 1 second"
-    3654121468]
-   ["refined-rhomboidal-hawk-banned-from-nivation-hollow.edn"
-    "1015 hours, 2 minutes, 13 seconds"
-    3654133468]
-   ["amazing-ochre-yellow-jacket-of-the-complex-volcano.edn"
-    "1015 hours, 6 minutes, 28 seconds"
-    3654388468]
-   ["lovely-cyan-hummingbird-banned-from-stratovolcano.edn"
-    "1018 hours, 40 minutes, 29 seconds"
-    3667229468]
-   ["favorable-icosahedral-opossum-banned-from-archipelago.edn"
-    "1020 hours, 25 minutes, 36 seconds"
-    3673536468]),
- :last-run-throwaway "14:01:18",
+ (["beaming-cyan-dolphin-hailing-from-pond.edn"
+   "1004 hours, 50 minutes, 43 seconds"
+   3617443726]
+   ["restored-indigo-pigeon-hailing-from-pyroclastic-shield.edn"
+    "1010 hours, 45 minutes, 15 seconds"
+    3638715838]
+   ["popular-cubic-fox-of-the-mountain.edn"
+    "1015 hours, 56 minutes, 19 seconds"
+    3657379820]
+   ["remarkable-teal-mallard-of-the-corrie.edn"
+    "1030 hours, 44 minutes, 10 seconds"
+    3710650851]
+   ["willing-puce-fish-of-the-thalweg.edn"
+    "1030 hours, 47 minutes, 7 seconds"
+    3710827473]
+   ["agreeable-amaranth-goose-banned-from-stream-pool.edn"
+    "1034 hours, 46 minutes, 44 seconds"
+    3725204143]
+   ["famous-lilac-jay-hailing-from-bluff.edn"
+    "1035 hours, 26 minutes, 43 seconds"
+    3727603143]
+   ["ethical-jungle-green-walrus-of-the-submarine-canyon.edn"
+    "1035 hours, 51 minutes, 50 seconds"
+    3729110143]
+   ["honest-lavender-panda-banned-from-turlough.edn"
+    "1036 hours, 30 minutes, 51 seconds"
+    3731451143]),
+ :last-run-throwaway "23:25:28",
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1697692860,
+ :user-params-hash 826125120,
  :grid-recos? true,
- :preview-keys2 [],
+ :session-hash -1872577033,
  :resolved-queries
- {:query-preview-inviz-109073643:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
+ {:client-memory-drag-36
+  {:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
+   :from [[:client_memory :ee183]],
+   :refresh-every 20,
+   :cache? false,
+   :_last-run "23:29:18"},
+  :new-query
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 300,
+   :group-by [2],
+   :_last-run "23:29:18",
+   :refresh-every 10,
    :from
    [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
      :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":essential-taupe-beaver-29" :client_name]},
-  :query-preview-inviz1569890868:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":affirmative-rectangular-crow-32" :client_name]},
-  :query-preview-inviz-219100167:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":supporting-chartreuse-magpie-18" :client_name]},
-  :client-name-drag-14
-  {:select
-   [:client_name
-    [[:count 1] :rowcnt]
-    [[:*render*
-      {:queries
-       {:gen-viz-609
-        {:select [[[[:sum :mem_used]] :mem_used] :ts],
-         :from
-         [{:select
-           [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-           :from [[:client_memory :ee183]]}],
-         :group-by [:ts],
-         :where [:= :client_name :_client_name]}},
-       :view
-       [:>
-        :ResponsiveContainer
-        {:width 300, :height 150}
-        [:>
-         :LineChart
-         {:data :gen-viz-609, :margin {:top 5, :bottom 5, :right 30, :left 20}}
-         [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-         [:> :Tooltip]
-         [:> :XAxis {:dataKey :ts}]
-         [:>
-          :Line
-          {:type "monotone",
-           :dataKey :mem_used,
-           :stroke "#8884d8",
-           :activeDot {:r 8},
-           :isAnimationActive false}]]]}]
-     :inviz_1161]
-    [[:avg :mem_used] :mem_used_avg_20]],
-   :from
-   [[{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-      :from [[:client_memory :ee183]]}
-     :rr180]],
-   :group-by [:client_name 3],
-   :order-by [[:rowcnt :desc]],
-   :row-height 100,
-   :col-widths {:inviz_1161 530, :rowcnt 72, :mem_used_avg_20 162},
-   :_last-run "14:03:42"},
+   :order-by [[2 :desc]],
+   :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 15] :ts_hour]]},
   :query-3213
   {:select [[[:count 1] :rowcnt]],
    :refresh-every 20,
@@ -1840,71 +1214,43 @@
    :from
    [[{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
       :from [[:client_memory :ee183]]}
-     :zz616]]},
-  :query-preview-inviz-1995211992:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":imaginative-green-owl-24" :client_name]},
-  :query-preview-inviz130541677:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":okay-amber-buffalo-9" :client_name]},
-  :query-preview-inviz1465113379:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":intellectual-circular-pig-14" :client_name]},
-  :query-preview-inviz95852087:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":unwavering-cubic-porpoise-42" :client_name]},
-  :query-preview-inviz-2139831509:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":blissful-baby-blue-serval-7" :client_name]},
-  :query-preview-inviz1094020852:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
-   :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":adorable-cubic-hedgehog-22" :client_name]},
-  :client-memory-drag-36
-  {:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-   :from [[:client_memory :ee183]],
-   :refresh-every 20,
-   :cache? false,
-   :_last-run "17:07:40"},
+     :zz616]],
+   :_last-run "23:29:18"},
   :gen-viz-516
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 300,
+   :group-by [2],
+   :_last-run "23:29:18",
+   :refresh-every 20,
    :from
    [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
      :from [[:client_memory :ee183]]}],
-   :where [:= :client_name ":imaginative-green-owl-24"],
-   :group-by [:ts]},
-  :query-preview-inviz-1637939235:inviz_1161
-  {:select [[[[:sum :mem_used]] :mem_used] :ts],
+   :order-by [[2 :desc]],
+   :select [[[[:sum :mem_used]] :mem_used] :ts]},
+  :packets-drag-15
+  {:select [[[:sum :packets] :packets_sum]],
    :from
-   [{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-     :from [[:client_memory :ee183]]}],
-   :group-by [:ts],
-   :where [:= ":agreeable-silver-sand-dollar-27" :client_name]}},
+   [[{:select [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
+      :from [[:client_memory :ee183]]}
+     :oo850]]}},
  :panels
- {:block-11049
+ {:block-3652
+  {:drag-meta {:type :open-input},
+   :w 8,
+   :selected-view :super-cobalt-mole,
+   :h 5,
+   :views
+   {:super-cobalt-mole
+    [:open-input
+     {:kp [:param :super-cobalt-mole],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "text"}]},
+   :tab "strategic grill locations",
+   :root [53 14],
+   :name "block-3652"},
+  :block-11049
   {:h 2,
    :w 7,
    :views
@@ -1927,181 +1273,34 @@
    :name "flow-play",
    :root [1 24],
    :tab "bountiful bird"},
-  :query-preview-block-219100167:inviz_1161
+  :block-6441
   {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
+   :w 16,
+   :root [50 31],
    :tab "strategic grill locations",
-   :name "query-preview-block-219100167:inviz_1161",
+   :selected-view :hi,
+   :name "block-6441",
    :views
-   {:a-row
-    [:>
-     :ResponsiveContainer
-     {:width 300, :height 150}
-     [:>
-      :LineChart
-      {:data :query-preview-inviz-219100167:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
-      [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
-   :queries
-   {:query-preview-inviz-219100167:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":supporting-chartreuse-magpie-18" :client_name]}}},
-  :query-preview-block-109073643:inviz_1161
-  {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
-   :tab "strategic grill locations",
-   :name "query-preview-block-109073643:inviz_1161",
-   :views
-   {:a-row
-    [:>
-     :ResponsiveContainer
-     {:width 300, :height 150}
-     [:>
-      :LineChart
-      {:data :query-preview-inviz-109073643:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
-      [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
-   :queries
-   {:query-preview-inviz-109073643:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":essential-taupe-beaver-29" :client_name]}}},
-  :query-preview-block-2139831509:inviz_1161
-  {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
-   :tab "strategic grill locations",
-   :name "query-preview-block-2139831509:inviz_1161",
-   :views
-   {:a-row
-    [:>
-     :ResponsiveContainer
-     {:width 300, :height 150}
-     [:>
-      :LineChart
-      {:data :query-preview-inviz-2139831509:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
-      [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
-   :queries
-   {:query-preview-inviz-2139831509:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":blissful-baby-blue-serval-7" :client_name]}}},
-  :query-preview-block95852087:inviz_1161
-  {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
-   :tab "strategic grill locations",
-   :name "query-preview-block95852087:inviz_1161",
-   :views
-   {:a-row
-    [:>
-     :ResponsiveContainer
-     {:width 300, :height 150}
-     [:>
-      :LineChart
-      {:data :query-preview-inviz95852087:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
-      [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
-   :queries
-   {:query-preview-inviz95852087:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":unwavering-cubic-porpoise-42" :client_name]}}},
-  :query-preview-block130541677:inviz_1161
-  {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
-   :tab "strategic grill locations",
-   :name "query-preview-block130541677:inviz_1161",
-   :views
-   {:a-row
-    [:>
-     :ResponsiveContainer
-     {:width 300, :height 150}
-     [:>
-      :LineChart
-      {:data :query-preview-inviz130541677:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
-      [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
-   :queries
-   {:query-preview-inviz130541677:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":okay-amber-buffalo-9" :client_name]}}},
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3341.:hi"}
+     :style
+     {:font-size "44px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:string :time/now]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
   :block-3108
   {:h 15,
    :w 23,
@@ -2113,14 +1312,14 @@
      :from [[:client_memory :ee183]],
      :refresh-every 20,
      :cache? false,
-     :_last-run "17:07:40"}},
-   :root [1 15],
+     :_last-run "23:29:18"}},
+   :root [1 18],
    :tab "strategic grill locations",
    :selected-view :client-memory-drag-36},
   :block-6003
-  {:h 3,
+  {:h 5,
    :w 10,
-   :root [14 10],
+   :root [14 12],
    :tab "strategic grill locations",
    :selected-view :hi,
    :name "block-6003",
@@ -2134,7 +1333,7 @@
      :attr
      {:id ":block-6003.:hi"}
      :style
-     {:font-size "33px",
+     {:font-size "137px",
       :font-weight 700,
       :padding-top "6px",
       :padding-left "14px",
@@ -2142,150 +1341,10 @@
       :color :theme/editor-outer-rim-color,
       :font-family :theme/base-font}
      :child
-     [:scrubber [:param :my-dash-killswitch?]]],
+     [:string :signal/cool-raccoon-signal-yo]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}],
     :params {:my-dash-killswitch? true}},
    :queries {}},
-  :query-preview-block-1637939235:inviz_1161
-  {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
-   :tab "strategic grill locations",
-   :name "query-preview-block-1637939235:inviz_1161",
-   :views
-   {:a-row
-    [:>
-     :ResponsiveContainer
-     {:width 300, :height 150}
-     [:>
-      :LineChart
-      {:data :query-preview-inviz-1637939235:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
-      [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
-   :queries
-   {:query-preview-inviz-1637939235:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":agreeable-silver-sand-dollar-27" :client_name]}}},
-  :query-preview-block-1995211992:inviz_1161
-  {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
-   :tab "strategic grill locations",
-   :name "query-preview-block-1995211992:inviz_1161",
-   :views
-   {:a-row
-    [:>
-     :ResponsiveContainer
-     {:width 300, :height 150}
-     [:>
-      :LineChart
-      {:data :query-preview-inviz-1995211992:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
-      [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
-   :queries
-   {:query-preview-inviz-1995211992:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":imaginative-green-owl-24" :client_name]}}},
-  :query-preview-block1094020852:inviz_1161
-  {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
-   :tab "strategic grill locations",
-   :name "query-preview-block1094020852:inviz_1161",
-   :views
-   {:a-row
-    [:>
-     :ResponsiveContainer
-     {:width 300, :height 150}
-     [:>
-      :LineChart
-      {:data :query-preview-inviz1094020852:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
-      [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
-   :queries
-   {:query-preview-inviz1094020852:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":adorable-cubic-hedgehog-22" :client_name]}}},
-  :query-preview-block1465113379:inviz_1161
-  {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
-   :tab "strategic grill locations",
-   :name "query-preview-block1465113379:inviz_1161",
-   :views
-   {:a-row
-    [:>
-     :ResponsiveContainer
-     {:width 300, :height 150}
-     [:>
-      :LineChart
-      {:data :query-preview-inviz1465113379:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
-      [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-      [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
-      [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
-   :queries
-   {:query-preview-inviz1465113379:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":intellectual-circular-pig-14" :client_name]}}},
   :block-5463
   {:h 2,
    :w 7,
@@ -2309,46 +1368,44 @@
    :name "flow-play",
    :root [1 26],
    :tab "bountiful bird"},
-  :query-preview-block1569890868:inviz_1161
-  {:h 2,
-   :w 10,
-   :connection-id "system-db",
-   :root [38 1],
+  :block-2178
+  {:h 5,
+   :w 45,
+   :root [1 6],
    :tab "strategic grill locations",
-   :name "query-preview-block1569890868:inviz_1161",
+   :selected-view :hi,
+   :name "block-2178",
    :views
-   {:a-row
+   {:new-view
     [:>
      :ResponsiveContainer
-     {:width 300, :height 150}
+     {:width "100%", :height :panel-height+50}
      [:>
-      :LineChart
-      {:data :query-preview-inviz1569890868:inviz_1161,
-       :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      :BarChart
+      {:data :new-query, :margin {:top 5, :right 30, :left 20, :bottom 5}}
       [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
       [:> :Tooltip]
-      [:> :XAxis {:dataKey :ts}]
+      [:> :XAxis {:dataKey :ts_hour}]
       [:>
-       :Line
-       {:type "monotone",
-        :dataKey :mem_used,
-        :stroke "#8884d8",
-        :activeDot {:r 8},
-        :isAnimationActive false}]]]},
+       :Bar
+       {:type "monotone", :dataKey :mem_used, :fill "#8884d833"}
+       [:> :LabelList {:dataKey :mem_used, :position "top"}]]]]},
    :queries
-   {:query-preview-inviz1569890868:inviz_1161
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
-     :from
-     [{:select
-       [:client_name :mem_limit :mem_time :mem_total :mem_used :packets :ts],
-       :from [[:client_memory :ee183]]}],
-     :group-by [:ts],
-     :where [:= ":affirmative-rectangular-crow-32" :client_name]}}},
+   {:new-query
+    {:cache? false,
+     :where [:= :client_name :*client-name-str],
+     :limit 300,
+     :group-by [2],
+     :_last-run "23:29:18",
+     :refresh-every 10,
+     :from [:query/client-memory-drag-36],
+     :order-by [[2 :desc]],
+     :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 15] :ts_hour]]}}},
   :block-8935
   {:name "block-8935",
-   :w 10,
+   :w 6,
    :selected-view :query-3213,
-   :root [1 9],
+   :root [1 12],
    :h 5,
    :connection-id "system-db",
    :queries
@@ -2356,7 +1413,8 @@
     {:select [[[:count 1] :rowcnt]],
      :refresh-every 20,
      :cache? false,
-     :from [[:query/client-memory-drag-36 :zz616]]}},
+     :from [[:query/client-memory-drag-36 :zz616]],
+     :_last-run "23:29:18"}},
    :tab "strategic grill locations",
    :views
    {:hi
@@ -2381,17 +1439,22 @@
   :block-653
   {:mad-libs-combo-hash ["-1470486502" "client_memory_drag_36"],
    :name "recharts_line - \"mem_used, ts\" - 1081",
-   :w 20,
+   :w 45,
    :selected-view :reech,
-   :root [2 3],
+   :root [1 1],
    :h 5,
    :connection-id "system-db",
    :queries
    {:gen-viz-516
-    {:select [[[[:sum :mem_used]] :mem_used] :ts],
+    {:cache? false,
+     :where [:= :client_name :*client-name-str],
+     :limit 300,
+     :group-by [2],
+     :_last-run "23:29:18",
+     :refresh-every 20,
      :from [:query/client-memory-drag-36],
-     :where [:= :client_name ":imaginative-green-owl-24"],
-     :group-by [:ts]}},
+     :order-by [[2 :desc]],
+     :select [[[[:sum :mem_used]] :mem_used] :ts]}},
    :tab "strategic grill locations",
    :conditionals nil,
    :views
@@ -2411,51 +1474,13 @@
         :dataKey :mem_used,
         :stroke "#8884d8",
         :activeDot {:r 8}}]]]}},
-  :block-3638
-  {:name "drag-from-select-all-client_memory",
-   :w 21,
-   :selected-view :client-name-drag-14,
-   :root [25 1],
-   :h 24,
-   :connection-id "system-db",
-   :queries
-   {:client-name-drag-14
-    {:select
-     [:client_name
-      [[:count 1] :rowcnt]
-      [[:*render*
-        {:queries
-         {:gen-viz-609
-          {:select [[[[:sum :mem_used]] :mem_used] :ts],
-           :from [:query/client-memory-drag-36],
-           :group-by [:ts],
-           :where [:= :client_name :_client_name]}},
-         :view
-         [:>
-          :ResponsiveContainer
-          {:width 900, :height 150}
-          [:>
-           :LineChart
-           {:data :gen-viz-609, :margin {:top 5, :bottom 5, :right 30, :left 20}}
-           [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-           [:> :Tooltip]
-           [:> :XAxis {:dataKey :ts}]
-           [:>
-            :Line
-            {:type "monotone",
-             :dataKey :mem_used,
-             :stroke "#8884d8",
-             :activeDot {:r 8},
-             :isAnimationActive false}]]]}]
-       :inviz_1161]
-      [[:avg :mem_used] :mem_used_avg_20]],
-     :from [[:query/client-memory-drag-36 :rr180]],
-     :group-by [:client_name 3],
-     :order-by [[:rowcnt :desc]],
-     :row-height 100,
-     :col-widths {:inviz_1161 530, :rowcnt 72, :mem_used_avg_20 162},
-     :_last-run "14:03:42"}},
+  :block-12288
+  {:h 5,
+   :w 6,
+   :root [7 12],
    :tab "strategic grill locations",
+   :selected-view :hi,
+   :name "block-12288",
    :views
    {:hi
     [:box
@@ -2464,7 +1489,7 @@
      :justify
      :center
      :attr
-     {:id ":block-3745.:hi"}
+     {:id ":block-12288.:hi"}
      :style
      {:font-size "106px",
       :font-weight 700,
@@ -2474,15 +1499,26 @@
       :color :theme/editor-outer-rim-color,
       :font-family :theme/base-font}
      :child
-     "hi!"]}}},
+     [:string :time/second]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-9365
+  {:h 4,
+   :w 4,
+   :connection-id "system-db",
+   :name "drag-from-select-all-client_memory",
+   :queries
+   {:packets-drag-15
+    {:select [[[:sum :packets] :packets_sum]],
+     :from [[:query/client-memory-drag-36 :oo850]]}},
+   :root [25 26],
+   :tab "strategic grill locations"}},
  :selected-block "none!",
  :signals-map
  {:fun-gorilla
   {:signal
    [:and
-    [:=
-     :client/fair-salmon-hawk-hailing-from-malpais>click-param>param>jessica
-     "jessica"]
+    [:= :client/cute-prismatic-human-7>click-param>param>jessica "jessica"]
     [:changed? :time/second]
     [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
     [:or [:= 2 1] [:< 9 4]]
@@ -2490,15 +1526,15 @@
   :cool-raccoon-signal-yo
   {:signal
    [:or
-    [:= :client/imaginative-green-owl-24>param>my-dash-killswitch? true]
+    [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
     [:and
      [:or [:> :time/hour 12] [:< :time/hour 6]]
      [:or
       [:= :time/second 10]
       [:= :time/second 20]
-      [:= :time/second 35]
+      [:= :time/second 45]
       [:= :time/second 25]]]]},
-  :worthy-fish-signal {:signal [:or [:= :time/day 22] [:= 221 22]]},
+  :worthy-fish-signal {:signal [:or [:= :time/hour 16] [:= 221 22]]},
   :hourly? {:signal [:or [:changed? :time/hour] [:= :time/minute -1]]},
   :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
   :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
@@ -2507,6 +1543,8 @@
   :exciting-cheetah-signal
   {:signal [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
   :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
+  :dragging-to-potential-cross-breed?
+  {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
   :special-lion-signal
   {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
   :optimistic-sheep-signal
@@ -2564,13 +1602,24 @@
    :blocks 3,
    :queries 0,
    :ts "2024-03-24 00:18:04"},
+  :time {:second 19, :now "Wednesday, May 1st 11:28PM"},
   :viz-tables-sys2 {:table_name :client-memory-drag-36},
   :param
-  {:selected-view [nil nil],
-   :selected-view-data nil,
-   :selected-block :block-3638,
+  {:selected-view [:queries :new-query],
+   :selected-view-data
+   {:cache? false,
+    :where [:= :client_name :*client-name-str],
+    :limit 300,
+    :group-by [2],
+    :_last-run "23:14:02",
+    :refresh-every 20,
+    :from [:query/client-memory-drag-36],
+    :order-by [[2 :desc]],
+    :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 13] :ts_hour]]},
+   :selected-block :block-2178,
    :my-dash-killswitch? false,
-   :upstanding-crimson-frog "new parameter value!"},
+   :upstanding-crimson-frog "new parameter value!",
+   :super-cobalt-mole ["1121pm - 229mb"]},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -2684,14 +1733,17 @@
    :hourly? false,
    :part-fun-gorilla-4 true,
    :part-cool-raccoon-signal-yo-6 false,
+   :part-genius-gnat-signal-0 true,
    :fair-armadillo-signal false,
    :part-fun-gorilla-7 true,
    :part-cool-raccoon-signal-yo-0 false,
    :part-cool-raccoon-signal-yo-1 false,
+   :cool-raccoon-story-yo nil,
    :part-fun-gorilla-1 false,
    :part-cool-raccoon-signal-yo-3 true,
    :nice-coyote-signal false,
    :part-cool-raccoon-signal-yo-2 false,
+   :part-elegant-grasshopper-signal-1 true,
    :part-fun-gorilla-10 false,
    :part-cool-raccoon-signal-yo-9 false,
    :elegant-grasshopper-signal false,
@@ -2699,19 +1751,24 @@
    :exciting-cheetah-signal false,
    :part-fun-gorilla-11 false,
    :part-fun-gorilla-3 true,
-   :genius-gnat-signal false,
+   :genius-gnat-signal true,
+   :dragging-to-potential-cross-breed? false,
    :part-cool-raccoon-signal-yo-7 false,
    :part-cool-raccoon-signal-yo-4 true,
    :part-fun-gorilla-8 false,
    :part-cool-raccoon-signal-yo-10 false,
    :part-fun-gorilla-5 true,
    :part-fun-gorilla-2 true,
+   :part-genius-gnat-signal-2 false,
    :part-cool-raccoon-signal-yo-8 false,
    :part-fun-gorilla-0 false,
+   :part-elegant-grasshopper-signal-2 false,
    :special-lion-signal false,
    :part-cool-raccoon-signal-yo-5 false,
    :part-fun-gorilla-9 false,
    :optimistic-sheep-signal false,
+   :part-genius-gnat-signal-1 true,
+   :part-elegant-grasshopper-signal-0 false,
    :glowing-bat-signal false}},
  :selected-flow "live-scratch-flow",
  :flow-statuses
@@ -2724,7 +1781,7 @@
    :since-start "less than a second",
    :*started-by :rvbbit-scheduler,
    :time-running "less than a second",
-   :last-update {:done :end},
+   :last-update {:done :start},
    :*running? false,
    :last-update-seconds nil,
    :channels-open? false,
@@ -2739,7 +1796,7 @@
    :since-start "6 seconds",
    :*started-by :rvbbit-scheduler,
    :time-running "6 seconds",
-   :last-update {:last-odd/x :end},
+   :last-update {:sleep-then-pass :end},
    :*running? false,
    :last-update-seconds nil,
    :channels-open? false,
@@ -2751,9 +1808,9 @@
    :block-overrides [:prompt :style-param :prompt-2 :prompt-3],
    :channels 0,
    :channels-open 0,
-   :since-start "53 seconds",
+   :since-start "32 seconds",
    :*started-by :agreeable-silver-sand-dollar-27,
-   :time-running "53 seconds",
+   :time-running "32 seconds",
    :last-update {:done :end},
    :*running? false,
    :last-update-seconds nil,
@@ -2774,20 +1831,4 @@
    :last-update-seconds nil,
    :channels-open? false,
    :retries-left -1,
-   :running-blocks []}},
- :post-condi
- {:c249-true? [{:v 1}],
-  :c482-testcc [{:v 1}],
-  :c212-up-or-down? [{:v 0}],
-  :c657-up-or-down? [{:v 0}],
-  :c649-up-or-down? [{:v 0}],
-  :c953-up-or-down? [{:v 0}],
-  :c945-testcc [{:v 1}],
-  :c295-up-or-down? [{:v 0}],
-  :c443-testcc [{:v 1}],
-  :c334-up-or-down? [{:v 0}],
-  :c218-up-or-down? [{:v 0}],
-  :c789-up-or-down? [{:v 0}],
-  :c66-testcc [{:v 1}],
-  :c94-up-or-down? [{:v 0}],
-  :c731-true? [{:v 1}]}}
+   :running-blocks []}}}

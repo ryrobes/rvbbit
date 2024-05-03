@@ -104,9 +104,8 @@
                 :timeout    500000}]}))
 
 (defn watch-fn [key ref old-state new-state]
-  ;(println "Atom changed from" old-state "to" new-state)
-  (re-frame/dispatch [::ship-atom key new-state])
-  )
+  (when (not= old-state new-state)
+    (re-frame/dispatch [::ship-atom key new-state])))
 
 (add-watch dragging? "dragging?" watch-fn)
 (add-watch dragging-body "dragging-body" watch-fn)
@@ -1243,7 +1242,7 @@
  ::update-workspace
  (undoable)
  (fn [db [_ keypath value]]
-   (tap> [:updating (cons :panels keypath) :with value])
+   ;(tap> [:updating (cons :panels keypath) :with value])
   ;;  (-> db
   ;;      (ut/dissoc-in [:data :history-log])
   ;;      (assoc-in (cons :panels keypath) value))
@@ -1254,7 +1253,7 @@
  (undoable)
  (fn [db [_ keypath value]]
    (if (not (= (get-in db keypath) value))
-     (do (tap> [:updating keypath :with value])
+     (do ;(tap> [:updating keypath :with value])
          (assoc-in db keypath value))
      db)))
 
@@ -9877,6 +9876,7 @@
         h                      (if fw fw h)
         ww                     (* w brick-size)
         hh                     (* h brick-size)
+        client-name @(re-frame/subscribe [::client-name])
         ;editor-panel? false ;; legacy, remove
         ;name @(re-frame/subscribe [::panel-name brick-vec-key])
         px-width-int           (- ww 100)
@@ -9977,6 +9977,9 @@
                                  :Hint reech/Hint
                                  :Funnel reech/Funnel
                                  :FunnelChart reech/FunnelChart
+
+                                 :*client-name client-name
+                                 :*client-name-str (pr-str client-name)
 
                                  :str (fn [args]
                                        ; (cstr/join "" args)

@@ -1113,6 +1113,11 @@
                          (when (some #(= query-key %)
                                      (keys (get v :queries))) k))))))
 
+(re-frame/reg-sub ;;; dupe from bricks!
+ ::client-name
+ (fn [db _]
+   (get db :client-name)))
+
 (defn sql-data
   ([keypath honey-sql]
    (let [style-rules (get honey-sql :style-rules)
@@ -1135,7 +1140,10 @@
                             (not (some #(= % :panel_history) flat)))
          honey-modded (if has-rules?
                         (assoc honey-sql :select (apply merge hselect rules))
-                        honey-sql)]
+                        honey-sql)
+         client-name @(re-frame/subscribe [::client-name])
+         honey-modded (walk/postwalk-replace {:*client-name client-name
+                                              :*client-name-str (pr-str client-name)} honey-modded)]
      (re-frame/dispatch [::wfx/request :default
                          {:message    {:kind (if (or connection-id literal-data?)
                                                :honey-xcall
@@ -1205,7 +1213,11 @@
           hselect (get honey-sql :select)
           honey-modded (if has-rules?
                          (assoc honey-sql :select (apply merge hselect rules))
-                         honey-sql)]
+                         honey-sql)
+          client-name @(re-frame/subscribe [::client-name])
+          honey-modded (walk/postwalk-replace {:*client-name client-name
+                                               :*client-name-str (str client-name)} honey-modded)]
+          
 
       (do (when (not (nil? refresh-every)) (re-frame/dispatch [::set-query-schedule (first keypath) refresh-every]))
 

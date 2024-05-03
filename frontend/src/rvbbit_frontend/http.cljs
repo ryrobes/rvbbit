@@ -1,6 +1,7 @@
 (ns rvbbit-frontend.http
   (:require
    [re-frame.core :as re-frame]
+   [re-frame.alpha :as rfa]
    [ajax.core :as ajax]
    [ajax.edn :as ajax-edn]
    [clojure.string :as cstr]
@@ -510,7 +511,7 @@
 
              flow-runner-sub? (let [rtn (get result :status)
                                     mp-key (walk/postwalk-replace {:flow-runner :return-map} task-id)
-                                    mp-key [(first mp-key) (last mp-key)] ;; remove flow-id
+                                    ;mp-key [(first mp-key) (last mp-key)] ;; remove flow-id
                                     mps-key (vec (walk/postwalk-replace {:flow-runner :return-maps} task-id))
                                     return-maps (get-in db [:flow-results :return-maps] {})]
                                 ;;(tap> [:sub-return-maps! task-id rtn mp-key mps-key (vec (drop 1  mps-key)) return-maps])
@@ -604,7 +605,7 @@
 
      ;(tap> [:socket-response result ui-keypath new-map map-order meta :insertable? (not (nil? map-order))])
      (if (not (nil? map-order)) ;; indicates bigger problem, too risky
-       (if (and (not (nil? repl-output)) (not (empty? repl-output)))
+       (if (and (not (nil? repl-output)) (ut/ne? repl-output))
          (-> db
              (assoc-in (cons :repl-output ui-keypath) repl-output)
              (assoc-in (cons :sql-str ui-keypath) sql-str)
