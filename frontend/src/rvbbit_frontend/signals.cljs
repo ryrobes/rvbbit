@@ -902,6 +902,25 @@
                   [selector-panel "signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
                   [selector-panel "rules" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
                   [selector-panel "solvers" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
+
+                  [re-com/gap :size "10px"]
+
+                  [re-com/h-box
+                   :size "auto"
+                   :gap "8px"
+                   :children (for [e ["solver" "rule" "signal"]]
+                               [re-com/v-box 
+                                :padding "4px"
+                                :style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 55) 
+                                        :font-size "16px"
+                                        :color (theme-pull :theme/editor-outer-rim-color nil)
+                                        :border-radius "4px"}
+                                :size "auto" :height "60px"
+                                :align :center ;:justify :center
+                                :children [[re-com/box :child (str "+ new " e )]
+                                           [re-com/box :child (str "group")]]])]
+                  
+                  [re-com/gap :size "20px"]
                   
                   ]]]]))
 

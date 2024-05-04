@@ -1002,7 +1002,9 @@
   (swap! client-latency assoc client-name
          (vec (conj (get @client-latency client-name [])
                     (try (- (System/currentTimeMillis) (get @ping-ts client-name)) (catch Exception _ -2)))))
-  (let [ins-sql {:insert-into [:client-memory] :values [(assoc memory :mem_used_mb (ut/bytes-to-mb (get memory :mem_used)))]}]
+  (let [ins-sql {:insert-into [:client-memory] :values [(-> memory 
+                                                            (assoc :messages-per-second (get-in @ack-scoreboard [client-name :messages_per_sec]))
+                                                            (assoc :mem_used_mb (ut/bytes-to-mb (get memory :mem_used))))]}]
     (sql-exec system-db (to-sql ins-sql)))
   (swap! ack-scoreboard assoc-in [client-name :memory] (ut/bytes-to-mb (get memory :mem_used)))
   (swap! ack-scoreboard assoc-in [client-name :client-sub-list] flow-subs)
@@ -1023,6 +1025,7 @@
 (defn new-client [client-name]
   (let [new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
     (ut/pp [:new-client-is-alive! client-name])
+    (swap! ack-scoreboard assoc-in [client-name :booted-ts] (System/currentTimeMillis))
     (swap! client-queues assoc client-name new-queue-atom)))
 
 ;; ARGGGGHHHHHHHHHHHHH {inhale} ARGGGGHHHHHHHHHHHHH
@@ -3238,10 +3241,10 @@
                            other-client-param-path)
        signal? (= client-name :rvbbit-signals)]
 
-   (when (not (= base-type :time)) ;; temp to eliminate console spam
-     (ut/pp [(if signal?
-               :signal-reaction-process!
-               :client-reaction-push!) base-type keypath client-name new-value client-param-path]))
+  ;;  (when (not (= base-type :time)) ;; temp to eliminate console spam
+  ;;    (ut/pp [(if signal?
+  ;;              :signal-reaction-process!
+  ;;              :client-reaction-push!) base-type keypath client-name new-value client-param-path]))
 
    (async/thread ;; really expensive logging below. temp
      (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
@@ -3753,8 +3756,7 @@
 
 (defmethod wl/handle-request :honey-call [{:keys [kind ui-keypath honey-sql client-name]}]
   (swap! q-calls2 inc)
-  ;(ut/pp [kind {:kind kind :ui-keypath ui-keypath ;:honey-sql honey-sql
-  ;        }])
+  ;; (ut/pp [kind {:kind kind :ui-keypath ui-keypath :honey-sql honey-sql}])
   (ut/pp [kind ;(not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
           @q-calls2 kind ui-keypath :system-db client-name ;; honey-sql ; (get honey-sql :transform-select) :full-honey honey-sql ; :select (get honey-sql :select)
             ;(when (get honey-sql :transform-select) [:TSELECT!! honey-sql])
@@ -4367,13 +4369,18 @@
 
 
 (defn query-runstream [kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key]
+  ;; (ut/pp [:honey-sql honey-sql])
   (doall
-   (let [honey-sql (if (get honey-sql :limit) ;; this is a crap solution since we can't introspect the top level query to get dims and measures, etc... TODO, selective limit pruning
+   (let [;;_ (ut/pp [:honey-sql honey-sql])
+         post-process-fn (get honey-sql :post-process-fn) ;; allowed at the top level only - will be discarded elsewhere FOR NOW...
+         ;;_ (when post-process-fn (ut/pp [:post-process1! post-process-fn]))
+         honey-sql (if (get honey-sql :limit) ;; this is a crap solution since we can't introspect the top level query to get dims and measures, etc... TODO, selective limit pruning
                      {:select [:*] :from [honey-sql]}
                      honey-sql)
+         honey-sql (ut/deep-remove-keys honey-sql [:post-process-fn]) ;; disregard if we have nested ones, we cant use them currently since its a SQL subquery...
          has-rql? (try (true? (some #(or (= % :*render*) (= % :*read-edn*) (= % :*code*)) (ut/deep-flatten honey-sql))) (catch Exception _ false))
          data-call? (true? (and (not has-rql?)
-                                (not (empty? (first (filter #(= (last %) :data) (ut/kvpaths honey-sql)))))))
+                                (ut/ne? (first (filter #(= (last %) :data) (ut/kvpaths honey-sql))))))
          ;; used for simple blocking in code-execution and data literals table insertion chicken/egg issue
          runstream (fn []
                      (try
@@ -4391,7 +4398,9 @@
            ;_ (ut/pp [:PPPP (filter #(= (last %) :repl-host) (ut/kvpaths honey-sql)) (filter #(= (last %) :repl-port) (ut/kvpaths honey-sql))])
                               honey-sql (ut/deep-remove-keys honey-sql [:repl-host :repl-port])
                               _ (when (and repl-host repl-port) (ut/pp [:external-repl! repl-host repl-port]))
-                              honey-sql (walk/postwalk-replace {[:*all= {}] nil} honey-sql) ;; take care of empty wherealls
+                              honey-sql (walk/postwalk-replace {[:*all= {}] nil  ;; take care of empty wherealls
+                                                                :*client-name-str (pr-str client-name)
+                                                                :*client-name (str client-name)} honey-sql)
                               orig-honey-sql honey-sql ;; for transform later
                               query-meta-subq? (true? (some #(or (= % :query_meta_subq) (= % :query-meta-subq)) (ut/deep-flatten honey-sql)))
                               literal-data? (and (get orig-honey-sql :data) ;false
@@ -4404,7 +4413,7 @@
                               rql-holder (atom {})
                              ;has-rql? (try (true? (some #(or (= % :*render*) (= % :*read-edn*) (= % :*code*)) (ut/deep-flatten honey-sql))) (catch Exception _ false))
                               post-sniffed-literal-data? (and (not literal-data?) ;false
-                                                              (not (empty? (filter #(= (last %) :data) (ut/kvpaths honey-sql))))
+                                                              (ut/ne? (filter #(= (last %) :data) (ut/kvpaths honey-sql)))
                                                               (not has-rql?)) ;; <-- look into, clashing with rql
           ; _ (when has-rql? (ut/pp [:has-rql!]))
           ; _ (when literal-data? (ut/pp [:literal-data!]))
@@ -4427,7 +4436,7 @@
                               ;;                         } honey-sql) ;; (ut/keypath-munger ui-keypath)
                                               (walk/postwalk-replace @literal-data-map orig-honey-sql)
                                               literal-data? (get orig-honey-sql :data)
-                                              (not (empty? (get orig-honey-sql :transform-select)))
+                                              (ut/ne? (get orig-honey-sql :transform-select))
                                               (-> (first (get orig-honey-sql :from))
                                ;(assoc :limit 4)
                                                   (dissoc :limit)
@@ -4437,7 +4446,8 @@
          ;  _ (ut/pp [:post-cond2 (walk/postwalk-replace @literal-data-map honey-sql)])
           ; honey-sql (replace-pre-sql honey-sql)
                               honey-sql (if has-rql? (extract-rql ui-keypath honey-sql rql-holder) honey-sql)
-                              honey-sql (replace-pre-sql honey-sql)
+
+                              honey-sql (replace-pre-sql honey-sql) ;; runs a subset of clover replacements that might have ended up in SQL / based on clover params being materialized pre-sql materialization
           ; _ (ut/pp [:pre-post (str honey-sql)])
                               target-db (cond query-meta-subq? system-db ;; override for sidecar meta queries
                                               (= connection-id "system-db") system-db
@@ -4455,7 +4465,7 @@
                                     ;agg (first (last d))
                                                           vls0 (last (last (last d))) ;; either static vals or a select to get them
                                                           sql? (and (map? vls0) (or (contains? vls0 :select) (contains? vls0 :select-distinct)))
-                                                          cached? (true? (not (empty? (get @pivot-cache vls0))))
+                                                          cached? (true? (ut/ne? (get @pivot-cache vls0)))
                                                           vls (if sql?
                                                                 (if cached? ;; if got exact cache, send it. else query
                                                                   (get @pivot-cache vls0)
@@ -4712,18 +4722,29 @@
                                                         (println (first replaced))
                                                         replaced)
                                              result)
+                                  _ (when (not (nil? post-process-fn)) (ut/pp [:post-process2! post-process-fn]))
+                                  result (if (not (nil? post-process-fn)) 
+                                           (try ((eval post-process-fn) result) 
+                                                (catch Throwable e (let [res [{:error "post-process-fn error" :vval (str e)}]] 
+                                                                     (ut/pp [:post-process-fn-error res])
+                                                                     res ))) 
+                                           result)
+                                  _ (when (not (nil? post-process-fn)) (ut/pp result))
+
                                   honey-meta (if (or (get orig-honey-sql :transform-select)
                                                      has-rql?      ;query-error?
+                                                     post-process-fn
                                                      (get orig-honey-sql :data)) ;; TODO< this is ugly rebinding shit
                                                (get-query-metadata result honey-sql) ;; get new meta on transformed data
                                                honey-meta)
+                                  _ (when (not (nil? post-process-fn)) (ut/pp [:post-process-meta! honey-meta]))
                                   fields (get honey-meta :fields) ;; lol, refactor, this is cheesy (will overwrite if transform)
                                   sniff-worthy? (and (not is-meta?)
                                                      (not has-rql?) ;;; temp since insert will fail dur to not being stringified, TODO
                                                      (not (= (ut/dissoc-recursive honey-sql)
                                                              (ut/dissoc-recursive (get-in @sql/query-history
                                                                                           [cache-table-name :honey-sql])))) ;; <-- seen this exact shape before?
-                                                     (not (empty? (flatten result)))
+                                                     (ut/ne? (flatten result))
                                                      (not (cstr/includes? (str ui-keypath) "-hist-")) ;; undo history preview queries, do NOT sniff
                                                      (not query-error?)
                                                      (not is-condi?)
@@ -4739,6 +4760,8 @@
                              ; (not (some #(= % filtered-req-hash) @deep-run-list)) ;; we seen it!
                                                       (not (some #(cstr/starts-with? (str %) ":query-preview") ui-keypath)) ;; browsing previously generated recos...
                                                       ))
+
+
                                ;  kit-output? (or sniff? (and (not is-meta?) (not query-error?) (not is-condi?) false))
                                   repl-output (ut/limited (get-in @literal-data-output [ui-keypath :evald-result] {}))
                                   output {:kind kind :ui-keypath ui-keypath :result result :result-meta honey-meta
@@ -4746,6 +4769,7 @@
                                           :repl-output repl-output :original-honey orig-honey-sql :panel-key panel-key
                                           :client-name client-name :map-order (if (or (get orig-honey-sql :transform-select)
                                                                                       query-error?
+                                                                                      post-process-fn
                                                                                       (get orig-honey-sql :data))
                                                                                 (keys fields)
                                                                                 (get @sql/map-orders honey-sql-str))}
@@ -4887,7 +4911,7 @@
           ;;        ))))
 
                               (do ;(swap! sql-cache assoc req-hash output)
-                                
+
                                 (when (and (not (cstr/starts-with? (str (first ui-keypath)) ":kick"))
                                            (not (cstr/includes? (str (first ui-keypath)) "-sys")))
                                   (kick client-name "kick-test!" (first ui-keypath)
@@ -4895,7 +4919,7 @@
                                         (str "query-log-" (first ui-keypath))
                                         (str "query-log-" (first ui-keypath))
                                         [(str (ut/get-current-timestamp) " - query ran in " query-ms " ms.")]))
-                                
+
                                 (when client-cache? (insert-into-cache req-hash output)) ;; no point to cache things that are :cache?false
                                 output)))))
                        (catch Exception e
@@ -4978,7 +5002,7 @@
           ;(when (get honey-sql :transform-select) [:TSELECT!! honey-sql])
            }])
 
-  (when (keyword? kit-name)
+  (when (keyword? kit-name) ;;; all kit stuff. deprecated?
     (enqueue-task2 (fn [] (try ;; save off the full thing... or try
                             (let [;kit-name :outliers
                                   _ (push-to-client ui-keypath [:kit-status (first ui-keypath)] client-name 2 kit-name :started)
@@ -5073,7 +5097,8 @@
    ;; if keypath includeds query-preview-block or query-preview-inviz, we know its a weave trellis, so maybe throttle them so they dont overwhelm everything
    ;; with any luck the cache will even things out eventually - ah, nevermind we'd need a blocking queue
 
-  (doall (if (or (cstr/includes? (str ui-keypath) "query-preview-block") (cstr/includes? (str ui-keypath) "query-preview-inviz"))
+  (doall (if (or (cstr/includes? (str ui-keypath) "query-preview-block") ;; queue up the inviz queries
+                 (cstr/includes? (str ui-keypath) "query-preview-inviz"))
            (doall (let [async-result-chan (go (let [result-chan (queue-runstream (fn []
                                                                                    (query-runstream kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key)))]
                                                 (println "inviz: Waiting for result...") ; Debugging
@@ -5081,6 +5106,7 @@
       ;; To get the result, you need to take from async-result-chan
                     (do (println "inviz: Getting result from async operation...")
                         (async/<!! async-result-chan)))) ; Blocking take from the channel
+           
            (query-runstream kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key)))
 
 
@@ -5838,10 +5864,24 @@
         ;;                     :stroke :theme/editor-outer-rim-color
         ;;                     :fill :theme/editor-outer-rim-color}]]]
          ; open_flow_channels (or (apply + (for [[_ v] @flow-db/channels-atom] (count v))) 0)
-          ack-scoreboard (into {} (for [[k v] (client-statuses)
+          ack-scoreboardv (into {} (for [[k v] (client-statuses)
                                         :when (not= (get v :last-seen-seconds) -1)]
                                     {k (ut/deselect-keys v [:booted :last-ack :last-push])}))
-          cli-rows (vec (for [[k v] ack-scoreboard] (merge {:client-name (str k)} v)))
+          cli-rows (vec (for [[k v] ack-scoreboardv
+                              :let [booted (get v :booted-ts)
+                                    now (System/currentTimeMillis)
+                                    pushed (get v :push)
+                                    uptime-seconds (/ (- now booted) 1000.0)
+                                    msg-per-second (Double/parseDouble (format "%.2f" (/ pushed uptime-seconds))) ;; dumb that I cant just do (round n 2), but whatever
+                                    uptime-str (ut/format-duration-seconds uptime-seconds)
+                                    _ (swap! ack-scoreboard assoc-in [k :uptime] uptime-str) ;; bad behavior all around, will refactor all this later. i just need to get to release 0 or this will never come out
+                                    _ (swap! ack-scoreboard assoc-in [k :messages-per-second] msg-per-second) ;; ^^ this.
+                                    ]] 
+                          (merge {:client-name (str k)
+                                  :uptime-seconds uptime-seconds
+                                  :messages-per-second msg-per-second
+                                  :uptime uptime-str} v)
+                          ))
           ;_ (ut/pp [:cli-rows cli-rows])
           insert-cli {:insert-into [:client_stats] :values cli-rows}
           insert-sql {:insert-into [:jvm_stats]
@@ -5876,26 +5916,26 @@
         (println " ")
       ;(ut/print-ansi-art "rrvbbit.ans")
         (ut/print-ansi-art "nname.ans")
-        (ut/pp [:version 0 :april 2024 "Hi."])
+        (ut/pp [:version 0 :june 2024 "Hi."])
       ;(ut/pp "Hi.")
         (println " "))
 
-      (ut/pp [:client-latency (into {} (for [[k v] @client-latency] {k (vec (take-last 10 v))}))])
+      ;; (ut/pp [:client-latency (into {} (for [[k v] @client-latency] {k (vec (take-last 10 v))}))])
 
       (ut/pp [:flow-status (flow-statuses)])
 
-      (ut/pp [:processes (into {} (for [[k {:keys [start *running? end]}] @processes]
-                                    {k {:time-running (- (or end (System/currentTimeMillis)) start)
-                                        :*running? *running?}}))])
+      ;; (ut/pp [:processes (into {} (for [[k {:keys [start *running? end]}] @processes]
+      ;;                               {k {:time-running (- (or end (System/currentTimeMillis)) start)
+      ;;                                   :*running? *running?}}))])
 
-      (ut/pp [:ack-scoreboard ack-scoreboard])
+      (ut/pp [:ack-scoreboard ack-scoreboardv])
 
-      (ut/pp [:date-map @time-atom])
+      ;; (ut/pp [:date-map @time-atom])
 
     ;; (ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
-      (ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (vec (keys v))})])
-      (ut/pp [:signals-watcher (get @atoms-and-watchers :rvbbit-signals)])
-      (ut/pp [:signals-watcher-values (get @last-values-per :rvbbit-signals)])
+      ;; (ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (vec (keys v))})])
+      ;; (ut/pp [:signals-watcher (get @atoms-and-watchers :rvbbit-signals)])
+      ;; (ut/pp [:signals-watcher-values (get @last-values-per :rvbbit-signals)])
 
     ;(ut/pp [:times-atom (into {} (for [[k v] @times-atom] {k [(count v) :samples (int (ut/avg v)) :avg-seconds]}))])
     ;; (ut/pp [:times-atom @times-atom])

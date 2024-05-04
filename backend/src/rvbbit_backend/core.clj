@@ -607,6 +607,8 @@
                                            ;(shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps/*"))
                                            ;(shell/sh "/bin/bash" "-c" (str "rm " "flow-history/src-maps-pre/*"))
                                            ;(shell/sh "/bin/bash" "-c" (str "rm " "flow-history/*"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "flow-logs/*"))
+                                           (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "status-change-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "data/search-index/*"))

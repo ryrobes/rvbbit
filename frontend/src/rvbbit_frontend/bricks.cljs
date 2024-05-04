@@ -2147,7 +2147,7 @@
                       _ (tap> [:incoming incoming @dragging-body])
                       ;_ (tap> [:start? types-vec (last (last incoming)) (map? (last (last incoming))) (try (read-string (last (last incoming))) (catch :default e (str e)))])
                       data        (read-string (last (last incoming)))
-
+                      data        (walk/postwalk-replace {:reagent-gt :>} data) ;; unfuck "invalid EDN" reagent keywords....
                       type        (first (first incoming))
                       rooted-data (assoc data :root root)
                       dm-type     (get-in rooted-data [:drag-meta :type])
@@ -2627,17 +2627,17 @@
                         :readOnly          false            ;true
                         :theme             "hopscotch"}}]]))
 
-(defn sql-data-one-off [keypath honey-sql]                  ;; yeah, no good. lol
-  (re-frame/dispatch [::wfx/request :default
-                      {:message     {:kind       :honey-call
-                                     :ui-keypath keypath
-                                     :honey-sql  honey-sql
-                                     :extras     {}}
-                       :on-response [::http/socket-response]
-                       ;:on-timeout [::failed-get-users]
-                       :timeout     500000}])
-  (re-frame/dispatch [::add-to-sql-history keypath honey-sql])
-  @(re-frame/subscribe [::conn/sql-data keypath]))
+;; (defn sql-data-one-off [keypath honey-sql]                  ;; yeah, no good. lol
+;;   (re-frame/dispatch [::wfx/request :default
+;;                       {:message     {:kind       :honey-call
+;;                                      :ui-keypath keypath
+;;                                      :honey-sql  honey-sql
+;;                                      :extras     {}}
+;;                        :on-response [::http/socket-response]
+;;                        ;:on-timeout [::failed-get-users]
+;;                        :timeout     500000}])
+;;   (re-frame/dispatch [::add-to-sql-history keypath honey-sql])
+;;   @(re-frame/subscribe [::conn/sql-data keypath]))
 
 (re-frame/reg-sub
  ::meta-from-param-name

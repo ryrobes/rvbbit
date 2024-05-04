@@ -820,10 +820,11 @@
          selected (get db :selected-block)]
      (-> db
        ;(ut/dissoc-in [:data query-id])
-         (assoc-in (if (not (= panel selected))
-                     [:panels panel :queries query-id :_last-run]
-                     [:last-run-throwaway])
-                   (ut/get-time-format-str)) ;; this is weird. was not needed before, but code-tables were not refreshing w/o a render kick... 1/12/24
+        ;;  (assoc-in (if (not (= panel selected))
+        ;;              [:panels panel :queries query-id :_last-run]
+        ;;              [:last-run-throwaway])
+        ;;            (ut/get-time-format-str)) ;; this is weird. was not needed before, but code-tables were not refreshing w/o a render kick... 1/12/24
+         (assoc-in [:panels panel :queries query-id :_last-run] (ut/get-time-format-str)) ;; this is weird. was not needed before, but code-tables were not refreshing w/o a render kick... 1/12/24
          (ut/dissoc-in [:query-history query-id])
          (ut/dissoc-in [:query-history-meta query-id])))))
 
@@ -1148,6 +1149,7 @@
                          {:message    {:kind (if (or connection-id literal-data?)
                                                :honey-xcall
                                                :honey-call) ;; override for data literals
+                                       ;:kind :honey-xcall
                                        :ui-keypath keypath
                                        :panel-key panel-key
                                        :kit-name kit-name

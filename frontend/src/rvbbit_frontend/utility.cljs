@@ -622,8 +622,9 @@
       :else data)))
 
 (defn clean-sql-from-ui-keys-fn [query]
-  (let [res (deep-remove-keys query [:cache? :col-widths :row-height :render-all? :refresh-every :page :connection-id
-                                     :deep-meta? :clicked-row-height :style-rules])]
+  (let [res (deep-remove-keys
+             query
+             [:cache? :col-widths :row-height :render-all? :refresh-every :page :connection-id :deep-meta? :clicked-row-height :style-rules])] 
     res))
 
 (defn update-nested-tabs [m old new]

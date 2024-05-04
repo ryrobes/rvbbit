@@ -1249,11 +1249,7 @@
 ;;       (puget/cprint x))
 ;;     ((fn [& _]) x)))
 
-;; (defn pp [x]
-;;   (if (>= debug-level 1)
-;;     (puget/with-options {:width (get-terminal-width)}
-;;       (puget/cprint x))
-;;     ((fn [& _]) x)))
+
 
 ;; (defn ppa [x] ;; always print
 ;;   (puget/with-options {:width (get-terminal-width)}
@@ -1261,18 +1257,18 @@
 
 (def console-lock (Object.))
 
-;; (defn safe-cprint [x]
-;;   (locking console-lock
-;;     (puget/with-options {:width (get-terminal-width)}
-;;       (puget/cprint x))))
-
 (defn safe-cprint [x]
   (locking console-lock
-    (try
-      (puget/with-options {:width (get-terminal-width)}
-        (puget/cprint x))
-      (finally ;; pass
-        ))))
+    (puget/with-options {:width (get-terminal-width)}
+      (puget/cprint x))))
+
+;; (defn safe-cprint [x]
+;;   (locking console-lock
+;;     (try
+;;       (puget/with-options {:width (get-terminal-width)}
+;;         (puget/cprint x))
+;;       (finally ;; pass
+;;         ))))
 
 ;; (defn safe-cprint [x]
 ;;   (locking console-lock
@@ -1298,6 +1294,12 @@
   (if (>= debug-level 1)
     (safe-cprint x)
     ((fn [& _]) x)))
+
+;; (defn pp [x]
+;;   (if (>= debug-level 1)
+;;     (puget/with-options {:width (get-terminal-width)}
+;;       (puget/cprint x))
+;;     ((fn [& _]) x)))
 
 (defn ppa [x] ;; always print
   (safe-cprint x))
