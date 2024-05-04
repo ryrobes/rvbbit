@@ -170,6 +170,20 @@
                           :timeout    15000000}]))
    db))
 
+(re-frame/reg-event-db
+ ::unsub-to-flow-value
+ (fn [db [_ key]]
+   ;(tap> [:ran-condi])
+   (let [client-name (get db :client-name)]
+     (re-frame/dispatch [::wfx/request :default
+                         {:message    {:kind :unsub-to-flow-value
+                                       :flow-key key
+                                       :client-name client-name}
+                          ;:on-response [::value-response-flow]
+                          ;:on-timeout  [::timeout-response :get-flow-value key]
+                          :timeout    15000000}]))
+   db))
+
 
 
 ;; (re-frame/dispatch [::sub-to-flow-value :flow/map-pull-test2>open-fn-6])

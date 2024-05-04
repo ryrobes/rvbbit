@@ -424,6 +424,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     uptime_seconds integer NULL,
     uptime text NULL,
     messages_per_second integer NULL,
+    recent_messages_per_second integer NULL,
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
 (def create-jvm-stats "create table if not exists jvm_stats
@@ -538,6 +539,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     mem_used_mb text NULL, 
     mem_total integer NULL,
     messages_per_second integer NULL,
+    recent_messages_per_second integer NULL,
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
 
 (defn create-attribute-sample [sample-table-name-str rowset]

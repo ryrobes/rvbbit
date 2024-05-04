@@ -982,6 +982,7 @@
 (re-frame/reg-event-db
  ::run-signals-history
  (fn [db _]
+  ;;  (tap> [:signals-history!])
    (re-frame/dispatch
     [::wfx/request :default
      {:message    {:kind :signals-history
@@ -1016,12 +1017,14 @@
         selected-signal @(re-frame/subscribe [::selected-signal])
         signal-vec (get-in signals [selected-signal :signal])
         signal-vec-parts (vec (ut/where-dissect signal-vec))
-        signals-history @(re-frame/subscribe [::signals-history])
+        signals-history (select-keys @(re-frame/subscribe [::signals-history]) signal-vec-parts) ;; sometimes we get weird other items if we change fast
         results (into {} (for [idx (range (count signal-vec-parts))]
                            (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
                                  name (get signal-vec-parts idx)
                                  vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])]
                              {name vv})))]
+    
+    ;; (tap> [:signals-history signals-history])
     
     ;; (re-frame/dispatch
     ;;  [::wfx/request :default
@@ -1122,7 +1125,7 @@
                                                     ^{:key (str selected-signal "child-boxes" e ee tt)}
                                                     [re-com/box
                                                      :size "none"
-                                                     :width "30px"
+                                                     :width "44px"
                                                      :align :center :justify :center
                                                      :style (merge {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
                                                                     :font-family  (theme-pull :theme/monospaced-font nil)

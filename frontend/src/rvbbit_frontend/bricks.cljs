@@ -381,6 +381,32 @@
      (vec (distinct (concat signal-subs drop-refs runstream-refs runstreams theme-refs flow-refs)))
      )))
 
+
+(re-frame/reg-sub
+ ::stale-flow-subs?
+ (fn [db _]
+   (let [new @(re-frame/subscribe [::get-flow-subs])
+         old (get db :flow-subs [])
+         deads (vec (cset/difference (set old) (set new)))]
+    ;;  (when (ut/ne? deads) 
+    ;;    (tap> [:unsub-check (get db :client-name) {:new new :old old :deads deads}]))
+     (ut/ne? deads))))
+
+(re-frame/reg-event-db
+ ::unsub-to-flows
+ (fn [db _]
+   (let [new @(re-frame/subscribe [::get-flow-subs])
+         old (get db :flow-subs [])
+         deads (vec (cset/difference (set old) (set new)))
+         _ (tap> [:flow-unsub-change! (get db :client-name) {:old old :new new :removing deads}])
+         ;;_ (tap> [:deads-exec! deads (get db :client-name)])
+         ]
+     (doall
+      (doseq [n deads]
+        (re-frame/dispatch [::http/unsub-to-flow-value n])))
+     (assoc db :flow-subs new))))
+
+
 (re-frame/reg-sub
  ::get-new-flow-subs
  (fn [db _]
@@ -390,8 +416,11 @@
 
 (re-frame/reg-sub
  ::new-flow-subs?
- (fn [_ _]
-   (not (empty? @(re-frame/subscribe [::get-new-flow-subs])))))
+ (fn [db _]
+   (ut/ne? @(re-frame/subscribe [::get-new-flow-subs]))
+  ;;  (not= @(re-frame/subscribe [::get-new-flow-subs]) 
+  ;;        (get db :flow-subs))
+   ))
 
 (re-frame/reg-sub
  ::alerts
@@ -405,11 +434,13 @@
  ::sub-to-flows
  (fn [db _]
    (let [new @(re-frame/subscribe [::get-new-flow-subs])
+         old (get db :flow-subs [])
+         _ (tap> [:flow-sub-change! (get db :client-name) {:old old :new new}])
          ;all (get db :flow-subs [])
          subbed (vec (for [n new]
                        (do (re-frame/dispatch [::http/sub-to-flow-value n])
                            n)))]
-     (assoc db :flow-subs (into subbed (get db :flow-subs []))))))
+     (assoc db :flow-subs (into subbed old)))))
 
 (re-frame/reg-event-db
  ::sub-to-flows-all ;; temp debugging
@@ -9185,7 +9216,11 @@
                                                       ;(tap> (js->clj %))
                                                       (get (walk/keywordize-keys (js->clj %))
                                                            (get edn-mass :size) 14)))
-                             edn-mass)]
+                             edn-mass)
+        ;edn-mass (assoc-in edn-mass [:theme :grid :line :stroke] "green")
+        ;edn-mass (assoc-in edn-mass [:theme] (get data :theme))
+        ]
+   ;(tap> [:edn-mas edn-mass])
     ;; (when (and (not has-keys?) t-map? (not (empty? (get transformation-map :pivot-by))))
     ;;   (tap> [:keys (vec (cset/difference
     ;;                      (set (keys (first post-data)))
@@ -10113,7 +10148,7 @@
                                 ;;                                                     :on-timeout [::http/timeout-response]
                                 ;;                                                     :timeout    500000}])))
                                 ;;                            (str flow-id)))
-                                 :grid (fn [tab] [rc/catch [grid tab]])
+                                 :ggrid (fn [tab] [rc/catch [grid tab]]) ;;; TODO :grid was clashing with nivo configs
 
                                 ;;  :unixtime (fn [] '(fn [unixTime]
                                 ;;              (let [date (js/Date. unixTime)]

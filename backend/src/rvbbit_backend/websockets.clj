@@ -1003,7 +1003,8 @@
          (vec (conj (get @client-latency client-name [])
                     (try (- (System/currentTimeMillis) (get @ping-ts client-name)) (catch Exception _ -2)))))
   (let [ins-sql {:insert-into [:client-memory] :values [(-> memory 
-                                                            (assoc :messages-per-second (get-in @ack-scoreboard [client-name :messages_per_sec]))
+                                                            (assoc :recent-messages-per-second (get-in @ack-scoreboard [client-name :recent-messages-per-second]))
+                                                            (assoc :messages-per-second (get-in @ack-scoreboard [client-name :messages-per-second]))
                                                             (assoc :mem_used_mb (ut/bytes-to-mb (get memory :mem_used))))]}]
     (sql-exec system-db (to-sql ins-sql)))
   (swap! ack-scoreboard assoc-in [client-name :memory] (ut/bytes-to-mb (get memory :mem_used)))
@@ -1036,7 +1037,7 @@
   (let [results (async/chan (async/sliding-buffer 200))] ;; was (async/sliding-buffer 450)
     (try
       (async/go-loop []
-        (async/<! (async/timeout 70)) ;; was 600 ?
+        (async/<! (async/timeout 50)) ;; was 70 ?
         (if-let [queue-atom (get @client-queues client-name (atom clojure.lang.PersistentQueue/EMPTY))]
           (let [item (ut/dequeue! queue-atom)]
             (if item
@@ -3069,6 +3070,12 @@
     ;;   (swap! client-subscriptions dissoc keypath))
     (swap! atoms-and-watchers ut/dissoc-in [client-name flow-key])) (catch Throwable e (ut/pp [:remove-watcher e]))))
 
+(defmethod wl/handle-request :unsub-to-flow-value [{:keys [client-name flow-key]}]
+  (let [sub (get-in @atoms-and-watchers [client-name flow-key] {})
+        flow-id nil]
+    (ut/pp [:unsubbing! client-name flow-key sub (get @atoms-and-watchers client-name)])
+    (remove-watcher (:keypath sub) client-name (:sub-type sub) flow-id (:flow-key sub))))
+
 (defn remove-watchers-for-flow [flow-id & [client-name]]
   (doseq [[c-name subs] @atoms-and-watchers
           :let [matching-subs (filter #(= (:flow-id %) flow-id) (vals subs))]
@@ -3137,11 +3144,11 @@
 
                                                     _ (when true ;(not= result (get @last-signals-atom part-key))  ;; no need for dupe histories
                                                         (swap! last-signals-history-atom assoc-in [kk part-key]
-                                                               (into (vec (take-last 19 (sort-by second (get-in @last-signals-history-atom [kk part-key])))) [[result nowah]]))
+                                                               (into (vec (take-last 12 (sort-by second (get-in @last-signals-history-atom [kk part-key])))) [[result nowah]]))
                                                         )
                                                     _ (when true ;(not= result (get @last-signals-atom vvv)) ;; no need for dupe histories
                                                         (swap! last-signals-history-atom assoc-in [kk vvv]
-                                                               (into (vec (take-last 19 (sort-by second (get-in @last-signals-history-atom [kk vvv])))) [[result nowah]]))
+                                                               (into (vec (take-last 12 (sort-by second (get-in @last-signals-history-atom [kk vvv])))) [[result nowah]]))
                                                         )
                                                     _ (swap! last-signals-atom-stamp assoc vvv nowah)
                                                     _ (swap! last-signals-atom assoc vvv result)
@@ -3449,6 +3456,8 @@
   ;; or if we wanted to skip real-time reactions, we could just run it every X seconds and push the result to the client
   ;; OR a watcher that updates OTHER atoms based on results-atom changes, and then we can just watch those atoms instead... [big brain]
   (doall (sub-to-value client-name flow-key)))
+
+
 
 
 ;; (defmethod wl/handle-request :sub-to-running-values [{:keys [client-name flow-keys]}]
@@ -4722,14 +4731,14 @@
                                                         (println (first replaced))
                                                         replaced)
                                              result)
-                                  _ (when (not (nil? post-process-fn)) (ut/pp [:post-process2! post-process-fn]))
+                                  ;; _ (when (not (nil? post-process-fn)) (ut/pp [:post-process2! post-process-fn]))
                                   result (if (not (nil? post-process-fn)) 
                                            (try ((eval post-process-fn) result) 
                                                 (catch Throwable e (let [res [{:error "post-process-fn error" :vval (str e)}]] 
                                                                      (ut/pp [:post-process-fn-error res])
                                                                      res ))) 
                                            result)
-                                  _ (when (not (nil? post-process-fn)) (ut/pp result))
+                                  ;; _ (when (not (nil? post-process-fn)) (ut/pp result))
 
                                   honey-meta (if (or (get orig-honey-sql :transform-select)
                                                      has-rql?      ;query-error?
@@ -4737,7 +4746,7 @@
                                                      (get orig-honey-sql :data)) ;; TODO< this is ugly rebinding shit
                                                (get-query-metadata result honey-sql) ;; get new meta on transformed data
                                                honey-meta)
-                                  _ (when (not (nil? post-process-fn)) (ut/pp [:post-process-meta! honey-meta]))
+                                  ;; _ (when (not (nil? post-process-fn)) (ut/pp [:post-process-meta! honey-meta]))
                                   fields (get honey-meta :fields) ;; lol, refactor, this is cheesy (will overwrite if transform)
                                   sniff-worthy? (and (not is-meta?)
                                                      (not has-rql?) ;;; temp since insert will fail dur to not being stringified, TODO
@@ -4753,6 +4762,7 @@
                                   sniffable? (or sniff? ;; <-- req from client only?
                                                  (and (not is-meta?) false ;; otherwise never? only on manual for now
                                                       (not query-error?)
+                                                      (not post-process-fn)
                              ;(not (get orig-honey-sql :transform-select))
                                                       (not is-condi?)
                              ;(not (= (last ui-keypath) :styles))  ;; style call. deprecated
@@ -5726,6 +5736,8 @@
         max-subs (apply max (map :subs data))]
     (if (> max-threads max-subs) :threads :subs)))
 
+(def mps-helper (atom {}))
+
 (defn jvm-stats []
   (when (not @shutting-down?)
     (let [runtime (java.lang.Runtime/getRuntime)
@@ -5871,11 +5883,15 @@
                               :let [booted (get v :booted-ts)
                                     now (System/currentTimeMillis)
                                     pushed (get v :push)
+                                    [last-now last-pushed] (get @mps-helper k)
+                                    _ (swap! mps-helper assoc k [now pushed])
+                                    recent-messages-per-second (Double/parseDouble (format "%.2f" (/ (- pushed last-pushed) (/ (- now last-now) 1000.0))))
                                     uptime-seconds (/ (- now booted) 1000.0)
                                     msg-per-second (Double/parseDouble (format "%.2f" (/ pushed uptime-seconds))) ;; dumb that I cant just do (round n 2), but whatever
                                     uptime-str (ut/format-duration-seconds uptime-seconds)
                                     _ (swap! ack-scoreboard assoc-in [k :uptime] uptime-str) ;; bad behavior all around, will refactor all this later. i just need to get to release 0 or this will never come out
                                     _ (swap! ack-scoreboard assoc-in [k :messages-per-second] msg-per-second) ;; ^^ this.
+                                    _ (swap! ack-scoreboard assoc-in [k :recent-messages-per-second] recent-messages-per-second) ;; ^^ this.
                                     ]] 
                           (merge {:client-name (str k)
                                   :uptime-seconds uptime-seconds
