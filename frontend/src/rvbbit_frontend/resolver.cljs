@@ -13,7 +13,7 @@
 
 (defn logic-and-params-fn [block-map panel-key]
   (if (try
-        (and (not (empty? block-map))
+        (and (ut/ne? block-map)
              (or (map? block-map)
                  (vector? block-map)
                  (keyword? block-map)))
@@ -117,11 +117,11 @@
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
         ;;                                        (walk/postwalk-replace logic-kps obody)))
 
-          string-walk            (fn [num obody] (let [kps       (ut/extract-patterns obody :string num)
-                                                       logic-kps (into {} (for [v kps]
-                                                                            (let [[_ & this] v]
-                                                                              {v (apply str this)})))]
-                                                   (walk/postwalk-replace logic-kps obody)))
+          ;; string-walk            (fn [num obody] (let [kps       (ut/extract-patterns obody :string num)
+          ;;                                              logic-kps (into {} (for [v kps]
+          ;;                                                                   (let [[_ & this] v]
+          ;;                                                                     {v (apply str this)})))]
+          ;;                                          (walk/postwalk-replace logic-kps obody)))
 
           case-walk         (fn [obody] (let [kps       (ut/extract-patterns obody :case 2)
                                               logic-kps (into {} (for [v kps]

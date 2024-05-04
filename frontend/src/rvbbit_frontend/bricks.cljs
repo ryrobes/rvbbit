@@ -3,6 +3,8 @@
   (:require
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
+   [re-frame.alpha :as rfa]
+   [re-frame.trace :as rft]
    [re-com.core :as re-com :refer [at]]
    [re-com.util :refer [px]]
    [rvbbit-frontend.recharts :as reech]
@@ -11768,6 +11770,7 @@
      
      )))
 
+(defn rs [edn brick-vec-key] (resolver/logic-and-params edn brick-vec-key))
 
 (defn grid [& [tab]]
   (let [;reaction-hack! @hover-square ;; seems less expensive than doall-for ?
@@ -11776,6 +11779,9 @@
         ;;external? @(re-frame/subscribe [::external?]) ;;; imp?
         ;reaction-hack! (when @dragging? @hover-square) ;; seems less expensive than doall-for ?
         panels-hash1    @(re-frame/subscribe [::panels-hash])
+        ;;panels-hash1    @(rfa/sub ::panels-hash {}) ;;; alpha sub that is SUPPOSED to be memory safe at the possible cost of CPU...
+        ;; ^^ https://day8.github.io/re-frame/Flows/#subscribing-to-flows
+        ;; meant for subbing to flows which seem to have their own memory and caching semantics
         panels-hash2    (hash (ut/remove-underscored @(re-frame/subscribe [::panels])))
         [tab-x tab-y]   (if tab
                           (let [tt @(re-frame/subscribe [::tab-recenter tab])]
@@ -11791,6 +11797,7 @@
         ;current-grid @(re-frame/subscribe [::build-grid end-y end-x start-y start-x])
         ;wspace @(re-frame/subscribe [::workspace []])
         selected-block @(re-frame/subscribe [::selected-block])
+        ;;selected-block @(ut/tracked-subscribe [::selected-block])
         lines?         @(re-frame/subscribe [::lines?])
         peek?          @(re-frame/subscribe [::peek?])
         ;editor-panels-map (editor-panels bricks-high bricks-wide)
@@ -11810,7 +11817,10 @@
         ;brick-roots (vec (for [[k v] brick-map] (:root v))) ;(vec (keys brick-map))
         brick-roots    (if tab
                          @(re-frame/subscribe [::all-roots-tab tab])
-                         @(re-frame/subscribe [::all-roots]))
+                         ;@(rfa/sub ::all-roots-tab tab)
+                         @(re-frame/subscribe [::all-roots])
+                         ;@(rfa/sub ::all-roots)
+                         )
         audio-playing? @(re-frame/subscribe [::audio/audio-playing?])
         ;brick-roots @(re-frame/subscribe [::all-roots2 start-y end-y start-x end-x])
         ;diff-grid1 (cset/union (set brick-roots) (cset/difference (set current-grid) (set used-bricks)))
@@ -11827,7 +11837,7 @@
     ;; ^^  TODO should this be at the honeycomb level instead? grid is one hell of a tick to key off of... feels overly sledgehammer-y.
 
 
-
+(tap> [:sub-tracker @ut/subscription-counts])
 
     ;(tap> [:grid-render])
     ;(when @over-block? (tap> [:over]))
@@ -11860,20 +11870,20 @@
                         ;;                        brick-vec-key
                         ;;                        )
                          ;;_ (tap> [:tab tab brick-vec-key])
-                         rs                  (fn [edn] (resolver/logic-and-params edn brick-vec-key))
-                         w                   (rs @(re-frame/subscribe [::panel-width brick-vec-key]))
-                         h                   (rs @(re-frame/subscribe [::panel-height brick-vec-key]))
-                         name                (rs @(re-frame/subscribe [::panel-name brick-vec-key]))
-                         z                   (rs @(re-frame/subscribe [::panel-depth brick-vec-key]))
+                         ;;rs                  (fn [edn] (resolver/logic-and-params edn brick-vec-key))
+                         w                   (rs @(re-frame/subscribe [::panel-width brick-vec-key]) brick-vec-key)
+                         h                   (rs @(re-frame/subscribe [::panel-height brick-vec-key]) brick-vec-key)
+                         name                (rs @(re-frame/subscribe [::panel-name brick-vec-key]) brick-vec-key)
+                         z                   (rs @(re-frame/subscribe [::panel-depth brick-vec-key]) brick-vec-key)
                          trunc-name          (when (not (nil? name))
                                                (let [charpx      5.75
                                                      pixel-width (* (count (str name)) charpx)
                                                      panel-width (- (* w brick-size) 50)]
                                                  (if (> pixel-width panel-width) (str (subs name 0 (/ panel-width charpx)) "...") name)))
                           ;panel-clone-map   (re-frame/subscribe [::panel-map brick-vec-key])  ;; questionable
-                         cross-breed?        @(re-frame/subscribe [::un-fired-cross-breed? brick-vec-key])
-                         _                   (when cross-breed? ;; TODO , move this side-effect elsewhere - its relatively safe here, but feels gross none-the-less
-                                               (re-frame/dispatch [::cross-breed brick-vec-key]))
+                        ; cross-breed?        @(re-frame/subscribe [::un-fired-cross-breed? brick-vec-key])
+                        ; _                   (when cross-breed? ;; TODO , move this side-effect elsewhere - its relatively safe here, but feels gross none-the-less
+                        ;                       (re-frame/dispatch [::cross-breed brick-vec-key]))
                          block-width         (if root? (+ 1 (* brick-size (if (= w 0) (- bricks-wide 1) w))) brick-size)
                          block-height        (if root? (+ 1 (* brick-size (if (= h 0) (- bricks-high 1) h))) brick-size)
                          selected?           (= brick-vec-key selected-block)
@@ -11903,11 +11913,11 @@
                                                   editor?
                                                   (= @db/editor-mode :vvv))
                          ;current-tab         @(re-frame/subscribe [::selected-tab])
-                         ghosted?            (rs @(re-frame/subscribe [::ghosted? brick-vec-key]))
-                         no-ui?              (or (rs @(re-frame/subscribe [::no-ui? brick-vec-key])) (not (nil? tab)))
-                         hidden?             (rs @(re-frame/subscribe [::hidden? brick-vec-key]))
-                         minimized?          (rs @(re-frame/subscribe [::minimized? brick-vec-key]))
-                         panel-style         (rs @(re-frame/subscribe [::panel-style brick-vec-key]))
+                         ghosted?            (rs @(re-frame/subscribe [::ghosted? brick-vec-key]) brick-vec-key)
+                         no-ui?              (or (rs @(re-frame/subscribe [::no-ui? brick-vec-key]) brick-vec-key) (not (nil? tab)))
+                         hidden?             (rs @(re-frame/subscribe [::hidden? brick-vec-key]) brick-vec-key)
+                         minimized?          (rs @(re-frame/subscribe [::minimized? brick-vec-key]) brick-vec-key)
+                         panel-style         (rs @(re-frame/subscribe [::panel-style brick-vec-key]) brick-vec-key)
                          tab-color           (cond
                                                selected? "#9973e0"
                                                viz-reco? "#ffb400"
@@ -11932,7 +11942,7 @@
                           ;;; all below are for bottom tab bar
                          single-view?        @(re-frame/subscribe [::is-single-view? brick-vec-key])
                          no-view?            @(re-frame/subscribe [::has-no-view? brick-vec-key])
-                         selected-view       (rs @(re-frame/subscribe [::selected-view brick-vec-key]))
+                         selected-view       (rs @(re-frame/subscribe [::selected-view brick-vec-key]) brick-vec-key)
                          selected-view       (cond viz-reco? reco-selected
                                                    (and (nil? selected-view) no-view? (seq sql-keys))
                                                    (first sql-keys)
@@ -11941,7 +11951,7 @@
                          is-pinned?          @(re-frame/subscribe [::is-pinned? brick-vec-key])
                          col-selected?       @(re-frame/subscribe [::column-selected-any-field? brick-vec-key selected-view])
                          views               @(re-frame/subscribe [::views brick-vec-key])
-                         views               (if (keyword? views) (rs views) views)
+                         views               (if (keyword? views) (rs views brick-vec-key) views)
                         ; reco-statuses       @(re-frame/subscribe [::queries-reco-status brick-vec-key]) ;; in for reactions
                          all-views           (if single-view? [] (vec (keys views)))
                           ;multiple-oz-views? @(re-frame/subscribe [::multiple-oz-views? brick-vec-key])
@@ -11987,8 +11997,8 @@
                                  :on-mouse-down #(mouse-down-handler % brick-vec-key tab-offset true)
                                  ;:on-mouse-up (fn [_] (reset! mouse-down? false))
                                  :on-mouse-over  #(when (and (not @over-block?) (not (= brick-vec-key @over-block)))
-                                                    (do (reset! over-block brick-vec-key)
-                                                        (reset! over-block? true))) ;; took out enter for watched over...? 12/14/23
+                                                    (reset! over-block brick-vec-key)
+                                                    (reset! over-block? true)) ;; took out enter for watched over...? 12/14/23
                                  :on-mouse-leave  #(do (reset! over-block? false)
                                                        (reset! over-block nil))
                                  :on-double-click #(do
@@ -12029,8 +12039,8 @@
                          ;                      )
 
                            :on-mouse-over  #(when (not @over-block?)
-                                              (do (reset! over-block brick-vec-key)
-                                                  (reset! over-block? true))) ;; took out enter for watched over...? 12/14/23
+                                              (reset! over-block brick-vec-key)
+                                              (reset! over-block? true)) ;; took out enter for watched over...? 12/14/23
                            :on-mouse-leave  #(do (reset! over-block? false)
                                                  (reset! over-block nil))}
                                                ;(re-frame/dispatch [::conn/click-parameter [:user-sys] nil])

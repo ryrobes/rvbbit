@@ -5,7 +5,7 @@
   [reagent "1.1.1"]
   ;[re-frame "1.3.0"]
   [re-frame "1.4.3"]
-  ;[day8.re-frame/tracing "0.6.2"]
+  [day8.re-frame/tracing "0.6.2"]
   ;[re-com "2.13.2"]
   ;[org.clojars.ryrobes/re-com "2.13.2-119-fcebaee-SNAPSHOT"]
   ;[org.clojars.ryrobes/re-com "2.13.2-121-8f432b8-SNAPSHOT"]

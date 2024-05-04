@@ -19,13 +19,23 @@
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))
 
+
+(def subscription-counts (atom {}))
+
+(defn tracked-subscribe [query & args] ;;; lmao - hack to track subscriptions for debugging
+  (swap! subscription-counts update query (fnil inc 0))
+  (apply re-frame.core/subscribe query args))
+
+(defn get-subscription-counts []
+  @subscription-counts)
+
+
+
 (defn sha-256 [s]
   (let [hash (goog.crypt.Sha256.)
         bytes (apply str (mapv cljs.core/char s))]
     (.update hash bytes)
     (cstr/replace (str (base64/encodeByteArray (.digest hash))) "/" "")))
-
-
 
 ;;(tap> [:sha256 (sha-256 "hello")])
 

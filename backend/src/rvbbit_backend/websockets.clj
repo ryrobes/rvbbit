@@ -2690,6 +2690,7 @@
 
 (defmethod wl/handle-request :signals-history [{:keys [client-name signal-name]}]
   ;;(ut/pp [:get-signals-history client-name :for signal-name])
+  (inc-score! client-name :push)
   (let [cc (get-in @signals-atom [signal-name :signal])
         ccw (vec (ut/where-dissect cc))
         history (select-keys (get @last-signals-history-atom signal-name) ccw)
@@ -2793,10 +2794,12 @@
 
 (defmethod wl/handle-request :get-status [{:keys [client-name]}]
   (ut/pp [:client-status-check-from client-name])
+  (inc-score! client-name :push)
   {:statuses (get @queue-status client-name)
    :data (get @queue-data client-name)})
 
 (defmethod wl/handle-request :get-flow-statuses [{:keys [client-name]}]
+  (inc-score! client-name :push)
   (let [payload   (merge (flow-statuses) ;; @flow-status
                          (into {} (for [[k v] @processes]
                                     {k (-> v
@@ -3765,6 +3768,7 @@
 
 (defmethod wl/handle-request :honey-call [{:keys [kind ui-keypath honey-sql client-name]}]
   (swap! q-calls2 inc)
+  (inc-score! client-name :push)
   ;; (ut/pp [kind {:kind kind :ui-keypath ui-keypath :honey-sql honey-sql}])
   (ut/pp [kind ;(not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
           @q-calls2 kind ui-keypath :system-db client-name ;; honey-sql ; (get honey-sql :transform-select) :full-honey honey-sql ; :select (get honey-sql :select)
@@ -5006,6 +5010,7 @@
 (defmethod wl/handle-request :honey-xcall [{:keys [kind ui-keypath honey-sql client-cache? sniff? connection-id panel-key client-name page kit-name]}]
   (swap! q-calls inc)
   (inc! running-user-queries)
+  (inc-score! client-name :push)
   (ut/pp [kind ;(not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
           @q-calls kind ui-keypath connection-id client-name panel-key page
           {:client-cache? client-cache? :sniff? sniff? ;:raw-honey (str honey-sql) ; (get honey-sql :transform-select) :full-honey honey-sql ; :select (get honey-sql :select)
