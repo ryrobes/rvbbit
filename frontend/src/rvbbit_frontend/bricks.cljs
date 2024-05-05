@@ -87,7 +87,7 @@
 ;; (re-frame/reg-event-db
 ;;  ::ship-atom
 ;;  (fn [db [_ atom-name aval]]
-;;    (re-frame/dispatch [::wfx/request :default
+;;    (ut/tracked-dispatch [::wfx/request :default
 ;;                        {:message    {:kind :client-ui
 ;;                                      :atom-name atom-name
 ;;                                      :value aval
@@ -107,7 +107,7 @@
 
 (defn watch-fn [key ref old-state new-state]
   (when (not= old-state new-state)
-    (re-frame/dispatch [::ship-atom key new-state])))
+    (ut/tracked-dispatch [::ship-atom key new-state])))
 
 (add-watch dragging? "dragging?" watch-fn)
 (add-watch dragging-body "dragging-body" watch-fn)
@@ -172,14 +172,14 @@
               ;(reset! screenshot dataUrl)
                 (when (not (nil? dataUrl))
                   ;(tap> [:push-snap? (get db :client-name)])
-                  (re-frame/dispatch [(if save? 
+                  (ut/tracked-dispatch [(if save? 
                                         ::http/save-screen-snap
                                         ::http/save-snap) dataUrl]))))
             (fn [error]
               (tap> ["Error taking screenshot:" error])))
 
      (when (not save?)
-       (re-frame/dispatch [::wfx/request :default
+       (ut/tracked-dispatch [::wfx/request :default
                            {:message    {:kind :session-snaps
                                          :client-name (get db :client-name)}
                             :on-response [::save-sessions]
@@ -228,7 +228,7 @@
 
 
 (defn theme-pull-fn [cmp-key fallback & test-fn]
-  (let [v                   @(re-frame/subscribe [::conn/clicked-parameter-key [cmp-key]])
+  (let [v                   @(ut/tracked-subscribe [::conn/clicked-parameter-key [cmp-key]])
         ;v                   (resolver/logic-and-params v nil)
         t0                  (cstr/split (str (ut/unkeyword cmp-key)) #"/")
         t1                  (keyword (first t0))
@@ -245,12 +245,20 @@
         rs (fn [edn] (resolver/logic-and-params edn nil))]
     (rs (if (not (nil? v)) v fallback0))))
 
+;; (re-frame/reg-sub
+;;  ::theme-pull-sub ;; more cache hits?
+;;  (fn [_ [_ cmp-key fallback & test-fn]]
+;;    (theme-pull-fn cmp-key fallback test-fn)))
+
 (re-frame/reg-sub
  ::theme-pull-sub ;; more cache hits?
- (fn [_ [_ cmp-key fallback & test-fn]]
+ (fn [_ {:keys [cmp-key fallback test-fn]}]
    (theme-pull-fn cmp-key fallback test-fn)))
 
-(defn theme-pull [cmp-key fallback & test-fn] @(re-frame/subscribe [::theme-pull-sub cmp-key fallback test-fn])) ;; cache tricky shit?
+(defn theme-pull [cmp-key fallback & test-fn] 
+  ;@(ut/tracked-subscribe [::theme-pull-sub cmp-key fallback test-fn])
+  @(rfa/sub ::theme-pull-sub {:cmp-key cmp-key :fallback fallback :test-fn test-fn})
+  ) ;; cache tricky shit?
 
 (defn code-mirror-theme [] ;; generate a dynamic theme to inject into the DOM
   (let [ccolor (fn [x] (get (theme-pull :theme/data-colors db/data-colors) x))]
@@ -346,7 +354,10 @@
                                                                                      {v (keyword (str "flow/" (first that) ">*running?"))})))]
                                                           (walk/postwalk-replace logic-kps obody)))
          runstream-refs (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/") (ut/deep-flatten (get db :runstreams)))))
-         runstreams (vec (for [{:keys [flow-id]} @(re-frame/subscribe [::runstreams])] (keyword (str "flow/" flow-id ">*running?"))))
+         runstreams (vec (for [{:keys [flow-id]} 
+                               ;;@(ut/tracked-subscribe [::runstreams])
+                               @(rfa/sub ::runstreams)
+                               ] (keyword (str "flow/" flow-id ">*running?"))))
          panels (create-runner-listeners (get db :panels))
          drop-refs (vec (distinct (vals @drop-last-tracker-refs)))
          sflow (get db :selected-flow)
@@ -387,7 +398,7 @@
 (re-frame/reg-sub
  ::stale-flow-subs?
  (fn [db _]
-   (let [new @(re-frame/subscribe [::get-flow-subs])
+   (let [new @(ut/tracked-subscribe [::get-flow-subs])
          old (get db :flow-subs [])
          deads (vec (cset/difference (set old) (set new)))]
     ;;  (when (ut/ne? deads) 
@@ -397,7 +408,7 @@
 (re-frame/reg-event-db
  ::unsub-to-flows
  (fn [db _]
-   (let [new @(re-frame/subscribe [::get-flow-subs])
+   (let [new @(ut/tracked-subscribe [::get-flow-subs])
          old (get db :flow-subs [])
          deads (vec (cset/difference (set old) (set new)))
          _ (tap> [:flow-unsub-change! (get db :client-name) {:old old :new new :removing deads}])
@@ -405,22 +416,22 @@
          ]
      (doall
       (doseq [n deads]
-        (re-frame/dispatch [::http/unsub-to-flow-value n])))
+        (ut/tracked-dispatch [::http/unsub-to-flow-value n])))
      (assoc db :flow-subs new))))
 
 
 (re-frame/reg-sub
  ::get-new-flow-subs
  (fn [db _]
-   (let [flow-refs @(re-frame/subscribe [::get-flow-subs])
+   (let [flow-refs @(ut/tracked-subscribe [::get-flow-subs])
          subbed (get db :flow-subs [])]
      (vec (cset/difference (set flow-refs) (set subbed))))))
 
 (re-frame/reg-sub
  ::new-flow-subs?
  (fn [db _]
-   (ut/ne? @(re-frame/subscribe [::get-new-flow-subs]))
-  ;;  (not= @(re-frame/subscribe [::get-new-flow-subs]) 
+   (ut/ne? @(ut/tracked-subscribe [::get-new-flow-subs]))
+  ;;  (not= @(ut/tracked-subscribe [::get-new-flow-subs]) 
   ;;        (get db :flow-subs))
    ))
 
@@ -429,43 +440,43 @@
  (fn [db _]
    (get db :alerts)))
 
-;(tap> [:flow-refs @(re-frame/subscribe [::get-flow-subs])])
-;(tap> [:new-flow-refs @(re-frame/subscribe [::get-new-flow-subs])])
+;(tap> [:flow-refs @(ut/tracked-subscribe [::get-flow-subs])])
+;(tap> [:new-flow-refs @(ut/tracked-subscribe [::get-new-flow-subs])])
 
 (re-frame/reg-event-db
  ::sub-to-flows
  (fn [db _]
-   (let [new @(re-frame/subscribe [::get-new-flow-subs])
+   (let [new @(ut/tracked-subscribe [::get-new-flow-subs])
          old (get db :flow-subs [])
          _ (tap> [:flow-sub-change! (get db :client-name) {:old old :new new}])
          ;all (get db :flow-subs [])
          subbed (vec (for [n new]
-                       (do (re-frame/dispatch [::http/sub-to-flow-value n])
+                       (do (ut/tracked-dispatch [::http/sub-to-flow-value n])
                            n)))]
      (assoc db :flow-subs (into subbed old)))))
 
 (re-frame/reg-event-db
  ::sub-to-flows-all ;; temp debugging
  (fn [db _]
-   (let [;new @(re-frame/subscribe [::get-new-flow-subs])
+   (let [;new @(ut/tracked-subscribe [::get-new-flow-subs])
          all (get db :flow-subs [])
         ;;  subbed (vec (for [n all]
-        ;;                (do (re-frame/dispatch [::http/sub-to-flow-value n])
+        ;;                (do (ut/tracked-dispatch [::http/sub-to-flow-value n])
         ;;                    n)))
          ]
-     (doseq [n all] (re-frame/dispatch [::http/sub-to-flow-value n]))
+     (doseq [n all] (ut/tracked-dispatch [::http/sub-to-flow-value n]))
      ;(assoc db :flow-subs (into subbed (get db :flow-subs [])))
      db
      )))
 
-;(re-frame/dispatch [::sub-to-flows])
+;(ut/tracked-dispatch [::sub-to-flows])
 
 
 (re-frame/reg-sub
  ::runstream-running?
  (fn [db _]
-   (let [selected-block @(re-frame/subscribe [::selected-block])
-         selected-view @(re-frame/subscribe [::editor-panel-selected-view])
+   (let [selected-block @(ut/tracked-subscribe [::selected-block])
+         selected-view @(ut/tracked-subscribe [::editor-panel-selected-view])
          kp (vec (flatten [selected-block selected-view]))
          mode (get @db/chat-mode kp (if
                                      (= "none!" (first kp))
@@ -512,7 +523,7 @@
    ;(tap> [:refresh-runstream-panel (keys (get db :runstreams))])
    (when  (not (empty? (keys (get db :runstreams))))
      (doseq [flow-id (keys (get db :runstreams))]
-       (re-frame/dispatch [::wfx/request :default
+       (ut/tracked-dispatch [::wfx/request :default
                            {:message    {:kind :get-flow-open-ports
                                          :flow-id flow-id
                                          :flowmap flow-id
@@ -591,14 +602,14 @@
          new-client-name (ut/gen-client-name) ;; (keyword (str (cstr/replace (str client-name) ":" "") "-resub*-" (rand-int 12345)))
          ]
      
-     (re-frame/dispatch [::wfx/unsubscribe http/socket-id :server-push2])
-     (re-frame/dispatch [::wfx/disconnect http/socket-id])
+     (ut/tracked-dispatch [::wfx/unsubscribe http/socket-id :server-push2])
+     (ut/tracked-dispatch [::wfx/disconnect http/socket-id])
 
-     (re-frame/dispatch [::set-client-name new-client-name]) ;; helps?
+     (ut/tracked-dispatch [::set-client-name new-client-name]) ;; helps?
      (tap> [:initiating-resub-for-new new-client-name])
 
-     (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])
-     (re-frame/dispatch [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)])
+     (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options client-name)])
+     (ut/tracked-dispatch [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)])
      (tap> [:initiating-resub-for-new new-client-name :done?])
      db)))
 
@@ -607,13 +618,13 @@
 ;;  (fn [db _]
 ;;    (tap> [:initiating-resub-for! (get db :client-name)])
 ;;    (let [client-name (get db :client-name)]
-;;      (re-frame/dispatch [::wfx/unsubscribe http/socket-id :server-push2])
-;;      (re-frame/dispatch [::wfx/disconnect http/socket-id])
+;;      (ut/tracked-dispatch [::wfx/unsubscribe http/socket-id :server-push2])
+;;      (ut/tracked-dispatch [::wfx/disconnect http/socket-id])
 
 ;;      (go
 ;;        (<! (async/timeout 3000)) ; wait for 3 seconds
-;;        (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])
-;;        (re-frame/dispatch [::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]))
+;;        (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options client-name)])
+;;        (ut/tracked-dispatch [::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]))
 ;;      db)))
 
 ;; (re-frame/reg-sub
@@ -640,15 +651,15 @@
       :dispatch-n [[::wfx/unsubscribe http/socket-id :server-push2]
                    [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)]]})))
 
-(defn sql-alias-replace-sub [query] @(re-frame/subscribe [::sql-alias-replace-sub query]))
+(defn sql-alias-replace-sub [query] @(ut/tracked-subscribe [::sql-alias-replace-sub query]))
 
 (re-frame.core/reg-event-fx
  ::save
  (fn [{:keys [db]} _]
    ;(tap> [:saving? 1])
-   (let [flow-id @(re-frame/subscribe [:rvbbit-frontend.flows/selected-flow])
-         flowmaps @(re-frame/subscribe [:rvbbit-frontend.flows/flowmap-raw])
-         flowmaps-connections @(re-frame/subscribe [:rvbbit-frontend.flows/flowmap-connections])
+   (let [flow-id @(ut/tracked-subscribe [:rvbbit-frontend.flows/selected-flow])
+         flowmaps @(ut/tracked-subscribe [:rvbbit-frontend.flows/flowmap-raw])
+         flowmaps-connections @(ut/tracked-subscribe [:rvbbit-frontend.flows/flowmap-connections])
          screen-name (get db :screen-name)
          resolved-queries (into {} (for [[qk q] (apply merge (for [[_ p] (get db :panels)] (get p :queries)))] {qk (sql-alias-replace-sub q)}))
         ;;  resolved-queries (for [[qk q] (apply merge (for [[_ p] (get db :panels)] (get p :queries)))] {qk q})
@@ -713,7 +724,9 @@
  ::matching-snapshots
  (fn [db _]
    (let [snaps (get-in db [:snapshots :params] {})
-         curr @(re-frame/subscribe [::current-params])]
+         ;curr @(ut/tracked-subscribe [::current-params])
+         curr @(rfa/sub ::current-params)
+         ]
      (for [[k v] snaps
            :let [block-states (get v :block-states)
                  valid-state-keys (vec (cset/intersection ;; since we are diffing, we only want state keys that exist in both
@@ -801,7 +814,7 @@
 (re-frame/reg-sub
  ::visible-tabs
  (fn [db]
-   (let [tabs @(re-frame/subscribe [::tabs])
+   (let [tabs @(ut/tracked-subscribe [::tabs])
          hidden-tabs (get db :hidden-tabs [])]
      (vec (cset/difference (set tabs) (set hidden-tabs))))))
 
@@ -814,7 +827,7 @@
  ::toggle-tab-visibility
  (undoable)
  (fn [db [_ tab-name]]
-   (let [tabs (get db :hidden-tabs []) ;@(re-frame/subscribe [::tabs])
+   (let [tabs (get db :hidden-tabs []) ;@(ut/tracked-subscribe [::tabs])
          exists? (some #(= % tab-name) tabs)]
      (if exists?
        (assoc db :hidden-tabs (vec (remove #(= % tab-name) tabs)))
@@ -974,9 +987,10 @@
  ::update-flow-statuses
  (fn [db [_]]
    ;(tap> [:flow-statuses-ask (get db :client-name)])
-   (re-frame/dispatch [::wfx/request :default
+   (ut/tracked-dispatch [::wfx/request :default
                        {:message {:kind         :get-flow-statuses
                                   :client-name  (get db :client-name)}
+                        :timeout 50000
                         :on-response [::flow-statuses-response]}])
    db))
 
@@ -1184,7 +1198,7 @@
          aslflat (filter #(cstr/includes? (str %) "/") (ut/deep-flatten asl))
          valid-body-params (filter #(not (and (cstr/ends-with? (str %) "-sys")
                                               (cstr/starts-with? (str %) ":theme")))
-                                   (ut/deep-flatten @(re-frame/subscribe [::valid-body-params-in asl])))
+                                   (ut/deep-flatten @(ut/tracked-subscribe [::valid-body-params-in asl])))
          vbp-bools (try  (into {}
                                (for [e valid-body-params] (let [spl (cstr/split (str e) #"/")]
                                                             {[(-> (first spl) str (ut/replacer #":" "") keyword)
@@ -1195,7 +1209,7 @@
                                 (for [[p v] (get-in db [:click-param])
                                       :when (and (not (= p :theme)) (not (cstr/ends-with? (str p) "-sys")))]
                                   (for [e (keys v)]
-                                    (let [;asl @(re-frame/subscribe [::all-sql-calls])
+                                    (let [;asl @(ut/tracked-subscribe [::all-sql-calls])
                                           comb-key (keyword (str (ut/unkeyword p) "/" (ut/unkeyword e)))]
                                       {[p e] (true? (some #(= % comb-key) aslflat))})))))
          both-maps (into {} (for [[[k1 k2] b] (merge params vbp-bools)
@@ -1362,7 +1376,7 @@
  ::delete-selected-panel
  (undoable)
  (fn [db _]
-   (re-frame/dispatch [::delete-panel (get db :selected-block)])
+   (ut/tracked-dispatch [::delete-panel (get db :selected-block)])
    db))
 
 (re-frame/reg-event-db
@@ -1587,12 +1601,13 @@
 (re-frame/reg-sub
  ::runstream-override-map
  (fn [_ _]
-   (let [runstreams @(re-frame/subscribe [::runstreams])]
+   (let [;runstreams @(ut/tracked-subscribe [::runstreams])
+         runstreams @(rfa/sub ::runstreams)]
          ;runstreams (vec (filter #(get % :run-on-change?) runstreams))
 
      ;(tap> [:rs-list? runstreams])
          ;runstream-keys (vec (map :flow-id runstreams))
-         ;runstreams-lookups @(re-frame/subscribe [::bricks/runstreams-lookups])
+         ;runstreams-lookups @(ut/tracked-subscribe [::bricks/runstreams-lookups])
      (into {}
            (for [{:keys [flow-id values]} runstreams
                  :let [override-map (into {}
@@ -1600,7 +1615,7 @@
                                                 :when (not (nil? value))]
                                             {k (if (= source :input)
                                                  value
-                                                 (let [vv @(re-frame/subscribe [::rs-value flow-id k])]
+                                                 (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])]
                                                    (if (and (vector? vv) (every? string? vv))
                                                      (cstr/join "\n" vv) vv)))}))
                      ;overrides-map? (not (empty? override-map))
@@ -1796,11 +1811,11 @@
 
 (re-frame/reg-event-fx
  ::undo-one
- (fn [_ _] (re-frame/dispatch [:undo])))
+ (fn [_ _] (ut/tracked-dispatch [:undo])))
 
 (re-frame/reg-event-fx
  ::redo-one
- (fn [_ _] (re-frame/dispatch [:redo])))
+ (fn [_ _] (ut/tracked-dispatch [:redo])))
 
 (re-frame/reg-sub
  ::build-grid
@@ -1893,8 +1908,8 @@
     (let [start-x       (.-clientX evt)
           start-y       (.-clientY evt)
           ;_ (tap> [:move block tab-offset])
-          ;block         @(re-frame/subscribe [::selected-block])
-          selected-root @(re-frame/subscribe [::root block]) ;;[-1 -1] ; @(re-frame/subscribe [::selected-root])
+          ;block         @(ut/tracked-subscribe [::selected-block])
+          selected-root @(ut/tracked-subscribe [::root block]) ;;[-1 -1] ; @(ut/tracked-subscribe [::selected-root])
           off-x         (:x offset)
           off-y         (:y offset)
           ;shift? (.-shiftKey evt)
@@ -1907,9 +1922,9 @@
           x             (- x1 (first tab-offset))
           y             (- y1 (last tab-offset))
           translate (when false ;icon?
-                      (let [containers @(re-frame/subscribe [::containers])
+                      (let [containers @(ut/tracked-subscribe [::containers])
                             started-in-container? (not (= tab-offset [0 0]))
-                            curr-tab @(re-frame/subscribe [::selected-tab])
+                            curr-tab @(ut/tracked-subscribe [::selected-tab])
                             tab-over (or (first (is-inside? [x1 y1] containers)) curr-tab)
                             base-tab? (= curr-tab tab-over)]
                         ;;(tap> [:containers  started-in-container? base-tab? tab-over x y x1 y1])
@@ -1929,10 +1944,10 @@
       (when (not (= selected-root [x y]))
         (if (and icon? translate)
           (do (when (not (= @dragging-block block)) (reset! dragging-block block))
-              (re-frame/dispatch-sync [::update-workspace-noundo [block :root] [(first translate) (second translate)]])
-              (re-frame/dispatch-sync [::update-workspace-noundo [block :tab] (last translate)]))
+              (ut/tracked-dispatch-sync [::update-workspace-noundo [block :root] [(first translate) (second translate)]])
+              (ut/tracked-dispatch-sync [::update-workspace-noundo [block :tab] (last translate)]))
           (do (when (not (= @dragging-block block)) (reset! dragging-block block))
-              (re-frame/dispatch-sync [::update-workspace-noundo [block :root] [x y]])))))))
+              (ut/tracked-dispatch-sync [::update-workspace-noundo [block :root] [x y]])))))))
 
 (def mouse-dragging-panel? (reagent/atom false))
 
@@ -1975,8 +1990,8 @@
           req-block-name (get-in (first body) [:drag-meta :block-name])
           new-keyw       (if (nil? req-block-name) (keyword new-key) (keyword req-block-name))
           new-keyw       (ut/safe-key new-keyw)
-          tab            @(re-frame/subscribe [::selected-tab])
-          param-value    (str @(re-frame/subscribe [::conn/clicked-parameter [(get-in (first body) [:drag-meta :param-table]) (get-in (first body) [:drag-meta :param-field])]]))
+          tab            @(ut/tracked-subscribe [::selected-tab])
+          param-value    (str @(ut/tracked-subscribe [::conn/clicked-parameter [(get-in (first body) [:drag-meta :param-table]) (get-in (first body) [:drag-meta :param-field])]]))
           is-image?      (and
                           (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".png")
                               (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpg")
@@ -2051,12 +2066,12 @@
                                             :font-family  :theme/base-font} :child "hi!"]
                                       :stack [:layout {:panels {:hello-there {:h 0.99 :w 0.99 :root [0 0]}}}]}
                             :queries {}})]
-    ;(tap> [:param-drop @(re-frame/subscribe [::conn/clicked-parameter [(get-in (first body) [:drag-meta :param-table]) (get-in (first body) [:drag-meta :param-field])]])])
+    ;(tap> [:param-drop @(ut/tracked-subscribe [::conn/clicked-parameter [(get-in (first body) [:drag-meta :param-table]) (get-in (first body) [:drag-meta :param-field])]])])
     ;(tap> [:param-drop (first body)])
     ;(when (and (not (nil? root)) (not (nil? height)) (nil? @dyn-dropper-hover)
     ;           (not (nil? width)) (>= height 2) (>= width 2))
       ;;(tap> [:insert? [new-keyw] base-map])
-      (re-frame/dispatch [::update-workspace [new-keyw] base-map])
+      (ut/tracked-dispatch [::update-workspace [new-keyw] base-map])
     ;  )
       (reset! hover-square nil))))
 
@@ -2083,14 +2098,14 @@
 (defn insert-rec-preview-block [viz query condis connection-id combohash combo-name shape-name single? panel?]
   (let [new-key     (str "reco-preview" (if (not single?) combohash ""))
         new-keyw    (keyword new-key)
-        ;combo-name @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/combo_edn]])
-        ;shape-name @(re-frame/subscribe [::conn/clicked-parameter-key (if panel?
+        ;combo-name @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_edn]])
+        ;shape-name @(ut/tracked-subscribe [::conn/clicked-parameter-key (if panel?
         ;                                                                [:viz-shapes0-sys/shape]
         ;                                                                [:viz-shapes0-sys2/shape])])
-        table-name  @(re-frame/subscribe [::conn/clicked-parameter-key (if panel?
+        table-name  @(ut/tracked-subscribe [::conn/clicked-parameter-key (if panel?
                                                                          [:viz-tables-sys/table_name]
                                                                          [:viz-tables-sys2/table_name])])
-        mad-libs-row (if (not panel?) @(re-frame/subscribe [::lookup-mad-libs-row combohash]) {})
+        mad-libs-row (if (not panel?) @(ut/tracked-subscribe [::lookup-mad-libs-row combohash]) {})
         table-name  (if (keyword? table-name) (ut/replacer (ut/replacer (str table-name) ":" "") "-" "_") table-name)
         condi-keys  (try (keys (read-string condis)) (catch :default _ []))
         condi-walks (into {}
@@ -2117,11 +2132,11 @@
         ;                    {(keyword (if (= q 0) "sql" (str "sql-" (+ 1 q))))
         ;                     (nth query q)}))
         ;queries (merge queries0 queries1)
-        h             (if panel? @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/h]]) (get mad-libs-row :h nil))
-        w             (if panel? @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/w]]) (get mad-libs-row :w nil))
+        h             (if panel? @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/h]]) (get mad-libs-row :h nil))
+        w             (if panel? @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/w]]) (get mad-libs-row :w nil))
         selected-view (if panel?
                         (try ;; weirdness here.. why was blowing up as seq? def just a keyword
-                          (let [sv @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/selected_view]])] (when (not (empty? sv)) sv))
+                          (let [sv @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/selected_view]])] (when (not (empty? sv)) sv))
                           (catch :default _ nil))
                         (when (not (empty? (get mad-libs-row :selected_view))) (get mad-libs-row :selected_view)))
         selected-view (when selected-view (try (keyword (ut/replacer selected-view #":" "")) (catch :default _ selected-view)))
@@ -2145,7 +2160,7 @@
     ;(tap> [:insert-condis condis :condi-keys condi-keys :condi-walks condi-walks])
     ;(when (and (not (nil? root)) (not (nil? height)) (nil? @dyn-dropper-hover)
     ;           (not (nil? width)) (>= height 2) (>= width 2))
-    (re-frame/dispatch [::update-workspace-noundo [new-keyw] base-map])))
+    (ut/tracked-dispatch [::update-workspace-noundo [new-keyw] base-map])))
     ;  )
 
 
@@ -2195,48 +2210,50 @@
                   ;(tap> :sofar?)
 
                   (when (= dm-type :viz-reco)
-                    (let [cc          @(re-frame/subscribe [::conn/clicked-parameter [:recos-sys]])
+                    (let [cc          @(ut/tracked-subscribe [::conn/clicked-parameter [:recos-sys]])
                           combo-keys  (select-keys cc [:context_hash :combo_hash])
-                          client-name @(re-frame/subscribe [::conn/client-name])]
+                          client-name @(ut/tracked-subscribe [::conn/client-name])]
                       (tap> [:dropped-viz-reco! data combo-keys cc])
-                      (re-frame/dispatch [::wfx/request :default
+                      (ut/tracked-dispatch [::wfx/request :default
                                           {:message {:kind         :selected-reco
                                                      :dm-type      :viz-reco
                                                      :combo_hash   (get combo-keys :combo_hash)
                                                      :context_hash (get combo-keys :context_hash)
-                                                     :client-name  client-name}}])))
+                                                     :client-name  client-name}
+                                           :timeout 50000}])))
 
                   (when (= dm-type :meta-fields)
-                    (let [;cc @(re-frame/subscribe [::conn/clicked-parameter [:recos-sys]])
+                    (let [;cc @(ut/tracked-subscribe [::conn/clicked-parameter [:recos-sys]])
                           ;combo-keys (select-keys cc [:context_hash :combo_hash])
                           cc          (get rooted-data :drag-meta)
-                          client-name @(re-frame/subscribe [::conn/client-name])]
+                          client-name @(ut/tracked-subscribe [::conn/client-name])]
                       (tap> [:dropped-field-usage data cc cc])
-                      (re-frame/dispatch [::wfx/request :default
+                      (ut/tracked-dispatch [::wfx/request :default
                                           {:message {:kind        :selected-reco
                                                      :dm-type     :meta-fields
                                                      :drag-meta   cc
                                                      ;:combo_hash (get combo-keys :combo_hash)
                                                      ;:context_hash (get combo-keys :context_hash)
-                                                     :client-name client-name}}])))
+                                                     :client-name client-name}
+                                           :timeout 50000}])))
 
                   (tap> [:dropped type :ok-new? :drag-meta-type dm-type [@on-block? @dyn-dropper-hover] ok-new? rooted-data root])
                   (reset! dragging? false)
                   (cond
                     (= dm-type :meta-screens)
-                    (re-frame/dispatch [::http/load (get rooted-data :file-path)])
+                    (ut/tracked-dispatch [::http/load (get rooted-data :file-path)])
 
                     (= dm-type :meta-theme)
-                    (re-frame/dispatch [::overwrite-theme
+                    (ut/tracked-dispatch [::overwrite-theme
                                         (apply dissoc rooted-data
                                                [:block-key :drag-meta :root :file-path])])
 
                     (= dm-type :meta-board)
-                    (re-frame/dispatch [::add-board
+                    (ut/tracked-dispatch [::add-board
                                         (apply dissoc rooted-data
                                                [:block-key :drag-meta :root :file-path])])
 
-                    ; (get rooted-data :file_path) ;; (get @(re-frame/subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
+                    ; (get rooted-data :file_path) ;; (get @(ut/tracked-subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
                     ok-new?                                 ;(or (nil? @dyn-dropper-hover) (not @on-block?)) ;; dont create new block for context drops
                     (insert-new-block root 4 4 rooted-data)))}
      [re-com/box :child element]]
@@ -2267,7 +2284,7 @@
                       (js/Math.floor (/ orig-y brick-size))]
           drag-w     (- x (js/Math.floor (/ orig-x brick-size)))
           drag-h     (- y (js/Math.floor (/ orig-y brick-size)))
-          drag-wake  @(re-frame/subscribe [::build-grid
+          drag-wake  @(ut/tracked-subscribe [::build-grid
                                            (+ drag-h (last start-root) 1)
                                            (+ drag-w (first start-root) 1)
                                            (last start-root)
@@ -2288,7 +2305,7 @@
 
 (defn resize-mouse-move-handler [offset width height]
   (fn [evt]
-    (let [block      @(re-frame/subscribe [::selected-block])
+    (let [block      @(ut/tracked-subscribe [::selected-block])
           start-x    (.-clientX evt)
           start-y    (.-clientY evt)
           off-x      (:x offset)
@@ -2297,19 +2314,19 @@
           h          (js/Math.floor (/ (- start-y off-y) brick-size))
           wf         (+ w width 0)
           hf         (+ h height 0)
-          selected-h @(re-frame/subscribe [::selected-h])
-          selected-w @(re-frame/subscribe [::selected-w])
+          selected-h @(ut/tracked-subscribe [::selected-h])
+          selected-w @(ut/tracked-subscribe [::selected-w])
           wmax       (if (< wf 2) 2 wf)
           hmax       (if (< hf 2) 2 hf)]
-      (when (not (= hmax selected-h)) (re-frame/dispatch [::update-workspace-noundo [block :h] hmax]))
-      (when (not (= wmax selected-w)) (re-frame/dispatch [::update-workspace-noundo [block :w] wmax])))))
+      (when (not (= hmax selected-h)) (ut/tracked-dispatch [::update-workspace-noundo [block :h] hmax]))
+      (when (not (= wmax selected-w)) (ut/tracked-dispatch [::update-workspace-noundo [block :w] wmax])))))
 
 (defn resize-mouse-down-handler [e]
-  ;(re-frame/dispatch [::select-block panel-id])
+  ;(ut/tracked-dispatch [::select-block panel-id])
   (let [{:keys [left top]} (get-client-rect e)
-        block   @(re-frame/subscribe [::selected-block])
-        width   @(re-frame/subscribe [::workspace [block :w]])
-        height  @(re-frame/subscribe [::workspace [block :h]])
+        block   @(ut/tracked-subscribe [::selected-block])
+        width   @(ut/tracked-subscribe [::workspace [block :w]])
+        height  @(ut/tracked-subscribe [::workspace [block :h]])
         offset  {:x (- (.-clientX e) width)
                  :y (- (.-clientY e) height)}
         on-move (resize-mouse-move-handler offset width height)]
@@ -2379,7 +2396,7 @@
 
 (defn panel-code-box [_ _ width-int height-int value]
   (let [sql-hint? (cstr/includes? (str value) ":::sql-string")
-        selected-kp @(re-frame/subscribe [::editor-panel-selected-view])
+        selected-kp @(ut/tracked-subscribe [::editor-panel-selected-view])
         selected-kp (if (nil? (first selected-kp)) nil selected-kp)
         key selected-kp
         font-size (if (nil? key) 13 17)
@@ -2408,12 +2425,12 @@
               ;;                           (catch :default _ :cannot-parse))
               ;;                unparseable? (= parse :cannot-parse)]
               ;;            (if unparseable? (js/alert "BAD FORMS!")
-              ;;                (re-frame/dispatch-sync [::update-workspace [panel-id key] parse])))
+              ;;                (ut/tracked-dispatch-sync [::update-workspace [panel-id key] parse])))
               :onBlur  #(let [parse        (try (read-string
                                                   ;(ut/rs-save-floats ;-preserve-floats
                                                  (cstr/join " " (ut/cm-deep-values %)))
                                                 (catch :default e [:cannot-parse (str (.-message e))]))
-                              selected-kp @(re-frame/subscribe [::editor-panel-selected-view])
+                              selected-kp @(ut/tracked-subscribe [::editor-panel-selected-view])
                               selected-kp (if (nil? (first selected-kp)) nil selected-kp)
                               key selected-kp
                               unparseable? (= (first parse) :cannot-parse)]
@@ -2425,8 +2442,8 @@
 
                             (do (reset! db/bad-form? false)
                                 (if (nil? key)
-                                  (re-frame/dispatch-sync [::update-selected parse])
-                                  (re-frame/dispatch-sync [::update-selected-key-cons key parse])))))
+                                  (ut/tracked-dispatch-sync [::update-selected parse])
+                                  (ut/tracked-dispatch-sync [::update-selected-key-cons key parse])))))
               :options {:mode              (if sql-hint? "sql" "clojure")
                         :lineWrapping      true
                         :lineNumbers       true
@@ -2468,8 +2485,8 @@
                                       (catch :default _ (pr-str (cstr/join "\n" rr))))]
                          (tap> [:open-input stringify? kp rr rrd value])
                          (if stringify?
-                           (when (not= value rr) (re-frame/dispatch [::conn/click-parameter kp rr]))
-                           (re-frame/dispatch [::conn/click-parameter kp rrd])))
+                           (when (not= value rr) (ut/tracked-dispatch [::conn/click-parameter kp rr]))
+                           (ut/tracked-dispatch [::conn/click-parameter kp rrd])))
               :options {:mode              syntax
                         :lineWrapping      true
                         :lineNumbers       false ;true
@@ -2497,7 +2514,7 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value   (ut/format-map (- width-int 24)
                                       (str value))
-              :onBlur  #(re-frame/dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
+              :onBlur  #(ut/tracked-dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
               :options {:mode              (if sql-hint? "sql" "clojure")
                         :lineWrapping      true
                         :lineNumbers       true
@@ -2528,13 +2545,13 @@
                                                (get value key))))
               ;:value (str (if (nil? key) value
               ;                (get value key)))
-              :onBlur  #(re-frame/dispatch [::set-user-parameters type-key
+              :onBlur  #(ut/tracked-dispatch [::set-user-parameters type-key
                                             (read-string (cstr/join " " (ut/cm-deep-values %)))])
               ;:onBlur #(doseq [[k v] (read-string (cstr/join " " (ut/cm-deep-values %)))]
-              ;           (re-frame/dispatch [::conn/click-parameter [type-key k] v]))
+              ;           (ut/tracked-dispatch [::conn/click-parameter [type-key k] v]))
               ;:onBlur #(if (nil? key)
-              ;           (re-frame/dispatch-sync [::update-selected (read-string (cstr/join " " (ut/cm-deep-values %)))])
-              ;           (re-frame/dispatch-sync [::update-selected-key key (read-string (cstr/join " " (ut/cm-deep-values %)))]))
+              ;           (ut/tracked-dispatch-sync [::update-selected (read-string (cstr/join " " (ut/cm-deep-values %)))])
+              ;           (ut/tracked-dispatch-sync [::update-selected-key key (read-string (cstr/join " " (ut/cm-deep-values %)))]))
               :options {:mode              (if sql-hint? "sql" "clojure")
                         :lineWrapping      true
                         :lineNumbers       true
@@ -2630,7 +2647,7 @@
 
 
 (defn panel-code-box-single [panel-id key width-int height-int]
-  (let [value     @(re-frame/subscribe [::workspace [panel-id key]])
+  (let [value     @(ut/tracked-subscribe [::workspace [panel-id key]])
         sql-hint? (cstr/includes? (str value) ":::sql-string")]
     [re-com/box
      :size "none"
@@ -2648,7 +2665,7 @@
                                                 (catch :default _ :cannot-parse))
                               unparseable? (= parse :cannot-parse)]
                           (if unparseable? (js/alert "BAD FORMS!")
-                              (re-frame/dispatch-sync [::update-workspace [panel-id key] parse])))
+                              (ut/tracked-dispatch-sync [::update-workspace [panel-id key] parse])))
               :options {:mode              (if sql-hint? "sql" "clojure")
                         :lineWrapping      true
                         :lineNumbers       true
@@ -2661,7 +2678,7 @@
                         :theme             "hopscotch"}}]]))
 
 ;; (defn sql-data-one-off [keypath honey-sql]                  ;; yeah, no good. lol
-;;   (re-frame/dispatch [::wfx/request :default
+;;   (ut/tracked-dispatch [::wfx/request :default
 ;;                       {:message     {:kind       :honey-call
 ;;                                      :ui-keypath keypath
 ;;                                      :honey-sql  honey-sql
@@ -2669,8 +2686,8 @@
 ;;                        :on-response [::http/socket-response]
 ;;                        ;:on-timeout [::failed-get-users]
 ;;                        :timeout     500000}])
-;;   (re-frame/dispatch [::add-to-sql-history keypath honey-sql])
-;;   @(re-frame/subscribe [::conn/sql-data keypath]))
+;;   (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql])
+;;   @(ut/tracked-subscribe [::conn/sql-data keypath]))
 
 (re-frame/reg-sub
  ::meta-from-param-name
@@ -2709,13 +2726,13 @@
 (defn click-param-browser [click-params width-int height-int]
   (let [ph                  @param-hover                    ;; reaction hack
         pf                  @db/param-filter
-        selected-block      @(re-frame/subscribe [::selected-block])
-        current-tab-queries (try                            ;(map #(-> % ut/sql-keyword str) @(re-frame/subscribe [::current-tab-queries]))
-                              (into (into (vec @(re-frame/subscribe [::current-tab-queries]))
-                                          (vec @(re-frame/subscribe [::current-tab-blocks])))
-                                    (vec @(re-frame/subscribe [::current-tab-condis])))
+        selected-block      @(ut/tracked-subscribe [::selected-block])
+        current-tab-queries (try                            ;(map #(-> % ut/sql-keyword str) @(ut/tracked-subscribe [::current-tab-queries]))
+                              (into (into (vec @(ut/tracked-subscribe [::current-tab-queries]))
+                                          (vec @(ut/tracked-subscribe [::current-tab-blocks])))
+                                    (vec @(ut/tracked-subscribe [::current-tab-condis])))
                               (catch :default _ []))
-        panel-queries       @(re-frame/subscribe [::panel-sql-call-keys selected-block])
+        panel-queries       @(ut/tracked-subscribe [::panel-sql-call-keys selected-block])
         panel-q-str         (str (first panel-queries))]
 
    ;; (tap> [current-tab-queries click-params])
@@ -2759,19 +2776,19 @@
                                       :background-color (theme-pull :theme/editor-param-background-color nil)}
                               :children (for [[k v] filtered-params]
                                           (let
-                                           [meta        @(re-frame/subscribe [::meta-from-param-name k])
+                                           [meta        @(ut/tracked-subscribe [::meta-from-param-name k])
                                             dtype       (get meta :data-type)
                                             dtype       (try (if (and (= dtype "vector") (every? string? v)) "string" dtype)
                                                              (catch :default _ dtype)) ;; since stringified code is technically not a string yet...
                                                                ;; ^^ its a vector of strings so it can be code edited properly...
                                                                ;; kinda fucky, but makes sense (also we do this in grid.cljs in the view tab drag out - line ~2200)
                                            ;; dtype       (if (nil? dtype) (get (ut/data-typer v) :data-type) dtype) ;; direct lookup?
-                                            dcolor      (get @(re-frame/subscribe [::conn/data-colors]) dtype)
+                                            dcolor      (get @(ut/tracked-subscribe [::conn/data-colors]) dtype)
                                             psplit      (cstr/split (ut/unkeyword (str k)) "/")
                                             ;table       (keyword (ut/replacer (ut/replacer (first psplit) #":" "") ".*" ""))
                                             table       (-> (first psplit) (ut/replacer  #":" "") (ut/replacer  ".*" "") keyword)
                                             field       (keyword (last psplit))
-                                            param-value (str @(re-frame/subscribe [::conn/clicked-parameter [table field]]))
+                                            param-value (str @(ut/tracked-subscribe [::conn/clicked-parameter [table field]]))
                                             is-image?   (and
                                                          (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".png")
                                                              (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpg")
@@ -2783,7 +2800,7 @@
                                             is-b64?      (ut/is-base64? (str param-value))
                                             is-video?     (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".mp4")
                                                               (cstr/ends-with? (cstr/lower-case (str param-value)) ".mov"))
-                                            selected?   @(re-frame/subscribe [::has-query? selected-block table])
+                                            selected?   @(ut/tracked-subscribe [::has-query? selected-block table])
                                             pwidth      (js/Math.floor (/ (count (str param-value)) 1.7))
                                             pwidth      (cond (> pwidth 30) 30
                                                               (< pwidth 6) 6
@@ -2817,7 +2834,7 @@
                                              :size "auto"
                                               ;:width (px (- width-int 33))
                                              :attr {:on-mouse-enter #(reset! param-hover [k table field])
-                                                    ;:on-mouse-down #(when (= (.-button %) 1) (re-frame/dispatch [::conn/declick-parameter [table field]]))
+                                                    ;:on-mouse-down #(when (= (.-button %) 1) (ut/tracked-dispatch [::conn/declick-parameter [table field]]))
                                                     :on-mouse-leave #(reset! param-hover nil)}
                                               ;:padding "3px"
                                              :style {:border           (str "1px solid " dcolor)
@@ -2841,7 +2858,7 @@
                                                   [re-com/md-icon-button
                                                    :md-icon-name "fa-regular fa-trash-can" ;; "zmdi-close" ;; <i class="fa-regular fa-trash-can"></i>
                                                    :style {:color dcolor :padding "0px" :margin-top "-2px" :margin-right "3px" :font-size "14px" :height "15px"}
-                                                   :on-click #(re-frame/dispatch [::conn/declick-parameter [table field]])]
+                                                   :on-click #(ut/tracked-dispatch [::conn/declick-parameter [table field]])]
                                                   [re-com/box
                                                    :child (str dtype) :style {:color       dcolor :font-size "10px"
                                                                               :padding-top "3px" :padding-left "4px" :padding-right "4px"}])]]
@@ -2891,8 +2908,8 @@
 
 (defn screen-query-browser [width-int height-int]
   (let [ph             @query-hover ;; reaction hack
-        queries-in-this-tab @(re-frame/subscribe [::queries-in-this-tab])
-        selected-block @(re-frame/subscribe [::selected-block])
+        queries-in-this-tab @(ut/tracked-subscribe [::queries-in-this-tab])
+        selected-block @(ut/tracked-subscribe [::selected-block])
         ;queries (vec (cset/intersection (set queries) (set queries-in-this-tab)))
         queries queries-in-this-tab] ;; TODO clean up, incoming queries is unneeded here, we got a local sub
 
@@ -2916,22 +2933,22 @@
                          ;          (not (cstr/starts-with? (str (first %)) ":connections-sys/"))
                          ;          (not (cstr/starts-with? (str (first %)) ":fields-sys/")))
                          ;    grp)]
-                         (let [;meta @(re-frame/subscribe [::meta-from-query-name k])
-                               meta                @(re-frame/subscribe [::conn/sql-merged-metadata [k]])
+                         (let [;meta @(ut/tracked-subscribe [::meta-from-query-name k])
+                               meta                @(ut/tracked-subscribe [::conn/sql-merged-metadata [k]])
                                rows                (nf (get meta :rowcount))
                                fields              (count (get meta :fields))
-                               query-panel         @(re-frame/subscribe [::panel-from-query-name k])
-                               subq-blocks         @(re-frame/subscribe [::subq-panels selected-block])
-                               subq-mapping        @(re-frame/subscribe [::subq-mapping])
+                               query-panel         @(ut/tracked-subscribe [::panel-from-query-name k])
+                               subq-blocks         @(ut/tracked-subscribe [::subq-panels selected-block])
+                               subq-mapping        @(ut/tracked-subscribe [::subq-mapping])
                                parent-of-selected? (some #(= % query-panel) subq-blocks)
                                upstream?           (some #(= % query-panel) (upstream-search subq-mapping selected-block))
                                downstream?         (some #(= % query-panel) (downstream-search subq-mapping selected-block))
-                               selected?           @(re-frame/subscribe [::has-query? selected-block k])]
+                               selected?           @(ut/tracked-subscribe [::has-query? selected-block k])]
                            ;(tap> @param-hover)
                            [re-com/v-box
                             :attr {:on-mouse-enter #(reset! query-hover k)
                                    :on-mouse-leave #(reset! query-hover nil)
-                                   :on-click       #(re-frame/dispatch [::select-block query-panel])}
+                                   :on-click       #(ut/tracked-dispatch [::select-block query-panel])}
                             :style {:border           (cond
                                                         (= selected-block query-panel) "2px solid #9973e0"
                                                         parent-of-selected? "2px solid #e6ed21"
@@ -2988,11 +3005,11 @@
 
 (defn screen-block-browser [width-int height-int]
   (let [ph             @query-hover ;; reaction hack
-       ; queries-in-this-tab @(re-frame/subscribe [::queries-in-this-tab])
-        selected-block @(re-frame/subscribe [::selected-block])
+       ; queries-in-this-tab @(ut/tracked-subscribe [::queries-in-this-tab])
+        selected-block @(ut/tracked-subscribe [::selected-block])
         ;queries (vec (cset/intersection (set queries) (set queries-in-this-tab)))
        ; queries queries-in-this-tab ;; TODO clean up, incoming queries is unneeded here, we got a local sub
-        blocks (map keyword @(re-frame/subscribe [::current-tab-blocks]))]
+        blocks (map keyword @(ut/tracked-subscribe [::current-tab-blocks]))]
 
     ;(tap> ph)
     [re-com/box
@@ -3013,23 +3030,23 @@
                          ;          (not (cstr/starts-with? (str (first %)) ":connections-sys/"))
                          ;          (not (cstr/starts-with? (str (first %)) ":fields-sys/")))
                          ;    grp)]
-                         (let [;meta @(re-frame/subscribe [::meta-from-query-name k])
-                               ;meta                {} ;@(re-frame/subscribe [::conn/sql-merged-metadata [k]])
+                         (let [;meta @(ut/tracked-subscribe [::meta-from-query-name k])
+                               ;meta                {} ;@(ut/tracked-subscribe [::conn/sql-merged-metadata [k]])
                                ;rows                "0" ;(nf (get meta :rowcount))
                                ;fields              0 ;(count (get meta :fields))
-                               [rows fields]       @(re-frame/subscribe [::panel-counts k])
-                               query-panel         k ;@(re-frame/subscribe [::panel-from-query-name k])
-                               subq-blocks         @(re-frame/subscribe [::subq-panels selected-block])
-                               subq-mapping        @(re-frame/subscribe [::subq-mapping])
+                               [rows fields]       @(ut/tracked-subscribe [::panel-counts k])
+                               query-panel         k ;@(ut/tracked-subscribe [::panel-from-query-name k])
+                               subq-blocks         @(ut/tracked-subscribe [::subq-panels selected-block])
+                               subq-mapping        @(ut/tracked-subscribe [::subq-mapping])
                                parent-of-selected? (some #(= % query-panel) subq-blocks)
                                upstream?           (some #(= % query-panel) (upstream-search subq-mapping selected-block))
                                downstream?         (some #(= % query-panel) (downstream-search subq-mapping selected-block))
-                               selected?           @(re-frame/subscribe [::has-query? selected-block k])]
+                               selected?           @(ut/tracked-subscribe [::has-query? selected-block k])]
                            ;(tap> @param-hover)
                            [re-com/v-box
                             :attr {:on-mouse-enter #(reset! query-hover k)
                                    :on-mouse-leave #(reset! query-hover nil)
-                                   :on-click       #(re-frame/dispatch [::select-block query-panel])}
+                                   :on-click       #(ut/tracked-dispatch [::select-block query-panel])}
                             :style {:border           (cond
                                                         (= selected-block query-panel) "2px solid #9973e0"
                                                         parent-of-selected? "2px solid #e6ed21"
@@ -3070,7 +3087,7 @@
 (defn sql-spawner [type panel-map data-keypath target-id source-panel-key]
   (let [sql-name-base        (ut/replacer (str (ut/unkeyword target-id) "-drag-" (rand-int 45)) #"_" "-")
         ;parent-sql (get-in panel-map [:queries (first data-keypath)])
-        query-meta           @(re-frame/subscribe [::conn/sql-metadata data-keypath])
+        query-meta           @(ut/tracked-subscribe [::conn/sql-metadata data-keypath])
         field-data-type      (get-in query-meta [:fields target-id :data-type])
         parent-sql-alias     (keyword (str "query/" (ut/unkeyword (first data-keypath))))
         ;parent-sql-sql-alias (keyword (ut/replacer (str "q_" (ut/unkeyword (first data-keypath))) "*" ""))
@@ -3121,8 +3138,8 @@
 (defn sql-spawner-where [type panel-map data-keypath field-name source-panel-key & [row-num]]
   (let [sql-name-base        (ut/replacer (str (ut/unkeyword field-name) "-drag-" (rand-int 45)) #"_" "-")
         ;parent-sql (get-in panel-map [:queries (first data-keypath)])
-        selected-field       @(re-frame/subscribe [::conn/clicked-parameter data-keypath])
-        query-meta           @(re-frame/subscribe [::conn/sql-metadata data-keypath])
+        selected-field       @(ut/tracked-subscribe [::conn/clicked-parameter data-keypath])
+        query-meta           @(ut/tracked-subscribe [::conn/sql-metadata data-keypath])
         field-data-type      (get-in query-meta [:fields field-name :data-type])
         parent-sql-alias     (keyword (str "query/" (ut/unkeyword (first data-keypath))))
         ;parent-sql-sql-alias (keyword (ut/replacer (str "q_" (ut/unkeyword (first data-keypath))) "*" ""))
@@ -3133,7 +3150,7 @@
         ;(or (= "integer" field-data-type)
         ;    (= "float" field-data-type));)
         flow-item? (= (first data-keypath) :flow-fn-sys)
-        new-flow-map (when flow-item? (let [pval @(re-frame/subscribe [::conn/clicked-parameter [:flow-fn-sys]])
+        new-flow-map (when flow-item? (let [pval @(ut/tracked-subscribe [::conn/clicked-parameter [:flow-fn-sys]])
                                             modded (conn/spawn-open-input-block pval)
                                             body (get modded 2)]
                                         ;(tap> [:new-flow-map-on-old modded])
@@ -3188,11 +3205,11 @@
 
 (defn sql-spawner-chat [query-src query-tgt & [name h w]]
   (let [sql-name-base        (ut/replacer (str "chat-drag-" (rand-int 45)) #"_" "-")
-        panel-id @(re-frame/subscribe [::panel-from-query-name query-src])
-        panel-map @(re-frame/subscribe [::panel-map panel-id])
+        panel-id @(ut/tracked-subscribe [::panel-from-query-name query-src])
+        panel-map @(ut/tracked-subscribe [::panel-map panel-id])
         ;parent-sql (get-in panel-map [:queries (first data-keypath)])
-        ;selected-field       @(re-frame/subscribe [::conn/clicked-parameter data-keypath])
-        ;query-meta           @(re-frame/subscribe [::conn/sql-metadata data-keypath])
+        ;selected-field       @(ut/tracked-subscribe [::conn/clicked-parameter data-keypath])
+        ;query-meta           @(ut/tracked-subscribe [::conn/sql-metadata data-keypath])
         ;field-data-type      (get-in query-meta [:fields field-name :data-type])
         ;parent-sql-alias     (keyword (str "query/" (ut/unkeyword (first data-keypath))))
         ;parent-sql-sql-alias (keyword (ut/replacer (str "q_" (ut/unkeyword (first data-keypath))) "*" ""))
@@ -3228,13 +3245,13 @@
 
 (defn view-spawner-chat [kp query-tgt]
   (let [;sql-name-base        (ut/replacer (str "chat-drag-" (rand-int 45)) #"_" "-")
-        panel-id (first kp) ;@(re-frame/subscribe [::panel-from-query-name query-src])
-        panel-map @(re-frame/subscribe [::panel-map panel-id])
+        panel-id (first kp) ;@(ut/tracked-subscribe [::panel-from-query-name query-src])
+        panel-map @(ut/tracked-subscribe [::panel-map panel-id])
         view-name (last kp)
         view-name (if (nil? view-name) (ut/safe-key (keyword "new")) view-name)
         ;parent-sql (get-in panel-map [:queries (first data-keypath)])
-        ;selected-field       @(re-frame/subscribe [::conn/clicked-parameter data-keypath])
-        ;query-meta           @(re-frame/subscribe [::conn/sql-metadata data-keypath])
+        ;selected-field       @(ut/tracked-subscribe [::conn/clicked-parameter data-keypath])
+        ;query-meta           @(ut/tracked-subscribe [::conn/sql-metadata data-keypath])
         ;field-data-type      (get-in query-meta [:fields field-name :data-type])
         ;parent-sql-alias     (keyword (str "query/" (ut/unkeyword (first data-keypath))))
         ;parent-sql-sql-alias (keyword (ut/replacer (str "q_" (ut/unkeyword (first data-keypath))) "*" ""))
@@ -3269,7 +3286,7 @@
 ;; (defn flow-fn-spawner []
 ;;   (let [;; same as viz-reco but with dynamic combo id via panel lookup
 ;;       req-name-str     (str "block-" (rand-int 999))
-;;       ddata            @(re-frame/subscribe [::panel-map type])
+;;       ddata            @(ut/tracked-subscribe [::panel-map type])
 ;;       poss-value-walks (filter #(or (cstr/starts-with? (str %) ":query-preview")
 ;;                                     (cstr/starts-with? (str %) ":panel-key"))
 ;;                                (ut/deep-flatten ddata))
@@ -3292,10 +3309,10 @@
 ;;                       :block-name (keyword req-name-str)}})))
 
 (defn sql-spawner-meta [type]
-  (let [selected-meta-db      @(re-frame/subscribe [::conn/clicked-parameter [:connections-sys]]) ;;
-        selected-meta-table   @(re-frame/subscribe [::conn/clicked-parameter [:tables-sys]])
-        selected-meta-field   @(re-frame/subscribe [::conn/clicked-parameter [:fields-sys]])
-        selected-fields       (vec (map ut/sql-keyword (map :field_name @(re-frame/subscribe [::conn/sql-data [:fields-sys]]))))
+  (let [selected-meta-db      @(ut/tracked-subscribe [::conn/clicked-parameter [:connections-sys]]) ;;
+        selected-meta-table   @(ut/tracked-subscribe [::conn/clicked-parameter [:tables-sys]])
+        selected-meta-field   @(ut/tracked-subscribe [::conn/clicked-parameter [:fields-sys]])
+        selected-fields       (vec (map ut/sql-keyword (map :field_name @(ut/tracked-subscribe [::conn/sql-data [:fields-sys]]))))
         parent-sql-sql-alias  (ut/gen-sql-sql-alias)
         field-name            (get selected-meta-field :field_name)
         table-name            (get selected-meta-table :table_name)
@@ -3350,14 +3367,14 @@
                                                 :from     [[(keyword qual-table-name) parent-sql-sql-alias]]
                                                 :group-by [(keyword field-name)]
                                                 :order-by [[:rowcnt :desc]]}}}
-        meta-screen-load      {:file-path (get @(re-frame/subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
+        meta-screen-load      {:file-path (get @(ut/tracked-subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
                                :drag-meta {:type type}}
 
         meta-block-load       (merge
-                               (read-string @(re-frame/subscribe [::conn/clicked-parameter-key [:blocks-sys/block_data]]))
-                               (let [bk (get @(re-frame/subscribe [::conn/clicked-parameter [:blocks-sys]]) :block_key)
-                                     bn (get @(re-frame/subscribe [::conn/clicked-parameter [:blocks-sys]]) :block_name)]
-                                 {:file-path (get @(re-frame/subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
+                               (read-string @(ut/tracked-subscribe [::conn/clicked-parameter-key [:blocks-sys/block_data]]))
+                               (let [bk (get @(ut/tracked-subscribe [::conn/clicked-parameter [:blocks-sys]]) :block_key)
+                                     bn (get @(ut/tracked-subscribe [::conn/clicked-parameter [:blocks-sys]]) :block_name)]
+                                 {:file-path (get @(ut/tracked-subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
                                   :block-key bk
                                   :drag-meta {:type (cond (= bk ":*theme*") :meta-theme
                                                           (cstr/starts-with? (str bn) "board: ") :meta-board
@@ -3380,7 +3397,7 @@
       (= type :viz-reco) (let [;; we need to change all the generic aliases into real rando keys
                                ;; inlcuding potential value aliases :query-key/field.row combo keys
                                req-name-str     (str "block-" (rand-int 999))
-                               ddata            @(re-frame/subscribe [::panel-map :reco-preview])
+                               ddata            @(ut/tracked-subscribe [::panel-map :reco-preview])
                                poss-value-walks (filter #(or (cstr/starts-with? (str %) ":query-preview")
                                                              (cstr/starts-with? (str %) ":panel-key"))
                                                         (ut/deep-flatten ddata))
@@ -3409,7 +3426,7 @@
       (= type :meta-blocks) meta-block-load
       :else (let [;; same as viz-reco but with dynamic combo id via panel lookup
                   req-name-str     (str "block-" (rand-int 999))
-                  ddata            @(re-frame/subscribe [::panel-map type])
+                  ddata            @(ut/tracked-subscribe [::panel-map type])
                   poss-value-walks (filter #(or (cstr/starts-with? (str %) ":query-preview")
                                                 (cstr/starts-with? (str %) ":panel-key"))
                                            (ut/deep-flatten ddata))
@@ -3433,10 +3450,10 @@
 
 
 (defn item-subscription-spawner-meta []
-  (let [main-row-selected      @(re-frame/subscribe [::conn/clicked-parameter [:searches-rows-sys]]) ;;
-        ;subtype-row-selected   @(re-frame/subscribe [::conn/clicked-parameter [:searches-sub-type-sys]])
-        ;type-row-selected      @(re-frame/subscribe [::conn/clicked-parameter [:searches-type-sys]])
-        ;selected-fields        (vec (map ut/sql-keyword (map :field_name @(re-frame/subscribe [::conn/sql-data [:fields-sys]]))))
+  (let [main-row-selected      @(ut/tracked-subscribe [::conn/clicked-parameter [:searches-rows-sys]]) ;;
+        ;subtype-row-selected   @(ut/tracked-subscribe [::conn/clicked-parameter [:searches-sub-type-sys]])
+        ;type-row-selected      @(ut/tracked-subscribe [::conn/clicked-parameter [:searches-type-sys]])
+        ;selected-fields        (vec (map ut/sql-keyword (map :field_name @(ut/tracked-subscribe [::conn/sql-data [:fields-sys]]))))
         ttype                  (get main-row-selected :item_type)
         shortcode              (try (edn/read-string (get main-row-selected :value)) (catch :default _ "shortcode-error!"))
         rando                (rand-int 45)
@@ -3447,8 +3464,8 @@
         natural-key           (ut/safe-key (get panel-map :natural-key (keyword (str "sub-" rando))))
 
 
-        ;;panel-map            {} ;; @(re-frame/subscribe [::workspace [source-panel-id]])
-        selected-fields      (vec (keys (get @(re-frame/subscribe [::conn/sql-metadata [name]]) :fields)))
+        ;;panel-map            {} ;; @(ut/tracked-subscribe [::workspace [source-panel-id]])
+        selected-fields      (vec (keys (get @(ut/tracked-subscribe [::conn/sql-metadata [name]]) :fields)))
         selected-fields      (if (empty? selected-fields) [:*] selected-fields)
         table-name           name
         view-data            (if (= name :view) (get panel-map :views) (get-in panel-map [:views name]))
@@ -3497,8 +3514,8 @@
 
 
 (defn sql-spawner-cloner [type source-panel-id name]
-  (let [panel-map            @(re-frame/subscribe [::workspace [source-panel-id]])
-        selected-fields      (vec (keys (get @(re-frame/subscribe [::conn/sql-metadata [name]]) :fields)))
+  (let [panel-map            @(ut/tracked-subscribe [::workspace [source-panel-id]])
+        selected-fields      (vec (keys (get @(ut/tracked-subscribe [::conn/sql-metadata [name]]) :fields)))
         selected-fields      (if (empty? selected-fields) [:*] selected-fields)
         table-name           name
         view-data            (if (= name :view) (get panel-map :views) (get-in panel-map [:views name]))
@@ -3644,8 +3661,8 @@
          flow?               (get full-map :flow? false)
          opts?               (get full-map :opts? false)
          runstreams?         (get full-map :runstreams? false)
-         panel-key           @(re-frame/subscribe [::selected-block])
-         block-map           @(re-frame/subscribe [::selected-block-map])
+         panel-key           @(ut/tracked-subscribe [::selected-block])
+         block-map           @(ut/tracked-subscribe [::selected-block-map])
          wild?               (true? (and (not (= (cstr/trim (str wildcard)) "")) (not (nil? wildcard))))
         ; _ (tap> [:keypath=map keypath-map])
          scrubber-boxes      (into (sorted-map) (for [[kp [v [scrub-type [ffn ffnx]]]] keypath-map]
@@ -3856,7 +3873,7 @@
 
 (re-frame/reg-sub
  ::resolve-sql-alias
- (fn [db [_ sql-key]]
+ (fn [db {:keys [sql-key]}]
    (let [q (get
             (into {} (for [[_ v] (get db :panels)]
                        (into {} (get v :queries))))
@@ -3893,11 +3910,14 @@
                     (catch :default _ []))
 
         all-clicked-walks   (into {}
-                                  (map (fn [x] {x @(re-frame/subscribe [::generate-all-clicked
+                                  (map (fn [x] {x @(ut/tracked-subscribe [::generate-all-clicked
                                                                         (-> x str (ut/replacer #":" "")
                                                                             (ut/replacer "/*.clicked" "") keyword)])})
                                        (filter #(cstr/includes? (str %) "/*.clicked") deep-flat-query)))
-        valid-params        (into (distinct @(re-frame/subscribe [::valid-body-params-all-condis]))
+        valid-params        (into (distinct 
+                                   ;@(ut/tracked-subscribe [::valid-body-params-all-condis])
+                                   @(rfa/sub ::valid-body-params-all-condis)
+                                   )
                                   (vec (remove nil? (for [k deep-flat-query]
                                                       (when (and (keyword? k)
                                                                  (cstr/includes? (str k) "/")
@@ -3914,10 +3934,10 @@
                                              ds    (keyword (first fs))
                                              row   (int (last gs))
                                              field (keyword (first gs))]
-                                         {k (get-in @(re-frame/subscribe [::conn/sql-data [ds]]) [row field])})))
+                                         {k (get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field])})))
         condi-walks-targets (filter #(cstr/includes? (str %) "condi/") valid-params)
         condi-walks         (into {} (for [k condi-walks-targets]
-                                       {k @(re-frame/subscribe [::conn/condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
+                                       {k @(ut/tracked-subscribe [::conn/condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
         meta-walks          (into {} (for [k valid-params
                                            :when (cstr/includes? (str k) ":meta/")]
                                        {k (let [table-key (ut/replacer (str k) ":meta/" "")
@@ -3927,8 +3947,11 @@
                                              :where  [:= :table_name sql-safe]})}))
         sql-params          (into {} (for [k valid-params]
                                        (if (cstr/includes? (str k) ":query/")
-                                         {k (dissoc @(re-frame/subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))]) :style-rules)}
-                                         {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])})))
+                                         {k (dissoc 
+                                             ;;@(ut/tracked-subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))])
+                                             @(rfa/sub ::resolve-sql-alias {:sql-key (keyword (ut/replacer (str k) ":query/" ""))})
+                                             :style-rules)}
+                                         {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])})))
         replaced            (->> query
                                  (walk/postwalk-replace condi-walks)
                                  (walk/postwalk-replace all-clicked-walks)
@@ -3938,7 +3961,7 @@
         ;_ (tap> [:master-replace query valid-params all-clicked-walks value-walks meta-walks])
 
     (if
-     (not (empty? valid-params-left))
+     (ut/ne? valid-params-left)
      (sql-alias-replace replaced)
      replaced)))
 
@@ -3969,7 +3992,7 @@
                                     (or (= clause :order-by-asc)
                                         (= clause :order-by-desc)) :order-by
                                     :else clause)
-         drops                @(re-frame/subscribe [::all-drops-of :*])
+         drops                @(ut/tracked-subscribe [::all-drops-of :*])
          new-q-key            (keyword (str "query-" (rand-int 12345)))
          parent-sql-sql-alias (ut/gen-sql-sql-alias)
          dvec                 (fn [v] (vec (set v)))
@@ -3984,7 +4007,7 @@
      (cond                                                 ;p = clause-conform
 
        (some #(= clause-conform %) drops)
-       (let [;dd @(re-frame/subscribe [::drop-details clause-conform])
+       (let [;dd @(ut/tracked-subscribe [::drop-details clause-conform])
              row-num      (get-in drop-data [:drag-body :row-num])
              src-table    (get-in drop-data [:drag-body :source-query])
              param-field  (get-in drop-data [:drag-body :param-field])
@@ -4043,7 +4066,7 @@
              view-width          (or (first (filter #(= (last %) :width) (ut/kvpaths view-body))) [:nope])
              data-key            (or (first (filter #(= (last %) :dataKey) (ut/kvpaths view-body))) [:nope]) ;; temp
              view-data-ref       (get-in view-body data-key-path)
-             base-query          @(re-frame/subscribe [::find-query (fxky view-data-ref)])
+             base-query          @(ut/tracked-subscribe [::find-query (fxky view-data-ref)])
              weave-by-placeholder (keyword (str "_" (ut/replacer (str weave-by) #":" "")))
              inner-q-name        :gen-viz-609
              view-body           (-> view-body
@@ -4070,14 +4093,14 @@
                                                                render-field)))
                                      (assoc :group-by (vec (conj (get host-query :group-by) (+ (count (get host-query :select)) 1)))))]
             ;;  fxky                (fn [k] (if (cstr/starts-with? (str k) ":query/") (keyword (ut/replacer k #":query/" "")) k))
-            ;;  base-query          @(re-frame/subscribe [::find-query (fxky view-data-ref)])
+            ;;  base-query          @(ut/tracked-subscribe [::find-query (fxky view-data-ref)])
             ;;  base-query-from     (first (get base-query :from))
             ;;  base-query-fields   (cond (map? base-query-from) (get base-query-from :select)
             ;;                            (keyword? base-query-from)
-            ;;                            (get @(re-frame/subscribe [::find-query (fxky base-query-from)]) :select [])
+            ;;                            (get @(ut/tracked-subscribe [::find-query (fxky base-query-from)]) :select [])
             ;;                            :else [])
-            ;;  local-fields        (get @(re-frame/subscribe [::find-query query-key]) :select [])
-            ;;  local-meta          (get @(re-frame/subscribe [::conn/sql-metadata [query-key]]) :fields)
+            ;;  local-fields        (get @(ut/tracked-subscribe [::find-query query-key]) :select [])
+            ;;  local-meta          (get @(ut/tracked-subscribe [::conn/sql-metadata [query-key]]) :fields)
             ;;                            ;local-parent-fields (get-in table-source [0 0 :select])
             ;;  possibles           (vec (cset/intersection (set local-fields) (set base-query-fields)))
             ;;  possibles-vec       (vec (for [p possibles
@@ -4209,8 +4232,8 @@
        (let [where-exist     (get-in db [:panels panel-key :queries query-key :where])
              source-query    (get-in drop-data [:drag-body :source-table])
              target-query    (get-in drop-data [:target-query])
-             gb1             @(re-frame/subscribe [::group-bys target-query])
-             gb2             @(re-frame/subscribe [::group-bys source-query])
+             gb1             @(ut/tracked-subscribe [::group-bys target-query])
+             gb2             @(ut/tracked-subscribe [::group-bys source-query])
              group-bys       (vec (cset/intersection (set gb1) (set gb2)))
              clicked-keyword (keyword (str (ut/replacer source-query #":" "") "/*.clicked"))
              exist?          (not (empty? where-exist))
@@ -4225,8 +4248,8 @@
        (let [exist     (get-in db [:panels panel-key :queries query-key :style-rules])
              source-query    (get-in drop-data [:drag-body :source-table])
              target-query    (get-in drop-data [:target-query])
-             gb1             @(re-frame/subscribe [::group-bys target-query])
-             gb2             @(re-frame/subscribe [::group-bys source-query])
+             gb1             @(ut/tracked-subscribe [::group-bys target-query])
+             gb2             @(ut/tracked-subscribe [::group-bys source-query])
              group-bys       (vec (cset/intersection (set gb1) (set gb2)))
              rule-key        [:* (keyword (str "highlight-row-" (rand-int 12345)))]
              clicked-keyword (keyword (str (ut/replacer source-query #":" "") "/*.clicked"))
@@ -4245,8 +4268,8 @@
              source-query    (get-in drop-data [:drag-body :source-table])
              src-panel-key   (get-in drop-data [:drag-body :source-panel-key])
              target-query    (get-in drop-data [:target-query])
-             gb1             @(re-frame/subscribe [::group-bys target-query])
-             gb2             (vec (vals @(re-frame/subscribe [::view-clicked-fields src-panel-key source-query])))
+             gb1             @(ut/tracked-subscribe [::group-bys target-query])
+             gb2             (vec (vals @(ut/tracked-subscribe [::view-clicked-fields src-panel-key source-query])))
              group-bys       (vec (cset/intersection (set gb1) (set gb2)))
              clicked-keyword (keyword (str (ut/replacer src-panel-key #":" "") "/*.clicked"))
              exist?          (not (empty? where-exist))
@@ -4450,7 +4473,7 @@
               ;                  source-tab) ;; else leave the name alone!
               ;                (keyword (str (ut/unkeyword source-tab) "-copy-" (rand-int 99))))
 
-         (when (= clause-conform :delete-query) (re-frame/dispatch [::unalias-query source-tab])) ;; dont orphan refs!
+         (when (= clause-conform :delete-query) (ut/tracked-dispatch [::unalias-query source-tab])) ;; dont orphan refs!
          (-> db
              (ut/dissoc-in [:panels source-block source-key source-tab])
              (assoc :selected-block (if (and last-tab? is-selected?) nil selected-block)) ;; unselect block if we are deleting it....
@@ -4554,7 +4577,7 @@
                 (reset! on-block? false)
                 (reset! dragging-size [])
                 ;(insert-new-block root 3 3 rooted-data)
-                (re-frame/dispatch [::execute-pill-drop (get drop-data :target-panel)
+                (ut/tracked-dispatch [::execute-pill-drop (get drop-data :target-panel)
                                     (get drop-data :target-query)
                                     (get drop-data :clause) drop-data]))}
    [re-com/box :child element]])
@@ -4587,10 +4610,10 @@
   ;(when true ;(= panel-key :block-4778)
   ;(tap> [:dynamic-spawner-targets panel-key query-key [table-source dbody width-int height-int]])
   (let [drag-body              (get dbody :drag-meta)
-        selected-view          @(re-frame/subscribe [::selected-view-w-queries panel-key])
-        is-layout?             @(re-frame/subscribe [::is-layout? panel-key selected-view])
+        selected-view          @(ut/tracked-subscribe [::selected-view-w-queries panel-key])
+        is-layout?             @(ut/tracked-subscribe [::is-layout? panel-key selected-view])
 
-        layout-map             (when is-layout? (let [view @(re-frame/subscribe [::view panel-key selected-view])
+        layout-map             (when is-layout? (let [view @(ut/tracked-subscribe [::view panel-key selected-view])
                                                       kvs  (first (filter #(= (get-in view %) :layout) (ut/kvpaths view)))
                                                       kvs1 (assoc kvs (dec (count kvs)) 1)
                                                       v    (get-in view kvs1)]
@@ -4600,14 +4623,14 @@
        ;                          (tap> [:view-data-ref view-data-ref]))
         viz-for-each-fields     (when (and (keyword view-data-ref) (not (nil? query-key)))
                                   (let [fxky                (fn [k] (if (cstr/starts-with? (str k) ":query/") (keyword (ut/replacer k #":query/" "")) k))
-                                        base-query          @(re-frame/subscribe [::find-query (fxky view-data-ref)])
+                                        base-query          @(ut/tracked-subscribe [::find-query (fxky view-data-ref)])
                                         base-query-from     (first (get base-query :from))
                                         base-query-fields   (cond (map? base-query-from) (get base-query-from :select)
                                                                   (keyword? base-query-from)
-                                                                  (get @(re-frame/subscribe [::find-query (fxky base-query-from)]) :select [])
+                                                                  (get @(ut/tracked-subscribe [::find-query (fxky base-query-from)]) :select [])
                                                                   :else [])
-                                        local-fields        (get @(re-frame/subscribe [::find-query query-key]) :select [])
-                                        local-meta          (get @(re-frame/subscribe [::conn/sql-metadata [query-key]]) :fields)
+                                        local-fields        (get @(ut/tracked-subscribe [::find-query query-key]) :select [])
+                                        local-meta          (get @(ut/tracked-subscribe [::conn/sql-metadata [query-key]]) :fields)
                                        ;local-parent-fields (get-in table-source [0 0 :select])
                                         possibles           (vec (cset/intersection (set local-fields) (set base-query-fields)))
                                         possibles-vec       (vec (for [p possibles
@@ -4634,7 +4657,7 @@
                                     (not (cstr/includes? (cstr/lower-case (str target)) "month"))
                                     (not (cstr/includes? (cstr/lower-case (str target)) "week")))
         dim?                   (not agg?)
-        connection-id          @(re-frame/subscribe [::connection-id panel-key])
+        connection-id          @(ut/tracked-subscribe [::connection-id panel-key])
         drag-type              (get drag-body :type)
         param?                 (and (or (= drag-type :param)
                                         (= drag-type :where))
@@ -4651,13 +4674,13 @@
         same-table?            (or (= source-table (first table-source))
                                    ;(= (ut/unre-qword source-table) (ut/unre-qword (first table-source)))
                                    (= table-source-k source-table))
-        clicked-fields         (if view-drag? @(re-frame/subscribe [::view-clicked-fields source-panel-key source-table]) [])
+        clicked-fields         (if view-drag? @(ut/tracked-subscribe [::view-clicked-fields source-panel-key source-table]) [])
         clicked?               (not (empty? clicked-fields))
         query-fields           (if (or clicked? table?)
-                                 (vec (keys (get @(re-frame/subscribe [::conn/sql-metadata [query-key]]) :fields))) [])
-        ;dim-query-fields (into {} (filter (fn [[_ v]] (= (get v :data-type) "string")) (get @(re-frame/subscribe [::conn/sql-metadata [query-key]]) :fields)))
+                                 (vec (keys (get @(ut/tracked-subscribe [::conn/sql-metadata [query-key]]) :fields))) [])
+        ;dim-query-fields (into {} (filter (fn [[_ v]] (= (get v :data-type) "string")) (get @(ut/tracked-subscribe [::conn/sql-metadata [query-key]]) :fields)))
         pivot-dim-query-fields (keys (into {} (filter (fn [[_ v]] (and (= (get v :data-type) "string") (< (get v :distinct) 50)))
-                                                      (get @(re-frame/subscribe [::conn/sql-merged-metadata [query-key]]) :fields))))
+                                                      (get @(ut/tracked-subscribe [::conn/sql-merged-metadata [query-key]]) :fields))))
         common-fields          (cond table? (vec (cset/intersection (set query-fields) (set (get drag-body :table-fields))))
                                      clicked? (vec (cset/intersection (set (vals clicked-fields)) (set query-fields)))
                                      :else [])
@@ -4673,8 +4696,8 @@
 
         self?                  (= panel-key source-panel-key)
         view-based?            (nil? table-source)
-        w                      @(re-frame/subscribe [::panel-width panel-key])
-        h                      @(re-frame/subscribe [::panel-height panel-key])
+        w                      @(ut/tracked-subscribe [::panel-width panel-key])
+        h                      @(ut/tracked-subscribe [::panel-height panel-key])
 
         multi-param?           (and (or (= drag-type :param)
                                         (= drag-type :where))
@@ -4731,7 +4754,7 @@
 
         viz-options            [[:x :y :color] [:size :row :column] [:shapes :label]]
         action-typer           (try (keyword (get-in dbody [:drag-meta :data-type])) (catch :default _ :error!)) ;; (get-in dbody [:drag-meta :param-full]) == actual value (or fqdn param I suppose)
-        drops                  @(re-frame/subscribe [::all-drops-of action-typer])
+        drops                  @(ut/tracked-subscribe [::all-drops-of action-typer])
         ;;_ (tap> [:spawner-drops action-typer panel-key drops])
         view-options           (remove nil? [[:text]
                                              (when (not (empty? drops)) drops)
@@ -4866,7 +4889,7 @@
 
     ;(when partial-union? (tap> [query-key panel-key :shadows? partial-union? not-view? not-sys? partial-union? (not self?)]))
     ;(tap> [:drag-body drag-body])
-    ;;(tap> [:pivot-meta? query-key pivot-dim-query-fields @(re-frame/subscribe [::conn/sql-merged-metadata [query-key]])])
+    ;;(tap> [:pivot-meta? query-key pivot-dim-query-fields @(ut/tracked-subscribe [::conn/sql-merged-metadata [query-key]])])
 
     ;(when is-layout?
     ;  (tap> [:find-layout-map layout-map]))
@@ -4876,8 +4899,8 @@
     ;parent-of-selected? "2px solid #9973e0"
     ;upstream? "2px solid #7be073"
     ;(tap> [:dyn-targets agg? (keys pivot-dim-query-fields)])
-    ;(tap> [:tt @(re-frame/subscribe [::conn/sql-metadata [query-key]])
-    ;           @(re-frame/subscribe [::conn/sql-merged-metadata [query-key]])])
+    ;(tap> [:tt @(ut/tracked-subscribe [::conn/sql-metadata [query-key]])
+    ;           @(ut/tracked-subscribe [::conn/sql-merged-metadata [query-key]])])
     ;(tap> [{(str selected-view "1") sql-options}])
     ;(tap> [:drag panel-key source-panel-key table-source table-source-k source-table drag-body panel-key])
     ;(tap> [:targets-run-in panel-key :from table-source :w query-key :err? drag-body])
@@ -5104,7 +5127,7 @@
                                                               :size "auto"])]))]]])]))))
 
 (re-frame/reg-sub                                           ;; sub is cached so faster than doing this expensive run each time? will sync properly?
- ::dynamic-drop-targets                                    ;; @(re-frame/subscribe [::dynamic-drop-targets table-source dbody panel-key query-key width-int height-int])
+ ::dynamic-drop-targets                                    ;; @(ut/tracked-subscribe [::dynamic-drop-targets table-source dbody panel-key query-key width-int height-int])
  (fn [_ [_ table-source dbody panel-key query-key width-int height-int]]
    [dynamic-spawner-targets table-source dbody panel-key query-key width-int height-int]))
 
@@ -5114,8 +5137,8 @@
 ;;                                          (when (and (keyword? k) (cstr/includes? (str k) "/")) k))))
 ;;         sql-params   (into {} (for [k valid-params]         ;; deref here?
 ;;                                 (if (cstr/includes? (str k) ":query/")
-;;                                   {k (dissoc @(re-frame/subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))]) :style-rules)}
-;;                                   {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])})))
+;;                                   {k (dissoc @(ut/tracked-subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))]) :style-rules)}
+;;                                   {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])})))
 ;;         replaced     (->> query
 ;;                           ;(walk/postwalk-replace condi-walks)
 ;;                           ;(walk/postwalk-replace value-walks)
@@ -5135,14 +5158,14 @@
           (catch :default _ s)))))
 
 ;; (defn materialize-all-sql [panel-id]
-;;   (let [block-map @(re-frame/subscribe [::workspace [panel-id]])
+;;   (let [block-map @(ut/tracked-subscribe [::workspace [panel-id]])
 ;;         sql-calls (get block-map :queries)
 ;;         ; sql-params (into {} (for [k (ut/deep-flatten sql-calls)]
 ;;         ;                       (cond
 ;;         ;                         (cstr/includes? (str k) ":query/")
-;;         ;                         {k @(re-frame/subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))])}
+;;         ;                         {k @(ut/tracked-subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))])}
 ;;         ;                         (cstr/includes? (str k) "/")
-;;         ;                         {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}
+;;         ;                         {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}
 ;;         ;                         :else {})))
 ;;         ]
 ;;     (into {} (doall (for [[k v] sql-calls]
@@ -5161,14 +5184,14 @@
 ;;                         {k str-query}))))))
 
 (defn materialize-one-sql [panel-id sql-key]
-  (let [block-map @(re-frame/subscribe [::workspace [panel-id]])
+  (let [block-map @(ut/tracked-subscribe [::workspace [panel-id]])
         sql-calls {sql-key (get-in block-map [:queries sql-key])}]
         ; sql-params (into {} (for [k (ut/deep-flatten sql-calls)]
         ;                       (cond
         ;                         (cstr/includes? (str k) ":query/")
-        ;                         {k @(re-frame/subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))])}
+        ;                         {k @(ut/tracked-subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))])}
         ;                         (cstr/includes? (str k) "/")
-        ;                         {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}
+        ;                         {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}
         ;                         :else {})))
 
     (first (for [[k v] sql-calls]
@@ -5191,13 +5214,13 @@
                   ; str-query (try (-> query
                   ;                    (honey/format {:pretty true :inline true}))
                   ;                (catch js/Error e [(str "\n -- honey-sql error - cannot parse: \n /* " e " */ ")]))
-                   str-query [@(re-frame/subscribe [::get-sql-server-string k])]]
+                   str-query [@(ut/tracked-subscribe [::get-sql-server-string k])]]
                ;(tap> [:sql-parse query data-key k v])
                (str "-- " k "\n" (first str-query)))))))
 
 (defn formula-code-box [panel-id key width-int height-int type]
   (let [;sql-hint? (cstr/includes? (str value) ":::sql-string")
-        honey-sql  @(re-frame/subscribe [::query panel-id key])
+        honey-sql  @(ut/tracked-subscribe [::query panel-id key])
         sql-string (materialize-one-sql panel-id key)]
     ;(tap> (cstr/split (str sql-string) #"\n"))
     [re-com/box
@@ -5219,8 +5242,8 @@
               ;:value (str (if (nil? key) value
               ;                (get value key)))
               ;:onBlur #(if (nil? key)
-              ;           (re-frame/dispatch-sync [::update-selected (read-string (cstr/join " " (ut/cm-deep-values %)))])
-              ;           (re-frame/dispatch-sync [::update-selected-key key (read-string (cstr/join " " (ut/cm-deep-values %)))]))
+              ;           (ut/tracked-dispatch-sync [::update-selected (read-string (cstr/join " " (ut/cm-deep-values %)))])
+              ;           (ut/tracked-dispatch-sync [::update-selected-key key (read-string (cstr/join " " (ut/cm-deep-values %)))]))
               :options {:mode              (if (= type :string) "sql" "clojure")
                         :lineWrapping      true
                         :lineNumbers       false
@@ -5366,7 +5389,7 @@
 
      (let [curr-field (get db :selected-tab)
            ;fields    (get db :tabs)
-           fields     @(re-frame/subscribe [::visible-tabs]) ;; sneaky sneaky
+           fields     @(ut/tracked-subscribe [::visible-tabs]) ;; sneaky sneaky
            field-idx  (.indexOf fields curr-field)
            new-field  (nth (cycle fields)
                            (if forward? (+ field-idx 1) (- field-idx 1)))]
@@ -5400,7 +5423,7 @@
   (let []
     ;(tap> [:insert-hidden-reco-preview reco-selected reco-viz reco-query reco-condis single?])
     (dorun
-     (when single? (re-frame/dispatch [::new-reco-preview reco-selected]))
+     (when single? (ut/tracked-dispatch [::new-reco-preview reco-selected]))
 
      (cond (= (first (read-string reco-viz)) :vega-lite)
 
@@ -5408,7 +5431,7 @@
                  ffromv        (-> (get-in incomingv [1 :data :values])
                                    (ut/replacer "_" "-")
                                    (ut/replacer "query/" ""))
-                 original-conn @(re-frame/subscribe [::lookup-connection-id-by-query-key (keyword ffromv)])
+                 original-conn @(ut/tracked-subscribe [::lookup-connection-id-by-query-key (keyword ffromv)])
                  view          (-> incomingv
                                    (assoc-in [1 :data :values] :query-preview)
                                    (assoc-in [1 :config] :theme/vega-defaults)
@@ -5435,7 +5458,7 @@
                         ;q-cnt (count q-data)
                        incoming      (first q-data)        ;; read-string will ruin my internal namespaced keywords
                        ffrom         (ut/replacer (first (get incoming :from)) "_" "-")
-                       original-conn @(re-frame/subscribe [::lookup-connection-id-by-query-key (keyword (last (cstr/split ffrom "/")))])
+                       original-conn @(ut/tracked-subscribe [::lookup-connection-id-by-query-key (keyword (last (cstr/split ffrom "/")))])
                         ;query (assoc incoming :from [(keyword ffrom)])
                        query         (vec (for [q q-data]
                                             (if (nil? (find q :vselect))
@@ -5454,43 +5477,43 @@
                     reco-selected combo-name shape-name single? false))))))
 
 (defn clear-preview2-recos []
-  (dorun (let [prev-preview-keys (for [k @(re-frame/subscribe [::preview-keys2])] (keyword (str "reco-preview" k)))]
+  (dorun (let [prev-preview-keys (for [k @(ut/tracked-subscribe [::preview-keys2])] (keyword (str "reco-preview" k)))]
                ;per-page per-page ;; if we ever get more room...
-               ;grid-page @(re-frame/subscribe [::recos-page2])
+               ;grid-page @(ut/tracked-subscribe [::recos-page2])
                ;grid-page (if (> (- grid-page 1) pages) 0 grid-page)
                ;recos (take per-page (drop (* grid-page per-page) @(re-frame.core/subscribe [::conn/sql-data [:recos-sys2]])))
-               ;panel-keys @(re-frame/subscribe [::panel-keys])
+               ;panel-keys @(ut/tracked-subscribe [::panel-keys])
                ;recos @(re-frame.core/subscribe [::conn/sql-data [:recos-sys2]])
                ;recos-keys (vec (for [{:keys [combo_hash]} recos] combo_hash))
 
            (tap> [:clear-mad-libs-recos prev-preview-keys])
-           (doseq [k prev-preview-keys] (re-frame/dispatch [::quick-delete-panel k]))
-           (re-frame/dispatch [::set-preview-keys2 []])
-           (re-frame/dispatch [::clear-query :recos-sys2]))))
+           (doseq [k prev-preview-keys] (ut/tracked-dispatch [::quick-delete-panel k]))
+           (ut/tracked-dispatch [::set-preview-keys2 []])
+           (ut/tracked-dispatch [::clear-query :recos-sys2]))))
            ;(doseq [{:keys [combo_hash query_map viz_map condis combo_edn shape_name]} recos]
            ;  (insert-hidden-reco-preview combo_hash viz_map query_map condis combo_edn shape_name false))
 
 
 (defn mad-libs-shapes [query-id width-int height-int]
-  (let [;all-sql-call-keys @(re-frame/subscribe [::all-sql-call-keys])
-        ;grid-reco? @(re-frame/subscribe [::grid-reco?])
-        parent-panel-key  @(re-frame/subscribe [::lookup-panel-key-by-query-key query-id])
-        [h w] @(re-frame/subscribe [::size parent-panel-key])
+  (let [;all-sql-call-keys @(ut/tracked-subscribe [::all-sql-call-keys])
+        ;grid-reco? @(ut/tracked-subscribe [::grid-reco?])
+        parent-panel-key  @(ut/tracked-subscribe [::lookup-panel-key-by-query-key query-id])
+        [h w] @(ut/tracked-subscribe [::size parent-panel-key])
         height-int        (- height-int 42)
         width-int         (- width-int 10)
-        recos-page        @(re-frame/subscribe [::recos-page2])
+        recos-page        @(ut/tracked-subscribe [::recos-page2])
         query-id          (ut/replacer (ut/replacer (str query-id) #":" "") "-" "_")
         ;all-sql-call-keys-str [query-id] ;(for [e all-sql-call-keys] (ut/replacer (ut/unkeyword e) "-" "_"))
         sql-params        (merge (into {} (for [k [:viz-shapes0-sys2/shape :viz-shapes-sys2/combo_edn :user-dropdown-sys2/req-field]]
-                                            {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+                                            {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
                                  {:viz-tables-sys2/table_name query-id})
-        sql-params-minus  (dissoc sql-params :viz-tables-sys2/table_name) ;; (re-frame/dispatch [::conn/click-parameter [:viz-tables-sys2 :table_name] nil])
+        sql-params-minus  (dissoc sql-params :viz-tables-sys2/table_name) ;; (ut/tracked-dispatch [::conn/click-parameter [:viz-tables-sys2 :table_name] nil])
         ;sql-params {:viz-tables-sys2/table_name query-id}
         combo-picked?     (not (nil? (get sql-params :viz-shapes-sys2/combo_edn)))
         shape-picked?     (not (nil? (get sql-params :viz-shapes0-sys2/shape)))
-        clear-filters-fn  (fn [] (do (re-frame/dispatch [::conn/click-parameter [:viz-shapes0-sys2 :shape] nil])
-                                     (re-frame/dispatch [::conn/click-parameter [:user-dropdown-sys2 :req-field] nil])
-                                     (re-frame/dispatch [::conn/click-parameter [:viz-shapes-sys2 :combo_edn] nil])))
+        ;; clear-filters-fn  (fn [] (do (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes0-sys2 :shape] nil])
+        ;;                              (ut/tracked-dispatch [::conn/click-parameter [:user-dropdown-sys2 :req-field] nil])
+        ;;                              (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys2 :combo_edn] nil])))
         req-field-picked? (not (nil? (get sql-params :user-dropdown-sys/req-field)))
         ;query-id-sql (ut/replacer query-id)
         sql-calls         {:viz-tables-sys2  {:select   [:table_name [[:count 1] :recos]]
@@ -5544,10 +5567,10 @@
         ;block-list @(re-frame.core/subscribe [::conn/sql-data [:viz-tables-sys]])
         ;combo-list @(re-frame.core/subscribe [::conn/sql-data [:viz-shapes-sys]])
         full-recos        @(re-frame.core/subscribe [::conn/sql-data [:recos-sys2]])
-        ;current-tab @(re-frame/subscribe [::selected-tab])
-        ;current-tab-queries  (try (map #(-> % ut/sql-keyword name) @(re-frame/subscribe [::current-tab-queries])) (catch :default _ []))
+        ;current-tab @(ut/tracked-subscribe [::selected-tab])
+        ;current-tab-queries  (try (map #(-> % ut/sql-keyword name) @(ut/tracked-subscribe [::current-tab-queries])) (catch :default _ []))
         recos-count       (count full-recos)
-        pkeys             @(re-frame/subscribe [::preview-keys2])
+        pkeys             @(ut/tracked-subscribe [::preview-keys2])
         preview-keys      (vec (for [k pkeys] (keyword (str "reco-preview" k))))
         preview-maps      (into {} (for [{:keys [combo_hash shape_name combo_edn query_map score w h selected_view viz_map condis]} full-recos]
                                          ;:when (not (= combo_hash "1622273823"))
@@ -5563,7 +5586,7 @@
                                        :condis     condis
                                        :combo_edn  combo_edn}}))
 
-        ;reco-selected (keyword (str "reco-preview" @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys2/combo_hash]])))
+        ;reco-selected (keyword (str "reco-preview" @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys2/combo_hash]])))
         ;; 9x9    2 x 2
         ;; 11x29  3 x 2
         ;charts-wide 3
@@ -5597,9 +5620,9 @@
                                        ;;_ (tap> [selected-view pk pnum])
                                        ;condis (get-in preview-maps [panel-key :condis])
                                        ;combo_hash (get-in preview-maps [panel-key :combo_hash])
-                                       ;query (first @(re-frame/subscribe [::panel-sql-call-keys panel-key]))
+                                       ;query (first @(ut/tracked-subscribe [::panel-sql-call-keys panel-key]))
                                        ;running? (some #(= % query)
-                                       ;      (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+                                       ;      (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
                                        ;        (let [p (get-in e [:message :ui-keypath])]
                                        ;          (when (= (count p) 1) (first p)))))
                                        rounder          (fn [num] (/ (js/Math.round (* num 100)) 100))
@@ -5614,12 +5637,12 @@
                                        ww               (js/Math.floor (* (/ (/ width-int charts-wide) brick-size) w-multi))
                                        body             [re-com/v-box
                                                          :size "none"
-                                                         ; :attr {:on-click #(do (re-frame/dispatch [::conn/click-parameter [:recos-sys2 :combo_hash] combo_hash])
-                                                         ;                       (re-frame/dispatch [::conn/click-parameter [:recos-sys2 :combo_edn] combo_edn])
-                                                         ;                       (re-frame/dispatch [::conn/click-parameter [:recos-sys2 :shape_name] shape_name])
-                                                         ;                       (re-frame/dispatch [::conn/click-parameter [:recos-sys2 :query_map] query_map])
-                                                         ;                       (re-frame/dispatch [::conn/click-parameter [:recos-sys2 :viz_map] viz_map])
-                                                         ;                       (re-frame/dispatch [::conn/click-parameter [:recos-sys2 :condis] condis]))}
+                                                         ; :attr {:on-click #(do (ut/tracked-dispatch [::conn/click-parameter [:recos-sys2 :combo_hash] combo_hash])
+                                                         ;                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys2 :combo_edn] combo_edn])
+                                                         ;                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys2 :shape_name] shape_name])
+                                                         ;                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys2 :query_map] query_map])
+                                                         ;                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys2 :viz_map] viz_map])
+                                                         ;                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys2 :condis] condis]))}
                                                          ;:width (px (/ width-int 3)) ;:width "240px"
                                                          :width (px (* ww brick-size))
                                                          :height (px (* hh brick-size))
@@ -5658,8 +5681,8 @@
                                                                                  :font-weight   400
                                                                                  :font-size     "30px"}
                                                                          :attr {:on-double-click #(do
-                                                                                                    (re-frame/dispatch [::set-recos-page2 0])
-                                                                                                    (re-frame/dispatch [::conn/click-parameter [:viz-shapes-sys2 :combo_edn] ce]))}
+                                                                                                    (ut/tracked-dispatch [::set-recos-page2 0])
+                                                                                                    (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys2 :combo_edn] ce]))}
                                                                          :child (str ;panel-key " " pnum
                                                                                  combo_edn)]]]
                                                                                   ;;" " (value-to-color all-scores colors1 score)
@@ -5683,8 +5706,8 @@
                                                                    :font-weight    400
                                                                    :font-size      "29px"}
                                                            :attr {:on-double-click #(do
-                                                                                      (re-frame/dispatch [::set-recos-page2 0])
-                                                                                      (re-frame/dispatch [::conn/click-parameter [:viz-shapes0-sys2 :shape] shape_name]))}
+                                                                                      (ut/tracked-dispatch [::set-recos-page2 0])
+                                                                                      (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes0-sys2 :shape] shape_name]))}
                                                            :child (str shape_name)]]]]
 
                                    ;;  (if sel? (draggable
@@ -5729,21 +5752,21 @@
 
     (tap> [:full-recos recos-page preview-maps preview-keys query-id full-recos (select-keys preview-maps preview-keys)])
 
-    (dorun (let [prev-preview-keys (for [k @(re-frame/subscribe [::preview-keys2])] (keyword (str "reco-preview" k)))
+    (dorun (let [prev-preview-keys (for [k @(ut/tracked-subscribe [::preview-keys2])] (keyword (str "reco-preview" k)))
                  ;per-page per-page ;; if we ever get more room...
-                 grid-page         @(re-frame/subscribe [::recos-page2])
+                 grid-page         @(ut/tracked-subscribe [::recos-page2])
                  grid-page         (if (> (- grid-page 1) pages) 0 grid-page)
                  recos             (take per-page (drop (* grid-page per-page) @(re-frame.core/subscribe [::conn/sql-data [:recos-sys2]])))
                  recos-keys        (vec (for [{:keys [combo_hash]} recos] combo_hash))]
-             (doseq [k prev-preview-keys] (re-frame/dispatch [::quick-delete-panel k]))
-             (re-frame/dispatch [::set-preview-keys2 recos-keys])
+             (doseq [k prev-preview-keys] (ut/tracked-dispatch [::quick-delete-panel k]))
+             (ut/tracked-dispatch [::set-preview-keys2 recos-keys])
              (doseq [{:keys [combo_hash query_map viz_map condis combo_edn shape_name]} recos]
                (insert-hidden-reco-preview combo_hash viz_map query_map condis combo_edn shape_name false))))
 
     (dorun (for [[k v] sql-calls]
              (let [query        (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                ;(tap> [:mad-libs-sql k query])
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
@@ -5821,8 +5844,8 @@
                                                                   :tooltip (str k)
                                                                   :md-icon-name zmdi
                                                                   ;:on-click #(clear-filters-fn)
-                                                                  :on-click #(do (re-frame/dispatch [::set-recos-page2 0])
-                                                                                 (re-frame/dispatch [::conn/click-parameter splts-vec nil])) ;; clear THIS param
+                                                                  :on-click #(do (ut/tracked-dispatch [::set-recos-page2 0])
+                                                                                 (ut/tracked-dispatch [::conn/click-parameter splts-vec nil])) ;; clear THIS param
                                                                   :style {:font-size  "22px"
                                                                           :cursor     "pointer"
                                                                           :opacity    0.5
@@ -5847,7 +5870,7 @@
                                                           :height "19px"
                                                           :align :end
                                                           :justify :center
-                                                          :attr {:on-click #(re-frame/dispatch [::set-recos-page2 c])}
+                                                          :attr {:on-click #(ut/tracked-dispatch [::set-recos-page2 c])}
                                                           :style {:padding-right    "4px"
                                                                   :cursor           "pointer"
                                                                   :font-size        "10px"
@@ -5891,16 +5914,16 @@
 (re-frame/reg-sub
  ::query-waitings
  (fn [_ [_ query-key]]
-   (let [;; messages (map :message @(re-frame/subscribe [::wfx/pending-requests http/socket-id]))
+   (let [;; messages (map :message @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id]))
         ;;  waitings (count (filter #(and (> (count (get % :ui-keypath)) 1)
         ;;                                (cstr/includes? (str (get % :ui-keypath)) (str query-key)))
         ;;                          messages))
          waitings (true? (some #(= % query-key)
-                               (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+                               (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
                                  (let [p (get-in e [:message :ui-keypath])]
                                    (when (> (count p) 1) (first p))))))
          single-wait (true? (some #(= % query-key)
-                                  (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+                                  (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
                                     (let [p (get-in e [:message :ui-keypath])]
                                       (when (= (count p) 1) (first p))))))]
          ;single-wait (if single-wait 1 0)
@@ -5939,7 +5962,7 @@
  (fn [db [_ type]] ;; TODO add "who is asking" deets like panel, query, so we can do kit WHEN filtering on fields, data, etc
    (let [all (get-in db [:server :settings :kits])
          ;_ (tap> all)
-         curr @(re-frame/subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
+         curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
          kits (vec (sort-by :name (for [[k v] all
                                         ;:let [_ (tap> [:0 [(get v :package-name) (get v :kit-name)] curr])]
                                         :when (and (some #(= [(get v :package-name) (get v :kit-name)] %) curr) ;; is enabled in params?
@@ -5957,7 +5980,7 @@
                                             :kit-name k} v))))]
      kits)))
 
-;(tap> [:installed-kits @(re-frame/subscribe [::installed-kits])])
+;(tap> [:installed-kits @(ut/tracked-subscribe [::installed-kits])])
 
 
 (re-frame/reg-sub
@@ -5977,43 +6000,43 @@
   ;(tap> [:magic-table [panel-key data-keypath [ww hh hide-fields] ]])
   (let [viewer-sourced?           (try (and (cstr/starts-with? (first data-keypath) "::") (string? (first data-keypath))) (catch :default _ false))
         data-keypath              (if viewer-sourced? (try [(edn/read-string (ut/replacer (first data-keypath) "::" ":"))] (catch :default _ nil)) data-keypath) ;; unpack the viewer string
-        panel-map                 @(re-frame/subscribe [::workspace [panel-key]])
+        panel-map                 @(ut/tracked-subscribe [::workspace [panel-key]])
         query-key                 (first data-keypath)
         w                         (get panel-map :w 11)
         h                         (get panel-map :h 10)
-        column-selected           @(re-frame/subscribe [::column-selected panel-key query-key]) ;; reaction hack TODO (important!)
-        custom-col-widths         @(re-frame/subscribe [::custom-col-widths panel-key query-key])
+        column-selected           @(ut/tracked-subscribe [::column-selected panel-key query-key]) ;; reaction hack TODO (important!)
+        custom-col-widths         @(ut/tracked-subscribe [::custom-col-widths panel-key query-key])
         {:keys
          [row-height
           render-all?
-          clicked-row-height]}    @(re-frame/subscribe [::custom-rows panel-key query-key])
+          clicked-row-height]}    @(ut/tracked-subscribe [::custom-rows panel-key query-key])
         width-int                 (- (* (if ww ww
                                             w) brick-size) 31)
         modded-width   (- width-int 8)
         height-int                (* (if hh hh
                                          h) brick-size)
         height-int                (if viewer-sourced? (+ height-int 38) height-int)
-        selected?                 @(re-frame/subscribe [::selected-block? panel-key])
-        page-num                  @(re-frame/subscribe [::page-num panel-key query-key])
-        parameters-used-in        @(re-frame/subscribe [::parameters-used-from query-key])
+        selected?                 @(ut/tracked-subscribe [::selected-block? panel-key])
+        page-num                  @(ut/tracked-subscribe [::page-num panel-key query-key])
+        parameters-used-in        @(ut/tracked-subscribe [::parameters-used-from query-key])
         parameters-used-in-sql    (vec (filter #(not (vector? %)) parameters-used-in))
         parameters-used-in-cell   (vec (filter #(vector? %) parameters-used-in))
         ;; expensive logic here.... must re-visit  COMBINE ALL 3 INTO A SINGLE SUB FOR SUB-CACHE PERF ?
-        selected-block            @(re-frame/subscribe [::selected-block])
-        subq-blocks               @(re-frame/subscribe [::subq-panels selected-block])
+        selected-block            @(ut/tracked-subscribe [::selected-block])
+        subq-blocks               @(ut/tracked-subscribe [::subq-panels selected-block])
         parent-of-selected?       (some #(= % panel-key) subq-blocks)
-        server-kits               @(re-frame/subscribe [::server-kits :queries])
+        server-kits               @(ut/tracked-subscribe [::server-kits :queries])
         ;_ (tap> server-kits)
-        ;child-parts (if parent-of-selected? (vec (ut/deep-flatten @(re-frame/subscribe [::panel-sql-calls selected-block]))) [])
-        ;subq-mapping @(re-frame/subscribe [::subq-mapping])
+        ;child-parts (if parent-of-selected? (vec (ut/deep-flatten @(ut/tracked-subscribe [::panel-sql-calls selected-block]))) [])
+        ;subq-mapping @(ut/tracked-subscribe [::subq-mapping])
         ;; running?                  (some #(= % query-key)
-        ;;                                 (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+        ;;                                 (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
         ;;                                   (let [p (get-in e [:message :ui-keypath])]
         ;;                                     (when (= (count p) 1) (first p)))))
         ;db/context-box (reagent/atom nil)
         ;; wasteful for simple col decorations... :/
-        ;   sql-keys @(re-frame/subscribe [::panel-sql-call-keys panel-key])
-        ;   reco-selected (let [rr @(re-frame/subscribe [::conn/clicked-parameter-key [:viz-tables-sys/table]])
+        ;   sql-keys @(ut/tracked-subscribe [::panel-sql-call-keys panel-key])
+        ;   reco-selected (let [rr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:viz-tables-sys/table]])
         ;                       rr (if (not (nil? rr)) (keyword (ut/replacer rr "_" "-")) nil)] rr)
         ;   viz-reco? (and (or (= selected-block "none!") (nil? selected-block))
         ;                  (some #(= % reco-selected) sql-keys)
@@ -6025,13 +6048,13 @@
                                         (cond parent-of-selected?
                                               (vec                ;;
                                                (ut/deep-flatten (merge
-                                                                 @(re-frame/subscribe [::panel-sql-calls selected-block])
-                                                                 @(re-frame/subscribe [::views selected-block]))))
+                                                                 @(ut/tracked-subscribe [::panel-sql-calls selected-block])
+                                                                 @(ut/tracked-subscribe [::views selected-block]))))
                                         ;  viz-reco? (vec (for [f (cstr/split
-                                        ;                    (ut/replacer @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/combo_edn]]) #"\"" "") ", ")]
+                                        ;                    (ut/replacer @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_edn]]) #"\"" "") ", ")]
                                         ;              (keyword f)))
                                               :else []))
-        ;deeper-parts (if upstream? (vec (ut/deep-flatten @(re-frame/subscribe [::panel-sql-calls selected-block]))) [])
+        ;deeper-parts (if upstream? (vec (ut/deep-flatten @(ut/tracked-subscribe [::panel-sql-calls selected-block]))) [])
         ;; expensive logic here.... ^^^^ alert!
 
         ;hide-fields (try (nth block-sizes 2) (catch :default _ []))
@@ -6045,7 +6068,7 @@
         ff                        (filter #(not (cstr/starts-with? (str %) ":styler_")) (keys (first @rowset))) ;; fields with styles thrown out
 
         selected-field-idx        (.indexOf ff column-selected)
-        col-names                 (reverse (into () @(re-frame/subscribe [::col-names])))
+        col-names                 (reverse (into () @(ut/tracked-subscribe [::col-names])))
         col-selected?             (> selected-field-idx -1)
         ff                        (if (and col-selected? (and
                                                           (not (nil? col-names))
@@ -6053,25 +6076,25 @@
                                     col-names
                                     ff)
         ;; (try (vec (for [r (get result :result)] (ut/asort r map-order))) (catch :default _ (get result :result)))
-        selected-field-code       (get-in @(re-frame/subscribe [::panel-sql-calls selected-block]) [query-key :select selected-field-idx])
+        selected-field-code       (get-in @(ut/tracked-subscribe [::panel-sql-calls selected-block]) [query-key :select selected-field-idx])
         fields                    (if hide? (cset/difference
                                              (set ff)
                                              (set hide-fields))
                                       ff)
         child-cols                (cset/intersection (set child-parts) (set fields))
         fields-cnt                (count fields)
-        clicked-row               @(re-frame/subscribe [::conn/clicked-parameter data-keypath])
+        clicked-row               @(ut/tracked-subscribe [::conn/clicked-parameter data-keypath])
         ;clicked? (not (nil? clicked-row))
         equal-width               (js/Math.floor (/ modded-width fields-cnt))
         ;parent-sql (get-in panel-map [:views query-key])
         equal-width-min           100
         row-height                (if (not (nil? row-height)) row-height 25) ;50 ;100 ;25 ;25
-        metadata                  @(re-frame/subscribe [::conn/sql-metadata data-keypath])
-        post-metadata             @(re-frame/subscribe [::conn/sql-post-metadata data-keypath])
-        ;post-styles @(re-frame/subscribe [::conn/sql-post-styles data-keypath])
-        ;post-styles-rows @(re-frame/subscribe [::conn/sql-post-styles-row-lookups data-keypath])
-        ;post-styles-cells @(re-frame/subscribe [::conn/sql-post-styles-cell-lookups data-keypath])
-        stylers                   @(re-frame/subscribe [::stylers panel-key query-key])
+        metadata                  @(ut/tracked-subscribe [::conn/sql-metadata data-keypath])
+        post-metadata             @(ut/tracked-subscribe [::conn/sql-post-metadata data-keypath])
+        ;post-styles @(ut/tracked-subscribe [::conn/sql-post-styles data-keypath])
+        ;post-styles-rows @(ut/tracked-subscribe [::conn/sql-post-styles-row-lookups data-keypath])
+        ;post-styles-cells @(ut/tracked-subscribe [::conn/sql-post-styles-cell-lookups data-keypath])
+        stylers                   @(ut/tracked-subscribe [::stylers panel-key query-key])
         ;post-styles-rows
         ;style-rules (get-in panel-map [:queries query-key :style-rules])
         ;has-row-styles? (not (empty? (flatten post-styles-rows)))
@@ -6105,7 +6128,7 @@
         ;tt query-key
         ;table-source-root [(keyword (last (cstr/split (ut/unkeyword (first (flatten table-source))) #"/")))]
         drag-meta                 (get @dragging-body :drag-meta)
-        connection-id             @(re-frame/subscribe [::connection-id panel-key])
+        connection-id             @(ut/tracked-subscribe [::connection-id panel-key])
         relevant-for-dyn-drop?    (if @dragging?
                                     (and
                                      (or (= (get drag-meta :connection-id) connection-id)
@@ -6132,12 +6155,12 @@
         ;;                                     (= (get-in @dragging-body [:drag-meta :type]) :meta-fields)
         ;;                                     (= (get-in @dragging-body [:drag-meta :type]) :query))
 
-        ;;                                 (>= (count (cset/intersection (set (keys (get @(re-frame/subscribe [::conn/sql-metadata table-source-root]) :fields)))
+        ;;                                 (>= (count (cset/intersection (set (keys (get @(ut/tracked-subscribe [::conn/sql-metadata table-source-root]) :fields)))
         ;;                                                        (set (get-in @dragging-body [:drag-meta :table-fields])))) 1))
 
         ;;                           ; (and (not (= (get-in @dragging-body [:drag-meta :source-table]) (first (flatten table-source))))
         ;;                           ;      (some #(= % (get-in @dragging-body [:drag-meta :param-field]))
-        ;;                           ;            (keys (get @(re-frame/subscribe [::conn/sql-metadata table-source-root]) :fields)))
+        ;;                           ;            (keys (get @(ut/tracked-subscribe [::conn/sql-metadata table-source-root]) :fields)))
         ;;                           ;      )
         ;;                            ; when tables are NOT the same, but are from the same db (?) and have columns with the same name and TYPE...
         ;;                            ;                 (suggest a join)
@@ -6145,7 +6168,7 @@
 
         ;;                            ;(some #(= % (get-in @dragging-body [:drag-meta :param-field])) fields)
         ;;                            (some #(= % (get-in @dragging-body [:drag-meta :param-field]))
-        ;;                                  (keys (get @(re-frame/subscribe [::conn/sql-metadata table-source-root]) :fields))))
+        ;;                                  (keys (get @(ut/tracked-subscribe [::conn/sql-metadata table-source-root]) :fields))))
         callout-instead?          (and (= rowcount 1) (= fields-cnt 1))
         mad-libs?                 (= query-key @mad-libs-view)
         overlay?                  (or mad-libs?
@@ -6156,7 +6179,7 @@
         ; first-matching-style-cell (fn [r f] (apply merge (remove nil? (for [[_ {:keys [rows styles]}] (get post-styles-cells f)]
         ;                                                                 (when (some #(= % r) rows) styles)))))
         query                     (get-in panel-map [:queries query-key])
-        panel-conn-id             @(re-frame/subscribe [::panel-connection-id panel-key])
+        panel-conn-id             @(ut/tracked-subscribe [::panel-connection-id panel-key])
         has-rabbit-code?          (true? (some (fn [x] (= x "rabbit-code")) (ut/deep-flatten (get metadata :fields))))
         clicked-rabbit-code-multiplier 4
         clicked-row-height        (if (not (nil? clicked-row-height)) clicked-row-height (* row-height clicked-rabbit-code-multiplier))
@@ -6181,10 +6204,10 @@
                                          (not (= page-num -1)))
         last-page?                  (and has-pages? (= page-num (js/Math.ceil (/ full-rowcount rows-per-page))))
         first-page?                 (and has-pages? (or (nil? page-num) (= page-num 1)))
-        [waits? single-wait?] @(re-frame/subscribe [::query-waitings query-key])
+        [waits? single-wait?] @(ut/tracked-subscribe [::query-waitings query-key])
         running? single-wait?
         double-click-timeout 400]
-    (re-frame/dispatch [::set-column-default-widths panel-key query-key equal-width-final]) ;; bad side effect TODO: pure fn to calc equal widths from anywhere
+    (ut/tracked-dispatch [::set-column-default-widths panel-key query-key equal-width-final]) ;; bad side effect TODO: pure fn to calc equal widths from anywhere
     ;; (tap> [:ff col-selected? col-names ff])
     ;(tap> [:hohoho @hover-field])
     ;(tap> [:max-rows max-rows])
@@ -6227,7 +6250,7 @@
            :children
            [(when (and overlay? (not mad-libs?))
               ;[dynamic-spawner-targets table-source @dragging-body panel-key query-key width-int height-int]
-              @(re-frame/subscribe [::dynamic-drop-targets table-source @dragging-body panel-key query-key width-int height-int]))
+              @(ut/tracked-subscribe [::dynamic-drop-targets table-source @dragging-body panel-key query-key width-int height-int]))
 
             [re-com/box :child (str label)
              :size "none" :height (px (* height-int 0.1))
@@ -6252,9 +6275,9 @@
                                                                (map? base-table) (try (sql-alias-replace base-table) (catch :default _ {:select [["error in sql-alias-replace-sub2" :err]]}))
                                                                :else {:select [:*] :from table-source})]
                                            (reset! animate? true)
-                                           (re-frame/dispatch [::add-query panel-key query-key new-query])
+                                           (ut/tracked-dispatch [::add-query panel-key query-key new-query])
                                            (js/setTimeout #(do ;; change view tab
-                                                             (re-frame/dispatch [::select-view panel-key query-key])
+                                                             (ut/tracked-dispatch [::select-view panel-key query-key])
                                                              (reset! animate? false)) 1000)))} {})
              :size "auto"
              :style {:font-size   pxsize
@@ -6269,7 +6292,7 @@
          :style {:margin-top "-8px"}
          :children [(when (and overlay? (not mad-libs?))
                       ;[dynamic-spawner-targets table-source @dragging-body panel-key query-key width-int height-int]
-                      @(re-frame/subscribe [::dynamic-drop-targets table-source @dragging-body panel-key query-key width-int height-int]))
+                      @(ut/tracked-subscribe [::dynamic-drop-targets table-source @dragging-body panel-key query-key width-int height-int]))
 
                     (when (and overlay? mad-libs? (not non-panel?)) ;;; MAD LIBS
                       [re-com/box
@@ -6315,7 +6338,7 @@
                                       ;:distinct-full (get-in post-metadata [c :distinct])
                                         :upstream?    (some #(= % c) child-cols)
                                         :data-type    (get-in metadata [:fields c :data-type])
-                                        :color        (get @(re-frame/subscribe [::conn/data-colors]) (get-in metadata [:fields c :data-type]))
+                                        :color        (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in metadata [:fields c :data-type]))
                                         :row-label-fn #(if (= % clicked-row)
 
                                                          (let [row-hash (str (hash %) c)
@@ -6384,9 +6407,9 @@
                                                                             (let [rowname (str "query-preview-block" row-hash)
                                                                                   qname (str "query-preview-inviz" row-hash)]
                                                                               (when (and (= (get-in % [c 0]) :*render*)
-                                                                                         (empty? @(re-frame/subscribe [::panel-map (keyword rowname)])))
+                                                                                         (empty? @(ut/tracked-subscribe [::panel-map (keyword rowname)])))
 
-                                                                                (re-frame/dispatch [::update-workspace [(keyword rowname)]
+                                                                                (ut/tracked-dispatch [::update-workspace [(keyword rowname)]
                                                                                                     (walk/postwalk-replace
                                                                                                      {:gen-viz-609 (keyword qname)}
                                                                                                      (let [render-code (get-in % [c 1])
@@ -6406,7 +6429,7 @@
                                                                                                                       (assoc-in [:queries] (get render-code :queries)))
                                                                                                                   base)]
                                                                                                        body))]))
-                                                                            ;; (re-frame/dispatch [::update-workspace [new-keyw] base-map])
+                                                                            ;; (ut/tracked-dispatch [::update-workspace [new-keyw] base-map])
                                                                               [re-com/box :size "auto"
                                                                                :height (px (+ row-height 20)) ;"33px" ;"30px"
                                                                                :align :start :justify :start
@@ -6472,9 +6495,9 @@
                                                                  rowname (str "query-preview-block" row-hash)
                                                                  qname (str "query-preview-inviz" row-hash)]
                                                              (when (and (= (get-in % [c 0]) :*render*)
-                                                                        (empty? @(re-frame/subscribe [::panel-map (keyword rowname)])))
+                                                                        (empty? @(ut/tracked-subscribe [::panel-map (keyword rowname)])))
 
-                                                               (re-frame/dispatch [::update-workspace [(keyword rowname)]
+                                                               (ut/tracked-dispatch [::update-workspace [(keyword rowname)]
                                                                                    (walk/postwalk-replace
                                                                                     {:gen-viz-609 (keyword qname)}
                                                                                     (let [render-code (get-in % [c 1])
@@ -6512,7 +6535,7 @@
                                                            [re-com/box
                                                             :child "NULL"
                                                             :attr {:on-context-menu
-                                                                   (fn [_] (re-frame/dispatch [::conn/cell-click-parameter
+                                                                   (fn [_] (ut/tracked-dispatch [::conn/cell-click-parameter
                                                                                                [(keyword (str (ut/replacer (str query-key) #":" "") ".*"))
                                                                                                 (keyword (ut/replacer (str c) #":" ""))]
                                                                                                (get % c)]))}
@@ -6574,7 +6597,7 @@
                                                            (and (integer? (get % c)) (not (cstr/includes? (cstr/lower-case (str c)) "year")))
                                                            [re-com/box
                                                             :attr {:on-context-menu
-                                                                   (fn [_] (re-frame/dispatch [::conn/cell-click-parameter
+                                                                   (fn [_] (ut/tracked-dispatch [::conn/cell-click-parameter
                                                                                                [(keyword (str (ut/replacer (str query-key) #":" "") ".*"))
                                                                                                 (keyword (ut/replacer (str c) #":" ""))]
                                                                                                (get % c)]))}
@@ -6590,7 +6613,7 @@
                                                            :else [re-com/box :child (str (get % c))
                                                                 ;:align :start :justify :start
                                                                   :attr {:on-context-menu
-                                                                         (fn [_] (re-frame/dispatch [::conn/cell-click-parameter
+                                                                         (fn [_] (ut/tracked-dispatch [::conn/cell-click-parameter
                                                                                                      [(keyword (str (ut/replacer (str query-key) #":" "") ".*"))
                                                                                                       (keyword (ut/replacer (str c) #":" ""))]
                                                                                                      (get % c)]))
@@ -6621,8 +6644,8 @@
                     ;;                      (tap> (str "Double clicked row!"  )))
                     ;;                    (do
                     ;;                      (if (= clicked-row (get @rowset %))
-                    ;;                        (re-frame/dispatch [::conn/click-parameter data-keypath nil])
-                    ;;                        (re-frame/dispatch [::conn/click-parameter data-keypath (get @rowset %)]))
+                    ;;                        (ut/tracked-dispatch [::conn/click-parameter data-keypath nil])
+                    ;;                        (ut/tracked-dispatch [::conn/click-parameter data-keypath (get @rowset %)]))
                     ;;                      (reset! timer-id (js/setTimeout
                     ;;                                        (fn []
                     ;;                                          (reset! timer-id nil))
@@ -6644,7 +6667,7 @@
                     ;;                                          (map? base-table) (try (sql-alias-replace base-table) (catch :default _ {:select [["error in sql-alias-replace-sub2" :err]]}))
                     ;;                                          :else {:select [:*] :from table-source})]
                     ;;                        ;(tap> [:double!])
-                    ;;                      (re-frame/dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])
+                    ;;                      (ut/tracked-dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])
 
                     ;;                       ; (tap> [:q-insert table-source (when is-sub? (sql-alias-replace-sub base-table))
                     ;;                       ;        (get-in table-source [0 0])
@@ -6655,18 +6678,18 @@
                     ;;                          (reset! timer-id nil)
                     ;;                          ;(tap> (str "Double click! " @hover-field " " (get-in @rowset [x @hover-field]) " " @hover-field))
                     ;;                          (reset! animate? true)
-                    ;;                          (re-frame/dispatch [::add-query panel-key query-key new-query])
+                    ;;                          (ut/tracked-dispatch [::add-query panel-key query-key new-query])
                     ;;                          (js/setTimeout #(do ;; change view tab
-                    ;;                                          ;;(re-frame/dispatch [::update-workspace [panel-key :selected-view query-key]])
-                    ;;                                            (re-frame/dispatch [::select-view panel-key query-key])
+                    ;;                                          ;;(ut/tracked-dispatch [::update-workspace [panel-key :selected-view query-key]])
+                    ;;                                            (ut/tracked-dispatch [::select-view panel-key query-key])
                     ;;                                            (reset! animate? false)) 1000)))
-                    ;;                      ;(re-frame/dispatch [::conn/click-parameter data-keypath (get @rowset x)])
+                    ;;                      ;(ut/tracked-dispatch [::conn/click-parameter data-keypath (get @rowset x)])
                     ;;                      )
 
                     ;;                    (do ;; single click
                     ;;                      ;(tap> (str "Single click!" x))
                     ;;                        ;(when (nil? @timer-id)
-                    ;;                      (re-frame/dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])
+                    ;;                      (ut/tracked-dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])
                     ;;                      (reset! timer-id (js/setTimeout
                     ;;                                        (fn []
                     ;;                                          (reset! timer-id nil))
@@ -6675,7 +6698,7 @@
                      :on-click-row (fn [x]
                                      ;(if @timer-id ;(and @timer-id @hover-field)
 
-                                         ;(re-frame/dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])
+                                         ;(ut/tracked-dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])
 
                                      (if (and (not (get-in metadata [:fields (first @hover-field) :group-by?])) ;agg?
                                               (not (nil? (first @hover-field)))
@@ -6687,7 +6710,7 @@
                                                                 (ut/replacer (str (first @hover-field)) #":" "")))
                                              base-table    (get-in table-source [0 0])
                                              is-sub?       (true? (cstr/starts-with? (str base-table) ":query/"))
-                                             group-bys  @(re-frame/subscribe [::group-bys query-key])
+                                             group-bys  @(ut/tracked-subscribe [::group-bys query-key])
                                              clicked-keyword (keyword (str (ut/replacer query-key #":" "") "/*.clicked"))
                                             ; field-id      (first @hover-field)
                                             ; clicked-panel-key     (last @hover-field)
@@ -6698,19 +6721,19 @@
                                                              :else {:select [:*] :from table-source})
                                              new-query (assoc new-query :where [:*when clicked-keyword
                                                                                 [:*all= clicked-keyword group-bys]])]
-                                             ;;(tap> [:safe @(re-frame/subscribe [::group-by-intersection query-key query-key])])
+                                             ;;(tap> [:safe @(ut/tracked-subscribe [::group-by-intersection query-key query-key])])
                                          (reset! animate? true)
-                                         (re-frame/dispatch [::add-query panel-key query-key new-query])
+                                         (ut/tracked-dispatch [::add-query panel-key query-key new-query])
                                          (js/setTimeout #(do ;; change view tab
-                                                             ;;(re-frame/dispatch [::update-workspace [panel-key :selected-view query-key]])
-                                                           (re-frame/dispatch [::select-view panel-key query-key])
+                                                             ;;(ut/tracked-dispatch [::update-workspace [panel-key :selected-view query-key]])
+                                                           (ut/tracked-dispatch [::select-view panel-key query-key])
                                                            (reset! animate? false)) 1000))
 
-                                       (re-frame/dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])))
+                                       (ut/tracked-dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])))
 
 ;;  :on-click-row #(if (= clicked-row (get @rowset %))
-                    ;;                   (re-frame/dispatch [::conn/click-parameter data-keypath nil])
-                    ;;                   (re-frame/dispatch [::conn/click-parameter data-keypath (get @rowset %)]))
+                    ;;                   (ut/tracked-dispatch [::conn/click-parameter data-keypath nil])
+                    ;;                   (ut/tracked-dispatch [::conn/click-parameter data-keypath (get @rowset %)]))
                      ;:fixed-column-border-color "#c53ac5"
                      ; :cell-style {:background-color "#00000011"
                      ;              :padding "0px" :margin "0px"
@@ -6728,7 +6751,7 @@
                                          multi-cell-used? (true? (some #(and (= (first %) id)
                                                                              (some (fn [x] (= x (get row id))) (last %)))
                                                                        parameters-used-in-cell)) ;; parameters-used-in-cell
-                                         sel?           (and selected? @(re-frame/subscribe [::column-selected? panel-key query-key id]))
+                                         sel?           (and selected? @(ut/tracked-subscribe [::column-selected? panel-key query-key id]))
                                          poss-stylers   (filter #(cstr/starts-with? (str %) ":styler_") (keys row))
                                          styler-keys    (sort (remove nil? (for [s poss-stylers] (when (= (get row s) 1)
                                                                                                    (keyword (-> (ut/unkeyword s)
@@ -6746,7 +6769,7 @@
                                                                           logic-kps (into {} (for [[_ v]
                                                                                                    (into {} (filter #(cstr/starts-with? (str (last %)) "[:heatmap") kps))]
                                                                                                (let [[_ scheme depth direction] v]
-                                                                                                 {v @(re-frame/subscribe [::heatmap-color-val panel-key query-key
+                                                                                                 {v @(ut/tracked-subscribe [::heatmap-color-val panel-key query-key
                                                                                                                           id (get row id) heatmap-styles
                                                                                                                           scheme depth direction])})))]
                                                                       ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
@@ -6755,7 +6778,7 @@
                                                                                                   (try (some #(= id %) (get-in stylers [s :cols])) (catch :default _ false)))
                                                                                             (get-in stylers [s :style]) {})))
                                          ; styles-walk (if heatmap-styles ;(some #(= :heatmap %) (ut/deep-flatten styles))
-                                         ;               {:heatmap @(re-frame/subscribe [::heatmap-color-val panel-key query-key
+                                         ;               {:heatmap @(ut/tracked-subscribe [::heatmap-color-val panel-key query-key
                                          ;                                               id (get row id) heatmap-styles])}
                                          ;               {})
                                          ; styles (walk/postwalk-replace styles-walk styles)
@@ -6763,11 +6786,11 @@
                                          ; row-styles   (apply merge (for [s styler-keys] (if (or (= (get-in stylers [s :cols]) :*)
                                          ;                                                      (= (get-in stylers [s :cols]) [:*]))
                                          ;                                                (get-in stylers [s :style]) {})))
-                                         data-type-color (get @(re-frame/subscribe [::conn/data-colors]) (get-in metadata [:fields id :data-type]))
+                                         data-type-color (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in metadata [:fields id :data-type]))
                                          agg? (and (not non-panel?) (not (get-in metadata [:fields id :group-by?])))
                                          used-in-a-query? (true? (some #(= id %) parameters-used-in-sql))
                                          clicked-row? (= row clicked-row)]                  ;; color on row doesnt work, overriding here...
-                                   ;;  (when sel? (tap> [:color id data-type-color (get-in metadata [:fields id :data-type])  @(re-frame/subscribe [::conn/data-colors]) ]))
+                                   ;;  (when sel? (tap> [:color id data-type-color (get-in metadata [:fields id :data-type])  @(ut/tracked-subscribe [::conn/data-colors]) ]))
                                      ;;(tap> [:row-id id parameters-used-in-cell row])
                                     ;;  (when (and (= id :country) (= (get row id) "us"))
                                     ;;    (tap> [:call id row  ]))
@@ -6775,13 +6798,13 @@
                                      (merge
 
                                       ;(when agg? {:box-shadow "inset 0px 0px 2px 2px #ffffff22"})
-                                      ;(when agg? {:box-shadow (str "inset 0 0 4px 2px " (get @(re-frame/subscribe [::conn/data-colors]) (get-in metadata [:fields id :data-type])))})
+                                      ;(when agg? {:box-shadow (str "inset 0 0 4px 2px " (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in metadata [:fields id :data-type])))})
 
                                       (cond
                                         (or (= row clicked-row)
                                             (and (= panel-key :recos-list*) ;; special case with viz browser
                                                  (= (get row :combo_hash)
-                                                    @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]]))))
+                                                    @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]]))))
 
                                         (if has-rabbit-code?
                                           {:border-top (str "2px solid " selected-background-color) ; "#9973e0"
@@ -6808,7 +6831,7 @@
                                                 styles)
                                         :else
                                         (let [upstream? (some (fn [x] (= x id)) child-cols)
-                                              fcolor    (get @(re-frame/subscribe [::conn/data-colors]) (get-in metadata [:fields id :data-type]))]
+                                              fcolor    (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in metadata [:fields id :data-type]))]
                                           (merge
                                                  ;row-styles
                                            {:background-color (if upstream?
@@ -6864,7 +6887,7 @@
                                                        (- clicked-row-height 5)
                                                        row-height))})
 
-                                      ;(when agg? {:color (get @(re-frame/subscribe [::conn/data-colors]) (get-in metadata [:fields id :data-type]))})
+                                      ;(when agg? {:color (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in metadata [:fields id :data-type]))})
                                       (when agg? {:text-decoration "underline"}))))               ;; temp
 
                      :row-height row-height ; 444 ;row-height
@@ -6899,7 +6922,7 @@
                                           (or (= row clicked-row)
                                               (and (= panel-key :recos-list*) ;; special case with viz browser
                                                    (= (get row :combo_hash)
-                                                      @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]]))))
+                                                      @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]]))))
                                           {:background-color selected-background-color ;"#bc798c" ; "#ec8250" grid-selected-background-color
                                            :color            selected-text-color ;"#000000"
                                            :padding          "0px"}
@@ -6907,7 +6930,7 @@
                                           ;cstyle (merge {:padding "0px"} cstyle)
                                           ; {:background-color "darkcyan" :color "black" :padding "0px"}
                                           ;(merge {:padding "0px"} (get-in post-styles [:* :toots2 :styles]))
-                                          ; (and (= data-keypath [:blocks-sys]) (cstr/includes? @(re-frame/subscribe [::conn/clicked-parameter-key [:blocks-sys/view_names]]) (get-in row [:block_key])))
+                                          ; (and (= data-keypath [:blocks-sys]) (cstr/includes? @(ut/tracked-subscribe [::conn/clicked-parameter-key [:blocks-sys/view_names]]) (get-in row [:block_key])))
                                           :else {:padding "0px"})))
                      :table-padding 5
                      ;:fixed-column-count (count fields)
@@ -6927,12 +6950,12 @@
                                                                   color      (get c :color)
                                                                   typ        (get c :data-type)
                                                                   ;sel? (true? (and selected? (= id (get @column-selected panel-key))))
-                                                                  sel?       (and selected? @(re-frame/subscribe [::column-selected? panel-key query-key id]))
+                                                                  sel?       (and selected? @(ut/tracked-subscribe [::column-selected? panel-key query-key id]))
                                                                   label      (get c :header-label)]
                                                               [re-com/box
                                                                ;:height "22px"
                                                                :attr (if selected?
-                                                                       {:on-click #(re-frame/dispatch [::column-select panel-key query-key (if sel? nil id)])}
+                                                                       {:on-click #(ut/tracked-dispatch [::column-select panel-key query-key (if sel? nil id)])}
                                                                        {})
                                                                :child (draggable (sql-spawner :field panel-map data-keypath id panel-key)
                                                                                  "meta-menu"
@@ -7077,18 +7100,18 @@
 
                         (let [;; waitings (filter #(and (> (count (get % :ui-keypath)) 1)
                               ;;                        (cstr/includes? (str (get % :ui-keypath)) (str query-key)))
-                              ;;                  (map :message @(re-frame/subscribe [::wfx/pending-requests http/socket-id])))
+                              ;;                  (map :message @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])))
 
                               ;; single-wait (count (filter #(and (> (count (get % :ui-keypath)) 1)
                               ;;                                  (cstr/includes? (str (get % :ui-keypath)) (str query-key)))
-                              ;;                            (map :message @(re-frame/subscribe [::wfx/pending-requests http/socket-id]))))
-                              reco-wait?  @(re-frame/subscribe [::reco-running? query-key :reco])
-                              reco-queued?  @(re-frame/subscribe [::reco-queued? query-key :reco])]
+                              ;;                            (map :message @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id]))))
+                              reco-wait?  @(ut/tracked-subscribe [::reco-running? query-key :reco])
+                              reco-queued?  @(ut/tracked-subscribe [::reco-queued? query-key :reco])]
 
                               ;; batch-status (into {}
                               ;;                    (for [{:keys [description kit-name name icon]} server-kits
-                              ;;                          :let [wait?  @(re-frame/subscribe [::reco-running? query-key kit-name])
-                              ;;                                queued?  @(re-frame/subscribe [::reco-queued? query-key kit-name])]]
+                              ;;                          :let [wait?  @(ut/tracked-subscribe [::reco-running? query-key kit-name])
+                              ;;                                queued?  @(ut/tracked-subscribe [::reco-queued? query-key kit-name])]]
                               ;;                      {kit-name {:wait? wait? :queued? queued?}}))
 
                               ;waits (count waitings)
@@ -7109,7 +7132,7 @@
                                                   [re-com/gap :size "0px"] ;; the 2 gaps are enough
                                                   [re-com/md-icon-button
                                                    :md-icon-name "zmdi-refresh"
-                                                   :on-click #(re-frame/dispatch [::conn/clear-query-history query-key])
+                                                   :on-click #(ut/tracked-dispatch [::conn/clear-query-history query-key])
                                                    :attr (when hover-field-enable?
                                                            {:on-mouse-enter #(swap! db/context-box assoc query-key "execute: (re)run query")
                                                             :on-mouse-leave #(swap! db/context-box dissoc query-key)})
@@ -7127,7 +7150,7 @@
                                                     [re-com/md-icon-button
                                                      :md-icon-name "zmdi-toll"
                                                  ;;:disabled? true
-                                                     :on-click #(re-frame/dispatch [::conn/run-sql-deep-meta-for panel-key query-key (sql-alias-replace-sub query)])
+                                                     :on-click #(ut/tracked-dispatch [::conn/run-sql-deep-meta-for panel-key query-key (sql-alias-replace-sub query)])
                                                      :attr (when hover-field-enable?
                                                              {:on-mouse-enter #(swap! db/context-box assoc query-key "meta: (re)run full counts of unique values for each column")
                                                               :on-mouse-leave #(swap! db/context-box dissoc query-key)})
@@ -7145,8 +7168,8 @@
                                                     [re-com/md-icon-button
                                                      :md-icon-name "zmdi-shape"
                                                      :on-click #(do (swap! db/sniff-deck assoc query-key :reco)
-                                                                    (re-frame/dispatch [::set-reco-queued query-key :reco])
-                                                                    (re-frame/dispatch [::conn/clear-query-history query-key]))
+                                                                    (ut/tracked-dispatch [::set-reco-queued query-key :reco])
+                                                                    (ut/tracked-dispatch [::conn/clear-query-history query-key]))
                                                      :attr (when hover-field-enable?
                                                              {:on-mouse-enter #(swap! db/context-box assoc query-key "shapes: (re)generate all possible viz combos for this query")
                                                               :on-mouse-leave #(swap! db/context-box dissoc query-key)})
@@ -7166,16 +7189,16 @@
                                          :gap "5px"
                                          :children (vec (cons [re-com/gap :size "6px"]
                                                               (vec (for [{:keys [description kit-name name icon]} server-kits
-                                                                         :let [wait?  @(re-frame/subscribe [::reco-running? query-key kit-name])
+                                                                         :let [wait?  @(ut/tracked-subscribe [::reco-running? query-key kit-name])
                                                                                  ;_ (tap> [:kit-name kit-name])
-                                                                               queued?  @(re-frame/subscribe [::reco-queued? query-key kit-name])]]
+                                                                               queued?  @(ut/tracked-subscribe [::reco-queued? query-key kit-name])]]
 
                                                                      [re-com/md-icon-button
                                                                       :md-icon-name icon
-                                                                        ;:on-click #(re-frame/dispatch [::conn/clear-query-history query-key])
+                                                                        ;:on-click #(ut/tracked-dispatch [::conn/clear-query-history query-key])
                                                                       :on-click #(do (swap! db/sniff-deck assoc query-key kit-name)
-                                                                                     (re-frame/dispatch [::set-reco-queued query-key kit-name])
-                                                                                     (re-frame/dispatch [::conn/clear-query-history query-key]))
+                                                                                     (ut/tracked-dispatch [::set-reco-queued query-key kit-name])
+                                                                                     (ut/tracked-dispatch [::conn/clear-query-history query-key]))
                                                                       :attr (when hover-field-enable?
                                                                               {:on-mouse-enter #(swap! db/context-box assoc query-key (str "kit-fn: " name " - " description))
                                                                                :on-mouse-leave #(swap! db/context-box dissoc query-key)})
@@ -7228,8 +7251,8 @@
                                        :gap "5px"
                                        :children [[re-com/md-icon-button
                                                    :md-icon-name "zmdi-fire"
-                                                   :on-click #(do (re-frame/dispatch [::toggle-heatmap panel-key query-key column-selected])
-                                                                  (re-frame/dispatch [::column-select panel-key query-key nil]))
+                                                   :on-click #(do (ut/tracked-dispatch [::toggle-heatmap panel-key query-key column-selected])
+                                                                  (ut/tracked-dispatch [::column-select panel-key query-key nil]))
                                                    :attr (when hover-field-enable?
                                                            {:on-mouse-enter #(swap! db/context-box assoc query-key "toggle heatmap on this column")
                                                             :on-mouse-leave #(swap! db/context-box dissoc query-key)})
@@ -7243,8 +7266,8 @@
 
                                                   [re-com/md-icon-button
                                                    :md-icon-name "zmdi-delete" ;; panel-key query-key clause drop-data
-                                                   :on-click #(do (re-frame/dispatch [::execute-pill-drop panel-key query-key :remove {:drag-body {:target column-selected}}])
-                                                                  (re-frame/dispatch [::column-select panel-key query-key nil]))
+                                                   :on-click #(do (ut/tracked-dispatch [::execute-pill-drop panel-key query-key :remove {:drag-body {:target column-selected}}])
+                                                                  (ut/tracked-dispatch [::column-select panel-key query-key nil]))
                                                    :attr (when hover-field-enable?
                                                            {:on-mouse-enter #(swap! db/context-box assoc query-key "remove this column from the query")
                                                             :on-mouse-leave #(swap! db/context-box dissoc query-key)})
@@ -7276,8 +7299,8 @@
 
                                                   [re-com/md-icon-button
                                                    :md-icon-name "zmdi-caret-left"
-                                                   :on-click #(do (re-frame/dispatch [::change-page panel-key query-key (- page-num 1) ttl-pages])
-                                                                  (re-frame/dispatch [::conn/clear-query-history query-key]))
+                                                   :on-click #(do (ut/tracked-dispatch [::change-page panel-key query-key (- page-num 1) ttl-pages])
+                                                                  (ut/tracked-dispatch [::conn/clear-query-history query-key]))
                                                    :style {:font-size  "22px"
                                                            :cursor     "pointer"
                                                            :opacity    0.5
@@ -7294,8 +7317,8 @@
 
                                                   [re-com/md-icon-button
                                                    :md-icon-name "zmdi-caret-right"
-                                                   :on-click #(do (re-frame/dispatch [::change-page panel-key query-key (+ page-num 1) ttl-pages])
-                                                                  (re-frame/dispatch [::conn/clear-query-history query-key]))
+                                                   :on-click #(do (ut/tracked-dispatch [::change-page panel-key query-key (+ page-num 1) ttl-pages])
+                                                                  (ut/tracked-dispatch [::conn/clear-query-history query-key]))
                                                    :style {:font-size  "22px"
                                                            :cursor     "pointer"
                                                            :opacity    0.5
@@ -7379,7 +7402,7 @@
                   (when (not (and running? (not sys-panel?)))
                     [re-com/md-icon-button
                      :md-icon-name "zmdi-refresh"
-                     :on-click #(re-frame/dispatch [::conn/clear-query-history query-key])
+                     :on-click #(ut/tracked-dispatch [::conn/clear-query-history query-key])
                     ;;  :attr (when hover-field-enable?
                     ;;          {:on-mouse-enter #(swap! db/context-box assoc query-key "refresh this row-set from the database")
                     ;;           :on-mouse-leave #(swap! db/context-box dissoc query-key)})
@@ -7538,8 +7561,8 @@
                      (assoc-in [1 :layer] oz-layers)
                      (assoc-in [1 :resolve] {:scale {:y "independent"}}))} ;; ex: "resolve": {"scale": {"y": "independent"}}
                 {})
-              (if tab-rules? {:dyn-tab @(re-frame/subscribe [::dynamic-tab-selected panel-key])}
-                               ;[:box :child (str ":" @(re-frame/subscribe [::dynamic-tab-selected panel-key]))]
+              (if tab-rules? {:dyn-tab @(ut/tracked-subscribe [::dynamic-tab-selected panel-key])}
+                               ;[:box :child (str ":" @(ut/tracked-subscribe [::dynamic-tab-selected panel-key]))]
                              {}))
        views))))
 
@@ -7598,8 +7621,8 @@
  ::editor-panel-selected-view
  (fn [db _]
    (let [selected-block (get db :selected-block)
-         sql-calls @(re-frame/subscribe [::panel-sql-calls selected-block])
-         views @(re-frame/subscribe [::panel-views selected-block])
+         sql-calls @(ut/tracked-subscribe [::panel-sql-calls selected-block])
+         views @(ut/tracked-subscribe [::panel-views selected-block])
          first-data-key (first (keys sql-calls))
          first-view-key (first (keys views))
          data-key (if
@@ -7746,15 +7769,15 @@
 
 (defn sql-data-boxes-values [keypath clickable? style]
   (let [styles        (if (and (map? style) (not (nil? style))) style {})
-        data          @(re-frame/subscribe [::conn/sql-data keypath])
-        clicked-param @(re-frame/subscribe [::conn/clicked-parameter keypath])]
+        data          @(ut/tracked-subscribe [::conn/sql-data keypath])
+        clicked-param @(ut/tracked-subscribe [::conn/clicked-parameter keypath])]
     (vec (for [r data]
            [re-com/box
             :size "auto" :padding "4px"
             :attr (if clickable?
                     ; {}
-                    {:on-click #(re-frame/dispatch [::click-parameter keypath r])}
-                    ; {:on-click (re-com/handler-fn (re-frame/dispatch [::conn/click-parameter keypath r]))}
+                    {:on-click #(ut/tracked-dispatch [::click-parameter keypath r])}
+                    ; {:on-click (re-com/handler-fn (ut/tracked-dispatch [::conn/click-parameter keypath r]))}
                     {})
             :child (str (vals r))
             :style (merge styles {:cursor           (if clickable? "pointer" "inherit")
@@ -7764,12 +7787,12 @@
 
 (defn sql-data-boxes-values2 [keypath style]
   (let [styles        (if (and (map? style) (not (nil? style))) style {})
-        data          @(re-frame/subscribe [::conn/sql-data keypath])
-        clicked-param @(re-frame/subscribe [::conn/clicked-parameter keypath])]
+        data          @(ut/tracked-subscribe [::conn/sql-data keypath])
+        clicked-param @(ut/tracked-subscribe [::conn/clicked-parameter keypath])]
     (vec (for [r data]
            [re-com/box
             :size "auto" :padding "4px"
-            :attr {:on-click #(re-frame/dispatch [::conn/click-parameter keypath r])}
+            :attr {:on-click #(ut/tracked-dispatch [::conn/click-parameter keypath r])}
             :child (str (vals r))
             :style (merge styles {:cursor           "pointer"
                                   :background-color (if (= r clicked-param)
@@ -7788,12 +7811,12 @@
           ;;                                 (distinct (map (comp vec drop-last)
           ;;                                                (filter #(and (= (last (drop-last %)) :root)
           ;;                                                              (cstr/includes? (str %) " :panels ")) kvpaths)))))
-         layout-map-scrubbers @(re-frame/subscribe [::scrub/keypaths-of-layout-panels panel-key view-key])
+         layout-map-scrubbers @(ut/tracked-subscribe [::scrub/keypaths-of-layout-panels panel-key view-key])
          kvpaths-vals         (into {} (for [p (sort (into layout-map-scrubbers kvpaths))]
                                          {p (let [v (get-in view p)]
                                               [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
       ;(tap> [:kvpaths kvpaths :kvpaths-vals kvpaths-vals :adds layout-map-scrubbers])
-      ;(tap> [:keypaths-of-layout-panels @(re-frame/subscribe [::keypaths-of-layout-panels panel-key view-key])])
+      ;(tap> [:keypaths-of-layout-panels @(ut/tracked-subscribe [::keypaths-of-layout-panels panel-key view-key])])
       ;(into (sorted-map) kvpaths-vals)
       ;(sort-by key kvpaths-vals)
       ;(reverse kvpaths-vals)
@@ -8088,10 +8111,10 @@
 (defn view-alias-replace [view panel-key selected-view]
   (let [valid-params (vec (remove nil? (for [k (ut/deep-flatten view)]
                                          (when (and (keyword? k) (cstr/starts-with? (str k) ":view/")) k))))
-        [ph pw] @(re-frame/subscribe [::size panel-key])
+        [ph pw] @(ut/tracked-subscribe [::size panel-key])
         sql-params   (into {} (for [k valid-params]         ;; deref here?
-                                (let [deets      @(re-frame/subscribe [::layouts-for panel-key selected-view k])
-                                      body       @(re-frame/subscribe [::resolve-view-alias k (get deets :w) (get deets :h)])
+                                (let [deets      @(ut/tracked-subscribe [::layouts-for panel-key selected-view k])
+                                      body       @(ut/tracked-subscribe [::resolve-view-alias k (get deets :w) (get deets :h)])
                                       body       (if (nil? body) [re-com/box
                                                                   :align :center :justify :center :size "auto"
                                                                   :child [:div [:span {:style {:color       "pink" :font-size "22px"
@@ -8128,7 +8151,7 @@
  ::remove-schedule
  (fn [db [_ query-key]]
    (-> db
-       ;(assoc-in [:panels @(re-frame/subscribe [::lookup-panel-key-by-query-key query-key]) :name]
+       ;(assoc-in [:panels @(ut/tracked-subscribe [::lookup-panel-key-by-query-key query-key]) :name]
        ;          ;(get-in db [:re-pollsive.core/polling :counter])
        ;          (str "turd farm" (rand-int 123))
        ;          )
@@ -8152,8 +8175,8 @@
               (doseq [query queries]
                 (dorun (let []
                          ;(tap> [:running-sched :tick ticktock :timer timer query])
-                         (re-frame/dispatch [::remove-schedule query])
-                         (re-frame/dispatch [::conn/clear-query-history query]))))))
+                         (ut/tracked-dispatch [::remove-schedule query])
+                         (ut/tracked-dispatch [::conn/clear-query-history query]))))))
 
      ;(tap> [:scheds-cron-debug :tick ticktock scheds scheds-reverse])
      db)))
@@ -8169,7 +8192,7 @@
    ;(assoc-in db [:sql-source query-id] sql-source)
    (let [client-name (get db :client-name)]
      ;(tap> [:checking-server-status... client-name])
-     (re-frame/dispatch [::wfx/request :default
+     (ut/tracked-dispatch [::wfx/request :default
                          {:message {:kind         :get-status
                                     :client-name  client-name}
                           :on-response [::http/status-response]
@@ -8239,6 +8262,7 @@
     ;;         ;(into (sorted-map) @ut/replacer-atom)
     ;;         client-name
     ;;         ])
+
     ;;  (tap> [:atom-sizes client-name ;; expensive, should do this less often or only on demand like in debug viewer
     ;;         (ut/calculate-atom-sizes {:replacer-atom ut/replacer-atom
     ;;                                   :db/flow-results db/flow-results
@@ -8253,12 +8277,14 @@
     ;;                                   :ut/body-set-atom ut/body-set-atom
     ;;                                   :ut/data-typer-atom ut/data-typer-atom
     ;;                                   :ut/coord-cache ut/coord-cache})])
-    ;;  (do (reset! ut/replacer-atom {})
-    ;;      (reset! ut/clean-sql-atom {})
-    ;;      (reset! ut/deep-flatten-atom {})
-          ;; (reset! ut/format-map-atom {})
-          ;; (reset! ut/data-typer-atom {})
-    ;;      (reset! ut/coord-cache {}))
+     
+      (do (reset! ut/replacer-atom {})
+          (reset! ut/clean-sql-atom {})
+          (reset! ut/deep-flatten-atom {})
+          (reset! ut/format-map-atom {})
+          (reset! ut/data-typer-atom {})
+          (reset! ut/coord-cache {}))
+      
      (if run-it?
        (-> db
            (ut/dissoc-in [:panels nil]) ;; garbage keys created by external edit with bad files
@@ -8302,12 +8328,12 @@
    (let [existing    (get-in db [:data :mad-libs-viz panel-id table-name])
          running?    (fn [kp] (some                        ;#(= (first %) panel-id)
                                #(= % kp)
-                               (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+                               (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
                                  (let [p (get-in e [:message :ui-keypath])]
                                    p))))
-         reco-counts @(re-frame/subscribe [::query-reco-counts table-name])]
+         reco-counts @(ut/tracked-subscribe [::query-reco-counts table-name])]
       ;(tap> [:mad-libs [combo-hash table-name] reco-counts])
-      ;;  (tap> [:yy (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+      ;;  (tap> [:yy (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
       ;;               (let [p (get-in e [:message :ui-keypath])]
       ;;                 p))])
      ;(tap> [:heehaw (empty? (get-in db [:data :viz-shapes])) (not (running? [:viz-shapes])) ])
@@ -8364,7 +8390,7 @@
    (let [;hm (str (hash axes-map))
          running? (fn [kp] (some                           ;#(= (first %) panel-id)
                             #(= % kp)
-                            (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+                            (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
                               (let [p (get-in e [:message :ui-keypath])]
                                 p))))
          kp1      [:data :mad-libs-viz2 panel-id src-table-id-str shape-name]
@@ -8397,7 +8423,7 @@
               ffromv        (-> (get-in incomingv [1 :data :values])
                                 (ut/replacer "_" "-")
                                 (ut/replacer "query/" ""))
-              original-conn @(re-frame/subscribe [::lookup-connection-id-by-query-key (keyword ffromv)])
+              original-conn @(ut/tracked-subscribe [::lookup-connection-id-by-query-key (keyword ffromv)])
               view          (-> incomingv
                                 (assoc-in [1 :data :values] :query-preview)
                                 (assoc-in [1 :config] :theme/vega-defaults)
@@ -8420,7 +8446,7 @@
                     q-data        (read-string reco-query)
                     incoming      (first q-data)            ;; read-string will ruin my internal namespaced keywords
                     ffrom         (ut/replacer (first (get incoming :from)) "_" "-")
-                    original-conn @(re-frame/subscribe [::lookup-connection-id-by-query-key (keyword (last (cstr/split ffrom "/")))])
+                    original-conn @(ut/tracked-subscribe [::lookup-connection-id-by-query-key (keyword (last (cstr/split ffrom "/")))])
                     query         (vec (for [q q-data]
                                          (if (nil? (find q :vselect))
                                            (assoc q :from [(keyword ffrom)]) q)))
@@ -8434,7 +8460,7 @@
                  :conn   original-conn})))
 
 (defn modify-combo-viz [viz query condis connection-id combohash combo-name shape-name single? table-name-str] ;;; dupe of insert code!!!
-  (let [;table-name @(re-frame/subscribe [::conn/clicked-parameter-key (if panel?
+  (let [;table-name @(ut/tracked-subscribe [::conn/clicked-parameter-key (if panel?
         ;                                                                [:viz-tables-sys/table_name]
         ;                                                                [:viz-tables-sys2/table_name])])
         ;table-name (if (keyword? table-name) (ut/replacer (ut/replacer (str table-name) ":" "") "-" "_") table-name)
@@ -8474,7 +8500,7 @@
   (let [;; we need to change all the generic aliases into real rando keys
         ;; inlcuding potential value aliases :query-key/field.row combo keys
         req-name-str     (ut/replacer (str panel-key) #":" "") ;OLD req-name-str (str "block-" (rand-int 999))
-        ;ddata @(re-frame/subscribe [::panel-map :reco-preview])
+        ;ddata @(ut/tracked-subscribe [::panel-map :reco-preview])
         poss-value-walks (distinct (filter #(or (cstr/starts-with? (str %) ":query-preview")
                                                 (cstr/starts-with? (str %) ":panel-key"))
                                            (ut/deep-flatten ddata)))
@@ -8502,7 +8528,7 @@
    (let [hm       (str (hash axes-map))
          running? (fn [kp] (some                           ;#(= (first %) panel-id)
                             #(= % kp)
-                            (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+                            (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
                               (let [p (get-in e [:message :ui-keypath])]
                                 p))))
          kp1      [:data :mad-libs-viz2 panel-id src-table-id-str shape-name hm]
@@ -8523,9 +8549,9 @@
            (go
              (<! (async/timeout 1000))
              (do
-               (re-frame/dispatch [::post-process-combo-hash panel-id src-table-id-str shape-name kp1])
+               (ut/tracked-dispatch [::post-process-combo-hash panel-id src-table-id-str shape-name kp1])
                (reset! db/mad-libs-waiting-room nil))))
-       (re-frame/dispatch [::post-process-combo-hash panel-id src-table-id-str shape-name kp1]))
+       (ut/tracked-dispatch [::post-process-combo-hash panel-id src-table-id-str shape-name kp1]))
 
      db)))
 
@@ -8561,7 +8587,7 @@
 ;;    (let [hm (str (hash axes-map))
 ;;          running? (fn [kp] (some ;#(= (first %) panel-id)
 ;;                             #(= % kp)
-;;                             (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+;;                             (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
 ;;                               (let [p (get-in e [:message :ui-keypath])]
 ;;                                 p))))
 ;;          kp1 [:data :mad-libs-viz2 panel-id src-table-id-str shape-name hm]
@@ -8712,17 +8738,17 @@
 
 ;; ;;; test
 ;; (defn honeycomb-stripped [panel-key & [override-view]]      ;; can sub lots of this TODO. no need to pass it all
-;;   (let [;block-map panel-map ;@(re-frame/subscribe [::panel-map panel-key]) ;(get workspace panel-key) ;; ?
-;;         connection-id     @(re-frame/subscribe [::panel-connection-id panel-key]) ;(get block-map :connection-id)
-;;         sql-calls         @(re-frame/subscribe [::panel-sql-calls panel-key]) ; (get block-map :queries)
+;;   (let [;block-map panel-map ;@(ut/tracked-subscribe [::panel-map panel-key]) ;(get workspace panel-key) ;; ?
+;;         connection-id     @(ut/tracked-subscribe [::panel-connection-id panel-key]) ;(get block-map :connection-id)
+;;         sql-calls         @(ut/tracked-subscribe [::panel-sql-calls panel-key]) ; (get block-map :queries)
 ;;         base-tables       (flatten (remove nil? (for [[_ v] sql-calls] (when (not (cstr/includes? (str (get v :from)) ":query/")) (get v :from)))))
 ;;         base-table-sniffs (into {} (for [t base-tables] {t {:select [:*] :from [t] :limit 100}})) ;; need to generate base metadata for use
 ;;         ]
 ;;     ;(dorun
 ;;     (doseq [[k v] (merge sql-calls base-table-sniffs)]      ;; base-table-sniffs allow us to get metadata for the root tables quietly
 ;;       (let [query        (sql-alias-replace2 v)
-;;             data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-;;             unrun-sql?   @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+;;             data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+;;             unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
 
 ;;         ;(dorun
 ;;         (when (or (not data-exists?) unrun-sql?)
@@ -8814,7 +8840,7 @@
         data (if (or (string? data) (number? data) (boolean? data)) [data] data)
         base-type-vec? (or (vector? data) (list? data))
         iter (if base-type-vec? (range (count data)) (keys data))
-        source @(re-frame/subscribe [::data-viewer-source block-id selected-view])
+        source @(ut/tracked-subscribe [::data-viewer-source block-id selected-view])
         font-size "inherit" ;;"11px"
         draggable? false ;; override bs TODO
         add-kp? (try (keyword? block-id) (catch :default _ false)) ;;true ;(not show-code-map-opt?) ;; for drag outs only
@@ -8834,7 +8860,7 @@
                             in-body? true ;(ut/contains-data? only-body k-val)
                             hovered? false ;(ut/contains-data? mat-hovered-input k-val)
                             border-ind (if in-body? "solid" "dashed")
-                            val-color (get @(re-frame/subscribe [::conn/data-colors]) k-val-type)
+                            val-color (get @(ut/tracked-subscribe [::conn/data-colors]) k-val-type)
                             keypath-in (conj keypath kk)
                             keystyle {:background-color (if hovered? (str val-color 66) "#00000000")
                                       ;:font-weight 700
@@ -8988,7 +9014,7 @@
                                                   [re-com/md-icon-button
                                                    :md-icon-name "zmdi-info"
                                                    :tooltip (str "FOOO" (get sql-explanations keypath ""))
-                                                   ;:on-click #(re-frame/dispatch [::change-page panel-key (first data-keypath) (- page-num 1) ttl-pages])
+                                                   ;:on-click #(ut/tracked-dispatch [::change-page panel-key (first data-keypath) (- page-num 1) ttl-pages])
                                                    :style {:font-size "16px"
                                                            :cursor "pointer"
                                                            :opacity 0.5
@@ -9072,7 +9098,7 @@
 
       (let [k-val-type (ut/data-typer data)
             nin? (not (= block-id :inline-render))
-            val-color (get @(re-frame/subscribe [::conn/data-colors]) k-val-type)]
+            val-color (get @(ut/tracked-subscribe [::conn/data-colors]) k-val-type)]
         [re-com/v-box
          ;:size "auto"
          :children
@@ -9196,7 +9222,7 @@
                                                             (when (not (nil? v)) {k v})))]
                                      (tap> [:nivo-click-params (js->clj %) m-pair])
                                      (doseq [[m1 m2] m-pair]
-                                       (re-frame/dispatch [::conn/click-parameter [panel-key m1] m2]))
+                                       (ut/tracked-dispatch [::conn/click-parameter [panel-key m1] m2]))
                                      ))
         edn-mass           (if (and (= nivo-fn nivo-calendar/Calendar)
                                     ;(get-in edn-mass [:data 0 :day])
@@ -9291,7 +9317,7 @@
 (re-frame/reg-sub
  ::get-layout-in
  (fn [_ [_ panel-key view-key]]
-   (let [view @(re-frame/subscribe [::view panel-key view-key])
+   (let [view @(ut/tracked-subscribe [::view panel-key view-key])
          kvs  (first (filter #(= (get-in view %) :layout) (ut/kvpaths view)))
          kvs1 (assoc kvs (dec (count kvs)) 1)
          v    (get-in view kvs1)]
@@ -9301,7 +9327,7 @@
  ::delete-layout-panel
  (undoable)
  (fn [db [_ panel-key view-key layout-key root]]
-   (let [[layout-kp layout-map] @(re-frame/subscribe [::get-layout-in panel-key view-key])
+   (let [[layout-kp layout-map] @(ut/tracked-subscribe [::get-layout-in panel-key view-key])
          target-kp (into layout-kp [:panels layout-key])]
      (tap> [:deleting-layout-shape target-kp layout-key])
      (ut/dissoc-in db target-kp))))
@@ -9310,7 +9336,7 @@
  ::clear-layout-panel
  (undoable)
  (fn [db [_ panel-key view-key layout-key root]]
-   (let [[layout-kp layout-map] @(re-frame/subscribe [::get-layout-in panel-key view-key])
+   (let [[layout-kp layout-map] @(ut/tracked-subscribe [::get-layout-in panel-key view-key])
          target-kp (into layout-kp [:panels layout-key])
          new-kp (into layout-kp [:panels (keyword (str "cleared-" (rand-int 1234)))])]
      (tap> [:clear-layout-assignment target-kp layout-key])
@@ -9323,7 +9349,7 @@
  ::split-v-layout-panel
  (undoable)
  (fn [db [_ panel-key view-key layout-key root processed-layout]]
-   (let [[layout-kp layout-map] @(re-frame/subscribe [::get-layout-in panel-key view-key])
+   (let [[layout-kp layout-map] @(ut/tracked-subscribe [::get-layout-in panel-key view-key])
          target-kp (into layout-kp [:panels layout-key])
          old       (get-in db target-kp)
           ;rup (fn [n] n)
@@ -9347,7 +9373,7 @@
  ::split-h-layout-panel
  (undoable)
  (fn [db [_ panel-key view-key layout-key root processed-layout]]
-   (let [[layout-kp layout-map] @(re-frame/subscribe [::get-layout-in panel-key view-key])
+   (let [[layout-kp layout-map] @(ut/tracked-subscribe [::get-layout-in panel-key view-key])
          target-kp (into layout-kp [:panels layout-key])
          old       (get-in db target-kp)
           ;rup (fn [n] n )
@@ -9372,14 +9398,14 @@
 
 (defn layout [panel-key view-key layout-map pw-int ph-int]
   (let [panels           (get layout-map :panels {})
-        selected-block   @(re-frame/subscribe [::selected-block])
+        selected-block   @(ut/tracked-subscribe [::selected-block])
         scrub-borders?   (and (= panel-key selected-block)
-                              @(re-frame/subscribe [::is-layout-selected-and-scrubber?]))
-        editor?          @(re-frame/subscribe [::editor?])
+                              @(ut/tracked-subscribe [::is-layout-selected-and-scrubber?]))
+        editor?          @(ut/tracked-subscribe [::editor?])
 
-       ; [p-x p-y]        @(re-frame/subscribe [::root panel-key])
-        p-z              @(re-frame/subscribe [::zindex panel-key]) ;; 0 ?
-        gli              @(re-frame/subscribe [::get-layout-in panel-key view-key])
+       ; [p-x p-y]        @(ut/tracked-subscribe [::root panel-key])
+        p-z              @(ut/tracked-subscribe [::zindex panel-key]) ;; 0 ?
+        gli              @(ut/tracked-subscribe [::get-layout-in panel-key view-key])
         scrubber-on?     (get-in @db/scrubbers [panel-key view-key] false)
         brix             (fn [x & [mod]] (px (if mod
                                                (+ (* brick-size x) mod)
@@ -9461,7 +9487,7 @@
                                                                                   :padding "5px" :justify :between
                                                                                   :children [[re-com/md-icon-button
                                                                                               :md-icon-name "zmdi-view-agenda"
-                                                                                              :on-click #(re-frame/dispatch [::split-v-layout-panel panel-key view-key orig-key (get p :root) processed-layout])
+                                                                                              :on-click #(ut/tracked-dispatch [::split-v-layout-panel panel-key view-key orig-key (get p :root) processed-layout])
                                                                                               :style {:font-size  "17px"
                                                                                                       :cursor     "pointer"
                                                                                                       :color "pink"
@@ -9470,7 +9496,7 @@
 
                                                                                              [re-com/md-icon-button
                                                                                               :md-icon-name "zmdi-view-agenda"
-                                                                                              :on-click #(re-frame/dispatch [::split-h-layout-panel panel-key view-key orig-key (get p :root) processed-layout])
+                                                                                              :on-click #(ut/tracked-dispatch [::split-h-layout-panel panel-key view-key orig-key (get p :root) processed-layout])
                                                                                               :style {:font-size  "17px"
                                                                                                       :cursor     "pointer"
                                                                                                       :transform  "rotate(90deg)"
@@ -9484,7 +9510,7 @@
                                                                                   :padding "5px" :justify :between
                                                                                   :children [[re-com/md-icon-button
                                                                                               :md-icon-name "zmdi-grid-off"
-                                                                                              :on-click #(re-frame/dispatch [::clear-layout-panel panel-key view-key orig-key (get p :root)])
+                                                                                              :on-click #(ut/tracked-dispatch [::clear-layout-panel panel-key view-key orig-key (get p :root)])
                                                                                               :style {:font-size  "17px"
                                                                                                       :cursor     "pointer"
                                                                                                       :color "pink"
@@ -9492,7 +9518,7 @@
                                                                                                       :margin-top "-1px"}]
                                                                                              [re-com/md-icon-button
                                                                                               :md-icon-name "zmdi-close"
-                                                                                              :on-click #(re-frame/dispatch [::delete-layout-panel panel-key view-key orig-key (get p :root)])
+                                                                                              :on-click #(ut/tracked-dispatch [::delete-layout-panel panel-key view-key orig-key (get p :root)])
                                                                                               :style {:font-size  "17px"
                                                                                                       :cursor     "pointer"
                                                                                                       :color "pink"
@@ -9554,9 +9580,9 @@
      :children boxes]))
 
 (defn dropdown [{:keys [choices field panel-key width button-style style placeholder]}]
-  ;(tap> [:dropdown? [choices @(re-frame/subscribe [::conn/clicked-parameter-key [:block-36/season]]) field]])
+  ;(tap> [:dropdown? [choices @(ut/tracked-subscribe [::conn/clicked-parameter-key [:block-36/season]]) field]])
   
-  (let [choice @(re-frame/subscribe [::conn/clicked-parameter-key [(try (keyword (str (name panel-key) "/" (name field))) (catch :default _ :error/error))]])
+  (let [choice @(ut/tracked-subscribe [::conn/clicked-parameter-key [(try (keyword (str (name panel-key) "/" (name field))) (catch :default _ :error/error))]])
         choice (if (string? (get-in choices [0 :id])) (str choice) choice)
         choice (if (and (string? choice) (empty? (cstr/trim choice))) nil choice) ;; in case we get a blank string it wont register as not selected for the placeholder
         ;; choices (if all (conj all choices) choices)
@@ -9567,8 +9593,8 @@
     [re-com/h-box
      :size "auto" :justify :between :align :center 
      :children [[re-com/md-icon-button
-                 ;:on-click #(re-frame/dispatch [::conn/click-parameter [panel-key] {field nil}])
-                 :on-click #(re-frame/dispatch [::conn/click-parameter [panel-key field] nil])
+                 ;:on-click #(ut/tracked-dispatch [::conn/click-parameter [panel-key] {field nil}])
+                 :on-click #(ut/tracked-dispatch [::conn/click-parameter [panel-key field] nil])
                  :style (merge {:font-size "19px" :width "30px" :margin-top "8px" :opacity 0.33} button-style)
                  :md-icon-name "zmdi-close"]
                 [re-com/single-dropdown
@@ -9580,10 +9606,10 @@
                  ;:max-height "700px"
                  :placeholder (str placeholder)
                  :choices choices
-                 :model choice ;(re-frame/subscribe [::conn/clicked-parameter-key [(try (keyword (str (name panel-key) "/" (name field))) (catch :default _ :error/error))]]) ;(reagent/atom model)
+                 :model choice ;(ut/tracked-subscribe [::conn/clicked-parameter-key [(try (keyword (str (name panel-key) "/" (name field))) (catch :default _ :error/error))]]) ;(reagent/atom model)
                  :width (px (- width 30))
-                 :on-change ;#(re-frame/dispatch [::conn/click-parameter [panel-key] {field %}])
-                 #(re-frame/dispatch [::conn/click-parameter [panel-key field] %])
+                 :on-change ;#(ut/tracked-dispatch [::conn/click-parameter [panel-key] {field %}])
+                 #(ut/tracked-dispatch [::conn/click-parameter [panel-key field] %])
                  ]]]))
 
 ;; notes for inline render.
@@ -9609,7 +9635,7 @@
    (let [src (get-in db [:runstreams flow-id :values kkey :source])]
      (if (= src :param)
        ;(get-in db [:runstreams flow-id :values kkey :value])
-       (first @(re-frame/subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]]))
+       (first @(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]]))
        (get-in db [:runstreams flow-id :values kkey :value])))))
 
 (re-frame/reg-sub
@@ -9620,7 +9646,7 @@
                                      :when (not (nil? value))]
                                  {k (if (= source :input)
                                       value
-                                      (let [vv @(re-frame/subscribe [::rs-value flow-id k])] ;;; dupe from buffy
+                                      (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])] ;;; dupe from buffy
                                         (if (and (vector? vv) (every? string? vv))
                                           (cstr/join "\n" vv) vv)))}))]
      ;(tap> [:override-map override-map])
@@ -9696,7 +9722,7 @@
           :else [honeycomb panel-key key 11 9])))
 
 
-;;(re-frame/dispatch [::start-webcam])
+;;(ut/tracked-dispatch [::start-webcam])
 
 
 (def mutation-log (reagent/atom []))
@@ -9749,7 +9775,7 @@
    (let [client-name (get db :client-name)]
      (tap> [:push-value flow-id bid value client-name])
      ;(ut/dispatch-delay 100 [::http/insert-alert [:box :child (str [:push-value-to flow-id bid value]) :style {:font-size "14px"}] 11 0.5 5])
-     (re-frame/dispatch [::wfx/request :default
+     (ut/tracked-dispatch [::wfx/request :default
                          {:message    (merge
                                        {:kind :push-value
                                         :flow-id flow-id
@@ -9869,15 +9895,15 @@
 
 (defn honeycomb [panel-key & [override-view fh fw replacement-view replacement-query]]         ;; can sub lots of this TODO. no need to pass it all
   ;;(tap> [:repo panel-key override-view fh fw replacement-view replacement-query])
-  (let [;block-map panel-map ;@(re-frame/subscribe [::panel-map panel-key]) ;(get workspace panel-key) ;; ?
-        ;da-sched @(re-frame/subscribe [::da-sched])
-        all-sql-call-keys      @(re-frame/subscribe [::all-sql-call-keys]) ;(into {} (for [[k v] workspace] (get v :queries)))
-        all-view-keys          @(re-frame/subscribe [::panel-view-keys panel-key])
+  (let [;block-map panel-map ;@(ut/tracked-subscribe [::panel-map panel-key]) ;(get workspace panel-key) ;; ?
+        ;da-sched @(ut/tracked-subscribe [::da-sched])
+        all-sql-call-keys      @(ut/tracked-subscribe [::all-sql-call-keys]) ;(into {} (for [[k v] workspace] (get v :queries)))
+        all-view-keys          @(ut/tracked-subscribe [::panel-view-keys panel-key])
         ;; sql-calls              (if replacement-view
         ;;                          (into {} (for [qid (cset/intersection (set all-sql-call-keys) (set (ut/deep-flatten replacement-view)))]
-        ;;                            {qid @(re-frame/subscribe [::find-query qid])}))
-        ;;                          @(re-frame/subscribe [::panel-sql-calls panel-key]))
-        sql-calls                @(re-frame/subscribe [::panel-sql-calls panel-key])
+        ;;                            {qid @(ut/tracked-subscribe [::find-query qid])}))
+        ;;                          @(ut/tracked-subscribe [::panel-sql-calls panel-key]))
+        sql-calls                @(ut/tracked-subscribe [::panel-sql-calls panel-key])
         replacement-query-only?  (and (nil? replacement-view) replacement-query)
         replacement-view-only?   (and (nil? replacement-query) replacement-view)
         replacement-all?         (and (not (nil? replacement-query)) (not (nil? replacement-view)))
@@ -9891,7 +9917,7 @@
         ;all-sql-call-keys      (if replacement-query (merge (keys sql-calls) all-sql-call-keys) all-sql-call-keys)
         all-keys               (vec (into (vec (sort (into (vec (keys sql-calls)) all-view-keys))) [:virtual-view]))
         orig-override-view     override-view
-        selected-view          @(re-frame/subscribe [::selected-view panel-key]) ;(or  :view)
+        selected-view          @(ut/tracked-subscribe [::selected-view panel-key]) ;(or  :view)
         override-view          (cond (= override-view :*) selected-view ;; default editor "everything" view
                                      (and (not (nil? override-view)) (some #(= % override-view) all-keys)) override-view ;; not nil and exists, do it
                                      (and (not (nil? override-view)) (not (some #(= % override-view) all-keys))) ; not nil, and doesnt exist - get first
@@ -9907,15 +9933,15 @@
         ;;                                                                                                 :d [:another/key :*this-block*/key-d]
         ;;                                                                                                 :e {:f :*this-block*/key-e
         ;;                                                                                                     :g {:h :*this-block*/key-f}}}})])
-        w                      (if (not (nil? override-view)) 11 @(re-frame/subscribe [::panel-width panel-key]))
-        h                      (if (not (nil? override-view)) 8.7 @(re-frame/subscribe [::panel-height panel-key]))
+        w                      (if (not (nil? override-view)) 11 @(ut/tracked-subscribe [::panel-width panel-key]))
+        h                      (if (not (nil? override-view)) 8.7 @(ut/tracked-subscribe [::panel-height panel-key]))
         w                      (if fh fh w)
         h                      (if fw fw h)
         ww                     (* w brick-size)
         hh                     (* h brick-size)
-        client-name @(re-frame/subscribe [::client-name])
+        client-name @(ut/tracked-subscribe [::client-name])
         ;editor-panel? false ;; legacy, remove
-        ;name @(re-frame/subscribe [::panel-name brick-vec-key])
+        ;name @(ut/tracked-subscribe [::panel-name brick-vec-key])
         px-width-int           (- ww 100)
         px-height-int          (- hh 105)
        ; _ (tap> [:pp panel-key override-view sql-calls])
@@ -9924,7 +9950,7 @@
 
 
         selected-view          (if override-view override-view selected-view)
-        all-drops              @(re-frame/subscribe [::all-drops-of :*])
+        all-drops              @(ut/tracked-subscribe [::all-drops-of :*])
 
         drop-walks             (into {} (for [d all-drops]
                                           {d (fn [x] ;(run-drop x)
@@ -10099,7 +10125,7 @@
                                                      (when (not (some #(= % text) @db/speech-log))
                                                        (swap! db/speech-log conj text)
                                                        (ut/dispatch-delay 800 [::http/insert-alert (str text) 13 1 5])
-                                                       (re-frame/dispatch [::audio/text-to-speech11
+                                                       (ut/tracked-dispatch [::audio/text-to-speech11
                                                                            panel-key ;:audio
                                                                            :speak (str text)]))
                                                      (str text)))
@@ -10107,7 +10133,7 @@
                                  :speak-always (fn [text] (let []
                                                             (when true ; (not (some #(= % text) @db/speech-log))
                                                          ;(swap! db/speech-log conj text)
-                                                              (re-frame/dispatch [::audio/text-to-speech11
+                                                              (ut/tracked-dispatch [::audio/text-to-speech11
                                                                                   panel-key ;:audio
                                                                                   :speak (str text)]))
                                                             (str text)))
@@ -10129,7 +10155,7 @@
                                                                                               (do
                                                                                                 ;(swap! db/speech-log conj text)
                                                                                                 (ut/dispatch-delay 800 [::http/insert-alert (str "\"" text "\"") 13 2 8])
-                                                                                                (re-frame/dispatch [::audio/text-to-speech11
+                                                                                                (ut/tracked-dispatch [::audio/text-to-speech11
                                                                                                                     ;:audio
                                                                                                                     panel-key
                                                                                                                     :speak (str text)]))))
@@ -10138,10 +10164,10 @@
                                                                                    :cursor    "pointer"}]
                                                                           [re-com/box :child ""]]]]]))
 
-                                ;;  :run-flow (fn [flow-id] (let [client-name @(re-frame/subscribe [::client-name])]
+                                ;;  :run-flow (fn [flow-id] (let [client-name @(ut/tracked-subscribe [::client-name])]
                                 ;;                            (when true ;(not (some #(= % text) @db/speech-log))
                                 ;;                              (do ;; some kind of debounce, prevent multiple, etc
-                                ;;                                (re-frame/dispatch [::wfx/request :default
+                                ;;                                (ut/tracked-dispatch [::wfx/request :default
                                 ;;                                                    {:message    {:kind :run-server-flow
                                 ;;                                                                  :flow-id flow-id
                                 ;;                                                                  :client-name client-name
@@ -10166,7 +10192,7 @@
                                                 :style {:overflow "auto"} ;; (merge {:overflow "auto"} (get args :style {}))
                                                 :child (let [;[kp width-int height-int syntax] args
                                                              {:keys [kp width-int height-int style syntax]} args
-                                                             vv @(re-frame/subscribe [::conn/clicked-parameter kp])
+                                                             vv @(ut/tracked-subscribe [::conn/clicked-parameter kp])
                                                              vv (if (string? vv) (pr-str vv) vv)]
                                                          [open-input-code-box kp width-int height-int vv syntax style])])
 
@@ -10174,14 +10200,14 @@
                                          (let [uid (or uid (str "tt" (rand-int 1234) (rand-int 1234)))]
                                            (when (not (some #(= % uid) @db/speech-log))
                                              (swap! db/speech-log conj uid)
-                                             (re-frame/dispatch [::audio/text-to-speech11 :audio :speak (str text) true]))
+                                             (ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak (str text) true]))
                                            ""))
 
                                  :play1 (fn [[text & [uid]]]
                                           (let [uid (or uid (str "tt" (rand-int 1234) (rand-int 1234)))]
                                             (when (not (some #(= % uid) @db/speech-log))
                                               (swap! db/speech-log conj uid)
-                                              (re-frame/dispatch [::audio/text-to-speech11 :audio :speak (str text) true]))
+                                              (ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak (str text) true]))
                                             ""))
 
                                  :play-click (fn [text]
@@ -10200,7 +10226,7 @@
                                                                           :on-click (fn [] (when (not (some (fn [x] (= x text)) @db/speech-log))
                                                                                              (do
                                                                                                 ;(swap! db/speech-log conj text)
-                                                                                               (re-frame/dispatch [::audio/text-to-speech11
+                                                                                               (ut/tracked-dispatch [::audio/text-to-speech11
                                                                                                                    :audio
                                                                                                                    ;panel-key
                                                                                                                    :speak (str text) true]))))
@@ -10210,10 +10236,10 @@
                                                                          [re-com/box :child ""]]]]]))
 
                                 ;;  :push> (fn [[flow-id bid value]]
-                                ;;           ;(re-frame/dispatch [::push-value flow-id bid value])
+                                ;;           ;(ut/tracked-dispatch [::push-value flow-id bid value])
                                 ;;           '(fn [] '(js/alert "hey")))
 
-                                ;;  :push> #(re-frame/dispatch [::push-value (get % 0) (get % 1) (get % 2)])
+                                ;;  :push> #(ut/tracked-dispatch [::push-value (get % 0) (get % 1) (get % 2)])
 
 
                                  :push (fn [[flow-id bid value & [view]]]
@@ -10232,7 +10258,7 @@
                                                         :children [[re-com/md-icon-button
                                                                     :md-icon-name "fa-solid fa-location-crosshairs" ;; <i class= "fa-solid fa-location-crosshairs" ></i>
                                                                     :on-click (fn [] (when bid
-                                                                                       (re-frame/dispatch [::push-value flow-id bid value])))
+                                                                                       (ut/tracked-dispatch [::push-value flow-id bid value])))
                                                                     :style {:font-size "15px"
                                                                             :opacity   0.25
                                                                             :cursor    "pointer"}]
@@ -10242,21 +10268,21 @@
                                                 (let [bid (try (if (cstr/starts-with? bid ":")
                                                                  (edn/read-string bid)
                                                                  (edn/read-string (str ":" bid))) (catch :default _ nil))
-                                                      alert-id @(re-frame/subscribe [::lookup-alert-id :dialog-push flow-id bid value])]
+                                                      alert-id @(ut/tracked-subscribe [::lookup-alert-id :dialog-push flow-id bid value])]
                                                   ;;(tap> [:alert-id alert-id])
                                                   [re-com/box
                                                    :style {:cursor "pointer"}
                                                            ;D:font-size "11px"
 
                                                    :attr {:on-click (fn [] (when bid
-                                                                             (re-frame/dispatch [::push-value flow-id bid value])
+                                                                             (ut/tracked-dispatch [::push-value flow-id bid value])
                                                                              (ut/dispatch-delay 800 [::prune-alert alert-id])))}
                                                    :size "auto"
                                                    :child (if view view (str "push " value " to " flow-id "/" bid))]))
 
                                  :web-cam #(let [video-ref (reagent/atom nil)
-                                                 running? @(re-frame/subscribe [::webcam?])
-                                                 webcam-stream @(re-frame/subscribe [::webcam-feed])]
+                                                 running? @(ut/tracked-subscribe [::webcam?])
+                                                 webcam-stream @(ut/tracked-subscribe [::webcam-feed])]
                                              (reagent/create-class
                                               {:component-did-mount
                                                (fn []
@@ -10271,8 +10297,8 @@
                                                   :style (if (not running?)
                                                            {:border "1px solid #ffffff87"} {})
                                                   :child [:video {:on-click (fn [_] (if running?
-                                                                                      (re-frame/dispatch [::audio/stop-webcam])
-                                                                                      (re-frame/dispatch [::audio/start-webcam])))
+                                                                                      (ut/tracked-dispatch [::audio/stop-webcam])
+                                                                                      (ut/tracked-dispatch [::audio/start-webcam])))
                                                           ;:style {:border "1px solid white"}
                                                                   :style {:objectFit "cover"
                                                                   ;:position "absolute"
@@ -10294,7 +10320,7 @@
                                                            (when (not already?)
                                                              (do (tap> [:forced-execution-from-honey-execute kk vv])
                                                                  (swap! mutation-log conj hid)
-                                                                 (re-frame/dispatch [::update-workspace-raw kk vv])))))
+                                                                 (ut/tracked-dispatch [::update-workspace-raw kk vv])))))
                                                        [re-com/box
                                                                 ;:width "580px" :align :end :justify :end
                                                                 ;:style {:margin-right "30px"}
@@ -10310,17 +10336,17 @@
                                                                         :padding-right "12px"}]])))
 
                                  :insert-alert (fn [[c w h d]]
-                                                 (re-frame/dispatch [::http/insert-alert c w h d]))
+                                                 (ut/tracked-dispatch [::http/insert-alert c w h d]))
 
                                  :run-flow (fn [[flow-id tt & [overrides]]]
-                                             (let [client-name @(re-frame/subscribe [::client-name])
+                                             (let [client-name @(ut/tracked-subscribe [::client-name])
                                                    base-opts {:increment-id? false}
                                                    running-key (keyword (str "flow/" flow-id ">*running?"))
-                                                   running? @(re-frame/subscribe [::conn/clicked-parameter-key [running-key]])
+                                                   running? @(ut/tracked-subscribe [::conn/clicked-parameter-key [running-key]])
                                                    ;overrides (if (nil? overrides) {} overrides)
                                                    runstreamed? (= overrides :runstream-overrides)
                                                    overrides (if runstreamed?
-                                                               @(re-frame/subscribe [::runstream-overrides flow-id])
+                                                               @(ut/tracked-subscribe [::runstream-overrides flow-id])
                                                                overrides)
                                                    overrides? (ut/ne? overrides)]
 
@@ -10346,7 +10372,7 @@
                                                                                            (let [fstr (str "running flow " flow-id (when overrides? " (with overrides)"))
                                                                                                  w (/ (count fstr) 4.1)]
                                                                                              ;(tap> [:fuck-me flow-id client-name overrides])
-                                                                                             (re-frame/dispatch [::wfx/request :default
+                                                                                             (ut/tracked-dispatch [::wfx/request :default
                                                                                                                  {:message    {:kind :run-flow
                                                                                                                                :flow-id flow-id
                                                                                                                                :flowmap flow-id
@@ -10355,18 +10381,18 @@
                                                                                                                                        (merge base-opts
                                                                                                                                               {:overrides overrides})
                                                                                                                                        base-opts)
-                                                                                                                              ;;  :file-image {:flowmaps @(re-frame/subscribe [::flowmap-raw])
-                                                                                                                              ;;               :opts @(re-frame/subscribe [::opts-map])
+                                                                                                                              ;;  :file-image {:flowmaps @(ut/tracked-subscribe [::flowmap-raw])
+                                                                                                                              ;;               :opts @(ut/tracked-subscribe [::opts-map])
                                                                                                                               ;;               :zoom @db/pan-zoom-offsets
                                                                                                                               ;;               :flow-id flow-id
-                                                                                                                              ;;               :flowmaps-connections @(re-frame/subscribe [::flowmap-connections])}
+                                                                                                                              ;;               :flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])}
                                                                                                                                :client-name client-name
                                                                                                                                :keypath [:panels panel-key :views selected-view]}
                                                                                                                   :on-response [::http/socket-response]
                                                                                                                   :on-timeout [::http/timeout-response]
                                                                                                                   :timeout    500000}])
                                                                                              (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5]))))
-                                                                                            ;;  (re-frame/dispatch [::conn/click-parameter ;; kinda cheating, but feels better
+                                                                                            ;;  (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
                                                                                             ;;                      [:flow (keyword (str flow-id ">*running?"))] true])
 
                                                                         :style {:font-size "inherit"
@@ -10377,12 +10403,12 @@
                                                                                 :cursor    "pointer"}]
                                                                        [re-com/box :child ""]]]]]))
 
-                                ;;  :run-flow-fn2 #(re-frame/dispatch [::wfx/request :default
+                                ;;  :run-flow-fn2 #(ut/tracked-dispatch [::wfx/request :default
                                 ;;                                     {:message    {:kind :run-flow
                                 ;;                                                   :flow-id %
                                 ;;                                                   :flowmap %
                                 ;;                                                   :opts {:increment-id? false}
-                                ;;                                                   :client-name @(re-frame/subscribe [::client-name])
+                                ;;                                                   :client-name @(ut/tracked-subscribe [::client-name])
                                 ;;                                                   :keypath [:panels panel-key :views selected-view]}
                                 ;;                                      :on-response [::http/socket-response]
                                 ;;                                      :on-timeout [::http/timeout-response]
@@ -10394,7 +10420,7 @@
 
                                  :scrubber22 (fn [[kk pm & [opts]]]
                                                [scrubber-panel true
-                                                @(re-frame/subscribe [::keypaths-in-params :param])
+                                                @(ut/tracked-subscribe [::keypaths-in-params :param])
                                                 kk pm
                                                 (if opts
                                                   {:fm true :canvas? true :opts opts}
@@ -10402,14 +10428,14 @@
 
                                  :scrubber (fn [[kk pm & [opts]]]
                                              [scrubber-panel true
-                                              @(re-frame/subscribe [::keypaths-in-params :param])
+                                              @(ut/tracked-subscribe [::keypaths-in-params :param])
                                               kk pm
                                               (if opts
                                                 {:fm true :canvas? true :opts opts}
                                                 {:fm true :canvas? true})])
 
 
-                                ; :data-color #(get @(re-frame/subscribe [::conn/data-colors]) (ut/data-typer %))
+                                ; :data-color #(get @(ut/tracked-subscribe [::conn/data-colors]) (ut/data-typer %))
 
                                 ; :condi-fill-fn #(let [dd (js->clj % :keywordize-keys true)]
                                 ;                         (tap> [:dd dd])
@@ -10418,7 +10444,7 @@
 
                                 ; :on-block? (true? @over-block?)
 
-                                ; :vvvalues (vec (for [r @(re-frame/subscribe [::conn/sql-data [:locations-venue-drag-37-clone-40]])] (last (get r :ft))))
+                                ; :vvvalues (vec (for [r @(ut/tracked-subscribe [::conn/sql-data [:locations-venue-drag-37-clone-40]])] (last (get r :ft))))
 
 
                                  :Map Map
@@ -10435,12 +10461,12 @@
                                 ; :MapSource Map/Source
                                 ; :MapLayer Map/Layer
                                 ; :MapMarker Map/Marker
-                                 :viewport-params-fn #(re-frame/dispatch [::conn/click-parameter [panel-key]
+                                 :viewport-params-fn #(ut/tracked-dispatch [::conn/click-parameter [panel-key]
                                                                           (select-keys
                                                                            (walk/keywordize-keys (js->clj (.-viewState %)))
                                                                            [:longitude :latitude :zoom])])
-                                 :test-params-fn #(re-frame/dispatch [::conn/click-parameter [panel-key] (str %)]) ;; (walk/keywordize-keys (js->clj (.-features %)))
-                                 :params> #(re-frame/dispatch [::conn/click-parameter [panel-key] (js->clj % :keywordize-keys true)])
+                                 :test-params-fn #(ut/tracked-dispatch [::conn/click-parameter [panel-key] (str %)]) ;; (walk/keywordize-keys (js->clj (.-features %)))
+                                 :params> #(ut/tracked-dispatch [::conn/click-parameter [panel-key] (js->clj % :keywordize-keys true)])
 
                                  ;:viewport-params-fn #(tap> (str %))
                                  ;;(fn [new-viewport] (reset! viewport new-viewport))
@@ -10456,8 +10482,8 @@
                                   ;:into into
                                   ;:grid 0
                                   ;:table honeycomb-table
-                                  ;:dispatch re-frame/dispatch
-                                  ;:click-param (fn [] (re-frame/dispatch [::conn/click-parameter [:user-sys] "test"]))
+                                  ;:dispatch ut/tracked-dispatch
+                                  ;:click-param (fn [] (ut/tracked-dispatch [::conn/click-parameter [:user-sys] "test"]))
                                  :text                  str
                                   ;:string str
                                 ;;  :string                (fn [x] (try
@@ -10471,11 +10497,11 @@
                                  (/ px-height-int brick-size)
                                  nil nil nil nil))
 
-        ;sql-aliases-used @(re-frame/subscribe [::panel-sql-aliases-in-views panel-key]) ;; pre :layout, needs to scrape postwalked bodies as well
+        ;sql-aliases-used @(ut/tracked-subscribe [::panel-sql-aliases-in-views panel-key]) ;; pre :layout, needs to scrape postwalked bodies as well
 
-        connection-id          @(re-frame/subscribe [::panel-connection-id panel-key]) ;(get block-map :connection-id)
+        connection-id          @(ut/tracked-subscribe [::panel-connection-id panel-key]) ;(get block-map :connection-id)
         ; (get block-map :queries)
-        body                   @(re-frame/subscribe [::views panel-key])
+        body                   @(ut/tracked-subscribe [::views panel-key])
        ; _ (tap> [:body replacement-view body])
         body (if replacement-view
                replacement-view ;{selected-view replacement-view}
@@ -10487,35 +10513,35 @@
 
         orig-body              body
 
-        single-view?           @(re-frame/subscribe [::is-single-view? panel-key])
-        no-view?               @(re-frame/subscribe [::has-no-view? panel-key])
+        single-view?           @(ut/tracked-subscribe [::is-single-view? panel-key])
+        no-view?               @(ut/tracked-subscribe [::has-no-view? panel-key])
 
-        is-layout?             @(re-frame/subscribe [::is-layout? panel-key selected-view])
+        is-layout?             @(ut/tracked-subscribe [::is-layout? panel-key selected-view])
 
         body                   (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") body) ;; eyes emoji - 10/17/23 (earliest swap needed?)
 
         body                   (view-alias-replace body panel-key selected-view) ; ; ; VIEW ALIAS. DRAGONS.
 
-        sql-aliases-used       @(re-frame/subscribe [::panel-sql-aliases-in-views-body panel-key body])
+        sql-aliases-used       @(ut/tracked-subscribe [::panel-sql-aliases-in-views-body panel-key body])
 
-        ;all-vsql-call-keys @(re-frame/subscribe [::all-vsql-call-keys]) ;LATER
+        ;all-vsql-call-keys @(ut/tracked-subscribe [::all-vsql-call-keys]) ;LATER
         vsql-calls             (if is-layout?
-                                 @(re-frame/subscribe [::all-vsql-calls]) ;; get all just in case they don't get resolved out in time (spoiler: they dont)
-                                 @(re-frame/subscribe [::panel-vsql-calls panel-key]))
+                                 @(ut/tracked-subscribe [::all-vsql-calls]) ;; get all just in case they don't get resolved out in time (spoiler: they dont)
+                                 @(ut/tracked-subscribe [::panel-vsql-calls panel-key]))
         vsql-calls             (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") vsql-calls)
         ;used-vsql-calls (cset/intersection (set (keys vsql-calls)) ) ;LATER
         vsql-replace-map       (into {} (for [[k v] vsql-calls]
                                           ;; search the map for datasets
                                           (let [look-for-datasets   (cset/intersection (set (ut/deep-flatten v)) (set all-sql-call-keys))
-                                                data-subbed-rep-map (into {} (for [ds look-for-datasets] {ds @(re-frame/subscribe [::conn/sql-data [ds]])}))
+                                                data-subbed-rep-map (into {} (for [ds look-for-datasets] {ds @(ut/tracked-subscribe [::conn/sql-data [ds]])}))
                                                 data-subbed-src     (walk/postwalk-replace data-subbed-rep-map v)]
                                                 ;data-subbed-modded (read-string (ut/replacer (str data-subbed-src) #":box "
                                                 ;                                 (str ":box :attr {:on-click #(re-frame.core/dispatch [::rvbbit-frontend.connections/click-parameter [" k "] \"test\"])} ")))
 
                                             ; (tap> [:vsql k (vsql-map v) data-subbed-src])
                                             {k (vsql-map data-subbed-src)})))
-        ;body orig-body ;@(re-frame/subscribe [::views panel-key]) ;(get block-map :views)
-        ;layered-body @(re-frame/subscribe [::layered-oz-views panel-key])
+        ;body orig-body ;@(ut/tracked-subscribe [::views panel-key]) ;(get block-map :views)
+        ;layered-body @(ut/tracked-subscribe [::layered-oz-views panel-key])
 
         ; selected-view-is-ref? (and
         ;                       ; false
@@ -10526,44 +10552,45 @@
         selected-view-is-sql?  (true? (some #(= selected-view %) (keys sql-calls)))
         override-view-is-sql?  (true? (some #(= override-view %) (keys sql-calls)))
 
-        ;params-used @(re-frame/subscribe [::panel-parameters-in-views panel-key])
-        valid-body-params      (ut/deep-flatten (merge @(re-frame/subscribe [::valid-body-params panel-key])
-                                                       @(re-frame/subscribe [::valid-body-params-all-condis])
+        ;params-used @(ut/tracked-subscribe [::panel-parameters-in-views panel-key])
+        valid-body-params      (ut/deep-flatten (merge @(ut/tracked-subscribe [::valid-body-params panel-key])
+                                                       ;;@(ut/tracked-subscribe [::valid-body-params-all-condis])
+                                                       @(rfa/sub ::valid-body-params-all-condis)
                                                        ;; ^^ all condis, just in case? TODO got back to ONLY condis detected in this view if expensive...
                                                        ;; ^^ perhaps they are being resolved out in original "get condis from params"?
-                                                       @(re-frame/subscribe [::valid-body-params-in body]) ;; extra? and expensive? by ONLY for view aliased views...
-                                                       @(re-frame/subscribe [::valid-body-params-in vsql-calls])))
+                                                       @(ut/tracked-subscribe [::valid-body-params-in body]) ;; extra? and expensive? by ONLY for view aliased views...
+                                                       @(ut/tracked-subscribe [::valid-body-params-in vsql-calls])))
         possible-datasets-used (set (for [e valid-body-params] (keyword (nth (cstr/split (ut/unkeyword e) #"/") 0))))
         used-datasets          (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys)))
         used-datasets          (if replacement-all? (into used-datasets (keys replacement-query)) used-datasets)
-        ;valid-sql-params @(re-frame/subscribe [::valid-sql-params panel-key])
+        ;valid-sql-params @(ut/tracked-subscribe [::valid-sql-params panel-key])
         data-walks             (into {} (for [k used-datasets] ;all-sql-call-keys]
-                                          {k @(re-frame/subscribe [::conn/sql-data [k]])}))
-                                           ;(keyword (str (ut/unkeyword k) "-text")) @(re-frame/subscribe [::conn/sql-data-text [k]])
-                                           ;(keyword (str (ut/unkeyword k) "->text")) @(re-frame/subscribe [::conn/sql-data-text [k]])
-                                           ;            (keyword (str (ut/unkeyword k) "/as-text")) @(re-frame/subscribe [::conn/sql-data-text [k]])
-                                           ;(keyword (str (ut/unkeyword k) "-table")) @(re-frame/subscribe [::sql-data-table-magic panel-key [k]])
-                                           ;(keyword (str (ut/unkeyword k) "..table")) @(re-frame/subscribe [::sql-data-table-magic panel-key [k]])
-                                           ;(keyword (str (ut/unkeyword k) "->table")) @(re-frame/subscribe [::sql-data-table-magic panel-key [k]])
-                                           ;(keyword (str (ut/unkeyword k) "-magic")) @(re-frame/subscribe [::sql-data-table-magic panel-key [k]])
-                                           ;          (keyword (str (ut/unkeyword k) "/as-table")) @(re-frame/subscribe [::sql-data-table-magic panel-key [k]])
-                                           ;(keyword (str (ut/unkeyword k) "-boxes")) @(re-frame/subscribe [::conn/sql-data-boxes [k] true nil])
-                                           ;(keyword (str (ut/unkeyword k) "-boxes-values")) @(re-frame/subscribe [::conn/sql-data-boxes-values [k] clickable? (get block-map :boxes-values-style)])
+                                          {k @(ut/tracked-subscribe [::conn/sql-data [k]])}))
+                                           ;(keyword (str (ut/unkeyword k) "-text")) @(ut/tracked-subscribe [::conn/sql-data-text [k]])
+                                           ;(keyword (str (ut/unkeyword k) "->text")) @(ut/tracked-subscribe [::conn/sql-data-text [k]])
+                                           ;            (keyword (str (ut/unkeyword k) "/as-text")) @(ut/tracked-subscribe [::conn/sql-data-text [k]])
+                                           ;(keyword (str (ut/unkeyword k) "-table")) @(ut/tracked-subscribe [::sql-data-table-magic panel-key [k]])
+                                           ;(keyword (str (ut/unkeyword k) "..table")) @(ut/tracked-subscribe [::sql-data-table-magic panel-key [k]])
+                                           ;(keyword (str (ut/unkeyword k) "->table")) @(ut/tracked-subscribe [::sql-data-table-magic panel-key [k]])
+                                           ;(keyword (str (ut/unkeyword k) "-magic")) @(ut/tracked-subscribe [::sql-data-table-magic panel-key [k]])
+                                           ;          (keyword (str (ut/unkeyword k) "/as-table")) @(ut/tracked-subscribe [::sql-data-table-magic panel-key [k]])
+                                           ;(keyword (str (ut/unkeyword k) "-boxes")) @(ut/tracked-subscribe [::conn/sql-data-boxes [k] true nil])
+                                           ;(keyword (str (ut/unkeyword k) "-boxes-values")) @(ut/tracked-subscribe [::conn/sql-data-boxes-values [k] clickable? (get block-map :boxes-values-style)])
                                            ;(keyword (str (ut/unkeyword k) "-boxes-values")) (sql-data-boxes-values [k] clickable? (get block-map :boxes-values-style))
                                            ;         (keyword (str (ut/unkeyword k) "/as-boxes-values")) (sql-data-boxes-values2 [k] nil)
                                            ;        (keyword (str (ut/unkeyword k) "/as-boxes")) (sql-data-boxes-values2 [k] nil)
-                                           ;         (keyword (str (ut/unkeyword k) "/parameter")) @(re-frame/subscribe [::conn/clicked-parameter [k]])
-                                           ;         (keyword (str (ut/unkeyword k) "/*")) @(re-frame/subscribe [::conn/clicked-parameter [k]])
-                                           ;(keyword (str (ut/unkeyword k) "-parameter")) @(re-frame/subscribe [::conn/clicked-parameter [k]])
-                                           ;(keyword (str (ut/unkeyword k) "->parameter")) @(re-frame/subscribe [::conn/clicked-parameter [k]])
+                                           ;         (keyword (str (ut/unkeyword k) "/parameter")) @(ut/tracked-subscribe [::conn/clicked-parameter [k]])
+                                           ;         (keyword (str (ut/unkeyword k) "/*")) @(ut/tracked-subscribe [::conn/clicked-parameter [k]])
+                                           ;(keyword (str (ut/unkeyword k) "-parameter")) @(ut/tracked-subscribe [::conn/clicked-parameter [k]])
+                                           ;(keyword (str (ut/unkeyword k) "->parameter")) @(ut/tracked-subscribe [::conn/clicked-parameter [k]])
 
         ;value-walks
 
         ;workspace-params (into {} (for [k (ut/deep-flatten body)] ;; slowish since all bodys with params need to be evaled when any click params are activated
         ;                            (if (cstr/includes? (str k) ".")
-        ;                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])} {})))
+        ;                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])} {})))
         workspace-params       (into {} (for [k valid-body-params] ;; deref here?
-                                          {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+                                          {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         ;;_ (when (= panel-key :block-55) (tap> [:workspace-params workspace-params]))  
         value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
         value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
@@ -10574,24 +10601,24 @@
                                                 ;row (int (last gs))
                                                 field (keyword (first gs))]
                                             {k (if (not (integer? row))
-                                                 ;(get-in @(re-frame/subscribe [::conn/sql-data [ds]]) [row field])
+                                                 ;(get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field])
                                                  (str field)
-                                                 (get-in @(re-frame/subscribe [::conn/sql-data [ds]]) [row field]))})))
+                                                 (get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field]))})))
 
         condi-walks-targets    (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
         condi-walks            (into {} (for [k condi-walks-targets]
-                                          {k @(re-frame/subscribe [::conn/condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
+                                          {k @(ut/tracked-subscribe [::conn/condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
         ;sql-params (into {} (for [k (ut/deep-flatten sql-calls)] ;; slowish since all bodys with params need to be evaled when any click params are activated
         ;                      (if (cstr/includes? (str k) ".")
-        ;                        {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])} {})))
+        ;                        {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])} {})))
         ;sql-params (into {} (for [k valid-sql-params] ;; deref here?
         ;                      ;(if (cstr/includes? (str k) ":query/")
-        ;                        ;{k @(re-frame/subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))])}
-        ;                      {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}));)
+        ;                        ;{k @(ut/tracked-subscribe [::resolve-sql-alias (keyword (ut/replacer (str k) ":query/" ""))])}
+        ;                      {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}));)
         ;gen-sql-params (fn [q] (let [valid-sql-params (vec (remove nil? (for [k (ut/deep-flatten q)]
         ;                                                                  (when (and (keyword? k) (cstr/includes? (str k) "/")) k))))]
         ;                         (into {} (for [k valid-sql-params]
-        ;                                    {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))))
+        ;                                    {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))))
         ;sql-params-replace-recur
         ; AFTER DINNER!
         ;// - remove all editor logic from honeycomb-reader!
@@ -10672,7 +10699,7 @@
         ;;                                                                     raw-param-key (get-in vsql-calls (conj (vec (first (filter #(= (last %) :on-click)
         ;;                                                                                                                                (ut/kvpaths vsql-calls)))) 1) pkey)]
         ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
-        ;;                                                                 {v (fn [] (re-frame/dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
+        ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
         ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
         ;;                                      (walk/postwalk-replace logic-kps obody)))
         onclick-walk-map2      (fn [obody] (let [kps       (ut/extract-patterns obody :set-parameter 3)
@@ -10681,7 +10708,7 @@
                                                                             raw-param-key (get-in vsql-calls (conj (vec (first (filter #(= (last %) :on-click)
                                                                                                                                        (ut/kvpaths vsql-calls)))) 1) pkey)]
                                                                         ;(tap> [:on-click-hack panel-key v raw-param-key])
-                                                                        {v (fn [] (re-frame/dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
+                                                                        {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
                                              ;(tap> [:set-param/logic-kps logic-kps kps])
                                              (walk/postwalk-replace logic-kps obody)))
 
@@ -10695,7 +10722,7 @@
                                                                                                                (last (get r that))))
                                                                                                                ;(get r that)
 
-                                                                                                        (vec (for [r @(re-frame/subscribe [::conn/sql-data [this]])] (last (get r that))))) panel-key)})))]
+                                                                                                        (vec (for [r @(ut/tracked-subscribe [::conn/sql-data [this]])] (last (get r that))))) panel-key)})))]
                                                                              ; panel-key)
                                                                          ;(= (str that) (str this))
 
@@ -10711,7 +10738,7 @@
                                                                              (vec (for [r this]
                                                                                    ;(last (get r that))
                                                                                     (get r that)))
-                                                                             (vec (for [r @(re-frame/subscribe [::conn/sql-data [this]])] (last (get r that)))))})))]
+                                                                             (vec (for [r @(ut/tracked-subscribe [::conn/sql-data [this]])] (last (get r that)))))})))]
                                                                              ; panel-key)
                                                                          ;(= (str that) (str this))
 
@@ -10725,7 +10752,7 @@
         ;;                                                                        (let [[_ this] v]
         ;;                                                                        ;(tap> [:scrubber2 panel-key kps this])
         ;;                                                                          {v [scrubber-panel true
-        ;;                                                                              @(re-frame/subscribe [::keypaths-in-params :param])
+        ;;                                                                              @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                              :param
         ;;                                                                              (str (last (cstr/split (str this) #"/")))
         ;;                                                                              {:fm true :canvas? true}]})))
@@ -10733,7 +10760,7 @@
         ;;                                                                         (let [[_ this opts] v]
         ;;                                                                         ;(tap> [:scrubber3 panel-key kps this])
         ;;                                                                           {v [scrubber-panel true
-        ;;                                                                               @(re-frame/subscribe [::keypaths-in-params :param])
+        ;;                                                                               @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                               :param
         ;;                                                                               (str (last (cstr/split (str this) #"/")))
         ;;                                                                               {:fm true :canvas? true :opts opts}]})))
@@ -10752,14 +10779,14 @@
                                                logic-kps (into {} (for [v kps]
                                                                     (let [[_ & this] v
                                                                           [[flow-id bid value alert?]] this]
-                                                                      {v  #(re-frame/dispatch [::push-value flow-id bid value alert?])})))]
+                                                                      {v  #(ut/tracked-dispatch [::push-value flow-id bid value alert?])})))]
                                            (walk/postwalk-replace logic-kps obody)))
 
         push-walk-fn            (fn [obody] (let [kps       (ut/extract-patterns obody :push>> 2) ;; is there a less expensive way to do this? unsure. 3/2/24
                                                   logic-kps (into {} (for [v kps]
                                                                        (let [[_ & this] v
                                                                              [[flow-id bid value alert?]] this]
-                                                                         {v  #(re-frame/dispatch [::push-value flow-id bid % alert?])})))]
+                                                                         {v  #(ut/tracked-dispatch [::push-value flow-id bid % alert?])})))]
                                               (walk/postwalk-replace logic-kps obody)))
 
         get-in-walk            (fn [obody] (let [kps       (ut/extract-patterns obody :get-in 2)
@@ -10806,41 +10833,41 @@
         ;;                                                    (walk/postwalk-replace logic-kps obody)))
 
         run-rs-flow (fn [flow-id flow-id-inst panel-key override-merge-map]
-                      (let [client-name @(re-frame/subscribe [::client-name])
+                      (let [client-name @(ut/tracked-subscribe [::client-name])
                             base-opts {:increment-id? false :instance-id flow-id-inst}
                             ;running-key (keyword (str "flow/" flow-id ">*running?"))
                             running-key (keyword (str "flow/" flow-id-inst ">*running?"))
-                            running? @(re-frame/subscribe [::conn/clicked-parameter-key [running-key]])
-                            overrides (merge @(re-frame/subscribe [::runstream-overrides flow-id]) override-merge-map)]
+                            running? @(ut/tracked-subscribe [::conn/clicked-parameter-key [running-key]])
+                            overrides (merge @(ut/tracked-subscribe [::runstream-overrides flow-id]) override-merge-map)]
                             ;overrides? (not (empty? overrides))
 
                         (when (not running?) ;(not (some (fn [x] (= x text)) @db/speech-log))
                           (let [fstr (str panel-key " DROP running flow " flow-id " (with double overrides)")
                                 w (/ (count fstr) 4.1)]
                             ;(tap> [:run? flow-id-inst])
-                            (re-frame/dispatch [::wfx/request :default
+                            (ut/tracked-dispatch [::wfx/request :default
                                                 {:message    {:kind :run-flow
                                                               :flow-id flow-id
                                                               :flowmap flow-id
                                                               :no-return? true
                                                               :opts (merge base-opts {:overrides overrides})
-                                                              ;; :file-image {:flowmaps @(re-frame/subscribe [::flowmap-raw])
-                                                              ;;              :opts @(re-frame/subscribe [::opts-map])
+                                                              ;; :file-image {:flowmaps @(ut/tracked-subscribe [::flowmap-raw])
+                                                              ;;              :opts @(ut/tracked-subscribe [::opts-map])
                                                               ;;              :zoom @db/pan-zoom-offsets
                                                               ;;              :flow-id flow-id
-                                                              ;;              :flowmaps-connections @(re-frame/subscribe [::flowmap-connections])}
+                                                              ;;              :flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])}
                                                               :client-name client-name
                                                               :keypath [:panels panel-key :views selected-view]}
                                                  :on-response [::http/socket-response]
                                                  :on-timeout [::http/timeout-response]
                                                  :timeout    500000}])
                             (ut/dispatch-delay 800 [::http/insert-alert [:box :child fstr :style {:font-size "14px"}] w 0.5 5])))))
-                            ;; (re-frame/dispatch [::conn/click-parameter ;; kinda cheating, but feels better
+                            ;; (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
                             ;;                     [:flow (keyword (str flow-id ">*running?"))] true])
 
 
         run-drop (fn [[drop-id _] val]
-                   (let [drop-deets @(re-frame/subscribe [::drop-details drop-id])
+                   (let [drop-deets @(ut/tracked-subscribe [::drop-details drop-id])
                          flow-id (get drop-deets :flow-id)
                          ;;flow-id-inst (str flow-id "__" (hash val)) ;; unique flow run instance so we can do multiple, etc
                          flow-id-inst (str flow-id "__" (hash panel-key)) ;; unique flow run instance so we can do multiple, etc
@@ -10855,7 +10882,7 @@
                     ;;   :child [:strings "we dropped! " drop-id " " val]]
 
                      (when (and
-                            @(re-frame/subscribe [::auto-run-and-connected?])
+                            @(ut/tracked-subscribe [::auto-run-and-connected?])
                             ;(not= (hash [drop-id val]) (get-in @drop-last-tracker [panel-key drop-id val]))
                             (not= (hash val) (get-in @drop-last-tracker [panel-key drop-id])))
                        ;(swap! drop-last-tracker assoc-in [panel-key drop-id val] (hash [drop-id val]))
@@ -10896,7 +10923,7 @@
 
 
 
-        ;[bricks/scrubber-panel true @(re-frame/subscribe [::bricks/keypaths-in-params key-type]) key-type (get @param-search key-type) {:fm true}]
+        ;[bricks/scrubber-panel true @(ut/tracked-subscribe [::bricks/keypaths-in-params key-type]) key-type (get @param-search key-type) {:fm true}]
 
 
         ;body (walk/postwalk-replace walk-map body)
@@ -11008,7 +11035,7 @@
         templated-strings-walk (if templates?
                                  (walk/postwalk-replace {nil ""}
                                                         (into {} (for [k templated-strings-vals]
-                                                                   {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))) {})
+                                                                   {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))) {})
 
         ;) ;; need to generate base metadata for use
         ;query-view-alias? (cstr/starts-with? (str orig-body) ":grid/")
@@ -11086,9 +11113,9 @@
     (doseq [[k v] (merge sql-calls base-table-sniffs)] ;; base-table-sniffs allow us to get metadata for the root tables quietly
       (let [
             query        (sql-alias-replace-sub v)
-                   ;last-known-fields (vec (keys (get @(re-frame/subscribe [::conn/sql-metadata [k]]) :fields))) ;; only used for :*all= ATM
-            data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-            unrun-sql?   @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])
+                   ;last-known-fields (vec (keys (get @(ut/tracked-subscribe [::conn/sql-metadata [k]]) :fields))) ;; only used for :*all= ATM
+            data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+            unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
             connection-id (get query :connection-id connection-id)
             ;; query (walk/postwalk-replace {:read-edn (fn [x] (try (edn/read-string x) (catch :default _ x)))} query)
             ] ;; override w query connection-id
@@ -11103,7 +11130,7 @@
             (if (or (empty? connection-id) (nil? connection-id))
               (conn/sql-data [k] query)
               (conn/sql-data [k] query connection-id))
-            (re-frame/dispatch [::insert-sql-source k query])))))
+            (ut/tracked-dispatch [::insert-sql-source k query])))))
 
     ;(when (= panel-key :block-289)
     ;  (tap> [:honeycomb panel-key (keys sql-calls) (true? (seq body)) override-view selected-view body (get body selected-view) (first (keys body)) sql-aliases-used used-datasets]))
@@ -11172,7 +11199,7 @@
               :children
               [(when overlay?
                      ;[dynamic-spawner-targets nil @dragging-body panel-key nil ww hh]
-                 @(re-frame/subscribe [::dynamic-drop-targets nil @dragging-body panel-key nil ww hh]))
+                 @(ut/tracked-subscribe [::dynamic-drop-targets nil @dragging-body panel-key nil ww hh]))
                [re-com/box
                 :style {:filter (if overlay? "blur(3px) opacity(60%)" "none")}
                 :child body]]]]
@@ -11188,7 +11215,7 @@
               :children
               [(when overlay?
                      ;[dynamic-spawner-targets nil @dragging-body panel-key nil ww hh]
-                 @(re-frame/subscribe [::dynamic-drop-targets nil @dragging-body panel-key nil ww hh]))
+                 @(ut/tracked-subscribe [::dynamic-drop-targets nil @dragging-body panel-key nil ww hh]))
                [re-com/box
                 :style {:filter      (if overlay? "blur(3px) opacity(60%)" "none")
                         :margin-top  (if (and overlay? is-layout?)
@@ -11198,7 +11225,7 @@
                 :child                                  ;(if (= selected-view :layered-viz)
                     ;(get body selected-view)
                     ;[re-com/box :child "LAYERSZSs"]
-                    ;@(re-frame/subscribe [::layered-oz-views panel-key])
+                    ;@(ut/tracked-subscribe [::layered-oz-views panel-key])
                     ;layered-body
                 (get body selected-view)]]]])                ;)
 
@@ -11212,7 +11239,7 @@
       [rc/catch [magic-table panel-key [(first (keys sql-calls))]]]
 
           ;editor-and-not-empty?
-          ;[rc/catch @(re-frame/subscribe [::panel-views panel-key])] ;; uinmodded body
+          ;[rc/catch @(ut/tracked-subscribe [::panel-views panel-key])] ;; uinmodded body
 
       :else [re-com/box :child "nothing here to do."])))
 
@@ -11222,7 +11249,7 @@
 ;;    (honeycomb-fn panel-key override-view fh fw replacement-view replacement-query)))
 
 ;; (defn honeycomb [panel-key & [override-view fh fw replacement-view replacement-query]]
-;;   @(re-frame/subscribe [::honeycomb  panel-key override-view fh fw replacement-view replacement-query]))
+;;   @(ut/tracked-subscribe [::honeycomb  panel-key override-view fh fw replacement-view replacement-query]))
 
 
 (defn brick-key-lookup [brick-vec brick-map]
@@ -11472,31 +11499,31 @@
                          :z-index          9}]]]))
 
 (defn param-usage [panel-key]
-  (let [all-sql-call-keys      @(re-frame/subscribe [::all-sql-call-keys]) ;(into {} (for [[k v] workspace] (get v :queries)))
-        sql-aliases-used       @(re-frame/subscribe [::panel-sql-aliases-in-views panel-key])
-        ;params-used @(re-frame/subscribe [::panel-parameters-in-views panel-key])
-        sql-calls              @(re-frame/subscribe [::panel-sql-calls panel-key])
-        valid-body-params      @(re-frame/subscribe [::valid-body-params panel-key])
+  (let [all-sql-call-keys      @(ut/tracked-subscribe [::all-sql-call-keys]) ;(into {} (for [[k v] workspace] (get v :queries)))
+        sql-aliases-used       @(ut/tracked-subscribe [::panel-sql-aliases-in-views panel-key])
+        ;params-used @(ut/tracked-subscribe [::panel-parameters-in-views panel-key])
+        sql-calls              @(ut/tracked-subscribe [::panel-sql-calls panel-key])
+        valid-body-params      @(ut/tracked-subscribe [::valid-body-params panel-key])
         possible-datasets-used (set (for [e (merge sql-calls valid-body-params)] (keyword (nth (cstr/split (ut/unkeyword e) #"/") 0))))
         used-datasets          (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys)))]
     (tap> [:pos panel-key possible-datasets-used])
-    (vec (for [d used-datasets] @(re-frame/subscribe [::lookup-panel-key-by-query-key d])))))
+    (vec (for [d used-datasets] @(ut/tracked-subscribe [::lookup-panel-key-by-query-key d])))))
 
 (defn draw-lines [coords]
   (doall (for [[x1 y1 x2 y2 involved? color z1 z2 same-tab?] coords]
            ^{:key (hash (str x1 y1 x2 y2 "lines"))}
-           (let [];selected-dash "" ;@(re-frame/subscribe [::selected-dash])
-                 ; relations "" ;@(re-frame/subscribe [::relations selected-dash])
-                 ; selected  "" ;@(re-frame/subscribe [::selected])
+           (let [];selected-dash "" ;@(ut/tracked-subscribe [::selected-dash])
+                 ; relations "" ;@(ut/tracked-subscribe [::relations selected-dash])
+                 ; selected  "" ;@(ut/tracked-subscribe [::selected])
                  ; involved (vec (remove nil? (distinct (apply concat (filter #(some (fn [x] (= x selected)) %) relations)))))
                  ; nothing-selected? (nil? selected)
                  ;  involved1? (some #(= n1 %) involved)
                  ; involved2? (some #(= n2 %) involved)
                  ; involved? (and involved1? involved2?)
-                 ; peek? @(re-frame/subscribe [::peek?])
+                 ; peek? @(ut/tracked-subscribe [::peek?])
 
             ;; (tap> [:coords coords])
-             ; (tap> [:lines z1 z2 same-tab? @(re-frame/subscribe [::what-tab z1]) @(re-frame/subscribe [::what-tab z2])])
+             ; (tap> [:lines z1 z2 same-tab? @(ut/tracked-subscribe [::what-tab z1]) @(ut/tracked-subscribe [::what-tab z2])])
              [:path {:stroke-width (if involved? 16 13)
                      :stroke       (if involved? color "#ffffff22") ;(if (or involved? nothing-selected?)
                      ;(if (nil? color) "pink" color) "#E6E6FA")
@@ -11586,8 +11613,8 @@
 (re-frame/reg-sub
  ::tab-recenter
  (fn [db [_ tab]]
-   (let [coords (vec (for [[x y _] @(re-frame/subscribe [::all-roots-tab tab])] [x y]))
-         coords+ @(re-frame/subscribe [::all-roots-tab-sizes tab])
+   (let [coords (vec (for [[x y _] @(ut/tracked-subscribe [::all-roots-tab tab])] [x y]))
+         coords+ @(ut/tracked-subscribe [::all-roots-tab-sizes tab])
          icons? (ut/not-empty? (for [[k v] (get db :panels)
                                      :when (and (= (get v :tab "") tab) (get v :iconized? false))]
                                  k)) ;; if icons, do not recenter
@@ -11602,7 +11629,7 @@
 (re-frame/reg-sub
  ::tab-offset
  (fn [_ [_ tab]]
-   (let [coords (vec (for [[x y _] @(re-frame/subscribe [::all-roots-tab tab])] [x y]))
+   (let [coords (vec (for [[x y _] @(ut/tracked-subscribe [::all-roots-tab tab])] [x y]))
          corner (try (ut/min-at-least-pos coords) (catch :default _ [0 0]))]
      ;(tap> [:tab-recenter corner [hh ww] coords])
      corner)))
@@ -11674,7 +11701,7 @@
  ::panel-icon
  (fn [db [_ panel-key]]
    (let [selected-view (get-in db [:panels panel-key :selected-view])
-         is-grid?     @(re-frame/subscribe [::is-grid? panel-key selected-view])
+         is-grid?     @(ut/tracked-subscribe [::is-grid? panel-key selected-view])
          selected-query? (some #(= % selected-view) (keys (get-in db [:panels panel-key :queries])))
          default (cond selected-query? "zmdi-grid"
                        is-grid? "zmdi-view-dashboard"
@@ -11775,31 +11802,31 @@
 (defn grid [& [tab]]
   (let [;reaction-hack! @hover-square ;; seems less expensive than doall-for ?
         ;reaction-hack2! @edit-mode?
-        ;editor? @(re-frame/subscribe [::get-in [:editor?]])
-        ;;external? @(re-frame/subscribe [::external?]) ;;; imp?
+        ;editor? @(ut/tracked-subscribe [::get-in [:editor?]])
+        ;;external? @(ut/tracked-subscribe [::external?]) ;;; imp?
         ;reaction-hack! (when @dragging? @hover-square) ;; seems less expensive than doall-for ?
-        panels-hash1    @(re-frame/subscribe [::panels-hash])
+        panels-hash1    @(ut/tracked-subscribe [::panels-hash])
         ;;panels-hash1    @(rfa/sub ::panels-hash {}) ;;; alpha sub that is SUPPOSED to be memory safe at the possible cost of CPU...
         ;; ^^ https://day8.github.io/re-frame/Flows/#subscribing-to-flows
         ;; meant for subbing to flows which seem to have their own memory and caching semantics
-        panels-hash2    (hash (ut/remove-underscored @(re-frame/subscribe [::panels])))
+        panels-hash2    (hash (ut/remove-underscored @(ut/tracked-subscribe [::panels])))
         [tab-x tab-y]   (if tab
-                          (let [tt @(re-frame/subscribe [::tab-recenter tab])]
+                          (let [tt @(ut/tracked-subscribe [::tab-recenter tab])]
                             [(get tt 0 0) (get tt 1 0)])
                           [0 0])
         start-y        (if tab tab-y 0)
         start-x        (if tab tab-x 0)
-        bricks-high    (+ (js/Math.floor (/ @(re-frame/subscribe [::subs/h]) brick-size)) 1)
-        bricks-wide    (+ (js/Math.floor (/ @(re-frame/subscribe [::subs/w]) brick-size)) 1)
+        bricks-high    (+ (js/Math.floor (/ @(ut/tracked-subscribe [::subs/h]) brick-size)) 1)
+        bricks-wide    (+ (js/Math.floor (/ @(ut/tracked-subscribe [::subs/w]) brick-size)) 1)
         ; bricks-wide (- end-x start-x)
         ; bricks-high (- end-y start-y)
-        ; current-grid @(re-frame/subscribe [::build-grid bricks-high bricks-wide start-y start-x])
-        ;current-grid @(re-frame/subscribe [::build-grid end-y end-x start-y start-x])
-        ;wspace @(re-frame/subscribe [::workspace []])
-        selected-block @(re-frame/subscribe [::selected-block])
+        ; current-grid @(ut/tracked-subscribe [::build-grid bricks-high bricks-wide start-y start-x])
+        ;current-grid @(ut/tracked-subscribe [::build-grid end-y end-x start-y start-x])
+        ;wspace @(ut/tracked-subscribe [::workspace []])
+        selected-block @(ut/tracked-subscribe [::selected-block])
         ;;selected-block @(ut/tracked-subscribe [::selected-block])
-        lines?         @(re-frame/subscribe [::lines?])
-        peek?          @(re-frame/subscribe [::peek?])
+        lines?         @(ut/tracked-subscribe [::lines?])
+        peek?          @(ut/tracked-subscribe [::peek?])
         ;editor-panels-map (editor-panels bricks-high bricks-wide)
         ;meta-menu (meta-menu-panel bricks-high bricks-wide)
         ;editor-keys (keys editor-panels-map)
@@ -11811,33 +11838,34 @@
         ;              [(- bricks-wide 3) (- bricks-high 3)]
         ;              [(- bricks-wide 3) (- bricks-high 4)]]
         ;used-bricks (used-space workspace bricks-high bricks-wide)
-        ;used-bricks @(re-frame/subscribe [::used-space workspace bricks-high bricks-wide])
-        ;used-bricks (cset/union (set @(re-frame/subscribe [::used-space2 bricks-high bricks-wide])) (set logo-bricks))
-        ;used-bricks @(re-frame/subscribe [::used-space3 bricks-high bricks-wide start-y end-y start-x end-x])
+        ;used-bricks @(ut/tracked-subscribe [::used-space workspace bricks-high bricks-wide])
+        ;used-bricks (cset/union (set @(ut/tracked-subscribe [::used-space2 bricks-high bricks-wide])) (set logo-bricks))
+        ;used-bricks @(ut/tracked-subscribe [::used-space3 bricks-high bricks-wide start-y end-y start-x end-x])
         ;brick-roots (vec (for [[k v] brick-map] (:root v))) ;(vec (keys brick-map))
         brick-roots    (if tab
-                         @(re-frame/subscribe [::all-roots-tab tab])
-                         ;@(rfa/sub ::all-roots-tab tab)
-                         @(re-frame/subscribe [::all-roots])
-                         ;@(rfa/sub ::all-roots)
+                         ;@(ut/tracked-subscribe [::all-roots-tab tab])
+                         @(rfa/sub ::all-roots-tab tab)
+                         ;@(ut/tracked-subscribe [::all-roots])
+                         @(rfa/sub ::all-roots)
                          )
-        audio-playing? @(re-frame/subscribe [::audio/audio-playing?])
-        ;brick-roots @(re-frame/subscribe [::all-roots2 start-y end-y start-x end-x])
+        audio-playing? @(ut/tracked-subscribe [::audio/audio-playing?])
+        ;brick-roots @(ut/tracked-subscribe [::all-roots2 start-y end-y start-x end-x])
         ;diff-grid1 (cset/union (set brick-roots) (cset/difference (set current-grid) (set used-bricks)))
         ;diff-grid2 (cset/union (set brick-roots) (remove (set used-bricks) (set current-grid)))
         ;diff-grid (merge (remove used-bricks current-grid) brick-roots)
         top-start      (* start-y brick-size)               ;-100 ;; if shifted some bricks away...
         left-start     (* start-x brick-size)]
     ;(tap> @panels-hash)
-    ;(tap> [:something-running? @(re-frame/subscribe [::something-running?])])
+    ;(tap> [:something-running? @(ut/tracked-subscribe [::something-running?])])
 
     (when (not @on-scrubber?) ;true ; external?
       (doall (when (not (= panels-hash2 panels-hash1))  ;; core update for blind backend updating / external editing 2-way
-               (re-frame/dispatch [::update-panels-hash]))))
+               (ut/tracked-dispatch [::update-panels-hash]))))
     ;; ^^  TODO should this be at the honeycomb level instead? grid is one hell of a tick to key off of... feels overly sledgehammer-y.
 
 
-(tap> [:sub-tracker @ut/subscription-counts])
+   ;(tap> [:sub-tracker @(rfa/sub ::client-name) (vec (take 20 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/subscription-counts)))))])
+    ;(tap> [:dispatch-tracker @(rfa/sub ::client-name) (vec (take 20 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/dispatch-counts)))))])
 
     ;(tap> [:grid-render])
     ;(when @over-block? (tap> [:over]))
@@ -11856,7 +11884,7 @@
      ;:style {:transform "scale(0.75)"}
      ;:attr {:on-drag-enter #(tap> [:dragging-over [ tab]])}
      :children [(doall
-                 (for [[bw bh brick-vec-key] brick-roots]                ;diff-grid1] ;(if @dragging? current-grid brick-roots)] @(re-frame/subscribe [::bricks/subq-panels selected-block])
+                 (for [[bw bh brick-vec-key] brick-roots]                ;diff-grid1] ;(if @dragging? current-grid brick-roots)] @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
                    (let [bricksw             (* bw brick-size)
                          bricksh             (* bh brick-size)
                          top                 (+ top-start bricksh)
@@ -11865,59 +11893,60 @@
                           ;edge? (or (= bw (- bricks-wide 1)) (= bh (- bricks-high 1)))
                          root?               true          ; (some #(= brick-vec %) brick-roots)
                         ;;  brick-vec-key       (if tab
-                        ;;                        @(re-frame/subscribe [::lookup-root-key-tab brick-vec tab])
-                        ;;                        ;@(re-frame/subscribe [::lookup-root-key brick-vec])
+                        ;;                        @(ut/tracked-subscribe [::lookup-root-key-tab brick-vec tab])
+                        ;;                        ;@(ut/tracked-subscribe [::lookup-root-key brick-vec])
                         ;;                        brick-vec-key
                         ;;                        )
                          ;;_ (tap> [:tab tab brick-vec-key])
                          ;;rs                  (fn [edn] (resolver/logic-and-params edn brick-vec-key))
-                         w                   (rs @(re-frame/subscribe [::panel-width brick-vec-key]) brick-vec-key)
-                         h                   (rs @(re-frame/subscribe [::panel-height brick-vec-key]) brick-vec-key)
-                         name                (rs @(re-frame/subscribe [::panel-name brick-vec-key]) brick-vec-key)
-                         z                   (rs @(re-frame/subscribe [::panel-depth brick-vec-key]) brick-vec-key)
+                         w                   (rs @(ut/tracked-subscribe [::panel-width brick-vec-key]) brick-vec-key)
+                         h                   (rs @(ut/tracked-subscribe [::panel-height brick-vec-key]) brick-vec-key)
+                         name                (rs @(ut/tracked-subscribe [::panel-name brick-vec-key]) brick-vec-key)
+                         z                   (rs @(ut/tracked-subscribe [::panel-depth brick-vec-key]) brick-vec-key)
                          trunc-name          (when (not (nil? name))
                                                (let [charpx      5.75
                                                      pixel-width (* (count (str name)) charpx)
                                                      panel-width (- (* w brick-size) 50)]
                                                  (if (> pixel-width panel-width) (str (subs name 0 (/ panel-width charpx)) "...") name)))
-                          ;panel-clone-map   (re-frame/subscribe [::panel-map brick-vec-key])  ;; questionable
-                        ; cross-breed?        @(re-frame/subscribe [::un-fired-cross-breed? brick-vec-key])
+                          ;panel-clone-map   (ut/tracked-subscribe [::panel-map brick-vec-key])  ;; questionable
+                        ; cross-breed?        @(ut/tracked-subscribe [::un-fired-cross-breed? brick-vec-key])
                         ; _                   (when cross-breed? ;; TODO , move this side-effect elsewhere - its relatively safe here, but feels gross none-the-less
-                        ;                       (re-frame/dispatch [::cross-breed brick-vec-key]))
+                        ;                       (ut/tracked-dispatch [::cross-breed brick-vec-key]))
                          block-width         (if root? (+ 1 (* brick-size (if (= w 0) (- bricks-wide 1) w))) brick-size)
                          block-height        (if root? (+ 1 (* brick-size (if (= h 0) (- bricks-high 1) h))) brick-size)
                          selected?           (= brick-vec-key selected-block)
                          block-selected?     selected?
-                         subq-blocks         (if root? @(re-frame/subscribe [::subq-panels selected-block]) [])
+                         subq-blocks         (if root? @(ut/tracked-subscribe [::subq-panels selected-block]) [])
                          parent-of-selected? (some #(= % brick-vec-key) subq-blocks)
                           ;param-hover-query (try (nth @param-hover 1) (catch :default e nil))
-                         editor?             @(re-frame/subscribe [::editor?])
+                         ;;editor?             @(ut/tracked-subscribe [::editor?])
+                         editor?             @(rfa/sub ::editor?)
                          hover-q?            (if (and editor? root?)
-                                               (or @(re-frame/subscribe [::has-query? brick-vec-key
+                                               (or @(ut/tracked-subscribe [::has-query? brick-vec-key
                                                                          (try (nth @param-hover 1) (catch :default _ nil))])
-                                                   @(re-frame/subscribe [::has-query? brick-vec-key @query-hover])
+                                                   @(ut/tracked-subscribe [::has-query? brick-vec-key @query-hover])
                                                    (and (= @query-hover brick-vec-key) (= @db/item-browser-mode :blocks))) false)
                           ;;editor-panel? false ; (true? (some #(= brick-vec-key %) editor-keys))
-                          ;subq-used (if root? @(re-frame/subscribe [::subq-used selected-block]) [])
-                          ;subq-produced (if root? @(re-frame/subscribe [::subq-produced selected-block]) [])
-                          ;subq-used2 (if root? @(re-frame/subscribe [::subq-used brick-vec-key]) [])
-                         subq-mapping        (if root? @(re-frame/subscribe [::subq-mapping]) [])
+                          ;subq-used (if root? @(ut/tracked-subscribe [::subq-used selected-block]) [])
+                          ;subq-produced (if root? @(ut/tracked-subscribe [::subq-produced selected-block]) [])
+                          ;subq-used2 (if root? @(ut/tracked-subscribe [::subq-used brick-vec-key]) [])
+                         subq-mapping        (if root? @(ut/tracked-subscribe [::subq-mapping]) [])
                          upstream?           (some #(= % brick-vec-key) (upstream-search subq-mapping selected-block))
                          downstream?         (some #(= % brick-vec-key) (downstream-search subq-mapping selected-block))
                           ;hovered? false
-                         sql-keys            @(re-frame/subscribe [::panel-sql-call-keys brick-vec-key])
-                         reco-selected       (let [rr @(re-frame/subscribe [::conn/clicked-parameter-key [:viz-tables-sys/table_name]])
+                         sql-keys            @(ut/tracked-subscribe [::panel-sql-call-keys brick-vec-key])
+                         reco-selected       (let [rr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:viz-tables-sys/table_name]])
                                                    rr (if (not (nil? rr)) (keyword (ut/replacer rr "_" "-")) nil)] rr)
                          viz-reco?           (and (or (= selected-block "none!") (nil? selected-block))
                                                   (some #(= % reco-selected) sql-keys)
                                                   editor?
                                                   (= @db/editor-mode :vvv))
-                         ;current-tab         @(re-frame/subscribe [::selected-tab])
-                         ghosted?            (rs @(re-frame/subscribe [::ghosted? brick-vec-key]) brick-vec-key)
-                         no-ui?              (or (rs @(re-frame/subscribe [::no-ui? brick-vec-key]) brick-vec-key) (not (nil? tab)))
-                         hidden?             (rs @(re-frame/subscribe [::hidden? brick-vec-key]) brick-vec-key)
-                         minimized?          (rs @(re-frame/subscribe [::minimized? brick-vec-key]) brick-vec-key)
-                         panel-style         (rs @(re-frame/subscribe [::panel-style brick-vec-key]) brick-vec-key)
+                         ;current-tab         @(ut/tracked-subscribe [::selected-tab])
+                         ghosted?            (rs @(ut/tracked-subscribe [::ghosted? brick-vec-key]) brick-vec-key)
+                         no-ui?              (or (rs @(ut/tracked-subscribe [::no-ui? brick-vec-key]) brick-vec-key) (not (nil? tab)))
+                         hidden?             (rs @(ut/tracked-subscribe [::hidden? brick-vec-key]) brick-vec-key)
+                         minimized?          (rs @(ut/tracked-subscribe [::minimized? brick-vec-key]) brick-vec-key)
+                         panel-style         (rs @(ut/tracked-subscribe [::panel-style brick-vec-key]) brick-vec-key)
                          tab-color           (cond
                                                selected? "#9973e0"
                                                viz-reco? "#ffb400"
@@ -11934,33 +11963,33 @@
                                                upstream? "#000000"
                                                downstream? "#000000"
                                                :else (theme-pull :theme/block-tab-selected-font-color "#ffffff55"))
-                         iconization         @(re-frame/subscribe [::iconized brick-vec-key])
+                         iconization         @(ut/tracked-subscribe [::iconized brick-vec-key])
                          being-dragged?      (= brick-vec-key @dragging-block)
                          drag-action?        (and @mouse-dragging-panel?
                                                   ;selected?
                                                   being-dragged?)
                           ;;; all below are for bottom tab bar
-                         single-view?        @(re-frame/subscribe [::is-single-view? brick-vec-key])
-                         no-view?            @(re-frame/subscribe [::has-no-view? brick-vec-key])
-                         selected-view       (rs @(re-frame/subscribe [::selected-view brick-vec-key]) brick-vec-key)
+                         single-view?        @(ut/tracked-subscribe [::is-single-view? brick-vec-key])
+                         no-view?            @(ut/tracked-subscribe [::has-no-view? brick-vec-key])
+                         selected-view       (rs @(ut/tracked-subscribe [::selected-view brick-vec-key]) brick-vec-key)
                          selected-view       (cond viz-reco? reco-selected
                                                    (and (nil? selected-view) no-view? (seq sql-keys))
                                                    (first sql-keys)
                                                    :else selected-view)
-                         is-grid?            @(re-frame/subscribe [::is-grid? brick-vec-key selected-view])
-                         is-pinned?          @(re-frame/subscribe [::is-pinned? brick-vec-key])
-                         col-selected?       @(re-frame/subscribe [::column-selected-any-field? brick-vec-key selected-view])
-                         views               @(re-frame/subscribe [::views brick-vec-key])
+                         is-grid?            @(ut/tracked-subscribe [::is-grid? brick-vec-key selected-view])
+                         is-pinned?          @(ut/tracked-subscribe [::is-pinned? brick-vec-key])
+                         col-selected?       @(ut/tracked-subscribe [::column-selected-any-field? brick-vec-key selected-view])
+                         views               @(ut/tracked-subscribe [::views brick-vec-key])
                          views               (if (keyword? views) (rs views brick-vec-key) views)
-                        ; reco-statuses       @(re-frame/subscribe [::queries-reco-status brick-vec-key]) ;; in for reactions
+                        ; reco-statuses       @(ut/tracked-subscribe [::queries-reco-status brick-vec-key]) ;; in for reactions
                          all-views           (if single-view? [] (vec (keys views)))
-                          ;multiple-oz-views? @(re-frame/subscribe [::multiple-oz-views? brick-vec-key])
+                          ;multiple-oz-views? @(ut/tracked-subscribe [::multiple-oz-views? brick-vec-key])
                           ;all-views (if multiple-oz-views? (conj all-views :layered-viz) all-views)
                          base-view-name      :view         ;; basically a default for single views
                           ;sql-keys0 (if (nil? sql-keys) [] sql-keys)
                          mouse-down?         (atom false)
-                         ;tab-parent-offset   (if tab @(re-frame/subscribe [::tab-offset tab]) [0 0])
-                         tab-offset          (if tab @(re-frame/subscribe [::tab-offset2 tab]) [0 0])
+                         ;tab-parent-offset   (if tab @(ut/tracked-subscribe [::tab-offset tab]) [0 0])
+                         tab-offset          (if tab @(ut/tracked-subscribe [::tab-offset2 tab]) [0 0])
                          click-delay         100
                          mixed-keys          (cond (and single-view? (seq sql-keys)) (conj sql-keys base-view-name)
                                                    (and no-view? (seq sql-keys)) sql-keys
@@ -11992,7 +12021,7 @@
                           :height (px (* brick-size icon-h))
                           :align :center :justify :center
                           :attr {;:on-click #(js/alert (if tab "in container" "not in container"))
-                                 :on-context-menu #(when (not tab) (re-frame/dispatch [::toggle-icon-block brick-vec-key]))
+                                 :on-context-menu #(when (not tab) (ut/tracked-dispatch [::toggle-icon-block brick-vec-key]))
                                  ;:on-mouse-enter #(tap> [:dragging-over [current-tab tab]])
                                  :on-mouse-down #(mouse-down-handler % brick-vec-key tab-offset true)
                                  ;:on-mouse-up (fn [_] (reset! mouse-down? false))
@@ -12004,9 +12033,9 @@
                                  :on-double-click #(do
                                                      (tag-screen-position %)
                                                      ;(ut/get-parent-z-index %)
-                                                     ;(re-frame/dispatch [::move-to-current-tab brick-vec-key])
-                                                     ;(re-frame/dispatch [::toggle-icon-block brick-vec-key])
-                                                     (re-frame/dispatch [::launch-clone brick-vec-key]))}
+                                                     ;(ut/tracked-dispatch [::move-to-current-tab brick-vec-key])
+                                                     ;(ut/tracked-dispatch [::toggle-icon-block brick-vec-key])
+                                                     (ut/tracked-dispatch [::launch-clone brick-vec-key]))}
                           :style (merge
                                   {:position         "fixed"
                                    :user-select      "none"
@@ -12035,7 +12064,7 @@
                           :attr ;(merge
                                ;{} ; (if (not root?) {:on-mouse-down mouse-down-handler-new} {})
                           {;:on-mouse-enter  #(do (reset! over-block? true)
-                         ;                      ;(re-frame/dispatch [::conn/click-parameter [:user-sys] {:over-block brick-vec-key}])
+                         ;                      ;(ut/tracked-dispatch [::conn/click-parameter [:user-sys] {:over-block brick-vec-key}])
                          ;                      )
 
                            :on-mouse-over  #(when (not @over-block?)
@@ -12043,7 +12072,7 @@
                                               (reset! over-block? true)) ;; took out enter for watched over...? 12/14/23
                            :on-mouse-leave  #(do (reset! over-block? false)
                                                  (reset! over-block nil))}
-                                               ;(re-frame/dispatch [::conn/click-parameter [:user-sys] nil])
+                                               ;(ut/tracked-dispatch [::conn/click-parameter [:user-sys] nil])
 
                                ; )
                        ;:padding "3px"
@@ -12193,7 +12222,7 @@
                                       ;;  :attr
                                       ;;  (when selected?
                                       ;;    {:on-mouse-down mouse-down-handler
-                                      ;;     :on-double-click #(re-frame/dispatch [::toggle-minimize-block brick-vec-key])})
+                                      ;;     :on-double-click #(ut/tracked-dispatch [::toggle-minimize-block brick-vec-key])})
                                          :height "20px"
                                          :padding "3px"
                                          :justify :between :align :center
@@ -12232,7 +12261,7 @@
                                                                :margin-top "-4px" ;; weird boxing so user doesnt click on the border and not get desired result
                                                                :padding-top  "4px" ;; weird boxing so user doesnt click on the border and not get desired result
                                                                :margin-left "-4px"} ;; weird boxing so user doesnt click on the border and not get desired result
-                                                       :attr {:on-click #(re-frame/dispatch [::select-block brick-vec-key])
+                                                       :attr {:on-click #(ut/tracked-dispatch [::select-block brick-vec-key])
                                                               :on-mouse-down (fn [e]
                                                                                (reset! mouse-down? true)
                                                                                (js/setTimeout
@@ -12246,7 +12275,7 @@
                                                       [re-com/box
                                                        :size "1"
                                                        :height "22px"
-                                                       :attr {:on-click #(re-frame/dispatch [::select-block brick-vec-key])
+                                                       :attr {:on-click #(ut/tracked-dispatch [::select-block brick-vec-key])
                                                               :on-mouse-down (fn [e]
                                                                                (reset! mouse-down? true)
                                                                                (js/setTimeout
@@ -12270,7 +12299,7 @@
                                                   ;; (when false ;(> w 7)
                                                   ;;   ^{:key (str "brick-" brick-vec "-header4")}
                                                   ;;   [re-com/box :size "1"
-                                                  ;;    :attr {:on-click #(re-frame/dispatch [::select-block brick-vec-key])}
+                                                  ;;    :attr {:on-click #(ut/tracked-dispatch [::select-block brick-vec-key])}
                                                   ;;    :style {:font-weight 300}
                                                   ;;    :child (str name)])
                                                     ^{:key (str "brick-" brick-vec "-header5")}
@@ -12299,7 +12328,7 @@
                                                                     ^{:key (str "brick-" brick-vec "-header-pp")}
                                                                     [re-com/md-icon-button
                                                                      :md-icon-name (if col-selected? "zmdi-pause" "zmdi-play")
-                                                                ;:on-click #(re-frame/dispatch [::delete-panel brick-vec-key])
+                                                                ;:on-click #(ut/tracked-dispatch [::delete-panel brick-vec-key])
                                                                      :style {:font-size "15px"
                                                                              :opacity   0.25
                                                                              :cursor    "pointer"}])
@@ -12312,11 +12341,11 @@
                                                                     ^{:key (str "brick-" brick-vec "-header-pin")}
                                                                     [re-com/md-icon-button
                                                                      :md-icon-name (if is-pinned? "zmdi-pin-off" "zmdi-pin")
-                                                                     :on-click #(do (re-frame/dispatch [::toggle-pin-block brick-vec-key])
-                                                                                  ;(re-frame/dispatch [::select-block "none!"])
+                                                                     :on-click #(do (ut/tracked-dispatch [::toggle-pin-block brick-vec-key])
+                                                                                  ;(ut/tracked-dispatch [::select-block "none!"])
                                                                                     ;(do)
                                                                                     ) ;(reset! over-block? false)
-                                                                                      ;(re-frame/dispatch [::conn/click-parameter [:user-sys] nil])
+                                                                                      ;(ut/tracked-dispatch [::conn/click-parameter [:user-sys] nil])
 
                                                                      :style {:font-size "15px"
                                                                              :opacity   (if is-pinned? 0.8 0.1)
@@ -12331,10 +12360,10 @@
                                                                     ^{:key (str "brick-" brick-vec "-header-min")}
                                                                     [re-com/md-icon-button
                                                                      :md-icon-name "zmdi-window-minimize"
-                                                                     :on-click #(do (re-frame/dispatch [::toggle-minimize-block brick-vec-key])
-                                                                                    (when selected? (re-frame/dispatch [::select-block "none!"]))
+                                                                     :on-click #(do (ut/tracked-dispatch [::toggle-minimize-block brick-vec-key])
+                                                                                    (when selected? (ut/tracked-dispatch [::select-block "none!"]))
                                                                                     (do (reset! over-block? false)))
-                                                                                      ;(re-frame/dispatch [::conn/click-parameter [:user-sys] nil])
+                                                                                      ;(ut/tracked-dispatch [::conn/click-parameter [:user-sys] nil])
 
                                                                      :style {:font-size "15px"
                                                                              :opacity   0.33
@@ -12349,10 +12378,10 @@
                                                                     ^{:key (str "brick-" brick-vec "-header-icon")}
                                                                     [re-com/md-icon-button
                                                                      :md-icon-name "zmdi-photo-size-select-small"
-                                                                     :on-click #(do (re-frame/dispatch [::toggle-icon-block brick-vec-key])
-                                                                                    (when selected? (re-frame/dispatch [::select-block "none!"]))
+                                                                     :on-click #(do (ut/tracked-dispatch [::toggle-icon-block brick-vec-key])
+                                                                                    (when selected? (ut/tracked-dispatch [::select-block "none!"]))
                                                                                     (do (reset! over-block? false)))
-                                                                                      ;(re-frame/dispatch [::conn/click-parameter [:user-sys] nil])
+                                                                                      ;(ut/tracked-dispatch [::conn/click-parameter [:user-sys] nil])
 
                                                                      :style {:font-size "15px"
                                                                              :opacity   0.33
@@ -12367,9 +12396,9 @@
                                                                     ^{:key (str "brick-" brick-vec "-header-close")}
                                                                     [re-com/md-icon-button
                                                                      :md-icon-name "zmdi-close"
-                                                                     :on-click #(do (re-frame/dispatch [::delete-panel brick-vec-key])
+                                                                     :on-click #(do (ut/tracked-dispatch [::delete-panel brick-vec-key])
                                                                                     (do (reset! over-block? false)))
-                                                                                      ;(re-frame/dispatch [::conn/click-parameter [:user-sys] nil])
+                                                                                      ;(ut/tracked-dispatch [::conn/click-parameter [:user-sys] nil])
 
                                                                      :style {:font-size "15px"
                                                                              :opacity   0.33
@@ -12410,16 +12439,16 @@
 
 
                                       (if (or (and (not ghosted?) (not no-ui?)) selected?)
-                                        (let [];;  single-view? @(re-frame/subscribe [::is-single-view? brick-vec-key])
-                                           ;;  no-view? @(re-frame/subscribe [::has-no-view? brick-vec-key])
-                                           ;;  selected-view @(re-frame/subscribe [::selected-view brick-vec-key])
+                                        (let [];;  single-view? @(ut/tracked-subscribe [::is-single-view? brick-vec-key])
+                                           ;;  no-view? @(ut/tracked-subscribe [::has-no-view? brick-vec-key])
+                                           ;;  selected-view @(ut/tracked-subscribe [::selected-view brick-vec-key])
                                            ;;  selected-view (cond viz-reco? reco-selected
                                            ;;                      (and (nil? selected-view) no-view? (seq sql-keys))
                                            ;;                      (first sql-keys)
                                            ;;                      :else selected-view)
-                                           ;;  views @(re-frame/subscribe [::views brick-vec-key])
+                                           ;;  views @(ut/tracked-subscribe [::views brick-vec-key])
                                            ;;  all-views (if single-view? [] (vec (keys views)))
-                                           ;;  ;multiple-oz-views? @(re-frame/subscribe [::multiple-oz-views? brick-vec-key])
+                                           ;;  ;multiple-oz-views? @(ut/tracked-subscribe [::multiple-oz-views? brick-vec-key])
                                            ;;  ;all-views (if multiple-oz-views? (conj all-views :layered-viz) all-views)
                                            ;;  base-view-name :view ;; basically a default for single views
                                            ;;     ;sql-keys0 (if (nil? sql-keys) [] sql-keys)
@@ -12453,20 +12482,20 @@
                                                                                      (let [selected?       (= (if (= s base-view-name) nil s) selected-view)
                                                                                         ;;  bselected?      (= brick-vec-key selected-block)
                                                                                            not-view?       (not (some #(= % s) (keys views)))
-                                                                                           reco-count      (when not-view? @(re-frame/subscribe [::reco-count s :reco]))
-                                                                                 ; reco-running?   (and not-view? @(re-frame/subscribe [::reco-running? s]))
+                                                                                           reco-count      (when not-view? @(ut/tracked-subscribe [::reco-count s :reco]))
+                                                                                 ; reco-running?   (and not-view? @(ut/tracked-subscribe [::reco-running? s]))
                                                                                            [_
-                                                                                            single-wait?]   (if not-view? @(re-frame/subscribe [::query-waitings s]) [0 0])
-                                                                                           reco-ready?     (and not-view? (> reco-count 0)) ; (not @(re-frame/subscribe [::reco-running? s])))
+                                                                                            single-wait?]   (if not-view? @(ut/tracked-subscribe [::query-waitings s]) [0 0])
+                                                                                           reco-ready?     (and not-view? (> reco-count 0)) ; (not @(ut/tracked-subscribe [::reco-running? s])))
                                                                                            query-running?  single-wait?
-                                                                                           flow-running?    @(re-frame/subscribe [::has-a-running-flow-view? brick-vec-key s])
+                                                                                           flow-running?    @(ut/tracked-subscribe [::has-a-running-flow-view? brick-vec-key s])
                                                                                  ; deep-running?   (> waitings 0)
 
                                                                                            param-keyword [(keyword (str "param/" (ut/unkeyword s)))]
-                                                                                           is-param?      @(re-frame/subscribe [::conn/clicked-parameter-key param-keyword])
+                                                                                           is-param?      @(ut/tracked-subscribe [::conn/clicked-parameter-key param-keyword])
                                                                                            param-dtype (when is-param?
                                                                                                          (ut/data-typer
-                                                                                                        ;@(re-frame/subscribe [::conn/clicked-parameter-key param-keyword])
+                                                                                                        ;@(ut/tracked-subscribe [::conn/clicked-parameter-key param-keyword])
                                                                                                           is-param?))
                                                                                            param-dtype  (try (if (and (= param-dtype "vector") (every? string? is-param?)) "string" param-dtype)
                                                                                                              (catch :default _ param-dtype)) ;; since stringified code is technically not a string yet...
@@ -12480,8 +12509,8 @@
                                                                                                              (= s :dyn-tab) "#FFA50087" ;(theme-pull :theme/block-tab-selected-font-color "#FFA50087") ;"#FFA50087"
                                                                                                              :else (theme-pull :theme/block-title-font-color "#ffffff50"))
                                                                                            bcolor          (if is-param? (str fcolor "22") (if selected? tab-color "inherit"))]
-                                                                             ;(tap> [:tt @(re-frame/subscribe [::http/websocket-status]) ])
-                                                                             ;(tap> [:s s is-param? param-keyword @(re-frame/subscribe [::conn/clicked-parameter-key param-keyword])])
+                                                                             ;(tap> [:tt @(ut/tracked-subscribe [::http/websocket-status]) ])
+                                                                             ;(tap> [:s s is-param? param-keyword @(ut/tracked-subscribe [::conn/clicked-parameter-key param-keyword])])
                                                                                        (draggable
                                                                                         (if is-param? ;; drop as a resgular param, not some view object
                                                                                           (let [k           (first param-keyword)
@@ -12510,7 +12539,7 @@
 
                                                                                                      :attr {:on-click #(do (reset! mad-libs-view nil)
                                                                                                                            (clear-preview2-recos)
-                                                                                                                           (re-frame/dispatch [::select-view brick-vec-key (if (= s base-view-name) nil s)]))}
+                                                                                                                           (ut/tracked-dispatch [::select-view brick-vec-key (if (= s base-view-name) nil s)]))}
 
                                                                                                      :style {:font-size        "12px"
                                                                                                              :cursor           (if selected? "inherit" "pointer")
@@ -12561,10 +12590,10 @@
                                                                                                                :md-icon-name "zmdi-view-dashboard"
                                                                                                                :on-click #(do
                                                                                                                             (clear-preview2-recos)
-                                                                                                                            (re-frame/dispatch [::select-view brick-vec-key (if (= s base-view-name) nil s)])
+                                                                                                                            (ut/tracked-dispatch [::select-view brick-vec-key (if (= s base-view-name) nil s)])
                                                                                                                             (reset! mad-libs-view (if (= s @mad-libs-view) nil s))
-                                                                                                                            (when (not (= s @(re-frame/subscribe [::conn/clicked-parameter-key [:viz-tables-sys2/table_name]])))
-                                                                                                                              (re-frame/dispatch [::conn/click-parameter [:viz-tables-sys2 :table_name] s])))
+                                                                                                                            (when (not (= s @(ut/tracked-subscribe [::conn/clicked-parameter-key [:viz-tables-sys2/table_name]])))
+                                                                                                                              (ut/tracked-dispatch [::conn/click-parameter [:viz-tables-sys2 :table_name] s])))
                                                                                                           ;(when (= s @mad-libs-view)
                                                                                                           ;  (clear-preview2-recos))
 
@@ -12604,7 +12633,7 @@
                                                                      :height "18px"
                                                                      :attr (if selected?
                                                                              {:on-mouse-down resize-mouse-down-handler}
-                                                                             {:on-click #(re-frame/dispatch [::select-block brick-vec-key])})
+                                                                             {:on-click #(ut/tracked-dispatch [::select-block brick-vec-key])})
                                                                      :style {:margin-top    "-2px"
                                                                              :margin-right  "-2px"
                                                                              :position "fixed"
@@ -12634,7 +12663,7 @@
                         ;;            ^{:key (str "brick-" brick-vec "-inner")}
                         ;;            [re-com/box
                         ;;             :attr (when @dragging?
-                        ;;                     (let [drag-wake @(re-frame/subscribe [::build-grid
+                        ;;                     (let [drag-wake @(ut/tracked-subscribe [::build-grid
                         ;;                                                           (+ (last @dragging-size) (last brick-vec) 0)
                         ;;                                                           (+ (first @dragging-size) (first brick-vec) 0)
                         ;;                                                           (last brick-vec)
@@ -12655,8 +12684,8 @@
                        ;)
 
 ;; (defn multi-grid []
-;;   (let [bricks-high (+ (js/Math.floor (/ @(re-frame/subscribe [::subs/h]) brick-size)) 1)
-;;         bricks-wide (+ (js/Math.floor (/ @(re-frame/subscribe [::subs/w]) brick-size)) 1)]
+;;   (let [bricks-high (+ (js/Math.floor (/ @(ut/tracked-subscribe [::subs/h]) brick-size)) 1)
+;;         bricks-wide (+ (js/Math.floor (/ @(ut/tracked-subscribe [::subs/w]) brick-size)) 1)]
 ;;     ;(tap> [bricks-high bricks-wide])
 ;;     ;; brick-offset-y brick-offset-x
 ;;     ;[grid bricks-high bricks-wide 0 0]

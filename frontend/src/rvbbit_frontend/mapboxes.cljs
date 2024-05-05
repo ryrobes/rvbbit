@@ -53,7 +53,7 @@
    ))
 
 (defn theme-pull-fn [cmp-key fallback & test-fn] ;; dupe from bricks.cljs refactor into its own ns?
-  (let [v                   @(re-frame/subscribe [::conn/clicked-parameter-key [cmp-key]])
+  (let [v                   @(ut/tracked-subscribe [::conn/clicked-parameter-key [cmp-key]])
         ;v                   (resolver/logic-and-params v nil)
         t0                  (cstr/split (str (ut/unkeyword cmp-key)) #"/")
         t1                  (keyword (first t0))
@@ -75,7 +75,7 @@
  (fn [_ [_ cmp-key fallback & test-fn]]
    (theme-pull-fn cmp-key fallback test-fn)))
 
-(defn theme-pull [cmp-key fallback & test-fn] @(re-frame/subscribe [::theme-pull-sub cmp-key fallback test-fn])) ;; dupe from bricks.cljs refactor into its own ns?
+(defn theme-pull [cmp-key fallback & test-fn] @(ut/tracked-subscribe [::theme-pull-sub cmp-key fallback test-fn])) ;; dupe from bricks.cljs refactor into its own ns?
 
 (defn sql-explanations-kp []
   {[:from 0 0] "table-name"
@@ -142,7 +142,7 @@
                             in-body? true ;(ut/contains-data? only-body k-val)
                             hovered? false ;(ut/contains-data? mat-hovered-input k-val)
                             border-ind (if in-body? "solid" "dashed")
-                            val-color (get @(re-frame/subscribe [::conn/data-colors]) k-val-type)
+                            val-color (get @(ut/tracked-subscribe [::conn/data-colors]) k-val-type)
                             keypath-in (conj keypath kk)
                             keystyle {:background-color (if hovered? (str val-color 66) "#00000000")
                                       ;:font-weight 700
@@ -279,7 +279,7 @@
                                                   [re-com/md-icon-button
                                                    :md-icon-name "zmdi-info"
                                                    :tooltip (str "FOOO" (get sql-explanations keypath ""))
-                                                   ;:on-click #(re-frame/dispatch [::change-page panel-key (first data-keypath) (- page-num 1) ttl-pages])
+                                                   ;:on-click #(ut/tracked-dispatch [::change-page panel-key (first data-keypath) (- page-num 1) ttl-pages])
                                                    :style {:font-size "16px"
                                                            :cursor "pointer"
                                                            :opacity 0.5
@@ -352,7 +352,7 @@
 
       (let [k-val-type (ut/data-typer data)
             nin? (not (= block-id :inline-render))
-            val-color (get @(re-frame/subscribe [::conn/data-colors]) k-val-type)]
+            val-color (get @(ut/tracked-subscribe [::conn/data-colors]) k-val-type)]
         [re-com/v-box
          ;:size "auto"
          :children

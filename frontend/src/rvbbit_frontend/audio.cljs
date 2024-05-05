@@ -87,7 +87,7 @@
 ;;          phrases (count (get result :results))
 ;;          lines (vec (for [e (range phrases)]
 ;;                       (get-in result [:results e :alternatives 0 :transcript])))]
-;;      (re-frame/dispatch [::chat-back @listening-block (cstr/join "\n" lines)])
+;;      (ut/tracked-dispatch [::chat-back @listening-block (cstr/join "\n" lines)])
 ;;      (-> db
 ;;          (assoc :audio-transcribed (conj (get db :audio-transcribed)
 ;;                                          (get result :results)))
@@ -155,7 +155,7 @@
      (.then stream-promise
             (fn [stream]
               ;; Process the stream here. For example, you can dispatch an event to save it in the app-db.
-              (re-frame/dispatch [::save-webcam-stream stream]))
+              (ut/tracked-dispatch [::save-webcam-stream stream]))
             (fn [err]
               (js/console.log "Error accessing the webcam:" err))))))
 
@@ -210,7 +210,7 @@
 ;; (defn start-webcam-stream []
 ;;   (.getUserMedia (.-mediaDevices js/navigator) #js {:video true :audio false}
 ;;                  (fn [stream]
-;;                    (re-frame/dispatch [:save-webcam-stream stream]))
+;;                    (ut/tracked-dispatch [:save-webcam-stream stream]))
 ;;                  (fn [err]
 ;;                    (js/console.error "Error accessing the webcam:" err))))
 
@@ -224,7 +224,7 @@
 ;;  ::start-recording
 ;;  (fn []
 ;;    (let [stream-promise (get-audio-stream)
-;;          face-block-id "face"] ;; @(re-frame/subscribe [::face-block @db/hovered-block])
+;;          face-block-id "face"] ;; @(ut/tracked-subscribe [::face-block @db/hovered-block])
 
 ;;      (reset! listening-block face-block-id)
 ;;      (.then stream-promise
@@ -237,7 +237,7 @@
 ;;                       ;; you now have a FormData object that you can send to the Google Speech-to-Text API
 ;;                       ;; use your existing HTTP request code to send this data
 
-;;                 (re-frame/dispatch [::recorder-created recorder])
+;;                 (ut/tracked-dispatch [::recorder-created recorder])
 ;;                 (start-recording recorder)))))))
 
 
@@ -247,7 +247,7 @@
    (reset! waiting-for-response (vec (remove #(= % kp) @waiting-for-response)))
    (let [chat-text (get-in result [:convo :choices 0 :message :content])
          new-chats (conj (get-in db [:chats kp] []) {:content chat-text :role "assistant" :timestamp (ut/get-time-format-str)})]
-   ;;  (re-frame/dispatch [::text-to-speech11 :audio :speak chat-text])
+   ;;  (ut/tracked-dispatch [::text-to-speech11 :audio :speak chat-text])
      ;(assoc-in db [:post-meta ui-keypath field name] new-map)
      ;(ut/dissoc-in db [:query-history])
      (tap> [:chat-response result])
@@ -264,7 +264,7 @@
 (defn push-oai-message [convo-vec client-name panels panel-key kp]
   ;(reset! waiting-for-response true)
   (swap! waiting-for-response conj kp)
-  (re-frame/dispatch [::wfx/request :default
+  (ut/tracked-dispatch [::wfx/request :default
                       {:message    {:kind :open-ai-push
                                     :client-name client-name
                                     :panel-key panel-key
@@ -313,7 +313,7 @@
    (let [src (get-in db [:runstreams flow-id :values kkey :source])]
      (if (= src :param)
        ;(get-in db [:runstreams flow-id :values kkey :value])
-       (first @(re-frame/subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]]))
+       (first @(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]]))
        (get-in db [:runstreams flow-id :values kkey :value])))))
 
 (re-frame/reg-sub
@@ -324,7 +324,7 @@
                                      :when (not (nil? value))]
                                  {k (if (= source :input)
                                       value
-                                      (let [vv @(re-frame/subscribe [::rs-value flow-id k])] ;;; dupe from buffy
+                                      (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])] ;;; dupe from buffy
                                         (if (and (vector? vv) (every? string? vv))
                                           (cstr/join "\n" vv) vv)))}))]
      ;(tap> [:override-map override-map])
@@ -356,13 +356,13 @@
 ;;    (vec (get-in db [:flows (get db :selected-flow) :connections] []))))
 
 (defn start-flow [flow-id]
-  (let [client-name @(re-frame/subscribe [::client-name])
+  (let [client-name @(ut/tracked-subscribe [::client-name])
         base-opts {:increment-id? false}
-        overrides @(re-frame/subscribe [::runstream-overrides flow-id])
+        overrides @(ut/tracked-subscribe [::runstream-overrides flow-id])
         overrides? (not (empty? overrides))
         fstr (str "running flow " flow-id (when overrides? " (with overrides)"))
         w (/ (count fstr) 4.1)]
-    (re-frame/dispatch [::wfx/request :default
+    (ut/tracked-dispatch [::wfx/request :default
                         {:message    {:kind :run-flow
                                       :flow-id flow-id
                                       :flowmap flow-id
@@ -370,17 +370,17 @@
                                               (merge base-opts
                                                      {:overrides overrides})
                                               base-opts)
-                                      ;; :file-image {:flowmaps @(re-frame/subscribe [::flowmap-raw])
-                                      ;;              :opts @(re-frame/subscribe [::opts-map])
+                                      ;; :file-image {:flowmaps @(ut/tracked-subscribe [::flowmap-raw])
+                                      ;;              :opts @(ut/tracked-subscribe [::opts-map])
                                       ;;              :zoom @db/pan-zoom-offsets
                                       ;;              :flow-id flow-id
-                                      ;;              :flowmaps-connections @(re-frame/subscribe [::flowmap-connections])}
+                                      ;;              :flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])}
                                       :client-name client-name}
                          :on-response [::http/socket-response]
                          :on-timeout [::http/timeout-response]
                          :timeout    500000}])
     (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
-    ;; (re-frame/dispatch [::conn/click-parameter ;; kinda cheating, but feels better
+    ;; (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
     ;;                     [:flow (keyword (str flow-id ">*running?"))] true])
     ))
 
@@ -410,8 +410,8 @@
          (try (start-flow flow-id) (catch :default e (tap> [:error flow-id e])))
          (ut/dispatch-delay 400 [::http/insert-alert [:box :child txt] cnt 1 6])))
 
-     ;;(re-frame/dispatch [::add-chat (str lines)]) ;; sends to oai as a chat content resp
-     (re-frame/dispatch [::wfx/request :default
+     ;;(ut/tracked-dispatch [::add-chat (str lines)]) ;; sends to oai as a chat content resp
+     (ut/tracked-dispatch [::wfx/request :default
                          {:message    {:kind :voice-trigger
                                        :client-name client-name
                                        :voice-text lines}
@@ -447,7 +447,7 @@
          method :POST]
 
      (when auto-train-voice?
-       (re-frame/dispatch [::edit-voice "me" "me"]))
+       (ut/tracked-dispatch [::edit-voice "me" "me"]))
 
      {:db   (assoc-in db [:http-reqs :speech-to-text]
                       {:status "running"
@@ -518,12 +518,12 @@
      (get voice-map voice-name))))
 
 ;; (defn play-audio-blob [audio-data]
-;;   (re-frame/dispatch [::audio-started])
+;;   (ut/tracked-dispatch [::audio-started])
 ;;   (let [url (.createObjectURL js/URL audio-data)
 ;;         audio (js/document.createElement "audio")]
 ;;     (set! (.-src audio) url)
 ;;     (.addEventListener audio "ended"
-;;                        (fn [e] (re-frame/dispatch [::audio-ended])))
+;;                        (fn [e] (ut/tracked-dispatch [::audio-ended])))
 ;;     (.play audio)))
 
 (def playing? (reagent.core/atom false)) ;; only used here for perf reasons instead of subs
@@ -568,7 +568,7 @@
 
 (defn play-audio-blob [audio-data block-id]
   (reset! playing? true)
-  (re-frame/dispatch [::audio-started])
+  (ut/tracked-dispatch [::audio-started])
   (reset! db/speaking block-id)
   ;(tap> audio-data)
   (let [audio-context (js/AudioContext.)
@@ -577,7 +577,7 @@
         source-node (.createMediaElementSource audio-context audio-element)
         analyser (.createAnalyser audio-context)]
     (set! (.-src audio-element) url)
-    (.addEventListener audio-element "ended" (fn [e] (do (re-frame/dispatch [::audio-ended])
+    (.addEventListener audio-element "ended" (fn [e] (do (ut/tracked-dispatch [::audio-ended])
                                                          (swap! db/audio-data dissoc block-id)
                                                          (swap! db/audio-data2 dissoc block-id)
                                                          (reset! playing? false))))
@@ -595,8 +595,8 @@
 (defn blob-to-base64 [blob]
   (-> (blob-util/blobToBase64String blob)
       (.then (fn [base64-string]
-               (re-frame/dispatch [::save-recording-data {:base64 base64-string :blob blob}])
-               (re-frame/dispatch [::speech-to-text])))))
+               (ut/tracked-dispatch [::save-recording-data {:base64 base64-string :blob blob}])
+               (ut/tracked-dispatch [::speech-to-text])))))
 
 (defn on-data-available [recorder callback]
   (.addEventListener recorder "dataavailable"
@@ -606,7 +606,7 @@
                          ;;(play-audio-blob audio-data "echo") ;; uncomment to hear the echo
                          (tap> [:audio-data-received-callback (count (str form-data))])
                          (blob-to-base64 audio-data)
-                         (re-frame/dispatch [::save-recording-data {:form form-data :raw audio-data}])))))
+                         (ut/tracked-dispatch [::save-recording-data {:form form-data :raw audio-data}])))))
         ;; you now have a FormData object that you can send to the Google Speech-to-Text API
         ;; use your existing HTTP request code to send this data
 
@@ -632,7 +632,7 @@
  ::face-block ;; modded dupe from canvas
  (fn [db [_ block-id]]
    (if (= (get-in db [:blocks block-id :block-type]) "kit")
-     (let [kits @(re-frame/subscribe [::kits block-id])
+     (let [kits @(ut/tracked-subscribe [::kits block-id])
            fb-id (get-in db [:blocks block-id :face-block-id] (first kits))]
        fb-id)
      block-id)))
@@ -641,7 +641,7 @@
  ::start-recording
  (fn []
    (let [stream-promise (get-audio-stream)
-         face-block-id "face"] ;; @(re-frame/subscribe [::face-block @db/hovered-block])
+         face-block-id "face"] ;; @(ut/tracked-subscribe [::face-block @db/hovered-block])
 
      (reset! listening-block face-block-id)
      (.then stream-promise
@@ -654,7 +654,7 @@
                       ;; you now have a FormData object that you can send to the Google Speech-to-Text API
                       ;; use your existing HTTP request code to send this data
 
-                (re-frame/dispatch [::recorder-created recorder])
+                (ut/tracked-dispatch [::recorder-created recorder])
                 (start-recording recorder)))))))
 
 ;; (re-frame/reg-event-db
@@ -684,7 +684,7 @@
    (get db :thumper-speaks)))
 
 (defn speak-last []
-  (let [audio-encoded @(re-frame/subscribe [::latest-audio])
+  (let [audio-encoded @(ut/tracked-subscribe [::latest-audio])
         audio-blob (ut/base64-to-blob audio-encoded "audio/mpeg")]
     (play-audio-blob audio-blob "?")))
 
@@ -839,8 +839,8 @@
                    :on-success      [::success-text-to-speech11 block-type block-id voices?]
                    :on-failure      [::failure-text-to-speech11 block-type block-id]}})))
 
-;(re-frame/dispatch [::text-to-speech11 :audio :elevenlabs nil]) ;; get voices if avail
-;(re-frame/dispatch [::text-to-speech11 :audio :speak "lets gets some data, y'all!! "])
+;(ut/tracked-dispatch [::text-to-speech11 :audio :elevenlabs nil]) ;; get voices if avail
+;(ut/tracked-dispatch [::text-to-speech11 :audio :speak "lets gets some data, y'all!! "])
 
 ;; (re-frame/reg-event-db
 ;;  ::failure-get-voices11
@@ -934,7 +934,7 @@
  (fn [{:keys [db]} [_ block-id block-type]]
    (let [;vid "AxgZF8qyZHiePwKPgREq"
          voice-name (get db :self-voice-name)
-         vid @(re-frame/subscribe [::get-voice-id voice-name])
+         vid @(ut/tracked-subscribe [::get-voice-id voice-name])
          new? (nil? vid)
          url (if new?
                (str "https://api.elevenlabs.io/v1/voices/add")

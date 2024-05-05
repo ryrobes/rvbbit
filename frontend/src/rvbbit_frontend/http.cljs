@@ -71,7 +71,7 @@
 (defn start-listening-to-url-changes []
   (let [on-hashchange (fn [_]
                         (let [new-url (-> js/window .-location .-hash)]
-                          (re-frame/dispatch [::url-changed new-url])))]
+                          (ut/tracked-dispatch [::url-changed new-url])))]
     (.addEventListener js/window "hashchange" on-hashchange)))
 
 (defn change-url [new-hash]
@@ -89,14 +89,14 @@
          base-dir "./screens/"
          screen (str base-dir (last url-vec) ".edn")]
      (tap> [:url-changed new-url url-vec :loading-new-screen])
-     (re-frame/dispatch [::load screen])
+     (ut/tracked-dispatch [::load screen])
      (assoc db :current-url new-url))))
 
 (re-frame/reg-event-db
  ::simple-response-boot
  (fn [db [_ result]]
    (let [screens (get result :screens)
-         url @(re-frame/subscribe [::url-vec])
+         url @(ut/tracked-subscribe [::url-vec])
          default-screen (get result :default)]
     ;ui-keypath (first (get result :ui-keypath))
          ;server-map (get db ui-keypath)
@@ -110,7 +110,7 @@
      (tap> [:screens screens :url-vec url])
 
      (when default-screen ;; load default canvas settings
-       (re-frame/dispatch [::load default-screen]))
+       (ut/tracked-dispatch [::load default-screen]))
 
      (if default-screen
        (-> db
@@ -123,14 +123,14 @@
  ::simple-response-boot-no-load
  (fn [db [_ result]]
    (let [];screens (get result :screens)
-         ;url @(re-frame/subscribe [::url-vec])
+         ;url @(ut/tracked-subscribe [::url-vec])
          ;default-screen (get result :default)
 
 
     ;; (tap> [:def (get result :default)])
 
     ;;  (when default-screen ;; load default canvas settings
-    ;;    (re-frame/dispatch [::load default-screen]))
+    ;;    (ut/tracked-dispatch [::load default-screen]))
 
      (if false ;default-screen
        (-> db
@@ -161,7 +161,7 @@
  (fn [db [_ key]]
    ;(tap> [:ran-condi])
    (let [client-name (get db :client-name)]
-     (re-frame/dispatch [::wfx/request :default
+     (ut/tracked-dispatch [::wfx/request :default
                          {:message    {:kind :sub-to-flow-value
                                        :flow-key key
                                        :client-name client-name}
@@ -175,7 +175,7 @@
  (fn [db [_ key]]
    ;(tap> [:ran-condi])
    (let [client-name (get db :client-name)]
-     (re-frame/dispatch [::wfx/request :default
+     (ut/tracked-dispatch [::wfx/request :default
                          {:message    {:kind :unsub-to-flow-value
                                        :flow-key key
                                        :client-name client-name}
@@ -186,9 +186,9 @@
 
 
 
-;; (re-frame/dispatch [::sub-to-flow-value :flow/map-pull-test2>open-fn-6])
-;; (re-frame/dispatch [::sub-to-flow-value :flow/map-pull-test2>open-fn-9])
-;; (re-frame/dispatch [::sub-to-flow-value :flow/map-pull-test2>write-file-1])
+;; (ut/tracked-dispatch [::sub-to-flow-value :flow/map-pull-test2>open-fn-6])
+;; (ut/tracked-dispatch [::sub-to-flow-value :flow/map-pull-test2>open-fn-9])
+;; (ut/tracked-dispatch [::sub-to-flow-value :flow/map-pull-test2>write-file-1])
 
 
 (defn update-context-boxes [result task-id ms reco-count]
@@ -241,7 +241,7 @@
    (tap> [:refresh-runstream-panelF (keys (get db :runstreams))])
    (when  (not (empty? (keys (get db :runstreams))))
      (doseq [flow-id (keys (get db :runstreams))]
-       (re-frame/dispatch [::wfx/request :default
+       (ut/tracked-dispatch [::wfx/request :default
                            {:message    {:kind :get-flow-open-ports
                                          :flow-id flow-id
                                          :flowmap flow-id
@@ -375,7 +375,7 @@
          (when (or (cstr/starts-with? (str client-name) ":trust")
                    ;(cstr/starts-with? (str client-name) ":stirr")
                    )(tap> [:heartbeat! client-name task-id result]))
-         (re-frame/dispatch [::wfx/request :default
+         (ut/tracked-dispatch [::wfx/request :default
                              {:message    {:kind :ack
                                            :memory (let [mem (when (exists? js/window.performance.memory)
                                                                [(.-totalJSHeapSize js/window.performance.memory)
@@ -432,7 +432,7 @@
 
          (swap! last-hash conj (hash result))
          (tap> [:rr result])
-         (re-frame/dispatch [::refresh-kits]))
+         (ut/tracked-dispatch [::refresh-kits]))
 
       ;;  (when (or flow-runner-sub? flow-runner-tracker?)
       ;;    (tap> [(if flow-runner-tracker?
@@ -469,7 +469,7 @@
                                             (assoc-in [:flow-results :tracker flow-id] trackers)))
 
             ;;  (and ;(get db :flow-gantt?) ;; no need if view isnt up!
-            ;;       ;(not (= (get @(re-frame/subscribe [::flow-results]) :status) :done)) ;; or channel running? we want animations!
+            ;;       ;(not (= (get @(ut/tracked-subscribe [::flow-results]) :status) :done)) ;; or channel running? we want animations!
             ;;   false ;; hjere we go boys
             ;;   (get db :flow?)
             ;;   flow-runner-tracker?)
@@ -513,7 +513,7 @@
             ;;    (swap! db/real-running-blocks assoc flow-id rr)
             ;;     ; _ (tap> [:running? running])
             ;;    ;;(swap! db/flow-results assoc-in [:tracker flow-id] status)
-            ;;    ;(re-frame/dispatch [::set-flow-results status [:tracker flow-id]])
+            ;;    ;(ut/tracked-dispatch [::set-flow-results status [:tracker flow-id]])
             ;;    (let []
             ;;      (if (not (empty? tracker-history))
             ;;        (assoc-in db [:flow-results :tracker flow-id]
@@ -532,9 +532,9 @@
                                 (if (= rtn :started)
                                   (assoc-in db task-id rtn)
                                   ;; (do ;(swap! db/flow-results assoc-in mp-key rtn)
-                                  ;;     (re-frame/dispatch [::set-flow-results rtn mp-key])
+                                  ;;     (ut/tracked-dispatch [::set-flow-results rtn mp-key])
                                   ;;     ;(swap! db/flow-results assoc-in mps-key rtn)
-                                  ;;     (re-frame/dispatch [::set-flow-results rtn mps-key])
+                                  ;;     (ut/tracked-dispatch [::set-flow-results rtn mps-key])
                                   ;;   (assoc-in db task-id rtn)
                                   ;;   ;  (assoc-in db task-id rtn)
 
@@ -688,12 +688,12 @@
 (re-frame/reg-sub
  ::websocket-status
  (fn [db _]
-   (let [subs (vec (doall @(re-frame/subscribe [::wfx/open-subscriptions socket-id])))
+   (let [subs (vec (doall @(ut/tracked-subscribe [::wfx/open-subscriptions socket-id])))
          subs1 (vec (for [s subs] (get-in s [:message :kind])))
          datas (count (keys (get db :data)))
          panels (count (keys (get db :panels)))
-         pendings @(re-frame/subscribe [::wfx/pending-requests socket-id])]
-     {:status @(re-frame/subscribe [::wfx/status socket-id])
+         pendings @(ut/tracked-subscribe [::wfx/pending-requests socket-id])]
+     {:status @(ut/tracked-subscribe [::wfx/status socket-id])
       :waiting (count pendings)
       :datasets datas
       :panels panels

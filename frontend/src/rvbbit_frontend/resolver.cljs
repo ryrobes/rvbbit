@@ -2,6 +2,7 @@
   (:require
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
+   [re-frame.alpha :as rfa]
     ;[re-pressed.core :as rp]
    [day8.re-frame.undo :as undo :refer [undoable]]
    [clojure.edn :as edn]
@@ -21,7 +22,7 @@
     ;; try to save some work
     (let [valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten block-map)))
           workspace-params       (into {} (for [k valid-body-params] ;; deref here?
-                                            {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+                                            {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
           value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
           value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
                                             (let [fs    (cstr/split (ut/unkeyword k) "/")
@@ -31,13 +32,13 @@
                                                 ;row (int (last gs))
                                                   field (keyword (first gs))]
                                               {k (if (not (integer? row))
-                                                 ;(get-in @(re-frame/subscribe [::conn/sql-data [ds]]) [row field])
+                                                 ;(get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field])
                                                    (str field)
-                                                   (get-in @(re-frame/subscribe [::conn/sql-data [ds]]) [row field]))})))
+                                                   (get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field]))})))
 
           condi-walks-targets    (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
           condi-walks            (into {} (for [k condi-walks-targets]
-                                            {k @(re-frame/subscribe [::conn/condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
+                                            {k @(ut/tracked-subscribe [::conn/condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
           into-walk-map2           (fn [obody] (let [;obody (walk/postwalk-replace condi-walks orig-body)
                                                      kps       (ut/extract-patterns obody :into 3) ;(kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
                                                      logic-kps (into {} (for [v kps]
@@ -93,7 +94,7 @@
         ;;                                                                     raw-param-key (get-in vsql-calls (conj (vec (first (filter #(= (last %) :on-click)
         ;;                                                                                                                                (ut/kvpaths vsql-calls)))) 1) pkey)]
         ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
-        ;;                                                                 {v (fn [] (re-frame/dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
+        ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
         ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
         ;;                                      (walk/postwalk-replace logic-kps obody)))
         ;; onclick-walk-map2      (fn [obody] (let [kps       (ut/extract-patterns obody :set-parameter 3)
@@ -102,7 +103,7 @@
         ;;                                                                     raw-param-key (get-in vsql-calls (conj (vec (first (filter #(= (last %) :on-click)
         ;;                                                                                                                                (ut/kvpaths vsql-calls)))) 1) pkey)]
         ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
-        ;;                                                                 {v (fn [] (re-frame/dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
+        ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
         ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
         ;;                                      (walk/postwalk-replace logic-kps obody)))
         ;; map-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :map 3)
@@ -111,7 +112,7 @@
         ;;                                                                 ;(tap> [:=-walk panel-key kps this that])
         ;;                                                                   {v (if (vector? this)
         ;;                                                                        (vec (for [r this] (last (get r that))))
-        ;;                                                                        (vec (for [r @(re-frame/subscribe [::conn/sql-data [this]])] (last (get r that)))))
+        ;;                                                                        (vec (for [r @(ut/tracked-subscribe [::conn/sql-data [this]])] (last (get r that)))))
         ;;                                                                  ;(= (str that) (str this))
         ;;                                                                    })))]
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
@@ -135,7 +136,7 @@
         ;;                                                                      (let [[_ this] v]
         ;;                                                                        (tap> [:scrubber panel-key kps this])
         ;;                                                                        {v [scrubber-panel true
-        ;;                                                                            @(re-frame/subscribe [::keypaths-in-params :param])
+        ;;                                                                            @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                            :param
         ;;                                                                            (str (last (cstr/split (str this) #"/")))
         ;;                                                                            {:fm true :canvas? true}]})))
@@ -143,7 +144,7 @@
         ;;                                                                       (let [[_ this opts] v]
         ;;                                                                         (tap> [:scrubber panel-key kps this])
         ;;                                                                         {v [scrubber-panel true
-        ;;                                                                             @(re-frame/subscribe [::keypaths-in-params :param])
+        ;;                                                                             @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                             :param
         ;;                                                                             (str (last (cstr/split (str this) #"/")))
         ;;                                                                             {:fm true :canvas? true :opts opts}]})))]
@@ -193,7 +194,7 @@
           templated-strings-walk (if templates?
                                    (walk/postwalk-replace {nil ""}
                                                           (into {} (for [k templated-strings-vals]
-                                                                     {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))) {})
+                                                                     {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))) {})
           out-block-map (if templates? (ut/deep-template-replace templated-strings-walk out-block-map) out-block-map)]
 
       ;;(tap> [:pp panel-key (ut/deep-template-find out-block-map)])
@@ -203,10 +204,17 @@
         out-block-map))
     block-map))
 
+;; (re-frame/reg-sub
+;;  ::logic-and-params
+;;  (fn [_ [_ m p]]
+;;    (logic-and-params-fn m p)))
+
 (re-frame/reg-sub
  ::logic-and-params
- (fn [_ [_ m p]]
+ (fn [_ {:keys [m p]}]
    (logic-and-params-fn m p)))
 
 (defn logic-and-params [m p]
-  @(re-frame/subscribe [::logic-and-params m p]))
+  ;;@(ut/tracked-subscribe [::logic-and-params m p])
+  @(rfa/sub ::logic-and-params {:m m :p p})
+  )

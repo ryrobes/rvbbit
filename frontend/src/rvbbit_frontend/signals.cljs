@@ -102,7 +102,7 @@
                     incoming (into [] (for [[k v] incoming] {k (edn/read-string v)}))
                     ii (last (last (first incoming)))
                     ]
-                (re-frame/dispatch [::edit-signal-drop (vec (cons operator content)) ii])
+                (ut/tracked-dispatch [::edit-signal-drop (vec (cons operator content)) ii])
                 (tap> [:drop-signal-item ii incoming content]))}
    element])
 
@@ -112,7 +112,7 @@
     :on-drop #(let [incoming   (js->clj %)
                     incoming (into [] (for [[k v] incoming] {k (edn/read-string v)}))
                     ii (last (last (first incoming)))]
-                (re-frame/dispatch [::edit-signal-drop2 content ii])
+                (ut/tracked-dispatch [::edit-signal-drop2 content ii])
                 (tap> [:drop-signal-item2 ii incoming content]))}
    element])
 
@@ -127,15 +127,15 @@
    :style {:cursor "pointer"}
    :attr {:on-click #(do
                        (tap> [:kill-nested op])
-                       (re-frame/dispatch [::edit-signal-drop-kill op]))}])
+                       (ut/tracked-dispatch [::edit-signal-drop-kill op]))}])
 
 (def hover-tools-atom (reagent/atom nil))
 
 (defn is-true? [coll full-coll] 
   (let [idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
-        selected-signal @(re-frame/subscribe [::selected-signal])
+        selected-signal @(ut/tracked-subscribe [::selected-signal])
         sigkw (keyword (str "signal/part-" (cstr/replace (str selected-signal) ":" "") "-" idx))
-        vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])
+        vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
         ;;vv (if (nil? vv) "err!" vv)
         ] vv))
 
@@ -145,9 +145,9 @@
 (defn hover-tools [coll full-coll]
   (let [hovered? (= @hover-tools-atom coll)
         idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
-        selected-signal @(re-frame/subscribe [::selected-signal])
+        selected-signal @(ut/tracked-subscribe [::selected-signal])
         sigkw (keyword (str "signal/part-" (cstr/replace (str selected-signal) ":" "") "-" idx))
-        vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])
+        vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
         vv (if (nil? vv) "err!" vv)]
     ;(tap> [:coll-hover coll])
     [re-com/v-box
@@ -345,7 +345,7 @@
                                     (reset! db/bad-form-msg-signals "Needs to be a vector / honey-sql where clause format"))
  
                                 :else (do (reset! db/bad-form-signals? false)
-                                          (re-frame/dispatch [::edit-signal parse]))))
+                                          (ut/tracked-dispatch [::edit-signal parse]))))
               :options {:mode              "clojure"
                         ;:lineWrapping      true
                         :lineNumbers       false ;true
@@ -485,11 +485,11 @@
 
 
 (defn signals-list [ph signals selected-signal]
-  (let [;signals @(re-frame/subscribe [::signals-map])
-        ;selected-signal @(re-frame/subscribe [::selected-signal])
+  (let [;signals @(ut/tracked-subscribe [::signals-map])
+        ;selected-signal @(ut/tracked-subscribe [::selected-signal])
         results (into {} (for [[name _] signals]
                            (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
-                                 vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])]
+                                 vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])]
                              {name vv})))]
     [re-com/v-box
      :children
@@ -498,12 +498,12 @@
        :align :center :justify :between
        :children [[re-com/box
                    :style {:cursor "pointer"}
-                   :attr {:on-click #(re-frame/dispatch [::add-signal "new signal"])}
+                   :attr {:on-click #(ut/tracked-dispatch [::add-signal "new signal"])}
                    :child "+ new signal"]
                   (if selected-signal
                     [re-com/box
                      :style {:cursor "pointer"}
-                     :attr {:on-click #(re-frame/dispatch [::delete-signal selected-signal])}
+                     :attr {:on-click #(ut/tracked-dispatch [::delete-signal selected-signal])}
                      :child (str "- delete this signal?")]
                     [re-com/gap :size "5px"])]]
       [re-com/v-box
@@ -523,7 +523,7 @@
                      :padding "6px"
                      :size "none"
                      :width "100%"
-                     :attr {:on-double-click #(re-frame/dispatch [::select-signal (if selected? nil name)])}
+                     :attr {:on-double-click #(ut/tracked-dispatch [::select-signal (if selected? nil name)])}
                      :style {:border (if selected?
                                        (str "3px dashed " (theme-pull :theme/editor-outer-rim-color nil) 99)
                                        (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) "28")
@@ -609,8 +609,8 @@
                 (when open?
                   (if (= name "signals")
 
-                    (let [;signals @(re-frame/subscribe [::signals-map]) ;; they get passed from the filter col
-                          selected-signal @(re-frame/subscribe [::selected-signal])
+                    (let [;signals @(ut/tracked-subscribe [::signals-map]) ;; they get passed from the filter col
+                          selected-signal @(ut/tracked-subscribe [::selected-signal])
                           ;signal-vec (get-in signals [selected-signal :signal])
                           ph 200]
                       [signals-list (if selected-signal
@@ -675,7 +675,7 @@
 ;;  ;;(undoable)
 ;;  (fn [db [_ flow-id]]
 ;;    ;(tap> [:refresh-runstream-panel (keys (get db :runstreams))])
-;;    (re-frame/dispatch [::wfx/request :default
+;;    (ut/tracked-dispatch [::wfx/request :default
 ;;                        {:message    {:kind :get-flow-open-ports
 ;;                                      :flow-id flow-id
 ;;                                      :flowmap flow-id
@@ -699,24 +699,24 @@
 (defonce mode-atom (reagent/atom "when logic"))
 
 (defn flow-box [hh]
-  (let [server-flows (map :flow_id @(re-frame/subscribe [::conn/sql-data [:flows-sys]]))
+  (let [server-flows (map :flow_id @(ut/tracked-subscribe [::conn/sql-data [:flows-sys]]))
         sql-calls {:flows-sys {:select [:flow_id :file_path :last_modified]
                                :from [:flows]
                                :connection-id "flows-db"
                                :order-by [[3 :desc]]}}
-        open-inputs @(re-frame/subscribe [::signal-open-inputs])
+        open-inputs @(ut/tracked-subscribe [::signal-open-inputs])
         react! [@mode-atom]
-        ;signals @(re-frame/subscribe [::signals-map])
-        ;selected-signal @(re-frame/subscribe [::selected-signal])
+        ;signals @(ut/tracked-subscribe [::signals-map])
+        ;selected-signal @(ut/tracked-subscribe [::selected-signal])
         ;signal-vec (get-in signals [selected-signal :signal])
         ;flow-id (get-in signals [selected-signal :flow-id])
         ww (* (- (last @db/flow-editor-system-mode) 14) 0.318)
-        fid @(re-frame/subscribe [::signal-flow-id])
+        fid @(ut/tracked-subscribe [::signal-flow-id])
         ]
 
     (dorun (for [[k query] sql-calls]
-             (let [data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+             (let [data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (if (get query :connection-id)
                    (conn/sql-data [k] query (get query :connection-id))
@@ -747,7 +747,7 @@
                                :child (str fid)]
                               [re-com/box
                                :style {:cursor "pointer"}
-                               :attr {:on-click #(re-frame/dispatch [::edit-signal-flow-id nil])}
+                               :attr {:on-click #(ut/tracked-dispatch [::edit-signal-flow-id nil])}
                                :child "x"]]]
                   [re-com/typeahead
                    :suggestion-to-string (fn [item]
@@ -757,8 +757,8 @@
                                          :style {:color "#000000"}
                                          :child (str (get ss :label))])
                    :on-change #(do
-                                 (re-frame/dispatch [::refresh-open-blocks (get % :id)])
-                                 (re-frame/dispatch [::edit-signal-flow-id (get % :id)]))
+                                 (ut/tracked-dispatch [::refresh-open-blocks (get % :id)])
+                                 (ut/tracked-dispatch [::edit-signal-flow-id (get % :id)]))
                    :rigid? true
                    :style {:font-family   (theme-pull :theme/monospaced-font nil)}
                    :width "320px"
@@ -820,11 +820,11 @@
 (defonce searcher-atom (reagent/atom nil))
 
 (defn left-col [ph]
-  (let [operators @(re-frame/subscribe [::operators])
-        conditions @(re-frame/subscribe [::conditions])
-        time-items @(re-frame/subscribe [::time-items])
-        signals @(re-frame/subscribe [::signals-map])
-        selected-signal @(re-frame/subscribe [::selected-signal])
+  (let [operators @(ut/tracked-subscribe [::operators])
+        conditions @(ut/tracked-subscribe [::conditions])
+        time-items @(ut/tracked-subscribe [::time-items])
+        signals @(ut/tracked-subscribe [::signals-map])
+        selected-signal @(ut/tracked-subscribe [::selected-signal])
         signal-vec (get-in signals [selected-signal :signal])
         react! [@selectors-open]
         filter-results (fn [x y]
@@ -836,7 +836,7 @@
                                                     (cstr/includes? (cstr/lower-case (str v)) (cstr/lower-case x))))
                                               y))
                              (vec (filter #(cstr/includes? (cstr/lower-case (str %)) (cstr/lower-case x)) y)))))
-        ;fid @(re-frame/subscribe [::signal-flow-id])
+        ;fid @(ut/tracked-subscribe [::signal-flow-id])
         flow-box-hh 148]
     [re-com/v-box
      ;:padding "6px"
@@ -964,7 +964,7 @@
        :model             (cstr/replace (str signal-name) ":" "")
        :width             (px (- w 6))
        :height            "45px"
-       :on-change         #(do (re-frame/dispatch [::rename-signal signal-name
+       :on-change         #(do (ut/tracked-dispatch [::rename-signal signal-name
                                                    (try
                                                      (keyword (str %))
                                                      (catch :default _ (str %)))])
@@ -983,11 +983,11 @@
  ::run-signals-history
  (fn [db _]
   ;;  (tap> [:signals-history!])
-   (re-frame/dispatch
+   (ut/tracked-dispatch
     [::wfx/request :default
      {:message    {:kind :signals-history
                    :signal-name (get db :selected-signal)
-                   :client-name @(re-frame/subscribe [::bricks/client-name])}
+                   :client-name @(ut/tracked-subscribe [::bricks/client-name])}
       :on-response [::signals-history-response]
       :timeout    15000000}])
    db))
@@ -1013,24 +1013,24 @@
 
 
 (defn right-col [ph]
-  (let [signals @(re-frame/subscribe [::signals-map])
-        selected-signal @(re-frame/subscribe [::selected-signal])
+  (let [signals @(ut/tracked-subscribe [::signals-map])
+        selected-signal @(ut/tracked-subscribe [::selected-signal])
         signal-vec (get-in signals [selected-signal :signal])
         signal-vec-parts (vec (ut/where-dissect signal-vec))
-        signals-history (select-keys @(re-frame/subscribe [::signals-history]) signal-vec-parts) ;; sometimes we get weird other items if we change fast
+        signals-history (select-keys @(ut/tracked-subscribe [::signals-history]) signal-vec-parts) ;; sometimes we get weird other items if we change fast
         results (into {} (for [idx (range (count signal-vec-parts))]
                            (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
                                  name (get signal-vec-parts idx)
-                                 vv @(re-frame/subscribe [::conn/clicked-parameter-key [sigkw]])]
+                                 vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])]
                              {name vv})))]
     
     ;; (tap> [:signals-history signals-history])
     
-    ;; (re-frame/dispatch
+    ;; (ut/tracked-dispatch
     ;;  [::wfx/request :default
     ;;   {:message    {:kind :signals-history
     ;;                 :signal-name selected-signal
-    ;;                 :client-name @(re-frame/subscribe [::bricks/client-name])}
+    ;;                 :client-name @(ut/tracked-subscribe [::bricks/client-name])}
     ;;    :on-response [::signals-history-response]
     ;;    :timeout    15000000}])
     
@@ -1058,7 +1058,7 @@
                                  :font-weight 700}
                          :height "100%"
                          :width (px (* ww 0.1))
-                         :child (str @(re-frame/subscribe [::conn/clicked-parameter-key 
+                         :child (str @(ut/tracked-subscribe [::conn/clicked-parameter-key 
                                                       [(keyword (str "signal/" (cstr/replace (str selected-signal) ":" "")))]]))]]])
 
                     [re-com/box
@@ -1171,23 +1171,23 @@
 
 (defn signals-panel []
   (let [[_ hpct] db/flow-panel-pcts ;; [0.85 0.50]
-        hh @(re-frame/subscribe [::subs/h]) ;; we want the reaction 
+        hh @(ut/tracked-subscribe [::subs/h]) ;; we want the reaction 
         panel-height (* hh hpct)
         details-panel-height (/ panel-height 1.25) ;; batshit math from flow.cljs panel parent
         ppanel-height (+ panel-height details-panel-height)
         
-        selected-signal @(re-frame/subscribe [::selected-signal])
-        signals-map @(re-frame/subscribe [::signals-map])
+        selected-signal @(ut/tracked-subscribe [::selected-signal])
+        signals-map @(ut/tracked-subscribe [::signals-map])
         get-signals-map-evt-vec [::wfx/request :default
                                  {:message    {:kind :signals-map
-                                               :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                               :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                                   :on-response [::signals-map-response]
                                   :on-timeout  [::timeout-response :get-signals]
                                   :timeout    15000000}]
         ph (- ppanel-height 124)]
     
     (when (nil? signals-map) 
-      (re-frame/dispatch get-signals-map-evt-vec)) ;; if fresh, pull it 
+      (ut/tracked-dispatch get-signals-map-evt-vec)) ;; if fresh, pull it 
 
     [re-com/v-box
      :padding "6px"
@@ -1205,29 +1205,29 @@
                              :gap "8px"
                              :style {:opacity 0.15}
                              :children [[re-com/box 
-                                         :attr {:on-click #(re-frame/dispatch get-signals-map-evt-vec)}
+                                         :attr {:on-click #(ut/tracked-dispatch get-signals-map-evt-vec)}
                                          :style {:cursor "pointer"}
                                          :child "pull from server?"]
                                         ;[re-com/box :child "(diff than the server!)"]
                                         ]]
                             
                             [re-com/box
-                             :attr {:on-click #(re-frame/dispatch
+                             :attr {:on-click #(ut/tracked-dispatch
                                                 [::wfx/request :default
                                                  {:message    {:kind :signals-history
                                                                :signal-name selected-signal
-                                                               :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                                               :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                                                                :on-response [::signals-history-response]
                                                   :timeout    15000000}])}
                              :style {:cursor "pointer" :opacity 0.15}
                              :child "get history"]
 
                             [re-com/box
-                             :attr {:on-click #(re-frame/dispatch
+                             :attr {:on-click #(ut/tracked-dispatch
                                                 [::wfx/request :default
                                                  {:message    {:kind :save-signals-map
-                                                               :signals-map @(re-frame/subscribe [::signals-map])
-                                                               :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                                               :signals-map @(ut/tracked-subscribe [::signals-map])
+                                                               :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                                                   ;:on-response [::signals-map-response]
                                                   ;:on-timeout  [::timeout-response :get-signals]
                                                   :timeout    15000000}])}

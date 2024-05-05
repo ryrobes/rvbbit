@@ -6,18 +6,18 @@
   (let []))
 
 ;; (defn preview-browser [query-id]
-;;   (let [all-sql-call-keys @(re-frame/subscribe [::all-sql-call-keys])
-;;         grid-reco? @(re-frame/subscribe [::grid-reco?])
-;;         recos-page @(re-frame/subscribe [::recos-page])
+;;   (let [all-sql-call-keys @(ut/tracked-subscribe [::all-sql-call-keys])
+;;         grid-reco? @(ut/tracked-subscribe [::grid-reco?])
+;;         recos-page @(ut/tracked-subscribe [::recos-page])
 ;;         all-sql-call-keys-str (for [e all-sql-call-keys] (cstr/replace (ut/unkeyword e) "-" "_"))
 ;;         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-tables-sys/table_name
 ;;                                      :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn :user-dropdown-sys/req-field]]
-;;                               {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+;;                               {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
 ;;         combo-picked? (not (nil? (get sql-params :viz-shapes-sys/combo_edn)))
 ;;         shape-picked? (not (nil? (get sql-params :viz-shapes0-sys/shape)))
-;;         clear-filters-fn (fn [] (do (re-frame/dispatch [::conn/click-parameter [:viz-shapes0-sys :shape] nil])
-;;                                     (re-frame/dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] nil])
-;;                                     (re-frame/dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] nil])))
+;;         clear-filters-fn (fn [] (do (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes0-sys :shape] nil])
+;;                                     (ut/tracked-dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] nil])
+;;                                     (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] nil])))
 ;;         req-field-picked? (not (nil? (get sql-params :user-dropdown-sys/req-field)))
 ;;         sql-calls {:viz-tables-sys {:select [:table_name [[:count 1] :recos]]
 ;;                                     :from [:viz_recos_vw]
@@ -58,8 +58,8 @@
 ;;         block-list @(re-frame.core/subscribe [::conn/sql-data [:viz-tables-sys]])
 ;;         combo-list @(re-frame.core/subscribe [::conn/sql-data [:viz-shapes-sys]])
 ;;         full-recos @(re-frame.core/subscribe [::conn/sql-data [:recos-sys]])
-;;         ;current-tab @(re-frame/subscribe [::selected-tab])
-;;         current-tab-queries  (try (map #(-> % ut/sql-keyword name) @(re-frame/subscribe [::current-tab-queries]))
+;;         ;current-tab @(ut/tracked-subscribe [::selected-tab])
+;;         current-tab-queries  (try (map #(-> % ut/sql-keyword name) @(ut/tracked-subscribe [::current-tab-queries]))
 ;;                                   (catch :default _ []))
 ;;         block-list (vec (filter (fn [x] (some #(= % (get x :table_name)) current-tab-queries)) block-list)) ;; overwrite above with curr tab only
 ;;         recos-count (count full-recos)
@@ -68,7 +68,7 @@
 ;;                                      sel? (= table_name sel)]]
 ;;                            [re-com/box
 ;;                             :attr {:on-click #(do
-;;                                                 (re-frame/dispatch [::conn/click-parameter [:viz-tables-sys :table_name] table_name])
+;;                                                 (ut/tracked-dispatch [::conn/click-parameter [:viz-tables-sys :table_name] table_name])
 ;;                                                 (clear-filters-fn))
 ;;                                    ;#(reset! viz-block table_name)
 ;;                                    }
@@ -89,7 +89,7 @@
 ;;                             :child (str table_name " (" recos ")")])
 ;;         combo-singles (vec (distinct (flatten (doall (for [{:keys [combo_edn recos]} combo-list]
 ;;                                                        (cstr/split (cstr/replace combo_edn #"\"" "") ", "))))))
-;;         pkeys @(re-frame/subscribe [::preview-keys])
+;;         pkeys @(ut/tracked-subscribe [::preview-keys])
 ;;         preview-keys (vec (for [k pkeys] (keyword (str "reco-preview" k))))
 ;;         preview-maps (into {} (for [{:keys [combo_hash shape_name combo_edn query_map viz_map condis]} full-recos]
 ;;                                 {(keyword (str "reco-preview" combo_hash))
@@ -99,7 +99,7 @@
 ;;                                   :viz_map viz_map
 ;;                                   :condis condis
 ;;                                   :combo_edn combo_edn}}))
-;;         reco-selected (keyword (str "reco-preview" @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])))
+;;         reco-selected (keyword (str "reco-preview" @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])))
 ;;         preview-container (fn [preview-maps pk pnum]
 ;;                             (try (let [panel-key (nth pk pnum)
 ;;                                        ce (get-in preview-maps [panel-key :combo_edn])
@@ -112,12 +112,12 @@
 ;;                                        sel? (= reco-selected panel-key)
 ;;                                        body [re-com/v-box
 ;;                                              :size "auto"
-;;                                              :attr {:on-click #(do (re-frame/dispatch [::conn/click-parameter [:recos-sys :combo_hash] combo_hash])
-;;                                                                    (re-frame/dispatch [::conn/click-parameter [:recos-sys :combo_edn] combo_edn])
-;;                                                                    (re-frame/dispatch [::conn/click-parameter [:recos-sys :shape_name] shape_name])
-;;                                                                    (re-frame/dispatch [::conn/click-parameter [:recos-sys :query_map] query_map])
-;;                                                                    (re-frame/dispatch [::conn/click-parameter [:recos-sys :viz_map] viz_map])
-;;                                                                    (re-frame/dispatch [::conn/click-parameter [:recos-sys :condis] condis]))}
+;;                                              :attr {:on-click #(do (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :combo_hash] combo_hash])
+;;                                                                    (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :combo_edn] combo_edn])
+;;                                                                    (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :shape_name] shape_name])
+;;                                                                    (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :query_map] query_map])
+;;                                                                    (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :viz_map] viz_map])
+;;                                                                    (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :condis] condis]))}
 ;;                                              :width "240px"
 ;;                                              :style {:zoom 0.44
 ;;                                                      :border "1px solid #ffffff22"
@@ -174,14 +174,14 @@
 ;; ;       ;(filter #(= (get % :table_name) ) block-list)
 ;; ;       current-tab-queries ]) 
 
-;;     (dorun (let [prev-preview-keys (for [k @(re-frame/subscribe [::preview-keys])] (keyword (str "reco-preview" k)))
+;;     (dorun (let [prev-preview-keys (for [k @(ut/tracked-subscribe [::preview-keys])] (keyword (str "reco-preview" k)))
 ;;                  per-page 6 ;; if we ever get more room...
-;;                  grid-page @(re-frame/subscribe [::recos-page])
+;;                  grid-page @(ut/tracked-subscribe [::recos-page])
 ;;                  grid-page (if (> (- grid-page 1) pages) 0 grid-page)
 ;;                  recos (take per-page (drop (* grid-page per-page) @(re-frame.core/subscribe [::conn/sql-data [:recos-sys]])))
 ;;                  recos-keys (vec (for [{:keys [combo_hash]} recos] combo_hash))]
-;;              (doseq [k prev-preview-keys] (re-frame/dispatch [::quick-delete-panel k]))
-;;              (re-frame/dispatch [::set-preview-keys recos-keys])
+;;              (doseq [k prev-preview-keys] (ut/tracked-dispatch [::quick-delete-panel k]))
+;;              (ut/tracked-dispatch [::set-preview-keys recos-keys])
 ;;              (doseq [{:keys [combo_hash query_map viz_map condis combo_edn shape_name]} recos]
 ;;                (insert-hidden-reco-preview combo_hash viz_map query_map condis combo_edn shape_name false))))
 
@@ -191,8 +191,8 @@
 ;;     ;(tap> combo-singles)
 ;;     (dorun (for [[k v] sql-calls]
 ;;              (let [query (walk/postwalk-replace sql-params v)
-;;                    data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-;;                    unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+;;                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+;;                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
 ;;                (when (or (not data-exists?) unrun-sql?)
 ;;                  (conn/sql-data [k] query)))))
 
@@ -229,7 +229,7 @@
 ;;                                           ;:can-drop-above? true
 ;;                                           ;:est-item-height 230
 ;;                              :model (get sql-params :user-dropdown-sys/req-field)
-;;                              :on-change #(re-frame/dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] %])
+;;                              :on-change #(ut/tracked-dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] %])
 ;;                              :width "285px"]
 ;;                             ;[re-com/box :child "hey"]
 ;;                             [re-com/single-dropdown
@@ -243,18 +243,18 @@
 ;;                                           ;:can-drop-above? true
 ;;                                           ;:est-item-height 230
 ;;                              :model (get sql-params :viz-shapes-sys/combo_edn)
-;;                              :on-change #(re-frame/dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] %])
+;;                              :on-change #(ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] %])
 ;;                              :width "660px"]
 
 ;;                             [re-com/box :child "grid"
-;;                              :attr {:on-click #(re-frame/dispatch [::set-grid-reco? true])}
+;;                              :attr {:on-click #(ut/tracked-dispatch [::set-grid-reco? true])}
 ;;                              :style {:color (if grid-reco? (theme-pull :theme/editor-font-color nil) "inherit")
 ;;                                      :cursor "pointer"
 ;;                                      :margin-top "-9px"
 ;;                                      :font-weight 700}]
 
 ;;                             [re-com/box :child "previews"
-;;                              :attr {:on-click #(re-frame/dispatch [::set-grid-reco? false])}
+;;                              :attr {:on-click #(ut/tracked-dispatch [::set-grid-reco? false])}
 ;;                              :style {:color (if (not grid-reco?) (theme-pull :theme/editor-font-color nil) "inherit")
 ;;                                      :cursor "pointer"
 ;;                                      :margin-top "-9px"
@@ -313,7 +313,7 @@
 ;;                                                   :height "19px"
 ;;                                                   :align :end
 ;;                                                   :justify :center
-;;                                                   :attr {:on-click #(re-frame/dispatch [::set-recos-page c])}
+;;                                                   :attr {:on-click #(ut/tracked-dispatch [::set-recos-page c])}
 ;;                                                   :style {:padding-right "4px"
 ;;                                                           :cursor "pointer"
 ;;                                                           :font-size "12px"

@@ -67,7 +67,7 @@
 (defonce dragging? (reagent/atom false))
 (defonce dragging-flow? (reagent/atom false))
 ;(defonce bid-over (reagent/atom nil))
-;(defonce db/flow-results (reagent/atom {})) ;; @(re-frame/subscribe [::http/flow-results])
+;(defonce db/flow-results (reagent/atom {})) ;; @(ut/tracked-subscribe [::http/flow-results])
 (def editor-tooltip-atom (reagent/atom nil))
 ;(def flow-id (reagent/atom "live-scratch-flow"))
 (defonce title-edit-idx (reagent/atom nil))
@@ -155,7 +155,7 @@
    (let [flow-id (str flow-id)
          curr-flow-id (get db :selected-flow)
          curr-flow (get-in db [:flows curr-flow-id] {})]
-    ;(reset! db/flow-results (walk/postwalk-replace {curr-flow-id flow-id} @(re-frame/subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
+    ;(reset! db/flow-results (walk/postwalk-replace {curr-flow-id flow-id} @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
      (-> db
         ;(assoc-in [:flows flow-id] curr-flow)
         ;(ut/dissoc-in [:flows curr-flow-id])
@@ -170,8 +170,8 @@
         ;curr-flow-id (get db :selected-flow)
         ;curr-flow (get-in db [:flows curr-flow-id] {})
 
-     ;(reset! db/flow-results (walk/postwalk-replace {old-flow-id new-flow-id} @(re-frame/subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
-     (re-frame/dispatch [::http/set-flow-results (walk/postwalk-replace {old-flow-id new-flow-id} @(re-frame/subscribe [::http/flow-results]))])
+     ;(reset! db/flow-results (walk/postwalk-replace {old-flow-id new-flow-id} @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
+     (ut/tracked-dispatch [::http/set-flow-results (walk/postwalk-replace {old-flow-id new-flow-id} @(ut/tracked-subscribe [::http/flow-results]))])
      (-> db
         ;(assoc-in [:flows flow-id] curr-flow)
         ;(ut/dissoc-in [:flows curr-flow-id])
@@ -187,7 +187,7 @@
          inputs (keys (get-in db [:flows curr-flow-id :map old-bid :ports :in]))
          outputs (keys (get-in db [:flows curr-flow-id :map old-bid :ports :out]))
          new-bid (keyword new-bid)
-         new-bid (ut/safe-key new-bid @(re-frame/subscribe [::conn/reserved-type-keywords]))
+         new-bid (ut/safe-key new-bid @(ut/tracked-subscribe [::conn/reserved-type-keywords]))
          input-replacements (into {}
                                   (for [k inputs] {(keyword (str (ut/unkeyword old-bid) "/" (ut/unkeyword k)))
                                                    (keyword (str (ut/unkeyword new-bid) "/" (ut/unkeyword k)))}))
@@ -198,8 +198,8 @@
      (tap> [:rename-block old-bid :to new-bid :with pw-replace-map]) ;; block id needs to be keyword,
      (if (not (some #(= new-bid %) block-ids)) ;; only if is unique, else do nothing
        (do
-;         (reset! db/flow-results (walk/postwalk-replace pw-replace-map @(re-frame/subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
-         (re-frame/dispatch [::http/set-flow-results (walk/postwalk-replace pw-replace-map @(re-frame/subscribe [::http/flow-results]))])
+;         (reset! db/flow-results (walk/postwalk-replace pw-replace-map @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
+         (ut/tracked-dispatch [::http/set-flow-results (walk/postwalk-replace pw-replace-map @(ut/tracked-subscribe [::http/flow-results]))])
          (-> db
              (assoc :selected-flow-block new-bid)
              (assoc-in [:flows curr-flow-id] (walk/postwalk-replace pw-replace-map (get-in db [:flows curr-flow-id])))))
@@ -314,7 +314,7 @@
      ;(tap> [::kks kks])
      (reset! trig-atom-test (str "refreshed live dat " (rand-int 1000)))
      (doseq [k kks]
-       (re-frame/dispatch [::conn/clear-query-history k])))))
+       (ut/tracked-dispatch [::conn/clear-query-history k])))))
     ;;  (ut/dissoc-in db [:data
     ;;                    (set (keys (get db :data)))
 
@@ -331,10 +331,10 @@
                     (assoc (into {} (for [k (range (count ddata)) :let [v (get ddata k)]] {(keyword (str "idx" k)) (keyword (ut/data-typer v))})) :* :vector)
                     :else ports)
         _ (tap> [:create-out-map-ports ddata dtype ports])
-        full (-> (get @(re-frame/subscribe [::flowmap]) bid)
+        full (-> (get @(ut/tracked-subscribe [::flowmap]) bid)
                 ;(assoc-in [:data :user-input] ddata)
                  (assoc-in [:ports :out] ports))]
-    (re-frame/dispatch [::update-flowmap-key-others bid fid nil full])))
+    (ut/tracked-dispatch [::update-flowmap-key-others bid fid nil full])))
 
 (re-frame/reg-event-db
  ::delay-tracker
@@ -347,17 +347,17 @@
        (assoc-in [:flow-results :tracker flow-id] tracker)
        (assoc-in [:flow-results :status] :done))
 
-  ;;  (re-frame/dispatch [::wfx/request :default
+  ;;  (ut/tracked-dispatch [::wfx/request :default
   ;;                   {:message    {:kind :kill-flow
   ;;                                 :flow-id flow-id
-  ;;                                 :client-name @(re-frame/subscribe [::bricks/client-name])}
+  ;;                                 :client-name @(ut/tracked-subscribe [::bricks/client-name])}
   ;;                    :timeout    15000000}])
    ))
 
 (re-frame/reg-event-db
  ::socket-response-flow
  (fn [db [_ result]]
-   (let [flow-id @(re-frame/subscribe [::selected-flow])
+   (let [flow-id @(ut/tracked-subscribe [::selected-flow])
          return-maps (get result :return-maps)
          return-maps (ut/replace-large-base64 return-maps) ;; since we loop over this, lets make it less expensive, no? wont change the data types anyways
          _ (doseq [[fid fb] return-maps] ;; backport map keys to out ports
@@ -383,7 +383,7 @@
      (reset! editor-tooltip-atom (str "finished. returned value: " (get result :return-val)))
     ;(swap! db/flow-results assoc flow-id (merge {:status :done} result))
 
-    ;;  (re-frame/dispatch [::http/set-flow-results {:status :done
+    ;;  (ut/tracked-dispatch [::http/set-flow-results {:status :done
     ;;                                               :return-maps (get result :return-maps)
     ;;                                               :tracker (get result :tracker)
     ;;                                               :run-refs (get result :run-refs)}])
@@ -426,8 +426,8 @@
                (= ttype :query)
                (let [pfull (first (vals (get-in v [:data :queries])))
                       ;; _ (tap> [:param-fmaps ttype k pfull])
-                    ;ddata @(re-frame/subscribe [::conn/clicked-parameter-key [pfull]])
-                     ddata (first @(re-frame/subscribe [::resolver/logic-and-params [pfull]]))
+                    ;ddata @(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
+                     ddata (first @(ut/tracked-subscribe [::resolver/logic-and-params [pfull]]))
                      dtype (ut/data-typer ddata)
                      ports {:out {:out (keyword dtype)}}
                      ports (cond (= dtype "map")
@@ -443,7 +443,7 @@
                (= ttype :param)
                (let [pfull (get-in v [:data :drag-meta :param-full])
                       ;; _ (tap> [:param-fmaps ttype k pfull])
-                     ddata @(re-frame/subscribe [::conn/clicked-parameter-key [pfull]])
+                     ddata @(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
                      dtype (ut/data-typer ddata)
                    ;;  ports {:out {:out (keyword dtype)}}
                    ;;  ports (cond (= dtype "map")
@@ -460,8 +460,8 @@
                (= ttype :cell)
                (let [pfull (get-in v [:data :drag-meta :param-full])
                       ;; _ (tap> [:param-fmaps ttype k pfull])
-                           ;ddata @(re-frame/subscribe [::conn/clicked-parameter-key [pfull]])
-                     ddata (first @(re-frame/subscribe [::resolver/logic-and-params [pfull]]))
+                           ;ddata @(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
+                     ddata (first @(ut/tracked-subscribe [::resolver/logic-and-params [pfull]]))
                      dtype (ut/data-typer ddata)
                      ports {:out {:out (keyword dtype)}}
                      ports (cond (= dtype "map")
@@ -487,8 +487,8 @@
                                      [(str (get-in v [:data :user-input]))])))) ;; converting raw data to stringified data, to avoid issues with edn/read-string
 
                        ;;     _ (tap> [:user-input-fmaps ttype k pfull])
-                           ;ddata (resolver/logic-and-params pfull nil) ;@(re-frame/subscribe [::conn/clicked-parameter-key [pfull]])
-                     ddata (first @(re-frame/subscribe [::resolver/logic-and-params [pfull]]))
+                           ;ddata (resolver/logic-and-params pfull nil) ;@(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
+                     ddata (first @(ut/tracked-subscribe [::resolver/logic-and-params [pfull]]))
                      dtype (ut/data-typer ddata)
                      ports {;:in (get-in v [:ports :in])
                             :out {:out (keyword dtype)}}
@@ -612,7 +612,7 @@
 
 (defn has-done? []
   (true? (some #(= % :done)
-               (apply concat @(re-frame/subscribe [::flowmap-connections])))))
+               (apply concat @(ut/tracked-subscribe [::flowmap-connections])))))
 
 (re-frame/reg-event-db
  ::run-current-flowmap
@@ -620,10 +620,10 @@
   ;(tap> [:ran-condi ])
    (when (get db :flow?) ;; and has-done?
    ;; only when flow is up and runnable
-     (doall (let [flowmap @(re-frame/subscribe [::flowmap])
-                  flow-id @(re-frame/subscribe [::selected-flow])
-                  flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
-                  client-name @(re-frame/subscribe [::conn/client-name])
+     (doall (let [flowmap @(ut/tracked-subscribe [::flowmap])
+                  flow-id @(ut/tracked-subscribe [::selected-flow])
+                  flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+                  client-name @(ut/tracked-subscribe [::conn/client-name])
                   opts-map (get-in db [:flows flow-id :opts] {})
                   server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)
                  ;running-subs (vec (conj (for [k (keys (get server-flowmap :components))] [flow-id k]) [flow-id :*running?]))
@@ -634,14 +634,14 @@
                   running-subs (vec (for [k (keys comps)] [flow-id k]))
                   running-subs (vec (into running-subs running-view-subs))
                   
-                  watched? (ut/ne? (get @(re-frame/subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
+                  watched? (ut/ne? (get @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
                   _ (tap> [:comps comps running-subs watched?])
                   fstr (str "running flow " flow-id)
                   w (/ (count fstr) 4.1)]
               (reset! editor-tooltip-atom (str flow-id " is running"))
            ;(swap! db/flow-results assoc flow-id {:status :started})
             ;(reset! db/flow-results {:status :started})
-              (re-frame/dispatch [::http/set-flow-results {:status :started} nil flow-id])
+              (ut/tracked-dispatch [::http/set-flow-results {:status :started} nil flow-id])
               (swap! db/running-blocks assoc flow-id (vec (keys flowmap)))
               (tap> [:flowmap-send-it flowmap server-flowmap running-subs])
               (reset! http/subsequent-runs [])
@@ -651,19 +651,19 @@
               ;;            (count (vec (map last running-subs)))))
               ;; we need to add new blocks if we are building. TODO selectivly re-sub, or not (dupes should be fine server-side)
                 ;;(tap> [:resub? (vec (filter #(cstr/includes? (str %) (str "blocks||" flow-id "||")) curr-flow-subs)) (vec (map last running-subs))])
-                (re-frame/dispatch [::wfx/request :default
+                (ut/tracked-dispatch [::wfx/request :default
                                     {:message    {:kind :sub-to-running-values
                                                   :flow-id flow-id
                                                   :flow-keys running-subs
                                                   :client-name client-name}
-                                     :timeout    15000000}]))
-            ;;  (re-frame/dispatch [::audio/text-to-speech11 :audio :speak "/home/ryanr/fight-like-hell.mp3" true])
-              (re-frame/dispatch [::wfx/request :default
+                                     :timeout    15000}]))
+            ;;  (ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak "/home/ryanr/fight-like-hell.mp3" true])
+              (ut/tracked-dispatch [::wfx/request :default
                                   {:message    {:kind :run-flow 
                                                 :flow-id flow-id
                                                 :no-return? true ;;false ; true ;false ;true  ;; if we arent subbing to running values, we need to return dump
-                                                :file-image {:flowmaps @(re-frame/subscribe [::flowmap-raw])
-                                                             :opts @(re-frame/subscribe [::opts-map])
+                                                :file-image {:flowmaps @(ut/tracked-subscribe [::flowmap-raw])
+                                                             :opts @(ut/tracked-subscribe [::opts-map])
                                                              :zoom @db/pan-zoom-offsets
                                                              :flow-id flow-id
                                                              :flowmaps-connections flowmaps-connections}
@@ -678,7 +678,7 @@
                                    :on-timeout  [::timeout-response :run-flow flowmap] ;; requeue?
                                    :timeout    15000000}])
               (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
-            ;;  (re-frame/dispatch [::conn/click-parameter ;; kinda cheating, but feels better
+            ;;  (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
             ;;                      [:flow (keyword (str flow-id ">*running?"))] true])
               (ut/dissoc-in db [:flow-runner flow-id])
               )))))
@@ -689,19 +689,19 @@
    (and (not (empty? (get @db/running-blocks flow-id [])))
         (= (get-in db [:flow-runner flow-id bid] :started) :started))))
 
-;(tap> [:results-atom @(re-frame/subscribe [::http/flow-results])])
+;(tap> [:results-atom @(ut/tracked-subscribe [::http/flow-results])])
 
 
                      ;@flowmaps-connections
 
 (defn is-running? [bid flow-id & [only?]]
-  (let [;started? @(re-frame/subscribe [::flow-runner flow-id bid])
+  (let [;started? @(ut/tracked-subscribe [::flow-runner flow-id bid])
         ;rblocks (get @db/running-blocks flow-id [])
-        chans-open? @(re-frame/subscribe [::bricks/flow-channels-open? flow-id])
+        chans-open? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
         server-running? (or (if only? false
                                 chans-open?)
                          ;chans-open?
-                            @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]]))
+                            @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]]))
         rrblocks (get @db/real-running-blocks flow-id [])]
     (if (= bid :*)
       server-running?
@@ -718,7 +718,7 @@
 ;; (re-frame/reg-sub
 ;;  ::is-waiting?
 ;;  (fn [_ [_ bid flow-id]]
-;;    (let [started? @(re-frame/subscribe [::flow-runner flow-id bid])
+;;    (let [started? @(ut/tracked-subscribe [::flow-runner flow-id bid])
 ;;          rblocks (get @db/running-blocks flow-id [])
 ;;          rrblocks (get @db/real-running-blocks flow-id [])]
 ;;      (and
@@ -731,8 +731,8 @@
 (re-frame/reg-sub
  ::is-running?
  (fn [db [_ bid flow-id & [only?]]]
-   (let [;chans-open? @(re-frame/subscribe [::bricks/flow-channels-open? flow-id])
-         flow-running? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]])
+   (let [;chans-open? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
+         flow-running? @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]])
          running (get-in db [:flow-results :tracker-blocks flow-id :running-blocks])]
      (cond (= bid :*) flow-running?
            ;;only? flow-running?
@@ -744,7 +744,7 @@
  ::is-waiting?
  (fn [db [_ bid flow-id]]
    (let [waiting (get-in db [:flow-results :tracker-blocks flow-id :waiting-blocks])
-         flow-running? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]])]
+         flow-running? @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]])]
      (true? (and flow-running?
                  (some #(= bid %) waiting))))))
 
@@ -767,7 +767,7 @@
 
 
 ;(defn build-ports-by-value [v])
-; (re-frame/subscribe [::flowmap])
+; (ut/tracked-subscribe [::flowmap])
 
 
 (re-frame/reg-sub
@@ -876,7 +876,7 @@
         ;only-body false ;(mapify-data block-id true)
         font-size "11px"
         ;iii @hovered-input
-        ;options {} ; (into {} (for [{:keys [block-keypath current]} @(re-frame/subscribe [::options block-id])] {(last block-keypath) current}))
+        ;options {} ; (into {} (for [{:keys [block-keypath current]} @(ut/tracked-subscribe [::options block-id])] {(last block-keypath) current}))
         ;show-code-map-opt? (get options :show-code-map? true)
         add-kp? (try (keyword? block-id) (catch :default _ false)) ;;true ;(not show-code-map-opt?) ;; for drag outs only
         cells? (= block-id :cells)
@@ -896,7 +896,7 @@
                             in-body? true ;(ut/contains-data? only-body k-val)
                             hovered? false ;(ut/contains-data? mat-hovered-input k-val)
                             border-ind (if in-body? "solid" "dashed")
-                            val-color (get @(re-frame/subscribe [::conn/data-colors]) k-val-type)
+                            val-color (get @(ut/tracked-subscribe [::conn/data-colors]) k-val-type)
                             keypath-in (conj keypath kk)
                             keystyle {:background-color (if hovered? (str val-color 66) "#00000000")
                                       ;:font-weight 700
@@ -1033,7 +1033,7 @@
                                                   [re-com/md-icon-button
                                                    :md-icon-name "zmdi-info"
                                                    :tooltip (str "FOOO" (get sql-explanations keypath ""))
-                                                   ;:on-click #(re-frame/dispatch [::change-page panel-key (first data-keypath) (- page-num 1) ttl-pages])
+                                                   ;:on-click #(ut/tracked-dispatch [::change-page panel-key (first data-keypath) (- page-num 1) ttl-pages])
                                                    :style {:font-size "16px"
                                                            :cursor "pointer"
                                                            :opacity 0.5
@@ -1106,7 +1106,7 @@
 
       (let [k-val-type (ut/data-typer data)
             nin? (not (= block-id :inline-render))
-            val-color (get @(re-frame/subscribe [::conn/data-colors]) k-val-type)]
+            val-color (get @(ut/tracked-subscribe [::conn/data-colors]) k-val-type)]
         [re-com/v-box
          :size "auto"
          :children
@@ -1183,10 +1183,10 @@
           coords))))
 
 (defn coord-cacher [conns flow-map]
-  (let [results-hash (hash (get @(re-frame/subscribe [::http/flow-results]) @(re-frame/subscribe [::selected-flow])))
+  (let [results-hash (hash (get @(ut/tracked-subscribe [::http/flow-results]) @(ut/tracked-subscribe [::selected-flow])))
         cachekey (str (hash (str conns flow-map)) "." results-hash)
-        flow-id @(re-frame/subscribe [::selected-flow])
-        react! [@(re-frame/subscribe [::http/flow-results])]
+        flow-id @(ut/tracked-subscribe [::selected-flow])
+        react! [@(ut/tracked-subscribe [::http/flow-results])]
         cache (get @ut/coord-cache cachekey)]
    ;(tap> [:conns conns])
     (if false cache ;; disable for now
@@ -1246,9 +1246,9 @@
                                 ;;  dcolor (get (theme-pull :theme/data-colors db/data-colors)
                                 ;;              (gn (get-in flow-map [bid-o :ports :out pid-o]))
                                 ;;              (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500"))
-                                 ;[ibid ivk] (if input? @(re-frame/subscribe [::get-incoming-port bid :in k]) [nil nil])
-                                 ;port-color @(re-frame/subscribe [::port-color flow-id (or ibid bid) (or ivk k)])
-                                 dcolor @(re-frame/subscribe [::port-color flow-id bid-o pid-o])]]
+                                 ;[ibid ivk] (if input? @(ut/tracked-subscribe [::get-incoming-port bid :in k]) [nil nil])
+                                 ;port-color @(ut/tracked-subscribe [::port-color flow-id (or ibid bid) (or ivk k)])
+                                 dcolor @(ut/tracked-subscribe [::port-color flow-id bid-o pid-o])]]
                                 ;;dcolor "#ffffff"
 
 
@@ -1297,9 +1297,9 @@
 (defn generate-coords [xx yy]
   (let [conns (vec (filter #(not (= (last %) :done))
                           ;@flowmaps-connections
-                           @(re-frame/subscribe [::flowmap-connections])))
+                           @(ut/tracked-subscribe [::flowmap-connections])))
        ;;tt @tentacle-pos
-        flow-map @(re-frame/subscribe [::flowmap])
+        flow-map @(ut/tracked-subscribe [::flowmap])
         fconns (coord-cacher conns flow-map)]
    ;;(tap> [:generate-coords conns fconns])
    ;; (if @dragging-port?
@@ -1310,7 +1310,7 @@
 (defn draw-tentacle [coords]
   (doall (for [[x1 y1 x2 y2 involved? color z1 z2] coords]
            ^{:key (hash (str x1 y1 x2 y2 "lines-flow"))}
-           (let [zoom-multi (get @db/pan-zoom-offsets 2)] ;;[flow-id @(re-frame/subscribe [::selected-flow])]
+           (let [zoom-multi (get @db/pan-zoom-offsets 2)] ;;[flow-id @(ut/tracked-subscribe [::selected-flow])]
              [:path {:stroke-width (* 8 zoom-multi) ;(if involved? 16 13)
                      :stroke       color ;;(if involved? color "#ffffff22") ;(if (or involved? nothing-selected?)
                     ;:style      {:animation "rotate linear infinite"}
@@ -1331,8 +1331,8 @@
 (defn draw-lines [coords]
   (doall (for [[x1 y1 x2 y2 involved? color z1 z2 z1a z2a] coords]
            ^{:key (hash (str x1 y1 x2 y2 "lines-flow"))}
-           (let [flow-id @(re-frame/subscribe [::selected-flow])
-                 flow-select @(re-frame/subscribe [::selected-flow-block])
+           (let [flow-id @(ut/tracked-subscribe [::selected-flow])
+                 flow-select @(ut/tracked-subscribe [::selected-flow-block])
                  selected-i (get-in @flow-details-block-container-atom [flow-id flow-select :port-panel :in])
                  selected-o (get-in @flow-details-block-container-atom [flow-id flow-select :port-panel :out])
                  not-selected? (true? (and (nil? selected-i) (nil? selected-o)))
@@ -1343,28 +1343,28 @@
                  uid-hash (hash [x1 y1 x2 y2 involved? color z1 z2 z1a z2a])
                  ;running? (is-running? z1 flow-id)
                  react! [@db/running-blocks]
-                 flow-running? @(re-frame/subscribe [::is-running? :* flow-id])
-                 running? (and flow-running? @(re-frame/subscribe [::is-running? z2 flow-id]))
-                 waiting? (and flow-running? @(re-frame/subscribe [::is-waiting? z2 flow-id]))
-                 error?   @(re-frame/subscribe [::is-error? z2 flow-id])
+                 flow-running? @(ut/tracked-subscribe [::is-running? :* flow-id])
+                 running? (and flow-running? @(ut/tracked-subscribe [::is-running? z2 flow-id]))
+                 waiting? (and flow-running? @(ut/tracked-subscribe [::is-waiting? z2 flow-id]))
+                 error?   @(ut/tracked-subscribe [::is-error? z2 flow-id])
                  opacity 1.0 ;(if (or running? selected?) 1.0 0.5)
-                 done? (and flow-running? @(re-frame/subscribe [::is-done? z2 flow-id]))]
+                 done? (and flow-running? @(ut/tracked-subscribe [::is-done? z2 flow-id]))]
 
                 ;;  (when true ;(cstr/starts-with? (str z1a) ":push-path") ;; (or (= z1 :open-fn-1) (= z2 :open-fn-1))
                 ;;    (tap> [:cc push-path? waiting? selected? selected-i selected-o  z1 z1a z2 z2a]))
 
-                 ;selected-dash "" ;@(re-frame/subscribe [::selected-dash]) ;;; (get (theme-pull :theme/data-colors db/data-colors) "unknown")
-                ; relations "" ;@(re-frame/subscribe [::relations selected-dash])
-                ; selected  "" ;@(re-frame/subscribe [::selected])
+                 ;selected-dash "" ;@(ut/tracked-subscribe [::selected-dash]) ;;; (get (theme-pull :theme/data-colors db/data-colors) "unknown")
+                ; relations "" ;@(ut/tracked-subscribe [::relations selected-dash])
+                ; selected  "" ;@(ut/tracked-subscribe [::selected])
                 ; involved (vec (remove nil? (distinct (apply concat (filter #(some (fn [x] (= x selected)) %) relations)))))
                 ; nothing-selected? (nil? selected)
                 ;  involved1? (some #(= n1 %) involved)
                 ; involved2? (some #(= n2 %) involved)
                 ; involved? (and involved1? involved2?)
-                ; peek? @(re-frame/subscribe [::peek?])
+                ; peek? @(ut/tracked-subscribe [::peek?])
 
            ;; (tap> [:coords coords])
-            ; (tap> [:lines z1 z2 same-tab? @(re-frame/subscribe [::what-tab z1]) @(re-frame/subscribe [::what-tab z2])])
+            ; (tap> [:lines z1 z2 same-tab? @(ut/tracked-subscribe [::what-tab z1]) @(ut/tracked-subscribe [::what-tab z2])])
              ^{:key (str uid-hash)}
              [:path {:stroke-width (if (or done? running?) 10 7) ;(if selected? 11 6) ;(if involved? 16 13)
                      :stroke       (if (or selected? involved?) color (str color 75)) ;(if (or involved? nothing-selected?)
@@ -1424,7 +1424,7 @@
 ;;           y      (- start-y off-y)]
 ;;       ;(reset! db/flow-detached-coords [x y])
 ;;       (swap! flowmaps assoc bid (->
-;;                                  (get @(re-frame/subscribe [::flowmap]) bid)
+;;                                  (get @(ut/tracked-subscribe [::flowmap]) bid)
 ;;                                  (assoc :x (+ (- x xx 78)))
 ;;                                  ;(assoc :x (- x 0))
 ;;                                  (assoc :y  (- y yy 4)))))))
@@ -1572,8 +1572,8 @@
 
 (defn center-to-saved-coords []
   (when-let [z @db/zoomer]
-    (let [[positionX positionY scale] @(re-frame/subscribe [::zoom-start])]
-          ;bb @(re-frame/subscribe [::get-flow-brick])
+    (let [[positionX positionY scale] @(ut/tracked-subscribe [::zoom-start])]
+          ;bb @(ut/tracked-subscribe [::get-flow-brick])
 
       (tap> [positionX positionY scale])
       ;(.setTransform z positionX positionY scale 0)
@@ -1581,8 +1581,8 @@
       ;(.zoomToElement z bb 1200)
       (js/setTimeout (fn []
                        ;(.centerView z)
-                       (.zoomToElement z @(re-frame/subscribe [::get-flow-brick]) 0.8))
-                       ;(let [[positionX positionY scale] @(re-frame/subscribe [::zoom-start])] (.setTransform z positionX positionY scale 0 ))
+                       (.zoomToElement z @(ut/tracked-subscribe [::get-flow-brick]) 0.8))
+                       ;(let [[positionX positionY scale] @(ut/tracked-subscribe [::zoom-start])] (.setTransform z positionX positionY scale 0 ))
                        ;(.zoomOut z 5)
                      1000)
 
@@ -1631,7 +1631,7 @@
 ;;           off-y (/ (+ (:y offset) yy) zoom-multi)
 ;;           x      (- (- (/ raw-x zoom-multi) (/ zoom-offset-x zoom-multi)) off-x)
 ;;           y      (- (- (/ raw-y zoom-multi) (/ zoom-offset-y zoom-multi)) off-y)]
-;;       (re-frame/dispatch-sync [::update-flowmap-coords bid x y]))))
+;;       (ut/tracked-dispatch-sync [::update-flowmap-coords bid x y]))))
 
 ;; (defn mouse-move-handler-block [offset bid]
 ;;   (let [last-coords (atom nil)]
@@ -1657,7 +1657,7 @@
 ;;         (when (or (not= snapped-x (first @last-coords))
 ;;                   (not= snapped-y (second @last-coords)))
 ;;           (reset! last-coords [snapped-x snapped-y])
-;;           (re-frame/dispatch-sync [::update-flowmap-coords bid snapped-x snapped-y]))))))
+;;           (ut/tracked-dispatch-sync [::update-flowmap-coords bid snapped-x snapped-y]))))))
 
 (defn mouse-move-handler-block [offset bid]
   (let [last-coords (atom nil)]
@@ -1684,7 +1684,7 @@
         (when (or (not= bounded-x (first @last-coords))
                   (not= bounded-y (second @last-coords)))
           (reset! last-coords [bounded-x bounded-y])
-          (re-frame/dispatch-sync [::update-flowmap-coords bid bounded-x bounded-y]))))))
+          (ut/tracked-dispatch-sync [::update-flowmap-coords bid bounded-x bounded-y]))))))
 
 ;:width "3200px" ;"6400px" ;(px ww)
 ;:height "2400px" ;"3600px" ;(px hh)
@@ -1793,7 +1793,7 @@
 
 ;; (defn resize-mouse-move-handler [offset sw sh sx sy bid]
 ;;   (fn [evt]
-;;     (let [[min-w min-h]   [100 60] ;@(re-frame/subscribe [::min-size block-id])
+;;     (let [[min-w min-h]   [100 60] ;@(ut/tracked-subscribe [::min-size block-id])
 ;;           is-mask?        false ;(= block-type "mask")
 ;;           is-square?      false ;(= block-type "image")
 ;;           zoom-multi      (get @db/pan-zoom-offsets 2)
@@ -1816,13 +1816,13 @@
 ;;                                 is-square? (+ (if (< w min-w) min-w w) 0)
 ;;                                 :else (if (< h min-h) min-h h))]
 ;;       (when (or (not (= hmax sh)) (not (= wmax sw)))
-;;         (re-frame/dispatch [::resize-block bid wmax hmax])))))
+;;         (ut/tracked-dispatch [::resize-block bid wmax hmax])))))
 
 
 (defn resize-mouse-move-handler [offset sw sh sx sy bid]
   (let [last-size (atom [sw sh])]
     (fn [evt]
-      (let [[min-w min-h]   [100 60] ;@(re-frame/subscribe [::min-size block-id])
+      (let [[min-w min-h]   [100 60] ;@(ut/tracked-subscribe [::min-size block-id])
             is-mask?        false ;(= block-type "mask")
             is-square?      false ;(= block-type "image")
             zoom-multi      (get @db/pan-zoom-offsets 2)
@@ -1849,10 +1849,10 @@
                                   :else (if (< snapped-h min-h) min-h snapped-h))]
         (when (or (not= hmax (second @last-size)) (not= wmax (first @last-size)))
           (reset! last-size [wmax hmax])
-          (re-frame/dispatch [::resize-block bid wmax hmax]))))))
+          (ut/tracked-dispatch [::resize-block bid wmax hmax]))))))
 
 (defn resize-mouse-down-handler [e bid]
-  (let [[w h] @(re-frame/subscribe [::size bid])
+  (let [[w h] @(ut/tracked-subscribe [::size bid])
         offset             {:x (- (.-clientX e) w)
                             :y (- (.-clientY e) h)}
         on-move            (resize-mouse-move-handler offset w h (.-clientX e) (.-clientY e) bid)]
@@ -2007,7 +2007,7 @@
 (defn ifnil [x n] (if (nil? x) n x))
 
 (defn remove-connections [bid pid input?]
-  (let [flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
+  (let [flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
         side-fn (if input? last first)
         conns-count (count (filter #(or (= (side-fn %) (keyword (str (gn bid) "/" (gn pid))))
                                         (if (or (= pid :in) (= pid :out))
@@ -2020,7 +2020,7 @@
                                        false)) ;; unnamed ports assumed
                                 flowmaps-connections)]
     (tap> [:removing bid pid (if input? :in :out) conns-count])
-    (re-frame/dispatch [::update-flowmap-connections new-connections])
+    (ut/tracked-dispatch [::update-flowmap-connections new-connections])
     conns-count))
 
 ;; (defn get-all-values [m k]
@@ -2034,7 +2034,7 @@
 ;; (get-all-values your-map :type)
 
 ;; (re-frame/reg-sub
-;;  ::conn/reserved-type-keywords ;; @(re-frame/subscribe [::conn/reserved-type-keywords])
+;;  ::conn/reserved-type-keywords ;; @(ut/tracked-subscribe [::conn/reserved-type-keywords])
 ;;  (fn [db]
 ;;    (let [lib-keys (try (vec (map edn/read-string (map :name (get-in db [:data :flow-fn-all-sys])))) (catch :default _ []))]
 ;;      (vec (into lib-keys
@@ -2043,12 +2043,12 @@
 ;;                  (vec (distinct (get-all-values (get-in db [:flows (get db :selected-flow)]) :type)))))))))
 
 ;; (defn conn/add-flow-block [x y & [body bid no-select?]]
-;;   (let [;bid (if bid bid (keyword (str "open-input-" (count @(re-frame/subscribe [::flowmap])))))
+;;   (let [;bid (if bid bid (keyword (str "open-input-" (count @(ut/tracked-subscribe [::flowmap])))))
 ;;         _ (tap> [:conn/add-flow-block bid])
 ;;         bid (keyword (cstr/replace (str (gn bid)) #"/" "-"))
 ;;         bid (if bid bid :open-input)
 ;;         _ (tap> [:ADD-pre-safe-bid bid])
-;;         safe-keys-reserved @(re-frame/subscribe [::conn/reserved-type-keywords])
+;;         safe-keys-reserved @(ut/tracked-subscribe [::conn/reserved-type-keywords])
 ;;         bid (ut/safe-key bid safe-keys-reserved)
 ;;         _ (tap> [:ADD-post-safe-bid bid])
 ;;         zoom-multi (get @db/pan-zoom-offsets 2)
@@ -2067,13 +2067,13 @@
 ;;                   :x drop-x :y drop-y :z 0
 ;;                   :ports {:in {:in :string}
 ;;                           :out {:out :string}}})]
-;;    ;(tap> [:adding-flow-block bid x y @(re-frame/subscribe [::flowmap])])
+;;    ;(tap> [:adding-flow-block bid x y @(ut/tracked-subscribe [::flowmap])])
 ;;    ;(swap! flowmaps assoc bid body)
-;;     (when (not no-select?) (re-frame/dispatch [::select-block bid]))
-;;     (re-frame/dispatch [::update-flowmap-key2 bid nil body])))
+;;     (when (not no-select?) (ut/tracked-dispatch [::select-block bid]))
+;;     (ut/tracked-dispatch [::update-flowmap-key2 bid nil body])))
 
 (defn remove-block [bid]
-  (let [flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
+  (let [flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
         new-connections (remove #(or (= (first %) bid) (= (last %) bid)
                                      (cstr/starts-with? (str (first %)) (str bid "/"))
                                      (cstr/starts-with? (str (last %)) (str bid "/")))
@@ -2089,9 +2089,9 @@
 ;;     (swap! flowmaps dissoc bid)
     (reset! flow-hover nil)
     (reset! port-hover2 nil)
-    (re-frame/dispatch [::select-block nil])
-    (re-frame/dispatch [::remove-flowmap-bid bid])
-    (re-frame/dispatch [::update-flowmap-connections new-connections])))
+    (ut/tracked-dispatch [::select-block nil])
+    (ut/tracked-dispatch [::remove-flowmap-bid bid])
+    (ut/tracked-dispatch [::update-flowmap-connections new-connections])))
 
 (re-frame/reg-sub
  ::selected-flow-block
@@ -2108,11 +2108,11 @@
  ;(reset! flow-select (if (= bid @flow-select) nil bid))
  ;(reset! flow-select bid)
   (tap> [:selecting-block2 bid])
-  (re-frame/dispatch [::select-block bid]))
+  (ut/tracked-dispatch [::select-block bid]))
 
 (defn connect-ports [src dest]
   (tap> [:connecting src dest])
-  (let [flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
+  (let [flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
         conns (vec (filter #(not (= (last %) :done)) flowmaps-connections))
         src (if (cstr/ends-with? (str src) "/*") ;; no need for *, will only confuse things. w/o it is implied. (since the multi-output ports are "fake" anyways. lol)
               (keyword (first (-> (str src) (cstr/replace #":" "") (cstr/split #"/")))) src)
@@ -2130,8 +2130,8 @@
 ;;     (reset! flowmaps-connections
 ;;             (conj @flowmaps-connections [src dest])
 ;;             (assoc-in db [:flows (get db :selected-flow) :connections] (conj flowmaps-connections)))
-    (re-frame/dispatch [::update-flowmap-connections conn-vec])
-    ;(re-frame/dispatch [::clean-connections])
+    (ut/tracked-dispatch [::update-flowmap-connections conn-vec])
+    ;(ut/tracked-dispatch [::clean-connections])
     ))
 
 (defn render-icon [icon bcolor & [size fsize]]
@@ -2218,7 +2218,7 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value   (ut/format-map (- width-int 24)
                                       (str value))
-            ; :onBlur  #(re-frame/dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
+            ; :onBlur  #(ut/tracked-dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
               :options {:mode              syntax ; "clojure"
                         :lineWrapping      true
                         :lineNumbers       false ;true
@@ -2250,9 +2250,9 @@
      :children [(if scrubber?
                   [bricks/scrubber-panel
                    true ; view?
-                   (let [oo @(re-frame/subscribe [::bricks/keypaths-in-flow-opts])
+                   (let [oo @(ut/tracked-subscribe [::bricks/keypaths-in-flow-opts])
                          oo (if (empty? oo) ;; grab defaults if somehow they havent been written in yet
-                              @(re-frame/subscribe [::opts-map])
+                              @(ut/tracked-subscribe [::opts-map])
                               oo)] oo)
                    [:opts flow-id] ;nil ;key-type
                    nil ;(get @param-search key-type)
@@ -2263,7 +2263,7 @@
                     :onBlur  #(let [opts (try (read-string (cstr/join " " (ut/cm-deep-values %)))
                                               (catch :default _ :err))]
                                 (when (map? opts)
-                                  (re-frame/dispatch [::set-flow-opts opts])))
+                                  (ut/tracked-dispatch [::set-flow-opts opts])))
                     :options {:mode              "clojure"
                               :lineWrapping      true
                               :lineNumbers       true
@@ -2301,7 +2301,7 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value   (if stringify? (str (edn/read-string value)) ; pr-str double quoted it, so we have to read it back to single quote it... weird TODO
                            (ut/format-map width-int (str value)))
-            ; :onBlur  #(re-frame/dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
+            ; :onBlur  #(ut/tracked-dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
               :options {:mode              syntax ; "clojure"
                         :lineWrapping      true ;false
                         :lineNumbers       false
@@ -2333,8 +2333,8 @@
 (re-frame/reg-sub
  ::port-color ;; [::port-color flow-id bid vk nil :data-type])
  (fn [_ [_ flow-id bid & [pid return-type]]]
-   (let [flow-map @(re-frame/subscribe [::flowmap])
-         override-value (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps (str flow-id) bid])
+   (let [flow-map @(ut/tracked-subscribe [::flowmap])
+         override-value (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps (str flow-id) bid])
          fmap (get flow-map bid)
          ports (get fmap :ports)
          data (get fmap :data)
@@ -2342,7 +2342,7 @@
          port-multi? (true? (or (map? value) (vector? value)))]
      ;(when (= bid :open-fn-1) (tap> [:pc1 bid pid return-type override-value value]))
      (if (nil? pid)
-       (let [flow-select @(re-frame/subscribe [::selected-flow-block])
+       (let [flow-select @(ut/tracked-subscribe [::selected-flow-block])
              selected? (= bid flow-select)
              python? (= (get data :syntax) "python")
              ttype (get-in fmap [:data :flow-item :type]
@@ -2356,7 +2356,7 @@
              styler-selected (get-in data [:flow-item :style-selected] {})
              styler (if selected? styler-selected styler)
            ;; sub-flow-lookup (when (= ttype :sub-flow)
-           ;;                   (let [subby-results (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps])
+           ;;                   (let [subby-results (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps])
            ;;                         sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (cstr/split (str k) "/"))) k}))
            ;;                         sfl (get sub-flow-lookup bid)] sfl))
             ;; dt (if (some #(= % :*) (keys outputs)) :map ;; if its a map always use map color for base block
@@ -2419,16 +2419,16 @@
 
 (defn step-ports [bid ports w input? flow-id x y & [done? bcolor]]
   (let [;;ports (into {} (for [e (range (+ 1 (rand-int 6)))] {(keyword (str "a" (rand-int 123))) (rand-nth [:any :string :vector :integer :float :boolean])})) ;; test
-        flow-select @(re-frame/subscribe [::selected-flow-block])
+        flow-select @(ut/tracked-subscribe [::selected-flow-block])
         valid-drops (when (and @dragging-port?
                                (not (= bid (first @dragged-port)))) ;; dont want to highlight self drop
                       (valid-drop-ports ports))
         react! [@port-hover @dragged-port @flow-details-block-container-atom]
-        binputs @(re-frame/subscribe [::block-inputs bid])
-        defaults (when input? @(re-frame/subscribe [::input-defaults bid]))
-        condi-ports (when (not input?) @(re-frame/subscribe [::condi-ports bid]))
-        push-ports (when (not input?) @(re-frame/subscribe [::push-ports bid]))
-        condi-valves (when condi-ports @(re-frame/subscribe [::bricks/condi-valves flow-id])) ;; react!
+        binputs @(ut/tracked-subscribe [::block-inputs bid])
+        defaults (when input? @(ut/tracked-subscribe [::input-defaults bid]))
+        condi-ports (when (not input?) @(ut/tracked-subscribe [::condi-ports bid]))
+        push-ports (when (not input?) @(ut/tracked-subscribe [::push-ports bid]))
+        condi-valves (when condi-ports @(ut/tracked-subscribe [::bricks/condi-valves flow-id])) ;; react!
         outport-keys (into (into (vec (sort-by str (keys ports))) (keys condi-ports)) (keys push-ports))
         ;; _ (when (not (empty? condi-ports))
         ;;     (tap> [:ports bid input? condi-ports ports ]))
@@ -2469,27 +2469,27 @@
                            hovered? (true? (= hover-key @port-hover))
                            hover-path (get-in @flow-details-block-container-atom [flow-id flow-select :port-panel (if input? :in :out)])
                            panel-hovered? (true? (= [bid k] hover-path))
-                           [ibid ivk] (if input? @(re-frame/subscribe [::get-incoming-port bid :in k]) [nil nil])
-                           port-color @(re-frame/subscribe [::port-color flow-id (or ibid bid) (or ivk k)])
+                           [ibid ivk] (if input? @(ut/tracked-subscribe [::get-incoming-port bid :in k]) [nil nil])
+                           port-color @(ut/tracked-subscribe [::port-color flow-id (or ibid bid) (or ivk k)])
                            has-default? (when input? (not (nil? (get defaults k))))
                            filled? (if input?
-                                     @(re-frame/subscribe [::get-incoming-port bid :in k])
-                                     (ut/ne? @(re-frame/subscribe [::get-outgoing-port bid (if input? :in :out) k])))
-                          ;;  _ (when (= bid :unpack-results-map) (tap> [:filler @(re-frame/subscribe [::get-outgoing-port bid :out k]) bid k]))
-                           ;ptype @(re-frame/subscribe  [::port-color flow-id (or ibid bid) (or ivk k) :data-type])
+                                     @(ut/tracked-subscribe [::get-incoming-port bid :in k])
+                                     (ut/ne? @(ut/tracked-subscribe [::get-outgoing-port bid (if input? :in :out) k])))
+                          ;;  _ (when (= bid :unpack-results-map) (tap> [:filler @(ut/tracked-subscribe [::get-outgoing-port bid :out k]) bid k]))
+                           ;ptype @(ut/tracked-subscribe  [::port-color flow-id (or ibid bid) (or ivk k) :data-type])
                            multi? (cstr/ends-with? (str k) "+")
                            pval1 (when (> (count ports) 1)
-                                   @(re-frame/subscribe [::port-color flow-id (or ibid bid) (or ivk k) :data-value])
-                                   ;@(re-frame/subscribe [::port-color flow-id bid nil :data-value])
+                                   @(ut/tracked-subscribe [::port-color flow-id (or ibid bid) (or ivk k) :data-value])
+                                   ;@(ut/tracked-subscribe [::port-color flow-id bid nil :data-value])
                                    )
                            ;;<i class= "fa-solid fa-circle-notch" ></i>
                            condi? (and (not input?) (cstr/starts-with? (str k) ":cond-path"))
                            push? (and (not input?) (cstr/starts-with? (str k) ":push-path"))
-                           valve-open? (when condi? @(re-frame/subscribe [::bricks/condi-valve-open? flow-id bid k])) ;; TODO needs bid
-                          ; port-color @(re-frame/subscribe [::port-color flow-id bid k])
+                           valve-open? (when condi? @(ut/tracked-subscribe [::bricks/condi-valve-open? flow-id bid k])) ;; TODO needs bid
+                          ; port-color @(ut/tracked-subscribe [::port-color flow-id bid k])
                           ;out? (not input?)
                           ;[xs ys] [(if out? (+ x w) x) (+ y 4 (+ 6 (* 1 22)))]
-                           ;;_ (tap> [:port-color bid input? port-color k ivk pval1 @(re-frame/subscribe [::port-color flow-id bid k :data-type])])
+                           ;;_ (tap> [:port-color bid input? port-color k ivk pval1 @(ut/tracked-subscribe [::port-color flow-id bid k :data-type])])
                            icon [re-com/md-icon-button
                                  :src (at)
                                 ;;  :md-icon-name (if done?
@@ -2623,7 +2623,7 @@
                            valid-drop?   [droppable-port icon bid k]
                            (and input? has-default?) [draggable-port icon flow-id bid {:from bid
                                                                                        :input-pid k
-                                                                                       :port-meta @(re-frame/subscribe [::meta-bundle bid k])
+                                                                                       :port-meta @(ut/tracked-subscribe [::meta-bundle bid k])
                                                                                        :flow-id flow-id
                                                                                        :keypath {}} v x y]
 
@@ -2633,7 +2633,7 @@
  (fn [db [_ bid]]
    (if (= (get-in db [:flows (get db :selected-flow) :map bid :data :drag-meta :type]) :open-block)
      (let [user-input (get-in db [:flows (get db :selected-flow) :map bid :data :user-input])
-           resolved-val @(re-frame/subscribe [::port-color (get db :selected-flow) bid :out :data-value])]
+           resolved-val @(ut/tracked-subscribe [::port-color (get db :selected-flow) bid :out :data-value])]
        (not (= user-input resolved-val))) false)))
 
 (re-frame/reg-sub
@@ -2652,14 +2652,14 @@
   (let [hovered?      (and (= bid (first @port-hover))
                            (not @dragging-flow?))
         ;ccolor (hsl->hex (complement bcolor))
-        running? @(re-frame/subscribe [::is-running? bid flow-id])
+        running? @(ut/tracked-subscribe [::is-running? bid flow-id])
         bcolor (if running? (theme-pull :theme/editor-outer-rim-color nil) bcolor)
         shades-color (try (vec (for  [s (shades bcolor)] (hsl->hex s))) (catch :default _ ["#ffffff"]))
         ;triad-color (vec (for  [s (triad bcolor)] (hsl->hex s)))
-        syntax @(re-frame/subscribe [::syntax bid])
+        syntax @(ut/tracked-subscribe [::syntax bid])
         tetrad-color (try (vec (for  [s (tetrad bcolor)] (hsl->hex s))) (catch :default _ ["#ffffff"])) ;; bad colors will crash it.
         mouse-down-fn #(mouse-down-handler-block % bid)
-        opts-map @(re-frame/subscribe [::opts-map])
+        opts-map @(ut/tracked-subscribe [::opts-map])
         has-override? (ut/ne? (get-in opts-map [:overrides bid]))
         ;running? (is-running? bid flow-id)
         
@@ -2668,7 +2668,7 @@
                ;;(tap> [:tbid cc bid w])
                (if (< cc llen) (str (subs (str bid) 0 cc) "..") bid))]
     ;(tap> [:center bid h w])
-    ;;(tap> [:image-check (count @(re-frame/subscribe [::image-check])) @(re-frame/subscribe [::image-check])])
+    ;;(tap> [:image-check (count @(ut/tracked-subscribe [::image-check])) @(ut/tracked-subscribe [::image-check])])
     ;(tap> [:checker (ut/is-base64? "Lato") (ut/is-base64? "")])
     ^{:key (str "flow-brick-center-" bid)}
     [re-com/v-box
@@ -2679,8 +2679,8 @@
      :justify :center
     ;;  :attr {:on-mouse-down mouse-down-fn
     ;;        ;:on-double-click #(when sub-flow-lookup
-    ;;        ;                    (re-frame/dispatch [::http/load-flow-w-alias
-    ;;        ;                                        (get-in @(re-frame/subscribe [::http/flow-results]) [:run-refs sub-flow-lookup 0]) (str sub-flow-lookup)]))
+    ;;        ;                    (ut/tracked-dispatch [::http/load-flow-w-alias
+    ;;        ;                                        (get-in @(ut/tracked-subscribe [::http/flow-results]) [:run-refs sub-flow-lookup 0]) (str sub-flow-lookup)]))
     ;;         :on-click #(select-block bid)}
      ;:gap "4px"
      :children [[re-com/h-box
@@ -2691,8 +2691,8 @@
                              :size "auto"
                              :attr {:on-mouse-down mouse-down-fn
            ;:on-double-click #(when sub-flow-lookup
-           ;                    (re-frame/dispatch [::http/load-flow-w-alias
-           ;                                        (get-in @(re-frame/subscribe [::http/flow-results]) [:run-refs sub-flow-lookup 0]) (str sub-flow-lookup)]))
+           ;                    (ut/tracked-dispatch [::http/load-flow-w-alias
+           ;                                        (get-in @(ut/tracked-subscribe [::http/flow-results]) [:run-refs sub-flow-lookup 0]) (str sub-flow-lookup)]))
                                     :on-click #(select-block bid)}
                              :style {:font-size "10px"
                                      :font-weight 700
@@ -2736,7 +2736,7 @@
                                        :transform-origin "11px 11px"
                                        ;:filter "drop-shadow(0.25rem 0.35rem 0.4rem rgba(0, 0, 0, 0.44))"
                                        :font-size "22px"}
-                               ;:on-click #(re-frame/dispatch [::run-current-flowmap])
+                               ;:on-click #(ut/tracked-dispatch [::run-current-flowmap])
                                ]
                               (when (and icon (>= w 125))
                                 [render-icon icon
@@ -2747,9 +2747,9 @@
                                    (first tetrad-color))
                                  20 17]))]]
                 (when (>= h 75)
-                  (let [pval @(re-frame/subscribe [::port-color flow-id bid :out :data-value])
-                        view-pval @(re-frame/subscribe [::port-color flow-id (keyword (str (cstr/replace (str bid) ":" "") "-vw")) :out :data-value])
-                        out-of-date? @(re-frame/subscribe [::input-out-of-date? bid])]
+                  (let [pval @(ut/tracked-subscribe [::port-color flow-id bid :out :data-value])
+                        view-pval @(ut/tracked-subscribe [::port-color flow-id (keyword (str (cstr/replace (str bid) ":" "") "-vw")) :out :data-value])
+                        out-of-date? @(ut/tracked-subscribe [::input-out-of-date? bid])]
 
                     ;; [re-com/box
                     ;;  :style {;:border-top (str "1px dashed " (ut/invert-hex-color bcolor) "45")
@@ -2867,14 +2867,14 @@
 
 
 (defn flow-grid [ww hh xx yy flowmaps-connections flow-id flow-map]
-  (let [selected-bid @(re-frame/subscribe [::selected-flow-block])
-        playing?     @(re-frame/subscribe [::audio/audio-playing?])
+  (let [selected-bid @(ut/tracked-subscribe [::selected-flow-block])
+        playing?     @(ut/tracked-subscribe [::audio/audio-playing?])
         done-block   (get (first (filter #(= (last %) :done) flowmaps-connections)) 0 :?)
-        zoom-unlocked? @(re-frame/subscribe [::zoom-unlocked?])
+        zoom-unlocked? @(ut/tracked-subscribe [::zoom-unlocked?])
         grid-line-color (str (theme-pull :theme/editor-outer-rim-color nil) 33)
         grid-line-color2 (str (theme-pull :theme/editor-outer-rim-color nil) 10)
-        ;audio-playing? @(re-frame/subscribe [::audio/audio-playing?])
-        reactions!   [@port-hover @involved @flow-details-block-container-atom @(re-frame/subscribe [::http/flow-results])]
+        ;audio-playing? @(ut/tracked-subscribe [::audio/audio-playing?])
+        reactions!   [@port-hover @involved @flow-details-block-container-atom @(ut/tracked-subscribe [::http/flow-results])]
         read-only-flow? (true? (cstr/includes? flow-id "/"))
         bounds-x (when read-only-flow? (apply min (for [[_ {:keys [x]}] flow-map :let []] x)))
         bounds-y (when read-only-flow? (- (apply min (for [[_ {:keys [y]}] flow-map :let []] y)) 30))
@@ -2886,7 +2886,7 @@
                                         (gn (first (vals (get-in flow-map [done-block :ports :out])))))
                                     (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500")))]
 
-   ;;(tap> [:run @(re-frame/subscribe [::http/flow-results])])
+   ;;(tap> [:run @(ut/tracked-subscribe [::http/flow-results])])
 
    ;(tap> [:flow-hover @flow-hover])
 ;;    (zoom-to-element "flow-brick-:open-input-1" 10)
@@ -2915,13 +2915,13 @@
                                  done-block?     (= bid done-block)
                                  hover-involved? (true? (some #(= % bid) (get-in @flow-details-block-container-atom [flow-id :involved])))
                            ;running?        (is-running? bid flow-id)
-                                 running?         @(re-frame/subscribe [::is-running? bid flow-id])
-                                 error?        @(re-frame/subscribe [::is-error? bid flow-id])
+                                 running?         @(ut/tracked-subscribe [::is-running? bid flow-id])
+                                 error?        @(ut/tracked-subscribe [::is-error? bid flow-id])
                            ;_ (tap> [:inny? (get-in @flow-details-block-container-atom [flow-id :involved])])
                            ;; python?         (= (get data :syntax) "python")
                            ;; styler          (get-in data [:flow-item :style] {})
                                  did             (str "flow-brick-" bid)
-                           ;; override-value  (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps (str flow-id) bid])
+                           ;; override-value  (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps (str flow-id) bid])
                            ;; value           (if override-value override-value (get data :user-input))
                             ;;     shake?          false ;(and playing? (some #(= % bid) @involved))
                          ;;styler-selected (get-in data [:flow-item :style-selected] {})
@@ -2935,7 +2935,7 @@
                            ;;                                   (gn (first (vals out-ports-map))))
                            ;;                               (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500"))))
                            ;;          (catch :default _ "orange"))
-                                 bcolor @(re-frame/subscribe [::port-color flow-id bid])
+                                 bcolor @(ut/tracked-subscribe [::port-color flow-id bid])
                            ;_ (when (= bid :open-fn-1) (tap> [bid :bcolor bcolor]))
                            ;_ (tap> selected?)
                                  ]
@@ -3039,14 +3039,14 @@
 ;;   (let [ww (- ww 16)
 ;;         hh (- hh 37)
 ;;         [xx yy] @db/flow-detached-coords
-;;        ;flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
-;;        ;flow-id @(re-frame/subscribe [::selected-flow])
-;;        ;flow-map @(re-frame/subscribe [::flowmap])
+;;        ;flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+;;        ;flow-id @(ut/tracked-subscribe [::selected-flow])
+;;        ;flow-map @(ut/tracked-subscribe [::flowmap])
 ;;         done-block (get (first (filter #(= (last %) :done) flowmaps-connections)) 0 :?)
 ;;         read-only-flow? (true? (cstr/includes? flow-id "/"))
 ;;        ;coords (generate-coords xx yy)
 ;;         react-hack [@dragging-port? @flow-hover @dragging-flow? @flow-drop-hover
-;;                     @(re-frame/subscribe [::http/flow-results]) @db/pan-zoom-offsets @dragging? @ports-react-render] ;; important to force re-render
+;;                     @(ut/tracked-subscribe [::http/flow-results]) @db/pan-zoom-offsets @dragging? @ports-react-render] ;; important to force re-render
 ;;        ;flow-selected :my-flow-1
 ;;         bounds-x (when read-only-flow? (apply min (for [[_ {:keys [x]}] flow-map :let []] x)))
 ;;         bounds-y (when read-only-flow? (apply min (for [[_ {:keys [y]}] flow-map :let []] y)))
@@ -3061,9 +3061,9 @@
 ;;                                     (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500")))]
 
 ;;    ;(tap> [:done-block done-block flow-map])
-;;    ;(tap> [:reserved-type-keywords @(re-frame/subscribe [::conn/reserved-type-keywords])])
+;;    ;(tap> [:reserved-type-keywords @(ut/tracked-subscribe [::conn/reserved-type-keywords])])
 ;;    ;(tap> [:generate-coords coords])
-;;    ;(tap> [:db/flow-results @(re-frame/subscribe [::http/flow-results])])
+;;    ;(tap> [:db/flow-results @(ut/tracked-subscribe [::http/flow-results])])
 
 ;;     ^{:key (str "flow-brick-grid")}
 ;;     [re-com/h-box
@@ -3084,7 +3084,7 @@
 ;;                             icon (if python? "zmdi-language-python" icon)
 ;;                             expandable-in? (get-in data [:flow-item :expandable?] false)
 ;;                             outputs (get ports :out)
-;;                             override-value (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps (str flow-id) bid])
+;;                             override-value (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps (str flow-id) bid])
 ;;                             outputs (if (and override-value (= (vec (keys outputs)) [:out])) ;; if we have return data,
 ;;                                       {:out (keyword (ut/data-typer override-value))} ;; change output data types to be more accurate
 ;;                                       outputs)
@@ -3094,11 +3094,11 @@
 ;;                             oy (* 30 zoom-multi)
 ;;                             mouse-down-fn #(mouse-down-handler-block % bid)
 ;;                             only-overridden? (and (empty? inputs)
-;;                                                   (not (nil? (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps (str flow-id) bid])))
-;;                                                   (not (= (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps (str flow-id) bid]) (get data :user-input))))
+;;                                                   (not (nil? (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps (str flow-id) bid])))
+;;                                                   (not (= (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps (str flow-id) bid]) (get data :user-input))))
 ;;                             value (if override-value override-value (get data :user-input))
 ;;                             error? (get value :error false)
-;;                             flow-select @(re-frame/subscribe [::selected-flow-block])
+;;                             flow-select @(ut/tracked-subscribe [::selected-flow-block])
 ;;                             selected? (= bid flow-select)
 ;;                             hovered? (= bid @flow-hover)
 ;;                             defaults (get-in data [:flow-item :defaults] {})
@@ -3114,7 +3114,7 @@
 ;;                             h (+ (if out-taller? 40 10) (* most-pills pill-size))
 ;;                             h (if (< h orig-h) orig-h h)
 ;;                             sub-flow-lookup (when (= ttype :sub-flow)
-;;                                               (let [subby-results (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps])
+;;                                               (let [subby-results (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps])
 ;;                                                     sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (cstr/split (str k) "/"))) k}))
 ;;                                                     sfl (get sub-flow-lookup bid)] sfl))
 ;;                             bcolor (try
@@ -3156,8 +3156,8 @@
 ;;                             :on-mouse-over #(when (not (= @flow-hover bid))
 ;;                                               (reset! flow-hover bid))
 ;;                             :on-double-click #(when sub-flow-lookup
-;;                                                 (re-frame/dispatch [::http/load-flow-w-alias
-;;                                                                     (get-in @(re-frame/subscribe [::http/flow-results]) [:run-refs sub-flow-lookup 0]) (str sub-flow-lookup)]))
+;;                                                 (ut/tracked-dispatch [::http/load-flow-w-alias
+;;                                                                     (get-in @(ut/tracked-subscribe [::http/flow-results]) [:run-refs sub-flow-lookup 0]) (str sub-flow-lookup)]))
 ;;                             :on-click #(select-block bid)
 ;;                             :on-mouse-leave #(reset! flow-hover nil)}
 ;;                            {})
@@ -3178,7 +3178,7 @@
 ;;                                                             :child (str k) ;; (if added? (str k " -") (str k))
 ;;                                                             :attr (cond out? {}
 ;;                                                                         (and (not out?) added?) {:on-context-menu #(do (remove-input bid k)
-;;                                                                                                                        (re-frame/dispatch [::delete-port bid k :in])
+;;                                                                                                                        (ut/tracked-dispatch [::delete-port bid k :in])
 ;;                                                                                                                        (reset! ports-react-render (rand-int 12345)))}
 ;;                                                                         :else {:on-context-menu #(remove-input bid k)})
 ;;                                                             :justify (if out? :end :start)
@@ -3233,7 +3233,7 @@
 ;;                                                                    :align :start
 ;;                                                                    :justify :center
 ;;                                                                    :size "none"
-;;                                                                    :attr {:on-click #(do (re-frame/dispatch [::add-port bid :in])
+;;                                                                    :attr {:on-click #(do (ut/tracked-dispatch [::add-port bid :in])
 ;;                                                                                          (reset! ports-react-render (rand-int 12345)))}
 ;;                                                                    :height (px (+ 3 pill-size))
 ;;                                                                    :width  (px (- longesti-w 10))
@@ -3510,9 +3510,9 @@
 ;(tap> [:safe-cpk (safe-cpk :theme/panel-1) (unsafe-cpk :theme>panel-1)])
 
 (defn get-flow-deps [panel-key body]
-  (let [all-sql-call-keys      @(re-frame/subscribe [::bricks/all-sql-call-keys])
-        sql-aliases-used       @(re-frame/subscribe [::bricks/panel-sql-aliases-in-views-body panel-key body])
-        valid-body-params      (vec (ut/deep-flatten @(re-frame/subscribe [::bricks/valid-body-params-in body])))
+  (let [all-sql-call-keys      @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
+        sql-aliases-used       @(ut/tracked-subscribe [::bricks/panel-sql-aliases-in-views-body panel-key body])
+        valid-body-params      (vec (ut/deep-flatten @(ut/tracked-subscribe [::bricks/valid-body-params-in body])))
         possible-datasets-used (set (for [e valid-body-params] (keyword (nth (cstr/split (ut/unkeyword e) #"/") 0))))
         used-datasets          (vec (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys))))
         value-walks-targets    [] ;(filter (fn [x] (and (cstr/includes? (str x) ".") (not (cstr/includes? (str %) ".*")))) valid-body-params)
@@ -3557,18 +3557,18 @@
                                 (ut/ne? (get-in @bricks/dragging-body [:flow-item :file-path])))
                         (let [inc-path (if (ut/ne? (get-in @bricks/dragging-body [:flow-item :file-path]))
                                          (get-in @bricks/dragging-body [:flow-item :file-path])
-                                         @(re-frame/subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]]))
-                              inc-loaded @(re-frame/subscribe [::sub-flow-loaded?])]
+                                         @(ut/tracked-subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]]))
+                              inc-loaded @(ut/tracked-subscribe [::sub-flow-loaded?])]
                           (when (and (not (= inc-path inc-loaded)) (not (= inc-path @last-loaded)))
                             (reset! last-loaded inc-path)
                             (tap> [:loading-sub-flow! inc-path inc-loaded])
-                            (re-frame/dispatch [::http/load-sub-flow inc-path]))))
+                            (ut/tracked-dispatch [::http/load-sub-flow inc-path]))))
       :on-drop #(when (or (empty? @port-hover) (nil? @port-hover)) ;; is not a port drop and intended to be a canvas drop
                   ;(do
                   (tap> [:dropped? @port-hover @dragged-port types-vec root @bricks/dragging-body element])
                   (if (and (= (get-in @bricks/dragging-body [:drag-meta :source-query]) :flows-sys) (not @drop-toggle?))
-                    (let [file-path @(re-frame/subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]])]
-                      (re-frame/dispatch [::http/load-flow file-path])
+                    (let [file-path @(ut/tracked-subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]])]
+                      (ut/tracked-dispatch [::http/load-flow file-path])
                       (tap> [:load-flow file-path])
                       ;(center-zoom-and-pan)
                       ;(center-to-saved-coords)
@@ -3593,9 +3593,9 @@
                                           (or (and (= (get-in @bricks/dragging-body [:drag-meta :source-query]) :flows-sys) @drop-toggle?) sub-flow-part?))
                           file-path (when sub-flow-drop? (if sub-flow-part?
                                                            (get-in @bricks/dragging-body [:flow-item :file-path])
-                                                           @(re-frame/subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]])))
+                                                           @(ut/tracked-subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]])))
                           _ (tap> [:dropper file-path sub-flow-part? sub-flow-drop?])
-                          sub-flow (when sub-flow-drop? @(re-frame/subscribe [::sub-flow-incoming]))
+                          sub-flow (when sub-flow-drop? @(ut/tracked-subscribe [::sub-flow-incoming]))
                           _ (when sub-flow-drop? (tap> [:sub-flow-drop! (get sub-flow :file-path)]))
                           zoom-multi (get @db/pan-zoom-offsets 2)
                           zoom-offset-x (get @db/pan-zoom-offsets 0)
@@ -3698,7 +3698,7 @@
                                                                     (str "view/" (gn (get-in rooted-data [:drag-meta :source-panel-key])) "."
                                                                          (gn (get-in rooted-data [:drag-meta :source-table]))))
                                             panel-key              (get-in rooted-data [:drag-meta :source-panel-key])
-                                            body                   @(re-frame/subscribe [::bricks/resolve-view-alias view-ref])
+                                            body                   @(ut/tracked-subscribe [::bricks/resolve-view-alias view-ref])
                                             res-params-map-types (get-flow-deps panel-key body)]
                                    ;(tap> [:view view-ref body all-params res-params-map res-params-map-types])
                                         {:w 200 :h 100
@@ -3720,7 +3720,7 @@
                                        :icon "zmdi-tune"
                                        :ports {:in {}
                                                :out {:out (keyword (ut/data-typer
-                                                                    @(re-frame/subscribe
+                                                                    @(ut/tracked-subscribe
                                                                       [::conn/clicked-parameter-key
                                                                        [(get-in rooted-data [:drag-meta :param-full])]])))}}}
 
@@ -3740,13 +3740,13 @@
                                          :icon "zmdi-grid"
                                          :ports {:in {}
                                                  :out {:out (keyword (ut/data-typer
-                                                                 ;@(re-frame/subscribe [::conn/clicked-parameter-key [cell-ref]])
+                                                                 ;@(ut/tracked-subscribe [::conn/clicked-parameter-key [cell-ref]])
                                                                       (first (resolver/logic-and-params [cell-ref] nil))))}}})
 
                                       (= dm-type :query)
                                       (let [panel-key              (get-in rooted-data [:drag-meta :source-panel-key])
                                             qid                    (get-in rooted-data [:drag-meta :source-table])
-                                            body                   @(re-frame/subscribe [::bricks/find-query qid])
+                                            body                   @(ut/tracked-subscribe [::bricks/find-query qid])
                                             res-params-map-types   (get-flow-deps panel-key body)]
                                         (tap> [:qbody body])
                                         {:w 200 :h 60
@@ -3765,17 +3765,17 @@
                           flow-id (cond
                                     sub-flow-drop? (ut/safe-key
                                                     (try (edn/read-string (get sub-flow :flow-id)) (catch :default _ :name-issue!))
-                                                 ;(vec (keys @(re-frame/subscribe [::flowmap])))
-                                                    @(re-frame/subscribe [::conn/reserved-type-keywords]))
+                                                 ;(vec (keys @(ut/tracked-subscribe [::flowmap])))
+                                                    @(ut/tracked-subscribe [::conn/reserved-type-keywords]))
 
                                     flow-item (ut/safe-key
                                                (try (edn/read-string (get flow-item :name)) (catch :default _ :name-issue!))
-                                            ;(vec (keys @(re-frame/subscribe [::flowmap])))
-                                               @(re-frame/subscribe [::conn/reserved-type-keywords]))
+                                            ;(vec (keys @(ut/tracked-subscribe [::flowmap])))
+                                               @(ut/tracked-subscribe [::conn/reserved-type-keywords]))
 
                                     :else (or (get-in rooted-data [:drag-meta :source-table])
                                               (get-in rooted-data [:drag-meta :param-full])))
-                          safe-keys-reserved @(re-frame/subscribe [::conn/reserved-type-keywords])
+                          safe-keys-reserved @(ut/tracked-subscribe [::conn/reserved-type-keywords])
                           src-block (cstr/replace (str (get-in rooted-data [:drag-meta :src-bid])) ":" "")
                           src-port (cstr/replace (str (get-in rooted-data [:drag-meta :src-pid])) ":" "")
                           check-port-drop (cond
@@ -3803,7 +3803,7 @@
                       (cond
                         false "hey"
 
-                   ; (get rooted-data :file_path) ;; (get @(re-frame/subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
+                   ; (get rooted-data :file_path) ;; (get @(ut/tracked-subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
                         :else (do ;;(tap> [:flow-inherits-drag-body? @bricks/dragging-body data drop-x drop-y flow-body flow-id check-port-drop])
                                 (conn/add-flow-block drop-x drop-y flow-body (if from-port? check-port-drop flow-id) browser-pull?)
                                 (when from-port?
@@ -3839,14 +3839,14 @@
 ;;       (.requestAnimationFrame js/window step))))
 
 
-;;@(re-frame/subscribe [::bricks/flow-editor?])
+;;@(ut/tracked-subscribe [::bricks/flow-editor?])
 
 (def current-index (atom 0))
 (def scrolly-pos (reagent/atom nil))
 
 (defn handle-wheel [event]
   (let [direction (if (> (.-deltaY event) 0) 1 -1)
-        items (vec (keys @(re-frame/subscribe [::flowmap])))
+        items (vec (keys @(ut/tracked-subscribe [::flowmap])))
        ;curr-value @flow-hover
         new-index (max 0 (min (count items) (+ @current-index direction)))]
     (tap> [:scrolled-to new-index])
@@ -3871,7 +3871,7 @@
         element (gdom/getElement element-id)
         container-left (.-scrollLeft container)
        ;element-left (.-offsetLeft element)
-        element-left (- (.-offsetLeft element) (if @(re-frame/subscribe [::bricks/flow-editor?]) 640 40))]
+        element-left (- (.-offsetLeft element) (if @(ut/tracked-subscribe [::bricks/flow-editor?]) 640 40))]
         ;; 40 is the width of the sidebar, so offset
 
     (when true ;(not (= @flow-select @scrolly-pos))
@@ -3880,7 +3880,7 @@
         (letfn [(step [timestamp]
                   (when (nil? @start) (reset! start timestamp))
                   (let [progress (/ (- timestamp @start) duration)
-                        flow-select @(re-frame/subscribe [::selected-flow-block])
+                        flow-select @(ut/tracked-subscribe [::selected-flow-block])
                         new-scroll-left (+ container-left (* progress (- element-left container-left)))]
                    ;(tap> [:scroll-assholes container-left element-left (Math/floor new-scroll-left)])
                     (reset! scrolly-pos flow-select)
@@ -3894,7 +3894,7 @@
         element (gdom/getElement element-id)
         container-left (.-scrollLeft container)
        ;element-left (.-offsetLeft element)
-        element-left (- (.-offsetLeft element) (if @(re-frame/subscribe [::bricks/flow-editor?]) 610 10))]
+        element-left (- (.-offsetLeft element) (if @(ut/tracked-subscribe [::bricks/flow-editor?]) 610 10))]
     (set! (.-scrollLeft container) (- element-left container-left))))
 
 (defn code-box-rw [width-int height-int value bid]
@@ -3912,12 +3912,12 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value   (ut/format-map (- width-int 24)
                                       (str value))
-             ;:onBlur  #(re-frame/dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
+             ;:onBlur  #(ut/tracked-dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
              ;:onBlur  #(try (swap! flowmaps assoc bid (read-string (cstr/join " " (ut/cm-deep-values %)))) (catch :default _ (swap! flowmaps assoc bid value)))
               :onBlur #(try
                          (let [new-vals (read-string (cstr/join " " (ut/cm-deep-values %)))]
-                           (re-frame/dispatch [::update-flowmap-key bid nil new-vals]))
-                         (catch :default _ (re-frame/dispatch [::update-flowmap-key bid nil value])))
+                           (ut/tracked-dispatch [::update-flowmap-key bid nil new-vals]))
+                         (catch :default _ (ut/tracked-dispatch [::update-flowmap-key bid nil value])))
               :options {:mode              "clojure"
                         :lineWrapping      true
                         :lineNumbers       true
@@ -3944,7 +3944,7 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value   (ut/format-map (- width-int 24)
                                       (str value))
-             ;:onBlur  #(re-frame/dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
+             ;:onBlur  #(ut/tracked-dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
              ;:onBlur  #(try (swap! flowmaps assoc bid (read-string (cstr/join " " (ut/cm-deep-values %)))) (catch :default _ (swap! flowmaps assoc bid value)))
               :onBlur #(try
                          (let [new-vals (read-string (cstr/join " " (ut/cm-deep-values %)))]
@@ -3975,12 +3975,12 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value   (ut/format-map (- width-int 24)
                                       (str value))
-             ;:onBlur  #(re-frame/dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
+             ;:onBlur  #(ut/tracked-dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
              ;:onBlur  #(try (swap! flowmaps assoc bid (read-string (cstr/join " " (ut/cm-deep-values %)))) (catch :default _ (swap! flowmaps assoc bid value)))
               :onBlur #(try
                          (let [new-vals (read-string (cstr/join " " (ut/cm-deep-values %)))]
-                           (re-frame/dispatch [::update-connections new-vals]))
-                         (catch :default _ (re-frame/dispatch [::update-flowmap-key bid nil value])))
+                           (ut/tracked-dispatch [::update-connections new-vals]))
+                         (catch :default _ (ut/tracked-dispatch [::update-flowmap-key bid nil value])))
               :options {:mode              "clojure"
                         :lineWrapping      true
                         :lineNumbers       true
@@ -4008,7 +4008,7 @@
              {:value   value
               :onBlur #(try
                          (let [new-vals (ut/cm-deep-values %)]
-                           (re-frame/dispatch [::update-flowmap-key bid :description new-vals]))
+                           (ut/tracked-dispatch [::update-flowmap-key bid :description new-vals]))
                          (catch :default _ (tap> [:issue-saving bid :text-rw (ut/cm-deep-values %)])))
               :options {:mode              "text"
                         :lineWrapping      true
@@ -4029,7 +4029,7 @@
                        (filter keyword? (ut/deep-flatten value)))
                      (catch :default _ []))
         ;_ (tap> [:value value])
-        opts @(re-frame/subscribe [::opts-map])
+        opts @(ut/tracked-subscribe [::opts-map])
         uses (vec (cset/intersection (set value-keys) (set (keys opts))))
         using-opts? (not (empty? uses))]
     [re-com/v-box
@@ -4050,11 +4050,11 @@
                               ;;  ports (try (second new-vals)
                               ;;             (catch :default _ (do (tap> [:error-making-arity-to-ports bid value new-vals]) [])))
 
-                               (re-frame/dispatch [::update-flowmap-key-in bid [:ports :in] fin])
-                               (re-frame/dispatch [::update-flowmap-key bid :raw-fn new-vals])
-                               (re-frame/dispatch [::clean-connections]))
+                               (ut/tracked-dispatch [::update-flowmap-key-in bid [:ports :in] fin])
+                               (ut/tracked-dispatch [::update-flowmap-key bid :raw-fn new-vals])
+                               (ut/tracked-dispatch [::clean-connections]))
                              (catch :default e (do (tap> [:error-saving-fn! (str e)])
-                                                   (re-frame/dispatch [::update-flowmap-key bid :raw-fn value]))))
+                                                   (ut/tracked-dispatch [::update-flowmap-key bid :raw-fn value]))))
                   :options {:mode              "clojure"
                             :lineWrapping      true
                             :lineNumbers       true
@@ -4074,7 +4074,7 @@
 
 (defn code-box-condi [width-int height-int value bid name]
   (let [value-keys (filter keyword? (ut/deep-flatten value))
-        opts @(re-frame/subscribe [::opts-map])
+        opts @(ut/tracked-subscribe [::opts-map])
         uses (vec (cset/intersection (set value-keys) (set (keys opts))))
         using-opts? (not (empty? uses))]
     [re-com/v-box
@@ -4089,7 +4089,7 @@
      :children [[(reagent/adapt-react-class cm/UnControlled)
                  {:value   (ut/format-map (- width-int 50)
                                           (str value))
-                  :onBlur #(re-frame/dispatch [::edit-condi-port bid name (read-string (cstr/join " " (ut/cm-deep-values %)))])
+                  :onBlur #(ut/tracked-dispatch [::edit-condi-port bid name (read-string (cstr/join " " (ut/cm-deep-values %)))])
                   :options {:mode              "clojure"
                             :lineWrapping      true
                             :lineNumbers       true
@@ -4110,9 +4110,9 @@
 (defn code-box-view [width-int height-int fmap bid flow-id]
   (let [value (get fmap :view) ;; we want nil if not being used. '(fn [x] [:box :child (str x)]))
         value-keys (filter keyword? (ut/deep-flatten value))
-        ;;bid @(re-frame/subscribe [::selected-flow-block]) ;; force rerender due to react "stickiness"
+        ;;bid @(ut/tracked-subscribe [::selected-flow-block]) ;; force rerender due to react "stickiness"
         bg-shade "#00000055"
-        opts @(re-frame/subscribe [::opts-map])
+        opts @(ut/tracked-subscribe [::opts-map])
         uses (vec (cset/intersection (set value-keys) (set (keys opts))))
         using-opts? (not (empty? uses))]
     [re-com/box
@@ -4138,7 +4138,7 @@
                            :onBlur #(do (tap> [:edit-view-fn bid (cstr/join " " (ut/cm-deep-values %))
                                                (try (read-string (cstr/join " " (ut/cm-deep-values %)))
                                                     (catch :default e (str :error e)))])
-                                        (re-frame/dispatch [::edit-view-fn bid (read-string (cstr/join " " (ut/cm-deep-values %)))]))
+                                        (ut/tracked-dispatch [::edit-view-fn bid (read-string (cstr/join " " (ut/cm-deep-values %)))]))
                            :options {:mode              "clojure"
                                      :lineWrapping      true
                                      :lineNumbers       true
@@ -4156,7 +4156,7 @@
                     :child [code-box width-int nil (str ";; using flow opts:  "
                                                         (pr-str (select-keys opts uses)))]])
 
-                 (let [condi-ports @(re-frame/subscribe [::push-ports bid])
+                 (let [condi-ports @(ut/tracked-subscribe [::push-ports bid])
                        selected (get-in @flow-details-block-container-atom [flow-id bid :port-panel :out])
                        cnt (count (keys condi-ports))
                        open? (true? (get-in @flow-details-block-container-atom [flow-id bid :push-paths :open?] false))]
@@ -4190,7 +4190,7 @@
                                                                 :cursor "pointer"}]
                                                        [re-com/box :child (str "push paths (" cnt ")")]]]
                                            [re-com/md-icon-button
-                                            :on-click #(re-frame/dispatch [::add-push-port bid])
+                                            :on-click #(ut/tracked-dispatch [::add-push-port bid])
                                             :md-icon-name "zmdi-plus"
                                             :style {:font-size "22px"
                                                     :cursor "pointer"}]]]
@@ -4206,7 +4206,7 @@
                                   :padding "4px"
                                   :children (for [[k {:keys [dest]}] condi-ports
                                                   :let [select-vec [bid k]
-                                                        valve-open? false ;@(re-frame/subscribe [::bricks/condi-valve-open? flow-id bid k])
+                                                        valve-open? false ;@(ut/tracked-subscribe [::bricks/condi-valve-open? flow-id bid k])
                                                         selected? (or (and @sniffy-sniff (= @port-hover2 bid)
                                                                            (= k (get @sniffy-sniff 1)))
                                                                       (= select-vec selected))
@@ -4243,7 +4243,7 @@
                                                              :children [[re-com/v-box :children (for [d dest] [re-com/box :child (str d)])]
                                                                         [re-com/md-icon-button :src (at)
                                                                          :md-icon-name "zmdi-close"
-                                                                         :on-click #(re-frame/dispatch [::remove-push-port bid k])
+                                                                         :on-click #(ut/tracked-dispatch [::remove-push-port bid k])
                                                                          :style {:cursor "pointer"
                                                                                  :font-size "16px"}]]]]]
                                                 [re-com/h-box
@@ -4287,7 +4287,7 @@
                                    value
                          ;(str (cstr/join "\n" value))
                                    (ut/format-map (- width-int 24) (pr-str value)))
-             ;:onBlur  #(re-frame/dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
+             ;:onBlur  #(ut/tracked-dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
                         :onBlur  #(if stringify?
 
                                     (let [ddata (ut/cm-deep-values %)
@@ -4298,12 +4298,12 @@
                                                                    :let [name (keyword (cstr/replace (str (ut/unkeyword (get inputs e))) "/" "-"))]]
                                                                {name :any}))]
 
-                                      (re-frame/dispatch [::update-flowmap-key-in bid [:ports :in] input-map])
-                                      (re-frame/dispatch [::update-flowmap-key-in bid [:data :user-input] ddata])
-                                      (re-frame/dispatch [::update-flowmap-key-in bid [:data :flow-item :inputs] (vec inputs)])
-                                      (re-frame/dispatch [::update-flowmap-key-in bid [:ports :out] {:out :any}])
-                                      (re-frame/dispatch [::clean-connections]))
-                            ;(re-frame/dispatch [::update-flowmap-key bid nil full])
+                                      (ut/tracked-dispatch [::update-flowmap-key-in bid [:ports :in] input-map])
+                                      (ut/tracked-dispatch [::update-flowmap-key-in bid [:data :user-input] ddata])
+                                      (ut/tracked-dispatch [::update-flowmap-key-in bid [:data :flow-item :inputs] (vec inputs)])
+                                      (ut/tracked-dispatch [::update-flowmap-key-in bid [:ports :out] {:out :any}])
+                                      (ut/tracked-dispatch [::clean-connections]))
+                            ;(ut/tracked-dispatch [::update-flowmap-key bid nil full])
 
 
                                     (try (let [ddata (read-string (cstr/join " " (ut/cm-deep-values %)))
@@ -4324,22 +4324,22 @@
                                                                             (cstr/starts-with? (str x) ":*")
                                                                             (cstr/ends-with? (str x) "*"))))
                                                               (ut/deep-flatten ddata))
-                                               flow-id @(re-frame/subscribe [::selected-flow])
-                                               existing-inputs (get-in @(re-frame/subscribe [::flowmap]) [flow-id bid :ports :in])
+                                               flow-id @(ut/tracked-subscribe [::selected-flow])
+                                               existing-inputs (get-in @(ut/tracked-subscribe [::flowmap]) [flow-id bid :ports :in])
                                                inputs-map (into {} (for [i inputs] {i (get existing-inputs i :any)}))]
-                                     ;; full (-> (get @(re-frame/subscribe [::flowmap]) bid)
+                                     ;; full (-> (get @(ut/tracked-subscribe [::flowmap]) bid)
                                      ;;          (assoc-in [:data :user-input] ddata)
                                      ;;          (assoc-in [:ports] ports))
 
                               ;(swap! flowmaps assoc bid full)
-                                 ;(re-frame/dispatch [::update-flowmap-key bid nil full])
-                                           (re-frame/dispatch [::update-flowmap-key-in bid [:ports :in] inputs-map])
-                                           (re-frame/dispatch [::update-flowmap-key-in bid [:data :user-input] ddata])
-                                           (re-frame/dispatch [::update-flowmap-key-in bid [:ports :out] ports])
-                                           (re-frame/dispatch [::clean-connections]))
+                                 ;(ut/tracked-dispatch [::update-flowmap-key bid nil full])
+                                           (ut/tracked-dispatch [::update-flowmap-key-in bid [:ports :in] inputs-map])
+                                           (ut/tracked-dispatch [::update-flowmap-key-in bid [:data :user-input] ddata])
+                                           (ut/tracked-dispatch [::update-flowmap-key-in bid [:ports :out] ports])
+                                           (ut/tracked-dispatch [::clean-connections]))
                                          (catch :default e (tap> [:saving-issue :code-box-rwo bid (str e) :parse-issue?]))))
                                                 ;;(swap! flowmaps assoc-in [bid :data :user-input] value)
-                                                ;;(re-frame/dispatch [::update-flowmap-key bid nil vval])
+                                                ;;(ut/tracked-dispatch [::update-flowmap-key bid nil vval])
                         :options {:mode              syntax ;"clojure"
                                   :lineWrapping      true
                                   :lineNumbers       true
@@ -4358,7 +4358,7 @@
                              (not
                               (or (cstr/ends-with? (str title) "*")
                                   (cstr/ends-with? (str title) "browser")))))
-        flow-select @(re-frame/subscribe [::selected-flow-block])
+        flow-select @(ut/tracked-subscribe [::selected-flow-block])
         sys? (nil? flow-select)
         dyn-width (if (not sys?) 600 (last @db/flow-editor-system-mode))]
     ;;(tap> [:panel-deets open? title flow-id bid])
@@ -4432,17 +4432,17 @@
         type (cond (= (get-in fmap [:data :source-panel]) :flow-fn-list*) :flow-part
                    :else (get-in fmap [:data :drag-meta :type]))
         ttype (get-in fmap [:data :drag-meta :type])
-        flow-select @(re-frame/subscribe [::selected-flow-block])
+        flow-select @(ut/tracked-subscribe [::selected-flow-block])
         selected? (= (str id) (str flow-select))
         hovered? (= (str id) (str @flow-hover))
-        raw-fmap @(re-frame/subscribe [::flowmap-raw-block id]) ;;(get @flowmaps id)
-        flow-id @(re-frame/subscribe [::selected-flow])
-        cvalue (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps flow-id id] "(not run yet)")
+        raw-fmap @(ut/tracked-subscribe [::flowmap-raw-block id]) ;;(get @flowmaps id)
+        flow-id @(ut/tracked-subscribe [::selected-flow])
+        cvalue (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps flow-id id] "(not run yet)")
         error? (get cvalue :error false)
         styler (get-in fmap [:data :flow-item :style] {})
         ;styler-selected (get-in fmap [:data :flow-item :style-selected] {})
         outputs (get-in fmap [:ports :out])
-        override-value (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps (str flow-id) id])
+        override-value (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps (str flow-id) id])
         outputs (if (and override-value (= (vec (keys outputs)) [:out])) ;; if we have return data,
                   {:out (keyword (ut/data-typer override-value))} ;; change output data types to be more accurate
                   outputs)
@@ -4468,7 +4468,7 @@
                          :width             "200px"
                          :on-change #(do (if (= str-id (str %)) ;; regex doesnt allow : so we need to remove before
                                            (reset! rename-block nil)
-                                           (do (re-frame/dispatch [::rename-block id %])
+                                           (do (ut/tracked-dispatch [::rename-block id %])
                                                (reset! rename-block nil))))
                          :validation-regex  flow-id-regex
                          :change-on-blur?   true
@@ -4483,11 +4483,11 @@
         ;show-output? (or (get-in fmap [:data :view-output?] false) output?)
         output-toggle [re-com/md-icon-button :src (at)
                        :md-icon-name "zmdi-more"
-                       :on-click #(re-frame/dispatch [::flow-block-meta id :view-output? (not show-output?)])
+                       :on-click #(ut/tracked-dispatch [::flow-block-meta id :view-output? (not show-output?)])
                        :style {:color ccolor ; (theme-pull :theme/editor-outer-rim-color nil)
                                :cursor "pointer"
                                ;:height "15px"
-                               ;:margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                               ;:margin-left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "-9px" "9px")
                                :font-size "17px"}]
         ;cvalue (if error?
         ;         (get cvalue :error)
@@ -4569,7 +4569,7 @@
 
                   (= @editor-mode :debug)
                   [re-com/box :child [(if read-only-flow? code-box code-box-rw) 600 440
-                                    ;(get @(re-frame/subscribe [::flowmap]) @flow-select)
+                                    ;(get @(ut/tracked-subscribe [::flowmap]) @flow-select)
                                       raw-fmap ;(get fmap flow-select)
                                       flow-select]
                    :width "600px" :height "430px" :size "1"]
@@ -4591,10 +4591,10 @@
                                :child [code-box-fn ccw 378 (str (get fmap :raw-fn "(fn [x] x)")) id]]]]
 
                   (= type :sub-flow)
-                  (let [;flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
-                    ;flow-id @(re-frame/subscribe [::selected-flow])
-                    ;flow-map @(re-frame/subscribe [::flowmap])
-                        subby-results (get-in @(re-frame/subscribe [::http/flow-results]) [:return-maps])
+                  (let [;flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+                    ;flow-id @(ut/tracked-subscribe [::selected-flow])
+                    ;flow-map @(ut/tracked-subscribe [::flowmap])
+                        subby-results (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps])
                         sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (cstr/split (str k) "/"))) k}))
                         sfl (get sub-flow-lookup id)]
                     ;(tap> [:lookups sub-flow-lookup sfl])
@@ -4684,7 +4684,7 @@
                                                                   :children (for [e widths
                                                                                   :let [selected? (= e width)]]
                                                                               [re-com/box
-                                                                               :attr (when (not selected?) {:on-click #(re-frame/dispatch [::flow-block-meta id :width e])})
+                                                                               :attr (when (not selected?) {:on-click #(ut/tracked-dispatch [::flow-block-meta id :width e])})
                                                                                :style (if selected? {} {:opacity 0.4 :cursor "pointer"})
                                                                                :child (str e)])]
                                                                  [re-com/h-box
@@ -4692,7 +4692,7 @@
                                                                   :children (for [e syntaxes
                                                                                   :let [selected? (= e syntax)]]
                                                                               [re-com/box
-                                                                               :attr (when (not selected?) {:on-click #(re-frame/dispatch [::flow-block-meta id :syntax e])})
+                                                                               :attr (when (not selected?) {:on-click #(ut/tracked-dispatch [::flow-block-meta id :syntax e])})
                                                                                :style (if selected? {} {:opacity 0.4 :cursor "pointer"})
                                                                                :child (str e)])]]]]])
                   (= type :flow-part) default-output
@@ -4709,8 +4709,8 @@
                   ;;                                  :child (str (get-in fmap [:data :user-input] cvalue))]]]
                   (= type :query) (let [qid (get-in fmap [:data :drag-meta :source-table]) ;; original query
                                         connection-id (get-in fmap [:data :connection-id])
-                                        query-body @(re-frame/subscribe [::bricks/find-query qid])
-                                    ;q (get @(re-frame/subscribe [::conn/clicked-parameter-key [:queries-sys]]) qid)
+                                        query-body @(ut/tracked-subscribe [::bricks/find-query qid])
+                                    ;q (get @(ut/tracked-subscribe [::conn/clicked-parameter-key [:queries-sys]]) qid)
                                         packed-query (merge (-> query-body
                                                                 (assoc :connection-id connection-id))
                                                             {:_w 10 :_h 5})]
@@ -4861,7 +4861,7 @@
        :model             (str flow-id)
        :width             (px w)
        :height            "45px"
-       :on-change         #(do (re-frame/dispatch [::rename-flow flow-id %])
+       :on-change         #(do (ut/tracked-dispatch [::rename-flow flow-id %])
                                (reset! title-edit-idx nil))
        :validation-regex  flow-id-regex
        :change-on-blur?   true
@@ -4911,17 +4911,17 @@
 (defonce last-loaded-run-id (reagent/atom nil))
 
 (defn settings-block [flow-id ttype]
-  (let [flow-select @(re-frame/subscribe [::selected-flow-block])
-        flowmaps @(re-frame/subscribe [::flowmap-raw])
+  (let [flow-select @(ut/tracked-subscribe [::selected-flow-block])
+        flowmaps @(ut/tracked-subscribe [::flowmap-raw])
         dyn-width (last @db/flow-editor-system-mode)
         panel-height (* (.-innerHeight js/window) 0.50)
         panel-height-bricks (/ panel-height bricks/brick-size)
-        ;flow-id @(re-frame/subscribe [::selected-flow])
+        ;flow-id @(ut/tracked-subscribe [::selected-flow])
         read-only-flow? (true? (cstr/includes? flow-id "/"))]
     (cond
       (= ttype :run-history)
-      (let [caller @(re-frame/subscribe [::conn/clicked-parameter-key [:virtual-panel/client_name]])
-            status @(re-frame/subscribe [::conn/clicked-parameter-key [:virtual-panel/return_status]])
+      (let [caller @(ut/tracked-subscribe [::conn/clicked-parameter-key [:virtual-panel/client_name]])
+            status @(ut/tracked-subscribe [::conn/clicked-parameter-key [:virtual-panel/return_status]])
             dropdown1 {:view [:dropdown
                               {:choices :gen-viz-812aaa
                                :width   "300px"
@@ -5042,7 +5042,7 @@
                           :height 245
                           :margin {:top 0 :right 5 :bottom 20 :left 25}
                           :data :flow-history-calendar-sys*}]}
-            vselected? @(re-frame/subscribe [::conn/clicked-parameter-key [:virtual-panel/flow-day]])
+            vselected? @(ut/tracked-subscribe [::conn/clicked-parameter-key [:virtual-panel/flow-day]])
             ;; grid-menu {:select [:flow-id :runs] ;; union is not materilizing correctly?
             ;;            :col-widths {:runs 45 :flow_id 220}
             ;;            :from [{:union-all 
@@ -5081,7 +5081,7 @@
             
             gm-kw "grid-menu-sys*" ;; (str "kick-" (hash grid-menu) "-sys*")
             ;viz-kw (str "kick-" (hash viz1) "-sys*")
-            selected? @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str gm-kw "/flow_id"))]])
+            selected? @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str gm-kw "/flow_id"))]])
 
             ;; grid1 {:select
             ;;        [:flow_id
@@ -5133,8 +5133,8 @@
                                (if status [:= :in_error :virtual-panel/return_status] [:= 1 1])]
                        :from [[:flow_history :tt336a]]}
             grid-kw "grid1-sys*" ;;(str "kick-" (hash grid1) "-sys*")
-            selected-run-id @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])
-            selected-start-ts @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/start_ts"))]])
+            selected-run-id @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])
+            selected-start-ts @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/start_ts"))]])
             run-selected? (not (nil? selected-run-id))
             grid2 {:select [:*]
                    :connection-id "flows-db"
@@ -5155,7 +5155,7 @@
         ;; ^^ if is is changed and not nil - swap the loaded flow !!!
           (reset! last-loaded-run-id selected-run-id)
           ;;(js/alert (str selected-run-id))
-          (re-frame/dispatch [::http/load-flow-history selected-run-id selected-start-ts]))
+          (ut/tracked-dispatch [::http/load-flow-history selected-run-id selected-start-ts]))
 
         [re-com/v-box
                  ;:align :center
@@ -5214,10 +5214,10 @@
 
                     ;; [re-com/box :child (str "flow value, overrides, inputs (even if static)" selected-run-id)]
 
-                    ;; (let [run-id @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])]
+                    ;; (let [run-id @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid-kw "/run_id"))]])]
                     ;;   [re-com/box
                     ;;    :style {:cursor "pointer"}
-                    ;;    :attr {:on-click #(re-frame/dispatch [::http/load-flow-history run-id])}
+                    ;;    :attr {:on-click #(ut/tracked-dispatch [::http/load-flow-history run-id])}
                     ;;    :child (str run-id)])
 
                     [re-com/gap :size "10px"]
@@ -5258,11 +5258,11 @@
                     ;; [re-com/box :child (str panel-height-bricks " " panel-height)]
 
 
-                    ;[re-com/box :child (str @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value")) ]]))]
+                    ;[re-com/box :child (str @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value")) ]]))]
 
-                    (let [pval @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]])
-                          blk @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/block"))]])
-                          flw @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/flow_id"))]])
+                    (let [pval @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]])
+                          blk @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/block"))]])
+                          flw @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/flow_id"))]])
                           pval (try (edn/read-string pval) (catch :default _ (pr-str pval)))]
                       (when pval
                         [re-com/box
@@ -5275,7 +5275,7 @@
                                      blk
                                      (str flw " / " blk)
                                      [] :output (if (vector? pval) "vector" "map") true]
-                                    [re-com/box :child (pr-str @(re-frame/subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]]))]))]))]])
+                                    [re-com/box :child (pr-str @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str grid2-kw "/value"))]]))]))]))]])
 
       (= ttype :flow-browser)
       [re-com/h-box
@@ -5299,9 +5299,9 @@
 
       (= ttype :debug)
       (if flow-select
-                ;[code-box 480 400 (get @(re-frame/subscribe [::flowmap]) @flow-select)]
+                ;[code-box 480 400 (get @(ut/tracked-subscribe [::flowmap]) @flow-select)]
         [re-com/box :child [(if read-only-flow? code-box code-box-rw) 600 440
-                                    ;(get @(re-frame/subscribe [::flowmap]) @flow-select)
+                                    ;(get @(ut/tracked-subscribe [::flowmap]) @flow-select)
                             (get flowmaps flow-select)
                             flow-select]
          :width "600px" :height "430px" :size "1"]
@@ -5318,7 +5318,7 @@
                    :from [[:live_schedules :tt336]]}
             vec2choices (fn [x] (vec (for [i x] {:label (str i) :id i})))
             comps (keys flowmaps)
-            flow-names (vec (distinct (map :flow_id @(re-frame/subscribe [::conn/sql-data [:flows-sys]]))))
+            flow-names (vec (distinct (map :flow_id @(ut/tracked-subscribe [::conn/sql-data [:flows-sys]]))))
             ddown (fn [x xdef w kkey] [re-com/box
                                        :size "none"
                                        :align :center
@@ -5454,14 +5454,14 @@
                                               :min-width "30px" :height "36px"
                                               :attr (if (= b "schedule!")
                                                       {:on-click #(do
-                                                                    (re-frame/dispatch
+                                                                    (ut/tracked-dispatch
                                                                      [::wfx/request :default
                                                                       {:message    (merge
                                                                                     (get @scheduler-atom flow-id)
                                                                                     {:kind :schedule-flow
                                                                                      :flow-id flow-id
                                                                                             ;:schedule (get @scheduler-atom flow-id)
-                                                                                     :client-name @(re-frame/subscribe [::bricks/client-name])})
+                                                                                     :client-name @(ut/tracked-subscribe [::bricks/client-name])})
 
                                                                        :on-response [::simple-response]
                                                                        :on-timeout  [::timeout-response :run-flow [:schedule flow-id]] ;; requeue?
@@ -5490,7 +5490,7 @@
       :else [re-com/box :child (str "unknown editor mode: " @editor-mode)])))
 
 (defn server-flows [hh]
-  (let [ss @(re-frame/subscribe [::bricks/flow-statuses])
+  (let [ss @(ut/tracked-subscribe [::bricks/flow-statuses])
         ss (vec (sort-by first (for [[k v] ss] [k v])))] ;; since maps wont keep key order in cljs, vectorize it
     [re-com/box
      :height (px hh)
@@ -5551,10 +5551,10 @@
                                       ;:color pcolor
                                       ;:margin-right "8px"
                                                   }
-                                          ;;:on-click #(do (re-frame/dispatch [::http/load-flow-history fid nil]))
-                                          :on-click #(let [;flowmap @(re-frame/subscribe [::flowmap])
-                                                           ;flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
-                                                           client-name @(re-frame/subscribe [::conn/client-name])
+                                          ;;:on-click #(do (ut/tracked-dispatch [::http/load-flow-history fid nil]))
+                                          :on-click #(let [;flowmap @(ut/tracked-subscribe [::flowmap])
+                                                           ;flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+                                                           client-name @(ut/tracked-subscribe [::conn/client-name])
                                                            ;server-flowmap (process-flowmap2 flowmap flowmaps-connections fid)
                                                            ;comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
                                                            ;running-view-subs (vec (for [[k v] comps :when (get v :view)]
@@ -5562,8 +5562,8 @@
                                                            ;running-subs (vec (for [k (keys comps)] [fid k]))
                                                            ;running-subs (vec (into running-subs running-view-subs))
                                                            ]
-                                                       (re-frame/dispatch [::http/load-flow-history fid nil])
-                                                       (re-frame/dispatch [::wfx/request :default
+                                                       (ut/tracked-dispatch [::http/load-flow-history fid nil])
+                                                       (ut/tracked-dispatch [::wfx/request :default
                                                                            {:message    {:kind :sub-to-running-values
                                                                                          :flow-id fid 
                                                                                          :flow-keys [] ;;running-subs
@@ -5576,11 +5576,11 @@
                                       ;:color pcolor
                                       ;:margin-right "8px"
                                                 }
-                                        :on-click #(re-frame/dispatch [::wfx/request :default
+                                        :on-click #(ut/tracked-dispatch [::wfx/request :default
                                                                        {:message    {:kind :kill-flow
                                                                                      :flow-id fid
                                                                                      :process? process?
-                                                                                     :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                                                                     :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                                                                         :timeout    15000000}])
                                         :md-icon-name "zmdi-stop"]]]
 
@@ -5616,14 +5616,14 @@
 (defn flow-editor [w h]
   (let [react-hack [@editor-mode @trig-atom-test @db/flow-editor-system-mode]
         sql-params (into {} (for [k [:flow-fn-categories-sys/category]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
-        ;flow-select @(re-frame/subscribe [::selected-flow-block])
-        ;flowmaps @(re-frame/subscribe [::flowmap-raw])
-        flow-id @(re-frame/subscribe [::selected-flow])
-        ;blocks @(re-frame/subscribe [::flowmap])
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+        ;flow-select @(ut/tracked-subscribe [::selected-flow-block])
+        ;flowmaps @(ut/tracked-subscribe [::flowmap-raw])
+        flow-id @(ut/tracked-subscribe [::selected-flow])
+        ;blocks @(ut/tracked-subscribe [::flowmap])
         ;orderb (vec (sort-by str (keys blocks)))
-        ;opts-map @(re-frame/subscribe [::opts-map])
-        ;gantt? @(re-frame/subscribe [::bricks/flow-gantt?])
+        ;opts-map @(ut/tracked-subscribe [::opts-map])
+        ;gantt? @(ut/tracked-subscribe [::bricks/flow-gantt?])
         dyn-width (last @db/flow-editor-system-mode)
         o-modes [["flows running" 800]
                  ["flow browser" 600]
@@ -5654,8 +5654,8 @@
 
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (if (get query :connection-id)
                    (conn/sql-data [k] query (get query :connection-id))
@@ -5879,7 +5879,7 @@
      ]))
 
 (defn waffles [data w]
-  (let [data (into [] (for [[k v] @(re-frame/subscribe [::flowmap])]
+  (let [data (into [] (for [[k v] @(ut/tracked-subscribe [::flowmap])]
                         {:name k :type (get-in v [:ports :out :out]) :number 1}))
                         ;[k {:name k :type (get-in v [:ports :out :out]) :number 1}]
 
@@ -5968,7 +5968,7 @@
 (re-frame/reg-sub
  ::get-incoming-port
  (fn [_ [_ bid type vk]]
-   (let [connections @(re-frame/subscribe [::flowmap-connections-parsed bid])
+   (let [connections @(ut/tracked-subscribe [::flowmap-connections-parsed bid])
          conn-map (group-by first connections)
          conns (for [[o1 o2 i1 i2] (map rest (get conn-map type))
                      :when (if (= type :in) (= vk i2) (= vk o2))]
@@ -5979,7 +5979,7 @@
 (re-frame/reg-sub
  ::get-outgoing-port
  (fn [_ [_ bid type vk]]
-   (let [connections @(re-frame/subscribe [::flowmap-connections-parsed bid])
+   (let [connections @(ut/tracked-subscribe [::flowmap-connections-parsed bid])
          conn-map (group-by first connections)
          filled (filter #(= % [bid vk]) (for [[b k _ _] (map rest (get conn-map type))] [b k]))]
         ;;  _ (when (= bid :unpack-results-map)
@@ -6109,17 +6109,17 @@
        (ut/dissoc-in [:flows (get db :selected-flow) :map bid :cond name]))))
 
 (defn port-panel [flow-id bid fmap type]
-  (let [;blocks @(re-frame/subscribe [::flowmap])
-        ;flow-id @(re-frame/subscribe [::selected-flow])
-        ;flow-select @(re-frame/subscribe [::selected-flow-block])
-        ;connections @(re-frame/subscribe [::flowmap-connections])
-        reactions! [@(re-frame/subscribe [::http/flow-results]) @sniffy-sniff @port-hover2]
+  (let [;blocks @(ut/tracked-subscribe [::flowmap])
+        ;flow-id @(ut/tracked-subscribe [::selected-flow])
+        ;flow-select @(ut/tracked-subscribe [::selected-flow-block])
+        ;connections @(ut/tracked-subscribe [::flowmap-connections])
+        reactions! [@(ut/tracked-subscribe [::http/flow-results]) @sniffy-sniff @port-hover2]
         [xx yy] @db/flow-detached-coords
         selected (get-in @flow-details-block-container-atom [flow-id bid :port-panel type])
-        connections @(re-frame/subscribe [::flowmap-connections-parsed bid])
-        defaults  (when (= type :in) @(re-frame/subscribe [::input-defaults bid]))
-        port-meta (when (= type :in) @(re-frame/subscribe [::get-meta bid]))
-        is-open-in? @(re-frame/subscribe [::is-open-in? bid])
+        connections @(ut/tracked-subscribe [::flowmap-connections-parsed bid])
+        defaults  (when (= type :in) @(ut/tracked-subscribe [::input-defaults bid]))
+        port-meta (when (= type :in) @(ut/tracked-subscribe [::get-meta bid]))
+        is-open-in? @(ut/tracked-subscribe [::is-open-in? bid])
         ;; scrubber-opts-map (into {} (for [[k v] port-meta
         ;;                                  :when (map? (get v :scrubber))]
         ;;                              {[k] (get v :scrubber)}))
@@ -6189,13 +6189,13 @@
                                     ;_ (when selected? (tap> [:inputs? (get-in fmap [:data :flow-item :inputs] (keys v))]))
                                     ;_ (tap> [:sniff bid @sniffy-sniff @port-hover2 vk])
 
-                                    ;react? [@(re-frame/subscribe [::get-raw-port-types flow-id bid type vk])]
-                                    ;vv @(re-frame/subscribe [::get-raw-port-types flow-id bid type vk])
-                                      [ibid ivk] (if (= type :in) @(re-frame/subscribe [::get-incoming-port bid type vk]) [nil nil])
+                                    ;react? [@(ut/tracked-subscribe [::get-raw-port-types flow-id bid type vk])]
+                                    ;vv @(ut/tracked-subscribe [::get-raw-port-types flow-id bid type vk])
+                                      [ibid ivk] (if (= type :in) @(ut/tracked-subscribe [::get-incoming-port bid type vk]) [nil nil])
 
-                                      pcolor @(re-frame/subscribe [::port-color flow-id (or ibid bid) (or ivk vk)])
-                                      ptype @(re-frame/subscribe  [::port-color flow-id (or ibid bid) (or ivk vk) :data-type])
-                                      pval1 @(re-frame/subscribe  [::port-color flow-id (or ibid bid) (or ivk vk) :data-value])
+                                      pcolor @(ut/tracked-subscribe [::port-color flow-id (or ibid bid) (or ivk vk)])
+                                      ptype @(ut/tracked-subscribe  [::port-color flow-id (or ibid bid) (or ivk vk) :data-type])
+                                      pval1 @(ut/tracked-subscribe  [::port-color flow-id (or ibid bid) (or ivk vk) :data-value])
 
                                     ;; ttoggle #(swap! flow-details-block-container-atom assoc-in [flow-id bid :port-panel type]
                                     ;;                 (if (= selected select-vec) nil select-vec))
@@ -6278,7 +6278,7 @@
                                                 ;;  :model (if (keyword? ptype)
                                                 ;;           (set [ptype])
                                                 ;;             (set ptype)) ;; dumb re-com shit
-                                                     :model (re-frame/subscribe [::get-raw-port-types-set flow-id bid type vk])
+                                                     :model (ut/tracked-subscribe [::get-raw-port-types-set flow-id bid type vk])
                                                      :parts {;:selection-list {:style {:margin-top (px (+ (* -1 yy) -45))
                                                          ;                         :margin-left (px (+ (* -1 xx) -20))
                                                          ;                         ;:position "relative"
@@ -6333,7 +6333,7 @@
                                                                     ;:color (ut/invert-hex-color v)
                                                                       :color (ut/choose-text-color v)
                                                                       :background-color v}))
-                                                     :on-change #(re-frame/dispatch [::set-raw-port-types flow-id bid type vk %])]
+                                                     :on-change #(ut/tracked-dispatch [::set-raw-port-types flow-id bid type vk %])]
                                                     (str vv))
                                            :padding "4px"
                                        ;:style (if (not selected?) {:margin-left "9px"} {})
@@ -6418,7 +6418,7 @@
                                              :else [(first conns)])]
                                   (let [[b1 p1] conn ;(first conns) ;; discarding others, since we can only get one data per port
                                         pval (if (= type :in)
-                                               @(re-frame/subscribe [::port-color flow-id b1 p1 :data-value])
+                                               @(ut/tracked-subscribe [::port-color flow-id b1 p1 :data-value])
                                                pval1)
                                         c-line (vec (into conn [bid vk]))
                                       ;_ (when (= type :in) (tap> [:conn c-line]))
@@ -6428,7 +6428,7 @@
                                         show-scrubber? (and scrubber default? show-default?)
                                         pval (if show-default? default pval)]
                                   ;(tap> [:pp bid default? show-default? conns vk type pval1 b1 p1 pval])
-                                ;(tap> [:ss @(re-frame/subscribe [::bricks/keypaths-in-flow bid])])
+                                ;(tap> [:ss @(ut/tracked-subscribe [::bricks/keypaths-in-flow bid])])
                                 ;(when (nil? pval) (tap> [:pp bid vk type pval1 b1 p1 pval]))
                                     (when vopen?
                                       [re-com/v-box
@@ -6466,13 +6466,13 @@
                                                                  :align :center :justify :center
                                                ;:style {:border "1px solid white"}
                                                                  :children [[re-com/md-icon-button
-                                                                             :attr {:on-click #(re-frame/dispatch [::re-order-connection c-line :up])}
+                                                                             :attr {:on-click #(ut/tracked-dispatch [::re-order-connection c-line :up])}
                                                                              :style {:font-size "12px"
                                                                                  ;:margin-top "4px"
                                                                                      :color (str (theme-pull :theme/editor-font-color nil) "75")}
                                                                              :md-icon-name "zmdi-chevron-up"]
                                                                             [re-com/md-icon-button
-                                                                             :attr {:on-click #(re-frame/dispatch [::re-order-connection c-line :down])}
+                                                                             :attr {:on-click #(ut/tracked-dispatch [::re-order-connection c-line :down])}
                                                                              :style {:font-size "12px"
                                                                                  ;:margin-bottom "4px"
                                                                                      :color (str (theme-pull :theme/editor-font-color nil) "75")}
@@ -6480,13 +6480,13 @@
                                                               ]]
 
                                                   (when show-scrubber? ;; scrubber?
-                                                         ;;(tap> [:kk @(re-frame/subscribe [::bricks/keypaths-in-flow bid])])
+                                                         ;;(tap> [:kk @(ut/tracked-subscribe [::bricks/keypaths-in-flow bid])])
 
                                                     [re-com/box
                                                           ;:padding "4px"
                                                      :style {:padding-top "8px" :padding-bottom "8px"}
                                                      :child [bricks/scrubber-panel true
-                                                             @(re-frame/subscribe [::bricks/keypaths-in-flow bid])
+                                                             @(ut/tracked-subscribe [::bricks/keypaths-in-flow bid])
                                                              [:flow bid] vk ;[:flow-item :defaults vk] ;;kk pm
                                                                   ;:flow bid
                                                              (if (map? scrubber)
@@ -6518,7 +6518,7 @@
 
       (when (and (= type :out) (not is-open-in?)) ;; if we can have conditional ports!
 
-        (let [condi-ports @(re-frame/subscribe [::condi-ports bid])
+        (let [condi-ports @(ut/tracked-subscribe [::condi-ports bid])
               cnt (count (keys condi-ports))
               open? (true? (get-in @flow-details-block-container-atom [flow-id bid :condi-paths :open?] false))]
           [re-com/v-box
@@ -6548,7 +6548,7 @@
                                    :attr {:on-click #(swap! flow-details-block-container-atom assoc-in [flow-id bid :condi-paths :open?] (not open?))}
                                    :children [[re-com/md-icon-button
                                                :src (at)
-                                                                       ;:on-click #(re-frame/dispatch [::add-condi-port bid])
+                                                                       ;:on-click #(ut/tracked-dispatch [::add-condi-port bid])
                                                :md-icon-name "fa-solid fa-tree" ;; <i class= "fa-solid fa-bezier-curve" ></i> <i class= "fa-solid fa-tree" ></i>
                                                :style {;:color (theme-pull :theme/editor-outer-rim-color nil)
                                                        :font-size "17px"
@@ -6556,7 +6556,7 @@
                                               [re-com/box :child (str "conditional paths (" cnt ")")]]]
                                   [re-com/md-icon-button
                                    :src (at)
-                                   :on-click #(re-frame/dispatch [::add-condi-port bid])
+                                   :on-click #(ut/tracked-dispatch [::add-condi-port bid])
                                    :md-icon-name "zmdi-plus"
                                    :style {;:color (theme-pull :theme/editor-outer-rim-color nil)
                                            :font-size "22px"
@@ -6577,12 +6577,12 @@
                          :padding "4px"
                          :children (for [[k {:keys [fn dest]}] condi-ports
                                          :let [select-vec [bid k]
-                                               valve-open? @(re-frame/subscribe [::bricks/condi-valve-open? flow-id bid k])
+                                               valve-open? @(ut/tracked-subscribe [::bricks/condi-valve-open? flow-id bid k])
                                                selected? (or (and @sniffy-sniff (= @port-hover2 bid)
                                                                   (= k (get @sniffy-sniff 1)))
                                                                                      ;; hover from canvas sniffer
                                                              (= select-vec selected))
-                                               pcolor (theme-pull :theme/editor-outer-rim-color nil) ;; @(re-frame/subscribe [::port-color flow-id bid :out])
+                                               pcolor (theme-pull :theme/editor-outer-rim-color nil) ;; @(ut/tracked-subscribe [::port-color flow-id bid :out])
                                                                        ;; TODO, ^^ will it ALWAYS be out? I think so... ? for out ports, non open
                                                ]]
                                      [re-com/v-box
@@ -6624,7 +6624,7 @@
                                                                                    ;[re-com/box :child (str dest)]
                                                                [re-com/md-icon-button :src (at)
                                                                 :md-icon-name "zmdi-close"
-                                                                :on-click #(re-frame/dispatch [::remove-condi-port bid k])
+                                                                :on-click #(ut/tracked-dispatch [::remove-condi-port bid k])
                                                                 :style {;:margin-top "-5px"
                                                                         :cursor "pointer"
                                                                                            ; :margin-right "-3px"
@@ -6652,14 +6652,14 @@
 (defn debug-box [flow-select raw-fmap]
   (let [read-only-flow? (true? (cstr/includes? (str flow-select) "/"))]
     [re-com/box :child [(if read-only-flow? code-box code-box-rw) 600 nil ;440
-                                    ;(get @(re-frame/subscribe [::flowmap]) @flow-select)
+                                    ;(get @(ut/tracked-subscribe [::flowmap]) @flow-select)
                         raw-fmap ;(get fmap flow-select)
                         flow-select]
      :width "600px"]))
 
 (defn channel-box [flow-id flow-select val]
   (let [read-only-flow? (true? (cstr/includes? (str flow-select) "/"))
-        connections (filter #(= flow-select (second %)) @(re-frame/subscribe [::flowmap-connections-parsed flow-select]))
+        connections (filter #(= flow-select (second %)) @(ut/tracked-subscribe [::flowmap-connections-parsed flow-select]))
         cc (count connections)]
     [re-com/v-box
      :gap "10px"
@@ -6691,7 +6691,7 @@
                  :align :center :justify :center
                  :child [re-com/h-box
                          :gap "10px"
-                         :attr {:on-click #(re-frame/dispatch [::bricks/push-value flow-id flow-select val true])}
+                         :attr {:on-click #(ut/tracked-dispatch [::bricks/push-value flow-id flow-select val true])}
                          :style {:color (theme-pull :theme/editor-outer-rim-color nil) :cursor "pointer"}
                          :padding "6px"
                          :children [[re-com/box :child (str "I understand - push to " cc " channel" (when (> cc 1) "s"))]
@@ -6723,9 +6723,9 @@
 
 (defn flow-code-editor-block [w h fmap flow-select ttype flow-id]
   (let [read-only-flow? (true? (cstr/includes? (str flow-select) "/"))
-        bcolor @(re-frame/subscribe [::port-color flow-id flow-select])
-        btype @(re-frame/subscribe [::port-color flow-id flow-select nil :data-type])
-        opts-map @(re-frame/subscribe [::opts-map])
+        bcolor @(ut/tracked-subscribe [::port-color flow-id flow-select])
+        btype @(ut/tracked-subscribe [::port-color flow-id flow-select nil :data-type])
+        opts-map @(ut/tracked-subscribe [::opts-map])
         has-override? (ut/ne? (get-in opts-map [:overrides flow-select]))
         bg-shade "#00000055"]
     ;(tap> [:fmap? flow-select fmap ttype flow-id])
@@ -6768,7 +6768,7 @@
                              ;(- w 5) h ;(- h 5)
                              (+ 10 w) nil ;h
                              ;;(get-in fmap [:data :user-input] (pr-str "feed me, seymour!")) ;; fmap is preprocessed..
-                             @(re-frame/subscribe [::get-raw-data-input flow-id flow-select])
+                             @(ut/tracked-subscribe [::get-raw-data-input flow-id flow-select])
                              flow-select syntax]]
                     [re-com/h-box
                      :width (px (- w 10))
@@ -6786,7 +6786,7 @@
                                  :children (for [e syntaxes
                                                  :let [selected? (= e syntax)]]
                                              [re-com/box
-                                              :attr (when (not selected?) {:on-click #(re-frame/dispatch [::flow-block-meta flow-select :syntax e])})
+                                              :attr (when (not selected?) {:on-click #(ut/tracked-dispatch [::flow-block-meta flow-select :syntax e])})
                                               :style (if selected? {:background-color bg-shade ;; (str (theme-pull :theme/editor-outer-rim-color nil) 25)
                                                                     :color (theme-pull :theme/editor-font-color nil)
                                                                     ;:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
@@ -6803,7 +6803,7 @@
                                  :child (str btype)]]]]]))))
 
 (defn output-viewer [w h flow-id bid & [pid]]
-  (let [value @(re-frame/subscribe [::port-color flow-id bid nil :data-value])
+  (let [value @(ut/tracked-subscribe [::port-color flow-id bid nil :data-value])
         bg-shade "#00000055"
         value (if (or (vector? value) (map? value) (list? value)) (ut/replace-large-base64 value) value)
         b64? (ut/is-base64? (str value))]
@@ -6868,7 +6868,7 @@
        :width             "200px"
        :on-change #(do (if (= str-bid (str %)) ;; regex doesnt allow : so we need to remove before
                          (reset! rename-block nil)
-                         (do (re-frame/dispatch [::rename-block bid %])
+                         (do (ut/tracked-dispatch [::rename-block bid %])
                              (reset! rename-block nil))))
        :validation-regex  flow-id-regex
        :change-on-blur?   true
@@ -6890,7 +6890,7 @@
    (get-in db [:flows (get db :selected-flow) :map bid :description] "")))
 
 (defn details-panel [bid]
-  (let [value @(re-frame/subscribe [::block-details bid])]
+  (let [value @(ut/tracked-subscribe [::block-details bid])]
     [text-box-rw nil nil value bid]))
     ;; [re-com/box
     ;;  :style {:color (theme-pull :theme/editor-font-color nil)
@@ -6931,7 +6931,7 @@
 ;;                            transformed-data))])))
 
 ;; (defn transform-data [data svg-width flow-id]
-;;   (let [blocks @(re-frame/subscribe [::flowmap])
+;;   (let [blocks @(ut/tracked-subscribe [::flowmap])
 ;;         orderb (vec (keys (get blocks flow-id)))
 
 ;;         data (into {}
@@ -6963,8 +6963,8 @@
 ;;           data)))
 
 ;; (defn transform-data [data svg-width flow-id]
-;;   (let [react! [@(re-frame/subscribe [::http/flow-results])]
-;;         blocks @(re-frame/subscribe [::flowmap])
+;;   (let [react! [@(ut/tracked-subscribe [::http/flow-results])]
+;;         blocks @(ut/tracked-subscribe [::flowmap])
 ;;         orderb (vec (sort (keys blocks)))
 ;;         data (select-keys data orderb)
 ;;         data-pairs (remove #(or (= (first %) :done)
@@ -6986,7 +6986,7 @@
 ;;                   x (int (* normalized-start svg-width))]
 ;;               {:step step
 ;;                :x x
-;;                :color @(re-frame/subscribe [::port-color flow-id step])
+;;                :color @(ut/tracked-subscribe [::port-color flow-id step])
 ;;                :width (max 2 normalized-log-width)
 ;;                :raw-duration duration-ms}))
 ;;           sorted-data-pairs)))
@@ -7003,9 +7003,9 @@
 
 ;; (defn gantt-chart [data svg-width flow-id]
 ;;   (let [gap 11 ;3.5
-;;         react! [@(re-frame/subscribe [::http/flow-results])]
+;;         react! [@(ut/tracked-subscribe [::http/flow-results])]
 ;;         running? (is-running? :* flow-id)
-;;         counter (if running? @(re-frame/subscribe [::ccounter]) 0)
+;;         counter (if running? @(ut/tracked-subscribe [::ccounter]) 0)
 ;;         ;jj (.now js/Date)
 ;;         ;; transformed-data (if (and (zero? (mod counter 3)) running? (not @stopper))
 ;;         ;;                           (do (reset! stopper true)
@@ -7037,9 +7037,9 @@
 
 ;; (defn transform-data [data svg-width flow-id]
 ;;   (let [log-scale? @gantt-log ;false ;true
-;;         react! [@(re-frame/subscribe [::http/flow-results]) @(re-frame/subscribe [::http/flow-results]) @gantt-log]
-;;         blocks @(re-frame/subscribe [::flowmap])
-;;         running? @(re-frame/subscribe [::is-running? :* flow-id])
+;;         react! [@(ut/tracked-subscribe [::http/flow-results]) @(ut/tracked-subscribe [::http/flow-results]) @gantt-log]
+;;         blocks @(ut/tracked-subscribe [::flowmap])
+;;         running? @(ut/tracked-subscribe [::is-running? :* flow-id])
 ;;         orderb (vec (sort (keys blocks)))
 ;;         data (select-keys data orderb)
 ;;         data-pairs (remove #(or (= (first %) :done)
@@ -7067,16 +7067,16 @@
 ;;               {:step step
 ;;                :x x
 ;;                :fake? fake?
-;;                :color @(re-frame/subscribe [::port-color flow-id step])
+;;                :color @(ut/tracked-subscribe [::port-color flow-id step])
 ;;                :width (max 2 normalized-width)
 ;;                :raw-duration duration-ms}))
 ;;           sorted-data-pairs)))
 
 ;; (defn gantt-chart [data svg-width flow-id]
 ;;   (let [gap 11 ;3.5
-;;         react! [@(re-frame/subscribe [::http/flow-results]) @gantt-log]
-;;         running? @(re-frame/subscribe [::is-running? :* flow-id])
-;;         counter (if running? @(re-frame/subscribe [::ccounter]) 0) ;; react!
+;;         react! [@(ut/tracked-subscribe [::http/flow-results]) @gantt-log]
+;;         running? @(ut/tracked-subscribe [::is-running? :* flow-id])
+;;         counter (if running? @(ut/tracked-subscribe [::ccounter]) 0) ;; react!
 ;;         transformed-data (transform-data data svg-width flow-id)
 ;;         height 26
 ;;         current-time (.now js/Date)]
@@ -7090,7 +7090,7 @@
 ;;       (swap! db/last-gantt assoc flow-id transformed-data))
 
 ;;       (let [transformed-data (get @db/last-gantt flow-id)
-;;             flow-select @(re-frame/subscribe [::selected-flow-block])]
+;;             flow-select @(ut/tracked-subscribe [::selected-flow-block])]
 ;;         [:svg {:width "110%"
 ;;                :height (str (+ 20 (* height (count transformed-data)) (* gap (dec (count transformed-data)))) "px")}
 ;;          (doall (map-indexed (fn [idx {:keys [step x color width raw-duration]}]
@@ -7124,9 +7124,9 @@
 
 (defn transform-data-old [data svg-width flow-id]
   (let [log-scale? @gantt-log ;false ;true
-        react! [@(re-frame/subscribe [::http/flow-results]) @(re-frame/subscribe [::http/flow-results]) @gantt-log]
-        blocks @(re-frame/subscribe [::flowmap])
-        running? @(re-frame/subscribe [::is-running? :* flow-id])
+        react! [@(ut/tracked-subscribe [::http/flow-results]) @(ut/tracked-subscribe [::http/flow-results]) @gantt-log]
+        blocks @(ut/tracked-subscribe [::flowmap])
+        running? @(ut/tracked-subscribe [::is-running? :* flow-id])
         orderb (vec (sort-by str (keys blocks)))
         data (select-keys data orderb)
         data-pairs (remove #(or (= (first %) :done)
@@ -7154,7 +7154,7 @@
               {:step step
                :x x
                :fake? fake?
-               :color @(re-frame/subscribe [::port-color flow-id step])
+               :color @(ut/tracked-subscribe [::port-color flow-id step])
                :width (max 2 normalized-width)
                :raw-duration duration-ms}))
           sorted-data-pairs)))
@@ -7165,9 +7165,9 @@
 
 ;; (defn transform-data [data svg-width flow-id ]
 ;;   (let [log-scale? @gantt-log
-;;         react! [@(re-frame/subscribe [::http/flow-results]) @(re-frame/subscribe [::http/flow-results]) @gantt-log]
-;;         blocks @(re-frame/subscribe [::flowmap])
-;;         running? @(re-frame/subscribe [::is-running? :* flow-id])
+;;         react! [@(ut/tracked-subscribe [::http/flow-results]) @(ut/tracked-subscribe [::http/flow-results]) @gantt-log]
+;;         blocks @(ut/tracked-subscribe [::flowmap])
+;;         running? @(ut/tracked-subscribe [::is-running? :* flow-id])
 ;;         orderb (vec (sort (keys blocks)))
 ;;         data (select-keys data orderb)
 ;;         sorted-data-pairs (mapcat (fn [[k v]] (map (fn [run] [k run]) v)) data)
@@ -7195,7 +7195,7 @@
 ;;                          {:step step
 ;;                           :x x
 ;;                           :fake? fake?
-;;                           :color @(re-frame/subscribe [::port-color flow-id step])
+;;                           :color @(ut/tracked-subscribe [::port-color flow-id step])
 ;;                           :width (max 2 normalized-width) ;; Ensure a minimum width for visibility
 ;;                           :raw-duration duration-ms}))
 ;;                      sorted-data-pairs)]
@@ -7203,9 +7203,9 @@
 
 (defn transform-data [data svg-width flow-id]
   (let [log-scale? @gantt-log
-        react! [@(re-frame/subscribe [::http/flow-results]) @(re-frame/subscribe [::http/flow-results]) @gantt-log]
-        blocks @(re-frame/subscribe [::flowmap])
-        running? @(re-frame/subscribe [::is-running? :* flow-id])
+        react! [@(ut/tracked-subscribe [::http/flow-results]) @(ut/tracked-subscribe [::http/flow-results]) @gantt-log]
+        blocks @(ut/tracked-subscribe [::flowmap])
+        running? @(ut/tracked-subscribe [::is-running? :* flow-id])
         orderb (vec (sort-by str (keys blocks)))
         sorted-data-pairs (mapcat (fn [[k v]] (map (fn [run] [k run]) v)) data)
         ;; Sort by orderb to maintain the order for rendering
@@ -7246,7 +7246,7 @@
                  :x x
                  :last? last?
                  :fake? fake?
-                 :color @(re-frame/subscribe [::port-color flow-id step])
+                 :color @(ut/tracked-subscribe [::port-color flow-id step])
                  :width (max 2 normalized-width)
                  :raw-duration duration-ms})))
           sorted-data-pairs)))
@@ -7256,10 +7256,10 @@
 
 (defn gantt-chart [data svg-width flow-id]
   (let [gap 11
-        react! [@(re-frame/subscribe [::http/flow-results]) @gantt-log]
-        blocks @(re-frame/subscribe [::flowmap])
+        react! [@(ut/tracked-subscribe [::http/flow-results]) @gantt-log]
+        blocks @(ut/tracked-subscribe [::flowmap])
         orderb (vec (sort-by str (keys blocks)))
-        running? @(re-frame/subscribe [::is-running? :* flow-id])
+        running? @(ut/tracked-subscribe [::is-running? :* flow-id])
         transformed-data (transform-data data svg-width flow-id)
         height 26
         current-time (.now js/Date)
@@ -7280,7 +7280,7 @@
       (swap! db/last-gantt assoc flow-id grouped-by-step))
 
     ;; Render SVG
-    (let [flow-select @(re-frame/subscribe [::selected-flow-block])
+    (let [flow-select @(ut/tracked-subscribe [::selected-flow-block])
           grouped-by-stepc (get @db/last-gantt flow-id {})]
       [:svg {:width "110%"
              :height (str (+ 20 (* height (count grouped-by-stepc)) (* gap (dec (count grouped-by-stepc)))) "px")}
@@ -7321,11 +7321,11 @@
         pw (* pw 0.33)
         gw (* 0.46 pw)
         left 35 top 73
-        react! [@(re-frame/subscribe [::http/flow-results]) @gantt-log @db/last-update @(re-frame/subscribe [::http/flow-results-tracker flow-id])]
+        react! [@(ut/tracked-subscribe [::http/flow-results]) @gantt-log @db/last-update @(ut/tracked-subscribe [::http/flow-results-tracker flow-id])]
         bg-height (+ (* (count orderb) 37) 36)
-        running? @(re-frame/subscribe [::is-running? :* flow-id])
-        ;data (get-in @(re-frame/subscribe [::http/flow-results]) [:tracker flow-id] {})
-        data  @(re-frame/subscribe [::http/flow-results-tracker flow-id])
+        running? @(ut/tracked-subscribe [::is-running? :* flow-id])
+        ;data (get-in @(ut/tracked-subscribe [::http/flow-results]) [:tracker flow-id] {})
+        data  @(ut/tracked-subscribe [::http/flow-results-tracker flow-id])
         ddata (apply concat (for [[_ v] data] v))
         ;;_ (tap> [:ddata ddata])
         sstart (apply min (for [{:keys [start]} ddata] start))
@@ -7338,8 +7338,8 @@
 
     (if in-sidebar?
 
-      (let [blocks @(re-frame/subscribe [::flowmap])
-            flow-select @(re-frame/subscribe [::selected-flow-block])]
+      (let [blocks @(ut/tracked-subscribe [::flowmap])
+            flow-select @(ut/tracked-subscribe [::selected-flow-block])]
         ;(tap> [:blocks blocks])
         [re-com/h-box
          :size "none"
@@ -7424,9 +7424,9 @@
 (defn block-icons [blocks flow-id flow-select]
   (vec (for ;[[k {:keys [icon]}] (ordered-for orderb blocks)]
         [[k icon] (sort-by first (for [[k v] blocks] [k (get v :icon)]))]
-         (let [bcolor @(re-frame/subscribe [::port-color flow-id k])
-               waiting? @(re-frame/subscribe [::is-waiting? k flow-id])
-               running? @(re-frame/subscribe [::is-running? k flow-id])
+         (let [bcolor @(ut/tracked-subscribe [::port-color flow-id k])
+               waiting? @(ut/tracked-subscribe [::is-waiting? k flow-id])
+               running? @(ut/tracked-subscribe [::is-running? k flow-id])
                selected? (= k flow-select)]
            [re-com/box
             :size "none"
@@ -7443,7 +7443,7 @@
                     :margin-top (when running? "-4px")
                     :margin-bottom (when running? "-5px")
                     :border (str "1px dotted " bcolor)
-                    :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-7px" "9px")}
+                    :margin-left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "-7px" "9px")}
             :child [re-com/md-icon-button :src (at)
                     :md-icon-name (or icon "zmdi-view-quilt")
                     :on-click #(do (select-block k))
@@ -7475,19 +7475,19 @@
               [re-com/h-box
                :padding "5px" :gap "6px"
                :children [[re-com/box
-                           :attr {:on-click #(re-frame/dispatch [::wfx/request :default
+                           :attr {:on-click #(ut/tracked-dispatch [::wfx/request :default
                                                                  {:message    {:kind :save-custom-flow-block
                                                                                :name flow-select
-                                                                               :block-map (let [flowmap @(re-frame/subscribe [::flowmap])
-                                                                                                flowmap-raw @(re-frame/subscribe [::flowmap-raw])
-                                                                                                flow-id @(re-frame/subscribe [::selected-flow])
-                                                                                                flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
+                                                                               :block-map (let [flowmap @(ut/tracked-subscribe [::flowmap])
+                                                                                                flowmap-raw @(ut/tracked-subscribe [::flowmap-raw])
+                                                                                                flow-id @(ut/tracked-subscribe [::selected-flow])
+                                                                                                flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
                                                                                                 server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)]
                                                                                             (merge {:types (get-in flowmap-raw [flow-select :data :flow-item :types])
                                                                                                     :description (cstr/join " " (get-in flowmap-raw [flow-select :description]))}
                                                                                                    (select-keys (get flowmap-raw flow-select) [:description])
                                                                                                    (get-in server-flowmap [:components flow-select])))
-                                                                               :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                                                               :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                                                                   :on-response [::simple-response]
                                                                   ;:on-timeout  [::timeout-response :run-flow flowmap] ;; requeue?
                                                                   :timeout    15000000}])}
@@ -7514,17 +7514,17 @@
 
 
 (defn flow-details-panel [panel-height panel-width details-panel-height]
-  (let [react-hacks [@flow-hover @scroll-id @editor-mode @(re-frame/subscribe [::http/flow-results])]
+  (let [react-hacks [@flow-hover @scroll-id @editor-mode @(ut/tracked-subscribe [::http/flow-results])]
         ;details-panel-height (/ panel-height 1.25)
-        blocks @(re-frame/subscribe [::flowmap])
+        blocks @(ut/tracked-subscribe [::flowmap])
         orderb (vec (sort-by str (keys blocks)))
-        flow-id @(re-frame/subscribe [::selected-flow])
-        flow-select @(re-frame/subscribe [::selected-flow-block])
+        flow-id @(ut/tracked-subscribe [::selected-flow])
+        flow-select @(ut/tracked-subscribe [::selected-flow-block])
         ;running? (is-running? :* flow-id)
         ;panel-width (- panel-width 28) ;; modded
         sys-panel-width (or (last @db/flow-editor-system-mode) 900)
         browser-panel-width (if (nil? flow-select) sys-panel-width 600)
-        gantt? @(re-frame/subscribe [::bricks/flow-gantt?])
+        gantt? @(ut/tracked-subscribe [::bricks/flow-gantt?])
         ;sys-panel? (true? (nil? flow-select))
         ;browser-panel-height (- details-panel-height 42)
         ;read-only-flow? (true? (cstr/includes? flow-id "/"))
@@ -7540,20 +7540,20 @@
     [re-com/v-box
      :children [[re-com/h-box
                  :children [;[re-com/gap :size "8px"]
-                            (when (and @(re-frame/subscribe [::bricks/flow-editor?]) (not flow-select))
+                            (when (and @(ut/tracked-subscribe [::bricks/flow-editor?]) (not flow-select))
                               [re-com/box
                                :style {:margin-top "-2px"}
                               ;:style {:border "1px solid yellow"  }
                                :child [flow-editor browser-panel-width full-height] ; browser-panel-height]
                                :width (px browser-panel-width)
                                :height (px full-height)])
-                            (when (and @(re-frame/subscribe [::bricks/flow-editor?]) flow-select)
-                              (let [;body (get @(re-frame/subscribe [::flowmap]) flow-select)
+                            (when (and @(ut/tracked-subscribe [::bricks/flow-editor?]) flow-select)
+                              (let [;body (get @(ut/tracked-subscribe [::flowmap]) flow-select)
                                     ;top-px (* (- full-height 45) 0.47)
                                     fmap (get blocks flow-select)
                                     inputs? (not (empty? (keys (get-in fmap [:ports :in]))))
-                                    pval @(re-frame/subscribe [::port-color flow-id flow-select :out :data-value])
-                                    view-pval @(re-frame/subscribe [::port-color flow-id (keyword (str (cstr/replace (str flow-select) ":" "") "-vw")) :out :data-value])
+                                    pval @(ut/tracked-subscribe [::port-color flow-id flow-select :out :data-value])
+                                    view-pval @(ut/tracked-subscribe [::port-color flow-id (keyword (str (cstr/replace (str flow-select) ":" "") "-vw")) :out :data-value])
                                     browsable? (true? (or (vector? pval) (map? pval)))
                                     rabbit-code? (or (and (vector? pval) (keyword? (first pval))) ;; is it renderable rabbit-code?
                                                      (and (map? pval) (contains? pval :queries) (contains? pval :view)))
@@ -7567,12 +7567,12 @@
                                     ttype (get-in fmap [:data :flow-item :type]
                                                   (get-in fmap [:data :drag-meta :type]))
                                     open? (true? (or (= ttype :open-fn) (= ttype :open-block) (= ttype :open-input)))
-                                    port-meta @(re-frame/subscribe [::get-meta flow-select])
+                                    port-meta @(ut/tracked-subscribe [::get-meta flow-select])
                                     single-scrubber? (and (or (= ttype :open-block) (= ttype :open-input))
                                                           (not (nil? (get-in port-meta [:* :scrubber]))))
-                                    flow-select @(re-frame/subscribe [::selected-flow-block]) ;; dupe here from above to force re-render
-                                    opts-map @(re-frame/subscribe [::opts-map])]
-                               ;; (tap> [:ss @(re-frame/subscribe [::bricks/keypaths-in-flow flow-select])])
+                                    flow-select @(ut/tracked-subscribe [::selected-flow-block]) ;; dupe here from above to force re-render
+                                    opts-map @(ut/tracked-subscribe [::opts-map])]
+                               ;; (tap> [:ss @(ut/tracked-subscribe [::bricks/keypaths-in-flow flow-select])])
 
                                 [re-com/v-box
                                  :align :center
@@ -7635,7 +7635,7 @@
                                                  [gantt-container flow-id orderb true 580] "zmdi-chart-donut"])
 
                                               ;; [flow-details-block-container "test gantt" flow-id flow-select
-                                              ;;  [gantt-chart (get-in @(re-frame/subscribe [::http/flow-results]) [:tracker flow-id]) 560 flow-id] "zmdi-comment-alt-text"]
+                                              ;;  [gantt-chart (get-in @(ut/tracked-subscribe [::http/flow-results]) [:tracker flow-id]) 560 flow-id] "zmdi-comment-alt-text"]
 
                                               [flow-details-block-container "step notes*" flow-id flow-select
                                                [details-panel flow-select] "zmdi-comment-alt-text"]
@@ -7656,7 +7656,7 @@
                                                           ;:background-color "gray"
                                                           :padding-bottom "8px"}
                                                   :child [bricks/scrubber-panel true
-                                                          @(re-frame/subscribe [::bricks/keypaths-in-flow flow-select true])
+                                                          @(ut/tracked-subscribe [::bricks/keypaths-in-flow flow-select true])
                                                           [:flow flow-select] :*
                                                           ;nil nil
                                                           {:fm true :canvas? true :flow? true}]]
@@ -7739,14 +7739,14 @@
                                               [flow-details-block-container "flow block map - debugger*" flow-id flow-select
                                                [debug-box flow-select
                                                 ;fmap ;; fmap is preprocessed....
-                                                @(re-frame/subscribe [::get-raw-block-map flow-id flow-select])]
+                                                @(ut/tracked-subscribe [::get-raw-block-map flow-id flow-select])]
                                                "zmdi-bug"]
 
                                               [flow-details-block-container "channel push - debugger*" flow-id flow-select
                                                (let [last-output (ut/replace-large-base64
-                                                                  @(re-frame/subscribe [::port-color flow-id flow-select nil :data-value]))
+                                                                  @(ut/tracked-subscribe [::port-color flow-id flow-select nil :data-value]))
                                                      val (get-in @channel-holster [flow-id flow-select :value] last-output)
-                                                     copen? @(re-frame/subscribe [::bricks/flow-channels-open? flow-id])]
+                                                     copen? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])]
                                                  (if copen? [channel-box flow-id flow-select val]
                                                      [re-com/v-box
                                                       :align :center :justify :center
@@ -7764,7 +7764,7 @@
                                                 :child [code-box-rwc
                                                         (- browser-panel-width 20) ;; 580
                                                         nil
-                                                        (str @(re-frame/subscribe [::flowmap-connections]))]]
+                                                        (str @(ut/tracked-subscribe [::flowmap-connections]))]]
                                                "zmdi-bug"]
 
                                               [re-com/gap :size "10px"]]]]]))
@@ -7776,14 +7776,14 @@
                              :style {:background-color "#00000099"
                                      :border-radius "0px 16px 0px 0px"
                                      :position "fixed"
-                                     :left (if @(re-frame/subscribe [::bricks/flow-editor?]) 
+                                     :left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) 
                                              browser-panel-width
                                              0)
                                      :backdrop-filter "blur(3px)"
                                      :transition "all 0.3s"
                                      :top -1 ;28
                                      :padding-top "10px"
-                                     :padding-right (if (not @(re-frame/subscribe [::bricks/flow-editor?])) "5px" "inherit")
+                                     :padding-right (if (not @(ut/tracked-subscribe [::bricks/flow-editor?])) "5px" "inherit")
                                      :border-top (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
                                      :border-right (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 25)}
                                      ;:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 15)
@@ -7791,23 +7791,23 @@
                              :width "40px"
                              :align :center :justify :start
                              :children (into [[re-com/md-icon-button :src (at)
-                                               :md-icon-name (if  @(re-frame/subscribe [::bricks/flow-editor?]) "zmdi-chevron-left" "zmdi-chevron-right")
-                                               :on-click #(do (re-frame/dispatch [::bricks/toggle-flow-editor])
+                                               :md-icon-name (if  @(ut/tracked-subscribe [::bricks/flow-editor?]) "zmdi-chevron-left" "zmdi-chevron-right")
+                                               :on-click #(do (ut/tracked-dispatch [::bricks/toggle-flow-editor])
                                                               (reset! editor-tooltip-atom nil))
-                                               :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "toggle flow work panel " (if @(re-frame/subscribe [::bricks/flow-editor?]) "open" "closed")))
+                                               :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "toggle flow work panel " (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "open" "closed")))
                                                       :on-mouse-leave #(reset! editor-tooltip-atom nil)}
                                                :style {:opacity 0.45
                                                        :color (theme-pull :theme/editor-outer-rim-color nil)
                                                        :cursor "pointer"
                                                        :height "15px"
-                                                       :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                                       :margin-left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "-9px" "9px")
                                                        :font-size "33px"}]
                                               
                                               ;(when (and gantt? sys-panel?) [re-com/gap :size "1px"])
 
                                               [re-com/md-icon-button :src (at)
                                                :md-icon-name "zmdi-chart"
-                                               :on-click #(do (re-frame/dispatch [::bricks/toggle-flow-gantt])
+                                               :on-click #(do (ut/tracked-dispatch [::bricks/toggle-flow-gantt])
                                                               (reset! editor-tooltip-atom nil))
                                                :attr {:on-mouse-enter #(reset! editor-tooltip-atom
                                                                                (str "toggle run gantt chart "
@@ -7818,7 +7818,7 @@
                                                        :cursor "pointer"
                                                        :height "15px"
                                                        :margin-top "14px"
-                                                       :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                                       :margin-left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "-9px" "9px")
                                                        :font-size "23px"}]
 
                                               [re-com/gap :size (if flow-select "3px" "3px")]
@@ -7832,7 +7832,7 @@
                                                [] ;; old menu buttons.... deprecated in lieu of top text label buttons
                                         ;;        [[re-com/md-icon-button :src (at)
                                         ;;          :md-icon-name "zmdi-view-list"
-                                        ;; ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
+                                        ;; ;:on-click #(ut/tracked-dispatch [::bricks/toggle-flow-editor])
                                         ;;          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow browser"))
                                         ;;                 :on-click #(reset! editor-mode :flow-browser)
                                         ;;                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
@@ -7841,11 +7841,11 @@
                                         ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
                                         ;;                  :cursor "pointer"
                                         ;;                  :height "15px"
-                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :margin-left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "-9px" "9px")
                                         ;;                  :font-size "19px"}]
                                         ;;         [re-com/md-icon-button :src (at)
                                         ;;          :md-icon-name "zmdi-shape"
-                                        ;; ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
+                                        ;; ;:on-click #(ut/tracked-dispatch [::bricks/toggle-flow-editor])
                                         ;;          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow part browser"))
                                         ;;                 :on-click #(reset! editor-mode :part-browser)
                                         ;;                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
@@ -7854,11 +7854,11 @@
                                         ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
                                         ;;                  :cursor "pointer"
                                         ;;                  :height "15px"
-                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :margin-left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "-9px" "9px")
                                         ;;                  :font-size "19px"}]
                                         ;;         [re-com/md-icon-button :src (at)
                                         ;;          :md-icon-name "zmdi-time-interval"
-                                        ;; ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
+                                        ;; ;:on-click #(ut/tracked-dispatch [::bricks/toggle-flow-editor])
                                         ;;          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "flow scheduler"))
                                         ;;                 :on-click #(reset! editor-mode :scheduler)
                                         ;;                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
@@ -7867,11 +7867,11 @@
                                         ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
                                         ;;                  :cursor "pointer"
                                         ;;                  :height "15px"
-                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :margin-left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "-9px" "9px")
                                         ;;                  :font-size "19px"}]
                                         ;;         [re-com/md-icon-button :src (at)
                                         ;;          :md-icon-name "zmdi-view-subtitles"
-                                        ;; ;:on-click #(re-frame/dispatch [::bricks/toggle-flow-editor])
+                                        ;; ;:on-click #(ut/tracked-dispatch [::bricks/toggle-flow-editor])
                                         ;;          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "run history"))
                                         ;;                 :on-click #(reset! editor-mode :run-history)
                                         ;;                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
@@ -7880,7 +7880,7 @@
                                         ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
                                         ;;                  :cursor "pointer"
                                         ;;                  :height "15px"
-                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :margin-left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "-9px" "9px")
                                         ;;                  :font-size "19px"}]
 
                                         ;;         [re-com/md-icon-button :src (at)
@@ -7892,7 +7892,7 @@
                                         ;;                  :color (theme-pull :theme/editor-outer-rim-color nil)
                                         ;;                  :cursor "pointer"
                                         ;;                  :height "15px"
-                                        ;;                  :margin-left (if @(re-frame/subscribe [::bricks/flow-editor?]) "-9px" "9px")
+                                        ;;                  :margin-left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) "-9px" "9px")
                                         ;;                  :font-size "19px"}]]
                                                ))]]]]
 
@@ -7912,7 +7912,7 @@
              :top 28} ;(- panel-height 8)
              ;:left 13
      :height (px full-height)
-     :width (if @(re-frame/subscribe [::bricks/flow-editor?]) (px browser-panel-width)
+     :width (if @(ut/tracked-subscribe [::bricks/flow-editor?]) (px browser-panel-width)
                 ;(px panel-width)
                 (px 45))]))
 
@@ -7920,7 +7920,7 @@
 
 ;; (defn alert-box2 []
 ;;   (let [rekt @db/kick-alert
-;;         alerts @(re-frame/subscribe [::bricks/alerts])]
+;;         alerts @(ut/tracked-subscribe [::bricks/alerts])]
 
 ;;     [re-com/box
 ;;      :child [re-com/h-box
@@ -7966,12 +7966,12 @@
 (defn alert-box []
   [rc/catch
    (let [rekt [@db/kick-alert @db/pause-alerts]
-         rs-running @(re-frame/subscribe [::bricks/runstreams-running])
-         rs-running-list @(re-frame/subscribe [::bricks/runstreams-running-list])
-         alerts @(re-frame/subscribe [::bricks/alerts])
+         rs-running @(ut/tracked-subscribe [::bricks/runstreams-running])
+         rs-running-list @(ut/tracked-subscribe [::bricks/runstreams-running-list])
+         alerts @(ut/tracked-subscribe [::bricks/alerts])
          ;;tick (rand-int 12345)
          ;tick "" ;(str (js/Date.now) "-" (rand-int 1000000))
-         estimates @(re-frame/subscribe [::estimates])
+         estimates @(ut/tracked-subscribe [::estimates])
          max-w (apply max (for [a alerts
                                 :let [width (* (get a 1) bricks/brick-size)]]
                             width))
@@ -8059,8 +8059,8 @@
                    :size "none"
                    :attr (when (not push-codes?)
                            (if @db/kick-alert
-                            ;{:on-click #(re-frame/dispatch [::bricks/prune-alerts true])}
-                             {:on-click #(re-frame/dispatch [::bricks/prune-alert alert-id])}
+                            ;{:on-click #(ut/tracked-dispatch [::bricks/prune-alerts true])}
+                             {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])}
                              {}))
                    :width (when (> width 0) (px width))
                    :height (when (> height 0) (px height))
@@ -8070,7 +8070,7 @@
       :height (px (if @db/kick-alert all-h box-height))
       :padding "9px"
      ;:attr {:on-click #(reset! db/kick-alert (not @db/kick-alert))}
-      ;:attr (if @db/kick-alert {:on-click #(re-frame/dispatch [::bricks/prune-alerts true])} {})
+      ;:attr (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alerts true])} {})
       :style {:position "fixed"
               :font-size "18px"
               :border-left (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
@@ -8091,8 +8091,8 @@
 (re-frame/reg-sub
  ::flow-parts-lookup
  (fn [_ [_ & [part-key]]]
-   (let [fflowparts-sys @(re-frame/subscribe [::conn/sql-data [:fflowparts-sys]])
-         ;fflow-sys  @(re-frame/subscribe [::conn/sql-data [:fflows-sys]])
+   (let [fflowparts-sys @(ut/tracked-subscribe [::conn/sql-data [:fflowparts-sys]])
+         ;fflow-sys  @(ut/tracked-subscribe [::conn/sql-data [:fflows-sys]])
          ;flow-parts (vec (sort-by :name (into fflowparts-sys fflow-sys)))
          flow-parts (vec (sort-by :name fflowparts-sys))
          flow-parts-key (when part-key
@@ -8128,8 +8128,8 @@
 ;;         raw-fn?         (and (= dtype :list)
 ;;                              (= (first starting-val) 'fn))
 
-;;         _ (when flow? (re-frame/dispatch [::http/load-sub-flow (get starting-val :file_path)]))
-;;         sub-flow (when flow? @(re-frame/subscribe [::sub-flow-incoming]))
+;;         _ (when flow? (ut/tracked-dispatch [::http/load-sub-flow (get starting-val :file_path)]))
+;;         sub-flow (when flow? @(ut/tracked-subscribe [::sub-flow-incoming]))
 ;;         open-block-body {:w 125 :h 60 :z 0
 ;;                          :data {:drag-meta {:type :open-block}
 ;;                                 :flow-item {:expandable? true}
@@ -8245,7 +8245,7 @@
 ;;                     part-key? (try-read (get lookup-map :name)) ;;:test ;(get lookup-map )
 ;;                     flow? (try-read (get sub-flow :flow-id))
 ;;                     :else :open-input)]
-;;     ;(tap> [:spawner @(re-frame/subscribe [::flow-parts-lookup :clojure-base/*])])
+;;     ;(tap> [:spawner @(ut/tracked-subscribe [::flow-parts-lookup :clojure-base/*])])
 ;;     (conn/add-flow-block snapped-x snapped-y block-body bname)))
 
 ;;; conn/add-flow-block [x y & [body bid no-select?]]
@@ -8259,7 +8259,7 @@
         [xx yy] @db/flow-detached-coords
         left (- left xx)
         top (- top yy)
-        flow-parts @(re-frame/subscribe [::flow-parts-lookup])
+        flow-parts @(ut/tracked-subscribe [::flow-parts-lookup])
         sql-calls {:fflows-sys {:select [[":flow" :category] ["" :description] [:flow_id :name] :file_path [:body :full_map] ["zmdi-developer-board" :icon]]
                                 :from [:flows]
                                 :connection-id "flows-db"
@@ -8270,8 +8270,8 @@
     ;; get all parts, AND get all other flows to import as a part... PLUS we allow literals and function starters
     ;; showertime first
     (dorun (for [[k query] sql-calls]
-             (let [data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+             (let [data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (if (get query :connection-id)
                    (conn/sql-data [k] query (get query :connection-id))
@@ -8387,8 +8387,8 @@
                          :style {:font-weight 700
                                  :border-radius "8px"
                                  :cursor "pointer"}
-                         :attr {:on-click #(do (re-frame/dispatch [::conn/clear-query-history :fflows-sys])
-                                               (re-frame/dispatch [::conn/clear-query-history :fflowparts-sys]))}]]]]))
+                         :attr {:on-click #(do (ut/tracked-dispatch [::conn/clear-query-history :fflows-sys])
+                                               (ut/tracked-dispatch [::conn/clear-query-history :fflowparts-sys]))}]]]]))
 
 (re-frame/reg-event-db
  ::flip-drop-toggle
@@ -8399,9 +8399,9 @@
 ;; (re-frame/reg-event-db
 ;;  ::unload-flow
 ;;  (fn [db [_ flow-id]]
-;;    (re-frame/dispatch [::wfx/request :default
+;;    (ut/tracked-dispatch [::wfx/request :default
 ;;                        {:message    {:kind :remove-flow-watcher ;; just in case we are super-subbed...
-;;                                      :client-name @(re-frame/subscribe [::conn/client-name])
+;;                                      :client-name @(ut/tracked-subscribe [::conn/client-name])
 ;;                                      :flow-id flow-id}}])
 ;;    (-> db
 ;;        (ut/dissoc-in [:flows flow-id])
@@ -8425,11 +8425,12 @@
 (re-frame/reg-event-fx
  ::unload-flow
  (fn [{:keys [db]} [_ flow-id]]
-   {:db (re-frame/dispatch [::unload-flow-db flow-id])
+   {:db (ut/tracked-dispatch [::unload-flow-db flow-id])
     :dispatch [::wfx/request :default
                {:message    {:kind :remove-flow-watcher ;; just in case we are super-subbed...
-                             :client-name @(re-frame/subscribe [::conn/client-name])
-                             :flow-id flow-id}}]}))
+                             :client-name @(ut/tracked-subscribe [::conn/client-name])
+                             :flow-id flow-id}
+                :timeout 50000}]}))
 
 
 (re-frame/reg-sub
@@ -8459,26 +8460,26 @@
         y-px (px y)
         [wpct hpct] db/flow-panel-pcts ;; [0.85 0.50]
         panel-width (* (.-innerWidth js/window) wpct)
-        hh @(re-frame/subscribe [::subs/h]) ;; to ensure we get refreshed when the browser changes
-        ww @(re-frame/subscribe [::subs/w])
-        flow-id @(re-frame/subscribe [::selected-flow])
-        watched? (ut/ne? (get @(re-frame/subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
-        zoom-unlocked? @(re-frame/subscribe [::zoom-unlocked?])
-        flow-drop-down? @(re-frame/subscribe [::flow-drop-down?])
-        flowmaps @(re-frame/subscribe [::flowmap-raw])
-       ;; flowmappp [@(re-frame/subscribe [::flowmap]) @ports-react-render]
-        flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
-       ;flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
-        ;flow-id @(re-frame/subscribe [::selected-flow])
-        flow-map @(re-frame/subscribe [::flowmap])
-        audio-playing? @(re-frame/subscribe [::audio/audio-playing?])
+        hh @(ut/tracked-subscribe [::subs/h]) ;; to ensure we get refreshed when the browser changes
+        ww @(ut/tracked-subscribe [::subs/w])
+        flow-id @(ut/tracked-subscribe [::selected-flow])
+        watched? (ut/ne? (get @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
+        zoom-unlocked? @(ut/tracked-subscribe [::zoom-unlocked?])
+        flow-drop-down? @(ut/tracked-subscribe [::flow-drop-down?])
+        flowmaps @(ut/tracked-subscribe [::flowmap-raw])
+       ;; flowmappp [@(ut/tracked-subscribe [::flowmap]) @ports-react-render]
+        flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+       ;flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+        ;flow-id @(ut/tracked-subscribe [::selected-flow])
+        flow-map @(ut/tracked-subscribe [::flowmap])
+        audio-playing? @(ut/tracked-subscribe [::audio/audio-playing?])
         ;running? (is-running? :* flow-id)
-        running? @(re-frame/subscribe [::is-running? :* flow-id true])
-        chans-open? @(re-frame/subscribe [::bricks/flow-channels-open? flow-id])
+        running? @(ut/tracked-subscribe [::is-running? :* flow-id true])
+        chans-open? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
         has-done? (has-done?)
         panel-height (* (.-innerHeight js/window) hpct)
-        flow-select @(re-frame/subscribe [::selected-flow-block])
-        opts-map @(re-frame/subscribe [::opts-map])
+        flow-select @(ut/tracked-subscribe [::selected-flow-block])
+        opts-map @(ut/tracked-subscribe [::opts-map])
         has-override? (ut/ne? (get opts-map :overrides))
         ;; _ (tap> [:sizes ww hh
         ;;          (.-innerWidth js/window)
@@ -8486,7 +8487,7 @@
 
         details-panel-height (/ panel-height 1.25)
         ppanel-height (+ panel-height details-panel-height)]
-        ;flow-id @(re-frame/subscribe [::selected-flow])
+        ;flow-id @(ut/tracked-subscribe [::selected-flow])
 
         ;coords (generate-coords x y)
         ;fart (cstr/replace nil "5" "55") ;; error test
@@ -8501,7 +8502,7 @@
         ;;choices []
 
     ;; (tap> [:port-hover @port-hover])
-    ;;(tap> [:db/flow-results @(re-frame/subscribe [::http/flow-results])])
+    ;;(tap> [:db/flow-results @(ut/tracked-subscribe [::http/flow-results])])
     ;(tap> [:wtf-man flow-id running? chans-open?])
 
     [rc/catch
@@ -8605,19 +8606,19 @@
                                         :children  [;; [re-com/h-box
                                                     ;;  :children (for [[v [file-path name]] 
                                                     ;;                  (into 
-                                                    ;;                   (for [[k v] @(re-frame/subscribe [::http/flows])] [k nil])
-                                                    ;;                   (get @(re-frame/subscribe [::http/flow-results]) :run-refs []))
-                                                    ;;                  ;(get @(re-frame/subscribe [::http/flows]) :run-refs [])
+                                                    ;;                   (for [[k v] @(ut/tracked-subscribe [::http/flows])] [k nil])
+                                                    ;;                   (get @(ut/tracked-subscribe [::http/flow-results]) :run-refs []))
+                                                    ;;                  ;(get @(ut/tracked-subscribe [::http/flows]) :run-refs [])
                                                     ;;                  ]
                                                     ;;              [re-com/box :child (str v)
                                                     ;; ;;  :attr {:on-click #(do (swap! chat-mode assoc kp c)
                                                     ;; ;;                        (swap! kit-mode assoc kp v))}
                                                     ;;               :attr {:on-click #(let [sub-flow-exec? (and (string? file-path) (not (nil? file-path)))]
                                                     ;;                                   (if sub-flow-exec?
-                                                    ;;                                     (re-frame/dispatch [::http/load-flow-w-alias file-path v])
-                                                    ;;                                     (re-frame/dispatch [::set-selected-flow (str v)]))
+                                                    ;;                                     (ut/tracked-dispatch [::http/load-flow-w-alias file-path v])
+                                                    ;;                                     (ut/tracked-dispatch [::set-selected-flow (str v)]))
                                                     ;;                                   ;; (js/setTimeout (fn []
-                                                    ;;                                   ;;                  (.zoomToElement @db/zoomer @(re-frame/subscribe [::get-flow-brick]) 0.8))
+                                                    ;;                                   ;;                  (.zoomToElement @db/zoomer @(ut/tracked-subscribe [::get-flow-brick]) 0.8))
                                                     ;;                                   ;;                1000)
                                                     ;;                                   )}
 
@@ -8638,12 +8639,12 @@
                                                              ;:margin-right "8px"
                                                                ;:color pcolor
                                                              }
-                                                     :on-click #(re-frame/dispatch [::toggle-flow-drop-down])
+                                                     :on-click #(ut/tracked-dispatch [::toggle-flow-drop-down])
                                                      :md-icon-name (if flow-drop-down? "zmdi-chevron-up" "zmdi-chevron-down")]
 
                                                     [re-com/md-icon-button
                                                      :md-icon-name "zmdi-window-minimize"
-                                                     :on-click #(re-frame/dispatch [::bricks/toggle-flow])
+                                                     :on-click #(ut/tracked-dispatch [::bricks/toggle-flow])
                                                      :style {:font-size "15px"
                                                              :opacity   0.33
                                                              :cursor    "pointer"}]
@@ -8667,8 +8668,8 @@
                                                                        (vec (sort
                                                                                      (distinct
                                                                                       (into
-                                                                                       (for [[k v] @(re-frame/subscribe [::http/flows])] [k nil])
-                                                                            ;(get @(re-frame/subscribe [::http/flow-results]) :run-refs [])
+                                                                                       (for [[k v] @(ut/tracked-subscribe [::http/flows])] [k nil])
+                                                                            ;(get @(ut/tracked-subscribe [::http/flow-results]) :run-refs [])
                                                                                        ))))
                                                                        :let [selected? (= (str v) (str flow-id))]]
                                                                    [re-com/h-box
@@ -8676,12 +8677,12 @@
                                                                     :children [[re-com/box
                                                                                 :attr {:on-click #(let [sub-flow-exec? (and (string? file-path) (not (nil? file-path)))]
                                                                                                     (if sub-flow-exec?
-                                                                                                      (re-frame/dispatch [::http/load-flow-w-alias file-path v])
-                                                                                                      (re-frame/dispatch [::set-selected-flow (str v)])))}
+                                                                                                      (ut/tracked-dispatch [::http/load-flow-w-alias file-path v])
+                                                                                                      (ut/tracked-dispatch [::set-selected-flow (str v)])))}
                                                                                 :child (str v)]
                                                                                [re-com/md-icon-button :src (at)
                                                                                 :md-icon-name "zmdi-close"
-                                                                                :on-click #(re-frame/dispatch [::unload-flow (str v)])
+                                                                                :on-click #(ut/tracked-dispatch [::unload-flow (str v)])
                                                                                 :style {;:color bcolor
                                                                                         :cursor "pointer"
                                                                                         :height "12px"
@@ -8956,14 +8957,14 @@
                                                                [re-com/h-box
                                                                 :gap "6px"
                                                                 ;:size "1"
-                                                                :width (if @(re-frame/subscribe [::bricks/flow-editor?])
+                                                                :width (if @(ut/tracked-subscribe [::bricks/flow-editor?])
                                                                          (px (* ww 0.5035))
                                                                          (px (* ww 0.793)))
                                                                 :style {:position "fixed"
                                                                         ;:border "1px solid green"
                                                                         :height "60px"
 
-                                                                        :left (if @(re-frame/subscribe [::bricks/flow-editor?]) 
+                                                                        :left (if @(ut/tracked-subscribe [::bricks/flow-editor?]) 
                                                                                 ;;640
                                                                                 (if (nil? flow-select)
                                                                                   (+ (last @db/flow-editor-system-mode) 40)
@@ -8983,7 +8984,7 @@
                                                                                                 :transform-origin "21.5px 22px"
                                                                                                 :filter "drop-shadow(0.25rem 0.35rem 0.4rem rgba(0, 0, 0, 0.44))"
                                                                                                 :font-size "43px"}
-                                                                                        :on-click #(re-frame/dispatch [::run-current-flowmap])]
+                                                                                        :on-click #(ut/tracked-dispatch [::run-current-flowmap])]
 
                                                                                 :style {:z-index 98
                                                                                       ;:background-color "#00000022"
@@ -8998,7 +8999,7 @@
                                                                                          :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "run flow live"))
                                                                                  ;:on-click #(reset! editor-mode :part-browser)
                                                                                                 :on-mouse-leave #(reset! editor-tooltip-atom nil)}
-                                                                                         :on-click #(re-frame/dispatch [::run-current-flowmap])
+                                                                                         :on-click #(ut/tracked-dispatch [::run-current-flowmap])
                                                                                          :style {:color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                                                  :cursor "pointer"
                                                                                                  :filter "drop-shadow(0.25rem 0.35rem 0.4rem rgba(0, 0, 0, 0.44))"
@@ -9024,11 +9025,11 @@
                                                                              [re-com/box
                                                                               :child [re-com/md-icon-button :src (at)
                                                                                       :md-icon-name "zmdi-stop"
-                                                                                        ;:on-click #(re-frame/dispatch [::run-current-flowmap])
-                                                                                      :attr {:on-click #(re-frame/dispatch [::wfx/request :default
+                                                                                        ;:on-click #(ut/tracked-dispatch [::run-current-flowmap])
+                                                                                      :attr {:on-click #(ut/tracked-dispatch [::wfx/request :default
                                                                                                                             {:message    {:kind :kill-flow
                                                                                                                                           :flow-id flow-id
-                                                                                                                                          :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                                                                                                                          :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                                                                                                                                ;:on-response [::simple-response]
                                                                                                                                ;:on-timeout  [::timeout-response :run-flow flowmap] ;; requeue?
                                                                                                                              :timeout    15000000}])
@@ -9081,9 +9082,9 @@
                                                                                  ;:on-click #(reset! editor-mode :part-browser)
                                                                                              :on-mouse-leave #(reset! editor-tooltip-atom nil)}
                                                                                       :on-click #(do
-                                                                                                   (re-frame/dispatch [::http/save-flow
-                                                                                                                       {:flowmaps flowmaps ;; @(re-frame/subscribe [::flowmap-raw])
-                                                                                                                        :opts @(re-frame/subscribe [::opts-map])
+                                                                                                   (ut/tracked-dispatch [::http/save-flow
+                                                                                                                       {:flowmaps flowmaps ;; @(ut/tracked-subscribe [::flowmap-raw])
+                                                                                                                        :opts @(ut/tracked-subscribe [::opts-map])
                                                                                                                         :zoom @db/pan-zoom-offsets
                                                                                                                         :flow-id flow-id
                                                                                                                         :flowmaps-connections flowmaps-connections}
@@ -9111,7 +9112,7 @@
                                                                                       :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "new flow"))
                                                                                  ;:on-click #(reset! editor-mode :part-browser)
                                                                                              :on-mouse-leave #(reset! editor-tooltip-atom nil)}
-                                                                                      :on-click #(re-frame/dispatch [::new-flow])
+                                                                                      :on-click #(ut/tracked-dispatch [::new-flow])
                                                                                       :md-icon-name "zmdi-widgets"
                                                                                       :style {:color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                                               :cursor "pointer"
@@ -9158,7 +9159,7 @@
                                                                                          :border (str "4px dashed " ccolor)
                                                                                          :margin-top "4px"}
                                                                                  :height "55px"
-                                                                                 :width (px (- (if @(re-frame/subscribe [::bricks/flow-editor?])
+                                                                                 :width (px (- (if @(ut/tracked-subscribe [::bricks/flow-editor?])
                                                                                                  (* ww 0.5035)
                                                                                                  (* ww 0.793)) 210))])]
                                                                      ;:width "80px"
@@ -9170,7 +9171,7 @@
                                                                               ;           (str (or @editor-tooltip-atom "")))
                                                                               :size "none"
                                                                               :height "80%"
-                                                                              :width (px (- (if @(re-frame/subscribe [::bricks/flow-editor?])
+                                                                              :width (px (- (if @(ut/tracked-subscribe [::bricks/flow-editor?])
                                                                                               (* ww 0.5035)
                                                                                               (* ww 0.793)) 210))
                                                                               :align :center :justify :center
@@ -9194,21 +9195,22 @@
                                                                            [re-com/md-icon-button :src (at)
                                                                             :md-icon-name (if watched? "zmdi-eye" "zmdi-eye-off")
                                                                             :on-click #(if watched?
-                                                                                         (re-frame/dispatch [::wfx/request :default
+                                                                                         (ut/tracked-dispatch [::wfx/request :default
                                                                                                              {:message    {:kind :remove-flow-watcher
-                                                                                                                           :client-name @(re-frame/subscribe [::conn/client-name])
-                                                                                                                           :flow-id flow-id}}])
-                                                                                         (let [flowmap @(re-frame/subscribe [::flowmap])
-                                                                                               ;flow-id @(re-frame/subscribe [::selected-flow])
-                                                                                               flowmaps-connections @(re-frame/subscribe [::flowmap-connections])
-                                                                                               client-name @(re-frame/subscribe [::conn/client-name])
+                                                                                                                           :client-name @(ut/tracked-subscribe [::conn/client-name])
+                                                                                                                           :flow-id flow-id}
+                                                                                                              :timeout 50000}])
+                                                                                         (let [flowmap @(ut/tracked-subscribe [::flowmap])
+                                                                                               ;flow-id @(ut/tracked-subscribe [::selected-flow])
+                                                                                               flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+                                                                                               client-name @(ut/tracked-subscribe [::conn/client-name])
                                                                                                server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)
                                                                                                comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
                                                                                                running-view-subs (vec (for [[k v] comps :when (get v :view)]
                                                                                                                         [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
                                                                                                running-subs (vec (for [k (keys comps)] [flow-id k]))
                                                                                                running-subs (vec (into running-subs running-view-subs))]
-                                                                                           (re-frame/dispatch [::wfx/request :default
+                                                                                           (ut/tracked-dispatch [::wfx/request :default
                                                                                                                {:message    {:kind :sub-to-running-values
                                                                                                                              :flow-keys running-subs
                                                                                                                              :flow-id flow-id 
@@ -9241,7 +9243,7 @@
                                                                 :child [re-com/md-icon-button :src (at)
                                                                         :md-icon-name (if zoom-unlocked? "zmdi-lock-open" "zmdi-lock")
                                                                         ;:on-click #(reset! pan-lock? (not @pan-lock?))
-                                                                        :on-click #(re-frame/dispatch [::toggle-lock])
+                                                                        :on-click #(ut/tracked-dispatch [::toggle-lock])
                                                                         :attr {:on-mouse-enter #(reset! editor-tooltip-atom (str "hold C to unlock flow pan & zoom"))
                                                                                :on-mouse-leave #(reset! editor-tooltip-atom nil)}
                                                                         :style {:color (if zoom-unlocked? "red"

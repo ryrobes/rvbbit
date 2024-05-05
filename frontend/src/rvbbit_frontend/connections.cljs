@@ -1,6 +1,7 @@
 (ns rvbbit-frontend.connections
   (:require
    [re-frame.core :as re-frame]
+   [re-frame.alpha :as rfa]
    [rvbbit-frontend.http :as http]
    [rvbbit-frontend.db :as db]
    [rvbbit-frontend.utility :as ut]
@@ -47,8 +48,8 @@
         raw-fn?         (and (= dtype :list)
                              (= (first starting-val) 'fn))
 
-        _ (when flow? (re-frame/dispatch [::http/load-sub-flow (get starting-val :file_path)]))
-        sub-flow (when flow? @(re-frame/subscribe [::sub-flow-incoming]))
+        _ (when flow? (ut/tracked-dispatch [::http/load-sub-flow (get starting-val :file_path)]))
+        sub-flow (when flow? @(ut/tracked-subscribe [::sub-flow-incoming]))
         open-block-body {:w 125 :h 60 :z 0
                          :data {:drag-meta {:type :open-block}
                                 :flow-item {:expandable? true}
@@ -164,7 +165,7 @@
                     part-key? (try-read (get lookup-map :name)) ;;:test ;(get lookup-map )
                     flow? (try-read (get sub-flow :flow-id))
                     :else :open-input)]
-    ;(tap> [:spawner @(re-frame/subscribe [::flow-parts-lookup :clojure-base/*])])
+    ;(tap> [:spawner @(ut/tracked-subscribe [::flow-parts-lookup :clojure-base/*])])
     ;(add-block snapped-x snapped-y block-body bname)
 ;;    (tap> [:spawner snapped-x snapped-y block-body bname])
     [snapped-x snapped-y block-body bname]
@@ -185,7 +186,7 @@
      (assoc-in db [:flows (get db :selected-flow) :map bid kkey] vval))))
 
 (re-frame/reg-sub
- ::reserved-type-keywords ;; @(re-frame/subscribe [::reserved-type-keywords])
+ ::reserved-type-keywords ;; @(ut/tracked-subscribe [::reserved-type-keywords])
  (fn [db]
    (let [lib-keys (try (vec (map edn/read-string (map :name (get-in db [:data :flow-fn-all-sys])))) (catch :default _ []))]
      (vec (into lib-keys
@@ -194,12 +195,12 @@
                  (vec (distinct (ut/get-all-values (get-in db [:flows (get db :selected-flow)]) :type)))))))))
 
 (defn add-flow-block [x y & [body bid no-select?]]
-  (let [;bid (if bid bid (keyword (str "open-input-" (count @(re-frame/subscribe [::flowmap])))))
+  (let [;bid (if bid bid (keyword (str "open-input-" (count @(ut/tracked-subscribe [::flowmap])))))
         _ (tap> [:add-block bid x y  body])
         bid (keyword (cstr/replace (str (gn bid)) #"/" "-"))
         bid (if bid bid :open-input)
         ;;_ (tap> [:ADD-pre-safe-bid bid])
-        safe-keys-reserved @(re-frame/subscribe [::reserved-type-keywords])
+        safe-keys-reserved @(ut/tracked-subscribe [::reserved-type-keywords])
         bid (ut/safe-key bid safe-keys-reserved)
         ;;_ (tap> [:ADD-post-safe-bid bid])
         zoom-multi (get @db/pan-zoom-offsets 2)
@@ -229,10 +230,10 @@
                  (assoc :data (select-keys (get body :data) [:flow-item :drag-meta]))
                  (assoc-in [:data :flow-item :inputs] (vec (keys (get-in body [:ports :in]))))) ;; clean up in case was row-dragged
         ]
-   ;(tap> [:adding-flow-block bid x y @(re-frame/subscribe [::flowmap])])
+   ;(tap> [:adding-flow-block bid x y @(ut/tracked-subscribe [::flowmap])])
    ;(swap! flowmaps assoc bid body)
-    (when (not no-select?) (re-frame/dispatch [::select-block bid]))
-    (re-frame/dispatch [::update-flowmap-key2 bid nil body])))
+    (when (not no-select?) (ut/tracked-dispatch [::select-block bid]))
+    (ut/tracked-dispatch [::update-flowmap-key2 bid nil body])))
 
 
 (defn logic-and-params-fn [block-map panel-key]
@@ -248,7 +249,7 @@
                                                     ) 
                                               (ut/deep-flatten block-map)))
           workspace-params       (into {} (for [k valid-body-params] ;; deref here?
-                                            {k @(re-frame/subscribe [::clicked-parameter-key [k]])}))
+                                            {k @(ut/tracked-subscribe [::clicked-parameter-key [k]])}))
           value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
           value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
                                             (let [fs    (cstr/split (ut/unkeyword k) "/")
@@ -258,13 +259,13 @@
                                                 ;row (int (last gs))
                                                   field (keyword (first gs))]
                                               {k (if (not (integer? row))
-                                                 ;(get-in @(re-frame/subscribe [::conn/sql-data [ds]]) [row field])
+                                                 ;(get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field])
                                                    (str field)
-                                                   (get-in @(re-frame/subscribe [::sql-data [ds]]) [row field]))})))
+                                                   (get-in @(ut/tracked-subscribe [::sql-data [ds]]) [row field]))})))
 
           condi-walks-targets    (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
           condi-walks            (into {} (for [k condi-walks-targets]
-                                            {k @(re-frame/subscribe [::condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
+                                            {k @(ut/tracked-subscribe [::condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
           into-walk-map2           (fn [obody] (let [;obody (walk/postwalk-replace condi-walks orig-body)
                                                      kps       (ut/extract-patterns obody :into 3) ;(kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
                                                      logic-kps (into {} (for [v kps]
@@ -320,7 +321,7 @@
         ;;                                                                     raw-param-key (get-in vsql-calls (conj (vec (first (filter #(= (last %) :on-click)
         ;;                                                                                                                                (ut/kvpaths vsql-calls)))) 1) pkey)]
         ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
-        ;;                                                                 {v (fn [] (re-frame/dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
+        ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
         ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
         ;;                                      (walk/postwalk-replace logic-kps obody)))
         ;; onclick-walk-map2      (fn [obody] (let [kps       (ut/extract-patterns obody :set-parameter 3)
@@ -329,7 +330,7 @@
         ;;                                                                     raw-param-key (get-in vsql-calls (conj (vec (first (filter #(= (last %) :on-click)
         ;;                                                                                                                                (ut/kvpaths vsql-calls)))) 1) pkey)]
         ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
-        ;;                                                                 {v (fn [] (re-frame/dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
+        ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
         ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
         ;;                                      (walk/postwalk-replace logic-kps obody)))
         ;; map-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :map 3)
@@ -338,7 +339,7 @@
         ;;                                                                 ;(tap> [:=-walk panel-key kps this that])
         ;;                                                                   {v (if (vector? this)
         ;;                                                                        (vec (for [r this] (last (get r that))))
-        ;;                                                                        (vec (for [r @(re-frame/subscribe [::conn/sql-data [this]])] (last (get r that)))))
+        ;;                                                                        (vec (for [r @(ut/tracked-subscribe [::conn/sql-data [this]])] (last (get r that)))))
         ;;                                                                  ;(= (str that) (str this))
         ;;                                                                    })))]
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
@@ -362,7 +363,7 @@
         ;;                                                                      (let [[_ this] v]
         ;;                                                                        (tap> [:scrubber panel-key kps this])
         ;;                                                                        {v [scrubber-panel true
-        ;;                                                                            @(re-frame/subscribe [::keypaths-in-params :param])
+        ;;                                                                            @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                            :param
         ;;                                                                            (str (last (cstr/split (str this) #"/")))
         ;;                                                                            {:fm true :canvas? true}]})))
@@ -370,7 +371,7 @@
         ;;                                                                       (let [[_ this opts] v]
         ;;                                                                         (tap> [:scrubber panel-key kps this])
         ;;                                                                         {v [scrubber-panel true
-        ;;                                                                             @(re-frame/subscribe [::keypaths-in-params :param])
+        ;;                                                                             @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                             :param
         ;;                                                                             (str (last (cstr/split (str this) #"/")))
         ;;                                                                             {:fm true :canvas? true :opts opts}]})))]
@@ -420,7 +421,7 @@
           templated-strings-walk (if templates?
                                    (walk/postwalk-replace {nil ""}
                                                           (into {} (for [k templated-strings-vals]
-                                                                     {k @(re-frame/subscribe [::clicked-parameter-key [k]])}))) {})
+                                                                     {k @(ut/tracked-subscribe [::clicked-parameter-key [k]])}))) {})
           out-block-map (if templates? (ut/deep-template-replace templated-strings-walk out-block-map) out-block-map)]
 
       ;;(tap> [:pp panel-key (ut/deep-template-find out-block-map)])
@@ -491,7 +492,7 @@
    (assoc db :selected-shape context_hash)))
 
 (defn refresh []
-  (re-frame/dispatch [::wfx/request :default
+  (ut/tracked-dispatch [::wfx/request :default
                       {:message    {:kind :honey-call
                                     :ui-keypath [:connections]
                                     :honey-sql {:select-distinct [:connection_id :database_name :database_version]
@@ -508,14 +509,14 @@
    (get-in db [:field-count])))
 
 (defn field-count []
-  (re-frame/dispatch [::wfx/request :default
+  (ut/tracked-dispatch [::wfx/request :default
                       {:message    {:kind :honey-call
                                     :ui-keypath [:field-count]
                                     :honey-sql {:select [[[:count 1] :cnt]]
                                                 :from [:fields]
                                                 :where [:and
-                                                        [:= :context_hash @(re-frame/subscribe [::selected-table])]
-                                                        [:= :connection_id @(re-frame/subscribe [::selected])]]}
+                                                        [:= :context_hash @(ut/tracked-subscribe [::selected-table])]
+                                                        [:= :connection_id @(ut/tracked-subscribe [::selected])]]}
                                     :extras {:requested? true
                                              :rando (rand-int 1234234525)}}
                        :on-response [::http/socket-response]
@@ -565,7 +566,7 @@
          if-walk-map2           (fn [obody] (let [kps       (ut/extract-patterns obody :if 4)
                                                   logic-kps (into {} (for [v kps]
                                                                        (let [kws (vec (filter #(cstr/includes? (str %) "/") (ut/deep-flatten v)))
-                                                                             wm @(re-frame/subscribe [::resolve-click-param kws])
+                                                                             wm @(ut/tracked-subscribe [::resolve-click-param kws])
                                                                              v0 (walk/postwalk-replace wm v)
                                                                              [_ l this that] v0]
                                                                         ;(tap> [:if-walk keypath v kps l this that kws (if l this that)])
@@ -733,11 +734,11 @@
             [re-com/box
              :size "auto" :padding "4px"
              :attr (if clickable?
-                     {:on-click #(re-frame/dispatch [::click-parameter keypath r])}
+                     {:on-click #(ut/tracked-dispatch [::click-parameter keypath r])}
                      {})
              :child (str r)
              :style (merge styles {:cursor (if clickable? "pointer" "inherit")
-                                   :background-color (if (= r @(re-frame/subscribe [::clicked-parameter keypath]))
+                                   :background-color (if (= r @(ut/tracked-subscribe [::clicked-parameter keypath]))
                                                        "grey"
                                                        "inherit")})])))))
 
@@ -749,12 +750,12 @@
             [re-com/box
              :size "auto" :padding "4px"
              :attr (if clickable?
-                     {;:on-click #(re-frame/dispatch [::click-parameter keypath r])
-                      :on-click (re-com/handler-fn (re-frame/dispatch [::click-parameter keypath r]))}
+                     {;:on-click #(ut/tracked-dispatch [::click-parameter keypath r])
+                      :on-click (re-com/handler-fn (ut/tracked-dispatch [::click-parameter keypath r]))}
                      {})
              :child (str (vals r))
              :style (merge styles {:cursor (if clickable? "pointer" "inherit")
-                                   :background-color (if (= r @(re-frame/subscribe [::clicked-parameter keypath]))
+                                   :background-color (if (= r @(ut/tracked-subscribe [::clicked-parameter keypath]))
                                                        "grey"
                                                        "inherit")})])))))
 
@@ -806,8 +807,8 @@
      (assoc-in db (cons :query-history-meta keypath) (hash query)))))
 
 (re-frame/reg-sub
- ::lookup-panel-key-by-query-key
- (fn [db [_ query-key]]
+ ::lookup-panel-key-by-query-key-alpha
+ (fn [db {:keys [query-key]}]
    (first (remove nil? (for [[k v] (get db :panels)]
                          (when (some #(= query-key %)
                                      (keys (get v :queries))) k))))))
@@ -816,8 +817,10 @@
  ::clear-query-history
  (fn [db [_ query-id]]
    ;(tap> [:cleared-query-history query-id])
-   (let [panel @(re-frame/subscribe [::lookup-panel-key-by-query-key query-id])
-         selected (get db :selected-block)]
+   (let [;panel @(ut/tracked-subscribe [::lookup-panel-key-by-query-key query-id])
+         panel @(rfa/sub ::lookup-panel-key-by-query-key-alpha {:query-key query-id})
+         ;selected (get db :selected-block)
+         ]
      (-> db
        ;(ut/dissoc-in [:data query-id])
         ;;  (assoc-in (if (not (= panel selected))
@@ -892,7 +895,7 @@
    (get db :client-name)))
 
 (defn theme-pull [cmp-key fallback & test-fn]
-  (let [v                   @(re-frame/subscribe [::clicked-parameter-key [cmp-key]])
+  (let [v                   @(ut/tracked-subscribe [::clicked-parameter-key [cmp-key]])
         t0                  (cstr/split (str (ut/unkeyword cmp-key)) #"/")
         t1                  (keyword (first t0))
         t2                  (keyword (last t0))
@@ -916,7 +919,10 @@
  (fn [_]
    (theme-pull :theme/data-colors db/data-colors)))
 
-(def data-colors @(re-frame/subscribe [::data-colors])) ;; kinda weird usage
+(def data-colors 
+  ;@(ut/tracked-subscribe [::data-colors])
+  @(re-frame.alpha/sub ::data-colors)
+  ) ;; kinda weird usage
 
 (re-frame/reg-sub
  ::sql-source
@@ -926,10 +932,10 @@
 (defn sql-deep-meta [keypath honey-sql connection-id & [deeps?]]
   ;(tap> [:sql-deep-meta keypath (str (first keypath)) (cstr/starts-with? (str (first keypath)) ":query-preview" )])
   (when (not (cstr/starts-with? (str (first keypath)) ":query-preview")) ;; lets not sniff rando recos, ok?
-    (let [fields (get @(re-frame/subscribe [::sql-metadata keypath]) :fields [])
+    (let [fields (get @(ut/tracked-subscribe [::sql-metadata keypath]) :fields [])
           ;;_ (when (cstr/includes? (str keypath) ":kick") (tap> [:deep-meta keypath honey-sql]))
           honey-sql (if (empty? (ut/clean-sql-from-ui-keys honey-sql)) 
-                      @(re-frame/subscribe [::sql-source (first keypath)]) honey-sql) 
+                      @(ut/tracked-subscribe [::sql-source (first keypath)]) honey-sql) 
           ;; ^^ kicks dont get passed honey-sql map correctly, so we look it up
           connection-id (or (get honey-sql :connection-id) 
                             (if (nil? connection-id) "cache.db" connection-id))
@@ -966,26 +972,26 @@
                                              ; {:select [[[:max field] :max-value]] :from [[honey-sql :subq]]}
                                              })){}))]
         (when ;true 
-        ;(or @(re-frame/subscribe [::sql-query-not-run? keypath honey-sql])
+        ;(or @(ut/tracked-subscribe [::sql-query-not-run? keypath honey-sql])
          (and (not (= keypath [:query-preview])) ;; no need to meta on browsing viz recos 
-                ; (= (count @(re-frame/subscribe [::wfx/pending-requests http/socket-id])) 0)
+                ; (= (count @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])) 0)
                 ;; false
-              @(re-frame/subscribe [::sql-meta-not-run?
+              @(ut/tracked-subscribe [::sql-meta-not-run?
                                    ;keypath 
                                     (conj (conj keypath f) name)
                                     hsql]))
 
           (dorun
-           (re-frame/dispatch [::wfx/request :default
+           (ut/tracked-dispatch [::wfx/request :default
                                {:message    {:kind :honey-xcall
                                              :ui-keypath (conj (conj keypath f) name)
                                              :honey-sql hsql
                                              :connection-id connection-id
-                                             :client-name @(re-frame/subscribe [::client-name])}
+                                             :client-name @(ut/tracked-subscribe [::client-name])}
                                 :on-response [::http/socket-response-post-meta]
                                 :on-timeout [::http/timeout-response (conj (conj keypath f) name)] ;; requeue?
                                 :timeout    50000}])
-           (re-frame/dispatch [::add-to-sql-history-meta
+           (ut/tracked-dispatch [::add-to-sql-history-meta
                                (conj (conj keypath f) name)
                             ; keypath
                                hsql])))))));)
@@ -1007,20 +1013,20 @@
                   :from [(ut/keypath-munger keypath)]}]
         (when
          (and
-          @(re-frame/subscribe [::sql-style-not-run? kp hsql honey-sql])
-          (not @(re-frame/subscribe [::sql-query-not-run? keypath honey-sql])))
+          @(ut/tracked-subscribe [::sql-style-not-run? kp hsql honey-sql])
+          (not @(ut/tracked-subscribe [::sql-query-not-run? keypath honey-sql])))
 
           (dorun
-           (re-frame/dispatch [::wfx/request :default
+           (ut/tracked-dispatch [::wfx/request :default
                                {:message    {:kind :honey-xcall
                                              :ui-keypath kp
                                              :honey-sql hsql
                                              :connection-id :cache ;connection-id
-                                             :client-name @(re-frame/subscribe [::client-name])}
+                                             :client-name @(ut/tracked-subscribe [::client-name])}
                                 :on-response [::http/socket-response-post-style style]
                                 :on-timeout [::http/timeout-response [keypath honey-sql]]
                                 :timeout    50000}])
-           (re-frame/dispatch [::add-to-sql-history-style kp hsql honey-sql])))))))
+           (ut/tracked-dispatch [::add-to-sql-history-style kp hsql honey-sql])))))))
 
 (defn sql-tab-meta [keypath rules panel-key]
   (let [;style-rules (get honey-sql :style-rules) 
@@ -1037,21 +1043,21 @@
         ;(tap> [kp hsql])
         (when ;true
          ;(and
-         @(re-frame/subscribe [::sql-tab-not-run? kp hsql kk])
-          ;(not @(re-frame/subscribe [::sql-query-not-run? keypath rules]))
+         @(ut/tracked-subscribe [::sql-tab-not-run? kp hsql kk])
+          ;(not @(ut/tracked-subscribe [::sql-query-not-run? keypath rules]))
          ; )
 
           (dorun
-           (re-frame/dispatch [::wfx/request :default
+           (ut/tracked-dispatch [::wfx/request :default
                                {:message    {:kind :honey-xcall
                                              :ui-keypath kp
                                              :honey-sql hsql
                                              :connection-id :cache ;connection-id
-                                             :client-name @(re-frame/subscribe [::client-name])}
+                                             :client-name @(ut/tracked-subscribe [::client-name])}
                                 :on-response [::http/socket-response-post-tab panel-key]
                                 :on-timeout [::http/timeout-response [keypath rules]]
                                 :timeout    50000}])
-           (re-frame/dispatch [::add-to-sql-history-tab kp hsql kk])))))))
+           (ut/tracked-dispatch [::add-to-sql-history-tab kp hsql kk])))))))
 
 (defn sql-condi-meta [keypath rules]
   (let [;style-rules (get honey-sql :style-rules) 
@@ -1068,33 +1074,34 @@
         ;(tap> [kp hsql])
         (when ;true
          ;(and
-         @(re-frame/subscribe [::sql-condi-not-run? kp hsql kk])
-          ;(not @(re-frame/subscribe [::sql-query-not-run? keypath rules]))
+         @(ut/tracked-subscribe [::sql-condi-not-run? kp hsql kk])
+          ;(not @(ut/tracked-subscribe [::sql-query-not-run? keypath rules]))
          ; )
 
           (dorun
-           (re-frame/dispatch [::wfx/request :default
+           (ut/tracked-dispatch [::wfx/request :default
                                {:message    {:kind :honey-xcall
                                              :ui-keypath kp
                                              :honey-sql hsql
                                              :connection-id :cache ;connection-id
-                                             :client-name @(re-frame/subscribe [::client-name])}
+                                             :client-name @(ut/tracked-subscribe [::client-name])}
                                 :on-response [::http/socket-response-post-condi]
                                 :on-timeout [::http/timeout-response [keypath rules]]
                                 :timeout    50000}])
-           (re-frame/dispatch [::add-to-sql-history-condi kp hsql kk])))))))
+           (ut/tracked-dispatch [::add-to-sql-history-condi kp hsql kk])))))))
 
 (defn push-panels-to-server [panels-map resolved-panels-map client-name]
   (let []
     (dorun
-     (re-frame/dispatch [::wfx/request   :default
+     (ut/tracked-dispatch [::wfx/request   :default
                          {:message    {:kind :current-panels
                                        :panels panels-map
                                        :resolved-panels resolved-panels-map
                                        ;:ui-keypath kp
                                        ;:honey-sql hsql
                                        ;:connection-id :cache ;connection-id
-                                       :client-name client-name} ;;@(re-frame/subscribe [::client-name])}
+                                       :client-name client-name}
+                          :timeout 50000;;@(ut/tracked-subscribe [::client-name])}
                           ;:on-response [::http/socket-response-post-condi]
                           ;:on-timeout [::http/timeout-response [keypath rules]]
                           ;:timeout    150000
@@ -1132,7 +1139,7 @@
                  (vec (for [[[col name] logic] style-rules]
                         [[:case (:logic logic) 1 :else 0]
                          (keyword (str "styler_" (ut/unkeyword name)))])))
-         panel-key @(re-frame/subscribe [::lookup-panel-key-by-query-key (first keypath)])
+         panel-key @(ut/tracked-subscribe [::lookup-panel-key-by-query-key (first keypath)])
          honey-sql (ut/clean-sql-from-ui-keys honey-sql)
          hselect (get honey-sql :select)
          flat (ut/deep-flatten honey-sql)
@@ -1142,10 +1149,10 @@
          honey-modded (if has-rules?
                         (assoc honey-sql :select (apply merge hselect rules))
                         honey-sql)
-         client-name @(re-frame/subscribe [::client-name])
+         client-name @(ut/tracked-subscribe [::client-name])
          honey-modded (walk/postwalk-replace {:*client-name client-name
                                               :*client-name-str (pr-str client-name)} honey-modded)]
-     (re-frame/dispatch [::wfx/request :default
+     (ut/tracked-dispatch [::wfx/request :default
                          {:message    {:kind (if (or connection-id literal-data?)
                                                :honey-xcall
                                                :honey-call) ;; override for data literals
@@ -1167,18 +1174,18 @@
                                     ;;                 (dissoc :refresh-every)
                                     ;;                 (dissoc :clicked-row-height)
                                     ;;                 (dissoc :style-rules)) 
-                                       :client-name @(re-frame/subscribe [::client-name])}
+                                       :client-name @(ut/tracked-subscribe [::client-name])}
                           :on-response [::http/socket-response]
                           :on-timeout [::http/timeout-response [keypath honey-sql]]
                           :timeout    50000}]))
 
    (when (not (nil? (get honey-sql :refresh-every)))
-     (re-frame/dispatch [::set-query-schedule (first keypath) (get honey-sql :refresh-every)]))
+     (ut/tracked-dispatch [::set-query-schedule (first keypath) (get honey-sql :refresh-every)]))
 
   ;;  (when (and (some #(= % :data) (ut/deep-flatten honey-sql)) 
   ;;             (not (= 111 (get honey-sql :limit)))) ;; <- code for a base table sniff 
-  ;;    (re-frame/dispatch-sync [::set-reco-status (first keypath) :started]))
-   (re-frame/dispatch [::add-to-sql-history keypath honey-sql]))
+  ;;    (ut/tracked-dispatch-sync [::set-reco-status (first keypath) :started]))
+   (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql]))
 
   ([keypath honey-sql connection-id]
    (doall
@@ -1201,7 +1208,7 @@
           refresh-every (get honey-sql :refresh-every)
           cache? (get honey-sql :cache? true)
           page (get honey-sql :page)
-          panel-key @(re-frame/subscribe [::lookup-panel-key-by-query-key (first keypath)])
+          panel-key @(ut/tracked-subscribe [::lookup-panel-key-by-query-key (first keypath)])
           honey-sql (ut/clean-sql-from-ui-keys honey-sql)
           ;; honey-sql (-> honey-sql
           ;;               (dissoc :col-widths)
@@ -1216,14 +1223,14 @@
           honey-modded (if has-rules?
                          (assoc honey-sql :select (apply merge hselect rules))
                          honey-sql)
-          client-name @(re-frame/subscribe [::client-name])
+          client-name @(ut/tracked-subscribe [::client-name])
           honey-modded (walk/postwalk-replace {:*client-name client-name
                                                :*client-name-str (str client-name)} honey-modded)]
           
 
-      (do (when (not (nil? refresh-every)) (re-frame/dispatch [::set-query-schedule (first keypath) refresh-every]))
+      (do (when (not (nil? refresh-every)) (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))
 
-          (re-frame/dispatch [::wfx/request :default
+          (ut/tracked-dispatch [::wfx/request :default
                               {:message    {:kind :honey-xcall
                                             :ui-keypath keypath
                                             :panel-key panel-key
@@ -1233,7 +1240,7 @@
                                             :sniff? sniff?
                                             :honey-sql honey-modded
                                             :connection-id connection-id
-                                            :client-name @(re-frame/subscribe [::client-name])}
+                                            :client-name @(ut/tracked-subscribe [::client-name])}
                                :on-response [::http/socket-response]
                                :on-timeout [::http/timeout-response [keypath honey-sql]]
                                :timeout    50000}])
@@ -1243,9 +1250,9 @@
           ;; clear out the sniff deck (even if not needed)
 
     ;;  (when (not (= 111 (get honey-sql :limit)))
-    ;;    (re-frame/dispatch-sync [::set-reco-status (first keypath) :started]))
-          (re-frame/dispatch [::add-to-sql-history keypath honey-modded]))))
-   ;(re-frame/dispatch-sync [::add-to-sql-history keypath honey-sql])
+    ;;    (ut/tracked-dispatch-sync [::set-reco-status (first keypath) :started]))
+          (ut/tracked-dispatch [::add-to-sql-history keypath honey-modded]))))
+   ;(ut/tracked-dispatch-sync [::add-to-sql-history keypath honey-sql])
    ;(sql-deep-meta keypath honey-sql connection-id)
    ))
 
@@ -1263,7 +1270,7 @@
 ;;    (get-in db (cons :xsql keypath))))
 
 ;; (defn xsql-data [keypath honey-sql connection-id]
-;;   (re-frame/dispatch [::wfx/request :default
+;;   (ut/tracked-dispatch [::wfx/request :default
 ;;                       {:message    {:kind :honey-xcall
 ;;                                     :ui-keypath (cons :xsql keypath) ;keypath
 ;;                                     :honey-sql (-> honey-sql

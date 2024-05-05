@@ -62,7 +62,7 @@
         ;only-body false ;(mapify-data block-id true) 
         font-size "11px"
         ;iii @hovered-input
-        ;options {} ; (into {} (for [{:keys [block-keypath current]} @(re-frame/subscribe [::options block-id])] {(last block-keypath) current})) 
+        ;options {} ; (into {} (for [{:keys [block-keypath current]} @(ut/tracked-subscribe [::options block-id])] {(last block-keypath) current})) 
         ;show-code-map-opt? (get options :show-code-map? true)
         add-kp? (try (keyword? block-id) (catch :default _ false)) ;;true ;(not show-code-map-opt?) ;; for drag outs only 
         cells? (= block-id :cells)
@@ -82,7 +82,7 @@
                             in-body? true ;(ut/contains-data? only-body k-val)
                             hovered? false ;(ut/contains-data? mat-hovered-input k-val)
                             border-ind (if in-body? "solid" "dashed")
-                            val-color (get @(re-frame/subscribe [::conn/data-colors]) k-val-type)
+                            val-color (get @(ut/tracked-subscribe [::conn/data-colors]) k-val-type)
                             keypath-in (conj keypath kk)
                             keystyle {:background-color (if hovered? (str val-color 66) "#00000000")
                                       ;:font-weight 700
@@ -215,7 +215,7 @@
                                                   [re-com/md-icon-button
                                                    :md-icon-name "zmdi-info"
                                                    :tooltip (str "FOOO" (get sql-explanations keypath ""))
-                                                   ;:on-click #(re-frame/dispatch [::change-page panel-key (first data-keypath) (- page-num 1) ttl-pages])
+                                                   ;:on-click #(ut/tracked-dispatch [::change-page panel-key (first data-keypath) (- page-num 1) ttl-pages])
                                                    :style {:font-size "16px"
                                                            :cursor "pointer"
                                                            :opacity 0.5
@@ -285,7 +285,7 @@
     (if (= keypath [])
 
       (let [k-val-type (ut/data-typer data)
-            val-color (get @(re-frame/subscribe [::conn/data-colors]) k-val-type)]
+            val-color (get @(ut/tracked-subscribe [::conn/data-colors]) k-val-type)]
         [re-com/v-box
          :size "auto"
          :children

@@ -1,6 +1,7 @@
 (ns rvbbit-frontend.utility
   (:require [clojure.string :as cstr]
             [talltale.core :as tales]
+            [re-frame.alpha :as rfa]
             [clojure.walk :as walk]
             [reagent.core :as reagent]
             [re-frame.core :as re-frame]
@@ -20,16 +21,52 @@
    [goog.events EventType]))
 
 
-(def subscription-counts (atom {}))
+(defonce subscription-counts (atom {}))
 
 (defn tracked-subscribe [query & args] ;;; lmao - hack to track subscriptions for debugging
   (swap! subscription-counts update query (fnil inc 0))
   (apply re-frame.core/subscribe query args))
 
-(defn get-subscription-counts []
-  @subscription-counts)
+(defonce dispatch-counts (atom {}))
+
+(defn tracked-dispatch [event & args]
+  (swap! dispatch-counts update event (fnil inc 0))
+  (apply re-frame.core/dispatch event args))
+
+(defn tracked-dispatch-sync [event & args]
+  (swap! dispatch-counts update event (fnil inc 0))
+  (apply re-frame.core/dispatch-sync event args))
+
+  ;; (if (= (first query) :websocket-fx.core/pending-requests)
+  ;;   (rfa/sub (first query) (last query))
+  ;;   (apply re-frame.core/subscribe query args))
 
 
+;; (defn tracked-subscribe [query]
+;;   (swap! subscription-counts update query (fnil inc 0))
+;;   ;(tap> [:query query])
+;;   (cond (= (count query) 1) ;(or (empty? args) (= 1 (count args)))
+;;         (rfa/sub (first query))
+;;         :else (re-frame.core/subscribe query)))
+
+;; (defn tracked-subscribe [query-vec]
+;;   (let [query (if (map? query-vec) (keys query-vec) (first query-vec))
+;;         args (if (map? query-vec) (vals query-vec) (next query-vec))
+;;         query-key query-vec]
+;;     (swap! subscription-counts update query-key (fnil inc 0))
+;;     (if false ;(and (or (nil? args) (= 1 (count args))) (not (cstr/includes? (str query-vec) ":bricks")))
+;;       (apply rfa/sub query-vec)
+;;       (re-frame.core/subscribe query-vec))))
+
+(defn tracked-subscribe-new [query-vec]
+  (let [query (first query-vec)
+        args (rest query-vec)
+        query-key query-vec]
+    (swap! subscription-counts update query-key (fnil inc 0))
+    (println "query:" query "args:" args)
+    (if (or (nil? args) (= 1 (count args)))
+      (do (println "using rfa/sub") (apply rfa/sub query args))
+      (do (println "using re-frame.core/subscribe") (apply re-frame.core/subscribe query-vec)))))
 
 (defn sha-256 [s]
   (let [hash (goog.crypt.Sha256.)
@@ -114,7 +151,7 @@
   [ms event]
   (async/go
     (<! (async/timeout ms))
-    (re-frame/dispatch event)))
+    (tracked-dispatch event)))
 
 (defn client-name []
   (let [quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
@@ -142,7 +179,7 @@
                                      (vector? (get (first x) k)))) false) false)))]
          (if aa true false)) (catch :default _ true)))
 
-(defn function-to-inputs [lookup-map] 
+(defn function-to-inputs [lookup-map]
   (let [ordered (atom [])
         ;_ (tap> [:function-to-inputs-w lookup-map])
         port-map (if (or (vector? lookup-map) (map? lookup-map) (list? lookup-map))
@@ -243,7 +280,7 @@
            (and incoming-keyword? (not (keyword? reco))) (keyword (cstr/replace (str reco) #":" ""))
            :else reco))))
 
-(defn safe-key [proposed & [locals]] @(re-frame/subscribe [::safe-key proposed locals]))
+(defn safe-key [proposed & [locals]] @(tracked-subscribe [::safe-key proposed locals]))
 
 (defn get-time-format-str []
   (cstr/join " " (drop 4 (drop-last 4 (cstr/split (str (js/Date.)) #" ")))))
@@ -634,7 +671,7 @@
 (defn clean-sql-from-ui-keys-fn [query]
   (let [res (deep-remove-keys
              query
-             [:cache? :col-widths :row-height :render-all? :refresh-every :page :connection-id :deep-meta? :clicked-row-height :style-rules])] 
+             [:cache? :col-widths :row-height :render-all? :refresh-every :page :connection-id :deep-meta? :clicked-row-height :style-rules])]
     res))
 
 (defn update-nested-tabs [m old new]

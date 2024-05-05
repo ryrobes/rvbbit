@@ -58,7 +58,7 @@
    (assoc db :alt-key-held? (not (get db :alt-key-held? false)))))
 
 (defn dispatch-keydown-rules []
-  (re-frame/dispatch-sync
+  (ut/tracked-dispatch-sync
    [::rp/set-keydown-rules
     {:event-keys [;[[::bricks/shift-down] [{:keyCode 16 :shiftKey true}]]
                   ;[[::bricks/select-block "none!"] [{:keyCode 27}]] ; ESC 
@@ -125,7 +125,7 @@
 
 
 (defn dispatch-keyup-rules []
-  (re-frame/dispatch-sync
+  (ut/tracked-dispatch-sync
    [::rp/set-keyup-rules
     {:event-keys
      ;;[[[::bricks/shift-up] [{:keyCode 16 :shiftKey true}]]]
@@ -182,7 +182,7 @@
 
 
 (defn dispatch-poller-rules []
-  (re-frame/dispatch
+  (ut/tracked-dispatch
    [::poll/set-rules
     [{:interval                 10 ;; 1 terrible idea. test
       :event                    [::bricks/dispatch-auto-queries]
@@ -281,8 +281,8 @@
 
 (defn ^:dev/after-load mount-root []
   (re-frame/clear-subscription-cache!)
-  ;(re-frame/dispatch [::wfx/connect http/socket-id db/options])
-  ;(re-frame/dispatch [::wfx/subscribe http/socket-id :server-push db/subscription]) ;; resub on dev page reload
+  ;(ut/tracked-dispatch [::wfx/connect http/socket-id db/options])
+  ;(ut/tracked-dispatch [::wfx/subscribe http/socket-id :server-push db/subscription]) ;; resub on dev page reload
   (let [root-el (.getElementById js/document "app")]
     (rdom/unmount-component-at-node root-el)
     (rdom/render [views/main-panel] root-el)))
@@ -292,18 +292,18 @@
 (defn init []
   ;; (set! (.-title js/document) (str "Rabbit (" client-name ")"))
   (set! (.-title js/document) (str "Rabbit is dreaming..."))
-  (re-frame/dispatch-sync [::events/initialize-db])
-  (re-frame/dispatch [::bricks/set-client-name client-name])
-  (re-frame/dispatch [::wfx/connect http/socket-id (http/options client-name)])
-  (re-frame/dispatch [::wfx/request :default
+  (ut/tracked-dispatch-sync [::events/initialize-db])
+  (ut/tracked-dispatch [::bricks/set-client-name client-name])
+  (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options client-name)])
+  (ut/tracked-dispatch [::wfx/request :default
                       {:message    {:kind :get-settings
                                     :client-name client-name}
                        :on-response [::http/simple-response-boot-no-load] ;; just get settings
                        :on-timeout [::http/timeout-response [:boot :get-settings]]
                        :timeout    15000}])
-  (re-frame/dispatch [::wfx/request :default
+  (ut/tracked-dispatch [::wfx/request :default
                       {:message    {:kind :signals-map
-                                    :client-name @(re-frame/subscribe [::bricks/client-name])}
+                                    :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                        :on-response [::signals/signals-map-response]
                        ;;:on-timeout  [::timeout-response :get-signals]
                        :timeout    15000000}])
@@ -322,29 +322,29 @@
                            (reset! flows/drop-toggle? false))))]
     (.addEventListener js/window "keydown" press-fn)
     (.addEventListener js/window "keyup" release-fn))
-  (re-frame/dispatch [::wfx/request :default
+  (ut/tracked-dispatch [::wfx/request :default
                       {:message    {:kind :session-snaps
                                     :client-name client-name}
                        :on-response [::bricks/save-sessions]
                        :timeout    15000}])
 
-  (let [url-vec  @(re-frame/subscribe [::http/url-vec])
+  (let [url-vec  @(ut/tracked-subscribe [::http/url-vec])
         base-dir "./screens/"]
     (if (>= (count url-vec) 1) ;; if we have a url with a flowset, load that, oitherwise load the server default
-      (re-frame/dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
-      (re-frame/dispatch [::wfx/request :default ;; load default boot flowset
+      (ut/tracked-dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
+      (ut/tracked-dispatch [::wfx/request :default ;; load default boot flowset
                           {:message    {:kind :get-settings
                                         :client-name client-name}
                            :on-response [::http/simple-response-boot]
                            :on-timeout [::http/timeout-response [:boot :get-settings]]
                            :timeout    15000}])))
   (http/start-listening-to-url-changes)
-  (re-frame/dispatch-sync [::rp/add-keyboard-event-listener "keydown"])
-  (re-frame/dispatch-sync [::rp/add-keyboard-event-listener "keyup"])
-  (re-frame/dispatch-sync [::poll/init])
-  (re-frame/dispatch [::subs/window-fx-watcher])
- ; (re-frame/dispatch [::subs/window-resized]) ;; redundant? 
-  (re-frame/dispatch [::audio/text-to-speech11 :audio :elevenlabs nil]) ;; get voices if avail
+  (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keydown"])
+  (ut/tracked-dispatch-sync [::rp/add-keyboard-event-listener "keyup"])
+  (ut/tracked-dispatch-sync [::poll/init])
+  (ut/tracked-dispatch [::subs/window-fx-watcher])
+ ; (ut/tracked-dispatch [::subs/window-resized]) ;; redundant? 
+  (ut/tracked-dispatch [::audio/text-to-speech11 :audio :elevenlabs nil]) ;; get voices if avail
   (dispatch-poller-rules)
   (dispatch-keyup-rules)
   (dispatch-keydown-rules)

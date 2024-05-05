@@ -20,7 +20,7 @@
    [clojure.walk :as walk]))
 
 ;; (defn theme-pull [cmp-key fallback & test-fn] ;;; dupe of bricks/theme-pull TODO
-;;   (let [v @(re-frame/subscribe [::conn/clicked-parameter-key [cmp-key]])
+;;   (let [v @(ut/tracked-subscribe [::conn/clicked-parameter-key [cmp-key]])
 ;;         t0 (cstr/split (str (ut/unkeyword cmp-key)) #"/")
 ;;         t1 (keyword (first t0))
 ;;         t2 (keyword (last t0))
@@ -37,7 +37,7 @@
 ;;     ;(tap> [:color-pull cmp-key t1 t2 fallback fallback0 theme-key? (get db/base-theme t2) base-theme-keys])
 ;;     (if (not (nil? v)) v fallback0)))
 
-(defn theme-pull [cmp-key fallback & test-fn] @(re-frame/subscribe [:rvbbit-frontend.bricks/theme-pull-sub cmp-key fallback test-fn]))
+(defn theme-pull [cmp-key fallback & test-fn] @(ut/tracked-subscribe [:rvbbit-frontend.bricks/theme-pull-sub cmp-key fallback test-fn]))
 
 (re-frame/reg-sub
  ::user-scrubber-options
@@ -98,9 +98,9 @@
 
 
 (defn friendly-text []
-  (let [theme-parameters @(re-frame/subscribe [::user-scrubber-options])
-        ;layout-box-maps @(re-frame/subscribe [::keypaths-of-layout-panels])
-        canvas-overrides @(re-frame/subscribe [::canvas-overrides])]
+  (let [theme-parameters @(ut/tracked-subscribe [::user-scrubber-options])
+        ;layout-box-maps @(ut/tracked-subscribe [::keypaths-of-layout-panels])
+        canvas-overrides @(ut/tracked-subscribe [::canvas-overrides])]
     ;(tap> [:scrubber-dyn theme-parameters canvas-overrides])
     ;; get available fields in selected-block / selected-tab IN EDITOR so we can dynamically populate the button row
     (merge
@@ -319,7 +319,7 @@
       :justify :between ;:size "1"
       :children [[re-com/md-icon-button
                   :md-icon-name "zmdi-caret-left"
-                  :on-click #(re-frame/dispatch [::scrubber-view-update kp
+                  :on-click #(ut/tracked-dispatch [::scrubber-view-update kp
                                                  (if (= ext :px)
                                                    (str (- v 1) "px") (- v 1))
                                                  view-key type-key])
@@ -342,13 +342,13 @@
                                  (catch :default _ false)) "210px")
                   ;:width     "200%" ;"460px"
                   ;:style {:width "100%"}
-                  :on-change #(re-frame/dispatch [::scrubber-view-update kp
+                  :on-change #(ut/tracked-dispatch [::scrubber-view-update kp
                                                   (if (= ext :px) (str % "px") %) view-key type-key])
                   :disabled? false]
 
                  [re-com/md-icon-button
                   :md-icon-name "zmdi-caret-right"
-                  :on-click #(re-frame/dispatch [::scrubber-view-update kp
+                  :on-click #(ut/tracked-dispatch [::scrubber-view-update kp
                                                  (if (= ext :px)
                                                    (str (+ v 1) "px") (+ v 1))
                                                  view-key type-key])
@@ -367,7 +367,7 @@
                           [re-com/box :child " " ; (str c)
                            :width "43px" :height "41px"
                            :justify :center :align :center
-                           :attr {:on-click #(re-frame/dispatch [::scrubber-view-update kp c view-key type-key])}
+                           :attr {:on-click #(ut/tracked-dispatch [::scrubber-view-update kp c view-key type-key])}
                            :style {:background-color c
                                    :font-size "9px"
                              ;:font-family "Kulim Park"
@@ -387,8 +387,8 @@
                             :font-weight 400}])])
 
 (defn color-farmer [kp v view-key type-key]
- ; (tap> [:colors-used @(re-frame/subscribe [::colors-used view-key])])
-  (let [colors-used @(re-frame/subscribe [::colors-used view-key])
+ ; (tap> [:colors-used @(ut/tracked-subscribe [::colors-used view-key])])
+  (let [colors-used @(ut/tracked-subscribe [::colors-used view-key])
         cccolor (if (= (count v) 9) (subs v 0 7) v)
         colors-used (vec (distinct (conj colors-used cccolor))) ;(if (empty? colors-used) [cccolor] colors-used)
         complement-color (hsl->hex (complement cccolor))
@@ -425,7 +425,7 @@
    ;:style {:border "1px solid white"}
                  :child [(reagent/adapt-react-class react-colorful/HexColorPicker)
                          {:color (str v)
-                          :onChange #(re-frame/dispatch [::scrubber-view-update kp % view-key type-key])}]]
+                          :onChange #(ut/tracked-dispatch [::scrubber-view-update kp % view-key type-key])}]]
                 (try
                   [color-farmer kp v view-key type-key]
                   (catch js/Object e [re-com/box :child (str "Error: " e)]))]]))
@@ -537,10 +537,10 @@
                                     (str value))
               ;:value (str (if (nil? key) value
               ;                (get value key)))
-              :onBlur #(re-frame/dispatch-sync [::scrubber-view-update kp (read-string (cstr/join " " (ut/cm-deep-values %))) view-key type-key])
+              :onBlur #(ut/tracked-dispatch-sync [::scrubber-view-update kp (read-string (cstr/join " " (ut/cm-deep-values %))) view-key type-key])
              ; :onBlur #(if (nil? key)
-             ;            (re-frame/dispatch-sync [::update-selected (read-string (cstr/join " " (ut/cm-deep-values %)))])
-             ;            (re-frame/dispatch-sync [::update-selected-key key (read-string (cstr/join " " (ut/cm-deep-values %)))]))
+             ;            (ut/tracked-dispatch-sync [::update-selected (read-string (cstr/join " " (ut/cm-deep-values %)))])
+             ;            (ut/tracked-dispatch-sync [::update-selected-key key (read-string (cstr/join " " (ut/cm-deep-values %)))]))
               :options {:mode (if sql-hint? "sql" "clojure")
                         :lineWrapping true
                         :lineNumbers false
@@ -580,20 +580,20 @@
 (defn clause-vec-loop [kp v view-key fp idx]
   (if (= fp 1)
 
-    (let [;result-fields @(re-frame/subscribe [::conn/sql-merged-metadata [view-key]])
+    (let [;result-fields @(ut/tracked-subscribe [::conn/sql-merged-metadata [view-key]])
           ;fields (keys (get result-fields :fields))
           ;iidx (nth fields idx)
           ;data-type (get-in result-fields [:fields iidx :data-type])
 ] ;; need to get resulting data types BEFORE the investigation loop...
       [re-com/v-box
        :size "auto"
-     ;:style {:border (str "3px solid " (get @(re-frame/subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]) "white"))}
+     ;:style {:border (str "3px solid " (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]) "white"))}
        :children
        [;[re-com/box :child (str (get-in @lookup-atom-f [view-key idx]))]
       ;[clause-vec-loop kp v view-key 0 idx]
         [shapes [clause-vec-loop kp v view-key 0 idx]
-       ;(get @(re-frame/subscribe [::conn/data-colors]) data-type "#ffffff22")
-         (get @(re-frame/subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]) "#ffffff22")
+       ;(get @(ut/tracked-subscribe [::conn/data-colors]) data-type "#ffffff22")
+         (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]) "#ffffff22")
          (get-in @lookup-atom [view-key idx])
        ;data-type
          v]]])
@@ -613,10 +613,10 @@
                     idx])]
       (let [pos (- (count kp) 1)
             lpos (last kp)
-            src-table (first (flatten (get @(re-frame/subscribe [::query-by-query-key view-key]) :from)))
+            src-table (first (flatten (get @(ut/tracked-subscribe [::query-by-query-key view-key]) :from)))
             src-table-base (if (cstr/starts-with? (str src-table) ":query/") (keyword (last (cstr/split (str src-table) "/"))) src-table)
-            metad @(re-frame/subscribe [::conn/sql-merged-metadata [view-key]])
-            src-metad @(re-frame/subscribe [::conn/sql-merged-metadata [src-table-base]])
+            metad @(ut/tracked-subscribe [::conn/sql-merged-metadata [view-key]])
+            src-metad @(ut/tracked-subscribe [::conn/sql-merged-metadata [src-table-base]])
             pos-meaning (cond
                           (or (and (= pos 0) (or (or (= lpos :group-by)
                                                      (= lpos :order-by)
@@ -689,14 +689,14 @@
                                             :padding-bottom "2px"
                                             :font-weight 200
                                             :font-size "12px"}])]
-                      :style {;:border-top (str "1px solid " (get @(re-frame/subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx])))
-                            ;:border (str "1px solid " (get @(re-frame/subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx])))
-                            ;:background-color (str (get @(re-frame/subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx])) 11)
-                            ;:color (get @(re-frame/subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]))
-                              :color (get @(re-frame/subscribe [::conn/data-colors]) data-type "#ffffff33")
-                            ;:border (str "1px solid " (get @(re-frame/subscribe [::conn/data-colors]) data-type "#ffffff33"))
-               ;:border (str "3px solid " (get @(re-frame/subscribe [::conn/data-colors]) data-type "#ffffff33"))
-               ;:background-color (str (get @(re-frame/subscribe [::conn/data-colors]) data-type "#ffffff33") 33)
+                      :style {;:border-top (str "1px solid " (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx])))
+                            ;:border (str "1px solid " (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx])))
+                            ;:background-color (str (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx])) 11)
+                            ;:color (get @(ut/tracked-subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]))
+                              :color (get @(ut/tracked-subscribe [::conn/data-colors]) data-type "#ffffff33")
+                            ;:border (str "1px solid " (get @(ut/tracked-subscribe [::conn/data-colors]) data-type "#ffffff33"))
+               ;:border (str "3px solid " (get @(ut/tracked-subscribe [::conn/data-colors]) data-type "#ffffff33"))
+               ;:background-color (str (get @(ut/tracked-subscribe [::conn/data-colors]) data-type "#ffffff33") 33)
                               :font-size "11px"
                               :font-weight 200
                ;:color "#ffffff"
@@ -709,16 +709,16 @@
      ;   (swap! lookup-atom-f assoc-in [view-key idx] pos-meaning))
 
       ;(tap> [:scrub-watch idx data-type])
-      ;(tap> [:scrub-meta (get-in @lookup-atom [view-key pos]) @(re-frame/subscribe [::conn/data-colors]) ])
+      ;(tap> [:scrub-meta (get-in @lookup-atom [view-key pos]) @(ut/tracked-subscribe [::conn/data-colors]) ])
         (if (and (not (nil? data-type)) (= pos-meaning :fn-val))
 
           [shapes [re-com/v-box
                  ;:padding "3px"
                    :children [;[re-com/box :child (str (if (not (keyword? v)) "fn-val" "field-val"))]
                               base-box] :size "auto"]
-         ;(get @(re-frame/subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]) "white")
-         ;(get @(re-frame/subscribe [::conn/data-colors]) data-type  )
-           (get @(re-frame/subscribe [::conn/data-colors]) data-type "#ffffff33")
+         ;(get @(ut/tracked-subscribe [::conn/data-colors]) (get-in @lookup-atom [view-key idx]) "white")
+         ;(get @(ut/tracked-subscribe [::conn/data-colors]) data-type  )
+           (get @(ut/tracked-subscribe [::conn/data-colors]) data-type "#ffffff33")
            (get-in @lookup-atom [view-key idx])
            v]
 
@@ -801,7 +801,7 @@
                   :size "auto"
                   :padding "3px"
                   :child (str vv)
-                  :attr {:on-click #(re-frame/dispatch [::scrubber-view-update kp vv view-key type-key])}
+                  :attr {:on-click #(ut/tracked-dispatch [::scrubber-view-update kp vv view-key type-key])}
                   :style {:color (if (= vv v) "#000000" "#ffffff77")
                           :cursor "pointer"
                           :font-size "12px"
@@ -864,9 +864,9 @@
               ;;                        )
               ;;                    (do (reset! db/bad-form? false)
               ;;                          ;(if (nil? key)
-              ;;                            ;(re-frame/dispatch-sync [::update-selected parse])
-              ;;                        (re-frame/dispatch [::scrubber-view-update kp parse view-key type-key])
-              ;;                          ;  (re-frame/dispatch-sync [::update-selected-key key parse])
+              ;;                            ;(ut/tracked-dispatch-sync [::update-selected parse])
+              ;;                        (ut/tracked-dispatch [::scrubber-view-update kp parse view-key type-key])
+              ;;                          ;  (ut/tracked-dispatch-sync [::update-selected-key key parse])
               ;;                          ;  )
               ;;                        )))(catch :default e (tap> [:error! e])))
                :readOnly true ;false
@@ -891,17 +891,17 @@
         base-pct-val 0.1
         base-val 0.5
         inc-val (if @use-percents? base-pct-val base-val)
-        x+ #(re-frame/dispatch [::scrubber-view-update kp (assoc v :root [(trunc (+ x inc-val)) y]) view-key type-key])
-        x- #(re-frame/dispatch [::scrubber-view-update kp (assoc v :root [(trunc (- x inc-val)) y]) view-key type-key])
-        y+ #(re-frame/dispatch [::scrubber-view-update kp (assoc v :root [x (trunc (+ y inc-val))]) view-key type-key])
-        y- #(re-frame/dispatch [::scrubber-view-update kp (assoc v :root [x (trunc (- y inc-val))]) view-key type-key])
+        x+ #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :root [(trunc (+ x inc-val)) y]) view-key type-key])
+        x- #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :root [(trunc (- x inc-val)) y]) view-key type-key])
+        y+ #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :root [x (trunc (+ y inc-val))]) view-key type-key])
+        y- #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :root [x (trunc (- y inc-val))]) view-key type-key])
 
-        h+ #(re-frame/dispatch [::scrubber-view-update kp (assoc v :h (trunc (+ h inc-val))) view-key type-key])
-        h- #(re-frame/dispatch [::scrubber-view-update kp (assoc v :h (trunc (- h inc-val))) view-key type-key])
-        w+ #(re-frame/dispatch [::scrubber-view-update kp (assoc v :w (trunc (+ w inc-val))) view-key type-key])
-        w- #(re-frame/dispatch [::scrubber-view-update kp (assoc v :w (trunc (- w inc-val))) view-key type-key])
-        z+ #(re-frame/dispatch [::scrubber-view-update kp (assoc v :z (trunc (+ z 1))) view-key type-key])
-        z- #(re-frame/dispatch [::scrubber-view-update kp (assoc v :z (trunc (- z 1))) view-key type-key])
+        h+ #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :h (trunc (+ h inc-val))) view-key type-key])
+        h- #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :h (trunc (- h inc-val))) view-key type-key])
+        w+ #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :w (trunc (+ w inc-val))) view-key type-key])
+        w- #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :w (trunc (- w inc-val))) view-key type-key])
+        z+ #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :z (trunc (+ z 1))) view-key type-key])
+        z- #(ut/tracked-dispatch [::scrubber-view-update kp (assoc v :z (trunc (- z 1))) view-key type-key])
 
         editor-box [re-com/box
                     :padding "10px"
@@ -1169,7 +1169,7 @@
                         (vec (for [o values] {:id o :label o})))
              :model (reagent/atom v)
              :width "360px"
-             :on-change #(re-frame/dispatch [::scrubber-view-update kp % view-key type-key])]]))
+             :on-change #(ut/tracked-dispatch [::scrubber-view-update kp % view-key type-key])]]))
 
 (defn boolean-panel [kp v view-key type-key]
   (let [values [true false]]
@@ -1184,7 +1184,7 @@
                   :size "auto"
                   :padding "3px"
                   :child (str vv)
-                  :attr {:on-click #(re-frame/dispatch [::scrubber-view-update kp vv view-key type-key])}
+                  :attr {:on-click #(ut/tracked-dispatch [::scrubber-view-update kp vv view-key type-key])}
                   :style {:color (if (= vv v) "#000000" "#ffffff77")
                           :cursor "pointer"
                           :font-size "12px"
@@ -1207,8 +1207,8 @@
 
 
 (defn scrubbers []
-  (let [layout-box-maps @(re-frame/subscribe [::keypaths-of-layout-panels])
-        user-scrubbers @(re-frame/subscribe [::user-scrubbers])
+  (let [layout-box-maps @(ut/tracked-subscribe [::keypaths-of-layout-panels])
+        user-scrubbers @(ut/tracked-subscribe [::user-scrubbers])
         user-scrubbers (walk/postwalk-replace {:button-panel button-panel
                                                :string? string?
                                                :vector? vector?

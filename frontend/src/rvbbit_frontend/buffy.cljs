@@ -99,8 +99,8 @@
    (let [kits (get-in db [:server :settings :kits])
         ;_ (tap> [:kits kits])
          ;selected-block (get db :selected-block)
-         curr @(re-frame/subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
-         [item-type item] @(re-frame/subscribe [::bricks/editor-panel-selected-view])
+         curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
+         [item-type item] @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
          valid-where? true ;; TODO
         ; _ (tap> [:kits kits item-type item])
          filtered-map (into {}
@@ -274,7 +274,7 @@
 
            :else "Howdy."))))
 
-;;;(re-frame/dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}])
+;;;(ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}])
 (re-frame/reg-event-db
  ::click-parameter
  (fn [db [_ keypath value]]
@@ -301,7 +301,7 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value   (ut/format-map (- width-int 24)
                                       (str value))
-             ; :onBlur  #(re-frame/dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
+             ; :onBlur  #(ut/tracked-dispatch-sync [::update-selected-field kp (read-string (cstr/join " " (ut/cm-deep-values %)))])
               :options {:mode              "clojure"
                         :lineWrapping      true
                         :lineNumbers       true
@@ -327,7 +327,7 @@
    (let [src (get-in db [:runstreams flow-id :values kkey :source])]
      (if (= src :param)
        ;(get-in db [:runstreams flow-id :values kkey :value])
-       (first @(re-frame/subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]]))
+       (first @(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]]))
        (get-in db [:runstreams flow-id :values kkey :value])))))
 
 (defn code-box-rs-value [width-int height-int flow-id kkey value & [param?]]
@@ -349,7 +349,7 @@
                          (ut/format-map (- width-int 24)
                                         (str value)))
               :onBlur  #(when (not param?)
-                          (re-frame/dispatch [::save-rs-value
+                          (ut/tracked-dispatch [::save-rs-value
                                               flow-id kkey :input
                                               (try
                                                 (read-string (cstr/join " " (ut/cm-deep-values %)))
@@ -400,10 +400,10 @@
 (declare render-honey-comb-fragments)
 
 (defn option-buttons [kp mode]
-  (let [;meta-fields-msg @(re-frame/subscribe [::table-meta-chat])
-        ;recos-fields-msg @(re-frame/subscribe [::recos-meta-chat])
+  (let [;meta-fields-msg @(ut/tracked-subscribe [::table-meta-chat])
+        ;recos-fields-msg @(ut/tracked-subscribe [::recos-meta-chat])
         ;curr-narrative (get @db/kit-keys kp) ;"narrative-1"
-       ; [r1 r2] @(re-frame/subscribe [::bricks/query-waitings :kit-results-sys])
+       ; [r1 r2] @(ut/tracked-subscribe [::bricks/query-waitings :kit-results-sys])
        ; running? (or r1 r2)
         data-kp (vec (cons :kit-results-sys kp))
 
@@ -443,7 +443,7 @@
                                          {:task-type ":watch" :item-type ":metric"  :item ":system-db/errors.count" :reqs 0 :need-feedback "false" :wip "false"}]}]}
         ;_ (tap> [:options-buttons kit-name kit-context-name curr-narrative ik item-key kits])
         react-hack @hide-diffs?
-        meta-object-msg (when (= mode :buffy2) @(re-frame/subscribe [::object-meta-chat kp]))]
+        meta-object-msg (when (= mode :buffy2) @(ut/tracked-subscribe [::object-meta-chat kp]))]
 
     (when (or (nil? (get @db/kit-keys kp)) (not (some #(= (get @db/kit-keys kp) %) narratives)))
       (swap! db/kit-keys assoc kp item-key))
@@ -460,7 +460,7 @@
                        :style {;:background-color "orange"
                                :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                                :cursor "pointer"}
-                       :attr {:on-click #(re-frame/dispatch [::create-snapshot])}
+                       :attr {:on-click #(ut/tracked-dispatch [::create-snapshot])}
                        :child "create new snapshot"]
 
                       [re-com/box
@@ -489,7 +489,7 @@
             ;;          :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
             ;;          :opacity 0.5
             ;;          :cursor "pointer"}
-            ;;  :attr {:on-click #(re-frame/dispatch [::audio/clear-chat kp])}
+            ;;  :attr {:on-click #(ut/tracked-dispatch [::audio/clear-chat kp])}
             ;;  :child "(clear)"]
                       ]
 
@@ -510,7 +510,7 @@
                                ;:cursor "pointer"
                                }
                        :height "44px"
-                        ;:attr {:on-click #(re-frame/dispatch [::audio/add-chat meta-object-msg kp])}
+                        ;:attr {:on-click #(ut/tracked-dispatch [::audio/add-chat meta-object-msg kp])}
                        :child (str narrative-desc)]
 
                       [re-com/h-box
@@ -553,7 +553,7 @@
                                    :size "auto"
                                    :justify :between :align :center
                                    :gap "6px"
-                        ;:attr {:on-click #(re-frame/dispatch [::audio/add-chat meta-object-msg kp])}
+                        ;:attr {:on-click #(ut/tracked-dispatch [::audio/add-chat meta-object-msg kp])}
                                    :children (let [mmin 0
                                                    mmax (- narrative-items 1)
                                                    is-last? (= narrative-item mmax)
@@ -583,7 +583,7 @@
                     ;;          :style {;:background-color "orange"
                     ;;                  :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                     ;;                  :cursor "pointer"}
-                    ;;         ; :attr {:on-click #(re-frame/dispatch [::audio/add-chat meta-object-msg kp])}
+                    ;;         ; :attr {:on-click #(ut/tracked-dispatch [::audio/add-chat meta-object-msg kp])}
                     ;;          :child "request variations"]
 
                     ;;         [re-com/box
@@ -593,7 +593,7 @@
                     ;;                  :color (theme-pull :theme/editor-outer-rim-color nil) ;"black"
                     ;;                  :opacity 0.5
                     ;;                  :cursor "pointer"}
-                    ;;          ;:attr {:on-click #(re-frame/dispatch [::audio/clear-chat kp])}
+                    ;;          ;:attr {:on-click #(ut/tracked-dispatch [::audio/clear-chat kp])}
                     ;;          :child "(clear)"]]
 
 
@@ -721,7 +721,7 @@
                                                                            [re-com/box
                                                                             :style {:color "orange" :cursor "pointer"}
                                                                             :child "swap to?"
-                                                                            :attr {:on-click #(re-frame/dispatch [::update-item kp (edn/read-string (str s))])}
+                                                                            :attr {:on-click #(ut/tracked-dispatch [::update-item kp (edn/read-string (str s))])}
                                                                             :align :end :justify :end :size "auto"]]])
                                                                        [re-com/gap :size "6px"]
                                                                        [code-box 580 nil (str s)]]]] (catch :default e [re-com/box :child (str e)]))
@@ -876,7 +876,7 @@
  ;(undoable)
  (fn [db [_ flow-id]]
    ;;(tap> [::get-runstream-ports flow-id])
-   (re-frame/dispatch [::wfx/request :default
+   (ut/tracked-dispatch [::wfx/request :default
                        {:message    {:kind :get-flow-open-ports
                                      :flow-id flow-id
                                      :flowmap flow-id
@@ -966,12 +966,12 @@
        :align :center :justify :center
        :gap "5px"
        :children [[re-com/box
-                   :attr {:on-click #(re-frame/dispatch [::toggle-runstream-outputs flow-id])}
+                   :attr {:on-click #(ut/tracked-dispatch [::toggle-runstream-outputs flow-id])}
                    :style {:cursor "pointer"}
                    :child (str (count (keys blocks-map)) " outputs")]
                   [re-com/md-icon-button :src (at)
                    :md-icon-name (if open-outputs? "zmdi-chevron-down" "zmdi-chevron-up")
-                   :on-click #(re-frame/dispatch [::toggle-runstream-outputs flow-id])
+                   :on-click #(ut/tracked-dispatch [::toggle-runstream-outputs flow-id])
                    :style {:color (str (theme-pull :theme/editor-outer-rim-color nil))
                            :cursor "pointer"
                            :padding "2px"
@@ -1135,7 +1135,7 @@
    (if (and (not (empty? (cstr/trim (str name))))
             (not (empty? (cstr/trim (str in))))
             (not (empty? (cstr/trim (str out)))))
-     (let [other-names @(re-frame/subscribe [::bricks/all-drops-of :*])
+     (let [other-names @(ut/tracked-subscribe [::bricks/all-drops-of :*])
            name (keyword name)
            name (ut/safe-key name other-names)
            _ (tap> [:other-names other-names name])]
@@ -1151,10 +1151,10 @@
 (defn runstream-box [panel-height panel-width kp]
   (let [text-box-height 110
         text-box? false
-        runstreams @(re-frame/subscribe [::bricks/runstreams])
+        runstreams @(ut/tracked-subscribe [::bricks/runstreams])
         runstream-keys (vec (map :flow-id runstreams))
-        runstreams-lookups @(re-frame/subscribe [::bricks/runstreams-lookups])
-       ; rs-hash @(re-frame/subscribe [::runstream-override-map])
+        runstreams-lookups @(ut/tracked-subscribe [::bricks/runstreams-lookups])
+       ; rs-hash @(ut/tracked-subscribe [::runstream-override-map])
         redrops! [@bricks/dragging-body @bricks/dragging?]]
 
     ;; (tap> [:rs-hash rs-hash])
@@ -1186,10 +1186,10 @@
                                       blocks-map (get-in runstreams-lookups [flow-id :blocks])
                                       ;; _ (tap> [:blocks-map blocks-map])
                                       no-open-inputs? (true? (empty? open-inputs))
-                                      shouts @(re-frame/subscribe [::shouts flow-id])
+                                      shouts @(ut/tracked-subscribe [::shouts flow-id])
                                       shouts? (not (empty? (cstr/trim (str shouts))))
-                                      fire?  @(re-frame/subscribe [::fire? flow-id])
-                                      drops?  @(re-frame/subscribe [::drops? flow-id])
+                                      fire?  @(ut/tracked-subscribe [::fire? flow-id])
+                                      drops?  @(ut/tracked-subscribe [::drops? flow-id])
                                       sshout-panel? (get @shout-panel? flow-id false)
                                       [xx yy] @detached-coords
                                         ;_ (tap> [:open-inputs flow-id open-inputs])
@@ -1198,7 +1198,7 @@
                                                               {k (if (= source :input)
                                                                    value
                                                               ;value
-                                                                   (let [vv @(re-frame/subscribe [::rs-value flow-id k])]
+                                                                   (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])]
                                                                      (if (and (vector? vv) (every? string? vv))
                                                                        (cstr/join "\n" vv) vv)))}))
                                       overrides-map? (not (empty? override-map))
@@ -1207,12 +1207,12 @@
                                       ;; drops
                                       input-ports (vec (keys open-inputs))
                                       output-ports (vec (cset/difference (set (keys blocks-map)) (set input-ports)))
-                                      drops @(re-frame/subscribe [::drops flow-id])]
+                                      drops @(ut/tracked-subscribe [::drops flow-id])]
 
                              ;(tap> [:override-map flow-id override-map])
 
                                   (when no-data? ;; fetch updated port info from server
-                                    (re-frame/dispatch [::get-runstream-ports flow-id]))
+                                    (ut/tracked-dispatch [::get-runstream-ports flow-id]))
 
                                   [re-com/v-box
                                    :padding "5px"
@@ -1228,7 +1228,7 @@
                                                :children [[re-com/h-box
                                                            :children [[re-com/md-icon-button :src (at)
                                                                        :md-icon-name "zmdi-close"
-                                                                       :on-click #(re-frame/dispatch [::bricks/remove-runstream flow-id])
+                                                                       :on-click #(ut/tracked-dispatch [::bricks/remove-runstream flow-id])
                                                                        :style {:color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                                :cursor "pointer"
                                                                                :height "15px"
@@ -1239,7 +1239,7 @@
                                                                       [re-com/box
                                                                        :style {:cursor "pointer"
                                                                                :user-select "none"}
-                                                                       :attr {:on-click #(re-frame/dispatch [::toggle-runstream-item flow-id])}
+                                                                       :attr {:on-click #(ut/tracked-dispatch [::toggle-runstream-item flow-id])}
                                                                        :child (str flow-id)]
 
                                                                       (bricks/draggable
@@ -1302,7 +1302,7 @@
 
                                                                       [re-com/md-icon-button :src (at)
                                                                        :md-icon-name "zmdi-fire"
-                                                                       :on-click #(re-frame/dispatch [::toggle-runstream-fire flow-id])
+                                                                       :on-click #(ut/tracked-dispatch [::toggle-runstream-fire flow-id])
                                                                        :style {:cursor "pointer"
                                                                                :color (if fire?
                                                                                         (ut/invert-hex-color (str (theme-pull :theme/editor-outer-rim-color nil)))
@@ -1318,7 +1318,7 @@
                                                                        :children
                                                                        [[re-com/md-icon-button :src (at)
                                                                          :md-icon-name "fa-solid fa-droplet"
-                                                                         :on-click #(re-frame/dispatch [::toggle-runstream-drops flow-id])
+                                                                         :on-click #(ut/tracked-dispatch [::toggle-runstream-drops flow-id])
                                                                          :style {:cursor "pointer"
                                                                                  :color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                                  :height "15px"
@@ -1435,7 +1435,7 @@
 
                                                             [re-com/input-text
                                                              :model (str shouts)
-                                                             :on-change #(re-frame/dispatch [::set-shout flow-id (str %)])
+                                                             :on-change #(ut/tracked-dispatch [::set-shout flow-id (str %)])
                                                              :change-on-blur? true
                                                              :width (px (- panel-width 70))
                                                              :style {:background-color "#00000022"
@@ -1610,7 +1610,7 @@
                                                                                                    :padding-left "14px"}
                                                                                            :align :center :justify :center
                                                                                            :attr {:on-click #(do
-                                                                                                               (re-frame/dispatch [::add-action
+                                                                                                               (ut/tracked-dispatch [::add-action
                                                                                                                                    flow-id @add-action-shelf-name
                                                                                                                                    @add-action-shelf-inputs
                                                                                                                                    @add-action-shelf-outputs
@@ -1647,7 +1647,7 @@
                                                                                                                    ;[re-com/box :child (str "-")]
                                                                                                      [re-com/md-icon-button :src (at)
                                                                                                       :md-icon-name "zmdi-close"
-                                                                                                      :on-click #(re-frame/dispatch [::remove-action flow-id a])
+                                                                                                      :on-click #(ut/tracked-dispatch [::remove-action flow-id a])
                                                                                                       :style {:color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                                                               :cursor "pointer"
                                                                                                               :height "15px"
@@ -1758,7 +1758,7 @@
                                                                      cell (fn [cc bbb meta drop?]
                                                                             (let [kkey (first bbb)
                                                                              ;drop? true
-                                                                                  override @(re-frame/subscribe [::rs-value flow-id kkey])
+                                                                                  override @(ut/tracked-subscribe [::rs-value flow-id kkey])
                                                                                   defaults (get-in (last bbb) [:defaults kkey])
                                                                                   ttype (get (last bbb) :type)
                                                                                   ttype (get (last bbb) :ttype)
@@ -1783,7 +1783,7 @@
                                                                                               :min-height "42px"
                                                                                               :width (px (- (/ panel-width 2) 30))
                                                                                               :align :center :justify :center
-                                                                                              :attr {:on-click #(re-frame/dispatch [::toggle-runstream-value flow-id kkey])}
+                                                                                              :attr {:on-click #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey])}
                                                                                               :style {:opacity 0.8
                                                                                                       :overflow "hidden"
                                                                                                       :cursor "pointer"
@@ -1822,14 +1822,14 @@
                                                                                                                  :children [(bricks/draggable
                                                                                                                              (prepare-output-param-drag (first bbb) flow-id ttype)
                                                                                                                              "meta-menu" [re-com/box
-                                                                                                                                          :attr {:on-click #(re-frame/dispatch [::toggle-runstream-value flow-id kkey])}
+                                                                                                                                          :attr {:on-click #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey])}
                                                                                                                                           :style {:font-size "17px"}
                                                                                                                                           :child (str (first bbb))])
 
                                                                                                                             (when overridden?
                                                                                                                               [re-com/md-icon-button :src (at)
                                                                                                                                :md-icon-name "zmdi-undo"
-                                                                                                                               :on-click #(re-frame/dispatch [::save-rs-value flow-id kkey nil nil])
+                                                                                                                               :on-click #(ut/tracked-dispatch [::save-rs-value flow-id kkey nil nil])
                                                                                                                                :style {:cursor "pointer"
                                                                                                                                        :color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                                                                                        :height "15px"
@@ -1838,8 +1838,8 @@
                                                                                                                             (when (and meta (not val-open?))
                                                                                                                               [re-com/md-icon-button :src (at)
                                                                                                                                :md-icon-name "zmdi-more"
-                                                                                                                               :on-click #(re-frame/dispatch [::toggle-runstream-value flow-id kkey])
-                                                                                                                               ;:on-click #(re-frame/dispatch [::save-rs-value flow-id kkey nil nil])
+                                                                                                                               :on-click #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey])
+                                                                                                                               ;:on-click #(ut/tracked-dispatch [::save-rs-value flow-id kkey nil nil])
                                                                                                                                :style {;:cursor "pointer"
                                                                                                                                        :color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                                                                                        :height "15px"
@@ -1867,7 +1867,7 @@
                                                                                                            :height "42px"
                                                                                                            :size "none"
                                                                                                            :width (px (- (/ panel-width 2) 30))
-                                                                                                           :attr {:on-click #(re-frame/dispatch [::toggle-runstream-value flow-id kkey])}
+                                                                                                           :attr {:on-click #(ut/tracked-dispatch [::toggle-runstream-value flow-id kkey])}
                                                                                                            :style {:opacity 0.35
                                                                                                                    :margin-left "7px"
                                                                                                                    :cursor "pointer"
@@ -1883,7 +1883,7 @@
                                                                                                        :size "auto"
                                                                                                        ;:style {:width "200px"}
                                                                                                        :child [bricks/scrubber-panel true
-                                                                                                               @(re-frame/subscribe [::bricks/keypaths-in-rs-values flow-id (first bbb)])
+                                                                                                               @(ut/tracked-subscribe [::bricks/keypaths-in-rs-values flow-id (first bbb)])
                                                                                                                [:runstreams flow-id (first bbb)] (first bbb) ;:* ;nil ;(first bbb) ;:*
                                                                                                                {:fm true :canvas? true :flow? true :runstreams? true}]])
 
@@ -1943,7 +1943,7 @@
                               :width (px (- panel-width 22))
                                 ;:style {:border "1px solid white"}
                               :gap "10px"
-                              :children (let [server-flows (map :flow_id @(re-frame/subscribe [::conn/sql-data [:flows-sys]]))
+                              :children (let [server-flows (map :flow_id @(ut/tracked-subscribe [::conn/sql-data [:flows-sys]]))
                                               server-flows (vec (sort (cset/difference (set server-flows) (set runstream-keys))))
                                               sql-calls {:flows-sys {:select [:flow_id :file_path :last_modified]
                                                                      :from [:flows]
@@ -1953,8 +1953,8 @@
                                           ;;(tap> [:server-flows server-flows])
 
                                           (dorun (for [[k query] sql-calls]
-                                                   (let [data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                                                         unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                                                   (let [data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                                                         unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                                                      (when (or (not data-exists?) unrun-sql?)
                                                        (if (get query :connection-id)
                                                          (conn/sql-data [k] query (get query :connection-id))
@@ -1983,7 +1983,7 @@
                                                            :on-click #(reset! add-flow-shelf? (not @add-flow-shelf?))]
                                                           [re-com/md-icon-button :src (at)
                                                            :md-icon-name "zmdi-refresh"
-                                                           :on-click #(re-frame/dispatch [::conn/clear-query-history :flows-sys])
+                                                           :on-click #(ut/tracked-dispatch [::conn/clear-query-history :flows-sys])
                                                            :style {:color (str (theme-pull :theme/editor-outer-rim-color nil))
                                                                    :cursor "pointer"
                                                                    :font-size "26px"}]
@@ -2035,7 +2035,7 @@
                                                                    :padding-left "14px"}
                                                            :align :center :justify :center
                                                            :attr {:on-click #(do
-                                                                               (re-frame/dispatch [::bricks/add-runstream @add-flow-shelf])
+                                                                               (ut/tracked-dispatch [::bricks/add-runstream @add-flow-shelf])
                                                                                (reset! add-flow-shelf? false))}
                                                            :child "add"]]]]
                                              [])))])]]))
@@ -2183,7 +2183,7 @@
                   :attr {:on-mouse-enter #(reset! ask-mutates-hover [uid k])
                          :on-mouse-leave #(reset! ask-mutates-hover nil)
                          :on-click #(doseq [[kk vv] v]
-                                      (re-frame/dispatch [::bricks/update-workspace-raw kk vv]))}
+                                      (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv]))}
                   :style {:background-color (if (= @ask-mutates-hover [uid k])
                                               (str (theme-pull :theme/editor-rim-color nil) 89)
                                               "#00000055")
@@ -2221,7 +2221,7 @@
  ::delete-kit-item
  (undoable)
  (fn [db [_ where id]]
-   (re-frame/dispatch [::wfx/request :default
+   (ut/tracked-dispatch [::wfx/request :default
                        {:message    {:kind :delete-kit-rows
                                      :where where
                                      :client-name (get db :client-name)}
@@ -2238,7 +2238,7 @@
         ;reaction-hack [@hide-diffs? @hide-block-diffs?  ];; important to force re-render
         ;snapshots @(re-frame.core/subscribe [::bricks/snapshots])
         ;narratives []
-        [r1 r2] @(re-frame/subscribe [::bricks/query-waitings :kit-results-sys])
+        [r1 r2] @(ut/tracked-subscribe [::bricks/query-waitings :kit-results-sys])
         running? (or r1 r2)
         ;curr-params @(re-frame.core/subscribe [::bricks/current-params])
         client-name @(re-frame.core/subscribe [::bricks/client-name])
@@ -2272,8 +2272,8 @@
                            (do (swap! kit-pages assoc kp (- (count narratives) 1))
                                (- (count narratives) 1))
                            narrative-item)
-        wait?  @(re-frame/subscribe [::bricks/reco-running? kit-context-name kit-name])
-        queued?  @(re-frame/subscribe [::bricks/reco-queued? kit-context-name kit-name])
+        wait?  @(ut/tracked-subscribe [::bricks/reco-running? kit-context-name kit-name])
+        queued?  @(ut/tracked-subscribe [::bricks/reco-queued? kit-context-name kit-name])
 
         allow-mutate? (get @kit-mutations kp false)
 
@@ -2282,16 +2282,16 @@
                                      :where where-filter}}]
      ;(tap> [:kitz where-filter [kit-name kit-context-name curr-narrative] kits narratives])
     ;;   (tap> [:safe-key (ut/safe-key "snapshot")])
-    ;;    (tap> [:safe-key @(re-frame/subscribe [::ut/safe-key "snapshot"])])
+    ;;    (tap> [:safe-key @(ut/tracked-subscribe [::ut/safe-key "snapshot"])])
     ;; (tap> [:history-log history-log kp "!"])
     ;; (reset! db/active-tmp-history hist-key)
 
-    ;(when (or wait? queued?) (re-frame/dispatch [::conn/clear-query-history [:kit-results-sys]]))
+    ;(when (or wait? queued?) (ut/tracked-dispatch [::conn/clear-query-history [:kit-results-sys]]))
 
     (doseq [[k query] sql-calls]
       (let [;query (walk/postwalk-replace sql-params v)
-            data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-            unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+            data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+            unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
         (when (and (or (not data-exists?) unrun-sql?) (not (or wait? queued?)))
           (sql-data [k] query))))
 
@@ -2313,7 +2313,7 @@
        :align :center :justify :center
        :child [re-com/md-icon-button
                :md-icon-name "zmdi-refresh"
-               ;;:on-click #(re-frame/dispatch [::conn/clear-query-history query-key])
+               ;;:on-click #(ut/tracked-dispatch [::conn/clear-query-history query-key])
                     ;;  :attr (when hover-field-enable?
                     ;;          {:on-mouse-enter #(swap! db/context-box assoc query-key "refresh this row-set from the database")
                     ;;           :on-mouse-leave #(swap! db/context-box dissoc query-key)})
@@ -2371,10 +2371,10 @@
                                                                    (ut/replacer "." "-")))) v}))
                                      _ (when (and (not (empty? step-mutates)) selected? allow-mutate?)
                                          (doseq [[kk vv] step-mutates]
-                                           (re-frame/dispatch [::bricks/update-workspace-raw kk vv])))
+                                           (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv])))
                                      _ (when (and (not (empty? parameters)) viewable?)
                                          (dorun (tap> [:reparameters reparameters])
-                                                (re-frame/dispatch [::click-parameter [kit-name] reparameters])))]
+                                                (ut/tracked-dispatch [::click-parameter [kit-name] reparameters])))]
                                :when (if as-pages? selected? true)]
 
                            [re-com/v-box
@@ -2420,7 +2420,7 @@
                                                                (when (or (= kit-name :kick) (= kit-name :ai/calliope))
                                                                  [re-com/md-icon-button :src (at)
                                                                   :md-icon-name "zmdi-close"
-                                                                  :on-click #(re-frame/dispatch [::delete-kit-item [:and [:= :id id] where-filter] id])
+                                                                  :on-click #(ut/tracked-dispatch [::delete-kit-item [:and [:= :id id] where-filter] id])
                                                                  ;:on-click #(js/alert (str kp idx id client-name ))
                                                                   :style {:color (str (theme-pull :theme/editor-outer-rim-color nil) (if selected? 33 16))
                                                                           :cursor "pointer"
@@ -2462,7 +2462,7 @@
                                                                           ;_ (tap> [:content-render execute? (when execute? (get c 1))])
                                                                           mods (when execute? (count (keys (get c 1))))
                                                                           _ (when execute?
-                                                                              ;(re-frame/dispatch [::bricks/execute-kit-item [kit-name] c])
+                                                                              ;(ut/tracked-dispatch [::bricks/execute-kit-item [kit-name] c])
                                                                               (let [pp (get c 1)
                                                                                     ;_ (tap> [:pp id idx pp])
                                                                                     ;kk (first pp)
@@ -2474,7 +2474,7 @@
                                                                                     (when (not already?)
                                                                                       (do (tap> [:forced-execution-from-kick kk vv])
                                                                                           (swap! mutation-log conj hid)
-                                                                                          (re-frame/dispatch [::bricks/update-workspace-raw kk vv])))))))
+                                                                                          (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv])))))))
                                                                           draggable-spawn-fn (if (or both? query?)
                                                                                                bricks/sql-spawner-chat
                                                                                                bricks/view-spawner-chat)
@@ -2587,13 +2587,13 @@
         ;; history-log @(re-frame.core/subscribe [::conn/sql-data [hist-key]])
         ]
     ;;   (tap> [:safe-key (ut/safe-key "snapshot")])
-    ;;    (tap> [:safe-key @(re-frame/subscribe [::ut/safe-key "snapshot"])])
+    ;;    (tap> [:safe-key @(ut/tracked-subscribe [::ut/safe-key "snapshot"])])
     ;; (tap> [:history-log history-log kp "!"])
     ;; (reset! db/active-tmp-history hist-key)
     ;; (dorun (for [[k query] sql-calls]
     ;;          (let [;query (walk/postwalk-replace sql-params v)
-    ;;                data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-    ;;                unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+    ;;                data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+    ;;                unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
     ;;            (when (or (not data-exists?) unrun-sql?)
     ;;              (conn/sql-data [k] query)))))
 
@@ -2669,7 +2669,7 @@
                                                                       :cursor "pointer"
                                                                       :user-select "none"}
                                                               :attr {:on-double-click #(reset! title-edit-idx key)
-                                                                     :on-click #(re-frame/dispatch [::bricks/swap-snapshot key])}
+                                                                     :on-click #(ut/tracked-dispatch [::bricks/swap-snapshot key])}
                                                               :child ;(str key)
                                                               (if (= @title-edit-idx key)
                                                                 [re-com/h-box
@@ -2679,7 +2679,7 @@
                                                                    :on-change #(do (tap> [:changed-snapshot-name (str key) :to (str %)])
                                                                                    (when (and (not (empty? (cstr/trim (str %))))
                                                                                               (not (some (fn [x] (= x %)) (keys snapshots))))
-                                                                                     (re-frame/dispatch [::rename-snapshot key (str %)]))
+                                                                                     (ut/tracked-dispatch [::rename-snapshot key (str %)]))
                                                                                    (reset! title-edit-idx nil))
                                                                    :change-on-blur? true
                                                                    :width (px (- panel-width 230)) ;(px (+ 15 (* (count (str key)) 11))) ;"inherit" ; "200px"
@@ -2709,7 +2709,7 @@
 
                                                                                                                ;:border "1px solid orange"
                                                                            }
-                                                                   :attr {:on-click #(re-frame/dispatch [::delete-snapshot key])}]]]
+                                                                   :attr {:on-click #(ut/tracked-dispatch [::delete-snapshot key])}]]]
 
                                                                 [re-com/box
                                                                  ;:size "none"
@@ -2724,7 +2724,7 @@
                                                              [re-com/box
                                                               :align :end :justify :end
                                                               :size "auto"
-                                                              :attr {:on-click #(re-frame/dispatch [::snapshot-extra-toggle key])}
+                                                              :attr {:on-click #(ut/tracked-dispatch [::snapshot-extra-toggle key])}
                                                               :style {:color (theme-pull :theme/editor-outer-rim-color nil)
                                                                       :opacity (if extra? 1 0.3)
                                                                       :cursor "pointer"
@@ -2735,7 +2735,7 @@
                                                              [re-com/box
                                                               :align :end :justify :end
                                                               :size "auto"
-                                                              :attr {:on-click #(re-frame/dispatch [::snapshot-menu-toggle key])}
+                                                              :attr {:on-click #(ut/tracked-dispatch [::snapshot-menu-toggle key])}
                                                               :style {:color (theme-pull :theme/editor-outer-rim-color nil)
                                                                       :opacity (if menu? 1 0.3)
                                                                       :cursor "pointer"
@@ -2788,7 +2788,7 @@
                                       :justify :between :align :center
                                       :children [[re-com/box
                                                   :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}
-                                                  :attr {:on-click #(re-frame/dispatch [::create-snapshot key])}
+                                                  :attr {:on-click #(ut/tracked-dispatch [::create-snapshot key])}
                                                   :child "overwrite"]
 
                                                  (when (= curr-params mparams)
@@ -2798,11 +2798,11 @@
 
                                                 ;;  [re-com/box
                                                 ;;   :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}
-                                                ;;   :attr {:on-click #(re-frame/dispatch [::bricks/swap-snapshot key])}
+                                                ;;   :attr {:on-click #(ut/tracked-dispatch [::bricks/swap-snapshot key])}
                                                 ;;   :child "open"]
                                                  [re-com/box
                                                   :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}
-                                                  :attr {:on-click #(re-frame/dispatch [::delete-snapshot key])}
+                                                  :attr {:on-click #(ut/tracked-dispatch [::delete-snapshot key])}
                                                   :child "delete"]]]]])]]))
 
 (defn history-box [panel-height panel-width kp]
@@ -2828,8 +2828,8 @@
     (reset! db/active-tmp-history hist-key)
     (dorun (for [[k query] sql-calls]
              (let [;query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
 
@@ -2862,7 +2862,7 @@
                                       kp_d (if (some #(or (= % :viz-gen) (= % :*) (= % :base)) kp_d)
                                              [(first kp_d)] ;(vec (walk/postwalk-replace {:* :base :viz-gen :base} (remove nil? kp)))
                                              kp_d)
-                                      has-flow-drop? @(re-frame/subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
+                                      has-flow-drop? @(ut/tracked-subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
                                       key (try (edn/read-string key) (catch :default _ :nope-cant-work-key))
                                       temp-key (keyword (str (ut/replacer (str key) #":" "") "-hist-" (rand-int 123) (hash data)))]
                                  ; (tap> [:prev-q temp-key data])
@@ -2883,7 +2883,7 @@
                                                :style {:background-color (str (theme-pull :theme/editor-rim-color nil) 99)
                                                        :border-radius "12px"
                                                        :cursor "pointer"}
-                                               :attr {:on-click #(re-frame/dispatch [::update-item kp_d data_d])}
+                                               :attr {:on-click #(ut/tracked-dispatch [::update-item kp_d data_d])}
                                                :children [[re-com/box
                                                            :padding "4px"
                                                            :style {:font-weight 700 :font-size "15px"}
@@ -2951,14 +2951,14 @@
         y-px (px (last @detached-coords)) ;(px (* y bricks/brick-size))
         panel-width 600
         text-box-height 110
-        selected-block @(re-frame/subscribe [::bricks/selected-block])
-        selected-view @(re-frame/subscribe [::bricks/editor-panel-selected-view])
+        selected-block @(ut/tracked-subscribe [::bricks/selected-block])
+        selected-view @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
         kp (vec (flatten [selected-block selected-view]))
 
-        chats-vec @(re-frame/subscribe [::chats kp])
-        audio-playing? @(re-frame/subscribe [::audio/audio-playing?])
-        hh @(re-frame/subscribe [::subs/h]) ;; to ensure we get refreshed when the browser changes
-        ww @(re-frame/subscribe [::subs/w])
+        chats-vec @(ut/tracked-subscribe [::chats kp])
+        audio-playing? @(ut/tracked-subscribe [::audio/audio-playing?])
+        hh @(ut/tracked-subscribe [::subs/h]) ;; to ensure we get refreshed when the browser changes
+        ww @(ut/tracked-subscribe [::subs/w])
         panel-height (* (.-innerHeight js/window) 0.8)
         ;multiple-choice [option-buttons kp]
         mode (get @db/chat-mode kp (if
@@ -2972,7 +2972,7 @@
         kmode (get @db/kit-mode kp)
         ;;_ (tap> [:kp kp mode kmode])
         text-box? (or (= mode :snapshots) (= mode :buffy) (= mode :narratives) (= mode :kick))
-        valid-kits @(re-frame/subscribe [::valid-kits])
+        valid-kits @(ut/tracked-subscribe [::valid-kits])
         narrative-mode? (some #(= % (last kp)) (keys valid-kits))
         ;_ (tap> [:valid-kits2 (vec (keys valid-kits))])
         choices (into
@@ -3065,7 +3065,7 @@
                                                               :height "15px"
                                                               :margin-top "3px"
                                                               :font-size "19px"}
-                                                      :attr {:on-click #(re-frame/dispatch (if (and (= kmode :runstreams)
+                                                      :attr {:on-click #(ut/tracked-dispatch (if (and (= kmode :runstreams)
                                                                                                     (= mode :runstreams))
                                                                                              [::refresh-runstreams]
                                                                                              [::refresh-kits]))}]
@@ -3085,7 +3085,7 @@
                                                         :padding "4px"]))]
                                          [re-com/md-icon-button
                                           :md-icon-name "zmdi-window-minimize"
-                                          :on-click #(re-frame/dispatch [::bricks/toggle-buffy])
+                                          :on-click #(ut/tracked-dispatch [::bricks/toggle-buffy])
                                           :style {:font-size "15px"
                                                   :opacity   0.33
                                                   :cursor    "pointer"}]]]]
@@ -3125,7 +3125,7 @@
                                                     :background-color "inherit"
                                                     :font-size "16px"
                                                     :font-weight 700}
-                                            :on-change #(re-frame/dispatch [::audio/add-chat % kp])])]
+                                            :on-change #(ut/tracked-dispatch [::audio/add-chat % kp])])]
                               :padding "5px"
                               :height (px text-box-height)
                               :width (px (- panel-width 12))

@@ -105,11 +105,11 @@
                                 :group-by [:db_schema :db_catalog :connection_id :table_name]
                                 :order-by [:schema_cat :table_name]}}
         sql-params (into {} (for [k [:connections-sys/connection_id]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))]
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
     [re-com/h-box
@@ -123,7 +123,7 @@
                  :child [bricks/magic-table :system-tables-list* [:tables-sys] 9 10 [:db_schema :connection_id :db_catalog]]]]]))
 
 (defn search-panel-metadata []
-  (let [client-name (cstr/replace (str @(re-frame/subscribe [::bricks/client-name])) ":" "")
+  (let [client-name (cstr/replace (str @(ut/tracked-subscribe [::bricks/client-name])) ":" "")
         sql-calls {:searches-types-sys {:select [:item_type] ;; :searches-types-sys/item_type 
                                         :where [:and [:not [:like :item_sub_type "%preview%"]]
                                                 [:not [:= :item_type "saved-block"]]]
@@ -143,15 +143,15 @@
                                                                     }}}
                                             :from [:client_items] :group-by [1 2]}}
         sql-params (into {} (for [k [:searches-types-sys/item_type]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))]
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
     ;;(tap> [:sql-params! sql-params])
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)
-                 (re-frame/dispatch [::bricks/insert-sql-source k query])))))
+                 (ut/tracked-dispatch [::bricks/insert-sql-source k query])))))
     [re-com/h-box
      :size "auto"
      :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} ;; rows label under grids THEME
@@ -166,7 +166,7 @@
   (let [sql-params (into {} (for [k [:searches-types-sys/item_type
                                      :searches-rows-sys/value
                                      :searches-sub-types-sys/item_key]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         selected-shortcode (get sql-params :searches-rows-sys/value)
         sql-calls {:searches-rows-sys {:select [:item_sub_type :item_type :item_key :display_name :sample :value :is_live :block_meta] ;; :searches-types-sys/item_type 
                                        :where [:and
@@ -179,8 +179,8 @@
 
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
 
@@ -206,7 +206,7 @@
   (let []
     ;(tap> [:insert-hidden-reco-preview reco-selected reco-viz reco-query reco-condis single?])
     (dorun
-     (when single? (re-frame/dispatch [::bricks/new-reco-preview reco-selected]))
+     (when single? (ut/tracked-dispatch [::bricks/new-reco-preview reco-selected]))
 
      (cond (= (first (read-string reco-viz)) :vega-lite)
 
@@ -214,7 +214,7 @@
                  ffromv (-> (get-in incomingv [1 :data :values])
                             (ut/replacer  "_" "-")
                             (ut/replacer  "query/" ""))
-                 original-conn @(re-frame/subscribe [::bricks/lookup-connection-id-by-query-key (keyword ffromv)])
+                 original-conn @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key (keyword ffromv)])
                  vega-cfg {:view {:stroke "transparent"}
                            :axis {:domainColor "#ffffff22"
                                   :grid true
@@ -249,7 +249,7 @@
                  q-data (read-string reco-query)
                  incoming (first q-data) ;; read-string will ruin my internal namespaced keywords
                  ffrom (ut/replacer (first (get incoming :from)) "_" "-")
-                    ;original-conn @(re-frame/subscribe [::bricks/lookup-connection-id-by-query-key (keyword ffrom)])
+                    ;original-conn @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key (keyword ffrom)])
                     ;      ;query (assoc incoming :from [(keyword ffrom)])
                  query (vec (for [q q-data] (assoc q :from [(keyword ffrom)])))
                  query (walk/postwalk-replace {[[:sum :rows]] [:count 1]} query)]
@@ -266,7 +266,7 @@
                           ;q-cnt (count q-data)
                        incoming (first q-data) ;; read-string will ruin my internal namespaced keywords
                        ffrom (ut/replacer (first (get incoming :from)) "_" "-")
-                       original-conn @(re-frame/subscribe [::bricks/lookup-connection-id-by-query-key (keyword (last (cstr/split ffrom "/")))])
+                       original-conn @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key (keyword (last (cstr/split ffrom "/")))])
                           ;query (assoc incoming :from [(keyword ffrom)])
                        query (vec (for [q q-data]
                                     (if (nil? (find q :vselect))
@@ -285,18 +285,18 @@
                     reco-selected combo-name shape-name single? true))))))
 
 (defn editor-panel-viz2 []
-  (let [all-sql-call-keys @(re-frame/subscribe [::bricks/all-sql-call-keys])
-        grid-reco? @(re-frame/subscribe [::bricks/grid-reco?])
-        recos-page @(re-frame/subscribe [::bricks/recos-page])
+  (let [all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
+        grid-reco? @(ut/tracked-subscribe [::bricks/grid-reco?])
+        recos-page @(ut/tracked-subscribe [::bricks/recos-page])
         all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/unkeyword e) "-" "_"))
         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-tables-sys/table_name
                                      :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn :user-dropdown-sys/req-field]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         combo-picked? (not (nil? (get sql-params :viz-shapes-sys/combo_edn)))
         shape-picked? (not (nil? (get sql-params :viz-shapes0-sys/shape)))
-        clear-filters-fn (fn [] (do (re-frame/dispatch [::conn/click-parameter [:viz-shapes0-sys :shape] nil])
-                                    (re-frame/dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] nil])
-                                    (re-frame/dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] nil])))
+        clear-filters-fn (fn [] (do (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes0-sys :shape] nil])
+                                    (ut/tracked-dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] nil])
+                                    (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] nil])))
         req-field-picked? (not (nil? (get sql-params :user-dropdown-sys/req-field)))
         sql-calls {:viz-tables-sys {:select [:table_name [[:count 1] :recos]]
                                     :from [:viz_recos_vw]
@@ -337,8 +337,8 @@
         block-list @(re-frame.core/subscribe [::conn/sql-data [:viz-tables-sys]])
         combo-list @(re-frame.core/subscribe [::conn/sql-data [:viz-shapes-sys]])
         full-recos @(re-frame.core/subscribe [::conn/sql-data [:recos-sys]])
-        ;current-tab @(re-frame/subscribe [::bricks/selected-tab])
-        current-tab-queries  (try (map #(-> % ut/sql-keyword name) @(re-frame/subscribe [::bricks/current-tab-queries]))
+        ;current-tab @(ut/tracked-subscribe [::bricks/selected-tab])
+        current-tab-queries  (try (map #(-> % ut/sql-keyword name) @(ut/tracked-subscribe [::bricks/current-tab-queries]))
                                   (catch :default _ []))
         block-list (vec (filter (fn [x] (some #(= % (get x :table_name)) current-tab-queries)) block-list)) ;; overwrite above with curr tab only
         recos-count (count full-recos)
@@ -347,7 +347,7 @@
                                      sel? (= table_name sel)]]
                            [re-com/box
                             :attr {:on-click #(do
-                                                (re-frame/dispatch [::conn/click-parameter [:viz-tables-sys :table_name] table_name])
+                                                (ut/tracked-dispatch [::conn/click-parameter [:viz-tables-sys :table_name] table_name])
                                                 (clear-filters-fn))
                                    ;#(reset! viz-block table_name)
                                    }
@@ -369,7 +369,7 @@
                             :child (str table_name " (" recos ")")])
         combo-singles (vec (distinct (flatten (doall (for [{:keys [combo_edn recos]} combo-list]
                                                        (cstr/split (ut/replacer combo_edn #"\"" "") ", "))))))
-        pkeys @(re-frame/subscribe [::bricks/preview-keys])
+        pkeys @(ut/tracked-subscribe [::bricks/preview-keys])
         preview-keys (vec (for [k pkeys] (keyword (str "reco-preview" k))))
         preview-maps (into {} (for [{:keys [combo_hash shape_name combo_edn query_map viz_map condis h w selected_view]} full-recos]
                                 {(keyword (str "reco-preview" combo_hash))
@@ -381,7 +381,7 @@
                                   :viz_map viz_map
                                   :condis condis
                                   :combo_edn combo_edn}}))
-        reco-selected (keyword (str "reco-preview" @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])))
+        reco-selected (keyword (str "reco-preview" @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])))
         preview-container (fn [preview-maps pk pnum]
                             (try (let [panel-key (nth pk pnum)
                                        ce (get-in preview-maps [panel-key :combo_edn])
@@ -397,15 +397,15 @@
                                        sel? (= reco-selected panel-key)
                                        body [re-com/v-box
                                              :size "none"
-                                             :attr {:on-click #(do (re-frame/dispatch [::conn/click-parameter [:recos-sys :combo_hash] combo_hash])
-                                                                   (re-frame/dispatch [::conn/click-parameter [:recos-sys :combo_edn] combo_edn])
-                                                                   (re-frame/dispatch [::conn/click-parameter [:recos-sys :shape_name] shape_name])
-                                                                   (re-frame/dispatch [::conn/click-parameter [:recos-sys :selected_view] selected-view])
-                                                                   (re-frame/dispatch [::conn/click-parameter [:recos-sys :h] h])
-                                                                   (re-frame/dispatch [::conn/click-parameter [:recos-sys :w] w])
-                                                                   (re-frame/dispatch [::conn/click-parameter [:recos-sys :query_map] query_map])
-                                                                   (re-frame/dispatch [::conn/click-parameter [:recos-sys :viz_map] viz_map])
-                                                                   (re-frame/dispatch [::conn/click-parameter [:recos-sys :condis] condis]))}
+                                             :attr {:on-click #(do (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :combo_hash] combo_hash])
+                                                                   (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :combo_edn] combo_edn])
+                                                                   (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :shape_name] shape_name])
+                                                                   (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :selected_view] selected-view])
+                                                                   (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :h] h])
+                                                                   (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :w] w])
+                                                                   (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :query_map] query_map])
+                                                                   (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :viz_map] viz_map])
+                                                                   (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :condis] condis]))}
                                              :width "581px"
                                              :height "434px" ;"200px"
                                              :style {:zoom 0.44
@@ -475,14 +475,14 @@
 ;       ;(filter #(= (get % :table_name) ) block-list)
 ;       current-tab-queries ])
 
-    (dorun (let [prev-preview-keys (for [k @(re-frame/subscribe [::bricks/preview-keys])] (keyword (str "reco-preview" k)))
+    (dorun (let [prev-preview-keys (for [k @(ut/tracked-subscribe [::bricks/preview-keys])] (keyword (str "reco-preview" k)))
                  per-page 6 ;; if we ever get more room...
-                 grid-page @(re-frame/subscribe [::bricks/recos-page])
+                 grid-page @(ut/tracked-subscribe [::bricks/recos-page])
                  grid-page (if (> (- grid-page 1) pages) 0 grid-page)
                  recos (take per-page (drop (* grid-page per-page) @(re-frame.core/subscribe [::conn/sql-data [:recos-sys]])))
                  recos-keys (vec (for [{:keys [combo_hash]} recos] combo_hash))]
-             (doseq [k prev-preview-keys] (re-frame/dispatch [::bricks/quick-delete-panel k]))
-             (re-frame/dispatch [::bricks/set-preview-keys recos-keys])
+             (doseq [k prev-preview-keys] (ut/tracked-dispatch [::bricks/quick-delete-panel k]))
+             (ut/tracked-dispatch [::bricks/set-preview-keys recos-keys])
              (doseq [{:keys [combo_hash query_map viz_map condis combo_edn shape_name]} recos]
                (insert-hidden-reco-preview combo_hash viz_map query_map condis combo_edn shape_name false))))
 
@@ -494,8 +494,8 @@
 
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
 
@@ -532,7 +532,7 @@
                                           ;:can-drop-above? true
                                           ;:est-item-height 230
                              :model (get sql-params :user-dropdown-sys/req-field)
-                             :on-change #(re-frame/dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] %])
+                             :on-change #(ut/tracked-dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] %])
                              :width "285px"]
                             ;[re-com/box :child "hey"]
                             [re-com/single-dropdown
@@ -546,18 +546,18 @@
                                           ;:can-drop-above? true
                                           ;:est-item-height 230
                              :model (get sql-params :viz-shapes-sys/combo_edn)
-                             :on-change #(re-frame/dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] %])
+                             :on-change #(ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] %])
                              :width "660px"]
 
                             [re-com/box :child "grid"
-                             :attr {:on-click #(re-frame/dispatch [::bricks/set-grid-reco? true])}
+                             :attr {:on-click #(ut/tracked-dispatch [::bricks/set-grid-reco? true])}
                              :style {:color (if grid-reco? (theme-pull :theme/editor-font-color nil) "inherit")
                                      :cursor "pointer"
                                      :margin-top "-9px"
                                      :font-weight 700}]
 
                             [re-com/box :child "previews"
-                             :attr {:on-click #(re-frame/dispatch [::bricks/set-grid-reco? false])}
+                             :attr {:on-click #(ut/tracked-dispatch [::bricks/set-grid-reco? false])}
                              :style {:color (if (not grid-reco?) (theme-pull :theme/editor-font-color nil) "inherit")
                                      :cursor "pointer"
                                      :margin-top "-9px"
@@ -616,7 +616,7 @@
                                                   :height "19px"
                                                   :align :end
                                                   :justify :center
-                                                  :attr {:on-click #(re-frame/dispatch [::bricks/set-recos-page c])}
+                                                  :attr {:on-click #(ut/tracked-dispatch [::bricks/set-recos-page c])}
                                                   :style {:padding-right "4px"
                                                           :cursor "pointer"
                                                           :font-size "12px"
@@ -631,10 +631,10 @@
                                    :width "30px"]]]))]]]]))
 
 (defn editor-panel-viz []
-  (let [all-sql-call-keys @(re-frame/subscribe [::bricks/all-sql-call-keys])
+  (let [all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
         all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/unkeyword e) "-" "_"))
         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         sql-calls {:viz-tables-sys {:select [:table_name [[:count 1] :recos]]
                                     :from [:viz_recos_vw]
                                     ;:where [:in :table_name all-sql-call-keys-str]
@@ -661,14 +661,14 @@
                                     :group-by [:combo_edn]
                                     ;:group-by [:db_schema :db_catalog :connection_id :table_name]
                                     ;:order-by [:schema_cat :table_name]
-}}  ;;  (re-frame/subscribe [::conn/clicked-parameter-key [:viz-tables-sys/table_name]])
+}}  ;;  (ut/tracked-subscribe [::conn/clicked-parameter-key [:viz-tables-sys/table_name]])
         ]
     ;(tap> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
     ;(tap> sql-params)
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
     [re-com/h-box
@@ -686,11 +686,11 @@
                  :child [bricks/magic-table :viz-shapes-list* [:viz-shapes-sys] 7 10 []]]]]))
 
 (defn editor-panel-status []
-  (let [;all-sql-call-keys @(re-frame/subscribe [::bricks/all-sql-call-keys])
+  (let [;all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
        ; all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/unkeyword e) "-" "_"))
         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
-        client-name (str @(re-frame/subscribe [::bricks/client-name]))
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+        client-name (str @(ut/tracked-subscribe [::bricks/client-name]))
         sql-calls {:status-sys {:select [:*]
                                 :from [:latest_status]
                                 :where [:= :client_name client-name]
@@ -704,8 +704,8 @@
     ;(tap> sql-params)
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
     [re-com/box
@@ -723,11 +723,11 @@
                   ;              :order-by [:schema_cat :table_name]}
                    }
         sql-params (into {} (for [k [:connections-sys/connection_id]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))]
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
     [re-com/h-box
@@ -741,12 +741,12 @@
                  :child [bricks/magic-table :files-list* [:files-sys] 11.5 10 [:file_path :ts]]]]]))
 
 (defn editor-panel-metadata-kits []
-  (let [;market (group-by :package-name @(re-frame/subscribe [::bricks/all-kits])) ;
+  (let [;market (group-by :package-name @(ut/tracked-subscribe [::bricks/all-kits])) ;
         ;; market {:boo [{:kit-name :boogers :name "boogs" :description "market placeholder" :package-name :boo}
         ;;               {:kit-name :boogers2 :name "boogs2" :description "market placeholder2" :package-name :boo}]}
-        market (group-by :package-name @(re-frame/subscribe [::bricks/market-kits]))
-        pkits1 (group-by :package-name @(re-frame/subscribe [::bricks/installed-kits]))
-        curr @(re-frame/subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
+        market (group-by :package-name @(ut/tracked-subscribe [::bricks/market-kits]))
+        pkits1 (group-by :package-name @(ut/tracked-subscribe [::bricks/installed-kits]))
+        curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
         kit-market {:installed-packages pkits1
                     :available-packages market}
         hackreact [@db/kit-browser]]
@@ -828,15 +828,15 @@
                  :child "Kits are a great way to expand Rabbit functionality. Add customization for your data needs, or execute seperate arbitrary functions (even on another server) that receive query result & metadata - that can surface new insights, helpers, or even fun 'block builders'."])]))
 
 (defn editor-panel-metadata-ext-kits []
-  (let [pkits1 (group-by :package-name @(re-frame/subscribe [::bricks/installed-kits]))
-        market (group-by :package-name @(re-frame/subscribe [::bricks/market-kits]))
+  (let [pkits1 (group-by :package-name @(ut/tracked-subscribe [::bricks/installed-kits]))
+        market (group-by :package-name @(ut/tracked-subscribe [::bricks/market-kits]))
         pkits (merge pkits1 market)
         hackreact [@db/kit-browser]
         settings-param-kp [:kits-sys]
         kit-body (filter #(= (get % :kit-name) (second @db/kit-browser)) (get pkits (first @db/kit-browser) {}))
         display-map (dissoc (first kit-body) :fn :when)
        ; display-map (assoc display-map :image-url "images/outliers-image.png")
-        curr @(re-frame/subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
+        curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
         install-box [re-com/h-box
                      :height "60px"
                      :size "none"
@@ -862,7 +862,7 @@
                                         :border (when enabled?
                                                   (str "3px solid " (theme-pull :theme/editor-grid-selected-background-color nil)))}
                                 :attr {:on-click #(let [curr (if (nil? curr) [] curr)]
-                                                    (re-frame/dispatch [::conn/click-parameter
+                                                    (ut/tracked-dispatch [::conn/click-parameter
                                                                         settings-param-kp
                                                                         {:enabled (vec (conj curr @db/kit-browser))}]))}
                                 :child "enabled"
@@ -875,7 +875,7 @@
                                         :color (when (not enabled?) (theme-pull :theme/editor-grid-selected-background-color nil))
                                         :border (when (not enabled?)
                                                   (str "3px solid " (theme-pull :theme/editor-grid-selected-background-color nil)))}
-                                :attr {:on-click #(re-frame/dispatch [::conn/click-parameter
+                                :attr {:on-click #(ut/tracked-dispatch [::conn/click-parameter
                                                                       settings-param-kp
                                                                       {:enabled (vec (remove (fn [x] (= x @db/kit-browser)) curr))}])}
                                 :child "disabled"
@@ -941,11 +941,11 @@
   (let [;theme-scrubber? false
         ;key-type :param
         ;data-key [:params :views :params]
-        param-map @(re-frame/subscribe [::bricks/user-parameters key-type])
+        param-map @(ut/tracked-subscribe [::bricks/user-parameters key-type])
         ;selected-panel-map {:param1 123
         ;                    :param2 [2 3 4]}
         ]
-   ;;; (tap> [:param-map @(re-frame/subscribe [::bricks/user-parameter-doubles])])
+   ;;; (tap> [:param-map @(ut/tracked-subscribe [::bricks/user-parameter-doubles])])
 
     [re-com/v-box
      :gap "2px"
@@ -987,7 +987,7 @@
                    :child [bricks/scrubber-panel
                            true ; view?
                              ;{} ;param-map ; keypath-map
-                           @(re-frame/subscribe [::bricks/keypaths-in-params key-type])
+                           @(ut/tracked-subscribe [::bricks/keypaths-in-params key-type])
                            key-type (get @param-search key-type) {:fm true}] ; view-key (update kp)
                    :style {:overflow "auto"}]
 
@@ -1003,7 +1003,7 @@
 
 (defn editor-panel-metadata-ext-files []
   (let [sql-params (into {} (for [k [:files-sys/file_path]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         sql-calls {:blocks-sys {:select [:block_key :block_name :queries :views :block_data :view_names :query_names]
                                 :from [:blocks]
                                 :where [:= :file_path :files-sys/file_path]
@@ -1018,8 +1018,8 @@
     ;;(tap> [:test sql-params])
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
 
@@ -1039,7 +1039,7 @@
 
 (defn editor-panel-metadata-ext []
   (let [sql-params (into {} (for [k [:connections-sys/connection_id :tables-sys/table_name]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         sql-calls {:fields-sys {:select [:field_name :field_type :data_type]
                                 :from [:fields]
                                 :where [:and
@@ -1062,16 +1062,16 @@
     ;;(tap> [:test sql-params])
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
 
    ; (when (or attribs? combos?)
    ;   (let [vw-k (if attribs? (attrib-view k) (combo-view k))
    ;         query {:select [:*] :from [vw-k]}
-   ;         data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [vw-k]])
-   ;         unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+   ;         data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [vw-k]])
+   ;         unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
    ;     (when (or (not data-exists?) unrun-sql?)
    ;       (conn/sql-data [vw-k] query))))
 
@@ -1100,7 +1100,7 @@
 
 (defn editor-panel-metadata-viz []
   (let [sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn]]
-                              {k @(re-frame/subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         combo-picked? (not (nil? (get sql-params :viz-shapes-sys/combo_edn)))
         shape-picked? (not (nil? (get sql-params :viz-shapes0-sys/shape)))
         sql-calls {:recos-sys {:select [:*]
@@ -1115,8 +1115,8 @@
     ;;(tap> [:test sql-params])
     (dorun (for [[k v] sql-calls]
              (let [query (walk/postwalk-replace sql-params v)
-                   data-exists? @(re-frame/subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql? @(re-frame/subscribe [::conn/sql-query-not-run? [k] query])]
+                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
 
@@ -1133,8 +1133,8 @@
                                                                                (when combo-picked? :combo_edn)]]]]]]]))
 
 (defn editor-panel-metadata-status []
-  (let [pending @(re-frame/subscribe [::wfx/pending-requests http/socket-id])
-        client-name @(re-frame/subscribe [::bricks/client-name])
+  (let [pending @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])
+        client-name @(ut/tracked-subscribe [::bricks/client-name])
         pending (remove #(cstr/ends-with? (str (get-in % [:message :ui-keypath 0])) "-sys") pending)]
     ;(tap> [:pending pending])
 ;;     [re-com/v-box
@@ -1173,7 +1173,7 @@
 
                                                   (do (when (= client-name :glamorous-carmine-leopard-exiled-from-archipelago)
                                                         (tap> [:msg (get e :message)
-                                                               @(re-frame/subscribe [::bricks/runstream-running?])]))
+                                                               @(ut/tracked-subscribe [::bricks/runstream-running?])]))
                                                       [[re-com/box :child (str (get e :message))]])
 
                                                   [[re-com/box :child (str ":s - " l)]
@@ -1192,20 +1192,33 @@
 ;(defonce file-mode? (reagent/atom false))
 ;(defonce db/editor-mode (reagent/atom :meta))
 
+;; (tap> [:atom-sizes (ut/calculate-atom-sizes {:replacer-atom ut/replacer-atom
+;;                                                                 ;:db/flow-results db/flow-results
+;;                                              :db/scrubbers db/scrubbers
+;;                                              :ut/is-base64-atom ut/is-base64-atom
+;;                                              :tu/is-large-base64-atom ut/is-large-base64-atom
+;;                                                                 ;:websocket-fx.core/CONNECTIONS websocket-fx.core/CONNECTIONS
+;;                                              :re-frame.db/app-db re-frame.db/app-db
+;;                                              :ut/clean-sql-atom ut/clean-sql-atom
+;;                                              :ut/deep-flatten-atom ut/deep-flatten-atom
+;;                                              :ut/format-map-atom ut/format-map-atom
+;;                                              :ut/body-set-atom ut/body-set-atom
+;;                                              :ut/data-typer-atom ut/data-typer-atom
+;;                                              :ut/coord-cache ut/coord-cache})])
 
 (defn ui-debugger []
   (let [;bw 33 bh 11
         ;ttl-height (* bh bricks/brick-size)
-        sched @(re-frame/subscribe [::bricks/query-schedule])
+        sched @(ut/tracked-subscribe [::bricks/query-schedule])
         params (merge sched
-                      {"client-name" @(re-frame/subscribe [::bricks/client-name])
-                       "[::bricks/last-heartbeat]" @(re-frame/subscribe [::bricks/last-heartbeat])
+                      {"client-name" @(ut/tracked-subscribe [::bricks/client-name])
+                       "[::bricks/last-heartbeat]" @(ut/tracked-subscribe [::bricks/last-heartbeat])
                        "db/context-modal-pos" @db/context-modal-pos
                        "db/editor-mode" @db/editor-mode
                        "db/auto-refresh?" @db/auto-refresh?
                        "db/param-filter" @db/param-filter
                        "data-browser-query" @db/data-browser-query
-                       "[::bricks/selected-block-map]" @(re-frame/subscribe [::bricks/selected-block-map])
+                       "[::bricks/selected-block-map]" @(ut/tracked-subscribe [::bricks/selected-block-map])
                        "bricks/dragging?" @bricks/dragging?
                        "bricks/dyn-dropper-hover (!!!!)" @bricks/dyn-dropper-hover
                        "bricks/dragging-size" @bricks/dragging-size
@@ -1275,8 +1288,8 @@
    (get db :search-results)))
 
 (defn search-panel-left [single-width single-height]
-  (let [client-name @(re-frame/subscribe [::bricks/client-name])
-        results @(re-frame/subscribe [::search-results])]
+  (let [client-name @(ut/tracked-subscribe [::bricks/client-name])
+        results @(ut/tracked-subscribe [::search-results])]
     [re-com/v-box
      :children [;[re-com/box
                 ; :child "search-box"]
@@ -1287,7 +1300,7 @@
                  ;:change-on-blur? false
                          :on-change #(do (reset! db/search-box %)
                                          (when (not (empty? (cstr/trim (str %))))
-                                           (re-frame/dispatch [::wfx/request :default
+                                           (ut/tracked-dispatch [::wfx/request :default
                                                                {:message    {:kind :search-groups
                                                                              :client-name client-name
                                                                              :max-hits 200
@@ -1334,10 +1347,10 @@
    :style {:border "2px solid yellow"}])
 
 (defn editor-panel [bricks-wide bricks-tall]
-  (let [selected-panel-map @(re-frame/subscribe [::bricks/selected-block-map])
-        selected-block @(re-frame/subscribe [::bricks/selected-block])
-        sql-calls @(re-frame/subscribe [::bricks/panel-sql-calls selected-block])
-        views @(re-frame/subscribe [::bricks/panel-views selected-block])
+  (let [selected-panel-map @(ut/tracked-subscribe [::bricks/selected-block-map])
+        selected-block @(ut/tracked-subscribe [::bricks/selected-block])
+        sql-calls @(ut/tracked-subscribe [::bricks/panel-sql-calls selected-block])
+        views @(ut/tracked-subscribe [::bricks/panel-views selected-block])
         system-panel? (or (= selected-block "none!") (nil? selected-block))
         ;we could hit (get selected-panel-map :queries), but the sub filters out the :vselects
         first-data-key (first (keys sql-calls))
@@ -1374,26 +1387,26 @@
         ;single-height-px (px (* (js/Math.floor (/ bricks-tall 4)) bricks/brick-size))
         single-height ttl-height
         single-height-px ttl-height-px
-        click-params @(re-frame/subscribe [::bricks/all-click-params])
-        all-sql-call-keys @(re-frame/subscribe [::bricks/all-sql-call-keys])
-        all-vsql-call-keys @(re-frame/subscribe [::bricks/all-vsql-call-keys])
+        click-params @(ut/tracked-subscribe [::bricks/all-click-params])
+        all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
+        all-vsql-call-keys @(ut/tracked-subscribe [::bricks/all-vsql-call-keys])
         sql-string (bricks/materialize-one-sql selected-block data-key)
-        reco-selected @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])
-        reco-combo @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/combo_edn]])
-        shape-name @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/shape_name]])
-        reco-query @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/query_map]])
-        reco-viz @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/viz_map]])
-        reco-condis @(re-frame/subscribe [::conn/clicked-parameter-key [:recos-sys/condis]])
-        reco-preview @(re-frame/subscribe [::bricks/reco-preview])
+        reco-selected @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])
+        reco-combo @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_edn]])
+        shape-name @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/shape_name]])
+        reco-query @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/query_map]])
+        reco-viz @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/viz_map]])
+        reco-condis @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/condis]])
+        reco-preview @(ut/tracked-subscribe [::bricks/reco-preview])
         reco-selected? (not (nil? reco-selected))
         mad-libs-combo? (not (empty? (get selected-panel-map :mad-libs-combo-hash)))
         mad-libs-combos (when mad-libs-combo?
-                          @(re-frame/subscribe [::bricks/get-combo-rows
+                          @(ut/tracked-subscribe [::bricks/get-combo-rows
                                                 selected-block (get selected-panel-map :mad-libs-combo-hash)]))
-        screen-name (ut/unkeyword @(re-frame/subscribe [::bricks/screen-name]))
+        screen-name (ut/unkeyword @(ut/tracked-subscribe [::bricks/screen-name]))
         screen-name-regex #"(.|\s)*\S(.|\s)*"
-        websocket-status (select-keys @(re-frame/subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])
-        ;websocket-status @(re-frame/subscribe [::http/websocket-status])
+        websocket-status (select-keys @(ut/tracked-subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])
+        ;websocket-status @(ut/tracked-subscribe [::http/websocket-status])
         ]
 
    ; (tap> @bricks/dragging-editor?)
@@ -1404,7 +1417,7 @@
     ;(tap> [:mad-libs-scrubber mad-libs-combo? mad-libs-combo])
 
     ;(tap> [reco-selected reco-preview])
-    ;(tap> [:pending (for [e @(re-frame/subscribe [::wfx/pending-requests http/socket-id])]
+    ;(tap> [:pending (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
     ;                   (get-in e [:message :ui-keypath])
     ;                 ; e
     ;                  ) ])
@@ -1415,10 +1428,10 @@
       )
 
    ; (when (and (empty? (get websocket-status :open-subs)) (= (get websocket-status :status) :connected))
-   ;   (debounce (re-frame/dispatch [::wfx/subscribe http/socket-id :server-push0 db/subscription]) 500) )
+   ;   (debounce (ut/tracked-dispatch [::wfx/subscribe http/socket-id :server-push0 db/subscription]) 500) )
     ;(tap> [:views (get @db/data-browser-query selected-block) data-key view-key queries? views? view-selected? (keys sql-calls) (keys views)])
     ;(tap> [panel-count bricks-wide])
-    ;(tap> @(re-frame/subscribe [::bricks/descendant-panels2 selected-block]))
+    ;(tap> @(ut/tracked-subscribe [::bricks/descendant-panels2 selected-block]))
     [rc/catch
      [re-com/h-box
       :size "none"
@@ -1513,7 +1526,7 @@
                                                                                                      :padding-right "5px"
                                                                                                      :margin-top "-6px"
                                                                                                      :font-size "19px"}
-                                                                                             :attr {:on-click #(re-frame/dispatch
+                                                                                             :attr {:on-click #(ut/tracked-dispatch
                                                                                                                 [::bricks/refresh-meta-tables
                                                                                                                  @db/editor-mode])}]
 
@@ -1592,10 +1605,10 @@
 
                                            (let [src-table-id-str (last (get selected-panel-map :mad-libs-combo-hash))
                                                  combo-hash (first (get selected-panel-map :mad-libs-combo-hash))
-                                                 opts @(re-frame/subscribe [::bricks/get-mad-libs-options selected-block src-table-id-str combo-hash])
+                                                 opts @(ut/tracked-subscribe [::bricks/get-mad-libs-options selected-block src-table-id-str combo-hash])
                                                  shape-name (get opts :shape_name)
                                                  ;combo-name (get opts :combo_edn)
-                                                 viz-shape @(re-frame/subscribe [::bricks/get-viz-shape shape-name])
+                                                 viz-shape @(ut/tracked-subscribe [::bricks/get-viz-shape shape-name])
                                                  color-keys [:YlGn :desc]
                                                  hacko @db/mad-libs-box
                                                  ;colors1 (vec (reverse (get-in ut/colorbrewer color-keys)))
@@ -1614,7 +1627,7 @@
                                                                     (if (and normalized (>= idx 0) (< idx (count color-vector)))
                                                                       (color-vector idx)
                                                                       nil)))
-                                                 viz-shape-rules (first (filter #(= (get % :shape_name) shape-name) @(re-frame/subscribe [::conn/sql-data [:viz-shapes]])))
+                                                 viz-shape-rules (first (filter #(= (get % :shape_name) shape-name) @(ut/tracked-subscribe [::conn/sql-data [:viz-shapes]])))
                                                  rounder (fn [num] (/ (js/Math.round (* num 100)) 100))
                                                  open-shape? (get-in @db/mad-libs-box [selected-block shape-name] false)
                                                  ;viz-shape (get viz-shapes shape-name)
@@ -1753,7 +1766,7 @@
                                                                                                                    :pivot-by [:attribute_name]
                                                                                                                    :col-widths {:field 240 :table_name 200}}}
                                                                                                       ;:root [12 11]
-                                                                                                        :tab @(re-frame/subscribe [::bricks/selected-tab])
+                                                                                                        :tab @(ut/tracked-subscribe [::bricks/selected-tab])
                                                                                                         :drag-meta {:block-name (str "show-me-" (rand-int 1234)) :type :viz-reco}}
                                                                                                        "meta-menu"
                                                                                                        [re-com/box :child "show me why" :padding "5px"
@@ -1865,10 +1878,10 @@
                                                                                                                           :width "19px" :height "19px"}])]]]]]
                                                                               :attr {:on-click #(when (not (or cur? cur-rev?))
                                                                                                   (let []
-                                                                                                    (re-frame/dispatch [::bricks/get-combo-hash
+                                                                                                    (ut/tracked-dispatch [::bricks/get-combo-hash
                                                                                                                         selected-block src-table-id-str shape-name new-curr-axe])
                                                                                                 ;;   (tap> [:lookup-combo-hash
-                                                                                                ;;          @(re-frame/subscribe
+                                                                                                ;;          @(ut/tracked-subscribe
                                                                                                 ;;            [::bricks/lookup-combo-hash
                                                                                                 ;;             selected-block
                                                                                                 ;;             src-table-id-str
@@ -1892,7 +1905,7 @@
                                                                 ;:child (str fname " " (hash (last ov)) " || " (hash cur-axes))
                                                                               ])]]]]])]]])
 
-                                           :else (let [selected-kp @(re-frame/subscribe [::bricks/editor-panel-selected-view])
+                                           :else (let [selected-kp @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
                                                        selected-kp (if (nil? (first selected-kp)) nil selected-kp)] ;; if viz-gen or :* then nil
                                                    ;(tap> [:selected-kp selected-kp])
                                                    (if ;(and ;view-selected?
@@ -1904,8 +1917,8 @@
                                                       :height (px (- single-height 40))
                                                       :child [bricks/scrubber-panel view-selected?
                                                               (if view-selected?
-                                                                @(re-frame/subscribe [::bricks/keypaths-in-view selected-block data-key])
-                                                                @(re-frame/subscribe [::bricks/keypaths-in-query selected-block data-key])) data-key nil {:fm true}]
+                                                                @(ut/tracked-subscribe [::bricks/keypaths-in-view selected-block data-key])
+                                                                @(ut/tracked-subscribe [::bricks/keypaths-in-query selected-block data-key])) data-key nil {:fm true}]
                                                       :style {:overflow "auto"}]
                                                      [bricks/panel-code-box
                                                       selected-block
@@ -1921,19 +1934,19 @@
                                                 (= @db/editor-mode :status))
                                        [re-com/box
                                         ;:align :end :justify :end
-                                        ;:attr {:on-click #(re-frame/dispatch [::bricks/resub!])}
+                                        ;:attr {:on-click #(ut/tracked-dispatch [::bricks/resub!])}
                                         :child
                                         (str websocket-status)
                                         ;[bricks/click-param-browser (str websocket-status) (* single-width 0.6) 33]
                                        ; [bricks/read-only-clojure-box (* single-width 0.7) single-height (str websocket-status)]
-                                       ;; (re-frame/dispatch [::wfx/subscribe socket-id :server-push subscription]) ;; resub on dev page reload
+                                       ;; (ut/tracked-dispatch [::wfx/subscribe socket-id :server-push subscription]) ;; resub on dev page reload
                                         :style {:color (str (theme-pull :theme/editor-font-color nil) 77) ;; "#ffffff44"
                                                 :font-size "12px"
                                                 :margin-top "-9px"
                                                 :padding-left "8px"}])
                                    ; [re-com/box
                                    ;  :style {:color "white" :margin-top "-20px"}
-                                   ;  :child (str @(re-frame/subscribe [::bricks/descendant-panels2 selected-block]))]
+                                   ;  :child (str @(ut/tracked-subscribe [::bricks/descendant-panels2 selected-block]))]
                                      ]]
                   :height single-height-px
                   :width (if (and (= @db/editor-mode :vvv)
@@ -2020,7 +2033,7 @@
                                                           :gap "7px"
                                                           :padding "5px" :style {:font-weight 700 :color "#dddddd"}
                                                           :children (for [k (keys sql-calls)]
-                                                                      (let [console-output @(re-frame/subscribe [::bricks/repl-output k])
+                                                                      (let [console-output @(ut/tracked-subscribe [::bricks/repl-output k])
                                                                             repl? (not (empty? console-output))
                                                                             dyn-color (if (= k data-key)
                                                                                         (theme-pull :theme/editor-background-color nil)
@@ -2095,14 +2108,14 @@
                                                                              :color "#dddddd66"
                                                                              :margin-top "3px"}
                                                       :children [[re-com/box
-                                                                  :attr {:on-click #(re-frame/dispatch
+                                                                  :attr {:on-click #(ut/tracked-dispatch
                                                                                      [::bricks/add-new selected-block :queries
                                                                                       {:select [["heya, friendo" :greetings]
                                                                                                 [(rand-int 123) :count_stuff]]}])}
                                                                   :style {:cursor "pointer"}
                                                                   :child "+query"]
                                                                  [re-com/box
-                                                                  :attr {:on-click #(re-frame/dispatch
+                                                                  :attr {:on-click #(ut/tracked-dispatch
                                                                                      [::bricks/add-new selected-block :queries
                                                                                       {:select [:*]
                                                                                        :from [{:data '(vec (for [i (range 45)]
@@ -2112,7 +2125,7 @@
                                                                   :style {:cursor "pointer"}
                                                                   :child "+code"]
                                                                  [re-com/box
-                                                                  :attr {:on-click #(re-frame/dispatch
+                                                                  :attr {:on-click #(ut/tracked-dispatch
                                                                                      [::bricks/add-new selected-block :views
                                                                                       [:box :child "heya"
                                                                                        :align :center
@@ -2164,7 +2177,7 @@
                                                         :size "auto" :child "(Block cannot be saved until corrected)"]]]
                                            (let [query-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys sql-calls))
                                                                 (some #(= % data-key) (keys sql-calls)))
-                                                 is-layout? @(re-frame/subscribe [::bricks/is-layout? selected-block data-key])
+                                                 is-layout? @(ut/tracked-subscribe [::bricks/is-layout? selected-block data-key])
                                                  viz-gen? (= :viz-gen (get @db/data-browser-query selected-block))]
                                                ;; (tap> [:as selected-block data-key] )
                                              [re-com/v-box
@@ -2173,7 +2186,7 @@
                                                                [re-com/v-box
                                                                 :justify :between
                                                                 :children (if (get @db/data-browser-query-con data-key)
-                                                                            [(let [repl-output (dissoc @(re-frame/subscribe [::bricks/repl-output data-key]) :status)
+                                                                            [(let [repl-output (dissoc @(ut/tracked-subscribe [::bricks/repl-output data-key]) :status)
                                                                                    console (vec (remove empty? (get repl-output :out [])))]
                                                                                [re-com/v-box
                                                                                 :padding "9px"
@@ -2192,19 +2205,19 @@
                                                                                            [shape/map-boxes2 (dissoc repl-output :out) "no-block" "no-flow" [] "no-block" "map"]]
                                                                                 ;["fart fax incoming!" (str repl-output)]
                                                                                 ])]
-                                                                            [@(re-frame/subscribe [::bricks/sql-data-table-editor selected-block
+                                                                            [@(ut/tracked-subscribe [::bricks/sql-data-table-editor selected-block
                                                                                                    [data-key]
                                                                                                    single-width-bricks 6.05])
                                                                              (when (not @bricks/dragging?)
                                                                                [bricks/read-only-sql-box single-width (/ single-height 3.2) (str sql-string)])])]
 
                                                                viz-gen? ;[re-com/box :child (str (count mad-libs-combos) " rows. ")]
-                                                               (let [;default-combo-view @(re-frame/subscribe [::bricks/lookup-mad-libs-row combohash])
+                                                               (let [;default-combo-view @(ut/tracked-subscribe [::bricks/lookup-mad-libs-row combohash])
                                                                      src-table-id-str (last (get selected-panel-map :mad-libs-combo-hash))
                                                                      combo-hash (first (get selected-panel-map :mad-libs-combo-hash))
-                                                                     opts @(re-frame/subscribe [::bricks/get-mad-libs-options selected-block src-table-id-str combo-hash])
+                                                                     opts @(ut/tracked-subscribe [::bricks/get-mad-libs-options selected-block src-table-id-str combo-hash])
                                                                      shape-name (get opts :shape_name)
-                                                                     viz-shape @(re-frame/subscribe [::bricks/get-viz-shape shape-name])
+                                                                     viz-shape @(ut/tracked-subscribe [::bricks/get-viz-shape shape-name])
                                                                      default-shape-view (get viz-shape :selected_view)
                                                                      default-shape-view (try (when (not (empty? default-shape-view)) (keyword (ut/replacer default-shape-view #":" ""))) (catch :default _ nil))]
                                                                  (tap> [:def-sel default-shape-view viz-shape])
@@ -2409,7 +2422,7 @@
                                                              :child (str b)])]
                                                [re-com/md-icon-button
                                                 :md-icon-name "zmdi-window-minimize"
-                                                :on-click #(re-frame/dispatch [::bricks/toggle-editor])
+                                                :on-click #(ut/tracked-dispatch [::bricks/toggle-editor])
                                                 :style {:font-size "15px"
                                                         :opacity   0.33
                                                         :cursor    "pointer"}]]]
@@ -2466,7 +2479,7 @@
                                               :model            (str screen-name)
                                               :width            "487px"
                                               :height "30px"
-                                              :on-change        #(re-frame/dispatch [::bricks/set-screen-name %])
+                                              :on-change        #(ut/tracked-dispatch [::bricks/set-screen-name %])
                                               :validation-regex screen-name-regex
                                               :change-on-blur? true
                                               :style  {:font-size "20px"
@@ -2485,7 +2498,7 @@
                                          ; :background-color (str (theme-pull :theme/editor-background-color nil) 44) ;; "#00000044"
                                         ;:cursor "pointer"
                                           :border-radius "7px"}
-                                ;:attr {:on-click #(re-frame/dispatch [::http/save :skinny])}
+                                ;:attr {:on-click #(ut/tracked-dispatch [::http/save :skinny])}
                                   ]
                                  [re-com/box
                                   :align :center :justify :center
@@ -2533,7 +2546,7 @@
                 ;;                           :cursor "pointer"
                 ;;                           :border-radius "7px"
                 ;;                           :font-size "13px"}
-                ;;                   :attr {:on-click #(re-frame/dispatch [::http/save :skinny screen-name])}]
+                ;;                   :attr {:on-click #(ut/tracked-dispatch [::http/save :skinny screen-name])}]
 
                 ;;                  [re-com/box :padding "8px" :child "save to server (with row data)" :size "auto" :align :center :justify :start
                 ;;                   :style {:color (theme-pull :theme/editor-font-color nil)
@@ -2541,7 +2554,7 @@
                 ;;                           :cursor "pointer"
                 ;;                           :border-radius "7px"
                 ;;                           :font-size "13px"}
-                ;;                   :attr {:on-click #(re-frame/dispatch [::http/save :fat screen-name])}]]
+                ;;                   :attr {:on-click #(ut/tracked-dispatch [::http/save :fat screen-name])}]]
                 ;;       :style {:padding-left "10px"
                 ;;               :padding-top "0px"
                 ;;               :padding-bottom "0px"
@@ -2587,7 +2600,7 @@
                                    (tap> [:saving-csv-to-server fname])
                                    (ut/read-file file0
                                              ;#(tap> (str %))
-                                                 #(re-frame/dispatch [::http/save-csv fname (str %)]))
+                                                 #(ut/tracked-dispatch [::http/save-csv fname (str %)]))
                                    (set! (-> files .-value) ""))
                                  (tap> [:invalid-file fname])))))})
 
@@ -2596,10 +2609,10 @@
 (defonce title-edit-idx (reagent/atom nil))
 
 (defn tab-menu []
-  (let [;tabs @(re-frame/subscribe [::bricks/tabs])
-        tabs @(re-frame/subscribe [::bricks/visible-tabs])
-        hidden-tabs @(re-frame/subscribe [::bricks/hidden-tabs])
-        selected-tab @(re-frame/subscribe [::bricks/selected-tab])
+  (let [;tabs @(ut/tracked-subscribe [::bricks/tabs])
+        tabs @(ut/tracked-subscribe [::bricks/visible-tabs])
+        hidden-tabs @(ut/tracked-subscribe [::bricks/hidden-tabs])
+        selected-tab @(ut/tracked-subscribe [::bricks/selected-tab])
         react-hack [@db/show-tabs? @title-edit-idx] ;; important
         ;is-last? (fn [t] (try (= (count tabs) (+ 1 (.indexOf tabs t))) (catch :default _ false)))
         tab-row (fn [top tabs & [hidden?]]
@@ -2623,7 +2636,7 @@
                                                                             :on-change #(do (tap> [:changed-tab-name (str t) :to (str %)])
                                                                                             (when (and (not (empty? (cstr/trim (str %))))
                                                                                                        (not (some (fn [x] (= x %)) tabs)))
-                                                                                              (re-frame/dispatch [::bricks/rename-tab (str t) (str %)])) ;; dont want to update with empty string or dupe
+                                                                                              (ut/tracked-dispatch [::bricks/rename-tab (str t) (str %)])) ;; dont want to update with empty string or dupe
                                                                                             (reset! title-edit-idx nil))
                                                                             :change-on-blur? true
                                                                             :width (px (+ 15 (* (count (str t)) 11))) ;"inherit" ; "200px"
@@ -2641,7 +2654,7 @@
                                                                                     :padding-top "5px"
                                                                                     :width "10px"
                                                                                     :height "20px"}
-                                                                            :attr {:on-click #(re-frame/dispatch [::bricks/delete-tab (str t)])}]]]
+                                                                            :attr {:on-click #(ut/tracked-dispatch [::bricks/delete-tab (str t)])}]]]
                                                                          (str t)))
                                                             :size "none"
                                                             :align :center :justify (when (not @db/show-tabs?) :center)
@@ -2650,12 +2663,12 @@
                                                             :style {:transition_NOT "all 0.2s ease-in-out"
                                                                     :backdrop-filter "blur(8px)"}]
                                                            :attr (merge (when (not (= @title-edit-idx t))
-                                                                          {:on-click #(do (re-frame/dispatch [::bricks/select-tab (str t)])
+                                                                          {:on-click #(do (ut/tracked-dispatch [::bricks/select-tab (str t)])
                                                                                           (reset! title-edit-idx nil))})
                                                                         (if selected?
                                                                           {:on-double-click #(reset! title-edit-idx (str t))}
                                                                           {})
-                                                                        {:on-context-menu #(re-frame/dispatch [::bricks/toggle-tab-visibility (str t)])})
+                                                                        {:on-context-menu #(ut/tracked-dispatch [::bricks/toggle-tab-visibility (str t)])})
                                                            :style {:cursor "pointer"
                                                                    :background-color (theme-pull :theme/base-block-color-selected nil)
                                                                    :color (theme-pull :theme/editor-outer-rim-color nil)
@@ -2670,7 +2683,7 @@
                                                                                (str "1px solid " (theme-pull :theme/block-tab-selected-font-color nil))))}]]]
                                         (if (not selected?)
                                           (bricks/draggable
-                                           (let [[_ _ w h] @(re-frame/subscribe [::bricks/tab-recenter t])]
+                                           (let [[_ _ w h] @(ut/tracked-subscribe [::bricks/tab-recenter t])]
                                              {:w              w
                                               :selected-view  :vv
                                               :name           (str t)
@@ -2721,8 +2734,8 @@
                                     :width "30px"
                                     :height "30px"}
                             :attr {:on-click #(let [new-tab (ut/make-tab-name)]
-                                                (re-frame/dispatch [::bricks/add-tab new-tab])
-                                                (re-frame/dispatch [::bricks/select-tab new-tab]))}]))
+                                                (ut/tracked-dispatch [::bricks/add-tab new-tab])
+                                                (ut/tracked-dispatch [::bricks/select-tab new-tab]))}]))
                    :height "30px"
                    :style {:position "fixed"
                            :top top :left 0
@@ -2737,9 +2750,9 @@
                   [tab-row 30 hidden-tabs true])]]))
 
 (defn snapshot-menu []
-  (let [;tabs @(re-frame/subscribe [::bricks/tabs])
-        matching @(re-frame/subscribe [::bricks/matching-snapshots])
-        selected-tab nil ; @(re-frame/subscribe [::bricks/selected-tab])
+  (let [;tabs @(ut/tracked-subscribe [::bricks/tabs])
+        matching @(ut/tracked-subscribe [::bricks/matching-snapshots])
+        selected-tab nil ; @(ut/tracked-subscribe [::bricks/selected-tab])
         snapshots @(re-frame.core/subscribe [::bricks/snapshots])
         tabs (vec (map :key (sort-by :key (vec (for [[k v] snapshots
                                                      :when (get v :menu?)]
@@ -2761,7 +2774,7 @@
                                                                             :align :center :justify (when (not @db/show-snaps?) :center)
                                                                             :padding "5px"
                                                                             :width (when (not @db/show-snaps?) "5px")
-                                                                            :attr {:on-click #(re-frame/dispatch [::bricks/swap-snapshot t])}
+                                                                            :attr {:on-click #(ut/tracked-dispatch [::bricks/swap-snapshot t])}
                                                                             :style {:transition_NOT "all 0.2s ease-in-out"
                                                                                     :backdrop-filter "blur(8px)"
                                                                          ;:transform-style "preserve-3d"
@@ -2834,8 +2847,8 @@
                                            :width "30px"
                                            :height "30px"}
                         ;:attr {:on-click #(let [new-tab (ut/make-tab-name)]
-                        ;                    (re-frame/dispatch [::bricks/add-tab new-tab])
-                        ;                    (re-frame/dispatch [::bricks/select-tab new-tab]))}
+                        ;                    (ut/tracked-dispatch [::bricks/add-tab new-tab])
+                        ;                    (ut/tracked-dispatch [::bricks/select-tab new-tab]))}
                                    ]
                         ;[re-com/box :child "+"]
                                   )))
@@ -2917,11 +2930,12 @@
          new-h (hash pp)
          client-name (get db :client-name)]
      ;;(tap> [:push-params! client-name (keys pp)])
-     (re-frame/dispatch [::wfx/request   :default ;; just a push, no response handling
+     (ut/tracked-dispatch [::wfx/request   :default ;; just a push, no response handling
                          {:message      {:kind         :sync-client-params
                                          :params-map   pp
                                          ;:flow-params-map 
-                                         :client-name  client-name}}])
+                                         :client-name  client-name}
+                          :timeout 10000}])
      (assoc db :user-params-hash new-h))))
 
 (re-frame/reg-sub
@@ -2987,20 +3001,20 @@
    (get-in db [:runstreams flow-id :fire?] false)))
 
 (defn run-flow [flow-id overrides] ;; same as honeycomb logic w/o the render obvs
-  (if @(re-frame/subscribe [::is-fire-on-change? flow-id])
-    (let [client-name @(re-frame/subscribe [::bricks/client-name])
+  (if @(ut/tracked-subscribe [::is-fire-on-change? flow-id])
+    (let [client-name @(ut/tracked-subscribe [::bricks/client-name])
           base-opts {:increment-id? false}
           running-key (keyword (str "flow/" flow-id ">*running?"))
-          running? @(re-frame/subscribe [::conn/clicked-parameter-key [running-key]])
+          running? @(ut/tracked-subscribe [::conn/clicked-parameter-key [running-key]])
           runstreamed? (= overrides :runstream-overrides)
           overrides (if runstreamed?
-                      @(re-frame/subscribe [::bricks/runstream-overrides flow-id])
+                      @(ut/tracked-subscribe [::bricks/runstream-overrides flow-id])
                       overrides)
           overrides? (not (empty? overrides))]
       (when (not running?) ;(not (some (fn [x] (= x text)) @db/speech-log))
         (let [fstr (str "changed! running flow " flow-id (when overrides? " (with overrides)"))
               w (/ (count fstr) 4.1)]
-          (re-frame/dispatch [::wfx/request :default
+          (ut/tracked-dispatch [::wfx/request :default
                               {:message    {:kind :run-flow
                                             :flow-id flow-id
                                             :flowmap flow-id
@@ -3008,37 +3022,37 @@
                                                     (merge base-opts
                                                            {:overrides overrides})
                                                     base-opts)
-                                        ;;     :file-image {:flowmaps @(re-frame/subscribe [::bricks/flowmap-raw])
-                                        ;;                  :opts @(re-frame/subscribe [::bricks/opts-map])
+                                        ;;     :file-image {:flowmaps @(ut/tracked-subscribe [::bricks/flowmap-raw])
+                                        ;;                  :opts @(ut/tracked-subscribe [::bricks/opts-map])
                                         ;;                  :zoom @db/pan-zoom-offsets
                                         ;;                  :flow-id flow-id
-                                        ;;                  :flowmaps-connections @(re-frame/subscribe [::bricks/flowmap-connections])}
+                                        ;;                  :flowmaps-connections @(ut/tracked-subscribe [::bricks/flowmap-connections])}
                                             :client-name client-name}
                                :on-response [::http/socket-response]
                                :on-timeout [::http/timeout-response]
                                :timeout    500000}])
           (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
-        ;;   (re-frame/dispatch [::conn/click-parameter ;; kinda cheating, but feels better
+        ;;   (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
         ;;                       [:flow (keyword (str flow-id ">*running?"))] true])
           )))
     (tap> [:no-fire-on-change flow-id :skipping])))
 
 (defn task-bar []
-  (let [min-panels @(re-frame/subscribe [::bricks/all-panels-minimized])
-        user-param-hash2 @(re-frame/subscribe [::watch-user-params])
-        selected-view @(re-frame/subscribe [::bricks/editor-panel-selected-view])
-        sselected-view  @(re-frame/subscribe [::conn/clicked-parameter [:param :selected-view]])
-        editor? @(re-frame/subscribe [::bricks/editor?])
-        user-param-hash1 @(re-frame/subscribe [::user-params-hash])
-        minimized-system-panels @(re-frame/subscribe [::minimized-system-panels])
-        audio-playing? false ;@(re-frame/subscribe [::audio/audio-playing?])
-        rs-overrides @(re-frame/subscribe [::bricks/runstream-override-map])
-        rs-overrides-hashmap @(re-frame/subscribe [::rs-overrides-hashmap])
-        theme-colors-hashmap @(re-frame/subscribe [::theme-colors-hashmap])
+  (let [min-panels @(ut/tracked-subscribe [::bricks/all-panels-minimized])
+        user-param-hash2 @(ut/tracked-subscribe [::watch-user-params])
+        selected-view @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
+        sselected-view  @(ut/tracked-subscribe [::conn/clicked-parameter [:param :selected-view]])
+        editor? @(ut/tracked-subscribe [::bricks/editor?])
+        user-param-hash1 @(ut/tracked-subscribe [::user-params-hash])
+        minimized-system-panels @(ut/tracked-subscribe [::minimized-system-panels])
+        audio-playing? false ;@(ut/tracked-subscribe [::audio/audio-playing?])
+        rs-overrides @(ut/tracked-subscribe [::bricks/runstream-override-map])
+        rs-overrides-hashmap @(ut/tracked-subscribe [::rs-overrides-hashmap])
+        theme-colors-hashmap @(ut/tracked-subscribe [::theme-colors-hashmap])
         theme-colors (theme-pull :theme/data-colors db/data-colors)
         ;_ (tap> [:min min-panels minimized-system-panels])
         min-panels (vec (into min-panels minimized-system-panels))
-        ;;mats @(re-frame/subscribe [::bricks/materialized-theme]) ;; prints out the materilized theme w/o refs
+        ;;mats @(ut/tracked-subscribe [::bricks/materialized-theme]) ;; prints out the materilized theme w/o refs
         ]
     ;;(tap> [selected-view sselected-view])
 
@@ -3050,25 +3064,25 @@
           (tap> [:runstream-override! k v])
           (when (not (empty? rs-overrides-hashmap)) ;; on first run, dont want to trigger all...
             (run-flow k v))))
-      (re-frame/dispatch [::set-rs-overrides-hashmap rs-overrides]))
+      (ut/tracked-dispatch [::set-rs-overrides-hashmap rs-overrides]))
 
     (when (not= theme-colors theme-colors-hashmap) ;; execute flows when mutated
       (tap> [:theme-colors-change! theme-colors theme-colors-hashmap])
       (ut/apply-theme (bricks/code-mirror-theme))
-      (re-frame/dispatch [::set-theme-colors-hashmap theme-colors]))
+      (ut/tracked-dispatch [::set-theme-colors-hashmap theme-colors]))
 
     ;;(when (not= (theme-pull :theme/data-colors db/data-colors) ))
 
 
     (when true ; some atom to short-circuit this if needed later.. (putting it here since this is a "cheap loop" bricks/grid is NOT)
       (doall (when (not (= user-param-hash1 user-param-hash2))  ;; core update for blind backend updating / external editing 2-way
-               (re-frame/dispatch [::update-user-params-hash]))))
+               (ut/tracked-dispatch [::update-user-params-hash]))))
 
     (when (and editor? (not (= selected-view sselected-view)))
-      (let [view-data @(re-frame/subscribe [::view-data selected-view])]
+      (let [view-data @(ut/tracked-subscribe [::view-data selected-view])]
         ;(tap> [:view-data selected-view view-data])
-        (re-frame/dispatch [::conn/click-parameter [:param :selected-view] selected-view])
-        (re-frame/dispatch [::conn/click-parameter [:param :selected-view-data] view-data])))
+        (ut/tracked-dispatch [::conn/click-parameter [:param :selected-view] selected-view])
+        (ut/tracked-dispatch [::conn/click-parameter [:param :selected-view-data] view-data])))
 
     (when (ut/not-empty? min-panels)
       [re-com/h-box
@@ -3094,15 +3108,15 @@
                        :let [nn (try (if (empty? name) e name) (catch :default _ e))
                              sys-panel? (true? (some #(= name %) panels))
                              nn (if sys-panel? (-> (str nn) (cstr/replace ":" "") (cstr/replace "?" "")) nn)
-                             icon (if sys-panel? "zmdi-developer-board" @(re-frame/subscribe [::bricks/panel-icon e]))]]
+                             icon (if sys-panel? "zmdi-developer-board" @(ut/tracked-subscribe [::bricks/panel-icon e]))]]
                    [re-com/h-box
                     :align :center :justify :center
                     :height "30px"
                     :gap "6px"
                   ;:width "30px"
                     :attr {:on-click #(if sys-panel?
-                                        (re-frame/dispatch [::toggle-sys-panel e])
-                                        (re-frame/dispatch [::bricks/toggle-minimize-block e]))}
+                                        (ut/tracked-dispatch [::toggle-sys-panel e])
+                                        (ut/tracked-dispatch [::bricks/toggle-minimize-block e]))}
                     :style {:background-color "#00000099"
                             :padding-left "7px"
                             :border (str "1px solid "
@@ -3135,9 +3149,9 @@
     (fn []
       (let [url (str "snaps/" (cstr/replace (str s) ".edn" ".jpg")
                      "?timestamp=" @timestamp)
-            client-name @(re-frame/subscribe [::bricks/client-name])
+            client-name @(ut/tracked-subscribe [::bricks/client-name])
             client-name (cstr/replace (str client-name) ":" "")
-            s-loading @(re-frame/subscribe [::session-loading])
+            s-loading @(ut/tracked-subscribe [::session-loading])
             current? (= (cstr/replace (str s) ".edn" "") client-name)
             loading? (= s s-loading)]
         [re-com/v-box
@@ -3149,8 +3163,8 @@
                            loading? (str "3px dashed " (theme-pull :theme/editor-outer-rim-color nil) 88)
                            current? (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil))
                            :else "3px solid #00000000")}
-         :attr {:on-click #(do (re-frame/dispatch [::set-session-loading s])
-                               (re-frame/dispatch [::http/load-session (str "./snaps/" s)]))}
+         :attr {:on-click #(do (ut/tracked-dispatch [::set-session-loading s])
+                               (ut/tracked-dispatch [::http/load-session (str "./snaps/" s)]))}
          :children [[re-com/box
                      :size "auto"
                      :child [:img {:src url
@@ -3188,13 +3202,13 @@
                                   [re-com/gap :size "10px"])]]]]))))
 
 (defn session-modal []
-  (let [hh @(re-frame/subscribe [::subs/h])
-        ww @(re-frame/subscribe [::subs/w])
+  (let [hh @(ut/tracked-subscribe [::subs/h])
+        ww @(ut/tracked-subscribe [::subs/w])
         per-page 9
         w (* ww 0.44) ;500
         h (* hh 0.5) ;500
-        client-name @(re-frame/subscribe [::bricks/client-name]) ;; reactions
-        sessions @(re-frame/subscribe [::bricks/sessions])
+        client-name @(ut/tracked-subscribe [::bricks/client-name]) ;; reactions
+        sessions @(ut/tracked-subscribe [::bricks/sessions])
         left (- (/ ww 2) (/ w 2))
         top (- (/ hh 2) (/ h 2))
         items (count sessions)
@@ -3215,7 +3229,7 @@
                       ;:background-color "orange"
                       :position "fixed"}}}
      :backdrop-opacity 0.75
-     :backdrop-on-click #(re-frame/dispatch [::bricks/disable-session-modal])
+     :backdrop-on-click #(ut/tracked-dispatch [::bricks/disable-session-modal])
      :child  [re-com/v-box
               :size "auto"
               :gap "4px"
@@ -3236,7 +3250,7 @@
 ;; (re-frame/reg-sub ;; helps stop re-sub blips during heavy packets, we aint offline until it's been 5 seconds..
 ;;  ::online?
 ;;  (fn [db _]
-;;    (let [websocket-status @(re-frame/subscribe [::http/websocket-status]) ;;;(get-in db [::http/websocket-status])
+;;    (let [websocket-status @(ut/tracked-subscribe [::http/websocket-status]) ;;;(get-in db [::http/websocket-status])
 ;;          status (get websocket-status :status)
 ;;          grace-period 10000]
 ;;      (when (= status :connected)
@@ -3247,40 +3261,40 @@
 
 
 (defn main-panel []
-  (let [editor? (and @(re-frame/subscribe [::bricks/editor?]) (not @bricks/dragging?))
-        buffy? @(re-frame/subscribe [::bricks/buffy?])
-        flows? @(re-frame/subscribe [::bricks/flow?])
-        external? @(re-frame/subscribe [::bricks/external?])
-        session? @(re-frame/subscribe [::bricks/session-modal?])
-        lines? @(re-frame/subscribe [::bricks/lines?])
-        peek? @(re-frame/subscribe [::bricks/peek?])
-        auto-run? @(re-frame/subscribe [::bricks/auto-run?])
+  (let [editor? (and @(ut/tracked-subscribe [::bricks/editor?]) (not @bricks/dragging?))
+        buffy? @(ut/tracked-subscribe [::bricks/buffy?])
+        flows? @(ut/tracked-subscribe [::bricks/flow?])
+        external? @(ut/tracked-subscribe [::bricks/external?])
+        session? @(ut/tracked-subscribe [::bricks/session-modal?])
+        lines? @(ut/tracked-subscribe [::bricks/lines?])
+        peek? @(ut/tracked-subscribe [::bricks/peek?])
+        auto-run? @(ut/tracked-subscribe [::bricks/auto-run?])
         rekt [@db/kick-alert]
         ;audio-react-hack [@db/audio-data]
-        ;selected-block @(re-frame/subscribe [::bricks/selected-block])
+        ;selected-block @(ut/tracked-subscribe [::bricks/selected-block])
         ;editor-ready? (and editor? (not (= selected-block "none!")) (not (nil? selected-block)))
         ;;rr @db/context-modal-pos
-        websocket-status (select-keys @(re-frame/subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])
-        ;;online? @(re-frame/subscribe [::online?]) ;;(true? (= (get websocket-status :status) :connected))
+        websocket-status (select-keys @(ut/tracked-subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])
+        ;;online? @(ut/tracked-subscribe [::online?]) ;;(true? (= (get websocket-status :status) :connected))
         online? (true? (= (get websocket-status :status) :connected))
-        hh @(re-frame/subscribe [::subs/h])
-        ww @(re-frame/subscribe [::subs/w])
-        selected-block @(re-frame/subscribe [::bricks/selected-block])
-        selected-tab @(re-frame/subscribe [::bricks/selected-tab])
+        hh @(ut/tracked-subscribe [::subs/h])
+        ww @(ut/tracked-subscribe [::subs/w])
+        selected-block @(ut/tracked-subscribe [::bricks/selected-block])
+        selected-tab @(ut/tracked-subscribe [::bricks/selected-tab])
         selected-block? (true? (not (or (nil? selected-block) (= selected-block "none!"))))
-        screen-name (ut/unkeyword @(re-frame/subscribe [::bricks/screen-name]))
-        client-name @(re-frame/subscribe [::bricks/client-name]) 
+        screen-name (ut/unkeyword @(ut/tracked-subscribe [::bricks/screen-name]))
+        client-name @(ut/tracked-subscribe [::bricks/client-name]) 
         ;bricks-high (+ (js/Math.floor (/ hh bricks/brick-size)) 1)
         ;bricks-wide (+ (js/Math.floor (/ ww bricks/brick-size)) 1)
-        flow-watcher-subs-grouped @(re-frame/subscribe [::bricks/flow-watcher-subs-grouped])
-        server-subs @(re-frame/subscribe [::bricks/server-subs])
+        flow-watcher-subs-grouped @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped])
+        server-subs @(ut/tracked-subscribe [::bricks/server-subs])
         ;lines? true ;false
         coords (if lines? ;; expensive otherwise
-                 (let [subq-mapping (if lines? @(re-frame/subscribe [::bricks/subq-mapping]) {})
+                 (let [subq-mapping (if lines? @(ut/tracked-subscribe [::bricks/subq-mapping]) {})
                        dwn-from-here (vec (bricks/downstream-search subq-mapping selected-block))
                        up-from-here (vec (bricks/upstream-search subq-mapping selected-block))
                        involved (vec (distinct (into dwn-from-here up-from-here)))
-                       subq-blocks @(re-frame/subscribe [::bricks/subq-panels selected-block])
+                       subq-blocks @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
                        ;parent-of-selected? (some #(= % brick-vec-key) subq-blocks)
                        smap (into {} (for [b (keys subq-mapping)] {b (bricks/downstream-search subq-mapping b)}))
                        lmap (vec (distinct
@@ -3289,19 +3303,19 @@
                                                           (for [d downs
                                                                 :when (and (not (cstr/starts-with? (str d) ":reco-preview"))
                                                                            (not (cstr/starts-with? (str k) ":reco-preview")))]
-                                                            (let [src-r @(re-frame/subscribe [::bricks/panel-px-root k])
-                                                                  src-h @(re-frame/subscribe [::bricks/panel-px-height k])
-                                                                  src-w @(re-frame/subscribe [::bricks/panel-px-width k])
+                                                            (let [src-r @(ut/tracked-subscribe [::bricks/panel-px-root k])
+                                                                  src-h @(ut/tracked-subscribe [::bricks/panel-px-height k])
+                                                                  src-w @(ut/tracked-subscribe [::bricks/panel-px-width k])
                                                                   dd (if (not (cstr/starts-with? (str d) ":block"))
-                                                                       @(re-frame/subscribe [::bricks/lookup-panel-key-by-query-key d]) d)
+                                                                       @(ut/tracked-subscribe [::bricks/lookup-panel-key-by-query-key d]) d)
                                                                   involved? (some #(= % dd) involved)
-                                                                  dest-r @(re-frame/subscribe [::bricks/panel-px-root dd])
-                                                                  dest-h @(re-frame/subscribe [::bricks/panel-px-height dd])
-                                                                  dest-w @(re-frame/subscribe [::bricks/panel-px-width dd])
+                                                                  dest-r @(ut/tracked-subscribe [::bricks/panel-px-root dd])
+                                                                  dest-h @(ut/tracked-subscribe [::bricks/panel-px-height dd])
+                                                                  dest-w @(ut/tracked-subscribe [::bricks/panel-px-width dd])
 
-                                                                  ;same-tab? @(re-frame/subscribe [::bricks/same-tab? k d])
-                                                                  t1 @(re-frame/subscribe [::bricks/what-tab k])
-                                                                  t2 @(re-frame/subscribe [::bricks/what-tab d])
+                                                                  ;same-tab? @(ut/tracked-subscribe [::bricks/same-tab? k d])
+                                                                  t1 @(ut/tracked-subscribe [::bricks/what-tab k])
+                                                                  t2 @(ut/tracked-subscribe [::bricks/what-tab d])
 
                                                                   x1 (+ (first src-r) src-w)
                                                                   y1 (+ (last src-r) (/ src-h 2))
@@ -3398,9 +3412,9 @@
                                                                                 ;;      :panel-height+80 "clojure"]]}
                                                                                 })
                                                       (let [default "new parameter value!" ;(if (nil? default) "new parameter value!" default)
-                                                            vv @(re-frame/subscribe [::conn/clicked-parameter kp])
+                                                            vv @(ut/tracked-subscribe [::conn/clicked-parameter kp])
                                                             exists? (not (nil? vv))
-                                                            _ (when (not exists?) (re-frame/dispatch [::conn/click-parameter kp default]))])))
+                                                            _ (when (not exists?) (ut/tracked-dispatch [::conn/click-parameter kp default]))])))
                                                   #_{:clj-kondo/ignore [:unresolved-symbol]}
                                                   (.preventDefault %)))}
                        :size "1"
@@ -3420,7 +3434,7 @@
                                                 :filter (when (not online?) "grayscale(100%)")
                                         ;;       :box-shadow (str "inset 0px 0px 400px " (theme-pull :theme/editor-outer-rim-color nil)) ;; talking animation ?
                                         ;;       :box-shadow (let [block-id :audio
-                                        ;;                         ;audio-playing? @(re-frame/subscribe [::audio/audio-playing?])
+                                        ;;                         ;audio-playing? @(ut/tracked-subscribe [::audio/audio-playing?])
                                         ;;                         ]
                                         ;;                     (when (not (empty? @db/audio-data)) ;audio-playing?
                                         ;;                       (str "inset 0px 0px " (px (js/Math.ceil (* 225 (+ 0.5 (get @db/audio-data :audio)))))  " "
@@ -3485,7 +3499,7 @@
                                                            :margin-top "-2px"
                                                            :padding-left "2px"
                                                            :font-size "15px"}
-                                                   :attr {:on-click #(re-frame/dispatch [::bricks/toggle-editor])}]
+                                                   :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-editor])}]
                                            :width "20px"
                                            :height "20px"
                                            ;:tooltip "foo"
@@ -3507,7 +3521,7 @@
                                                            :margin-top "-2px"
                                                            :padding-left "2px"
                                                            :font-size "15px"}
-                                                   :attr {:on-click #(re-frame/dispatch [::bricks/toggle-lines])}]
+                                                   :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-lines])}]
                                            :width "20px"
                                            :height "20px"
                                            ;:tooltip "foo"
@@ -3529,7 +3543,7 @@
                                                            :margin-top "-2px"
                                                            :padding-left "2px"
                                                            :font-size "15px"}
-                                                   :attr {:on-click #(re-frame/dispatch [::bricks/toggle-peek])}]
+                                                   :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-peek])}]
                                            :width "20px"
                                            :height "20px"
                                            ;:tooltip "foo"
@@ -3551,7 +3565,7 @@
                                                            :margin-top "-2px"
                                                            :padding-left "2px"
                                                            :font-size "15px"}
-                                                   :attr {:on-click #(re-frame/dispatch [::bricks/toggle-auto-run])}]
+                                                   :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-auto-run])}]
                                            :width "20px"
                                            :height "20px"
                                            ;:tooltip "foo"
@@ -3573,7 +3587,7 @@
                                                            :margin-top "-2px"
                                                            :padding-left "2px"
                                                            :font-size "15px"}
-                                                   :attr {:on-click #(re-frame/dispatch [::bricks/toggle-external])}]
+                                                   :attr {:on-click #(ut/tracked-dispatch [::bricks/toggle-external])}]
                                            :width "20px"
                                            :height "20px"
                                            ;:tooltip "foo"
@@ -3595,7 +3609,7 @@
                                                            :margin-top "-2px"
                                                            :padding-left "2px"
                                                            :font-size "15px"}
-                                                   :attr {:on-click #(re-frame/dispatch [::bricks/select-block "none!"])}]
+                                                   :attr {:on-click #(ut/tracked-dispatch [::bricks/select-block "none!"])}]
                                            :width "20px"
                                            :height "20px"
                                            ;:tooltip "foo"
@@ -3607,7 +3621,7 @@
                                                    :background-color "#00000022"
                                                    :color "white"}]
 
-                                          (when @(re-frame/subscribe [::audio/audio-playing?])
+                                          (when @(ut/tracked-subscribe [::audio/audio-playing?])
                                             [re-com/md-icon-button :src (at)
                                              :md-icon-name "zmdi-speaker"
                                              :style {;:margin-top "4px"
@@ -3616,7 +3630,7 @@
                                                      :color "red"
                                                      :font-size "22px"}])
 
-                                          (when @(re-frame/subscribe [::audio/recording?])
+                                          (when @(ut/tracked-subscribe [::audio/recording?])
                                             [re-com/md-icon-button :src (at)
                                              :md-icon-name "zmdi-mic"
                                              :style {;:margin-top "-0px"
@@ -3653,12 +3667,13 @@
                                                                                  [re-com/md-icon-button :md-icon-name "zmdi-close"
                                                                                   :style {:cursor "pointer" :color "white" :font-size "15px" :height "10px" :margin-top "-3px"}
                                                                                   :on-click #(do (tap> [:remove-flow-watchers client-name kk])
-                                                                                                 (re-frame/dispatch [::wfx/request :default
+                                                                                                 (ut/tracked-dispatch [::wfx/request :default
                                                                                                                      {:message    {:kind :remove-flow-watcher
                                                                                                                                    :client-name client-name
-                                                                                                                                   :flow-id kk}}]))]]])])]]
+                                                                                                                                   :flow-id kk}
+                                                                                                                      :timeout 50000}]))]]])])]]
 
-                                          (let [mem @(re-frame/subscribe [::bricks/memory])]
+                                          (let [mem @(ut/tracked-subscribe [::bricks/memory])]
                                             [re-com/box
                                              :size "none"
                                              :style {:position "fixed" :left 2 :bottom 20 :font-weight 700 :color "#ffffff88"}
@@ -3689,8 +3704,8 @@
                                                    :md-icon-name "zmdi-refresh"
                                                    :tooltip "refresh all"
                                                    :on-click #(do
-                                                                ;(re-frame/dispatch [::bricks/clean-up-previews])
-                                                                (re-frame/dispatch [::bricks/refresh-all]))
+                                                                ;(ut/tracked-dispatch [::bricks/clean-up-previews])
+                                                                (ut/tracked-dispatch [::bricks/refresh-all]))
                                                    :style {:color "#ffffff"
                                                            :cursor "pointer"
                                                            :margin-top "-2px"
@@ -3711,8 +3726,8 @@
                                                    :md-icon-name "zmdi-save"
                                                    :tooltip "save board (Ctrl-S)"
                                                    :on-click #(do
-                                                                ;(re-frame/dispatch [::bricks/clean-up-previews])
-                                                                (re-frame/dispatch [::http/save :skinny screen-name]))
+                                                                ;(ut/tracked-dispatch [::bricks/clean-up-previews])
+                                                                (ut/tracked-dispatch [::http/save :skinny screen-name]))
                                                    :style {:color "#ffffff"
                                                            :cursor "pointer"
                                                            :margin-top "-2px"
@@ -3734,8 +3749,8 @@
                                         ;;            :md-icon-name "zmdi-file-plus"
                                         ;;            :tooltip "save board *w data*"
                                         ;;            :on-click #(do
-                                        ;;                         ;(re-frame/dispatch [::bricks/clean-up-previews])
-                                        ;;                         (re-frame/dispatch [::http/save :fat screen-name]))
+                                        ;;                         ;(ut/tracked-dispatch [::bricks/clean-up-previews])
+                                        ;;                         (ut/tracked-dispatch [::http/save :fat screen-name]))
                                         ;;            :style {:color "#ffffff"
                                         ;;                    :cursor "pointer"
                                         ;;                    :margin-top "-2px"
