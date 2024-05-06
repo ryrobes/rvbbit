@@ -334,9 +334,9 @@
                                          [:like :combo_edn (str "%" (get sql-params :user-dropdown-sys/req-field) "%")])
                                        (when shape-picked?
                                          [:= :shape_name :viz-shapes0-sys/shape])]}}
-        block-list @(re-frame.core/subscribe [::conn/sql-data [:viz-tables-sys]])
-        combo-list @(re-frame.core/subscribe [::conn/sql-data [:viz-shapes-sys]])
-        full-recos @(re-frame.core/subscribe [::conn/sql-data [:recos-sys]])
+        block-list @(ut/tracked-subscribe [::conn/sql-data [:viz-tables-sys]])
+        combo-list @(ut/tracked-subscribe [::conn/sql-data [:viz-shapes-sys]])
+        full-recos @(ut/tracked-subscribe [::conn/sql-data [:recos-sys]])
         ;current-tab @(ut/tracked-subscribe [::bricks/selected-tab])
         current-tab-queries  (try (map #(-> % ut/sql-keyword name) @(ut/tracked-subscribe [::bricks/current-tab-queries]))
                                   (catch :default _ []))
@@ -479,7 +479,10 @@
                  per-page 6 ;; if we ever get more room...
                  grid-page @(ut/tracked-subscribe [::bricks/recos-page])
                  grid-page (if (> (- grid-page 1) pages) 0 grid-page)
-                 recos (take per-page (drop (* grid-page per-page) @(re-frame.core/subscribe [::conn/sql-data [:recos-sys]])))
+                 recos (take per-page (drop (* grid-page per-page) 
+                                            @(ut/tracked-subscribe [::conn/sql-data [:recos-sys]])
+                                            
+                                            ))
                  recos-keys (vec (for [{:keys [combo_hash]} recos] combo_hash))]
              (doseq [k prev-preview-keys] (ut/tracked-dispatch [::bricks/quick-delete-panel k]))
              (ut/tracked-dispatch [::bricks/set-preview-keys recos-keys])
@@ -2752,17 +2755,16 @@
 (defn snapshot-menu []
   (let [;tabs @(ut/tracked-subscribe [::bricks/tabs])
         matching @(ut/tracked-subscribe [::bricks/matching-snapshots])
-        selected-tab nil ; @(ut/tracked-subscribe [::bricks/selected-tab])
-        snapshots @(re-frame.core/subscribe [::bricks/snapshots])
+        ;;selected-tab nil ; @(ut/tracked-subscribe [::bricks/selected-tab])
+        snapshots @(ut/tracked-subscribe [::bricks/snapshots])
         tabs (vec (map :key (sort-by :key (vec (for [[k v] snapshots
                                                      :when (get v :menu?)]
                                                  (assoc v :key k))))))
-       ; curr-params @(re-frame.core/subscribe [::bricks/current-params])
         react-hack [@db/show-snaps? @db/vertical-snaps?] ;; important
         ;is-last? (fn [t] (try (= (count tabs) (+ 1 (.indexOf tabs t))) (catch :default _ false)))
         ]
     ;;(tap> [:matching matching tabs])
-    (when (not (empty? tabs))
+    (when (ut/ne? tabs)
       [(if @db/vertical-snaps? re-com/v-box re-com/h-box)
        :children (reverse (conj (vec (conj (for [t (reverse tabs)] [re-com/box
                                                                     :child [re-com/box
@@ -2926,10 +2928,14 @@
 (re-frame/reg-event-db
  ::update-user-params-hash
  (fn [db _]
-   (let [pp (get-in db [:click-param]) ;; was param
-         new-h (hash pp)
+   (let [fs (vec (for [kk (get db :flow-subs)
+                  :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
+              [(keyword f1) (keyword f2)]))
+         pp (get db :click-param)
+         pp-without-fs (ut/remove-keys pp (map first fs))
+         new-h (hash pp-without-fs)
          client-name (get db :client-name)]
-     ;;(tap> [:push-params! client-name (keys pp)])
+     (tap> [:push-params! client-name new-h])
      (ut/tracked-dispatch [::wfx/request   :default ;; just a push, no response handling
                          {:message      {:kind         :sync-client-params
                                          :params-map   pp
@@ -2941,7 +2947,12 @@
 (re-frame/reg-sub
  ::watch-user-params
  (fn [db]
-   (hash (get-in db [:click-param])))) ;; was :param
+   (let [fs (vec (for [kk (get db :flow-subs)
+                       :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
+                   [(keyword f1) (keyword f2)]))
+         pp (get db :click-param)
+         pp-without-fs (ut/remove-keys pp (map first fs))]
+     (hash pp-without-fs)))) ;; was :param
 
 (re-frame/reg-sub
  ::user-params-hash

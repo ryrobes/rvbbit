@@ -228,7 +228,8 @@
 
 
 (defn theme-pull-fn [cmp-key fallback & test-fn]
-  (let [v                   @(ut/tracked-subscribe [::conn/clicked-parameter-key [cmp-key]])
+  (let [;v                   @(ut/tracked-subscribe [::conn/clicked-parameter-key [cmp-key]])
+        v                   @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [cmp-key]})
         ;v                   (resolver/logic-and-params v nil)
         t0                  (cstr/split (str (ut/unkeyword cmp-key)) #"/")
         t1                  (keyword (first t0))
@@ -1198,7 +1199,10 @@
          aslflat (filter #(cstr/includes? (str %) "/") (ut/deep-flatten asl))
          valid-body-params (filter #(not (and (cstr/ends-with? (str %) "-sys")
                                               (cstr/starts-with? (str %) ":theme")))
-                                   (ut/deep-flatten @(ut/tracked-subscribe [::valid-body-params-in asl])))
+                                   (ut/deep-flatten 
+                                    ;;@(ut/tracked-subscribe [::valid-body-params-in asl])
+                                    @(rfa/sub ::valid-body-params-in {:body asl})
+                                    ))
          vbp-bools (try  (into {}
                                (for [e valid-body-params] (let [spl (cstr/split (str e) #"/")]
                                                             {[(-> (first spl) str (ut/replacer #":" "") keyword)
@@ -3312,7 +3316,10 @@
   (let [selected-meta-db      @(ut/tracked-subscribe [::conn/clicked-parameter [:connections-sys]]) ;;
         selected-meta-table   @(ut/tracked-subscribe [::conn/clicked-parameter [:tables-sys]])
         selected-meta-field   @(ut/tracked-subscribe [::conn/clicked-parameter [:fields-sys]])
-        selected-fields       (vec (map ut/sql-keyword (map :field_name @(ut/tracked-subscribe [::conn/sql-data [:fields-sys]]))))
+        selected-fields       (vec (map ut/sql-keyword (map :field_name 
+                                                            ;@(ut/tracked-subscribe [::conn/sql-data [:fields-sys]])
+                                                            @(rfa/sub ::conn/sql-data-alpha {:keypath [:fields-sys]})
+                                                            )))
         parent-sql-sql-alias  (ut/gen-sql-sql-alias)
         field-name            (get selected-meta-field :field_name)
         table-name            (get selected-meta-table :table_name)
@@ -3910,9 +3917,12 @@
                     (catch :default _ []))
 
         all-clicked-walks   (into {}
-                                  (map (fn [x] {x @(ut/tracked-subscribe [::generate-all-clicked
-                                                                        (-> x str (ut/replacer #":" "")
-                                                                            (ut/replacer "/*.clicked" "") keyword)])})
+                                  (map (fn [x] {x
+                                                @(ut/tracked-subscribe [::generate-all-clicked
+                                                                        {:query-key (-> x str (ut/replacer #":" "")
+                                                                                        (ut/replacer "/*.clicked" "") keyword)}])
+                                                ;(rfa/sub ::generate-all-clicked {:query-key (-> x str (ut/replacer #":" "") (ut/replacer "/*.clicked" "") keyword)})
+                                                })
                                        (filter #(cstr/includes? (str %) "/*.clicked") deep-flat-query)))
         valid-params        (into (distinct 
                                    ;@(ut/tracked-subscribe [::valid-body-params-all-condis])
@@ -3934,7 +3944,10 @@
                                              ds    (keyword (first fs))
                                              row   (int (last gs))
                                              field (keyword (first gs))]
-                                         {k (get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field])})))
+                                         {k (get-in 
+                                             ;@(ut/tracked-subscribe [::conn/sql-data [ds]])
+                                             @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]})
+                                             [row field])})))
         condi-walks-targets (filter #(cstr/includes? (str %) "condi/") valid-params)
         condi-walks         (into {} (for [k condi-walks-targets]
                                        {k @(ut/tracked-subscribe [::conn/condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
@@ -5417,6 +5430,11 @@
  (fn [db [_ panel-key query-key w]]
    (assoc-in db [:default-col-widths panel-key query-key] w)))
 
+(re-frame/reg-sub
+ ::column-default-widths
+ (fn [db {:keys [panel-key query-key]}]
+   (get-in db [:default-col-widths panel-key query-key])))
+
 (declare honeycomb)                                         ;; eyes emoji - would be better to restructure, eh?
 
 (defn insert-hidden-reco-preview [reco-selected reco-viz reco-query reco-condis combo-name shape-name single?]
@@ -5566,7 +5584,8 @@
                                                              [:= :shape_name :viz-shapes0-sys2/shape])]})}
         ;block-list @(re-frame.core/subscribe [::conn/sql-data [:viz-tables-sys]])
         ;combo-list @(re-frame.core/subscribe [::conn/sql-data [:viz-shapes-sys]])
-        full-recos        @(re-frame.core/subscribe [::conn/sql-data [:recos-sys2]])
+        ;; full-recos        @(re-frame.core/subscribe [::conn/sql-data [:recos-sys2]])
+        full-recos        @(rfa/sub ::conn/sql-data-alpha {:keypath [:recos-sys2]})
         ;current-tab @(ut/tracked-subscribe [::selected-tab])
         ;current-tab-queries  (try (map #(-> % ut/sql-keyword name) @(ut/tracked-subscribe [::current-tab-queries])) (catch :default _ []))
         recos-count       (count full-recos)
@@ -5756,7 +5775,7 @@
                  ;per-page per-page ;; if we ever get more room...
                  grid-page         @(ut/tracked-subscribe [::recos-page2])
                  grid-page         (if (> (- grid-page 1) pages) 0 grid-page)
-                 recos             (take per-page (drop (* grid-page per-page) @(re-frame.core/subscribe [::conn/sql-data [:recos-sys2]])))
+                 recos             (take per-page (drop (* grid-page per-page) @(ut/tracked-subscribe [::conn/sql-data [:recos-sys2]])))
                  recos-keys        (vec (for [{:keys [combo_hash]} recos] combo_hash))]
              (doseq [k prev-preview-keys] (ut/tracked-dispatch [::quick-delete-panel k]))
              (ut/tracked-dispatch [::set-preview-keys2 recos-keys])
@@ -5919,11 +5938,17 @@
         ;;                                (cstr/includes? (str (get % :ui-keypath)) (str query-key)))
         ;;                          messages))
          waitings (true? (some #(= % query-key)
-                               (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
+                               (for [e 
+;                                     @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])
+                                     @(rfa/sub ::http/pending-requests {:socket-id http/socket-id})
+                                     ]
                                  (let [p (get-in e [:message :ui-keypath])]
                                    (when (> (count p) 1) (first p))))))
          single-wait (true? (some #(= % query-key)
-                                  (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
+                                  (for [e 
+                                        ;;@(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])
+                                        @(rfa/sub ::http/pending-requests {:socket-id http/socket-id})
+                                        ]
                                     (let [p (get-in e [:message :ui-keypath])]
                                       (when (= (count p) 1) (first p))))))]
          ;single-wait (if single-wait 1 0)
@@ -6061,7 +6086,8 @@
         hide? #_{:clj-kondo/ignore [:not-empty?]}
         (not (empty? hide-fields)) ;(not (empty? hide-fields))
         ;height-int (* (:h panel-map) brick-size)
-        rowset                    (re-frame.core/subscribe [::conn/sql-data data-keypath])
+        ;;rowset                    (re-frame.core/subscribe [::conn/sql-data data-keypath])
+        rowset                    (rfa/sub ::conn/sql-data-alpha {:keypath data-keypath})
         non-panel?                (false? (or (nil? hh) (nil? ww)))
 
         ;is-rowset? (true? (= (db/data-typer @rowset) "rowset"))
@@ -6072,7 +6098,7 @@
         col-selected?             (> selected-field-idx -1)
         ff                        (if (and col-selected? (and
                                                           (not (nil? col-names))
-                                                          (not (empty? col-names))))
+                                                          (ut/ne? col-names)))
                                     col-names
                                     ff)
         ;; (try (vec (for [r (get result :result)] (ut/asort r map-order))) (catch :default _ (get result :result)))
@@ -6205,9 +6231,13 @@
         last-page?                  (and has-pages? (= page-num (js/Math.ceil (/ full-rowcount rows-per-page))))
         first-page?                 (and has-pages? (or (nil? page-num) (= page-num 1)))
         [waits? single-wait?] @(ut/tracked-subscribe [::query-waitings query-key])
+        default-col-widths @(re-frame/subscribe [::column-default-widths {:panel-key panel-key :query-key query-key}])
         running? single-wait?
         double-click-timeout 400]
-    (ut/tracked-dispatch [::set-column-default-widths panel-key query-key equal-width-final]) ;; bad side effect TODO: pure fn to calc equal widths from anywhere
+    
+    (when (not= default-col-widths equal-width-final)
+      (ut/tracked-dispatch [::set-column-default-widths panel-key query-key equal-width-final])) ;; bad side effect TODO: pure fn to calc equal widths from anywhere
+
     ;; (tap> [:ff col-selected? col-names ff])
     ;(tap> [:hohoho @hover-field])
     ;(tap> [:max-rows max-rows])
@@ -7910,14 +7940,14 @@
 
 (re-frame/reg-sub
  ::valid-body-params
- (fn [db [_ panel-key]]
+ (fn [db {:keys [panel-key]}]
    (let [dat   (get-in db [:panels panel-key :views])
          flats (ut/deep-flatten dat)]
       ;(tap> [:valids panel-key flats dat])
      (vec (remove nil? (for [k flats]
                          (when (and (keyword? k) (cstr/includes? (str k) "/")
-                                    (not (cstr/includes? (str k) ":view/")))
-                           (not (ut/is-sql-sql-alias? k))
+                                    (not (cstr/includes? (str k) ":view/"))
+                           (not (ut/is-sql-sql-alias? k)))
                            k)))))))
 
 (re-frame/reg-sub
@@ -7934,7 +7964,7 @@
 
 (re-frame/reg-sub
  ::valid-body-params-in
- (fn [_ [_ body]]
+ (fn [_ {:keys [body]}]
    (vec (remove nil? (for [k (ut/deep-flatten body)]
                        (when (and (keyword? k) (cstr/includes? (str k) "/")
                                   (not (cstr/includes? (str k) ":view/"))) k))))))
@@ -8123,7 +8153,7 @@
                                                                           [:br] (str " I can't find this view. Halp.")]
                                                                   :width :width-px :height :height-px] body)
                                       vega-lite? (true? (some #(= % :vega-lite) (ut/deep-flatten body)))
-                                      size-map   (when (and (not (empty? deets))
+                                      size-map   (when (and (ut/ne? deets)
                                                             (not (nil? (get deets :w)))
                                                             (not (nil? (get deets :h))))
                                                    (walk-map-sizes (get deets :w) ;(* brick-size (get deets :w))
@@ -8278,12 +8308,15 @@
     ;;                                   :ut/data-typer-atom ut/data-typer-atom
     ;;                                   :ut/coord-cache ut/coord-cache})])
      
-      (do (reset! ut/replacer-atom {})
-          (reset! ut/clean-sql-atom {})
-          (reset! ut/deep-flatten-atom {})
-          (reset! ut/format-map-atom {})
-          (reset! ut/data-typer-atom {})
-          (reset! ut/coord-cache {}))
+      ;; (do (reset! ut/subscription-counts {}) ;; temp
+      ;;     (reset! ut/dispatch-counts {}) ;; temp
+
+      ;;     (reset! ut/replacer-atom {})
+      ;;     (reset! ut/clean-sql-atom {})
+      ;;     (reset! ut/deep-flatten-atom {})
+      ;;     (reset! ut/format-map-atom {})
+      ;;     (reset! ut/data-typer-atom {})
+      ;;     (reset! ut/coord-cache {}))
       
      (if run-it?
        (-> db
@@ -8328,7 +8361,10 @@
    (let [existing    (get-in db [:data :mad-libs-viz panel-id table-name])
          running?    (fn [kp] (some                        ;#(= (first %) panel-id)
                                #(= % kp)
-                               (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
+                               (for [e 
+                                     ;;@(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])
+                                     @(rfa/sub ::http/pending-requests {:socket-id http/socket-id})
+                                     ]
                                  (let [p (get-in e [:message :ui-keypath])]
                                    p))))
          reco-counts @(ut/tracked-subscribe [::query-reco-counts table-name])]
@@ -8390,7 +8426,10 @@
    (let [;hm (str (hash axes-map))
          running? (fn [kp] (some                           ;#(= (first %) panel-id)
                             #(= % kp)
-                            (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
+                            (for [e 
+                                  ;;@(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])
+                                  @(rfa/sub ::http/pending-requests {:socket-id http/socket-id})
+                                  ]
                               (let [p (get-in e [:message :ui-keypath])]
                                 p))))
          kp1      [:data :mad-libs-viz2 panel-id src-table-id-str shape-name]
@@ -8528,7 +8567,10 @@
    (let [hm       (str (hash axes-map))
          running? (fn [kp] (some                           ;#(= (first %) panel-id)
                             #(= % kp)
-                            (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
+                            (for [e 
+                                  ;;@(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])
+                                  @(rfa/sub ::http/pending-requests {:socket-id http/socket-id})
+                                  ]
                               (let [p (get-in e [:message :ui-keypath])]
                                 p))))
          kp1      [:data :mad-libs-viz2 panel-id src-table-id-str shape-name hm]
@@ -9617,7 +9659,7 @@
 
 (re-frame/reg-sub
  ::generate-all-clicked
- (fn [db [_ query-key]]
+ (fn [db {:keys [query-key]}]
    (let [click-params (get-in db [:click-param query-key] {})
          multi-query-key (-> query-key str (ut/replacer #":" "") (str ".*") keyword)
          click-multi-params (get-in db [:click-param multi-query-key] {})
@@ -10533,7 +10575,11 @@
         vsql-replace-map       (into {} (for [[k v] vsql-calls]
                                           ;; search the map for datasets
                                           (let [look-for-datasets   (cset/intersection (set (ut/deep-flatten v)) (set all-sql-call-keys))
-                                                data-subbed-rep-map (into {} (for [ds look-for-datasets] {ds @(ut/tracked-subscribe [::conn/sql-data [ds]])}))
+                                                data-subbed-rep-map (into {} (for [ds look-for-datasets] 
+                                                                               {ds 
+                                                                                ;;@(ut/tracked-subscribe [::conn/sql-data [ds]])
+                                                                                @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]})
+                                                                                }))
                                                 data-subbed-src     (walk/postwalk-replace data-subbed-rep-map v)]
                                                 ;data-subbed-modded (read-string (ut/replacer (str data-subbed-src) #":box "
                                                 ;                                 (str ":box :attr {:on-click #(re-frame.core/dispatch [::rvbbit-frontend.connections/click-parameter [" k "] \"test\"])} ")))
@@ -10553,19 +10599,27 @@
         override-view-is-sql?  (true? (some #(= override-view %) (keys sql-calls)))
 
         ;params-used @(ut/tracked-subscribe [::panel-parameters-in-views panel-key])
-        valid-body-params      (ut/deep-flatten (merge @(ut/tracked-subscribe [::valid-body-params panel-key])
+        valid-body-params      (ut/deep-flatten (merge ;;@(ut/tracked-subscribe [::valid-body-params panel-key])
+                                                       @(rfa/sub ::valid-body-params {:panel-key panel-key})
                                                        ;;@(ut/tracked-subscribe [::valid-body-params-all-condis])
                                                        @(rfa/sub ::valid-body-params-all-condis)
                                                        ;; ^^ all condis, just in case? TODO got back to ONLY condis detected in this view if expensive...
                                                        ;; ^^ perhaps they are being resolved out in original "get condis from params"?
-                                                       @(ut/tracked-subscribe [::valid-body-params-in body]) ;; extra? and expensive? by ONLY for view aliased views...
-                                                       @(ut/tracked-subscribe [::valid-body-params-in vsql-calls])))
+                                                       ;;@(ut/tracked-subscribe [::valid-body-params-in body]) ;; extra? and expensive? by ONLY for view aliased views...
+                                                       @(rfa/sub ::valid-body-params-in {:body body})
+                                                       ;;@(ut/tracked-subscribe [::valid-body-params-in vsql-calls])
+                                                       @(rfa/sub ::valid-body-params-in {:body vsql-calls})
+                                                       
+                                                       ))
         possible-datasets-used (set (for [e valid-body-params] (keyword (nth (cstr/split (ut/unkeyword e) #"/") 0))))
         used-datasets          (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys)))
         used-datasets          (if replacement-all? (into used-datasets (keys replacement-query)) used-datasets)
         ;valid-sql-params @(ut/tracked-subscribe [::valid-sql-params panel-key])
         data-walks             (into {} (for [k used-datasets] ;all-sql-call-keys]
-                                          {k @(ut/tracked-subscribe [::conn/sql-data [k]])}))
+                                          {k 
+                                           ;;@(ut/tracked-subscribe [::conn/sql-data [k]])
+                                           @(rfa/sub ::conn/sql-data-alpha {:keypath [k]})
+                                           }))
                                            ;(keyword (str (ut/unkeyword k) "-text")) @(ut/tracked-subscribe [::conn/sql-data-text [k]])
                                            ;(keyword (str (ut/unkeyword k) "->text")) @(ut/tracked-subscribe [::conn/sql-data-text [k]])
                                            ;            (keyword (str (ut/unkeyword k) "/as-text")) @(ut/tracked-subscribe [::conn/sql-data-text [k]])
@@ -10603,7 +10657,10 @@
                                             {k (if (not (integer? row))
                                                  ;(get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field])
                                                  (str field)
-                                                 (get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field]))})))
+                                                 (get-in 
+                                                  ;;@(ut/tracked-subscribe [::conn/sql-data [ds]])
+                                                  @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]})
+                                                  [row field]))})))
 
         condi-walks-targets    (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
         condi-walks            (into {} (for [k condi-walks-targets]
@@ -10722,28 +10779,31 @@
                                                                                                                (last (get r that))))
                                                                                                                ;(get r that)
 
-                                                                                                        (vec (for [r @(ut/tracked-subscribe [::conn/sql-data [this]])] (last (get r that))))) panel-key)})))]
+                                                                                                        (vec (for [r 
+                                                                                                                  ;;  @(ut/tracked-subscribe [::conn/sql-data [this]])
+                                                                                                                   @(rfa/sub ::conn/sql-data-alpha {:keypath [this]})
+                                                                                                                   ] (last (get r that))))) panel-key)})))]
                                                                              ; panel-key)
                                                                          ;(= (str that) (str this))
 
                                               ; (tap> [:=map/logic-kps logic-kps kps  ])
                                                (walk/postwalk-replace logic-kps obody)))
 
-        map-walk-map3            (fn [obody] (let [kps       (ut/extract-patterns obody :map2 3) ;;; TEMP!!
-                                                   logic-kps (into {} (for [v kps]
-                                                                        (let [[_ that this] v]
-                                                                        ;(tap> [:=-walk panel-key kps this that])
-                                                                          {v ;(resolver/logic-and-params
-                                                                           (if (vector? this)
-                                                                             (vec (for [r this]
-                                                                                   ;(last (get r that))
-                                                                                    (get r that)))
-                                                                             (vec (for [r @(ut/tracked-subscribe [::conn/sql-data [this]])] (last (get r that)))))})))]
-                                                                             ; panel-key)
-                                                                         ;(= (str that) (str this))
+        ;; map-walk-map3            (fn [obody] (let [kps       (ut/extract-patterns obody :map2 3) ;;; TEMP!!
+        ;;                                            logic-kps (into {} (for [v kps]
+        ;;                                                                 (let [[_ that this] v]
+        ;;                                                                 ;(tap> [:=-walk panel-key kps this that])
+        ;;                                                                   {v ;(resolver/logic-and-params
+        ;;                                                                    (if (vector? this)
+        ;;                                                                      (vec (for [r this]
+        ;;                                                                            ;(last (get r that))
+        ;;                                                                             (get r that)))
+        ;;                                                                      (vec (for [r @(ut/tracked-subscribe [::conn/sql-data [this]])] (last (get r that)))))})))]
+        ;;                                                                      ; panel-key)
+        ;;                                                                  ;(= (str that) (str this))
 
-                                               ;(tap> [:=map2/logic-kps logic-kps kps  ])
-                                               (walk/postwalk-replace logic-kps obody)))
+        ;;                                        ;(tap> [:=map2/logic-kps logic-kps kps  ])
+        ;;                                        (walk/postwalk-replace logic-kps obody)))
 
         ;; scrubber-walk-map2            (fn [obody] (try
         ;;                                             (let [kps      (ut/extract-patterns obody :scrubber2 2)
@@ -10944,10 +11004,10 @@
                                  true (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
                                     ;;(walk/postwalk-replace walk-map) ;;; moved up from after like 6470 - 10/17/23
                                  (has-fn? :*this-block*) (walk/postwalk-replace {:*this-block* panel-key})
-                                 (not (empty? value-walks)) (walk/postwalk-replace value-walks)
-                                 (not (empty? condi-walks)) (walk/postwalk-replace condi-walks)
-                                 (not (empty? data-walks)) (walk/postwalk-replace data-walks)
-                                 (not (empty? vsql-replace-map)) (walk/postwalk-replace vsql-replace-map) ;;(walk/postwalk-replace walk-map vsql-replace-map))
+                                 (ut/ne? value-walks) (walk/postwalk-replace value-walks)
+                                 (ut/ne? condi-walks) (walk/postwalk-replace condi-walks)
+                                 (ut/ne? data-walks) (walk/postwalk-replace data-walks)
+                                 (ut/ne? vsql-replace-map) (walk/postwalk-replace vsql-replace-map) ;;(walk/postwalk-replace walk-map vsql-replace-map))
                                     ;scrubber-walk-map2
                                     ;keymerge-walk
 
@@ -10956,7 +11016,7 @@
 
                                     ;(walk/postwalk-replace {:=block-10980/season :block-10980/season})
 
-                                 (not (empty? workspace-params)) (walk/postwalk-replace workspace-params)
+                                 (ut/ne? workspace-params) (walk/postwalk-replace workspace-params)
 
                                     ;(walk/postwalk-replace if-walk-map)
 
@@ -11031,7 +11091,7 @@
                                               :from [t] :limit 111}}))
 
         templated-strings-vals (ut/deep-template-find body)
-        templates?              (not (empty? templated-strings-vals))
+        templates?              (ut/ne? templated-strings-vals)
         templated-strings-walk (if templates?
                                  (walk/postwalk-replace {nil ""}
                                                         (into {} (for [k templated-strings-vals]
@@ -11503,7 +11563,8 @@
         sql-aliases-used       @(ut/tracked-subscribe [::panel-sql-aliases-in-views panel-key])
         ;params-used @(ut/tracked-subscribe [::panel-parameters-in-views panel-key])
         sql-calls              @(ut/tracked-subscribe [::panel-sql-calls panel-key])
-        valid-body-params      @(ut/tracked-subscribe [::valid-body-params panel-key])
+        ;;valid-body-params      @(ut/tracked-subscribe [::valid-body-params panel-key])
+        valid-body-params      @(rfa/sub ::valid-body-params {:panel-key panel-key})
         possible-datasets-used (set (for [e (merge sql-calls valid-body-params)] (keyword (nth (cstr/split (ut/unkeyword e) #"/") 0))))
         used-datasets          (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys)))]
     (tap> [:pos panel-key possible-datasets-used])
@@ -11864,8 +11925,8 @@
     ;; ^^  TODO should this be at the honeycomb level instead? grid is one hell of a tick to key off of... feels overly sledgehammer-y.
 
 
-   ;(tap> [:sub-tracker @(rfa/sub ::client-name) (vec (take 20 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/subscription-counts)))))])
-    ;(tap> [:dispatch-tracker @(rfa/sub ::client-name) (vec (take 20 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/dispatch-counts)))))])
+    ;; (tap> [:sub-tracker @(rfa/sub ::client-name) (vec (take 20 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/subscription-counts)))))])
+    ;; (tap> [:dispatch-tracker @(rfa/sub ::client-name) (vec (take 20 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/dispatch-counts)))))])
 
     ;(tap> [:grid-render])
     ;(when @over-block? (tap> [:over]))

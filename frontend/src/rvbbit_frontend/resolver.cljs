@@ -34,7 +34,10 @@
                                               {k (if (not (integer? row))
                                                  ;(get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field])
                                                    (str field)
-                                                   (get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field]))})))
+                                                   (get-in 
+                                                    ;;@(ut/tracked-subscribe [::conn/sql-data [ds]])
+                                                    @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]})
+                                                    [row field]))})))
 
           condi-walks-targets    (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
           condi-walks            (into {} (for [k condi-walks-targets]

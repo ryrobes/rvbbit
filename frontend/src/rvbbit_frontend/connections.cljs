@@ -261,7 +261,10 @@
                                               {k (if (not (integer? row))
                                                  ;(get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field])
                                                    (str field)
-                                                   (get-in @(ut/tracked-subscribe [::sql-data [ds]]) [row field]))})))
+                                                   (get-in 
+                                                    ;;@(ut/tracked-subscribe [::sql-data [ds]])
+                                                    @(rfa/sub ::sql-data-alpha {:keypath [ds]})
+                                                    [row field]))})))
 
           condi-walks-targets    (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
           condi-walks            (into {} (for [k condi-walks-targets]
@@ -525,7 +528,7 @@
 
 (re-frame/reg-sub ;; RESOLVE COMPOUND KEY 
  ::resolve-click-param
- (fn [db [_ long-keyword]]
+ (fn [db {:keys [long-keyword]}]
    (let [get-it (fn [kw]
                   (let [slp (vec (map keyword ;; memoize this in ut?
                                       (-> kw
@@ -566,7 +569,8 @@
          if-walk-map2           (fn [obody] (let [kps       (ut/extract-patterns obody :if 4)
                                                   logic-kps (into {} (for [v kps]
                                                                        (let [kws (vec (filter #(cstr/includes? (str %) "/") (ut/deep-flatten v)))
-                                                                             wm @(ut/tracked-subscribe [::resolve-click-param kws])
+                                                                             ;wm @(ut/tracked-subscribe [::resolve-click-param kws])
+                                                                             wm @(rfa/sub ::resolve-click-param {:long-keyword kws})
                                                                              v0 (walk/postwalk-replace wm v)
                                                                              [_ l this that] v0]
                                                                         ;(tap> [:if-walk keypath v kps l this that kws (if l this that)])
@@ -629,6 +633,83 @@
      ;val
      )))
 
+
+(re-frame/reg-sub ;; RESOLVE KEYPATH TEMP FOR TESTING
+ ::clicked-parameter-key-alpha  ;;; important, common, and likely more expensive than need be. TODO
+ (fn [db {:keys [keypath]}]
+   (let [cmp (cstr/split (ut/unkeyword (nth keypath 0)) "/")
+         kkey (keyword (cstr/replace (nth cmp 0) "-parameter" ""))
+         vkey (keyword (peek cmp))
+;;         _ (when (cstr/includes? (str keypath) ":query") (tap> [:? keypath kkey vkey (get-in db (cons :click-param [kkey vkey]))]))
+         val0 (get-in db (cons :click-param [kkey vkey]))
+         if-walk-map2           (fn [obody] (let [kps       (ut/extract-patterns obody :if 4)
+                                                  logic-kps (into {} (for [v kps]
+                                                                       (let [kws (vec (filter #(cstr/includes? (str %) "/") (ut/deep-flatten v)))
+                                                                             ;wm @(ut/tracked-subscribe [::resolve-click-param kws])
+                                                                             wm @(rfa/sub ::resolve-click-param {:long-keyword kws})
+                                                                             v0 (walk/postwalk-replace wm v)
+                                                                             [_ l this that] v0]
+                                                                        ;(tap> [:if-walk keypath v kps l this that kws (if l this that)])
+                                                                         {v (if l this that)})))]
+                                              (walk/postwalk-replace logic-kps obody)))
+         ;;val0 (resolver/logic-and-params val0 nil)
+         val0 (try (if (= (first val0) :if) (if-walk-map2 val0) val0) (catch :default _ val0)) ;; TODO
+        ;;  val0 (walk/postwalk-replace {:text                  str
+        ;;                               :case (fn [x] (ut/vectorized-case x))
+        ;;                               :str (fn [args]
+        ;;                                 ;  (cstr/join "" args)
+        ;;                                 ; (do (tap> [:str args])
+        ;;                                      (apply str args);)
+        ;;                                      )} val0)
+         ns-kw? (and (cstr/starts-with? (str val0) ":") (cstr/includes? (str val0) "/") (keyword? val0))
+         ;val (if (cstr/starts-with? ":theme/" (str val))
+         ;      
+         ;      )
+         val (cond ns-kw?
+                   (get-in db (let [sp (cstr/split (str val0) "/")]
+                                [:click-param (ut/unre-qword (cstr/replace (str (first sp)) ":" ""))
+                                 (ut/unre-qword (last sp))]))
+                   (map? val0)
+                   (let [km (into {} (distinct (map #(when (>= (count %) 2) {(str (cstr/replace (str (get % 0)) ":" "") "/"
+                                                                                  (cstr/replace (str (get % 1)) ":" "")) [(get % 0) (get % 1)]})
+                                                    (ut/keypaths (get db :click-param)))))
+                         rep-map (into {} (for [[k v] km] {(keyword k) (get-in db (cons :click-param v))}))]
+                     ;(tap> [:replace-map val0 rep-map])
+                     (walk/postwalk-replace rep-map val0))
+                   :else val0)
+         ;;val (walk/postwalk-replace {:case (fn [x] (ut/vectorized-case x))} val)
+        ;;  _ (tap> [:val keypath val])
+
+
+         ;;; recursize resolve parameter IF WHEN ETC here! TODO - need to recur see if-walk, else will be true due to keywords
+         val      (if (and (string? val) (cstr/starts-with? (str val) ":") (not (cstr/includes? (str val) " ")))
+       ;(cstr/replace (str val) ":" "")
+                    (edn/read-string val) ;; temp hacky param work around (since we cant save keywords in the DB).. TODO :/
+                    val)
+         ;_ (tap> [:resolver (logic-and-params-fn val nil)])
+         contains-params? (contains-namespaced-keyword? val)
+         contains-sql-alias? (cstr/includes? (str val) ":query/")
+         ;_ (when (cstr/includes? (str val) ":query/") (tap> [:? val keypath kkey vkey (get-in db (cons :click-param [kkey vkey]))]))
+         ;_ (when contains-sql-alias? (tap> [:contains-sql-alias? keypath val0 val]))
+         ;_ (when contains-params? (tap> [:contains-params? keypath val0 val]))
+         ]
+     ;;(tap> [:rec-param (ut/deep-template-find val0)])
+    ; (when (cstr/includes? (str val) "theme") 
+    ;   (tap> [:clicked-param-key? keypath val (if-walk-map2 val) val0]))
+    ; (when ns-kw?
+    ;   (tap> [:click-param ns-kw? val val0 (when ns-kw? (let [sp (cstr/split (str val0) "/")]
+    ;                                                      [:click-param (ut/unre-qword (cstr/replace (str (first sp)) ":" ""))
+    ;                                                       (ut/unre-qword (last sp))])) val [kkey vkey]]))
+     ;(if (nil? val) (str "(nil val)") val)
+
+     ;(resolver/logic-and-params val nil)
+     (if contains-params? ;; (and contains-params? (not contains-sql-alias?))
+       (logic-and-params-fn val nil) ;; process again, no recursion here for now... we want to contain this reaction chain
+       val)
+     ;val
+     )))
+
+
 (re-frame/reg-event-db
  ::click-parameter
  (fn [db [_ keypath value]]
@@ -667,6 +748,11 @@
 (re-frame/reg-sub
  ::sql-data
  (fn [db [_ keypath]]
+   (get-in db (cons :data keypath))))
+
+(re-frame/reg-sub
+ ::sql-data-alpha
+ (fn [db {:keys [keypath]}]
    (get-in db (cons :data keypath))))
 
 (re-frame/reg-sub
@@ -895,7 +981,8 @@
    (get db :client-name)))
 
 (defn theme-pull [cmp-key fallback & test-fn]
-  (let [v                   @(ut/tracked-subscribe [::clicked-parameter-key [cmp-key]])
+  (let [;v                   @(ut/tracked-subscribe [::clicked-parameter-key [cmp-key]])
+        v                   @(rfa/sub ::clicked-parameter-key-alpha {:keypath [cmp-key]})
         t0                  (cstr/split (str (ut/unkeyword cmp-key)) #"/")
         t1                  (keyword (first t0))
         t2                  (keyword (last t0))

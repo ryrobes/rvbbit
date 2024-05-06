@@ -23,19 +23,25 @@
 
 (defonce subscription-counts (atom {}))
 
-(defn tracked-subscribe [query & args] ;;; lmao - hack to track subscriptions for debugging
+(defn tracked-subscribe [query] ;;; lmao - hack to track subscriptions for debugging
   (swap! subscription-counts update query (fnil inc 0))
-  (apply re-frame.core/subscribe query args))
+  ;(apply re-frame.core/subscribe query args)
+  (re-frame.core/subscribe query)
+  )
 
 (defonce dispatch-counts (atom {}))
 
-(defn tracked-dispatch [event & args]
+(defn tracked-dispatch [event]
   (swap! dispatch-counts update event (fnil inc 0))
-  (apply re-frame.core/dispatch event args))
+  ;(apply re-frame.core/dispatch event args)
+  (re-frame.core/dispatch event)
+  )
 
-(defn tracked-dispatch-sync [event & args]
+(defn tracked-dispatch-sync [event]
   (swap! dispatch-counts update event (fnil inc 0))
-  (apply re-frame.core/dispatch-sync event args))
+  ;(apply re-frame.core/dispatch-sync event args)
+  (re-frame.core/dispatch-sync event)
+  )
 
   ;; (if (= (first query) :websocket-fx.core/pending-requests)
   ;;   (rfa/sub (first query) (last query))
@@ -58,15 +64,6 @@
 ;;       (apply rfa/sub query-vec)
 ;;       (re-frame.core/subscribe query-vec))))
 
-(defn tracked-subscribe-new [query-vec]
-  (let [query (first query-vec)
-        args (rest query-vec)
-        query-key query-vec]
-    (swap! subscription-counts update query-key (fnil inc 0))
-    (println "query:" query "args:" args)
-    (if (or (nil? args) (= 1 (count args)))
-      (do (println "using rfa/sub") (apply rfa/sub query args))
-      (do (println "using re-frame.core/subscribe") (apply re-frame.core/subscribe query-vec)))))
 
 (defn sha-256 [s]
   (let [hash (goog.crypt.Sha256.)
@@ -927,6 +924,9 @@
                               :parse {:interpose "\n\n"}})]
         (swap! format-map-atom assoc [w s] o)
         o))))
+
+(defn remove-keys [m keys]
+  (apply dissoc m keys))
 
 (def body-set-atom (atom {}))
 

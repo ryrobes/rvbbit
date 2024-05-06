@@ -1034,10 +1034,10 @@
 (defmethod wl/handle-subscription :server-push2 [{:keys [kind ui-keypath client-name] :as data}]
   (when (not (get @client-queues client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 200))] ;; was (async/sliding-buffer 450)
+  (let [results (async/chan (async/sliding-buffer 100))] ;; was (async/sliding-buffer 450)
     (try
       (async/go-loop []
-        (async/<! (async/timeout 50)) ;; was 70 ?
+        (async/<! (async/timeout 70)) ;; was 70 ?
         (if-let [queue-atom (get @client-queues client-name (atom clojure.lang.PersistentQueue/EMPTY))]
           (let [item (ut/dequeue! queue-atom)]
             (if item

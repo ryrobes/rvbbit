@@ -35,6 +35,16 @@
                 :extras {:hello? true}}
    :on-message [::simple-response]})
 
+(re-frame/reg-sub
+ ::pending-requests
+ (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
+   (vals (get-in db [::sockets socket-id :requests]))))
+
+(re-frame/reg-sub
+ ::open-subscriptions
+ (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
+   (vals (get-in db [::sockets socket-id :subscriptions]))))
+
 ;; (defn options [x]
 ;;   {:url    "ws://localhost:3030/ws"
 ;;    :format :edn
@@ -678,6 +688,7 @@
  (fn [db [_  result]]
    (let [ui-keypath (get result :ui-keypath)]
      ;(-> db
+     
      (assoc-in db ;(conj
                (vec (cons :post-condi ui-keypath))
                        ;     panel-key)
@@ -688,11 +699,17 @@
 (re-frame/reg-sub
  ::websocket-status
  (fn [db _]
-   (let [subs (vec (doall @(ut/tracked-subscribe [::wfx/open-subscriptions socket-id])))
+   (let [subs (vec (doall 
+                    ;;@(ut/tracked-subscribe [::wfx/open-subscriptions socket-id])
+                    @(rfa/sub ::open-subscriptions {:socket-id socket-id})
+                    ))
          subs1 (vec (for [s subs] (get-in s [:message :kind])))
          datas (count (keys (get db :data)))
          panels (count (keys (get db :panels)))
-         pendings @(ut/tracked-subscribe [::wfx/pending-requests socket-id])]
+         pendings 
+         ;;@(ut/tracked-subscribe [::wfx/pending-requests socket-id])
+         @(rfa/sub ::pending-requests {:socket-id socket-id})
+         ]
      {:status @(ut/tracked-subscribe [::wfx/status socket-id])
       :waiting (count pendings)
       :datasets datas
