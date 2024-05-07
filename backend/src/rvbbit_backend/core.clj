@@ -1078,7 +1078,7 @@
     (ut/pp [:waiting-for-background-systems...])
     ;; (delayed-start 30000 start-services)
 
-    (let [fut (future  (Thread/sleep 15000) (start-services))
+    (let [fut (future  (Thread/sleep 5000) (start-services))
           ;fut2 (future (Thread/sleep 15000) (wss/create-websocket-server!))
           ]
       ;[@fut @fut2]

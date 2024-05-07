@@ -43,26 +43,52 @@
   (re-frame.core/dispatch-sync event)
   )
 
-  ;; (if (= (first query) :websocket-fx.core/pending-requests)
-  ;;   (rfa/sub (first query) (last query))
-  ;;   (apply re-frame.core/subscribe query args))
-
+;; (defonce subscription-memory (atom {}))
 
 ;; (defn tracked-subscribe [query]
-;;   (swap! subscription-counts update query (fnil inc 0))
-;;   ;(tap> [:query query])
-;;   (cond (= (count query) 1) ;(or (empty? args) (= 1 (count args)))
-;;         (rfa/sub (first query))
-;;         :else (re-frame.core/subscribe query)))
+;;   (let [memory-before (.-usedJSHeapSize js/performance.memory)]
+;;     (swap! subscription-counts update query (fnil inc 0))
+;;     (let [result (re-frame.core/subscribe query)]
+;;       (js/setTimeout
+;;        (fn []
+;;          (let [memory-after (.-usedJSHeapSize js/performance.memory)]
+;;            (swap! subscription-memory update query (fnil conj {:timestamp (js/Date.) :memory-before memory-before :memory-after memory-after}))))
+;;        0)
+;;       result)))
 
-;; (defn tracked-subscribe [query-vec]
-;;   (let [query (if (map? query-vec) (keys query-vec) (first query-vec))
-;;         args (if (map? query-vec) (vals query-vec) (next query-vec))
-;;         query-key query-vec]
-;;     (swap! subscription-counts update query-key (fnil inc 0))
-;;     (if false ;(and (or (nil? args) (= 1 (count args))) (not (cstr/includes? (str query-vec) ":bricks")))
-;;       (apply rfa/sub query-vec)
-;;       (re-frame.core/subscribe query-vec))))
+;; (defonce dispatch-memory (atom {}))
+
+;; (defn tracked-dispatch [event]
+;;   (let [memory-before (.-usedJSHeapSize js/performance.memory)]
+;;     (swap! dispatch-counts update event (fnil inc 0))
+;;     (re-frame.core/dispatch event)
+;;     (js/setTimeout
+;;      (fn []
+;;        (let [memory-after (.-usedJSHeapSize js/performance.memory)]
+;;          (swap! dispatch-memory update event (fnil conj {:timestamp (js/Date.) :memory-before memory-before :memory-after memory-after}))))
+;;      0)))
+
+;; (defn tracked-dispatch-sync [event]
+;;   (let [memory-before (.-usedJSHeapSize js/performance.memory)]
+;;     (swap! dispatch-counts update event (fnil inc 0))
+;;     (re-frame.core/dispatch-sync event)
+;;     (js/setTimeout
+;;      (fn []
+;;        (let [memory-after (.-usedJSHeapSize js/performance.memory)]
+;;          (swap! dispatch-memory update event (fnil conj {:timestamp (js/Date.) :memory-before memory-before :memory-after memory-after}))))
+;;      0)))
+
+;; (defn top-memory-usage [memory-atom]
+;;   (->> @memory-atom
+;;        (map (fn [[event snapshots]]
+;;               [event (->> snapshots
+;;                           (map (fn [snapshot] (- (:memory-after snapshot) (:memory-before snapshot))))
+;;                           (reduce +)
+;;                           (/ (count snapshots)))]))
+;;        (sort-by second)
+;;        (reverse)
+;;        (take 20)))
+
 
 
 (defn sha-256 [s]

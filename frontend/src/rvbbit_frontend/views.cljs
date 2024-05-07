@@ -2,6 +2,7 @@
   (:require
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
+   [re-frame.alpha :as rfa]
    [re-com.core :as re-com :refer [at]]
    [re-com.util :refer [px]]
    [rvbbit-frontend.connections :as conn]
@@ -1352,8 +1353,10 @@
 (defn editor-panel [bricks-wide bricks-tall]
   (let [selected-panel-map @(ut/tracked-subscribe [::bricks/selected-block-map])
         selected-block @(ut/tracked-subscribe [::bricks/selected-block])
-        sql-calls @(ut/tracked-subscribe [::bricks/panel-sql-calls selected-block])
-        views @(ut/tracked-subscribe [::bricks/panel-views selected-block])
+        ;;sql-calls @(ut/tracked-subscribe [::bricks/panel-sql-calls selected-block])
+        sql-calls @(rfa/sub ::bricks/panel-sql-calls {:panel-key selected-block})
+        ;;views @(ut/tracked-subscribe [::bricks/panel-views selected-block])
+        views @(rfa/sub ::bricks/panel-views {:panel-key selected-block})
         system-panel? (or (= selected-block "none!") (nil? selected-block))
         ;we could hit (get selected-panel-map :queries), but the sub filters out the :vselects
         first-data-key (first (keys sql-calls))
@@ -1366,8 +1369,8 @@
          ; view-key (cond (get @view-browser-query selected-block) (get @view-browser-query selected-block)
          ;                (nil? first-view-key) :base
          ;                :else first-view-key)
-        queries? (not (empty? sql-calls))
-        views? (not (empty? views))
+        queries? (ut/ne? sql-calls)
+        views? (ut/ne? views)
         view-selected? (true? (or (and views? (some #(= % (get @db/data-browser-query selected-block)) (keys views)))
                                   (not queries?)))
           ;view-scrubbers? (get-in @scrubbers [selected-block view-key] false)

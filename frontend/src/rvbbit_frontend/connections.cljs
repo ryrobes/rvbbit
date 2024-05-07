@@ -249,7 +249,10 @@
                                                     ) 
                                               (ut/deep-flatten block-map)))
           workspace-params       (into {} (for [k valid-body-params] ;; deref here?
-                                            {k @(ut/tracked-subscribe [::clicked-parameter-key [k]])}))
+                                            {k 
+                                             ;;@(ut/tracked-subscribe [::clicked-parameter-key [k]])
+                                             @(rfa/sub ::clicked-parameter-key-alpha {:keypath [k]})
+                                             }))
           value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
           value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
                                             (let [fs    (cstr/split (ut/unkeyword k) "/")
@@ -424,7 +427,10 @@
           templated-strings-walk (if templates?
                                    (walk/postwalk-replace {nil ""}
                                                           (into {} (for [k templated-strings-vals]
-                                                                     {k @(ut/tracked-subscribe [::clicked-parameter-key [k]])}))) {})
+                                                                     {k 
+                                                                      ;;@(ut/tracked-subscribe [::clicked-parameter-key [k]])
+                                                                      @(rfa/sub ::clicked-parameter-key-alpha {:keypath [k]})
+                                                                      }))) {})
           out-block-map (if templates? (ut/deep-template-replace templated-strings-walk out-block-map) out-block-map)]
 
       ;;(tap> [:pp panel-key (ut/deep-template-find out-block-map)])

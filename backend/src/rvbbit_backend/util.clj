@@ -277,6 +277,9 @@
 ;(def debug? false) ;false) ; false)
 ;(defn ifdebug? [x] (when debug? x))
 
+(defn replace-multiple [s replacements]
+  (reduce (fn [s [k v]] (cstr/replace s k v)) s replacements))
+
 (defn json-to-edn [json-str]
   ;;(pp [:json-to-end-debug! (str json-str)])
   (json2/read-str (str json-str) :key-fn keyword))

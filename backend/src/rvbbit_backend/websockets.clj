@@ -102,6 +102,11 @@
 (def signals-atom (ut/thaw-atom {} "./defs/signals.edn"))
 (def time-atom (ut/thaw-atom {} "./data/atoms/time-atom.edn"))
 
+(def param-var-mapping (atom {}))
+(def param-var-crosswalk (atom {}))
+(def param-var-key-mapping (atom {}))
+
+
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
 ;; (defonce flow-running-tasks (atom {}))
@@ -996,6 +1001,7 @@
            [(System/currentTimeMillis) (ut/get-current-timestamp)]
            (inc (get-in @ack-scoreboard [client-name key] 0)))))
 
+
 (defmethod wl/handle-request :ack [{:keys [client-name memory flow-subs]}]
   ;(ut/pp [:thank-you-from client-name])
   (inc-score! client-name :ack)
@@ -1884,7 +1890,12 @@
                 :mutates {}
                 :options {:actions? false, :pages? false, :search? false}
                 :parameters {}}}))
+
 (declare insert-kit-data)
+
+(defn replace-keywords [sub-task subbed-subs]
+  (let [replacements (into {} (map (fn [[k v]] [v k]) subbed-subs))]
+    (map (fn [k] (get replacements k k)) sub-task)))
 
 (defn kick [client-name task-id sub-task thread-id thread-desc message-name & args]
   ;(ut/pp [:kick-called-with! {:client-name client-name :task-id task-id :sub-task sub-task :thread-id thread-id :thread-desc thread-desc :message-name message-name}])
@@ -1909,7 +1920,15 @@
                            :else client-name)]
     (doseq [cid destinations]
       (let [hb? (= sub-task :heartbeat)
-            sub-task (if hb? (vec (keys (get @atoms-and-watchers cid {}))) sub-task)]
+            sub-task (if hb? 
+                       (let [ssubs (vec (keys (get @atoms-and-watchers cid {})))
+                             subbed-subs (vec (distinct (get @param-var-key-mapping cid [])))
+                             sss-map (into {} (for [[orig subbb] subbed-subs] {subbb orig}))
+                             replaced-subs (walk/postwalk-replace sss-map ssubs)]
+                        ;;  (ut/pp [:kick-subs-boomerang! cid ssubs subbed-subs replaced-subs])
+                        ;;  ssubs
+                         replaced-subs)
+                       sub-task)]
         ;; (when true ; false ;(not (= task-id :heartbeat))
         ;;   (ut/pp [:kick! ui-keypath data cid queue-id task-id sub-task]))
         (when hb? (swap! ping-ts assoc cid (System/currentTimeMillis)))
@@ -2588,8 +2607,16 @@
     (flow-kill! flow-id client-name))
   [:assassin-sent!])
 
+
+
 (defn boomerang-client-subs [cid]
-  (let [sub-task (vec (keys (get @atoms-and-watchers cid {})))]
+  (let [sub-task (vec (keys (get @atoms-and-watchers cid {})))
+        ;;subbed-subs (get @param-var-key-mapping cid []) ;; will be [original-key replacement-key] 
+        ;;replaced-sub-task (vec (replace-keywords sub-task subbed-subs))
+        ]
+    
+    ;; (ut/pp [:boomerang-client-subs cid sub-task subbed-subs  ])
+    
     (push-to-client [:kick] {:at "", :payload nil, :payload-kp [:heartbeat :heartbeat], :sent! :heartbeat, :to :all}
                     cid -1 :heartbeat sub-task)))
 
@@ -2944,8 +2971,15 @@
           ;param-value (get-in @params-atom [client-name :flow param-key])
           last-value (get-in @last-values-per [client-name keypath])
           all-clients-subbed (for [c (keys @atoms-and-watchers)
-                                   :when (some #(= % flow-key) (keys (get @atoms-and-watchers c)))] c)]
-      ;; (ut/pp [:mkk-watcher flow-key client-name keypath (not= old-value new-value)])
+                                   :when (some #(= % flow-key) (keys (get @atoms-and-watchers c)))] c)
+
+
+          ;; keypath-wildcards-map {"*client-name*" client-name  ;; ALREADY IN SUB TO VALUE, NOT NEEDED HERE.
+          ;;                        :*client-name* client-name}
+          ;; keypath (walk/postwalk-replace keypath-wildcards-map keypath) ;; keypath wildcards... but sub still ref'd flow-key as wildcard for client in question
+          
+          ]
+      ;;(ut/pp [:mkk-watcher flow-key client-name keypath (not= old-value new-value)])
       (when ;(or
              (and (not (nil? new-value))
                   ;(or ;(not= last-value new-value) 
@@ -2984,9 +3018,9 @@
 ;;; [:add-watcher! :screen :fair-salmon-hawk-hailing-from-malpais :screen/error-monitor-vanessa3>:panels>:block-899>:name :param-sub [:screen "error-monitor-vanessa3" :panels :block-899 :name] ("error-monitor-vanessa3" :panels :block-899 :name)]
 
 (defn get-atom-from-keys [base-type sub-type sub-path keypath]
-  (let [status? (cstr/includes? (str keypath) ":*")
-        tracker? (= sub-type :tracker)
+  (let [tracker? (= sub-type :tracker)
         flow?    (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
+        status?  (and (cstr/includes? (str keypath) ":*") flow?)
         client?  (= base-type :client)
         panel?   (= base-type :panel)
                 ;param?  (= base-type :ext-param)
@@ -3009,12 +3043,19 @@
   (let [;;client-name :all ;; test
         ;watch-key (str client-name "-" (str keypath) "-" sub-type)
         ;watcher (make-watcher keypath flow-key client-name fn (= sub-type :tracker))
-        watch-key (str :all "-" (str keypath) "-" sub-type "-" flow-key)
         sub-path (break-up-flow-key-ext flow-key)
+
+        ;; keypath-wildcards-map {"*client-name*" client-name  ;; ALREADY IN SUB TO VALUE, NOT NEEDED HERE.
+        ;;                        :*client-name* client-name}
+        ;; keypath (walk/postwalk-replace keypath-wildcards-map keypath) ;; keypath wildcards... but sub still ref'd flow-key as wildcard for client in question
+        ;; sub-path (walk/postwalk-replace keypath-wildcards-map sub-path)
+
+        watch-key (str :all "-" (str keypath) "-" sub-type "-" flow-key)
+        
         base-type (first sub-path)
-        status? (cstr/includes? (str keypath) ":*")
         tracker? (= sub-type :tracker)
         flow?    (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
+        status?  (and (cstr/includes? (str keypath) ":*") flow?)
         client?  (= base-type :client)
         panel?   (= base-type :panel)
         ;param?  (= base-type :ext-param)
@@ -3028,8 +3069,10 @@
                    panel?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                    client? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                    :else keypath)
-        watcher (make-watcher keypath flow-key :all fn (= sub-type :tracker))
 
+
+
+        watcher (make-watcher keypath flow-key :all fn (= sub-type :tracker))
         ;;_ (ut/pp [:is-flow-id? (first keypath)])
         atom-to-watch (cond status? flow-status
                             tracker? flow-db/tracker
@@ -3043,7 +3086,9 @@
                             screen? (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
                             :else (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
     (remove-watch atom-to-watch watch-key)
-    ;(ut/pp [:add-watcher! (first sub-path) client-name flow-key sub-type sub-path keypath])
+    ;; (ut/pp [:add-watcher! base-type (keyword (second sub-path)) client-name flow-key watch-key sub-type sub-path keypath client? 
+    ;;         ;(get-in atom-to-watch (vec (rest keypath)))
+    ;;         ])
     (add-watch atom-to-watch watch-key watcher) 
     (swap! atoms-and-watchers assoc-in [client-name flow-key]
            {:created (ut/get-current-timestamp)
@@ -3059,30 +3104,101 @@
 ;;(def client-subscriptions (atom {}))
 
 (defn remove-watcher [keypath client-name sub-type flow-id flow-key]
-  (try (let [watch-key (str client-name "-" (str keypath) "-" sub-type "-" flow-key)
-            ;;  _ (ut/pp [:removing-watcher-try!!! keypath client-name sub-type flow-id flow-key])
-             atom-to-watch (if (cstr/includes? (str keypath) ":*")
-                             flow-status
-                             ;flow-db/results-atom
-                             ;(get-or-create-child-atom (first keypath))
-                             (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
-    (ut/pp [:removing-watcher keypath client-name sub-type flow-id watch-key])
-    (remove-watch atom-to-watch watch-key)
+  (try (let [sub-path (break-up-flow-key-ext flow-key)
+
+             keypath-wildcards-map {"*client-name*" client-name  ;; ALREADY IN SUB TO VALUE, NOT NEEDED HERE.
+                                    :*client-name* client-name}
+             keypath (walk/postwalk-replace keypath-wildcards-map keypath) ;; keypath wildcards... but sub still ref'd flow-key as wildcard for client in question
+             sub-path (walk/postwalk-replace keypath-wildcards-map sub-path)
+
+             watch-key (str :all "-" (str keypath) "-" sub-type "-" flow-key)
+
+             base-type (first sub-path)
+             tracker? (= sub-type :tracker)
+             flow?    (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
+             status?  (and (cstr/includes? (str keypath) ":*") flow?)
+             client?  (= base-type :client)
+             panel?   (= base-type :panel)
+                     ;param?  (= base-type :ext-param)
+             screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
+             time?    (= base-type :time)
+             signal?  (= base-type :signal)
+             keypath  (cond ;flow? keypath 
+                        signal? (vec (rest keypath))
+                        time?   (vec (rest keypath))
+                        screen? (vec (rest sub-path))
+                        panel?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                        client? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                        :else keypath)
+
+            ;;  keypath-wildcards-map {"*client-name*" client-name ;; ALREADY IN SUB TO VALUE, NOT NEEDED HERE.
+            ;;                         :*client-name* client-name}
+            ;;  keypath (walk/postwalk-replace keypath-wildcards-map keypath) ;; keypath wildcards... but sub still ref'd flow-key as wildcard for client in question
+            ;;  sub-path (walk/postwalk-replace keypath-wildcards-map sub-path)
+
+             atom-to-watch (cond status? flow-status
+                                 tracker? flow-db/tracker
+                                         ;:else flow-db/results-atom
+                                         ;:else (get-or-create-child-atom (first keypath))
+                                 signal? last-signals-atom ;; no need to split for now, will keep an eye on it
+                                 time?   time-atom
+                                 panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
+                                 client? (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
+                                 flow? (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
+                                 screen? (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
+                                 :else (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
+         (ut/pp [:removing-watcher keypath client-name sub-type flow-id watch-key])
+         (remove-watch atom-to-watch watch-key)
     ;; (swap! client-subscriptions update keypath (partial remove #(= % client-name)))
     ;; (when (empty? (get @client-subscriptions keypath))
     ;;   (swap! client-subscriptions dissoc keypath))
-    (swap! atoms-and-watchers ut/dissoc-in [client-name flow-key])) (catch Throwable e (ut/pp [:remove-watcher e]))))
+         (swap! atoms-and-watchers ut/dissoc-in [client-name flow-key])) (catch Throwable e (ut/pp [:remove-watcher e]))))
+
+;; (defn remove-watcher-old [keypath client-name sub-type flow-id flow-key]
+;;   (try (let [watch-key (str client-name "-" (str keypath) "-" sub-type "-" flow-key)
+;;             ;;  _ (ut/pp [:removing-watcher-try!!! keypath client-name sub-type flow-id flow-key])
+;;              atom-to-watch (if (cstr/includes? (str keypath) ":*")
+;;                              flow-status
+;;                              ;flow-db/results-atom
+;;                              ;(get-or-create-child-atom (first keypath))
+;;                              (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
+;;     (ut/pp [:removing-watcher keypath client-name sub-type flow-id watch-key])
+;;     (remove-watch atom-to-watch watch-key)
+;;     ;; (swap! client-subscriptions update keypath (partial remove #(= % client-name)))
+;;     ;; (when (empty? (get @client-subscriptions keypath))
+;;     ;;   (swap! client-subscriptions dissoc keypath))
+;;     (swap! atoms-and-watchers ut/dissoc-in [client-name flow-key])) (catch Throwable e (ut/pp [:remove-watcher e]))))
+
+(defn replace-flow-key-vars [flow-key client-name]
+  (let [client-name-str (cstr/replace (str client-name) ":" "")]
+    (edn/read-string ;; should always be a keyword coming in
+     (ut/replace-multiple (str flow-key)
+                         {"*client-name*" client-name-str}))))
 
 (defmethod wl/handle-request :unsub-to-flow-value [{:keys [client-name flow-key]}]
-  (let [sub (get-in @atoms-and-watchers [client-name flow-key] {})
+  (let [;;orig-flow-key flow-key
+        ;;flow-key (replace-flow-key-vars flow-key client-name)
+        ;;sub (get-in @atoms-and-watchers [client-name flow-key] {})
+        subbed-sub (get-in @param-var-crosswalk [client-name flow-key])
         flow-id nil]
-    (ut/pp [:unsubbing! client-name flow-key sub (get @atoms-and-watchers client-name)])
-    (remove-watcher (:keypath sub) client-name (:sub-type sub) flow-id (:flow-key sub))))
+    (if (ut/ne? subbed-sub) ;; clean up ugly crosswalk keys; what in gods name have we done?
+      
+      (let [[srv-flow-key mapping-key] subbed-sub
+            sub (get-in @atoms-and-watchers [client-name srv-flow-key] {})]
+        (ut/pp [:unsubbing*w.var! client-name flow-key sub])
+        (remove-watcher (:keypath sub) client-name (:sub-type sub) flow-id (:flow-key sub))
+        (swap! param-var-mapping dissoc [client-name mapping-key]) ;; compound (single) key
+        (swap! param-var-crosswalk ut/dissoc-in [client-name flow-key])
+        (swap! param-var-key-mapping assoc client-name (vec (filter #(not (= (first %) flow-key)) (get @param-var-key-mapping client-name)))))
+
+      (let [sub (get-in @atoms-and-watchers [client-name flow-key] {})]
+        (ut/pp [:unsubbing! client-name flow-key sub])
+        (remove-watcher (:keypath sub) client-name (:sub-type sub) flow-id (:flow-key sub))))))
 
 (defn remove-watchers-for-flow [flow-id & [client-name]]
   (doseq [[c-name subs] @atoms-and-watchers
           :let [matching-subs (filter #(= (:flow-id %) flow-id) (vals subs))]
-          :when (not (empty? matching-subs))
+          :when (ut/ne? matching-subs)
                 ;(and
                 ; (not (empty? matching-subs))
                 ; (if client-name (= c-name client-name) true))
@@ -3243,30 +3359,42 @@
             ;;     (swap! last-signal-value-atom assoc-in [k kk] vv))) ;; when all done, set "last-value" so future :changed statements work - has to be PER signal, else we miss some
     ))
 
+;;         flow-key-split (break-up-flow-key flow-key)
+;; flow-key-split-sub (break-up-flow-key flow-key-sub)
+;; vars? (not (= flow-key flow-key-sub))
+;; _ (ut/pp [:flow-key flow-key vars? flow-key-sub flow-key-split flow-key-split-sub])
+;; _ (when vars? (swap! param-var-mapping assoc [client-name flow-key-split-sub] flow-key-sub))
+
 (defn send-reaction [base-type keypath client-name new-value]
- (let [flow-client-param-path (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+ (let [;;_ (ut/pp [:send-reaction-keypath keypath client-name])
+       keypath (get @param-var-mapping [client-name keypath] keypath) ;; get the REQUESTED keypath from the client, even if we replaced it...
+
+       flow-client-param-path (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
        other-client-param-path (keyword (cstr/replace (cstr/join ">" keypath) ":" "")) ;;(keyword (cstr/join ">" keypath))
        client-param-path (if (= base-type :flow)
                            flow-client-param-path
                            other-client-param-path)
        signal? (= client-name :rvbbit-signals)]
+   
+  ;;  (when (and (not= base-type :time) (not signal?))
+  ;;    (ut/pp [:send-reaction! base-type keypath client-name new-value client-param-path @param-var-mapping]))
 
-  ;;  (when (not (= base-type :time)) ;; temp to eliminate console spam
+  ;;  (when (and (not signal?) (not (= base-type :time))) ;; temp to eliminate console spam
   ;;    (ut/pp [(if signal?
   ;;              :signal-reaction-process!
   ;;              :client-reaction-push!) base-type keypath client-name new-value client-param-path]))
 
-   (async/thread ;; really expensive logging below. temp
-     (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
-           b? (boolean? new-value)
-           fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value)) ".edn")]
-       (ext/create-dirs "./reaction-logs/")
-       (ut/pretty-spit fp {:client-name client-name
-                           :keypath keypath
-                           :value (ut/replace-large-base64 new-value)
-                           :last-vals (ut/replace-large-base64 (get @last-values-per client-name))
-                           :subs-at-time (keys (get @atoms-and-watchers client-name))
-                           :flow-child-atoms (keys @flow-child-atoms)} 125)))
+  ;;  (async/thread ;; really expensive logging below. temp
+  ;;    (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
+  ;;          b? (boolean? new-value)
+  ;;          fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value)) ".edn")]
+  ;;      (ext/create-dirs "./reaction-logs/")
+  ;;      (ut/pretty-spit fp {:client-name client-name
+  ;;                          :keypath keypath
+  ;;                          :value (ut/replace-large-base64 new-value)
+  ;;                          :last-vals (ut/replace-large-base64 (get @last-values-per client-name))
+  ;;                          :subs-at-time (keys (get @atoms-and-watchers client-name))
+  ;;                          :flow-child-atoms (keys @flow-child-atoms)} 125)))
 
    (if (not signal?)
      (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)
@@ -3400,8 +3528,29 @@
             (select-keys (get @flow-status flow-id) [:running-blocks :done-blocks :error-blocks :waiting-blocks])
             nil nil nil))))
 
+(defn client-kp [flow-key keypath base-type sub-path client-param-path]
+  (cond (cstr/includes? (str flow-key) "*running?") false
+        (= base-type :time)   client-param-path
+        (= base-type :signal) client-param-path
+        (= base-type :screen) (vec (rest sub-path))
+        (= base-type :client) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+        (= base-type :panel) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+        :else keypath ;; assume flow
+        ))
+
 (defn sub-to-value [client-name flow-key & [signal?]]
-  (let [[flow-id step-id] (break-up-flow-key flow-key)
+  (let [flow-key-orig flow-key
+        flow-key-sub (replace-flow-key-vars flow-key client-name)
+
+        flow-key-split (break-up-flow-key flow-key)
+        flow-key-split-sub (break-up-flow-key flow-key-sub)
+        vars? (not (= flow-key flow-key-sub))
+
+
+        flow-key (if vars? flow-key-sub flow-key)
+        flow-key-split (if vars? flow-key-split-sub flow-key-split)
+
+        [flow-id step-id] flow-key-split ;(break-up-flow-key flow-key)
         signal? (true? signal?)
         keypath [flow-id step-id]
         sub-path (break-up-flow-key-ext flow-key)
@@ -3409,19 +3558,35 @@
        ;screen? (cstr/starts-with? (str flow-key) ":screen/")
         flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
         other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
-        client-param-path (if (= base-type :flow)
-                            flow-client-param-path
-                            other-client-param-path)
+        client-param-path (if (= base-type :flow) flow-client-param-path other-client-param-path)
+        client-keypath (client-kp flow-key keypath base-type sub-path client-param-path)
+        ssp (break-up-flow-key-ext flow-key-orig)
+        req-client-kp (client-kp flow-key-orig (vec (break-up-flow-key flow-key-orig)) base-type ssp 
+                                 (keyword (cstr/replace (cstr/join ">" (vec (rest ssp))) ":" "")))
+        
           ;; keypath (cond ;flow? keypath 
           ;;           screen? (vec (rest sub-path))
           ;;           :else keypath)
           ;;clis (first (keys (get-in @last-values [keypath]))) ;; in case we are a new ""client"" (as is usual)
+
+        _ (ut/pp [:flow-key flow-key vars? flow-key-sub flow-key-split flow-key-split-sub]) ;; this is all a clusterfuck, total rewrite of flow-key vars in future version. will be more extendable, sensical
+        _ (when vars? (swap! param-var-mapping assoc [client-name client-keypath] req-client-kp))
+        _ (when vars? (swap! param-var-crosswalk assoc-in [client-name flow-key-orig] [flow-key [client-name client-keypath]])) ;; all the precomputed values to delete the rest. ugh. mistake.
+        ;;         ^^ flow-key as the CLIENT understands it.... client-keypath as the server understands it.... ^^
+        _ (when vars? (swap! param-var-key-mapping assoc client-name (vec (distinct (conj (get @param-var-key-mapping client-name []) [flow-key-orig flow-key])))))
+
+
+        ;; keypath-wildcards-map {"*client-name*" client-name
+        ;;                        :*client-name* client-name}
+        ;; keypath (walk/postwalk-replace keypath-wildcards-map keypath) ;; keypath wildcards... but sub still ref'd flow-key as wildcard for client in question
+        ;; sub-path (walk/postwalk-replace keypath-wildcards-map sub-path)
+
         lv (get @last-values keypath)]
 
       ;(ut/pp [:client-sub! base-type flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key :keypath keypath :client-param-path client-param-path])
       ;(ut/pp [:client-sub! base-type flow-id :keypath keypath :client-param-path client-param-path])
 
-    (ut/pp [:client-sub! (if signal? :signal! :regular!) client-name :wants base-type client-param-path keypath])
+    (ut/pp [:client-sub! (if signal? :signal! :regular!) client-name :wants base-type client-param-path keypath flow-key])
 
     (when (get-in @flow-db/results-atom keypath)
       (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
@@ -3429,6 +3594,7 @@
     ;; (if signal?
     ;;   (add-watcher keypath client-name send-signal flow-key :param-sub)
     ;;   (add-watcher keypath client-name send-reaction flow-key :param-sub))
+
     (add-watcher keypath client-name send-reaction flow-key :param-sub)
 
         ;; (add-watcher keypath client-name send-reaction flow-key :param-sub)
@@ -5882,8 +6048,8 @@
         ;;                     :fill :theme/editor-outer-rim-color}]]]
          ; open_flow_channels (or (apply + (for [[_ v] @flow-db/channels-atom] (count v))) 0)
           ack-scoreboardv (into {} (for [[k v] (client-statuses)
-                                        :when (not= (get v :last-seen-seconds) -1)]
-                                    {k (ut/deselect-keys v [:booted :last-ack :last-push])}))
+                                         :when (not= (get v :last-seen-seconds) -1)]
+                                     {k (ut/deselect-keys v [:booted :last-ack :last-push])}))
           cli-rows (vec (for [[k v] ack-scoreboardv
                               :let [booted (get v :booted-ts)
                                     now (System/currentTimeMillis)
@@ -5897,13 +6063,18 @@
                                     _ (swap! ack-scoreboard assoc-in [k :uptime] uptime-str) ;; bad behavior all around, will refactor all this later. i just need to get to release 0 or this will never come out
                                     _ (swap! ack-scoreboard assoc-in [k :messages-per-second] msg-per-second) ;; ^^ this.
                                     _ (swap! ack-scoreboard assoc-in [k :recent-messages-per-second] recent-messages-per-second) ;; ^^ this.
-                                    ]] 
+                                    ]]
                           (merge {:client-name (str k)
                                   :uptime-seconds uptime-seconds
                                   :messages-per-second msg-per-second
-                                  :uptime uptime-str} v)
-                          ))
-          ;_ (ut/pp [:cli-rows cli-rows])
+                                  :uptime uptime-str} v)))
+          ;;_ (ut/pp [:cli-rows cli-rows])
+          _ (doall
+             (try
+               (doseq [cli-row cli-rows]
+                 (swap! params-atom assoc-in [(edn/read-string (get cli-row :client-name)) :stats] cli-row))
+               (catch Exception e (ut/pp [:jvm-stats-params-atom-error (str e)]))))
+
           insert-cli {:insert-into [:client_stats] :values cli-rows}
           insert-sql {:insert-into [:jvm_stats]
                       :columns [:used_memory_mb :thread_count :sql_cache_size :ws_peers :open_flow_channels :queries_run :internal_queries_run :sniffs_run :sys_load]

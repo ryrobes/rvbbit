@@ -22,7 +22,10 @@
     ;; try to save some work
     (let [valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten block-map)))
           workspace-params       (into {} (for [k valid-body-params] ;; deref here?
-                                            {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+                                            {k 
+                                             ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                                             @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                                             }))
           value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
           value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
                                             (let [fs    (cstr/split (ut/unkeyword k) "/")
@@ -192,17 +195,20 @@
 
           templated-strings-vals (vec (filter #(cstr/includes? (str %) "/")
                                               (ut/deep-template-find out-block-map))) ;; ignore non compounds, let the server deal with it
-          templates?              (not (empty? templated-strings-vals))
+          templates?              (ut/ne? templated-strings-vals)
           _ (when templates? (tap> [:replacing-string-templates... templated-strings-vals out-block-map]))
           templated-strings-walk (if templates?
                                    (walk/postwalk-replace {nil ""}
                                                           (into {} (for [k templated-strings-vals]
-                                                                     {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))) {})
+                                                                     {k 
+                                                                      ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                                                                      @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                                                                      }))) {})
           out-block-map (if templates? (ut/deep-template-replace templated-strings-walk out-block-map) out-block-map)]
 
       ;;(tap> [:pp panel-key (ut/deep-template-find out-block-map)])
       ;;(tap> [:resolver-val-walks panel-key valid-body-params workspace-params valid-body-params out-block-map])
-      (if (not (empty? (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten out-block-map)))))
+      (if (ut/ne? (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten out-block-map))))
         (logic-and-params-fn out-block-map panel-key)
         out-block-map))
     block-map))
