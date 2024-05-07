@@ -991,7 +991,8 @@
                    :child [bricks/scrubber-panel
                            true ; view?
                              ;{} ;param-map ; keypath-map
-                           @(ut/tracked-subscribe [::bricks/keypaths-in-params key-type])
+                           ;;@(ut/tracked-subscribe [::bricks/keypaths-in-params key-type])
+                           @(rfa/sub ::bricks/keypaths-in-params  {:key-type key-type})
                            key-type (get @param-search key-type) {:fm true}] ; view-key (update kp)
                    :style {:overflow "auto"}]
 

@@ -1132,9 +1132,9 @@
  ::add-action
  (undoable)
  (fn [db [_ flow-id name in out type]]
-   (if (and (not (empty? (cstr/trim (str name))))
-            (not (empty? (cstr/trim (str in))))
-            (not (empty? (cstr/trim (str out)))))
+   (if (and (ut/ne? (cstr/trim (str name)))
+            (ut/ne? (cstr/trim (str in)))
+            (ut/ne? (cstr/trim (str out))))
      (let [other-names @(ut/tracked-subscribe [::bricks/all-drops-of :*])
            name (keyword name)
            name (ut/safe-key name other-names)
@@ -1187,7 +1187,7 @@
                                       ;; _ (tap> [:blocks-map blocks-map])
                                       no-open-inputs? (true? (empty? open-inputs))
                                       shouts @(ut/tracked-subscribe [::shouts flow-id])
-                                      shouts? (not (empty? (cstr/trim (str shouts))))
+                                      shouts? (ut/ne? (cstr/trim (str shouts)))
                                       fire?  @(ut/tracked-subscribe [::fire? flow-id])
                                       drops?  @(ut/tracked-subscribe [::drops? flow-id])
                                       sshout-panel? (get @shout-panel? flow-id false)
@@ -1201,7 +1201,7 @@
                                                                    (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])]
                                                                      (if (and (vector? vv) (every? string? vv))
                                                                        (cstr/join "\n" vv) vv)))}))
-                                      overrides-map? (not (empty? override-map))
+                                      overrides-map? (ut/ne? override-map)
                                       override-map (if (empty? override-map) nil override-map)
                                       no-data? (not open-inputs)
                                       ;; drops

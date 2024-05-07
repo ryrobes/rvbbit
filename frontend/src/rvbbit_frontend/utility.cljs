@@ -20,28 +20,79 @@
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))
 
+(defonce parameter-keys-hit (atom {}))
 
 (defonce subscription-counts (atom {}))
+(defonce simple-subscription-counts (atom []))
 
 (defn tracked-subscribe [query] ;;; lmao - hack to track subscriptions for debugging
-  (swap! subscription-counts update query (fnil inc 0))
+  ;(swap! subscription-counts update query (fnil inc 0))
+  (swap! simple-subscription-counts conj (first query))
   ;(apply re-frame.core/subscribe query args)
-  (re-frame.core/subscribe query)
-  )
+
+  (cond
+
+    (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query) :rvbbit-frontend.connections/clicked-parameter-key)
+    (do ;(tap> [:cpk! (last query)])
+      ;(swap! parameter-keys-hit update (first (last query)) (fnil inc 0))
+      ;;(re-frame.core/subscribe query)
+      (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))
+
+    (cstr/ends-with? (str (first query)) "conn/data-colors")
+    (rfa/sub :rvbbit-frontend.connections/data-colors {})
+
+    (cstr/ends-with? (str (first query)) "conn/sql-metadata")
+    (rfa/sub :rvbbit-frontend.connections/sql-metadata-alpha {:keypath (last query)})
+
+    (cstr/ends-with? (str (first query)) "bricks/all-drops-of")
+    (rfa/sub :rvbbit-frontend.bricks/all-drops-of-alpha {:ttype (last query)})
+
+    (cstr/ends-with? (str (first query)) "bricks/subq-mapping")
+    (rfa/sub :rvbbit-frontend.bricks/subq-mapping-alpha {})
+
+    (cstr/ends-with? (str (first query)) "bricks/subq-panels")
+    (rfa/sub :rvbbit-frontend.bricks/subq-panels-alpha {:panel-id (last query)})
+
+    (cstr/ends-with? (str (first query)) "bricks/workspace")
+    (rfa/sub :rvbbit-frontend.bricks/workspace-alpha {:keypath (last query)})
+
+    (cstr/ends-with? (str (first query)) "bricks/selected-block")
+    (rfa/sub :rvbbit-frontend.bricks/selected-block {})
+
+    (cstr/ends-with? (str (first query)) "bricks/client-name")
+    (rfa/sub :rvbbit-frontend.bricks/client-name {})
+
+    (cstr/ends-with? (str (first query)) "connections/client-name")
+    (rfa/sub :rvbbit-frontend.connections/client-name {})
+
+    (cstr/ends-with? (str (first query)) "signals/selected-signal")
+    (rfa/sub :rvbbit-frontend.signals/selected-signal {})
+
+    :else (re-frame.core/subscribe query)))
 
 (defonce dispatch-counts (atom {}))
+(defonce simple-dispatch-counts (atom []))
 
 (defn tracked-dispatch [event]
-  (swap! dispatch-counts update event (fnil inc 0))
+  ;(swap! dispatch-counts update event (fnil inc 0))
+  (swap! simple-dispatch-counts conj (first event))
   ;(apply re-frame.core/dispatch event args)
   (re-frame.core/dispatch event)
   )
 
 (defn tracked-dispatch-sync [event]
-  (swap! dispatch-counts update event (fnil inc 0))
+  ;(swap! dispatch-counts update event (fnil inc 0))
+  (swap! simple-dispatch-counts conj (first event))
   ;(apply re-frame.core/dispatch-sync event args)
   (re-frame.core/dispatch-sync event)
   )
+
+;; (defonce tracked-clicked-parameter-key (atom {}))
+
+;; (defn tracked-param-key [query]
+;;   (let [[ss kp] query]
+;;     (rfa/sub ss kp))
+;;   (re-frame/subscribe [ss kp]))
 
 ;; (defonce subscription-memory (atom {}))
 
@@ -1082,23 +1133,38 @@
                    :else [item]))
            coll)))
 
-(defn matches-pattern? [item kw num]
-  ;(or ;(and (vector? item) (= (count item) 3) (= (first item) :=))
-  ;    ;(and (vector? item) (= (count item) 3) (= (first item) :when))
-  (and (vector? item) (= (count item) num) (= (first item) kw))
-  ;    ;(and (vector? item) (= (count item) 3) (= (first item) :set-parameter))
-  ;    )
-  )
+;; (defn matches-pattern? [item kw num]
+;;   ;(or ;(and (vector? item) (= (count item) 3) (= (first item) :=))
+;;   ;    ;(and (vector? item) (= (count item) 3) (= (first item) :when))
+;;   (and (vector? item) (= (count item) num) (= (first item) kw))
+;;   ;    ;(and (vector? item) (= (count item) 3) (= (first item) :set-parameter))
+;;   ;    )
+;;   )
 
-(defn extract-patterns [data kw num]
-  (let [matches (atom [])]
-    (walk/prewalk
-     (fn [item]
-       (when (matches-pattern? item kw num)
-         (swap! matches conj item))
-       item)
-     data)
-    @matches))
+;; (defn extract-patterns [data kw num]
+;;   (let [matches (atom [])]
+;;     (walk/prewalk
+;;      (fn [item]
+;;        (when (matches-pattern? item kw num)
+;;          (swap! matches conj item))
+;;        item)
+;;      data)
+;;     @matches))
+
+(def matches-pattern? (memoize
+                       (fn [item kw num]
+                         (and (vector? item) (= (count item) num) (= (first item) kw)))))
+
+(def extract-patterns (memoize
+                       (fn [data kw num]
+                         (let [matches (atom [])]
+                           (walk/prewalk
+                            (fn [item]
+                              (when (matches-pattern? item kw num)
+                                (swap! matches conj item))
+                              item)
+                            data)
+                           @matches))))
 
 (defn keypaths
   ([m] (keypaths [] m ()))

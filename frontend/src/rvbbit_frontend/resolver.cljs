@@ -22,10 +22,9 @@
     ;; try to save some work
     (let [valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten block-map)))
           workspace-params       (into {} (for [k valid-body-params] ;; deref here?
-                                            {k 
+                                            {k
                                              ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
-                                             @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
-                                             }))
+                                             @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
           value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
           value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
                                             (let [fs    (cstr/split (ut/unkeyword k) "/")
@@ -37,7 +36,7 @@
                                               {k (if (not (integer? row))
                                                  ;(get-in @(ut/tracked-subscribe [::conn/sql-data [ds]]) [row field])
                                                    (str field)
-                                                   (get-in 
+                                                   (get-in
                                                     ;;@(ut/tracked-subscribe [::conn/sql-data [ds]])
                                                     @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]})
                                                     [row field]))})))
@@ -158,9 +157,9 @@
           singles               {:text                  str
                                  ;:case (fn [x] (ut/vectorized-case x))
                                  :str (fn [args]
-                                           (if (vector? args)
-                                             (cstr/join "" (apply str args))
-                                             (str args)))
+                                        (if (vector? args)
+                                          (cstr/join "" (apply str args))
+                                          (str args)))
                                  :string (fn [args]
                                            (if (vector? args)
                                              (cstr/join "" (apply str args))
@@ -172,26 +171,21 @@
                               ;                                  (catch :default _ (str x))))
                                ;:number                (fn [x] (str (nf x)))
                                ;:percent               (fn [x] (str (nf x) "%"))
+          obody-key-set (ut/body-set block-map)
+          has-fn? (fn [k] (some #(= % k) obody-key-set))
 
-          out-block-map (->> block-map
-                             (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
-                             (walk/postwalk-replace {:*this-block* panel-key})
-                             (walk/postwalk-replace value-walks)
-                             (walk/postwalk-replace condi-walks)
-                             (walk/postwalk-replace workspace-params)
-                             ;(string-walk 1)
-                            ;;  (string-walk 2)
-                            ;;  (string-walk 3)
-                            ;;  (string-walk 4)
-                            ;;  (string-walk 5)
-                            ;;  (string-walk 6)
-                           ;map-walk-map2
-                             =-walk-map2
-                             if-walk-map2
-                             when-walk-map2
-                             into-walk-map2
-                             (walk/postwalk-replace singles)
-                             case-walk)
+          out-block-map (cond->> block-map
+                          true (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
+                          true (walk/postwalk-replace {:*this-block* panel-key})
+                          (ut/ne? value-walks) (walk/postwalk-replace value-walks)
+                          (ut/ne? condi-walks) (walk/postwalk-replace condi-walks)
+                          (ut/ne? workspace-params) (walk/postwalk-replace workspace-params)
+                          (has-fn? :=) =-walk-map2
+                          (has-fn? :if) if-walk-map2
+                          (has-fn? :when) when-walk-map2
+                          (has-fn? :into) into-walk-map2
+                          (ut/ne? singles) (walk/postwalk-replace singles)
+                          (has-fn? :case) case-walk)
 
           templated-strings-vals (vec (filter #(cstr/includes? (str %) "/")
                                               (ut/deep-template-find out-block-map))) ;; ignore non compounds, let the server deal with it
@@ -200,10 +194,9 @@
           templated-strings-walk (if templates?
                                    (walk/postwalk-replace {nil ""}
                                                           (into {} (for [k templated-strings-vals]
-                                                                     {k 
+                                                                     {k
                                                                       ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
-                                                                      @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
-                                                                      }))) {})
+                                                                      @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))) {})
           out-block-map (if templates? (ut/deep-template-replace templated-strings-walk out-block-map) out-block-map)]
 
       ;;(tap> [:pp panel-key (ut/deep-template-find out-block-map)])

@@ -541,6 +541,12 @@
      (get-in db merged-keypath))))
 
 (re-frame/reg-sub
+ ::workspace-alpha
+ (fn [db {:keys [keypath]}]
+   (let [merged-keypath (cons :panels keypath)]
+     (get-in db merged-keypath))))
+
+(re-frame/reg-sub
  ::what-tab
  (fn [db [_ panel-key]]
    (get-in db [:panels panel-key :tab] "")))
@@ -3565,17 +3571,17 @@
     ;(tap> [:hmmm panel-map])
     new-panel))
 
-(re-frame/reg-sub
- ::subq-panels
- (fn [db [_ panel-id]]                                     ;; filter has got to be faster than for loops. TODO for other subs
-   (let [queries-used    (filter #(cstr/includes? (str %) ":query/")
-                                 (ut/deep-flatten (get-in db [:panels panel-id :queries])))
-         root-query-keys (for [k queries-used] (keyword (last (cstr/split (ut/unkeyword k) "/"))))
-         query-sources   (into {} (remove empty? (flatten (for [[k v] (get db :panels)]
-                                                            (flatten (for [kk (keys (get v :queries))]
-                                                                       {kk k}))))))]
-      ;(tap> [:root-query-keys root-query-keys :query-sources query-sources])
-     (vec (remove nil? (for [q root-query-keys] (get query-sources q)))))))
+;; (re-frame/reg-sub
+;;  ::subq-panels
+;;  (fn [db [_ panel-id]]                                     ;; filter has got to be faster than for loops. TODO for other subs
+;;    (let [queries-used    (filter #(cstr/includes? (str %) ":query/")
+;;                                  (ut/deep-flatten (get-in db [:panels panel-id :queries])))
+;;          root-query-keys (for [k queries-used] (keyword (last (cstr/split (ut/unkeyword k) "/"))))
+;;          query-sources   (into {} (remove empty? (flatten (for [[k v] (get db :panels)]
+;;                                                             (flatten (for [kk (keys (get v :queries))]
+;;                                                                        {kk k}))))))]
+;;       ;(tap> [:root-query-keys root-query-keys :query-sources query-sources])
+;;      (vec (remove nil? (for [q root-query-keys] (get query-sources q)))))))
 
 (re-frame/reg-sub
  ::subq-used
@@ -3610,7 +3616,7 @@
                                                        (when (nil? (find vv :vselect)) {kk vv}))))))]
       ;(tap> [:ttt all-sql-call-keys])
      (into {} (for [[k v] panels]
-                {k (merge {:uses (apply concat (for [[k1 v1] (merge (get v :queries)
+                {k (merge {:uses (apply concat (for [[_ v1] (merge (get v :queries)
                                                                     (get v :views))]
                                                  (for [qq (filter #(or (cstr/includes? (str %) ":query/")
                                                                        (some #{%} all-sql-call-keys))
@@ -3620,7 +3626,29 @@
                                                                                         (filter #(cstr/includes? (str %) "/")
                                                                                                 (ut/deep-flatten v1))))))]
                                                    (keyword (last (cstr/split (ut/unkeyword qq) "/"))))))}
-                          {:produces (keys (get-in db [:panels k :queries]))})}))))) ;)
+                          {:produces (keys (get-in db [:panels k :queries]))})})))))
+
+(re-frame/reg-sub
+ ::subq-mapping-alpha
+ (fn [db {}]                                              ;; filter has got to be faster than for loops. TODO for other subs im using FOR for
+    ;(let [qs (keys (get-in db [:panels panel-id :queries]))]
+   (let [panels            (get db :panels)                ;(into {} (filter #(= (get db :selected-tab) (get (val %) :tab "")) (get db :panels))) ;(get db :panels)
+         all-sql-call-keys (keys (into {} (for [[_ v] panels]
+                                            (into {} (for [[kk vv] (get v :queries)]
+                                                       (when (nil? (find vv :vselect)) {kk vv}))))))]
+      ;(tap> [:ttt all-sql-call-keys])
+     (into {} (for [[k v] panels]
+                {k (merge {:uses (apply concat (for [[_ v1] (merge (get v :queries)
+                                                                   (get v :views))]
+                                                 (for [qq (filter #(or (cstr/includes? (str %) ":query/")
+                                                                       (some #{%} all-sql-call-keys))
+                                                                  (flatten (conj (ut/deep-flatten v1)
+                                                                                 (apply (fn [x] ;; get partial matches from param use (filters, etc)...
+                                                                                          (keyword (first (cstr/split (str (ut/unkeyword x)) #"/"))))
+                                                                                        (filter #(cstr/includes? (str %) "/")
+                                                                                                (ut/deep-flatten v1))))))]
+                                                   (keyword (last (cstr/split (ut/unkeyword qq) "/"))))))}
+                          {:produces (keys (get-in db [:panels k :queries]))})})))))
 
 (re-frame/reg-sub
  ::subq-panels
@@ -3639,6 +3667,26 @@
                                                                          {kk k}))))))]
       ;(tap> [:root-query-keys root-query-keys :query-sources query-sources])
      (vec (remove #(or (nil? %) (= (get db :selected-block) %)) (for [q root-query-keys] (get query-sources q)))))))
+
+
+(re-frame/reg-sub
+ ::subq-panels-alpha
+ (fn [db {:keys [panel-id]}]                                     ;; filter has got to be faster than for loops. TODO for other subs im using FOR for
+   (let [panels            (into {} (filter #(= (get db :selected-tab) (get (val %) :tab "")) (get db :panels))) ;(get db :panels)
+         all-sql-call-keys (keys (into {} (for [[_ v] panels]
+                                            (into {} (for [[kk vv] (get v :queries)]
+                                                       (when (nil? (find vv :vselect)) {kk vv}))))))
+         queries-used      (filter #(or (cstr/includes? (str %) ":query/")
+                                        (some #{%} all-sql-call-keys))
+                                   (ut/deep-flatten (merge (get-in db [:panels panel-id :queries])
+                                                           (get-in db [:panels panel-id :views]))))
+         root-query-keys   (for [k queries-used] (keyword (last (cstr/split (ut/unkeyword k) "/"))))
+         query-sources     (into {} (remove empty? (flatten (for [[k v] panels]
+                                                              (flatten (for [kk (keys (get v :queries))]
+                                                                         {kk k}))))))]
+      ;(tap> [:root-query-keys root-query-keys :query-sources query-sources])
+     (vec (remove #(or (nil? %) (= (get db :selected-block) %)) (for [q root-query-keys] (get query-sources q)))))))
+
 
 (re-frame/reg-sub
  ::subq-panels-all
@@ -4623,6 +4671,19 @@
                                     (= ttype (get vv :type))) (catch :default _ false))]
                  kk)))))))
 
+(re-frame/reg-sub
+ ::all-drops-of-alpha
+ (fn [db {:keys [ttype]}]
+   (let [rss (get-in db [:runstream-drops] {})]
+     (vec
+      (apply concat
+             (for [[_ v] rss]
+               (for [[kk vv] v
+                     :when (try (or (= ttype :*)
+                                    (some #(= % ttype) (get vv :type))
+                                    (= ttype (get vv :type))) (catch :default _ false))]
+                 kk)))))))
+
 (defn dynamic-spawner-targets [table-source dbody panel-key query-key width-int height-int]
   ;(when true ;(= panel-key :block-4778)
   ;(tap> [:dynamic-spawner-targets panel-key query-key [table-source dbody width-int height-int]])
@@ -4692,7 +4753,7 @@
                                    ;(= (ut/unre-qword source-table) (ut/unre-qword (first table-source)))
                                    (= table-source-k source-table))
         clicked-fields         (if view-drag? @(ut/tracked-subscribe [::view-clicked-fields source-panel-key source-table]) [])
-        clicked?               (not (empty? clicked-fields))
+        clicked?               (ut/ne? clicked-fields)
         query-fields           (if (or clicked? table?)
                                  (vec (keys (get @(ut/tracked-subscribe [::conn/sql-metadata [query-key]]) :fields))) [])
         ;dim-query-fields (into {} (filter (fn [[_ v]] (= (get v :data-type) "string")) (get @(ut/tracked-subscribe [::conn/sql-metadata [query-key]]) :fields)))
@@ -4701,10 +4762,10 @@
         common-fields          (cond table? (vec (cset/intersection (set query-fields) (set (get drag-body :table-fields))))
                                      clicked? (vec (cset/intersection (set (vals clicked-fields)) (set query-fields)))
                                      :else [])
-        union?                 (and (= (sort query-fields) (sort (get drag-body :table-fields))) (not (empty? query-fields)))
+        union?                 (and (= (sort query-fields) (sort (get drag-body :table-fields))) (ut/ne? query-fields))
         partial-union?         (and (>= (count (cset/intersection (set query-fields)
                                                                   (set (get drag-body :table-fields)))) 1) ;; do they share at least 2 field names?
-                                    (not (empty? query-fields)))
+                                    (ut/ne? query-fields))
         common-fields?         (>= (count common-fields) 1)
 
         ;font-size-int (int (/ width-int 17))
@@ -4774,7 +4835,7 @@
         drops                  @(ut/tracked-subscribe [::all-drops-of action-typer])
         ;;_ (tap> [:spawner-drops action-typer panel-key drops])
         view-options           (remove nil? [[:text]
-                                             (when (not (empty? drops)) drops)
+                                             (when (ut/ne? drops) drops)
                                              ;(when dim? [:dropdown])
                                              (when dim? [:table-filter])])
 
@@ -4830,7 +4891,7 @@
         block-ops              (into (if (>= w 10)
                                        (if view-drag? [[:move-into :copy-into :reference]] [[:move-into :copy-into :row-count]])
                                        (if view-drag? [[:move-into] [:copy-into] [:reference]] [[:move-into] [:copy-into] [:row-count]]))
-                                     (when (not (empty? viz-for-each-fields))
+                                     (when (ut/ne? viz-for-each-fields)
                                        (if (>= w 10)
                                          (vec (for [ff (partition-all 3 viz-for-each-fields)]
                                                 (vec (for [f ff] (keyword (str "weave/" (ut/unkeyword f)))))))
@@ -4838,9 +4899,9 @@
                                                 [(keyword (str "weave/" (ut/unkeyword f)))])))))
 
         general-color          #(get color-map (first (first %)))
-        has-view-options?      (not (empty? (flatten view-options)))
-        has-viz-options?       (not (empty? (flatten viz-options)))
-        has-sql-options?       (not (empty? (flatten sql-options)))
+        has-view-options?      (ut/ne? (flatten view-options))
+        has-viz-options?       (ut/ne? (flatten viz-options))
+        has-sql-options?       (ut/ne? (flatten sql-options))
         big-enough-for-viz?    (and (>= w 6) (>= h 5))
         all-options            (cond
 
@@ -6241,11 +6302,12 @@
         last-page?                  (and has-pages? (= page-num (js/Math.ceil (/ full-rowcount rows-per-page))))
         first-page?                 (and has-pages? (or (nil? page-num) (= page-num 1)))
         [waits? single-wait?] @(ut/tracked-subscribe [::query-waitings query-key])
-        default-col-widths @(re-frame/subscribe [::column-default-widths {:panel-key panel-key :query-key query-key}])
+        default-col-widths @(rfa/sub ::column-default-widths {:panel-key panel-key :query-key query-key})
         running? single-wait?
         double-click-timeout 400]
     
     (when (not= default-col-widths equal-width-final)
+      ;;(tap> [:default-col-widths panel-key query-key default-col-widths equal-width-final])
       (ut/tracked-dispatch [::set-column-default-widths panel-key query-key equal-width-final])) ;; bad side effect TODO: pure fn to calc equal widths from anywhere
 
     ;; (tap> [:ff col-selected? col-names ff])
@@ -7910,7 +7972,7 @@
 
        kvpaths-vals)
      (catch :default e
-       (do (tap> [:error-in :keypaths-in-params e :passed bid]) {})))))
+       (do (tap> [:error-in :keypaths-in-flow e :passed bid]) {})))))
 
 (re-frame/reg-sub
  ::keypaths-in-flow-opts
@@ -7927,7 +7989,7 @@
 
 (re-frame/reg-sub
  ::keypaths-in-params
- (fn [db [_ key-type]]
+ (fn [db {:keys [key-type]}]
    (try
      (let [params       (get-in db [:click-param key-type])
            kvpaths      (ut/keypaths params)
@@ -8320,6 +8382,8 @@
     ;;                                   :ut/data-typer-atom ut/data-typer-atom
     ;;                                   :ut/coord-cache ut/coord-cache})])
      
+;;; also remembner we are using memoize on extract-patterns in ut, which might get large and is unclearable !! 5/7/24
+
       (do (reset! ut/subscription-counts {}) ;; temp
           (reset! ut/dispatch-counts {}) ;; temp
 
@@ -10092,9 +10156,7 @@
                                  :ReferenceLine reech/ReferenceLine
                                  :AreaChart reech/AreaChart
                                  :LabelList reech/LabelList
-                                 :PolarAngleAxis reech/PolarAngleAxis
-                                 :PolarRadiusAxis reech/PolarRadiusAxis
-                                 :PolarRadiusAxisTick reech/PolarRadiusAxisTick
+                                 :PolarAngleAxis reech/PolarRadiusAxisTick
                                  :PolarGrid reech/PolarGrid
                                  :PolarChart reech/PolarChart
                                  :Hint reech/Hint
@@ -10483,17 +10545,18 @@
 
                                  :case (fn [x] (ut/vectorized-case x))
 
-                                 :scrubber22 (fn [[kk pm & [opts]]]
-                                               [scrubber-panel true
-                                                @(ut/tracked-subscribe [::keypaths-in-params :param])
-                                                kk pm
-                                                (if opts
-                                                  {:fm true :canvas? true :opts opts}
-                                                  {:fm true :canvas? true})])
+                                ;;  :scrubber22 (fn [[kk pm & [opts]]]
+                                ;;                [scrubber-panel true
+                                ;;                 @(ut/tracked-subscribe [::keypaths-in-params :param]) ;; leakable?
+                                ;;                 kk pm
+                                ;;                 (if opts
+                                ;;                   {:fm true :canvas? true :opts opts}
+                                ;;                   {:fm true :canvas? true})])
 
                                  :scrubber (fn [[kk pm & [opts]]]
                                              [scrubber-panel true
-                                              @(ut/tracked-subscribe [::keypaths-in-params :param])
+                                              ;;@(ut/tracked-subscribe [::keypaths-in-params :param]) ;; leakable?
+                                              @(rfa/sub ::keypaths-in-params  {:key-type :param})
                                               kk pm
                                               (if opts
                                                 {:fm true :canvas? true :opts opts}
@@ -10586,7 +10649,7 @@
 
         body                   (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") body) ;; eyes emoji - 10/17/23 (earliest swap needed?)
 
-        body                   (view-alias-replace body panel-key selected-view) ; ; ; VIEW ALIAS. DRAGONS.
+        ;;;removing for now;;;body                   (view-alias-replace body panel-key selected-view) ; ; ; VIEW ALIAS. DRAGONS.
 
         sql-aliases-used       @(ut/tracked-subscribe [::panel-sql-aliases-in-views-body panel-key body])
 
@@ -10856,11 +10919,11 @@
         ;;                                               (walk/postwalk-replace (merge logic-kps2 logic-kps) obody))
         ;;                                             (catch :default e (do (tap> [:scrubber-honey-comb-error (str e)]) obody))))
 
-        string-walk            (fn [num obody] (let [kps       (ut/extract-patterns obody :string num)
-                                                     logic-kps (into {} (for [v kps]
-                                                                          (let [[_ & this] v]
-                                                                            {v (apply str this)})))]
-                                                 (walk/postwalk-replace logic-kps obody)))
+        ;; string-walk            (fn [num obody] (let [kps       (ut/extract-patterns obody :string num)
+        ;;                                              logic-kps (into {} (for [v kps]
+        ;;                                                                   (let [[_ & this] v]
+        ;;                                                                     {v (apply str this)})))]
+        ;;                                          (walk/postwalk-replace logic-kps obody)))
 
         push-walk            (fn [obody] (let [kps       (ut/extract-patterns obody :push> 2) ;; is there a less expensive way to do this? unsure. 3/2/24
                                                logic-kps (into {} (for [v kps]
@@ -10882,36 +10945,36 @@
                                                                           {v (get-in data kp)})))]
                                                (walk/postwalk-replace logic-kps obody)))
 
-        keymerge-walk            (fn [obody] (let [kps       (ut/extract-patterns obody :keymerge 3)
-                                                   logic-kps (into {} (for [v kps]
-                                                                        (let [[_ that this] v]
-                                                                          {v (keyword (ut/replacer (str that this) #":" ""))})))]
-                                               (walk/postwalk-replace logic-kps obody)))
+        ;; keymerge-walk            (fn [obody] (let [kps       (ut/extract-patterns obody :keymerge 3)
+        ;;                                            logic-kps (into {} (for [v kps]
+        ;;                                                                 (let [[_ that this] v]
+        ;;                                                                   {v (keyword (ut/replacer (str that this) #":" ""))})))]
+        ;;                                        (walk/postwalk-replace logic-kps obody)))
 
-        honey-walk            (fn [obody] (let [kps       (ut/extract-patterns obody :*render* 2)
-                                                logic-kps (into {} (for [v kps]
-                                                                     (let [[_ data_d] v]
-                                                                       (tap> [:data_d data_d])
-                                                                       {v ;(keyword (ut/replacer (str that this) #":" ""))
-                                                                        (let [queries (get data_d :queries)
-                                                                         ;views {:view (get data_d :view)}
-                                                                              qkeys (into {} (for [q (keys queries)]
-                                                                                               {q (keyword (str (ut/replacer (str q) #":" "") "-hist-" (rand-int 123) (hash data_d)))}))
-                                                                              ndata (walk/postwalk-replace qkeys data_d)]
-                                                                             ; ndata (assoc-in ndata [:views :view1] (get ndata :view))
-                                                                            ;  ndata (walk/postwalk-replace {{:state ["de" "dc" "fl" "ca" "ct" "bc" "az" "co" "ar"]} ["de" "dc" "fl" "ca" "co" "ct"]
-                                                                            ;                                [:= nil :country] [:= 1 1]} ndata)
-                                                                             ; ndata data_d
+        ;; honey-walk            (fn [obody] (let [kps       (ut/extract-patterns obody :*render* 2)
+        ;;                                         logic-kps (into {} (for [v kps]
+        ;;                                                              (let [[_ data_d] v]
+        ;;                                                                (tap> [:data_d data_d])
+        ;;                                                                {v ;(keyword (ut/replacer (str that this) #":" ""))
+        ;;                                                                 (let [queries (get data_d :queries)
+        ;;                                                                  ;views {:view (get data_d :view)}
+        ;;                                                                       qkeys (into {} (for [q (keys queries)]
+        ;;                                                                                        {q (keyword (str (ut/replacer (str q) #":" "") "-hist-" (rand-int 123) (hash data_d)))}))
+        ;;                                                                       ndata (walk/postwalk-replace qkeys data_d)]
+        ;;                                                                      ; ndata (assoc-in ndata [:views :view1] (get ndata :view))
+        ;;                                                                     ;  ndata (walk/postwalk-replace {{:state ["de" "dc" "fl" "ca" "ct" "bc" "az" "co" "ar"]} ["de" "dc" "fl" "ca" "co" "ct"]
+        ;;                                                                     ;                                [:= nil :country] [:= 1 1]} ndata)
+        ;;                                                                      ; ndata data_d
 
-                                                                          (tap> [:qkeys panel-key qkeys ndata])
-                                                                          [honeycomb :block-213 ;panel-key
-                                                                                   ;(or (first (keys views)) (first (keys queries)))
-                                                                           :new-view ;(get data_d :selected-view)
-                                                                           nil nil
-                                                                           {:new-view (get ndata :view)} ;{:views {:view (get ndata :view)}} ;views ;(walk/postwalk-replace qkeys views)
-                                                                           (get ndata :queries)])})))] ;(walk/postwalk-replace qkeys queries)
+        ;;                                                                   (tap> [:qkeys panel-key qkeys ndata])
+        ;;                                                                   [honeycomb :block-213 ;panel-key
+        ;;                                                                            ;(or (first (keys views)) (first (keys queries)))
+        ;;                                                                    :new-view ;(get data_d :selected-view)
+        ;;                                                                    nil nil
+        ;;                                                                    {:new-view (get ndata :view)} ;{:views {:view (get ndata :view)}} ;views ;(walk/postwalk-replace qkeys views)
+        ;;                                                                    (get ndata :queries)])})))] ;(walk/postwalk-replace qkeys queries)
 
-                                            (walk/postwalk-replace logic-kps obody)))
+        ;;                                     (walk/postwalk-replace logic-kps obody)))
 
         ;; drop-walk-replace            (fn [obody keyname] (let [kps       (ut/extract-patterns obody keyname 2)
         ;;                                                        logic-kps (into {} (for [v kps]
@@ -11218,11 +11281,13 @@
               ;;  (tap> [:query-all-clicked k data-exists? unrun-sql? query])
 
         (when (or (not data-exists?) unrun-sql?)
-          (do
+          (let [src @(rfa/sub ::conn/sql-source {:kkey k})
+                srcnew? (not= src query)]
             (if (or (empty? connection-id) (nil? connection-id))
               (conn/sql-data [k] query)
               (conn/sql-data [k] query connection-id))
-            (ut/tracked-dispatch [::insert-sql-source k query])))))
+            (when srcnew? ;;; no need to dispatch to update the same shit over and over... (with autorefresh queries)
+              (ut/tracked-dispatch [::insert-sql-source k query]))))))
 
     ;(when (= panel-key :block-289)
     ;  (tap> [:honeycomb panel-key (keys sql-calls) (true? (seq body)) override-view selected-view body (get body selected-view) (first (keys body)) sql-aliases-used used-datasets]))
@@ -11965,8 +12030,14 @@
     ;; ^^  TODO should this be at the honeycomb level instead? grid is one hell of a tick to key off of... feels overly sledgehammer-y.
 
 
-    ;; (tap> [:sub-tracker @(rfa/sub ::client-name) (vec (take 20 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/subscription-counts)))))])
-    ;; (tap> [:dispatch-tracker @(rfa/sub ::client-name) (vec (take 20 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/dispatch-counts)))))])
+    ;; (tap> [:sub-tracker @(rfa/sub ::client-name) (vec (take 40 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/subscription-counts)))))])
+    ;; (tap> [:dispatch-tracker @(rfa/sub ::client-name) (vec (take 40 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/dispatch-counts)))))])
+    ;; (tap> [:dispatch-peek! (vec (map first @ut/dispatch-counts))])
+    ;; (tap> [:sub-counter @(rfa/sub ::client-name) @ut/parameter-keys-hit])
+
+    (when false ;; (cstr/includes? (str @(rfa/sub ::client-name)) "emerald")
+      (tap> [:dispatch-peek! @(rfa/sub ::client-name)  (vec (reverse (sort-by val (frequencies @ut/simple-dispatch-counts))))])
+      (tap> [:sub-peek! @(rfa/sub ::client-name)  (vec (reverse (sort-by val (frequencies @ut/simple-subscription-counts))))]))
 
     ;(tap> [:grid-render])
     ;(when @over-block? (tap> [:over]))
