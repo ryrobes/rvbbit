@@ -4,7 +4,7 @@
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
    [re-frame.alpha :as rfa]
-   [re-frame.trace :as rft]
+   ;[re-frame.trace :as rft]
    [re-com.core :as re-com :refer [at]]
    [re-com.util :refer [px]]
    [rvbbit-frontend.recharts :as reech]
@@ -399,7 +399,8 @@
 (re-frame/reg-sub
  ::stale-flow-subs?
  (fn [db _]
-   (let [new @(ut/tracked-subscribe [::get-flow-subs])
+   (let [;;new @(ut/tracked-subscribe [::get-flow-subs])
+         new @(rfa/sub ::get-flow-subs {})
          old (get db :flow-subs [])
          deads (vec (cset/difference (set old) (set new)))]
     ;;  (when (ut/ne? deads) 
@@ -409,7 +410,8 @@
 (re-frame/reg-event-db
  ::unsub-to-flows
  (fn [db _]
-   (let [new @(ut/tracked-subscribe [::get-flow-subs])
+   (let [;;new @(ut/tracked-subscribe [::get-flow-subs])
+         new @(rfa/sub ::get-flow-subs {})
          old (get db :flow-subs [])
          deads (vec (cset/difference (set old) (set new)))
          _ (tap> [:flow-unsub-change! (get db :client-name) {:old old :new new :removing deads}])
@@ -424,14 +426,18 @@
 (re-frame/reg-sub
  ::get-new-flow-subs
  (fn [db _]
-   (let [flow-refs @(ut/tracked-subscribe [::get-flow-subs])
+   (let [;;flow-refs @(ut/tracked-subscribe [::get-flow-subs])
+         flow-refs @(rfa/sub ::get-flow-subs {})
          subbed (get db :flow-subs [])]
      (vec (cset/difference (set flow-refs) (set subbed))))))
 
 (re-frame/reg-sub
  ::new-flow-subs?
- (fn [db _]
-   (ut/ne? @(ut/tracked-subscribe [::get-new-flow-subs]))
+ (fn [_ _]
+   (ut/ne? 
+    ;;@(ut/tracked-subscribe [::get-new-flow-subs])
+    @(rfa/sub ::get-new-flow-subs {})
+    )
   ;;  (not= @(ut/tracked-subscribe [::get-new-flow-subs]) 
   ;;        (get db :flow-subs))
    ))
@@ -447,7 +453,8 @@
 (re-frame/reg-event-db
  ::sub-to-flows
  (fn [db _]
-   (let [new @(ut/tracked-subscribe [::get-new-flow-subs])
+   (let [;;new @(ut/tracked-subscribe [::get-new-flow-subs])
+         new @(rfa/sub ::get-new-flow-subs {})
          old (get db :flow-subs [])
          _ (tap> [:flow-sub-change! (get db :client-name) {:old old :new new}])
          ;all (get db :flow-subs [])
@@ -522,7 +529,7 @@
  ;;(undoable)
  (fn [db _]
    ;(tap> [:refresh-runstream-panel (keys (get db :runstreams))])
-   (when  (not (empty? (keys (get db :runstreams))))
+   (when  (ut/ne? (keys (get db :runstreams)))
      (doseq [flow-id (keys (get db :runstreams))]
        (ut/tracked-dispatch [::wfx/request :default
                            {:message    {:kind :get-flow-open-ports
@@ -658,7 +665,10 @@
       :dispatch-n [[::wfx/unsubscribe http/socket-id :server-push2]
                    [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)]]})))
 
-(defn sql-alias-replace-sub [query] @(ut/tracked-subscribe [::sql-alias-replace-sub query]))
+(defn sql-alias-replace-sub [query] 
+  ;;@(ut/tracked-subscribe [::sql-alias-replace-sub query])
+  @(rfa/sub ::sql-alias-replace-sub {:query query})
+  )
 
 (re-frame.core/reg-event-fx
  ::save
@@ -732,7 +742,7 @@
  (fn [db _]
    (let [snaps (get-in db [:snapshots :params] {})
          ;curr @(ut/tracked-subscribe [::current-params])
-         curr @(rfa/sub ::current-params)
+         curr @(rfa/sub ::current-params {})
          ]
      (for [[k v] snaps
            :let [block-states (get v :block-states)
@@ -822,7 +832,7 @@
  ::visible-tabs
  (fn [db]
    (let [;tabs @(ut/tracked-subscribe [::tabs])
-         tabs @(rfa/sub ::tabs)
+         tabs @(rfa/sub ::tabs {})
          hidden-tabs (get db :hidden-tabs [])]
      (vec (cset/difference (set tabs) (set hidden-tabs))))))
 
@@ -1569,9 +1579,11 @@
         ;;           :limit (last mem)}
          ;memory-sys (vec (take-last 200 (conj (get-in db [:data :memory-sys] []) mem-row)))
          ]
-     (-> db
-         ;(assoc-in [:data :memory-sys] memory-sys)
-         (assoc :memory mem)))))
+    ;;  (-> db
+    ;;      ;(assoc-in [:data :memory-sys] memory-sys)
+    ;;      (assoc :memory mem))
+     (assoc db :memory mem)
+     )))
 
 (re-frame/reg-sub
  ::memory
@@ -1613,7 +1625,7 @@
  ::runstream-override-map
  (fn [_ _]
    (let [;runstreams @(ut/tracked-subscribe [::runstreams])
-         runstreams @(rfa/sub ::runstreams)]
+         runstreams @(rfa/sub ::runstreams {})]
          ;runstreams (vec (filter #(get % :run-on-change?) runstreams))
 
      ;(tap> [:rs-list? runstreams])
@@ -1626,7 +1638,9 @@
                                                 :when (not (nil? value))]
                                             {k (if (= source :input)
                                                  value
-                                                 (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])]
+                                                 (let [;;vv @(ut/tracked-subscribe [::rs-value flow-id k])
+                                                       vv @(rfa/sub ::rs-value {:flow-id flow-id :key k})
+                                                       ]
                                                    (if (and (vector? vv) (every? string? vv))
                                                      (cstr/join "\n" vv) vv)))}))
                      ;overrides-map? (not (empty? override-map))
@@ -4032,7 +4046,7 @@
 
 (re-frame/reg-sub
  ::sql-alias-replace-sub ;; caching abuse?
- (fn [_ [_ query]]
+ (fn [_ {:keys [query]}]
    (sql-alias-replace query)))
 
 (re-frame/reg-sub
@@ -8386,6 +8400,8 @@
 
       (do (reset! ut/subscription-counts {}) ;; temp
           (reset! ut/dispatch-counts {}) ;; temp
+          (reset! ut/simple-subscription-counts [])
+          (reset! ut/simple-dispatch-counts [])
 
           (reset! ut/replacer-atom {})
           (reset! ut/clean-sql-atom {})
@@ -9749,7 +9765,7 @@
 
 (re-frame/reg-sub
  ::rs-value
- (fn [db [_ flow-id kkey]]  ;;; dupe from buffy
+ (fn [db {:keys [flow-id kkey]}]  ;;; dupe from buffy
    (let [src (get-in db [:runstreams flow-id :values kkey :source])]
      (if (= src :param)
        ;(get-in db [:runstreams flow-id :values kkey :value])
@@ -9767,7 +9783,9 @@
                                      :when (not (nil? value))]
                                  {k (if (= source :input)
                                       value
-                                      (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])] ;;; dupe from buffy
+                                      (let [;;vv @(ut/tracked-subscribe [::rs-value flow-id k])
+                                            vv @(rfa/sub ::rs-value {:flow-id flow-id :key k})
+                                            ] ;;; dupe from buffy
                                         (if (and (vector? vv) (every? string? vv))
                                           (cstr/join "\n" vv) vv)))}))]
      ;(when (cstr/includes? (str (get db :client-name)) "copper") (tap> [:override-map values override-map]))
@@ -11034,7 +11052,8 @@
                     ;;   :child [:strings "we dropped! " drop-id " " val]]
 
                      (when (and
-                            @(ut/tracked-subscribe [::auto-run-and-connected?])
+                            ;;@(ut/tracked-subscribe [::auto-run-and-connected?])
+                            @(rfa/sub ::auto-run-and-connected? {})
                             ;(not= (hash [drop-id val]) (get-in @drop-last-tracker [panel-key drop-id val]))
                             (not= (hash val) (get-in @drop-last-tracker [panel-key drop-id])))
                        ;(swap! drop-last-tracker assoc-in [panel-key drop-id val] (hash [drop-id val]))

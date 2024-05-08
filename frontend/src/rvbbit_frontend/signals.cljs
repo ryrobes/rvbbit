@@ -2,6 +2,7 @@
   (:require
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]
+   [re-frame.alpha :as rfa]
    [re-com.core :as re-com :refer [at]]
    [re-com.util :refer [px]]
    [rvbbit-frontend.connections :as conn]
@@ -997,7 +998,7 @@
  (fn [db _]
    (and (get db :flow?) 
         (not (nil? (get db :selected-signal)))
-        (= (get @ db/flow-editor-system-mode 0) "signals"))))
+        (= (get @db/flow-editor-system-mode 0) "signals"))))
 
 (defn history-mouse-enter [e]
   (reset! hover-tools-atom e))
@@ -1017,12 +1018,18 @@
         selected-signal @(ut/tracked-subscribe [::selected-signal])
         signal-vec (get-in signals [selected-signal :signal])
         signal-vec-parts (vec (ut/where-dissect signal-vec))
-        signals-history (select-keys @(ut/tracked-subscribe [::signals-history]) signal-vec-parts) ;; sometimes we get weird other items if we change fast
+        signals-history (select-keys 
+                         ;;@(ut/tracked-subscribe [::signals-history])
+                         @(rfa/sub ::signals-history {})
+                         signal-vec-parts) ;; sometimes we get weird other items if we change fast
+        
         results (into {} (for [idx (range (count signal-vec-parts))]
                            (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
                                  name (get signal-vec-parts idx)
                                  vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])]
-                             {name vv})))]
+                             {name vv})))] 
+        ;; ^^^ this is a weird hack we need to revisit - by invoking the param-keys we are summoning them from the server to be read and reactive
+        ;; even though it is dereffed in a "safe" place...
     
     ;; (tap> [:signals-history signals-history])
     

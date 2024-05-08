@@ -27,7 +27,7 @@
 
 (defn tracked-subscribe [query] ;;; lmao - hack to track subscriptions for debugging
   ;(swap! subscription-counts update query (fnil inc 0))
-  (swap! simple-subscription-counts conj (first query))
+  ;(swap! simple-subscription-counts conj (first query))
   ;(apply re-frame.core/subscribe query args)
 
   (cond
@@ -59,6 +59,9 @@
     (cstr/ends-with? (str (first query)) "bricks/selected-block")
     (rfa/sub :rvbbit-frontend.bricks/selected-block {})
 
+    (cstr/ends-with? (str (first query)) "bricks/editor-panel-selected-view")
+    (rfa/sub :rvbbit-frontend.bricks/editor-panel-selected-view {})
+
     (cstr/ends-with? (str (first query)) "bricks/client-name")
     (rfa/sub :rvbbit-frontend.bricks/client-name {})
 
@@ -75,14 +78,14 @@
 
 (defn tracked-dispatch [event]
   ;(swap! dispatch-counts update event (fnil inc 0))
-  (swap! simple-dispatch-counts conj (first event))
+  ;(swap! simple-dispatch-counts conj (first event))
   ;(apply re-frame.core/dispatch event args)
   (re-frame.core/dispatch event)
   )
 
 (defn tracked-dispatch-sync [event]
   ;(swap! dispatch-counts update event (fnil inc 0))
-  (swap! simple-dispatch-counts conj (first event))
+  ;(swap! simple-dispatch-counts conj (first event))
   ;(apply re-frame.core/dispatch-sync event args)
   (re-frame.core/dispatch-sync event)
   )
@@ -1133,38 +1136,38 @@
                    :else [item]))
            coll)))
 
-;; (defn matches-pattern? [item kw num]
-;;   ;(or ;(and (vector? item) (= (count item) 3) (= (first item) :=))
-;;   ;    ;(and (vector? item) (= (count item) 3) (= (first item) :when))
-;;   (and (vector? item) (= (count item) num) (= (first item) kw))
-;;   ;    ;(and (vector? item) (= (count item) 3) (= (first item) :set-parameter))
-;;   ;    )
-;;   )
+(defn matches-pattern? [item kw num]
+  ;(or ;(and (vector? item) (= (count item) 3) (= (first item) :=))
+  ;    ;(and (vector? item) (= (count item) 3) (= (first item) :when))
+  (and (vector? item) (= (count item) num) (= (first item) kw))
+  ;    ;(and (vector? item) (= (count item) 3) (= (first item) :set-parameter))
+  ;    )
+  )
 
-;; (defn extract-patterns [data kw num]
-;;   (let [matches (atom [])]
-;;     (walk/prewalk
-;;      (fn [item]
-;;        (when (matches-pattern? item kw num)
-;;          (swap! matches conj item))
-;;        item)
-;;      data)
-;;     @matches))
+(defn extract-patterns [data kw num]
+  (let [matches (atom [])]
+    (walk/prewalk
+     (fn [item]
+       (when (matches-pattern? item kw num)
+         (swap! matches conj item))
+       item)
+     data)
+    @matches))
 
-(def matches-pattern? (memoize
-                       (fn [item kw num]
-                         (and (vector? item) (= (count item) num) (= (first item) kw)))))
+;; (def matches-pattern? (memoize
+;;                        (fn [item kw num]
+;;                          (and (vector? item) (= (count item) num) (= (first item) kw)))))
 
-(def extract-patterns (memoize
-                       (fn [data kw num]
-                         (let [matches (atom [])]
-                           (walk/prewalk
-                            (fn [item]
-                              (when (matches-pattern? item kw num)
-                                (swap! matches conj item))
-                              item)
-                            data)
-                           @matches))))
+;; (def extract-patterns (memoize
+;;                        (fn [data kw num]
+;;                          (let [matches (atom [])]
+;;                            (walk/prewalk
+;;                             (fn [item]
+;;                               (when (matches-pattern? item kw num)
+;;                                 (swap! matches conj item))
+;;                               item)
+;;                             data)
+;;                            @matches))))
 
 (defn keypaths
   ([m] (keypaths [] m ()))
