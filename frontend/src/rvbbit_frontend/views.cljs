@@ -3663,6 +3663,7 @@
                                            :children [[re-com/box :size "none"
                                                        ;:style {:mid-width "167px"}
                                                        :child (str (get websocket-status :waiting -1)
+                                                                   ;;;@(rfa/sub ::http/open-subscriptions {:socket-id :default})
                                                                    (str ", " (ut/nf (count server-subs)))
                                                                    (when (not online?) " (RVBBIT server is offline)"))]
                                                       (when (ut/ne? flow-watcher-subs-grouped)

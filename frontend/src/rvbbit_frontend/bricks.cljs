@@ -608,67 +608,45 @@
  (fn [db _]
    (get-in db [:snapshots :params] {})))
 
-(re-frame/reg-event-db
- ::resub!
- (fn [db _]
-   (tap> [:initiating-resub-for (get db :client-name)])
-   (let [client-name (get db :client-name)
-         new-client-name (ut/gen-client-name) ;; (keyword (str (cstr/replace (str client-name) ":" "") "-resub*-" (rand-int 12345)))
-         ]
-     
-     (ut/tracked-dispatch [::wfx/unsubscribe http/socket-id :server-push2])
-     (ut/tracked-dispatch [::wfx/disconnect http/socket-id])
-
-     (ut/tracked-dispatch [::set-client-name new-client-name]) ;; helps?
-     (tap> [:initiating-resub-for-new new-client-name])
-
-     (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options client-name)])
-     (ut/tracked-dispatch [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)])
-     (tap> [:initiating-resub-for-new new-client-name :done?])
-     db)))
-
 ;; (re-frame/reg-event-db
 ;;  ::resub!
 ;;  (fn [db _]
-;;    (tap> [:initiating-resub-for! (get db :client-name)])
-;;    (let [client-name (get db :client-name)]
+;;    (tap> [:initiating-resub-for (get db :client-name)])
+;;    (let [client-name (get db :client-name)
+;;          new-client-name (ut/gen-client-name) ;; (keyword (str (cstr/replace (str client-name) ":" "") "-resub*-" (rand-int 12345)))
+;;          ]
+     
 ;;      (ut/tracked-dispatch [::wfx/unsubscribe http/socket-id :server-push2])
 ;;      (ut/tracked-dispatch [::wfx/disconnect http/socket-id])
 
-;;      (go
-;;        (<! (async/timeout 3000)) ; wait for 3 seconds
-;;        (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options client-name)])
-;;        (ut/tracked-dispatch [::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name)]))
+;;      (ut/tracked-dispatch [::set-client-name new-client-name]) ;; helps?
+;;      (tap> [:initiating-resub-for-new new-client-name])
+
+;;      (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options client-name)])
+;;      (ut/tracked-dispatch [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)])
+;;      (tap> [:initiating-resub-for-new new-client-name :done?])
 ;;      db)))
 
 ;; (re-frame/reg-sub
 ;;  ::lost-server-connection?
 ;;  (fn [db _]
-;;    (let [last-heartbeat (get-in db [:status-data :heartbeat :kick :data 0 :at] "none!")] ;;; returns  "2024-04-14 05:46:43"
-     
-;;      )))
+;;    (let [last-heartbeat (get-in db [:status-data :heartbeat :kick :data 0 :at] "none!") ;;; returns "2024-04-14 05:46:43"
+;;          last-heartbeat-time (js/Date. last-heartbeat)
+;;          three-minutes-ago (js/Date. (- (js/Date.now) (* 3 60 1000)))]
+;;      (< last-heartbeat-time three-minutes-ago))))
 
-(re-frame/reg-sub
- ::lost-server-connection?
- (fn [db _]
-   (let [last-heartbeat (get-in db [:status-data :heartbeat :kick :data 0 :at] "none!") ;;; returns "2024-04-14 05:46:43"
-         last-heartbeat-time (js/Date. last-heartbeat)
-         three-minutes-ago (js/Date. (- (js/Date.now) (* 3 60 1000)))]
-     (< last-heartbeat-time three-minutes-ago))))
+;; (re-frame.core/reg-event-fx
+;;  ::resub!-fx ;; test fx version 2/4/24
+;;  (fn [{:keys [db]} _]
+;;    (tap> [:initiating-resub-for (get db :client-name)])
+;;    (let [client-name (get db :client-name)]
+;;      {:db db
+;;       :dispatch-n [[::wfx/unsubscribe http/socket-id :server-push2]
+;;                    [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)]]})))
 
-(re-frame.core/reg-event-fx
- ::resub!-fx ;; test fx version 2/4/24
- (fn [{:keys [db]} _]
-   (tap> [:initiating-resub-for (get db :client-name)])
-   (let [client-name (get db :client-name)]
-     {:db db
-      :dispatch-n [[::wfx/unsubscribe http/socket-id :server-push2]
-                   [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)]]})))
-
-(defn sql-alias-replace-sub [query] 
+(defn sql-alias-replace-sub [query]
   ;;@(ut/tracked-subscribe [::sql-alias-replace-sub query])
-  @(rfa/sub ::sql-alias-replace-sub {:query query})
-  )
+  @(rfa/sub ::sql-alias-replace-sub {:query query}))
 
 (re-frame.core/reg-event-fx
  ::save
@@ -1639,7 +1617,7 @@
                                             {k (if (= source :input)
                                                  value
                                                  (let [;;vv @(ut/tracked-subscribe [::rs-value flow-id k])
-                                                       vv @(rfa/sub ::rs-value {:flow-id flow-id :key k})
+                                                       vv @(rfa/sub ::rs-value {:flow-id flow-id :kkey k})
                                                        ]
                                                    (if (and (vector? vv) (every? string? vv))
                                                      (cstr/join "\n" vv) vv)))}))
@@ -8277,6 +8255,30 @@
        ;(ut/dissoc-in [:post-meta query-key])
        (ut/dissoc-in [:sched query-key]))))
 
+;; (re-frame/reg-event-db ;; original. works fine. BUT dumps all the query execs into one operation
+;;  ::dispatch-auto-queries
+;;  (fn [db [_]]
+;;    (let [scheds (get db :sched)
+;;          scheds-reverse (doall (into {}
+;;                                      (for [vv (vals scheds)]
+;;                                        {vv (vec (for [[k v] scheds
+;;                                                       :when (= v vv)] k))})))
+;;          ;scheds-reverse {10 [:ufo-sightings-drag-country-415]}
+;;          ticktock (get-in db [:re-pollsive.core/polling :counter])]
+
+;;      (dorun (doseq [[timer queries] scheds-reverse
+;;                     :when (>= ticktock timer)]
+;;               (doseq [query queries]
+;;                 (dorun (let []
+;;                          ;(tap> [:running-sched :tick ticktock :timer timer query])
+;;                          (ut/tracked-dispatch [::remove-schedule query])
+;;                          (ut/tracked-dispatch [::conn/clear-query-history query]))))))
+
+;;      ;(tap> [:scheds-cron-debug :tick ticktock scheds scheds-reverse])
+;;      db)))
+
+
+;; 5/8/24 trying to offset the execution a little bit to give the screen time to repaint, etc
 (re-frame/reg-event-db
  ::dispatch-auto-queries
  (fn [db [_]]
@@ -8285,18 +8287,17 @@
                                      (for [vv (vals scheds)]
                                        {vv (vec (for [[k v] scheds
                                                       :when (= v vv)] k))})))
-         ;scheds-reverse {10 [:ufo-sightings-drag-country-415]}
          ticktock (get-in db [:re-pollsive.core/polling :counter])]
 
-     (dorun (doseq [[timer queries] scheds-reverse
-                    :when (>= ticktock timer)]
-              (doseq [query queries]
-                (dorun (let []
-                         ;(tap> [:running-sched :tick ticktock :timer timer query])
-                         (ut/tracked-dispatch [::remove-schedule query])
-                         (ut/tracked-dispatch [::conn/clear-query-history query]))))))
-
-     ;(tap> [:scheds-cron-debug :tick ticktock scheds scheds-reverse])
+     (letfn [(process-query [query]
+               (go
+                 (ut/tracked-dispatch [::remove-schedule query])
+                 (ut/tracked-dispatch [::conn/clear-query-history query])
+                 (<! (async/timeout 1000))))]
+       (dorun (doseq [[timer queries] scheds-reverse
+                      :when (>= ticktock timer)]
+                (doseq [query queries]
+                  (process-query query)))))
      db)))
 
 (re-frame/reg-event-db
@@ -9784,7 +9785,7 @@
                                  {k (if (= source :input)
                                       value
                                       (let [;;vv @(ut/tracked-subscribe [::rs-value flow-id k])
-                                            vv @(rfa/sub ::rs-value {:flow-id flow-id :key k})
+                                            vv @(rfa/sub ::rs-value {:flow-id flow-id :kkey k})
                                             ] ;;; dupe from buffy
                                         (if (and (vector? vv) (every? string? vv))
                                           (cstr/join "\n" vv) vv)))}))]

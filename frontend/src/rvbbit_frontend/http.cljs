@@ -28,8 +28,8 @@
 ;                     {:db          (assoc-in db path command)
 ;                      ::ws-message {:socket-id socket-id :message payload}})))
 
-(defn subscription [x]
-  {:message    {:kind :server-push2
+(defn subscription [x sub-name]
+  {:message    {:kind sub-name ;; :server-push2
                 :client-name x
                 :ui-keypath [:server]
                 :extras {:hello? true}}
@@ -43,7 +43,10 @@
 (re-frame/reg-sub
  ::open-subscriptions
  (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
-   (vals (get-in db [::sockets socket-id :subscriptions]))))
+   ;(vals 
+   (get-in db [::sockets socket-id :subscriptions])
+   ; )
+   ))
 
 ;; (defn options [x]
 ;;   {:url    "ws://localhost:3030/ws"
@@ -61,8 +64,31 @@
     (tap> [:http-ws-connect-url! url])
     {:url    url
      :format :edn ;;:transit-json
-     :on-disconnect [::wfx/unsubscribe socket-id :server-push2]
-     :on-connect [::wfx/subscribe socket-id :server-push2 (subscription x)]}))
+     :on-disconnect [::dispatch-unsubscriptions]
+     :on-connect [::dispatch-subscriptions x]}))
+
+(re-frame/reg-event-fx
+ ::dispatch-subscriptions
+ (fn [_ [_ x]]
+   {:dispatch-n [[::wfx/subscribe socket-id :server-push2 (subscription x :server-push2)]
+                 [::wfx/subscribe socket-id :server-push3 (subscription x :server-push3)]
+                 [::wfx/subscribe socket-id :server-push4 (subscription x :server-push4)]]}))
+
+(re-frame/reg-event-fx
+ ::dispatch-unsubscriptions
+ (fn [_ _]
+   {:dispatch-n [[::wfx/unsubscribe socket-id :server-push2]
+                 [::wfx/unsubscribe socket-id :server-push3]
+                 [::wfx/unsubscribe socket-id :server-push4]]}))
+
+
+;; (re-frame/reg-event-db
+;;  ::dispatch-subscriptions
+;;  (fn [db [_ x]]
+;;    (ut/tracked-dispatch [::wfx/subscribe socket-id :server-push2 (subscription x :server-push2)])
+;;    (ut/tracked-dispatch [::wfx/subscribe socket-id :server-push3 (subscription x :server-push3)])
+;;    (ut/tracked-dispatch [::wfx/subscribe socket-id :server-push4 (subscription x :server-push4)])
+;;    db))
 
 (def server-http-port 8888)
 (def url-base (str (cstr/join ":" (drop-last (cstr/split (.. js/document -location -href) #":"))) ":" server-http-port)) ;; no trailing slash
@@ -172,12 +198,12 @@
    ;(tap> [:ran-condi])
    (let [client-name (get db :client-name)]
      (ut/tracked-dispatch [::wfx/request :default
-                         {:message    {:kind :sub-to-flow-value
-                                       :flow-key key
-                                       :client-name client-name}
-                          :on-response [::value-response-flow]
-                          :on-timeout  [::timeout-response :get-flow-value key]
-                          :timeout    15000000}]))
+                           {:message    {:kind :sub-to-flow-value
+                                         :flow-key key
+                                         :client-name client-name}
+                            :on-response [::value-response-flow]
+                            :on-timeout  [::timeout-response :get-flow-value key]
+                            :timeout    15000000}]))
    db))
 
 (re-frame/reg-event-db
@@ -186,12 +212,12 @@
    ;(tap> [:ran-condi])
    (let [client-name (get db :client-name)]
      (ut/tracked-dispatch [::wfx/request :default
-                         {:message    {:kind :unsub-to-flow-value
-                                       :flow-key key
-                                       :client-name client-name}
+                           {:message    {:kind :unsub-to-flow-value
+                                         :flow-key key
+                                         :client-name client-name}
                           ;:on-response [::value-response-flow]
                           ;:on-timeout  [::timeout-response :get-flow-value key]
-                          :timeout    15000000}]))
+                            :timeout    15000000}]))
    db))
 
 
@@ -248,13 +274,13 @@
    (when  (not (empty? (keys (get db :runstreams))))
      (doseq [flow-id (keys (get db :runstreams))]
        (ut/tracked-dispatch [::wfx/request :default
-                           {:message    {:kind :get-flow-open-ports
-                                         :flow-id flow-id
-                                         :flowmap flow-id
-                                         :client-name (get db :client-name)}
-                            :on-response [::runstream-item]
+                             {:message    {:kind :get-flow-open-ports
+                                           :flow-id flow-id
+                                           :flowmap flow-id
+                                           :client-name (get db :client-name)}
+                              :on-response [::runstream-item]
                         ;:on-timeout [::http/timeout-response]
-                            :timeout    500000}])))
+                              :timeout    500000}])))
    db))
 
 (re-frame/reg-event-db
@@ -285,7 +311,7 @@
    (get db :flow-results {})))
 
 (re-frame/reg-sub
- ::flows 
+ ::flows
  (fn [db _]
    (get db :flows {})))
 
@@ -384,22 +410,22 @@
         ;;            ) 
         ;;    (tap> [:heartbeat! client-name task-id result]))
          (ut/tracked-dispatch [::wfx/request :default
-                             {:message    {:kind :ack
-                                           :memory (let [mem (when (exists? js/window.performance.memory)
-                                                               [(.-totalJSHeapSize js/window.performance.memory)
-                                                                (.-usedJSHeapSize js/window.performance.memory)
-                                                                (.-jsHeapSizeLimit js/window.performance.memory)])
-                                                         mem-row {:mem_time (str (.toISOString (js/Date.)))
-                                                                  :mem_total (first mem)
-                                                                  :packets @packets-received
-                                                                  :mem_used (second mem)
-                                                                  :client-name (str client-name)
-                                                                  :mem_limit (last mem)}]
-                                                     mem-row)
-                                           :flow-subs (get db :flow-subs)
+                               {:message    {:kind :ack
+                                             :memory (let [mem (when (exists? js/window.performance.memory)
+                                                                 [(.-totalJSHeapSize js/window.performance.memory)
+                                                                  (.-usedJSHeapSize js/window.performance.memory)
+                                                                  (.-jsHeapSizeLimit js/window.performance.memory)])
+                                                           mem-row {:mem_time (str (.toISOString (js/Date.)))
+                                                                    :mem_total (first mem)
+                                                                    :packets @packets-received
+                                                                    :mem_used (second mem)
+                                                                    :client-name (str client-name)
+                                                                    :mem_limit (last mem)}]
+                                                       mem-row)
+                                             :flow-subs (get db :flow-subs)
                                            ;;:memory (get-in db [:data :memory])
-                                           :client-name (get db :client-name)}
-                              :timeout    50000}]))
+                                             :client-name (get db :client-name)}
+                                :timeout    50000}]))
 
      ;(assoc-in db [:post-meta ui-keypath field name] new-map)
      ;(ut/dissoc-in db [:query-history])
@@ -686,7 +712,7 @@
  (fn [db [_  result]]
    (let [ui-keypath (get result :ui-keypath)]
      ;(-> db
-     
+
      (assoc-in db ;(conj
                (vec (cons :post-condi ui-keypath))
                        ;     panel-key)
@@ -705,10 +731,9 @@
          subs1 (vec (for [s subs] (get-in s [:message :kind])))
          datas (count (keys (get db :data)))
          panels (count (keys (get db :panels)))
-         pendings 
+         pendings
          ;;@(ut/tracked-subscribe [::wfx/pending-requests socket-id])
-         @(rfa/sub ::pending-requests {:socket-id socket-id})
-         ]
+         @(rfa/sub ::pending-requests {:socket-id socket-id})]
      {;;:status @(ut/tracked-subscribe [::wfx/status socket-id])
       :status (get-in db [:websocket-fx.core/sockets socket-id :status]) ;;; trying to not sub-witin-a-sub
       :waiting (count pendings)
@@ -1224,11 +1249,11 @@
  (fn [{:keys [db]} [_ run-id start-ts]]
    (let [url (str url-base "/load-flow-history")
          method :get
-         request (merge 
+         request (merge
                   {:run-id run-id
-                  :start-ts start-ts}
-                  (when (nil? start-ts) 
-                    {:runner? true}))] 
+                   :start-ts start-ts}
+                  (when (nil? start-ts)
+                    {:runner? true}))]
      ;(tap> [:req request])
      {:db   (assoc-in db [:http-reqs :load-flow-history]
                       {:status "running"

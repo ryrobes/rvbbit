@@ -93,7 +93,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
   (client_name text NULL,
    op_name text NULL,
    status text NULL,
-   -- ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   -- ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
    ts TIMESTAMP DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')) 
    ) ;")
 
@@ -102,7 +102,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
   (db_conn text NULL,
    sql_stmt text NULL,
    error_str text NULL,
-   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
    ) ;")
 
 (def create-screens
@@ -111,7 +111,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    screen_name text NULL,
    blocks integer NULL,
    queries integer NULL,
-   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
    ) ;")
 
 (def create-blocks
@@ -126,7 +126,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    query_names text NULL, 
    block_data text NULL,
    tab_name text NULL,
-   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
    ) ;")
 
 (def create-boards
@@ -135,7 +135,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    screen_name text NULL,
    board_name text NULL,
    board_data text NULL,
-   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
    ) ;")
 
 (def create-tests
@@ -160,7 +160,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    test_val_string text NULL,
    test_val_integer integer NULL,
    test_val_float float NULL,
-   updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+   updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
    run_id integer NULL) ;")
 
 (def create-attributes
@@ -178,7 +178,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    derived_name text NULL,
    attribute_name text NULL,
    attribute_value boolean NULL,
-   updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+   updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
    run_id integer NULL
    -- primary key (connection_id, attribute_name)
    -- PK later when we figure out update semantics 
@@ -200,7 +200,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    shape_name text NULL, 
    axes_key text NULL,
    logic_map text NULL, 
-   updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+   updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
    run_id integer NULL
    -- primary key (connection_id, attribute_name)
    -- PK later when we figure out update semantics 
@@ -212,11 +212,11 @@ group by 1, 2) tt on s.client_name = tt.client_name
     user_name text NULL, 
     database_name text NULL, 
     database_version text NULL,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
     original_connection_str text NULL, 
     metadata_filter text NULL,
     run_id integer NULL,
-    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+    started_at TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
     ended_at TIMESTAMP NULL --,
     -- primary key (connection_id)
     ) ;")
@@ -236,7 +236,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    is_group_by boolean NULL,
    derived_calc text NULL, 
    derived_name text NULL,
-   updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+   updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
    run_id integer NULL --,
    -- primary key (db_type, connection_id, table_type, db_schema, db_catalog, table_name, field_name, derived_calc)
    ) ;")
@@ -339,7 +339,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     user_name text NULL, 
     product_name text NULL, 
     product_version text NULL,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
     run_id integer NULL) ;")
 
 (def create-viz "create table if not exists connections
@@ -348,7 +348,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     user_name text NULL, 
     product_name text NULL, 
     product_version text NULL,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL,
     run_id integer NULL) ;")
 
 ;; {:kp (str kp) :client_name (str client-name) :data (pr-str data) :panel-key (str (get kp 0)) :key (str (get kp 2)) :type (str (get kp 1))}
@@ -363,12 +363,12 @@ group by 1, 2) tt on s.client_name = tt.client_name
     panel_key text NULL, 
     key text NULL,
     type text NULL,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-board-history "create table if not exists board_history
    (client_name text NULL, 
     data text NULL, 
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-flow-functions "create table if not exists flow_functions
    (connection_id text NULL,
@@ -382,7 +382,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     icon text NULL,
     input_types text NULL,
     output_types text NULL,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-kits "create table if not exists kits
    (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -396,13 +396,13 @@ group by 1, 2) tt on s.client_name = tt.client_name
     item_data text NULL, 
     client_name text NULL,
     flow_id text NULL,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-flow-schedules "create table if not exists flow_schedules
    (schedule text NULL,
     flow_id text NULL,
     opts text NULL,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 ;; ^^^ query_hash, type, query_id, kit_name,   key,    idx,  edn_data
 ;; (no client-id so we can "reuse" persistent calls if wanted)
@@ -421,11 +421,12 @@ group by 1, 2) tt on s.client_name = tt.client_name
     server_subs integer NULL,     
     last_seen_seconds integer NULL,
     booted_ts integer NULL,
+    queue_distro text NULL,
     uptime_seconds integer NULL,
     uptime text NULL,
     messages_per_second integer NULL,
     recent_messages_per_second integer NULL,
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-jvm-stats "create table if not exists jvm_stats
    (used_memory_mb integer NULL, 
@@ -437,7 +438,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     internal_queries_run integer NULL,
     sniffs_run integer NULL,
     sys_load real NULL,
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-flows
   "create table if not exists flows
@@ -447,7 +448,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    connections integer NULL,
    last_modified text NULL,
    body text NULL,
-   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
    ) ;")
 
 (def create-flow-history
@@ -464,7 +465,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    elapsed_seconds real NULL,
    human_elapsed text NULL,
    overrides text NULL,
-   ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL
+   ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL
    ) ;")
 
 (def create-flow-results "create table if not exists flow_results
@@ -472,7 +473,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     block_key text NULL,
     block_value text NULL,                      
     data_type text NULL,
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-live-schedules "create table if not exists live_schedules
    (flow_id text NULL,
@@ -480,7 +481,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     schedule text NULL,
     channel text NULL,
     next_times text NULL,
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-channel-history "create table if not exists channel_history
    (flow_id text NULL,
@@ -496,7 +497,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     start number NULL,
     type text NULL,
     value text NULL,
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-fn-history "create table if not exists fn_history
    (flow_id text NULL,
@@ -517,7 +518,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     start number NULL,
     type text NULL,
     value text NULL,
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-client-items "create table if not exists client_items
    (item_key text NULL,
@@ -528,7 +529,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     sample text NULL,
     display_name text NULL,
     block_meta text NULL,
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (def create-client-memory "create table if not exists client_memory
    (mem_time text NULL,
@@ -538,9 +539,12 @@ group by 1, 2) tt on s.client_name = tt.client_name
     mem_used integer NULL,
     mem_used_mb text NULL, 
     mem_total integer NULL,
+    latency integer NULL,
+    client_subs integer NULL,
+    server_subs integer NULL,
     messages_per_second integer NULL,
     recent_messages_per_second integer NULL,
-    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL) ;")
+    ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
 (defn create-attribute-sample [sample-table-name-str rowset]
   ;; TODO should rewrite this in honeysql, just to be consistent...

@@ -1001,6 +1001,7 @@
            [(System/currentTimeMillis) (ut/get-current-timestamp)]
            (inc (get-in @ack-scoreboard [client-name key] 0)))))
 
+(declare client-statuses)
 
 (defmethod wl/handle-request :ack [{:keys [client-name memory flow-subs]}]
   ;(ut/pp [:thank-you-from client-name])
@@ -1008,7 +1009,11 @@
   (swap! client-latency assoc client-name
          (vec (conj (get @client-latency client-name [])
                     (try (- (System/currentTimeMillis) (get @ping-ts client-name)) (catch Exception _ -2)))))
-  (let [ins-sql {:insert-into [:client-memory] :values [(-> memory 
+  (let [cstats (client-statuses)
+        ins-sql {:insert-into [:client-memory] :values [(-> memory 
+                                                            (assoc :latency (get-in cstats [client-name :client-latency]))
+                                                            (assoc :server_subs (get-in cstats [client-name :server-subs]))
+                                                            (assoc :client_subs (get-in cstats [client-name :client-subs]))
                                                             (assoc :recent-messages-per-second (get-in @ack-scoreboard [client-name :recent-messages-per-second]))
                                                             (assoc :messages-per-second (get-in @ack-scoreboard [client-name :messages-per-second]))
                                                             (assoc :mem_used_mb (ut/bytes-to-mb (get memory :mem_used))))]}]
@@ -1028,23 +1033,27 @@
 
 
 (defonce client-queues (atom {}))
+(defonce client-queues-2 (atom {}))
+(defonce client-queues-3 (atom {}))
+(defonce client-queue-atoms [client-queues client-queues-2 client-queues-3 ])
+
+(defonce queue-distributions (atom {}))
 
 (defn new-client [client-name]
-  (let [new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
-    (ut/pp [:new-client-is-alive! client-name])
-    (swap! ack-scoreboard assoc-in [client-name :booted-ts] (System/currentTimeMillis))
-    (swap! client-queues assoc client-name new-queue-atom)))
+  (ut/pp [:new-client-is-alive! client-name :opening (count client-queue-atoms) :queues])
+  (swap! ack-scoreboard assoc-in [client-name :booted-ts] (System/currentTimeMillis))
+  (doseq [cq client-queue-atoms]
+   (let [new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
+    (swap! cq assoc client-name new-queue-atom))))
 
-;; ARGGGGHHHHHHHHHHHHH {inhale} ARGGGGHHHHHHHHHHHHH
-;; I fucking hate this, but it works pretty well. so fuck me, I guess?
-(defmethod wl/handle-subscription :server-push2 [{:keys [kind ui-keypath client-name] :as data}]
-  (when (not (get @client-queues client-name)) (new-client client-name)) ;; new? add to atom, create queue
+(defn sub-push-loop [client-name data cq sub-name]
+  (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
   (let [results (async/chan (async/sliding-buffer 100))] ;; was (async/sliding-buffer 450)
     (try
       (async/go-loop []
         (async/<! (async/timeout 70)) ;; was 70 ?
-        (if-let [queue-atom (get @client-queues client-name (atom clojure.lang.PersistentQueue/EMPTY))]
+        (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
           (let [item (ut/dequeue! queue-atom)]
             (if item
               (when (async/>! results item)
@@ -1052,14 +1061,27 @@
               (recur)))
           (recur)))
       (catch Throwable e
-        (ut/pp [:server-push2-subscription-err!! (str e) data])
+        (ut/pp [:subscription-err!! sub-name (str e) data])
         (async/go-loop [] (recur))))
     results))
+
+(defmethod wl/handle-subscription :server-push2 [{:keys [kind client-name] :as data}]
+  (sub-push-loop client-name data client-queues kind))
+
+(defmethod wl/handle-subscription :server-push3 [{:keys [kind client-name] :as data}]
+  (sub-push-loop client-name data client-queues-2 kind))
+
+(defmethod wl/handle-subscription :server-push4 [{:keys [kind client-name] :as data}]
+  (sub-push-loop client-name data client-queues-3 kind))
 
 (defn push-to-client [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
   (doall
    (try
-     (let [client-queue-atom (get @client-queues client-name)]
+     (let [rr (rand-int 3)
+           cq (get client-queue-atoms rr)
+           _ (swap! queue-distributions assoc client-name 
+                    (vec (conj (get @queue-distributions client-name []) rr)))
+           client-queue-atom (get @cq client-name)]
        (swap! queue-status assoc-in [client-name task-id ui-keypath] status)
        (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
        (if client-queue-atom
@@ -1589,6 +1611,7 @@
                                                   (get-in v [:last-ack 0] 0)) 1000))
                            never? (nil? (get-in v [:last-ack 0]))]
                        (-> v
+                           (assoc :queue-distro (frequencies (get @queue-distributions k)))
                            (assoc :queue-size (count @(get @client-queues k)))
                            (assoc :client-latency (ut/avg (get @client-latency k [])))
                            (assoc :server-subs (count (keys (get @atoms-and-watchers k))))
@@ -6063,11 +6086,14 @@
                                     _ (swap! ack-scoreboard assoc-in [k :uptime] uptime-str) ;; bad behavior all around, will refactor all this later. i just need to get to release 0 or this will never come out
                                     _ (swap! ack-scoreboard assoc-in [k :messages-per-second] msg-per-second) ;; ^^ this.
                                     _ (swap! ack-scoreboard assoc-in [k :recent-messages-per-second] recent-messages-per-second) ;; ^^ this.
+                                    queue-distro (get v :queue-distro)
                                     ]]
                           (merge {:client-name (str k)
                                   :uptime-seconds uptime-seconds
                                   :messages-per-second msg-per-second
-                                  :uptime uptime-str} v)))
+                                  :uptime uptime-str} 
+                                 (assoc v :queue-distro (pr-str queue-distro))
+                                 )))
           ;;_ (ut/pp [:cli-rows cli-rows])
           _ (doall
              (try

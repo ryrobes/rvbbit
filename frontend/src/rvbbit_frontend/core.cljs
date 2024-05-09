@@ -294,7 +294,10 @@
   (set! (.-title js/document) (str "Rabbit is dreaming..."))
   (ut/tracked-dispatch-sync [::events/initialize-db])
   (ut/tracked-dispatch [::bricks/set-client-name client-name])
-  (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options client-name)])
+  (ut/tracked-dispatch [::wfx/connect   http/socket-id (http/options client-name)])
+  ;; (ut/tracked-dispatch [::wfx/subscribe http/socket-id :server-push2 (http/subscription client-name :server-push2)])
+  ;; (ut/tracked-dispatch [::wfx/subscribe http/socket-id :server-push3 (http/subscription client-name :server-push3)])
+  ;; (ut/tracked-dispatch [::wfx/subscribe http/socket-id :server-push4 (http/subscription client-name :server-push4)])
   (ut/tracked-dispatch [::wfx/request :default
                       {:message    {:kind :get-settings
                                     :client-name client-name}
