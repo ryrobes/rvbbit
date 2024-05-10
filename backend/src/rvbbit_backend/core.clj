@@ -552,7 +552,7 @@
 
     (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too much?
 
-    (def purge (tt/every! 30 2 (bound-fn [] (wss/purge-dead-client-watchers))))
+    (def purge (tt/every! wss/jvm-stats-every 2 (bound-fn [] (wss/purge-dead-client-watchers))))
 
     (def timekeeper (tt/every! 1 3 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
 

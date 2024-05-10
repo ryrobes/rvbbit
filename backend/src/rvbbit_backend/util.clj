@@ -226,7 +226,9 @@
            (pp ["  " :freezing-atom file-path])
            (with-open [wtr (io/writer file-path)]
              (binding [*out* wtr]
-               (if (cstr/includes? (str file-path) "signals")
+               (if (or (cstr/includes? (str file-path) "signals.")
+                       (cstr/includes? (str file-path) "rules.")
+                       (cstr/includes? (str file-path) "solvers."))
                  (clojure.pprint/pprint @a)
                  (prn @a)))))
          @managed-atoms)))

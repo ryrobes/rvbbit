@@ -308,8 +308,17 @@
                       {:message    {:kind :signals-map
                                     :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                        :on-response [::signals/signals-map-response]
-                       ;;:on-timeout  [::timeout-response :get-signals]
                        :timeout    15000000}])
+  (ut/tracked-dispatch [::wfx/request :default
+                        {:message    {:kind :rules-map
+                                      :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                         :on-response [::signals/rules-map-response]
+                         :timeout    15000000}])
+  (ut/tracked-dispatch [::wfx/request :default
+                        {:message    {:kind :solvers-map
+                                      :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                         :on-response [::signals/solvers-map-response]
+                         :timeout    15000000}])
   (undo/undo-config!
    {:harvest-fn  (fn [ratom] (select-keys @ratom [:panels :signals-map :flows]))
     :reinstate-fn (fn [ratom value] (swap! ratom merge value))})

@@ -25,6 +25,11 @@
 (defonce subscription-counts (atom {}))
 (defonce simple-subscription-counts (atom []))
 
+(defn tracked-sub [sub-key sub-map] ;;; lmao - hack to track subscriptions for debugging
+  ;(swap! subscription-counts update query (fnil inc 0))
+  ;(swap! simple-subscription-counts conj (first query))
+  (rfa/sub sub-key sub-map))
+
 (defn tracked-subscribe [query] ;;; lmao - hack to track subscriptions for debugging
   ;(swap! subscription-counts update query (fnil inc 0))
   ;(swap! simple-subscription-counts conj (first query))
@@ -68,8 +73,8 @@
     (cstr/ends-with? (str (first query)) "connections/client-name")
     (rfa/sub :rvbbit-frontend.connections/client-name {})
 
-    (cstr/ends-with? (str (first query)) "signals/selected-signal")
-    (rfa/sub :rvbbit-frontend.signals/selected-signal {})
+    (cstr/ends-with? (str (first query)) "signals/selected-warren-item")
+    (rfa/sub :rvbbit-frontend.signals/selected-warren-item {})
 
     :else (re-frame.core/subscribe query)))
 
@@ -143,7 +148,8 @@
 ;;        (reverse)
 ;;        (take 20)))
 
-
+(defn drop-last-char [s]
+  (subs s 0 (dec (count s))))
 
 (defn sha-256 [s]
   (let [hash (goog.crypt.Sha256.)

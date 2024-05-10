@@ -100,11 +100,16 @@
 (def client-latency (atom {}))
 
 (def signals-atom (ut/thaw-atom {} "./defs/signals.edn"))
+(def rules-atom (ut/thaw-atom {} "./defs/rules.edn"))
+(def solvers-atom (ut/thaw-atom {} "./defs/solvers.edn"))
+
 (def time-atom (ut/thaw-atom {} "./data/atoms/time-atom.edn"))
 
 (def param-var-mapping (atom {}))
 (def param-var-crosswalk (atom {}))
 (def param-var-key-mapping (atom {}))
+
+(def jvm-stats-every 30)
 
 
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
@@ -1613,7 +1618,7 @@
                        (-> v
                            (assoc :queue-distro (frequencies (get @queue-distributions k)))
                            (assoc :queue-size (count @(get @client-queues k)))
-                           (assoc :client-latency (ut/avg (get @client-latency k [])))
+                           (assoc :client-latency (ut/avg (take-last 20 (get @client-latency k []))))
                            (assoc :server-subs (count (keys (get @atoms-and-watchers k))))
                            (assoc :last-seen-seconds (if never? -1 seconds-ago))
                            (dissoc :client-sub-list)
@@ -2736,6 +2741,16 @@
   (let [bm {}]
     @signals-atom))
 
+(defmethod wl/handle-request :rules-map [{:keys [client-name]}]
+  (ut/pp [:get-rules-map client-name])
+  (let [bm {}]
+    @rules-atom))
+
+(defmethod wl/handle-request :solvers-map [{:keys [client-name]}]
+  (ut/pp [:get-solvers-map client-name])
+  (let [bm {}]
+    @solvers-atom))
+
 (defonce client-helper-atom (atom {}))
 
 (defmethod wl/handle-request :signals-history [{:keys [client-name signal-name]}]
@@ -2743,26 +2758,38 @@
   (inc-score! client-name :push)
   (let [cc (get-in @signals-atom [signal-name :signal])
         ccw (vec (ut/where-dissect cc))
-        history (select-keys (get @last-signals-history-atom signal-name) ccw)
-        last-payload (get-in @client-helper-atom [client-name signal-name])
-        is-new? (not= last-payload history)]
+        history (select-keys (get @last-signals-history-atom signal-name {}) ccw)
+        ;last-payload (get-in @client-helper-atom [client-name signal-name])
+        ;is-new? (not= last-payload history)
+        ]
     ;(ut/pp [:signals-history signal-name ccw])
     ;(ut/pp [:hist-keys (keys @last-signals-history-atom)])
     ;; (into {} (for [[k hist] (select-keys @last-signals-history-atom ccw)]
     ;;   {k (vec (map first (take-last 10 (sort-by last hist))))}
     ;;   ))
-    (if is-new? 
-      (do 
-        (swap! client-helper-atom assoc-in [client-name signal-name] history)
-        history) 
-      :no-updates)
+    ;; (if is-new? 
+    ;;   (do 
+    ;;     (swap! client-helper-atom assoc-in [client-name signal-name] history)
+    ;;     history) 
+    ;;   :no-updates)
+    history
     )
   )
 
-(defmethod wl/handle-request :save-signals-map [{:keys [client-name signals-map]}]
+(defmethod wl/handle-request :save-signals-map [{:keys [client-name data-map]}]
   (ut/pp [:saving-signals-map client-name])
   (let [bm {}]
-    (reset! signals-atom signals-map)))
+    (reset! signals-atom data-map)))
+
+(defmethod wl/handle-request :save-rules-map [{:keys [client-name data-map]}]
+  (ut/pp [:saving-rules-map client-name])
+  (let [bm {}]
+    (reset! rules-atom data-map)))
+
+(defmethod wl/handle-request :save-solvers-map [{:keys [client-name data-map]}]
+  (ut/pp [:saving-solvers-map client-name])
+  (let [bm {}]
+    (reset! solvers-atom data-map)))
 
 (defmethod wl/handle-request :save-custom-flow-block [{:keys [client-name name block-map]}]
   (ut/pp [:saving-custom-flow-block client-name :for name])

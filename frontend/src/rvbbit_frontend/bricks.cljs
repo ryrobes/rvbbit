@@ -379,11 +379,11 @@
                                current-flow-open)))
          signals-mode?  (and (= (get @db/flow-editor-system-mode 0) "signals") (get db :flow?))
          signal-ui-refs (when signals-mode? (vec (for [ss (keys (get db :signals-map))] (keyword (str "signal/" (cstr/replace (str ss) ":" ""))))))
-         signal-ui-part-refs (when (and (get db :selected-signal) signals-mode?)
-                               (let [pps (ut/where-dissect (get-in db [:signals-map (get db :selected-signal) :signal]))]
+         signal-ui-part-refs (when (and (get db :selected-warren-item) signals-mode?)
+                               (let [pps (ut/where-dissect (get-in db [:signals-map (get db :selected-warren-item) :signal]))]
                                  (vec (for [pp pps]
                                         (keyword (str "signal/part-"
-                                                      (cstr/replace (str (get db :selected-signal)) ":" "") "-"
+                                                      (cstr/replace (str (get db :selected-warren-item)) ":" "") "-"
                                                       (.indexOf pps pp)))))))
          signal-subs (if signals-mode? (vec (into signal-ui-refs signal-ui-part-refs)) [])
          ;;_ (when (ut/ne? signal-subs) (tap> [:signal-subs  signal-subs]))

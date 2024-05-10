@@ -8,28 +8,28 @@
    [rvbbit-frontend.connections :as conn]
    [re-catch.core :as rc]
    [rvbbit-frontend.utility :as ut]
-   [rvbbit-frontend.buffy :as buffy]
-   [clojure.data :as cdata]
+   ;[rvbbit-frontend.buffy :as buffy]
+   ;[clojure.data :as cdata]
    ;[re-pressed.core :as rp]
-   [rvbbit-frontend.audio :as audio]
+   ;[rvbbit-frontend.audio :as audio]
    [cljs.tools.reader :refer [read-string]]
    ;[rvbbit-frontend.shapes2 :as shape2]
    ;[rvbbit-frontend.shapes :as scrubbers]
-   [garden.color :as c :refer [hex->hsl hsl->hex hsl hsla color? hex? invert mix
-                               complement shades triad tetrad split-complement
-                               analogous rgb->hsl rgb->hex]]
-   [talltale.core :as tales]
+  ;;  [garden.color :as c :refer [hex->hsl hsl->hex hsl hsla color? hex? invert mix
+  ;;                              complement shades triad tetrad split-complement
+  ;;                              analogous rgb->hsl rgb->hex]]
+  ;;  [talltale.core :as tales]
    [day8.re-frame.undo :as undo :refer [undoable]]
    [cljs.core.async :as async :refer [<! >! chan]]
    ;["react" :as react]
-   [rvbbit-frontend.resolver :as resolver]
+   ;[rvbbit-frontend.resolver :as resolver]
    [clojure.edn :as edn]
    [rvbbit-frontend.db :as db]
    [rvbbit-frontend.subs :as subs]
    [rvbbit-frontend.http :as http]
-   [goog.dom :as gdom]
+   ;[goog.dom :as gdom]
    [rvbbit-frontend.bricks :as bricks :refer [theme-pull]]
-   [goog.events :as gevents]
+   ;[goog.events :as gevents]
    [clojure.walk :as walk]
    [clojure.string :as cstr]
    [clojure.set :as cset]
@@ -43,14 +43,14 @@
    ["codemirror/mode/r/r.js"]
    ["codemirror/mode/julia/julia.js"]
    [rvbbit-frontend.connections :refer [sql-data]]
-   ["react-zoom-pan-pinch" :as zpan]
+   ;["react-zoom-pan-pinch" :as zpan]
    [websocket-fx.core :as wfx]
    ;[cljs.tools.reader :refer [read-string]]
    ;[oz.core :as oz]
    ;[reagent.dom :as rdom]
    ;[websocket-fx.core :as wfx]
-   [cljs-drag-n-drop.core :as dnd2]
-   [clojure.walk :as w])
+   ;[cljs-drag-n-drop.core :as dnd2]
+   )
   (:import [goog.events EventType]
            [goog.async Debouncer]))
 
@@ -59,22 +59,22 @@
  (undoable)
  (fn [db [_ content adding]]
    (tap> [:edit? content adding])
-   (let [curr (get-in db [:signals-map (get db :selected-signal) :signal])]
-     (assoc-in db [:signals-map (get db :selected-signal) :signal] 
+   (let [curr (get-in db [:signals-map (get db :selected-warren-item) :signal])]
+     (assoc-in db [:signals-map (get db :selected-warren-item) :signal] 
                (walk/postwalk-replace
                 {content
                  (vec (conj content (if (vector? adding) adding [adding])))
                                        ;(vec (cons adding content))
                                        ;[adding content]
-                 }curr)))))
+                 } curr)))))
 
 (re-frame/reg-event-db
  ::edit-signal-drop-kill
  (undoable)
  (fn [db [_ content]]
-   (let [curr (get-in db [:signals-map (get db :selected-signal) :signal])]
+   (let [curr (get-in db [:signals-map (get db :selected-warren-item) :signal])]
      (tap> [:kill-nested? content :from curr])
-     (assoc-in db [:signals-map (get db :selected-signal) :signal]
+     (assoc-in db [:signals-map (get db :selected-warren-item) :signal]
                (ut/remove-subvec curr content)))))
 
 (re-frame/reg-event-db
@@ -82,8 +82,8 @@
  (undoable)
  (fn [db [_ content adding]]
    (tap> [:edit2? content adding])
-   (let [curr (get-in db [:signals-map (get db :selected-signal) :signal])]
-     (assoc-in db [:signals-map (get db :selected-signal) :signal]
+   (let [curr (get-in db [:signals-map (get db :selected-warren-item) :signal])]
+     (assoc-in db [:signals-map (get db :selected-warren-item) :signal]
                (walk/postwalk-replace
                 {content (vec (conj content adding))} curr)))))
 
@@ -134,8 +134,8 @@
 
 (defn is-true? [coll full-coll] 
   (let [idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
-        selected-signal @(ut/tracked-subscribe [::selected-signal])
-        sigkw (keyword (str "signal/part-" (cstr/replace (str selected-signal) ":" "") "-" idx))
+        selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
+        sigkw (keyword (str "signal/part-" (cstr/replace (str selected-warren-item) ":" "") "-" idx))
         vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
         ;;vv (if (nil? vv) "err!" vv)
         ] vv))
@@ -146,8 +146,8 @@
 (defn hover-tools [coll full-coll]
   (let [hovered? (= @hover-tools-atom coll)
         idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
-        selected-signal @(ut/tracked-subscribe [::selected-signal])
-        sigkw (keyword (str "signal/part-" (cstr/replace (str selected-signal) ":" "") "-" idx))
+        selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
+        sigkw (keyword (str "signal/part-" (cstr/replace (str selected-warren-item) ":" "") "-" idx))
         vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
         vv (if (nil? vv) "err!" vv)]
     ;(tap> [:coll-hover coll])
@@ -308,7 +308,7 @@
 
 (declare highlight-code)
 
-(defn code-box [width-int height-int value]
+(defn code-box [width-int height-int value ttype]
   (let [] ;;[react! [@cm-instance @markers]]
     ;(tap> [:width-int width-int]) ;; 634.4 
     [re-com/box
@@ -345,8 +345,13 @@
                                 (do (reset! db/bad-form-signals? true)
                                     (reset! db/bad-form-msg-signals "Needs to be a vector / honey-sql where clause format"))
  
-                                :else (do (reset! db/bad-form-signals? false)
-                                          (ut/tracked-dispatch [::edit-signal parse]))))
+                                :else (if (= ttype :signal)
+                                       (do (reset! db/bad-form-signals? false)
+                                          (ut/tracked-dispatch [::edit-signal parse]))
+                                        
+                                        (do (reset! db/bad-form-signals? false)
+                                            (ut/tracked-dispatch [::edit-basic parse ttype])))
+                                ))
               :options {:mode              "clojure"
                         ;:lineWrapping      true
                         :lineNumbers       false ;true
@@ -403,10 +408,20 @@
  (fn [db _]
    (get db :signals-map {})))
 
+(re-frame/reg-sub
+ ::solvers-map
+ (fn [db _]
+   (get db :solvers-map {})))
+
+(re-frame/reg-sub
+ ::rules-map
+ (fn [db _]
+   (get db :rules-map {})))
+
 (re-frame/reg-event-db
  ::select-signal
  (fn [db [_ signal-name]]
-   (assoc db :selected-signal signal-name)))
+   (assoc db :selected-warren-item signal-name)))
 
 (re-frame/reg-sub
  ::operators
@@ -431,34 +446,43 @@
             ])))
 
 (re-frame/reg-sub
- ::selected-signal
+ ::selected-warren-item
  (fn [db _]
-   (get db :selected-signal)))
+   (get db :selected-warren-item)))
 
 (re-frame/reg-event-db
  ::edit-signal
  (undoable)
  (fn [db [_ signal]]
-   (assoc-in db [:signals-map (get db :selected-signal) :signal] signal)))
+   (assoc-in db [:signals-map (get db :selected-warren-item) :signal] signal)))
+
+(re-frame/reg-event-db
+ ::edit-basic
+ (undoable)
+ (fn [db [_ parsed ttype]] 
+   (let [sver (fn [x] (cstr/replace (str x) ":" ""))
+         item-type-str (sver ttype)
+         item-type-key (keyword (str item-type-str "s-map"))]
+     (assoc-in db [item-type-key (get db :selected-warren-item)] parsed))))
 
 (re-frame/reg-event-db
  ::delete-signal
  (undoable)
- (fn [db [_ signal-name]]
+ (fn [db [_ signal-name item-type]]
    (-> db
        (ut/dissoc-in [:signals-map signal-name])
-       (assoc :selected-signal nil))))
+       (assoc :selected-warren-item nil))))
 
 (re-frame/reg-event-db
  ::add-signal
  (undoable)
- (fn [db [_]]
+ (fn [db [_ item-type]]
    (let [rr (keyword (ut/gen-signal-name))
          signal-name (ut/safe-key rr (vec (keys (get db :signals-map {}))))]
      (tap> [:add-signal? signal-name])
      (-> db
          (assoc-in [:signals-map signal-name :signal] [:and [:= :day 1] [:= :hour 9]])
-         (assoc :selected-signal signal-name)))))
+         (assoc :selected-warren-item signal-name)))))
 
 (defn code-box-smol [width-int height-int value & [syntax]]
   [re-com/box
@@ -485,27 +509,39 @@
                       :theme             (theme-pull :theme/codemirror-theme nil)}}]]) ;"ayu-mirage" ;"hopscotch"
 
 
-(defn signals-list [ph signals selected-signal]
+(defn items-list [ph signals selected-warren-item warren-type-string]
   (let [;signals @(ut/tracked-subscribe [::signals-map])
-        ;selected-signal @(ut/tracked-subscribe [::selected-signal])
+        ;selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
+        warren-item-type @(ut/tracked-sub ::warren-item-type {})
+        ssr (cstr/replace (str @(ut/tracked-sub ::warren-item-type {})) ":" "")
+        selected-type (str ssr "s")
         results (into {} (for [[name _] signals]
                            (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
-                                 vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])]
-                             {name vv})))]
+                                 vv (if (= warren-type-string :signals)
+                                      @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
+                                      "")]
+                             {name vv})))
+        ;; warren-type-string-label (if (cstr/ends-with? warren-type-string "s")
+        ;;                            (ut/drop-last-char warren-type-string)
+        ;;                            warren-type-string)
+        ]
+    ;;(tap> [:warren selected-type warren-type-string])
     [re-com/v-box
      :children
      [[re-com/h-box
        :height "30px" :padding "6px"
        :align :center :justify :between
+       :style {:font-size "12px"}
        :children [[re-com/box
                    :style {:cursor "pointer"}
-                   :attr {:on-click #(ut/tracked-dispatch [::add-signal "new signal"])}
-                   :child "+ new signal"]
-                  (if selected-signal
+                   :attr {:on-click #(ut/tracked-dispatch [::add-signal warren-type-string])}
+                   :child (str "+ new " warren-type-string)]
+                  (if (and selected-warren-item
+                           (= warren-type-string selected-type))
                     [re-com/box
                      :style {:cursor "pointer"}
-                     :attr {:on-click #(ut/tracked-dispatch [::delete-signal selected-signal])}
-                     :child (str "- delete this signal?")]
+                     :attr {:on-click #(ut/tracked-dispatch [::delete-signal selected-warren-item warren-item-type])}
+                     :child (str "- delete this " warren-type-string "?")]
                     [re-com/gap :size "5px"])]]
       [re-com/v-box
        :padding "6px"
@@ -515,7 +551,7 @@
        :size "none"
        ;:height (px (- ph 94))
        :children (for [[name {:keys [signal]}] signals
-                       :let [selected? (= name selected-signal)
+                       :let [selected? (= name selected-warren-item)
                              sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
                              vv (get results name)]]
                    
@@ -543,7 +579,7 @@
                                  ;:height "25px"
 
                                  :children [[re-com/box 
-                                             :style {:font-size "16px"
+                                             :style {:font-size "15px"
                                                      ;:border "1px solid yellow"
                                                      :font-weight 700}
                                              ;:width "200px"
@@ -554,7 +590,7 @@
                                              :align :center :justify :center
                                              :child (str (if (nil? vv) "err!" vv))
                                              :style {:font-weight 700
-                                                     :font-size "17px"
+                                                     :font-size "15px"
                                                      :opacity (if (true? vv) 1.0 0.2)}]]]
                                 ;; (when true ;;(not selected?)
                                 ;;   [re-com/box
@@ -587,7 +623,9 @@
                    style)
      :children [[re-com/h-box
                  :height "28px"
-                 :style {:cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}
+                 :style {:cursor "pointer" 
+                         :user-select "none"
+                         :color (theme-pull :theme/editor-outer-rim-color nil)}
                  :justify :between :align :center
                  :attr {:on-click #(if open?
                                      (reset! selectors-open (remove (fn [x] (= x name)) @selectors-open))
@@ -608,22 +646,22 @@
                                      :color (theme-pull :theme/editor-outer-rim-color nil)
                                      :font-size "14px"}]]]
                 (when open?
-                  (if (= name "signals")
+                  
+                  (if (or (= name "solvers") (= name "rules") (= name "signals"))
 
                     (let [;signals @(ut/tracked-subscribe [::signals-map]) ;; they get passed from the filter col
-                          selected-signal @(ut/tracked-subscribe [::selected-signal])
-                          ;signal-vec (get-in signals [selected-signal :signal])
+                          selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
+                          ;signal-vec (get-in signals [selected-warren-item :signal])
                           ph 200]
-                      [signals-list (if selected-signal
-                                    (* ph 0.3)
-                                    ph) items selected-signal])
-                    
+
+                      [items-list (if selected-warren-item (* ph 0.3) ph) items selected-warren-item name])
+
                     (if partition?
                       [re-com/v-box
                        :style {:margin-top "6px"}
                        :children (for [seg (partition-all wide? items)]
                                    [re-com/h-box ;;:size "auto"
-                                    :align :center :justify :center 
+                                    :align :center :justify :center
                                     :children (for [item seg
                                                     :let [pw (* (- (last @db/flow-editor-system-mode) 70) 0.35)
                                                           width (- (/ pw wide?) 10)]]
@@ -650,26 +688,26 @@
 (re-frame/reg-sub
  ::signal-flow-id
  (fn [db _]
-   (get-in db [:signals-map (get db :selected-signal) :flow-id])))
+   (get-in db [:signals-map (get db :selected-warren-item) :flow-id])))
 
 (re-frame/reg-sub
  ::signal-open-inputs
  (fn [db _]
-   (get-in db [:signals-map (get db :selected-signal) :open-inputs])))
+   (get-in db [:signals-map (get db :selected-warren-item) :open-inputs])))
 
 (re-frame/reg-event-db
  ::edit-signal-flow-id
  (undoable)
  (fn [db [_ flow-id]]
-   (assoc-in db [:signals-map (get db :selected-signal) :flow-id] flow-id)))
+   (assoc-in db [:signals-map (get db :selected-warren-item) :flow-id] flow-id)))
 
 (re-frame/reg-event-db
  ::open-blocks
  ;;(undoable)
  (fn [db [_ result]]
    (-> db
-       (assoc-in [:signals-map (get db :selected-signal) :open-inputs] (get result :open-inputs))
-       (assoc-in [:signals-map (get db :selected-signal) :blocks] (get result :blocks)))))
+       (assoc-in [:signals-map (get db :selected-warren-item) :open-inputs] (get result :open-inputs))
+       (assoc-in [:signals-map (get db :selected-warren-item) :blocks] (get result :blocks)))))
 
 ;; (re-frame/reg-event-db
 ;;  ::refresh-open-blocks
@@ -708,9 +746,9 @@
         open-inputs @(ut/tracked-subscribe [::signal-open-inputs])
         react! [@mode-atom]
         ;signals @(ut/tracked-subscribe [::signals-map])
-        ;selected-signal @(ut/tracked-subscribe [::selected-signal])
-        ;signal-vec (get-in signals [selected-signal :signal])
-        ;flow-id (get-in signals [selected-signal :flow-id])
+        ;selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
+        ;signal-vec (get-in signals [selected-warren-item :signal])
+        ;flow-id (get-in signals [selected-warren-item :flow-id])
         ww (* (- (last @db/flow-editor-system-mode) 14) 0.318)
         fid @(ut/tracked-subscribe [::signal-flow-id])
         ]
@@ -821,12 +859,17 @@
 (defonce searcher-atom (reagent/atom nil))
 
 (defn left-col [ph]
-  (let [operators @(ut/tracked-subscribe [::operators])
-        conditions @(ut/tracked-subscribe [::conditions])
-        time-items @(ut/tracked-subscribe [::time-items])
-        signals @(ut/tracked-subscribe [::signals-map])
-        selected-signal @(ut/tracked-subscribe [::selected-signal])
-        signal-vec (get-in signals [selected-signal :signal])
+  (let [operators @(ut/tracked-sub ::operators {})
+        conditions @(ut/tracked-sub ::conditions {})
+        time-items @(ut/tracked-sub ::time-items {})
+
+        signals @(ut/tracked-sub ::signals-map {})
+        solvers @(ut/tracked-sub ::solvers-map {})
+        rules @(ut/tracked-sub ::rules-map {})
+
+        selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
+
+        signal-vec (get-in signals [selected-warren-item :signal])
         react! [@selectors-open]
         filter-results (fn [x y]
                          (if (or (nil? x) (empty? x))
@@ -844,7 +887,7 @@
      :gap "6px"
      :width "35%"
      :children
-     [;(when selected-signal
+     [;(when selected-warren-item
       ;  [flow-box (- flow-box-hh 10)])
       [re-com/h-box
        :padding "6px"
@@ -879,7 +922,7 @@
        :padding "6px"
        ;:width "35%"
        :height (px (- ph 100 ;; 50
-                      ;(if selected-signal (+ flow-box-hh 50) 50)
+                      ;(if selected-warren-item (+ flow-box-hh 50) 50)
                       ))
        :style {;:border "1px solid yellow"
                :overflow "auto"}
@@ -901,8 +944,8 @@
                   [re-com/gap :size "20px"]
 
                   [selector-panel "signals" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
-                  [selector-panel "rules" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
-                  [selector-panel "solvers" (filter-results @searcher-atom signals) "zmdi-flash" {} 5]
+                  [selector-panel "rules" (filter-results @searcher-atom rules) "zmdi-flash" {} 5]
+                  [selector-panel "solvers" (filter-results @searcher-atom solvers) "zmdi-flash" {} 5]
 
                   [re-com/gap :size "10px"]
 
@@ -913,11 +956,13 @@
                                [re-com/v-box 
                                 :padding "4px"
                                 :style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 55) 
-                                        :font-size "16px"
+                                        :font-size "14px"
                                         :color (theme-pull :theme/editor-outer-rim-color nil)
                                         :border-radius "4px"}
-                                :size "auto" :height "60px"
-                                :align :center ;:justify :center
+                                :size "auto" 
+                                :height "50px"
+                                :align :center 
+                                :justify :center
                                 :children [[re-com/box :child (str "+ new " e )]
                                            [re-com/box :child (str "group")]]])]
                   
@@ -927,20 +972,33 @@
 
 
 (re-frame/reg-event-db
- ::rename-signal
+ ::rename-item
  (undoable)
- (fn [db [_ old new]]
-   ;(assoc db :signals-map (cset/rename-keys {old new} (get db :signals-map {})))
+ (fn [db [_ old new item-type]]
    (let [sver (fn [x] (cstr/replace (str x) ":" ""))
-         refs {(keyword (str "signal/" (sver old)))
-               (keyword (str "signal/" (sver new)))}]
+         item-type-str (sver item-type)
+         item-type-key (keyword (str item-type-str "s-map"))
+         
+         refs {(keyword (str item-type-str "/" (sver old)))
+               (keyword (str item-type-str "/" (sver new)))}
+         ;;old-item (get-in db [item-type-key old])
+         ]
+     
+     (tap> [:rename-item! old new item-type item-type-str item-type-key refs])
+
      (-> db
-         (assoc :signals-map (walk/postwalk-replace (merge {old new} refs) (get db :signals-map {})))
-         (assoc :selected-signal new)))))
+
+         (assoc :signals-map  (walk/postwalk-replace (if (= item-type-key :signals-map) (merge {old new} refs) refs) (get db :signals-map {}))) ;; change all fqns refs
+         (assoc :rules-map    (walk/postwalk-replace (if (= item-type-key :rules-map) (merge {old new} refs) refs) (get db :rules-map {})))
+         (assoc :solvers-map  (walk/postwalk-replace (if (= item-type-key :solvers-map) (merge {old new} refs) refs) (get db :solvers-map {})))
+
+         (assoc :selected-warren-item new))))) ;; set as selected item
+
+
 
 (defonce title-edit-idx (reagent/atom nil))
 
-(defn edit-signal-name [signal-name w]
+(defn edit-item-name [item-name item-type w]
   (let [;read-only-flow? (true? (cstr/includes? flow-id "/"))
         ;flow-id-regex #"^[a-zA-Z0-9_-]+$"  ;; alpha, underscores, hypens, numbers
         flow-id-regex #"^[a-zA-Z0-9_?\-]+$"  ;; alpha, underscores, hypens, numbers, question marks
@@ -952,23 +1010,24 @@
        :width (px w)
        :align :center
        :justify :start
-       :attr {:on-double-click #(reset! title-edit-idx (str signal-name))}
+       :attr {:on-double-click #(reset! title-edit-idx (str item-name))}
        :style {:cursor "pointer"
                :padding-right "12px"
                :padding-top "1px"
                :border "2px solid transparent"
                ;:border "2px solid yellow"
                :font-size "26px"}
-       :child (str signal-name)]
+       :child (str item-name)]
       [re-com/input-text
        :src (at)
-       :model             (cstr/replace (str signal-name) ":" "")
+       :model             (cstr/replace (str item-name) ":" "")
        :width             (px (- w 6))
        :height            "45px"
-       :on-change         #(do (ut/tracked-dispatch [::rename-signal signal-name
-                                                   (try
-                                                     (keyword (str %))
-                                                     (catch :default _ (str %)))])
+       :on-change         #(do (ut/tracked-dispatch
+                                [::rename-item
+                                 item-name
+                                 (try (keyword (str %)) (catch :default _ (str %)))
+                                 item-type])
                                (reset! title-edit-idx nil))
        :validation-regex  flow-id-regex
        :change-on-blur?   true
@@ -987,7 +1046,7 @@
    (ut/tracked-dispatch
     [::wfx/request :default
      {:message    {:kind :signals-history
-                   :signal-name (get db :selected-signal)
+                   :signal-name (get db :selected-warren-item)
                    :client-name @(ut/tracked-subscribe [::bricks/client-name])}
       :on-response [::signals-history-response]
       :timeout    15000000}])
@@ -996,9 +1055,24 @@
 (re-frame/reg-sub
  ::run-signals-history?
  (fn [db _]
-   (and (get db :flow?) 
-        (not (nil? (get db :selected-signal)))
-        (= (get @db/flow-editor-system-mode 0) "signals"))))
+   (let [signals (vec (keys (get db :signals-map)))
+         sel (get db :selected-warren-item)]
+     (and (get db :flow?)
+          (not (nil? sel))
+          (some #(= sel %) signals)
+          (= (get @db/flow-editor-system-mode 0) "signals")))))
+
+(re-frame/reg-sub
+ ::warren-item-type
+ (fn [db _]
+   (let [name (get db :selected-warren-item)
+         signals (keys (get db :signals-map))
+         rules (keys (get db :rules-map))
+         solvers (keys (get db :solvers-map))]
+     (cond (some #(= name %) signals) :signal
+           (some #(= name %) rules) :rule
+           (some #(= name %) solvers) :solver
+           :else :unknown))))
 
 (defn history-mouse-enter [e]
   (reset! hover-tools-atom e))
@@ -1014,20 +1088,39 @@
 
 
 (defn right-col [ph]
-  (let [signals @(ut/tracked-subscribe [::signals-map])
-        selected-signal @(ut/tracked-subscribe [::selected-signal])
-        signal-vec (get-in signals [selected-signal :signal])
+  (let [signals @(ut/tracked-sub ::signals-map {})
+        selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
+        warren-item-type @(ut/tracked-sub ::warren-item-type {})
+
+        sver (fn [x] (cstr/replace (str x) ":" ""))
+        item-type-str (sver warren-item-type)
+        item-type-key (keyword (str item-type-str "s-map"))
+
+        signal? (true? (= warren-item-type :signal))
+
+        signal-vec (get-in signals [selected-warren-item :signal])
         signal-vec-parts (vec (ut/where-dissect signal-vec))
-        signals-history (select-keys 
-                         ;;@(ut/tracked-subscribe [::signals-history])
-                         @(rfa/sub ::signals-history {})
-                         signal-vec-parts) ;; sometimes we get weird other items if we change fast
-        
-        results (into {} (for [idx (range (count signal-vec-parts))]
-                           (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
-                                 name (get signal-vec-parts idx)
-                                 vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])]
-                             {name vv})))] 
+
+        warren-item-type @(ut/tracked-sub ::warren-item-type {})
+        ;; signals-history (select-keys 
+        ;;                  ;;@(ut/tracked-subscribe [::signals-history])
+        ;;                  @(rfa/sub ::signals-history {})
+        ;;                  signal-vec-parts) ;; sometimes we get weird other items if we change fast
+
+        signals-history (when signal? @(rfa/sub ::signals-history {}))
+
+        other (cond (= warren-item-type :solver) (get @(ut/tracked-sub ::solvers-map {}) selected-warren-item)
+                    (= warren-item-type :rule) (get @(ut/tracked-sub ::rules-map {}) selected-warren-item)
+                    :else {})
+
+        results (if signal?
+                  (into {} (for [idx (range (count signal-vec-parts))]
+                             (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
+                                   name (get signal-vec-parts idx)
+                                   vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])]
+                               {name vv})))
+                  {})]
+
         ;; ^^^ this is a weird hack we need to revisit - by invoking the param-keys we are summoning them from the server to be read and reactive
         ;; even though it is dereffed in a "safe" place...
     
@@ -1036,16 +1129,16 @@
     ;; (ut/tracked-dispatch
     ;;  [::wfx/request :default
     ;;   {:message    {:kind :signals-history
-    ;;                 :signal-name selected-signal
+    ;;                 :signal-name selected-warren-item
     ;;                 :client-name @(ut/tracked-subscribe [::bricks/client-name])}
     ;;    :on-response [::signals-history-response]
     ;;    :timeout    15000000}])
     
 
-    ;; (tap> [:right-col ph signals selected-signal signal-vec @db/flow-editor-system-mode])
+    ;; (tap> [:right-col ph signals selected-warren-item signal-vec @db/flow-editor-system-mode])
     [re-com/v-box
      :width "65%"
-     :children [(when selected-signal
+     :children [(when selected-warren-item
                   [re-com/v-box
                    :style {;:font-family   (theme-pull :theme/monospaced-font nil)
                            ;:border "1px solid pink"
@@ -1057,16 +1150,19 @@
                       [re-com/h-box
                        :justify :between :align :center
                        :children
-                       [[edit-signal-name selected-signal (* ww 0.9)]
-                        [re-com/box 
-                         :align :center :justify :center
-                         :style {;:border "1px solid yellow"
-                                 :font-size "22px"
-                                 :font-weight 700}
-                         :height "100%"
-                         :width (px (* ww 0.1))
-                         :child (str @(ut/tracked-subscribe [::conn/clicked-parameter-key 
-                                                      [(keyword (str "signal/" (cstr/replace (str selected-signal) ":" "")))]]))]]])
+                       [[edit-item-name selected-warren-item warren-item-type (* ww 0.9)]
+                        (if signal?
+                          [re-com/box
+                           :align :center :justify :center
+                           :style {;:border "1px solid yellow"
+                                   :font-size "22px"
+                                   :font-weight 700}
+                           :height "100%"
+                           :width (px (* ww 0.1))
+                           :child (str @(ut/tracked-subscribe [::conn/clicked-parameter-key
+                                                               [(keyword (str "signal/" (cstr/replace (str selected-warren-item) ":" "")))]]))]
+                          [re-com/gap :size "10px"] ;; placeholder
+                          )]])
 
                     [re-com/box
                      :style {;:border "1px solid orange"
@@ -1076,7 +1172,11 @@
                      :child [code-box
                              (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
                              (- (* (* ph 0.7) 0.25) 5) ;; (* ph 0.25) 
-                             (str signal-vec)]]
+                             (if (not signal?) 
+                               (str other)
+                               (str signal-vec))
+                             warren-item-type
+                             ]]
 
                     [re-com/box
                      :height (px (- (* (* ph 0.7) 0.75) 50)) :size "none"
@@ -1095,23 +1195,24 @@
                               ;[re-com/box :child "yo"]
                               )]]])
                 
-                ;; [signals-list (if selected-signal
+                ;; [items-list (if selected-warren-item
                 ;;               (* ph 0.3)
-                ;;               ph) signals selected-signal]
+                ;;               ph) signals selected-warren-item]
 
                 [re-com/box
                  :padding "6px"
                  :align :center :justify :center
                  ;:style {:border "1px solid lime"}
                  :height (px (- (* ph 0.3) 48))
-                 :child (if (not (nil? selected-signal))
+                 :child (if (not (nil? selected-warren-item))
 
                           [re-com/v-box
                            :size "auto"
-                           :children (for [[e vv] (sort-by #(count (pr-str (last %))) signals-history)
+                           :children (for [[e vv] ;(sort-by #(count (pr-str (last %))) signals-history)
+                                                    signals-history
                                                     ;:let (for [[ee vvv] signals-history] [(count (str))])
                                            ]
-                                       ^{:key (str selected-signal "h-box")}
+                                       ^{:key (str selected-warren-item e vv "h-box")}
                                        [re-com/h-box
                                         :style (when (= e @hover-tools-atom)
                                                  {:filter "invert(233%)"})
@@ -1129,7 +1230,7 @@
                                         :width "600px"
                                         :children (for [[ee tt] vv
                                                         :let [sec (-> tt js/Date. .toISOString (subs 17 19))]]
-                                                    ^{:key (str selected-signal "child-boxes" e ee tt)}
+                                                    ^{:key (str selected-warren-item "child-boxes" e ee tt)}
                                                     [re-com/box
                                                      :size "none"
                                                      :width "44px"
@@ -1142,7 +1243,7 @@
                                                                      {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 65)}))
                                                      :child (str sec)])])]
 
-                          "(no signal selected)")]
+                          "(no signal / rule / solver selected)")]
                 
                 ]]))
 
@@ -1161,6 +1262,20 @@
      (assoc db :signals-map result))))
 
 (re-frame/reg-event-db
+ ::rules-map-response
+ (fn [db [_ result]]
+   (let []
+     (tap> [:rules-map-in result])
+     (assoc db :rules-map result))))
+
+(re-frame/reg-event-db
+ ::solvers-map-response
+ (fn [db [_ result]]
+   (let []
+     (tap> [:solvers-map-in result])
+     (assoc db :solvers-map result))))
+
+(re-frame/reg-event-db
  ::signals-history-response
  (fn [db [_ result]]
    (if (not (= result :no-updates))
@@ -1176,70 +1291,87 @@
  (fn [db _]
    (get db :signals-history)))
 
+(defn panel-options [get-map-evt-vec selected-item item-type]
+  (let [item-type-str (cstr/replace (str item-type) ":" "" )
+        server-fn (keyword (str "save-" item-type-str "s-map"))
+        data-map (cond (= item-type :solver)  @(ut/tracked-sub ::solvers-map {})
+                       (= item-type :rule)    @(ut/tracked-sub ::rules-map {})
+                       :else @(ut/tracked-sub ::signals-map {}))]
+    [re-com/h-box
+     :padding "6px"
+     :justify :between :align :center
+     :children [[re-com/h-box
+                 :align :center :justify :center
+                 :gap "8px"
+                 :style {:opacity 0.15}
+                 :children [[re-com/h-box
+                             :attr {:on-click #(ut/tracked-dispatch get-map-evt-vec)}
+                             :style {:cursor "pointer"}
+                             :gap "4px"
+                             :children [[re-com/md-icon-button :src (at)
+                                         :md-icon-name "zmdi-download"
+                                         :style {:font-size "17px"}]
+                                        [re-com/box :child (str "pull " item-type-str "s from server?")]]]]]
+
+                [re-com/box
+                 :attr {:on-click #(ut/tracked-dispatch
+                                    [::wfx/request :default
+                                     {:message    {:kind :signals-history
+                                                   :signal-name selected-item
+                                                   :client-name @(ut/tracked-sub ::bricks/client-name {})}
+                                      :on-response [::signals-history-response]
+                                      :timeout    15000000}])}
+                 :style {:cursor "pointer" :opacity 0.15}
+                 :child "get history (auto)"]
+
+                [re-com/h-box
+                 :align :center :justify :center
+                 :attr {:on-click #(ut/tracked-dispatch
+                                    [::wfx/request :default
+                                     {:message    {:kind server-fn ;;:save-signals-map
+                                                   :data-map data-map
+                                                   :client-name @(ut/tracked-sub ::bricks/client-name {})}
+                                                          ;:on-response [::signals-map-response]
+                                                          ;:on-timeout  [::timeout-response :get-signals]
+                                      :timeout    15000000}])}
+                 :style {:cursor "pointer" :opacity 0.15}
+                 :gap "4px"
+                 :children [[re-com/box :child (str "push this " item-type-str "s set to server?")]
+                            [re-com/md-icon-button :src (at)
+                             :md-icon-name "zmdi-upload"
+                             :style {:font-size "17px"}]]]]])
+  )
+
 (defn signals-panel []
   (let [[_ hpct] db/flow-panel-pcts ;; [0.85 0.50]
         hh @(ut/tracked-subscribe [::subs/h]) ;; we want the reaction 
         panel-height (* hh hpct)
         details-panel-height (/ panel-height 1.25) ;; batshit math from flow.cljs panel parent
         ppanel-height (+ panel-height details-panel-height)
-        
-        selected-signal @(ut/tracked-subscribe [::selected-signal])
-        signals-map @(ut/tracked-subscribe [::signals-map])
-        get-signals-map-evt-vec [::wfx/request :default
-                                 {:message    {:kind :signals-map
-                                               :client-name @(ut/tracked-subscribe [::bricks/client-name])}
-                                  :on-response [::signals-map-response]
-                                  :on-timeout  [::timeout-response :get-signals]
-                                  :timeout    15000000}]
+
+        selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
+        warren-item-type @(ut/tracked-sub ::warren-item-type {:name selected-warren-item})
+        ;; signals-map @(ut/tracked-sub ::signals-map {})
+        get-map-evt-vec [::wfx/request :default
+                         {:message    {:kind :signals-map
+                                       :client-name @(ut/tracked-sub ::bricks/client-name {})}
+                          :on-response [::signals-map-response]
+                          :on-timeout  [::timeout-response :get-signals]
+                          :timeout    15000000}]
         ph (- ppanel-height 124)]
-    
-    (when (nil? signals-map) 
-      (ut/tracked-dispatch get-signals-map-evt-vec)) ;; if fresh, pull it 
+
+    ;; (when (nil? signals-map)
+    ;;   (ut/tracked-dispatch get-map-evt-vec)) ;; if fresh, pull it 
 
     [re-com/v-box
      :padding "6px"
-   ;:size "auto" 
      :width (px (- (last @db/flow-editor-system-mode) 14))
      :size "none"
      :height (px ph)
      :style {;;:border "1px solid cyan"
              :border-radius "8px"
              :background-color (str (theme-pull :theme/editor-rim-color nil) "18")}
-     :children [[re-com/h-box
-                 :padding "6px"
-                 :justify :between :align :center 
-                 :children [[re-com/h-box 
-                             :gap "8px"
-                             :style {:opacity 0.15}
-                             :children [[re-com/box 
-                                         :attr {:on-click #(ut/tracked-dispatch get-signals-map-evt-vec)}
-                                         :style {:cursor "pointer"}
-                                         :child "pull from server?"]
-                                        ;[re-com/box :child "(diff than the server!)"]
-                                        ]]
-                            
-                            [re-com/box
-                             :attr {:on-click #(ut/tracked-dispatch
-                                                [::wfx/request :default
-                                                 {:message    {:kind :signals-history
-                                                               :signal-name selected-signal
-                                                               :client-name @(ut/tracked-subscribe [::bricks/client-name])}
-                                                               :on-response [::signals-history-response]
-                                                  :timeout    15000000}])}
-                             :style {:cursor "pointer" :opacity 0.15}
-                             :child "get history"]
-
-                            [re-com/box
-                             :attr {:on-click #(ut/tracked-dispatch
-                                                [::wfx/request :default
-                                                 {:message    {:kind :save-signals-map
-                                                               :signals-map @(ut/tracked-subscribe [::signals-map])
-                                                               :client-name @(ut/tracked-subscribe [::bricks/client-name])}
-                                                  ;:on-response [::signals-map-response]
-                                                  ;:on-timeout  [::timeout-response :get-signals]
-                                                  :timeout    15000000}])}
-                             :style {:cursor "pointer" :opacity 0.15}
-                             :child "push this signal set to server?"]]]
+     :children [[panel-options get-map-evt-vec selected-warren-item warren-item-type]
                 [re-com/gap :size "5px"]
                 [re-com/h-box :children [[left-col ph]
                                          [right-col ph]]]]]))
