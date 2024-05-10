@@ -165,9 +165,12 @@
                ]]
     (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
-(defn gen-signal-name []
+(defn gen-signal-name [suff]
   (let [names [(tales/quality) (tales/animal)]]
-    (cstr/lower-case (str (cstr/join "-" names) "-signal"))))
+    (cstr/replace 
+     (cstr/lower-case (str (cstr/join "-" names) "-" (cstr/replace (str suff) ":" "")))
+     " " "-")))
+
 
 (defn gen-tab-name []
   (let [names [(tales/quality) (tales/animal)]]

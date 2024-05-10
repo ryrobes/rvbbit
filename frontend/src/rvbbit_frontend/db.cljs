@@ -30,8 +30,10 @@
 (defonce bad-form? (reagent/atom false))
 (defonce bad-form-msg (reagent/atom nil))
 
-(defonce bad-form-signals? (reagent/atom false))
-(defonce bad-form-msg-signals (reagent/atom nil))
+(def bad-form-signals? (reagent/atom false))
+(def bad-form-msg-signals (reagent/atom nil))
+
+(defonce selectors-open (reagent/atom []))
 
 (defonce kick-alert (reagent/atom false))
 

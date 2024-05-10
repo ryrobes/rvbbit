@@ -478,10 +478,20 @@
 
     (add-watch wss/signals-atom :master-signal-def-watcher ;; watcher signals defs
                (fn [_ _ old-state new-state]
-                 ;;(ut/pp [:SCREEN-WATCHER-ACTIVATE!])
                  (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....])
-                 (wss/reload-signals-subs)
-                 ))
+                 (wss/reload-signals-subs)))
+    
+    (add-watch wss/rules-atom :master-rule-def-watcher
+           (fn [_ _ old-state new-state]
+             (ut/pp [:rules-defs-changed :reloading....])
+             ;(wss/reload-signals-subs)
+             ))
+    
+    (add-watch wss/solvers-atom :master-solver-def-watcher
+           (fn [_ _ old-state new-state]
+             (ut/pp [:solvers-defs-changed :reloading....])
+             ;(wss/reload-signals-subs)
+             ))    
 
     (wss/reload-signals-subs) ;; run once on boot
     (update-all-screen-meta)
@@ -1075,14 +1085,16 @@
 ;; (ut/pp [:waiting-for-background-systems...])
 ;; (delay-execution 30000 #(force delayed-startup))
 
-    (ut/pp [:waiting-for-background-systems...])
-    ;; (delayed-start 30000 start-services)
+    ;; (ut/pp [:waiting-for-background-systems...])
+    ;; ;; (delayed-start 30000 start-services)
 
-    (let [fut (future  (Thread/sleep 5000) (start-services))
-          ;fut2 (future (Thread/sleep 15000) (wss/create-websocket-server!))
-          ]
-      ;[@fut @fut2]
-      @fut)
+    ;; (let [fut (future  (Thread/sleep 5000) (start-services))
+    ;;       ;fut2 (future (Thread/sleep 15000) (wss/create-websocket-server!))
+    ;;       ]
+    ;;   ;[@fut @fut2]
+    ;;   @fut)
+
+    (start-services)
 
     (println " ")
 

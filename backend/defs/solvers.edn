@@ -1,5 +1,1 @@
-
-{:solver-1 {:signal nil
-            :clover nil}
- :solver-2 {:signal nil
-            :clover nil}}
+{:vibrant-antelope-solver {:signal nil, :body nil}}

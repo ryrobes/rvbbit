@@ -309,8 +309,7 @@
 (declare highlight-code)
 
 (defn code-box [width-int height-int value ttype]
-  (let [] ;;[react! [@cm-instance @markers]]
-    ;(tap> [:width-int width-int]) ;; 634.4 
+  (let [signal? (= ttype :signal)] 
     [re-com/box
      :size "none"
      ;:width (px (- width-int 24))
@@ -341,11 +340,12 @@
                                 (do (reset! db/bad-form-signals? true)
                                     (reset! db/bad-form-msg-signals "Empty signal"))
 
-                                (not (vector? parse))
+                                (and (not (vector? parse)) signal?)
                                 (do (reset! db/bad-form-signals? true)
                                     (reset! db/bad-form-msg-signals "Needs to be a vector / honey-sql where clause format"))
  
-                                :else (if (= ttype :signal)
+                                :else (if signal?
+                                        
                                        (do (reset! db/bad-form-signals? false)
                                           (ut/tracked-dispatch [::edit-signal parse]))
                                         
@@ -469,19 +469,36 @@
  ::delete-signal
  (undoable)
  (fn [db [_ signal-name item-type]]
-   (-> db
-       (ut/dissoc-in [:signals-map signal-name])
-       (assoc :selected-warren-item nil))))
+   (let [sver (fn [x] (cstr/replace (str x) ":" ""))
+         item-type-str (sver item-type)
+         item-type-key (keyword (str item-type-str "s-map"))] ;; :signals-map , etc
+     (-> db
+         (ut/dissoc-in [item-type-key signal-name])
+         (assoc :selected-warren-item nil)))))
 
 (re-frame/reg-event-db
  ::add-signal
  (undoable)
  (fn [db [_ item-type]]
-   (let [rr (keyword (ut/gen-signal-name))
-         signal-name (ut/safe-key rr (vec (keys (get db :signals-map {}))))]
-     (tap> [:add-signal? signal-name])
+   (let [item-type (keyword (ut/drop-last-char item-type))
+         rr (keyword (ut/gen-signal-name item-type))
+         existing-keys (vec
+                        (into (into (keys (get db :signals-map {}))
+                                    (keys (get db :solvers-map {})))
+                              (keys (get db :rules-map {}))))
+         signal-name (ut/safe-key rr existing-keys)
+         sver (fn [x] (cstr/replace (str x) ":" ""))
+         item-type-str (sver item-type)
+         item-type-key (keyword (str item-type-str "s-map"))
+         starting-data (cond (= item-type :signal) [:and [:= :day 1] [:= :hour 9]]
+                             (= item-type :solver) {:signal nil :body nil}
+                             :else {:flow-id nil :signal nil :overrides {}})
+         kp (if (= item-type :signal)
+              [:signals-map signal-name :signal]
+              [item-type-key signal-name])]
+     (tap> [:add-item? item-type signal-name kp rr])
      (-> db
-         (assoc-in [:signals-map signal-name :signal] [:and [:= :day 1] [:= :hour 9]])
+         (assoc-in kp starting-data)
          (assoc :selected-warren-item signal-name)))))
 
 (defn code-box-smol [width-int height-int value & [syntax]]
@@ -517,7 +534,7 @@
         selected-type (str ssr "s")
         results (into {} (for [[name _] signals]
                            (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
-                                 vv (if (= warren-type-string :signals)
+                                 vv (if (= warren-type-string "signals")
                                       @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
                                       "")]
                              {name vv})))
@@ -525,7 +542,7 @@
         ;;                            (ut/drop-last-char warren-type-string)
         ;;                            warren-type-string)
         ]
-    ;;(tap> [:warren selected-type warren-type-string])
+    ;; (tap> [:warren selected-type warren-type-string])
     [re-com/v-box
      :children
      [[re-com/h-box
@@ -588,7 +605,7 @@
                                              :child (str name)]
                                             [re-com/box
                                              :align :center :justify :center
-                                             :child (str (if (nil? vv) "err!" vv))
+                                             :child (str (if (nil? vv) "" vv))
                                              :style {:font-weight 700
                                                      :font-size "15px"
                                                      :opacity (if (true? vv) 1.0 0.2)}]]]
@@ -610,10 +627,11 @@
 
 
 
-(defonce selectors-open (reagent/atom []))
+
 
 (defn selector-panel [name items icon & [style wide?]]
-  (let [open? (some #(= name %) @selectors-open)
+  ;; (tap> [:db/selectors-open @db/selectors-open])
+  (let [open? (some #(= name %) @db/selectors-open)
         items-count (count items)
         partition? (integer? wide?)]
     [re-com/v-box
@@ -628,8 +646,8 @@
                          :color (theme-pull :theme/editor-outer-rim-color nil)}
                  :justify :between :align :center
                  :attr {:on-click #(if open?
-                                     (reset! selectors-open (remove (fn [x] (= x name)) @selectors-open))
-                                     (swap! selectors-open conj name))}
+                                     (reset! db/selectors-open (remove (fn [x] (= x name)) @db/selectors-open))
+                                     (swap! db/selectors-open conj name))}
                  :children [[re-com/h-box
                              :style {:font-size "22px"}
                              :gap "8px" :align :center :justify :center 
@@ -870,7 +888,7 @@
         selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
 
         signal-vec (get-in signals [selected-warren-item :signal])
-        react! [@selectors-open]
+        react! [@db/selectors-open]
         filter-results (fn [x y]
                          (if (or (nil? x) (empty? x))
                            y
@@ -1171,29 +1189,34 @@
                      :padding "6px"
                      :child [code-box
                              (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
-                             (- (* (* ph 0.7) 0.25) 5) ;; (* ph 0.25) 
+                             (if signal? 
+                               (- (* (* ph 0.7) 0.25) 5)
+                               (- (* (* ph 0.7) 0.75) 5))
+                             
                              (if (not signal?) 
                                (str other)
                                (str signal-vec))
                              warren-item-type
                              ]]
 
-                    [re-com/box
-                     :height (px (- (* (* ph 0.7) 0.75) 50)) :size "none"
-                     :padding "6px"
-                     :style {;:border "1px solid pink" 
-                             :overflow "auto"}
-                     :child (if @db/bad-form-signals?
-                              [re-com/box
-                               :size "auto"
-                               :style {:background-color "rgba(255, 0, 0, 0.3)"
-                                       :border "1px solid red"
-                                       :padding "6px"
-                                       :font-size "20px"}
-                               :child (str @db/bad-form-msg-signals)]
-                              [rc/catch (visualize-clause signal-vec 0 nil signal-vec)]
+                    (when signal?
+                      [re-com/box
+                       :height (px (- (* (* ph 0.7) 0.75) 50)) :size "none"
+                       :padding "6px"
+                       :style {;:border "1px solid pink" 
+                               :overflow "auto"}
+                       :child (if @db/bad-form-signals?
+                                [re-com/box
+                                 :size "auto"
+                                 :style {:background-color "rgba(255, 0, 0, 0.3)"
+                                         :border "1px solid red"
+                                         :padding "6px"
+                                         :font-size "20px"}
+                                 :child (str @db/bad-form-msg-signals)]
+                                [rc/catch (visualize-clause signal-vec 0 nil signal-vec)]
                               ;[re-com/box :child "yo"]
-                              )]]])
+                                )])
+                    ]])
                 
                 ;; [items-list (if selected-warren-item
                 ;;               (* ph 0.3)
@@ -1204,7 +1227,7 @@
                  :align :center :justify :center
                  ;:style {:border "1px solid lime"}
                  :height (px (- (* ph 0.3) 48))
-                 :child (if (not (nil? selected-warren-item))
+                 :child (cond (and signal? (not (nil? selected-warren-item)))
 
                           [re-com/v-box
                            :size "auto"
@@ -1216,14 +1239,7 @@
                                        [re-com/h-box
                                         :style (when (= e @hover-tools-atom)
                                                  {:filter "invert(233%)"})
-                                        :attr {;:on-mouse-enter #(reset! hover-tools-atom e)
-                                                        ;:on-mouse-over #(when true ;(not= @hover-tools-atom e)
-                                                        ;                   (highlight-code (str e))
-                                                        ;                   (reset! hover-tools-atom e))
-                                                        ; :on-mouse-leave #(do 
-                                                        ;                    (unhighlight-code)
-                                                        ;                    (reset! hover-tools-atom nil))
-                                               :on-mouse-enter #(history-mouse-enter e)
+                                        :attr {:on-mouse-enter #(history-mouse-enter e)
                                                :on-mouse-over #(history-mouse-over e)
                                                :on-mouse-leave history-mouse-leave}
                                         :size "auto"
@@ -1242,8 +1258,11 @@
                                                                    (when (true? ee)
                                                                      {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 65)}))
                                                      :child (str sec)])])]
+                          
+                          (not (nil? selected-warren-item)) [re-com/box :child (str warren-item-type)]
 
-                          "(no signal / rule / solver selected)")]
+                          :else "(no signal / rule / solver selected)"
+                          )]
                 
                 ]]))
 
@@ -1313,16 +1332,16 @@
                                          :style {:font-size "17px"}]
                                         [re-com/box :child (str "pull " item-type-str "s from server?")]]]]]
 
-                [re-com/box
-                 :attr {:on-click #(ut/tracked-dispatch
-                                    [::wfx/request :default
-                                     {:message    {:kind :signals-history
-                                                   :signal-name selected-item
-                                                   :client-name @(ut/tracked-sub ::bricks/client-name {})}
-                                      :on-response [::signals-history-response]
-                                      :timeout    15000000}])}
-                 :style {:cursor "pointer" :opacity 0.15}
-                 :child "get history (auto)"]
+                ;; [re-com/box
+                ;;  :attr {:on-click #(ut/tracked-dispatch
+                ;;                     [::wfx/request :default
+                ;;                      {:message    {:kind :signals-history
+                ;;                                    :signal-name selected-item
+                ;;                                    :client-name @(ut/tracked-sub ::bricks/client-name {})}
+                ;;                       :on-response [::signals-history-response]
+                ;;                       :timeout    15000000}])}
+                ;;  :style {:cursor "pointer" :opacity 0.15}
+                ;;  :child "get history (auto)"]
 
                 [re-com/h-box
                  :align :center :justify :center
@@ -1350,13 +1369,21 @@
         ppanel-height (+ panel-height details-panel-height)
 
         selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
-        warren-item-type @(ut/tracked-sub ::warren-item-type {:name selected-warren-item})
+        warren-item-type @(ut/tracked-sub ::warren-item-type {})
         ;; signals-map @(ut/tracked-sub ::signals-map {})
+
+        sver (fn [x] (cstr/replace (str x) ":" ""))
+         item-type-str (sver warren-item-type)
+         item-type-key (keyword (str item-type-str "s-map"))
+
         get-map-evt-vec [::wfx/request :default
-                         {:message    {:kind :signals-map
+                         {:message    {:kind item-type-key ;;:signals-map
                                        :client-name @(ut/tracked-sub ::bricks/client-name {})}
-                          :on-response [::signals-map-response]
-                          :on-timeout  [::timeout-response :get-signals]
+                          :on-response (cond
+                                         (= item-type-key :rules-map) [::rules-map-response]
+                                         (= item-type-key :solvers-map) [::solvers-map-response]
+                                         :else [::signals-map-response])
+                          :on-timeout  [::timeout-response [:get item-type-key]]
                           :timeout    15000000}]
         ph (- ppanel-height 124)]
 
@@ -1371,7 +1398,9 @@
      :style {;;:border "1px solid cyan"
              :border-radius "8px"
              :background-color (str (theme-pull :theme/editor-rim-color nil) "18")}
-     :children [[panel-options get-map-evt-vec selected-warren-item warren-item-type]
+     :children [(if (= warren-item-type :unknown)
+                  [re-com/gap :size "36px"]
+                  [panel-options get-map-evt-vec selected-warren-item warren-item-type])
                 [re-com/gap :size "5px"]
                 [re-com/h-box :children [[left-col ph]
                                          [right-col ph]]]]]))

@@ -377,7 +377,9 @@
                                                 (ut/deep-flatten (get-all-values (get db :click-param))) ;; do we have params in params? 
                                                 )))
                                current-flow-open)))
-         signals-mode?  (and (= (get @db/flow-editor-system-mode 0) "signals") (get db :flow?))
+         signals-mode?  (and (= (get @db/flow-editor-system-mode 0) "signals") ;; signals tab selected 
+                             (get db :flow?) ;; flow panel open
+                             (some #(= % "signals") @db/selectors-open)) ;; signal subbox open
          signal-ui-refs (when signals-mode? (vec (for [ss (keys (get db :signals-map))] (keyword (str "signal/" (cstr/replace (str ss) ":" ""))))))
          signal-ui-part-refs (when (and (get db :selected-warren-item) signals-mode?)
                                (let [pps (ut/where-dissect (get-in db [:signals-map (get db :selected-warren-item) :signal]))]
@@ -8255,31 +8257,7 @@
        ;(ut/dissoc-in [:post-meta query-key])
        (ut/dissoc-in [:sched query-key]))))
 
-;; (re-frame/reg-event-db ;; original. works fine. BUT dumps all the query execs into one operation
-;;  ::dispatch-auto-queries
-;;  (fn [db [_]]
-;;    (let [scheds (get db :sched)
-;;          scheds-reverse (doall (into {}
-;;                                      (for [vv (vals scheds)]
-;;                                        {vv (vec (for [[k v] scheds
-;;                                                       :when (= v vv)] k))})))
-;;          ;scheds-reverse {10 [:ufo-sightings-drag-country-415]}
-;;          ticktock (get-in db [:re-pollsive.core/polling :counter])]
-
-;;      (dorun (doseq [[timer queries] scheds-reverse
-;;                     :when (>= ticktock timer)]
-;;               (doseq [query queries]
-;;                 (dorun (let []
-;;                          ;(tap> [:running-sched :tick ticktock :timer timer query])
-;;                          (ut/tracked-dispatch [::remove-schedule query])
-;;                          (ut/tracked-dispatch [::conn/clear-query-history query]))))))
-
-;;      ;(tap> [:scheds-cron-debug :tick ticktock scheds scheds-reverse])
-;;      db)))
-
-
-;; 5/8/24 trying to offset the execution a little bit to give the screen time to repaint, etc
-(re-frame/reg-event-db
+(re-frame/reg-event-db ;; original. works fine. BUT dumps all the query execs into one operation
  ::dispatch-auto-queries
  (fn [db [_]]
    (let [scheds (get db :sched)
@@ -8287,18 +8265,41 @@
                                      (for [vv (vals scheds)]
                                        {vv (vec (for [[k v] scheds
                                                       :when (= v vv)] k))})))
+         ;scheds-reverse {10 [:ufo-sightings-drag-country-415]}
          ticktock (get-in db [:re-pollsive.core/polling :counter])]
 
-     (letfn [(process-query [query]
-               (go
-                 (ut/tracked-dispatch [::remove-schedule query])
-                 (ut/tracked-dispatch [::conn/clear-query-history query])
-                 (<! (async/timeout 1000))))]
-       (dorun (doseq [[timer queries] scheds-reverse
-                      :when (>= ticktock timer)]
-                (doseq [query queries]
-                  (process-query query)))))
+     (dorun (doseq [[timer queries] scheds-reverse
+                    :when (>= ticktock timer)]
+              (doseq [query queries]
+                (dorun (let []
+                         ;(tap> [:running-sched :tick ticktock :timer timer query])
+                         (ut/tracked-dispatch [::remove-schedule query])
+                         (ut/tracked-dispatch [::conn/clear-query-history query]))))))
+     ;(tap> [:scheds-cron-debug :tick ticktock scheds scheds-reverse])
      db)))
+
+
+;; 5/8/24 trying to offset the execution a little bit to give the screen time to repaint, etc
+;; (re-frame/reg-event-db
+;;  ::dispatch-auto-queries
+;;  (fn [db [_]]
+;;    (let [scheds (get db :sched)
+;;          scheds-reverse (doall (into {}
+;;                                      (for [vv (vals scheds)]
+;;                                        {vv (vec (for [[k v] scheds
+;;                                                       :when (= v vv)] k))})))
+;;          ticktock (get-in db [:re-pollsive.core/polling :counter])]
+
+;;      (letfn [(process-query [query]
+;;                (go
+;;                  (ut/tracked-dispatch [::remove-schedule query])
+;;                  (ut/tracked-dispatch [::conn/clear-query-history query])
+;;                  (<! (async/timeout 1000))))]
+;;        (dorun (doseq [[timer queries] scheds-reverse
+;;                       :when (>= ticktock timer)]
+;;                 (doseq [query queries]
+;;                   (process-query query)))))
+;;      db)))
 
 (re-frame/reg-event-db
  ::insert-sql-source

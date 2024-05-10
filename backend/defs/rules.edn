@@ -1,7 +1,1 @@
-
-{:rule-1 {:signal nil
-          :flow-id nil
-          :overrides {}}
- :rule-2 {:signal nil
-          :flow-id nil
-          :overrides {}}}
+{:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}}

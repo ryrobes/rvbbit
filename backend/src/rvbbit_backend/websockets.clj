@@ -1091,7 +1091,7 @@
        (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
        (if client-queue-atom
          (do
-           ;(ut/pp [:push-to-client client-name ui-keypath status reco-count elapsed-ms])
+          ;;  (ut/pp [:PUSH-to-client! client-name ui-keypath task-id status data])
            (inc-score! client-name :push)
            (inc-score! client-name :last-push true)
            (swap! client-queue-atom conj
@@ -1101,7 +1101,10 @@
                    :reco-count reco-count
                    :queue-id queue-id
                    :task-id task-id
-                   :data [data (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
+                   :data [{} ;; data  ;; data is likely needed for :payload and :payload-kp that kits need? but we can revisit later... 
+                                      ;; not sure if kits will ship in current form. doubtful actually
+                                      ;; in the meantime this takes a chunk out of client memory reqs  || 5/10/25 12:35am
+                          (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
                    :client-name client-name}))
          (doall
           (let [] ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
@@ -1931,14 +1934,16 @@
         payload (vec args)
         payload? (not (empty? payload))
         heartbeat? (= sub-task :heartbeat)
-        payload (when (and payload? (not heartbeat?)) (wrap-payload payload thread-id thread-desc message-name))
+        payload (when (and payload? (not heartbeat?)) 
+                  (wrap-payload payload thread-id thread-desc message-name))
 
         ;_ (insert-kit-data client-name task-id sub-task payload)
         ;; insert-kit-data [output query-hash ui-keypath ttype kit-name elapsed-ms & [client-name flow-id]]
         _ (when (and payload? (not heartbeat?))
             (insert-kit-data payload (hash payload) sub-task task-id ui-keypath 0 client-name "flow-id-here!"))
         data (merge {:sent! task-id :to client-name :at (str (ut/get-current-timestamp)) :payload payload}
-                    (when payload? {:payload-kp [sub-task task-id]}))
+                    (when payload? {:payload-kp [sub-task task-id]})
+                    )
         queue-id -1
        ; client-name (try (if (string? client-name) (edn/read-string client-name) client-name) (catch :default _ client-name))
         ;status "what?"
@@ -2756,6 +2761,7 @@
 (defmethod wl/handle-request :signals-history [{:keys [client-name signal-name]}]
   ;;(ut/pp [:get-signals-history client-name :for signal-name])
   (inc-score! client-name :push)
+  (ut/pp [:PUSH-signals-history client-name signal-name])
   (let [cc (get-in @signals-atom [signal-name :signal])
         ccw (vec (ut/where-dissect cc))
         history (select-keys (get @last-signals-history-atom signal-name {}) ccw)
@@ -2872,11 +2878,13 @@
 (defmethod wl/handle-request :get-status [{:keys [client-name]}]
   (ut/pp [:client-status-check-from client-name])
   (inc-score! client-name :push)
+  (ut/pp [:PUSH-get-status! client-name])
   {:statuses (get @queue-status client-name)
    :data (get @queue-data client-name)})
 
 (defmethod wl/handle-request :get-flow-statuses [{:keys [client-name]}]
   (inc-score! client-name :push)
+  (ut/pp [:PUSH-get-flow-status! client-name])
   (let [payload   (merge (flow-statuses) ;; @flow-status
                          (into {} (for [[k v] @processes]
                                     {k (-> v
@@ -3985,11 +3993,12 @@
 (defmethod wl/handle-request :honey-call [{:keys [kind ui-keypath honey-sql client-name]}]
   (swap! q-calls2 inc)
   (inc-score! client-name :push)
+  (ut/pp [:PUSH-honey-call! (str honey-sql)])
   ;; (ut/pp [kind {:kind kind :ui-keypath ui-keypath :honey-sql honey-sql}])
-  (ut/pp [kind ;(not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
-          @q-calls2 kind ui-keypath :system-db client-name ;; honey-sql ; (get honey-sql :transform-select) :full-honey honey-sql ; :select (get honey-sql :select)
-            ;(when (get honey-sql :transform-select) [:TSELECT!! honey-sql])
-          ])
+  ;; (ut/pp [kind ;(not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
+  ;;         @q-calls2 kind ui-keypath :system-db client-name ;; honey-sql ; (get honey-sql :transform-select) :full-honey honey-sql ; :select (get honey-sql :select)
+  ;;           ;(when (get honey-sql :transform-select) [:TSELECT!! honey-sql])
+  ;;         ])
   ;(time
   ;(inc! running-system-queries)
   (time! (timer instrument/metric-registry ["queries" "timings" "system-db"]) ;; test
@@ -5142,13 +5151,14 @@
 
                               (do ;(swap! sql-cache assoc req-hash output)
 
-                                (when (and (not (cstr/starts-with? (str (first ui-keypath)) ":kick"))
-                                           (not (cstr/includes? (str (first ui-keypath)) "-sys")))
-                                  (kick client-name "kick-test!" (first ui-keypath)
-                                        "query-log"
-                                        (str "query-log-" (first ui-keypath))
-                                        (str "query-log-" (first ui-keypath))
-                                        [(str (ut/get-current-timestamp) " - query ran in " query-ms " ms.")]))
+                                ;; query kick back. kinda neat, but also kinda unnecessary
+                                ;; (when (and (not (cstr/starts-with? (str (first ui-keypath)) ":kick"))
+                                ;;            (not (cstr/includes? (str (first ui-keypath)) "-sys")))
+                                ;;   (kick client-name "kick-test!" (first ui-keypath)
+                                ;;         "query-log"
+                                ;;         (str "query-log-" (first ui-keypath))
+                                ;;         (str "query-log-" (first ui-keypath))
+                                ;;         [(str (ut/get-current-timestamp) " - query ran in " query-ms " ms.")]))
 
                                 (when client-cache? (insert-into-cache req-hash output)) ;; no point to cache things that are :cache?false
                                 output)))))
@@ -5227,11 +5237,13 @@
   (swap! q-calls inc)
   (inc! running-user-queries)
   (inc-score! client-name :push)
-  (ut/pp [kind ;(not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
-          @q-calls kind ui-keypath connection-id client-name panel-key page
-          {:client-cache? client-cache? :sniff? sniff? ;:raw-honey (str honey-sql) ; (get honey-sql :transform-select) :full-honey honey-sql ; :select (get honey-sql :select)
-          ;(when (get honey-sql :transform-select) [:TSELECT!! honey-sql])
-           }])
+  (ut/pp [:PUSH-honeyx-call! (str honey-sql)])
+
+  ;; (ut/pp [kind ;(not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
+  ;;         @q-calls kind ui-keypath connection-id client-name panel-key page
+  ;;         {:client-cache? client-cache? :sniff? sniff? ;:raw-honey (str honey-sql) ; (get honey-sql :transform-select) :full-honey honey-sql ; :select (get honey-sql :select)
+  ;;         ;(when (get honey-sql :transform-select) [:TSELECT!! honey-sql])
+  ;;          }])
 
   (when (keyword? kit-name) ;;; all kit stuff. deprecated?
     (enqueue-task2 (fn [] (try ;; save off the full thing... or try

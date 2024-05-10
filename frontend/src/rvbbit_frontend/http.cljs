@@ -356,7 +356,7 @@
            file-push? (= ui-keypath :file-changed)
            external-enabled? (get db :external? false)
            task-id (get result :task-id)
-           payload-kp (get-in result [:data 0 :payload-kp])
+           ;payload-kp (get-in result [:data 0 :payload-kp])
            elapsed-ms (get result :elapsed-ms)
            reco-count (get result :reco-count)
            kick? (= ui-keypath :kick)
