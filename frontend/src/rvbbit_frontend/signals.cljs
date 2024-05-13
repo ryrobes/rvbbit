@@ -1135,7 +1135,8 @@
                   (into {} (for [idx (range (count signal-vec-parts))]
                              (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
                                    name (get signal-vec-parts idx)
-                                   vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])]
+                                   ;; vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
+                                   vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})]
                                {name vv})))
                   {})]
 
@@ -1177,8 +1178,9 @@
                                    :font-weight 700}
                            :height "100%"
                            :width (px (* ww 0.1))
-                           :child (str @(ut/tracked-subscribe [::conn/clicked-parameter-key
-                                                               [(keyword (str "signal/" (cstr/replace (str selected-warren-item) ":" "")))]]))]
+                           :child (str @(ut/tracked-sub
+                                         ::conn/clicked-parameter-key-alpha
+                                         {:keypath [(keyword (str "signal/" (cstr/replace (str selected-warren-item) ":" "")))]}))]
                           [re-com/gap :size "10px"] ;; placeholder
                           )]])
 
@@ -1189,15 +1191,14 @@
                      :padding "6px"
                      :child [code-box
                              (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
-                             (if signal? 
+                             (if signal?
                                (- (* (* ph 0.7) 0.25) 5)
                                (- (* (* ph 0.7) 0.75) 5))
-                             
-                             (if (not signal?) 
+
+                             (if (not signal?)
                                (str other)
                                (str signal-vec))
-                             warren-item-type
-                             ]]
+                             warren-item-type]]
 
                     (when signal?
                       [re-com/box
@@ -1215,56 +1216,113 @@
                                  :child (str @db/bad-form-msg-signals)]
                                 [rc/catch (visualize-clause signal-vec 0 nil signal-vec)]
                               ;[re-com/box :child "yo"]
-                                )])
-                    ]])
-                
+                                )])]])
+
                 ;; [items-list (if selected-warren-item
                 ;;               (* ph 0.3)
                 ;;               ph) signals selected-warren-item]
 
-                [re-com/box
-                 :padding "6px"
-                 :align :center :justify :center
-                 ;:style {:border "1px solid lime"}
-                 :height (px (- (* ph 0.3) 48))
-                 :child (cond (and signal? (not (nil? selected-warren-item)))
+                ;; [re-com/box
+                ;;  :padding "6px"
+                ;;  :align :center :justify :center
+                ;;  ;:style {:border "1px solid lime"}
+                ;;  :height (px (- (* ph 0.3) 48))
+                ;;  :child (cond (and signal? (not (nil? selected-warren-item)))
+                ;;               [re-com/v-box
+                ;;                :size "auto"
+                ;;                :children (for [[e vv] ;(sort-by #(count (pr-str (last %))) signals-history)
+                ;;                                signals-history
+                ;;                                     ;:let (for [[ee vvv] signals-history] [(count (str))])
+                ;;                                ]
+                ;;                            ^{:key (str selected-warren-item e vv "h-box")}
+                ;;                            [re-com/h-box
+                ;;                             :style (when (= e @hover-tools-atom)
+                ;;                                      {:filter "invert(233%)"})
+                ;;                             :attr {:on-mouse-enter #(history-mouse-enter e)
+                ;;                                    :on-mouse-over #(history-mouse-over e)
+                ;;                                    :on-mouse-leave history-mouse-leave}
+                ;;                             :size "auto"
+                ;;                             :width "600px"
+                ;;                             :children (for [[ee tt] vv
+                ;;                                             :let [sec (-> tt js/Date. .toISOString (subs 17 19))]]
+                ;;                                         ^{:key (str selected-warren-item "child-boxes" e ee tt)}
+                ;;                                         [re-com/box
+                ;;                                          :size "none"
+                ;;                                          :width "44px"
+                ;;                                          :align :center :justify :center
+                ;;                                          :style (merge {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
+                ;;                                                         :font-family  (theme-pull :theme/monospaced-font nil)
+                ;;                                                         :color "#000000"
+                ;;                                                         :font-size "10px"}
+                ;;                                                        (when (true? ee)
+                ;;                                                          {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 65)}))
+                ;;                                          :child (str sec)])])]
 
-                          [re-com/v-box
-                           :size "auto"
-                           :children (for [[e vv] ;(sort-by #(count (pr-str (last %))) signals-history)
-                                                    signals-history
-                                                    ;:let (for [[ee vvv] signals-history] [(count (str))])
-                                           ]
-                                       ^{:key (str selected-warren-item e vv "h-box")}
-                                       [re-com/h-box
-                                        :style (when (= e @hover-tools-atom)
-                                                 {:filter "invert(233%)"})
-                                        :attr {:on-mouse-enter #(history-mouse-enter e)
-                                               :on-mouse-over #(history-mouse-over e)
-                                               :on-mouse-leave history-mouse-leave}
-                                        :size "auto"
-                                        :width "600px"
-                                        :children (for [[ee tt] vv
-                                                        :let [sec (-> tt js/Date. .toISOString (subs 17 19))]]
-                                                    ^{:key (str selected-warren-item "child-boxes" e ee tt)}
-                                                    [re-com/box
-                                                     :size "none"
-                                                     :width "44px"
-                                                     :align :center :justify :center
-                                                     :style (merge {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))
-                                                                    :font-family  (theme-pull :theme/monospaced-font nil)
+                ;;               (not (nil? selected-warren-item)) [re-com/box :child (str warren-item-type)]
+
+                ;;               :else "(no signal / rule / solver selected)")]
+
+                (let [signals-history2 (into {} (for [tt (range (count (get signals-history (first (keys signals-history)))))]
+                                        {tt (vec (for [kk (keys signals-history)]
+                                                   [kk (get-in signals-history [kk tt])]))}
+                                        ))]
+                  ;; (tap> [:signals-history2 signals-history2])
+                  [re-com/box
+                   :padding "6px"
+                   :align :center :justify :center
+                 ;:style {:border "1px solid lime"}
+                   ;:height (px (- (* ph 0.3) 48))
+                   :child (cond (and signal? (not (nil? selected-warren-item)))
+                                [re-com/h-box
+                                 ;:size "auto"
+                                 :width "600px"
+                                 :children (for [[e vv] signals-history2
+                                                 :let [main (reduce (fn [a b] (if (> (count a) (count b)) a b)) (map first vv)) ;; largest vector is likely the main
+                                                       ;;_ (tap> [:main e main])
+                                                       ff (first (filter #(= main (first %)) vv))
+                                                       main-true? (true? (first (last ff)))
+                                                       ]]
+                                             ^{:key (str selected-warren-item e vv "h-box")}
+                                             [re-com/v-box
+                                              :height (px (- (* ph 0.3) 48))
+                                              :size "auto"
+                                              ;:width "600px"
+                                              :children (for [[kk [ee tt]] vv
+                                                              :let [sec (-> tt js/Date. .toISOString (subs 17 19))
+                                                                    ;;is-main? (true? (= kk main))
+                                                                    ]]
+                                                          ^{:key (str selected-warren-item "child-boxes" e ee tt)}
+                                                          [re-com/box
+                                                           :attr {:on-mouse-enter #(history-mouse-enter kk)
+                                                                  :on-mouse-over #(history-mouse-over kk)
+                                                                  :on-mouse-leave history-mouse-leave}
+                                                           :size "auto"
+                                                           ;:width "44px"
+
+                                                           :align :center :justify :center
+                                                           :style (merge
+                                                                   (when (= kk @hover-tools-atom)
+                                                                     {:filter "invert(233%)"})
+                                                                   (when (not main-true?)
+                                                                     {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil) 45))})
+                                                                   {:font-family  (theme-pull :theme/monospaced-font nil)
                                                                     :color "#000000"
                                                                     :font-size "10px"}
+                                                                   (when main-true? ;;(and main-true? (true? ee))
+                                                                    ;;  {:border-left (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))
+                                                                    ;;   :border-right (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))}
+                                                                     { :border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))}
+                                                                     )
                                                                    (when (true? ee)
                                                                      {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 65)}))
-                                                     :child (str sec)])])]
-                          
-                          (not (nil? selected-warren-item)) [re-com/box :child (str warren-item-type)]
+                                                           :child (str sec)])])]
 
-                          :else "(no signal / rule / solver selected)"
-                          )]
-                
-                ]]))
+                                (not (nil? selected-warren-item)) [re-com/box :child (str warren-item-type)]
+
+                                :else "(no signal / rule / solver selected)")])
+                              
+                              
+                              ]]))
 
 (re-frame/reg-event-db
  ::timeout-response

@@ -1032,7 +1032,7 @@
 (def default-viz-shapes (slread "./defs/viz-shapes.edn"))
 
 (defn insert-field-vectors! [field-vectors system-db & sql-filter]
-  (ut/pp [:insert-field-vectors! field-vectors])
+  ;; (ut/pp [:insert-field-vectors! field-vectors])
   ;(when (not (empty? sql-filter))
   ;  (let [base-honey {:delete-from [:fields]}
   ;        honey-map (if sql-filter (assoc base-honey :where (first (sqlize-keywords sql-filter)))
@@ -1834,7 +1834,7 @@
 (defn captured-sniff [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset]]
  ; (when (= (count @sniffs) 0) (create-sqlite-sys-tables-if-needed! dest))
   (swap! sniffs inc)
-  (ut/pp [:starting-captured-sniff! src-conn-id base-conn-id src-conn result-hash sql-filter :using-tmp-src-db? (not (nil? resultset)) :no. @sniffs])
+  ;; (ut/pp [:starting-captured-sniff! src-conn-id base-conn-id src-conn result-hash sql-filter :using-tmp-src-db? (not (nil? resultset)) :no. @sniffs])
   (doall
    (let [res? (not (nil? resultset))
         ;tmp-src {:jdbc-url (str "jdbc:sqlite:file:tmpsniffdb" (rand-int 12345) "?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
@@ -1884,14 +1884,15 @@
                           (dissoc :status))
            sniff-rows (dissoc sniff-rows :connections)
 
-           combos-found (get (first (sql-query dest (to-sql {:select [[[:count 1] :cnt]] :from [:combos]}))) :cnt)]
+           ;combos-found (get (first (sql-query dest (to-sql {:select [[[:count 1] :cnt]] :from [:combos]}))) :cnt)
+           ]
             ;(when (> combos-found 0) (swap! sniff-cache assoc result-hash sniff-rows))
-       (ut/pp [:captured-sniff-done!
-               :sql-filter sql-filter
-               :result-hash result-hash
-               ;:deets sniff-deets
-                    ;:attribs (sql-query dest (to-sql {:select [:*] :from [:attributes] :where  [:= :attribute_name "is_sqlite?"]}))
-               :combos-found combos-found])
+      ;;  (ut/pp [:captured-sniff-done!
+      ;;          :sql-filter sql-filter
+      ;;          :result-hash result-hash
+      ;;          ;:deets sniff-deets
+      ;;               ;:attribs (sql-query dest (to-sql {:select [:*] :from [:attributes] :where  [:= :attribute_name "is_sqlite?"]}))
+      ;;          :combos-found combos-found])
            ; (send-off insert-agent1 (fn [_] 
        (sql/insert-all-tables sniff-rows (last sql-filter))
 
@@ -1933,7 +1934,7 @@
          (sql-exec src-conn (to-sql {:drop-table [(last sql-filter)]})));)
 
       ;(hik/close-datasource (get dest :datasource)) ;; close to free memory
-       (ut/pp [:captured-sniff-inserted! sql-filter])
+      ;;  (ut/pp [:captured-sniff-inserted! sql-filter])
        ;(.release semaphore)
        nil))))
 

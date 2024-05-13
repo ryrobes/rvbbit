@@ -252,7 +252,7 @@
      {:interval                 5 ;; subscribe to server data from flows if we see it
       :event                    [::bricks/unsub-to-flows]
       :poll-when                [::bricks/stale-flow-subs?]
-      :dispatch-event-on-start? false}     
+      :dispatch-event-on-start? false}
      
     ;;  {:interval                 30
     ;;   :event                    [::bricks/sub-to-flows-all]

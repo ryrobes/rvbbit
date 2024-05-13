@@ -1040,7 +1040,7 @@
 (defonce client-queues (atom {}))
 (defonce client-queues-2 (atom {}))
 (defonce client-queues-3 (atom {}))
-(defonce client-queue-atoms [client-queues client-queues-2 client-queues-3 ])
+(defonce client-queue-atoms [client-queues]) ;; [client-queues client-queues-2 client-queues-3 ])
 
 (defonce queue-distributions (atom {}))
 
@@ -1051,18 +1051,71 @@
    (let [new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
     (swap! cq assoc client-name new-queue-atom))))
 
-(defn sub-push-loop [client-name data cq sub-name]
+;; (defn sub-push-loop [client-name data cq sub-name] ;; works, old human version
+;;   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
+;;   (inc-score! client-name :booted true)
+;;   (let [results (async/chan (async/sliding-buffer 100))] ;; was (async/sliding-buffer 450)
+;;     (try
+;;       (async/go-loop []
+;;         (async/<! (async/timeout 70)) ;; was 70 ?
+;;         (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
+;;           (let [item (ut/dequeue! queue-atom)]
+;;             (if item
+;;               (when (async/>! results item)
+;;                 (recur))
+;;               (recur)))
+;;           (recur)))
+;;       (catch Throwable e
+;;         (ut/pp [:subscription-err!! sub-name (str e) data])
+;;         (async/go-loop [] (recur))))
+;;     results))
+
+
+;; (defn sub-push-loop [client-name data cq sub-name] ;;; version 1 of batching, does NOT remove dupe task-ids
+;;   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
+;;   (inc-score! client-name :booted true)
+;;   (let [results (async/chan (async/sliding-buffer 100))] ;; was (async/sliding-buffer 450)
+;;     (try
+;;       (async/go-loop []
+;;         (async/<! (async/timeout 500)) ;; was 70 ?
+;;         (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
+;;           (let [items (loop [res []]
+;;                         (if-let [item (ut/dequeue! queue-atom)]
+;;                           (recur (conj res item))
+;;                           res))]
+;;             (if (not-empty items)
+;;               (let [message (if (= 1 (count items)) (first items) items)]
+;;                 (when (async/>! results message)
+;;                   (recur)))
+;;               (recur)))
+;;           (recur)))
+;;       (catch Throwable e
+;;         (ut/pp [:subscription-err!! sub-name (str e) data])
+;;         (async/go-loop [] (recur))))
+;;     results))
+
+(defn sub-push-loop [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
   (let [results (async/chan (async/sliding-buffer 100))] ;; was (async/sliding-buffer 450)
     (try
       (async/go-loop []
-        (async/<! (async/timeout 70)) ;; was 70 ?
+        (async/<! (async/timeout 600)) ;; was 70 ?
         (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
-          (let [item (ut/dequeue! queue-atom)]
-            (if item
-              (when (async/>! results item)
-                (recur))
+          (let [items (loop [res []]
+                        (if-let [item (ut/dequeue! queue-atom)]
+                          (recur (conj res item))
+                          res))
+                items-by-task-id (group-by :task-id items)
+                latest-items (mapv (fn [group]
+                                     (if (= :alert1 (first group))
+                                       group
+                                       (last group)))
+                                   (vals items-by-task-id))]
+            (if (not-empty latest-items)
+              (let [message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
+                (when (async/>! results message)
+                  (recur)))
               (recur)))
           (recur)))
       (catch Throwable e
@@ -1073,16 +1126,16 @@
 (defmethod wl/handle-subscription :server-push2 [{:keys [kind client-name] :as data}]
   (sub-push-loop client-name data client-queues kind))
 
-(defmethod wl/handle-subscription :server-push3 [{:keys [kind client-name] :as data}]
-  (sub-push-loop client-name data client-queues-2 kind))
+;; (defmethod wl/handle-subscription :server-push3 [{:keys [kind client-name] :as data}]
+;;   (sub-push-loop client-name data client-queues-2 kind))
 
-(defmethod wl/handle-subscription :server-push4 [{:keys [kind client-name] :as data}]
-  (sub-push-loop client-name data client-queues-3 kind))
+;; (defmethod wl/handle-subscription :server-push4 [{:keys [kind client-name] :as data}]
+;;   (sub-push-loop client-name data client-queues-3 kind))
 
 (defn push-to-client [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
   (doall
    (try
-     (let [rr (rand-int 3)
+     (let [rr 0 ;(rand-int 3)
            cq (get client-queue-atoms rr)
            _ (swap! queue-distributions assoc client-name 
                     (vec (conj (get @queue-distributions client-name []) rr)))
@@ -1101,7 +1154,7 @@
                    :reco-count reco-count
                    :queue-id queue-id
                    :task-id task-id
-                   :data [{} ;; data  ;; data is likely needed for :payload and :payload-kp that kits need? but we can revisit later... 
+                   :data [data  ;; data is likely needed for :payload and :payload-kp that kits need? but we can revisit later... 
                                       ;; not sure if kits will ship in current form. doubtful actually
                                       ;; in the meantime this takes a chunk out of client memory reqs  || 5/10/25 12:35am
                           (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
@@ -2068,7 +2121,7 @@
         components-key (into {} (for [[k {:keys [data ports view file-path flow-path raw-fn sub-flow-id flow-id sub-flow]}] flowmap ;; <-- flow-id refers to the subflow embed, not the parent
                                       :let [ttype (or (get-in data [:flow-item :type])
                                                       (get-in data [:drag-meta :type]))
-                                            try-read (fn [x] (try (edn/read-string x) (catch Exception _ x)))
+                                            try-read  (fn [x] (try (edn/read-string x) (catch Exception _ x)))
                                             view-swap (fn [obody flow-id bid push-key]
                                                         (let [pkey       (keyword (str (cstr/replace (str push-key) ":" "") ">"))
                                                               kps        (ut/extract-patterns obody pkey 2)
@@ -2100,7 +2153,7 @@
                                             fn-category (try-read (get-in data [:flow-item :category] ":unknown!"))]]
                                   (cond
 
-                                    (and (= ttype :open-block) (not (empty? (get ports :in)))) ;; open block with inputs
+                                    (and (= ttype :open-block) (ut/ne? (get ports :in))) ;; open block with inputs
                                     {k {:data (get data :user-input)
                                         :default-overrides (get-in data [:flow-item :defaults] {})
                                         :inputs (vec (keys (get ports :in)))}}
@@ -2131,9 +2184,9 @@
                                     {k (-> (process-flowmap2 (get sub-flow :map) (get sub-flow :connections) fid)
                                            (assoc :file-path file-path)
                                            (assoc :flow-id flow-id))} ;; flow-id of the embdeeded flow, NOT the parent
-                                                ;; {k {:components (get sub-flow :map)
-                                                ;;     :connections (get sub-flow :connections)}}
-                                             ;;(= ttype :param) {k (get data :user-input)}
+                                              ;; {k {:components (get sub-flow :map)
+                                               ;;     :connections (get sub-flow :connections)}}
+                                            ;;(= ttype :param) {k (get data :user-input)}
 
                                     :else {k {:fn-key [fn-category fn-key]
                                               :default-overrides (get-in data [:flow-item :defaults] {})
@@ -2243,6 +2296,8 @@
 (defn flow! [client-name flowmap file-image flow-id opts & [no-return?]]
   (try
     (let [orig-flowmap flowmap
+          from-string? (true? (string? flowmap))
+          ;;_ (ut/pp [:run-flow-called! [client-name flowmap file-image flow-id opts no-return?]])
           _ (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of flowmaps starter overlap
           orig-opts opts ;; contains overrides
         ;opts (merge {:client-name (str (or (get opts :client-name) client-name :rvbbit))} (or opts {}))) ;; stuff into opts for flow-waiter
@@ -2268,9 +2323,12 @@
                               (catch Exception _ (do (when (not= flow-id "client-keepalive") ;; since no file exists and its not from a client, it has not real "file-image" map
                                                        (ut/pp [:error-reading-flow-from-disk-file-image-flow! flow-id client-name]))
                                                      {}))))
-          ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps-pre") ;; TEMP FOR DEBUGGING PRE PROCESSED MAPS
-          ;;                     (ut/pretty-spit (str "./flow-history/src-maps-pre/" flow-id ".edn") ;; expensive...
-          ;;                                     flowmap 185)))
+
+          ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps-pre0") ;; TEMP FOR DEBUGGING PRE PROCESSED MAPS
+          ;;           (ut/pretty-spit (str "./flow-history/src-maps-pre0/" flow-id "." from-string? ".edn") ;; expensive...
+          ;;                           flowmap 185)))            
+
+
           user-opts (get oo-flowmap :opts (get opts :opts))
           opts (assoc opts :opts user-opts) ;; kinda weird, but we need to account for saved opts or live interactive opts
           ;;_ (ut/pp [:flow!-opts opts user-opts])
@@ -2278,6 +2336,11 @@
         ;; _ (ut/pp [:applying-walk-map walk-map])
         ;; pre-run subbing in params and other contextual values for offline running... (:server / :calliope will have own, etc)
           flowmap (walk/postwalk-replace walk-map oo-flowmap)
+
+          ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps-pre") ;; TEMP FOR DEBUGGING PRE PROCESSED MAPS
+          ;;           (ut/pretty-spit (str "./flow-history/src-maps-pre/" flow-id "." from-string? ".edn") ;; expensive...
+          ;;                           flowmap 185)))          
+
           uid (get opts :instance-id (str flow-id))  ;(ut/generate-name)
           post-id (if (get opts :increment-id? false) ;; if auto increment idx, lets use that for lookups...
                     (str uid "-" (count (filter #(cstr/starts-with? % uid) (keys @flow-db/channel-history))))
@@ -2305,9 +2368,11 @@
           opts (merge opts (select-keys (get opts :opts {}) [:close-on-done? :debug? :timeout]))
           opts (merge {:client-name client-name} opts)
           finished-flowmap (assoc finished-flowmap :opts opts)
+
           ;; _ (async/thread (do (ext/create-dirs "./flow-history/src-maps") ;; TEMP FOR DEBUGGING POST PROCESSED MAPS
-          ;;                     (ut/pretty-spit (str "./flow-history/src-maps/" flow-id ".edn") ;; expensive...
+          ;;                     (ut/pretty-spit (str "./flow-history/src-maps/" flow-id "." from-string? ".edn") ;; expensive...
           ;;                                     finished-flowmap 185)))
+
           ;;_ (ut/pp [:***flow!-finished-flowmap finished-flowmap [:opts opts]])
           _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter          
           _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
@@ -2318,7 +2383,7 @@
           ;;_ (swap! last-times assoc flow-id []) 
           ;_ (alert! client-name  10 1.35)
           base-flow-id (if (cstr/includes? (str flow-id) "-SHD-") (first (cstr/split flow-id #"-SHD-")) flow-id) ;; if history run, only for estimates for now
-          prev-times (get @times-atom base-flow-id [-1])
+          prev-times (get @times-atom base-flow-id [-1]) 
 
           ;; _ (push-to-client [:estimate] (ut/avg prev-times) client-name -1 :est1 :est2)
 
@@ -2333,10 +2398,10 @@
                                                   (Throwable->map e)
                                                   (str e)]) 0)))
           
-          _ (when (not= flow-id "client-keepalive")
-              (doseq [client-name (keys (client-statuses))] (ship-est client-name))) ;; send to all clients just in case they care... (TODO make this more relevant)
+          ;; _ (when (not= flow-id "client-keepalive")
+          ;;     (doseq [client-name (keys (client-statuses))] (ship-est client-name))) ;; send to all clients just in case they care... (TODO make this more relevant)
 
-          ;;_ (ship-est client-name)
+          _ (ship-est client-name)
 
 
          ;; _ (ut/pp [:opts!! opts flow-id])
@@ -3993,7 +4058,7 @@
 (defmethod wl/handle-request :honey-call [{:keys [kind ui-keypath honey-sql client-name]}]
   (swap! q-calls2 inc)
   (inc-score! client-name :push)
-  (ut/pp [:PUSH-honey-call! (str honey-sql)])
+  ;; (ut/pp [:PUSH-honey-call! (str honey-sql)])
   ;; (ut/pp [kind {:kind kind :ui-keypath ui-keypath :honey-sql honey-sql}])
   ;; (ut/pp [kind ;(not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
   ;;         @q-calls2 kind ui-keypath :system-db client-name ;; honey-sql ; (get honey-sql :transform-select) :full-honey honey-sql ; :select (get honey-sql :select)
@@ -5237,7 +5302,7 @@
   (swap! q-calls inc)
   (inc! running-user-queries)
   (inc-score! client-name :push)
-  (ut/pp [:PUSH-honeyx-call! (str honey-sql)])
+  ;; (ut/pp [:PUSH-honeyx-call! (str honey-sql)])
 
   ;; (ut/pp [kind ;(not (empty? (ut/extract-patterns honey-sql :pivot-by 2)))
   ;;         @q-calls kind ui-keypath connection-id client-name panel-key page

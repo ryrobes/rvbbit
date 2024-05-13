@@ -427,7 +427,7 @@
                (let [pfull (first (vals (get-in v [:data :queries])))
                       ;; _ (tap> [:param-fmaps ttype k pfull])
                     ;ddata @(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
-                     ddata (first @(ut/tracked-subscribe [::resolver/logic-and-params [pfull]]))
+                     ddata (first @(ut/tracked-sub ::resolver/logic-and-params {:m [pfull] :p nil}))
                      dtype (ut/data-typer ddata)
                      ports {:out {:out (keyword dtype)}}
                      ports (cond (= dtype "map")
@@ -461,7 +461,7 @@
                (let [pfull (get-in v [:data :drag-meta :param-full])
                       ;; _ (tap> [:param-fmaps ttype k pfull])
                            ;ddata @(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
-                     ddata (first @(ut/tracked-subscribe [::resolver/logic-and-params [pfull]]))
+                     ddata (first @(ut/tracked-sub ::resolver/logic-and-params {:m [pfull] :p nil}))
                      dtype (ut/data-typer ddata)
                      ports {:out {:out (keyword dtype)}}
                      ports (cond (= dtype "map")
@@ -488,7 +488,7 @@
 
                        ;;     _ (tap> [:user-input-fmaps ttype k pfull])
                            ;ddata (resolver/logic-and-params pfull nil) ;@(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
-                     ddata (first @(ut/tracked-subscribe [::resolver/logic-and-params [pfull]]))
+                     ddata (first @(ut/tracked-sub ::resolver/logic-and-params {:m [pfull] :p nil}))
                      dtype (ut/data-typer ddata)
                      ports {;:in (get-in v [:ports :in])
                             :out {:out (keyword dtype)}}
@@ -549,7 +549,7 @@
                                             fn-category (try-read (get-in data [:flow-item :category] ":unknown!"))]]
                                   (cond
 
-                                    (and (= ttype :open-block) (not (empty? (get ports :in)))) ;; open block with inputs
+                                    (and (= ttype :open-block) (ut/ne? (get ports :in))) ;; open block with inputs
                                     {k {:data (get data :user-input)
                                         :default-overrides (get-in data [:flow-item :defaults] {})
                                         :inputs (vec (keys (get ports :in)))}}
@@ -615,6 +615,16 @@
                (apply concat @(ut/tracked-subscribe [::flowmap-connections])))))
 
 (re-frame/reg-event-db
+ ::add-live-flow-subs 
+ (fn [db [_ running-subs]]
+      (assoc db :flow-subs 
+             ;; running subs have hashed names and are ephememeral, but we still need them on the sub list
+             ;; so the sub list maintainer doesn't trash them when she realizes that they aren't needed. she'd be right! BUT ALSO WRONG! 
+             ;; since these running flow subs are expensive/powerful, I want to put the user in charge of creating and destorying them - for now.
+             ;; they should only really be used in the interactive creation of flows anyways...
+             (vec (into running-subs (get db :flow-subs))))))
+
+(re-frame/reg-event-db
  ::run-current-flowmap
  (fn [db _]
   ;(tap> [:ran-condi ])
@@ -628,7 +638,7 @@
                   server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)
                  ;running-subs (vec (conj (for [k (keys (get server-flowmap :components))] [flow-id k]) [flow-id :*running?]))
                   comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
-                  curr-flow-subs (get db :flow-subs)
+                  ;;curr-flow-subs (get db :flow-subs)
                   running-view-subs (vec (for [[k v] comps :when (get v :view)]
                                            [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
                   running-subs (vec (for [k (keys comps)] [flow-id k]))
@@ -651,6 +661,7 @@
               ;;            (count (vec (map last running-subs)))))
               ;; we need to add new blocks if we are building. TODO selectivly re-sub, or not (dupes should be fine server-side)
                 ;;(tap> [:resub? (vec (filter #(cstr/includes? (str %) (str "blocks||" flow-id "||")) curr-flow-subs)) (vec (map last running-subs))])
+                (ut/tracked-dispatch [::add-live-flow-subs running-subs])
                 (ut/tracked-dispatch [::wfx/request :default
                                     {:message    {:kind :sub-to-running-values
                                                   :flow-id flow-id
@@ -659,7 +670,7 @@
                                      :timeout    15000}]))
             ;;  (ut/tracked-dispatch [::audio/text-to-speech11 :audio :speak "/home/ryanr/fight-like-hell.mp3" true])
               (ut/tracked-dispatch [::wfx/request :default
-                                  {:message    {:kind :run-flow 
+                                  {:message    {:kind :run-flow
                                                 :flow-id flow-id
                                                 :no-return? true ;;false ; true ;false ;true  ;; if we arent subbing to running values, we need to return dump
                                                 :file-image {:flowmaps @(ut/tracked-subscribe [::flowmap-raw])
@@ -5490,11 +5501,13 @@
       :else [re-com/box :child (str "unknown editor mode: " @editor-mode)])))
 
 (defn server-flows [hh]
-  (let [ss @(ut/tracked-subscribe [::bricks/flow-statuses])
+  (let [ss @(ut/tracked-sub ::bricks/flow-statuses {})
         ss (vec (sort-by first (for [[k v] ss] [k v])))] ;; since maps wont keep key order in cljs, vectorize it
     [re-com/box
      :height (px hh)
-     :style {:overflow "auto"}
+     :style {:overflow "auto"
+             ;:border "1px solid green"
+             }
      :child [re-com/v-box
              :padding "3px"
              :style {;:border "1px dashed white"
@@ -5554,15 +5567,30 @@
                                           ;;:on-click #(do (ut/tracked-dispatch [::http/load-flow-history fid nil]))
                                           :on-click #(let [;flowmap @(ut/tracked-subscribe [::flowmap])
                                                            ;flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
-                                                           client-name @(ut/tracked-subscribe [::conn/client-name])
+                                                           client-name @(ut/tracked-sub ::conn/client-name {})
                                                            ;server-flowmap (process-flowmap2 flowmap flowmaps-connections fid)
                                                            ;comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
                                                            ;running-view-subs (vec (for [[k v] comps :when (get v :view)]
                                                            ;                         [fid (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
                                                            ;running-subs (vec (for [k (keys comps)] [fid k]))
                                                            ;running-subs (vec (into running-subs running-view-subs))
+                                                           flowmap @(ut/tracked-subscribe [::flowmap])
+                                                           flow-id @(ut/tracked-subscribe [::selected-flow])
+                                                           flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+                                                           ;client-name @(ut/tracked-subscribe [::conn/client-name])
+                                                           ;opts-map (get-in db [:flows flow-id :opts] {})
+                                                           server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)
+                                                                            ;running-subs (vec (conj (for [k (keys (get server-flowmap :components))] [flow-id k]) [flow-id :*running?]))
+                                                           comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
+                                                                             ;;curr-flow-subs (get db :flow-subs)
+                                                           running-view-subs (vec (for [[k v] comps :when (get v :view)]
+                                                                                    [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
+                                                           running-subs (vec (for [k (keys comps)] [flow-id k]))
+                                                           running-subs (vec (into running-subs running-view-subs))
+                                                           ;watched? (ut/ne? (get @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
                                                            ]
                                                        (ut/tracked-dispatch [::http/load-flow-history fid nil])
+                                                       (ut/tracked-dispatch [::add-live-flow-subs running-subs]) 
                                                        (ut/tracked-dispatch [::wfx/request :default
                                                                            {:message    {:kind :sub-to-running-values
                                                                                          :flow-id fid 
@@ -5747,8 +5775,8 @@
                       [flow-details-block-container "server flow statuses" :system :system
                        [re-com/box 
                         ;:style {:border "1px solid white"}
-                        :height "960px"
-                        :child [server-flows]] ; flow-id orderb true 570 nil ;366
+                        :height (px (* h 0.6))
+                        :child [server-flows (* h 0.6)]] ; flow-id orderb true 570 nil ;366
                        "zmdi-dns"]
 
                       (= (first @db/flow-editor-system-mode) "flow browser")
@@ -5768,7 +5796,7 @@
                 (cond (some #(= (first @db/flow-editor-system-mode) %) ["flow browser" "flow parts"])
 
                       [flow-details-block-container "server flow statuses" :system :system
-                       [server-flows 300] ; flow-id orderb true 570 nil ;366
+                       [server-flows 240] ; flow-id orderb true 570 nil ;366
                        "zmdi-dns"]
 
                       (= (first @db/flow-editor-system-mode) "scheduler")
@@ -5810,7 +5838,7 @@
                                      {:data   :gen-viz-192
                                       :margin {:top 5 :bottom 25 :right 30 :left 20}}
                                      [:> :CartesianGrid
-                                      {:strokeDasharray "1 4" :opacity 0.33}]
+                                      {:strokeDasharray "1 5" :opacity 0.1}]
                                      [:> :Tooltip] ;[:> :XAxis {:dataKey :ts}]
                                      [:> :Area
                                       {:type      "monotone"
@@ -5836,7 +5864,7 @@
                                            {:data   :gen-viz-545
                                             :margin {:top 5 :bottom 25 :right 30 :left 20}}
                                            [:> :CartesianGrid
-                                            {:strokeDasharray "1 4" :opacity 0.33}]
+                                            {:strokeDasharray "1 5" :opacity 0.1}]
                                            [:> :Tooltip] ;[:> :XAxis {:dataKey :ts}]
                                            [:> :Bar
                                             {:dataKey :threads

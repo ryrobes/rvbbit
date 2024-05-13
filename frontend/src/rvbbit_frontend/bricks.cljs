@@ -394,7 +394,9 @@
          theme-refs (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/") (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))]
      ;(tap> [:flow-refs flow-refs])
      ;;(vec (distinct (into signal-subs (into drop-refs (into runstream-refs (into runstreams (into theme-refs flow-refs)))))))
-     (vec (distinct (concat signal-subs drop-refs runstream-refs runstreams theme-refs flow-refs)))
+     (filterv 
+      #(not (cstr/includes? (str %) "||")) ;; live running subs ignore
+      (vec (distinct (concat signal-subs drop-refs runstream-refs runstreams theme-refs flow-refs))))
      )))
 
 
@@ -404,7 +406,9 @@
    (let [;;new @(ut/tracked-subscribe [::get-flow-subs])
          new @(rfa/sub ::get-flow-subs {})
          old (get db :flow-subs [])
-         deads (vec (cset/difference (set old) (set new)))]
+         deads (vec (cset/difference (set old) (set new)))
+         deads (filterv #(not (cstr/includes? (str %) "||")) deads)] ;; dont mess with running-sub pseudo flows
+   
     ;;  (when (ut/ne? deads) 
     ;;    (tap> [:unsub-check (get db :client-name) {:new new :old old :deads deads}]))
      (ut/ne? deads))))
@@ -415,7 +419,9 @@
    (let [;;new @(ut/tracked-subscribe [::get-flow-subs])
          new @(rfa/sub ::get-flow-subs {})
          old (get db :flow-subs [])
+         old (filterv #(not (cstr/includes? (str %) "||")) old)
          deads (vec (cset/difference (set old) (set new)))
+         deads (filterv #(not (cstr/includes? (str %) "||")) deads)  ;; dont mess with running-sub pseudo flows
          _ (tap> [:flow-unsub-change! (get db :client-name) {:old old :new new :removing deads}])
          ;;_ (tap> [:deads-exec! deads (get db :client-name)])
          ]
@@ -430,7 +436,8 @@
  (fn [db _]
    (let [;;flow-refs @(ut/tracked-subscribe [::get-flow-subs])
          flow-refs @(rfa/sub ::get-flow-subs {})
-         subbed (get db :flow-subs [])]
+         subbed (get db :flow-subs [])
+         subbed (filterv #(not (cstr/includes? (str %) "||")) subbed)]  ;; dont mess with running-sub pseudo flows
      (vec (cset/difference (set flow-refs) (set subbed))))))
 
 (re-frame/reg-sub
@@ -458,6 +465,7 @@
    (let [;;new @(ut/tracked-subscribe [::get-new-flow-subs])
          new @(rfa/sub ::get-new-flow-subs {})
          old (get db :flow-subs [])
+         old (filterv #(not (cstr/includes? (str %) "||")) old)
          _ (tap> [:flow-sub-change! (get db :client-name) {:old old :new new}])
          ;all (get db :flow-subs [])
          subbed (vec (for [n new]
@@ -10519,25 +10527,26 @@
                                                                                            (let [fstr (str "running flow " flow-id (when overrides? " (with overrides)"))
                                                                                                  w (/ (count fstr) 4.1)]
                                                                                              ;(tap> [:fuck-me flow-id client-name overrides])
-                                                                                             (ut/tracked-dispatch [::wfx/request :default
-                                                                                                                 {:message    {:kind :run-flow
-                                                                                                                               :flow-id flow-id
-                                                                                                                               :flowmap flow-id
-                                                                                                                               :no-return? true
-                                                                                                                               :opts (if (map? overrides)
-                                                                                                                                       (merge base-opts
-                                                                                                                                              {:overrides overrides})
-                                                                                                                                       base-opts)
+                                                                                             (ut/tracked-dispatch
+                                                                                              [::wfx/request :default
+                                                                                               {:message    {:kind :run-flow
+                                                                                                             :flow-id flow-id
+                                                                                                             :flowmap flow-id
+                                                                                                             :no-return? true
+                                                                                                             :opts (if (map? overrides)
+                                                                                                                     (merge base-opts
+                                                                                                                            {:overrides overrides})
+                                                                                                                     base-opts)
                                                                                                                               ;;  :file-image {:flowmaps @(ut/tracked-subscribe [::flowmap-raw])
                                                                                                                               ;;               :opts @(ut/tracked-subscribe [::opts-map])
                                                                                                                               ;;               :zoom @db/pan-zoom-offsets
                                                                                                                               ;;               :flow-id flow-id
                                                                                                                               ;;               :flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])}
-                                                                                                                               :client-name client-name
-                                                                                                                               :keypath [:panels panel-key :views selected-view]}
-                                                                                                                  :on-response [::http/socket-response]
-                                                                                                                  :on-timeout [::http/timeout-response]
-                                                                                                                  :timeout    500000}])
+                                                                                                             :client-name client-name
+                                                                                                             :keypath [:panels panel-key :views selected-view]}
+                                                                                                :on-response [::http/socket-response]
+                                                                                                :on-timeout [::http/timeout-response]
+                                                                                                :timeout    500000}])
                                                                                              (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5]))))
                                                                                             ;;  (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
                                                                                             ;;                      [:flow (keyword (str flow-id ">*running?"))] true])
