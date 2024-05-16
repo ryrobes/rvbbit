@@ -3,15 +3,16 @@
    [clojure.java.jdbc :as jdbc]
    [clojure.edn :as edn]
    [clojure.core.async :as async :refer [<! >! <!! >!! go chan]]
+   [ring.adapter.jetty9 :as jetty]
    [nextjournal.beholder :as beholder]
    [shutdown.core :as shutdown]
    [flowmaps.core :as flow]
    [flowmaps.examples.simple-flows :as fex]
    [flowmaps.web :as flow-web]
    [flowmaps.db :as flow-db]
-   [ring.adapter.jetty9 :as jetty]
    [clojure.pprint :as ppt]
    ;[rvbbit-backend.flowmaps :as flow]
+   [websocket-layer.network :as net]
    [rvbbit-backend.transform :as ts]
    [rvbbit-backend.embeddings :as em]
    [clj-time.coerce :as tcc]
@@ -338,17 +339,28 @@
                 {})]
     (reset! flow-db/results-atom state)))
 
+;; (def websocket-server (atom nil))
+
 
   
 (defn start-services []
   (ut/pp [:starting-services...])
+  
   (evl/create-nrepl-server!)
   (wss/create-web-server!)
-  (wss/create-websocket-server!)
+  ;; (wss/create-websocket-server!)
+  ;; (wss/start-websocket-server!)
+  ;; (def ttttr
+  ;;   (jetty/run-jetty #'wss/web-handler wss/ring-options))
+
+;; (reset! websocket-server (jetty/run-jetty wss/web-handler wss/ring-options))
+;; (.start @websocket-server)
+
   ;; (do (ut/pp [:STYING??!])
   ;;   (reset! wss/websocket-server (jetty/run-jetty wss/web-handler wss/ring-options))
   ;; (.start @wss/websocket-server))
-  (evl/create-nrepl-server!))
+  (evl/create-nrepl-server!)
+  )
 
 (defn delayed-start [ms f]
   (Thread. #(do (Thread/sleep ms) (f))))
@@ -1095,6 +1107,12 @@
     ;;   @fut)
 
     (start-services)
+
+    ;; (defonce wssr (jetty/run-jetty #'wss/web-handler wss/ring-options))
+    ;; (.start wssr)
+
+
+    
 
     (println " ")
 

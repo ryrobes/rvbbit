@@ -1,7 +1,18 @@
 (ns rvbbit-backend.websockets
   (:require [clojure.core.async :as async :refer [<! >! <!! >!! go chan]]
             [websocket-layer.core :as wl]
+
+            ;[ring.server.standalone :refer [create-server]]
             [ring.adapter.jetty9 :as jetty]
+;[io.pedestal.http.jetty :as jetty]
+            
+
+            ;[ring.adapter.jetty :as jetty]
+
+        
+ 
+
+
             [websocket-layer.network :as net]
             [nextjournal.beholder :as beholder]
             [io.pedestal.http :as http]
@@ -60,8 +71,19 @@
   (:import ;(clojure.lang MultiFn)
    [com.github.vertical_blank.sqlformatter SqlFormatter]
    [java.util.concurrent Executors TimeUnit TimeoutException]
+
+   [org.eclipse.jetty.server Server]
+
+  ;;  [org.eclipse.jetty.server Server]
+  ;;  [org.eclipse.jetty.servlet ServletContextHandler ServletHolder]
+
+
+
+
    [java.lang ProcessBuilder]
    [java.io BufferedReader InputStreamReader]
+
+
    ;[java.util.concurrent CountDownLatch]
    ;(import (java.util.concurrent Executors))
    ;[java.util.concurrent Executors]
@@ -648,13 +670,14 @@
 ;;                                           :max-lifetime       1800000
 ;;                                           :cache "shared"} "imports-db-pool")})
 
-(def cache-db {:datasource @(pool-create {:jdbc-url "jdbc:sqlite:file:cachedb?mode=memory&cache=shared&transaction_mode=IMMEDIATE&auto_vacuum=FULL" ; "jdbc:sqlite:db/cache.db"
+(def cache-db {:datasource @(pool-create {;;:jdbc-url "jdbc:sqlite:file:cachedb?mode=memory&cache=shared&transaction_mode=IMMEDIATE&auto_vacuum=FULL" ; "jdbc:sqlite:db/cache.db"
+                                          :jdbc-url "jdbc:sqlite:file:cachedb?mode=memory&cache=shared&auto_vacuum=FULL"
                                           ;:jdbc-url "jdbc:sqlite:file:./db/cache.db?cache=shared&transaction_mode=IMMEDIATE&auto_vacuum=FULL" ; "jdbc:sqlite:db/cache.db"
                                           ;:jdbc-url "jdbc:sqlite::memory:?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL" ; "jdbc:sqlite:db/cache.db"
                                           ;:idle-timeout        600000 ;;; 10/25/23 LAST KNOWN GOOD SQLITE CONFIG
                                           ;:max-lifetime       1800000
                                           ;:maximum-pool-size 60
-                                          :transaction_mode "IMMEDIATE"
+                                          ;:transaction_mode "IMMEDIATE"
                                           ;:journal_mode "WAL"
                                           :cache "shared"} "cache-db-pool")})
 
@@ -2265,7 +2288,7 @@
         ;data (assoc data :flow-block block)
         ]
 
-    (ut/pp [:create-flowblock-for file-path])
+    ;; (ut/pp [:create-flowblock-for file-path])
 
     (async/thread ;; really expensive logging below. temp
       (let [fp (str "./flow-blocks/" fid ".edn")]
@@ -2826,7 +2849,7 @@
 (defmethod wl/handle-request :signals-history [{:keys [client-name signal-name]}]
   ;;(ut/pp [:get-signals-history client-name :for signal-name])
   (inc-score! client-name :push)
-  (ut/pp [:PUSH-signals-history client-name signal-name])
+  ;; (ut/pp [:PUSH-signals-history client-name signal-name])
   (let [cc (get-in @signals-atom [signal-name :signal])
         ccw (vec (ut/where-dissect cc))
         history (select-keys (get @last-signals-history-atom signal-name {}) ccw)
@@ -6351,25 +6374,11 @@
 ;;    :max-text-message-size 8192}) ; add this line to set the maximum message size
 
 
-(defn web-handler [request]
-  {:status  200 ;; stub
-   :headers {"Content-Type" "text/html"}
-   :body    "<html><head></head><body>youre never going to see this, bro</body></html>"})
 
-(def ws-endpoints
-  {"/ws" (net/websocket-handler {:encoding :edn ;; :transit-json ;; :edn
-                                 })})
 
-(def websocket-port 3030)
 
-(def ring-options
-  {:port                 websocket-port
-   :join?                false
-   :async?               true
-   :max-threads          450
-   ;:max-idle-time        10000
-   :websockets           ws-endpoints
-   :allow-null-path-info true})
+
+
 
 ;; (defn websocket-server []
 ;;   (jetty/run-jetty #'web-handler ring-options))
@@ -6390,24 +6399,214 @@
 ;;   (ut/ppa [:starting-websocket-server :port websocket-port])
 ;;   (.start (websocket-server)))
 
-(defonce websocket-server (jetty/run-jetty #'web-handler ring-options))
+
+;;; ##############################
+
 ;; (defonce websocket-server (delay (do (Thread/sleep 30000) (jetty/run-jetty #'web-handler ring-options))))
 
-(defn create-websocket-server! []
-  (ut/ppa [:starting-websocket-server :port websocket-port])
-  (.start websocket-server))
 
-(defn destroy-websocket-server! []
-  (ut/ppa [:shutting-down-websocket-server :port websocket-port])
-  (.stop websocket-server)
-  (let [timeout-ms 10000
-        start-time (System/currentTimeMillis)]
-    (while (and (.isRunning websocket-server)
-                (< (- (System/currentTimeMillis) start-time) timeout-ms))
-      (Thread/sleep 300))
-    (when (.isRunning websocket-server)
-      (ut/ppa [:killing-websocket-server! (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
-      (.destroy websocket-server))))
+
+
+
+;; (defonce websocket-server (atom nil))
+
+;; (defn create-websocket-server-instance []
+;;   (ut/ppa [:creating-websocket-server-instance :port websocket-port])
+;;   (jetty/run-jetty #'web-handler (assoc ring-options :port websocket-port :join? false :async? true)))
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (let [server-instance (create-websocket-server-instance)]
+;;     (reset! websocket-server server-instance)
+;;     (.start @websocket-server) ;; Manually start the server
+;;     (ut/ppa [:websocket-server-started :port websocket-port])))
+
+;; (defn destroy-websocket-server! []
+;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
+;;   (when @websocket-server
+;;     (.stop @websocket-server)
+;;     (reset! websocket-server nil)
+;;     (ut/ppa [:websocket-server-stopped :port websocket-port])))
+
+
+;; (def websocket-port 3030)
+
+;; (def ring-options
+;;   {:port                 websocket-port
+;;    :join?                false
+;;    :async?               true
+;;    :max-threads          450
+;;    ;; :max-idle-time        10000
+;;    :websockets           ws-endpoints
+;;    :allow-null-path-info true})
+
+;; (def service-map
+;;   (merge ring-options
+;;          {:env :prod
+;;           ::http/type :jetty
+;;           ::http/host "0.0.0.0"
+;;           ::http/port  websocket-port
+;;           ::http/routes []
+;;           ::http/container-options ring-options}))
+
+;; (defonce runnable-wsservice (server/create-server service-map))
+
+;; (def wss-server (atom nil))
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (reset! wss-server
+;;           (server/start runnable-wsservice)))
+
+;; (defn destroy-websocket-server! []
+;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
+;;   (when @wss-server
+;;     (server/stop @wss-server)
+;;     (reset! wss-server nil)))
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (reset! websocket-server
+;;           (http/start (http/create-server service-map))))
+
+;; (defn destroy-websocket-server! []
+;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
+;;   (when @websocket-server
+;;     (http/stop @websocket-server)
+;;     (reset! websocket-server nil)))
+
+
+
+
+
+
+(defn web-handler [request]
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "<html><head></head><body>youre never going to see this, bro</body></html>"})
+
+(def websocket-port 3030)
+
+(def ws-endpoints
+  {"/ws" (net/websocket-handler {:encoding :edn ;; :transit-json ;; :edn
+                                 })})
+
+(def ring-options
+  {:port                 websocket-port
+   :join?                false
+   :async?               true
+   :max-threads          450
+   ;; :max-idle-time        10000
+   :websockets           ws-endpoints
+   :allow-null-path-info true})
+
+(defonce websocket-server (jetty/run-jetty #'web-handler ring-options))
+
+
+
+
+
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (.start websocket-server))
+
+
+
+;; (defn create-websocket-server! []
+;;   (letfn [(handler [request respond raise] (respond {:status 404}))]
+;;     (jetty/run-jetty (fn [& args] (apply handler args)) ring-options)))
+
+
+
+;; (defonce websocket-server (atom nil))
+
+;; (defn start-server []
+;;   (jetty/run-jetty #'web-handler ring-options))
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (reset! websocket-server (start-server)))
+
+(defn destroy-websocket-server! [] nil)
+
+;; (defn destroy-websocket-server! []
+;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
+;;   (.stop websocket-server)
+;;   (let [timeout-ms 10000
+;;         start-time (System/currentTimeMillis)]
+;;     (while (and (.isRunning websocket-server)
+;;                 (< (- (System/currentTimeMillis) start-time) timeout-ms))
+;;       (Thread/sleep 300))
+;;     (when (.isRunning websocket-server)
+;;       (ut/ppa [:killing-websocket-server! (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
+;;       (.destroy websocket-server))))
+;; #######
+
+
+;; (defn create-jetty-server []
+;;   (let [server (Server. websocket-port)
+;;         context (ServletContextHandler. ServletContextHandler/NO_SESSIONS)]
+;;     (.setContextPath context "/")
+;;     (.addServlet context (ServletHolder. (jetty/proxy-handler #'web-handler)) "/")
+;;     (.setHandler server context)
+;;     server))
+
+;; (defonce websocket-server (atom nil))
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (reset! websocket-server (create-jetty-server))
+;;   (when @websocket-server
+;;     (.start @websocket-server)
+;;     (ut/ppa [:websocket-server-started :port websocket-port])))
+
+;; (defn destroy-websocket-server! []
+;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
+;;   (when @websocket-server
+;;     (.stop @websocket-server)
+;;     (reset! websocket-server nil)
+;;     (ut/ppa [:websocket-server-stopped :port websocket-port])))
+
+
+
+
+
+;; (defonce websocket-server (atom nil))
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (reset! websocket-server (jetty/run-jetty #'web-handler ring-options)))
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (reset! websocket-server (http/create-server (assoc ring-options :io.pedestal.http/routes #'web-handler)))
+;;   (http/start @websocket-server))
+
+
+
+;; (defn create-websocket-server! []
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])
+;;   (reset! websocket-server (server/create-server (assoc ring-options :io.pedestal.http/routes #'web-handler)))
+;;   (http/start @websocket-server))
+
+
+;; (defn destroy-websocket-server! []
+;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
+;;   (.stop websocket-server)
+;;   (let [timeout-ms 10000
+;;         start-time (System/currentTimeMillis)]
+;;     (while (and (.isRunning websocket-server)
+;;                 (< (- (System/currentTimeMillis) start-time) timeout-ms))
+;;       (Thread/sleep 300))
+;;     (when (.isRunning websocket-server)
+;;       (ut/ppa [:killing-websocket-server! (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
+;;       (.destroy websocket-server))))
+
+
+;;; ##############################
+
+
 
 ;; (defn restart-websocket-server! []
 ;;   (let [cache-size (count @sql-cache)]

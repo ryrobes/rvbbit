@@ -78,16 +78,30 @@
                  ;[org.slf4j/jul-to-slf4j "1.7.25"]
                  ;[org.slf4j/jcl-over-slf4j "1.7.25"]
                  ;[org.slf4j/log4j-over-slf4j "1.7.26"]
+                 
                  [metrics-clojure "2.10.0"]
                  [metrics-clojure-jvm "2.10.0"]
                  [metrics-clojure-health "2.10.0"]
                  [metrics-clojure-graphite "2.10.0"]
                  [metrics-clojure-ring "2.10.0"]
+
                  [com.github.vertical-blank/sql-formatter "1.0.3"]
                  [org.clojars.rutledgepaulv/websocket-layer "0.1.11"]
                  [com.fasterxml.jackson.core/jackson-core "2.14.0-rc1"]
-                 [io.pedestal/pedestal.service "0.5.10"]
-                 [io.pedestal/pedestal.jetty "0.5.10"]]
+                 ;[io.pedestal/pedestal.service "0.5.10"]
+                 ;[io.pedestal/pedestal.jetty "0.5.10"]
+
+
+                 
+                ;;  [ring "1.9.0"]
+                ;;  [ring/ring-jetty-adapter "1.9.0"]
+                ;;  [org.eclipse.jetty/jetty-server "9.4.43.v20210629"]
+                ;;  [org.eclipse.jetty/jetty-servlet "9.4.43.v20210629"]
+                ;;  [org.eclipse.jetty.websocket/websocket-server "9.4.43.v20210629"]
+
+
+                 [io.pedestal/pedestal.service "0.6.4"]
+                 [io.pedestal/pedestal.jetty "0.6.4"]]
   :jvm-opts ["--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED" ;; suppresses codahale.metrics msg in Java 11
              "--add-opens=java.base/java.nio=ALL-UNNAMED"
              "-Xmx28g" ;; testing with 48g

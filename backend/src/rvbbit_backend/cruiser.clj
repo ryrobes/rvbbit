@@ -114,18 +114,19 @@
    (via a honey-sql map) and returns it"
   ;; yes, I know this is inefficent as all hell compared to map,filter,reduce, etc - but I want the honeySQL DSL for consistency / end-user usability sake
   [rowset query & columns-vec]
-  (let [rando-name (str "rowset" (rand-int 12345567)) ;; prevent non-deterministic async name collisions...
-        rowset-type (cond (and (map? (first rowset)) (vector? rowset)) :rowset
-                          (and (not (map? (first rowset))) (vector? rowset)) :vectors)
-        columns-vec-arg (first columns-vec)
+  (when (ut/ne? rowset)
+    (let [rando-name (str "rowset" (rand-int 12345567)) ;; prevent non-deterministic async name collisions...
+          rowset-type (cond (and (map? (first rowset)) (vector? rowset)) :rowset
+                            (and (not (map? (first rowset))) (vector? rowset)) :vectors)
+          columns-vec-arg (first columns-vec)
         ;columns-vec-arg-underscores (vec (for [k (first columns-vec)] (keyword (cstr/replace (str (ut/unkeyword k)) #"-" "_"))))
-        columns-vec-arg-underscores (edn/read-string (cstr/replace (str columns-vec-arg) #"-" "_")) ;; ugly, but I need to keep the order
-        db-conn-old  {:classname   "org.sqlite.JDBC"
-                      :subprotocol "sqlite"
-                      :auto_vacuum "FULL"
-                      :subname     "::memory::?auto_vacuum=FULL" ;; "file:filterdb?mode=memory&auto_vacuum=FULL" ;
-                      }
-        db-conn filter-db ;; ^^^
+          columns-vec-arg-underscores (edn/read-string (cstr/replace (str columns-vec-arg) #"-" "_")) ;; ugly, but I need to keep the order
+          db-conn-old  {:classname   "org.sqlite.JDBC"
+                        :subprotocol "sqlite"
+                        :auto_vacuum "FULL"
+                        :subname     "::memory::?auto_vacuum=FULL" ;; "file:filterdb?mode=memory&auto_vacuum=FULL" ;
+                        }
+          db-conn filter-db ;; ^^^
         ;; db-conn {:classname   "org.sqlite.JDBC"
         ;;          :subprotocol "sqlite"
         ;;          :subname (str "file:filterdb?mode=memory&auto_vacuum=FULL" )
@@ -137,36 +138,36 @@
         ;;          }
         ;db-conn (str "jdbc:sqlite:file:filterdb" (rand-int 12345) "?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
         ;db-conn cache-db
-        rowset-fixed (if (= rowset-type :vectors)
-                       (vec (for [r rowset]
-                              (zipmap columns-vec-arg r)))
-                       rowset)
+          rowset-fixed (if (= rowset-type :vectors)
+                         (vec (for [r rowset]
+                                (zipmap columns-vec-arg r)))
+                         rowset)
         ;map-order (fn [amap order] (conj {} (select-keys amap order)))
-        asort (fn [m order]
-                (let [order-map (apply hash-map (interleave order (range)))]
-                  (conj
-                   (sorted-map-by #(compare (order-map %1) (order-map %2))) ; empty map with the desired ordering
-                   (select-keys m order))))
-        columns (keys (first rowset-fixed))
-        values (vec (for [r rowset-fixed] (vals r)))
-        ddl-str (sqlite-ddl/create-attribute-sample rando-name rowset-fixed) ;; has to be hardcoded sqlite-ddl!
-        insert-sql (to-sql {:insert-into [(keyword rando-name)]
-                            :columns columns
-                            :values values})
-        query-sql (to-sql (assoc query :from [(keyword rando-name)]))]
+          asort (fn [m order]
+                  (let [order-map (apply hash-map (interleave order (range)))]
+                    (conj
+                     (sorted-map-by #(compare (order-map %1) (order-map %2))) ; empty map with the desired ordering
+                     (select-keys m order))))
+          columns (keys (first rowset-fixed))
+          values (vec (for [r rowset-fixed] (vals r)))
+          ddl-str (sqlite-ddl/create-attribute-sample rando-name rowset-fixed) ;; has to be hardcoded sqlite-ddl!
+          insert-sql (to-sql {:insert-into [(keyword rando-name)]
+                              :columns columns
+                              :values values})
+          query-sql (to-sql (assoc query :from [(keyword rando-name)]))]
     ;(ut/pp [ddl-str  query-sql columns-vec-arg columns-vec-arg-underscores])
-    (sql-exec2 db-conn ddl-str)
-    (sql-exec2 db-conn insert-sql)
-    (let [results (sql-query db-conn query-sql)]
+      (sql-exec2 db-conn ddl-str)
+      (sql-exec2 db-conn insert-sql)
+      (let [results (sql-query db-conn query-sql)]
       ;(ut/pp (asort (first results) columns-vec-arg-underscores))
       ;(ut/pp (select-keys (first results) columns-vec-arg-underscores))
-      (sql-exec2 db-conn (str "drop table if exists " rando-name ";"))
-      (if (= rowset-type :vectors) ;; give it back in the format it was given 
-        (vec
-         (for [r results]
-           (vec ;; need to return the vec in the same field order as we got it, not just random key order
-            (vals (asort r columns-vec-arg-underscores)))))
-        results))))
+        (sql-exec2 db-conn (str "drop table if exists " rando-name ";"))
+        (if (= rowset-type :vectors) ;; give it back in the format it was given 
+          (vec
+           (for [r results]
+             (vec ;; need to return the vec in the same field order as we got it, not just random key order
+              (vals (asort r columns-vec-arg-underscores)))))
+          results)))))
 
 
 ;(ut/pp (rowset-sql-query [[1 2 3 "boo"] [1 2 3 "foo"]] {:select [:*] :from :rowset} [:one :two :three :four]))
@@ -1808,18 +1809,20 @@
 ;(set-error-mode! insert-agent1 :continue)
 
 (def tmp-db-src1 {:datasource @(pool-create {;:jdbc-url "jdbc:sqlite:file:./db/sniffdb1.db?cache=shared&transaction_mode=IMMEDIATE&auto_vacuum=FULL" 
-                                             :jdbc-url "jdbc:sqlite:file:tmpsniffdb1?mode=memory&cache=shared&transaction_mode=IMMEDIATE&auto_vacuum=FULL"
+                                            ;;  :jdbc-url "jdbc:sqlite:file:tmpsniffdb1?mode=memory&cache=shared&transaction_mode=IMMEDIATE&auto_vacuum=FULL" ;; removed IMMEDIATE 5/16/24
+                                             :jdbc-url "jdbc:sqlite:file:tmpsniffdb1?mode=memory&cache=shared&auto_vacuum=FULL"
                                              ;:max-lifetime       1800000
-                                             :transaction_mode "IMMEDIATE"
+                                             ;;:transaction_mode "IMMEDIATE"
                                              ;:journal_mode "WAL" ;; vacuum wont work w WAL ?
                                              :auto_vacuum "FULL"
                                              :cache "shared"}
                                             "tmp-db-src1")})
 
 (def dest {:datasource @(pool-create {;:jdbc-url "jdbc:sqlite:file:./db/sniffdb2.db?cache=shared&transaction_mode=IMMEDIATE&auto_vacuum=FULL" 
-                                      :jdbc-url "jdbc:sqlite:file:sniffdbdb2?mode=memory&cache=shared&transaction_mode=IMMEDIATE&auto_vacuum=FULL"
+                                      ;; :jdbc-url "jdbc:sqlite:file:sniffdbdb2?mode=memory&cache=shared&transaction_mode=IMMEDIATE&auto_vacuum=FULL" ;; removed IMMEDIATE 5/16/24
+                                      :jdbc-url "jdbc:sqlite:file:sniffdbdb2?mode=memory&cache=shared&auto_vacuum=FULL"
                                       ;:max-lifetime       1800000
-                                      :transaction_mode "IMMEDIATE"
+                                      ;; :transaction_mode "IMMEDIATE"
                                       :auto_vacuum "FULL"
                                       ;:journal_mode "WAL"
                                       :cache "shared"}

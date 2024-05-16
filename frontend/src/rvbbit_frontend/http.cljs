@@ -347,7 +347,7 @@
 (defonce batches-received (atom 0))
 (defonce packets-received-log (atom []))
 
-(tap> [:packets-received-log [(count @packets-received-log) @packets-received] (frequencies @packets-received-log)])
+;; (tap> [:packets-received-log [(count @packets-received-log) @packets-received] (frequencies @packets-received-log)])
 
 (re-frame/reg-event-db
  ::simple-response
@@ -361,7 +361,7 @@
        (let [ui-keypath (first (get result :ui-keypath))
             ;;  _ (when (not batched?)
             ;;      (tap> [:single-message (get result :task-id) (get-in db [:re-pollsive.core/polling :counter])]))
-             _ (swap! packets-received-log conj (get result :task-id))
+            ;;  _ (swap! packets-received-log conj (get result :task-id))
            ;new-map (:data result)
            ;name (:name result)
            ;field (:field result)
@@ -404,6 +404,7 @@
                                                              mem-row {:mem_time (str (.toISOString (js/Date.)))
                                                                       :mem_total (first mem)
                                                                       :packets @packets-received
+                                                                      :batches @batches-received
                                                                       :mem_used (second mem)
                                                                       :client-name (str client-name)
                                                                       :mem_limit (last mem)}]

@@ -134,9 +134,11 @@
 
 (defn is-true? [coll full-coll] 
   (let [idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
-        selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
+        ;selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
+        selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
         sigkw (keyword (str "signal/part-" (cstr/replace (str selected-warren-item) ":" "") "-" idx))
-        vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
+        ;vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
+        vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
         ;;vv (if (nil? vv) "err!" vv)
         ] vv))
 
@@ -146,9 +148,11 @@
 (defn hover-tools [coll full-coll]
   (let [hovered? (= @hover-tools-atom coll)
         idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
-        selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
+        ;selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
+        selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
         sigkw (keyword (str "signal/part-" (cstr/replace (str selected-warren-item) ":" "") "-" idx))
-        vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
+        ;;vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
+        vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
         vv (if (nil? vv) "err!" vv)]
     ;(tap> [:coll-hover coll])
     [re-com/v-box
@@ -535,7 +539,8 @@
         results (into {} (for [[name _] signals]
                            (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
                                  vv (if (= warren-type-string "signals")
-                                      @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
+                                      ;; @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
+                                      @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
                                       "")]
                              {name vv})))
         ;; warren-type-string-label (if (cstr/ends-with? warren-type-string "s")
@@ -1065,7 +1070,7 @@
     [::wfx/request :default
      {:message    {:kind :signals-history
                    :signal-name (get db :selected-warren-item)
-                   :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                   :client-name @(ut/tracked-sub ::bricks/client-name {})}
       :on-response [::signals-history-response]
       :timeout    15000000}])
    db))
@@ -1421,7 +1426,7 @@
 
 (defn signals-panel []
   (let [[_ hpct] db/flow-panel-pcts ;; [0.85 0.50]
-        hh @(ut/tracked-subscribe [::subs/h]) ;; we want the reaction 
+        hh @(ut/tracked-sub ::subs/h {}) ;; we want the reaction 
         panel-height (* hh hpct)
         details-panel-height (/ panel-height 1.25) ;; batshit math from flow.cljs panel parent
         ppanel-height (+ panel-height details-panel-height)

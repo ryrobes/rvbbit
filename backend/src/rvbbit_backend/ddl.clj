@@ -535,6 +535,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    (mem_time text NULL,
     client_name text NULL,
     packets integer NULL,
+    batches integer NULL,                           
     mem_limit integer NULL,
     mem_used integer NULL,
     mem_used_mb text NULL, 

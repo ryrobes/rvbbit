@@ -10287,6 +10287,8 @@
                                                                                   panel-key ;:audio
                                                                                   :speak (str text)]))
                                                             (str text)))
+                                 
+                                 ;;:number (fn [x] (ut/nf x))
 
                                  :speak-click (fn [text]
                                                 (let []
