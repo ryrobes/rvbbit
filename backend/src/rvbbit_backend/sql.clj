@@ -93,7 +93,8 @@
 ;;                                            } "system-db")})
 
 
-(def system-db {:datasource @(pool-create {:jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" &mode=memory ; "jdbc:sqlite:db/system.db"
+(def system-db {:datasource @(pool-create {;;:jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" &mode=memory ; "jdbc:sqlite:db/system.db"
+                                           :jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE"  ; "jdbc:sqlite:db/system.db"
                                            :idle-timeout        600000  ;;;; LAST KNOW GOOD SQLITE 10/25/23 
                                            :max-lifetime       1800000
                                            :auto_vacuum        "FULL"
@@ -176,7 +177,7 @@
 ;; (declare sql-exec)
 
 
-(defn insert-error-row! [error-db-conn query error] ;; warning uses shit outside of what it is passed!!!
+(defn insert-error-row-OLD! [error-db-conn query error] ;; warning uses shit outside of what it is passed!!!
   (jdbc/with-db-connection [sdb system-db] ;; ?
     (let [ins (-> {:insert-into [:errors]
                    ;:columns [:db_conn :sql_stmt :error_str]
@@ -192,6 +193,15 @@
         ;(sql-exec sdb ins)
         (catch Exception e
           (ut/pp {:error-inserting-error e :query query}))))))
+
+(defonce errors (ut/thaw-atom [] "./data/atoms/sql-errors.edn"))
+
+(defn insert-error-row! [error-db-conn query error] ;; warning uses shit outside of what it is passed!!!
+  (swap! errors conj [(str error) error-db-conn query])
+  (ut/pp {:sql-error! error 
+          :error-db-conn error-db-conn
+          :query (try (subs (str query) 0 1000) (catch Throwable _ (str query))) ;;query
+          }))
 
 ;(defn insert-error-row! [error-db-conn query error] (ut/pp [:insert-error-row! query error]))
 
@@ -345,28 +355,32 @@
 
 
 
+;; (defn sql-exec [db-spec query & [extra]]
+;;   (enqueue-task-sql
+;;    (fn [] ;; test
+;;      (jdbc/with-db-transaction
+;;        [t-con db-spec {:isolation :read-uncommitted}]
+;;        (try
+;;          (jdbc/db-do-commands t-con query)
+;;          (catch Exception e
+;;            (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec
+;;                               :query (try (subs (str query) 0 1000) (catch Throwable _ (str query)))}
+;;                              (if extra {:ex extra} {})))
+;;                (insert-error-row! db-spec query e))))))))
+
 (defn sql-exec [db-spec query & [extra]]
   (enqueue-task-sql
    (fn [] ;; test
-     (jdbc/with-db-transaction
-       [t-con db-spec {:isolation :read-uncommitted}]
+     (jdbc/with-db-connection
+       [t-con db-spec]
        (try
          (jdbc/db-do-commands t-con query)
          (catch Exception e
-           (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec
+           (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec 
+                              ;;:query query
                               :query (try (subs (str query) 0 1000) (catch Throwable _ (str query)))}
                              (if extra {:ex extra} {})))
                (insert-error-row! db-spec query e))))))))
-
-;; (defn sql-exec-no-t [db-spec query & [extra]]
-;;   (jdbc/with-db-connection
-;;     [t-con db-spec]
-;;     (try
-;;       (jdbc/db-do-commands t-con query)
-;;       (catch Exception e
-;;         (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec :query query}
-;;                           (if extra {:ex extra} {})))
-;;             (insert-error-row! db-spec query e))))))
 
 (defn sql-exec-no-t [db-spec query & [extra]]
   (jdbc/with-db-connection [conn db-spec]

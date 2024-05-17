@@ -141,7 +141,7 @@
     ;;                                {:content screen-name ;screen-data 
     ;;                                 :type :screen 
     ;;                                 :row {:file-path f-path :screen-name screen-name :blocks 0 :queries 0}})
-    (ut/pp [:updating-screen-meta-for f-path])
+    ;; (ut/pp [:updating-screen-meta-for f-path])
     (sql-exec system-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
     (sql-exec system-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
     ;(sql-exec system-db (to-sql {:delete-from [:boards] :where [:= :file_path f-path]}))
@@ -348,7 +348,7 @@
   
   (evl/create-nrepl-server!)
   (wss/create-web-server!)
-  ;; (wss/create-websocket-server!)
+  (wss/create-websocket-server!)
   ;; (wss/start-websocket-server!)
   ;; (def ttttr
   ;;   (jetty/run-jetty #'wss/web-handler wss/ring-options))
@@ -381,6 +381,8 @@
 
 
   (defn -main [& args]
+    
+    (ut/print-ansi-art "rrvbbit.ans")
     
     ;; (def where [:and
     ;;             [:or [:= :time/day 22] [:or [:= 88 88] [:= :time/day 23]]]
@@ -609,13 +611,14 @@
                                                 (Thread/sleep 1000)
                                                 ;; (do (ut/pp [:shutting-down-lucene-index-writers])
                                                 ;;     (search/close-index-writer search/index-writer))
-                                                (wss/destroy-websocket-server!)
+                                                
                                                 (wss/stop-web-server!)
                                                 (wss/stop-worker)
                                                 (wss/stop-worker2)
                                                 (wss/stop-worker3)
                                                 (ut/ppa [:shutting-down-system-pools])
-                                                (hik/close-datasource (get system-db :datasource))))
+                                                (hik/close-datasource (get system-db :datasource))
+                                                (wss/destroy-websocket-server!)))
 
     (shutdown/add-hook! ::clear-cache #(do (ut/ppa [:freezing-system-atoms])
                                            (ut/freeze-atoms)
@@ -1106,15 +1109,21 @@
     ;;   ;[@fut @fut2]
     ;;   @fut)
 
-    (start-services)
+(let [_ (ut/pp [:waiting-for-background-systems...])
+      _ (Thread/sleep 10000)
+      _ (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options))] ;; wut?
+  (start-services)
 
-    ;; (defonce wssr (jetty/run-jetty #'wss/web-handler wss/ring-options))
+
     ;; (.start wssr)
 
+    ;; (letfn [(handler [request respond raise] (respond {:status 404}))]
+    ;;   (jetty/run-jetty (fn [& args] (apply handler args)) wss/ring-options))
 
-    
 
-    (println " ")
+
+
+  (ut/pp [" GO: end of main-fn "]))
 
 ;;  (ut/print-ansi-art "rvbbit.ans")
 

@@ -31,7 +31,7 @@
 
 ;(ut/pp [:size-of-cosine-cache (count @cosine-cache)])
 ;(ut/pp [:size-of-embedding-cache (count @embedding-cache)])
-(ut/pp [:reco-history-weight (count @selected-recos)])
+;; (ut/pp [:reco-history-weight (count @selected-recos)])
 ;; (ut/pp [:selected-recos-debug (take 10 @selected-recos)]) ;; pre-reduce and then use multiplier in calcs
 ;; (ut/pp [:selected-recos-debug (take 10 (frequencies @selected-recos))])
 ;; (ut/pp [:selected-recos-debug (take 10 (vec (for [[k v] (frequencies @selected-recos)] (assoc k :freq v))))]) ;; pre-reduce and then use multiplier in calcs

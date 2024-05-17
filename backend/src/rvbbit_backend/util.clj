@@ -228,6 +228,7 @@
              (binding [*out* wtr]
                (if (or (cstr/includes? (str file-path) "signals.")
                        (cstr/includes? (str file-path) "rules.")
+                       (cstr/includes? (str file-path) "errors.")
                        (cstr/includes? (str file-path) "solvers."))
                  (clojure.pprint/pprint @a)
                  (prn @a)))))

@@ -5,6 +5,8 @@
             ;[ring.server.standalone :refer [create-server]]
             [ring.adapter.jetty9 :as jetty]
 ;[io.pedestal.http.jetty :as jetty]
+
+[io.pedestal.http.jetty.websockets :as ws]
             
 
             ;[ring.adapter.jetty :as jetty]
@@ -72,7 +74,7 @@
    [com.github.vertical_blank.sqlformatter SqlFormatter]
    [java.util.concurrent Executors TimeUnit TimeoutException]
 
-   [org.eclipse.jetty.server Server]
+   ;[org.eclipse.jetty.server Server]
 
   ;;  [org.eclipse.jetty.server Server]
   ;;  [org.eclipse.jetty.servlet ServletContextHandler ServletHolder]
@@ -6061,15 +6063,16 @@
 
 (defn jvm-stats []
   (when (not @shutting-down?)
-    (let [runtime (java.lang.Runtime/getRuntime)
-          total-memory (.totalMemory runtime)
-          free-memory (.freeMemory runtime)
-          used-memory (/ (- total-memory free-memory) (* 1024 1024))
-          mm (int (Math/floor used-memory))
-          sys-load (ut/get-system-load-average)
-          thread-mx-bean (java.lang.management.ManagementFactory/getThreadMXBean)
-          thread-count (.getThreadCount thread-mx-bean)
-          booted? (= @stats-cnt 0)
+    (try 
+      (let [runtime (java.lang.Runtime/getRuntime)
+            total-memory (.totalMemory runtime)
+            free-memory (.freeMemory runtime)
+            used-memory (/ (- total-memory free-memory) (* 1024 1024))
+            mm (int (Math/floor used-memory))
+            sys-load (ut/get-system-load-average)
+            thread-mx-bean (java.lang.management.ManagementFactory/getThreadMXBean)
+            thread-count (.getThreadCount thread-mx-bean)
+            booted? (= @stats-cnt 0)
 
         ;; chart-view [:>
         ;;             :ResponsiveContainer
@@ -6107,80 +6110,76 @@
         ;;                ;:stroke :theme/editor-outer-rim-color
         ;;                ;:fill :theme/editor-outer-rim-color
         ;;                }]]]
-          ttl (try (apply + (for [[_ v] @atoms-and-watchers] (count (keys v)))) (catch Exception _ -1))
-          _ (swap! stats-shadow conj {:mem mm :tick (count @stats-shadow) :threads thread-count :subs ttl :load sys-load})
-          chart-view (fn [data]
-                       (let [max-key (find-max-key data)]
-                         [:>
-                          :ResponsiveContainer
-                          {:width "100%" :height :panel-height+50}
-                          [:>
-                           :ComposedChart
-                           {:data data ;(last-x-items @stats-shadow 50)
-                            :margin
-                            {:top 5 :bottom 5 :right 30 :left 20}}
+            ttl (try (apply + (for [[_ v] @atoms-and-watchers] (count (keys v)))) (catch Exception _ -1))
+            _ (swap! stats-shadow conj {:mem mm :tick (count @stats-shadow) :threads thread-count :subs ttl :load sys-load})
+            chart-view (fn [data]
+                         (let [max-key (find-max-key data)]
                            [:>
-                            :CartesianGrid
-                            {:strokeDasharray "1 4" :opacity 0.33}]
-                           [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
-                           [:> :XAxis {:dataKey :tick
-                                       :hide true}]
-                           [:> :YAxis {:yAxisId "left"
-                                       :hide true
-                                       :dataKey :mem}]
-                           [:> :YAxis {:yAxisId "right"
-                                       :hide true
-                                       :dataKey max-key ;:threads
-                                       :orientation "right"}]
-                           [:>
-                            :Bar
-                            {:yAxisId "left" :dataKey :mem
-                             :isAnimationActive false
-                             :stroke :theme/editor-outer-rim-color
-                             :fill [:string :theme/editor-outer-rim-color "33"]}]
-                           [:>
-                            :Line
-                            {:yAxisId "right"
-                             :strokeWidth 4
-                             :type "monotone"
-                             :dot false
-                             :dataKey :threads
-                             :isAnimationActive false
-                             :stroke :theme/editor-grid-selected-background-color
-                             :fill :theme/editor-grid-selected-background-color}]
-                           [:>
-                            :Line
-                            {:yAxisId "right" :strokeWidth 3 :type "monotone" :dot false :dataKey :subs
-                             :isAnimationActive false
-                             :stroke :theme/block-tab-selected-font-color
-                             :fill :theme/block-tab-selected-font-color
-                             :strokeDasharray "5 5"}]]]))
-          load-view (fn [data]
-                      [:>
-                       :ResponsiveContainer
-                       {:width "100%" :height :panel-height+50}
-                       [:>
-                        :BarChart
-                        {:data data ;(last-x-items @stats-shadow 50)
-                         :margin
-                         {:top 5 :bottom 5 :right 30 :left 20}}
-                        [:>
-                         :CartesianGrid
-                         {:strokeDasharray "1 4" :opacity 0.33}]
-                        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
-                        [:> :XAxis {:dataKey :tick
-                                    :hide true}]
-                        [:> :YAxis {:hide true
-                                    :dataKey :load}]
-                        [:>
-                         :Bar
-                         {:dataKey :load
-                          :isAnimationActive false
-                          :stroke :theme/editor-outer-rim-color
-                          :fill [:string :theme/editor-outer-rim-color "33"]}]]])
+                            :ResponsiveContainer
+                            {:width "100%" :height :panel-height+50}
+                            [:>
+                             :ComposedChart
+                             {:data data ;(last-x-items @stats-shadow 50)
+                              :margin
+                              {:top 5 :bottom 5 :right 30 :left 20}}
+                             [:>
+                              :CartesianGrid
+                              {:strokeDasharray "1 4" :opacity 0.33}]
+                             [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
+                             [:> :XAxis {:dataKey :tick
+                                         :hide true}]
+                             [:> :YAxis {:yAxisId "left"
+                                         :hide true
+                                         :dataKey :mem}]
+                             [:> :YAxis {:yAxisId "right"
+                                         :hide true
+                                         :dataKey max-key ;:threads
+                                         :orientation "right"}]
+                             [:>
+                              :Bar
+                              {:yAxisId "left" :dataKey :mem
+                               :isAnimationActive false
+                               :stroke :theme/editor-outer-rim-color
+                               :fill [:string :theme/editor-outer-rim-color "33"]}]
+                             [:>
+                              :Line
+                              {:yAxisId "right"
+                               :strokeWidth 4
+                               :type "monotone"
+                               :dot false
+                               :dataKey :threads
+                               :isAnimationActive false
+                               :stroke :theme/editor-grid-selected-background-color
+                               :fill :theme/editor-grid-selected-background-color}]
+                             [:>
+                              :Line
+                              {:yAxisId "right" :strokeWidth 3 :type "monotone" :dot false :dataKey :subs
+                               :isAnimationActive false
+                               :stroke :theme/block-tab-selected-font-color
+                               :fill :theme/block-tab-selected-font-color
+                               :strokeDasharray "5 5"}]]]))
+            ;; load-view (fn [data]
+            ;;             [:>
+            ;;              :ResponsiveContainer
+            ;;              {:width "100%" :height :panel-height+50}
+            ;;              [:>
+            ;;               :BarChart
+            ;;               {:data data ;(laerror
+            ;;                {:strokeDasharray "1 4" :opacity 0.33}]
+            ;;               [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
+            ;;               [:> :XAxis {:dataKey :tick
+            ;;                           :hide true}]
+            ;;               [:> :YAxis {:hide true
+            ;;                           :dataKey :load}]
+            ;;               [:>
+            ;;                :Bar
+            ;;                {:dataKey :load
+            ;;                 :isAnimationActive false
+            ;;                 :stroke :theme/editor-outer-rim-color
+            ;;                 :fill [:string :theme/editor-outer-rim-color "33"]}]]])
         ;; long-chart-view [:>
         ;;                  :ResponsiveContainer
-        ;;                  {:width "100%" :height :panel-height+50}
+        ;;                  {:width "100%" error:height :panel-height+50}
         ;;                  [:>
         ;;                   :BarChart
         ;;                   {:data (last-x-items @stats-shadow 30)
@@ -6194,48 +6193,46 @@
         ;;                   [:>
         ;;                    :Bar
         ;;                    {:dataKey :mem
-        ;;                     :stroke :theme/editor-outer-rim-color
-        ;;                     :fill :theme/editor-outer-rim-color}]]]
-         ; open_flow_channels (or (apply + (for [[_ v] @flow-db/channels-atom] (count v))) 0)
-          ack-scoreboardv (into {} (for [[k v] (client-statuses)
-                                         :when (not= (get v :last-seen-seconds) -1)]
-                                     {k (ut/deselect-keys v [:booted :last-ack :last-push])}))
-          cli-rows (vec (for [[k v] ack-scoreboardv
-                              :let [booted (get v :booted-ts)
-                                    now (System/currentTimeMillis)
-                                    pushed (get v :push)
-                                    [last-now last-pushed] (get @mps-helper k)
-                                    _ (swap! mps-helper assoc k [now pushed])
-                                    recent-messages-per-second (Double/parseDouble (format "%.2f" (/ (- pushed last-pushed) (/ (- now last-now) 1000.0))))
-                                    uptime-seconds (/ (- now booted) 1000.0)
-                                    msg-per-second (Double/parseDouble (format "%.2f" (/ pushed uptime-seconds))) ;; dumb that I cant just do (round n 2), but whatever
-                                    uptime-str (ut/format-duration-seconds uptime-seconds)
-                                    _ (swap! ack-scoreboard assoc-in [k :uptime] uptime-str) ;; bad behavior all around, will refactor all this later. i just need to get to release 0 or this will never come out
-                                    _ (swap! ack-scoreboard assoc-in [k :messages-per-second] msg-per-second) ;; ^^ this.
-                                    _ (swap! ack-scoreboard assoc-in [k :recent-messages-per-second] recent-messages-per-second) ;; ^^ this.
-                                    queue-distro (get v :queue-distro)
-                                    ]]
-                          (merge {:client-name (str k)
-                                  :uptime-seconds uptime-seconds
-                                  :messages-per-second msg-per-second
-                                  :uptime uptime-str} 
-                                 (assoc v :queue-distro (pr-str queue-distro))
-                                 )))
-          ;;_ (ut/pp [:cli-rows cli-rows])
-          _ (doall
-             (try
-               (doseq [cli-row cli-rows]
-                 (swap! params-atom assoc-in [(edn/read-string (get cli-row :client-name)) :stats] cli-row))
-               (catch Exception e (ut/pp [:jvm-stats-params-atom-error (str e)]))))
+        ;;                     :stroke :theerror(for [[_ v] @flow-db/channels-atom] (count v))) 0)
+            ;; _ (ut/pp [:client-statuses (client-statuses)])
+            ack-scoreboardv (into {} (for [[k v] (client-statuses)
+                                           :when (not= (get v :last-seen-seconds) -1)]
+                                       {k (ut/deselect-keys v [:booted :last-ack :last-push])}))
+            ;; _ (ut/pp [:ack-scoreboardv ack-scoreboardv])
+            cli-rows (vec (for [[k v] ack-scoreboardv
+                                :let [booted (get v :booted-ts)
+                                      now (System/currentTimeMillis)
+                                      pushed (get v :push)
+                                      [last-now last-pushed] (get @mps-helper k)
+                                      _ (swap! mps-helper assoc k [now pushed])
+                                      recent-messages-per-second (try (Double/parseDouble (format "%.2f" (/ (- pushed last-pushed) (/ (- now last-now) 1000.0)))) (catch Exception _ -1))
+                                      uptime-seconds (try (/ (- now booted) 1000.0) (catch Exception _ -1))
+                                      msg-per-second (try (Double/parseDouble (format "%.2f" (/ pushed uptime-seconds))) (catch Exception _ -1))
+                                      uptime-str (ut/format-duration-seconds uptime-seconds)
+                                      _ (swap! ack-scoreboard assoc-in [k :uptime] uptime-str) ;; bad behavior all around, will refactor all this later. i just need to get to release 0 or this will never come out
+                                      _ (swap! ack-scoreboard assoc-in [k :messages-per-second] msg-per-second) ;; ^^ this.
+                                      _ (swap! ack-scoreboard assoc-in [k :recent-messages-per-second] recent-messages-per-second) ;; ^^ this.
+                                      queue-distro (get v :queue-distro)]]
+                            (merge {:client-name (str k)
+                                    :uptime-seconds uptime-seconds
+                                    :messages-per-second msg-per-second
+                                    :uptime uptime-str}
+                                   (assoc v :queue-distro (pr-str queue-distro)))))
+            ;; _ (ut/pp [:cli-rows cli-rows])
+            _ (doseq [cli-row cli-rows]
+                (swap! params-atom assoc-in [(edn/read-string (get cli-row :client-name)) :stats] cli-row))
 
-          insert-cli {:insert-into [:client_stats] :values cli-rows}
-          insert-sql {:insert-into [:jvm_stats]
-                      :columns [:used_memory_mb :thread_count :sql_cache_size :ws_peers :open_flow_channels :queries_run :internal_queries_run :sniffs_run :sys_load]
-                      :values [[mm thread-count (count @sql-cache) (count @wl/sockets) -1 @q-calls @q-calls2 @cruiser/sniffs sys-load]]}]
-      (swap! stats-cnt inc)
-      (do (sql-exec system-db (to-sql {:delete-from [:client_stats]}))
-          (sql-exec system-db (to-sql insert-cli)))
-      (sql-exec system-db (to-sql insert-sql))
+            insert-cli {:insert-into [:client_stats] :values cli-rows}
+            insert-sql {:insert-into [:jvm_stats]
+                        :columns [:used_memory_mb :thread_count :sql_cache_size :ws_peers :open_flow_channels :queries_run :internal_queries_run :sniffs_run :sys_load]
+                        :values [[mm thread-count (count @sql-cache) (count @wl/sockets) -1 @q-calls @q-calls2 @cruiser/sniffs sys-load]]}
+        ;; _ (ut/pp [:insert-sql insert-sql])
+            ]
+        (swap! stats-cnt inc)
+        (sql-exec system-db (to-sql {:delete-from [:client_stats]}))
+        (sql-exec system-db (to-sql insert-cli))
+        (sql-exec system-db (to-sql insert-sql))
+        ;; (ut/pp [:we-insert?])
     ;(ut/pp @queue-status)
       ;; (ut/pp {:client-sub-queues (into {} (for [[k v] @client-queues]
       ;;                                       ;{k (seq @v)}
@@ -6256,26 +6253,31 @@
     ;;         ;:fn-history-sql (update-fn-history>sql)
     ;;         })
 
-      (when booted?
+        (when booted?
       ;(ut/pp [:booted!])
-        (println " ")
+          (println " ")
       ;(ut/print-ansi-art "rrvbbit.ans")
-        (ut/print-ansi-art "nname.ans")
-        (ut/pp [:version 0 :june 2024 "Hi."])
+          (ut/print-ansi-art "nname.ans")
+          (ut/pp [:version 0 :june 2024 "Hi."])
       ;(ut/pp "Hi.")
-        (println " "))
+          (println " "))
 
-      ;; (ut/pp [:client-latency (into {} (for [[k v] @client-latency] {k (vec (take-last 10 v))}))])
+        ;; (ut/pp [:client-latency (into {} (for [[k v] @client-latency] {k (vec (take-last 10 v))}))])
 
-      (ut/pp [:flow-status (flow-statuses)])
+        (ut/pp [:flow-status (flow-statuses)])
 
       ;; (ut/pp [:processes (into {} (for [[k {:keys [start *running? end]}] @processes]
       ;;                               {k {:time-running (- (or end (System/currentTimeMillis)) start)
       ;;                                   :*running? *running?}}))])
 
-      (ut/pp [:ack-scoreboard ack-scoreboardv])
+        (ut/pp [:ack-scoreboard ack-scoreboardv])
 
-      ;; (ut/pp [:date-map @time-atom])
+        (ut/pp [:date-map @time-atom])
+
+        (ut/pp [:sql-errors! {:ttl (count @sql/errors)
+                              ;;:freq (frequencies (mapv #(cstr/join (drop 1 (cstr/split (str (first %)) " ")) " ") @sql/errors))
+                              :freq (frequencies (mapv first @sql/errors))
+                              :freq-db (frequencies (mapv second @sql/errors))}])
 
     ;; (ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (count (keys v))})])
       ;; (ut/pp [:atoms-and-watchers (for [[k v] @atoms-and-watchers] {k (vec (keys v))})])
@@ -6304,64 +6306,70 @@
     ;(ut/pp (ut/kvpaths @queue-status))
     ;(ut/pp (filter #(= (count %) 3) (ut/kvpaths @queue-status)))
     ;(ut/pp {:async-tasks-running (filter-not-done @queue-status)})
-      (ut/pp ["     "
-              :jvm-stats
-              {:*cached-queries (count @sql-cache)
-               :ws-peers (count @wl/sockets)
-               :sys-load sys-load
-               :cwidth (ut/get-terminal-width)
+
+
+        (try
+          (ut/pp ["     "
+                  :jvm-stats
+                  {:*cached-queries (count @sql-cache)
+                   :ws-peers (count @wl/sockets)
+                   :sys-load sys-load
+                   :cwidth (ut/get-terminal-width)
              ;:uptime-seconds (ut/uptime-seconds)
-               :uptime (ut/format-duration-seconds (ut/uptime-seconds))
-               :server-subs ttl
+                   :uptime (ut/format-duration-seconds (ut/uptime-seconds))
+                   :server-subs ttl
             ;:live-channels (into {} (for [[k v] @flow-db/channels-atom] {k (count v)}))
-               :*jvm-memory-used [(ut/nf mm) :mb]
-               :*current-threads thread-count}])
+                   :*jvm-memory-used [(ut/nf mm) :mb]
+                   :*current-threads thread-count}])
+          (catch Throwable e (ut/pp [:printing-shit-error? (str e)])))
 
-      (when
-       (or booted? (zero? (mod @stats-cnt 100)))
-        (doseq [[client-name v] @atoms-and-watchers]
-      ;(ut/pp [:watchers (for [[k f] v] [k (first f)])])
-          (let [clients (count @wl/sockets)]
-            (alert! client-name [:v-box
-                                 :justify :center
-                                 :style {;:margin-top "-6px"
-                                         :opacity 0.7} ;:color (if error? "red" "inherit")}
-                                 :children [[:box
-                                             :style {:font-weight 700 :font-size "18px"}
-                                             :child (str "[sys-stats] " client-name)]
-                                            [:box
-                                             :style {:font-weight 700 :font-size "11px" :opacity 0.6}
-                                             :child (str thread-count " threads,  "
-                                                         (ut/nf mm) " MB used on server, "
-                                                         (ut/nf ttl) " active client subs, "
-                                                         clients " client" (when (> clients 1) "s")  " connected")]
-                                            [:box
-                                             :style {:font-weight 700 :font-size "11px" :opacity 0.6}
-                                             :child (str "uptime: " (ut/format-duration-seconds (ut/uptime-seconds)))]
-                                            [:box
-                                             :style {:font-weight 700 :font-size "11px" :opacity 0.6}
-                                             :child (str "you have " (count (keys v)) " (server) watcher subs")]
 
-                                            (when booted?
-                                              [:box
-                                               :style {:color :theme/editor-outer-rim-color :font-weight 700}
-                                               :child
-                                           ;[:speak-always (str "Hello. R-V-B-B-I-T system is online." )]
-                                               [:box :child (str "Hello. R-V-B-B-I-T system is online.")]])
+      ;; (when
+      ;;  (or booted? (zero? (mod @stats-cnt 100)))
+      ;;   (doseq [[client-name v] @atoms-and-watchers]
+      ;; ;(ut/pp [:watchers (for [[k f] v] [k (first f)])])
+      ;;     (let [clients (count @wl/sockets)]
+      ;;       (alert! client-name [:v-box
+      ;;                            :justify :center
+      ;;                            :style {;:margin-top "-6px"
+      ;;                                    :opacity 0.7} ;:color (if error? "red" "inherit")}
+      ;;                            :children [[:box
+      ;;                                        :style {:font-weight 700 :font-size "18px"}
+      ;;                                        :child (str "[sys-stats] " client-name)]
+      ;;                                       [:box
+      ;;                                        :style {:font-weight 700 :font-size "11px" :opacity 0.6}
+      ;;                                        :child (str thread-count " threads,  "
+      ;;                                                    (ut/nf mm) " MB used on server, "
+      ;;                                                    (ut/nf ttl) " active client subs, "
+      ;;                                                    clients " client" (when (> clients 1) "s")  " connected")]
+      ;;                                       [:box
+      ;;                                        :style {:font-weight 700 :font-size "11px" :opacity 0.6}
+      ;;                                        :child (str "uptime: " (ut/format-duration-seconds (ut/uptime-seconds)))]
+      ;;                                       [:box
+      ;;                                        :style {:font-weight 700 :font-size "11px" :opacity 0.6}
+      ;;                                        :child (str "you have " (count (keys v)) " (server) watcher subs")]
 
-                                      ;; [:box
-                                      ;;  :style {:font-weight 700 :font-size "11px" :opacity 0.6}
-                                      ;;  :child (str "internal-watchers-count " (count-watchers flow-db/results-atom) )]
-                                            ]]10 (if booted? 2.2 1.7) 6)
-            (alert! client-name (load-view  (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
-            (alert! client-name (load-view  (last-x-items @stats-shadow 50)) 10 4 5)
-            (alert! client-name (chart-view (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
-            (alert! client-name (chart-view (last-x-items @stats-shadow 50)) 10 4 5))))
+      ;;                                       (when booted?
+      ;;                                         [:box
+      ;;                                          :style {:color :theme/editor-outer-rim-color :font-weight 700}
+      ;;                                          :child
+      ;;                                      ;[:speak-always (str "Hello. R-V-B-B-I-T system is online." )]
+      ;;                                          [:box :child (str "Hello. R-V-B-B-I-T system is online.")]])
+
+      ;;                                 ;; [:box
+      ;;                                 ;;  :style {:font-weight 700 :font-size "11px" :opacity 0.6}
+      ;;                                 ;;  :child (str "internal-watchers-count " (count-watchers flow-db/results-atom) )]
+      ;;                                       ]]10 (if booted? 2.2 1.7) 6)
+      ;;       (alert! client-name (load-view  (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
+      ;;       (alert! client-name (load-view  (last-x-items @stats-shadow 50)) 10 4 5)
+      ;;       (alert! client-name (chart-view (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
+      ;;       (alert! client-name (chart-view (last-x-items @stats-shadow 50)) 10 4 5))))
 
 
     ;(ut/pp [:watchers (for [[k f] @atoms-and-watchers] [k (first f)])])
   ;(ut/pp [:watchers @atoms-and-watchers])
-      )))
+        )
+      (catch Exception e (ut/pp [:jvm-stats (str e)])))))
 
 ;; (def ring-options
 ;;   {:port                 websocket-port
@@ -6488,19 +6496,20 @@
 (def websocket-port 3030)
 
 (def ws-endpoints
-  {"/ws" (net/websocket-handler {:encoding :edn ;; :transit-json ;; :edn
-                                 })})
+  {"/ws" (try 
+           (net/websocket-handler {:encoding :edn})
+           (catch Throwable _ (ut/pp [:websocket-layer-interupppted])))})
 
 (def ring-options
   {:port                 websocket-port
-   :join?                false
+   :join?                false ;true ;; false
    :async?               true
    :max-threads          450
    ;; :max-idle-time        10000
    :websockets           ws-endpoints
    :allow-null-path-info true})
 
-(defonce websocket-server (jetty/run-jetty #'web-handler ring-options))
+;; (defonce websocket-server (jetty/run-jetty #'web-handler ring-options))
 
 
 
@@ -6513,13 +6522,15 @@
 
 
 
-;; (defn create-websocket-server! []
-;;   (letfn [(handler [request respond raise] (respond {:status 404}))]
-;;     (jetty/run-jetty (fn [& args] (apply handler args)) ring-options)))
+(defn create-websocket-server! []
+  (try 
+    (letfn [(handler [request respond raise] (respond {:status 404}))]
+    (jetty/run-jetty (fn [& args] (apply handler args)) ring-options))
+    (catch Throwable e (ut/pp [:wss (str e)]))))
 
 
 
-;; (defonce websocket-server (atom nil))
+(defonce websocket-server (atom nil))
 
 ;; (defn start-server []
 ;;   (jetty/run-jetty #'web-handler ring-options))
@@ -6528,20 +6539,30 @@
 ;;   (ut/ppa [:starting-websocket-server :port websocket-port])
 ;;   (reset! websocket-server (start-server)))
 
-(defn destroy-websocket-server! [] nil)
+;; (defn destroy-websocket-server! [] @websocket-server)
 
 ;; (defn destroy-websocket-server! []
 ;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
-;;   (.stop websocket-server)
+;;   (.stop @websocket-server)
 ;;   (let [timeout-ms 10000
 ;;         start-time (System/currentTimeMillis)]
-;;     (while (and (.isRunning websocket-server)
+;;     (while (and (.isRunning @websocket-server)
 ;;                 (< (- (System/currentTimeMillis) start-time) timeout-ms))
 ;;       (Thread/sleep 300))
-;;     (when (.isRunning websocket-server)
+;;     (when (.isRunning @websocket-server)
 ;;       (ut/ppa [:killing-websocket-server! (format "Forcefully stopping websocket server @ %d after timeout" websocket-port)])
-;;       (.destroy websocket-server))))
+;;       (.destroy @websocket-server))))
 ;; #######
+
+(defn destroy-websocket-server! []
+  (ut/ppa [:shutting-down-websocket-server :port websocket-port])
+  (try 
+    (when @websocket-server
+    (.stop @websocket-server)
+    @websocket-server
+    ;; (.destroy @websocket-server)
+    (reset! websocket-server nil))
+    (catch Throwable _ nil)))
 
 
 ;; (defn create-jetty-server []
@@ -6555,11 +6576,8 @@
 ;; (defonce websocket-server (atom nil))
 
 ;; (defn create-websocket-server! []
-;;   (ut/ppa [:starting-websocket-server :port websocket-port])
-;;   (reset! websocket-server (create-jetty-server))
-;;   (when @websocket-server
-;;     (.start @websocket-server)
-;;     (ut/ppa [:websocket-server-started :port websocket-port])))
+;;   (ut/ppa [:starting-websocket-server :port websocket-port])(def ws-endpoints
+  ;; {"/ws" (net/websocket-handler {:encoding :edn})})
 
 ;; (defn destroy-websocket-server! []
 ;;   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
@@ -6635,9 +6653,10 @@
               ["/load-flow" :get (conj common-interceptors `load-flow)]
               ["/load-flow-history" :get (conj common-interceptors `load-flow-history)]
               ;["/home" :get (conj common-interceptors `home-page)]
+              ;;["/ws" :get (conj common-interceptors (ws/connection-fn ws-endpoints))]
               })
 
-(def web-server-port 8888)
+(def web-server-port 8888) ;; 8888
 
 (def service {:env :prod
               ::http/routes routes
@@ -6648,6 +6667,7 @@
               ::http/type :jetty
               ::http/host "0.0.0.0"
               ::http/port web-server-port
+              ;;::http/websockets ws-endpoints ;;{"/ws" (net/websocket-handler {:encoding :edn})}
               ::http/container-options {:h2c? true
                                         :h2? false
                                         :ssl? false}})
