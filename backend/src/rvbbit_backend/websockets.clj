@@ -6500,14 +6500,30 @@
            (net/websocket-handler {:encoding :edn})
            (catch Throwable _ (ut/pp [:websocket-layer-interupppted])))})
 
-(def ring-options
+(def ring-options-old
   {:port                 websocket-port
-   :join?                false ;true ;; false
+   :join?                false 
    :async?               true
    :max-threads          450
    ;; :max-idle-time        10000
    :websockets           ws-endpoints
    :allow-null-path-info true})
+
+(def ring-options
+  {:port                 websocket-port
+   :join?                false
+   :async?               true
+   :min-threads          50
+   :max-threads          450
+   :idle-timeout         5000
+   :queue-size           1000
+   :max-idle-time        30000
+   :input-buffer-size    8192
+   :output-buffer-size   8192
+   ;:max-message-size     65536
+   :websockets           ws-endpoints
+   :allow-null-path-info true})
+
 
 ;; (defonce websocket-server (jetty/run-jetty #'web-handler ring-options))
 

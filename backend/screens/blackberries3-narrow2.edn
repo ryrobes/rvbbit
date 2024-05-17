@@ -95,14 +95,15 @@
    :from [[:client_memory :ee183]],
    :refresh-every 200,
    :cache? false,
-   :_last-run "10:33:52",
-   :order-by [[:mem_time :desc]]},
+   :_last-run "23:41:37",
+   :order-by [[:mem_time :desc]],
+   :col-widths {:batches 131, :packets 131, :ts 151}},
   :gen-viz-516
   {:cache? false,
    :where [:= :client_name :*client-name-str],
    :limit 50,
    :group-by [:ts],
-   :_last-run "10:37:56",
+   :_last-run "23:40:37",
    :refresh-every 200,
    :from
    [{:select
@@ -143,7 +144,7 @@
    :from [[:client_stats :gg588]],
    :refresh-every 210,
    :cache? false,
-   :_last-run "10:34:22",
+   :_last-run "23:40:57",
    :col-widths
    {:ack 81,
     :client_latency 141,
@@ -163,7 +164,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 26,
    :group-by [2],
-   :_last-run "10:38:00",
+   :_last-run "23:40:37",
    :refresh-every 230,
    :from
    [{:select
@@ -270,117 +271,117 @@
   {:fields
    {:mem_limit
     {:data-type "integer",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {4294705152 111},
-     :cardinality 0},
+     :commons {4294705152 100, 2172649472 11},
+     :cardinality 1},
     :server_subs
     {:data-type "integer",
-     :distinct 6,
+     :distinct 7,
      :group-by? true,
-     :commons {11 41, 35 23, 13 23},
-     :cardinality 5},
+     :commons {11 39, 13 21, 1 11},
+     :cardinality 6},
     :mem_used
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {109725945 1, 54753108 1, 60425010 1},
+     :commons {62602831 1, 60466016 1, 1472112836 1},
      :cardinality 100},
     :client_subs
     {:data-type "integer",
      :distinct 7,
      :group-by? true,
-     :commons {11 38, 35 21, 13 21},
+     :commons {11 39, 13 21, 1 11},
      :cardinality 6},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 49,
+     :distinct 38,
      :group-by? true,
-     :commons {nil 16, 2.33 7, 1.03 5},
-     :cardinality 44},
+     :commons {1 14, 1.03 13, -1 10},
+     :cardinality 34},
     :mem_time
     {:data-type "string",
-     :distinct 110,
+     :distinct 107,
      :group-by? true,
      :commons
-     {"2024-05-14T02:18:40.950Z" 2,
-      "2024-05-14T02:16:23.697Z" 1,
-      "2024-05-14T02:13:23.879Z" 1},
-     :cardinality 99},
+     {"2024-05-17T01:13:17.557Z" 2,
+      "2024-05-17T01:14:02.571Z" 2,
+      "2024-05-17T01:12:32.539Z" 2},
+     :cardinality 96},
     :ts
     {:data-type "string",
-     :distinct 19,
+     :distinct 15,
      :group-by? true,
      :commons
-     {"2024-05-13 22:19:23" 9, "2024-05-13 22:18:38" 9, "2024-05-13 22:17:08" 9},
-     :cardinality 17},
+     {"2024-05-16 21:13:08" 10, "2024-05-16 21:08:38" 10, "2024-05-16 21:10:08" 10},
+     :cardinality 13},
     :messages_per_second
     {:data-type "float",
-     :distinct 73,
+     :distinct 59,
      :group-by? true,
-     :commons {nil 16, 2.28 6, 1.13 3},
-     :cardinality 65},
+     :commons {nil 10, 0.97 5, 2.18 5},
+     :cardinality 53},
     :latency
     {:data-type "integer",
-     :distinct 105,
+     :distinct 99,
      :group-by? true,
-     :commons {372 2, 334 2, 308 2},
-     :cardinality 94},
+     :commons {486 2, 283 2, 622 2},
+     :cardinality 89},
     :batches
     {:data-type "integer",
-     :distinct 64,
+     :distinct 100,
      :group-by? true,
-     :commons {2 18, 29 5, 11 4},
-     :cardinality 57},
+     :commons {2 12, 11569 1, 2525 1},
+     :cardinality 90},
     :client_name
     {:data-type "string",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
      :commons
-     {":attractive-rhomboidal-otter-29" 17,
-      ":creative-peach-buffalo-27" 15,
-      ":yummy-cobalt-rhinoceros-41" 15},
-     :cardinality 8},
+     {":whole-oval-gnat-25" 12,
+      ":easy-narrow-wolf-19" 12,
+      ":great-triangular-clam-38" 11},
+     :cardinality 9},
     :mem_total
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {198470163 1, 79769961 1, 136373709 1},
+     :commons {86657773 1, 73574491 1, 105398668 1},
      :cardinality 100},
     :packets
     {:data-type "integer",
-     :distinct 106,
+     :distinct 111,
      :group-by? true,
-     :commons {15 3, 509 2, 547 2},
-     :cardinality 95},
+     :commons {70707 1, 70944 1, 415125 1},
+     :cardinality 100},
     :mem_used_mb
     {:data-type "string",
-     :distinct 63,
+     :distinct 82,
      :group-by? true,
-     :commons {"54" 7, "52" 6, "57" 6},
-     :cardinality 56}},
+     :commons {"76" 4, "69" 4, "58" 4},
+     :cardinality 73}},
    :rowcount 111},
   :new-query
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {"1024 MB" 1},
+     :commons {"+137" 1, "149 MB" 1},
      :cardinality 100},
     :mem_used
     {:data-type "float",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {1.0735112456666666E9 1},
+     :commons {2.9932176517241377E8 1, 1.5609010914285713E8 1},
      :cardinality 100},
     :ts_hour
     {:data-type "string",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-05-15 10" 1},
+     :commons {"2024-05-16 23" 1, "2024-05-16 22" 1},
      :cardinality 100}},
-   :rowcount 1},
+   :rowcount 2},
   :flows-sys
   {:fields
    {:flow_id
@@ -410,53 +411,53 @@
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 104,
+     :distinct 111,
      :group-by? true,
-     :commons {0 8, 11796 1, 15449 1},
-     :cardinality 93},
+     :commons {9810 1, 6160 1, 5229 1},
+     :cardinality 100},
     :sql_cache_size
     {:data-type "integer",
-     :distinct 10,
+     :distinct 6,
      :group-by? true,
-     :commons {36 21, 38 20, 40 20},
-     :cardinality 9},
+     :commons {12 37, 9 34, 16 21},
+     :cardinality 5},
     :ts
     {:data-type "string",
      :distinct 111,
      :group-by? true,
      :commons
-     {"2024-05-13 22:07:58" 1, "2024-05-13 22:59:58" 1, "2024-05-13 22:37:58" 1},
+     {"2024-05-16 21:08:13" 1, "2024-05-16 21:29:43" 1, "2024-05-16 21:13:43" 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 104,
+     :distinct 111,
      :group-by? true,
-     :commons {0 8, 3244 1, 94 1},
-     :cardinality 93},
+     :commons {190 1, 3946 1, 71 1},
+     :cardinality 100},
     :sys_load
     {:data-type "float",
-     :distinct 110,
+     :distinct 111,
      :group-by? true,
-     :commons {2.73095703125 2, 4.35888671875 1, 4.07763671875 1},
-     :cardinality 99},
+     :commons {4.74560546875 1, 4.32373046875 1, 3.87255859375 1},
+     :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
      :distinct 107,
      :group-by? true,
-     :commons {1298 2, 2003 2, 1477 2},
+     :commons {2291 2, 2415 2, 2386 2},
      :cardinality 96},
     :thread_count
     {:data-type "integer",
-     :distinct 36,
+     :distinct 26,
      :group-by? true,
-     :commons {120 8, 118 8, 124 7},
-     :cardinality 32},
+     :commons {122 14, 114 10, 123 10},
+     :cardinality 23},
     :internal_queries_run
     {:data-type "integer",
-     :distinct 104,
+     :distinct 111,
      :group-by? true,
-     :commons {0 8, 549 1, 362 1},
-     :cardinality 93},
+     :commons {692 1, 183 1, 438 1},
+     :cardinality 100},
     :open_flow_channels
     {:data-type "integer",
      :distinct 1,
@@ -465,10 +466,10 @@
      :cardinality 0},
     :ws_peers
     {:data-type "integer",
-     :distinct 6,
+     :distinct 2,
      :group-by? true,
-     :commons {10 87, 9 12, 0 8},
-     :cardinality 5}},
+     :commons {10 110, 0 1},
+     :cardinality 1}},
    :rowcount 111},
   :client-stats-drag-36
   {:fields
@@ -476,191 +477,191 @@
     {:data-type "integer",
      :distinct 6,
      :group-by? true,
-     :commons {11 4, 13 2, 35 2},
-     :cardinality 54},
+     :commons {11 4, 13 3, 35 2},
+     :cardinality 50},
     :push
     {:data-type "integer",
-     :distinct 11,
+     :distinct 12,
      :group-by? true,
-     :commons {446637 1, 415893 1, 245 1},
+     :commons {2708 1, 14138 1, 9847 1},
      :cardinality 100},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 8,
+     :distinct 11,
      :group-by? true,
-     :commons {1.03 4, 1.1 1, 2.7 1},
-     :cardinality 72},
+     :commons {1.2 2, 1.03 1, 1.27 1},
+     :cardinality 91},
     :uptime
     {:data-type "string",
-     :distinct 11,
+     :distinct 7,
      :group-by? true,
      :commons
-     {"1 minute, 18 seconds" 1,
-      "36 hours, 28 minutes, 5 seconds" 1,
-      "36 hours, 28 minutes, 16 seconds" 1},
-     :cardinality 100},
+     {"2 hours, 35 minutes, 24 seconds" 3,
+      "2 hours, 35 minutes, 22 seconds" 2,
+      "2 hours, 35 minutes, 20 seconds" 2},
+     :cardinality 58},
     :last_seen_seconds
     {:data-type "integer",
-     :distinct 4,
+     :distinct 1,
      :group-by? true,
-     :commons {4 6, 3 3, 1251 1},
-     :cardinality 36},
+     :commons {4 12},
+     :cardinality 8},
     :memory
     {:data-type "string",
-     :distinct 11,
+     :distinct 12,
      :group-by? true,
-     :commons {"71" 1, "133" 1, "906" 1},
+     :commons {"65" 1, "373" 1, "74" 1},
      :cardinality 100},
     :queue_distro
     {:data-type "string",
-     :distinct 11,
+     :distinct 12,
      :group-by? true,
-     :commons {"{0 160766}" 1, "{0 160929}" 1, "{0 228479}" 1},
+     :commons {"{0 9680}" 1, "{0 11919}" 1, "{0 891}" 1},
      :cardinality 100},
     :styler_highlight_8717
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {0 10, 1 1},
-     :cardinality 18},
+     :commons {0 11, 1 1},
+     :cardinality 16},
     :client_latency
     {:data-type "integer",
-     :distinct 10,
+     :distinct 12,
      :group-by? true,
-     :commons {507 2, 1288 1, 8228 1},
-     :cardinality 90},
+     :commons {432 1, 574 1, 423 1},
+     :cardinality 100},
     :ack
     {:data-type "integer",
-     :distinct 9,
+     :distinct 4,
      :group-by? true,
-     :commons {2919 2, 2914 2, 2886 1},
-     :cardinality 81},
+     :commons {208 9, 210 1, 39 1},
+     :cardinality 33},
     :client_name
     {:data-type "string",
-     :distinct 11,
+     :distinct 12,
      :group-by? true,
      :commons
-     {":pretty-icosahedral-hog-32" 1,
-      ":pretty-byzantium-gerbil-26" 1,
+     {":great-triangular-clam-38" 1,
+      ":pretty-icosahedral-hog-32" 1,
       ":attractive-rhomboidal-otter-29" 1},
      :cardinality 100},
     :last_seen
     {:data-type "string",
-     :distinct 4,
+     :distinct 1,
      :group-by? true,
-     :commons {"4 seconds" 6, "3 seconds" 3, "20 minutes, 51 seconds" 1},
-     :cardinality 36}},
-   :rowcount 11},
+     :commons {"4 seconds" 12},
+     :cardinality 8}},
+   :rowcount 12},
   :client_stats
   {:fields
    {:server_subs
     {:data-type "integer",
-     :distinct 6,
+     :distinct 7,
      :group-by? true,
-     :commons {11 4, 35 2, 13 2},
-     :cardinality 54},
+     :commons {11 3, 35 2, 13 2},
+     :cardinality 63},
     :queue_size
     {:data-type "integer",
-     :distinct 3,
+     :distinct 1,
      :group-by? true,
-     :commons {1 9, 0 1, 119 1},
-     :cardinality 27},
+     :commons {0 11},
+     :cardinality 9},
     :push
     {:data-type "integer",
      :distinct 11,
      :group-by? true,
-     :commons {446637 1, 415893 1, 245 1},
+     :commons {13274 1, 4665 1, 3 1},
      :cardinality 100},
     :client_subs
     {:data-type "integer",
-     :distinct 6,
+     :distinct 7,
      :group-by? true,
-     :commons {35 3, 11 3, 13 2},
-     :cardinality 54},
+     :commons {11 3, 35 2, 13 2},
+     :cardinality 63},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 8,
+     :distinct 9,
      :group-by? true,
-     :commons {1.03 4, 2.7 1, 0.13 1},
-     :cardinality 72},
+     :commons {1.03 2, 1.1 2, 3.13 1},
+     :cardinality 81},
     :uptime_seconds
     {:data-type "float",
      :distinct 11,
      :group-by? true,
-     :commons {131124.313 1, 131106.176 1, 42148.813 1},
+     :commons {4581.731 1, 4583.152 1, 4584.452 1},
      :cardinality 100},
     :uptime
     {:data-type "string",
-     :distinct 11,
+     :distinct 6,
      :group-by? true,
      :commons
-     {"1 minute, 18 seconds" 1,
-      "36 hours, 28 minutes, 5 seconds" 1,
-      "36 hours, 28 minutes, 16 seconds" 1},
-     :cardinality 100},
+     {"1 hour, 15 minutes, 54 seconds" 3,
+      "1 hour, 15 minutes, 52 seconds" 2,
+      "1 hour, 15 minutes, 50 seconds" 2},
+     :cardinality 54},
     :last_seen_seconds
     {:data-type "integer",
-     :distinct 4,
+     :distinct 1,
      :group-by? true,
-     :commons {4 6, 3 3, 1251 1},
-     :cardinality 36},
+     :commons {4 11},
+     :cardinality 9},
     :memory
     {:data-type "string",
-     :distinct 11,
+     :distinct 10,
      :group-by? true,
-     :commons {"71" 1, "133" 1, "906" 1},
-     :cardinality 100},
+     :commons {"63" 2, "41" 1, "375" 1},
+     :cardinality 90},
     :queue_distro
     {:data-type "string",
      :distinct 11,
      :group-by? true,
-     :commons {"{0 160766}" 1, "{0 160929}" 1, "{0 228479}" 1},
+     :commons {"{0 429}" 1, "{0 5874}" 1, "{0 7734}" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-05-15 10:37:28" 11},
+     :commons {"2024-05-16 22:23:43" 11},
      :cardinality 9},
     :messages_per_second
     {:data-type "float",
-     :distinct 11,
-     :group-by? true,
-     :commons {0.22 1, 2.04 1, 3.17 1},
-     :cardinality 100},
-    :client_latency
-    {:data-type "integer",
-     :distinct 10,
-     :group-by? true,
-     :commons {507 2, 1288 1, 8228 1},
-     :cardinality 90},
-    :ack
-    {:data-type "integer",
      :distinct 9,
      :group-by? true,
-     :commons {2919 2, 2914 2, 2886 1},
+     :commons {1.02 2, 1.05 2, 0.31 1},
      :cardinality 81},
+    :client_latency
+    {:data-type "integer",
+     :distinct 11,
+     :group-by? true,
+     :commons {543 1, 320 1, 647 1},
+     :cardinality 100},
+    :ack
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {102 10, 1 1},
+     :cardinality 18},
     :booted_ts
     {:data-type "integer",
      :distinct 11,
      :group-by? true,
-     :commons {1715783739987 1, 1715652522184 1, 1715741699570 1},
+     :commons {1715908041470 1, 1715908039181 1, 1715908040049 1},
      :cardinality 100},
     :client_name
     {:data-type "string",
      :distinct 11,
      :group-by? true,
      :commons
-     {":pretty-icosahedral-hog-32" 1,
-      ":pretty-byzantium-gerbil-26" 1,
+     {":great-triangular-clam-38" 1,
+      ":pretty-icosahedral-hog-32" 1,
       ":attractive-rhomboidal-otter-29" 1},
      :cardinality 100},
     :last_seen
     {:data-type "string",
-     :distinct 4,
+     :distinct 1,
      :group-by? true,
-     :commons {"4 seconds" 6, "3 seconds" 3, "20 minutes, 51 seconds" 1},
-     :cardinality 36}},
+     :commons {"4 seconds" 11},
+     :cardinality 9}},
    :rowcount 11},
   :flow-fn-categories-sys
   {:fields
@@ -678,74 +679,74 @@
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":genius-rectangular-ostrich-17" 3},
-     :cardinality 33},
+     :commons {":good-sapphire-hyena-18" 107},
+     :cardinality 0},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 3,
+     :distinct 20,
      :group-by? true,
-     :commons {nil 1, 1.03 1, 2.7 1},
-     :cardinality 100},
+     :commons {3.1 16, 3.17 14, 3.13 13},
+     :cardinality 18},
     :messages_per_second
     {:data-type "float",
-     :distinct 3,
+     :distinct 14,
      :group-by? true,
-     :commons {nil 1, 1.63 1, 2.04 1},
-     :cardinality 100},
+     :commons {3.13 54, 3.12 33, 3.11 5},
+     :cardinality 13},
     :mem_used
     {:data-type "integer",
-     :distinct 3,
+     :distinct 107,
      :group-by? true,
-     :commons {1046607529 1, 1051695949 1, 1122230259 1},
+     :commons {147170530 1, 43263937 1, 96855986 1},
      :cardinality 100},
     :batches
     {:data-type "integer",
-     :distinct 3,
+     :distinct 107,
      :group-by? true,
-     :commons {2 1, 6 1, 15 1},
+     :commons {49 1, 936 1, 549 1},
      :cardinality 100},
     :packets
     {:data-type "integer",
-     :distinct 3,
+     :distinct 107,
      :group-by? true,
-     :commons {24 1, 77 1, 161 1},
+     :commons {5214 1, 7752 1, 8852 1},
      :cardinality 100},
     :ts
     {:data-type "string",
-     :distinct 3,
+     :distinct 107,
      :group-by? true,
      :commons
-     {"2024-05-15 10:35:53" 1, "2024-05-15 10:36:38" 1, "2024-05-15 10:37:23" 1},
+     {"2024-05-16 22:40:08" 1, "2024-05-16 23:37:08" 1, "2024-05-16 23:04:08" 1},
      :cardinality 100}},
-   :rowcount 3},
+   :rowcount 107},
   :gen-viz-516
   {:fields
    {:mb
     {:data-type "integer",
-     :distinct 3,
+     :distinct 44,
      :group-by? true,
-     :commons {1070 1, 1002 1, 998 1},
-     :cardinality 100},
+     :commons {296 2, 342 2, 303 2},
+     :cardinality 87},
     :mem_used
     {:data-type "integer",
-     :distinct 3,
+     :distinct 50,
      :group-by? true,
-     :commons {1122230259 1, 1051695949 1, 1046607529 1},
+     :commons {341029325 1, 291253599 1, 365657613 1},
      :cardinality 100},
     :messages_per_second
     {:data-type "float",
-     :distinct 3,
+     :distinct 16,
      :group-by? true,
-     :commons {2.7 1, 1.03 1, nil 1},
-     :cardinality 100},
+     :commons {3.13 8, 3.1 8, 2.93 5},
+     :cardinality 31},
     :ts
     {:data-type "string",
-     :distinct 3,
+     :distinct 50,
      :group-by? true,
      :commons
-     {"2024-05-15 10:37:23" 1, "2024-05-15 10:36:38" 1, "2024-05-15 10:35:53" 1},
+     {"2024-05-16 23:37:08" 1, "2024-05-16 23:41:38" 1, "2024-05-16 23:26:38" 1},
      :cardinality 100}},
-   :rowcount 3},
+   :rowcount 50},
   :flow-fn-all-sys
   {:fields
    {:name
@@ -759,10 +760,9 @@
  {:block-3108 {:client-memory-drag-36 151},
   :block-2618 {:client-stats-drag-36 114},
   :virtual-panel {:kick--1764769189 152},
-  :block-12050 {:gen-viz-516 127},
-  :block-2178 {:new-query 170}},
+  :block-12050 {:gen-viz-516 127}},
  :runstream-drops nil,
- :data-hash 1817480692,
+ :data-hash -457578433,
  :tabs ["generated lass of the woodlands" "bountiful bird"],
  :auto-run? true,
  :selected-cols nil,
@@ -872,6 +872,7 @@
     "error-monitor-vanessa2"
     "error-monitor-vanessa3"
     "error-monitor-vanessa4"
+    "error-monitor-vanessa5"
     "evil-main-street"
     "fake-books-1"
     "fake-bricks"
@@ -970,91 +971,37 @@
  :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [388751033 108600597 4294705152],
+ :memory [508648801 474359701 4294705152],
  :sched
- {:client-memory-drag-36 310,
-  :gen-viz-516 331,
-  :client-stats-drag-36 320,
-  :new-query 365},
+ {:gen-viz-516 5016,
+  :new-query 5010,
+  :client-stats-drag-36 4990,
+  :client-memory-drag-36 4980},
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-15 10:38:08",
+      :at "2024-05-16 23:43:53",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
-    :reco-count nil}},
-  :alert1
-  {:alerts
-   {:data
-    [[[:v-box
-       :justify
-       :center
-       :style
-       {:opacity 0.7}
-       :children
-       [[:box
-         :style
-         {:font-weight 700, :font-size "11px", :opacity 0.6}
-         :child
-         "successfully saved screen"]
-        [:box
-         :style
-         {:font-weight 700, :font-size "18px"}
-         :child
-         "blackberries3-narrow2"]
-        [:box
-         :style
-         {:font-weight 700, :font-size "11px", :opacity 0.6}
-         :child
-         "@ /home/ryanr/rvbbit/backend/screens/blackberries3-narrow2.edn"]]]
-      10
-      1.6
-      8]
-     nil],
-    :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:signal/part-cool-raccoon-signal-yo-0
-  :signal/part-cool-raccoon-signal-yo-3
-  :signal/nice-coyote-signal
-  :signal/part-cool-raccoon-signal-yo-5
-  :signal/part-cool-raccoon-signal-yo-2
-  :signal/glowing-bat-signal
-  :client/*client-name*>stats>messages-per-second
-  :signal/exciting-cheetah-signal
-  :signal/brave-ape-signal
+ [:client/*client-name*>stats>messages-per-second
+  :client/*client-name*>stats>client-latency
+  :client/*client-name*>stats>client-name
   :signal/cool-raccoon-signal-yo
   :time/now
-  :signal/worthy-fish-signal
-  :signal/dragging-to-potential-cross-breed?
-  :signal/part-cool-raccoon-signal-yo-7
-  :signal/part-cool-raccoon-signal-yo-4
-  :signal/part-cool-raccoon-signal-yo-10
-  :signal/part-cool-raccoon-signal-yo-1
-  :client/*client-name*>stats>client-name
-  :signal/part-cool-raccoon-signal-yo-8
   :client/*client-name*>stats>uptime
-  :signal/special-lion-signal
-  :signal/optimistic-sheep-signal
+  :client/*client-name*>stats>memory
   :flow/live-scratch-flow>*running?
-  :signal/part-cool-raccoon-signal-yo-9
-  :signal/elegant-grasshopper-signal
-  :signal/fun-gorilla
   :time/second
   :flow/a-random-wow>*running?
-  :signal/genius-gnat-signal
-  :signal/hourly?
-  :signal/part-cool-raccoon-signal-yo-6
-  :client/*client-name*>stats>client-latency
-  :client/*client-name*>stats>recent-messages-per-second
-  :client/*client-name*>stats>memory
-  :signal/fair-armadillo-signal],
- :client-name :genius-rectangular-ostrich-17,
+  :client/*client-name*>stats>recent-messages-per-second],
+ :client-name :good-sapphire-hyena-18,
  :signals-history
  {[:and
    [:or [:> :time/hour 12] [:< :time/hour 6]]
@@ -1063,149 +1010,149 @@
     [:= :time/second 20]
     [:= :time/second 45]
     [:= :time/second 25]]]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [false 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [false 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[false 1715917386206]
+   [false 1715917387204]
+   [false 1715917388204]
+   [false 1715917389204]
+   [true 1715917390206]
+   [false 1715917391205]
+   [false 1715917392204]
+   [false 1715917393205]
+   [false 1715917394204]
+   [false 1715917395204]
+   [false 1715917396204]
+   [false 1715917397204]
+   [false 1715917398204]],
   [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [false 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [false 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[false 1715917386206]
+   [false 1715917387204]
+   [false 1715917388204]
+   [false 1715917389204]
+   [false 1715917390206]
+   [false 1715917391205]
+   [false 1715917392204]
+   [false 1715917393205]
+   [false 1715917394204]
+   [false 1715917395204]
+   [false 1715917396204]
+   [false 1715917397204]
+   [false 1715917398204]],
   [:= :time/second 45]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [false 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [false 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[false 1715917386206]
+   [false 1715917387204]
+   [false 1715917388204]
+   [false 1715917389204]
+   [false 1715917390206]
+   [false 1715917391205]
+   [false 1715917392204]
+   [false 1715917393205]
+   [false 1715917394204]
+   [false 1715917395204]
+   [false 1715917396204]
+   [false 1715917397204]
+   [false 1715917398204]],
   [:> :time/hour 12]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [false 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [false 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[true 1715917386206]
+   [true 1715917387204]
+   [true 1715917388204]
+   [true 1715917389204]
+   [true 1715917390206]
+   [true 1715917391205]
+   [true 1715917392204]
+   [true 1715917393205]
+   [true 1715917394204]
+   [true 1715917395204]
+   [true 1715917396204]
+   [true 1715917397204]
+   [true 1715917398204]],
   [:or [:> :time/hour 12] [:< :time/hour 6]]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [false 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [false 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[true 1715917386206]
+   [true 1715917387204]
+   [true 1715917388204]
+   [true 1715917389204]
+   [true 1715917390206]
+   [true 1715917391205]
+   [true 1715917392204]
+   [true 1715917393205]
+   [true 1715917394204]
+   [true 1715917395204]
+   [true 1715917396204]
+   [true 1715917397204]
+   [true 1715917398204]],
   [:= :time/second 10]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [false 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [false 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[false 1715917386206]
+   [false 1715917387204]
+   [false 1715917388204]
+   [false 1715917389204]
+   [true 1715917390206]
+   [false 1715917391205]
+   [false 1715917392204]
+   [false 1715917393205]
+   [false 1715917394204]
+   [false 1715917395204]
+   [false 1715917396204]
+   [false 1715917397204]
+   [false 1715917398204]],
   [:< :time/hour 6]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [false 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [false 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[false 1715917386206]
+   [false 1715917387204]
+   [false 1715917388204]
+   [false 1715917389204]
+   [false 1715917390206]
+   [false 1715917391205]
+   [false 1715917392204]
+   [false 1715917393205]
+   [false 1715917394204]
+   [false 1715917395204]
+   [false 1715917396204]
+   [false 1715917397204]
+   [false 1715917398204]],
   [:= :time/second 20]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [true 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [false 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[false 1715917386206]
+   [false 1715917387204]
+   [false 1715917388204]
+   [false 1715917389204]
+   [false 1715917390206]
+   [false 1715917391205]
+   [false 1715917392204]
+   [false 1715917393205]
+   [false 1715917394204]
+   [false 1715917395204]
+   [false 1715917396204]
+   [false 1715917397204]
+   [false 1715917398204]],
   [:or
    [:= :time/second 10]
    [:= :time/second 20]
    [:= :time/second 45]
    [:= :time/second 25]]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [true 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [true 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[false 1715917386206]
+   [false 1715917387204]
+   [false 1715917388204]
+   [false 1715917389204]
+   [true 1715917390206]
+   [false 1715917391205]
+   [false 1715917392204]
+   [false 1715917393205]
+   [false 1715917394204]
+   [false 1715917395204]
+   [false 1715917396204]
+   [false 1715917397204]
+   [false 1715917398204]],
   [:= :time/second 25]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [false 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [true 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]],
+  [[false 1715917386206]
+   [false 1715917387204]
+   [false 1715917388204]
+   [false 1715917389204]
+   [false 1715917390206]
+   [false 1715917391205]
+   [false 1715917392204]
+   [false 1715917393205]
+   [false 1715917394204]
+   [false 1715917395204]
+   [false 1715917396204]
+   [false 1715917397204]
+   [false 1715917398204]],
   [:or
    [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
    [:and
@@ -1215,66 +1162,41 @@
      [:= :time/second 20]
      [:= :time/second 45]
      [:= :time/second 25]]]]
-  [[false 1715783896291]
-   [false 1715783897291]
-   [false 1715783898291]
-   [false 1715783899292]
-   [false 1715783900291]
-   [false 1715783901291]
-   [false 1715783902291]
-   [false 1715783903291]
-   [false 1715783904291]
-   [false 1715783905293]
-   [false 1715783906293]
-   [false 1715783907293]
-   [false 1715783908292]]},
+  [[false 1715917386206]
+   [false 1715917387204]
+   [false 1715917388204]
+   [false 1715917389204]
+   [true 1715917390206]
+   [false 1715917391205]
+   [false 1715917392204]
+   [false 1715917393205]
+   [false 1715917394204]
+   [false 1715917395204]
+   [false 1715917396204]
+   [false 1715917397204]
+   [false 1715917398204]]},
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2548, :h 1328},
+ :window {:w 2750, :h 1408},
  :post-meta
- {:client-memory-drag-36 {:* {:rowcount 3}},
-  :gen-viz-516 {:* {:rowcount 3}},
-  :client-stats-drag-36 {:* {:rowcount 11}},
-  :new-query {:* {:rowcount 1}}},
+ {:client-memory-drag-36 {:* {:rowcount 105}},
+  :gen-viz-516 {:* {:rowcount 50}},
+  :client-stats-drag-36 {:* {:rowcount 12}},
+  :new-query {:* {:rowcount 2}}},
  :status
  {:heartbeat
   {:kick
-   [:signal/part-cool-raccoon-signal-yo-0
-    :signal/part-cool-raccoon-signal-yo-3
-    :signal/nice-coyote-signal
-    :signal/part-cool-raccoon-signal-yo-5
-    :signal/part-cool-raccoon-signal-yo-2
-    :signal/glowing-bat-signal
-    :client/*client-name*>stats>messages-per-second
-    :signal/exciting-cheetah-signal
-    :signal/brave-ape-signal
+   [:client/*client-name*>stats>messages-per-second
+    :client/*client-name*>stats>client-latency
+    :client/*client-name*>stats>client-name
     :signal/cool-raccoon-signal-yo
     :time/now
-    :signal/worthy-fish-signal
-    :signal/dragging-to-potential-cross-breed?
-    :signal/part-cool-raccoon-signal-yo-7
-    :signal/part-cool-raccoon-signal-yo-4
-    :signal/part-cool-raccoon-signal-yo-10
-    :signal/part-cool-raccoon-signal-yo-1
-    :client/*client-name*>stats>client-name
-    :signal/part-cool-raccoon-signal-yo-8
     :client/*client-name*>stats>uptime
-    :signal/special-lion-signal
-    :signal/optimistic-sheep-signal
+    :client/*client-name*>stats>memory
     :flow/live-scratch-flow>*running?
-    :signal/part-cool-raccoon-signal-yo-9
-    :signal/elegant-grasshopper-signal
-    :signal/fun-gorilla
     :time/second
     :flow/a-random-wow>*running?
-    :signal/genius-gnat-signal
-    :signal/hourly?
-    :signal/part-cool-raccoon-signal-yo-6
-    :client/*client-name*>stats>client-latency
-    :client/*client-name*>stats>recent-messages-per-second
-    :client/*client-name*>stats>memory
-    :signal/fair-armadillo-signal]},
-  :alert1 {:alerts :alert2}},
+    :client/*client-name*>stats>recent-messages-per-second]}},
  :screen-name "blackberries3-narrow2",
  :recos-page2 0,
  :selected-warren-item :cool-raccoon-signal-yo,
@@ -1287,30 +1209,33 @@
  :rs-overrides-hashmap {"a-random-wow" nil},
  :base-sniff-queries
  {:client_memory -1981695802, :client_stats -175748261, :jvm_stats 1498154063},
- :panels-hash -550978893,
+ :panels-hash -1375906633,
  :sessions
- (["ready-azure-snake-17.edn" "1013 hours, 10 minutes, 32 seconds" 3647432698]
-   ["transformative-oval-raven-19.edn"
-    "1013 hours, 19 minutes, 40 seconds"
-    3647980331]
+ (["respected-icosahedral-clam-1.edn"
+   "1002 hours, 33 minutes, 40 seconds"
+   3609220529]
+   ["grin-hexagonal-leopard-32.edn" "1006 hours, 2 minutes, 50 seconds" 3621770972]
+   ["open-elliptic-frog-of-volcanic-island.edn"
+    "1030 hours, 34 minutes, 28 seconds"
+    3710068891]
+   ["simple-globular-lion-of-tepui.edn"
+    "1030 hours, 45 minutes, 21 seconds"
+    3710721496]
+   ["sparkling-hexagonal-bee-38.edn"
+    "1033 hours, 16 minutes, 25 seconds"
+    3719785397]
    ["efficient-prismatic-parrot-18.edn"
-    "1013 hours, 7 minutes, 14 seconds"
-    3647234971]
-   ["intellectual-octohedral-jay-8.edn"
-    "1016 hours, 12 minutes, 41 seconds"
-    3658361608]
-   ["famous-linear-echidna-4.edn" "1016 hours, 16 minutes, 52 seconds" 3658612899]
-   ["virtuous-blush-rabbit-27.edn" "1016 hours, 40 minutes, 6 seconds" 3660006524]
-   ["refreshing-plum-prairie-dog-4.edn"
-    "1016 hours, 56 minutes, 44 seconds"
-    3661004450]
-   ["effervescent-blush-tiger-24.edn" "1017 hours, 55 minutes, 0 second" 3664500863]
-   ["skillful-plum-clam-19.edn" "1017 hours, 56 minutes, 23 seconds" 3664583847]),
+    "1048 hours, 55 minutes, 10 seconds"
+    3776110782]
+   ["ready-azure-snake-17.edn" "1048 hours, 58 minutes, 28 seconds" 3776308509]
+   ["transformative-oval-raven-19.edn"
+    "1049 hours, 7 minutes, 36 seconds"
+    3776856142]
+   ["virtuous-blush-rabbit-27.edn" "1052 hours, 28 minutes, 2 seconds" 3788882335]),
  :solvers-map {:vibrant-antelope-solver {:signal nil, :body nil}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 965391610,
+ :user-params-hash -1535870810,
  :grid-recos? true,
- :session-hash 1931412823,
  :resolved-queries
  {:client-memory-drag-36
   {:select
@@ -1325,14 +1250,15 @@
    :from [[:client_memory :ee183]],
    :refresh-every 200,
    :cache? false,
-   :_last-run "10:33:52",
-   :order-by [[:mem_time :desc]]},
+   :_last-run "23:41:37",
+   :order-by [[:mem_time :desc]],
+   :col-widths {:batches 131, :packets 131, :ts 151}},
   :gen-viz-516
   {:cache? false,
    :where [:= :client_name :*client-name-str],
    :limit 50,
    :group-by [:ts],
-   :_last-run "10:37:56",
+   :_last-run "23:40:37",
    :refresh-every 200,
    :from
    [{:select
@@ -1373,7 +1299,7 @@
    :from [[:client_stats :gg588]],
    :refresh-every 210,
    :cache? false,
-   :_last-run "10:34:22",
+   :_last-run "23:40:57",
    :col-widths
    {:ack 81,
     :client_latency 141,
@@ -1393,7 +1319,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 26,
    :group-by [2],
-   :_last-run "10:38:00",
+   :_last-run "23:40:37",
    :refresh-every 230,
    :from
    [{:select
@@ -1553,7 +1479,7 @@
        :child
        "client batches"]]]}},
   :block-3108
-  {:h 5,
+  {:h 4,
    :w 22,
    :connection-id "system-db",
    :name "select-all-client_memory",
@@ -1571,8 +1497,9 @@
      :from [[:client_memory :ee183]],
      :refresh-every 200,
      :cache? false,
-     :_last-run "10:33:52",
-     :order-by [[:mem_time :desc]]}},
+     :_last-run "23:41:37",
+     :order-by [[:mem_time :desc]],
+     :col-widths {:batches 131, :packets 131, :ts 151}}},
    :root [1 21],
    :tab "generated lass of the woodlands",
    :selected-view :client-memory-drag-36},
@@ -1769,7 +1696,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 50,
      :group-by [:ts],
-     :_last-run "10:37:56",
+     :_last-run "23:40:37",
      :refresh-every 200,
      :from [:query/client-memory-drag-36],
      :order-by [[:ts :desc]],
@@ -1830,14 +1757,14 @@
        :Line
        {:isAnimationActive false,
         :dataKey :mb,
+        :type "monotone",
         :yAxisId "left",
         :stroke-width 3,
         :stroke "#8884d8",
         :activeDot {:r 8}}]
       [:>
        :Bar
-       {:type "monotone",
-        :isAnimationActive false,
+       {:isAnimationActive false,
         :dataKey :messages_per_second,
         :yAxisId "right",
         :fill "#00000000",
@@ -1865,7 +1792,7 @@
      :from [[:client_stats :gg588]],
      :refresh-every 210,
      :cache? false,
-     :_last-run "10:34:22",
+     :_last-run "23:40:57",
      :col-widths
      {:ack 81,
       :client_latency 141,
@@ -1928,7 +1855,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 26,
      :group-by [2],
-     :_last-run "10:38:00",
+     :_last-run "23:40:37",
      :refresh-every 230,
      :from [:query/client-memory-drag-36],
      :order-by [[:ts :desc]],
@@ -2045,8 +1972,7 @@
   "date" "#A2AFB7",
   "nil" "#13283E"},
  :click-param
- {nil {nil nil},
-  :blocks-sys
+ {:blocks-sys
   {:block_key ":*theme*",
    :block_name "(meta: this screen's theme)",
    :queries 0,
@@ -2078,7 +2004,7 @@
    :blocks 3,
    :queries 0,
    :ts "2024-03-24 00:18:04"},
-  :time {:second 29, :now "Wednesday, May 15th 10:38AM", :minute 39},
+  :time {:second 57, :now "Thursday, May 16th 11:43PM", :minute 39},
   :viz-tables-sys2 {:table_name :client-memory-drag-36},
   :client-stats-drag-36
   {:server_subs 12,
@@ -2095,16 +2021,19 @@
   :client
   {:friendly-wide-grasshopper-40>stats>client-name nil,
    :genius-thin-sea-urchin-30>stats>memory 262,
+   :good-sapphire-hyena-18>stats>uptime nil,
    :friendly-wide-grasshopper-40>stats>memory nil,
    :spirited-jungle-green-rat-27>stats>recent-messages-per-second nil,
-   :*client-name*>stats>messages-per-second 2.38,
+   :*client-name*>stats>messages-per-second 3.13,
+   :good-sapphire-hyena-18>stats>recent-messages-per-second nil,
    :satisfactory-octohedral-cheetah-26>stats>memory nil,
    :familiar-prismatic-woodpecker-22>stats>uptime nil,
-   :*client-name*>stats>client-name ":genius-rectangular-ostrich-17",
+   :*client-name*>stats>client-name ":good-sapphire-hyena-18",
    :satisfactory-octohedral-cheetah-26>stats>recent-messages-per-second nil,
    :familiar-prismatic-woodpecker-22>stats>memory nil,
    :thrilling-icosahedral-raccoon-3>stats>messages-per-second nil,
    :graceful-star-shaped-opossum-5>stats>uptime nil,
+   :attractive-rhomboidal-otter-29>stats>uptime nil,
    :stellar-viridian-bee-26>stats>memory nil,
    :stellar-viridian-bee-26>stats>recent-messages-per-second nil,
    :genius-rectangular-ostrich-17>stats>recent-messages-per-second nil,
@@ -2113,6 +2042,7 @@
    :spirited-jungle-green-rat-27>stats>memory nil,
    :genius-rectangular-ostrich-17>stats>uptime nil,
    :genius-thin-sea-urchin-30>stats>uptime "5 minutes, 13 seconds",
+   :attractive-rhomboidal-otter-29>stats>memory nil,
    :friendly-wide-grasshopper-40>stats>recent-messages-per-second nil,
    :graceful-star-shaped-opossum-5>stats>memory nil,
    :genius-rectangular-ostrich-17>stats>messages-per-second nil,
@@ -2120,65 +2050,96 @@
    :thrilling-icosahedral-raccoon-3>stats>client-latency nil,
    :spirited-jungle-green-rat-27>stats>uptime nil,
    :constant-lime-wombat-41>stats>uptime nil,
+   :good-sapphire-hyena-18>stats>client-latency nil,
    :friendly-wide-grasshopper-40>stats>messages-per-second nil,
+   :good-sapphire-hyena-18>stats>messages-per-second nil,
+   :good-sapphire-hyena-18>stats>client-name nil,
    :satisfactory-octohedral-cheetah-26>stats>uptime nil,
    :familiar-prismatic-woodpecker-22>stats>recent-messages-per-second nil,
+   :attractive-rhomboidal-otter-29>stats>client-latency nil,
    :constant-lime-wombat-41>stats>recent-messages-per-second nil,
    :genius-rectangular-ostrich-17>stats>memory nil,
    :familiar-prismatic-woodpecker-22>stats>client-name nil,
    :stellar-viridian-bee-26>stats>uptime nil,
-   :*client-name*>stats>memory 1194,
+   :*client-name*>stats>memory 373,
    :friendly-wide-grasshopper-40>stats>client-latency nil,
    :graceful-star-shaped-opossum-5>stats>recent-messages-per-second nil,
    :friendly-wide-grasshopper-40>stats>uptime nil,
-   :*client-name*>stats>recent-messages-per-second 2.8,
-   :*client-name*>stats>uptime "2 minutes, 18 seconds",
+   :good-sapphire-hyena-18>stats>memory nil,
+   :attractive-rhomboidal-otter-29>stats>messages-per-second nil,
+   :*client-name*>stats>recent-messages-per-second 3.13,
+   :*client-name*>stats>uptime "1 hour, 19 minutes, 37 seconds",
    :familiar-prismatic-woodpecker-22>stats>client-latency nil,
+   :attractive-rhomboidal-otter-29>stats>client-name nil,
    :genius-rectangular-ostrich-17>stats>client-name nil,
    :constant-lime-wombat-41>stats>client-latency nil,
-   :*client-name*>stats>client-latency 511,
+   :*client-name*>stats>client-latency 424,
    :constant-lime-wombat-41>stats>client-name nil,
    :constant-lime-wombat-41>stats>messages-per-second nil,
    :familiar-prismatic-woodpecker-22>stats>messages-per-second 3.11,
+   :attractive-rhomboidal-otter-29>stats>recent-messages-per-second nil,
    :thrilling-icosahedral-raccoon-3>stats>client-name nil},
   :param
-  {:selected-view [:queries :new-query],
+  {:selected-view [:views :every-45-seconds],
    :selected-view-data
-   {:cache? false,
-    :where [:= :client_name :*client-name-str],
-    :limit 26,
-    :group-by [2],
-    :_last-run "10:35:02",
-    :refresh-every 230,
-    :from [:query/client-memory-drag-36],
-    :order-by [[:ts :desc]],
-    :connection-id "system-db",
-    :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 13] :ts_hour]],
-    :post-process-fn
-    (fn [x]
-      (vec
-        (for
-          [idx
-           (range (count x))
-           :let
-           [rx
-            (vec (reverse x))
-            prev-row
-            (get rx (- idx 1) {:mem_used 0})
-            row
-            (get rx idx {:mem_used 0})
-            pre-mb
-            (/ (get prev-row :mem_used) 1048576)
-            mb
-            (/ (get row :mem_used) 1048576)
-            diff
-            (Math/round (- mb pre-mb))
-            pos
-            (cond (> diff 0) "+" (< diff 0) "" :else "")]]
-          (merge
-            row
-            {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))},
-   :selected-block :block-2178,
+   [:>
+    :ResponsiveContainer
+    {:width "100%", :height :panel-height+50}
+    [:>
+     :ComposedChart
+     {:data :gen-viz-516,
+      :style {:font-family :theme/base-font},
+      :margin {:top 5, :bottom 5, :right 30, :left 20}}
+     [:> :CartesianGrid {:strokeDasharray "0 0", :opacity 0}]
+     [:>
+      :Tooltip
+      {:content-style
+       {:background-color "#00000099",
+        :font-weight 700,
+        :border "1px solid transparent",
+        :border-radius "4px"}}]
+     [:> :XAxis {:dataKey :ts}]
+     [:>
+      :YAxis
+      {:yAxisId "left",
+       :label
+       {:value "MB",
+        :angle -90,
+        :fill "#8884d8",
+        :style {:font-size "20px", :font-weight 700},
+        :position "middle",
+        :dx -25},
+       :domain ["auto" "auto"]}]
+     [:>
+      :YAxis
+      {:yAxisId "right",
+       :label
+       {:value "Messages per Second",
+        :angle 90,
+        :fill "#82ca9d",
+        :style {:font-weight 700, :font-size "15px"},
+        :position "middle",
+        :dx 20},
+       :domain ["auto" "auto"],
+       :orientation "right"}]
+     [:>
+      :Line
+      {:isAnimationActive false,
+       :dataKey :mb,
+       :yAxisId "left",
+       :stroke-width 3,
+       :stroke "#8884d8",
+       :activeDot {:r 8}}]
+     [:>
+      :Bar
+      {:type "monotone",
+       :isAnimationActive false,
+       :dataKey :messages_per_second,
+       :yAxisId "right",
+       :fill "#00000000",
+       :stroke-width 3,
+       :stroke "#82ca9d"}]]],
+   :selected-block :block-12050,
    :my-dash-killswitch? false,
    :upstanding-crimson-frog "new parameter value!",
    :super-cobalt-mole ["1121pm - 229mb"]},
@@ -2278,7 +2239,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image "url(images/large/technicolor-shanny-8k-4k.png)",
+   {:background-image "url(images/large/b64-image-41776-81810-4k.webp)",
     :transition "all 0.8s ease-in-out",
     :background-blend-mode "hard-light",
     :background-size "cover",
@@ -2311,7 +2272,7 @@
    :cool-raccoon-story-yo nil,
    :part-fun-gorilla-1 false,
    :part-worthy-fish-signal-1 false,
-   :part-cool-raccoon-signal-yo-3 false,
+   :part-cool-raccoon-signal-yo-3 true,
    :nice-coyote-signal false,
    :part-cool-raccoon-signal-yo-2 false,
    :part-elegant-grasshopper-signal-1 true,
@@ -2329,7 +2290,7 @@
    :dragging-to-potential-cross-breed? false,
    :part-worthy-fish-signal-2 false,
    :part-cool-raccoon-signal-yo-7 false,
-   :part-cool-raccoon-signal-yo-4 false,
+   :part-cool-raccoon-signal-yo-4 true,
    :part-nice-coyote-signal-1 true,
    :part-optimistic-sheep-signal-0 false,
    :part-fun-gorilla-8 false,
@@ -2385,7 +2346,7 @@
    :since-start "6 seconds",
    :*started-by :rvbbit-scheduler,
    :time-running "6 seconds",
-   :last-update {:sleep-then-pass :end},
+   :last-update {:done :end},
    :*running? false,
    :last-update-seconds nil,
    :channels-open? false,
@@ -2397,9 +2358,9 @@
    :block-overrides [:prompt :prompt-2 :prompt-3],
    :channels 0,
    :channels-open 0,
-   :since-start "48 seconds",
-   :*started-by :stunning-slate-gray-koala-12,
-   :time-running "48 seconds",
+   :since-start "38 seconds",
+   :*started-by :whole-oval-gnat-25,
+   :time-running "38 seconds",
    :last-update {:done :end},
    :*running? false,
    :last-update-seconds nil,
@@ -2413,11 +2374,12 @@
    :channels 0,
    :channels-open 0,
    :since-start "less than a second",
-   :*started-by :stunning-slate-gray-koala-12,
+   :*started-by :whole-oval-gnat-25,
    :time-running "less than a second",
    :last-update {:done :end},
    :*running? false,
    :last-update-seconds nil,
    :channels-open? false,
    :retries-left -1,
-   :running-blocks []}}}
+   :running-blocks []}},
+ :current-url "#/blackberries3-narrow2"}
