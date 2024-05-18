@@ -6513,7 +6513,7 @@
   {:port                 websocket-port
    :join?                false
    :async?               true
-   :min-threads          50
+   :min-threads          100 ;; 50
    :max-threads          450
    :idle-timeout         5000
    :queue-size           1000

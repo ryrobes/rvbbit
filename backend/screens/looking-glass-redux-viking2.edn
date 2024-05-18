@@ -644,7 +644,7 @@
   "violet ferret"
   "octohedral alligator"
   "round eagle"],
- :selected-cols nil,
+ :selected-cols {},
  :server
  {:settings
   {:harvest-on-boot? true,
@@ -751,6 +751,7 @@
     "error-monitor-vanessa2"
     "error-monitor-vanessa3"
     "error-monitor-vanessa4"
+    "error-monitor-vanessa5"
     "evil-main-street"
     "fake-books-1"
     "fake-bricks"
@@ -852,17 +853,19 @@
    :values
    {:prompt {:value :param/green-turquoise-skunk, :source :param},
     :prompt-2 {:value :param/green-turquoise-skunk, :source :param},
-    :prompt-3 {:value :param/green-turquoise-skunk, :source :param}}}},
+    :prompt-3 {:value :param/green-turquoise-skunk, :source :param},
+    :prompt-4 {:value :param/green-turquoise-skunk, :source :param},
+    :prompt-5 {:value :param/green-turquoise-skunk, :source :param}}}},
  :editor? false,
  :buffy? false,
- :memory [96801063 65686971 4294705152],
+ :memory [91702013 65158613 4294705152],
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-16 22:55:53",
+      :at "2024-05-17 16:07:39",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -875,26 +878,23 @@
        :justify
        :center
        :style
-       {:opacity 0.7}
+       {:margin-top "-6px", :color "inherit"}
        :children
-       [[:box
-         :style
-         {:font-weight 700, :font-size "11px", :opacity 0.6}
-         :child
-         "successfully saved screen"]
+       [[:box :child "flow openai-image-gen-ladder3 has finished"]
+        nil
         [:box
          :style
-         {:font-weight 700, :font-size "18px"}
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "looking-glass-redux-viking2"]
+         "47 seconds "]
         [:box
          :style
-         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "@ /home/ryanr/rvbbit/backend/screens/looking-glass-redux-viking2.edn"]]]
+         "returns: ./images/gen/b64-image-8053-58254.png"]]]
       10
-      1.6
-      8]
+      1.35
+      9]
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
@@ -912,7 +912,7 @@
   :time/second
   :flow/flow-forever>:final-math
   :flow/openai-image-gen-ladder3>:output-revised-prompt],
- :client-name :whole-oval-gnat-25,
+ :client-name :prominent-magenta-cheetah-20,
  :runstreams-lookups
  {"openai-image-gen-ladder3"
   {:open-inputs
@@ -941,7 +941,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:created 1715849510, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
+     :sample "{:created 1715922481, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
     :prompt-5
     {:type :string,
      :ttype :open-block,
@@ -950,27 +950,26 @@
      :defaults {},
      :sample ""},
     :node-js-color-thief-script
-    {:type :map,
+    {:type {:dominantColor :string, :colorPalette :vector, :* :map},
      :ttype :sub-flow,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample
-     "{:dominantColor \"#156071\", :colorPalette [\"#ca97a2\" \"#095c6d..."},
+     :sample "no sample data"},
     :dominant-color
-    {:type :string,
+    {:type {:out :string},
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#156071"},
+     :sample "no sample data"},
     :shell-command-1
-    {:type :map,
+    {:type {:out :any},
      :ttype :shell-command,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:output [\"    1 image files updated\"], :exception [], :seco..."},
+     :sample "no sample data"},
     :quality-param
     {:type :string,
      :ttype :open-block,
@@ -988,7 +987,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/tmp/rand-exif-43292.txt"},
+     :sample "/tmp/rand-exif-19117.txt"},
     :execute-shell-command
     {:type :map,
      :ttype :shell-command,
@@ -997,19 +996,19 @@
      :defaults {},
      :sample "{:output [], :exception [], :seconds [], :command \"cp /home/..."},
     :pop-color
-    {:type :string,
+    {:type {:out :string},
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#ca97a2"},
+     :sample "no sample data"},
     :prompt-2
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "Use this prompt exactly as is with no modifications please, ..."},
+     :sample "For testing purposes, please use exactly this prompt and do ..."},
     :base-save-directory
     {:type :string,
      :ttype :open-block,
@@ -1018,20 +1017,19 @@
      :defaults {},
      :sample "/home/ryanr/rvbbit-out"},
     :color-palette
-    {:type :map,
+    {:type {:dominantColor :string, :colorPalette :vector, :* :map},
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample
-     "{:dominantColor \"#156071\", :colorPalette [\"#ca97a2\" \"#095c6d..."},
+     :sample "no sample data"},
     :stringify-exif-map
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt-asked \"Use this prompt exactly as is with no modifi..."},
+     :sample "{:prompt-asked \"For testing purposes, please use exactly thi..."},
     :size-param
     {:type :string,
      :ttype :open-block,
@@ -1049,35 +1047,35 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "Use this prompt exactly as is with no modifications please, ..."},
+     :sample "For testing purposes, please use exactly this prompt and do ..."},
     :write-file-1
     {:type :map,
      :ttype :write-file,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:status :ok, :file-path \"/tmp/rand-exif-43292.txt\"}"},
+     :sample "{:status :ok, :file-path \"/tmp/rand-exif-19117.txt\"}"},
     :save-base64-to-webp-file
     {:type :string,
      :ttype :save-base64-to-webp,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-41776-81810.png"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-72185-54134.png"},
     :prompt-4
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample ""},
+     :sample "Please use this prompt EXACTLY as is with NO changes at all ..."},
     :request-body-map
     {:type :map,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt \"Use this prompt exactly as is with no modification..."},
+     :sample "{:prompt \"For testing purposes, please use exactly this prom..."},
     :base-web-directory
     {:type :string,
      :ttype :open-block,
@@ -1100,7 +1098,7 @@
      :defaults {},
      :sample "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-..."},
     :hiccup-image-box-w-png-vw
-    {:type :vector,
+    {:type nil,
      :ttype nil,
      :meta nil,
      :last? false,
@@ -1112,42 +1110,54 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "cp /home/ryanr/rvbbit-out/b64-image-41776-81810.png /home/ry..."},
+     :sample "cp /home/ryanr/rvbbit-out/b64-image-72185-54134.png /home/ry..."},
     :hiccup-image-box-w-png
-    {:type :vector,
+    {:type
+     {:idx7 :keyword,
+      :idx5 :keyword,
+      :* :vector,
+      :idx2 :string,
+      :idx4 :string,
+      :idx1 :keyword,
+      :idx6 :keyword,
+      :idx3 :keyword,
+      :idx10 :vector,
+      :idx8 :map,
+      :idx9 :keyword,
+      :idx0 :keyword},
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "[:v-box :padding \"10px\" :gap \"8px\" :width :width-px :style {..."},
+     :sample "no sample data"},
     :generate-file-path
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-41776-81810.png"},
+     :sample "/home/ryanr/rvbbit-out/b64-image-72185-54134.png"},
     :relative-url-path-for-png-version
-    {:type :string,
+    {:type {:out :string},
      :ttype :open-fn,
      :meta nil,
      :last? true,
      :defaults {},
-     :sample "./images/gen/b64-image-41776-81810.png"},
+     :sample "no sample data"},
     :exif-map
     {:type :map,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt-asked \"Use this prompt exactly as is with no modifi..."},
+     :sample "{:prompt-asked \"For testing purposes, please use exactly thi..."},
     :prompt-3
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "Use this prompt exactly as is with no modifications please, ..."},
+     :sample "For testing purposes, please use exactly this prompt and do ..."},
     :http-req-map
     {:type :map,
      :ttype :open-block,
@@ -1175,14 +1185,14 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/tmp/rand-exif-43292.txt"},
+     :sample "/tmp/rand-exif-19117.txt"},
     :output-revised-prompt
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "A highly detailed, exaggerated pinup style illustration, fea..."},
+     :sample "A highly detailed, stylized illustration with pinup influenc..."},
     :style-param
     {:type :string,
      :ttype :open-block,
@@ -1194,23 +1204,22 @@
      :last? false,
      :defaults {},
      :sample "vivid"}}}},
- :alt-key-held? false,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2022, :h 1281},
+ :window {:w 2457, :h 1285},
  :post-meta
  {:gen-viz-1132 {:* {:rowcount 7}},
-  :client-items-drag-item-key-5 {:* {:rowcount 19350}},
-  :client-items-drag-20 {:* {:rowcount 43493}},
-  :client-items-drag-35 {:* {:rowcount 43493}},
+  :client-items-drag-item-key-5 {:* {:rowcount 19650}},
+  :client-items-drag-20 {:* {:rowcount 44626}},
+  :client-items-drag-35 {:* {:rowcount 44626}},
   :rowcnt-drag-7 {:* {:rowcount 1}},
-  :blocks-drag-44 {:* {:rowcount 2890}},
+  :blocks-drag-44 {:* {:rowcount 2919}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
-  :fields-drag-16 {:* {:rowcount 1074}},
+  :fields-drag-16 {:* {:rowcount 1059}},
   :city-drag-26-1 {:* {:rowcount 3755}},
   :ufo-sightings-drag-9 {:* {:rowcount 67662}},
   :item-type-drag-5 {:* {:rowcount 7}},
-  :item-type-drag-0 {:* {:rowcount 3431}},
+  :item-type-drag-0 {:* {:rowcount 3444}},
   :duration-hours-drag-43 {:* {:rowcount 7103}},
   :city-drag-26 {:* {:rowcount 12346}},
   :gen-viz-555 {:* {:rowcount 13}},
@@ -1218,7 +1227,7 @@
   :shape-drag-7 {:* {:rowcount 29}}},
  :flow-estimates
  {"openai-image-gen-ladder3"
-  {:times 47, :run-id "96e0592e-5c33-4291-82c5-bf011449d3a0"}},
+  {:times 51, :run-id "1341dfbb-577d-4b3b-bafd-68bb04df74ec"}},
  :status
  {:heartbeat
   {:kick
@@ -1239,7 +1248,6 @@
  :screen-name "looking-glass-redux-viking2",
  :recos-page2 0,
  :selected-tab "fat zebra",
- :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts [],
@@ -1251,35 +1259,36 @@
    :prompt-2
    "Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.\n\nA highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise.",
    :prompt-3
+   "Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.\n\nA highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise.",
+   :prompt-4
+   "Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.\n\nA highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise.",
+   :prompt-5
    "Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.\n\nA highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise."}},
  :panels-hash -31952493,
  :sessions
- (["open-elliptic-frog-of-volcanic-island.edn"
-   "1000 hours, 24 minutes, 55 seconds"
-   3601495499]
+ (["glamorous-indigo-ox-10.edn" "1001 hours, 41 minutes, 3 seconds" 3606063554]
+   ["genius-wide-parrot-28.edn" "1002 hours, 3 minutes, 56 seconds" 3607436027]
+   ["respected-icosahedral-clam-1.edn"
+    "1004 hours, 57 minutes, 33 seconds"
+    3617853870]
+   ["grin-hexagonal-leopard-32.edn" "1008 hours, 26 minutes, 44 seconds" 3630404314]
+   ["open-elliptic-frog-of-volcanic-island.edn"
+    "1032 hours, 58 minutes, 22 seconds"
+    3718702234]
    ["simple-globular-lion-of-tepui.edn"
-    "1000 hours, 35 minutes, 48 seconds"
-    3602148104]
-   ["sparkling-hexagonal-bee-38.edn" "1003 hours, 6 minutes, 52 seconds" 3611212005]
+    "1033 hours, 9 minutes, 14 seconds"
+    3719354839]
+   ["sparkling-hexagonal-bee-38.edn"
+    "1035 hours, 40 minutes, 18 seconds"
+    3728418738]
    ["efficient-prismatic-parrot-18.edn"
-    "1018 hours, 45 minutes, 37 seconds"
-    3667537390]
-   ["ready-azure-snake-17.edn" "1018 hours, 48 minutes, 55 seconds" 3667735117]
-   ["transformative-oval-raven-19.edn"
-    "1018 hours, 58 minutes, 2 seconds"
-    3668282750]
-   ["intellectual-octohedral-jay-8.edn"
-    "1021 hours, 51 minutes, 4 seconds"
-    3678664027]
-   ["famous-linear-echidna-4.edn" "1021 hours, 55 minutes, 15 seconds" 3678915318]
-   ["virtuous-blush-rabbit-27.edn"
-    "1022 hours, 18 minutes, 28 seconds"
-    3680308942]),
+    "1051 hours, 19 minutes, 4 seconds"
+    3784744124]
+   ["ready-azure-snake-17.edn" "1051 hours, 22 minutes, 21 seconds" 3784941851]),
  :solvers-map {:vibrant-antelope-solver {:signal nil, :body nil}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
  :user-params-hash -671163825,
  :grid-recos? true,
- :session-hash 272958327,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -2838,11 +2847,11 @@
    :openai-image-gen-ladder2>relative-url-path-for-png-version
    "./images/gen/b64-image-59678-4653.png",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
-   :openai-image-gen-ladder3>pop-color "#ca97a2",
+   :openai-image-gen-ladder3>pop-color "#cd999a",
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
    "./images/gen/b64-image-55006-75802.png",
-   :openai-image-gen-ladder3>dominant-color "#156071",
+   :openai-image-gen-ladder3>dominant-color "#145b69",
    :counting-loop>open-fn-2 44,
    :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
@@ -2876,7 +2885,7 @@
    :counting-loop>*running? false,
    :counting-loop>open-fn-3 45,
    :openai-image-gen-ladder3>relative-url-path-for-png-version
-   "./images/gen/b64-image-41776-81810.png",
+   "./images/gen/b64-image-8053-58254.png",
    :flow-forever>*running? false,
    :openai-image-gen-ladder2>*running? false,
    :openai-image-gen-ladder>execute-shell-command
@@ -2904,7 +2913,7 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
-  :time {:seconds nil, :second 28},
+  :time {:seconds nil, :second 21},
   :viz-tables-sys2 {:table_name :ufo-sightings-drag-9},
   :user-dropdown-sys {:req-field nil},
   :searches-types-sys {:item_type "client-queries"},
