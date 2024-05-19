@@ -1,8 +1,8 @@
 {:flowmaps
- {:open-fn-1
+ {:simulation-fn-and-view
   {:y 1175,
    :fn (fn [x] x),
-   :w 325,
+   :w 425,
    :raw-fn
    (fn [rows cols delay-ms iterations]
      (defn initialize-grid [rows cols]
@@ -64,12 +64,14 @@
                                      :color (str ccolor "12"),
                                      :width "20px",
                                      :height "20px",
-                                     :border "1px solid #00000011"}}]))])]]
+                                     :border "2px solid #00000044"}}]))])]]
                          15
                          5
                          4)))
            render-it (fn [grid]
-                       (let [max-x (apply max (map (comp :x second) grid)) max-y (apply max (map (comp :y second) grid))]
+                       (let [max-x (apply max (map (comp :x second) grid))
+                             max-y (apply max (map (comp :y second) grid))
+                             max-age (apply max (for [[k v] grid] (get v :age)))]
                          [:box
                           :style
                           {}
@@ -83,22 +85,38 @@
                               (for
                                 [x (range (inc max-x))]
                                 (let [{:keys [color age]} (get grid [x y] {:color :white, :age 0})
-                                      ccolor (if (= :white color) "#ffffff22" "#00000000")]
+                                      ccolor (if (= :black color) "#379fb5" "#00000000")
+                                      left? (= (get-in grid [[(- x 1) y] :color]) :black)
+                                      right? (= (get-in grid [[(+ x 1) y] :color]) :black)
+                                      up? (= (get-in grid [[x (- y 1)] :color]) :black)
+                                      down? (= (get-in grid [[x (+ y 1)] :color]) :black)
+                                      depth "10px"
+                                      radi-str (str
+                                                 (if (or left? up?) "0px" depth)
+                                                 " "
+                                                 (if (or right? up?) "0px" depth)
+                                                 " "
+                                                 (if (or right? down?) "0px" depth)
+                                                 " "
+                                                 (if (or down? left?) "0px" depth))]
                                   [:box
                                    :child
-                                   (str (when (> age 0) age))
+                                   (str (when (> age 0) (str age)))
                                    :align
                                    :center
                                    :justify
                                    :center
                                    {:style
-                                    {:background-color ccolor,
-                                     :font-size "7px",
-                                     :font-family "Homemade Apple",
-                                     :color (str ccolor "12"),
+                                    {:color "#000000",
+                                     :font-size (str (+ 15 (* 0.01 age)) "px"),
+                                     :transition "all 0.25s ease-out allow-discrete",
+                                     :font-weight (* age 100),
+                                     :background-color ccolor,
                                      :width "50px",
-                                     :height "50px",
-                                     :border "1px solid #00000011"}}]))])]]))]
+                                     :filter (str "brightness(" (+ 50 (* age 20)) "%)"),
+                                     :border (str "3px solid " ccolor),
+                                     :border-radius radi-str,
+                                     :height "50px"}}]))])]]))]
        (println "Initial grid:" (deref grid))
        (defn game-of-life [rows cols delay-ms iterations]
          (let [done (java.util.concurrent.CountDownLatch. 1)]
@@ -112,10 +130,10 @@
                            alive-cnt (fn [x] (count (for [[k v] (deref grid) :when (= (get v :color) :white)] k)))]
                        (swap! grid update-grid)
                        (swap!
-                         rvbbit-backend.websockets/panels-atom
+                         rvbbit-backend.websockets/params-atom
                          assoc-in
-                         [:client-name :block-11586 :views :hi]
-                         [:box :child (render-it (deref grid))])
+                         [:intelligent-harlequin-camel-32 :param :conway]
+                         (render-it (deref grid)))
                        (Thread/sleep delay-ms)
                        (if (= prev-grid (deref grid))
                          (do
@@ -131,7 +149,7 @@
    :z 0,
    :ports {:in {:rows :any, :cols :any, :delay-ms :any, :iterations :any}, :out {:out :any}},
    :inputs nil,
-   :h 250,
+   :h 475,
    :x 1875,
    :view
    (fn [grid]
@@ -156,7 +174,6 @@
                 {:style
                  {:background-color ccolor,
                   :font-size "7px",
-                  :font-family "Homemade Apple",
                   :font-weight 400,
                   :color (str ccolor "12"),
                   :width "20px",
@@ -174,8 +191,8 @@
      :inputs [:rows :cols :delay-ms],
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
-  :open-fn-2d
-  {:y 1475,
+  :ending-alive
+  {:y 1700,
    :fn (fn [x] x),
    :w 175,
    :raw-fn (fn [x] (count (for [[k v] x :when (= (get v :color) :white)] k))),
@@ -199,7 +216,7 @@
      :inputs [:x],
      :expandable? true,
      :drag-meta {:type :open-fn}}}},
-  :open-input
+  :rows-int
   {:y 1050,
    :w 125,
    :right-click? true,
@@ -208,9 +225,20 @@
    :ports {:in {}, :out {:out {:out :integer}}},
    :inputs nil,
    :h 85,
-   :x 1775,
+   :x 1875,
    :data {:flow-item {:expandable? true, :inputs []}, :drag-meta {:type :open-block}, :user-input 20}},
-  :open-input-1
+  :cols-int
+  {:y 1050,
+   :w 100,
+   :right-click? true,
+   :types nil,
+   :z 0,
+   :ports {:in {}, :out {:out {:out :integer}}},
+   :inputs nil,
+   :h 85,
+   :x 2050,
+   :data {:flow-item {:expandable? true, :inputs []}, :drag-meta {:type :open-block}, :user-input 20}},
+  :tick-delay-ms
   {:y 1050,
    :w 125,
    :right-click? true,
@@ -219,9 +247,9 @@
    :ports {:in {}, :out {:out {:out :integer}}},
    :inputs nil,
    :h 85,
-   :x 1925,
-   :data {:flow-item {:expandable? true, :inputs []}, :drag-meta {:type :open-block}, :user-input 35}},
-  :open-input-2
+   :x 2200,
+   :data {:flow-item {:expandable? true, :inputs []}, :drag-meta {:type :open-block}, :user-input 500}},
+  :iterations-max
   {:y 1050,
    :w 125,
    :right-click? true,
@@ -230,26 +258,15 @@
    :ports {:in {}, :out {:out {:out :integer}}},
    :inputs nil,
    :h 85,
-   :x 2075,
-   :data {:flow-item {:expandable? true, :inputs []}, :drag-meta {:type :open-block}, :user-input 2456}},
-  :open-input-3
-  {:y 1050,
-   :w 125,
-   :right-click? true,
-   :types nil,
-   :z 0,
-   :ports {:in {}, :out {:out {:out :integer}}},
-   :inputs nil,
-   :h 85,
-   :x 2225,
-   :data {:flow-item {:expandable? true, :inputs []}, :drag-meta {:type :open-block}, :user-input 13}}},
- :zoom [-785 -862 0.925],
+   :x 2350,
+   :data {:flow-item {:expandable? true, :inputs []}, :drag-meta {:type :open-block}, :user-input 44}}},
+ :zoom [-1795.71 -1326.7 1.372],
  :opts {:retry-on-error? false, :retries 5, :close-on-done? true, :timeout 4500000},
  :flow-id "game-of-life-test1",
  :flowmaps-connections
- [[:open-fn-2d :done]
-  [:open-input :open-fn-1/rows]
-  [:open-input-1 :open-fn-1/cols]
-  [:open-input-2 :open-fn-1/delay-ms]
-  [:open-fn-1 :open-fn-2d/x]
-  [:open-input-3 :open-fn-1/iterations]]}
+ [[:ending-alive :done]
+  [:rows-int :simulation-fn-and-view/rows]
+  [:cols-int :simulation-fn-and-view/cols]
+  [:tick-delay-ms :simulation-fn-and-view/delay-ms]
+  [:simulation-fn-and-view :ending-alive/x]
+  [:iterations-max :simulation-fn-and-view/iterations]]}

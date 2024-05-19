@@ -197,11 +197,10 @@
 (defonce errors (ut/thaw-atom [] "./data/atoms/sql-errors.edn"))
 
 (defn insert-error-row! [error-db-conn query error] ;; warning uses shit outside of what it is passed!!!
-  (swap! errors conj [(str error) error-db-conn query])
-  (ut/pp {:sql-error! error 
+  (swap! errors conj [(str error) (str error-db-conn) query])
+  (ut/pp {:sql-error! error
           :error-db-conn error-db-conn
-          :query (try (subs (str query) 0 1000) (catch Throwable _ (str query))) ;;query
-          }))
+          :query (try (subs (str query) 0 1000) (catch Throwable _ (str query)))}))
 
 ;(defn insert-error-row! [error-db-conn query error] (ut/pp [:insert-error-row! query error]))
 

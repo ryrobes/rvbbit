@@ -2435,6 +2435,7 @@
           ;;                                          :source-map finished-flowmap
           ;;                                          :client-name client-name
           ;;                                          :flow-id flow-id})
+          ;; needed for history echoes to work
           _ (do (ext/create-dirs "./flow-history") ;; just in case
                 (spit ;; a partial flow-history map so if someone wants to "jump into" a running flow we can use flow-history pipeline. ephemeral, obvs
                  (str "./flow-history/" flow-id ".edn")
@@ -3532,17 +3533,18 @@
   ;;              :signal-reaction-process!
   ;;              :client-reaction-push!) base-type keypath client-name new-value client-param-path]))
 
-  ;;  (async/thread ;; really expensive logging below. temp
-  ;;    (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
-  ;;          b? (boolean? new-value)
-  ;;          fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value)) ".edn")]
-  ;;      (ext/create-dirs "./reaction-logs/")
-  ;;      (ut/pretty-spit fp {:client-name client-name
-  ;;                          :keypath keypath
-  ;;                          :value (ut/replace-large-base64 new-value)
-  ;;                          :last-vals (ut/replace-large-base64 (get @last-values-per client-name))
-  ;;                          :subs-at-time (keys (get @atoms-and-watchers client-name))
-  ;;                          :flow-child-atoms (keys @flow-child-atoms)} 125)))
+   (when (not= base-type :time)
+     (async/thread ;; really expensive logging below. temp
+       (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
+             b? (boolean? new-value)
+             fp (str "./reaction-logs/" (str (System/currentTimeMillis)) "@@" client-name "=" summary (when b? (str "*" new-value)) ".edn")]
+         (ext/create-dirs "./reaction-logs/")
+         (ut/pretty-spit fp {:client-name client-name
+                             :keypath keypath
+                             :value (ut/replace-large-base64 new-value)
+                             :last-vals (ut/replace-large-base64 (get @last-values-per client-name))
+                             :subs-at-time (keys (get @atoms-and-watchers client-name))
+                             :flow-child-atoms (keys @flow-child-atoms)} 125))))
 
    (if (not signal?)
      (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)

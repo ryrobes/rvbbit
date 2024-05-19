@@ -3684,10 +3684,10 @@
                                                                                   :style {:cursor "pointer" :color "white" :font-size "15px" :height "10px" :margin-top "-3px"}
                                                                                   :on-click #(do (tap> [:remove-flow-watchers client-name kk])
                                                                                                  (ut/tracked-dispatch [::wfx/request :default
-                                                                                                                     {:message    {:kind :remove-flow-watcher
-                                                                                                                                   :client-name client-name
-                                                                                                                                   :flow-id kk}
-                                                                                                                      :timeout 50000}]))]]])])]]
+                                                                                                                       {:message    {:kind :remove-flow-watcher
+                                                                                                                                     :client-name client-name
+                                                                                                                                     :flow-id kk}
+                                                                                                                        :timeout 50000}]))]]])])]]
 
                                           (let [mem @(ut/tracked-subscribe [::bricks/memory])]
                                             [re-com/box
@@ -3714,6 +3714,25 @@
                                           [task-bar]
 
                                           [flows/alert-box]
+
+                                          [re-com/box
+                                           :child [re-com/md-icon-button :src (at)
+                                                   :md-icon-name "zmdi-labels"
+                                                   :tooltip "toggle display mode"
+                                                   :on-click #(ut/tracked-dispatch [::bricks/toggle-no-ui])
+                                                   :style {:color "#ffffff"
+                                                           :cursor "pointer"
+                                                           :opacity (if @(ut/tracked-sub ::bricks/full-no-ui? {}) 1.0 0.3)
+                                                           :margin-top "-2px"
+                                                           :padding-left "2px"
+                                                           :font-size "15px"}]
+                                           :width "20px"
+                                           :height "20px"
+                                           :style {:position "fixed"
+                                                   :z-index 98
+                                                   :bottom 0 :right 49
+                                                   :background-color "#00000022"
+                                                   :color "white"}]
 
                                           [re-com/box
                                            :child [re-com/md-icon-button :src (at)

@@ -559,7 +559,7 @@
     (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
 
     (tt/start!)
-    (def mon (tt/every! 30 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30 seconds (excessive, lenghten in prod..)
+    (def mon (tt/every! 15 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30 seconds (excessive, lenghten in prod..)
     ;(instrument-jvm instrument/metric-registry)
     (wss/subscribe-to-session-changes)
 
@@ -810,13 +810,13 @@
 
           ;;(ut/pp [:trigger-status-changes! kks])
 
-          (async/thread ;; really expensive logging below. temp
-            (let [fp (str "./status-change-logs/" (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":")) "@" (str (System/currentTimeMillis)) ".edn")]
-              (ext/create-dirs "./status-change-logs/")
-              (ut/pretty-spit fp {:kks kks
-                                  :res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
-                                  :tracker (ut/replace-large-base64 (select-keys @flow-db/tracker kks))
-                                  :diff (ut/replace-large-base64 b)} 125)))
+          ;; (async/thread ;; really expensive logging below. temp
+          ;;   (let [fp (str "./status-change-logs/" (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/" ":")) "@" (str (System/currentTimeMillis)) ".edn")]
+          ;;     (ext/create-dirs "./status-change-logs/")
+          ;;     (ut/pretty-spit fp {:kks kks
+          ;;                         :res (ut/replace-large-base64 (select-keys @flow-db/results-atom kks)) ;(select-keys @flow-db/results-atom (filter #(cstr/includes? (str %) "node-js-color-thief-script") (keys @flow-db/results-atom)))
+          ;;                         :tracker (ut/replace-large-base64 (select-keys @flow-db/tracker kks))
+          ;;                         :diff (ut/replace-large-base64 b)} 125)))
 
           (update-stat-atom kks))
       ;(when kks (ut/pp [:flow-finished kks]))

@@ -914,6 +914,11 @@
    (get db :lines? false)))
 
 (re-frame/reg-sub
+ ::full-no-ui?
+ (fn [db]
+   (get db :no-ui? false)))
+
+(re-frame/reg-sub
  ::peek?
  (fn [db]
    (get db :peek? false)))
@@ -1084,6 +1089,11 @@
  ::toggle-auto-run
  (fn [db [_]]
    (assoc-in db [:auto-run?] (not (get-in db [:auto-run?] false)))))
+
+(re-frame/reg-event-db
+ ::toggle-no-ui
+ (fn [db [_]]
+   (assoc-in db [:no-ui?] (not (get-in db [:no-ui?] false)))))
 
 (re-frame/reg-event-db
  ::overwrite-theme
@@ -2951,8 +2961,9 @@
                                rows                (nf (get meta :rowcount))
                                fields              (count (get meta :fields))
                                query-panel         @(ut/tracked-subscribe [::panel-from-query-name k])
-                               subq-blocks         @(ut/tracked-subscribe [::subq-panels selected-block])
-                               subq-mapping        @(ut/tracked-subscribe [::subq-mapping])
+                              ;;  subq-blocks         @(ut/tracked-subscribe [::subq-panels selected-block])
+                               subq-blocks         @(ut/tracked-sub ::subq-panels-alpha {:panel-id selected-block})
+                               subq-mapping        @(ut/tracked-sub ::subq-mapping {})
                                parent-of-selected? (some #(= % query-panel) subq-blocks)
                                upstream?           (some #(= % query-panel) (upstream-search subq-mapping selected-block))
                                downstream?         (some #(= % query-panel) (downstream-search subq-mapping selected-block))
@@ -3016,13 +3027,20 @@
          queries (count (keys (get-in db [:panels panel-key :queries])))]
      [views queries])))
 
+(re-frame/reg-sub
+ ::panel-name-only 
+ (fn [db {:keys [panel-key]}]
+   (get-in db [:panels panel-key :name] (str panel-key))))
+
+
 (defn screen-block-browser [width-int height-int]
   (let [ph             @query-hover ;; reaction hack
        ; queries-in-this-tab @(ut/tracked-subscribe [::queries-in-this-tab])
-        selected-block @(ut/tracked-subscribe [::selected-block])
+        selected-block @(ut/tracked-sub ::selected-block {})
+        ;selected-block @(ut/tracked-subscribe [::selected-block])
         ;queries (vec (cset/intersection (set queries) (set queries-in-this-tab)))
        ; queries queries-in-this-tab ;; TODO clean up, incoming queries is unneeded here, we got a local sub
-        blocks (map keyword @(ut/tracked-subscribe [::current-tab-blocks]))]
+        blocks (map keyword @(ut/tracked-sub ::current-tab-blocks {}))]
 
     ;(tap> ph)
     [re-com/box
@@ -3047,10 +3065,14 @@
                                ;meta                {} ;@(ut/tracked-subscribe [::conn/sql-merged-metadata [k]])
                                ;rows                "0" ;(nf (get meta :rowcount))
                                ;fields              0 ;(count (get meta :fields))
+                               nname               @(ut/tracked-sub ::panel-name-only {:panel-key k})
                                [rows fields]       @(ut/tracked-subscribe [::panel-counts k])
                                query-panel         k ;@(ut/tracked-subscribe [::panel-from-query-name k])
-                               subq-blocks         @(ut/tracked-subscribe [::subq-panels selected-block])
+                               ;subq-blocks         @(ut/tracked-subscribe [::subq-panels selected-block])
+                               subq-blocks         @(ut/tracked-sub ::subq-panels-alpha {:panel-id selected-block})
                                subq-mapping        @(ut/tracked-subscribe [::subq-mapping])
+                               ;subq-blocks         @(ut/tracked-sub ::subq-panels-alpha {:panel-id selected-block})
+                               ;subq-mapping        @(ut/tracked-sub ::subq-mapping {})
                                parent-of-selected? (some #(= % query-panel) subq-blocks)
                                upstream?           (some #(= % query-panel) (upstream-search subq-mapping selected-block))
                                downstream?         (some #(= % query-panel) (downstream-search subq-mapping selected-block))
@@ -3080,7 +3102,8 @@
                               :justify :between
                               :children
                               [[re-com/box
-                                :child (str k)
+                                :child (str nname)
+                                :size "auto"
                                 :style {:font-weight  700 :font-size "13px"
                                         :padding-left "4px" :padding-right "4px"}]]]
 
@@ -6114,8 +6137,8 @@
         parameters-used-in-sql    (vec (filter #(not (vector? %)) parameters-used-in))
         parameters-used-in-cell   (vec (filter #(vector? %) parameters-used-in))
         ;; expensive logic here.... must re-visit  COMBINE ALL 3 INTO A SINGLE SUB FOR SUB-CACHE PERF ?
-        selected-block            @(ut/tracked-subscribe [::selected-block])
-        subq-blocks               @(ut/tracked-subscribe [::subq-panels selected-block])
+        selected-block            @(ut/tracked-sub ::selected-block {})
+        subq-blocks               @(ut/tracked-sub ::subq-panels-alpha {:panel-id selected-block})
         parent-of-selected?       (some #(= % panel-key) subq-blocks)
         server-kits               @(ut/tracked-subscribe [::server-kits :queries])
         ;_ (tap> server-kits)
@@ -10276,18 +10299,18 @@
                                                        (swap! db/speech-log conj text)
                                                        (ut/dispatch-delay 800 [::http/insert-alert (str text) 13 1 5])
                                                        (ut/tracked-dispatch [::audio/text-to-speech11
-                                                                           panel-key ;:audio
-                                                                           :speak (str text)]))
+                                                                             panel-key ;:audio
+                                                                             :speak (str text)]))
                                                      (str text)))
 
                                  :speak-always (fn [text] (let []
                                                             (when true ; (not (some #(= % text) @db/speech-log))
                                                          ;(swap! db/speech-log conj text)
                                                               (ut/tracked-dispatch [::audio/text-to-speech11
-                                                                                  panel-key ;:audio
-                                                                                  :speak (str text)]))
+                                                                                    panel-key ;:audio
+                                                                                    :speak (str text)]))
                                                             (str text)))
-                                 
+
                                  ;;:number (fn [x] (ut/nf x))
 
                                  :speak-click (fn [text]
@@ -10309,8 +10332,8 @@
                                                                                                 (ut/dispatch-delay 800 [::http/insert-alert (str "\"" text "\"") 13 2 8])
                                                                                                 (ut/tracked-dispatch [::audio/text-to-speech11
                                                                                                                     ;:audio
-                                                                                                                    panel-key
-                                                                                                                    :speak (str text)]))))
+                                                                                                                      panel-key
+                                                                                                                      :speak (str text)]))))
                                                                            :style {:font-size "15px"
                                                                                    :opacity   0.25
                                                                                    :cursor    "pointer"}]
@@ -10379,9 +10402,34 @@
                                                                                              (do
                                                                                                 ;(swap! db/speech-log conj text)
                                                                                                (ut/tracked-dispatch [::audio/text-to-speech11
-                                                                                                                   :audio
-                                                                                                                   ;panel-key
-                                                                                                                   :speak (str text) true]))))
+                                                                                                                   ;:audio
+                                                                                                                     panel-key
+                                                                                                                     :speak (str text) true]))))
+                                                                          :style {:font-size "15px"
+                                                                                  :opacity   0.25
+                                                                                  :cursor    "pointer"}]
+                                                                         [re-com/box :child ""]]]]]))
+
+                                 :play-click-target (fn [[text panel-key]]
+                                               (let []
+                                                 [re-com/v-box
+                                                  :size "auto"
+                                                  :children [[re-com/box :child (str text)]
+                                                             [re-com/h-box :size "auto"
+                                                              :justify :between
+                                                              :height "10px"
+                                                              :style {};:border "1px solid white"
+                                                                                                        ;:margin-top "-6px"
+
+                                                              :children [[re-com/md-icon-button
+                                                                          :md-icon-name "zmdi-play"
+                                                                          :on-click (fn [] (when (not (some (fn [x] (= x text)) @db/speech-log))
+                                                                                             (do
+                                                                                                                                 ;(swap! db/speech-log conj text)
+                                                                                               (ut/tracked-dispatch [::audio/text-to-speech11
+                                                                                                                     ;:audio
+                                                                                                                     panel-key
+                                                                                                                     :speak (str text) true]))))
                                                                           :style {:font-size "15px"
                                                                                   :opacity   0.25
                                                                                   :cursor    "pointer"}]
@@ -10494,7 +10542,7 @@
                                              (let [client-name @(ut/tracked-subscribe [::client-name])
                                                    base-opts {:increment-id? false}
                                                    running-key (keyword (str "flow/" flow-id ">*running?"))
-                                                   running? 
+                                                   running?
                                                    ;@(ut/tracked-subscribe [::conn/clicked-parameter-key [running-key]])
                                                    @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
 
@@ -10504,7 +10552,7 @@
                                                                @(ut/tracked-subscribe [::runstream-overrides flow-id])
                                                                overrides)
                                                    overrides? (ut/ne? overrides)]
-                                               
+
                                                (tap> [:overrides overrides])
 
                                                [re-com/h-box
@@ -10621,9 +10669,9 @@
                                 ; :MapLayer Map/Layer
                                 ; :MapMarker Map/Marker
                                  :viewport-params-fn #(ut/tracked-dispatch [::conn/click-parameter [panel-key]
-                                                                          (select-keys
-                                                                           (walk/keywordize-keys (js->clj (.-viewState %)))
-                                                                           [:longitude :latitude :zoom])])
+                                                                            (select-keys
+                                                                             (walk/keywordize-keys (js->clj (.-viewState %)))
+                                                                             [:longitude :latitude :zoom])])
                                  :test-params-fn #(ut/tracked-dispatch [::conn/click-parameter [panel-key] (str %)]) ;; (walk/keywordize-keys (js->clj (.-features %)))
                                  :params> #(ut/tracked-dispatch [::conn/click-parameter [panel-key] (js->clj % :keywordize-keys true)])
 
@@ -11598,7 +11646,11 @@
  (fn [db [_ panel-key]]
    (if (get db :peek?)
      false
-     (get-in db [:panels panel-key :no-ui?] false))))
+     (or 
+      (get db :no-ui? false)
+      (get-in db [:panels panel-key :no-ui?] false)))
+   ;true
+   ))
 
 (re-frame/reg-sub
  ::panel-style
@@ -12120,7 +12172,8 @@
                          block-height        (if root? (+ 1 (* brick-size (if (= h 0) (- bricks-high 1) h))) brick-size)
                          selected?           (= brick-vec-key selected-block)
                          block-selected?     selected?
-                         subq-blocks         (if root? @(ut/tracked-subscribe [::subq-panels selected-block]) [])
+                         ;;subq-blocks         (if root? @(ut/tracked-subscribe [::subq-panels selected-block]) [])
+                         subq-blocks         (if root? @(ut/tracked-sub ::subq-panels-alpha {:panel-id selected-block}) [])
                          parent-of-selected? (some #(= % brick-vec-key) subq-blocks)
                           ;param-hover-query (try (nth @param-hover 1) (catch :default e nil))
                          ;;editor?             @(ut/tracked-subscribe [::editor?])
@@ -12147,7 +12200,7 @@
                                                   editor?
                                                   (= @db/editor-mode :vvv))
                          ;current-tab         @(ut/tracked-subscribe [::selected-tab])
-                         ghosted?            (rs @(ut/tracked-subscribe [::ghosted? brick-vec-key]) brick-vec-key)
+                         ghosted?            (rs @(ut/tracked-subscribe [::ghosted? brick-vec-key]) brick-vec-key)    
                          no-ui?              (or (rs @(ut/tracked-subscribe [::no-ui? brick-vec-key]) brick-vec-key) (not (nil? tab)))
                          hidden?             (rs @(ut/tracked-subscribe [::hidden? brick-vec-key]) brick-vec-key)
                          minimized?          (rs @(ut/tracked-subscribe [::minimized? brick-vec-key]) brick-vec-key)
