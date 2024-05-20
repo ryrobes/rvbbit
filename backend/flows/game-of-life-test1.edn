@@ -129,11 +129,8 @@
                      (let [iteration-num (- iterations i)
                            alive-cnt (fn [x] (count (for [[k v] (deref grid) :when (= (get v :color) :white)] k)))]
                        (swap! grid update-grid)
-                       (swap!
-                         rvbbit-backend.websockets/params-atom
-                         assoc-in
-                         [:intelligent-harlequin-camel-32 :param :conway]
-                         (render-it (deref grid)))
+                       (save! :conway-render (render-it (deref grid)) nil)
+                       (save! :conway-iteration i)
                        (Thread/sleep delay-ms)
                        (if (= prev-grid (deref grid))
                          (do
@@ -260,7 +257,7 @@
    :h 85,
    :x 2350,
    :data {:flow-item {:expandable? true, :inputs []}, :drag-meta {:type :open-block}, :user-input 44}}},
- :zoom [-1795.71 -1326.7 1.372],
+ :zoom [-1566.77 -1323.34 1.324],
  :opts {:retry-on-error? false, :retries 5, :close-on-done? true, :timeout 4500000},
  :flow-id "game-of-life-test1",
  :flowmaps-connections

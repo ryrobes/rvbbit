@@ -513,17 +513,18 @@
 
 
 
-    (cruiser/insert-current-rules! system-db "system-db" 0
-                                   cruiser/default-sniff-tests
-                                   cruiser/default-field-attributes
-                                   cruiser/default-derived-fields
-                                   cruiser/default-viz-shapes
-                                   (merge
-                                    cruiser/default-flow-functions
+    (cruiser/insert-current-rules!
+     system-db "system-db" 0
+     cruiser/default-sniff-tests
+     cruiser/default-field-attributes
+     cruiser/default-derived-fields
+     cruiser/default-viz-shapes
+     (merge
+      cruiser/default-flow-functions
                                   ;; (let [] ;; custom categories instead of :sub-flow
                                   ;;   (doseq [[k v] @wss/sub-flow-blocks] {k v}))
-                                    {:custom @wss/custom-flow-blocks}
-                                    {:sub-flows @wss/sub-flow-blocks}))
+      {:custom @wss/custom-flow-blocks}
+      {:sub-flows @wss/sub-flow-blocks}))
 
   (when harvest-on-boot?
     (update-all-conn-meta))

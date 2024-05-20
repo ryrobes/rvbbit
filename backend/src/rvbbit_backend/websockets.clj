@@ -6,14 +6,14 @@
             [ring.adapter.jetty9 :as jetty]
 ;[io.pedestal.http.jetty :as jetty]
 
-[io.pedestal.http.jetty.websockets :as ws]
-            
+;;[io.pedestal.http.jetty.websockets :as ws]
+
 
             ;[ring.adapter.jetty :as jetty]
 
-        
- 
 
+
+            [clojure.pprint :as pprint]
 
             [websocket-layer.network :as net]
             [nextjournal.beholder :as beholder]
@@ -105,6 +105,7 @@
 (def custom-flow-blocks (ut/thaw-atom {} "./data/atoms/custom-flow-blocks-atom.edn"))
 ;(def screens-atom (atom {}))
 (def screens-atom (ut/thaw-atom {} "./data/atoms/screens-atom.edn"))
+(def server-atom (ut/thaw-atom {} "./data/atoms/server-atom.edn"))
 (def last-signals-atom (ut/thaw-atom {} "./data/atoms/last-signals-atom.edn"))
 (def last-signals-history-atom (ut/thaw-atom {} "./data/atoms/last-signals-history-atom.edn"))
 (def last-signal-value-atom (ut/thaw-atom {} "./data/atoms/last-signal-value-atom.edn"))
@@ -126,6 +127,7 @@
 (def signals-atom (ut/thaw-atom {} "./defs/signals.edn"))
 (def rules-atom (ut/thaw-atom {} "./defs/rules.edn"))
 (def solvers-atom (ut/thaw-atom {} "./defs/solvers.edn"))
+
 
 (def time-atom (ut/thaw-atom {} "./data/atoms/time-atom.edn"))
 
@@ -1023,9 +1025,10 @@
 ;;       results)
 ;;     (catch Throwable e (ut/pp [:server-push2-subscription-err!! (str e) data]))))
 
-
+(def all-pushes (atom 0))
 
 (defn inc-score! [client-name key & [ts?]]
+  (swap! all-pushes inc)
   (swap! ack-scoreboard assoc-in [client-name key]
          (if ts?
            [(System/currentTimeMillis) (ut/get-current-timestamp)]
@@ -2135,6 +2138,8 @@
                  {k full})
                :else {k v}))))
 
+(declare save!)
+(declare tap>)
 
 (defn process-flowmap2 [flowmap flowmaps-connections fid]
   ;;; test
@@ -2316,6 +2321,11 @@
 
 ;; (tap> "Hello, world!")
 
+(defn save! [kp v & [client-name]]
+  (let [kp (if (keyword? kp) [kp] kp)] ;; just incase 
+    ;;(ut/pp [:saving-server-param! {:to kp :val v :from client-name}])
+    (swap! server-atom assoc-in kp v)))
+
  (def last-times (atom {})) ;; stopgap for error times TODO, april 2024
 
 (defn flow! [client-name flowmap file-image flow-id opts & [no-return?]]
@@ -2379,12 +2389,14 @@
 
           sub-map {:flow-id uid :client-name client-name}
           finished-flowmap (process-flowmaps flowmap sub-map)
-          finished-flowmap (walk/postwalk-replace (merge
+          finished-flowmap (walk/postwalk-replace (merge ;; need to do recursively eventually? this map keeps getting bigger... will need to share with REPL execution as well, including a server-side resolver...
                                                    {:client-name client-name
                                                     :cid client-name
                                                     :flow-id flow-id
                                                     :fid flow-id
                                                     :client-id client-name
+                                                    ;;`save! '(fn [kp v] (rvbbit-backend.websockets/save! kp v client-name))
+                                                    'save! 'rvbbit-backend.websockets/save!
                                                     'tap> 'rvbbit-backend.websockets/ttap>}
                                                    (ut/deselect-keys (get opts :opts) ;; TODO, why did I nest/unnest this? so confusing
                                                                      [:retries :retry-on-error? :close-on-done? :debug? :timeout]))
@@ -3175,18 +3187,20 @@
                 ;param?  (= base-type :ext-param)
         screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
         time?    (= base-type :time)
-        signal?  (= base-type :signal)]
+        signal?  (= base-type :signal)
+        server?  (= base-type :server)]
     (cond status? flow-status
           tracker? flow-db/tracker
                               ;:else flow-db/results-atom
                               ;:else (get-or-create-child-atom (first keypath))
           signal? last-signals-atom ;; no need to split for now, will keep an eye on it
-          time?   time-atom
+          server? server-atom ;; no need to split for now, will keep an eye on it - don't expect LOTS of writes... but who knows
+          time?   time-atom ;; zero need to split ever. lol, its like 6 keys
           panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
           client? (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
-          flow? (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
+          flow?   (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
           screen? (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
-          :else (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))))
+          :else   (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))))
 
 (defn add-watcher [keypath client-name fn flow-key sub-type & [flow-id]] ;; flow id optional is for unsub stuff later (NOT reduntant)
   (let [;;client-name :all ;; test
@@ -3211,9 +3225,11 @@
         screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
         time?    (= base-type :time)
         signal?  (= base-type :signal)
+        server?  (= base-type :server)
         keypath  (cond ;flow? keypath 
                    signal? (vec (rest keypath))
                    time?   (vec (rest keypath))
+                   server? (vec (rest keypath))
                    screen? (vec (rest sub-path))
                    panel?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                    client? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -3228,7 +3244,8 @@
                             ;:else flow-db/results-atom
                             ;:else (get-or-create-child-atom (first keypath))
                             signal? last-signals-atom ;; no need to split for now, will keep an eye on it
-                            time?   time-atom
+                            server? server-atom ;; no need to split for now, will keep an eye on it - don't expect LOTS of writes... but who knows
+                            time?   time-atom ;; zero need to split ever. lol, its like 6 keys
                             panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                             client? (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
                             flow? (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -3272,10 +3289,12 @@
              screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
              time?    (= base-type :time)
              signal?  (= base-type :signal)
+             server?  (= base-type :server)
              keypath  (cond ;flow? keypath 
                         signal? (vec (rest keypath))
                         time?   (vec (rest keypath))
                         screen? (vec (rest sub-path))
+                        server? (vec (rest sub-path))
                         panel?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                         client? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                         :else keypath)
@@ -3290,7 +3309,8 @@
                                          ;:else flow-db/results-atom
                                          ;:else (get-or-create-child-atom (first keypath))
                                  signal? last-signals-atom ;; no need to split for now, will keep an eye on it
-                                 time?   time-atom
+                                 server? server-atom ;; no need to split for now, will keep an eye on it - don't expect LOTS of writes... but who knows
+                                 time?   time-atom ;; zero need to split ever. lol, its like 6 keys
                                  panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                                  client? (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
                                  flow? (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -3525,6 +3545,8 @@
                            other-client-param-path)
        signal? (= client-name :rvbbit-signals)]
    
+  ;;  (when (= base-type :server) (ut/pp [:SERVER=PARAM! base-type keypath client-name new-value]))
+   
   ;;  (when (and (not= base-type :time) (not signal?))
   ;;    (ut/pp [:send-reaction! base-type keypath client-name new-value client-param-path @param-var-mapping]))
 
@@ -3533,7 +3555,8 @@
   ;;              :signal-reaction-process!
   ;;              :client-reaction-push!) base-type keypath client-name new-value client-param-path]))
 
-   (when (not= base-type :time)
+   (when (and (not= base-type :time) 
+              (not= base-type :signal))
      (async/thread ;; really expensive logging below. temp
        (let [summary (-> (str keypath) (cstr/replace " " "_") (cstr/replace "/" ":"))
              b? (boolean? new-value)
@@ -3682,6 +3705,7 @@
   (cond (cstr/includes? (str flow-key) "*running?") false
         (= base-type :time)   client-param-path
         (= base-type :signal) client-param-path
+        (= base-type :server) client-param-path
         (= base-type :screen) (vec (rest sub-path))
         (= base-type :client) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
         (= base-type :panel) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -3754,6 +3778,7 @@
             (cond (cstr/includes? (str flow-key) "*running?") false
                   (= base-type :time)   (get @time-atom client-param-path)
                   (= base-type :signal) (get @last-signals-atom client-param-path)
+                  (= base-type :server) (get @server-atom client-param-path lv)
                   (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
                   (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
                   (= base-type :panel) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
@@ -4275,6 +4300,9 @@
                   {v rql-key})))]
     (walk/postwalk-replace logic-kps obody)))
 
+
+(defonce pre-sql-cache (ut/thaw-atom [] "./data/atoms/pre-sql-cache.edn")) ;; no need to persist for now...
+
 (defn replace-pre-sql [honey-sql]
   (let [if-walk-map2           (fn [query] (let [kps       (ut/extract-patterns query :*if 4) ;(kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
                                                  logic-kps (into {} (for [v kps]
@@ -4289,7 +4317,7 @@
         when-walk-map2            (fn [query] (let [kps       (ut/extract-patterns query :*when 3)
                                                     logic-kps (into {} (for [v kps]
                                                                          (let [[_ that this] v]
-                                                                           {v (when (or (true? that) (not (empty? that))) this)})))]
+                                                                           {v (when (or (true? that) (ut/ne? that)) this)})))]
                                                 (walk/postwalk-replace logic-kps query)))
         fix-nil-ins            (fn [query] (let [kps       (ut/extract-patterns query :in 3)
                                                  logic-kps (into {} (for [v kps
@@ -4310,15 +4338,18 @@
                                                                           {v (vec (conj (for [[k v] fmap ;(select-keys fmap (get fmap :last-known-fields))
                                                                                               :let [in? (vector? v)]]
                                                                                           (if in? [:in k v] [:= k v])) :and))})))]
-                                               (walk/postwalk-replace logic-kps query)))]
-    (-> honey-sql
-        =-walk-map2
-        when-walk-map2
-        if-walk-map2
-        all=-map2
-        all=-map2-inc
-        fix-nil-ins
-        ut/deep-remove-nil-values)))
+                                               (walk/postwalk-replace logic-kps query)))
+        pre-sql-out (-> honey-sql
+                        =-walk-map2
+                        when-walk-map2
+                        if-walk-map2
+                        all=-map2
+                        all=-map2-inc
+                        fix-nil-ins
+                        ut/deep-remove-nil-values)
+        pre-sql-out (ut/lists-to-vectors pre-sql-out)]
+    (reset! pre-sql-cache (vec (distinct (conj @pre-sql-cache pre-sql-out))))
+    pre-sql-out))
 
 ;(def fj-pool (Executors/newWorkStealingPool 10))
 ;(set-agent-send-off-executor! fj-pool)
@@ -6062,6 +6093,8 @@
     (if (> max-threads max-subs) :threads :subs)))
 
 (def mps-helper (atom {}))
+(def last-stats-row (atom {}))
+(def booted (atom nil))
 
 (defn jvm-stats []
   (when (not @shutting-down?)
@@ -6225,9 +6258,42 @@
                 (swap! params-atom assoc-in [(edn/read-string (get cli-row :client-name)) :stats] cli-row))
 
             insert-cli {:insert-into [:client_stats] :values cli-rows}
+            seconds-since-last (try (/ (- (System/currentTimeMillis) (get @last-stats-row :unix_ms)) 1000) (catch Exception _ -1))
+            seconds-since-boot (try (/ (- (System/currentTimeMillis) @booted) 1000) (catch Exception _ -1))
+            last-messages (- @all-pushes (get @last-stats-row :messages 0))
+            queries-since-last (- (+ @q-calls @q-calls2)
+                                  (+ (get @last-stats-row :queries_run 0)
+                                     (get @last-stats-row :internal_queries_run 0)))
+                                   ;; (- (System/currentTimeMillis) (get @last-stats-row :unix_ms 0))
+            as-double (fn [x] (Double/parseDouble (clojure.pprint/cl-format nil "~,2f" x)))
+            jvm-stats-vals {:used_memory_mb mm
+                            :messages @all-pushes
+                            :unix_ms (System/currentTimeMillis)
+                            ;;:messages_per_second (try (Double/parseDouble (format "%.2f" (/ @all-pushes seconds-since-boot))) (catch Exception _ -1))
+                            :uptime_seconds seconds-since-boot
+                            :seconds_since_last_update seconds-since-last
+                            :messages_per_second (as-double (try (/ @all-pushes seconds-since-boot) (catch Exception _ -1)))
+                            :recent_messages_per_second (as-double (try (/ last-messages seconds-since-last) (catch Exception _ -1)))
+                            :recent_queries_run queries-since-last
+                            :recent_messages (- @all-pushes last-messages)
+                            :recent_queries_per_second (as-double (try (/ queries-since-last seconds-since-last) (catch Exception _ -1)))
+                            :queries_per_second (try (/ (+ @q-calls @q-calls2) seconds-since-boot) (catch Exception _ -1))
+                            :thread_count thread-count
+                            :sql_cache_size (count @sql-cache)
+                            :ws_peers (count @wl/sockets)
+                            :open_flow_channels (apply + (for [[_ v] (flow-statuses)] (get v :channels-open)))
+                            :queries_run @q-calls
+                            :internal_queries_run @q-calls2
+                            :sniffs_run @cruiser/sniffs
+                            :sys_load (as-double sys-load) ;;sys-load to 2 decimal places
+                            }
+            _ (reset! last-stats-row jvm-stats-vals)
             insert-sql {:insert-into [:jvm_stats]
-                        :columns [:used_memory_mb :thread_count :sql_cache_size :ws_peers :open_flow_channels :queries_run :internal_queries_run :sniffs_run :sys_load]
-                        :values [[mm thread-count (count @sql-cache) (count @wl/sockets) -1 @q-calls @q-calls2 @cruiser/sniffs sys-load]]}
+                        ;:columns [:used_memory_mb :thread_count :sql_cache_size :ws_peers :open_flow_channels :queries_run :internal_queries_run :sniffs_run :sys_load]
+                        ;:values [[mm thread-count (count @sql-cache) (count @wl/sockets) -1 @q-calls @q-calls2 @cruiser/sniffs sys-load]]
+                        :values [jvm-stats-vals]
+                        }
+            _ (swap! server-atom assoc :uptime (ut/format-duration-seconds seconds-since-boot))
         ;; _ (ut/pp [:insert-sql insert-sql])
             ]
         (swap! stats-cnt inc)
@@ -6258,6 +6324,7 @@
         (when booted?
       ;(ut/pp [:booted!])
           (println " ")
+          (reset! booted (System/currentTimeMillis))
       ;(ut/print-ansi-art "rrvbbit.ans")
           (ut/print-ansi-art "nname.ans")
           (ut/pp [:version 0 :june 2024 "Hi."])
@@ -6520,9 +6587,12 @@
    :idle-timeout         5000
    :queue-size           1000
    :max-idle-time        30000
-   :input-buffer-size    8192
-   :output-buffer-size   8192
+   ;:input-buffer-size    8192
+   ;:output-buffer-size   8192
    ;:max-message-size     65536
+   :input-buffer-size    16384  ;; doubled from 8192 to 16384
+   :output-buffer-size   16384
+   :max-message-size     1048576  ;; 1MB - only like 1% of messages
    :websockets           ws-endpoints
    :allow-null-path-info true})
 

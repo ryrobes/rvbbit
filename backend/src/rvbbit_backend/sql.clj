@@ -194,7 +194,7 @@
         (catch Exception e
           (ut/pp {:error-inserting-error e :query query}))))))
 
-(defonce errors (ut/thaw-atom [] "./data/atoms/sql-errors.edn"))
+(defonce errors (atom [])) ;; (ut/thaw-atom [] "./data/atoms/sql-errors.edn")) ;; no need to persist for now...
 
 (defn insert-error-row! [error-db-conn query error] ;; warning uses shit outside of what it is passed!!!
   (swap! errors conj [(str error) (str error-db-conn) query])

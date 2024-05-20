@@ -349,6 +349,8 @@
 
 ;; (tap> [:packets-received-log [(count @packets-received-log) @packets-received] (frequencies @packets-received-log)])
 
+(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :panel :client})
+
 (re-frame/reg-event-db
  ::simple-response
  (fn [db [_ result & [batched?]]]
@@ -377,13 +379,16 @@
              heartbeat? (= task-id :heartbeat)
              alert? (= task-id :alert1)
            ;not-sys-stats? (not (cstr/includes? (str (get result :data)) "[sys-stats]"))
-             server-sub? (and kick? (or (= (get-in result [:task-id 0]) :flow)
-                                        (= (get-in result [:task-id 0]) :screen)
-                                        (= (get-in result [:task-id 0]) :time)
-                                        (= (get-in result [:task-id 0]) :signal)
-                                        (= (get-in result [:task-id 0]) :ext-param)
-                                        (= (get-in result [:task-id 0]) :panel)
-                                        (= (get-in result [:task-id 0]) :client))
+             server-sub? (and kick?
+                              ;; (or (= (get-in result [:task-id 0]) :flow)
+                              ;;     (= (get-in result [:task-id 0]) :screen)
+                              ;;     (= (get-in result [:task-id 0]) :time)
+                              ;;     (= (get-in result [:task-id 0]) :signal)
+                              ;;     (= (get-in result [:task-id 0]) :server)
+                              ;;     (= (get-in result [:task-id 0]) :ext-param)
+                              ;;     (= (get-in result [:task-id 0]) :panel)
+                              ;;     (= (get-in result [:task-id 0]) :client))
+                              (contains? valid-task-ids (get-in result [:task-id 0])) ;; should be faster w set member check?
                               (not heartbeat?)) ;; server mutate only for click-param
              flow-runner-sub? (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?)) ;; server mutate only for click-param
            ;flow-runner-tracker? (and kick? (= (get-in result [:task-id 0]) :tracker) (not heartbeat?))
@@ -394,7 +399,10 @@
 
          (swap! packets-received inc)
 
+
+
          (when heartbeat?
+           (tap> [:hb client-name (get result :status) (get db :flow-subs)]) ;; server subs confirm 
            (ut/tracked-dispatch [::wfx/request :default
                                  {:message    {:kind :ack
                                                :memory (let [mem (when (exists? js/window.performance.memory)

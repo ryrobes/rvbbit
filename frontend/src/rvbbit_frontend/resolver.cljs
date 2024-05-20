@@ -56,7 +56,9 @@
                                                    logic-kps (into {} (for [v kps]
                                                                         (let [[_ l this that] v]
                                                                         ;(tap> [:if-walk panel-key kps l this that])
-                                                                          {v (if l this that)})))]
+                                                                          {v (if 
+                                                                              (logic-and-params-fn l nil) ;; l 
+                                                                               this that)})))]
                                                (walk/postwalk-replace logic-kps obody)))
         ;; when-walk-map          (fn [obody] (let [kps       (kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
         ;;                                          logic-kps (into {} (for [[_ v]
@@ -156,6 +158,8 @@
         ;;                                             (walk/postwalk-replace (merge logic-kps2 logic-kps) obody)))
           singles               {:text                  str
                                  ;:case (fn [x] (ut/vectorized-case x))
+                                 :>> (fn [[x y]] (true? (> x y)))
+                                 :<< (fn [[x y]] (true? (< x y)))
                                  :str (fn [args]
                                         (if (vector? args)
                                           (cstr/join "" (apply str args))

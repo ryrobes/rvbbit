@@ -11,6 +11,7 @@
    [rvbbit-frontend.buffy :as buffy]
    [rvbbit-frontend.flows :as flows]
    [rvbbit-frontend.audio :as audio]
+   [clojure.data :as cdata]
    ;[re-pressed.core :as rp]
    ;[rvbbit-frontend.events :as events]
    [cljs.tools.reader :refer [read-string]]
@@ -2929,6 +2930,8 @@
                      :width "100%"}]])
     " "))
 
+(defonce temp-atom (atom {}))
+
 (re-frame/reg-event-db
  ::update-user-params-hash
  (fn [db _]
@@ -2936,17 +2939,23 @@
                   :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
               [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
-         pp-without-fs (ut/remove-keys pp (map first fs))
+         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client]))
          new-h (hash pp-without-fs)
-         client-name (get db :client-name)]
-     (tap> [:push-params! client-name new-h])
+         client-name (get db :client-name)
+         ]
+     (tap> [:push-params! client-name new-h pp-without-fs
+            {:new
+             (get (vec (cdata/diff pp-without-fs @temp-atom)) 0)}])
      (ut/tracked-dispatch [::wfx/request   :default ;; just a push, no response handling
                          {:message      {:kind         :sync-client-params
-                                         :params-map   pp
+                                         :params-map   pp-without-fs ;; pp ;; why send things we are getting shipped? just too much. revist this, in case it was a mistake
+                                         ;; ^^ I just dont see why we would need to reference a reference, we only want shit that is OWNED by this client/session/screen rabbit-env
                                          ;:flow-params-map 
                                          :client-name  client-name}
                           :timeout 10000}])
-     (assoc db :user-params-hash new-h))))
+     (reset! temp-atom pp-without-fs)
+     (assoc db :user-params-hash new-h)
+     )))
 
 (re-frame/reg-sub
  ::watch-user-params
@@ -2955,7 +2964,9 @@
                        :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
                    [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
-         pp-without-fs (ut/remove-keys pp (map first fs))]
+         ;;pp-without-fs (ut/remove-keys pp (map first fs))
+         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client]))
+         ]
      (hash pp-without-fs)))) ;; was :param
 
 (re-frame/reg-sub

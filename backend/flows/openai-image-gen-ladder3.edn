@@ -754,7 +754,7 @@
   {:y 1300,
    :fn (fn [x] x),
    :w 350,
-   :raw-fn (fn [base-dir] (str base-dir "/b64-image-" (rand-int 99999) "-" (rand-int 99999) ".png")),
+   :raw-fn (fn [base-dir] (str base-dir "/b64-image3-" (rand-int 99999) "-" (rand-int 99999) ".png")),
    :right-click? true,
    :icon "zmdi-functions",
    :types nil,

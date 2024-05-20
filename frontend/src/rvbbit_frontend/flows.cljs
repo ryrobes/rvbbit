@@ -4368,7 +4368,8 @@
   (let [open? (true? (get-in @flow-details-block-container-atom [flow-id bid title :open?]
                              (not
                               (or (cstr/ends-with? (str title) "*")
-                                  (cstr/ends-with? (str title) "browser")))))
+                                  ;(cstr/ends-with? (str title) "browser")
+                                  ))))
         flow-select @(ut/tracked-subscribe [::selected-flow-block])
         sys? (nil? flow-select)
         dyn-width (if (not sys?) 600 (last @db/flow-editor-system-mode))]
