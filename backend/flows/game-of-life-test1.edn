@@ -130,7 +130,11 @@
                            alive-cnt (fn [x] (count (for [[k v] (deref grid) :when (= (get v :color) :white)] k)))]
                        (swap! grid update-grid)
                        (save! :conway-render (render-it (deref grid)) nil)
-                       (save! :conway-iteration i)
+                       (save! :conway-iteration (- i 1))
+                       (save!
+                         :conway-iteration-map
+                         {:alive (count (for [[_ v] (deref grid) :when (= (get v :color) :black)] 1)),
+                          :dead (count (for [[_ v] (deref grid) :when (= (get v :color) :white)] 1))})
                        (Thread/sleep delay-ms)
                        (if (= prev-grid (deref grid))
                          (do
@@ -257,7 +261,7 @@
    :h 85,
    :x 2350,
    :data {:flow-item {:expandable? true, :inputs []}, :drag-meta {:type :open-block}, :user-input 44}}},
- :zoom [-1566.77 -1323.34 1.324],
+ :zoom [-785 -862 0.925],
  :opts {:retry-on-error? false, :retries 5, :close-on-done? true, :timeout 4500000},
  :flow-id "game-of-life-test1",
  :flowmaps-connections

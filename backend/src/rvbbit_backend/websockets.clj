@@ -1122,6 +1122,8 @@
 ;;         (async/go-loop [] (recur))))
 ;;     results))
 
+(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :tracker :alert1})
+
 (defn sub-push-loop [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
@@ -1136,7 +1138,14 @@
                           res))
                 items-by-task-id (group-by :task-id items)
                 latest-items (mapv (fn [group]
-                                     (if (= :alert1 (first group))
+                                     (if
+                                      (contains? valid-groups (first group))
+                                      ;; (or
+                                      ;;  (= :flow-runner (first group))
+                                      ;;  (= :tracker-blocks (first group))
+                                      ;;  (= :acc-tracker (first group))
+                                      ;;  (= :tracker (first group))
+                                      ;;  (= :alert1 (first group)))
                                        group
                                        (last group)))
                                    (vals items-by-task-id))]
@@ -2139,7 +2148,7 @@
                :else {k v}))))
 
 (declare save!)
-(declare tap>)
+(declare ttap>)
 
 (defn process-flowmap2 [flowmap flowmaps-connections fid]
   ;;; test
@@ -3464,7 +3473,7 @@
   (when (not (= base-type :time)) (ut/pp [:process-signals-reaction! base-type keypath new-value client-param-path]))
   (let [re-con-key (keyword (str (cstr/replace (str base-type) ":" "") "/" (cstr/replace (str client-param-path) ":" "")))
         valid-signals (map first (vec (filter #(some (fn [x] (= x re-con-key)) (last %)) @signal-parts-atom)))
-        _ (tap> [:signal-processing (vec valid-signals)])
+        ;; _ (ut/pp [:signal-processing! (vec valid-signals)]) ;; useful but annoying
 
         ;; signals-map (select-keys @signals-atom valid-signals)
         ;; signals-parts-map (into {} (for [[k {:keys [signal]}] signals-map] {k (vec (distinct (ut/where-dissect signal)))}))
@@ -6339,7 +6348,7 @@
       ;;                               {k {:time-running (- (or end (System/currentTimeMillis)) start)
       ;;                                   :*running? *running?}}))])
 
-        (ut/pp [:ack-scoreboard ack-scoreboardv])
+        ;; (ut/pp [:ack-scoreboard ack-scoreboardv])
 
         (ut/pp [:date-map @time-atom])
 

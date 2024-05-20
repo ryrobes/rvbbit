@@ -402,7 +402,7 @@
 
 
          (when heartbeat?
-           (tap> [:hb client-name (get result :status) (get db :flow-subs)]) ;; server subs confirm 
+          ;;  (tap> [:hb client-name (get result :status) (get db :flow-subs)]) ;; server subs confirm 
            (ut/tracked-dispatch [::wfx/request :default
                                  {:message    {:kind :ack
                                                :memory (let [mem (when (exists? js/window.performance.memory)

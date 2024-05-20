@@ -10419,7 +10419,7 @@
                                 ;;                                                     :on-timeout [::http/timeout-response]
                                 ;;                                                     :timeout    500000}])))
                                 ;;                            (str flow-id)))
-                                 :ggrid (fn [tab] [rc/catch [grid tab]]) ;;; TODO :grid was clashing with nivo configs
+                                 :the-grid (fn [tab] [rc/catch [grid tab]]) ;;; TODO :grid was clashing with nivo configs
 
                                 ;;  :unixtime (fn [] '(fn [unixTime]
                                 ;;              (let [date (js/Date. unixTime)]

@@ -754,7 +754,7 @@
   {:y 1300,
    :fn (fn [x] x),
    :w 350,
-   :raw-fn (fn [base-dir] (str base-dir "/b64-image4-" (rand-int 99999) "-" (rand-int 99999) ".png")),
+   :raw-fn (fn [base-dir] (str base-dir "/b64-image1-" (rand-int 99999) "-" (rand-int 99999) ".png")),
    :right-click? true,
    :icon "zmdi-functions",
    :types nil,
@@ -778,7 +778,7 @@
   {:y 2825,
    :fn (fn [x] (get-in x [10 0 2])),
    :w 275,
-   :raw-fn (fn [x bang] (get-in x [10 0 2])),
+   :raw-fn (fn [x bang] (get-in x [10 0 2] :done)),
    :icon "zmdi-functions",
    :types nil,
    :z 0,
@@ -956,11 +956,12 @@
     {:expandable? true,
      :meta {:* {:scrubber {:message "OpenAI image gen style selector - DALLE3", :values ["vivid" "natural"]}}}},
     :user-input "vivid"}}},
- :zoom [-785 -862 0.925],
+ :zoom [-313.7 -679.07 0.658],
  :opts
- {:close-on-done? true,
+ {:close-on-done? false,
   :retry-on-error? true,
   :retries 404,
+  :timeout 120000,
   :overrides
   {:prompt
    "Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:\n\nGenerate a high-definition, fantasy-inspired illustration in a 16:9 ratio. The scene is set in an otherworldly, yet characteristically New England small town during winter. The main figure is a Caucasian woman in her late 20s, with a robust, hyper curvaceous physique. She sports a sultry yet pleased expression, with long hair, full lips, and a slightly upturned nose. Intricate Celtic-style tattoos of rabbits and wilderness decorate her neck, collarbone, and shoulders. Her body emanates mysterious blue and pink lights. She's wearing a choker ribbon and a long necklace, encapsulating a confident, playful aura as she shares a sly glance with the viewer. This piece is influenced by pinup noir femme fatale and cyberpunk aesthetics, channeling a strong burlesque vibe.",
@@ -987,7 +988,6 @@
   [:pop-color :hiccup-image-box-w-png/color]
   [:execute-shell-command/command :hiccup-image-box-w-png/_]
   [:hiccup-image-box-w-png/* :relative-url-path-for-png-version/x]
-  [:relative-url-path-for-png-version :done]
   [:base-save-directory :generate-file-path/base-dir]
   [:base-web-directory :create-png-path/base-web-dir]
   [:base-save-directory :create-png-path/base-dir]
@@ -1013,4 +1013,5 @@
   [:save-base64-to-webp-file :write-exif-to-image-command/img-path]
   [:write-file-1_file-path :write-exif-to-image-command/x]
   [:write-exif-to-image-command :shell-command-1/command]
-  [:shell-command-1 :relative-url-path-for-png-version/bang]]}
+  [:shell-command-1 :relative-url-path-for-png-version/bang]
+  [:relative-url-path-for-png-version :done]]}
