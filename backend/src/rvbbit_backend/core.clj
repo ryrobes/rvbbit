@@ -381,9 +381,9 @@
 
 
   (defn -main [& args]
-    
+
     (ut/print-ansi-art "rrvbbit.ans")
-    
+
     ;; (def where [:and
     ;;             [:or [:= :time/day 22] [:or [:= 88 88] [:= :time/day 23]]]
     ;;             [:=
@@ -391,7 +391,7 @@
     ;;              "./images/gen/b64-image-12972-98621.png"]
     ;;             [:<> :time/second 45]
     ;;             [:= :time/hour 22]])
-    
+
     ;; (ut/pp [:where (ut/where-dissect where)])
     ;; (System/exit 0)
 
@@ -494,18 +494,18 @@
                (fn [_ _ old-state new-state]
                  (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....])
                  (wss/reload-signals-subs)))
-    
+
     (add-watch wss/rules-atom :master-rule-def-watcher
-           (fn [_ _ old-state new-state]
-             (ut/pp [:rules-defs-changed :reloading....])
+               (fn [_ _ old-state new-state]
+                 (ut/pp [:rules-defs-changed :reloading....])
              ;(wss/reload-signals-subs)
-             ))
-    
+                 ))
+
     (add-watch wss/solvers-atom :master-solver-def-watcher
-           (fn [_ _ old-state new-state]
-             (ut/pp [:solvers-defs-changed :reloading....])
+               (fn [_ _ old-state new-state]
+                 (ut/pp [:solvers-defs-changed :reloading....])
              ;(wss/reload-signals-subs)
-             ))    
+                 ))
 
     (wss/reload-signals-subs) ;; run once on boot
     (update-all-screen-meta)
@@ -526,8 +526,8 @@
       {:custom @wss/custom-flow-blocks}
       {:sub-flows @wss/sub-flow-blocks}))
 
-  (when harvest-on-boot?
-    (update-all-conn-meta))
+    (when harvest-on-boot?
+      (update-all-conn-meta))
 
     (cruiser/lets-give-it-a-whirl-no-viz  ;;; force system-db as a conn, takes a sec
      "system-db"
@@ -612,7 +612,7 @@
                                                 (Thread/sleep 1000)
                                                 ;; (do (ut/pp [:shutting-down-lucene-index-writers])
                                                 ;;     (search/close-index-writer search/index-writer))
-                                                
+
                                                 (wss/stop-web-server!)
                                                 (wss/stop-worker)
                                                 (wss/stop-worker2)
@@ -1054,8 +1054,11 @@
   ;; (wss/schedule! [:seconds 30] (wss/materialize-flowmap :server "map-pull-test2" "map-pull-test2" {})
   ;;                {:debug? false :close-on-done? true :increment-id? false :flow-id "map-pull-test2"})
 
-    (wss/schedule! [:minutes 20] "crow-flow-201a"
-                   {:close-on-done? true :increment-id? false :flow-id "crow-flow-201a" :debug? false})
+    ;; (wss/schedule! [:minutes 20] "crow-flow-201a"
+    ;;                {:close-on-done? true :increment-id? false :flow-id "crow-flow-201a" :debug? false})
+
+    (wss/schedule! [:minutes 20] "game-of-life-test1"
+                   {:close-on-done? true :increment-id? false :flow-id "game-of-life-test1" :debug? false :overrides {:iterations-max 1000 :tick-delay-ms 1000}})
 
     (wss/schedule! [:minutes 30] "counting-loop"
                    {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
@@ -1110,10 +1113,10 @@
     ;;   ;[@fut @fut2]
     ;;   @fut)
 
-(let [_ (ut/pp [:waiting-for-background-systems...])
-      _ (Thread/sleep 10000)
-      _ (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options))] ;; wut?
-  (start-services)
+    (let [_ (ut/pp [:waiting-for-background-systems...])
+          _ (Thread/sleep 10000)
+          _ (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options))] ;; wut?
+      (start-services)
 
 
     ;; (.start wssr)
@@ -1124,7 +1127,7 @@
 
 
 
-  (ut/pp [" GO: end of main-fn "]))
+      (ut/pp [" GO: end of main-fn "]))
 
 ;;  (ut/print-ansi-art "rvbbit.ans")
 

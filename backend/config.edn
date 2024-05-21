@@ -16,7 +16,7 @@
                           :icon "images/rvbbit-clover.png"}
            :clojure {:type :built-in
                      :runner {:port 8181 :host "127.0.0.1"}
-                     :default '(+ 1 2 3)
+                     :default (+ 1 2 3)
                      :default-view [:box :child [:string :*query-id]]
                      :icon "images/clj.png"}
            ;;:ext-repl {:port 8181 :host "127.0.0.1"}
@@ -31,7 +31,7 @@
            :python3 {:runner {:flow-id :run-python3
                               :overrides {:code :selected-view} :opts? {:instanced? true}}
                      :type :flow-based
-                     :default "import foo\nprint(foo.bar())"
+                     ;:default "import foo\nprint(foo.bar())"
                      :default-view [:box :child [:string :*query-id]]
                      :icon "images/python3.png"}}
  :eleven-labs-api-key nil}

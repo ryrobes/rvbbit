@@ -6290,6 +6290,7 @@
                             :thread_count thread-count
                             :sql_cache_size (count @sql-cache)
                             :ws_peers (count @wl/sockets)
+                            :subscriptions ttl
                             :open_flow_channels (apply + (for [[_ v] (flow-statuses)] (get v :channels-open)))
                             :queries_run @q-calls
                             :internal_queries_run @q-calls2
@@ -6387,18 +6388,30 @@
 
 
         (try
-          (ut/pp ["     "
-                  :jvm-stats
-                  {:*cached-queries (count @sql-cache)
-                   :ws-peers (count @wl/sockets)
-                   :sys-load sys-load
-                   :cwidth (ut/get-terminal-width)
+          (let [peers (count @wl/sockets)
+                uptime-str (ut/format-duration-seconds (ut/uptime-seconds))
+                server-subs ttl]
+            ;; (swap! server-atom assoc :uptime uptime-str)
+            ;; (swap! server-atom assoc :clients peers)
+            ;; (swap! server-atom assoc :threads thread-count)
+            ;; (swap! server-atom assoc :memory mm)
+            (swap! server-atom assoc
+                   :uptime uptime-str
+                   :clients peers
+                   :threads thread-count
+                   :memory mm)
+            (ut/pp ["     "
+                    :jvm-stats
+                    {:*cached-queries (count @sql-cache)
+                     :ws-peers peers
+                     :sys-load sys-load
+                     :cwidth (ut/get-terminal-width)
              ;:uptime-seconds (ut/uptime-seconds)
-                   :uptime (ut/format-duration-seconds (ut/uptime-seconds))
-                   :server-subs ttl
+                     :uptime uptime-str
+                     :server-subs server-subs
             ;:live-channels (into {} (for [[k v] @flow-db/channels-atom] {k (count v)}))
-                   :*jvm-memory-used [(ut/nf mm) :mb]
-                   :*current-threads thread-count}])
+                     :*jvm-memory-used [(ut/nf mm) :mb]
+                     :*current-threads thread-count}]))
           (catch Throwable e (ut/pp [:printing-shit-error? (str e)])))
 
 

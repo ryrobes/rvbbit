@@ -441,6 +441,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
     queries_per_second float NULL,
     sql_cache_size integer NULL, 
     ws_peers integer NULL,
+    subscriptions integer NULL,
     open_flow_channels integer NULL,
     uptime_seconds integer NULL,
     seconds_since_last_update integer NULL,
