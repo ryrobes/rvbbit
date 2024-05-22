@@ -47,9 +47,9 @@
                  [org.clojure/core.cache "1.0.207"]
                  [talltale "0.5.8"]
 
-                 [org.apache.lucene/lucene-core "7.5.0"]
-                 [org.apache.lucene/lucene-analyzers-common "7.5.0"]
-                 [org.apache.lucene/lucene-queryparser "7.5.0"]
+                 ;[org.apache.lucene/lucene-core "7.5.0"]
+                 ;[org.apache.lucene/lucene-analyzers-common "7.5.0"]
+                 ;[org.apache.lucene/lucene-queryparser "7.5.0"]
 
                  [clucie "0.4.2"]
 
@@ -79,11 +79,11 @@
                  ;[org.slf4j/jcl-over-slf4j "1.7.25"]
                  ;[org.slf4j/log4j-over-slf4j "1.7.26"]
 
-                 [metrics-clojure "2.10.0"]
-                 [metrics-clojure-jvm "2.10.0"]
-                 [metrics-clojure-health "2.10.0"]
-                 [metrics-clojure-graphite "2.10.0"]
-                 [metrics-clojure-ring "2.10.0"]
+                 ;[metrics-clojure "2.10.0"]
+                 ;[metrics-clojure-jvm "2.10.0"]
+                 ;[metrics-clojure-health "2.10.0"]
+                 ;[metrics-clojure-graphite "2.10.0"]
+                 ;[metrics-clojure-ring "2.10.0"]
 
                  [com.github.vertical-blank/sql-formatter "1.0.3"]
                  [org.clojars.rutledgepaulv/websocket-layer "0.1.11"]
@@ -106,15 +106,15 @@
                  ;;[info.sunng/ring-jetty9-adapter "0.12.5"]
                  ]
   :jvm-opts ["--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED" ;; suppresses codahale.metrics msg in Java 11
-             "--add-opens=java.base/java.nio=ALL-UNNAMED"
+             ;"--add-opens=java.base/java.nio=ALL-UNNAMED"
              "-Xmx28g" ;; testing with 48g
-             "-Dcom.sun.management.jmxremote=true"
-             "-Dcom.sun.management.jmxremote.port=8989"
-             "-Dcom.sun.management.jmxremote.host=0.0.0.0"
-             "-Dcom.sun.management.jmxremote.rmi.port=8989"
-             "-Dcom.sun.management.jmxremote.local.port=8990"
-             "-Dcom.sun.management.jmxremote.authenticate=false"
-             "-Dcom.sun.management.jmxremote.ssl=false"
+             ;"-Dcom.sun.management.jmxremote=true"
+             ;"-Dcom.sun.management.jmxremote.port=8989"
+             ;"-Dcom.sun.management.jmxremote.host=0.0.0.0"
+             ;"-Dcom.sun.management.jmxremote.rmi.port=8989"
+             ;"-Dcom.sun.management.jmxremote.local.port=8990"
+             ;"-Dcom.sun.management.jmxremote.authenticate=false"
+             ;"-Dcom.sun.management.jmxremote.ssl=false"
              "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"] ;; datalevin specific for Java 11+ (eliminates warnings)
   :cljfmt {}
   :source-paths ["src" "../shared"]

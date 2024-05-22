@@ -1,155 +1,15 @@
 {:orders
- {:flow-fn-sys
-  [:name :description :full_map :inputs :icon :input_types :output_types :category],
-  :blocks-sys
-  [:block_key :block_name :queries :views :block_data :view_names :query_names],
+ {:reco-counts [:table_name :cnt],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :connections-sys [:database_name :connection_id],
   :fields-sys [:field_name :field_type :data_type],
   :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :flows-sys [:flow_id :file_path :last_modified],
-  :files-sys [:file_path :screen_name :blocks :queries :ts],
-  :jvm_stats
-  [:used_memory_mb
-   :thread_count
-   :sql_cache_size
-   :ws_peers
-   :open_flow_channels
-   :queries_run
-   :internal_queries_run
-   :sniffs_run
-   :sys_load
-   :ts],
-  :flow-fn-categories-sys [:category],
-  :connections-sys [:database_name :connection_id],
-  :reco-counts [:table_name :cnt],
-  :flow-fn-all-sys [:name]},
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
  :reco-preview nil,
  :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
- :flow? false,
- :sql-source
- {:jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111}},
+ :sql-source {},
  :meta
- {:flow-fn-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 123,
-     :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
-     :cardinality 100},
-    :description
-    {:data-type "string",
-     :distinct 33,
-     :group-by? true,
-     :commons
-     {"" 89, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
-     :cardinality 26},
-    :full_map
-    {:data-type "string",
-     :distinct 123,
-     :group-by? true,
-     :commons
-     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
-      1},
-     :cardinality 100},
-    :inputs
-    {:data-type "string",
-     :distinct 66,
-     :group-by? true,
-     :commons
-     {"[:open-input-1 :open-input]" 10,
-      "[:value1 :value2]" 7,
-      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
-     :cardinality 53},
-    :icon
-    {:data-type "string",
-     :distinct 21,
-     :group-by? true,
-     :commons {"zmdi-puzzle-piece" 89, "zmdi-pizza" 3, "zmdi-file-text" 3},
-     :cardinality 17},
-    :input_types
-    {:data-type "string",
-     :distinct 56,
-     :group-by? true,
-     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
-     :cardinality 45},
-    :output_types
-    {:data-type "string",
-     :distinct 14,
-     :group-by? true,
-     :commons {":any" 63, "" 18, ":boolean" 12},
-     :cardinality 11},
-    :category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 89, ":rabbit-base" 18, ":clojure-base" 16},
-     :cardinality 2}},
-   :rowcount 123},
-  :blocks-sys
-  {:fields
-   {:block_key
-    {:data-type "string",
-     :distinct 12,
-     :group-by? true,
-     :commons {":block-4550" 1, ":block-6104" 1, ":block-6931" 1},
-     :cardinality 100},
-    :block_name
-    {:data-type "string",
-     :distinct 8,
-     :group-by? true,
-     :commons
-     {"drag-from-select-all-fn_history" 3,
-      "drag-from-drag-from-select-all-fn_history" 3,
-      "select-all-fn_history" 1},
-     :cardinality 66},
-    :queries
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {1 9, 0 3},
-     :cardinality 16},
-    :views
-    {:data-type "integer",
-     :distinct 3,
-     :group-by? true,
-     :commons {0 8, 2 3, 27 1},
-     :cardinality 25},
-    :block_data
-    {:data-type "string",
-     :distinct 12,
-     :group-by? true,
-     :commons
-     {"{:h 5, :w 16, :connection-id \"flows-db\", :name \"drag-from-select-all-fn_history\", :queries {:block-drag-34 {:select [:block [[:count 1] :rowcnt] [[:sum :elapsed_ms] :elapsed_ms_sum_205] :start :end [[:+ :end 1] :end_plus] :run_id], :from [[:query/fn-history-drag-20 :xx662]], :group-by [:block :start :end :run_id], :order-by [[:rowcnt :desc]], :where [:and [:not [:like :block \"%/%\"]] [:*when :run-id-drag-36/run_id [:= :run_id :run-id-drag-36/run_id]]], :_last-run \"02:25:31\"}}, :root [19 8], :tab \"cape-cod-vikings\", :selected-view :block-drag-34}"
-      1,
-      "{:name \"block-2068\", :w 5, :selected-view :hi, :root [10 10], :h 4, :queries {}, :tab \"cape-cod-vikings\", :minimized? true, :views {:hi [:box :align :center :justify :center :attr {:id \":block-2068.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child \"hi!\"], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}"
-      1,
-      "{:h 7, :w 30, :connection-id \"flows-db\", :name \"select-all-fn_history\", :queries {:fn-history-drag-20 {:select [:base_flow_id :block :channel :data_type :dbgn :dest :elapsed_ms :end :end_ts :flow_id :from_block :path :run_id :start :start_ts :ts :type :value], :from [[:fn_history :qq205]], :where [:*when :base-flow-id-drag-26/base_flow_id [:= :base_flow_id :base-flow-id-drag-26/base_flow_id]], :_last-run \"03:51:14\"}}, :root [5 1], :tab \"cape-cod-vikings\", :selected-view :fn-history-drag-20}"
-      1},
-     :cardinality 100},
-    :view_names
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"" 8,
-      ":hi :stack" 2,
-      ":codemirror-theme :editor-param-background-color :base-block-style :vega-defaults :grid-selected-column-css :base-block-color-selected :block-title-font-color :base-block-color :editor-rim-color :base-block-filter-selected :vega-default-color-scheme :data-colors :editor-grid-selected-font-color :monospaced-font :editor-grid-selected-background-color :nivo-defaults :editor-outer-rim-color :grid-selected-font-color :block-title-selected-font-color :grid-selected-background-color :grid-font-color :canvas-background-css :editor-font-color :base-font :block-tab-selected-font-color :editor-background-color :editor-grid-font-color"
-      1},
-     :cardinality 33},
-    :query_names
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"" 3, ":gen-viz-715" 1, ":rowcnt-drag-33" 1},
-     :cardinality 83}},
-   :rowcount 12},
-  :fields-sys
+ {:fields-sys
   {:fields
    {:field_name
     {:data-type "string",
@@ -191,39 +51,39 @@
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"none" 24},
-     :cardinality 4},
+     :commons {"none" 27},
+     :cardinality 3},
     :db_catalog
     {:data-type "unknown",
      :distinct 1,
      :group-by? true,
-     :commons {nil 24},
-     :cardinality 4},
+     :commons {nil 27},
+     :cardinality 3},
     :connection_id
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"system-db" 24},
-     :cardinality 4},
+     :commons {"system-db" 27},
+     :cardinality 3},
     :schema_cat
     {:data-type "unknown",
      :distinct 1,
      :group-by? false,
-     :commons {nil 24},
-     :cardinality 4},
+     :commons {nil 27},
+     :cardinality 3},
     :table_name
     {:data-type "string",
-     :distinct 24,
+     :distinct 27,
      :group-by? true,
      :commons {"connections" 1, "board_history" 1, "client_items" 1},
      :cardinality 100},
     :fields
     {:data-type "integer",
-     :distinct 15,
+     :distinct 16,
      :group-by? false,
-     :commons {6 4, 5 3, 12 2},
-     :cardinality 62}},
-   :rowcount 24},
+     :commons {6 4, 5 3, 15 3},
+     :cardinality 59}},
+   :rowcount 27},
   :client-items-drag-item-key-5
   {:fields
    {:item_type
@@ -494,129 +354,28 @@
   {:fields
    {:flow_id
     {:data-type "string",
-     :distinct 89,
+     :distinct 91,
      :group-by? true,
-     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
-     :cardinality 97},
+     :commons
+     {"clam-flow-851" 3, "openai-image-gen-ladder3" 2, "openai-image-gen-ladder" 2},
+     :cardinality 95},
     :file_path
     {:data-type "string",
-     :distinct 91,
+     :distinct 95,
      :group-by? true,
      :commons
      {"./flows/stitches-math.edn" 1,
-      "./flows/hey-rabbit-pathfinder.edn" 1,
-      "./flows/dalle3-create-image-newengland-old.edn" 1},
+      "./flows/openai-image-gen-ladder3.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1},
      :cardinality 100},
     :last_modified
     {:data-type "string",
-     :distinct 25,
+     :distinct 29,
      :group-by? true,
      :commons
-     {"2024-03-12 02:37:43" 67, "2024-05-03 21:13:48" 1, "2024-03-14 07:50:09" 1},
-     :cardinality 27}},
-   :rowcount 91},
-  :files-sys
-  {:fields
-   {:file_path
-    {:data-type "string",
-     :distinct 151,
-     :group-by? true,
-     :commons
-     {"./screens/weave-test122.edn" 1,
-      "./screens/nightcity-cape-cod.edn" 1,
-      "./screens/counting-lord-of-the-woods.edn" 1},
-     :cardinality 100},
-    :screen_name
-    {:data-type "string",
-     :distinct 144,
-     :group-by? true,
-     :commons
-     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
-     :cardinality 95},
-    :blocks
-    {:data-type "integer",
-     :distinct 46,
-     :group-by? true,
-     :commons {3 45, 16 6, 12 6},
-     :cardinality 30},
-    :queries
-    {:data-type "integer",
-     :distinct 32,
-     :group-by? true,
-     :commons {0 53, 5 14, 6 9},
-     :cardinality 21},
-    :ts
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons
-     {"2024-05-10 00:38:35" 63, "2024-05-10 00:38:36" 39, "2024-05-10 00:38:37" 24},
-     :cardinality 4}},
-   :rowcount 151},
-  :jvm_stats
-  {:fields
-   {:queries_run
-    {:data-type "integer",
-     :distinct 108,
-     :group-by? true,
-     :commons {0 3, 22 2, 390 1},
-     :cardinality 97},
-    :sql_cache_size
-    {:data-type "integer",
-     :distinct 6,
-     :group-by? true,
-     :commons {6 64, 2 18, 9 13},
-     :cardinality 5},
-    :ts
-    {:data-type "string",
-     :distinct 111,
-     :group-by? true,
-     :commons
-     {"2024-05-10 00:46:45" 1, "2024-05-10 00:54:15" 1, "2024-05-10 01:34:45" 1},
-     :cardinality 100},
-    :sniffs_run
-    {:data-type "integer",
-     :distinct 91,
-     :group-by? true,
-     :commons {5 16, 20 3, 0 3},
-     :cardinality 81},
-    :sys_load
-    {:data-type "float",
-     :distinct 110,
-     :group-by? true,
-     :commons {3.13671875 2, 2.80810546875 1, 4.2412109375 1},
-     :cardinality 99},
-    :used_memory_mb
-    {:data-type "integer",
-     :distinct 107,
-     :group-by? true,
-     :commons {2902 2, 1365 2, 1042 2},
-     :cardinality 96},
-    :thread_count
-    {:data-type "integer",
-     :distinct 23,
-     :group-by? true,
-     :commons {115 14, 118 12, 117 12},
-     :cardinality 20},
-    :internal_queries_run
-    {:data-type "integer",
-     :distinct 108,
-     :group-by? true,
-     :commons {0 3, 2 2, 390 1},
-     :cardinality 97},
-    :open_flow_channels
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {-1 111},
-     :cardinality 0},
-    :ws_peers
-    {:data-type "integer",
-     :distinct 6,
-     :group-by? true,
-     :commons {4 77, 2 13, 5 12},
-     :cardinality 5}},
-   :rowcount 111},
+     {"2024-03-12 02:37:43" 67, "2024-05-03 21:13:48" 1, "2024-05-20 03:53:25" 1},
+     :cardinality 30}},
+   :rowcount 95},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -726,15 +485,6 @@
      :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
      :cardinality 8}},
    :rowcount 500},
-  :flow-fn-categories-sys
-  {:fields
-   {:category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
-     :cardinality 100}},
-   :rowcount 3},
   :city-drag-26-1
   {:fields
    {:city
@@ -965,27 +715,13 @@
      :group-by? false,
      :commons {1 5, 199 1, 1092 1},
      :cardinality 86}},
-   :rowcount 29},
-  :flow-fn-all-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 123,
-     :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
-     :cardinality 100}},
-   :rowcount 123}},
+   :rowcount 29}},
  :default-col-widths
  {:system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys 137},
-  :system-fields-list* {:fields-sys 170},
-  :virtual-panel {:kick--1764769189 152},
-  :flow-list* {:flows-sys 187},
-  :files-list* {:files-sys 178},
-  :blocks-list* {:blocks-sys 127}},
+  :system-tables-list* {:tables-sys ##Inf},
+  :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
- :zoom-start [-415.95 -719.47 0.775],
- :data-hash 1182562627,
+ :data-hash -1656498094,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -1066,6 +802,7 @@
     "blackberries2"
     "blackberries3"
     "blackberries3-narrow"
+    "blackberries3-narrow2"
     "blank-sizzle"
     "blank-sizzle2"
     "blue-pines"
@@ -1098,12 +835,15 @@
     "error-monitor-vanessa"
     "error-monitor-vanessa2"
     "error-monitor-vanessa3"
+    "error-monitor-vanessa4"
+    "error-monitor-vanessa5"
     "evil-main-street"
     "fake-books-1"
     "fake-bricks"
     "fetching-pentagonal-termite-of-tghe-submarine-canyon"
     "final-fantasy-dorchester"
     "fox-hills"
+    "game-of-life"
     "glass-fish-board-test"
     "green-storm-city"
     "hue-board-1"
@@ -1113,7 +853,11 @@
     "layout-test-12"
     "light-theme"
     "literal-data-test"
+    "looking-glass-conway"
     "looking-glass-redux"
+    "looking-glass-redux-conway2"
+    "looking-glass-redux-viking"
+    "looking-glass-redux-viking2"
     "looking-glass-redux2"
     "looking-glass-redux23a"
     "looking-glass-redux23abb"
@@ -1152,6 +896,7 @@
     "refresh-test"
     "retro-machines"
     "riffle-test"
+    "server-stats"
     "sick-of-your-shit"
     "sizzle-board-1"
     "sneaky-swamp-creatures1"
@@ -1193,13 +938,88 @@
    :openapi-key "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"}},
  :runstreams
  {"openai-image-gen-ladder2"
-  {:open? true, :values {:prompt {:value :param/poised-tan-hog, :source :param}}}},
+  {:open? true,
+   :values {:prompt {:value :param/poised-tan-hog, :source :param}},
+   :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [112716606 79222686 4294705152],
+ :memory [381443103 325194771 4294705152],
  :status-data
- {:heartbeat {:kick {:data [{} nil], :elapsed-ms nil, :reco-count nil}},
-  :alert1 {:alerts {:data [{} nil], :elapsed-ms nil, :reco-count nil}}},
+ {:heartbeat
+  {:kick
+   {:data
+    [{:sent! :heartbeat,
+      :to :all,
+      :at "2024-05-21 01:01:01",
+      :payload nil,
+      :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :alert1
+  {:alerts
+   {:data
+    [[[:v-box
+       :justify
+       :center
+       :style
+       {:opacity 0.7}
+       :children
+       [[:box
+         :style
+         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         :child
+         "successfully saved screen"]
+        [:box
+         :style
+         {:font-weight 700, :font-size "18px"}
+         :child
+         "looking-glass-redux-viking"]
+        [:box
+         :style
+         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         :child
+         "@ /home/ryanr/rvbbit/backend/screens/looking-glass-redux-viking.edn"]]]
+      10
+      1.6
+      8]
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :file-change
+  {:file-changed
+   {:data
+    [{:path
+      "./live/earnest-oval-kangaroo-24/fat zebra/flow-play-from-runstreams-1/block-3630.edn",
+      :type :modify,
+      :panel-key nil,
+      :block-data
+      {:block-3630 {:h 2, :w 25, :root [1 1]},
+       :views
+       {:flow-play-runstreamed
+        [:box
+         :align
+         :center
+         :justify
+         :center
+         :style
+         {:font-weight 700,
+          :font-size "25px",
+          :padding-top "6px",
+          :padding-left "14px",
+          :margin-top "-8px",
+          :color :theme/editor-outer-rim-color,
+          :font-family :theme/base-font}
+         :child
+         [:run-flow
+          ["openai-image-gen-ladder2"
+           "run openai-image-gen-ladder2!"
+           :runstream-overrides]]]},
+       :tab "fat zebra",
+       :name "flow-play-from-runstreams-1"}}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}}},
  :flow-subs
  [:flow/openai-image-gen-ladder2>:dominant-color
   :flow/openai-image-gen-ladder2>:output-revised-prompt
@@ -1210,12 +1030,13 @@
   :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
   :flow/openai-image-gen-ladder2>:relative-url-path-for-png-version
   :client/proud-magenta-skunk-exiled-from-volcanic-arc>city-drag-26>city
+  :flow/live-scratch-flow>*running?
   :time/second
   :flow/flow-forever>:final-math
   :flow/openai-image-gen-ladder2>:pop-color],
- :client-name :trusting-gray-lion-10,
+ :client-name :earnest-oval-kangaroo-24,
  :runstreams-lookups
- {"openai-image-gen-ladder"
+ {"openai-image-gen-ladder2"
   {:open-inputs
    {:prompt-5 {:user-input "", :defaults {}, :type :string},
     :quality-param {:user-input "hd", :defaults {}, :type :string},
@@ -1242,14 +1063,14 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:created 1715378756, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
+     :sample "{:created 1716193031, :data [{:b64_json \"iVBORw0KGgoAAAANSUh..."},
     :prompt-5
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "A high-definition, highly stylized and artistic 16:9 highly ..."},
+     :sample ""},
     :node-js-color-thief-script
     {:type :map,
      :ttype :sub-flow,
@@ -1257,14 +1078,14 @@
      :last? false,
      :defaults {},
      :sample
-     "{:dominantColor \"#19374c\", :colorPalette [\"#daa06a\" \"#11304c..."},
+     "{:dominantColor \"#313740\", :colorPalette [\"#28323f\" \"#cda790..."},
     :dominant-color
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#19374c"},
+     :sample "#313740"},
     :shell-command-1
     {:type :map,
      :ttype :shell-command,
@@ -1289,7 +1110,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/tmp/rand-exif-71344.txt"},
+     :sample "/tmp/rand-exif-65352.txt"},
     :execute-shell-command
     {:type :map,
      :ttype :shell-command,
@@ -1303,14 +1124,14 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "#daa06a"},
+     :sample "#28323f"},
     :prompt-2
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "Please use this prompt EXACTLY as is with NO changes at all ..."},
+     :sample ""},
     :base-save-directory
     {:type :string,
      :ttype :open-block,
@@ -1325,14 +1146,14 @@
      :last? false,
      :defaults {},
      :sample
-     "{:dominantColor \"#19374c\", :colorPalette [\"#daa06a\" \"#11304c..."},
+     "{:dominantColor \"#313740\", :colorPalette [\"#28323f\" \"#cda790..."},
     :stringify-exif-map
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt-asked \"Please use this prompt EXACTLY as is with NO..."},
+     :sample "{:prompt-asked \"For testing purposes, please use exactly thi..."},
     :size-param
     {:type :string,
      :ttype :open-block,
@@ -1350,35 +1171,35 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "Please use this prompt EXACTLY as is with NO changes at all ..."},
+     :sample "For testing purposes, please use exactly this prompt and do ..."},
     :write-file-1
     {:type :map,
      :ttype :write-file,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:status :ok, :file-path \"/tmp/rand-exif-71344.txt\"}"},
+     :sample "{:status :ok, :file-path \"/tmp/rand-exif-65352.txt\"}"},
     :save-base64-to-webp-file
     {:type :string,
      :ttype :save-base64-to-webp,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-55006-75802.png"},
+     :sample "/home/ryanr/rvbbit-out/b64-image2-1679-5974.png"},
     :prompt-4
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "A high-definition, hyperreal, vivid 16:9 illustration of a N..."},
+     :sample ""},
     :request-body-map
     {:type :map,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt \"Please use this prompt EXACTLY as is with NO chang..."},
+     :sample "{:prompt \"For testing purposes, please use exactly this prom..."},
     :base-web-directory
     {:type :string,
      :ttype :open-block,
@@ -1392,7 +1213,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "Please use this prompt EXACTLY as is with NO changes at all ..."},
+     :sample "For testing purposes, please use exactly this prompt and do ..."},
     :create-png-path
     {:type :string,
      :ttype :open-fn,
@@ -1413,7 +1234,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "cp /home/ryanr/rvbbit-out/b64-image-55006-75802.png /home/ry..."},
+     :sample "cp /home/ryanr/rvbbit-out/b64-image2-1679-5974.png /home/rya..."},
     :hiccup-image-box-w-png
     {:type :vector,
      :ttype :open-fn,
@@ -1427,28 +1248,28 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/home/ryanr/rvbbit-out/b64-image-55006-75802.png"},
+     :sample "/home/ryanr/rvbbit-out/b64-image2-1679-5974.png"},
     :relative-url-path-for-png-version
     {:type :string,
      :ttype :open-fn,
      :meta nil,
      :last? true,
      :defaults {},
-     :sample "./images/gen/b64-image-55006-75802.png"},
+     :sample "./images/gen/b64-image2-1679-5974.png"},
     :exif-map
     {:type :map,
      :ttype :open-fn,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "{:prompt-asked \"Please use this prompt EXACTLY as is with NO..."},
+     :sample "{:prompt-asked \"For testing purposes, please use exactly thi..."},
     :prompt-3
     {:type :string,
      :ttype :open-block,
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "Please use this prompt EXACTLY as is with NO changes at all ..."},
+     :sample ""},
     :http-req-map
     {:type :map,
      :ttype :open-block,
@@ -1476,7 +1297,7 @@
      :meta nil,
      :last? false,
      :defaults {},
-     :sample "/tmp/rand-exif-71344.txt"},
+     :sample "/tmp/rand-exif-65352.txt"},
     :output-revised-prompt
     {:type :string,
      :ttype :open-fn,
@@ -1494,336 +1315,32 @@
         :values ["vivid" "natural"]}}},
      :last? false,
      :defaults {},
-     :sample "vivid"}}},
-  "openai-image-gen-ladder2"
-  {:open-inputs
-   {:prompt-5 {:user-input "", :defaults {}, :type :string},
-    :quality-param {:user-input "hd", :defaults {}, :type :string},
-    :prompt-2 {:user-input "", :defaults {}, :type :string},
-    :base-save-directory
-    {:user-input "/home/ryanr/rvbbit-out", :defaults {}, :type :string},
-    :size-param {:user-input "1792x1024", :defaults {}, :type :string},
-    :prompt-4 {:user-input "", :defaults {}, :type :string},
-    :base-web-directory
-    {:user-input "/home/ryanr/rvbbit/frontend/resources/public/images/gen",
-     :defaults {},
-     :type {:out :string}},
-    :prompt
-    {:user-input
-     "A highly-detailed, hyperrealistic 16:9 digitally-rendered illustration of a pre-dawn winter scene in a traditional New England setting, filled with a mix of rustic charm and cyberpunk aesthetics. The town is bathed in a fresh blanket of snow under a heavy snowstorm, capturing a slightly gritty ambience, with buildings glowing softly in hues of pink and neon light blue. On the left of the frame stands a vibrant Irish woman in her early 30s. Features include a very buxom build, full pouty lips with a prominent bottom one, an upturned nose, and a pleased yet sultry expression. Her long hair, slightly damp from the intense snow, runs down her neck and shoulders. Intricate, Celtic-inspired tattoos depicting rabbits and wilderness adorn her neck, collarbone, and shoulders. As the sun cautiously peeps over the horizon, its light reflects off her body, enhancing the mood set by the serene yet enigmatic pre-dawn lighting. Full figured and motherly - as the light dances off her body.",
-     :defaults {},
-     :type {:out :string}},
-    :prompt-3 {:user-input "", :defaults {}, :type :string},
-    :style-param {:user-input "vivid", :defaults {}, :type :string}},
-   :blocks
-   {:oai-api-call
-    {:type {:created :integer, :data :rowset, :* :map},
-     :ttype :make-http-call,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :prompt-5
-    {:type {:out :string},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :node-js-color-thief-script
-    {:type {:dominantColor :string, :colorPalette :vector, :* :map},
-     :ttype :sub-flow,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :dominant-color
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :shell-command-1
-    {:type {:out :any},
-     :ttype :shell-command,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :quality-param
-    {:type {:out :string},
-     :ttype :open-block,
-     :meta
-     {:*
-      {:scrubber
-       {:message "OpenAI image gen quality selector - DALLE3",
-        :values ["hd" "standard"]}}},
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :open-fn-1
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :execute-shell-command
-    {:type
-     {:output :list, :exception :list, :seconds :list, :command :string, :* :map},
-     :ttype :shell-command,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :pop-color
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :prompt-2
-    {:type {:out :string},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :base-save-directory
-    {:type {:out :string},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :color-palette
-    {:type {:dominantColor :string, :colorPalette :vector, :* :map},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :stringify-exif-map
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :size-param
-    {:type {:out :string},
-     :ttype :open-block,
-     :meta
-     {:*
-      {:scrubber
-       {:message "OpenAI image gen size selector - DALLE3",
-        :values ["1024x1024" "1792x1024" "1024x1792"]}}},
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :prompt-jukebox
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :write-file-1
-    {:type {:out :string},
-     :ttype :write-file,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :save-base64-to-webp-file
-    {:type {:out :string},
-     :ttype :save-base64-to-webp,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :prompt-4
-    {:type {:out :string},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :request-body-map
-    {:type
-     {:prompt :string,
-      :n :integer,
-      :size :string,
-      :style :string,
-      :response_format :string,
-      :model :string,
-      :quality :string,
-      :* :map},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :base-web-directory
-    {:type {:out {:out :string}},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :prompt
-    {:type {:out {:out :string}},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :create-png-path
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :hiccup-image-box-w-png-vw
-    {:type nil,
-     :ttype nil,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "(renderable view)"},
-    :create-convert-command-line
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :hiccup-image-box-w-png
-    {:type
-     {:idx7 :keyword,
-      :idx5 :keyword,
-      :* :vector,
-      :idx2 :string,
-      :idx4 :string,
-      :idx1 :keyword,
-      :idx6 :keyword,
-      :idx3 :keyword,
-      :idx10 :vector,
-      :idx8 :map,
-      :idx9 :keyword,
-      :idx0 :keyword},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :generate-file-path
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :relative-url-path-for-png-version
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? true,
-     :defaults {},
-     :sample "no sample data"},
-    :exif-map
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :prompt-3
-    {:type {:out :string},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :http-req-map
-    {:type {:headers :map, :method :keyword, :url :string, :body :map, :* :map},
-     :ttype :open-block,
-     :meta {},
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :write-exif-to-image-command
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :just-the-image
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :write-file-1_file-path
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :output-revised-prompt
-    {:type {:out :string},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :style-param
-    {:type {:out :string},
-     :ttype :open-block,
-     :meta
-     {:*
-      {:scrubber
-       {:message "OpenAI image gen style selector - DALLE3",
-        :values ["vivid" "natural"]}}},
-     :last? false,
-     :defaults {},
-     :sample "no sample data"}}}},
+     :sample "vivid"}}}},
  :alt-key-held? false,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2025, :h 1304},
+ :window {:w 2010, :h 1400},
  :post-meta
  {:gen-viz-1132 {:* {:rowcount 7}},
-  :client-items-drag-item-key-5 {:* {:rowcount 16419}},
-  :client-items-drag-20 {:* {:rowcount 35642}},
-  :client-items-drag-35 {:* {:rowcount 35642}},
+  :client-items-drag-item-key-5 {:* {:rowcount 21473}},
+  :client-items-drag-20 {:* {:rowcount 48875}},
+  :client-items-drag-35 {:* {:rowcount 48875}},
   :rowcnt-drag-7 {:* {:rowcount 1}},
-  :blocks-drag-44 {:* {:rowcount 2700}},
-  :flows-sys
-  {:*
-   {:rowcount
-    "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}},
+  :blocks-drag-44 {:* {:rowcount 3042}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
-  :fields-drag-16 {:* {:rowcount 999}},
+  :fields-drag-16 {:* {:rowcount 1079}},
   :city-drag-26-1 {:* {:rowcount 3755}},
   :ufo-sightings-drag-9 {:* {:rowcount 67662}},
   :item-type-drag-5 {:* {:rowcount 7}},
-  :item-type-drag-0 {:* {:rowcount 3409}},
+  :item-type-drag-0 {:* {:rowcount 3497}},
   :duration-hours-drag-43 {:* {:rowcount 7103}},
   :city-drag-26 {:* {:rowcount 12346}},
-  :gen-viz-555 {:* {:rowcount 6}},
+  :gen-viz-555 {:* {:rowcount 12}},
   :state-drag-3 {:* {:rowcount 59}},
   :shape-drag-7 {:* {:rowcount 29}}},
  :flow-estimates
- {"openai-image-gen-ladder"
-  {:times 41, :run-id "d14c5bed-ddb8-4bf4-a285-43d95b7973a8"},
-  "counting-loop" {:times 6, :run-id "949c2766-8ecb-4f49-a7ba-2041d4ee2104"}},
+ {"openai-image-gen-ladder2"
+  {:times 44, :run-id "ca12cb8a-0b18-4e1d-9117-556fdcb7af8e"}},
  :status
  {:heartbeat
   {:kick
@@ -1836,57 +1353,61 @@
     :flow/openai-image-gen-ladder>:relative-url-path-for-png-version
     :flow/openai-image-gen-ladder2>:relative-url-path-for-png-version
     :client/proud-magenta-skunk-exiled-from-volcanic-arc>city-drag-26>city
+    :flow/live-scratch-flow>*running?
     :time/second
     :flow/flow-forever>:final-math
     :flow/openai-image-gen-ladder2>:pop-color]},
-  :alert1 {:alerts :alert2}},
+  :alert1 {:alerts :alert2},
+  :file-change {:file-changed :done}},
  :screen-name "looking-glass-redux-viking",
  :recos-page2 0,
  :selected-tab "fat zebra",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
- :alerts [],
+ :alerts
+ [[[:box
+    :child
+    "sent screen save request to server... Please wait."
+    :style
+    {:font-size "12px", :opacity 0.66}]
+   11
+   0.5
+   74548
+   1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap
  {"openai-image-gen-ladder2"
   {:prompt
    "For testing purposes, please use exactly this prompt and do not change it at all. Use it exactly like this:\n\nA highly detailed highly stylized & exaggerated pinup style illustration showcasing a stunning, young, robust, and powerfully built Swedish woman in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen donning a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly"}},
- :base-sniff-queries {:jvm_stats 1498154063},
- :panels-hash 1768503593,
+ :panels-hash 1989823877,
  :sessions
- (["vibrant-burgundy-grasshopper-exiled-from-towhead.edn"
-   "1002 hours, 15 minutes, 13 seconds"
-   3608113132]
-   ["okay-prismatic-grasshopper-hailing-from-exhumed-river-channel.edn"
-    "1023 hours, 10 minutes, 28 seconds"
-    3683428572]
-   ["blissful-ivory-bird-banned-from-ravine.edn"
-    "1048 hours, 32 minutes, 55 seconds"
-    3774775129]
-   ["quick-circular-eagle-banned-from-karst-fenster.edn"
-    "1052 hours, 51 minutes, 53 seconds"
-    3790313660]
-   ["engaging-sapphire-frog-of-the-stratovolcano.edn"
-    "1074 hours, 24 minutes, 39 seconds"
-    3867879695]
-   ["awesome-pentagonal-swallow-banned-from-atoll.edn"
-    "1106 hours, 51 minutes, 47 seconds"
-    3984707395]
-   ["skillful-square-peafowl-hailing-from-lacustrine-terrace.edn"
-    "1106 hours, 58 minutes, 4 seconds"
-    3985084817]
-   ["excellent-indigo-monkey-exiled-from-proglacial-lake.edn"
-    "1125 hours, 58 minutes, 15 seconds"
-    4053495232]
-   ["instinctive-short-clam-of-the-barrier-island.edn"
-    "1127 hours, 34 minutes, 4 seconds"
-    4059244268]),
+ (["honored-prismatic-rhinoceros-2.edn"
+   "1007 hours, 53 minutes, 46 seconds"
+   3628426025]
+   ["thorough-tan-nightingale-2.edn"
+    "1031 hours, 38 minutes, 51 seconds"
+    3713931899]
+   ["adorable-conical-human-15.edn" "1031 hours, 46 minutes, 4 seconds" 3714364249]
+   ["fair-chocolate-frog-38.edn" "1032 hours, 55 minutes, 46 seconds" 3718546785]
+   ["thrilling-scarlet-turtle-34.edn"
+    "1033 hours, 48 minutes, 49 seconds"
+    3721729972]
+   ["adventurous-ochre-ferret-27.edn"
+    "1033 hours, 9 minutes, 27 seconds"
+    3719367865]
+   ["composed-prismatic-koala-28.edn"
+    "1034 hours, 16 minutes, 11 seconds"
+    3723371798]
+   ["adorable-rhomboidal-raven-13.edn"
+    "1034 hours, 17 minutes, 38 seconds"
+    3723458437]
+   ["polished-jade-wolf-42.edn" "1034 hours, 29 minutes, 14 seconds" 3724154494]),
  :solvers-map {:vibrant-antelope-solver {:signal nil, :body nil}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -688587982,
+ :user-params-hash -1541274783,
  :grid-recos? true,
- :session-hash -913366816,
+ :session-hash -97513085,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -2255,18 +1776,32 @@
    :views
    {:param-val
     [:box
+     :padding
+     "13px"
+     :size
+     "auto"
      :align
      :center
      :justify
      :center
-     :padding
-     "13px"
+     :height
+     :panel-height+50-px
+     :width
+     :panel-width+70-px
      :style
-     {:font-size "45px"}
+     {:background-size "cover",
+      :background-color "#00000000",
+      :background-position "center",
+      :transition "all 1.8s ease-in-out",
+      :background-image
+      [:string3
+       "url("
+       :flow/openai-image-gen-ladder2>:relative-url-path-for-png-version
+       ")"],
+      :filter [:when :flow/openai-image-gen-ladder2>*running? "blur(5px)"],
+      :font-size "22px"}
      :child
-     [:img
-      {:src :flow/openai-image-gen-ladder2>:relative-url-path-for-png-version,
-       :width :width-px}]]}},
+     " "]}},
   :block-6016
   {:h 7,
    :w 14,
@@ -3411,16 +2946,17 @@
   :flow
   {:counting-loop>open-fn-1 nil,
    :openai-image-gen-ladder>pop-color "#daa06a",
-   :openai-image-gen-ladder2>relative-url-path-for-png-version nil,
+   :openai-image-gen-ladder2>relative-url-path-for-png-version
+   "./images/gen/b64-image2-91897-32199.png",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image-55006-75802.png",
+   "./images/gen/b64-image4-79256-89323.png",
    :counting-loop>open-fn-2 44,
    :openai-image-gen-ladder>*running? false,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
-   "A highly detailed highly stylized & exaggerated pinup style illustration showcasing a stunning, young, robust, and powerfully built Swedish woman in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen donning a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly.",
+   "A highly detailed highly stylized & exaggerated pinup style illustration showcasing a stunning, young, robust, and powerfully built Swedish woman in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen donning a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly",
    :live-scratch-flow>*running? false,
    :openai-image-gen-ladder>hiccup-image-box-w-png-vw
    [:v-box
@@ -3445,7 +2981,7 @@
       [:img
        {:src "./images/gen/b64-image-84236-40490.png",
         :style {:border-radius "30px"}}]]]],
-   :openai-image-gen-ladder2>dominant-color nil,
+   :openai-image-gen-ladder2>dominant-color "#132f43",
    :counting-loop>*running? false,
    :counting-loop>open-fn-3 45,
    :flow-forever>*running? false,
@@ -3457,10 +2993,11 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder2>output-revised-prompt nil,
+   :openai-image-gen-ladder2>output-revised-prompt
+   "A highly detailed highly stylized pinup style illustration showcasing a stunning, young, built, and robust Caucasian woman, of Swedish descent in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She looks confidently directly into the camera, intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen wearing a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly.",
    :openai-image-gen-ladder>dominant-color "#19374c",
-   :openai-image-gen-ladder2>pop-color nil,
-   :flow-forever>final-math 683.5},
+   :openai-image-gen-ladder2>pop-color "#c7a9ce",
+   :flow-forever>final-math 663.5},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",
    :file_path "./flows/openai-image-gen-ladder.edn",
@@ -3471,7 +3008,7 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
-  :time {:seconds nil, :second 47},
+  :time {:seconds nil, :second 30},
   :viz-tables-sys2 {:table_name :ufo-sightings-drag-9},
   :user-dropdown-sys {:req-field nil},
   :searches-types-sys {:item_type "client-queries"},
@@ -3539,20 +3076,7 @@
     "Generate a high-definition, fantasy-inspired illustration in a 16:9 ratio. The scene is set in an otherworldly, yet characteristically New England small town during winter. The main figure is a Caucasian woman in her late 20s, with a robust, hyper curvaceous physique. She sports a sultry yet pleased expression, with long hair, full lips, and a slightly upturned nose. Intricate Celtic-style tattoos of rabbits and wilderness decorate her neck, collarbone, and shoulders. Her body emanates mysterious blue and pink lights. She's wearing a choker ribbon and a long necklace, encapsulating a confident, playful aura as she shares a sly glance with the viewer. This piece is influenced by pinup noir femme fatale and cyberpunk aesthetics, channeling a strong burlesque vibe."],
    :okay-orchid-koala
    ["  Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Florida beach during summer. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long hair, full pouty lips, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she casts a coy glance at the viewer. This artwork is inspired by pinup art, having a strong burlesque influence. "],
-   :selected-view-data
-   [:box
-    :align
-    :center
-    :justify
-    :center
-    :padding
-    "13px"
-    :style
-    {:font-size "45px"}
-    :child
-    [:img
-     {:src :flow/openai-image-gen-ladder2>:relative-url-path-for-png-version,
-      :width :width-px}]],
+   :selected-view-data nil,
    :skillful-viridian-falcon
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please: "
     ""
@@ -3565,7 +3089,7 @@
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:"
     ""
     "Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork is inspired by the pinup noir femme fatale and cyberpunk aesthetics, having a strong burlesque influence."],
-   :selected-view [:views :param-val],
+   :selected-view [nil nil],
    :fabulous-pink-eagle
    ["I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS:"
     ""
@@ -3784,65 +3308,4 @@
    :is_live 1,
    :items 8,
    :styler_highlight_4018a 1}},
- :selected-flow "openai-image-gen-ladder2",
- :flow-statuses
- {"counting-loop"
-  {:last-updated nil,
-   :blocks_finished 13,
-   :block-overrides [],
-   :channels 0,
-   :channels-open 0,
-   :since-start "6 seconds",
-   :*started-by :rvbbit-scheduler,
-   :time-running "6 seconds",
-   :last-update {:last-even/x :end},
-   :*running? false,
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "crow-flow-201a"
-  {:last-updated nil,
-   :blocks_finished 9,
-   :block-overrides [],
-   :channels 0,
-   :channels-open 0,
-   :since-start "less than a second",
-   :*started-by :rvbbit-scheduler,
-   :time-running "less than a second",
-   :last-update {:done :start},
-   :*running? false,
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "openai-image-gen-ladder"
-  {:last-updated nil,
-   :blocks_finished 83,
-   :block-overrides [:prompt :style-param :prompt-2 :prompt-3 :prompt-4 :prompt-5],
-   :channels 0,
-   :channels-open 0,
-   :since-start "37 seconds",
-   :*started-by :trusting-gray-lion-10,
-   :time-running "37 seconds",
-   :last-update {:done :start},
-   :*running? false,
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "openai-image-gen-ladder/node-js-color-thief-script"
-  {:last-updated nil,
-   :blocks_finished 16,
-   :block-overrides [:image-path],
-   :channels 0,
-   :channels-open 0,
-   :since-start "less than a second",
-   :*started-by :trusting-gray-lion-10,
-   :time-running "less than a second",
-   :last-update {:done :end},
-   :*running? false,
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []}}}
+ :selected-flow "live-scratch-flow"}

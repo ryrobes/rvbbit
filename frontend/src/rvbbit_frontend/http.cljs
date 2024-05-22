@@ -698,6 +698,7 @@
                      (dissoc :flows) ;;; mostly ephemeral with the UI....
                      (dissoc :http-reqs)
                      (dissoc :sql-str)
+                     (ut/dissoc-in [:server :settings :runners])
                      (dissoc :file-changed)
                      (assoc :panels (select-keys (get db :panels) p0)))
                  db)

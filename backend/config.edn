@@ -4,9 +4,7 @@
  :openapi-key "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"
  :openapi-org-id nil
  :default "./screens/looking-glass-redux.edn"
-
  :harvest-on-boot? true
-
  :runners {:clover {:default [:box :child "hey"] 
                     :type :built-in
                     :icon "images/rvbbit-clover.png"}
@@ -23,13 +21,15 @@
            ;;:raw-sql {}
            ;;:voice-to-sql {}
            :dalle3 {:runner {:flow-id :run-dalle3
-                             :overrides {:code :selected-view} :opts? {:instanced? true}}
+                             :overrides {:code :selected-view} 
+                             :opts? {:instanced? true}}
                     :type :flow-based
                     :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene."
                     :default-view [:box :child [:img {:src :*query-id}]]
                     :icon "images/dalle.png"}
            :python3 {:runner {:flow-id :run-python3
-                              :overrides {:code :selected-view} :opts? {:instanced? true}}
+                              :overrides {:code :selected-view} 
+                              :opts? {:instanced? true}}
                      :type :flow-based
                      ;:default "import foo\nprint(foo.bar())"
                      :default-view [:box :child [:string :*query-id]]

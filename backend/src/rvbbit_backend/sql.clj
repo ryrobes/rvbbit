@@ -10,7 +10,7 @@
    [clj-time.core :as time]
    [clj-time.coerce :as tc]
    [rvbbit-backend.util :as ut]
-   [rvbbit-backend.instrument :as instrument]
+   ;[rvbbit-backend.instrument :as instrument]
    [clj-time.jdbc]))  ;; enables joda time returns
 
 ;; https://github.com/tomekw/hikari-cp
@@ -51,7 +51,7 @@
                      :idle-timeout       600000
                      :max-lifetime       1800000
                      :pool-name name ;"system-db-pool"
-                     :metric-registry instrument/metric-registry
+                     ;:metric-registry instrument/metric-registry
                      ;:maximum-pool-size 10
                      }
                bbase (merge base jdbc-body)]

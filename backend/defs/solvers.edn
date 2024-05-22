@@ -1,1 +1,24 @@
-{:vibrant-antelope-solver {:signal nil, :body nil}}
+{:vibrant-antelope-solver
+ {:signal :signal/cool-raccoon-signal-yo,
+  :persist? false,
+  :type :clojure,
+  :default -1,
+  :data (+ 1 2 3 88)},
+ :dazzling-gnu-solver
+ {:signal :signal/hourly?,
+  :persist? false,
+  :type :clojure,
+  :default -1,
+  :data (+ 1 2 3 90)},
+ :polished-kangaroo-solver
+ {:signal :signal/genius-gnat-signal,
+  :persist? false,
+  :type :clojure,
+  :default -1,
+  :data (+ 1 2 3 50)},
+ :stupendous-termite-solver
+ {:signal :signal/cool-raccoon-signal-yo,
+  :persist? false,
+  :type :clojure,
+  :default -1,
+  :data (+ 5 5)}}

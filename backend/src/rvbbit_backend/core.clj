@@ -42,12 +42,12 @@
    [rvbbit-backend.surveyor :as surveyor]
    [rvbbit-backend.sql :as sql :refer [sql-exec sql-query sql-query-meta sql-query-one system-db flows-db insert-error-row! to-sql pool-create]]
    [clojure.math.combinatorics :as combo]
-   [metrics.jvm.core :refer [instrument-jvm]]
-   [metrics.core :refer [new-registry]]
-   [metrics.gauges :refer [gauge-fn gauge]]
-   [metrics.timers :refer [timer]]
-   [metrics.reporters.csv :as csv]
-   [rvbbit-backend.instrument :as instrument]
+   ;[metrics.jvm.core :refer [instrument-jvm]]
+   ;[metrics.core :refer [new-registry]]
+   ;[metrics.gauges :refer [gauge-fn gauge]]
+   ;[metrics.timers :refer [timer]]
+   ;[metrics.reporters.csv :as csv]
+   ;[rvbbit-backend.instrument :as instrument]
    [clj-time.jdbc]
    [clj-http.client :as client]) ;; enables joda jdbc time returns
   (:import [java.util Date]
@@ -504,10 +504,10 @@
     (add-watch wss/solvers-atom :master-solver-def-watcher
                (fn [_ _ old-state new-state]
                  (ut/pp [:solvers-defs-changed :reloading....])
-             ;(wss/reload-signals-subs)
-                 ))
+                 (wss/reload-solver-subs)))
 
     (wss/reload-signals-subs) ;; run once on boot
+    (wss/reload-solver-subs) ;; run once on boot
     (update-all-screen-meta)
     (update-all-flow-meta)
 
@@ -1058,7 +1058,7 @@
     ;;                {:close-on-done? true :increment-id? false :flow-id "crow-flow-201a" :debug? false})
 
     (wss/schedule! [:minutes 20] "game-of-life-test1"
-                   {:close-on-done? true :increment-id? false :flow-id "game-of-life-test1" :debug? false :overrides {:iterations-max 1000 :tick-delay-ms 1000}})
+                   {:close-on-done? true :increment-id? false :flow-id "game-of-life-test1" :debug? false :overrides {:iterations-max 1000 :tick-delay-ms 800}})
 
     (wss/schedule! [:minutes 30] "counting-loop"
                    {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
@@ -1114,7 +1114,7 @@
     ;;   @fut)
 
     (let [_ (ut/pp [:waiting-for-background-systems...])
-          _ (Thread/sleep 10000)
+          _ (Thread/sleep 13000) ;; 10 enough? want everything cranking before clients come online
           _ (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options))] ;; wut?
       (start-services)
 

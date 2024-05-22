@@ -494,9 +494,17 @@
          sver (fn [x] (cstr/replace (str x) ":" ""))
          item-type-str (sver item-type)
          item-type-key (keyword (str item-type-str "s-map"))
-         starting-data (cond (= item-type :signal) [:and [:= :day 1] [:= :hour 9]]
-                             (= item-type :solver) {:signal nil :body nil}
-                             :else {:flow-id nil :signal nil :overrides {}})
+         starting-data (cond (= item-type :signal)
+                             [:and [:= :day 1] [:= :hour 9]]
+                             (= item-type :solver)
+                             ;{:signal nil :body nil}
+                             {:signal false
+                              :persist? false
+                              :type :clojure
+                              :default 0
+                              :data (+ 1 2 3)}
+                             :else
+                             {:flow-id nil :signal nil :overrides {}})
          kp (if (= item-type :signal)
               [:signals-map signal-name :signal]
               [item-type-key signal-name])]

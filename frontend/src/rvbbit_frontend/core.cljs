@@ -102,7 +102,7 @@
                   ;[[::bricks/change-drop-type] [{:keyCode 81}]] ; q
                   ;[[::bricks/change-drop-type] [{:keyCode 69}]] ; e
 
-                  [[::bricks/save] [{:keyCode 83 :shiftKey false :ctrlKey true}]]
+                  [[::bricks/save] [{:keyCode 83 :shiftKey false :ctrlKey true}]] ;; ctrl-s
 
                   [[::bricks/nudge-panel :up] [{:keyCode 87}]] ; w
                   [[::bricks/nudge-panel :down] [{:keyCode 83}]] ; s
@@ -194,10 +194,10 @@
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
       :dispatch-event-on-start? false}
 
-    ;;  {:interval                 30
-    ;;   :event                    [::bricks/take-screenshot]
-    ;;   :poll-when                [::bricks/is-mouse-active?]
-    ;;   :dispatch-event-on-start? false}
+     {:interval                 30 ;;;; ?????
+      :event                    [::bricks/take-screenshot]
+      :poll-when                [::bricks/is-mouse-active?]
+      :dispatch-event-on-start? false}
 
      {:interval                 5
       :event                    [::bricks/update-flow-statuses]
