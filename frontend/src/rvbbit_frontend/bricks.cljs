@@ -11253,7 +11253,7 @@
         has-drops? (boolean (some obody-key-set all-drops)) ;; faster?
         ;;_ (tap> [:all-drops all-drops has-drops? panel-key])
         ;pre-body               body
-        _ (when (= panel-key :block-1774) (tap> [:prebody selected-view body]))
+        ;; _ (when (= panel-key :block-1774) (tap> [:prebody selected-view body]))
         body                   (cond->> body
                                  true (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
                                     ;;(walk/postwalk-replace walk-map) ;;; moved up from after like 6470 - 10/17/23
@@ -11314,7 +11314,7 @@
         ;body (walk/postwalk-replace drop-walks body)
         body                   (walk/postwalk-replace walk-map body)
 
-        _ (when (= panel-key :block-1774) (tap> [:postbody selected-view body]))
+        ;; _ (when (= panel-key :block-1774) (tap> [:postbody selected-view body]))
        ; _ (when (= panel-key :block-5474) (tap> [:postbody body]))
         ;; body (-> body
         ;;          =-walk-map ;; test, needs to be first - "and" after... THEN if...
@@ -11877,7 +11877,7 @@
                  {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace-sub vv)})))}))
            new-h (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
-      ;;(tap> [:!!!!!!!panels-updated!!!!!! (get db :panels-hash) ppr new-h client-name])
+       (tap> [:!!!!!!!panels-pushed!!!!!! client-name (get db :panels-hash) ppr new-h])
        (conn/push-panels-to-server pp ppr client-name)
        (ut/dispatch-delay 2000 [::refresh-history-log])
        (assoc db :panels-hash new-h)) db)))
@@ -12180,8 +12180,7 @@
                          ;@(ut/tracked-subscribe [::all-roots-tab tab])
                          @(rfa/sub ::all-roots-tab tab)
                          ;@(ut/tracked-subscribe [::all-roots])
-                         @(rfa/sub ::all-roots)
-                         )
+                         @(rfa/sub ::all-roots))
         audio-playing? @(ut/tracked-subscribe [::audio/audio-playing?])
         ;brick-roots @(ut/tracked-subscribe [::all-roots2 start-y end-y start-x end-x])
         ;diff-grid1 (cset/union (set brick-roots) (cset/difference (set current-grid) (set used-bricks)))
@@ -12193,8 +12192,9 @@
     ;(tap> [:something-running? @(ut/tracked-subscribe [::something-running?])])
 
     (when (not @on-scrubber?) ;true ; external?
-      (doall (when (not (= panels-hash2 panels-hash1))  ;; core update for blind backend updating / external editing 2-way
-               (ut/tracked-dispatch [::update-panels-hash]))))
+      (when (not (= panels-hash2 panels-hash1))  ;; core update for blind backend updating / external editing 2-way
+        (ut/tracked-dispatch [::update-panels-hash])))
+    
     ;; ^^  TODO should this be at the honeycomb level instead? grid is one hell of a tick to key off of... feels overly sledgehammer-y.
 
 
@@ -12264,7 +12264,7 @@
                          editor?             @(rfa/sub ::editor?)
                          hover-q?            (if (and editor? root?)
                                                (or @(ut/tracked-subscribe [::has-query? brick-vec-key
-                                                                         (try (nth @param-hover 1) (catch :default _ nil))])
+                                                                           (try (nth @param-hover 1) (catch :default _ nil))])
                                                    @(ut/tracked-subscribe [::has-query? brick-vec-key @query-hover])
                                                    (and (= @query-hover brick-vec-key) (= @db/item-browser-mode :blocks))) false)
                           ;;editor-panel? false ; (true? (some #(= brick-vec-key %) editor-keys))
@@ -12284,7 +12284,7 @@
                                                   editor?
                                                   (= @db/editor-mode :vvv))
                          ;current-tab         @(ut/tracked-subscribe [::selected-tab])
-                         ghosted?            (rs @(ut/tracked-subscribe [::ghosted? brick-vec-key]) brick-vec-key)    
+                         ghosted?            (rs @(ut/tracked-subscribe [::ghosted? brick-vec-key]) brick-vec-key)
                          no-ui?              (or (rs @(ut/tracked-subscribe [::no-ui? brick-vec-key]) brick-vec-key) (not (nil? tab)))
                          hidden?             (rs @(ut/tracked-subscribe [::hidden? brick-vec-key]) brick-vec-key)
                          minimized?          (rs @(ut/tracked-subscribe [::minimized? brick-vec-key]) brick-vec-key)
@@ -12560,7 +12560,7 @@
                                         ;     (not selected?)
                                         ;     (not no-ui?))
                                        (or (and (not ghosted?) (not no-ui?)) selected?)
-                                       ^{:key (str "brick-" brick-vec "-header1")}
+                                        ^{:key (str "brick-" brick-vec "-header1")}
                                         [re-com/h-box
                                       ;;  :attr
                                       ;;  (when selected?
@@ -12687,7 +12687,7 @@
                                                                      :on-click #(do (ut/tracked-dispatch [::toggle-pin-block brick-vec-key])
                                                                                   ;(ut/tracked-dispatch [::select-block "none!"])
                                                                                     ;(do)
-                                                                                    ) ;(reset! over-block? false)
+) ;(reset! over-block? false)
                                                                                       ;(ut/tracked-dispatch [::conn/click-parameter [:user-sys] nil])
 
                                                                      :style {:font-size "15px"
@@ -12775,9 +12775,8 @@
                                          (if @dragging-block ;; @dragging? ;; dragging-block 
                                            [re-com/box :child " "]
                                            [rc/catch (if viz-reco?
-                                                     [honeycomb brick-vec-key selected-view]
-                                                     [honeycomb brick-vec-key])])
-                                         )]
+                                                       [honeycomb brick-vec-key selected-view]
+                                                       [honeycomb brick-vec-key])]))]
                                                    ;(honeycomb brick-vec-key)
 
 
@@ -12836,7 +12835,7 @@
 
                                                                                            param-keyword [(keyword (str "param/" (ut/unkeyword s)))]
                                                                                            is-param?      ;@(ut/tracked-subscribe [::conn/clicked-parameter-key param-keyword])
-                                                                                                          @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath param-keyword})
+                                                                                           @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath param-keyword})
                                                                                            param-dtype (when is-param?
                                                                                                          (ut/data-typer
                                                                                                         ;@(ut/tracked-subscribe [::conn/clicked-parameter-key param-keyword])
@@ -12936,10 +12935,9 @@
                                                                                                                             (clear-preview2-recos)
                                                                                                                             (ut/tracked-dispatch [::select-view brick-vec-key (if (= s base-view-name) nil s)])
                                                                                                                             (reset! mad-libs-view (if (= s @mad-libs-view) nil s))
-                                                                                                                            (when (not (= s 
+                                                                                                                            (when (not (= s
                                                                                                                                           ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [:viz-tables-sys2/table_name]])
-                                                                                                                                          @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [:viz-tables-sys2/table_name]})
-                                                                                                                                          ))
+                                                                                                                                          @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [:viz-tables-sys2/table_name]})))
                                                                                                                               (ut/tracked-dispatch [::conn/click-parameter [:viz-tables-sys2 :table_name] s])))
                                                                                                           ;(when (= s @mad-libs-view)
                                                                                                           ;  (clear-preview2-recos))

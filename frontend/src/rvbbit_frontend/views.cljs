@@ -2939,7 +2939,7 @@
                   :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
               [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
-         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client]))
+         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client nil]))
          new-h (hash pp-without-fs)
          client-name (get db :client-name)
          ]
@@ -2965,7 +2965,7 @@
                    [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
          ;;pp-without-fs (ut/remove-keys pp (map first fs))
-         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client]))
+         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client nil]))
          ]
      (hash pp-without-fs)))) ;; was :param
 

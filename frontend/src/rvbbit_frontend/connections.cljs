@@ -720,7 +720,7 @@
 (re-frame/reg-event-db
  ::click-parameter
  (fn [db [_ keypath value]]
-   ;(tap> [:click-parameter keypath value])
+   ;;(tap> [:click-parameter keypath value])
    (let [cc (get-in db (cons :click-param keypath))]
      (assoc-in db (cons :click-param keypath)
                (if (and (not (= (first keypath) :param)) (= cc value)) ;; unset to nil if same value UNLESS is a user param... (breaks open-input UI)
