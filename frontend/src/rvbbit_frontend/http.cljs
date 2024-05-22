@@ -802,6 +802,7 @@
          request {:image image
                   :session (ut/deselect-keys db compund-keys)
                   :client-name client-name}]
+     (tap> [:save-snap! (get db :client-name)])
      ;(tap> [:save-flow request])
      {:db   (assoc-in db [:http-reqs :save-snap]
                       {:status "running"
@@ -825,6 +826,7 @@
  ::failure-http-save-screen-snap
  (fn [db [_]]
    (let [old-status (get-in db [:http-reqs :save-screen-snap])]
+     (tap> [:saving-screen-snap-for (get db :client-name)])
      (assoc-in db [:http-reqs :save-screen-snap] ; comp key from ::get-http-data
                (merge old-status
                       {:status "failed"
@@ -847,7 +849,7 @@
          screen-name (get db :screen-name)
          request {:image image
                   :screen-name screen-name}]
-     (tap> [:save-screen-snap!])
+     (tap> [:save-screen-snap! (get db :client-name) screen-name])
      {:db   (assoc-in db [:http-reqs :save-screen-snap]
                       {:status "running"
                        :url url

@@ -1,13 +1,15 @@
 {:orders
  {:reco-counts [:table_name :cnt],
-  :blocks-sys
-  [:block_key :block_name :queries :views :block_data :view_names :query_names],
-  :files-sys [:file_path :screen_name :blocks :queries :ts]},
+  :connections-sys [:database_name :connection_id],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :fields-sys [:field_name :field_type :data_type]},
  :reco-preview nil,
  :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
  :sql-source {},
  :meta
- {:blocks-sys {:fields {}, :rowcount 0},
+ {:fields-sys {:fields {}, :rowcount 0},
+  :tables-sys {:fields {}, :rowcount 0},
   :gen-viz-797
   {:fields
    {:rows
@@ -23,44 +25,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :files-sys
-  {:fields
-   {:file_path
-    {:data-type "string",
-     :distinct 161,
-     :group-by? true,
-     :commons
-     {"./screens/weave-test122.edn" 1,
-      "./screens/nightcity-cape-cod.edn" 1,
-      "./screens/counting-lord-of-the-woods.edn" 1},
-     :cardinality 100},
-    :screen_name
-    {:data-type "string",
-     :distinct 154,
-     :group-by? true,
-     :commons
-     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
-     :cardinality 95},
-    :blocks
-    {:data-type "integer",
-     :distinct 49,
-     :group-by? true,
-     :commons {3 45, 12 6, 6 6},
-     :cardinality 30},
-    :queries
-    {:data-type "integer",
-     :distinct 34,
-     :group-by? true,
-     :commons {0 53, 5 13, 11 9},
-     :cardinality 21},
-    :ts
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"2024-05-22 00:23:59" 51, "2024-05-22 00:24:00" 45, "2024-05-22 00:23:58" 32},
-     :cardinality 3}},
-   :rowcount 161},
   :gen-viz-94
   {:fields
    {:diff
@@ -109,6 +73,21 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -245,17 +224,15 @@
  :default-col-widths
  {:system-connections-list* {:connections-sys 111},
   :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf},
-  :files-list* {:files-sys 178},
-  :blocks-list* {:blocks-sys ##Inf}},
+  :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
- :data-hash 799746052,
+ :data-hash -1292778655,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"],
- :selected-cols {},
+ :selected-cols nil,
  :server
  {:settings
   {:harvest-on-boot? true,
@@ -465,34 +442,68 @@
     "wow-board"],
    :openapi-key "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"}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [365054883 286391199 4294705152],
+ :memory [256299254 219746846 2172649472],
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-22 00:36:51",
+      :at "2024-05-22 01:36:51",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
+    :reco-count nil}},
+  :file-change
+  {:file-changed
+   {:data
+    [{:path
+      "./live/ready-globular-mallard-37/star-shaped wallaby/block-3341/block-3341.edn",
+      :type :modify,
+      :panel-key nil,
+      :block-data
+      {:block-3341 {:h 4, :w 30, :root [1 38], :selected-view :hi},
+       :views
+       {:stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}],
+        :hi
+        [:box
+         :align
+         :center
+         :justify
+         :center
+         :attr
+         {:id ":block-3341.:hi"}
+         :style
+         {:font-size "90px",
+          :font-weight 700,
+          :padding-top "6px",
+          :padding-left "14px",
+          :margin-top "-8px",
+          :color :theme/editor-outer-rim-color,
+          :font-family :theme/base-font}
+         :child
+         [:string :time/now]]},
+       :tab "star-shaped wallaby",
+       :name "block-3341"}}
+     nil],
+    :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:flow/live-scratch-flow>*running?
-  :time/second
-  :time/minute
-  :time/hour
-  :flow/flow-forever>:final-math
-  :flow/flow-forever>*running?
+ [:time/second
   :time/now
-  :solver/wallpaper-of-the-moment],
- :client-name :virtuous-chartreuse-prairie-dog-38,
+  :flow/live-scratch-flow>*running?
+  :solver/wallpaper-of-the-moment
+  :time/hour
+  :time/minute
+  :flow/flow-forever>*running?
+  :flow/flow-forever>:final-math],
+ :client-name :ready-globular-mallard-37,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 1806, :h 1154},
+ :window {:w 1440, :h 812},
  :post-meta
  {:gen-viz-797 {:* {:rowcount 317}},
   :gen-viz-94 {:* {:rowcount 1}},
@@ -507,17 +518,19 @@
  :status
  {:heartbeat
   {:kick
-   [:flow/live-scratch-flow>*running?
-    :time/second
-    :time/minute
-    :time/hour
-    :flow/flow-forever>:final-math
-    :flow/flow-forever>*running?
+   [:time/second
     :time/now
-    :solver/wallpaper-of-the-moment]}},
+    :flow/live-scratch-flow>*running?
+    :solver/wallpaper-of-the-moment
+    :time/hour
+    :time/minute
+    :flow/flow-forever>*running?
+    :flow/flow-forever>:final-math]},
+  :file-change {:file-changed :done}},
  :screen-name "alarm-clock1",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
+ :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
@@ -528,31 +541,31 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   674
+   488
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :panels-hash -923288494,
+ :panels-hash -1733964046,
  :sessions
- (["truthful-apricot-donkey-42.edn" "1001 hours, 8 minutes, 50 seconds" 3604130479]
+ (["wholesome-salmon-peafowl-19.edn" "1 hour, 31 minutes, 41 seconds" 5501672]
+   ["truthful-apricot-donkey-42.edn" "1002 hours, 7 minutes, 30 seconds" 3607650033]
    ["wholesome-triangular-camel-12.edn"
-    "1004 hours, 51 minutes, 44 seconds"
-    3617504590]
-   ["easy-ochre-walrus-30.edn" "1004 hours, 57 minutes, 4 seconds" 3617824675]
-   ["light-icosahedral-wallaby-35.edn" "1007 hours, 27 seconds" 3625227280]
+    "1005 hours, 50 minutes, 24 seconds"
+    3621024144]
+   ["easy-ochre-walrus-30.edn" "1005 hours, 55 minutes, 44 seconds" 3621344229]
+   ["light-icosahedral-wallaby-35.edn"
+    "1007 hours, 59 minutes, 6 seconds"
+    3628746834]
+   ["meaningful-magenta-hog-18.edn" "1008 hours, 2 minutes, 48 seconds" 3628968630]
    ["stirring-triangular-hippopotamus-42.edn"
-    "1007 hours, 4 minutes, 15 seconds"
-    3625455724]
-   ["meaningful-magenta-hog-18.edn" "1007 hours, 4 minutes, 9 seconds" 3625449076]
+    "1008 hours, 2 minutes, 55 seconds"
+    3628975278]
    ["earnest-star-shaped-mouse-23.edn"
-    "1008 hours, 48 minutes, 24 seconds"
-    3631704598]
+    "1009 hours, 47 minutes, 4 seconds"
+    3635224152]
    ["legendary-prismatic-locust-27.edn"
-    "1008 hours, 8 minutes, 52 seconds"
-    3629332279]
-   ["engaging-bulbous-jellyfish-17.edn"
-    "1010 hours, 42 minutes, 47 seconds"
-    3638567144]),
+    "1009 hours, 7 minutes, 31 seconds"
+    3632851833]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
@@ -588,9 +601,10 @@
          random-file (first files)]
      (str rel-dir random-file))}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -306578324,
+ :user-params-hash -887433070,
  :grid-recos? true,
- :session-hash 2068283778,
+ :session-hash -97282701,
+ :no-ui? false,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -871,7 +885,7 @@
    :tab "sapphire ape"},
   :block-3341
   {:h 4,
-   :w 26,
+   :w 30,
    :root [1 38],
    :tab "star-shaped wallaby",
    :selected-view :hi,
@@ -1476,7 +1490,7 @@
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
   :param
-  {:selected-view [nil nil], :selected-view-data nil, :selected-block "none!"},
+  {:selected-view [nil nil], :selected-view-data nil, :selected-block :block-3341},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -1575,6 +1589,7 @@
    {:background-image [:string3 "url(" :solver/wallpaper-of-the-moment ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
+    :background-position "center",
     :background-color "#424f57"},
    :editor-font-color "#ffffff",
    :base-font "Nova Square",
@@ -1599,14 +1614,14 @@
   :time
   {:month-name "MAY",
    :day 4,
-   :hour 0,
-   :now "Wednesday, May 22nd 12:37AM",
-   :second 25,
+   :hour 1,
+   :now "Wednesday, May 22nd 1:36AM",
+   :second 52,
    :now-seconds "Wednesday, April 24 1:43:57PM",
    :nth "th",
    :month 4,
-   :minute 37},
-  :solver {:wallpaper-of-the-moment "./images/large/pink-dusk-falls-8k-4k.png"}},
+   :minute 36},
+  :solver
+  {:wallpaper-of-the-moment "./images/large/b64-image-46566-19751-4k.webp"}},
  :selected-flow "live-scratch-flow",
- :current-url "#/alarm-clock1",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

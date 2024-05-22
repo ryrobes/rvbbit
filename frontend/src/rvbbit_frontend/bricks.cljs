@@ -163,8 +163,15 @@
  ::take-screenshot
  (fn [db [_ & [save?]]]
    (let [element (js/document.getElementById "base-canvas")
-         session-hash (hash [(get db :panels)
-                             (get db :click-param)])]
+         ;session-hash (hash [(get db :panels)
+         ;                    (get db :click-param)])
+         fs (vec (for [kk (get db :flow-subs)
+                       :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
+                   [(keyword f1) (keyword f2)]))
+         session-hash (hash [(ut/remove-underscored (get db :panels))
+                             ;(get db :click-param)
+                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client nil]))])
+         ]
      ;(tap> [:pushed-snap? (get db :client-name)])
      (.then (html2canvas element)
             (fn [canvas]
@@ -197,8 +204,13 @@
 (re-frame/reg-sub
  ::is-mouse-active?
  (fn [db _]
-   (let [session-hash (hash [(get db :panels)
-                             (get db :click-param)])]
+   (let [fs (vec (for [kk (get db :flow-subs)
+                       :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
+                   [(keyword f1) (keyword f2)]))
+         session-hash (hash [(ut/remove-underscored (get db :panels))
+                             ;(get db :click-param)
+                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client nil]))
+                             ])]
      (and (not= session-hash (get db :session-hash))
           (not (true? (mouse-active-recently? 5)))))))
 
