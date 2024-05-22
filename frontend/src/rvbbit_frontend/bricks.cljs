@@ -370,6 +370,7 @@
                                             (cstr/starts-with? (str %) ":signal/")
                                             (cstr/starts-with? (str %) ":server/")
                                             (cstr/starts-with? (str %) ":ext-param/")
+                                            (cstr/starts-with? (str %) ":solver/")
                                             (cstr/starts-with? (str %) ":panel/")
                                             (cstr/starts-with? (str %) ":client/"))
                                        (filter keyword?

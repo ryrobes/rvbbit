@@ -349,7 +349,7 @@
 
 ;; (tap> [:packets-received-log [(count @packets-received-log) @packets-received] (frequencies @packets-received-log)])
 
-(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :panel :client})
+(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :panel :client})
 
 (re-frame/reg-event-db
  ::simple-response
@@ -386,6 +386,7 @@
                               ;;     (= (get-in result [:task-id 0]) :signal)
                               ;;     (= (get-in result [:task-id 0]) :server)
                               ;;     (= (get-in result [:task-id 0]) :ext-param)
+                              ;;     (= (get-in result [:task-id 0]) :solver)
                               ;;     (= (get-in result [:task-id 0]) :panel)
                               ;;     (= (get-in result [:task-id 0]) :client))
                               (contains? valid-task-ids (get-in result [:task-id 0])) ;; should be faster w set member check?

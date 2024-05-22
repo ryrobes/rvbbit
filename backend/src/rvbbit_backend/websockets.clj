@@ -3188,12 +3188,14 @@
         screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
         time?    (= base-type :time)
         signal?  (= base-type :signal)
+        solver?  (= base-type :solver)
         server?  (= base-type :server)]
     (cond status? flow-status
           tracker? flow-db/tracker
                               ;:else flow-db/results-atom
                               ;:else (get-or-create-child-atom (first keypath))
           signal? last-signals-atom ;; no need to split for now, will keep an eye on it
+          solver? last-solvers-atom ;; no need to split for now, will keep an eye on it - besides, there is not "natural" keypath split ATM..
           server? server-atom ;; no need to split for now, will keep an eye on it - don't expect LOTS of writes... but who knows
           time?   time-atom ;; zero need to split ever. lol, its like 6 keys
           panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
@@ -3225,9 +3227,11 @@
         screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
         time?    (= base-type :time)
         signal?  (= base-type :signal)
+        solver?  (= base-type :solver)
         server?  (= base-type :server)
         keypath  (cond ;flow? keypath 
                    signal? (vec (rest keypath))
+                   solver? (vec (rest keypath))
                    time?   (vec (rest keypath))
                    server? (vec (rest keypath))
                    screen? (vec (rest sub-path))
@@ -3243,8 +3247,9 @@
                             tracker? flow-db/tracker
                             ;:else flow-db/results-atom
                             ;:else (get-or-create-child-atom (first keypath))
-                            signal? last-signals-atom ;; no need to split for now, will keep an eye on it
-                            server? server-atom ;; no need to split for now, will keep an eye on it - don't expect LOTS of writes... but who knows
+                            signal? last-signals-atom ;; no need to split for now, will keep an eye on it - besides there is not natural parent key "work" distribution like others
+                            solver? last-solvers-atom ;; no need to split for now, will keep an eye on it - besides there is not natural parent key "work" distribution like others
+                            server? server-atom ;; no need to split for now, will keep an eye on it - I don't expect LOTS of writes... but who knows
                             time?   time-atom ;; zero need to split ever. lol, its like 6 keys
                             panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                             client? (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
@@ -3289,9 +3294,11 @@
              screen?  (= base-type :screen) ;; (cstr/starts-with? (str flow-key) ":screen/")
              time?    (= base-type :time)
              signal?  (= base-type :signal)
+             solver?  (= base-type :solver)
              server?  (= base-type :server)
              keypath  (cond ;flow? keypath 
                         signal? (vec (rest keypath))
+                        solver? (vec (rest keypath))
                         time?   (vec (rest keypath))
                         screen? (vec (rest sub-path))
                         server? (vec (rest sub-path))
@@ -3396,8 +3403,9 @@
         vdata (get solver-map :data -1)
         ttype (get solver-map :type :clojure)
         runner-map (get-in config/settings [:runners ttype] {})]
-    (when (= ttype :clojure)
-      (try 
+    
+    (when (= ttype :clojure) ;;; just for now until we get this shit dynamic ? or is this evergreen no matter what is listed in :runners? 
+      (try
         (let [repl-host nil
               repl-port nil
               output-full (evl/repl-eval vdata repl-host repl-port)
@@ -3409,14 +3417,13 @@
                               (assoc-in [:evald-result :values]
                                         (try (count (last (get-in output-full [:evald-result :value])))
                                              (catch Exception _ 0))))]
-          (ut/pp [:SOLVER-REPL {:output output :output-full output-full}])
+          (ut/pp [:running-solver solver-name {:output output :output-full output-full}])
           (swap! last-solvers-atom assoc solver-name output)
           (swap! last-solvers-atom-meta assoc solver-name output-full))
-        
-        (catch Throwable e 
+
+        (catch Throwable e
           (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name])
-              (swap! last-solvers-atom-meta assoc solver-name {:runner-error (str e)})))))
-    (swap! last-solvers-atom assoc solver-name (rand-int 123))))
+              (swap! last-solvers-atom-meta assoc solver-name {:runner-error (str e)})))))))
 
 (defn process-signal [signal-name & [solver-dep?]]
   (doall
@@ -3484,7 +3491,7 @@
                                                (doseq [[sk sv] @solvers-atom
                                                        :when (or (= (get sv :signal) kk)
                                                                  (= (get sv :signal) (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
-                                                 (ut/pp [:running-solver! sk :dep-met kk])
+                                                 ;(ut/pp [:running-solver! sk :dep-met kk])
                                                  (run-solver sk)))
                                            _ (swap! last-signals-atom-stamp assoc kk nowah)]]
                                  {[kk vv] result}))]
@@ -3622,7 +3629,7 @@
 
    (if (not signal?)
      (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)
-     (do (ut/pp [:signal-or-solver base-type keypath client-name])
+     (do ;;(ut/pp [:signal-or-solver base-type keypath client-name])
          (process-signals-reaction base-type keypath new-value client-param-path))
      )))
 
@@ -3758,6 +3765,7 @@
   (cond (cstr/includes? (str flow-key) "*running?") false
         (= base-type :time)   client-param-path
         (= base-type :signal) client-param-path
+        (= base-type :solver) client-param-path
         (= base-type :server) client-param-path
         (= base-type :screen) (vec (rest sub-path))
         (= base-type :client) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -3831,6 +3839,7 @@
             (cond (cstr/includes? (str flow-key) "*running?") false
                   (= base-type :time)   (get @time-atom client-param-path)
                   (= base-type :signal) (get @last-signals-atom client-param-path)
+                  (= base-type :solver) (get @last-solvers-atom client-param-path)
                   (= base-type :server) (get @server-atom client-param-path lv)
                   (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
                   (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)

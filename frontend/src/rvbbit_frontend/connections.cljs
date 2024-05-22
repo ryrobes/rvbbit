@@ -349,11 +349,11 @@
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
         ;;                                        (walk/postwalk-replace logic-kps obody)))
 
-          ;; string-walk            (fn [num obody] (let [kps       (ut/extract-patterns obody :string num)
-          ;;                                              logic-kps (into {} (for [v kps]
-          ;;                                                                   (let [[_ & this] v]
-          ;;                                                                     {v (apply str this)})))]
-          ;;                                          (walk/postwalk-replace logic-kps obody)))
+          string-walk            (fn [num obody] (let [kps       (ut/extract-patterns obody :string3 num)
+                                                       logic-kps (into {} (for [v kps]
+                                                                            (let [[_ & this] v]
+                                                                              {v (apply str this)})))]
+                                                   (walk/postwalk-replace logic-kps obody)))
 
           case-walk         (fn [obody] (let [kps       (ut/extract-patterns obody :case 2)
                                               logic-kps (into {} (for [v kps]
@@ -408,6 +408,13 @@
                           (ut/ne? value-walks) (walk/postwalk-replace value-walks)
                           (ut/ne? condi-walks) (walk/postwalk-replace condi-walks)
                           (ut/ne? workspace-params) (walk/postwalk-replace workspace-params)
+
+                          (has-fn? :string3) (string-walk 2) ;; TODO, remove all these extra string replacements and make a [:string & x] ver
+                          (has-fn? :string3) (string-walk 3)
+                          (has-fn? :string3) (string-walk 4)
+                          (has-fn? :string3) (string-walk 5)
+                          (has-fn? :string3) (string-walk 6) ;; TODO REMOVE ALL THIS FUCKERY - we already have a better way w &[args] mapping!
+
                           (has-fn? :=) =-walk-map2
                           (has-fn? :if) if-walk-map2
                           (has-fn? :when) when-walk-map2

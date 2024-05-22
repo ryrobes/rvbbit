@@ -29,11 +29,23 @@
  :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
  :exciting-cheetah-signal
  {:signal
-  [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
+  [:and [:> :time/day 1] [:= "cheese" "cheese"] [:= :time/hour 9]]},
  :genius-gnat-signal
  {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
  :dragging-to-potential-cross-breed?
  {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
+ :every-5-minutes {:signal [:or [:= :time/minute 0]
+                            [:= :time/minute 5]
+                            [:= :time/minute 10]
+                            [:= :time/minute 15]
+                            [:= :time/minute 20]
+                            [:= :time/minute 25]
+                            [:= :time/minute 30]
+                            [:= :time/minute 35]
+                            [:= :time/minute 40]
+                            [:= :time/minute 45]
+                            [:= :time/minute 50]
+                            [:= :time/minute 55]]},
  :special-lion-signal
  {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
  :optimistic-sheep-signal

@@ -1,14 +1,13 @@
 {:orders
  {:reco-counts [:table_name :cnt],
-  :fields-sys [:field_name :field_type :data_type],
-  :connections-sys [:database_name :connection_id],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
+  :blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
+  :files-sys [:file_path :screen_name :blocks :queries :ts]},
  :reco-preview nil,
+ :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
  :sql-source {},
  :meta
- {:fields-sys {:fields {}, :rowcount 0},
-  :tables-sys {:fields {}, :rowcount 0},
+ {:blocks-sys {:fields {}, :rowcount 0},
   :gen-viz-797
   {:fields
    {:rows
@@ -24,6 +23,44 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 161,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 154,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 95},
+    :blocks
+    {:data-type "integer",
+     :distinct 49,
+     :group-by? true,
+     :commons {3 45, 12 6, 6 6},
+     :cardinality 30},
+    :queries
+    {:data-type "integer",
+     :distinct 34,
+     :group-by? true,
+     :commons {0 53, 5 13, 11 9},
+     :cardinality 21},
+    :ts
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"2024-05-22 00:23:59" 51, "2024-05-22 00:24:00" 45, "2024-05-22 00:23:58" 32},
+     :cardinality 3}},
+   :rowcount 161},
   :gen-viz-94
   {:fields
    {:diff
@@ -72,21 +109,6 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -221,19 +243,19 @@
      :cardinality 83}},
    :rowcount 30}},
  :default-col-widths
- {:block-11262 {:new-query 153},
-  :block-4167 {:query-11824 211},
-  :system-connections-list* {:connections-sys 111},
+ {:system-connections-list* {:connections-sys 111},
   :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf}},
+  :system-fields-list* {:fields-sys ##Inf},
+  :files-list* {:files-sys 178},
+  :blocks-list* {:blocks-sys ##Inf}},
  :runstream-drops nil,
- :data-hash -1292778655,
+ :data-hash 799746052,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"],
- :selected-cols nil,
+ :selected-cols {},
  :server
  {:settings
   {:harvest-on-boot? true,
@@ -294,6 +316,7 @@
     "aaaaah-esday-the-day"
     "aaaaah-wednesday-the-day"
     "aaaah-wednesday-the-day"
+    "alarm-clock1"
     "alice-puzzle-1"
     "asdasdasdasd"
     "autumn-theme"
@@ -303,6 +326,9 @@
     "bigfoot-snapshots3"
     "blackberries"
     "blackberries2"
+    "blackberries3"
+    "blackberries3-narrow"
+    "blackberries3-narrow2"
     "blank-sizzle"
     "blank-sizzle2"
     "blue-pines"
@@ -335,12 +361,15 @@
     "error-monitor-vanessa"
     "error-monitor-vanessa2"
     "error-monitor-vanessa3"
+    "error-monitor-vanessa4"
+    "error-monitor-vanessa5"
     "evil-main-street"
     "fake-books-1"
     "fake-bricks"
     "fetching-pentagonal-termite-of-tghe-submarine-canyon"
     "final-fantasy-dorchester"
     "fox-hills"
+    "game-of-life"
     "glass-fish-board-test"
     "green-storm-city"
     "hue-board-1"
@@ -350,7 +379,12 @@
     "layout-test-12"
     "light-theme"
     "literal-data-test"
+    "looking-glass-conway"
     "looking-glass-redux"
+    "looking-glass-redux-conway2"
+    "looking-glass-redux-mix5"
+    "looking-glass-redux-viking"
+    "looking-glass-redux-viking2"
     "looking-glass-redux2"
     "looking-glass-redux23a"
     "looking-glass-redux23abb"
@@ -389,9 +423,11 @@
     "refresh-test"
     "retro-machines"
     "riffle-test"
+    "server-stats"
     "sick-of-your-shit"
     "sizzle-board-1"
     "sneaky-swamp-creatures1"
+    "solver-test"
     "stop-drawing-dead-dashboards"
     "swamp-nightgown"
     "swamp-reacher"
@@ -429,191 +465,34 @@
     "wow-board"],
    :openapi-key "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"}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [1890741465 1805218269 2172649472],
+ :memory [365054883 286391199 4294705152],
  :status-data
- {"kick-test!"
-  {:kick
-   {:data
-    [{:sent! "kick-test!",
-      :to :unreal-coral-fish-41,
-      :at "2024-05-04 23:59:42",
-      :payload
-      {:query-log
-       {:data
-        [{:content ["2024-05-04 23:59:42 - query ran in 0 ms."],
-          :name "query-log-:query-11824",
-          :order 1714881582,
-          :parameters {},
-          :forced-mutates {},
-          :step-mutates {}}],
-        :description "query-log-:query-11824",
-        :mutates {},
-        :options {:actions? false, :pages? false, :search? false},
-        :parameters {}}},
-      :payload-kp [:query-11824 "kick-test!"]}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  :heartbeat
+ {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-07 01:58:26",
+      :at "2024-05-22 00:36:51",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
-    :reco-count nil}},
-  :file-change
-  {:file-changed
-   {:data
-    [{:path
-      "./live/unreal-coral-fish-41/star-shaped wallaby/block-3341/block-3341.edn",
-      :type :modify,
-      :panel-key nil,
-      :block-data
-      {:block-3341 {:h 3, :w 21, :root [1 36], :selected-view :hi},
-       :views
-       {:stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}],
-        :hi
-        [:box
-         :align
-         :center
-         :justify
-         :center
-         :attr
-         {:id ":block-3341.:hi"}
-         :style
-         {:font-size "66px",
-          :font-weight 700,
-          :padding-top "6px",
-          :padding-left "14px",
-          :margin-top "-8px",
-          :color :theme/editor-outer-rim-color,
-          :font-family :theme/base-font}
-         :child
-         [:string :time/now]]},
-       :tab "star-shaped wallaby",
-       :name "block-3341"}}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  :alert1
-  {:alerts
-   {:data
-    [[[:>
-       :ResponsiveContainer
-       {:width "100%", :height :panel-height+50}
-       [:>
-        :ComposedChart
-        {:data
-         [{:mem 913, :tick 257, :threads 109, :subs 65, :load 1.462890625}
-          {:mem 1932, :tick 258, :threads 111, :subs 65, :load 1.43359375}
-          {:mem 1433, :tick 259, :threads 111, :subs 65, :load 1.56982421875}
-          {:mem 906, :tick 260, :threads 111, :subs 65, :load 1.97265625}
-          {:mem 1939, :tick 261, :threads 114, :subs 65, :load 2.22314453125}
-          {:mem 1419, :tick 262, :threads 116, :subs 65, :load 2.37353515625}
-          {:mem 867, :tick 263, :threads 115, :subs 65, :load 2.33251953125}
-          {:mem 1854, :tick 264, :threads 118, :subs 65, :load 2.35107421875}
-          {:mem 1737, :tick 265, :threads 129, :subs 65, :load 2.30419921875}
-          {:mem 1658, :tick 266, :threads 128, :subs 65, :load 2.8896484375}
-          {:mem 1553, :tick 267, :threads 128, :subs 65, :load 2.92236328125}
-          {:mem 1404, :tick 268, :threads 125, :subs 65, :load 2.64453125}
-          {:mem 1246, :tick 269, :threads 129, :subs 65, :load 2.9345703125}
-          {:mem 1373, :tick 270, :threads 130, :subs 65, :load 3.2841796875}
-          {:mem 956, :tick 271, :threads 124, :subs 65, :load 3.2529296875}
-          {:mem 1366, :tick 272, :threads 130, :subs 65, :load 2.8369140625}
-          {:mem 1183, :tick 273, :threads 130, :subs 65, :load 2.74755859375}
-          {:mem 1585, :tick 274, :threads 125, :subs 65, :load 3.31591796875}
-          {:mem 2037, :tick 275, :threads 130, :subs 65, :load 3.2998046875}
-          {:mem 1654, :tick 276, :threads 126, :subs 65, :load 2.55322265625}
-          {:mem 1145, :tick 277, :threads 109, :subs 65, :load 2.15625}
-          {:mem 2107, :tick 278, :threads 112, :subs 65, :load 1.9130859375}
-          {:mem 1645, :tick 279, :threads 112, :subs 65, :load 1.712890625}
-          {:mem 1204, :tick 280, :threads 114, :subs 65, :load 1.65234375}
-          {:mem 2199, :tick 281, :threads 115, :subs 65, :load 1.34130859375}
-          {:mem 1707, :tick 282, :threads 115, :subs 65, :load 1.50244140625}
-          {:mem 1157, :tick 283, :threads 113, :subs 65, :load 1.52392578125}
-          {:mem 2132, :tick 284, :threads 115, :subs 65, :load 1.31640625}
-          {:mem 2007, :tick 285, :threads 125, :subs 65, :load 3.4052734375}
-          {:mem 2089, :tick 286, :threads 122, :subs 65, :load 4.341796875}
-          {:mem 2042, :tick 287, :threads 123, :subs 65, :load 4.998046875}
-          {:mem 1517, :tick 288, :threads 126, :subs 65, :load 4.017578125}
-          {:mem 966, :tick 289, :threads 125, :subs 65, :load 2.82763671875}
-          {:mem 2098, :tick 290, :threads 112, :subs 65, :load 2.1689453125}
-          {:mem 1766, :tick 291, :threads 112, :subs 65, :load 1.70654296875}
-          {:mem 1353, :tick 292, :threads 114, :subs 65, :load 1.58740234375}
-          {:mem 1034, :tick 293, :threads 113, :subs 65, :load 1.61328125}
-          {:mem 2067, :tick 294, :threads 118, :subs 65, :load 1.4189453125}
-          {:mem 1649, :tick 295, :threads 128, :subs 65, :load 1.37744140625}
-          {:mem 1277, :tick 296, :threads 124, :subs 65, :load 1.34326171875}
-          {:mem 916, :tick 297, :threads 118, :subs 65, :load 1.20703125}
-          {:mem 2010, :tick 298, :threads 113, :subs 65, :load 1.474609375}
-          {:mem 2101, :tick 299, :threads 119, :subs 65, :load 1.708984375}
-          {:mem 2165, :tick 300, :threads 131, :subs 65, :load 2.49853515625}
-          {:mem 1320, :tick 301, :threads 132, :subs 65, :load 2.02734375}
-          {:mem 936, :tick 302, :threads 118, :subs 65, :load 2.248046875}
-          {:mem 2095, :tick 303, :threads 114, :subs 65, :load 2.9580078125}
-          {:mem 1783, :tick 304, :threads 111, :subs 65, :load 2.78564453125}
-          {:mem 1838, :tick 305, :threads 122, :subs 65, :load 3.150390625}
-          {:mem 2193, :tick 306, :threads 123, :subs 65, :load 3.708984375}],
-         :margin {:top 5, :bottom 5, :right 30, :left 20}}
-        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
-        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
-        [:> :XAxis {:dataKey :tick, :hide true}]
-        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
-        [:>
-         :YAxis
-         {:yAxisId "right", :hide true, :dataKey :threads, :orientation "right"}]
-        [:>
-         :Bar
-         {:yAxisId "left",
-          :dataKey :mem,
-          :isAnimationActive false,
-          :stroke :theme/editor-outer-rim-color,
-          :fill [:string :theme/editor-outer-rim-color "33"]}]
-        [:>
-         :Line
-         {:yAxisId "right",
-          :strokeWidth 4,
-          :type "monotone",
-          :dot false,
-          :dataKey :threads,
-          :isAnimationActive false,
-          :stroke :theme/editor-grid-selected-background-color,
-          :fill :theme/editor-grid-selected-background-color}]
-        [:>
-         :Line
-         {:stroke :theme/block-tab-selected-font-color,
-          :fill :theme/block-tab-selected-font-color,
-          :type "monotone",
-          :yAxisId "right",
-          :dataKey :subs,
-          :strokeWidth 3,
-          :strokeDasharray "5 5",
-          :dot false,
-          :isAnimationActive false}]]]
-      10
-      4
-      5]
-     nil],
-    :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:time/minute
-  :time/hour
+ [:flow/live-scratch-flow>*running?
   :time/second
-  :flow/live-scratch-flow>*running?
-  :time/now
+  :time/minute
+  :time/hour
+  :flow/flow-forever>:final-math
   :flow/flow-forever>*running?
-  :flow/flow-forever>:final-math],
- :client-name :unreal-coral-fish-41,
+  :time/now
+  :solver/wallpaper-of-the-moment],
+ :client-name :virtuous-chartreuse-prairie-dog-38,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2880, :h 1624},
+ :window {:w 1806, :h 1154},
  :post-meta
  {:gen-viz-797 {:* {:rowcount 317}},
   :gen-viz-94 {:* {:rowcount 1}},
@@ -625,122 +504,93 @@
   :city-drag-26 {:* {:rowcount 19899}},
   :state-drag-3 {:* {:rowcount 68}},
   :shape-drag-7 {:* {:rowcount 30}}},
- :flow-estimates
- {"openai-image-gen-ladder"
-  {:times 43, :run-id "a4b6f208-15ab-4d23-9da6-6fd35b49f13d"},
-  "counting-loop" {:times 6, :run-id "ad2ff0c0-dc50-4711-8286-8b9962868081"}},
  :status
- {"kick-test!" {:kick :query-11824},
-  :heartbeat
+ {:heartbeat
   {:kick
-   [:time/minute
-    :time/hour
+   [:flow/live-scratch-flow>*running?
     :time/second
-    :flow/live-scratch-flow>*running?
-    :time/now
+    :time/minute
+    :time/hour
+    :flow/flow-forever>:final-math
     :flow/flow-forever>*running?
-    :flow/flow-forever>:final-math]},
-  :file-change {:file-changed :done},
-  :alert1 {:alerts :alert2}},
+    :time/now
+    :solver/wallpaper-of-the-moment]}},
  :screen-name "alarm-clock1",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
- :alerts [],
+ :alerts
+ [[[:box
+    :child
+    "sent screen save request to server... Please wait."
+    :style
+    {:font-size "12px", :opacity 0.66}]
+   11
+   0.5
+   674
+   1100038046]],
  :recos-page 0,
- :repl-output
- {:new-query
-  {:ns "rabbit-board.user",
-   :value
-   [[{:row_id 0, :type "pizza", :name "row 0"}
-     {:row_id 1, :type "pizza", :name "row 1"}
-     {:row_id 2, :type "dog", :name "row 2"}
-     {:row_id 3, :type "cat", :name "row 3"}
-     {:row_id 4, :type "pizza", :name "row 4"}
-     {:row_id 5, :type "dog", :name "row 5"}
-     {:row_id 6, :type "cat", :name "row 6"}
-     {:row_id 7, :type "cat", :name "row 7"}
-     {:row_id 8, :type "cat", :name "row 8"}
-     {:row_id 9, :type "pizza", :name "row 9"}
-     {:row_id 10, :type "pizza", :name "row 10"}
-     {:row_id 11, :type "pizza", :name "row 11"}
-     {:row_id 12, :type "cat", :name "row 12"}
-     {:row_id 13, :type "dog", :name "row 13"}
-     {:row_id 14, :type "dog", :name "row 14"}
-     {:row_id 15, :type "cat", :name "row 15"}
-     {:row_id 16, :type "dog", :name "row 16"}
-     {:row_id 17, :type "pizza", :name "row 17"}
-     {:row_id 18, :type "cat", :name "row 18"}
-     {:row_id 19, :type "dog", :name "row 19"}
-     {:row_id 20, :type "pizza", :name "row 20"}
-     {:row_id 21, :type "pizza", :name "row 21"}
-     {:row_id 22, :type "pizza", :name "row 22"}
-     {:row_id 23, :type "cat", :name "row 23"}
-     {:row_id 24, :type "cat", :name "row 24"}
-     {:row_id 25, :type "dog", :name "row 25"}
-     {:row_id 26, :type "dog", :name "row 26"}
-     {:row_id 27, :type "dog", :name "row 27"}
-     {:row_id 28, :type "dog", :name "row 28"}
-     {:row_id 29, :type "cat", :name "row 29"}
-     {:row_id 30, :type "cat", :name "row 30"}
-     {:row_id 31, :type "pizza", :name "row 31"}
-     {:row_id 32, :type "dog", :name "row 32"}
-     {:row_id 33, :type "dog", :name "row 33"}
-     {:row_id 34, :type "dog", :name "row 34"}
-     {:row_id 35, :type "pizza", :name "row 35"}
-     {:row_id 36, :type "pizza", :name "row 36"}
-     {:row_id 37, :type "dog", :name "row 37"}
-     {:row_id 38, :type "cat", :name "row 38"}
-     {:row_id 39, :type "dog", :name "row 39"}
-     {:row_id 40, :type "cat", :name "row 40"}
-     {:row_id 41, :type "dog", :name "row 41"}
-     {:row_id 42, :type "cat", :name "row 42"}
-     {:row_id 43, :type "pizza", :name "row 43"}
-     {:row_id 44, :type "dog", :name "row 44"}
-     {:row_id 45, :type "pizza", :name "row 45"}
-     {:row_id 46, :type "pizza", :name "row 46"}
-     {:row_id 47, :type "cat", :name "row 47"}
-     {:row_id 48, :type "pizza", :name "row 48"}
-     {:row_id 49, :type "cat", :name "row 49"}]],
-   :status #{"done"},
-   :meta {:nrepl-conn {:host "127.0.0.1", :port 8181}},
-   :out [""],
-   :output-lines 0,
-   :values 4435}},
  :rs-overrides-hashmap {"flow-forever" nil},
  :panels-hash -923288494,
  :sessions
- (["remarkable-rectangular-armadillo-exiled-from-pingo.edn"
-   "1008 hours, 35 minutes, 33 seconds"
-   3630933584]
-   ["classic-icosahedral-gnat-of-salt-flat.edn"
-    "1009 hours, 28 minutes, 22 seconds"
-    3634102706]
-   ["fair-salmon-hawk-hailing-from-malpais.edn"
-    "1009 hours, 30 minutes, 57 seconds"
-    3634257554]
-   ["engaging-peach-pronghorn-of-the-impact-crater.edn"
-    "1009 hours, 31 minutes, 26 seconds"
-    3634286253]
-   ["worthy-amaranth-pheasant-exiled-from-fjord.edn"
-    "1009 hours, 43 minutes, 2 seconds"
-    3634982151]
-   ["favorable-rose-camel-hailing-from-hanging-valley.edn"
-    "1009 hours, 43 minutes, 4 seconds"
-    3634984023]
-   ["affirmative-thin-goat-hailing-from-cinder-cone.edn"
-    "1009 hours, 45 minutes, 34 seconds"
-    3635134298]
-   ["fetching-circular-fish-of-plunge-pool.edn"
-    "1009 hours, 59 minutes, 46 seconds"
-    3635986416]
-   ["poised-oval-wombat-of-the-oceanic-plateau.edn"
-    "1009 hours, 59 minutes, 59 seconds"
-    3635999460]),
+ (["truthful-apricot-donkey-42.edn" "1001 hours, 8 minutes, 50 seconds" 3604130479]
+   ["wholesome-triangular-camel-12.edn"
+    "1004 hours, 51 minutes, 44 seconds"
+    3617504590]
+   ["easy-ochre-walrus-30.edn" "1004 hours, 57 minutes, 4 seconds" 3617824675]
+   ["light-icosahedral-wallaby-35.edn" "1007 hours, 27 seconds" 3625227280]
+   ["stirring-triangular-hippopotamus-42.edn"
+    "1007 hours, 4 minutes, 15 seconds"
+    3625455724]
+   ["meaningful-magenta-hog-18.edn" "1007 hours, 4 minutes, 9 seconds" 3625449076]
+   ["earnest-star-shaped-mouse-23.edn"
+    "1008 hours, 48 minutes, 24 seconds"
+    3631704598]
+   ["legendary-prismatic-locust-27.edn"
+    "1008 hours, 8 minutes, 52 seconds"
+    3629332279]
+   ["engaging-bulbous-jellyfish-17.edn"
+    "1010 hours, 42 minutes, 47 seconds"
+    3638567144]),
+ :solvers-map
+ {:vibrant-antelope-solver
+  {:signal :signal/cool-raccoon-signal-yo,
+   :persist? false,
+   :type :clojure,
+   :default -1,
+   :data (+ 1 2 3 88)},
+  :dazzling-gnu-solver
+  {:signal :signal/hourly?,
+   :persist? false,
+   :type :clojure,
+   :default -1,
+   :data (+ 1 2 3 90)},
+  :polished-kangaroo-solver
+  {:signal :signal/genius-gnat-signal,
+   :persist? false,
+   :type :clojure,
+   :default -1,
+   :data (+ 1 2 3 50)},
+  :wallpaper-of-the-moment
+  {:signal :signal/every-5-minutes,
+   :persist? false,
+   :type :clojure,
+   :default -1,
+   :data
+   (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+         rel-dir "./images/large/"
+         files (->>
+                 (file-seq (clojure.java.io/file dir))
+                 (filter (fn [x] (.isFile x)))
+                 (map (fn [x] (.getName x)))
+                 (shuffle))
+         random-file (first files)]
+     (str rel-dir random-file))}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 2112471675,
+ :user-params-hash -306578324,
  :grid-recos? true,
+ :session-hash 2068283778,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1567,16 +1417,31 @@
       [:= :time/second 45]
       [:= :time/second 25]]]]},
   :worthy-fish-signal {:signal [:or [:= :time/hour 16] [:= 221 22]]},
-  :hourly? {:signal [:or [:changed? :time/hour] [:= :time/minute -1]]},
+  :hourly? {:signal [:or [:changed? :time/hour] [:<> :time/minute -1]]},
   :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
   :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
   :elegant-grasshopper-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
   :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
   :exciting-cheetah-signal
-  {:signal [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
+  {:signal [:and [:> :time/day 1] [:= "cheese" "cheese"] [:= :time/hour 9]]},
   :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
   :dragging-to-potential-cross-breed?
   {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
+  :every-5-minutes
+  {:signal
+   [:or
+    [:= :time/minute 0]
+    [:= :time/minute 5]
+    [:= :time/minute 10]
+    [:= :time/minute 15]
+    [:= :time/minute 20]
+    [:= :time/minute 25]
+    [:= :time/minute 30]
+    [:= :time/minute 35]
+    [:= :time/minute 40]
+    [:= :time/minute 45]
+    [:= :time/minute 50]
+    [:= :time/minute 55]]},
   :special-lion-signal
   {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
   :optimistic-sheep-signal
@@ -1607,7 +1472,7 @@
  {:flow
   {:crow-flow-201a>*running? false,
    :counting-loop>*running? false,
-   :flow-forever>final-math 683.5,
+   :flow-forever>final-math 663.5,
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
   :param
@@ -1707,7 +1572,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image "url(images/large/b64-image-98275-59630-4k.webp)",
+   {:background-image [:string3 "url(" :solver/wallpaper-of-the-moment ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-color "#424f57"},
@@ -1734,12 +1599,14 @@
   :time
   {:month-name "MAY",
    :day 4,
-   :hour 1,
-   :now "Tuesday, May 7th 1:58AM",
-   :second 41,
+   :hour 0,
+   :now "Wednesday, May 22nd 12:37AM",
+   :second 25,
    :now-seconds "Wednesday, April 24 1:43:57PM",
    :nth "th",
    :month 4,
-   :minute 58}},
+   :minute 37},
+  :solver {:wallpaper-of-the-moment "./images/large/pink-dusk-falls-8k-4k.png"}},
  :selected-flow "live-scratch-flow",
+ :current-url "#/alarm-clock1",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

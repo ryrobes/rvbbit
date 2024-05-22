@@ -16,9 +16,23 @@
   :type :clojure,
   :default -1,
   :data (+ 1 2 3 50)},
- :stupendous-termite-solver
- {:signal :signal/cool-raccoon-signal-yo,
+ :wallpaper-of-the-moment
+ {:signal :signal/every-5-minutes,
   :persist? false,
   :type :clojure,
   :default -1,
-  :data (+ 5 5)}}
+  :data
+  (let
+   [dir
+    "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+    rel-dir
+    "./images/large/"
+    files
+    (->>
+     (file-seq (clojure.java.io/file dir))
+     (filter (fn [x] (.isFile x)))
+     (map (fn [x] (.getName x)))
+     (shuffle))
+    random-file
+    (first files)]
+   (str rel-dir random-file))}}
