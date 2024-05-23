@@ -345,8 +345,9 @@
   
 (defn start-services []
   (ut/pp [:starting-services...])
-  
-  (evl/create-nrepl-server!)
+  (evl/create-nrepl-server!) ;; needs to start 
+  (wss/reload-signals-subs) ;; run once on boot
+  (wss/reload-solver-subs) ;; run once on boot (needs nrepl(s) to start first...)
   (wss/create-web-server!)
   (wss/create-websocket-server!)
   ;; (wss/start-websocket-server!)
@@ -359,7 +360,7 @@
   ;; (do (ut/pp [:STYING??!])
   ;;   (reset! wss/websocket-server (jetty/run-jetty wss/web-handler wss/ring-options))
   ;; (.start @wss/websocket-server))
-  (evl/create-nrepl-server!)
+  ;;(evl/create-nrepl-server!)
   )
 
 (defn delayed-start [ms f]
@@ -506,8 +507,8 @@
                  (ut/pp [:solvers-defs-changed :reloading....])
                  (wss/reload-solver-subs)))
 
-    (wss/reload-signals-subs) ;; run once on boot
-    (wss/reload-solver-subs) ;; run once on boot
+    ;; (wss/reload-signals-subs) ;; run once on boot
+    ;; (wss/reload-solver-subs) ;; run once on boot
     (update-all-screen-meta)
     (update-all-flow-meta)
 

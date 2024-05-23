@@ -170,7 +170,7 @@
                    [(keyword f1) (keyword f2)]))
          session-hash (hash [(ut/remove-underscored (get db :panels))
                              ;(get db :click-param)
-                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client nil]))])
+                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client :solver nil]))])
          ]
      ;(tap> [:pushed-snap? (get db :client-name)])
      (.then (html2canvas element)
@@ -209,7 +209,7 @@
                    [(keyword f1) (keyword f2)]))
          session-hash (hash [(ut/remove-underscored (get db :panels))
                              ;(get db :click-param)
-                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client nil]))
+                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client :solver nil]))
                              ])]
      (and (not= session-hash (get db :session-hash))
           (not (true? (mouse-active-recently? 5)))))))

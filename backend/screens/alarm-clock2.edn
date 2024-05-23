@@ -1,47 +1,232 @@
 {:orders
- {:reco-counts [:table_name :cnt],
-  :new-query [:row_id :type :name],
-  :connections-sys [:database_name :connection_id],
-  :fields-sys [:field_name :field_type :data_type],
+ {:fields-sys [:field_name :field_type :data_type],
   :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :gen-viz-797 [:rows :date_posted],
+  :gen-viz-94 [:diff],
+  :rowcnt-drag-2 [:rowcnt_sum],
+  :gen-viz-828 [:agg :date_posted],
+  :ufo_sightings (:query_error),
+  :gen-viz-84 [:rows :country],
+  :connections-sys [:database_name :connection_id],
+  :ufo-sightings-drag-9
+  [:city
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :latitude
+   :longitude
+   :shape
+   :state],
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :reco-counts [:table_name :cnt],
+  :state-drag-3 [:state :rowcnt],
+  :shape-drag-7 [:shape :rowcnt]},
  :reco-preview nil,
  :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
  :sql-source
- {:new-query
-  {:select [:*],
+ {:gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
    :from
-   [{:data
-     (vec
-       (for
-         [i (range 4435)]
-         {:row_id i,
-          :type (rand-nth ["cat" "dog" "pizza"]),
-          :name (str "row " i)}))}]}},
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]}},
  :meta
- {:fields-sys {:fields {}, :rowcount 0},
+ {:blocks-sys {:fields {}, :rowcount 0},
+  :fields-sys {:fields {}, :rowcount 0},
   :tables-sys {:fields {}, :rowcount 0},
-  :new-query
-  {:fields
-   {:row_id
-    {:data-type "integer",
-     :distinct 500,
-     :group-by? true,
-     :commons {84 1, 390 1, 49 1},
-     :cardinality 100},
-    :type
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"cat" 173, "dog" 164, "pizza" 163},
-     :cardinality 0},
-    :name
-    {:data-type "string",
-     :distinct 500,
-     :group-by? true,
-     :commons {"row 272" 1, "row 443" 1, "row 277" 1},
-     :cardinality 100}},
-   :rowcount 500},
   :gen-viz-797
   {:fields
    {:rows
@@ -57,13 +242,51 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 161,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 154,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 95},
+    :blocks
+    {:data-type "integer",
+     :distinct 49,
+     :group-by? true,
+     :commons {3 45, 12 6, 6 6},
+     :cardinality 30},
+    :queries
+    {:data-type "integer",
+     :distinct 34,
+     :group-by? true,
+     :commons {0 53, 5 13, 11 9},
+     :cardinality 21},
+    :ts
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"2024-05-22 00:23:59" 51, "2024-05-22 00:24:00" 45, "2024-05-22 00:23:58" 32},
+     :cardinality 3}},
+   :rowcount 161},
   :gen-viz-94
   {:fields
    {:diff
     {:data-type "unknown",
      :distinct 1,
      :group-by? false,
-     :commons {},
+     :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
   :rowcnt-drag-2
@@ -90,6 +313,18 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings)"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
   :gen-viz-84
   {:fields
    {:rows
@@ -150,7 +385,7 @@
     {:data-type "string",
      :distinct 45,
      :group-by? true,
-     :commons {"oh" 48, "tx" 39},
+     :commons {nil 120, "oh" 48, "tx" 39},
      :cardinality 9},
     :duration_seconds
     {:data-type "string",
@@ -189,7 +424,7 @@
     {:data-type "string",
      :distinct 6,
      :group-by? true,
-     :commons {"us" 288, "au" 37},
+     :commons {"us" 288, nil 113, "au" 37},
      :cardinality 1}},
    :rowcount 500},
   :duration-hours-drag-43
@@ -254,18 +489,23 @@
      :cardinality 83}},
    :rowcount 30}},
  :default-col-widths
- {:block-11262 {:new-query 153},
+ {:block-11609 {:city-drag-26 180},
+  :block-7416 {:rowcnt-drag-2 161},
+  :block-8805 {:duration-hours-drag-43 180},
   :system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf}},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-7319 {:shape-drag-7 180},
+  :block-3777 {:state-drag-3 180},
+  :block-1449 {:ufo-sightings-drag-9 141},
+  :system-tables-list* {:tables-sys ##Inf}},
  :runstream-drops nil,
- :data-hash -1639598169,
+ :data-hash 674119365,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"],
- :selected-cols nil,
+ :selected-cols {},
  :server
  {:settings
   {:harvest-on-boot? true,
@@ -327,6 +567,7 @@
     "aaaaah-wednesday-the-day"
     "aaaah-wednesday-the-day"
     "alarm-clock1"
+    "alarm-clock2"
     "alice-puzzle-1"
     "asdasdasdasd"
     "autumn-theme"
@@ -398,6 +639,7 @@
     "looking-glass-redux2"
     "looking-glass-redux23a"
     "looking-glass-redux23abb"
+    "looking-glass-redux23b"
     "looking-glass-redux2a"
     "looking-glass-redux2aa"
     "looking-glass-redux45"
@@ -477,52 +719,34 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [283721032 250794588 4294705152],
+ :memory [327942712 248471464 4294705152],
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-22 19:48:51",
+      :at "2024-05-23 15:09:35",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
-    :reco-count nil}},
-  :alert1
-  {:alerts
-   {:data
-    [[[:v-box
-       :justify
-       :center
-       :style
-       {:opacity 0.7}
-       :children
-       [[:box
-         :style
-         {:color :theme/editor-outer-rim-color, :font-weight 700}
-         :child
-         [:box :child "Heads up: R-V-B-B-I-T system going offline."]]]]
-      10
-      1
-      5]
-     nil],
-    :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:time/now
-  :flow/live-scratch-flow>*running?
-  :solver/wallpaper-of-the-moment
+ [:solver/wallpaper-of-the-moment
+  :time/second
+  :time/minute
+  :time/hour
+  :flow/flow-forever>*running?
+  :time/now
   :flow/flow-forever>:final-math
-  :flow/flow-forever>*running?],
- :client-name :vivacious-green-spider-21,
+  :flow/live-scratch-flow>*running?],
+ :client-name :restored-sangria-penguin-14,
  :flow-editor? true,
  :openai-api-key "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",
  :window {:w 2007, :h 1282},
  :post-meta
- {:new-query {:* {:rowcount 4435}},
-  :gen-viz-797 {:* {:rowcount 317}},
+ {:gen-viz-797 {:* {:rowcount 317}},
   :gen-viz-94 {:* {:rowcount 1}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
   :gen-viz-828 {:* {:rowcount 317}},
@@ -535,16 +759,17 @@
  :status
  {:heartbeat
   {:kick
-   [:time/now
-    :flow/live-scratch-flow>*running?
-    :solver/wallpaper-of-the-moment
+   [:solver/wallpaper-of-the-moment
+    :time/second
+    :time/minute
+    :time/hour
+    :flow/flow-forever>*running?
+    :time/now
     :flow/flow-forever>:final-math
-    :flow/flow-forever>*running?]},
-  :alert1 {:alerts :alert2}},
- :screen-name "solver-test",
+    :flow/live-scratch-flow>*running?]}},
+ :screen-name "alarm-clock2",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
- :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
@@ -555,80 +780,38 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   2644
+   100
    1100038046]],
  :recos-page 0,
- :repl-output
- {:new-query
-  {:ns "rabbit-board.user",
-   :value
-   [[{:row_id 0, :type "dog", :name "row 0"}
-     {:row_id 1, :type "cat", :name "row 1"}
-     {:row_id 2, :type "dog", :name "row 2"}
-     {:row_id 3, :type "cat", :name "row 3"}
-     {:row_id 4, :type "dog", :name "row 4"}
-     {:row_id 5, :type "pizza", :name "row 5"}
-     {:row_id 6, :type "cat", :name "row 6"}
-     {:row_id 7, :type "pizza", :name "row 7"}
-     {:row_id 8, :type "pizza", :name "row 8"}
-     {:row_id 9, :type "dog", :name "row 9"}
-     {:row_id 10, :type "cat", :name "row 10"}
-     {:row_id 11, :type "dog", :name "row 11"}
-     {:row_id 12, :type "dog", :name "row 12"}
-     {:row_id 13, :type "cat", :name "row 13"}
-     {:row_id 14, :type "cat", :name "row 14"}
-     {:row_id 15, :type "pizza", :name "row 15"}
-     {:row_id 16, :type "dog", :name "row 16"}
-     {:row_id 17, :type "pizza", :name "row 17"}
-     {:row_id 18, :type "cat", :name "row 18"}
-     {:row_id 19, :type "dog", :name "row 19"}
-     {:row_id 20, :type "cat", :name "row 20"}
-     {:row_id 21, :type "cat", :name "row 21"}
-     {:row_id 22, :type "pizza", :name "row 22"}
-     {:row_id 23, :type "dog", :name "row 23"}
-     {:row_id 24, :type "pizza", :name "row 24"}
-     {:row_id 25, :type "pizza", :name "row 25"}
-     {:row_id 26, :type "cat", :name "row 26"}
-     {:row_id 27, :type "pizza", :name "row 27"}
-     {:row_id 28, :type "cat", :name "row 28"}
-     {:row_id 29, :type "pizza", :name "row 29"}
-     {:row_id 30, :type "cat", :name "row 30"}
-     {:row_id 31, :type "pizza", :name "row 31"}
-     {:row_id 32, :type "dog", :name "row 32"}
-     {:row_id 33, :type "dog", :name "row 33"}
-     {:row_id 34, :type "dog", :name "row 34"}
-     {:row_id 35, :type "cat", :name "row 35"}
-     {:row_id 36, :type "cat", :name "row 36"}
-     {:row_id 37, :type "dog", :name "row 37"}
-     {:row_id 38, :type "cat", :name "row 38"}
-     {:row_id 39, :type "pizza", :name "row 39"}
-     {:row_id 40, :type "cat", :name "row 40"}
-     {:row_id 41, :type "cat", :name "row 41"}
-     {:row_id 42, :type "dog", :name "row 42"}
-     {:row_id 43, :type "cat", :name "row 43"}
-     {:row_id 44, :type "pizza", :name "row 44"}
-     {:row_id 45, :type "dog", :name "row 45"}
-     {:row_id 46, :type "dog", :name "row 46"}
-     {:row_id 47, :type "cat", :name "row 47"}
-     {:row_id 48, :type "pizza", :name "row 48"}
-     {:row_id 49, :type "cat", :name "row 49"}]],
-   :status #{"done"},
-   :meta {:nrepl-conn {:host "127.0.0.1", :port 8181}},
-   :out [""],
-   :output-lines 0,
-   :values 4435}},
  :rs-overrides-hashmap {"flow-forever" nil},
- :panels-hash 601801475,
+ :base-sniff-queries {:ufo_sightings 484893751},
+ :panels-hash -633919131,
  :sessions
- (["lovely-spring-bud-elephant-0.edn" "10 hours, 43 minutes, 52 seconds" 38632130]
-   ["growing-cerise-wolf-0.edn" "10 hours, 47 minutes, 53 seconds" 38873380]
-   ["enchanting-square-porpoise-4.edn" "10 minutes, 26 seconds" 626670]
-   ["ready-globular-mallard-37.edn" "10 minutes, 26 seconds" 626699]
-   ["truthful-cylindrical-hyena-16.edn" "10 minutes, 26 seconds" 626803]
-   ["stirring-hexagonal-fly-2.edn" "10 minutes, 27 seconds" 627343]
-   ["refined-cerise-wren-18.edn" "10 minutes, 28 seconds" 628406]
-   ["nurturing-coral-turkey-14.edn" "10 minutes, 29 seconds" 629370]
-   ["composed-plum-eel-37.edn" "10 minutes, 29 seconds" 629146]),
+ (["pretty-magenta-goat-24.edn" "1010 hours, 48 minutes, 16 seconds" 3638896655]
+   ["intuitive-amaranth-opossum-39.edn"
+    "1011 hours, 40 minutes, 49 seconds"
+    3642049878]
+   ["prominent-Persian-blue-hippopotamus-39.edn"
+    "1012 hours, 29 minutes, 31 seconds"
+    3644971124]
+   ["handsome-conical-pronghorn-24.edn"
+    "1017 hours, 28 minutes, 14 seconds"
+    3662894386]
+   ["beautiful-prismatic-ostrich-23.edn"
+    "1017 hours, 5 minutes, 33 seconds"
+    3661533139]
+   ["impressive-triangular-quail-2.edn"
+    "1018 hours, 11 minutes, 17 seconds"
+    3665477654]
+   ["friendly-star-shaped-prairie-dog-10.edn"
+    "1018 hours, 15 minutes, 44 seconds"
+    3665744294]
+   ["friendly-scarlet-giraffe-10.edn"
+    "1019 hours, 34 minutes, 33 seconds"
+    3670473670]
+   ["growing-baby-blue-toad-14.edn"
+    "1019 hours, 51 minutes, 25 seconds"
+    3671485251]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
@@ -649,7 +832,7 @@
    :default -1,
    :data (+ 1 2 3 50)},
   :wallpaper-of-the-moment
-  {:signal :signal/cool-raccoon-signal-yo,
+  {:signal :signal/every-5-minutes,
    :persist? false,
    :type :clojure,
    :default -1,
@@ -664,21 +847,11 @@
          random-file (first files)]
      (str rel-dir random-file))}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -429593046,
+ :user-params-hash -1235672934,
  :grid-recos? true,
- :session-hash -452461108,
+ :session-hash -1632673614,
  :resolved-queries
- {:new-query
-  {:select [:*],
-   :from
-   [{:data
-     (vec
-       (for
-         [i (range 4435)]
-         {:row_id i,
-          :type (rand-nth ["cat" "dog" "pizza"]),
-          :name (str "row " i)}))}]},
-  :gen-viz-797
+ {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
    :from
    [{:select
@@ -913,44 +1086,6 @@
       :padding 4,
       :background "transparent"}
      {:actions false}]}},
-  :block-11262
-  {:h 6,
-   :w 10,
-   :root [1 2],
-   :tab "star-shaped wallaby",
-   :selected-view :new-query,
-   :name "block-11262",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-11262.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "hi!"],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries
-   {:new-query
-    {:select [:*],
-     :from
-     [{:data
-       (vec
-         (for
-           [i (range 4435)]
-           {:row_id i,
-            :type (rand-nth ["cat" "dog" "pizza"]),
-            :name (str "row " i)}))}]}}},
   :block-11251
   {:name "block-11251",
    :w 6,
@@ -980,29 +1115,6 @@
      :child
      [:push ["flow-forever" ":open-input" 21555]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
-  :block-2149
-  {:h 10,
-   :w 16,
-   :root [18 1],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-2149",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :size
-     "auto"
-     :attr
-     {:id ":block-2149.:hi"}
-     :style
-     {:color :theme/editor-outer-rim-color, :font-family :theme/base-font}
-     :child
-     [:img {:src :solver/wallpaper-of-the-moment, :width "100%"}]]},
-   :queries {}},
   :block-11609
   {:h 5,
    :w 8,
@@ -1017,33 +1129,31 @@
    :root [1 8],
    :tab "sapphire ape"},
   :block-3341
-  {:h 3,
-   :w 21,
-   :root [1 17],
-   :tab "star-shaped wallaby",
+  {:name "block-3341",
+   :w 13,
+   :style {:background-color "#00000000", :border-radius "30px 0px 0px 0px"},
    :selected-view :hi,
-   :name "block-3341",
+   :root [28 24],
+   :h 2,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :ghosted? true,
    :views
    {:hi
     [:box
-     :align
-     :center
-     :justify
-     :center
      :attr
      {:id ":block-3341.:hi"}
      :style
-     {:font-size "66px",
+     {:font-size "32px",
       :font-weight 700,
       :padding-top "6px",
       :padding-left "14px",
       :margin-top "-8px",
       :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
+      :font-family "Homemade Apple"}
      :child
      [:string :time/now]],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}},
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
   :block-7416
   {:h 5,
    :w 4,
@@ -1054,26 +1164,6 @@
     {:select [[[:sum :rowcnt] :rowcnt_sum]], :from [[:query/city-drag-26 :yy403]]}},
    :root [1 13],
    :tab "sapphire ape"},
-  :block-8088
-  {:h 3,
-   :w 6,
-   :tab "star-shaped wallaby",
-   :root [5 8],
-   :name "block-8088",
-   :views
-   {:param-val
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :padding
-     "13px"
-     :style
-     {:font-size "14px"}
-     :child
-     [:string :solver/wallpaper-of-the-moment]]},
-   :queries {}},
   :block-11530
   {:h 2,
    :w 9,
@@ -1097,6 +1187,34 @@
    :name "flow-play-from-runstreams",
    :root [5 18],
    :tab "through the rabbit hole and out the other side"},
+  :block-1194
+  {:h 10,
+   :w 11,
+   :root [27 43],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-1194",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-1194.:hi"}
+     :style
+     {:font-size "303px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:left-pad [:time/second 2]]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
   :block-204
   {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
    :name "compound_trend_1 - \"date_posted, rows\" - 1141",
@@ -1240,6 +1358,34 @@
        {:padding-top "133px", :font-size "20px"}
        :child
        [:string [:date_posted " vs " :rows]]]]]}},
+  :block-11814
+  {:h 10,
+   :w 12,
+   :root [14 43],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-11814",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11814.:hi"}
+     :style
+     {:font-size "303px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:left-pad [:time/minute 2]]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
   :block-2536
   {:h 2,
    :w 16,
@@ -1363,6 +1509,31 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-1827
+  {:h 10,
+   :w 12,
+   :views
+   {:view-clone
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11814.:hi"}
+     :style
+     {:font-size "303px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:left-pad [:time/hour 2]]]},
+   :name "clone-hi29",
+   :root [1 43],
+   :tab "star-shaped wallaby"},
   :block-7319
   {:h 5,
    :w 8,
@@ -1481,7 +1652,7 @@
    :root [1 1],
    :tab "sapphire ape",
    :selected-view :ufo-sightings-drag-9}},
- :selected-block :block-8088,
+ :selected-block "none!",
  :signals-map
  {:fun-gorilla
   {:signal
@@ -1509,10 +1680,25 @@
   :elegant-grasshopper-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
   :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
   :exciting-cheetah-signal
-  {:signal [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
+  {:signal [:and [:> :time/day 1] [:= "cheese" "cheese"] [:= :time/hour 9]]},
   :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
   :dragging-to-potential-cross-breed?
   {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
+  :every-5-minutes
+  {:signal
+   [:or
+    [:= :time/minute 0]
+    [:= :time/minute 5]
+    [:= :time/minute 10]
+    [:= :time/minute 15]
+    [:= :time/minute 20]
+    [:= :time/minute 25]
+    [:= :time/minute 30]
+    [:= :time/minute 35]
+    [:= :time/minute 40]
+    [:= :time/minute 45]
+    [:= :time/minute 50]
+    [:= :time/minute 55]]},
   :special-lion-signal
   {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
   :optimistic-sheep-signal
@@ -1547,20 +1733,7 @@
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
   :param
-  {:selected-view [:views :param-val],
-   :selected-view-data
-   [:box
-    :align
-    :center
-    :justify
-    :center
-    :padding
-    "13px"
-    :style
-    {:font-size "14px"}
-    :child
-    [:string :solver/wallpaper-of-the-moment]],
-   :selected-block :block-8088},
+  {:selected-view [nil nil], :selected-view-data nil, :selected-block :block-3341},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -1656,7 +1829,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image "url(images/large/b64-image-98275-59630-4k.webp)",
+   {:background-image [:string3 "url(" :solver/wallpaper-of-the-moment ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-color "#424f57"},
@@ -1682,14 +1855,16 @@
    :country "us"},
   :time
   {:month-name "MAY",
-   :day 21,
-   :hour 23,
-   :now "Wednesday, May 22nd 7:49PM",
-   :second 24,
+   :day 4,
+   :hour 15,
+   :now "Thursday, May 23rd 3:09PM",
+   :second 37,
    :now-seconds "Wednesday, April 24 1:43:57PM",
-   :nth "st",
+   :nth "th",
    :month 4,
-   :minute 45},
-  :solver {:wallpaper-of-the-moment "./images/large/b64-image-12461-5746-4k.webp"}},
+   :minute 9},
+  :solver {:wallpaper-of-the-moment "./images/large/b64-image-34647-16558-4k.webp"},
+  nil {nil nil},
+  :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

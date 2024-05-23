@@ -31,6 +31,10 @@
     (->>
      (file-seq (clojure.java.io/file dir))
      (filter (fn [x] (.isFile x)))
+     (filter
+      (fn
+       [x]
+       (not (clojure.string/includes? (str (.getName x)) "8k"))))
      (map (fn [x] (.getName x)))
      (shuffle))
     random-file
