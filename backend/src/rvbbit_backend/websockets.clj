@@ -1711,7 +1711,7 @@
                                                    :else (ut/format-duration-seconds seconds-ago)))))})));)
 
 (defn flow-statuses []
-  (into {} (for [[k {:keys [*time-running *running? *started-by *finished overrides started running-blocks]}] @flow-status
+  (into {} (for [[k {:keys [*time-running *running? *started-by *finished overrides started waiting-blocks running-blocks]}] @flow-status
                  :let [chans (count (get @flow-db/channels-atom k))
                        chans-open (count
                                    (doall
@@ -1740,6 +1740,7 @@
                  :running-blocks running-blocks
                  :block-overrides (vec (keys overrides))
                  :since-start (str human-elapsed)
+                 :waiting-blocks waiting-blocks
                  ;:timeouts (count (filter #(= % :timeout) (ut/deep-flatten tracker-events)))
                  ;:skips (count (filter #(= % :skip) (ut/deep-flatten tracker-events)))
                  :channels-open? channels-open?
@@ -3410,6 +3411,59 @@
     ;(vec (map keyword ff2))
     [(first ff2) (keyword (last ff2))]))
 
+(declare client-kp)
+
+(defn clover-lookup [client-name flow-key & [signal?]]
+  ;; flow-key expects the clover user-space version of the compound keyword kp bundle, i.e. :flow/flow-forever>final-math etc
+ ;; ^^ still includes complex/messy side effecting *var logic. keeping for now since it will never be used in this instance, I DONT THINK
+ ;; ^^ ....also this keeps it congrunt with the orginal sub-to-value fn - TODO
+  (let [flow-key-orig flow-key
+        flow-key-sub (replace-flow-key-vars flow-key client-name)
+
+        flow-key-split (break-up-flow-key flow-key)
+        flow-key-split-sub (break-up-flow-key flow-key-sub)
+        vars? (not (= flow-key flow-key-sub))
+
+        flow-key (if vars? flow-key-sub flow-key)
+        flow-key-split (if vars? flow-key-split-sub flow-key-split)
+
+        [flow-id step-id] flow-key-split ;(break-up-flow-key flow-key)
+        ;signal? (true? signal?)
+        keypath [flow-id step-id]
+        sub-path (break-up-flow-key-ext flow-key)
+        base-type (first sub-path)
+       ;screen? (cstr/starts-with? (str flow-key) ":screen/")
+        flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
+        other-client-param-path (keyword (cstr/replace (cstr/join ">" (vec (rest sub-path))) ":" ""))
+        client-param-path (if (= base-type :flow) flow-client-param-path other-client-param-path)
+        client-keypath (client-kp flow-key keypath base-type sub-path client-param-path)
+        ssp (break-up-flow-key-ext flow-key-orig)
+        req-client-kp (client-kp flow-key-orig (vec (break-up-flow-key flow-key-orig)) base-type ssp
+                                 (keyword (cstr/replace (cstr/join ">" (vec (rest ssp))) ":" "")))
+
+        _ (ut/pp [:flow-key flow-key vars? flow-key-sub flow-key-split flow-key-split-sub]) ;; this is all a clusterfuck, total rewrite of flow-key vars in future version. will be more extendable, sensical
+        _ (when vars? (swap! param-var-mapping assoc [client-name client-keypath] req-client-kp))
+        _ (when vars? (swap! param-var-crosswalk assoc-in [client-name flow-key-orig] [flow-key [client-name client-keypath]])) ;; all the precomputed values to delete the rest. ugh. mistake.
+        ;;         ^^ flow-key as the CLIENT understands it.... client-keypath as the server understands it.... ^^
+        _ (when vars? (swap! param-var-key-mapping assoc client-name (vec (distinct (conj (get @param-var-key-mapping client-name []) [flow-key-orig flow-key])))))
+
+        lv (get @last-values keypath)]
+
+    (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath {:sub-path sub-path} ])
+
+    (cond (cstr/includes? (str flow-key) "*running?") false
+          (= base-type :time)   (get @time-atom client-param-path)
+          (= base-type :signal) (get @last-signals-atom client-param-path)
+          (= base-type :solver) (get-in @last-solvers-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv) ;; (get @last-solvers-atom client-param-path)
+          (= base-type :solver-meta) (get-in @last-solvers-atom-meta (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+          (= base-type :server) (get @server-atom client-param-path lv)
+          (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
+          (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+          (= base-type :panel) (get-in @panels-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+          :else (get-in @flow-db/results-atom keypath lv) ;; assume flow
+                        ;; ^^ SHOULD be the last val (persistently cached), on cold boot @results-atom will be empty anyways
+          )))
+
 ;;;  :client-reaction-push! ["error-monitor-vanessa3" :panels :block-899 :name] :fair-salmon-hawk-hailing-from-malpais "drag-from-select-all-jvm_stddat!s!!" :error-monitor-vanessa3>name]
 ;;; [:client-reaction-push! ["error-monitor-vanessa3" :panels :block-899 :name] :fair-salmon-hawk-hailing-from-malpais "drag-from-seldect-all-jvm_sstddat!s!!" :error-monitor-vanessa3>name]
 
@@ -3417,6 +3471,23 @@
   (let [solver-map (get @solvers-atom solver-name)
         ;;solver-map (walk/postwalk-replace {} solver-map) ;; we need a universal solver for compund keys - finds needed, resolves them, and replaces them. similar to make-watcher / click-param resolver?
         vdata (get solver-map :data -1)
+        vdata-clover-kps (vec (filter
+                               #(and (keyword? %) 
+                                     (cstr/includes? (str %) "/")
+                                     (not= % (keyword (str "solver/" (cstr/replace (str solver-name) ":" "")))) ;; dont recur resolve self if someone was foolish enough to attempt
+                                     ;(not (cstr/includes? (str %) "solver/"))
+                                     ;(not (cstr/includes? (str %) "solver-meta/")
+                                          )
+                               (ut/deep-flatten vdata)))
+        vdata-clover-walk-map (into {}
+                                    (for [kp vdata-clover-kps]
+                                      {kp (try
+                                            (clover-lookup :rvbbit-solver kp)
+                                            (catch Exception e (ut/pp [:clover-lookup-error kp e])
+                                                   (str "clover-param-lookup-error " kp)))}))
+        vdata (if (ut/ne? vdata-clover-walk-map)
+                (walk/postwalk-replace vdata-clover-walk-map vdata) vdata) ;; sub out all clover kp refs...
+        _ (ut/pp [:vdata-clover-walk-map vdata-clover-walk-map])
         runner-name (get solver-map :type :clojure)
         runner-map (get-in config/settings [:runners runner-name] {})
         runner-type (get runner-map :type runner-name)
@@ -3827,7 +3898,7 @@
         :else keypath ;; assume flow
         ))
 
-(defn sub-to-value [client-name flow-key & [signal?]]
+(defn sub-to-value [client-name flow-key & [signal?]] ;;; IF CHANGED, REMEMBER TO ALSO UPDATE "CLOVER-LOOKUP" - TODO, combine the logic?
   (let [flow-key-orig flow-key
         flow-key-sub (replace-flow-key-vars flow-key client-name)
 
@@ -3916,6 +3987,7 @@
   ;; need to revisit this. might not work as scale. use sep atoms per flow perhaps, or something like javelin's cells? except on CLJ
   ;; or if we wanted to skip real-time reactions, we could just run it every X seconds and push the result to the client
   ;; OR a watcher that updates OTHER atoms based on results-atom changes, and then we can just watch those atoms instead... [big brain]
+  ;; (ut/pp [:sub-to-value flow-key client-name :********])
   (doall (sub-to-value client-name flow-key)))
 
 
@@ -6544,7 +6616,9 @@
 
         ;; (ut/pp [:client-latency (into {} (for [[k v] @client-latency] {k (vec (take-last 10 v))}))])
 
-        (ut/pp [:flow-status (flow-statuses)])
+        (let [fss (flow-statuses)
+              fssk (vec (filter #(not (cstr/includes? (str %) "-solver-flow-")) (keys fss)))]
+          (ut/pp [:flow-status (select-keys fss fssk)]))
 
       ;; (ut/pp [:processes (into {} (for [[k {:keys [start *running? end]}] @processes]
       ;;                               {k {:time-running (- (or end (System/currentTimeMillis)) start)

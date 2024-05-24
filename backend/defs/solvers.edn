@@ -1,46 +1,35 @@
 {:vibrant-antelope-solver
  {:signal :signal/cool-raccoon-signal-yo,
   :persist? false,
-  :type :clojure,
+  :type :clojure2,
   :default -1,
-  :data (+ 1 2 3 88)},
+  :data (+ 1 2 3 88 (rand-int 1234))},
  :dazzling-gnu-solver
  {:signal :signal/hourly?,
   :persist? false,
   :type :clojure,
   :default -1,
-  :data (+ 1 2 3 90)},
- :polished-kangaroo-solver
+  :data (+ 1 2 3 90 (rand-int 12345))},
+ :static-data
  {:signal :signal/genius-gnat-signal,
   :persist? false,
   :type :clojure,
   :default -1,
-  :data (+ 1 2 3 50)},
+  :data
+  [0
+   9
+   8
+   7
+   "farts"
+   (apply + [1 2 3])
+   :solver/wallpaper-of-the-moment
+   :solver/wallpaper-of-the-moment-8k]},
  :color-theft
  {:signal :signal/every-5-minutes,
   :persist? false,
   :type :flow,
   :default -1,
   :data {:flowmap "node-color-thief-js", :opts {}, :return nil}},
- :color-theft2
- {:signal :signal/every-5-minutes,
-  :persist? false,
-  :type :flow,
-  :default -1,
-  :data
-  {:flowmap "node-color-thief-js",
-   :opts
-   {:overrides
-    {:image-path
-     "/home/ryanr/rvbbit/frontend/resources/public/images/large/vap7.png"}},
-   :return nil}},
- :color-theft3
- {:signal :signal/every-5-minutes,
-  :persist? false,
-  :type :flow,
-  :default -1,
-  :data
-  {:flowmap "node-color-thief-js", :opts {}, :return :image-path}},
  :wallpaper-of-the-moment-8k
  {:signal :signal/every-5-minutes,
   :persist? false,
@@ -86,4 +75,12 @@
      (shuffle))
     random-file
     (first files)]
-   (str rel-dir random-file))}}
+   (str rel-dir random-file))},
+ :readable-wallpaper?
+ {:signal :signal/changed-wallpaper?,
+  :persist? false,
+  :type :clojure,
+  :default -1,
+  :data
+  (true?
+   (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}}
