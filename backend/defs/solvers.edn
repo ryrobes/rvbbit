@@ -16,6 +16,53 @@
   :type :clojure,
   :default -1,
   :data (+ 1 2 3 50)},
+ :color-theft
+ {:signal :signal/every-5-minutes,
+  :persist? false,
+  :type :flow,
+  :default -1,
+  :data {:flowmap "node-color-thief-js", :opts {}, :return nil}},
+ :color-theft2
+ {:signal :signal/every-5-minutes,
+  :persist? false,
+  :type :flow,
+  :default -1,
+  :data
+  {:flowmap "node-color-thief-js",
+   :opts
+   {:overrides
+    {:image-path
+     "/home/ryanr/rvbbit/frontend/resources/public/images/large/vap7.png"}},
+   :return nil}},
+ :color-theft3
+ {:signal :signal/every-5-minutes,
+  :persist? false,
+  :type :flow,
+  :default -1,
+  :data
+  {:flowmap "node-color-thief-js", :opts {}, :return :image-path}},
+ :wallpaper-of-the-moment-8k
+ {:signal :signal/every-5-minutes,
+  :persist? false,
+  :type :clojure2,
+  :default -1,
+  :data
+  (let
+   [dir
+    "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+    rel-dir
+    "./images/large/"
+    files
+    (->>
+     (file-seq (clojure.java.io/file dir))
+     (filter (fn [x] (.isFile x)))
+     (filter
+      (fn [x] (clojure.string/includes? (str (.getName x)) "8k")))
+     (map (fn [x] (.getName x)))
+     (shuffle))
+    random-file
+    (first files)]
+   (str rel-dir random-file))},
  :wallpaper-of-the-moment
  {:signal :signal/every-5-minutes,
   :persist? false,

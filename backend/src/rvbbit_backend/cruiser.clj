@@ -9,7 +9,7 @@
    [hikari-cp.core :as hik]
    ;[wkok.openai-clojure.api :as api]
    [rvbbit-backend.embeddings :as em]
-   [rvbbit-backend.search :as search]
+   ;[rvbbit-backend.search :as search]
    ;;[durable-atom.core :refer [durable-atom]]
    ;[incanter.core :as ic]
    ;[incanter.stats :as stats]

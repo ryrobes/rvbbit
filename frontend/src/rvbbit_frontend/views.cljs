@@ -2909,7 +2909,7 @@
 ;;      :style {:font-family "Homemade Apple" :color "orange" :margin-top "2px"}]]])
 
 (defn render-icon [icon]
-  (if (and (not (empty? icon))
+  (if (and (ut/ne? icon)
            (not (nil? icon)))
     (if (cstr/includes? icon "zmdi")
       [re-com/md-icon-button :src (at)
@@ -2939,7 +2939,7 @@
                   :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
               [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
-         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client :solver nil]))
+         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client :solver :solver-meta nil]))
          new-h (hash pp-without-fs)
          client-name (get db :client-name)
          ]
@@ -2965,7 +2965,7 @@
                    [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
          ;;pp-without-fs (ut/remove-keys pp (map first fs))
-         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client :solver nil]))
+         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client :solver :solver-meta nil]))
          ]
      (hash pp-without-fs)))) ;; was :param
 

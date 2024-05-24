@@ -1128,6 +1128,14 @@
       (remove-empty-key :queries)
       (remove-empty-key :views)))
 
+(defn remove-namespaced-keys [m]
+  (walk/postwalk
+   (fn [x]
+     (if (map? x)
+       (into {} (remove (fn [[k v]] (and (keyword? k) (namespace k))) x))
+       x))
+   m))
+
 ;;; dupe for dumb reasons 11/5/23 TODO
 (defn pool-create [jdbc-body name]
   (delay (let [base {;:jdbc-url "jdbc:sqlite:db/system.db"

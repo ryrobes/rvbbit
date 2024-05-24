@@ -1,228 +1,6 @@
-{:orders
- {:fields-sys [:field_name :field_type :data_type],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :gen-viz-797 [:rows :date_posted],
-  :gen-viz-94 [:diff],
-  :rowcnt-drag-2 [:rowcnt_sum],
-  :gen-viz-828 [:agg :date_posted],
-  :ufo_sightings (:query_error),
-  :gen-viz-84 [:rows :country],
-  :connections-sys [:database_name :connection_id],
-  :ufo-sightings-drag-9
-  [:city
-   :country
-   :date_posted
-   :datetime
-   :duration_hours
-   :duration_seconds
-   :duration_seconds_int
-   :latitude
-   :longitude
-   :shape
-   :state],
-  :duration-hours-drag-43 [:duration_hours :rowcnt],
-  :city-drag-26 [:city :rowcnt],
-  :reco-counts [:table_name :cnt],
-  :state-drag-3 [:state :rowcnt],
-  :shape-drag-7 [:shape :rowcnt]},
+{:orders {:reco-counts [:table_name :cnt]},
  :reco-preview nil,
  :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
- :sql-source
- {:gen-viz-797
-  {:select [[[:count 1] :rows] :date_posted],
-   :from
-   [{:select
-     [:city
-      :country
-      :date_posted
-      :datetime
-      :duration_hours
-      :duration_seconds
-      :duration_seconds_int
-      :latitude
-      :longitude
-      :shape
-      :state],
-     :from [[:ufo_sightings :jj584]],
-     :order-by [[:city :asc]]}],
-   :group-by [:date_posted]},
-  :gen-viz-94
-  {:select
-   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
-     :diff]],
-   :from
-   [{:select
-     [:city
-      :country
-      :date_posted
-      :datetime
-      :duration_hours
-      :duration_seconds
-      :duration_seconds_int
-      :latitude
-      :longitude
-      :shape
-      :state],
-     :from [[:ufo_sightings :jj584]],
-     :order-by [[:city :asc]]}]},
-  :rowcnt-drag-2
-  {:select [[[:sum :rowcnt] :rowcnt_sum]],
-   :from
-   [[{:select [:city [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:city
-          :country
-          :date_posted
-          :datetime
-          :duration_hours
-          :duration_seconds
-          :duration_seconds_int
-          :latitude
-          :longitude
-          :shape
-          :state],
-         :from [[:ufo_sightings :jj584]],
-         :order-by [[:city :asc]]}
-        :ff571]],
-      :group-by [:city],
-      :order-by [[:rowcnt :desc]]}
-     :yy403]]},
-  :gen-viz-828
-  {:select [[[[:count 1]] :agg] :date_posted],
-   :from
-   [{:select
-     [:city
-      :country
-      :date_posted
-      :datetime
-      :duration_hours
-      :duration_seconds
-      :duration_seconds_int
-      :latitude
-      :longitude
-      :shape
-      :state],
-     :from [[:ufo_sightings :jj584]],
-     :order-by [[:city :asc]]}],
-   :order-by [[:date_posted :desc]],
-   :group-by [:date_posted]},
-  :ufo_sightings
-  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
-  :gen-viz-84
-  {:select [[[:count 1] :rows] :country],
-   :from
-   [{:select
-     [:city
-      :country
-      :date_posted
-      :datetime
-      :duration_hours
-      :duration_seconds
-      :duration_seconds_int
-      :latitude
-      :longitude
-      :shape
-      :state],
-     :from [[:ufo_sightings :jj584]],
-     :order-by [[:city :asc]]}],
-   :group-by [:country]},
-  :ufo-sightings-drag-9
-  {:select
-   [:city
-    :country
-    :date_posted
-    :datetime
-    :duration_hours
-    :duration_seconds
-    :duration_seconds_int
-    :latitude
-    :longitude
-    :shape
-    :state],
-   :from [[:ufo_sightings :jj584]],
-   :order-by [[:city :asc]]},
-  :duration-hours-drag-43
-  {:select [:duration_hours [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:city
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :jj584]],
-      :order-by [[:city :asc]]}
-     :cc350]],
-   :group-by [:duration_hours],
-   :order-by [[:rowcnt :desc]]},
-  :city-drag-26
-  {:select [:city [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:city
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :jj584]],
-      :order-by [[:city :asc]]}
-     :ff571]],
-   :group-by [:city],
-   :order-by [[:rowcnt :desc]]},
-  :state-drag-3
-  {:select [:state [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:city
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :jj584]],
-      :order-by [[:city :asc]]}
-     :uu58]],
-   :group-by [:state],
-   :order-by [[:rowcnt :desc]]},
-  :shape-drag-7
-  {:select [:shape [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:city
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :jj584]],
-      :order-by [[:city :asc]]}
-     :hh354]],
-   :group-by [:shape],
-   :order-by [[:rowcnt :desc]]}},
  :meta
  {:blocks-sys {:fields {}, :rowcount 0},
   :fields-sys {:fields {}, :rowcount 0},
@@ -488,24 +266,14 @@
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
    :rowcount 30}},
- :default-col-widths
- {:block-11609 {:city-drag-26 180},
-  :block-7416 {:rowcnt-drag-2 161},
-  :block-8805 {:duration-hours-drag-43 180},
-  :system-connections-list* {:connections-sys 111},
-  :system-fields-list* {:fields-sys ##Inf},
-  :block-7319 {:shape-drag-7 180},
-  :block-3777 {:state-drag-3 180},
-  :block-1449 {:ufo-sightings-drag-9 141},
-  :system-tables-list* {:tables-sys ##Inf}},
  :runstream-drops nil,
- :data-hash 674119365,
+ :data-hash 359686701,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"],
- :selected-cols {},
+ :selected-cols nil,
  :server
  {:settings
   {:harvest-on-boot? true,
@@ -719,32 +487,32 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [327942712 248471464 4294705152],
+ :memory [420584360 243686356 4294705152],
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-23 15:09:35",
+      :at "2024-05-23 15:50:57",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:solver/wallpaper-of-the-moment
+ [:time/hour
+  :solver/wallpaper-of-the-moment
+  :time/now
   :time/second
   :time/minute
-  :time/hour
-  :flow/flow-forever>*running?
-  :time/now
   :flow/flow-forever>:final-math
+  :flow/flow-forever>*running?
   :flow/live-scratch-flow>*running?],
- :client-name :restored-sangria-penguin-14,
+ :client-name :special-rhomboidal-koala-37,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2007, :h 1282},
+ :window {:w 2033, :h 1428},
  :post-meta
  {:gen-viz-797 {:* {:rowcount 317}},
   :gen-viz-94 {:* {:rowcount 1}},
@@ -759,17 +527,18 @@
  :status
  {:heartbeat
   {:kick
-   [:solver/wallpaper-of-the-moment
+   [:time/hour
+    :solver/wallpaper-of-the-moment
+    :time/now
     :time/second
     :time/minute
-    :time/hour
-    :flow/flow-forever>*running?
-    :time/now
     :flow/flow-forever>:final-math
+    :flow/flow-forever>*running?
     :flow/live-scratch-flow>*running?]}},
  :screen-name "alarm-clock2",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
+ :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
@@ -780,38 +549,35 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   100
+   67
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :base-sniff-queries {:ufo_sightings 484893751},
- :panels-hash -633919131,
+ :panels-hash 1940229278,
  :sessions
- (["pretty-magenta-goat-24.edn" "1010 hours, 48 minutes, 16 seconds" 3638896655]
+ (["composed-bulbous-bear-30.edn" "1 hour, 27 minutes, 25 seconds" 5245666]
+   ["pretty-magenta-goat-24.edn" "1011 hours, 29 minutes, 29 seconds" 3641369802]
    ["intuitive-amaranth-opossum-39.edn"
-    "1011 hours, 40 minutes, 49 seconds"
-    3642049878]
+    "1012 hours, 22 minutes, 3 seconds"
+    3644523025]
    ["prominent-Persian-blue-hippopotamus-39.edn"
-    "1012 hours, 29 minutes, 31 seconds"
-    3644971124]
-   ["handsome-conical-pronghorn-24.edn"
-    "1017 hours, 28 minutes, 14 seconds"
-    3662894386]
+    "1013 hours, 10 minutes, 44 seconds"
+    3647444270]
    ["beautiful-prismatic-ostrich-23.edn"
-    "1017 hours, 5 minutes, 33 seconds"
-    3661533139]
+    "1017 hours, 46 minutes, 46 seconds"
+    3664006286]
    ["impressive-triangular-quail-2.edn"
-    "1018 hours, 11 minutes, 17 seconds"
-    3665477654]
+    "1018 hours, 52 minutes, 30 seconds"
+    3667950801]
    ["friendly-star-shaped-prairie-dog-10.edn"
-    "1018 hours, 15 minutes, 44 seconds"
-    3665744294]
+    "1018 hours, 56 minutes, 57 seconds"
+    3668217441]
+   ["handsome-conical-pronghorn-24.edn"
+    "1018 hours, 9 minutes, 27 seconds"
+    3665367533]
    ["friendly-scarlet-giraffe-10.edn"
-    "1019 hours, 34 minutes, 33 seconds"
-    3670473670]
-   ["growing-baby-blue-toad-14.edn"
-    "1019 hours, 51 minutes, 25 seconds"
-    3671485251]),
+    "1020 hours, 15 minutes, 46 seconds"
+    3672946817]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
@@ -842,14 +608,16 @@
          files (->>
                  (file-seq (clojure.java.io/file dir))
                  (filter (fn [x] (.isFile x)))
+                 (filter
+                   (fn [x]
+                     (not (clojure.string/includes? (str (.getName x)) "8k"))))
                  (map (fn [x] (.getName x)))
                  (shuffle))
          random-file (first files)]
      (str rel-dir random-file))}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1235672934,
+ :user-params-hash -509105510,
  :grid-recos? true,
- :session-hash -1632673614,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1130,24 +898,26 @@
    :tab "sapphire ape"},
   :block-3341
   {:name "block-3341",
-   :w 13,
+   :w 16,
    :style {:background-color "#00000000", :border-radius "30px 0px 0px 0px"},
    :selected-view :hi,
-   :root [28 24],
-   :h 2,
+   :root [25 26],
+   :h 3,
    :queries {},
    :tab "star-shaped wallaby",
    :ghosted? true,
    :views
    {:hi
     [:box
+     :justify
+     :center
      :attr
      {:id ":block-3341.:hi"}
      :style
-     {:font-size "32px",
+     {:font-size "43px",
       :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
+      :padding-top "26px",
+      :padding-left "22px",
       :margin-top "-8px",
       :color :theme/editor-outer-rim-color,
       :font-family "Homemade Apple"}
@@ -1733,7 +1503,22 @@
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
   :param
-  {:selected-view [nil nil], :selected-view-data nil, :selected-block :block-3341},
+  {:selected-view [:views :hi],
+   :selected-view-data
+   [:box
+    :attr
+    {:id ":block-3341.:hi"}
+    :style
+    {:font-size "32px",
+     :font-weight 700,
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family "Homemade Apple"}
+    :child
+    [:string :time/now]],
+   :selected-block :block-3341},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -1857,13 +1642,13 @@
   {:month-name "MAY",
    :day 4,
    :hour 15,
-   :now "Thursday, May 23rd 3:09PM",
-   :second 37,
+   :now "Thursday, May 23rd 3:51PM",
+   :second 10,
    :now-seconds "Wednesday, April 24 1:43:57PM",
    :nth "th",
    :month 4,
-   :minute 9},
-  :solver {:wallpaper-of-the-moment "./images/large/b64-image-34647-16558-4k.webp"},
+   :minute 51},
+  :solver {:wallpaper-of-the-moment "./images/large/b64-image-33260-55928-4k.webp"},
   nil {nil nil},
   :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3}},
  :selected-flow "live-scratch-flow",

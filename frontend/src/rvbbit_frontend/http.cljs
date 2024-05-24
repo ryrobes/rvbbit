@@ -349,7 +349,7 @@
 
 ;; (tap> [:packets-received-log [(count @packets-received-log) @packets-received] (frequencies @packets-received-log)])
 
-(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :panel :client})
+(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :solver-meta :panel :client})
 
 (re-frame/reg-event-db
  ::simple-response

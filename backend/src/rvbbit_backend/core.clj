@@ -33,7 +33,7 @@
    [clojure.walk :as walk]
    [clojure.core.async :refer [<! timeout]]
    [rvbbit-backend.websockets :as wss]
-   [rvbbit-backend.search :as search]
+   ;[rvbbit-backend.search :as search]
    [rvbbit-backend.cruiser :as cruiser]
    [rvbbit-backend.util :as ut :refer [ne?]]
    [rvbbit-backend.evaluator :as evl]
@@ -349,7 +349,7 @@
   (wss/reload-signals-subs) ;; run once on boot
   (wss/reload-solver-subs) ;; run once on boot (needs nrepl(s) to start first...)
   (wss/create-web-server!)
-  (wss/create-websocket-server!)
+  ;;(wss/create-websocket-server!)
   ;; (wss/start-websocket-server!)
   ;; (def ttttr
   ;;   (jetty/run-jetty #'wss/web-handler wss/ring-options))
@@ -587,11 +587,12 @@
 
 
     (shutdown/add-hook! ::the-pool-is-now-closing
-                        #(do (tt/stop!)
+                        #(do (reset! wss/shutting-down? true)
+                             (wss/destroy-websocket-server!)
+                             (tt/stop!)
                              (wss/stop-worker)
                              (wss/stop-worker2)
-                             (wss/stop-worker3)
-                             (reset! wss/shutting-down? true)))
+                             (wss/stop-worker3)))
 
     (shutdown/add-hook! ::the-pool-is-now-closed
                         #(doseq [[conn-name conn] @wss/conn-map]
@@ -610,6 +611,7 @@
                                                                                :child
                                                                                ;[:speak-always (str "Heads up: R-V-B-B-I-T system going offline.")]
                                                                                [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]] 10 1 5)))
+                                                (wss/destroy-websocket-server!)
                                                 (Thread/sleep 1000)
                                                 ;; (do (ut/pp [:shutting-down-lucene-index-writers])
                                                 ;;     (search/close-index-writer search/index-writer))
@@ -638,7 +640,7 @@
                                            (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "status-change-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
-                                           (shell/sh "/bin/bash" "-c" (str "rm " "data/search-index/*"))
+                                          ;;  (shell/sh "/bin/bash" "-c" (str "rm " "data/search-index/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
                                            (shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))))
 

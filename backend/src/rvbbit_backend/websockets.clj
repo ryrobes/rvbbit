@@ -14,7 +14,7 @@
             [clojure.data :as data]
             [rvbbit-backend.external :as ext]
             [rvbbit-backend.evaluator :as evl]
-            [rvbbit-backend.search :as search]
+            ;; [rvbbit-backend.search :as search]
             [io.pedestal.http.body-params :as body-params]
             [chime.core :as chime]
             ;[rvbbit-backend.flowmaps :as flow]
@@ -2343,8 +2343,9 @@
           ;opts (merge {:client-name client-name} opts)
           ;; _ (ut/pp [:flow!-passed-opts flow-id opts])
           oo-flowmap (if (string? flowmap) ;; load from disk and run client sync post processing (make sure fn is in sync w client code)
-                       (let [raw (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
-                                      (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk-oo-flowmap-flow! flow-id client-name])
+                       (let [fss (str "./flows/" flowmap ".edn")
+                             raw (try (edn/read-string (slurp fss))
+                                      (catch Exception _ (do (ut/pp [:error-reading-flow-from-disk-oo-flowmap-flow! fss flow-id client-name])
                                                              {})))
                              flowmaps (process-flow-map (get raw :flowmaps))
                              connections (get raw :flowmaps-connections)
@@ -2765,16 +2766,16 @@
   (boomerang-client-subs client-name)
   [:watcers-removed!])
 
-(defmethod wl/handle-request :search-groups [{:keys [client-name search-str max-hits]}]
-  (ut/pp [:search-for search-str :from client-name])
-  (let [results (search/search-index search/idx-path search-str)]
-    ;(group-by :type (for [[k v] results] (merge {:docid k} v)))
-    (frequencies (map :type (for [[k v] results] (merge {:docid k} v))))))
+;; (defmethod wl/handle-request :search-groups [{:keys [client-name search-str max-hits]}]
+;;   (ut/pp [:search-for search-str :from client-name])
+;;   (let [results (search/search-index search/idx-path search-str)]
+;;     ;(group-by :type (for [[k v] results] (merge {:docid k} v)))
+;;     (frequencies (map :type (for [[k v] results] (merge {:docid k} v))))))
 
-(defmethod wl/handle-request :search [{:keys [client-name search-str max-hits hit-type]}]
-  (ut/pp [:search-for search-str :from client-name])
-  (let [results (search/search-index search/idx-path search-str (or max-hits 100))]
-    results))
+;; (defmethod wl/handle-request :search [{:keys [client-name search-str max-hits hit-type]}]
+;;   (ut/pp [:search-for search-str :from client-name])
+;;   (let [results (search/search-index search/idx-path search-str (or max-hits 100))]
+;;     results))
 
 (defmethod wl/handle-request :session-snaps [{:keys [client-name]}]
   ;(ut/pp [:get-session-snaps :from client-name :!])
@@ -3114,12 +3115,18 @@
                    (swap! new-child-atom assoc key (get new-state key)))))))
 ;;; ^^ master atom watcher. dissects keys into child atoms to watch easier...
 
+;; (defn break-up-flow-key-ext [key]
+;;   (let [ff (cstr/split (-> (str key) (cstr/replace #":" "")) #"/")
+;;         ff2 (cstr/split (last ff) #">")]
+;;     ;(ut/pp [:splitter ff ff2])
+;;     ;(vec (map keyword ff2))
+;;     (vec (into [(keyword (first ff)) (first ff2)] (rest (for [e ff2] (keyword e)))))))
+
 (defn break-up-flow-key-ext [key]
   (let [ff (cstr/split (-> (str key) (cstr/replace #":" "")) #"/")
-        ff2 (cstr/split (last ff) #">")]
-    ;(ut/pp [:splitter ff ff2])
-    ;(vec (map keyword ff2))
-    (vec (into [(keyword (first ff)) (first ff2)] (rest (for [e ff2] (keyword e)))))))
+        ff2 (cstr/split (last ff) #">")
+        keyword-or-int (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s)))] ;; dont want to keywordize integer vector indexes/"keys"
+    (vec (into [(keyword (first ff)) (first ff2)] (rest (for [e ff2] (keyword-or-int e)))))))
 
 (defn make-watcher [keypath flow-key client-name handler-fn & [no-save]]
   (fn [kkey atom old-state new-state]
@@ -3189,6 +3196,7 @@
         time?    (= base-type :time)
         signal?  (= base-type :signal)
         solver?  (= base-type :solver)
+        solver-meta?  (= base-type :solver-meta)
         server?  (= base-type :server)]
     (cond status? flow-status
           tracker? flow-db/tracker
@@ -3196,6 +3204,7 @@
                               ;:else (get-or-create-child-atom (first keypath))
           signal? last-signals-atom ;; no need to split for now, will keep an eye on it
           solver? last-solvers-atom ;; no need to split for now, will keep an eye on it - besides, there is not "natural" keypath split ATM..
+          solver-meta? last-solvers-atom-meta
           server? server-atom ;; no need to split for now, will keep an eye on it - don't expect LOTS of writes... but who knows
           time?   time-atom ;; zero need to split ever. lol, its like 6 keys
           panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
@@ -3228,10 +3237,12 @@
         time?    (= base-type :time)
         signal?  (= base-type :signal)
         solver?  (= base-type :solver)
+        solver-meta?  (= base-type :solver-meta)
         server?  (= base-type :server)
         keypath  (cond ;flow? keypath 
                    signal? (vec (rest keypath))
-                   solver? (vec (rest keypath))
+                   solver? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec (rest keypath))
+                   solver-meta? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec (rest keypath))
                    time?   (vec (rest keypath))
                    server? (vec (rest keypath))
                    screen? (vec (rest sub-path))
@@ -3249,6 +3260,7 @@
                             ;:else (get-or-create-child-atom (first keypath))
                             signal? last-signals-atom ;; no need to split for now, will keep an eye on it - besides there is not natural parent key "work" distribution like others
                             solver? last-solvers-atom ;; no need to split for now, will keep an eye on it - besides there is not natural parent key "work" distribution like others
+                            solver-meta? last-solvers-atom-meta
                             server? server-atom ;; no need to split for now, will keep an eye on it - I don't expect LOTS of writes... but who knows
                             time?   time-atom ;; zero need to split ever. lol, its like 6 keys
                             panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
@@ -3295,10 +3307,12 @@
              time?    (= base-type :time)
              signal?  (= base-type :signal)
              solver?  (= base-type :solver)
+             solver-meta?  (= base-type :solver-meta)
              server?  (= base-type :server)
              keypath  (cond ;flow? keypath 
                         signal? (vec (rest keypath))
-                        solver? (vec (rest keypath))
+                        solver? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;; (vec (rest keypath))
+                        solver-meta? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec (rest keypath))
                         time?   (vec (rest keypath))
                         screen? (vec (rest sub-path))
                         server? (vec (rest sub-path))
@@ -3316,6 +3330,8 @@
                                          ;:else flow-db/results-atom
                                          ;:else (get-or-create-child-atom (first keypath))
                                  signal? last-signals-atom ;; no need to split for now, will keep an eye on it
+                                 solver? last-solvers-atom ;; no need to split for now, will keep an eye on it - besides there is not natural parent key "work" distribution like others
+                                 solver-meta? last-solvers-atom-meta
                                  server? server-atom ;; no need to split for now, will keep an eye on it - don't expect LOTS of writes... but who knows
                                  time?   time-atom ;; zero need to split ever. lol, its like 6 keys
                                  panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
@@ -3401,13 +3417,18 @@
   (let [solver-map (get @solvers-atom solver-name)
         ;;solver-map (walk/postwalk-replace {} solver-map) ;; we need a universal solver for compund keys - finds needed, resolves them, and replaces them. similar to make-watcher / click-param resolver?
         vdata (get solver-map :data -1)
-        ttype (get solver-map :type :clojure)
-        runner-map (get-in config/settings [:runners ttype] {})]
+        runner-name (get solver-map :type :clojure)
+        runner-map (get-in config/settings [:runners runner-name] {})
+        runner-type (get runner-map :type runner-name)
+        timestamp (System/currentTimeMillis)
+        _ (ut/pp [:trying solver-name runner-type timestamp {:runner-map runner-map :vdata vdata}])]
     
-    (when (= ttype :clojure) ;;; just for now until we get this shit dynamic ? or is this evergreen no matter what is listed in :runners? 
+    (cond
+
+      (= runner-type :nrepl)
       (try
-        (let [repl-host nil
-              repl-port nil
+        (let [repl-host (get-in runner-map [:runner :host])
+              repl-port (get-in runner-map [:runner :port])
               output-full (evl/repl-eval vdata repl-host repl-port)
               output (last (get-in output-full [:evald-result :value]))
               output-full (-> output-full
@@ -3420,10 +3441,42 @@
           (ut/pp [:running-solver solver-name {:output output :output-full output-full}])
           (swap! last-solvers-atom assoc solver-name output)
           (swap! last-solvers-atom-meta assoc solver-name output-full))
-
         (catch Throwable e
-          (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name])
-              (swap! last-solvers-atom-meta assoc solver-name {:runner-error (str e)})))))))
+          (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
+              (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+
+      (= runner-type :flow) ;; no runner def needed for anon flow pulls
+      (try 
+       (let [client-name :rvbbit-solver
+             flowmap (get vdata :flowmap)
+            ;; flowmap (if (string? flowmap)
+            ;;           (if (cstr/includes? flowmap "/") flowmap (str "./flows/" flowmap))
+            ;;           flowmap) ;; if supplied some dirs, we leave as is.. if its just a file name, we append a relative path
+             opts (merge {:close-on-done? true :timeout 10000} (get vdata :opts {}))
+             return (get vdata :return) ;; alternate block-id to fetch when done
+             flow-id (str (cstr/replace (str solver-name) ":" "") "-solver-flow-" timestamp)
+             output (flow! client-name flowmap nil flow-id opts)
+             output (ut/remove-namespaced-keys
+                     (ut/replace-large-base64 output))
+             output-val (get-in output [:return-val])
+             output-val (if return ;;(keyword? return)
+                          (get-in output [:return-maps flow-id return] output-val)
+                          output-val)
+             output-full {:req vdata
+                          :value output
+                          ;:rval (get-in output [:return-val])
+                          :output-val output-val
+                          :flow-id flow-id
+                          :return return}]
+        (ut/pp [:running-solver-flow solver-name output-full])
+        (swap! last-solvers-atom assoc solver-name output-val)
+        (swap! last-solvers-atom-meta assoc solver-name output-full))
+        (catch Throwable e
+          (do (ut/pp [:SOLVER-FLOW-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
+              (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+
+      :else ;; else we assume it's just data
+      vdata)))
 
 (defn process-signal [signal-name & [solver-dep?]]
   (doall
@@ -3766,6 +3819,7 @@
         (= base-type :time)   client-param-path
         (= base-type :signal) client-param-path
         (= base-type :solver) client-param-path
+        (= base-type :solver-meta) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec sub-path) ;; client-param-path
         (= base-type :server) client-param-path
         (= base-type :screen) (vec (rest sub-path))
         (= base-type :client) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -3821,7 +3875,7 @@
       ;(ut/pp [:client-sub! base-type flow-id :step-id step-id :client-name client-name :last-val lv :flow-key flow-key :keypath keypath :client-param-path client-param-path])
       ;(ut/pp [:client-sub! base-type flow-id :keypath keypath :client-param-path client-param-path])
 
-    (ut/pp [:client-sub! (if signal? :signal! :regular!) client-name :wants base-type client-param-path keypath flow-key])
+    (ut/pp [:client-sub! (if signal? :signal! :regular!) client-name :wants base-type client-param-path keypath {:sub-path sub-path} flow-key])
 
     (when (get-in @flow-db/results-atom keypath)
       (ut/pp [:react (get-in @flow-db/results-atom keypath)]))
@@ -3839,7 +3893,8 @@
             (cond (cstr/includes? (str flow-key) "*running?") false
                   (= base-type :time)   (get @time-atom client-param-path)
                   (= base-type :signal) (get @last-signals-atom client-param-path)
-                  (= base-type :solver) (get @last-solvers-atom client-param-path)
+                  (= base-type :solver) (get-in @last-solvers-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv) ;; (get @last-solvers-atom client-param-path)
+                  (= base-type :solver-meta) (get-in @last-solvers-atom-meta (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
                   (= base-type :server) (get @server-atom client-param-path lv)
                   (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
                   (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
@@ -6732,17 +6787,21 @@
 
 (def websocket-port 3030)
 
+;; (def ws-endpoints
+;;   {"/ws" (try 
+;;            (net/websocket-handler {:encoding :edn})
+;;            (catch Throwable _ (ut/pp [:websocket-layer-interupppted])))})
+
 (def ws-endpoints
-  {"/ws" (try 
-           (net/websocket-handler {:encoding :edn})
-           (catch Throwable _ (ut/pp [:websocket-layer-interupppted])))})
+  {"/ws" (net/websocket-handler {:encoding :edn})})
 
 (def ring-options-old
   {:port                 websocket-port
    :join?                false 
    :async?               true
-   :max-threads          450
+   ;; :max-threads          450
    ;; :max-idle-time        10000
+   :max-idle-time        5000
    :websockets           ws-endpoints
    :allow-null-path-info true})
 
@@ -6778,11 +6837,11 @@
 
 
 
-(defn create-websocket-server! []
-  (try 
-    (letfn [(handler [request respond raise] (respond {:status 404}))]
-    (jetty/run-jetty (fn [& args] (apply handler args)) ring-options))
-    (catch Throwable e (ut/pp [:wss (str e)]))))
+;; (defn create-websocket-server! []
+;;   (try 
+;;     (letfn [(handler [request respond raise] (respond {:status 404}))]
+;;     (jetty/run-jetty (fn [& args] (apply handler args)) ring-options))
+;;     (catch Throwable e (ut/pp [:wss (str e)]))))
 
 
 
@@ -6812,12 +6871,14 @@
 
 (defn destroy-websocket-server! []
   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
-  (try 
-    (when @websocket-server
-    (.stop @websocket-server)
-    @websocket-server
+  (try
+    (do
+      (when @websocket-server
+        (.stop @websocket-server)
+        @websocket-server
     ;; (.destroy @websocket-server)
-    (reset! websocket-server nil))
+        (reset! websocket-server nil))
+      @websocket-server)
     (catch Throwable _ nil)))
 
 
