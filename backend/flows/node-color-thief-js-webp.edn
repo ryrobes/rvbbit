@@ -1,0 +1,394 @@
+{:flowmaps
+ {:shell-command-1
+  {:w 200,
+   :h 100,
+   :x 1350,
+   :y 1550,
+   :z 0,
+   :data
+   {:flow-item
+    {:description "Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs",
+     :category ":rabbit-base",
+     :fn (fn [command] (rvbbit-backend.websockets/run-shell-command command)),
+     :name ":shell-command",
+     :icon "zmdi-washing-machine",
+     :defaults {:command "ls -la"},
+     :types {:command :string, :out :any},
+     :input_types "[:string]",
+     :style {:color "#ffdd3c"},
+     :selected-style {:color "#ffdd3c"},
+     :inputs "[:command]",
+     :output_types ":any",
+     :full_map
+     "{:description \"Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs\", :fn (fn [command] (rvbbit-backend.websockets/run-shell-command command)), :icon \"zmdi-washing-machine\", :defaults {:command \"ls -la\"}, :types {:command :string, :out :any}, :style {:color \"#ffdd3c\"}, :selected-style {:color \"#ffdd3c\"}, :inputs [:command], :required [:command]}",
+     :required [:command]},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [539.1770935058594 176.171875],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-42
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
+      :from [[:query/flow-fn-sys :cc59]],
+      :where [:= :name ":shell-command"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":shell-command",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :where,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 6}},
+   :icon "zmdi-washing-machine",
+   :ports
+   {:in {:command :string}, :out {:output :vector, :exception :vector, :seconds :vector, :command :string, :* :map}}},
+  :json-to-edn_colorPalette
+  {:y 1967.84224325644,
+   :fn (fn [x] (get-in x [:colorPalette])),
+   :w 150,
+   :raw-fn (fn [x] (get-in x [:colorPalette])),
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 85,
+   :x 1444.4887814083615,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] (get-in x [:colorPalette])),
+     :name ":open-fn",
+     :raw-fn (fn [x] (get-in x [:colorPalette])),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :convert-to-png
+  {:y 1025,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn
+   (fn [x y]
+     (let [x (if (clojure.string/starts-with? (str x) "./images/")
+               (clojure.string/replace (str x) "./images/" "/home/ryanr/rvbbit/frontend/resources/public/images/")
+               x)]
+       (str "convert " x " " y))),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any, :y :any}, :out {:out :any}},
+   :inputs nil,
+   :h 85,
+   :x 1500,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :run-the-convert-command
+  {:y 1150,
+   :w 200,
+   :right-click? true,
+   :icon "zmdi-washing-machine",
+   :z 0,
+   :ports {:in {:command :string}, :out {:out :any}},
+   :h 100,
+   :x 1500,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :name ":shell-command",
+     :type :shell-command,
+     :icon "zmdi-washing-machine",
+     :defaults {:command "ls -la"},
+     :types {:command :string, :out :any},
+     :style {:color "#ffdd3c"},
+     :selected-style {:color "#ffdd3c"},
+     :inputs [:command],
+     :expandable? true,
+     :required [:command]},
+    :drag-meta {:type :shell-command}}},
+  :json-to-edn
+  {:w 200,
+   :h 100,
+   :x 1375,
+   :y 1825,
+   :z 0,
+   :data
+   {:flow-item
+    {:description "Convert a JSON string to Clojure EDN",
+     :category ":rabbit-base",
+     :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)),
+     :name ":json-to-edn",
+     :icon "zmdi-file-text",
+     :types {:json-string :string, :out :any},
+     :input_types "[:string]",
+     :inputs "[:json-string]",
+     :output_types ":any",
+     :full_map
+     "{:description \"Convert a JSON string to Clojure EDN\", :fn (fn [json-string] (rvbbit-backend.util/json-to-edn json-string)), :inputs [:json-string], :icon \"zmdi-file-text\", :types {:json-string :string, :out :any}}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [1297.1770935058594 207.171875],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-41
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
+      :from [[:query/flow-fn-sys :uu284]],
+      :where [:= :name ":json-to-edn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":json-to-edn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :where,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 7}},
+   :icon "zmdi-file-text",
+   :ports {:in {:json-string :string}, :out {:dominantColor :string, :colorPalette :vector, :* :map}}},
+  :clojure-string-join-1
+  {:w 200,
+   :h 100,
+   :x 1350,
+   :y 1425,
+   :z 0,
+   :data
+   {:flow-item
+    {:description "Clojure.string's join function.",
+     :category ":clojure-base",
+     :fn (fn [delimiter & args] (clojure.string/join delimiter args)),
+     :name ":clojure-string-join",
+     :icon "zmdi-group",
+     :defaults {:delimiter " "},
+     :types {:delimiter :string, :out :string},
+     :input_types "[:string]",
+     :inputs "[:delimiter]",
+     :output_types ":string",
+     :expandable? true,
+     :full_map
+     "{:description \"Clojure.string's join function.\", :fn (fn [delimiter & args] (clojure.string/join delimiter args)), :inputs [:delimiter], :required [:delimiter], :defaults {:delimiter \" \"}, :expandable? true, :icon \"zmdi-group\", :types {:delimiter :string, :out :string}}",
+     :required [:delimiter]},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :root [540.1770935058594 279.171875],
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-12
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
+      :from [[:query/flow-fn-sys :ww526]],
+      :where [:= :name ":clojure-string-join"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":clojure-string-join",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :where,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 15}},
+   :icon "zmdi-group",
+   :ports {:in {:delimiter :string, :value-1 :any, :value-2 :any}, :out {:out :string}}},
+  :image-path
+  {:y 750,
+   :w 475,
+   :types nil,
+   :z 0,
+   :ports {:out {:out {:out :string}}, :in {}},
+   :inputs nil,
+   :h 125,
+   :x 1425,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input "./images/large/b64-image-94588-74015-4k.webp"}},
+  :get-color-edges
+  {:y 2100,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn
+   (fn [x]
+     (defn hex-to-rgb [hex] (map (fn [x] (Integer/parseInt x 16)) (re-seq (re-pattern "[0-9a-fA-F]{2}") (subs hex 1))))
+     (defn brightness [rgb] (let [[r g b] rgb] (Math/sqrt (+ (* 0.299 (* r r)) (* 0.587 (* g g)) (* 0.114 (* b b))))))
+     (defn brightest-and-darkest-colors [colors]
+       (when (not (empty? colors))
+         (let [brightnesses (map (fn [x] (-> x hex-to-rgb brightness)) colors)
+               brightest-index (apply max-key #(nth brightnesses %) (range (count colors)))
+               darkest-index (apply min-key #(nth brightnesses %) (range (count colors)))]
+           {:colors colors, :brightest (nth colors brightest-index), :darkest (nth colors darkest-index)})))
+     (brightest-and-darkest-colors x)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :inputs nil,
+   :h 135,
+   :x 1450,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :join-output-as-string
+  {:y 1700,
+   :fn (fn [x] x),
+   :w 200,
+   :raw-fn (fn [x] (clojure.string/join " " x)),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:value :any}, :out {:out :any}},
+   :h 100,
+   :x 1375,
+   :data
+   {:flow-item
+    {:description "Write you own Clojure function! Godspeed!",
+     :category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:value :any, :out :any},
+     :input_types "[:any]",
+     :inputs "[:value]",
+     :output_types ":any",
+     :expandable? true,
+     :full_map
+     "{:description \"Write you own Clojure function! Godspeed!\", :fn (fn [x] x), :raw-fn (fn [x] x), :type :open-fn, :icon \"zmdi-functions\", :types {:value :any, :out :any}, :inputs [:value], :expandable? true, :view (fn [_])}"},
+    :name "drag-from-",
+    :w 5,
+    :source-panel :flow-fn-list*,
+    :h 6,
+    :connection-id nil,
+    :queries
+    {:name-drag-25
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
+      :from [[:query/flow-fn-sys :ii11]],
+      :where [:= :name ":open-fn"]}},
+    :drag-meta
+    {:data-type "string",
+     :source-query :flow-fn-sys,
+     :param-full ":open-fn",
+     :param-field :name,
+     :source-panel-key :flow-fn-list*,
+     :type :open-fn,
+     :param-table :flow-fn-sys,
+     :source-table :query/flow-fn-sys,
+     :connection-id nil,
+     :target :name,
+     :row-num 5}}},
+  :shell-command-in
+  {:y 750,
+   :w 225,
+   :types nil,
+   :z 0,
+   :ports {:out {:out {:out :string}}, :in {}},
+   :inputs nil,
+   :h 125,
+   :x 1175,
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true},
+    :user-input "cd /home/ryanr/color-thief-project ; node ./colorThief2.js"}},
+  :waiter-fn
+  {:y 1300,
+   :fn (fn [x] x),
+   :w 125,
+   :raw-fn (fn [cmd img] img),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:cmd :any, :img :any}, :out {:out :any}},
+   :inputs nil,
+   :h 85,
+   :x 1525,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:cmd :img],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}},
+  :temp-name
+  {:y 900,
+   :fn (fn [x] x),
+   :w 150,
+   :raw-fn (fn [x] (str "/tmp/img" (hash x) ".png")),
+   :right-click? true,
+   :icon "zmdi-functions",
+   :types nil,
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :inputs nil,
+   :h 100,
+   :x 1650,
+   :data
+   {:flow-item
+    {:category ":rabbit-base",
+     :fn (fn [x] x),
+     :name ":open-fn",
+     :raw-fn (fn [x] x),
+     :type :open-fn,
+     :icon "zmdi-functions",
+     :types {:x :any, :out :any},
+     :inputs [:x],
+     :expandable? true,
+     :drag-meta {:type :open-fn}}}}},
+ :zoom [-132.73 -593.8 0.792],
+ :opts {:close-on-done? true, :retry-on-error? false, :retries 0},
+ :flow-id "node-color-thief-js-webp",
+ :flowmaps-connections
+ [[:shell-command-in :clojure-string-join-1/value-1]
+  [:clojure-string-join-1 :shell-command-1/command]
+  [:shell-command-1/output :join-output-as-string/value]
+  [:join-output-as-string :json-to-edn/json-string]
+  [:image-path :convert-to-png/x]
+  [:image-path :temp-name/x]
+  [:temp-name :convert-to-png/y]
+  [:convert-to-png :run-the-convert-command/command]
+  [:run-the-convert-command :waiter-fn/cmd]
+  [:temp-name :waiter-fn/img]
+  [:waiter-fn :clojure-string-join-1/value-2]
+  [:json-to-edn :json-to-edn_colorPalette/x]
+  [:json-to-edn_colorPalette :get-color-edges/x]
+  [:get-color-edges :done]]}

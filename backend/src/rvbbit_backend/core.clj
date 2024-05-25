@@ -354,6 +354,11 @@
   ;; (def ttttr
   ;;   (jetty/run-jetty #'wss/web-handler wss/ring-options))
 
+  ;; temp clean-up get rid of solver flows as well as huge base46 strings that we probably don't need. users should have saved them as files already, they can't exist in server memory forever. lol
+  (let [flows (vec (filter #(not (cstr/includes? (str %) "-solver-flow-")) (keys @flow-db/results-atom)))]
+    (reset! flow-db/results-atom (select-keys (ut/replace-large-base64 @flow-db/results-atom) flows)))
+
+
 ;; (reset! websocket-server (jetty/run-jetty wss/web-handler wss/ring-options))
 ;; (.start @websocket-server)
 

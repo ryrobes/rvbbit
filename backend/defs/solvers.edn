@@ -16,20 +16,18 @@
   :type :clojure,
   :default -1,
   :data
-  [0
-   9
-   8
-   7
-   "farts"
-   (apply + [1 2 3])
+  [(apply + [1 2 3])
    :solver/wallpaper-of-the-moment
    :solver/wallpaper-of-the-moment-8k]},
  :color-theft
- {:signal :signal/every-5-minutes,
+ {:signal :signal/changed-wallpaper?,
   :persist? false,
   :type :flow,
   :default -1,
-  :data {:flowmap "node-color-thief-js", :opts {}, :return nil}},
+  :data
+  {:flowmap "node-color-thief-js-webp",
+   :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
+   :return nil}},
  :wallpaper-of-the-moment-8k
  {:signal :signal/every-5-minutes,
   :persist? false,
@@ -83,4 +81,15 @@
   :default -1,
   :data
   (true?
-   (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))}}
+   (clojure.string/ends-with?
+    :solver/wallpaper-of-the-moment
+    ".png"))},
+ :colors-of-the-moment
+ {:signal :signal/changed-wallpaper?,
+  :persist? false,
+  :type :flow,
+  :default -1,
+  :data
+  {:flowmap "node-color-thief-js-webp",
+   :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
+   :return nil}}}

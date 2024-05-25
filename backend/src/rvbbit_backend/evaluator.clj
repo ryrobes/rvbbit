@@ -24,9 +24,7 @@
   (ut/pp [:starting-local-nrepl :port repl-port])
   (reset! repl-server (nrepl-server/start-server
                        :port repl-port
-                       :bind "127.0.0.1"
-                       ;:handler cider-nrepl-handler
-                       )))
+                       :bind "127.0.0.1")))
 
 (defn strip-ansi-codes [s]
   (cstr/replace s #"\u001B\[[0-9;]*m" ""))
@@ -42,9 +40,7 @@
       (do ;(println "cache-hit" cache-hash)
         (get @eval-cache cache-hash))
 
-      (let [;s (or (get-in request [:edn-params :eval-string])
-        ;      (get-in request [:query-params :eval-string]))
-            nrepl? true ;(cstr/includes? s ":::use-nrepl")
+      (let [nrepl? true ;(cstr/includes? s ":::use-nrepl")
             ext-nrepl? (cstr/includes? s ":::ext-nrepl") ;; from rabbit.edn 
             custom-nrepl? (cstr/includes? s ":::custom-nrepl")
             custom-nrepl-map (cond ext-nrepl? {:host ext-repl-host ;; hardcoded instead of internal nrepl
@@ -59,16 +55,7 @@
                                    :else {:host "127.0.0.1"
                                           :port 8181})
             nrepl-port (get custom-nrepl-map :port)
-            nrepl-host (get custom-nrepl-map :host)
-          ;  debug? (get rabbit-config :debug-output?) ;; true ; false ;true
-            ;rreedd (try (edn/read-string s) (catch Exception _ nil))
-            ]
-
-        ;; (when debug?
-        ;;   (try (ut/pp [:repl-eval {:h nrepl-host :p nrepl-port} s])
-        ;;        (catch Exception ee
-        ;;          (println ee))))
-
+            nrepl-host (get custom-nrepl-map :host)]
 
         (if (not nrepl?) ;; never going to happen here TODO: remove if
 
@@ -86,65 +73,26 @@
                   (println ["   !**NOT REPL**!   " (newline) (str output-type) (newline) eval-output]))
                 {:evald-result eval-output0}))
 
-;(send-edn-success {:evald-result [:cant :connect :to :nrepl!]}) ;; nrepl://127.0.0.1:44865
-      ;(do ;(when (and debug? nrepl?)
-          ;  (println ["   !**REPL**!   " (str "using nrepl @ " nrepl-host ":" nrepl-port " ")]))
-
-          (let [e (try ;(with-open [conn (nrepl/connect :host nrepl-host :port nrepl-port)]
+          (let [e (try 
 
                     (with-open [conn (nrepl/connect :host nrepl-host :port nrepl-port)]
-                      (let [;conn (nrepl/connect :host nrepl-host :port nrepl-port)
-                            user-fn-str (slurp "./user.clj")
+                      (let [user-fn-str (slurp "./user.clj")
                             s (str user-fn-str "\n" s)
-                            skt (nrepl/client conn 1000000000)
+                            skt (nrepl/client conn 60000)
                             msg (nrepl/message skt {:op "eval" :code s})
-                               ;msg (message skt {:op "eval" :code s})
                             rsp-read (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var")) ;; no nil returns or def selfs #'my-thing-def etc. useless.
                                                   (nrepl/response-values msg)))
-                            ;; jdbc-conn (first (remove nil? (for [s rsp-read]
-                            ;;                                 (when (or (and (map? s)
-                            ;;                                                (contains? s :classname)
-                            ;;                                                (contains? s :subprotocol)
-                            ;;                                                (contains? s :subname))
-                            ;;                                           (and (map? s)
-                            ;;                                                (contains? s :dbtype)
-                            ;;                                                (contains? s :dbname)
-                            ;;                                                (contains? s :host)))
-                            ;;                                   s))))
-                            ;; has-jdbc? (not (empty? jdbc-conn))
-                            ;; jdbc-meta (when has-jdbc?
-                            ;;             (try
-                            ;;               (get-jdbc-conn-meta jdbc-conn)
-                            ;;               (catch Exception e {:jdbc-error (str (.getMessage e))})))
-
                             rsp (nrepl/combine-responses msg)
-                              ;output (doall (clojure.pprint/pprint msg))
                             msg-out (vec (remove nil? (for [m msg] (get m :out))))
-                            ;msg-out-session (vec (remove nil? (for [m msg] (get m :session))))
-                            merged-values ;(if has-jdbc?
-                                          ;  ;(conj rsp-read (merge jdbc-conn {:rabbit-meta jdbc-meta}))
-                                          ;  [(merge jdbc-conn {:rabbit-meta jdbc-meta})]
-                            rsp-read
-                                          ;  )
-                            ;jdbc-inject-vales (if has-jdbc? 
-                            ;                    (for [v rsp-read] 
-                            ;                      )
-                            ;                    )
-                            ]
-                        ;;(println rsp-read)
-                        ;(println (frequencies msg-out-session))
-                        ;(println (cstr/join msg-out))
+                            merged-values rsp-read]
 
                         {:evald-result (-> rsp
-                                           ;(assoc-in [:meta :jdbc] (merge jdbc-conn {:rabbit-meta jdbc-meta}))
-                                           ;(assoc-in [:meta :has-jdbc?] has-jdbc?)
                                            (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
                                            (assoc :value merged-values) ;; ?
                                            (assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join msg-out)) #"\n")))
-                                                  ;;[(strip-ansi-codes (cstr/join msg-out))]) ;msg-out)
-                                           ;(assoc-in [:value 0] (merge jdbc-conn {:rabbit-meta jdbc-meta}))
                                            (dissoc :id)
                                            (dissoc :session))}))
+
                     (catch Exception ee
                       (let [error-msg (ex-message ee)
                             added-errors (if (cstr/includes? error-msg "Could not read response value")
@@ -154,7 +102,6 @@
                                                 ;(ex-cause ee) (ex-data ee)
                                                 )
                                            nil)]
-                        ;;; if :cause = ""java.lang.RuntimeException: No reader function for tag object"" wrap in str....
                         {:evald-result (merge {:nrepl-conn custom-nrepl-map
                                                :cause (str (ex-cause ee))
                                                :err-data (str (ex-data ee))

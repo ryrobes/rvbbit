@@ -129,6 +129,109 @@
 (def jvm-stats-every 30)
 
 
+(def task-queue (java.util.concurrent.LinkedBlockingQueue.))
+(def running (atom true))
+(def worker (atom nil)) ; Holds the future of the worker thread
+
+(defn enqueue-task [task]
+  (.put task-queue task))
+
+(defn worker-loop []
+  (loop []
+    (when @running
+      (let [task (.take task-queue)]
+        (task))))
+  (recur))
+
+(defn start-worker []
+  ;(Thread/sleep 1000)
+  (ut/pp [:starting-sync-worker-thread 1])
+  (reset! running true)
+  (reset! worker (future (worker-loop))))
+
+(defn stop-worker []
+  (reset! running false)
+  (when-let [w @worker]
+    (future-cancel w)
+    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+      (Thread/sleep 60))))
+
+(defn recycle-worker []
+  ;(ut/pp [:REBOOTING-WORKER-THREAD!!])
+  (reset! stats-cnt 0)
+  ;(System/gc) ;;; hehe, fuck it
+  (stop-worker)
+  (start-worker))
+
+(def task-queue2 (java.util.concurrent.LinkedBlockingQueue.))
+(def running2 (atom true))
+(def worker2 (atom nil)) ; Holds the future of the worker thread
+
+(defn enqueue-task2 [task]
+  (.put task-queue2 task))
+
+(defn worker-loop2 []
+  (loop []
+    (when @running2
+      (let [task (.take task-queue2)]
+        (task))))
+  (recur))
+
+(defn start-worker2 []
+  ;(Thread/sleep 2000)
+  (ut/pp [:starting-sync-worker-thread 2])
+  (reset! running2 true)
+  (reset! worker2 (future (worker-loop2))))
+
+(defn stop-worker2 []
+  (reset! running2 false)
+  (when-let [w @worker2]
+    (future-cancel w)
+    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+      (Thread/sleep 60))))
+
+(defn recycle-worker2 []
+  ;(ut/pp [:REBOOTING-WORKER-THREAD2!!])
+  ;(System/gc) ;;; hehe, fuck it
+  (stop-worker2)
+  (start-worker2))
+
+(def task-queue3 (java.util.concurrent.LinkedBlockingQueue.))
+(def running3 (atom true))
+(def worker3 (atom nil)) ; Holds the future of the worker thread
+
+(defn enqueue-task3 [task]
+  (.put task-queue3 task))
+
+(defn worker-loop3 []
+  (loop []
+    (when @running3
+      (let [task (.take task-queue3)]
+        (task))))
+  (recur))
+
+(defn start-worker3 []
+  ;(Thread/sleep 3000)
+  (ut/pp [:starting-sync-worker-thread 3])
+  (reset! running3 true)
+  (reset! worker3 (future (worker-loop3))))
+
+(defn stop-worker3 []
+  (reset! running3 false)
+  (when-let [w @worker3]
+    (future-cancel w)
+    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+      (Thread/sleep 60))))
+
+(defn recycle-worker3 []
+  ;(ut/pp [:REBOOTING-WORKER-THREAD3!!])
+  ;(System/gc) ;;; hehe, fuck it
+  (stop-worker3)
+  (start-worker3))
+
+
+
+
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
 ;; (defonce flow-running-tasks (atom {}))
@@ -1710,6 +1813,9 @@
                                                    (= k :rvbbit-scheduler) "n/a"
                                                    :else (ut/format-duration-seconds seconds-ago)))))})));)
 
+(declare flow-kill!)
+(declare alert!)
+
 (defn flow-statuses []
   (into {} (for [[k {:keys [*time-running *running? *started-by *finished overrides started waiting-blocks running-blocks]}] @flow-status
                  :let [chans (count (get @flow-db/channels-atom k))
@@ -1728,7 +1834,14 @@
                        last-update-seconds (int (/ (- (System/currentTimeMillis) (get @watchdog-atom k)) 1000))
                        human-elapsed (if *running?
                                        (ut/format-duration started (System/currentTimeMillis))
-                                       *time-running)]]
+                                       *time-running)
+                       last-update (get @last-block-written k)
+                       _ (when (and (> last-update-seconds 240) (empty? running-blocks) (not (nil? last-update)) *running?)
+                           (alert! *started-by [:box 
+                                                :style {:color "red"}
+                                                :child (str "ATTN: flow " k " killed by rabbit watchdog for going idle - TODO")] 15 1 60)
+                           (flow-kill! k :rvbbit-watchdog))]]
+             
              {k {:time-running *time-running
                  :*running? *running?
                  ;:tracker-events tracker-events
@@ -1736,7 +1849,7 @@
                  :*started-by *started-by
                  :last-update-seconds (when *running? last-update-seconds)
                  :last-updated (when *running? (ut/format-duration-seconds last-update-seconds))
-                 :last-update (get @last-block-written k)
+                 :last-update last-update
                  :running-blocks running-blocks
                  :block-overrides (vec (keys overrides))
                  :since-start (str human-elapsed)
@@ -2990,7 +3103,9 @@
 (defmethod wl/handle-request :get-flow-statuses [{:keys [client-name]}]
   (inc-score! client-name :push)
   (ut/pp [:PUSH-get-flow-status! client-name])
-  (let [payload   (merge (flow-statuses) ;; @flow-status
+  (let [fss (flow-statuses)
+        fssk (vec (filter #(not (cstr/includes? (str %) "-solver-flow-")) (vec (keys fss))))
+        payload   (merge (select-keys fss fssk)
                          (into {} (for [[k v] @processes]
                                     {k (-> v
                                            (assoc :process? true)
@@ -3497,24 +3612,27 @@
     (cond
 
       (= runner-type :nrepl)
-      (try
-        (let [repl-host (get-in runner-map [:runner :host])
-              repl-port (get-in runner-map [:runner :port])
-              output-full (evl/repl-eval vdata repl-host repl-port)
-              output (last (get-in output-full [:evald-result :value]))
-              output-full (-> output-full
-                              (assoc-in [:evald-result :output-lines]
-                                        (try (count (remove empty? (get-in output-full [:evald-result :out])))
-                                             (catch Exception _ 0)))
-                              (assoc-in [:evald-result :values]
-                                        (try (count (last (get-in output-full [:evald-result :value])))
-                                             (catch Exception _ 0))))]
-          (ut/pp [:running-solver solver-name {:output output :output-full output-full}])
-          (swap! last-solvers-atom assoc solver-name output)
-          (swap! last-solvers-atom-meta assoc solver-name output-full))
-        (catch Throwable e
-          (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
-              (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+      ;;(enqueue-task3
+      ;; (fn []
+         (try
+           (let [repl-host (get-in runner-map [:runner :host])
+                 repl-port (get-in runner-map [:runner :port])
+                 output-full (evl/repl-eval vdata repl-host repl-port)
+                 output (last (get-in output-full [:evald-result :value]))
+                 output-full (-> output-full
+                                 (assoc-in [:evald-result :output-lines]
+                                           (try (count (remove empty? (get-in output-full [:evald-result :out])))
+                                                (catch Exception _ 0)))
+                                 (assoc-in [:evald-result :values]
+                                           (try (count (last (get-in output-full [:evald-result :value])))
+                                                (catch Exception _ 0))))]
+             (ut/pp [:running-solver solver-name {:output output :output-full output-full}])
+             (swap! last-solvers-atom assoc solver-name output)
+             (swap! last-solvers-atom-meta assoc solver-name output-full))
+           (catch Throwable e
+             (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
+                 (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+        ;; ))
 
       (= runner-type :flow) ;; no runner def needed for anon flow pulls
       (try 
@@ -3525,7 +3643,8 @@
             ;;           flowmap) ;; if supplied some dirs, we leave as is.. if its just a file name, we append a relative path
              opts (merge {:close-on-done? true :timeout 10000} (get vdata :opts {}))
              return (get vdata :return) ;; alternate block-id to fetch when done
-             flow-id (str (cstr/replace (str solver-name) ":" "") "-solver-flow-" timestamp)
+            ;;  flow-id (str (cstr/replace (str solver-name) ":" "") "-solver-flow-" timestamp)
+             flow-id (str (cstr/replace (str solver-name) ":" "") "-solver-flow-")
              output (flow! client-name flowmap nil flow-id opts)
              output (ut/remove-namespaced-keys
                      (ut/replace-large-base64 output))
@@ -4730,105 +4849,7 @@
 ;;     (reset! worker-thread new-thread))) ;; Update the atom with the new thread.
 
 
-(def task-queue (java.util.concurrent.LinkedBlockingQueue.))
-(def running (atom true))
-(def worker (atom nil)) ; Holds the future of the worker thread
 
-(defn enqueue-task [task]
-  (.put task-queue task))
-
-(defn worker-loop []
-  (loop []
-    (when @running
-      (let [task (.take task-queue)]
-        (task))))
-  (recur))
-
-(defn start-worker []
-  ;(Thread/sleep 1000)
-  (ut/pp [:starting-sync-worker-thread 1])
-  (reset! running true)
-  (reset! worker (future (worker-loop))))
-
-(defn stop-worker []
-  (reset! running false)
-  (when-let [w @worker]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60))))
-
-(defn recycle-worker []
-  ;(ut/pp [:REBOOTING-WORKER-THREAD!!])
-  (reset! stats-cnt 0)
-  ;(System/gc) ;;; hehe, fuck it
-  (stop-worker)
-  (start-worker))
-
-(def task-queue2 (java.util.concurrent.LinkedBlockingQueue.))
-(def running2 (atom true))
-(def worker2 (atom nil)) ; Holds the future of the worker thread
-
-(defn enqueue-task2 [task]
-  (.put task-queue2 task))
-
-(defn worker-loop2 []
-  (loop []
-    (when @running2
-      (let [task (.take task-queue2)]
-        (task))))
-  (recur))
-
-(defn start-worker2 []
-  ;(Thread/sleep 2000)
-  (ut/pp [:starting-sync-worker-thread 2])
-  (reset! running2 true)
-  (reset! worker2 (future (worker-loop2))))
-
-(defn stop-worker2 []
-  (reset! running2 false)
-  (when-let [w @worker2]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60))))
-
-(defn recycle-worker2 []
-  ;(ut/pp [:REBOOTING-WORKER-THREAD2!!])
-  ;(System/gc) ;;; hehe, fuck it
-  (stop-worker2)
-  (start-worker2))
-
-(def task-queue3 (java.util.concurrent.LinkedBlockingQueue.))
-(def running3 (atom true))
-(def worker3 (atom nil)) ; Holds the future of the worker thread
-
-(defn enqueue-task3 [task]
-  (.put task-queue3 task))
-
-(defn worker-loop3 []
-  (loop []
-    (when @running3
-      (let [task (.take task-queue3)]
-        (task))))
-  (recur))
-
-(defn start-worker3 []
-  ;(Thread/sleep 3000)
-  (ut/pp [:starting-sync-worker-thread 3])
-  (reset! running3 true)
-  (reset! worker3 (future (worker-loop3))))
-
-(defn stop-worker3 []
-  (reset! running3 false)
-  (when-let [w @worker3]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60))))
-
-(defn recycle-worker3 []
-  ;(ut/pp [:REBOOTING-WORKER-THREAD3!!])
-  ;(System/gc) ;;; hehe, fuck it
-  (stop-worker3)
-  (start-worker3))
 
 
 
@@ -6224,9 +6245,9 @@
                       ])
         ;prows (vec (filter #(cstr/includes? (str (get % 6) "") "-preview-") (distinct (into (into (into param-rows flow-rows) block-rows) panel-rows))))
         prows (vec (distinct (into (into (into param-rows flow-rows) block-rows) panel-rows)))
-        keys (vec (distinct (map first prows)))
+        ;;keys (vec (distinct (map first prows)))
         rows (vec (for [r prows] (zipmap [:item_key :item_type :item_sub_type :value :is_live :sample :display_name :block_meta] r)))
-        delete-sql {:delete-from [:client_items] :where (cons :or (vec (for [k keys] [:= :item_key k])))}
+        delete-sql {:delete-from [:client_items] :where [:= 1 1]} ;; (cons :or (vec (for [k keys] [:= :item_key k])))}
         ;insert-sql {:insert-into [:client_items] :values rows}
         ]
     ;; (ut/pp [:panel-rows (take 75 panel-rows)])
@@ -6250,17 +6271,25 @@
                               (for [[flow-id v] (ut/replace-large-base64 (dissoc @flow-db/results-atom "client-keepalive"))]
                                 (vec (for [[block_key block_value] v]
                                        (stringify-except
-                                        {:flow_id flow-id :block_key block_key :block_value block_value :data_type (ut/data-typer block_value)}
+                                        {:flow_id flow-id 
+                                         :block_key block_key 
+                                         :block_value (try (subs (str block_value) 0 1000) (catch Exception _ (str block_value))) 
+                                         :data_type (ut/data-typer block_value)}
                                         [:start :end]))))))
                   (catch Exception e (do (ut/pp [:update-flow-results>sql-error (str e)]) [])))
-        rows (vec (for [r rows
-                        :let [v (str (if (> (count (get r :block_value)) 3000) (subs (get r :block_value) 0 3000) (get r :block_value)))]]
-                    (assoc r :block_value v)))
-        insert-sql {:insert-into [:flow_results] :values rows}]
+        ;; rows (vec (for [r rows
+        ;;                 :let [v (str (if (> (count (get r :block_value)) 1000) (subs (get r :block_value) 0 1000) (get r :block_value)))]]
+        ;;             (assoc r :block_value v)))
+        ;insert-sql {:insert-into [:flow_results] :values (vec rows)}
+        ]
     ;(ut/pp [:flow-results-rows rows])
-    (when (not (empty? rows))
-      (do (sql-exec flows-db (to-sql {:delete-from [:flow_results]}))
-          (sql-exec flows-db (to-sql insert-sql))))))
+    (when (ut/ne? rows)
+      (sql-exec flows-db (to-sql {:delete-from [:flow_results]}))
+
+      ;(sql-exec flows-db (to-sql insert-sql)) ;;; this is dumb. TODO - worked earlier, but won't at scale unless we are careful wiht maintaining "active" flow roster
+      (doseq [chunk (partition-all 50 rows)]
+        (sql-exec flows-db (to-sql {:insert-into [:flow_results] :values (vec chunk)})))
+      )))
 
 (defn update-channel-history>sql []
   (let [rows (try (apply concat
@@ -6879,21 +6908,36 @@
    :websockets           ws-endpoints
    :allow-null-path-info true})
 
+;; (def ring-options
+;;   {:port                 websocket-port
+;;    :join?                false
+;;    :async?               true
+;;    :min-threads          100 ;; 50
+;;    :max-threads          450
+;;    :idle-timeout         5000
+;;    :queue-size           1000
+;;    :max-idle-time        30000
+;;    ;:input-buffer-size    8192
+;;    ;:output-buffer-size   8192
+;;    ;:max-message-size     65536
+;;    :input-buffer-size    16384  ;; doubled from 8192 to 16384
+;;    :output-buffer-size   16384
+;;    :max-message-size     1048576  ;; 1MB - only like 1% of messages
+;;    :websockets           ws-endpoints
+;;    :allow-null-path-info true})
+
 (def ring-options
   {:port                 websocket-port
    :join?                false
    :async?               true
-   :min-threads          100 ;; 50
-   :max-threads          450
-   :idle-timeout         5000
-   :queue-size           1000
-   :max-idle-time        30000
-   ;:input-buffer-size    8192
-   ;:output-buffer-size   8192
-   ;:max-message-size     65536
-   :input-buffer-size    16384  ;; doubled from 8192 to 16384
-   :output-buffer-size   16384
-   :max-message-size     1048576  ;; 1MB - only like 1% of messages
+   :min-threads          300
+   :max-threads          1000  ;; Increased max threads
+   :idle-timeout         10000  ;; Increased idle timeout
+   :queue-size           5000  ;; Increased queue size
+   :max-idle-time        60000  ;; Increased max idle time
+   :input-buffer-size    32768  ;; Increased buffer sizes
+   :output-buffer-size   32768
+   :max-message-size     2097152  ;; Increased max message size
    :websockets           ws-endpoints
    :allow-null-path-info true})
 
