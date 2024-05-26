@@ -65,9 +65,17 @@
    (clojure.string/ends-with?
     :solver/wallpaper-of-the-moment
     ".png"))},
+ :colors-of-the-moment-8k
+ {:signal :signal/changed-wallpaper-8k?,
+  :cache? false,
+  :type :flow,
+  :data
+  {:flowmap "node-color-thief-js-webp",
+   :opts {:overrides {:image-path :solver/wallpaper-of-the-moment-8k}},
+   :return nil}},
  :colors-of-the-moment
  {:signal :signal/changed-wallpaper?,
-  :cache? true,
+  :cache? false,
   :type :flow,
   :data
   {:flowmap "node-color-thief-js-webp",

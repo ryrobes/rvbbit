@@ -94,10 +94,11 @@
 
 
 (def system-db {:datasource @(pool-create {;;:jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" &mode=memory ; "jdbc:sqlite:db/system.db"
-                                           :jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE"  ; "jdbc:sqlite:db/system.db"
+                                           ;:jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE"  ; "jdbc:sqlite:db/system.db"
+                                           :jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE"  ; "jdbc:sqlite:db/system.db"
                                            :idle-timeout        600000  ;;;; LAST KNOW GOOD SQLITE 10/25/23 
                                            :max-lifetime       1800000
-                                           :auto_vacuum        "FULL"
+                                           ;:auto_vacuum        "FULL"
                                            :cache "shared"} "system-db")})
 
 (def flows-db {:datasource @(pool-create {:jdbc-url "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" ; "jdbc:sqlite:db/system.db"

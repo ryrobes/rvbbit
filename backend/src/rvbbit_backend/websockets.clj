@@ -237,6 +237,77 @@
 
 
 
+
+;; thread pool version... testing out with run-solvers instead of async free for all...
+(def task-queue4 (java.util.concurrent.LinkedBlockingQueue.))
+(def running4 (atom true))
+(def workers4 (atom nil)) ; Holds the futures of the worker threads
+
+(defn enqueue-task4 [task]
+  (.put task-queue4 task))
+
+(defn worker-loop4 []
+  (loop []
+    (when @running4
+      (let [task (.take task-queue4)]
+        (task))))
+  (recur))
+
+(defn start-workers4 [num-workers]
+  (ut/pp [:starting-sync-worker-thread-*pool 4])
+  (reset! running4 true)
+  (reset! workers4 (doall (map (fn [_] (future (worker-loop4))) (range num-workers)))))
+
+(defn stop-workers4 []
+  (reset! running4 false)
+  (doseq [w @workers4]
+    (future-cancel w)
+    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+      (Thread/sleep 60))))
+
+(defn recycle-workers4 [num-workers]
+  (stop-workers4)
+  (start-workers4 num-workers))
+
+
+
+
+
+
+
+;; thread pool version... testing out with run-solvers instead of async free for all...
+(def task-queue5 (java.util.concurrent.LinkedBlockingQueue.))
+(def running5 (atom true))
+(def workers5 (atom nil)) ; Holds the futures of the worker threads
+
+(defn enqueue-task5 [task]
+  (.put task-queue5 task))
+
+(defn worker-loop5 []
+  (loop []
+    (when @running5
+      (let [task (.take task-queue5)]
+        (task))))
+  (recur))
+
+(defn start-workers5 [num-workers]
+  (ut/pp [:starting-sync-worker-thread-*pool 5])
+  (reset! running5 true)
+  (reset! workers5 (doall (map (fn [_] (future (worker-loop5))) (range num-workers)))))
+
+(defn stop-workers5 []
+  (reset! running5 false)
+  (doseq [w @workers5]
+    (future-cancel w)
+    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+      (Thread/sleep 60))))
+
+(defn recycle-workers5 [num-workers]
+  (stop-workers5)
+  (start-workers5 num-workers))
+
+
+
 ;; (def flow-executor-service (Executors/newFixedThreadPool 5))
 
 ;; (defonce flow-running-tasks (atom {}))
@@ -1269,37 +1340,39 @@
 ;;   (sub-push-loop client-name data client-queues-3 kind))
 
 (defn push-to-client [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
-  (doall
-   (try
-     (let [rr 0 ;(rand-int 3)
-           cq (get client-queue-atoms rr)
-           _ (swap! queue-distributions assoc client-name 
-                    (vec (conj (get @queue-distributions client-name []) rr)))
-           client-queue-atom (get @cq client-name)]
-       (swap! queue-status assoc-in [client-name task-id ui-keypath] status)
-       (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
-       (if client-queue-atom
-         (do
+  ;(doall
+   (enqueue-task5 
+    (fn []
+      (try
+        (let [rr 0 ;(rand-int 3)
+              cq (get client-queue-atoms rr)
+              _ (swap! queue-distributions assoc client-name
+                       (vec (conj (get @queue-distributions client-name []) rr)))
+              client-queue-atom (get @cq client-name)]
+          (swap! queue-status assoc-in [client-name task-id ui-keypath] status)
+          (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
+          (if client-queue-atom
+            (do
           ;;  (ut/pp [:PUSH-to-client! client-name ui-keypath task-id status data])
-           (inc-score! client-name :push)
-           (inc-score! client-name :last-push true)
-           (swap! client-queue-atom conj
-                  {:ui-keypath ui-keypath
-                   :status status
-                   :elapsed-ms elapsed-ms
-                   :reco-count reco-count
-                   :queue-id queue-id
-                   :task-id task-id
-                   :data [data  ;; data is likely needed for :payload and :payload-kp that kits need? but we can revisit later... 
+              (inc-score! client-name :push)
+              (inc-score! client-name :last-push true)
+              (swap! client-queue-atom conj
+                     {:ui-keypath ui-keypath
+                      :status status
+                      :elapsed-ms elapsed-ms
+                      :reco-count reco-count
+                      :queue-id queue-id
+                      :task-id task-id
+                      :data [data  ;; data is likely needed for :payload and :payload-kp that kits need? but we can revisit later... 
                                       ;; not sure if kits will ship in current form. doubtful actually
                                       ;; in the meantime this takes a chunk out of client memory reqs  || 5/10/25 12:35am
-                          (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
-                   :client-name client-name}))
-         (doall
-          (let [] ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
-            (new-client client-name)
-            (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms)))))
-     (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data])))))
+                             (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
+                      :client-name client-name}))
+         ;(doall
+            (let [] ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
+              (new-client client-name)
+              (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))));)
+        (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))))));)
 ;;; ORIGINAL HUMAN VERSION
 
 
@@ -3630,13 +3703,15 @@
         cache-key (when use-cache? (hash [vdata runner-name])) ;; since we could have 2 connections with the same data... I suppose.
         cache-val (when use-cache? (get @solvers-cache-atom cache-key))
         cache-hit? (true? (and use-cache? (vector? cache-val)))
-        timestamp-str (str (when use-cache? "*") (when cache-hit? "x") " " (millis-to-date timestamp))
-        meta-extra {:extra {:last-processed timestamp-str :cache-hit? cache-hit?}}]
+        timestamp-str (cstr/trim (str (when use-cache? "^") 
+                                      (when cache-hit? "*") " " (millis-to-date timestamp)))]
     ;; (ut/pp [:solverCACHE?? use-cache? cache-key cache-val cache-hit?])
     
     (cond
       
       cache-hit? (let [[output output-full] cache-val
+                       meta-extra {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms 0}}
+                       timestamp-str (str timestamp-str " (cache hit)")
                        new-history (vec (conj (get @last-solvers-history-atom solver-name []) timestamp-str ))] ;; regardless of what it is, if its cached and enabled, we send it. IFYKYK
                    (ut/pp [:solver-cache-hit solver-name {:output output :output-full (assoc output-full :cache-hit? true)}])
                    (swap! last-solvers-atom assoc solver-name output)
@@ -3649,7 +3724,9 @@
          (try
            (let [repl-host (get-in runner-map [:runner :host])
                  repl-port (get-in runner-map [:runner :port])
-                 output-full (evl/repl-eval vdata repl-host repl-port)
+                 ;;output-full (evl/repl-eval vdata repl-host repl-port)
+                 {:keys [result elapsed-ms]} (ut/timed-exec (evl/repl-eval vdata repl-host repl-port))
+                 output-full result
                  output (last (get-in output-full [:evald-result :value]))
                  output-full (-> output-full
                                  (assoc-in [:evald-result :output-lines]
@@ -3658,7 +3735,10 @@
                                  (assoc-in [:evald-result :values]
                                            (try (count (last (get-in output-full [:evald-result :value])))
                                                 (catch Exception _ 0))))
-                 new-history (vec (conj (get @last-solvers-history-atom solver-name []) timestamp-str ))]
+                 runs (get @last-solvers-history-atom solver-name [])
+                 meta-extra {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms elapsed-ms :runs (count runs)}}
+                 timestamp-str (str timestamp-str " (" elapsed-ms "ms)")
+                 new-history (vec (conj runs timestamp-str ))]
              (ut/pp [:running-solver solver-name {:output output :output-full output-full}])
              (swap! last-solvers-atom assoc solver-name output)
              (swap! last-solvers-atom-meta assoc solver-name (merge meta-extra output-full {:history (vec (reverse (take-last 20 new-history)))}))
@@ -3666,7 +3746,7 @@
              (when use-cache? (swap! solvers-cache-atom assoc cache-key [output output-full])))
            (catch Throwable e
              (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
-                 (swap! last-solvers-atom-meta assoc solver-name (merge meta-extra {:error (str e)})))))
+                 (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
         ;; ))
 
       (= runner-type :flow) ;; no runner def needed for anon flow pulls
@@ -3682,7 +3762,9 @@
               return (get vdata :return) ;; alternate block-id to fetch when done
             ;;  flow-id (str (cstr/replace (str solver-name) ":" "") "-solver-flow-" timestamp)
               flow-id (str (cstr/replace (str solver-name) ":" "") "-solver-flow-")
-              output (flow! client-name flowmap nil flow-id opts)
+              ;output (flow! client-name flowmap nil flow-id opts)
+              {:keys [result elapsed-ms]} (ut/timed-exec (flow! client-name flowmap nil flow-id opts))
+              output result
               output (ut/remove-namespaced-keys
                       (ut/replace-large-base64 output))
               output-val (get-in output [:return-val])
@@ -3696,7 +3778,10 @@
                            :output-val output-val
                            :flow-id flow-id
                            :return return}
-              new-history (conj (get @last-solvers-history-atom solver-name []) timestamp-str)]
+              runs (get @last-solvers-history-atom solver-name [])
+              meta-extra {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms elapsed-ms :runs (count runs)}}
+              timestamp-str (str timestamp-str " (" elapsed-ms "ms)")
+              new-history (conj runs timestamp-str)]
           (ut/pp [:running-solver-flow solver-name output-full])
           (swap! last-solvers-atom assoc solver-name output-val)
           (swap! last-solvers-atom-meta assoc solver-name (merge meta-extra output-full {:history (vec (reverse (take-last 20 new-history)))}))
@@ -3704,11 +3789,14 @@
           (when use-cache? (swap! solvers-cache-atom assoc cache-key [output output-full])))
         (catch Throwable e
           (do (ut/pp [:SOLVER-FLOW-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
-              (swap! last-solvers-atom-meta assoc solver-name (merge meta-extra {:error (str e)})))))
+              (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
 
       :else ;; else we assume it's just data and keep it as is
       (let [output-full {:static-data vdata}
-            new-history (conj (get @last-solvers-history-atom solver-name []) timestamp-str )]
+            runs (get @last-solvers-history-atom solver-name [])
+            meta-extra {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms -1 runs (count runs)}}
+            timestamp-str (str timestamp-str " (static)")
+            new-history (conj runs timestamp-str )]
         (ut/pp [:solver-static solver-name vdata])
         (swap! last-solvers-atom assoc solver-name vdata)
         (swap! last-solvers-atom-meta assoc solver-name (merge meta-extra output-full {:history (vec (reverse (take-last 20 new-history)))}))
@@ -3784,7 +3872,8 @@
                                                        :when (or (= (get sv :signal) kk)
                                                                  (= (get sv :signal) (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
                                                  ;(ut/pp [:running-solver! sk :dep-met kk])
-                                                 (run-solver sk)))
+                                                 (enqueue-task4 (fn [] (run-solver sk)))
+                                                 ))
                                            _ (swap! last-signals-atom-stamp assoc kk nowah)]]
                                  {[kk vv] result}))]
      (doseq [[k v] signals-resolve-map]

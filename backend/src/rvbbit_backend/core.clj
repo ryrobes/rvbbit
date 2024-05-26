@@ -574,9 +574,16 @@
       ;(def worker-thread (wss/start-thread-worker))
       ;(def lunchbreak (tt/every! 90 2 (bound-fn [] (wss/recycle-worker worker-thread)))) ;; "reboot" the sniffer worker thread every 30 mins
 
-    (def lunchbreak  (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker)))) ;; "reboot" the sniffer worker thread every hour
-    (def lunchbreak2 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker2))))
-    (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
+    ;; (def lunchbreak  (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker)))) ;; "reboot" the sniffer worker thread every hour
+    ;; (def lunchbreak2 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker2))))
+    ;; (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
+    ;; (def lunchbreak4 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker4))))
+
+    (wss/recycle-worker)
+    (wss/recycle-worker2)
+    (wss/recycle-worker3)
+    (wss/recycle-workers4 3) ;; run-solver only
+    (wss/recycle-workers5 6) ;; push-to-client only
 
         ;;(def lucene-commiter (tt/every! 30 2 (bound-fn [] (search/commit-writer search/index-writer))))
     (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))

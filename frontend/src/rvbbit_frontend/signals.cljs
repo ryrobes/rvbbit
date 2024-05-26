@@ -560,6 +560,7 @@
                                                     "")]
                                            {name vv})))
                       :else {})
+        ;; top-result (first (first (reverse (sort-by last (for [[k v] results] [k (get v :last-processed -1)])))))
         ;; warren-type-string-label (if (cstr/ends-with? warren-type-string "s")
         ;;                            (ut/drop-last-char warren-type-string)
         ;;                            warren-type-string)
@@ -616,10 +617,9 @@
                                  :style {:font-size "19px"}
                                  :justify :between
                                  ;:height "25px"
-
                                  :children [[re-com/box 
                                              :style {:font-size "15px"
-                                                     ;:border "1px solid yellow"
+                                                     ;;:border (when (= name top-result) "1px solid yellow")
                                                      :font-weight 700}
                                              ;:width "200px"
                                              :padding "6px"
@@ -635,13 +635,16 @@
                                 (when solver? 
                                   (let [ext-map @(ut/tracked-sub
                                                   ::conn/clicked-parameter-key-alpha
-                                                  {:keypath [(keyword (str "solver-meta/" (cstr/replace (str name) ":" "") ">extra"))]})]
+                                                  {:keypath [(keyword (str "solver-meta/" (cstr/replace (str name) ":" "") ">extra"))]})
+                                        ;cache-hit? (get ext-map :cache-hit?)
+                                        ;ext-map (dissoc ext-map :cache-hit?)
+                                        ]
                                     [re-com/h-box
                                      :padding "6px"
                                      :justify :between
                                      :style {:font-size "13px" :opacity 0.56}
-                                     :children (for [[_ v] ext-map]
-                                                 [re-com/box :child (str v)])])
+                                     :children [[re-com/box :child (str (get ext-map :last-processed))]
+                                                [re-com/box :child (str (get ext-map :elapsed-ms) "ms")]]])
                                   )
 
                                 ;; (when true ;;(not selected?)
