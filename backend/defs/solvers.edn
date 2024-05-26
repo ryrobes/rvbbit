@@ -1,38 +1,22 @@
 {:vibrant-antelope-solver
  {:signal :signal/cool-raccoon-signal-yo,
-  :persist? false,
   :type :clojure2,
-  :default -1,
   :data (+ 1 2 3 88 (rand-int 1234))},
  :dazzling-gnu-solver
  {:signal :signal/hourly?,
-  :persist? false,
   :type :clojure,
-  :default -1,
+  :cache? true,
   :data (+ 1 2 3 90 (rand-int 12345))},
  :static-data
  {:signal :signal/genius-gnat-signal,
-  :persist? false,
   :type :clojure,
-  :default -1,
   :data
   [(apply + [1 2 3])
    :solver/wallpaper-of-the-moment
    :solver/wallpaper-of-the-moment-8k]},
- :color-theft
- {:signal :signal/changed-wallpaper?,
-  :persist? false,
-  :type :flow,
-  :default -1,
-  :data
-  {:flowmap "node-color-thief-js-webp",
-   :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
-   :return nil}},
  :wallpaper-of-the-moment-8k
  {:signal :signal/every-5-minutes,
-  :persist? false,
   :type :clojure2,
-  :default -1,
   :data
   (let
    [dir
@@ -52,9 +36,7 @@
    (str rel-dir random-file))},
  :wallpaper-of-the-moment
  {:signal :signal/every-5-minutes,
-  :persist? false,
   :type :clojure,
-  :default -1,
   :data
   (let
    [dir
@@ -74,11 +56,10 @@
     random-file
     (first files)]
    (str rel-dir random-file))},
- :readable-wallpaper?
+ :png-wallpaper?
  {:signal :signal/changed-wallpaper?,
-  :persist? false,
   :type :clojure,
-  :default -1,
+  :cache? true,
   :data
   (true?
    (clojure.string/ends-with?
@@ -86,9 +67,8 @@
     ".png"))},
  :colors-of-the-moment
  {:signal :signal/changed-wallpaper?,
-  :persist? false,
+  :cache? true,
   :type :flow,
-  :default -1,
   :data
   {:flowmap "node-color-thief-js-webp",
    :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},

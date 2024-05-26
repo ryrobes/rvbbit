@@ -235,13 +235,61 @@
    (fn [x]
      (defn hex-to-rgb [hex] (map (fn [x] (Integer/parseInt x 16)) (re-seq (re-pattern "[0-9a-fA-F]{2}") (subs hex 1))))
      (defn brightness [rgb] (let [[r g b] rgb] (Math/sqrt (+ (* 0.299 (* r r)) (* 0.587 (* g g)) (* 0.114 (* b b))))))
-     (defn brightest-and-darkest-colors [colors]
+     (defn rgb-to-lab [rgb]
+       (let [[r g b] (map (fn [x] (/ x 255)) rgb)
+             [r g b] (map (fn [v] (if (> v 0.04045) (Math/pow (/ (+ v 0.055) 1.055) 2.4) (/ v 12.92))) [r g b])
+             x (* (+ (* r 0.4124564) (* g 0.3575761) (* b 0.1804375)) 100)
+             y (* (+ (* r 0.2126729) (* g 0.7151522) (* b 0.072175)) 100)
+             z (* (+ (* r 0.0193339) (* g 0.119192) (* b 0.9503041)) 100)
+             [x y z] (map (fn [v ref] (/ v ref)) [x y z] [95.047 100 108.883])
+             [x y z] (map (fn [v] (if (> v 0.008856) (Math/pow v 0.3333333333333333) (+ (* 7.787 v) (/ 16 116)))) [x y z])]
+         [(+ (* 116 y) -16) (* 500 (- x y)) (* 200 (- y z))]))
+     (defn rgb-to-hsl [rgb]
+       (let [[r g b] (map (fn [x] (/ x 255)) rgb)
+             max (apply max [r g b])
+             min (apply min [r g b])
+             l (/ (+ max min) 2)
+             d (- max min)
+             s (if (= d 0) 0 (/ d (if (< l 0.5) (+ max min) (- 2 max min))))
+             h (cond
+                 (= max r) (/ (+ (- g b) (* d (if (< g b) 6 0))) 6)
+                 (= max g) (/ (+ (- b r) (* d 2)) 6)
+                 :else (/ (+ (- r g) (* d 4)) 6))]
+         [(* h 360) s l]))
+     (defn color-distance [lab1 lab2] (Math/sqrt (reduce + (map (fn [a b] (Math/pow (- a b) 2)) lab1 lab2))))
+     (defn average-contrast [lab colors]
+       (/ (reduce + (map (fn [other-lab] (color-distance lab other-lab)) colors)) (count colors)))
+     (defn most-frequent-color [colors] (first (apply max-key val (frequencies colors))))
+     (defn notable-colors [colors]
        (when (not (empty? colors))
-         (let [brightnesses (map (fn [x] (-> x hex-to-rgb brightness)) colors)
-               brightest-index (apply max-key #(nth brightnesses %) (range (count colors)))
-               darkest-index (apply min-key #(nth brightnesses %) (range (count colors)))]
-           {:colors colors, :brightest (nth colors brightest-index), :darkest (nth colors darkest-index)})))
-     (brightest-and-darkest-colors x)),
+         (let [rgb-colors (map hex-to-rgb colors)
+               lab-colors (map rgb-to-lab rgb-colors)
+               hsl-colors (map rgb-to-hsl rgb-colors)
+               brightnesses (map brightness rgb-colors)
+               indexed-brightnesses (map-indexed vector brightnesses)
+               sorted-by-brightness (sort-by second indexed-brightnesses)
+               [darkest-idx second-darkest-idx] (map first (take 2 sorted-by-brightness))
+               [second-brightest-idx brightest-idx] (map first (take-last 2 sorted-by-brightness))
+               contrasts (map (fn [lab] (average-contrast lab (remove (fn [x] (= lab x)) lab-colors))) lab-colors)
+               most-contrasting-index (apply max-key (fn [i] (nth contrasts i)) (range (count colors)))
+               dark-colors-indices (filter (fn [i] (< (nth brightnesses i) 128)) (range (count colors)))
+               light-colors-indices (filter (fn [i] (>= (nth brightnesses i) 128)) (range (count colors)))
+               most-contrasting-dark-index (apply max-key (fn [i] (nth contrasts i)) dark-colors-indices)
+               most-contrasting-light-index (apply max-key (fn [i] (nth contrasts i)) light-colors-indices)
+               saturations (map second hsl-colors)
+               highest-saturation-index (apply max-key (fn [i] (nth saturations i)) (range (count colors)))
+               most-frequent (most-frequent-color colors)]
+           {:second-darkest (nth colors second-darkest-idx),
+            :highest-saturation (nth colors highest-saturation-index),
+            :most-contrasting (nth colors most-contrasting-index),
+            :darkest (nth colors darkest-idx),
+            :colors colors,
+            :most-frequent most-frequent,
+            :most-contrasting-dark (nth colors most-contrasting-dark-index),
+            :second-brightest (nth colors second-brightest-idx),
+            :brightest (nth colors brightest-idx),
+            :most-contrasting-light (nth colors most-contrasting-light-index)})))
+     (notable-colors x)),
    :right-click? true,
    :icon "zmdi-functions",
    :types nil,
@@ -375,7 +423,7 @@
      :expandable? true,
      :drag-meta {:type :open-fn}}}}},
  :zoom [-132.73 -593.8 0.792],
- :opts {:close-on-done? true, :retry-on-error? false, :retries 0},
+ :opts {:close-on-done? true, :retry-on-error? false, :timeout 320000, :retries 0},
  :flow-id "node-color-thief-js-webp",
  :flowmaps-connections
  [[:shell-command-in :clojure-string-join-1/value-1]

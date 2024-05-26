@@ -8,7 +8,7 @@
    [rvbbit-frontend.connections :as conn]
    [re-catch.core :as rc]
    [rvbbit-frontend.utility :as ut]
-   ;[rvbbit-frontend.buffy :as buffy]
+   ;[rvbbit-frontend.flows :as flows]
    ;[clojure.data :as cdata]
    ;[re-pressed.core :as rp]
    ;[rvbbit-frontend.audio :as audio]
@@ -319,7 +319,7 @@
      ;:width (px (- width-int 24))
      :height (px (- height-int 24))
      :style {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
-             :font-size     "17px"
+             :font-size     "15px"
              :overflow      "auto"
              :border-radius "12px"
              :background-color "#000000"
@@ -395,7 +395,7 @@
                      (.markText doc
                                 #js {:line start-line, :ch start-ch}
                                 #js {:line end-line, :ch end-ch}
-                                #js {:css (str "filter: invert(233%); color: white; font-weight: 700; background-color: teal; padding: 4px;" )})
+                                #js {:css (str "filter: invert(233%); color: white; font-weight: 700; background-color: teal; font-size: 15px;" )})
                      (catch :default e (tap> [:marker-error (str e)])))]
         (swap! markers conj marker)))))
 
@@ -540,17 +540,26 @@
 
 (defn items-list [ph signals selected-warren-item warren-type-string]
   (let [;signals @(ut/tracked-subscribe [::signals-map])
+        solver? (= warren-type-string "solvers")
+        signal? (= warren-type-string "signals")
         ;selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
         warren-item-type @(ut/tracked-sub ::warren-item-type {})
         ssr (cstr/replace (str @(ut/tracked-sub ::warren-item-type {})) ":" "")
         selected-type (str ssr "s")
-        results (into {} (for [[name _] signals]
-                           (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
-                                 vv (if (= warren-type-string "signals")
-                                      ;; @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
-                                      @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
-                                      "")]
-                             {name vv})))
+        results (cond signal?
+                      (into {} (for [[name _] signals]
+                                 (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
+                                       vv (if (= warren-type-string "signals")
+                                            @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
+                                            "")]
+                                   {name vv})))
+                      solver? (into {} (for [[name _] signals]
+                                         (let [sigkw (keyword (str "solver-meta/" (cstr/replace (str name) ":" "") ">extra"))
+                                               vv (if (= warren-type-string "solvers")
+                                                    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
+                                                    "")]
+                                           {name vv})))
+                      :else {})
         ;; warren-type-string-label (if (cstr/ends-with? warren-type-string "s")
         ;;                            (ut/drop-last-char warren-type-string)
         ;;                            warren-type-string)
@@ -583,7 +592,7 @@
        :children (for [[name {:keys [signal]}] signals
                        :let [selected? (= name selected-warren-item)
                              sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
-                             vv (get results name)]]
+                             vv (when signal? (get results name))]]
                    
                    [draggable-item
                     [re-com/v-box
@@ -618,10 +627,23 @@
                                              :child (str name)]
                                             [re-com/box
                                              :align :center :justify :center
-                                             :child (str (if (nil? vv) "" vv))
+                                             :child (str (if (nil? vv) "" vv) )
                                              :style {:font-weight 700
                                                      :font-size "15px"
                                                      :opacity (if (true? vv) 1.0 0.2)}]]]
+                                
+                                (when solver? 
+                                  (let [ext-map @(ut/tracked-sub
+                                                  ::conn/clicked-parameter-key-alpha
+                                                  {:keypath [(keyword (str "solver-meta/" (cstr/replace (str name) ":" "") ">extra"))]})]
+                                    [re-com/h-box
+                                     :padding "6px"
+                                     :justify :between
+                                     :style {:font-size "13px" :opacity 0.56}
+                                     :children (for [[_ v] ext-map]
+                                                 [re-com/box :child (str v)])])
+                                  )
+
                                 ;; (when true ;;(not selected?)
                                 ;;   [re-com/box
                                 ;;    :padding "4px"
@@ -1128,6 +1150,7 @@
         item-type-key (keyword (str item-type-str "s-map"))
 
         signal? (true? (= warren-item-type :signal))
+        solver? (true? (= warren-item-type :solver))
 
         signal-vec (get-in signals [selected-warren-item :signal])
         signal-vec-parts (vec (ut/where-dissect signal-vec))
@@ -1144,14 +1167,14 @@
                     (= warren-item-type :rule) (get @(ut/tracked-sub ::rules-map {}) selected-warren-item)
                     :else {})
 
-        results (if signal?
+        results (cond signal?
                   (into {} (for [idx (range (count signal-vec-parts))]
                              (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
                                    name (get signal-vec-parts idx)
                                    ;; vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
                                    vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})]
                                {name vv})))
-                  {})]
+                  :else {})]
 
         ;; ^^^ this is a weird hack we need to revisit - by invoking the param-keys we are summoning them from the server to be read and reactive
         ;; even though it is dereffed in a "safe" place...
@@ -1204,21 +1227,33 @@
                      :padding "6px"
                      :child [code-box
                              (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
+
                              (if signal?
                                (- (* (* ph 0.7) 0.25) 5)
-                               (- (* (* ph 0.7) 0.75) 5))
+                               (- (* (* ph 0.7) 0.25) 5))
 
                              (if (not signal?)
                                (str other)
                                (str signal-vec))
                              warren-item-type]]
+                    
+                    ;;;(when solver? [re-com/box :child "hey"])
 
-                    (when signal?
+                    (when (or solver? signal?)
                       [re-com/box
-                       :height (px (- (* (* ph 0.7) 0.75) 50)) :size "none"
+                       :height (px (if signal? 
+                                     (- (* (* ph 0.7) 0.75) 50)
+                                     (- (* (* ph 0.7) 0.75) 50)
+                                     ;(- (* (* ph 0.9) 0.9) 80)
+                                     
+                                     )
+                                   ) :size "none"
                        :padding "6px"
-                       :style {;:border "1px solid pink" 
-                               :overflow "auto"}
+                       :style (merge
+                               {;:border "1px solid pink" 
+                                :overflow "auto"}
+                               (when solver? {:border-top (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 88)
+                                              :border-radius "12px"}))
                        :child (if @db/bad-form-signals?
                                 [re-com/box
                                  :size "auto"
@@ -1227,7 +1262,44 @@
                                          :padding "6px"
                                          :font-size "20px"}
                                  :child (str @db/bad-form-msg-signals)]
-                                [rc/catch (visualize-clause signal-vec 0 nil signal-vec)]
+                                (if signal?
+                                  [rc/catch (visualize-clause signal-vec 0 nil signal-vec)]
+                                  
+                                  ;; [rc/catch [re-com/box :child "vizzy"]]
+                                  [re-com/v-box
+                                   :padding "6px"
+                                   ;:style {:border "1px solid green"}
+                                   :children [[re-com/box 
+                                               :style {:font-size "19px"
+                                                       :padding-top "6px"
+                                                       :font-weight 700}
+                                               :child "latest returned value"]
+                                              [re-com/box
+                                               :child
+                                               [bricks/map-boxes2 @(ut/tracked-sub
+                                                                    ::conn/clicked-parameter-key-alpha
+                                                                    {:keypath [(keyword (str "solver/" (cstr/replace (str selected-warren-item) ":" "")))]})
+                                                nil :solver-meta [] :output nil false]]
+                                              
+                                              ;; [re-com/gap :size "20px"]
+                                              ;; [re-com/box
+                                              ;;  :style {:font-size "22px"
+                                              ;;          :font-weight 700}
+                                              ;;  :child "latest returned value metadata"]
+                                              ;; [re-com/box
+                                              ;;  :child
+                                              ;;  ;;;data block-id selected-view keypath kki init-data-type & [draggable?]
+                                              ;;  [bricks/map-boxes2 @(ut/tracked-sub
+                                              ;;                       ::conn/clicked-parameter-key-alpha
+                                              ;;                       {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "") ">extra"))]})
+                                              ;;   nil :solver-meta [] :output nil false]]
+                                              
+                                                                              ;; (str @(ut/tracked-sub
+                                                                              ;;        ::conn/clicked-parameter-key-alpha
+                                                                              ;;        {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "")))]}))
+                                              ]]
+                                  
+                                  )
                               ;[re-com/box :child "yo"]
                                 )])]])
 
@@ -1293,8 +1365,7 @@
                                                  :let [main (reduce (fn [a b] (if (> (count a) (count b)) a b)) (map first vv)) ;; largest vector is likely the main
                                                        ;;_ (tap> [:main e main])
                                                        ff (first (filter #(= main (first %)) vv))
-                                                       main-true? (true? (first (last ff)))
-                                                       ]]
+                                                       main-true? (true? (first (last ff)))]]
                                              ^{:key (str selected-warren-item e vv "h-box")}
                                              [re-com/v-box
                                               :height (px (- (* ph 0.3) 48))
@@ -1324,13 +1395,73 @@
                                                                    (when main-true? ;;(and main-true? (true? ee))
                                                                     ;;  {:border-left (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))
                                                                     ;;   :border-right (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))}
-                                                                     { :border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))}
-                                                                     )
+                                                                     {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))})
                                                                    (when (true? ee)
                                                                      {:background-color (str (theme-pull :theme/editor-outer-rim-color nil) 65)}))
                                                            :child (str sec)])])]
 
-                                (not (nil? selected-warren-item)) [re-com/box :child (str warren-item-type)]
+                                ;; (and solver? (not (nil? selected-warren-item)))
+
+                                ;; [re-com/v-box 
+                                ;;  :style {:border "1px solid green"}
+                                ;;  :children [[re-com/box :child "latest returned value"]
+                                ;;                          [re-com/box :child [bricks/map-boxes2 @(ut/tracked-sub
+                                ;;                                                                  ::conn/clicked-parameter-key-alpha
+                                ;;                                                                  {:keypath [(keyword (str "solver/" (cstr/replace (str selected-warren-item) ":" "")))]})
+                                ;;                                              nil
+                                ;;                                              :solver-meta [] :output nil]]
+                                ;;                          [re-com/box :child "latest returned value metadata"]
+                                ;;                          [re-com/box :child [bricks/map-boxes2 @(ut/tracked-sub
+                                ;;                                                                  ::conn/clicked-parameter-key-alpha
+                                ;;                                                                  {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "") ">extra"))]})
+                                ;;                                              nil
+                                ;;                                              :solver-meta [] :output nil]]
+                                ;;             ;; (str @(ut/tracked-sub
+                                ;;             ;;        ::conn/clicked-parameter-key-alpha
+                                ;;             ;;        {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "")))]}))
+                                ;;             ]
+                                ;;                          ]
+
+                                (not (nil? selected-warren-item))
+                                ;; [re-com/box :child (str warren-item-type "?")]
+
+                                [re-com/box
+                                 :size "none"
+                                 :width "600px" 
+                                 :padding "6px"
+                                 :height (px (- (* ph 0.3) 60))
+                                 :style {;:border "1px solid pink" 
+                                         :border-top (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 88)
+                                         :border-radius "12px"
+                                         :overflow "auto"}
+                                 :child [re-com/v-box
+                                         :width "582px"
+                                         :children
+                                         [[re-com/box
+                                           ;:padding "6px"
+                                           :style {:font-size "19px"
+                                                   :padding-top "6px"
+                                                   :font-weight 700}
+                                           :child "latest returned value metadata"]
+
+                                          [re-com/box
+                                           :size "auto"
+                                           ;:width "600px"
+                                           :child
+                                           [bricks/map-boxes2 @(ut/tracked-sub
+                                                                ::conn/clicked-parameter-key-alpha
+                                                                {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "") ">extra"))]})
+                                            nil :solver-meta [] :output nil false]]
+
+                                          [re-com/box
+                                           :size "auto"
+                                           ;:width "600px"
+                                           :child
+                                           [bricks/map-boxes2 @(ut/tracked-sub
+                                                                ::conn/clicked-parameter-key-alpha
+                                                                {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "") ">history"))]})
+                                            nil :solver-meta [] :output nil false]]]]]
+
 
                                 :else "(no signal / rule / solver selected)")])
                               

@@ -1,10 +1,100 @@
-{:orders {:reco-counts [:table_name :cnt]},
+{:orders
+ {:reco-counts [:table_name :cnt],
+  :connections-sys [:database_name :connection_id],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :fields-sys [:field_name :field_type :data_type],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :tmp--54233052-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated]},
  :reco-preview nil,
  :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
+ :sql-source {},
  :meta
- {:blocks-sys {:fields {}, :rowcount 0},
-  :fields-sys {:fields {}, :rowcount 0},
+ {:fields-sys {:fields {}, :rowcount 0},
   :tables-sys {:fields {}, :rowcount 0},
+  :tmp--54233052-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-3341 :views :hi]" 15},
+     :cardinality 6},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":hi" 15},
+     :cardinality 6},
+    :updated
+    {:data-type "string",
+     :distinct 15,
+     :group-by? true,
+     :commons
+     {"2024-05-25 03:07:07" 1, "2024-05-25 03:07:19" 1, "2024-05-25 03:07:29" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 15},
+     :cardinality 6},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-3341" 15},
+     :cardinality 6},
+    :diff_kp
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"([6 :font-family] [6] [5] [4] [3] [2] [1] [0])" 10,
+      "([6 :margin-top] [6] [5] [4] [3] [2] [1] [0])" 3,
+      "([6 :font-size] [6] [5] [4] [3] [2] [1] [0])" 1},
+     :cardinality 26},
+    :client_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":simple-conical-pig-40" 15},
+     :cardinality 6},
+    :pre_data
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons
+     {"[:box :justify :center :attr {:id \":block-3341.:hi\"} :style {:color :solver/colors-of-the-moment>brightest, :font-size \"64px\", :font-weight 700, :margin-top \"-50px\", :padding-top \"26px\", :padding-left \"55px\", :text-shadow [:string3 \"2px 2px 10px \" :solver/colors-of-the-moment>darkest \", 2px 2px 10px \" :solver/colors-of-the-moment>darkest], :font-family \"Alata\"} :child [:string :time/now-seconds]]"
+      2,
+      "[:box :justify :center :attr {:id \":block-3341.:hi\"} :style {:color :solver/colors-of-the-moment>brightest, :font-size \"64px\", :font-weight 700, :margin-top \"-50px\", :padding-top \"26px\", :padding-left \"55px\", :text-shadow [:string3 \"2px 2px 10px \" :solver/colors-of-the-moment>darkest \", 2px 2px 10px \" :solver/colors-of-the-moment>darkest], :font-family \"VikingNormal\"} :child [:string :time/now-seconds]]"
+      1,
+      "[:box :justify :center :attr {:id \":block-3341.:hi\"} :style {:color :solver/colors-of-the-moment>brightest, :font-size \"64px\", :font-weight 700, :margin-top \"-50px\", :padding-top \"26px\", :padding-left \"55px\", :text-shadow [:string3 \"2px 2px 10px \" :solver/colors-of-the-moment>darkest \", 2px 2px 10px \" :solver/colors-of-the-moment>darkest], :font-family \"Sono\"} :child [:string :time/now-seconds]]"
+      1},
+     :cardinality 93},
+    :diff
+    {:data-type "string",
+     :distinct 15,
+     :group-by? true,
+     :commons
+     {"[nil nil nil nil nil nil {:margin-top \"-50px\"}]" 1,
+      "[nil nil nil nil nil nil {:font-family \"Victor Mono\"}]" 1,
+      "[nil nil nil nil nil nil {:font-size \"60px\"}]" 1},
+     :cardinality 100},
+    :data
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons
+     {"[:box :justify :center :attr {:id \":block-3341.:hi\"} :style {:color :solver/colors-of-the-moment>brightest, :font-size \"64px\", :font-weight 700, :margin-top \"-50px\", :padding-top \"26px\", :padding-left \"55px\", :text-shadow [:string3 \"2px 2px 10px \" :solver/colors-of-the-moment>darkest \", 2px 2px 10px \" :solver/colors-of-the-moment>darkest], :font-family \"Alata\"} :child [:string :time/now-seconds]]"
+      2,
+      "[:box :justify :center :attr {:id \":block-3341.:hi\"} :style {:color :solver/colors-of-the-moment>brightest, :font-size \"64px\", :font-weight 700, :margin-top \"-50px\", :padding-top \"26px\", :padding-left \"55px\", :text-shadow [:string3 \"2px 2px 10px \" :solver/colors-of-the-moment>darkest \", 2px 2px 10px \" :solver/colors-of-the-moment>darkest], :font-family \"VikingNormal\"} :child [:string :time/now-seconds]]"
+      1,
+      "[:box :justify :center :attr {:id \":block-3341.:hi\"} :style {:color :solver/colors-of-the-moment>brightest, :font-size \"64px\", :font-weight 700, :margin-top \"-50px\", :padding-top \"26px\", :padding-left \"55px\", :text-shadow [:string3 \"2px 2px 10px \" :solver/colors-of-the-moment>darkest \", 2px 2px 10px \" :solver/colors-of-the-moment>darkest], :font-family \"Sono\"} :child [:string :time/now-seconds]]"
+      1},
+     :cardinality 93}},
+   :rowcount 15},
   :gen-viz-797
   {:fields
    {:rows
@@ -20,44 +110,31 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :files-sys
+  :flows-sys
   {:fields
-   {:file_path
+   {:flow_id
     {:data-type "string",
-     :distinct 161,
+     :distinct 93,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "map-pull-test2" 1},
+     :cardinality 96},
+    :file_path
+    {:data-type "string",
+     :distinct 96,
      :group-by? true,
      :commons
-     {"./screens/weave-test122.edn" 1,
-      "./screens/nightcity-cape-cod.edn" 1,
-      "./screens/counting-lord-of-the-woods.edn" 1},
+     {"./flows/stitches-math.edn" 1,
+      "./flows/openai-image-gen-ladder3.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1},
      :cardinality 100},
-    :screen_name
+    :last_modified
     {:data-type "string",
-     :distinct 154,
+     :distinct 30,
      :group-by? true,
      :commons
-     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
-     :cardinality 95},
-    :blocks
-    {:data-type "integer",
-     :distinct 49,
-     :group-by? true,
-     :commons {3 45, 12 6, 6 6},
-     :cardinality 30},
-    :queries
-    {:data-type "integer",
-     :distinct 34,
-     :group-by? true,
-     :commons {0 53, 5 13, 11 9},
-     :cardinality 21},
-    :ts
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"2024-05-22 00:23:59" 51, "2024-05-22 00:24:00" 45, "2024-05-22 00:23:58" 32},
-     :cardinality 3}},
-   :rowcount 161},
+     {"2024-03-12 02:37:43" 67, "2024-05-03 21:13:48" 1, "2024-03-14 07:50:09" 1},
+     :cardinality 31}},
+   :rowcount 96},
   :gen-viz-94
   {:fields
    {:diff
@@ -91,18 +168,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :ufo_sightings
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings)"
-      1},
-     :cardinality 100}},
-   :rowcount 2},
   :gen-viz-84
   {:fields
    {:rows
@@ -266,8 +331,12 @@
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
    :rowcount 30}},
+ :default-col-widths
+ {:system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys ##Inf},
+  :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
- :data-hash 359686701,
+ :data-hash -1375544127,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -487,29 +556,201 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [420584360 243686356 4294705152],
+ :memory [269931614 221946934 4294705152],
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-23 15:50:57",
+      :at "2024-05-25 04:49:54",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
+    :reco-count nil}},
+  :alert1
+  {:alerts
+   {:data
+    [[[:v-box
+       :justify
+       :center
+       :style
+       {:opacity 0.7}
+       :children
+       [[:box
+         :style
+         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         :child
+         "successfully saved screen"]
+        [:box :style {:font-weight 700, :font-size "18px"} :child "alarm-clock2"]
+        [:box
+         :style
+         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         :child
+         "@ /home/ryanr/rvbbit/backend/screens/alarm-clock2.edn"]]]
+      10
+      1.6
+      8]
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :file-change
+  {:file-changed
+   {:data
+    [{:path
+      "./live/simple-conical-pig-40/star-shaped wallaby/the palette!/block-11273.edn",
+      :type :modify,
+      :panel-key nil,
+      :block-data
+      {:block-11273
+       {:w 12,
+        :style {:backdrop-filter "blur(4px) brightness(70%)"},
+        :selected-view :hi,
+        :root [0 8],
+        :h 19,
+        :minimized? false},
+       :views
+       {:hi
+        [:box
+         :align
+         :center
+         :justify
+         :center
+         :padding
+         "6px"
+         :attr
+         {:id ":block-423d0.:hi"}
+         :style
+         {:font-size "33px",
+          :font-weight 700,
+          :padding-top "6px",
+          :padding-left "14px",
+          :margin-top "-8px",
+          :color :theme/editor-outer-rim-color,
+          :font-family :theme/base-font}
+         :child
+         [:data-viewer :solver/colors-of-the-moment]]},
+       :tab "star-shaped wallaby",
+       :name "the palette!"}}
+     nil],
+    :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:time/hour
-  :solver/wallpaper-of-the-moment
-  :time/now
-  :time/second
-  :time/minute
-  :flow/flow-forever>:final-math
+ [:time/now-seconds
   :flow/flow-forever>*running?
-  :flow/live-scratch-flow>*running?],
- :client-name :special-rhomboidal-koala-37,
+  :time/minute
+  :time/hour
+  :solver/colors-of-the-moment>most-contrasting-light
+  :solver/colors-of-the-moment>brightest
+  :flow/live-scratch-flow>*running?
+  :solver/colors-of-the-moment
+  :solver/wallpaper-of-the-moment
+  :time/second
+  :flow/flow-forever>:final-math
+  :solver/colors-of-the-moment>second-brightest
+  :solver/colors-of-the-moment>darkest],
+ :client-name :simple-conical-pig-40,
+ :runstreams-lookups
+ {"flow-forever"
+  {:open-inputs
+   {:dialog-width {:user-input 10, :defaults {}, :type {:out :integer}},
+    :duration-to-show {:user-input 600, :defaults {}, :type :integer},
+    :some-input-int {:user-input 333, :defaults {}, :type {:out :integer}},
+    :another-input-int {:user-input 234.5, :defaults {}, :type {:out :float}},
+    :dialog-height {:user-input 3, :defaults {}, :type :integer}},
+   :blocks
+   {:dialog-ui-box
+    {:type {:out :any},
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :dialog-width
+    {:type {:out {:out :integer}},
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :final-math
+    {:type {:out :any},
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :render-the-answer
+    {:type {:out :any},
+     :ttype :open-fn,
+     :meta nil,
+     :last? true,
+     :defaults {},
+     :sample "no sample data"},
+    :user-value-in
+    {:type {:out :any},
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :dialog-pushed
+    {:type {:out :any},
+     :ttype :alert!,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :render-the-choice
+    {:type {:out :any},
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :more-math
+    {:type {:out :any},
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :duration-to-show
+    {:type {:out :integer},
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :some-math
+    {:type {:out :any},
+     :ttype :open-fn,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :some-input-int
+    {:type {:out {:out :integer}},
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :another-input-int
+    {:type {:out {:out :float}},
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"},
+    :dialog-height
+    {:type {:out :integer},
+     :ttype :open-block,
+     :meta nil,
+     :last? false,
+     :defaults {},
+     :sample "no sample data"}}}},
  :flow-editor? true,
  :openai-api-key "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",
  :window {:w 2033, :h 1428},
@@ -527,14 +768,21 @@
  :status
  {:heartbeat
   {:kick
-   [:time/hour
-    :solver/wallpaper-of-the-moment
-    :time/now
-    :time/second
-    :time/minute
-    :flow/flow-forever>:final-math
+   [:time/now-seconds
     :flow/flow-forever>*running?
-    :flow/live-scratch-flow>*running?]}},
+    :time/minute
+    :time/hour
+    :solver/colors-of-the-moment>most-contrasting-light
+    :solver/colors-of-the-moment>brightest
+    :flow/live-scratch-flow>*running?
+    :solver/colors-of-the-moment
+    :solver/wallpaper-of-the-moment
+    :time/second
+    :flow/flow-forever>:final-math
+    :solver/colors-of-the-moment>second-brightest
+    :solver/colors-of-the-moment>darkest]},
+  :alert1 {:alerts :alert2},
+  :file-change {:file-changed :done}},
  :screen-name "alarm-clock2",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
@@ -549,54 +797,66 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   67
+   6200
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :panels-hash 1940229278,
+ :panels-hash 1627666098,
  :sessions
- (["composed-bulbous-bear-30.edn" "1 hour, 27 minutes, 25 seconds" 5245666]
-   ["pretty-magenta-goat-24.edn" "1011 hours, 29 minutes, 29 seconds" 3641369802]
-   ["intuitive-amaranth-opossum-39.edn"
-    "1012 hours, 22 minutes, 3 seconds"
-    3644523025]
-   ["prominent-Persian-blue-hippopotamus-39.edn"
-    "1013 hours, 10 minutes, 44 seconds"
-    3647444270]
-   ["beautiful-prismatic-ostrich-23.edn"
-    "1017 hours, 46 minutes, 46 seconds"
-    3664006286]
-   ["impressive-triangular-quail-2.edn"
-    "1018 hours, 52 minutes, 30 seconds"
-    3667950801]
-   ["friendly-star-shaped-prairie-dog-10.edn"
-    "1018 hours, 56 minutes, 57 seconds"
-    3668217441]
-   ["handsome-conical-pronghorn-24.edn"
-    "1018 hours, 9 minutes, 27 seconds"
-    3665367533]
-   ["friendly-scarlet-giraffe-10.edn"
-    "1020 hours, 15 minutes, 46 seconds"
-    3672946817]),
+ (["worthy-gold-bird-36.edn" "1 hour, 34 minutes, 54 seconds" 5694463]
+   ["legendary-cylindrical-panda-41.edn" "1 hour, 45 minutes, 37 seconds" 6337471]
+   ["famous-desert-lion-36.edn" "1 hour, 55 minutes, 28 seconds" 6928928]
+   ["trusting-cerise-gnu-5.edn" "1009 hours, 33 minutes, 6 seconds" 3634386790]
+   ["meritorious-hexagonal-louse-7.edn"
+    "1009 hours, 39 minutes, 17 seconds"
+    3634757791]
+   ["happy-prismatic-hornet-6.edn" "1010 hours, 19 minutes, 32 seconds" 3637172437]
+   ["pleasurable-spherical-louse-10.edn"
+    "1010 hours, 39 minutes, 53 seconds"
+    3638393537]
+   ["constant-lime-bat-22.edn" "1010 hours, 51 minutes, 15 seconds" 3639075635]
+   ["protected-star-shaped-falcon-24.edn"
+    "1011 hours, 1 minute, 12 seconds"
+    3639672607]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
    :persist? false,
-   :type :clojure,
+   :type :clojure2,
    :default -1,
-   :data (+ 1 2 3 88)},
+   :data (+ 1 2 3 88 (rand-int 1234))},
   :dazzling-gnu-solver
   {:signal :signal/hourly?,
    :persist? false,
    :type :clojure,
    :default -1,
-   :data (+ 1 2 3 90)},
-  :polished-kangaroo-solver
+   :data (+ 1 2 3 90 (rand-int 12345))},
+  :static-data
   {:signal :signal/genius-gnat-signal,
    :persist? false,
    :type :clojure,
    :default -1,
-   :data (+ 1 2 3 50)},
+   :data
+   [(apply + [1 2 3])
+    :solver/wallpaper-of-the-moment
+    :solver/wallpaper-of-the-moment-8k]},
+  :wallpaper-of-the-moment-8k
+  {:signal :signal/every-5-minutes,
+   :persist? false,
+   :type :clojure2,
+   :default -1,
+   :data
+   (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+         rel-dir "./images/large/"
+         files (->>
+                 (file-seq (clojure.java.io/file dir))
+                 (filter (fn [x] (.isFile x)))
+                 (filter
+                   (fn [x] (clojure.string/includes? (str (.getName x)) "8k")))
+                 (map (fn [x] (.getName x)))
+                 (shuffle))
+         random-file (first files)]
+     (str rel-dir random-file))},
   :wallpaper-of-the-moment
   {:signal :signal/every-5-minutes,
    :persist? false,
@@ -614,10 +874,27 @@
                  (map (fn [x] (.getName x)))
                  (shuffle))
          random-file (first files)]
-     (str rel-dir random-file))}},
+     (str rel-dir random-file))},
+  :readable-wallpaper?
+  {:signal :signal/changed-wallpaper?,
+   :persist? false,
+   :type :clojure,
+   :default -1,
+   :data
+   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))},
+  :colors-of-the-moment
+  {:signal :signal/changed-wallpaper?,
+   :persist? false,
+   :type :flow,
+   :default -1,
+   :data
+   {:flowmap "node-color-thief-js-webp",
+    :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
+    :return nil}}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -509105510,
+ :user-params-hash 1250006529,
  :grid-recos? true,
+ :session-hash 121353845,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -898,11 +1175,18 @@
    :tab "sapphire ape"},
   :block-3341
   {:name "block-3341",
-   :w 16,
-   :style {:background-color "#00000000", :border-radius "30px 0px 0px 0px"},
+   :w 25,
+   :style
+   {:border-radius "0px 0px 0px 40px",
+    :_border-left
+    [:string3 "3px solid " :solver/colors-of-the-moment>second-brightest],
+    :_border-top
+    [:string3 "3px solid " :solver/colors-of-the-moment>second-brightest],
+    :background-color [:string3 :solver/colors-of-the-moment>darkest 99],
+    :backdrop-filter "blur(4px)"},
    :selected-view :hi,
-   :root [25 26],
-   :h 3,
+   :root [16 0],
+   :h 2,
    :queries {},
    :tab "star-shaped wallaby",
    :ghosted? true,
@@ -914,15 +1198,22 @@
      :attr
      {:id ":block-3341.:hi"}
      :style
-     {:font-size "43px",
+     {:color :solver/colors-of-the-moment>most-contrasting-light,
+      :font-size "60px",
+      :transition "all 1.5s",
       :font-weight 700,
+      :margin-top "-45px",
       :padding-top "26px",
-      :padding-left "22px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family "Homemade Apple"}
+      :padding-left "55px",
+      :text-shadow
+      [:string3
+       "2px 2px 10px "
+       :solver/colors-of-the-moment>darkest
+       ", 2px 2px 10px "
+       :solver/colors-of-the-moment>darkest],
+      :font-family "Alata"}
      :child
-     [:string :time/now]],
+     [:string :time/now-seconds]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
   :block-7416
   {:h 5,
@@ -1193,6 +1484,37 @@
      :order-by [[:rowcnt :desc]]}},
    :root [25 8],
    :tab "sapphire ape"},
+  :block-11273
+  {:name "the palette!",
+   :w 12,
+   :style {:backdrop-filter "blur(4px) brightness(70%)"},
+   :selected-view :hi,
+   :root [0 5],
+   :h 22,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :minimized? false,
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "6px"
+     :attr
+     {:id ":block-423d0.:hi"}
+     :style
+     {:font-size "23px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:data-viewer :solver/colors-of-the-moment]]}},
   :block-94
   {:mad-libs-combo-hash ["1561519308" "ufo_sightings_drag_9"],
    :name "basic_v_bar - \"country, rows\" - 559",
@@ -1421,7 +1743,30 @@
      :order-by [[:city :asc]]}},
    :root [1 1],
    :tab "sapphire ape",
-   :selected-view :ufo-sightings-drag-9}},
+   :selected-view :ufo-sightings-drag-9},
+  :block-3487
+  {:name "get-in test",
+   :w 7,
+   :style {:backdrop-filter "blur(4px) brightness(70%)"},
+   :root [0 6],
+   :h 2,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :minimized? true,
+   :views
+   {:pulled-val
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "45px",
+      :color [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]}
+     :child
+     [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]]}}},
  :selected-block "none!",
  :signals-map
  {:fun-gorilla
@@ -1454,6 +1799,7 @@
   :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
   :dragging-to-potential-cross-breed?
   {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
+  :every-minute {:signal [:changed? :time/minute]},
   :every-5-minutes
   {:signal
    [:or
@@ -1469,6 +1815,9 @@
     [:= :time/minute 45]
     [:= :time/minute 50]
     [:= :time/minute 55]]},
+  :changed-wallpaper?
+  {:signal
+   [:and [:<> :time/second -1] [:changed? :solver/wallpaper-of-the-moment]]},
   :special-lion-signal
   {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
   :optimistic-sheep-signal
@@ -1499,30 +1848,37 @@
  {:flow
   {:crow-flow-201a>*running? false,
    :counting-loop>*running? false,
-   :flow-forever>final-math 663.5,
+   :flow-forever>final-math nil,
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
   :param
   {:selected-view [:views :hi],
    :selected-view-data
    [:box
+    :align
+    :center
+    :justify
+    :center
+    :padding
+    "6px"
     :attr
-    {:id ":block-3341.:hi"}
+    {:id ":block-423d0.:hi"}
     :style
-    {:font-size "32px",
+    {:font-size "12px",
      :font-weight 700,
      :padding-top "6px",
      :padding-left "14px",
      :margin-top "-8px",
      :color :theme/editor-outer-rim-color,
-     :font-family "Homemade Apple"}
+     :font-family :theme/base-font}
     :child
-    [:string :time/now]],
+    [:data-viewer :solver/colors-of-the-moment]],
+   :test [:string [:get-in [:solver/colors-of-the-moment [:colors 2]]]],
    :selected-block :block-3341},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
-   :base-block-style {:backdrop-filter "blur(2px) brightness(30%) "},
+   :base-block-style {},
    :vega-defaults
    {:view {:stroke "transparent"},
     :axis
@@ -1557,7 +1913,7 @@
    :base-block-color-selected "#00030a",
    :block-title-font-color "#ffffff",
    :base-block-color "#04041e82",
-   :editor-rim-color "#379fb5",
+   :editor-rim-color [:string3 :solver/colors-of-the-moment>brightest 77],
    :base-block-filter-selected
    "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
    :vega-default-color-scheme {:scheme "pastel2"},
@@ -1608,7 +1964,7 @@
      :ticks
      {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
     :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
-   :editor-outer-rim-color "#379fb5",
+   :editor-outer-rim-color :solver/colors-of-the-moment>brightest,
    :grid-selected-font-color "#000000",
    :block-title-selected-font-color "#ffffff",
    :grid-selected-background-color "#a3d3ff",
@@ -1641,15 +1997,41 @@
   :time
   {:month-name "MAY",
    :day 4,
-   :hour 15,
-   :now "Thursday, May 23rd 3:51PM",
-   :second 10,
-   :now-seconds "Wednesday, April 24 1:43:57PM",
+   :hour 4,
+   :now "Saturday, May 25th 3:05AM",
+   :second 29,
+   :now-second nil,
+   :now-seconds "Saturday, May 25th 4:50:29AM",
    :nth "th",
    :month 4,
-   :minute 51},
-  :solver {:wallpaper-of-the-moment "./images/large/b64-image-33260-55928-4k.webp"},
-  nil {nil nil},
+   :minute 50},
+  :solver
+  {:wallpaper-of-the-moment "./images/large/b64-image-55166-93797-4k.webp",
+   :colors-of-the-moment>brightest "#cec1c5",
+   :colors-of-the-moment>second-brightest "#7db8ca",
+   :colors-of-the-moment>darkest "#0f254e",
+   :colors-of-the-moment
+   {:second-darkest "#405276",
+    :highest-saturation "#0f254e",
+    :most-contrasting "#0f254e",
+    :darkest "#0f254e",
+    :colors
+    ["#cec1c5"
+     "#0f254e"
+     "#7db8ca"
+     "#7c7a94"
+     "#6994b8"
+     "#4a7b9d"
+     "#3e5c89"
+     "#405276"
+     "#a56478"
+     "#ac6e6c"],
+    :most-frequent "#7db8ca",
+    :most-contrasting-dark "#0f254e",
+    :second-brightest "#7db8ca",
+    :brightest "#cec1c5",
+    :most-contrasting-light "#ac6e6c"},
+   :colors-of-the-moment>most-contrasting-light "#ac6e6c"},
   :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

@@ -367,10 +367,9 @@
                                                                                      {v (keyword (str "flow/" (first that) ">*running?"))})))]
                                                           (walk/postwalk-replace logic-kps obody)))
          runstream-refs (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/") (ut/deep-flatten (get db :runstreams)))))
-         runstreams (vec (for [{:keys [flow-id]} 
+         runstreams (vec (for [{:keys [flow-id]}
                                ;;@(ut/tracked-subscribe [::runstreams])
-                               @(rfa/sub ::runstreams)
-                               ] (keyword (str "flow/" flow-id ">*running?"))))
+                               @(rfa/sub ::runstreams)] (keyword (str "flow/" flow-id ">*running?"))))
          panels (create-runner-listeners (get db :panels))
          drop-refs (vec (distinct (vals @drop-last-tracker-refs)))
          sflow (get db :selected-flow)
@@ -392,15 +391,26 @@
                                                 (ut/deep-flatten (get-all-values (get db :click-param))) ;; do we have params in params? 
                                                 )))
                                current-flow-open)))
+         warren-item (get db :selected-warren-item)
+         solver-open? (and (= (get @db/flow-editor-system-mode 0) "signals") ;; signals tab selected 
+                           (get db :flow?) ;; flow panel open
+                           )
+         solver (if (and (get-in db [:solvers-map warren-item :data]) solver-open?)
+                  [(keyword (str "solver/" (cstr/replace (str warren-item) ":" "")))
+                   (keyword (str "solver-meta/" (cstr/replace (str warren-item) ":" "") ">extra"))
+                   (keyword (str "solver-meta/" (cstr/replace (str warren-item) ":" "") ">history"))
+                   ] [])
+         solvers (if (and solver-open? (some #(= % "solvers") @db/selectors-open))
+                   (vec (for [ss (keys (get db :solvers-map))] (keyword (str "solver-meta/" (cstr/replace (str ss) ":" "") ">extra")))) [])
          signals-mode?  (and (= (get @db/flow-editor-system-mode 0) "signals") ;; signals tab selected 
                              (get db :flow?) ;; flow panel open
                              (some #(= % "signals") @db/selectors-open)) ;; signal subbox open
          signal-ui-refs (when signals-mode? (vec (for [ss (keys (get db :signals-map))] (keyword (str "signal/" (cstr/replace (str ss) ":" ""))))))
-         signal-ui-part-refs (when (and (get db :selected-warren-item) signals-mode?)
-                               (let [pps (ut/where-dissect (get-in db [:signals-map (get db :selected-warren-item) :signal]))]
+         signal-ui-part-refs (when (and warren-item signals-mode?)
+                               (let [pps (ut/where-dissect (get-in db [:signals-map warren-item :signal]))]
                                  (vec (for [pp pps]
                                         (keyword (str "signal/part-"
-                                                      (cstr/replace (str (get db :selected-warren-item)) ":" "") "-"
+                                                      (cstr/replace (str warren-item) ":" "") "-"
                                                       (.indexOf pps pp)))))))
          signal-subs (if signals-mode? (vec (into signal-ui-refs signal-ui-part-refs)) [])
          ;;_ (when (ut/ne? signal-subs) (tap> [:signal-subs  signal-subs]))
@@ -411,7 +421,7 @@
      ;;(vec (distinct (into signal-subs (into drop-refs (into runstream-refs (into runstreams (into theme-refs flow-refs)))))))
      (filterv 
       #(not (cstr/includes? (str %) "||")) ;; live running subs ignore
-      (vec (distinct (concat signal-subs drop-refs runstream-refs runstreams theme-refs flow-refs))))
+      (vec (distinct (concat signal-subs solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs))))
      )))
 
 
@@ -2230,6 +2240,9 @@
                         (reset! dragging-size [(get data :w) (get data :h)]))
     :data          (pr-str data)}
    [re-com/box :size "auto" :child element :style {:cursor "grab"}]])
+
+(defn draggable-stub [data type element]
+  [re-com/box :size "auto" :child element ])
 
 (defn droppable [types-vec root element]
   ;(tap> [:dropped? types-vec @dragging-body root])
@@ -9094,6 +9107,8 @@
         draggable? false ;; override bs TODO
         add-kp? (try (keyword? block-id) (catch :default _ false)) ;;true ;(not show-code-map-opt?) ;; for drag outs only
         cells? (= block-id :cells)
+        non-canvas? (nil? block-id)
+        dggbl (if non-canvas? draggable-stub draggable)
         main-boxes [re-com/v-box ;(if cells? re-com/h-box re-com/v-box)
                     :size "auto"
                     :padding "5px"
@@ -9128,7 +9143,7 @@
                                ^{:key (str block-id keypath kki kk k-val-type)}
                                [re-com/h-box
                                 :children
-                                [[draggable
+                                [[dggbl ;;draggable
                                   ;; {:from block-id
                                   ;;  :new-block [:artifacts "text"]
                                   ;;  :idx 0 ;idx
@@ -9156,7 +9171,7 @@
                                                    (count (str kk))
                                                    11)) ;"110px"
                                    ;:size "auto"
-                                   :style {:cursor (when draggable? "grab")
+                                   :style {;:cursor (when draggable? "grab")
                                            ;:border "1px solid white"
                                            }
                                    :children [^{:key (str block-id keypath kki kk k-val-type 124)}
@@ -9185,7 +9200,7 @@
                                 :style {:border-radius "12px"
                                         :border "3px solid black"}
                                 :children
-                                [[draggable
+                                [[dggbl ;;draggable
                                   ;; {:from block-id
                                   ;;  :new-block [:artifacts "text"]
                                   ;;  :idx 0 ;idx
@@ -9209,7 +9224,7 @@
                                    :min-width (px (*
                                                    (count (str kk))
                                                    11)) ;"110px"
-                                   :style {:cursor (when draggable? "grab") ;;; skeptical, ryan 5/24/33
+                                   :style {;:cursor (when draggable? "grab") ;;; skeptical, ryan 5/24/33
                                            }
                                    :children (if (and (= k-val-type "list")
                                                       (= (ut/data-typer (first k-val)) "function"))
@@ -9257,7 +9272,7 @@
                                                          ;:font-weight 400
                                                            :padding-top "7px"}])
 
-                                                (when (not (empty? (get sql-explanations keypath "")))
+                                                (when (ut/ne? (get sql-explanations keypath ""))
                                                   ^{:key (str block-id keypath kki kk k-val-type 82)}
 
                                                   [re-com/md-icon-button
@@ -9285,7 +9300,7 @@
                                 :children [^{:key (str block-id keypath kki kk k-val-type 10)}
                                            [re-com/h-box
                                             :gap "6px"
-                                            :children [[draggable
+                                            :children [[dggbl ;;draggable
                                   ;;                       {:from block-id
                                   ;;                        :new-block [:artifacts "text"]
                                   ;;  ;:override (when is-map? src-block-id)
@@ -9310,7 +9325,7 @@
                                                         "meta-menu" ;block-id
                                                         ^{:key (str block-id keypath kki kk k-val-type 11)}
                                                         [re-com/box :child (str kk)
-                                                         :style {:cursor (when draggable? "grab")
+                                                         :style {;:cursor (when draggable? "grab")
                                                                 ;:border "1px solid white"
                                                                  }]]
 
