@@ -51,7 +51,10 @@
    [:= :time/minute 50]
    [:= :time/minute 55]]},
  :changed-wallpaper-8k?
- {:signal [:and [:changed? :solver/wallpaper-of-the-moment-8k]]},
+ {:signal
+  [:and
+   [:<> :time/minute -1]
+   [:changed? :solver/wallpaper-of-the-moment-8k]]},
  :changed-wallpaper?
  {:signal
   [:and

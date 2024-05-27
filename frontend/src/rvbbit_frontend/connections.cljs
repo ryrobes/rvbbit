@@ -1230,6 +1230,7 @@
   ([keypath honey-sql]
    (let [style-rules (get honey-sql :style-rules)
           ;sniff? (true? (ut/not-empty? (get @db/sniff-deck (first keypath))))
+         ;clover-sql honey-sql
          sniff? (= (get @db/sniff-deck (first keypath)) :reco)
          kit-name (when (and (not sniff?)
                              (keyword? (get @db/sniff-deck (first keypath))))
@@ -1240,10 +1241,12 @@
                         [[:case (:logic logic) 1 :else 0]
                          (keyword (str "styler_" (ut/unkeyword name)))])))
          panel-key @(rfa/sub ::lookup-panel-key-by-query-key-alpha {:query-key (first keypath)})
+         clover-sql (assoc honey-sql :connection-id "system-db")
          honey-sql (ut/clean-sql-from-ui-keys honey-sql)
          hselect (get honey-sql :select)
          flat (ut/deep-flatten honey-sql)
          connection-id nil ;(get honey-sql :connection-id)
+         
          literal-data? (and (some #(= % :data) flat)
                             (not (some #(= % :panel_history) flat)))
          honey-modded (if has-rules?
@@ -1260,6 +1263,7 @@
                                        :ui-keypath keypath
                                        :panel-key panel-key
                                        :kit-name kit-name
+                                       :clover-sql clover-sql
                                        :honey-sql honey-modded
                                        :client-cache? (if literal-data? (get honey-sql :cache? true) false)
                                        :page (get honey-sql :page)
@@ -1305,6 +1309,7 @@
                               (nil? connection-id) "cache.db"
                               (= connection-id "system") "system-db"
                               :else connection-id)
+          clover-sql (assoc honey-sql :connection-id connection-id)
           refresh-every (get honey-sql :refresh-every)
           cache? (get honey-sql :cache? true)
           page (get honey-sql :page)
@@ -1336,6 +1341,7 @@
                                             :ui-keypath keypath
                                             :panel-key panel-key
                                             :kit-name kit-name
+                                            :clover-sql clover-sql
                                             :page page
                                             :client-cache? cache?
                                             :sniff? sniff?

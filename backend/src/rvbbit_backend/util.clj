@@ -225,10 +225,11 @@
    (pmap (fn [[file-path a]]
            (pp ["  " :freezing-atom file-path])
            (with-open [wtr (io/writer file-path)]
-             (binding [*out* wtr]
+             (binding [*out* wtr] ;; selective pretty print formatting 
                (if (or (cstr/includes? (str file-path) "signals.")
                        (cstr/includes? (str file-path) "rules.")
                        (cstr/includes? (str file-path) "errors.")
+                       (cstr/includes? (str file-path) "training-atom.")
                        (cstr/includes? (str file-path) "sql-cache.")
                        (cstr/includes? (str file-path) "solvers."))
                  (clojure.pprint/pprint @a)
@@ -1173,6 +1174,23 @@
            (reduce-kv (fn [acc k v]
                         (if (or (key-remove-set k)
                                 (and (keyword? k) (cstr/starts-with? (name k) "_")))
+                          acc
+                          (assoc acc k (deep-remove-keys v keys-to-remove)))) {})
+           (into (empty data)))
+
+      (vector? data)
+      (mapv (fn [elem] (deep-remove-keys elem keys-to-remove)) data)
+
+      :else data)))
+
+
+(defn deep-remove-keys2 [data keys-to-remove] ;; doent automatically remove underscore keys 
+  (let [key-remove-set (set keys-to-remove)]
+    (cond
+      (map? data)
+      (->> data
+           (reduce-kv (fn [acc k v]
+                        (if (key-remove-set k)
                           acc
                           (assoc acc k (deep-remove-keys v keys-to-remove)))) {})
            (into (empty data)))

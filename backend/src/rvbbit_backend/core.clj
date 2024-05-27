@@ -583,7 +583,7 @@
     (wss/recycle-worker2)
     (wss/recycle-worker3)
     (wss/recycle-workers4 3) ;; run-solver only
-    (wss/recycle-workers5 6) ;; push-to-client only
+    (wss/recycle-workers5 5) ;; push-to-client only
 
         ;;(def lucene-commiter (tt/every! 30 2 (bound-fn [] (search/commit-writer search/index-writer))))
     (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))
@@ -597,14 +597,77 @@
     (def last-look (atom {}))
     (def saved-uids (atom []))
 
+    
+    ;; enrich training data?
+    ;(async/thread 
+      (let [tdata (into {} (take 5 (seq (dissoc @wss/clover-sql-training-atom nil)))) ;;@wss/clover-sql-training-atom
+                        ]
+                    (doseq [[clover-sql {:keys [db-type sql-string table-metadata]}] tdata
+                             :let [;;{:keys [db-type sql-string table-metadata]} v
+                                   req {:body {:model "gpt-4" ;;"gpt-4-turbo" ;; gpt-3.5-turbo-0125"
+                                               :messages [{:role "system"
+                                                           :content "You are a training enrichment bot. Here we have data for Clover-SQL which is DSL for a SQL-like language based on Clojure's honey-sql. 
+                                                                     It is a completely data-based and declarative and doesn't not contain Clojure list unless explicitly noted (i.e. :post-process-fn key allows Clojure functions).
+                                                                     Clover-SQL is used for a front-end tool called RVBBIT, there will inevitably be front-end only keys and values in the clover-sql calls - these are important,
+                                                                     since they capture the users intent / presentation and are used to generate the final SQL query. 
+                                                                     There may be special keys such as :pivot, etc that are important, since the SQL query is generated FROM the user clover-sql map.
+                                                                     Client name variables like *client-name-str mean that user wants data from IT'S client, which is populated automatically at runtime - 
+                                                                     so in these cases please refer to this as 'my client' regardless of what the materialized sql string says, this is dynamic session-based names.
+
+                                                                     You will be given 3 things: 
+                                                                       The Clover-SQL query map, 
+                                                                           the database type, 
+                                                                           the SQL string that was generated from the Clover-SQL query map, 
+                                                                       as well as the metadata for the tables involved.
+                                                                     
+                                                                     Given this context - please return ONLY a human-english natural language description of the SQL query and what they user was trying to do. 
+                                                                     For example, if THIS is the output - what was the users natural language query to arrive here?
+                                                                     Phrase the question as if YOU were the user and not in the 3rd person. Be as general as possible while still allowing the intet to be understood.
+                                                                     "}
+                                                          {:role "user"
+                                                           :content (pr-str {:clover-sql clover-sql 
+                                                                             ;:database-type db-type
+                                                                             :sql-string sql-string 
+                                                                             :table-metadata table-metadata})}
+                                                          ]}
+                                        :headers {"Authorization" "Bearer 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", "Content-Type" "application/json"},
+                                        :method :post,
+                                        :url "https://api.openai.com/v1/chat/completions"}] ]
+                      (let [resp (wss/make-http-call req)
+                            full-data {:question (get-in resp [:choices 0 :message :content]) :clover-sql clover-sql :database-type db-type :sql-string sql-string :table-metadata table-metadata}]
+                        (ut/pp [:TRAINING-RESP! full-data])
+                        (swap! wss/clover-sql-enriched-training-atom assoc clover-sql full-data) )
+                        )
+                      
+                      
+                    )
+                    ;)
 
     (shutdown/add-hook! ::the-pool-is-now-closing
                         #(do (reset! wss/shutting-down? true)
+                             (let [destinations (vec (keys @wss/client-queues))]
+                               (doseq [d destinations]
+                                 (wss/alert! d [:v-box
+                                                :justify :center
+                                                :style {:opacity 0.7}
+                                                :children [[:box
+                                                            :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                                            :child
+                                                            [:speak-always (str "Heads up: data-rabbit system going offline.")]
+                                                            ;[:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]
+                                                            ]]] 10 1 5)))
+                             ;(wss/destroy-websocket-server!)
+                             (Thread/sleep 2000)
                              (wss/destroy-websocket-server!)
                              (tt/stop!)
                              (wss/stop-worker)
                              (wss/stop-worker2)
-                             (wss/stop-worker3)))
+                             (wss/stop-worker3)
+                             (wss/stop-workers4)
+                             (wss/stop-workers5)
+                             (Thread/sleep 2000)
+                             (wss/destroy-websocket-server!)
+                             ))
 
     (shutdown/add-hook! ::the-pool-is-now-closed
                         #(doseq [[conn-name conn] @wss/conn-map]
@@ -613,16 +676,6 @@
                                     (catch Exception e (ut/pp [:close-error e]))))))
 
     (shutdown/add-hook! ::close-system-pools #(do
-                                                (let [destinations (vec (keys @wss/client-queues))]
-                                                  (doseq [d destinations]
-                                                    (wss/alert! d [:v-box
-                                                                   :justify :center
-                                                                   :style {:opacity 0.7}
-                                                                   :children [[:box
-                                                                               :style {:color :theme/editor-outer-rim-color :font-weight 700}
-                                                                               :child
-                                                                               ;[:speak-always (str "Heads up: R-V-B-B-I-T system going offline.")]
-                                                                               [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]] 10 1 5)))
                                                 (wss/destroy-websocket-server!)
                                                 (Thread/sleep 1000)
                                                 ;; (do (ut/pp [:shutting-down-lucene-index-writers])

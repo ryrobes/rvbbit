@@ -593,7 +593,11 @@
        :children (for [[name {:keys [signal]}] signals
                        :let [selected? (= name selected-warren-item)
                              sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
-                             vv (when signal? (get results name))]]
+                             vv (when signal? (get results name))
+                             ext-map (when solver?
+                                       @(ut/tracked-sub
+                                         ::conn/clicked-parameter-key-alpha
+                                         {:keypath [(keyword (str "solver-meta/" (cstr/replace (str name) ":" "") ">extra"))]}))]]
                    
                    [draggable-item
                     [re-com/v-box
@@ -627,25 +631,21 @@
                                              :child (str name)]
                                             [re-com/box
                                              :align :center :justify :center
-                                             :child (str (if (nil? vv) "" vv) )
+                                             :child (if solver?
+                                                      (ut/nf (get ext-map :runs))
+                                                      (str (if (nil? vv) "" vv)))
                                              :style {:font-weight 700
                                                      :font-size "15px"
                                                      :opacity (if (true? vv) 1.0 0.2)}]]]
                                 
                                 (when solver? 
-                                  (let [ext-map @(ut/tracked-sub
-                                                  ::conn/clicked-parameter-key-alpha
-                                                  {:keypath [(keyword (str "solver-meta/" (cstr/replace (str name) ":" "") ">extra"))]})
-                                        ;cache-hit? (get ext-map :cache-hit?)
-                                        ;ext-map (dissoc ext-map :cache-hit?)
-                                        ]
                                     [re-com/h-box
                                      :padding "6px"
                                      :justify :between
                                      :style {:font-size "13px" :opacity 0.56}
                                      :children [[re-com/box :child (str (get ext-map :last-processed))]
                                                 [re-com/box :child (str (get ext-map :elapsed-ms) "ms")]]])
-                                  )
+                                  
 
                                 ;; (when true ;;(not selected?)
                                 ;;   [re-com/box
