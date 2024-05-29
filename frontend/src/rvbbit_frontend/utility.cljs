@@ -1017,6 +1017,11 @@
 (defn remove-keys [m keys]
   (apply dissoc m keys))
 
+(defn hiccup-css-to-string [css-map]
+  (->> css-map
+       (map (fn [[k v]] (str (name k) ": " v ";")))
+       (cstr/join " ")))
+
 (def body-set-atom (atom {}))
 
 (defn body-set-fn [body] ;; expensive

@@ -1,10 +1,13 @@
 {:orders
  {:flow-fn-sys
   [:name :description :full_map :inputs :icon :input_types :output_types :category],
+  :blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
   :fields-sys [:field_name :field_type :data_type],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
   :flows-sys [:flow_id :file_path :last_modified],
+  :files-sys [:file_path :screen_name :blocks :queries :ts],
   :jvm_stats
   [:used_memory_mb
    :thread_count
@@ -30,14 +33,44 @@
   :flow-fn-categories-sys [:category],
   :connections-sys [:database_name :connection_id],
   :reco-counts [:table_name :cnt],
+  :gen-viz-516 (:mb :mem_used :messages_per_second :ts),
   :flow-fn-all-sys [:name]},
  :reco-preview nil,
  :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
  :flow? false,
  :sql-source
  {:jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111}},
- :audio-playing? false,
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
+  :gen-viz-516
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 13,
+   :group-by [:ts],
+   :_last-run "04:40:05",
+   :refresh-every 20,
+   :from
+   [{:select
+     [:client_name
+      :recent_messages_per_second
+      :messages_per_second
+      :mem_used
+      :batches
+      :packets
+      :ts],
+     :where [:= :client_name :*client-name-str],
+     :from [[:client_memory :ee183]],
+     :order-by [[:mem_time :desc]]}],
+   :order-by [[:ts :desc]],
+   :connection-id "system-db",
+   :select
+   [[[[:sum :mem_used]] :mem_used]
+    [[:sum :recent_messages_per_second] :messages_per_second]
+    :ts],
+   :post-process-fn
+   (fn [x]
+     (vec
+       (reverse
+         (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
  :meta
  {:flow-fn-sys
   {:fields
@@ -100,6 +133,57 @@
      :commons {":sub-flows" 94, ":rabbit-base" 18, ":clojure-base" 16},
      :cardinality 2}},
    :rowcount 128},
+  :blocks-sys
+  {:fields
+   {:block_key
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons {":block-3108" 1, ":block-6003" 1, ":block-7377" 1},
+     :cardinality 100},
+    :block_name
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons {"block-12050" 1, "block-8670" 1, "block-4424" 1},
+     :cardinality 100},
+    :queries
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 13, 1 4},
+     :cardinality 11},
+    :views
+    {:data-type "integer",
+     :distinct 5,
+     :group-by? true,
+     :commons {1 7, 2 5, 0 3},
+     :cardinality 29},
+    :block_data
+    {:data-type "string",
+     :distinct 17,
+     :group-by? true,
+     :commons
+     {"{:name \"client latency callout\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :hi, :root [35 7], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:hi [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>client-latency]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"client latency (ms)\"]]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}"
+      1,
+      "{:h 8, :w 26, :connection-id \"system-db\", :name \"select-all-client_stats\", :queries {:client-stats-drag-36 {:select [:ack :client_latency :client_name :last_seen :last_seen_seconds :memory :recent_messages_per_second :push :queue_distro :server_subs :uptime], :from [[:client_stats :gg588]], :refresh-every 10, :cache? false, :_last-run \"21:58:32\", :col-widths {:ack 81, :client_latency 141, :client_name 261, :memory 81, :push 91, :server_subs 111, :uptime 201, :last_seen 171}, :order-by [[:last_seen_seconds :asc]], :style-rules {[:* :highlight-8717] {:logic [:= :client_name :*client-name-str], :style {:border \"1px solid #cac18255\"}}}}}, :root [14 13], :tab \"generated lass of the woodlands\"}"
+      1,
+      "{:panels {:block-8670 {:h 2, :w 12, :root [28 21], :tab \"generated lass of the woodlands\", :selected-view :hi, :name \"block-8670\", :views {:hi [:box :size \"auto\" :align :center :justify :center :style {:font-size \"27px\", :font-weight 700, :padding-right \"20px\", :padding-top \"6px\", :color \"#cac182\", :transition \"all 0.6s ease-in-out\"} :child [:string [\"\" :client/*client-name*>stats>client-name]]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-7377 {:name \"block-7377\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :cell-drop-5164, :root [23 21], :h 2, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:cell-drop-5164 [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"35px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client-memory-drag-36/packets.0]] [:box :style {:font-size \"14px\", :margin-top \"-10px\"} :child \"client packets\"]]]}}, :block-6441 {:h 2, :w 13, :root [1 17], :tab \"generated lass of the woodlands\", :selected-view :hi, :name \"block-6441\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-3341.:hi\"} :style {:font-size \"44px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color \"#cac182\", :font-family :theme/base-font} :child [:string :time/now]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-7453 {:name \"block-7453\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :cell-drop-2732, :root [23 23], :h 2, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:cell-drop-2732 [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"35px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client-memory-drag-36/batches.0]] [:box :style {:font-size \"14px\", :margin-top \"-10px\"} :child \"client batches\"]]]}}, :block-3108 {:h 5, :w 22, :connection-id \"system-db\", :name \"select-all-client_memory\", :queries {:client-memory-drag-36 {:select [:client_name :recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts], :where [:= :client_name :*client-name-str], :from [[:client_memory :ee183]], :refresh-every 20, :cache? false, :_last-run \"21:58:21\", :order-by [[:mem_time :desc]]}}, :root [1 21], :tab \"generated lass of the woodlands\", :selected-view :client-memory-drag-36}, :block-6003 {:h 4, :w 7, :root [7 13], :tab \"generated lass of the woodlands\", :selected-view :hi, :name \"block-6003\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-6003.:hi\"} :style {:font-size \"95px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color \"#cac182\", :font-family :theme/base-font} :child [:string :signal/cool-raccoon-signal-yo]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}], :params {:my-dash-killswitch? true}}, :queries {}}, :block-2505 {:name \"client latency callout\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :hi, :root [35 7], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:hi [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>client-latency]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"client latency (ms)\"]]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}, :block-5659 {:name \"block-5659\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :hi, :root [35 10], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:hi [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:string :client/*client-name*>stats>messages-per-second]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"messages/sec (all)\"]]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}, :block-9994 {:name \"block-9994\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :cell-drop-11937, :root [35 1], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:cell-drop-11937 [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:string :client/*client-name*>stats>recent-messages-per-second]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"messages/sec (recent)\"]]]}}, :block-4424 {:h 2, :w 13, :root [1 19], :tab \"generated lass of the woodlands\", :selected-view :cell-drop-4478, :name \"block-4424\", :views {:cell-drop-4478 [:box :size \"auto\" :align :center :justify :center :style {:font-size \"23px\", :font-weight 700, :color \"#cac182\", :padding-right \"20px\", :transition \"all 0.6s ease-in-out\"} :child [:string [\"uptime: \" :client/*client-name*>stats>uptime]]]}, :queries {}}, :block-285 {:name \"block-285\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :cell-drop-7398, :root [35 4], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:cell-drop-7398 [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"60px\", :color \"#8884d8\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>memory]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"js used heap (mb)\"]]]}}, :block-12050 {:name \"block-12050\", :w 34, :selected-view :every-45-seconds, :root [1 1], :h 6, :connection-id \"system-db\", :queries {:gen-viz-516 {:cache? false, :where [:= :client_name :*client-name-str], :limit 50, :group-by [:ts], :_last-run \"21:58:32\", :refresh-every 20, :from [{:select [:client_name :recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts], :where [:= :client_name :*client-name-str], :from [[:client_memory :ee183]], :order-by [[:mem_time :desc]]}], :order-by [[:ts :desc]], :connection-id \"system-db\", :select [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts], :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}}, :tab \"generated lass of the woodlands\", :views {:every-45-seconds [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :ComposedChart {:data :gen-viz-516, :style {:font-family :theme/base-font}, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:reagent-gt :CartesianGrid {:strokeDasharray \"0 0\", :opacity 0}] [:reagent-gt :Tooltip {:content-style {:background-color \"#00000099\", :font-weight 700, :border \"1px solid transparent\", :border-radius \"4px\"}}] [:reagent-gt :XAxis {:dataKey :ts}] [:reagent-gt :YAxis {:yAxisId \"left\", :label {:value \"MB\", :angle -90, :fill \"#8884d8\", :style {:font-size \"20px\", :font-weight 700}, :position \"middle\", :dx -25}, :domain [\"auto\" \"auto\"]}] [:reagent-gt :YAxis {:yAxisId \"right\", :label {:value \"Messages per Second\", :angle 90, :fill \"#82ca9d\", :style {:font-weight 700, :font-size \"15px\"}, :position \"middle\", :dx 20}, :domain [\"auto\" \"auto\"], :orientation \"right\"}] [:reagent-gt :Line {:type \"monotone\", :dataKey :mb, :yAxisId \"left\", :stroke-width 3, :stroke \"#8884d8\", :activeDot {:r 8}}] [:reagent-gt :Bar {:type \"monotone\", :dataKey :messages_per_second, :yAxisId \"right\", :fill \"#00000000\", :stroke-width 3, :stroke \"#82ca9d\"}]]]}}, :block-2618 {:h 8, :w 26, :connection-id \"system-db\", :name \"select-all-client_stats\", :queries {:client-stats-drag-36 {:select [:ack :client_latency :client_name :last_seen :last_seen_seconds :memory :recent_messages_per_second :push :queue_distro :server_subs :uptime], :from [[:client_stats :gg588]], :refresh-every 10, :cache? false, :_last-run \"21:58:32\", :col-widths {:ack 81, :client_latency 141, :client_name 261, :memory 81, :push 91, :server_subs 111, :uptime 201, :last_seen 171}, :order-by [[:last_seen_seconds :asc]], :style-rules {[:* :highlight-8717] {:logic [:= :client_name :*client-name-str], :style {:border \"1px solid #cac18255\"}}}}}, :root [14 13], :tab \"generated lass of the woodlands\"}, :block-2178 {:h 6, :w 34, :root [1 7], :tab \"generated lass of the woodlands\", :selected-view :every-10-min-avg, :name \"block-2178\", :views {:every-10-min-avg [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :BarChart {:data :new-query, :style {:font-family :theme/base-font}, :margin {:top 25, :right 30, :left 20, :bottom 5}} [:reagent-gt :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0}] [:reagent-gt :Tooltip {:content-style {:background-color \"#00000099\", :font-weight 700, :border \"1px solid transparent\", :border-radius \"4px\"}}] [:reagent-gt :XAxis {:dataKey :ts_hour}] [:reagent-gt :YAxis {:domain [\"auto\" \"auto\"]}] [:reagent-gt :Bar {:type \"monotone\", :dataKey :mem_used, :stroke \"#8884d8\", :stroke-width 3, :fill \"#8884d801\"} [:reagent-gt :LabelList {:dataKey :diff, :fill \"#8884d8\", :style {:font-size \"18px\", :font-weight 700}, :position \"top\"}]]]]}, :queries {:new-query {:cache? false, :where [:= :client_name :*client-name-str], :limit 26, :group-by [2], :_last-run \"21:58:32\", :refresh-every 10, :from [{:select [:client_name :recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts], :where [:= :client_name :*client-name-str], :from [[:client_memory :ee183]], :order-by [[:mem_time :desc]]}], :order-by [[:ts :desc]], :connection-id \"system-db\", :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 15] :ts_hour]], :post-process-fn (fn [x] (vec (for [idx (range (count x)) :let [rx (vec (reverse x)) prev-row (get rx (- idx 1) {:mem_used 0}) row (get rx idx {:mem_used 0}) pre-mb (/ (get prev-row :mem_used) 1048576) mb (/ (get row :mem_used) 1048576) diff (Math/round (- mb pre-mb)) pos (cond (> diff 0) \"+\" (< diff 0) \"\" :else \"\")]] (merge row {:diff (if (= idx 0) (str (Math/round mb) \" MB\") (str pos diff))}))))}}}, :block-12288 {:h 4, :w 6, :root [1 13], :tab \"generated lass of the woodlands\", :selected-view :hi, :name \"block-12288\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-12288.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color \"#cac182\", :font-family :theme/base-font} :child [:string :time/second]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}}, :click-param {:param {:selected-view [nil :*], :selected-view-data nil, :selected-block :block-7453, :my-dash-killswitch? false, :upstanding-crimson-frog \"new parameter value!\", :super-cobalt-mole [\"1121pm - 229mb\"]}}}"
+      1},
+     :cardinality 100},
+    :view_names
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons {":hi :stack" 5, "" 3, ":every-10-min-avg" 1},
+     :cardinality 64},
+    :query_names
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons {"" 13, ":client-stats-drag-36" 1, ":client-memory-drag-36" 1},
+     :cardinality 29}},
+   :rowcount 17},
   :fields-sys {:fields {}, :rowcount 0},
   :tables-sys {:fields {}, :rowcount 0},
   :gen-viz-797
@@ -142,6 +226,44 @@
      {"2024-03-12 02:37:43" 67, "2024-05-03 21:13:48" 1, "2024-03-14 07:50:09" 1},
      :cardinality 31}},
    :rowcount 96},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 163,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 156,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 95},
+    :blocks
+    {:data-type "integer",
+     :distinct 49,
+     :group-by? true,
+     :commons {3 45, 12 6, 6 6},
+     :cardinality 30},
+    :queries
+    {:data-type "integer",
+     :distinct 34,
+     :group-by? true,
+     :commons {0 53, 5 13, 11 9},
+     :cardinality 20},
+    :ts
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons
+     {"2024-05-27 02:04:18" 47, "2024-05-27 02:04:17" 46, "2024-05-27 02:04:16" 42},
+     :cardinality 4}},
+   :rowcount 163},
   :gen-viz-94
   {:fields
    {:diff
@@ -155,130 +277,130 @@
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 111,
+     :distinct 109,
      :group-by? true,
-     :commons {432 1, 438 1, 161 1},
-     :cardinality 100},
+     :commons {0 3, 390 1, 177 1},
+     :cardinality 98},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 92,
+     :distinct 102,
      :group-by? true,
-     :commons {28.14 4, 28.93 3, 28.03 3},
-     :cardinality 82},
+     :commons {27.07 3, 28.14 3, 25.47 2},
+     :cardinality 91},
     :uptime_seconds
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {915 1, 1004 1, 1635 1},
+     :commons {1259 1, 390 1, 915 1},
      :cardinality 100},
     :queries_per_second
     {:data-type "float",
-     :distinct 2,
+     :distinct 1,
      :group-by? true,
-     :commons {0 109, 1 2},
-     :cardinality 1},
+     :commons {0 111},
+     :cardinality 0},
     :sql_cache_size
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {3 85, 0 26},
+     :commons {1 63, 0 48},
      :cardinality 1},
     :ts
     {:data-type "string",
      :distinct 111,
      :group-by? true,
      :commons
-     {"2024-05-26 02:04:50" 1, "2024-05-26 01:46:50" 1, "2024-05-26 01:39:35" 1},
+     {"2024-05-27 02:14:44" 1, "2024-05-27 02:06:44" 1, "2024-05-27 02:18:14" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
-     :distinct 7,
+     :distinct 6,
      :group-by? true,
-     :commons {187 84, 179 15, 168 5},
-     :cardinality 6},
+     :commons {182 71, 184 29, 183 4},
+     :cardinality 5},
     :messages_per_second
     {:data-type "float",
-     :distinct 82,
+     :distinct 91,
      :group-by? true,
-     :commons {28.54 4, 28.4 4, 28.59 3},
-     :cardinality 73},
+     :commons {27.73 3, 27.11 3, 27.81 3},
+     :cardinality 81},
     :messages
     {:data-type "integer",
-     :distinct 111,
+     :distinct 110,
      :group-by? true,
-     :commons {12130 1, 8 1, 432 1},
-     :cardinality 100},
+     :commons {0 2, 29612 1, 10971 1},
+     :cardinality 99},
     :sniffs_run
     {:data-type "integer",
      :distinct 19,
      :group-by? true,
-     :commons {23 13, 25 13, 29 13},
+     :commons {12 13, 15 13, 20 13},
      :cardinality 17},
     :sys_load
     {:data-type "float",
-     :distinct 82,
+     :distinct 103,
      :group-by? true,
-     :commons {2.64 4, 3.44 3, 2.56 3},
-     :cardinality 73},
+     :commons {3.98 2, 2.79 2, 3.29 2},
+     :cardinality 92},
     :unix_ms
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {1716703250418 1, 1716702155432 1, 1716703070419 1},
+     :commons {1716790619942 1, 1716790229882 1, 1716791114900 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 108,
+     :distinct 110,
      :group-by? true,
-     :commons {1335 2, 868 2, 2263 2},
-     :cardinality 97},
+     :commons {1757 2, 2220 1, 2705 1},
+     :cardinality 99},
     :recent_queries_run
     {:data-type "integer",
-     :distinct 18,
+     :distinct 19,
      :group-by? true,
-     :commons {4 34, 2 26, 6 11},
-     :cardinality 16},
+     :commons {4 30, 2 24, 6 13},
+     :cardinality 17},
     :thread_count
     {:data-type "integer",
-     :distinct 30,
+     :distinct 39,
      :group-by? true,
-     :commons {400 14, 397 13, 395 12},
-     :cardinality 27},
+     :commons {423 7, 417 7, 404 6},
+     :cardinality 35},
     :internal_queries_run
     {:data-type "integer",
-     :distinct 99,
+     :distinct 95,
      :group-by? true,
-     :commons {8 2, 105 2, 133 2},
-     :cardinality 89},
+     :commons {0 3, 80 2, 10 2},
+     :cardinality 85},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 5,
+     :distinct 9,
      :group-by? true,
-     :commons {11 79, 0 25, 42 5},
-     :cardinality 4},
+     :commons {11 53, 104 20, 0 18},
+     :cardinality 8},
     :ws_peers
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {12 110, 0 1},
+     :commons {12 108, 0 3},
      :cardinality 1},
     :recent_messages
     {:data-type "integer",
-     :distinct 111,
+     :distinct 109,
      :group-by? true,
-     :commons {12130 1, 8 1, 432 1},
-     :cardinality 100},
+     :commons {0 3, 29612 1, 10971 1},
+     :cardinality 98},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 18,
+     :distinct 20,
      :group-by? true,
-     :commons {0.27 34, 0.13 26, 0.4 11},
-     :cardinality 16},
+     :commons {0.27 30, 0.13 24, 0.4 13},
+     :cardinality 18},
     :seconds_since_last_update
     {:data-type "integer",
      :distinct 3,
      :group-by? true,
-     :commons {14 56, 15 54, -1 1},
+     :commons {15 60, 14 50, -1 1},
      :cardinality 2}},
    :rowcount 111},
   :rowcnt-drag-2
@@ -462,6 +584,34 @@
      :commons {183 1, 968 1, 633 1},
      :cardinality 100}},
    :rowcount 68},
+  :gen-viz-516
+  {:fields
+   {:mb
+    {:data-type "integer",
+     :distinct 13,
+     :group-by? true,
+     :commons {1362 1, 1269 1, 1426 1},
+     :cardinality 100},
+    :mem_used
+    {:data-type "integer",
+     :distinct 13,
+     :group-by? true,
+     :commons {1750543515 1, 1331124285 1, 1602901975 1},
+     :cardinality 100},
+    :messages_per_second
+    {:data-type "float",
+     :distinct 11,
+     :group-by? true,
+     :commons {3.27 2, 3.6 2, 3.87 1},
+     :cardinality 84},
+    :ts
+    {:data-type "string",
+     :distinct 13,
+     :group-by? true,
+     :commons
+     {"2024-05-28 04:34:49" 1, "2024-05-28 04:37:49" 1, "2024-05-28 04:39:19" 1},
+     :cardinality 100}},
+   :rowcount 13},
   :shape-drag-7
   {:fields
    {:shape
@@ -490,14 +640,18 @@
  {:virtual-panel {:kick--1764769189 152},
   :system-connections-list* {:connections-sys 111},
   :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf}},
+  :system-fields-list* {:fields-sys ##Inf},
+  :files-list* {:files-sys 178},
+  :blocks-list* {:blocks-sys 127},
+  :block-4284 {:gen-viz-516 127}},
  :runstream-drops nil,
- :data-hash 522106447,
+ :data-hash 1828743346,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"],
+ :auto-run? true,
  :selected-cols nil,
  :server
  {:settings
@@ -712,16 +866,129 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [331312752 295430816 4294705152],
+ :memory [1586276946 1517799870 4294705152],
+ :sched {:gen-viz-516 88548},
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-27 02:22:03",
+      :at "2024-05-28 04:40:03",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
+     nil],
+    :elapsed-ms nil,
+    :reco-count nil}},
+  :file-change
+  {:file-changed
+   {:data
+    [{:path
+      "./live/engaging-teal-duck-15/star-shaped wallaby/block-12050/views/every-45-seconds.edn",
+      :type :modify,
+      :panel-key :block-4284,
+      :block-data
+      {:name "block-12050",
+       :w 24,
+       :style {:border-radius "0px 0px 0px 30px"},
+       :block-key ":block-12050",
+       :selected-view :every-45-seconds,
+       :root [26 23],
+       :h 6,
+       :file-path "./screens/blackberries3-narrow.edn",
+       :connection-id "system-db",
+       :queries
+       {:gen-viz-516
+        {:cache? false,
+         :where [:= :client_name :*client-name-str],
+         :limit 13,
+         :group-by [:ts],
+         :_last-run "04:36:53",
+         :refresh-every 20,
+         :from
+         [{:select
+           [:client_name
+            :recent_messages_per_second
+            :messages_per_second
+            :mem_used
+            :batches
+            :packets
+            :ts],
+           :where [:= :client_name :*client-name-str],
+           :from [[:client_memory :ee183]],
+           :order-by [[:mem_time :desc]]}],
+         :order-by [[:ts :desc]],
+         :connection-id "system-db",
+         :select
+         [[[[:sum :mem_used]] :mem_used]
+          [[:sum :recent_messages_per_second] :messages_per_second]
+          :ts],
+         :post-process-fn
+         (fn [x]
+           (vec
+             (reverse
+               (for
+                 [row x]
+                 (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
+       :tab "star-shaped wallaby",
+       :views
+       {:every-45-seconds
+        [:>
+         :ResponsiveContainer
+         {:width "100%", :height :panel-height+50}
+         [:>
+          :ComposedChart
+          {:data :gen-viz-516,
+           :style {:font-family :theme/base-font},
+           :margin {:top 5, :bottom 5, :right 30, :left 20}}
+          [:> :CartesianGrid {:strokeDasharray "0 0", :opacity 0}]
+          [:>
+           :Tooltip
+           {:content-style
+            {:background-color "#00000099",
+             :font-weight 700,
+             :border "1px solid transparent",
+             :border-radius "4px"}}]
+          [:> :XAxis {:dataKey :ts}]
+          [:>
+           :YAxis
+           {:yAxisId "left",
+            :label
+            {:value "MB",
+             :angle -90,
+             :fill :solver/colors-of-the-moment>colors>1,
+             :style {:font-size "20px", :font-weight 700},
+             :position "middle",
+             :dx -25},
+            :domain ["auto" "auto"]}]
+          [:>
+           :YAxis
+           {:yAxisId "right",
+            :label
+            {:value "Messages per Second",
+             :angle 90,
+             :fill :solver/colors-of-the-moment>highest-saturation,
+             :style {:font-weight 700, :color "#ffffff", :font-size "15px"},
+             :position "middle",
+             :dx 20},
+            :domain ["auto" "auto"],
+            :orientation "right"}]
+          [:>
+           :Line
+           {:type "monotone",
+            :dataKey :mb,
+            :yAxisId "left",
+            :stroke-width 4,
+            :stroke :solver/colors-of-the-moment>contrast-with-dominant,
+            :activeDot {:r 8}}]
+          [:>
+           :Bar
+           {:type "monotone",
+            :dataKey :messages_per_second,
+            :yAxisId "right",
+            :fill "#00000000",
+            :stroke-width 4,
+            :stroke :solver/colors-of-the-moment>highest-saturation}]]]}}}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -754,29 +1021,223 @@
  :flow-subs
  [:time/now-seconds
   :flow/flow-forever>*running?
+  :solver/colors-of-the-moment>highest-saturation
   :time/minute
   :time/hour
+  :client/*client-name*>stats>memory
   :solver/colors-of-the-moment>data-colors
+  :solver/colors-of-the-moment>colors>1
   :solver/colors-of-the-moment>brightest
   :flow/live-scratch-flow>*running?
   :solver/colors-of-the-moment
   :solver/wallpaper-of-the-moment
+  :solver/colors-of-the-moment>colors>0
   :solver/colors-of-the-moment>contrast-with-dominant
   :time/second
   :flow/flow-forever>:final-math
-  :solver/colors-of-the-moment>most-contrasting
   :solver/colors-of-the-moment>second-brightest
   :solver/colors-of-the-moment>darkest],
- :client-name :light-sapphire-serval-22,
+ :client-name :engaging-teal-duck-15,
+ :signals-history
+ {[:= :time/minute 25]
+  [[true 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 40]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 5]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 15]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 30]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [true 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:or
+   [:= :time/minute 0]
+   [:= :time/minute 5]
+   [:= :time/minute 10]
+   [:= :time/minute 15]
+   [:= :time/minute 20]
+   [:= :time/minute 25]
+   [:= :time/minute 30]
+   [:= :time/minute 35]
+   [:= :time/minute 40]
+   [:= :time/minute 45]
+   [:= :time/minute 50]
+   [:= :time/minute 55]]
+  [[true 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [true 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [true 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 35]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [true 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 55]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 20]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 45]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 10]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 0]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]],
+  [:= :time/minute 50]
+  [[false 1716884700908]
+   [false 1716884760919]
+   [false 1716884820914]
+   [false 1716884880910]
+   [false 1716884940908]
+   [false 1716885000911]
+   [false 1716885060905]
+   [false 1716885120924]
+   [false 1716885180908]
+   [false 1716885240923]
+   [false 1716885300921]
+   [false 1716885360904]
+   [false 1716885420900]]},
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2137, :h 1342},
+ :window {:w 2490, :h 1427},
  :post-meta
  {:gen-viz-797 {:* {:rowcount 317}},
-  :flows-sys
-  {:*
-   {:rowcount
-    "[SQLITE_ERROR] SQL error or missing database (near \")\": syntax error)"}},
   :gen-viz-94 {:* {:rowcount 1}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
   :gen-viz-828 {:* {:rowcount 317}},
@@ -785,29 +1246,34 @@
   :duration-hours-drag-43 {:* {:rowcount 8349}},
   :city-drag-26 {:* {:rowcount 19899}},
   :state-drag-3 {:* {:rowcount 68}},
+  :gen-viz-516 {:* {:rowcount 13}},
   :shape-drag-7 {:* {:rowcount 30}}},
  :status
  {:heartbeat
   {:kick
    [:time/now-seconds
     :flow/flow-forever>*running?
+    :solver/colors-of-the-moment>highest-saturation
     :time/minute
     :time/hour
+    :client/*client-name*>stats>memory
     :solver/colors-of-the-moment>data-colors
+    :solver/colors-of-the-moment>colors>1
     :solver/colors-of-the-moment>brightest
     :flow/live-scratch-flow>*running?
     :solver/colors-of-the-moment
     :solver/wallpaper-of-the-moment
+    :solver/colors-of-the-moment>colors>0
     :solver/colors-of-the-moment>contrast-with-dominant
     :time/second
     :flow/flow-forever>:final-math
-    :solver/colors-of-the-moment>most-contrasting
     :solver/colors-of-the-moment>second-brightest
     :solver/colors-of-the-moment>darkest]},
+  :file-change {:file-changed :done},
   :alert1 {:alerts :alert2}},
  :screen-name "alarm-clock2",
  :recos-page2 0,
- :selected-warren-item :colors-of-the-moment,
+ :selected-warren-item :every-5-minutes,
  :selected-tab "star-shaped wallaby",
  :col-names nil,
  :snapshots nil,
@@ -820,34 +1286,24 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   78289
+   88555
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :base-sniff-queries {:jvm_stats 1498154063},
- :panels-hash 1376254993,
+ :panels-hash 1704451998,
  :sessions
- (["virtuous-chartreuse-prairie-dog-38.edn"
-   "102 hours, 25 minutes, 25 seconds"
-   368725412]
-   ["moving-star-shaped-prairie-dog-29.edn"
-    "102 hours, 49 minutes, 3 seconds"
-    370143584]
-   ["certain-icosahedral-hound-19.edn"
-    "1028 hours, 44 minutes, 23 seconds"
-    3703463889]
-   ["trusting-cerise-gnu-5.edn" "1055 hours, 2 minutes, 40 seconds" 3798160180]
-   ["happy-prismatic-hornet-6.edn" "1055 hours, 49 minutes, 5 seconds" 3800945827]
-   ["meritorious-hexagonal-louse-7.edn"
-    "1055 hours, 8 minutes, 51 seconds"
-    3798531181]
-   ["constant-lime-bat-22.edn" "1056 hours, 20 minutes, 49 seconds" 3802849025]
-   ["protected-star-shaped-falcon-24.edn"
-    "1056 hours, 30 minutes, 45 seconds"
-    3803445998]
-   ["prominent-globular-leopard-40.edn"
-    "1056 hours, 34 minutes, 10 seconds"
-    3803650807]),
+ (["beaming-gray-opossum-6.edn" "1002 hours, 34 minutes, 0 second" 3609240806]
+   ["nutritious-round-donkey-34.edn" "101 hours, 16 minutes, 32 seconds" 364592246]
+   ["smile-rectangular-tiger-5.edn" "101 hours, 53 minutes, 30 seconds" 366810416]
+   ["independent-conical-leopard-22.edn"
+    "102 hours, 36 minutes, 27 seconds"
+    369387283]
+   ["victorious-tan-hog-37.edn" "102 hours, 43 minutes, 52 seconds" 369832048]
+   ["active-purple-toad-14.edn" "102 hours, 45 minutes, 48 seconds" 369948228]
+   ["quiet-red-llama-26.edn" "102 hours, 52 minutes, 3 seconds" 370323057]
+   ["thriving-yellow-pig-39.edn" "102 hours, 59 minutes, 9 seconds" 370749769]
+   ["brave-cobalt-echidna-43.edn" "104 hours, 3 minutes, 52 seconds" 374632913]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
@@ -904,7 +1360,7 @@
    (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))},
   :colors-of-the-moment-8k
   {:signal :signal/changed-wallpaper-8k?,
-   :cache? true,
+   :cache? false,
    :type :flow,
    :data
    {:flowmap "node-color-thief-js-webp",
@@ -912,16 +1368,17 @@
     :return nil}},
   :colors-of-the-moment
   {:signal :signal/changed-wallpaper?,
-   :cache? true,
+   :cache? false,
    :type :flow,
    :data
    {:flowmap "node-color-thief-js-webp",
     :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
     :return nil}}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -336371870,
+ :user-params-hash -2094983820,
  :grid-recos? true,
- :session-hash -1460555980,
+ :session-hash -402822752,
+ :no-ui? false,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1095,6 +1552,36 @@
      :uu58]],
    :group-by [:state],
    :order-by [[:rowcnt :desc]]},
+  :gen-viz-516
+  {:cache? false,
+   :where [:= :client_name :*client-name-str],
+   :limit 13,
+   :group-by [:ts],
+   :_last-run "04:40:05",
+   :refresh-every 20,
+   :from
+   [{:select
+     [:client_name
+      :recent_messages_per_second
+      :messages_per_second
+      :mem_used
+      :batches
+      :packets
+      :ts],
+     :where [:= :client_name :*client-name-str],
+     :from [[:client_memory :ee183]],
+     :order-by [[:mem_time :desc]]}],
+   :order-by [[:ts :desc]],
+   :connection-id "system-db",
+   :select
+   [[[[:sum :mem_used]] :mem_used]
+    [[:sum :recent_messages_per_second] :messages_per_second]
+    :ts],
+   :post-process-fn
+   (fn [x]
+     (vec
+       (reverse
+         (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))},
   :shape-drag-7
   {:select [:shape [[:count 1] :rowcnt]],
    :from
@@ -1202,7 +1689,7 @@
    :tab "sapphire ape"},
   :block-3341
   {:name "block-3341",
-   :w 25,
+   :w 35,
    :style
    {:border-radius "0px 0px 0px 40px",
     :_border-left
@@ -1213,7 +1700,7 @@
     :backdrop-filter "blur(4px)"},
    :selected-view :hi,
    :root [16 0],
-   :h 2,
+   :h 3,
    :queries {},
    :tab "star-shaped wallaby",
    :ghosted? true,
@@ -1225,11 +1712,11 @@
      :attr
      {:id ":block-3341.:hi"}
      :style
-     {:color :solver/colors-of-the-moment>contrast-with-dominant,
-      :font-size "60px",
+     {:color :solver/colors-of-the-moment>second-brightest,
+      :font-size "84px",
       :transition "all 1.5s",
       :font-weight 700,
-      :margin-top "-45px",
+      :margin-top "-40px",
       :padding-top "26px",
       :padding-left "55px",
       :text-shadow
@@ -1237,8 +1724,7 @@
        "2px 2px 10px "
        :solver/colors-of-the-moment>darkest
        ", 2px 2px 10px "
-       :solver/colors-of-the-moment>darkest],
-      :font-family "Alata"}
+       :solver/colors-of-the-moment>darkest]}
      :child
      [:string :time/now-seconds]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
@@ -1533,7 +2019,7 @@
      :attr
      {:id ":block-423d0.:hi"}
      :style
-     {:font-size "15px",
+     {:font-size "14px",
       :font-weight 700,
       :padding-top "6px",
       :padding-left "14px",
@@ -1690,6 +2176,37 @@
       "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-2589
+  {:name "block-2589",
+   :w 5,
+   :style {:border-radius "0px 0px 30px 0px"},
+   :selected-view :hi,
+   :root [43 0],
+   :h 3,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :minimized? true,
+   :views
+   {:hi
+    [:v-box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "60px",
+      :color :solver/colors-of-the-moment>second-brightest,
+      :font-weight 700,
+      :transition "all 0.6s ease-in-out"}
+     :children
+     [[:box :child [:number :client/*client-name*>stats>memory]]
+      [:box
+       :style
+       {:font-size "18px", :margin-top "-10px"}
+       :child
+       "js used heap (mb)"]]]}},
   :block-7215
   {:h 4,
    :w 9,
@@ -1723,6 +2240,106 @@
      :order-by [[:rowcnt :desc]]}},
    :root [17 8],
    :tab "sapphire ape"},
+  :block-4284
+  {:name "block-12050",
+   :w 24,
+   :style {:border-radius "0px 0px 0px 30px"},
+   :block-key ":block-12050",
+   :selected-view :every-45-seconds,
+   :root [26 23],
+   :h 6,
+   :file-path "./screens/blackberries3-narrow.edn",
+   :connection-id "system-db",
+   :queries
+   {:gen-viz-516
+    {:cache? false,
+     :where [:= :client_name :*client-name-str],
+     :limit 13,
+     :group-by [:ts],
+     :_last-run "04:40:05",
+     :refresh-every 20,
+     :from
+     [{:select
+       [:client_name
+        :recent_messages_per_second
+        :messages_per_second
+        :mem_used
+        :batches
+        :packets
+        :ts],
+       :where [:= :client_name :*client-name-str],
+       :from [[:client_memory :ee183]],
+       :order-by [[:mem_time :desc]]}],
+     :order-by [[:ts :desc]],
+     :connection-id "system-db",
+     :select
+     [[[[:sum :mem_used]] :mem_used]
+      [[:sum :recent_messages_per_second] :messages_per_second]
+      :ts],
+     :post-process-fn
+     (fn [x]
+       (vec
+         (reverse
+           (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
+   :tab "star-shaped wallaby",
+   :views
+   {:every-45-seconds
+    [:>
+     :ResponsiveContainer
+     {:width "100%", :height :panel-height+50}
+     [:>
+      :ComposedChart
+      {:data :gen-viz-516,
+       :style {:font-family :theme/base-font},
+       :margin {:top 5, :bottom 5, :right 30, :left 20}}
+      [:> :CartesianGrid {:strokeDasharray "0 0", :opacity 0}]
+      [:>
+       :Tooltip
+       {:content-style
+        {:background-color "#00000099",
+         :font-weight 700,
+         :border "1px solid transparent",
+         :border-radius "4px"}}]
+      [:> :XAxis {:dataKey :ts}]
+      [:>
+       :YAxis
+       {:yAxisId "left",
+        :label
+        {:value "MB",
+         :angle -90,
+         :fill :solver/colors-of-the-moment>colors>0,
+         :style {:font-size "20px", :font-weight 700},
+         :position "middle",
+         :dx -25},
+        :domain ["auto" "auto"]}]
+      [:>
+       :YAxis
+       {:yAxisId "right",
+        :label
+        {:value "Messages per Second",
+         :angle 90,
+         :fill :solver/colors-of-the-moment>colors>1,
+         :style {:font-weight 700, :color "#ffffff", :font-size "15px"},
+         :position "middle",
+         :dx 20},
+        :domain ["auto" "auto"],
+        :orientation "right"}]
+      [:>
+       :Line
+       {:type "monotone",
+        :dataKey :mb,
+        :yAxisId "left",
+        :stroke-width 4,
+        :stroke :solver/colors-of-the-moment>colors>0,
+        :activeDot {:r 8}}]
+      [:>
+       :Bar
+       {:type "monotone",
+        :dataKey :messages_per_second,
+        :yAxisId "right",
+        :fill "#00000000",
+        :stroke-width 4,
+        :stroke :solver/colors-of-the-moment>colors>1}]]]}},
   :block-6121
   {:h 2,
    :w 16,
@@ -1843,7 +2460,8 @@
     [:= :time/minute 50]
     [:= :time/minute 55]]},
   :changed-wallpaper-8k?
-  {:signal [:and [:changed? :solver/wallpaper-of-the-moment-8k]]},
+  {:signal
+   [:and [:<> :time/minute -1] [:changed? :solver/wallpaper-of-the-moment-8k]]},
   :changed-wallpaper?
   {:signal
    [:and [:<> :time/second -1] [:changed? :solver/wallpaper-of-the-moment]]},
@@ -1859,66 +2477,120 @@
   :glowing-bat-signal
   {:signal [:and [:= :time/day 1] [:changed? :time/second] [:= :time/hour 9]]}},
  :theme-colors-hashmap
- {"float" "#c8eaf2",
-  "boolean" "#93a3da",
-  "map" "#c5d77e",
-  "list" "#5a668e",
+ {"float" "#b8bef0",
+  "boolean" "#c5cdcf",
+  "map" "#b69cd4",
+  "list" "#ad796c",
   "string" "#ffffff",
-  "any" "#50c29f",
-  "vector" "#b183ce",
-  "keyword" "#cb56c1",
-  "rabbit-code" "#9f95a9",
-  "datetime" "#72189c",
-  "integer" "#d2c4bf",
-  "unknown" "#5b2322",
-  "date" "#2d4511"},
+  "any" "#cb86c1",
+  "vector" "#dcd793",
+  "keyword" "#e4f8ed",
+  "rabbit-code" "#b7da84",
+  "datetime" "#64994b",
+  "integer" "#d1cece",
+  "unknown" "#631b58",
+  "date" "#2b3e2f"},
  :click-param
  {nil {nil nil},
+  :blocks-sys
+  {:block_key ":block-12050",
+   :block_name "block-12050",
+   :queries 1,
+   :views 1,
+   :block_data
+   "{:name \"block-12050\", :w 34, :selected-view :every-45-seconds, :root [1 1], :h 6, :connection-id \"system-db\", :queries {:gen-viz-516 {:cache? false, :where [:= :client_name :*client-name-str], :limit 50, :group-by [:ts], :_last-run \"21:58:32\", :refresh-every 20, :from [{:select [:client_name :recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts], :where [:= :client_name :*client-name-str], :from [[:client_memory :ee183]], :order-by [[:mem_time :desc]]}], :order-by [[:ts :desc]], :connection-id \"system-db\", :select [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts], :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}}, :tab \"generated lass of the woodlands\", :views {:every-45-seconds [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :ComposedChart {:data :gen-viz-516, :style {:font-family :theme/base-font}, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:reagent-gt :CartesianGrid {:strokeDasharray \"0 0\", :opacity 0}] [:reagent-gt :Tooltip {:content-style {:background-color \"#00000099\", :font-weight 700, :border \"1px solid transparent\", :border-radius \"4px\"}}] [:reagent-gt :XAxis {:dataKey :ts}] [:reagent-gt :YAxis {:yAxisId \"left\", :label {:value \"MB\", :angle -90, :fill \"#8884d8\", :style {:font-size \"20px\", :font-weight 700}, :position \"middle\", :dx -25}, :domain [\"auto\" \"auto\"]}] [:reagent-gt :YAxis {:yAxisId \"right\", :label {:value \"Messages per Second\", :angle 90, :fill \"#82ca9d\", :style {:font-weight 700, :font-size \"15px\"}, :position \"middle\", :dx 20}, :domain [\"auto\" \"auto\"], :orientation \"right\"}] [:reagent-gt :Line {:type \"monotone\", :dataKey :mb, :yAxisId \"left\", :stroke-width 3, :stroke \"#8884d8\", :activeDot {:r 8}}] [:reagent-gt :Bar {:type \"monotone\", :dataKey :messages_per_second, :yAxisId \"right\", :fill \"#00000000\", :stroke-width 3, :stroke \"#82ca9d\"}]]]}}",
+   :view_names ":every-45-seconds",
+   :query_names ":gen-viz-516"},
   :flow
   {:crow-flow-201a>*running? false,
    :counting-loop>*running? false,
    :flow-forever>final-math nil,
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
+  :files-sys
+  {:file_path "./screens/blackberries3-narrow.edn",
+   :screen_name "blackberries3-narrow",
+   :blocks 17,
+   :queries 4,
+   :ts "2024-05-27 02:04:18"},
   :time
   {:month-name "MAY",
    :day 4,
-   :hour 2,
+   :hour 4,
    :now "Saturday, May 25th 3:05AM",
-   :second 3,
+   :second 27,
    :now-second nil,
-   :now-seconds "Monday, May 27th 2:22:03AM",
+   :now-seconds "Tuesday, May 28th 4:40:27AM",
    :nth "th",
    :month 4,
-   :minute 22},
+   :minute 40},
+  :client
+  {:engaging-teal-duck-15>stats>memory 268, :*client-name*>stats>memory 1323},
   :param
-  {:selected-view [:views :hi],
+  {:selected-view [:views :every-45-seconds],
    :selected-view-data
-   [:box
-    :align
-    :center
-    :justify
-    :center
-    :padding
-    "6px"
-    :attr
-    {:id ":block-423d0.:hi"}
-    :style
-    {:font-size "15px",
-     :font-weight 700,
-     :padding-top "6px",
-     :padding-left "14px",
-     :margin-top "-8px",
-     :color :theme/editor-outer-rim-color,
-     :font-family :theme/base-font}
-    :child
-    [:data-viewer :solver/colors-of-the-moment]],
+   [:>
+    :ResponsiveContainer
+    {:width "100%", :height :panel-height+50}
+    [:>
+     :ComposedChart
+     {:data :gen-viz-516,
+      :style {:font-family :theme/base-font},
+      :margin {:top 5, :bottom 5, :right 30, :left 20}}
+     [:> :CartesianGrid {:strokeDasharray "0 0", :opacity 0}]
+     [:>
+      :Tooltip
+      {:content-style
+       {:background-color "#00000099",
+        :font-weight 700,
+        :border "1px solid transparent",
+        :border-radius "4px"}}]
+     [:> :XAxis {:dataKey :ts}]
+     [:>
+      :YAxis
+      {:yAxisId "left",
+       :label
+       {:value "MB",
+        :angle -90,
+        :fill :solver/colors-of-the-moment>contrast-with-dominant,
+        :style {:font-size "20px", :font-weight 700},
+        :position "middle",
+        :dx -25},
+       :domain ["auto" "auto"]}]
+     [:>
+      :YAxis
+      {:yAxisId "right",
+       :label
+       {:value "Messages per Second",
+        :angle 90,
+        :fill :solver/colors-of-the-moment>highest-saturation,
+        :style {:font-weight 700, :color "#ffffff", :font-size "15px"},
+        :position "middle",
+        :dx 20},
+       :domain ["auto" "auto"],
+       :orientation "right"}]
+     [:>
+      :Line
+      {:type "monotone",
+       :dataKey :mb,
+       :yAxisId "left",
+       :stroke-width 4,
+       :stroke :solver/colors-of-the-moment>contrast-with-dominant,
+       :activeDot {:r 8}}]
+     [:>
+      :Bar
+      {:type "monotone",
+       :dataKey :messages_per_second,
+       :yAxisId "right",
+       :fill "#00000000",
+       :stroke-width 4,
+       :stroke :solver/colors-of-the-moment>highest-saturation}]]],
    :test [:string [:get-in [:solver/colors-of-the-moment [:colors 2]]]],
-   :selected-block :block-3341},
+   :selected-block :block-4284},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
-   :base-block-style {},
+   :base-block-style {:text-shadow "4px 4px 4px #00000088"},
    :vega-defaults
    {:view {:stroke "transparent"},
     :axis
@@ -1953,13 +2625,13 @@
    :base-block-color-selected "#00030a",
    :block-title-font-color "#ffffff",
    :base-block-color "#04041e82",
-   :editor-rim-color [:string3 :solver/colors-of-the-moment>brightest 77],
+   :editor-rim-color [:string3 :solver/colors-of-the-moment>brightest 99],
    :base-block-filter-selected
    "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
    :vega-default-color-scheme {:scheme "pastel2"},
    :data-colors :solver/colors-of-the-moment>data-colors,
    :editor-grid-selected-font-color "#000000",
-   :monospaced-font "Nova Mono",
+   :monospaced-font "JetBrains Mono",
    :editor-grid-selected-background-color "#dc9cb0",
    :nivo-defaults
    {:font-family "Instagram Sans",
@@ -2001,7 +2673,7 @@
     :background-size "cover",
     :background-color "#424f57"},
    :editor-font-color "#ffffff",
-   :base-font "Nova Square",
+   :base-font "Poppins",
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
@@ -2022,145 +2694,341 @@
    :country "us"},
   :solver-meta
   {:colors-of-the-moment-8k>extra
-   {:last-processed "2024-05-27 02:20:01 106",
+   {:last-processed "2024-05-28 00:35:01 167",
     :cache-hit? false,
-    :elapsed-ms 13827,
-    :runs 178,
+    :elapsed-ms 19889,
+    :runs 251,
     :error? false},
    :colors-of-the-moment>extra
-   {:last-processed "2024-05-27 02:20:01 021",
+   {:last-processed "2024-05-28 00:35:01 067",
     :cache-hit? false,
-    :elapsed-ms 5272,
-    :runs 287,
+    :elapsed-ms 7597,
+    :runs 554,
     :error? false},
    :wallpaper-of-the-moment>extra
-   {:last-processed "2024-05-27 02:20:00 934",
+   {:last-processed "2024-05-28 00:35:00 930",
     :cache-hit? false,
-    :elapsed-ms 45,
-    :runs 287,
+    :elapsed-ms 37,
+    :runs 554,
     :error? false},
+   :dazzling-gnu-solver>history
+   ["^* 2024-05-27 03:46:00 902 (cache hit)"
+    "^* 2024-05-27 03:45:00 896 (cache hit)"
+    "^* 2024-05-27 03:44:00 895 (cache hit)"
+    "^* 2024-05-27 03:43:00 896 (cache hit)"
+    "^* 2024-05-27 03:42:00 896 (cache hit)"
+    "^* 2024-05-27 03:41:00 896 (cache hit)"
+    "^* 2024-05-27 03:40:00 899 (cache hit)"
+    "^* 2024-05-27 03:39:00 898 (cache hit)"
+    "^* 2024-05-27 03:38:00 896 (cache hit)"
+    "^* 2024-05-27 03:37:00 898 (cache hit)"
+    "^* 2024-05-27 03:36:00 896 (cache hit)"
+    "^* 2024-05-27 03:35:00 897 (cache hit)"
+    "^* 2024-05-27 03:34:00 895 (cache hit)"
+    "^* 2024-05-27 03:33:00 895 (cache hit)"
+    "^* 2024-05-27 03:32:00 894 (cache hit)"
+    "^* 2024-05-27 03:31:00 895 (cache hit)"
+    "^* 2024-05-27 03:30:00 894 (cache hit)"
+    "^* 2024-05-27 03:29:00 894 (cache hit)"
+    "^* 2024-05-27 03:28:00 897 (cache hit)"
+    "^* 2024-05-27 03:27:00 895 (cache hit)"],
    :dazzling-gnu-solver>extra
-   {:last-processed "^* 2024-05-27 02:21:00 899", :cache-hit? true, :elapsed-ms 0},
+   {:last-processed "^* 2024-05-28 00:35:00 910", :cache-hit? true, :elapsed-ms 0},
+   :vibrant-antelope-solver>history
+   ["2024-05-27 03:46:25 891 (20ms)"
+    "2024-05-27 03:46:20 893 (18ms)"
+    "2024-05-27 03:46:10 890 (17ms)"
+    "2024-05-27 03:45:45 890 (18ms)"
+    "2024-05-27 03:45:25 892 (26ms)"
+    "2024-05-27 03:45:20 890 (17ms)"
+    "2024-05-27 03:45:10 890 (19ms)"
+    "2024-05-27 03:44:45 889 (19ms)"
+    "2024-05-27 03:44:25 890 (17ms)"
+    "2024-05-27 03:44:20 890 (19ms)"
+    "2024-05-27 03:44:10 890 (18ms)"
+    "2024-05-27 03:43:45 892 (21ms)"
+    "2024-05-27 03:43:25 890 (17ms)"
+    "2024-05-27 03:43:20 890 (21ms)"
+    "2024-05-27 03:43:10 892 (17ms)"
+    "2024-05-27 03:42:45 891 (19ms)"
+    "2024-05-27 03:42:25 893 (28ms)"
+    "2024-05-27 03:42:20 889 (18ms)"
+    "2024-05-27 03:42:10 906 (18ms)"
+    "2024-05-27 03:41:45 893 (20ms)"],
    :wallpaper-of-the-moment-8k>extra
-   {:last-processed "2024-05-27 02:20:00 925",
+   {:last-processed "2024-05-28 00:35:00 920",
     :cache-hit? false,
-    :elapsed-ms 61,
-    :runs 287,
+    :elapsed-ms 91,
+    :runs 554,
     :error? false},
    :png-wallpaper?>extra
-   {:last-processed "^* 2024-05-27 02:20:01 018", :cache-hit? true, :elapsed-ms 0},
+   {:last-processed "^* 2024-05-28 00:35:01 014", :cache-hit? true, :elapsed-ms 0},
    :static-data>extra
-   {:last-processed "2024-05-27 02:21:00 900",
+   {:last-processed "2024-05-28 00:35:00 905",
     :cache-hit? false,
-    :elapsed-ms 5,
-    :runs 1447,
+    :elapsed-ms 26,
+    :runs 2782,
     :error? false},
    :colors-of-the-moment>history
-   ["2024-05-27 02:20:01 021 (5272ms)"
-    "2024-05-27 02:15:01 088 (4210ms)"
-    "2024-05-27 02:10:01 041 (3931ms)"
-    "2024-05-26 22:25:00 431 (4998ms)"
-    "2024-05-26 22:20:00 505 (3995ms)"
-    "2024-05-26 22:15:00 395 (4754ms)"
-    "2024-05-26 22:05:00 649 (5425ms)"
-    "2024-05-26 22:00:00 219 (1823ms)"
-    "2024-05-26 21:50:00 921 (3727ms)"
-    "2024-05-26 21:45:00 880 (4274ms)"
-    "2024-05-26 21:40:00 919 (4516ms)"
-    "2024-05-26 21:35:00 988 (4608ms)"
-    "2024-05-26 21:25:00 702 (4446ms)"
-    "2024-05-26 21:15:00 776 (4179ms)"
-    "2024-05-26 21:05:00 792 (3897ms)"
-    "2024-05-26 21:00:00 420 (4425ms)"
-    "2024-05-26 20:55:00 226 (3948ms)"
-    "2024-05-26 20:35:00 224 (4492ms)"
-    "2024-05-26 20:30:00 180 (3854ms)"
-    "2024-05-26 20:25:00 151 (4814ms)"],
+   ["2024-05-28 00:35:01 067 (7597ms)"
+    "2024-05-28 00:30:01 155 (5885ms)"
+    "2024-05-28 00:25:01 182 (8894ms)"
+    "2024-05-28 00:20:01 232 (7919ms)"
+    "2024-05-28 00:15:01 089 (4560ms)"
+    "2024-05-28 00:10:01 007 (3986ms)"
+    "2024-05-28 00:05:01 082 (4631ms)"
+    "2024-05-28 00:00:01 399 (6450ms)"
+    "2024-05-27 23:55:01 246 (4839ms)"
+    "2024-05-27 23:50:01 075 (2145ms)"
+    "2024-05-27 23:45:01 062 (3885ms)"
+    "2024-05-27 23:40:01 050 (17504ms)"
+    "2024-05-27 23:35:01 003 (1969ms)"
+    "2024-05-27 23:30:01 078 (3527ms)"
+    "2024-05-27 23:25:01 040 (4233ms)"
+    "2024-05-27 23:20:01 048 (16681ms)"
+    "2024-05-27 23:15:01 078 (3790ms)"
+    "2024-05-27 23:10:01 028 (1778ms)"
+    "2024-05-27 23:05:01 078 (17140ms)"
+    "2024-05-27 23:00:01 071 (3861ms)"],
    :vibrant-antelope-solver>extra
-   {:last-processed "2024-05-27 02:21:45 891",
+   {:last-processed "2024-05-28 00:35:45 900",
     :cache-hit? false,
-    :elapsed-ms 18,
-    :runs 4069,
-    :error? false}},
+    :elapsed-ms 33,
+    :runs 7725,
+    :error? false},
+   :colors-of-the-moment-8k>history
+   ["2024-05-27 05:06:00 907 (3329ms)"
+    "2024-05-27 05:00:01 043 (11960ms)"
+    "2024-05-27 04:55:00 970 (11069ms)"
+    "2024-05-27 04:50:01 155 (12609ms)"
+    "2024-05-27 04:45:01 114 (14569ms)"
+    "2024-05-27 04:40:01 154 (13369ms)"
+    "2024-05-27 04:35:00 995 (14678ms)"
+    "2024-05-27 04:30:01 103 (15458ms)"
+    "2024-05-27 04:25:00 993 (13224ms)"
+    "2024-05-27 04:20:00 987 (12679ms)"
+    "2024-05-27 04:15:01 006 (14103ms)"
+    "2024-05-27 04:10:01 115 (12823ms)"
+    "2024-05-27 04:05:01 017 (12420ms)"
+    "2024-05-27 04:00:01 011 (13351ms)"
+    "2024-05-27 03:55:01 085 (12794ms)"
+    "2024-05-27 03:50:00 986 (12567ms)"
+    "2024-05-27 03:45:01 001 (15634ms)"
+    "2024-05-27 03:40:00 984 (14958ms)"
+    "2024-05-27 03:35:01 153 (10006ms)"
+    "2024-05-27 03:30:01 069 (4614ms)"]},
   :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3},
+  :signal
+  {:fun-gorilla false,
+   :cool-raccoon-signal-yo false,
+   :part-optimistic-sheep-signal-1 false,
+   :worthy-fish-signal false,
+   :hourly? true,
+   :part-every-5-minutes-9 false,
+   :part-every-5-minutes-10 false,
+   :fair-armadillo-signal false,
+   :part-every-5-minutes-3 false,
+   :part-every-5-minutes-2 false,
+   :nice-coyote-signal false,
+   :part-every-5-minutes-8 false,
+   :part-every-5-minutes-12 false,
+   :elegant-grasshopper-signal false,
+   :brave-ape-signal false,
+   :exciting-cheetah-signal false,
+   :part-optimistic-sheep-signal-4 false,
+   :part-every-5-minutes-7 false,
+   :genius-gnat-signal false,
+   :dragging-to-potential-cross-breed? false,
+   :part-every-5-minutes-5 false,
+   :part-colors-of-the-moment-0 nil,
+   :every-minute true,
+   :part-optimistic-sheep-signal-0 false,
+   :part-every-5-minutes-6 false,
+   :every-5-minutes false,
+   :changed-wallpaper-8k? false,
+   :part-every-5-minutes-1 false,
+   :changed-wallpaper? false,
+   :part-every-minute-0 true,
+   :part-optimistic-sheep-signal-3 true,
+   :part-optimistic-sheep-signal-2 false,
+   :special-lion-signal false,
+   :part-every-5-minutes-4 false,
+   :optimistic-sheep-signal false,
+   :part-every-5-minutes-0 false,
+   :part-every-5-minutes-11 false,
+   :glowing-bat-signal false},
   :solver
   {:colors-of-the-moment
-   {:second-darkest "#1e2c43",
-    :highest-saturation "#1b4170",
-    :most-contrasting "#a1543e",
-    :darkest "#111e32",
-    :contrast-with-dominant "#c3bfd2",
+   {:second-darkest "#1a2a48",
+    :highest-saturation "#71a4d6",
+    :most-contrasting "#bd5174",
+    :darkest "#23262f",
+    :contrast-with-dominant "#bd5174",
     :colors
-    ["#c3bfd2"
-     "#111e32"
-     "#3f6895"
-     "#7eb0d7"
-     "#5e91bc"
-     "#6a494c"
-     "#1b4170"
-     "#857071"
-     "#af7155"
-     "#a1543e"
-     "#1e2c43"],
-    :most-frequent "#3f6895",
+    ["#d1cece"
+     "#3f5971"
+     "#93c9dc"
+     "#23262f"
+     "#71a4d6"
+     "#9498a4"
+     "#699bb3"
+     "#5882ac"
+     "#1a2a48"
+     "#bd5174"
+     "#536d86"],
+    :most-frequent "#93c9dc",
     :data-colors
-    {"float" "#c8eaf2",
-     "boolean" "#93a3da",
-     "map" "#c5d77e",
-     "list" "#5a668e",
+    {"float" "#b8bef0",
+     "boolean" "#c5cdcf",
+     "map" "#b69cd4",
+     "list" "#ad796c",
      "string" "#ffffff",
-     "any" "#50c29f",
-     "vector" "#b183ce",
-     "keyword" "#cb56c1",
-     "rabbit-code" "#9f95a9",
-     "datetime" "#72189c",
-     "integer" "#d2c4bf",
-     "unknown" "#5b2322",
-     "date" "#2d4511"},
-    :dominant "#1e2c43",
-    :most-contrasting-dark "#a1543e",
-    :second-brightest "#7eb0d7",
-    :brightest "#c3bfd2",
-    :most-contrasting-light "#af7155"},
+     "any" "#cb86c1",
+     "vector" "#dcd793",
+     "keyword" "#e4f8ed",
+     "rabbit-code" "#b7da84",
+     "datetime" "#64994b",
+     "integer" "#d1cece",
+     "unknown" "#631b58",
+     "date" "#2b3e2f"},
+    :dominant "#536d86",
+    :most-contrasting-dark "#bd5174",
+    :second-brightest "#93c9dc",
+    :brightest "#d1cece",
+    :most-contrasting-light "#d1cece"},
    :colors-of-the-moment>most-contrasting-light "#66b6c6",
-   :colors-of-the-moment>contrast-with-dominant "#c3bfd2",
-   :colors-of-the-moment>brightest "#c3bfd2",
-   :colors-of-the-moment>second-brightest "#7eb0d7",
-   :colors-of-the-moment>darkest "#111e32",
+   :colors-of-the-moment>colors>0 "#d1cece",
+   :colors-of-the-moment>contrast-with-dominant "#bd5174",
+   :colors-of-the-moment>brightest "#d1cece",
+   :colors-of-the-moment>second-brightest "#93c9dc",
+   :colors-of-the-moment-8k
+   {:second-darkest "#474c5d",
+    :highest-saturation "#ce7446",
+    :most-contrasting "#ce7446",
+    :darkest "#303346",
+    :contrast-with-dominant "#ce7446",
+    :colors
+    ["#303346"
+     "#d9c2a3"
+     "#95c3bc"
+     "#9d847a"
+     "#6c9298"
+     "#73595c"
+     "#6897be"
+     "#546e8b"
+     "#c65259"
+     "#ce7446"
+     "#474c5d"],
+    :most-frequent "#ce7446",
+    :data-colors
+    {"float" "#c9a0dd",
+     "boolean" "#d0e289",
+     "map" "#a7c2a9",
+     "list" "#a170b1",
+     "string" "#fafaf3",
+     "any" "#96b9bb",
+     "vector" "#e87ed5",
+     "keyword" "#d5ead5",
+     "rabbit-code" "#c3ac95",
+     "datetime" "#718097",
+     "integer" "#d9a9a3",
+     "unknown" "#7b595f",
+     "date" "#5d583b"},
+    :dominant "#474c5d",
+    :most-contrasting-dark "#303346",
+    :second-brightest "#95c3bc",
+    :brightest "#d9c2a3",
+    :most-contrasting-light "#ce7446"},
+   :vibrant-antelope-solver 193,
+   :colors-of-the-moment>darkest "#23262f",
+   :colors-of-the-moment>highest-saturation "#71a4d6",
    :colors-of-the-moment>most-contrasting "#a1543e",
-   :wallpaper-of-the-moment "./images/large/b64-image-45100-63608-4k.webp",
+   :wallpaper-of-the-moment "./images/large/b64-image-63928-58971-4k.webp",
+   :dazzling-gnu-solver 11214,
+   :colors-of-the-moment>colors>1 "#3f5971",
    :colors-of-the-moment>data-colors
-   {"float" "#c8eaf2",
-    "boolean" "#93a3da",
-    "map" "#c5d77e",
-    "list" "#5a668e",
+   {"float" "#b8bef0",
+    "boolean" "#c5cdcf",
+    "map" "#b69cd4",
+    "list" "#ad796c",
     "string" "#ffffff",
-    "any" "#50c29f",
-    "vector" "#b183ce",
-    "keyword" "#cb56c1",
-    "rabbit-code" "#9f95a9",
-    "datetime" "#72189c",
-    "integer" "#d2c4bf",
-    "unknown" "#5b2322",
-    "date" "#2d4511"}}},
+    "any" "#cb86c1",
+    "vector" "#dcd793",
+    "keyword" "#e4f8ed",
+    "rabbit-code" "#b7da84",
+    "datetime" "#64994b",
+    "integer" "#d1cece",
+    "unknown" "#631b58",
+    "date" "#2b3e2f"}}},
  :selected-flow "live-scratch-flow",
  :flow-statuses
  {"openai-image-gen-ladder5"
-  {:last-updated nil,
-   :blocks_finished 83,
+  {:last-updated "2 seconds",
+   :blocks_finished 31,
    :block-overrides [:prompt],
-   :channels 0,
-   :channels-open 0,
-   :since-start "38 seconds",
+   :channels 93,
+   :channels-open 93,
+   :since-start "2 seconds",
    :*started-by :meaningful-jungle-green-hummingbird-34,
-   :time-running "38 seconds",
-   :last-update {:done :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
+   :time-running "less than a second",
+   :last-update {:oai-api-call :start},
+   :*running? true,
+   :waiting-blocks
+   [:node-js-color-thief-script
+    :dominant-color
+    :create-png-path/x
+    :done
+    :shell-command-1
+    :open-fn-1
+    :execute-shell-command
+    :stringify-exif-map/img-path
+    :pop-color
+    :write-exif-to-image-command/x
+    :save-base64-to-webp-file5
+    :relative-url-path-for-png-version/bang
+    :color-palette
+    :dominant-color/x
+    :stringify-exif-map
+    :hiccup-image-box-w-png/bg-color
+    :write-file-1
+    :output-revised-prompt/x
+    :color-palette/x
+    :write-file-1/file-data
+    :node-js-color-thief-script-dominantColor
+    :hiccup-image-box-w-png/x
+    :create-png-path
+    :node-js-color-thief-script/image-path
+    :write-exif-to-image-command/img-path
+    :execute-shell-command-command/in
+    :save-base64-to-webp-file5/b64-data
+    :create-convert-command-line
+    :write-file-1_file-path/x
+    :execute-shell-command/command
+    :hiccup-image-box-w-png
+    :hiccup-image-box-w-png/color
+    :exif-map/revised
+    :pop-color/x
+    :relative-url-path-for-png-version
+    :relative-url-path-for-png-version/x
+    :execute-shell-command-command
+    :exif-map
+    :hiccup-image-box-w-png/_
+    :open-fn-1/_
+    :create-convert-command-line/x
+    :shell-command-1/command
+    :stringify-exif-map/x
+    :write-file-1/full-path
+    :node-js-color-thief-script-dominantColor/in
+    :stringify-exif-map/bang
+    :write-exif-to-image-command
+    :just-the-image
+    :write-file-1_file-path
+    :output-revised-prompt
+    :just-the-image/x],
+   :last-update-seconds 2,
+   :channels-open? true,
+   :retries-left 2,
+   :running-blocks [:oai-api-call]},
   "openai-image-gen-ladder/node-js-color-thief-script"
   {:last-updated nil,
    :blocks_finished 16,
@@ -2177,16 +3045,32 @@
    :channels-open? false,
    :retries-left -1,
    :running-blocks []},
+  "openai-image-gen-ladder2/node-js-color-thief-script"
+  {:last-updated nil,
+   :blocks_finished 16,
+   :block-overrides [:image-path],
+   :channels 0,
+   :channels-open 0,
+   :since-start "less than a second",
+   :*started-by :handsome-cylindrical-grasshopper-7,
+   :time-running "less than a second",
+   :last-update {:done :end},
+   :*running? false,
+   :waiting-blocks [],
+   :last-update-seconds nil,
+   :channels-open? false,
+   :retries-left -1,
+   :running-blocks []},
   "openai-image-gen-ladder"
   {:last-updated nil,
    :blocks_finished 83,
    :block-overrides [:prompt :style-param :prompt-2 :prompt-3 :prompt-4 :prompt-5],
    :channels 0,
    :channels-open 0,
-   :since-start "44 seconds",
+   :since-start "45 seconds",
    :*started-by :angelic-cerise-dolphin-32,
-   :time-running "44 seconds",
-   :last-update {:done :end},
+   :time-running "45 seconds",
+   :last-update {:done :start},
    :*running? false,
    :waiting-blocks [],
    :last-update-seconds nil,
@@ -2195,13 +3079,13 @@
    :running-blocks []},
   "colors-of-the-moment-solver-flow-"
   {:last-updated nil,
-   :blocks_finished 30,
+   :blocks_finished 33,
    :block-overrides [:image-path],
    :channels 0,
    :channels-open 0,
-   :since-start "3 seconds",
+   :since-start "4 seconds",
    :*started-by :rvbbit-solver,
-   :time-running "3 seconds",
+   :time-running "4 seconds",
    :last-update {:done :end},
    :*running? false,
    :waiting-blocks [],
@@ -2215,25 +3099,9 @@
    :block-overrides [:iterations-max :tick-delay-ms],
    :channels 0,
    :channels-open 0,
-   :since-start "13 minutes, 22 seconds",
+   :since-start "13 minutes, 23 seconds",
    :*started-by :rvbbit-scheduler,
-   :time-running "13 minutes, 22 seconds",
-   :last-update {:done :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "openai-image-gen-ladder3/node-js-color-thief-script"
-  {:last-updated nil,
-   :blocks_finished 16,
-   :block-overrides [:image-path],
-   :channels 0,
-   :channels-open 0,
-   :since-start "less than a second",
-   :*started-by :smile-elliptic-heron-10,
-   :time-running "less than a second",
+   :time-running "13 minutes, 23 seconds",
    :last-update {:done :end},
    :*running? false,
    :waiting-blocks [],
@@ -2273,15 +3141,15 @@
    :channels-open? false,
    :retries-left -1,
    :running-blocks []},
-  "colors-of-the-moment-8k-solver-flow-"
+  "openai-image-gen-ladder2"
   {:last-updated nil,
-   :blocks_finished 30,
-   :block-overrides [:image-path],
+   :blocks_finished 83,
+   :block-overrides [:prompt],
    :channels 0,
    :channels-open 0,
-   :since-start "15 seconds",
-   :*started-by :rvbbit-solver,
-   :time-running "15 seconds",
+   :since-start "42 seconds",
+   :*started-by :handsome-cylindrical-grasshopper-7,
+   :time-running "42 seconds",
    :last-update {:done :end},
    :*running? false,
    :waiting-blocks [],
@@ -2289,71 +3157,20 @@
    :channels-open? false,
    :retries-left -1,
    :running-blocks []},
-  "openai-image-gen-ladder3"
-  {:last-updated "26 seconds",
-   :blocks_finished 31,
-   :block-overrides [:prompt :prompt-2 :prompt-3 :prompt-4 :prompt-5],
-   :channels 93,
-   :channels-open 93,
-   :since-start "26 seconds",
-   :*started-by :smile-elliptic-heron-10,
-   :time-running "less than a second",
-   :last-update {:oai-api-call :start},
-   :*running? true,
-   :waiting-blocks
-   [:node-js-color-thief-script
-    :dominant-color
-    :create-png-path/x
-    :done
-    :shell-command-1
-    :open-fn-1
-    :execute-shell-command
-    :stringify-exif-map/img-path
-    :pop-color
-    :write-exif-to-image-command/x
-    :relative-url-path-for-png-version/bang
-    :color-palette
-    :dominant-color/x
-    :stringify-exif-map
-    :hiccup-image-box-w-png/bg-color
-    :write-file-1
-    :save-base64-to-webp-file
-    :output-revised-prompt/x
-    :color-palette/x
-    :write-file-1/file-data
-    :node-js-color-thief-script-dominantColor
-    :hiccup-image-box-w-png/x
-    :create-png-path
-    :node-js-color-thief-script/image-path
-    :write-exif-to-image-command/img-path
-    :execute-shell-command-command/in
-    :create-convert-command-line
-    :write-file-1_file-path/x
-    :execute-shell-command/command
-    :hiccup-image-box-w-png
-    :save-base64-to-webp-file/b64-data
-    :hiccup-image-box-w-png/color
-    :exif-map/revised
-    :pop-color/x
-    :relative-url-path-for-png-version
-    :relative-url-path-for-png-version/x
-    :execute-shell-command-command
-    :exif-map
-    :hiccup-image-box-w-png/_
-    :open-fn-1/_
-    :create-convert-command-line/x
-    :shell-command-1/command
-    :stringify-exif-map/x
-    :write-file-1/full-path
-    :node-js-color-thief-script-dominantColor/in
-    :stringify-exif-map/bang
-    :write-exif-to-image-command
-    :just-the-image
-    :write-file-1_file-path
-    :output-revised-prompt
-    :just-the-image/x],
-   :last-update-seconds 26,
-   :channels-open? true,
+  "colors-of-the-moment-8k-solver-flow-"
+  {:last-updated nil,
+   :blocks_finished 33,
+   :block-overrides [:image-path],
+   :channels 0,
+   :channels-open 0,
+   :since-start "13 seconds",
+   :*started-by :rvbbit-solver,
+   :time-running "13 seconds",
+   :last-update {:done :end},
+   :*running? false,
+   :waiting-blocks [],
+   :last-update-seconds nil,
+   :channels-open? false,
    :retries-left -1,
-   :running-blocks [:oai-api-call]}},
+   :running-blocks []}},
  :post-condi {:c345-up-or-down? [{:v 0}]}}

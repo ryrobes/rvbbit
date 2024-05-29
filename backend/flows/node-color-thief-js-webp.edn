@@ -335,13 +335,13 @@
                  dom-rgb (hex-to-rgb dom)
                  dom-lab (rgb-to-lab dom-rgb)
                  data-color-keys ["string"
+                                  "keyword"
                                   "float"
                                   "integer"
                                   "boolean"
                                   "map"
                                   "vector"
                                   "rabbit-code"
-                                  "keyword"
                                   "any"
                                   "list"
                                   "datetime"

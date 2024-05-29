@@ -25,12 +25,12 @@
    [rvbbit-frontend.http :as http]
    [rvbbit-frontend.connections :as conn]
    [re-catch.core :as rc]
-   [honey.sql :as honey]
+   ;[honey.sql :as honey]
     ;[websocket-fx.core :as wfx]
    [cljs.tools.reader :refer [read-string]]
    [oz.core :as oz]
    [clojure.walk :as walk]
-   [zprint.core :as zp]
+   ;[zprint.core :as zp]
    [clojure.string :as cstr]
    [clojure.set :as cset]
    [goog.events :as gevents]
@@ -41,7 +41,7 @@
    ["@nivo/swarmplot" :as nivo-swarmplot]
    ["@nivo/treemap" :as nivo-treemap]
     ;["@nivo/geo" :as nivo-geo]
-   ["@nivo/heatmap" :as nivo-heatmap]
+   ;["@nivo/heatmap" :as nivo-heatmap]
    ["@nivo/waffle" :as nivo-waffle]
    ["@nivo/calendar" :as nivo-calendar]
    ["react-drag-and-drop" :as rdnd]
@@ -49,6 +49,9 @@
    ["codemirror/mode/sql/sql.js"]
    ["codemirror/addon/edit/matchbrackets.js"]
    ["codemirror/addon/edit/closebrackets.js"]
+   ["codemirror/addon/hint/show-hint.js"]
+   ;["codemirror/addon/hint/javascript-hint.js"]
+   ;["codemirror/addon/selection/active-line.js"]
    ["codemirror/mode/clojure/clojure.js"]
    ["codemirror/mode/python/python.js"]
    ["codemirror/mode/r/r.js"]
@@ -59,7 +62,7 @@
    ;[html2canvas :default html2canvas]
    [goog.i18n.NumberFormat.Format]
    ;["react-date-range" :as date-picker]
-    ;[reagent.dom :as rdom]
+    [reagent.dom :as rdom]
     ;[goog.events.KeyCodes :as keycodes]
     ;[goog.events :as gev]
    [cljs.core.async :as async :refer [<! >! chan]]
@@ -264,14 +267,23 @@
 ;;    (theme-pull-fn cmp-key fallback test-fn)))
 
 (re-frame/reg-sub
- ::theme-pull-sub ;; more cache hits?
+ ::theme-pull-sub  
  (fn [_ {:keys [cmp-key fallback test-fn]}]
    (theme-pull-fn cmp-key fallback test-fn)))
 
-(defn theme-pull [cmp-key fallback & test-fn] 
+(defn theme-pull [cmp-key fallback & test-fn]
   ;@(ut/tracked-subscribe [::theme-pull-sub cmp-key fallback test-fn])
-  @(rfa/sub ::theme-pull-sub {:cmp-key cmp-key :fallback fallback :test-fn test-fn})
-  ) ;; cache tricky shit?
+  @(rfa/sub ::theme-pull-sub {:cmp-key cmp-key :fallback fallback :test-fn test-fn})) 
+
+
+;; (re-frame/reg-sub
+;;  ::theme-pull-sub
+;;  (fn [_ [_ cmp-key fallback test-fn]]
+;;    (theme-pull-fn cmp-key fallback test-fn)))
+
+;; (defn theme-pull [cmp-key fallback & test-fn]
+;;   @(rfa/sub ::theme-pull-sub [cmp-key fallback test-fn])) 
+
 
 (defn code-mirror-theme [] ;; generate a dynamic theme to inject into the DOM
   (let [ccolor (fn [x] (get (theme-pull :theme/data-colors db/data-colors) x))]
@@ -332,7 +344,36 @@
      ".cm-s-rvbbit-dynamic ::-webkit-scrollbar-corner" {:background "rgba(0,0,0,0) !important", "background-color" "rgba(0,0,0,0) !important"}
          ;; Matching bracket styles
      "div.CodeMirror span.CodeMirror-matchingbracket" {:color (str (theme-pull :theme/editor-outer-rim-color nil) " !important") ;; "#ff4aff !important"
-                                                       :font-weight "bold"}}))
+                                                       :font-weight "bold"}
+     
+      ".CodeMirror-hints" {:position "absolute"
+                           :z-index "1000000"
+                           :overflow "hidden"
+                           :list-style "none"
+                           :margin "0"
+                           :padding "2px"
+                           ;:"-webkit-box-shadow" "2px 3px 5px rgba(0, 0, 0, 0.2)"
+                           ;:"-moz-box-shadow" "2px 3px 5px rgba(0, 0, 0, 0.2)"
+                           :box-shadow "2px 3px 5px rgba(0, 0, 0, 0.2)"
+                           :background "white"
+                           :font-family (theme-pull :theme/monospaced-font nil) ;;"monospace"
+                           ;:font-size "0.9em"
+                           ;:max-height "20em"
+                           :overflow-y "auto"}
+     
+      ".CodeMirror-hint" {:padding "0 4px"
+                          :white-space "pre"
+                          :overflow "hidden"
+                          ;:color "red"
+                          :cursor "pointer"
+                          ;:background "black"
+                          }
+     
+      ".CodeMirror-hint-active" {:background-color (theme-pull :theme/editor-outer-rim-color nil)
+                                 :color (ut/invert-hex-color (theme-pull :theme/editor-outer-rim-color nil))}
+
+     
+     }))
 
 ;;(ut/apply-theme (code-mirror-theme))
 
@@ -2454,6 +2495,367 @@
     ; (ww2 panel-id [])
     (flatten (get-in mm [panel-id :produces]))))              ;; single depth
 
+(defonce cm-instance-panel-code-box (atom nil)) ;; for highlighting
+(defonce markers-panel-code-box (atom []))
+
+(defn highlight-code [code]
+  (when-let [editor @cm-instance-panel-code-box]
+    (let [doc (.getDoc editor)
+          ;; code (ut/format-map 640 ;; 539 ;;(- 634.4 95) 
+          ;;                     (str code))
+          code (str code)
+          _ (tap> [:highlighted-code-panel-code-box code])]
+      ;; Clear existing markers
+      (doseq [marker @markers-panel-code-box]
+        (.clear marker))
+      (reset! markers-panel-code-box [])
+      (let [code-lines (clojure.string/split-lines code)
+            start-line (loop [line 0]
+                         (when (< line (.lineCount doc))
+                           (if (clojure.string/includes? (.getLine doc line) (first code-lines))
+                             line
+                             (recur (inc line)))))
+            end-line (loop [line start-line]
+                       (when (< line (.lineCount doc))
+                         (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+                           line
+                           (recur (inc line)))))
+            start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+            end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+            marker (try
+                     (.markText doc
+                                #js {:line start-line, :ch start-ch}
+                                #js {:line end-line, :ch end-ch}
+                                #js {:css (str "filter: invert(233%); color: white; font-weight: 700; background-color: teal; font-size: 15px;")})
+                     (catch :default e (tap> [:marker-error (str e)])))]
+        (swap! markers-panel-code-box conj marker)))))
+
+;; (defn highlight-codes [codes css]
+;;   (let [css-string (ut/hiccup-css-to-string css)]
+;;     (when-let [editor @cm-instance-panel-code-box]
+;;       (let [doc (.getDoc editor)]
+;;         ;; Clear existing markers
+;;         (doseq [marker @markers-panel-code-box]
+;;           (.clear marker))
+;;         (reset! markers-panel-code-box [])
+;;         (doseq [code codes]
+;;           (let [code (str code)
+;;                 _ (tap> [:highlighted-code-panel-code-box code])
+;;                 code-lines (clojure.string/split-lines code)
+;;                 start-line (loop [line 0]
+;;                              (when (< line (.lineCount doc))
+;;                                (if (clojure.string/includes? (.getLine doc line) (first code-lines))
+;;                                  line
+;;                                  (recur (inc line)))))
+;;                 end-line (loop [line start-line]
+;;                            (when (< line (.lineCount doc))
+;;                              (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+;;                                line
+;;                                (recur (inc line)))))
+;;                 start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+;;                 end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+;;                 marker (try
+;;                          (.markText doc
+;;                                     #js {:line start-line, :ch start-ch}
+;;                                     #js {:line end-line, :ch end-ch}
+;;                                     #js {:css css-string})
+;;                          (catch :default e (tap> [:marker-error (str e)])))]
+;;             (swap! markers-panel-code-box conj marker)))))))
+
+;; (defn highlight-codes-only [codes css]
+;;   (let [css-string (ut/hiccup-css-to-string css)]
+;;     (when-let [editor @cm-instance-panel-code-box]
+;;       (let [doc (.getDoc editor)]
+;;         ;; Clear existing markers
+;;         (doseq [marker @markers-panel-code-box]
+;;           (.clear marker))
+;;         (reset! markers-panel-code-box [])
+;;         (doseq [code codes]
+;;           (let [code (str code)
+;;                 _ (tap> [:highlighted-code-panel-code-box code])
+;;                 code-lines (clojure.string/split-lines code)
+;;                 start-line (loop [line 0]
+;;                              (when (< line (.lineCount doc))
+;;                                (if (clojure.string/includes? (.getLine doc line) (first code-lines))
+;;                                  line
+;;                                  (recur (inc line)))))
+;;                 end-line (loop [line start-line]
+;;                            (when (< line (.lineCount doc))
+;;                              (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+;;                                line
+;;                                (recur (inc line)))))
+;;                 start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+;;                 end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+;;                 marker (try
+;;                          (let [node (js/document.createElement "span")
+;;                                _ (.setAttribute node "style" css-string)
+;;                                _ (.appendChild node (js/document.createTextNode code))]
+;;                            (.markText doc
+;;                                       #js {:line start-line, :ch start-ch}
+;;                                       #js {:line end-line, :ch end-ch}
+;;                                       #js {:replacedWith node}))
+;;                          (catch :default e (tap> [:marker-error (str e)])))]
+;;             (swap! markers-panel-code-box conj marker)))))))
+
+
+
+;; (defn highlight-codes-only [codes css hiccup-fn]
+;;   (tap> [:highlight-codes-only [codes css hiccup-fn]])
+;;   (let [css-string (ut/hiccup-css-to-string css)]
+;;     (when-let [editor @cm-instance-panel-code-box]
+;;       (let [doc (.getDoc editor)]
+;;         ;; Clear existing markers
+;;         (doseq [marker @markers-panel-code-box]
+;;           (.clear marker))
+;;         (reset! markers-panel-code-box [])
+;;         (doseq [code codes]
+;;           (let [code (str code)
+;;                 ;_ (tap> [:highlighted-code-panel-code-box code])
+;;                 code-lines (clojure.string/split-lines code)
+;;                 start-line (loop [line 0]
+;;                              (when (< line (.lineCount doc))
+;;                                (if (clojure.string/includes? (.getLine doc line) (first code-lines))
+;;                                  line
+;;                                  (recur (inc line)))))
+;;                 end-line (loop [line start-line]
+;;                            (when (< line (.lineCount doc))
+;;                              (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+;;                                line
+;;                                (recur (inc line)))))
+;;                 start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+;;                 end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+;;                 marker (try
+;;                          (let [node (js/document.createElement "span")
+;;                                _ (.setAttribute node "style" css-string)
+;;                                _ (.appendChild node (js/document.createTextNode code))
+;;                                widget-node (js/document.createElement "div")]
+;;                            (.addEventListener node "mouseover" (fn []
+;;                                                                  (when-not @widget
+;;                                                                    (let [react-element (reagent/as-element (hiccup-fn code))]
+;;                                                                      (rdom/render react-element widget-node)
+;;                                                                      (reset! widget (.addLineWidget doc end-line widget-node))))))
+;;                            (.addEventListener node "mouseout" (fn []
+;;                                                                 (when @widget
+;;                                                                   (.clear @widget)
+;;                                                                   (reset! widget nil))))
+;;                            (.addEventListener node "mouseleave" (fn []
+;;                                                                   (when @widget
+;;                                                                     (.clear @widget)
+;;                                                                     (reset! widget nil))))
+;;                            (.markText doc
+;;                                       #js {:line start-line, :ch start-ch}
+;;                                       #js {:line end-line, :ch end-ch}
+;;                                       #js {:replacedWith node}))
+;;                          (catch :default e (tap> [:marker-error (str e)])))]
+;;             (swap! markers-panel-code-box conj marker)))))))
+
+(def widget (atom nil))
+
+(defn highlight-codes-only [codes css hiccup-fn]
+  ;; (tap> [:highlight-codes-only [codes css hiccup-fn]])
+  (let [css-string (ut/hiccup-css-to-string css)]
+    (when-let [editor @cm-instance-panel-code-box]
+      (let [doc (.getDoc editor)]
+        ;; Clear existing markers
+        (doseq [marker @markers-panel-code-box]
+          (.clear marker))
+        (reset! markers-panel-code-box [])
+        (doseq [code codes]
+          (let [code (str code)
+                code-lines (clojure.string/split-lines code)]
+            (loop [line 0]
+              (when (< line (.lineCount doc))
+                (when (clojure.string/includes? (.getLine doc line) (first code-lines))
+                  (let [start-line line
+                        end-line (loop [line start-line]
+                                   (when (< line (.lineCount doc))
+                                     (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+                                       line
+                                       (recur (inc line)))))
+                        start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+                        end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+                        marker (try
+                                 (let [node (js/document.createElement "span")
+                                       _ (.setAttribute node "style" css-string)
+                                       _ (.appendChild node (js/document.createTextNode code))
+                                       widget-node (js/document.createElement "div")]
+                                   (.addEventListener node "mouseover" (fn []
+                                                                         (when-not @widget
+                                                                           (let [react-element (reagent/as-element (hiccup-fn code))]
+                                                                             (rdom/render react-element widget-node)
+                                                                             (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))}))))))  ;; Render widget above if on last line
+                                   (.addEventListener node "mouseout" (fn []
+                                                                        (when @widget
+                                                                          (.clear @widget)
+                                                                          (reset! widget nil))))
+                                   (.addEventListener node "mouseleave" (fn []
+                                                                          (when @widget
+                                                                            (.clear @widget)
+                                                                            (reset! widget nil))))
+                                   (.markText doc
+                                              #js {:line start-line, :ch start-ch}
+                                              #js {:line end-line, :ch end-ch}
+                                              #js {:replacedWith node}))
+                                 (catch :default e (tap> [:marker-error (str e)])))]
+                    (swap! markers-panel-code-box conj marker)))
+                (recur (inc line))))))))))
+
+
+
+
+
+;; (defn highlight-codes [codes hiccup-fn]
+;;   (when-let [editor @cm-instance-panel-code-box]
+;;     (let [doc (.getDoc editor)]
+;;       ;; Clear existing markers
+;;       (doseq [marker @markers-panel-code-box]
+;;         (.clear marker))
+;;       (reset! markers-panel-code-box [])
+;;       (doseq [code codes]
+;;         (let [code (str code)
+;;               _ (tap> [:highlighted-code-panel-code-box code])
+;;               code-lines (clojure.string/split-lines code)
+;;               start-line (loop [line 0]
+;;                            (when (< line (.lineCount doc))
+;;                              (if (clojure.string/includes? (.getLine doc line) (first code-lines))
+;;                                line
+;;                                (recur (inc line)))))
+;;               end-line (loop [line start-line]
+;;                          (when (< line (.lineCount doc))
+;;                            (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+;;                              line
+;;                              (recur (inc line)))))
+;;               start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+;;               end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+;;               marker (try
+;;                        (let [node (js/document.createElement "span")
+;;                              _ (.setAttribute node "style" "display: inline;")
+;;                              react-element (reagent/as-element (hiccup-fn code))
+;;                              _ (rdom/render react-element node)
+;;                              widget-node (js/document.createElement "div")
+;;                              widget (atom nil)]
+;;                          (.addEventListener node "mouseenter" (fn []
+;;                                                                (reset! widget (.addLineWidget doc (inc end-line) widget-node))))
+;;                          (.addEventListener node "mouseover" (fn []
+;;                                                                (reset! widget (.addLineWidget doc (inc end-line) widget-node))))
+;;                          (.addEventListener node "mouseleave" (fn []
+;;                                                               (when @widget
+;;                                                                 (.clear @widget)
+;;                                                                 (reset! widget nil))))
+;;                          (.addEventListener node "mouseout" (fn []
+;;                                                               (when @widget
+;;                                                                 (.clear @widget)
+;;                                                                 (reset! widget nil))))
+;;                          (.markText doc
+;;                                     #js {:line start-line, :ch start-ch}
+;;                                     #js {:line end-line, :ch end-ch}
+;;                                     #js {:replacedWith node}))
+;;                        (catch :default e (tap> [:marker-error (str e)])))]
+;;           (swap! markers-panel-code-box conj marker))))))
+
+;; (defn highlight-codes [codes hiccup-fn]
+;;   (when-let [editor @cm-instance-panel-code-box]
+;;     (let [doc (.getDoc editor)]
+;;       ;; Clear existing markers
+;;       (doseq [marker @markers-panel-code-box]
+;;         (.clear marker))
+;;       (reset! markers-panel-code-box [])
+;;       (doseq [code codes]
+;;         (let [code (str code)
+;;               _ (tap> [:highlighted-code-panel-code-box code])
+;;               code-lines (clojure.string/split-lines code)
+;;               start-line (loop [line 0]
+;;                            (when (< line (.lineCount doc))
+;;                              (if (clojure.string/includes? (.getLine doc line) (first code-lines))
+;;                                line
+;;                                (recur (inc line)))))
+;;               end-line (loop [line start-line]
+;;                          (when (< line (.lineCount doc))
+;;                            (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+;;                              line
+;;                              (recur (inc line)))))
+;;               start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+;;               end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+;;               marker (try
+;;                        (let [node (js/document.createElement "span")
+;;                              _ (.setAttribute node "style" "display: inline;")
+;;                              react-element (reagent/as-element (hiccup-fn code))
+;;                              _ (rdom/render react-element node)]
+;;                          (.markText doc
+;;                                     #js {:line start-line, :ch start-ch}
+;;                                     #js {:line end-line, :ch end-ch}
+;;                                     #js {:replacedWith node}))
+;;                        (catch :default e (tap> [:marker-error (str e)])))]
+;;           (swap! markers-panel-code-box conj marker))))))
+
+(defn unhighlight-code []
+  (when-let [editor @cm-instance-panel-code-box]
+    (let [doc (.getDoc editor)]
+      (doseq [marker @markers-panel-code-box]
+        (when marker
+          (.clear marker)))
+      (reset! markers-panel-code-box []))))
+
+
+;; (defn custom-completions [cm]
+;;   (let [cursor (.getCursor cm)
+;;         token (.getTokenAt cm cursor {:precise true})]
+;;     ;; Generate your custom completion list here
+;;     (let [list (map name [:keyword1 :k! :keyword2 ":keyword44"])] ; Your custom keywords
+;;       ;; Show custom completions
+;;       (.showHint cm (clj->js {:list list
+;;                               :from {:line (.-line cursor) :ch (.-start token)}
+;;                               :to {:fdline (.-line cursor) :ch (.-end token)}})))))
+
+;; (defn custom-hint-fn [cm options]
+;;   (let [cursor (.-doc cm) ;; Get the current cursor position
+;;         token (.getRange cursor (.getCursor cursor) (.getCursor cursor "end"))] ;; Get the current token
+;;     (tap> ["Current token:" token]) ;; Optional: for debugging
+;;     ;; Define your list of suggestions here
+;;     (let [list [":keyword1" ":k!" ":keyword2" ":keyword44"]]
+;;       ;; Return a hint object expected by CodeMirror
+;;       (clj->js {:list list
+;;                 :from (.-cursor cursor)
+;;                 :to (.-cursor cursor)}))))
+
+;; (defn custom-hint-fn [cm options]
+;;   (let [;cursor (.-doc cm)
+;;         token (.getTokenAt cm (.getCursor cm) "end")]
+;;     (tap> ["Current token:" (.-string token)]) ;; Debugging
+;;     ;; Define your list of suggestions here
+;;     (let [input (.-string token)
+;;           list [":keyword1" ":k!" ":keyword2" ":keyword44" ":kiwi/farts" ":liwi/limes"]
+;;           filtered-list (filter #(clojure.string/starts-with? % input) list)] ;; Dynamic filtering
+;;       ;; Return a hint object expected by CodeMirror
+;;       (clj->js {:list filtered-list
+;;                 :from (.-start token)
+;;                 :to (.-end token)}))))
+
+(re-frame/reg-sub
+ ::parameters-available
+ (fn [db _]
+   (let [;;codes [:theme/base-font :font-family :height]
+         flow-subs (get db :flow-subs)
+         click-params (vec (for [e (keys (get-in db [:click-param :param]))]
+                             (keyword (str "param/" (cstr/replace (str e) ":" "")))))
+         themes (vec (for [e (keys (get-in db [:click-param :theme]))]
+                       (keyword (str "theme/" (cstr/replace (str e) ":" "")))))
+         codes (vec (into themes (into flow-subs click-params)))]
+     codes)))
+
+(defn custom-hint-fn [cm options]
+  (let [cursor (.getCursor cm)
+        token (.getTokenAt cm cursor)]
+    (tap> ["Current token:" (.-string token)]) ;; Debugging
+    ;; Define your list of suggestions here
+    (let [input (.-string token)
+          list (vec (map str @(rfa/sub ::parameters-available {})))
+          ;list [":keyword1" ":k!" ":keyword2" ":keyword44" ":kiwi/farts" ":liwi/limes"]
+          filtered-list (filter #(clojure.string/starts-with? % input) list)] ;; Dynamic filtering
+      ;; Return a hint object expected by CodeMirror
+      (clj->js {:list filtered-list
+                :from (clj->js {:line (.-line cursor) :ch (.-start token)})
+                :to (clj->js {:line (.-line cursor) :ch (.-end token)})}))))
 
 (defn panel-code-box [_ _ width-int height-int value]
   (let [sql-hint? (cstr/includes? (str value) ":::sql-string")
@@ -2476,17 +2878,9 @@
              :border-radius    "12px"
              :font-weight      700}
      :child [(reagent/adapt-react-class cm/UnControlled)
-             {;:value   (ut/format-map (- width-int 24) ;; 11/19/23; not used this way anymore
-              ;                        (str (if (nil? key) value
-              ;                                 (get value key))))
-              :value (ut/format-map code-width (str value)) ;; value will be pre filtered by caller
-              ;:value (str (if (nil? key) value
-              ;                (get value key)))
-              ;; :onBlur #(let [parse (try (read-string (cstr/join " " (ut/cm-deep-values %)))
-              ;;                           (catch :default _ :cannot-parse))
-              ;;                unparseable? (= parse :cannot-parse)]
-              ;;            (if unparseable? (js/alert "BAD FORMS!")
-              ;;                (ut/tracked-dispatch-sync [::update-workspace [panel-id key] parse])))
+             {:value (ut/format-map code-width (str value)) ;; value will be pre filtered by caller
+              :onBeforeChange (fn [editor _ _] ;; data value]
+                                (reset! cm-instance-panel-code-box editor))
               :onBlur  #(let [parse        (try (read-string
                                                   ;(ut/rs-save-floats ;-preserve-floats
                                                  (cstr/join " " (ut/cm-deep-values %)))
@@ -2505,16 +2899,86 @@
                                 (if (nil? key)
                                   (ut/tracked-dispatch-sync [::update-selected parse])
                                   (ut/tracked-dispatch-sync [::update-selected-key-cons key parse])))))
+              :onInputRead (fn [cm]
+                             (tap> "onInputRead called")
+                             (let [cursor (.getCursor cm)
+                                   token (.getTokenAt cm cursor)]
+                                (tap> [:cc (.-string token)])
+                               (when (= (.-string token) ":")
+                                 (tap> [:hit-auto?])
+                                 (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
               :options {:mode              (if sql-hint? "sql" "clojure")
+                        ;; :extraKeys        {"Ctrl-Space" "autocomplete"}
+                        ;; ;;:extraKeys        {"Ctrl-Space" (fn [cm] (custom-completions cm))}
+                        ;; :hintOptions {:hint custom-hint-fn}
+                        ;; :extraKeys {"Ctrl-Space" "autocomplete"
+                        ;;             "Tab" "autocomplete"
+                        ;;             }
+                        :hintOptions {:hint custom-hint-fn
+                                      ;; :endCompletion  (fn [cm _]
+                                      ;;                    (js/setTimeout (fn [] (.focus cm)) 0))
+                                      ;; :close (fn [cm _]
+                                      ;;          (js/setTimeout (fn [] (.focus cm)) 0))
+                                      }
                         :lineWrapping      true
                         :lineNumbers       true
                         :matchBrackets     true
                         :autoCloseBrackets true
-                        :autofocus         false
+                        :autofocus         true ;false
                         :autoScroll        false
                         :detach            true
                         :readOnly          false            ;true
-                        :theme             (theme-pull :theme/codemirror-theme nil)}}]])) ;"ayu-mirage" ;"hopscotch"
+                        :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
+
+
+
+(declare map-boxes2)
+
+
+
+
+(re-frame/reg-event-db
+ ::highlight-panel-code
+ (fn [db _]
+   (let [;;codes [:theme/base-font :font-family :height]
+         flow-subs (get db :flow-subs)
+         click-params (vec (for [e (keys (get-in db [:click-param :param]))] 
+                        (keyword (str "param/" (cstr/replace (str e) ":" "")))))
+         themes (vec (for [e (keys (get-in db [:click-param :theme]))]
+                       (keyword (str "theme/" (cstr/replace (str e) ":" "")))))
+         codes (vec (into themes (into flow-subs click-params)))
+         
+         ]
+     
+    ;;  (highlight-codes-only codes {;:color "white" 
+    ;;                               :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")) )
+    ;;                               :filter "invert(0.8)"
+    ;;                               ;:font-weight 700
+    ;;                               :border-radius "5px"})
+          (highlight-codes-only codes {;:color "white" 
+                                       :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
+                                       :filter "invert(1.2)"
+                                  ;:font-weight 700
+                                       :border-radius "5px"}
+                                (fn [code] (let [code (try (edn/read-string code) (catch :default _ code))
+                                                 vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})]
+                                             [re-com/box
+                                              ;:min-height "80px"
+                                              :size "auto"
+                                              :width "100%"
+                                              :align :center :justify :center
+                                              :style {:font-size "15px"}
+                                              ;;:child (pr-str vv)
+                                              :child [shape/map-boxes2 vv nil "" [] nil "map"]
+                                              ;;:child [map-boxes2 vv nil nil [] :output nil]
+                                              :style {;:color "white" 
+                                                      ;:color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
+                                                      ;:background-color (get (theme-pull :theme/data-colors nil) "keyword")
+                                                      :border-radius "4px"}]))
+                                )
+     ;;(highlight-codes codes (fn [code][re-com/box :child (str code) :style {:color "white" :background-color "teal" :border-radius "4px"}]))
+     )
+   db))
 
 
 (defn open-input-code-box [kp width-int height-int value syntax & [style]]

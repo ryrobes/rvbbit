@@ -219,7 +219,7 @@
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
       :dispatch-event-on-start? false}
      
-     {:interval                 1
+     {:interval                 15
       :event                    [::signals/run-signals-history]
       :poll-when                [::signals/run-signals-history?]
       :dispatch-event-on-start? false}
@@ -238,6 +238,11 @@
     ;;   :event                    [::bricks/check-status]
     ;;   :poll-when                [::bricks/something-running?]
     ;;   :dispatch-event-on-start? false}
+     
+      {:interval                 4  ;;; test
+      :event                    [::bricks/highlight-panel-code]
+      ;:poll-when                [::bricks/something-running?]
+      :dispatch-event-on-start? false}
 
      {:interval                 2 ;; push sample data to runstream when running ?
       :event                    [::bricks/refresh-runstreams]

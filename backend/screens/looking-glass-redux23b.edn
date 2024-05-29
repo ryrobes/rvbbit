@@ -37,6 +37,7 @@
  :sql-source
  {:jvm_stats
   {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111}},
+ :audio-playing? false,
  :meta
  {:flow-fn-sys
   {:fields
@@ -1193,14 +1194,14 @@
    :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [370202918 320918166 4294705152],
+ :memory [390528464 360386132 4294705152],
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-26 07:33:39",
+      :at "2024-05-28 06:22:48",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -1221,12 +1222,12 @@
          :style
          {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "42 seconds "]
+         "34 seconds "]
         [:box
          :style
          {:font-weight 700, :font-size "10px", :opacity 0.7}
          :child
-         "returns: ./images/gen/b64-image4-60910-27964.png"]]]
+         "returns: ./images/gen/b64-image4-86010-89837.png"]]]
       10
       1.35
       9]
@@ -1530,7 +1531,7 @@
  :alt-key-held? false,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2003, :h 1481},
+ :window {:w 2003, :h 1441},
  :post-meta
  {:gen-viz-1132 {:* {:rowcount 7}},
   :client-items-drag-item-key-5 {:* {:rowcount 25441}},
@@ -1551,7 +1552,7 @@
   :shape-drag-7 {:* {:rowcount 29}}},
  :flow-estimates
  {"openai-image-gen-ladder"
-  {:times 38, :run-id "4025b10c-20f0-4101-b958-bf6b06101121"}},
+  {:times 39, :run-id "b565c2c5-8df0-418a-a730-51c223fb7f44"}},
  :status
  {:heartbeat
   {:kick
@@ -1581,7 +1582,7 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   95834
+   233584
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap
@@ -1598,23 +1599,19 @@
    :prompt-5
    "Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.\n\nA highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, flowing dark hair, buxom pinup build. The setting is in the picturesque wilderness of Cape Code America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise."}},
  :base-sniff-queries {:jvm_stats 1498154063},
- :panels-hash 1629728774,
+ :panels-hash -1336984044,
  :sessions
- (["brilliant-gold-mallard-13.edn" "1 hour, 25 minutes, 37 seconds" 5137096]
-   ["pretty-Prussian-blue-bee-3.edn" "10 hours, 32 minutes, 7 seconds" 37927091]
-   ["certain-icosahedral-hound-19.edn"
-    "1009 hours, 56 minutes, 29 seconds"
-    3635789324]
-   ["wholesome-salmon-peafowl-19.edn" "103 hours, 25 minutes, 45 seconds" 372345328]
-   ["trusting-cerise-gnu-5.edn" "1036 hours, 14 minutes, 45 seconds" 3730485614]
-   ["meritorious-hexagonal-louse-7.edn"
-    "1036 hours, 20 minutes, 56 seconds"
-    3730856615]
-   ["happy-prismatic-hornet-6.edn" "1037 hours, 1 minute, 11 seconds" 3733271262]
-   ["pleasurable-spherical-louse-10.edn"
-    "1037 hours, 21 minutes, 32 seconds"
-    3734492362]
-   ["constant-lime-bat-22.edn" "1037 hours, 32 minutes, 54 seconds" 3735174459]),
+ (["popular-puce-falcon-3.edn" "1 hour, 38 minutes, 9 seconds" 5889774]
+   ["valued-wide-pronghorn-22.edn" "100 hours, 26 minutes, 54 seconds" 361614631]
+   ["charming-oval-weasel-40.edn" "100 hours, 59 minutes, 39 seconds" 363579613]
+   ["beaming-gray-opossum-6.edn" "1008 hours, 20 minutes, 6 seconds" 3630006982]
+   ["wondrous-thin-squirrel-4.edn" "101 hours, 42 minutes, 29 seconds" 366149900]
+   ["powerful-azure-hamster-9.edn" "101 hours, 44 minutes, 43 seconds" 366283907]
+   ["satisfactory-long-magpie-22.edn" "103 hours, 21 minutes, 49 seconds" 372109948]
+   ["soulful-fat-deer-41.edn" "104 hours, 38 minutes, 48 seconds" 376728328]
+   ["distinguished-beige-monkey-3.edn"
+    "104 hours, 38 minutes, 53 seconds"
+    376733593]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
@@ -1689,9 +1686,9 @@
     :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
     :return nil}}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1766313621,
+ :user-params-hash 234727486,
  :grid-recos? true,
- :session-hash -203613723,
+ :session-hash 1835748516,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -2677,6 +2674,35 @@
      :child
      [:string :flow/openai-image-gen-ladder>:dominant-color]]},
    :queries {}},
+  :block-6399
+  {:h 2,
+   :w 6,
+   :root [19 26],
+   :tab "fat zebra",
+   :selected-view :hi,
+   :name "block-6399",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-weight 700,
+      :font-size "25px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:run-flow
+      ["openai-image-gen-ladder"
+       "run-calliope!"
+       {:prompt
+        "Generate a 16x9 highly detailed, stylistically exaggerated pinup style illustration with a vaporwave and cyberpunk aesthetic, focusing on a close-up of a beautiful, stunning woman of Irish descent. She smiles at the camera. She is late 20s of age, large pouty lips, and a slightly upturned nose.  She should exhibit visible intricate tattoos on her neck and collarbone and be styled in a distinctive cyberpunk fashion with neon blue and purple highlights. Dramatic lighting. "}]]]},
+   :queries {}},
   :block-353
   {:h 7,
    :w 31,
@@ -3350,16 +3376,16 @@
    :views 0},
   :flow
   {:counting-loop>open-fn-1 nil,
-   :openai-image-gen-ladder>pop-color "#b99d84",
+   :openai-image-gen-ladder>pop-color "#dca0ba",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version
-   "./images/gen/b64-image4-60910-27964.png",
+   "./images/gen/b64-image4-86010-89837.png",
    :counting-loop>open-fn-2 44,
-   :openai-image-gen-ladder>*running? false,
+   :openai-image-gen-ladder>*running? true,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt
-   "Generate an illustrative image with a vintage influence displaying an empowered, robust Caucasian woman of Scandinavian descent in her early thirties. She has fully detailed facial features, long dark hair, and a curvaceous build. Place her against the scenic wilderness of Cape Cod, America, with a backdrop having a color palette of teal and pink, exuding dusk inspired by Cyberpunk-Vaporwave aesthetics. Her confident gaze and bold dark makeup, highlighted by the lighting, radiate her charm. A slight smile, hinting at mischief, graces her lips, enhancing her alluring presence. Intricate tattoos, each telling a unique story, trace from her shoulders up to her collarbone and neck. A rabbit pendant nestles around her neck, with subtle rabbit-themed elements included in her tattoos. The main themes are of wonder, mystery, and temptation, intersecting with a radiant sunrise, providing a witty contrast.",
+   "Create a detailed 16x9 dimension illustration that fuses elements of vaporwave and cyberpunk aesthetics. The image should focus on a close-up of a beautiful, stunning Irish woman who's in her late 20s. She sports a charismatic smile that reveals large pouty lips while a slight upturn decorates her nose. Adorn her with intricate neck tattoos that add an element of distinctiveness. Style her in remarkable cyberpunk fashion, enhancing her look with thrilling neon blue and purple highlights. Use dramatic lighting to emphasize the mood and character of the image. Please avoid making any elements exaggerated.",
    :live-scratch-flow>*running? false,
    :openai-image-gen-ladder>hiccup-image-box-w-png-vw
    [:v-box
@@ -3394,7 +3420,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :counting-loop>final-value 44,
-   :openai-image-gen-ladder>dominant-color "#114558",
+   :openai-image-gen-ladder>dominant-color "#090711",
    :flow-forever>final-math nil},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",
@@ -3406,7 +3432,7 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
-  :time {:seconds nil, :second 17},
+  :time {:seconds nil, :second 19},
   :viz-tables-sys2 {:table_name :ufo-sightings-drag-9},
   :user-dropdown-sys {:req-field nil},
   :searches-types-sys {:item_type "client-queries"},
@@ -3481,11 +3507,25 @@
     ""
     "A highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, flowing dark hair, buxom pinup build. The setting is in the picturesque wilderness of Cape Code America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise."],
    :selected-view-data
-   [:open-input
-    {:kp [:param :fair-Persian-blue-shark],
-     :width-int :panel-width+100,
-     :height-int :panel-height+80,
-     :syntax "text"}],
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-weight 700,
+     :font-size "25px",
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family :theme/base-font}
+    :child
+    [:run-flow
+     ["openai-image-gen-ladder"
+      "run-mlf!"
+      {:prompt
+       "Generate an image of a physically fit Scandinavian woman in her early thirties, having unbound dark hair and curvaceous figure inspired by a pinup style. She is situated against a backdrop combining elements of Cyberpunk and Vaporwave, giving an impression of a location akin to Cape Cod. Show the striking contrast between the organic and the artificial, illustrated with a blue-green and pink color palette, indicating a magical dawn. She responds to the viewer's gaze with an enigmatic expression, her features accentuated by excess makeup in the increasing light. A slight, playful smile adorns her lips. Her upper body is decorated with a collection of intricate tattoos, each unveiling a unique story. A rabbit-shaped necklace adorns her neck, a motif repeated in her tattoos. The image merges the mystical and the appealing under a beautiful sunrise"}]]],
    :skillful-viridian-falcon
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please: "
     ""
@@ -3498,7 +3538,7 @@
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:"
     ""
     "Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork is inspired by the pinup noir femme fatale and cyberpunk aesthetics, having a strong burlesque influence."],
-   :selected-view [:views :fair-Persian-blue-shark],
+   :selected-view [:views :hi],
    :fabulous-pink-eagle
    ["I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS:"
     ""
@@ -3536,7 +3576,7 @@
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. "
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
-   :selected-block :block-1517,
+   :selected-block :block-6399,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""

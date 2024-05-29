@@ -73,7 +73,7 @@
                     :gap "2px"
                     :style {:color "black"
                             :font-family "Poppins"
-                            :font-size font-size; "11px"
+                            :font-size "inherit" ;; font-size; "11px"
                             :font-weight 500}
                     :children
                     (for [kk iter] ;; (keys data)

@@ -20,13 +20,13 @@
 		"@nivo/waffle": "^0.83.0",
 		"@types/mapbox-gl": "^2.7.19",
 		"blob-util": "^2.0.2",
-		"codemirror": "^5.62.3",
+		"codemirror": "^5.65.16",
 		"create-react-class": "^15.7.0",
 		"highlight.js": "11.5.1",
 		"html2canvas": "^1.4.1",
 		"mapbox-gl": "^2.15.0",
 		"react": "17.0.2",
-		"react-codemirror2": "^7.2.1",
+		"react-codemirror2": "^7.3.0",
 		"react-colorful": "^5.6.1",
 		"react-dom": "17.0.2",
 		"react-drag-and-drop": "^3.0.0",
@@ -38,6 +38,6 @@
 		"vega-lite": "^5.6.0"
 	},
 	"devDependencies": {
-		"shadow-cljs": "2.20.5"
+		"shadow-cljs": "2.28.8"
 	}
 }
