@@ -1,6 +1,16 @@
 {:orders
  {:kke192 (:query_error),
+  :tmp--1757207994-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :gen-viz-553 (:thread_count :clients :ts),
+  :tmp-1206016650-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp--920412895-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp--1549474592-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp--2143644724-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :new-query (:diff :mem_used :ts_hour),
   :new-query-1
   [:used_memory_mb
@@ -39,6 +49,10 @@
    :memory
    :ts
    :styler_highlight_8717],
+  :tmp-353558926-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp--1996236498-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :jvm-stats-drag-40
   [:sql_cache_size
    :thread_count
@@ -76,6 +90,8 @@
    :sniffs_run
    :sys_load
    :ts],
+  :tmp-1507599106-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :client_stats
   [:client_name
    :ack
@@ -94,15 +110,18 @@
    :messages_per_second
    :recent_messages_per_second
    :ts],
-  :viz-shapes
-  [:axes_logic
-   :base_score
-   :connection_id
-   :library_shapes
-   :selected_view
-   :run_id
-   :shape_name
-   :sql_maps],
+  :tmp--1844510639-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp--2029697965-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp--1540690333-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp-769805907-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp-1149099949-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp-937003173-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :gen-viz-1002-clone-38 (:diff :used_memory_mb :ts1),
   :reco-counts [:table_name :cnt]},
  :reco-preview nil,
@@ -113,8 +132,8 @@
   {:cache? false,
    :limit 18,
    :group-by [3],
-   :_last-run "06:02:35",
-   :refresh-every 600,
+   :_last-run "19:15:16",
+   :refresh-every 300,
    :from
    [{:select
      [:sql_cache_size
@@ -143,7 +162,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 26,
    :group-by [2],
-   :_last-run "06:04:53",
+   :_last-run "19:17:01",
    :refresh-every 230,
    :from
    [{:select
@@ -200,8 +219,8 @@
      {:background-color [:heatmap :PuRd :9 :asc],
       :border "1px solid #00000000",
       :color "#ffffff"}}},
-   :_last-run "06:02:36",
-   :refresh-every 600,
+   :_last-run "19:15:16",
+   :refresh-every 300,
    :from [[:jvm_stats :zz596]],
    :order-by [[:ts :desc]],
    :connection-id "system-db",
@@ -223,7 +242,7 @@
    :refresh-every 20,
    :order-by [[:client_name :asc]],
    :from [[:client_stats :ww254]],
-   :_last-run "06:04:42",
+   :_last-run "19:17:57",
    :style-rules
    {[:* :highlight-8717]
     {:logic [:= :client_name :*client-name-str],
@@ -253,17 +272,17 @@
     :sys_load
     :used_memory_mb
     :ws_peers],
-   :refresh-every 600,
+   :refresh-every 300,
    :cache? false,
    :from [[:jvm_stats :kke192]],
    :order-by [[3 :desc]],
-   :_last-run "06:02:35"},
+   :_last-run "19:15:16"},
   :gen-viz-1002
   {:cache? false,
    :limit 18,
    :group-by [3],
-   :_last-run "06:02:35",
-   :refresh-every 600,
+   :_last-run "19:15:16",
+   :refresh-every 300,
    :from
    [{:select
      [:sql_cache_size
@@ -318,8 +337,8 @@
   {:cache? false,
    :limit 24,
    :group-by [2],
-   :_last-run "06:02:36",
-   :refresh-every 600,
+   :_last-run "19:15:16",
+   :refresh-every 300,
    :from
    [[{:group-by [:ts1],
       :from
@@ -378,27 +397,96 @@
       "[SQLITE_ERROR] SQL error or missing database (no such table: kke192)" 1},
      :cardinality 100}},
    :rowcount 2},
+  :tmp--1757207994-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-9727 :queries :gen-viz-553]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":gen-viz-553" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-9727" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([:post-process-fn] [:select 2 1] [:select 2 0 3] [:select 2 0 2] [:select 2 0 1] [:select 2 0 0] [:select 2 0] [:select 2] [:select 1 1] [:select 1 0 1] [:select 1 0 0] [:select 1 0] [:select 1] [:select 0 1] [:select 0 0 1] [:select 0 0 0] [:select 0 0] [:select 0] [:select] [:order-by 0 1] [:order-by 0 0] [:order-by 0] [:order-by] [:from 0] [:from] [:refresh-every] [:_last-run] [:group-by 0] [:group-by] [:limit] [:cache?])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :limit 18, :group-by [3], :_last-run \"06:02:35\", :refresh-every 300, :from [:query/jvm-stats-drag-40], :order-by [[:ts :desc]], :select [[[:avg :thread_count] :thread_count] [[:avg :ws_peers] :clients] [[:substring :ts 1 15] :ts]], :post-process-fn reverse}"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :limit 18, :group-by [3], :_last-run \"06:02:35\", :refresh-every 300, :from [:query/jvm-stats-drag-40], :order-by [[:ts :desc]], :select [[[:avg :thread_count] :thread_count] [[:avg :ws_peers] :clients] [[:substring :ts 1 15] :ts]], :post-process-fn reverse}"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
   :gen-viz-553
   {:fields
    {:thread_count
     {:data-type "float",
-     :distinct 7,
+     :distinct 18,
      :group-by? true,
-     :commons {415.1 1, 411.75 1, 412.75 1},
+     :commons {431.8181818181818 1, 428.475 1, 428.225 1},
      :cardinality 100},
     :clients
     {:data-type "float",
-     :distinct 2,
+     :distinct 1,
      :group-by? true,
-     :commons {11 6, 5.5 1},
-     :cardinality 28},
+     :commons {11 18},
+     :cardinality 5},
     :ts
     {:data-type "string",
-     :distinct 7,
+     :distinct 18,
      :group-by? true,
-     :commons {"2024-05-26 06:0" 1, "2024-05-26 05:5" 1, "2024-05-26 05:4" 1},
+     :commons {"2024-05-29 18:2" 1, "2024-05-29 17:1" 1, "2024-05-29 18:0" 1},
      :cardinality 100}},
-   :rowcount 7},
+   :rowcount 18},
   :status-drag-0
   {:fields
    {:queries_run
@@ -529,46 +617,322 @@
      :commons {14 19, 15 17, -1 1},
      :cardinality 8}},
    :rowcount 37},
+  :tmp-1206016650-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-3438 :queries :new-query-1]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":new-query-1" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-3438" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([:select 0] [:select] [:connection-id] [:order-by 0 1] [:order-by 0 0] [:order-by 0] [:order-by] [:from 0 1] [:from 0 0] [:from 0] [:from] [:refresh-every] [:_last-run] [:style-rules [:recent_messages_per_second :heatmap-2888] :style :color] [:style-rules [:recent_messages_per_second :heatmap-2888] :style :border] [:style-rules [:recent_messages_per_second :heatmap-2888] :style :background-color 3] [:style-rules [:recent_messages_per_second :heatmap-2888] :style :background-color 2] [:style-rules [:recent_messages_per_second :heatmap-2888] :style :background-color 1] [:style-rules [:recent_messages_per_second :heatmap-2888] :style :background-color 0] [:style-rules [:recent_messages_per_second :heatmap-2888] :style :background-color] [:style-rules [:recent_messages_per_second :heatmap-2888] :style] [:style-rules [:recent_messages_per_second :heatmap-2888] :logic] [:style-rules [:recent_messages_per_second :heatmap-2888]] [:style-rules [:sys_load :heatmap-7696] :style :color] [:style-rules [:sys_load :heatmap-7696] :style :border] [:style-rules [:sys_load :heatmap-7696] :style :background-color 3] [:style-rules [:sys_load :heatmap-7696] :style :background-color 2] [:style-rules [:sys_load :heatmap-7696] :style :background-color 1] [:style-rules [:sys_load :heatmap-7696] :style :background-color 0] [:style-rules [:sys_load :heatmap-7696] :style :background-color] [:style-rules [:sys_load :heatmap-7696] :style] [:style-rules [:sys_load :heatmap-7696] :logic] [:style-rules [:sys_load :heatmap-7696]] [:style-rules] [:limit] [:cache?])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :limit 50, :style-rules {[:sys_load :heatmap-7696] {:logic true, :style {:background-color [:heatmap :PuRd :9 :asc], :border \"1px solid #00000000\", :color \"#ffffff\"}}, [:recent_messages_per_second :heatmap-2888] {:logic true, :style {:background-color [:heatmap :PuRd :9 :asc], :border \"1px solid #00000000\", :color \"#ffffff\"}}}, :_last-run \"06:02:36\", :refresh-every 300, :from [[:jvm_stats :zz596]], :order-by [[:ts :desc]], :connection-id \"system-db\", :select [:*]}"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :limit 50, :style-rules {[:sys_load :heatmap-7696] {:logic true, :style {:background-color [:heatmap :PuRd :9 :asc], :border \"1px solid #00000000\", :color \"#ffffff\"}}, [:recent_messages_per_second :heatmap-2888] {:logic true, :style {:background-color [:heatmap :PuRd :9 :asc], :border \"1px solid #00000000\", :color \"#ffffff\"}}}, :_last-run \"06:02:36\", :refresh-every 300, :from [[:jvm_stats :zz596]], :order-by [[:ts :desc]], :connection-id \"system-db\", :select [:*]}"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
+  :tmp--920412895-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-4808 :views :hi]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":hi" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-4808" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([10 1 4] [10 1 3] [10 1 2 :margin-top] [10 1 2 :font-size] [10 1 2] [10 1 1] [10 1 0] [10 1] [10 0 2 1] [10 0 2 0] [10 0 2] [10 0 1] [10 0 0] [10 0] [10] [9] [8 :transition] [8 :font-weight] [8 :color] [8 :font-size] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>client-latency]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"client latency (ms)\"]]]"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>client-latency]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"client latency (ms)\"]]]"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
+  :tmp--1549474592-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-494 :queries :jvm-stats-drag-40]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":jvm-stats-drag-40" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-494" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([:_last-run] [:order-by 0 1] [:order-by 0 0] [:order-by 0] [:order-by] [:from 0 1] [:from 0 0] [:from 0] [:from] [:cache?] [:refresh-every] [:select 12] [:select 11] [:select 10] [:select 9] [:select 8] [:select 7] [:select 6] [:select 5] [:select 4] [:select 3 1] [:select 3 0 3] [:select 3 0 2] [:select 3 0 1] [:select 3 0 0] [:select 3 0] [:select 3] [:select 2 1] [:select 2 0] [:select 2] [:select 1] [:select 0] [:select])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :recent_messages_per_second :recent_queries_per_second :internal_queries_run :open_flow_channels :sys_load :used_memory_mb :ws_peers], :refresh-every 300, :cache? false, :from [[:jvm_stats :kke192]], :order-by [[3 :desc]], :_last-run \"06:02:35\"}"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :recent_messages_per_second :recent_queries_per_second :internal_queries_run :open_flow_channels :sys_load :used_memory_mb :ws_peers], :refresh-every 300, :cache? false, :from [[:jvm_stats :kke192]], :order-by [[3 :desc]], :_last-run \"06:02:35\"}"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
+  :tmp--2143644724-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-3719 :views :cell-drop-11937]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":cell-drop-11937" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-3719" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([10 1 4] [10 1 3] [10 1 2 :margin-top] [10 1 2 :font-size] [10 1 2] [10 1 1] [10 1 0] [10 1] [10 0 2 1] [10 0 2 0] [10 0 2] [10 0 1] [10 0 0] [10 0] [10] [9] [8 :transition] [8 :font-weight] [8 :color] [8 :font-size] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:string :client/*client-name*>stats>recent-messages-per-second]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"messages/sec (recent)\"]]]"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:string :client/*client-name*>stats>recent-messages-per-second]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"messages/sec (recent)\"]]]"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
   :new-query
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 2,
+     :distinct 10,
      :group-by? true,
-     :commons {"-1" 1, "288 MB" 1},
-     :cardinality 100},
+     :commons {"+9" 3, "+6" 2, "+8" 2},
+     :cardinality 71},
     :mem_used
     {:data-type "float",
-     :distinct 2,
+     :distinct 14,
      :group-by? true,
-     :commons {3.009613655E8 1, 3.0169338641791046E8 1},
+     :commons {2.85117835325E8 1, 2.38790371225E8 1, 3.03263370325E8 1},
      :cardinality 100},
     :ts_hour
     {:data-type "string",
-     :distinct 2,
+     :distinct 14,
      :group-by? true,
-     :commons {"2024-05-26 06" 1, "2024-05-26 05" 1},
+     :commons {"2024-05-29 19" 1, "2024-05-29 09" 1, "2024-05-29 08" 1},
      :cardinality 100}},
-   :rowcount 2},
+   :rowcount 14},
   :new-query-1
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 42,
+     :distinct 50,
      :group-by? true,
-     :commons {852 2, 973 2, 889 2},
-     :cardinality 83},
+     :commons {181555 1, 181094 1, 181412 1},
+     :cardinality 100},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 47,
+     :distinct 48,
      :group-by? true,
-     :commons {28.27 2, 27.07 2, 25.47 2},
-     :cardinality 93},
+     :commons {28.26 2, 28.38 2, 25.34 1},
+     :cardinality 95},
     :uptime_seconds
     {:data-type "integer",
      :distinct 50,
      :group-by? true,
-     :commons {2819 1, 2594 1, 2879 1},
+     :commons {234390 1, 233985 1, 234525 1},
      :cardinality 100},
     :queries_per_second
     {:data-type "float",
@@ -578,10 +942,10 @@
      :cardinality 1},
     :sql_cache_size
     {:data-type "integer",
-     :distinct 1,
+     :distinct 5,
      :group-by? true,
-     :commons {3 50},
-     :cardinality 1},
+     :commons {50 45, 58 2, 52 1},
+     :cardinality 10},
     :styler_heatmap_2888
     {:data-type "integer",
      :distinct 1,
@@ -593,49 +957,49 @@
      :distinct 50,
      :group-by? true,
      :commons
-     {"2024-05-26 06:01:44" 1, "2024-05-26 05:50:29" 1, "2024-05-26 06:00:29" 1},
+     {"2024-05-29 19:03:15" 1, "2024-05-29 19:03:45" 1, "2024-05-29 19:14:30" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {177 50},
+     :commons {179 50},
      :cardinality 1},
     :messages_per_second
     {:data-type "float",
-     :distinct 10,
+     :distinct 2,
      :group-by? true,
-     :commons {28.37 11, 28.32 8, 28.38 7},
-     :cardinality 20},
+     :commons {33.7 39, 33.69 11},
+     :cardinality 3},
     :messages
     {:data-type "integer",
      :distinct 50,
      :group-by? true,
-     :commons {68899 1, 89366 1, 81290 1},
+     :commons {7895297 1, 7898522 1, 7891947 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 4,
+     :distinct 15,
      :group-by? true,
-     :commons {38 14, 40 14, 43 14},
-     :cardinality 7},
+     :commons {16825 10, 16818 9, 16808 9},
+     :cardinality 30},
     :sys_load
     {:data-type "float",
      :distinct 47,
      :group-by? true,
-     :commons {5.58 2, 4.65 2, 4.45 2},
+     :commons {3.21 2, 3.88 2, 3.6 2},
      :cardinality 93},
     :unix_ms
     {:data-type "integer",
      :distinct 50,
      :group-by? true,
-     :commons {1716717674029 1, 1716717269029 1, 1716717164028 1},
+     :commons {1717023915094 1, 1717023870103 1, 1717024455108 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
      :distinct 50,
      :group-by? true,
-     :commons {1434 1, 1630 1, 2650 1},
+     :commons {2698 1, 4858 1, 2227 1},
      :cardinality 100},
     :styler_heatmap_7696
     {:data-type "integer",
@@ -645,28 +1009,28 @@
      :cardinality 1},
     :recent_queries_run
     {:data-type "integer",
-     :distinct 10,
+     :distinct 17,
      :group-by? true,
-     :commons {4 27, 0 8, 14 5},
-     :cardinality 20},
+     :commons {8 9, 13 9, 12 7},
+     :cardinality 34},
     :thread_count
     {:data-type "integer",
      :distinct 22,
      :group-by? true,
-     :commons {407 5, 405 5, 417 4},
+     :commons {421 5, 432 4, 423 4},
      :cardinality 43},
     :internal_queries_run
     {:data-type "integer",
-     :distinct 42,
+     :distinct 46,
      :group-by? true,
-     :commons {270 2, 265 2, 283 2},
-     :cardinality 83},
+     :commons {30707 2, 30737 2, 30713 2},
+     :cardinality 92},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 4,
+     :distinct 2,
      :group-by? true,
-     :commons {104 26, 11 22, 42 1},
-     :cardinality 7},
+     :commons {11 42, 0 8},
+     :cardinality 3},
     :ws_peers
     {:data-type "integer",
      :distinct 1,
@@ -677,64 +1041,64 @@
     {:data-type "integer",
      :distinct 50,
      :group-by? true,
-     :commons {89366 1, 81290 1, 82550 1},
+     :commons {7903062 1, 7895297 1, 7898522 1},
      :cardinality 100},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 11,
+     :distinct 19,
      :group-by? true,
-     :commons {0.27 27, 0 8, 0.93 3},
-     :cardinality 21},
+     :commons {0.53 9, 0.87 8, 0.8 7},
+     :cardinality 37},
     :seconds_since_last_update
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {15 26, 14 24},
+     :commons {15 27, 14 23},
      :cardinality 3}},
    :rowcount 50},
   :client-stats-drag-33
   {:fields
    {:server_subs
     {:data-type "integer",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
-     :commons {13 3, 10 1, 11 1},
-     :cardinality 81},
+     :commons {13 2, 18 1, 10 1},
+     :cardinality 90},
     :push
     {:data-type "integer",
      :distinct 11,
      :group-by? true,
-     :commons {6685 1, 3338 1, 5084 1},
+     :commons {47210 1, 325210 1, 59773 1},
      :cardinality 100},
     :client_subs
     {:data-type "integer",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
-     :commons {13 3, 10 1, 11 1},
-     :cardinality 81},
+     :commons {13 2, 18 1, 10 1},
+     :cardinality 90},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 7,
+     :distinct 8,
      :group-by? true,
-     :commons {1 4, 1.13 2, 1.33 1},
-     :cardinality 63},
+     :commons {1 4, 1.4 1, 0.2 1},
+     :cardinality 72},
     :last_seen_seconds
     {:data-type "integer",
-     :distinct 1,
+     :distinct 3,
      :group-by? true,
-     :commons {4 11},
-     :cardinality 9},
+     :commons {10 6, 9 4, 4 1},
+     :cardinality 27},
     :memory
     {:data-type "string",
-     :distinct 11,
+     :distinct 10,
      :group-by? true,
-     :commons {"410" 1, "206" 1, "229" 1},
-     :cardinality 100},
+     :commons {"179" 2, "324" 1, "267" 1},
+     :cardinality 90},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-05-26 06:04:29" 11},
+     :commons {"2024-05-29 19:17:45" 11},
      :cardinality 9},
     :styler_highlight_8717
     {:data-type "integer",
@@ -744,161 +1108,299 @@
      :cardinality 18},
     :client_latency
     {:data-type "integer",
-     :distinct 10,
+     :distinct 11,
      :group-by? true,
-     :commons {189 2, 190 1, 393 1},
-     :cardinality 90},
+     :commons {207 1, 326 1, 332 1},
+     :cardinality 100},
     :ack
     {:data-type "integer",
-     :distinct 1,
+     :distinct 6,
      :group-by? true,
-     :commons {73 11},
-     :cardinality 9},
+     :commons {1022 4, 5217 3, 1024 1},
+     :cardinality 54},
     :client_name
     {:data-type "string",
      :distinct 11,
      :group-by? true,
      :commons
-     {":angelic-cerise-dolphin-32" 1,
-      ":simple-conical-pig-40" 1,
-      ":perfect-hexagonal-nightingale-39" 1},
+     {":prominent-plum-serval-0" 1,
+      ":encouraging-periwinkle-jay-40" 1,
+      ":charming-coral-serval-22" 1},
      :cardinality 100},
     :last_seen
     {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"10 seconds" 6, "9 seconds" 4, "4 seconds" 1},
+     :cardinality 27}},
+   :rowcount 11},
+  :tmp-353558926-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"4 seconds" 11},
-     :cardinality 9}},
-   :rowcount 11},
+     :commons {"[:block-3218 :views :hi]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":hi" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-3218" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([12 1 12] [12 1 11] [12 1 10 :font-size] [12 1 10] [12 1 9] [12 1 8] [12 1 7] [12 1 6] [12 1 5] [12 1 4] [12 1 3] [12 1 2] [12 1 1] [12 1 0] [12 1] [12 0 8 1] [12 0 8 0] [12 0 8] [12 0 7] [12 0 6] [12 0 5] [12 0 4] [12 0 3] [12 0 2] [12 0 1] [12 0 0] [12 0] [12] [11] [10 :transition] [10 :font-weight] [10 :color] [10 :font-size] [10] [9] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :align :center :justify :center :size \"auto\" :height \"100px\" :style {:font-size \"20px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :size \"auto\" :align :center :justify :center :child [:string :server/uptime]] [:box :align :center :justify :center :size \"auto\" :height \"10px\" :style {:font-size \"18px\"} :child \"server uptime\"]]]"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :align :center :justify :center :size \"auto\" :height \"100px\" :style {:font-size \"20px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :size \"auto\" :align :center :justify :center :child [:string :server/uptime]] [:box :align :center :justify :center :size \"auto\" :height \"10px\" :style {:font-size \"18px\"} :child \"server uptime\"]]]"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
+  :tmp--1996236498-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-12161 :views :hi]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":hi" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-12161" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([10 1 4] [10 1 3] [10 1 2 :margin-top] [10 1 2 :font-size] [10 1 2] [10 1 1] [10 1 0] [10 1] [10 0 2 1] [10 0 2 0] [10 0 2] [10 0 1] [10 0 0] [10 0] [10] [9] [8 :transition] [8 :font-weight] [8 :color] [8 :font-size] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :jvm-stats-drag-40/recent_queries_per_second.0]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"recent q-per-sec\"]]]"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :jvm-stats-drag-40/recent_queries_per_second.0]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"recent q-per-sec\"]]]"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
   :query-4704 {:fields {}, :rowcount 0},
   :jvm-stats-drag-40
   {:fields
    {:ts1
     {:data-type "string",
-     :distinct 212,
+     :distinct 500,
      :group-by? true,
      :commons
-     {"2024-05-26 05:18:59" 1, "2024-05-26 05:23:29" 1, "2024-05-26 06:01:44" 1},
+     {"2024-05-29 18:23:15" 1, "2024-05-29 18:22:15" 1, "2024-05-29 18:22:30" 1},
      :cardinality 100},
     :queries_run
     {:data-type "integer",
-     :distinct 179,
+     :distinct 500,
      :group-by? true,
-     :commons {246 2, 852 2, 499 2},
-     :cardinality 84},
+     :commons {176602 1, 176353 1, 181555 1},
+     :cardinality 100},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 154,
+     :distinct 359,
      :group-by? true,
-     :commons {27.07 6, 25.6 6, 28.27 4},
-     :cardinality 72},
+     :commons {26.54 7, 25.46 5, 26.52 4},
+     :cardinality 71},
     :sql_cache_size
     {:data-type "integer",
-     :distinct 2,
+     :distinct 5,
      :group-by? true,
-     :commons {0 132, 3 80},
+     :commons {50 495, 58 2, 52 1},
      :cardinality 0},
     :ts
     {:data-type "string",
-     :distinct 7,
+     :distinct 13,
      :group-by? true,
-     :commons {"2024-05-26 05:1" 40, "2024-05-26 05:2" 40, "2024-05-26 05:3" 40},
-     :cardinality 3},
+     :commons {"2024-05-29 18:2" 40, "2024-05-29 18:0" 40, "2024-05-29 18:1" 40},
+     :cardinality 2},
     :sniffs_run
     {:data-type "integer",
-     :distinct 21,
+     :distinct 124,
      :group-by? true,
-     :commons {18 14, 38 14, 16 14},
-     :cardinality 9},
+     :commons {16584 12, 16559 12, 16576 12},
+     :cardinality 24},
     :sys_load
     {:data-type "float",
-     :distinct 158,
+     :distinct 294,
      :group-by? true,
-     :commons {3.58 6, 3.56 4, 3.63 4},
-     :cardinality 74},
+     :commons {5.13 5, 3.33 5, 5.02 5},
+     :cardinality 58},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 201,
+     :distinct 464,
      :group-by? true,
-     :commons {1283 2, 1704 2, 1108 2},
-     :cardinality 94},
+     :commons {4372 3, 3586 3, 2819 2},
+     :cardinality 92},
     :thread_count
     {:data-type "integer",
-     :distinct 36,
+     :distinct 34,
      :group-by? true,
-     :commons {406 17, 405 16, 403 15},
-     :cardinality 16},
+     :commons {422 39, 424 38, 431 36},
+     :cardinality 6},
     :internal_queries_run
     {:data-type "integer",
-     :distinct 179,
+     :distinct 462,
      :group-by? true,
-     :commons {63 2, 199 2, 71 2},
-     :cardinality 84},
+     :commons {30378 2, 30707 2, 30152 2},
+     :cardinality 92},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 11,
+     :distinct 4,
      :group-by? true,
-     :commons {11 99, 104 47, 0 44},
-     :cardinality 5},
+     :commons {11 333, 0 161, 46 5},
+     :cardinality 0},
     :ws_peers
     {:data-type "integer",
-     :distinct 2,
+     :distinct 1,
      :group-by? true,
-     :commons {11 211, 0 1},
+     :commons {11 500},
      :cardinality 0},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 20,
+     :distinct 36,
      :group-by? true,
-     :commons {0.27 98, 0 34, 0.6 14},
-     :cardinality 9}},
-   :rowcount 212},
+     :commons {0.53 84, 0.87 72, 0.8 67},
+     :cardinality 7}},
+   :rowcount 500},
   :gen-viz-1002
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 7,
+     :distinct 17,
      :group-by? true,
-     :commons {"-272" 1, "+168" 1, "+130" 1},
-     :cardinality 100},
+     :commons {"+50" 2, "+304" 1, "-97" 1},
+     :cardinality 94},
     :used_memory_mb
     {:data-type "float",
-     :distinct 7,
+     :distinct 18,
      :group-by? true,
-     :commons {1644.9 1, 1916.5 1, 1748.35 1},
+     :commons {3450.5454545454545 1, 3321.175 1, 3293.55 1},
      :cardinality 100},
     :mps
     {:data-type "float",
-     :distinct 7,
+     :distinct 13,
      :group-by? true,
-     :commons {27.85 1, 28.7 1, 28.85 1},
-     :cardinality 100},
+     :commons {31.04 2, 30.86 2, 30.81 2},
+     :cardinality 72},
     :ts1
     {:data-type "string",
-     :distinct 7,
+     :distinct 18,
      :group-by? true,
-     :commons {"2024-05-26 06:0" 1, "2024-05-26 05:5" 1, "2024-05-26 05:4" 1},
+     :commons {"2024-05-29 18:2" 1, "2024-05-29 17:1" 1, "2024-05-29 18:0" 1},
      :cardinality 100}},
-   :rowcount 7},
+   :rowcount 18},
   :jvm_stats
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 94,
+     :distinct 109,
      :group-by? true,
-     :commons {246 2, 499 2, 324 2},
-     :cardinality 84},
+     :commons {0 3, 390 1, 177 1},
+     :cardinality 98},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 90,
+     :distinct 102,
      :group-by? true,
-     :commons {28.14 4, 25.6 4, 27.33 3},
-     :cardinality 81},
+     :commons {27.07 3, 28.14 3, 25.47 2},
+     :cardinality 91},
     :uptime_seconds
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {390 1, 1364 1, 1004 1},
+     :commons {1259 1, 390 1, 915 1},
      :cardinality 100},
     :queries_per_second
     {:data-type "float",
@@ -908,108 +1410,177 @@
      :cardinality 0},
     :sql_cache_size
     {:data-type "integer",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
+     :commons {1 63, 0 48},
+     :cardinality 1},
     :ts
     {:data-type "string",
      :distinct 111,
      :group-by? true,
      :commons
-     {"2024-05-26 05:18:59" 1, "2024-05-26 05:23:29" 1, "2024-05-26 05:25:59" 1},
+     {"2024-05-27 02:14:44" 1, "2024-05-27 02:06:44" 1, "2024-05-27 02:18:14" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
-     :distinct 3,
+     :distinct 6,
      :group-by? true,
-     :commons {177 108, 17 2, 0 1},
-     :cardinality 2},
+     :commons {182 71, 184 29, 183 4},
+     :cardinality 5},
     :messages_per_second
     {:data-type "float",
-     :distinct 77,
+     :distinct 91,
      :group-by? true,
-     :commons {27.8 6, 27.93 5, 27.94 5},
-     :cardinality 69},
+     :commons {27.73 3, 27.11 3, 27.81 3},
+     :cardinality 81},
     :messages
     {:data-type "integer",
-     :distinct 111,
+     :distinct 110,
      :group-by? true,
-     :commons {44943 1, 23623 1, 8 1},
-     :cardinality 100},
+     :commons {0 2, 29612 1, 10971 1},
+     :cardinality 99},
     :sniffs_run
     {:data-type "integer",
-     :distinct 13,
+     :distinct 19,
      :group-by? true,
-     :commons {18 14, 16 14, 14 14},
-     :cardinality 11},
+     :commons {12 13, 15 13, 20 13},
+     :cardinality 17},
     :sys_load
     {:data-type "float",
-     :distinct 83,
+     :distinct 103,
      :group-by? true,
-     :commons {3.58 5, 3.89 4, 3.48 3},
-     :cardinality 74},
+     :commons {3.98 2, 2.79 2, 3.29 2},
+     :cardinality 92},
     :unix_ms
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {1716715859027 1, 1716714989036 1, 1716716159029 1},
+     :commons {1716790619942 1, 1716790229882 1, 1716791114900 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 107,
+     :distinct 110,
      :group-by? true,
-     :commons {1177 2, 1602 2, 1205 2},
-     :cardinality 96},
+     :commons {1757 2, 2220 1, 2705 1},
+     :cardinality 99},
     :recent_queries_run
     {:data-type "integer",
-     :distinct 15,
+     :distinct 19,
      :group-by? true,
-     :commons {4 49, 0 18, 8 7},
-     :cardinality 13},
+     :commons {4 30, 2 24, 6 13},
+     :cardinality 17},
     :thread_count
     {:data-type "integer",
-     :distinct 29,
+     :distinct 39,
      :group-by? true,
-     :commons {406 15, 404 12, 405 11},
-     :cardinality 26},
+     :commons {423 7, 417 7, 404 6},
+     :cardinality 35},
     :internal_queries_run
     {:data-type "integer",
-     :distinct 94,
+     :distinct 95,
      :group-by? true,
-     :commons {63 2, 71 2, 67 2},
-     :cardinality 84},
+     :commons {0 3, 80 2, 10 2},
+     :cardinality 85},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 5,
+     :distinct 9,
      :group-by? true,
-     :commons {11 67, 0 26, 104 16},
-     :cardinality 4},
+     :commons {11 53, 104 20, 0 18},
+     :cardinality 8},
     :ws_peers
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {11 110, 0 1},
+     :commons {12 108, 0 3},
      :cardinality 1},
     :recent_messages
     {:data-type "integer",
-     :distinct 111,
+     :distinct 109,
      :group-by? true,
-     :commons {44943 1, 23623 1, 8 1},
-     :cardinality 100},
+     :commons {0 3, 29612 1, 10971 1},
+     :cardinality 98},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 15,
+     :distinct 20,
      :group-by? true,
-     :commons {0.27 49, 0 18, 0.53 7},
-     :cardinality 13},
+     :commons {0.27 30, 0.13 24, 0.4 13},
+     :cardinality 18},
     :seconds_since_last_update
     {:data-type "integer",
      :distinct 3,
      :group-by? true,
-     :commons {14 58, 15 52, -1 1},
+     :commons {15 60, 14 50, -1 1},
      :cardinality 2}},
    :rowcount 111},
+  :tmp-1507599106-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-10778 :queries :gen-viz-1002]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":gen-viz-1002" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-10778" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([:post-process-fn] [:select 2 1] [:select 2 0 3] [:select 2 0 2] [:select 2 0 1] [:select 2 0 0] [:select 2 0] [:select 2] [:select 1 1] [:select 1 0 2] [:select 1 0 1 1] [:select 1 0 1 0] [:select 1 0 1] [:select 1 0 0] [:select 1 0] [:select 1] [:select 0 1] [:select 0 0 0 1] [:select 0 0 0 0] [:select 0 0 0] [:select 0 0] [:select 0] [:select] [:order-by 0 1] [:order-by 0 0] [:order-by 0] [:order-by] [:from 0] [:from] [:refresh-every] [:_last-run] [:group-by 0] [:group-by] [:limit] [:cache?])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :limit 18, :group-by [3], :_last-run \"06:02:35\", :refresh-every 300, :from [:query/jvm-stats-drag-40], :order-by [[3 :desc]], :select [[[[:avg :used_memory_mb]] :used_memory_mb] [[:round [:avg :recent_messages_per_second] 2] :mps] [[:substring :ts 1 15] :ts1]], :post-process-fn (fn [x] (vec (for [idx (range (count x)) :let [rx (vec (reverse x)) prev-row (get rx (- idx 1) {:used_memory_mb 0}) row (get rx idx {:used_memory_mb 0}) pre-mb (get prev-row :used_memory_mb) mb (get row :used_memory_mb) diff (Math/round (- mb pre-mb)) pos (cond (> diff 0) \"+\" (< diff 0) \"\" :else \"\")]] (merge row {:diff (if (= idx 0) (str (Math/round mb) \" MB\") (str pos diff))}))))}"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :limit 18, :group-by [3], :_last-run \"06:02:35\", :refresh-every 300, :from [:query/jvm-stats-drag-40], :order-by [[3 :desc]], :select [[[[:avg :used_memory_mb]] :used_memory_mb] [[:round [:avg :recent_messages_per_second] 2] :mps] [[:substring :ts 1 15] :ts1]], :post-process-fn (fn [x] (vec (for [idx (range (count x)) :let [rx (vec (reverse x)) prev-row (get rx (- idx 1) {:used_memory_mb 0}) row (get rx idx {:used_memory_mb 0}) pre-mb (get prev-row :used_memory_mb) mb (get row :used_memory_mb) diff (Math/round (- mb pre-mb)) pos (cond (> diff 0) \"+\" (< diff 0) \"\" :else \"\")]] (merge row {:diff (if (= idx 0) (str (Math/round mb) \" MB\") (str pos diff))}))))}"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
   :status-drag-28
   {:fields
    {:server_subs
@@ -1126,184 +1697,546 @@
   {:fields
    {:server_subs
     {:data-type "integer",
-     :distinct 9,
-     :group-by? true,
-     :commons {13 3, 10 1, 11 1},
-     :cardinality 81},
-    :queue_size
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 11},
-     :cardinality 9},
-    :push
-    {:data-type "integer",
      :distinct 11,
      :group-by? true,
-     :commons {2057 1, 1027 1, 2007 1},
+     :commons {13 2, 10 1, 16 1},
+     :cardinality 91},
+    :queue_size
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {0 9, 1 2, 980 1},
+     :cardinality 25},
+    :push
+    {:data-type "integer",
+     :distinct 12,
+     :group-by? true,
+     :commons {1051 1, 193135 1, 194813 1},
      :cardinality 100},
     :client_subs
     {:data-type "integer",
-     :distinct 9,
-     :group-by? true,
-     :commons {13 3, 10 1, 11 1},
-     :cardinality 81},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 9,
-     :group-by? true,
-     :commons {1 2, 1.4 2, 2.27 1},
-     :cardinality 81},
-    :uptime_seconds
-    {:data-type "float",
-     :distinct 10,
-     :group-by? true,
-     :commons {1956.39 2, 1955.47 1, 1956.328 1},
-     :cardinality 90},
-    :uptime
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"32 minutes, 21 seconds" 6,
-      "32 minutes, 20 seconds" 2,
-      "32 minutes, 16 seconds" 1},
-     :cardinality 45},
-    :last_seen_seconds
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {34 11},
-     :cardinality 9},
-    :memory
-    {:data-type "string",
      :distinct 11,
      :group-by? true,
-     :commons {"292" 1, "205" 1, "194" 1},
+     :commons {13 2, 10 1, 16 1},
+     :cardinality 91},
+    :recent_messages_per_second
+    {:data-type "integer",
+     :distinct 5,
+     :group-by? true,
+     :commons {1 5, 1.13 3, 2 2},
+     :cardinality 41},
+    :uptime_seconds
+    {:data-type "float",
+     :distinct 12,
+     :group-by? true,
+     :commons {8027.809 1, 6516.248 1, 188681.165 1},
+     :cardinality 100},
+    :uptime
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons
+     {"52 hours, 24 minutes, 28 seconds" 4,
+      "52 hours, 24 minutes, 27 seconds" 2,
+      "1 hour, 48 minutes, 21 seconds" 1},
+     :cardinality 66},
+    :last_seen_seconds
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {9 10, 10 1, 820 1},
+     :cardinality 25},
+    :memory
+    {:data-type "string",
+     :distinct 12,
+     :group-by? true,
+     :commons {"922" 1, "2174" 1, "2190" 1},
      :cardinality 100},
     :queue_distro
     {:data-type "string",
-     :distinct 11,
+     :distinct 12,
      :group-by? true,
-     :commons {"{0 4205}" 1, "{0 3968}" 1, "{0 1997}" 1},
+     :commons {"{0 7345}" 1, "{0 193017}" 1, "{0 407298}" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-05-26 05:42:29" 11},
-     :cardinality 9},
+     :commons {"2024-05-29 06:29:45" 12},
+     :cardinality 8},
     :messages_per_second
     {:data-type "float",
-     :distinct 10,
+     :distinct 11,
      :group-by? true,
-     :commons {1.05 2, 1.01 1, 1.03 1},
-     :cardinality 90},
+     :commons {1.02 2, 1.49 1, 1.03 1},
+     :cardinality 91},
     :client_latency
     {:data-type "integer",
      :distinct 11,
      :group-by? true,
-     :commons {543 1, 386 1, 203 1},
-     :cardinality 100},
+     :commons {443 2, 434 1, 446 1},
+     :cardinality 91},
     :ack
     {:data-type "integer",
-     :distinct 1,
+     :distinct 6,
      :group-by? true,
-     :commons {43 11},
-     :cardinality 9},
+     :commons {4193 7, 145 1, 250 1},
+     :cardinality 50},
     :booted_ts
     {:data-type "integer",
-     :distinct 10,
+     :distinct 12,
      :group-by? true,
-     :commons {1716714592634 2, 1716714592767 1, 1716714597213 1},
-     :cardinality 90},
+     :commons {1716789902000 1, 1716789902283 1, 1716789905366 1},
+     :cardinality 100},
     :client_name
     {:data-type "string",
-     :distinct 11,
+     :distinct 12,
      :group-by? true,
      :commons
-     {":angelic-cerise-dolphin-32" 1,
-      ":simple-conical-pig-40" 1,
-      ":perfect-hexagonal-nightingale-39" 1},
+     {":meaningful-jungle-green-hummingbird-34" 1,
+      ":encouraging-periwinkle-jay-40" 1,
+      ":light-sapphire-serval-22" 1},
      :cardinality 100},
     :last_seen
     {:data-type "string",
-     :distinct 1,
+     :distinct 3,
      :group-by? true,
-     :commons {"34 seconds" 11},
-     :cardinality 9}},
-   :rowcount 11},
-  :viz-shapes
+     :commons {"9 seconds" 10, "10 seconds" 1, "13 minutes, 40 seconds" 1},
+     :cardinality 25}},
+   :rowcount 12},
+  :tmp--1844510639-hist-sys
   {:fields
-   {:axes_logic
-    {:data-type "string",
-     :distinct 26,
-     :group-by? true,
-     :commons
-     {"{:x [:and :dimension? [:or :looks-like-date? :looks-like-datetime? :is-date? :is-datetime?]], :y [:measure?]}"
-      3,
-      "{:x [:and :dimension? [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :color [:and :dimension? [:or :low-cardinality? :very-low-cardinality?] [:or :is-string? :is-year? :is-month?] [:and [:not :is-date?] [:not :is-datetime?]]], :y [:measure?]}"
-      3,
-      "{:x [:or [:and :dimension? [:or :low-cardinality? :very-low-cardinality? :medium-cardinality?]] [:or :looks-like-date? :looks-like-datetime? :is-date? :is-datetime?]], :y [:measure?]}"
-      3},
-     :cardinality 70},
-    :base_score
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {1 37},
-     :cardinality 2},
-    :connection_id
+   {:kp
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"system-db" 37},
-     :cardinality 2},
-    :library_shapes
+     :commons {"[:block-8619 :views :hi]" 2},
+     :cardinality 50},
+    :key
     {:data-type "string",
-     :distinct 36,
+     :distinct 1,
+     :group-by? true,
+     :commons {":hi" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-8619" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
      :group-by? true,
      :commons
-     {"[:box :child [:vega-lite {:width \"container\", :height :panel-height+50, :autosize \"none\", :padding {:top 0, :bottom 0, :left 0, :right 0}, :params [{:name \"tx\", :expr \"width/2\"} {:name \"ty\", :expr \"height/2\"} {:name \"zoom_precise\", :value 4, :bind {:input \"range\", :min 2, :max 30, :step 0.05}} {:name \"centerY\", :value 38.76, :bind {:input \"range\", :min -60, :max 60, :step 0.01}} {:name \"centerX\", :value -97.17, :bind {:input \"range\", :min -180, :max 180, :step 0.01}} {:name \"baseTileSize\", :value 256} {:name \"tileUrl\", :value \"https://a.tile.openstreetmap.org/\"} {:name \"zoom\", :expr \"ceil(zoom_precise)\"} {:name \"tilesCount\", :expr \"pow(2,zoom)\"} {:name \"tileSize\", :expr \"baseTileSize*pow(2,zoom_precise-zoom)\"} {:name \"maxTiles\", :expr \"ceil(max(height,width)/tileSize +1)\"} {:name \"basePoint\", :expr \"invert('projection',[0,0])\"} {:name \"dii\", :expr \"((basePoint[0]+180)/360*tilesCount)\"} {:name \"di\", :expr \"floor(dii)\"} {:name \"dx\", :expr \"round((floor(dii)-dii)*tileSize)\"} {:name \"djj\", :expr \"((1-log(tan(basePoint[1]*PI/180) + 1/cos(basePoint[1]*PI/180))/PI)/2 *tilesCount)\"} {:name \"dj\", :expr \"floor(djj)\"} {:name \"dy\", :expr \"round((floor(djj)-djj)*tileSize)\"} {:name \"scale\", :expr \"baseTileSize * pow(2,zoom_precise) / (2 * PI)\"}], :layer [[:if :condi/geo-background? {:data {:name \"tile_list\", :sequence {:start 0, :stop {:signal \"maxTiles\"}, :as \"a\"}}, :transform [{:calculate \"sequence(0,maxTiles)\", :as \"b\"} {:flatten [\"b\"]} {:calculate \"tileUrl+zoom+'/'+(datum.a+di+tilesCount)%tilesCount+'/'+((datum.b+dj))+'.png'\", :as \"url\"} {:calculate \"(datum.a * tileSize + dx)+(tileSize/2)\", :as \"x\"} {:calculate \"(datum.b * tileSize + dy)+(tileSize/2)\", :as \"y\"}], :mark {:type \"image\", :opacity 0.5, :background \"#000000\", :fill \"#000000\", :width {:signal \"tileSize\"}, :height {:signal \"tileSize\"}}, :encoding {:x {:field \"x\", :type \"quantitative\", :scale nil}, :y {:field \"y\", :type \"quantitative\", :scale nil}, :url {:field \"url\", :type \"nominal\"}}} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/us-counties? {:data {:name \"us-counties\", :url \"https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json\", :format {:type \"topojson\", :feature \"counties\"}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}, :mark \"geoshape\", :transform [{:lookup :id, :from {:data {:values :query-preview}, :key :county-field, :fields [:county-field :color-field]}}], :encoding {:color {:field :color-field, :type \"nominal\", :scale {:scheme \"spectral\"}}, :stroke {:value \"#FFA50077\"}, :strokeWidth {:value 2}}, :background \"transparent\"} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/us-states? {:data {:name \"us-states\", :url \"https://raw.githubusercontent.com/vega/vega/61dd8b1fdb9a268dc80c986938a5983d27cf8f2c/docs/data/us-10m.json\", :format {:type \"topojson\", :feature \"states\"}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}, :mark \"geoshape\", :encoding {:stroke {:value \"#FFA50077\"}, :strokeWidth {:value 2}}, :background \"transparent\"} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}] [:if :condi/country-lines? {:data {:name \"world\", :url \"https://vega.github.io/vega-datasets/data/world-110m.json\", :format {:type \"topojson\", :feature \"countries\"}}, :mark \"geoshape\", :encoding {:fill {:value \"#FFA500\"}, :fillOpacity {:value 0.1}, :stroke {:value \"#FFA500\"}, :strokeWidth {:value 2}}, :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}} {:mark \"geoshape\", :projection {:type \"mercator\", :scale {:expr \"scale\"}, :center [{:signal \"centerX\"} {:signal \"centerY\"}], :translate [{:signal \"tx\"} {:signal \"ty\"}]}}]], :background \"transparent\", :config {:view {:stroke \"transparent\"}}} {:actions false}]]"
-      2,
-      "[:nivo-treemap {:orientLabel false, :labelTextColor \"#000000\", :tile \"squarify\", :identity :name, :labelSkipSize 12, :borderColor \"#000000\", :value :y-field, :enableLabel true, :width :panel-width+70, :parentLabelPosition \"top\", :colors {:scheme \"nivo\"}, :transformation-map {:transform-select [[[:sum :y-field] :y-field] [:x2-field :name]], :from [:data], :nest-by [:x1-field :x2-field]}, :theme :theme/nivo-defaults, :leavesOnly false, :click {:c :x1-field, :x :x2-field, :y :y-field}, :label :name, :parentLabelSize 22, :parentLabelTextColor \"#ffffff\", :enableParentLabel true, :parentLabel \"id\", :height :panel-height+50, :margin {:top 15, :right 5, :bottom 15, :left 15}, :data :query-preview}]"
-      1,
-      "[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
-      1},
-     :cardinality 97},
-    :selected_view
+     {"([10 1 4] [10 1 3] [10 1 2 :margin-top] [10 1 2 :font-size] [10 1 2] [10 1 1] [10 1 0] [10 1] [10 0 2 1] [10 0 2 0] [10 0 2] [10 0 1] [10 0 0] [10 0] [10] [9] [8 :transition] [8 :font-weight] [8 :color] [8 :font-size] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :jvm-stats-drag-40/used_memory_mb.0]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"server mb\"]]]"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :jvm-stats-drag-40/used_memory_mb.0]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"server mb\"]]]"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
+  :tmp--2029697965-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-11070 :views :hi]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":hi" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-11070" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([10 1 4] [10 1 3] [10 1 2 :margin-top] [10 1 2 :font-size] [10 1 2] [10 1 1] [10 1 0] [10 1] [10 0 2 1] [10 0 2 0] [10 0 2] [10 0 1] [10 0 0] [10 0] [10] [9] [8 :transition] [8 :font-weight] [8 :color] [8 :font-size] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :jvm-stats-drag-40/thread_count.0]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"server threads\"]]]"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :jvm-stats-drag-40/thread_count.0]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"server threads\"]]]"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
+  :tmp--1540690333-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-8179 :queries :client-stats-drag-33]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":client-stats-drag-33" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-8179" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([:col-widths :client_name] [:col-widths :ack] [:col-widths :client_latency] [:col-widths :ts] [:col-widths :memory] [:col-widths :recent_messages_per_second] [:col-widths :client_subs] [:col-widths :push] [:col-widths :server_subs] [:col-widths] [:style-rules [:* :highlight-8717] :style :border] [:style-rules [:* :highlight-8717] :style] [:style-rules [:* :highlight-8717] :logic 2] [:style-rules [:* :highlight-8717] :logic 1] [:style-rules [:* :highlight-8717] :logic 0] [:style-rules [:* :highlight-8717] :logic] [:style-rules [:* :highlight-8717]] [:style-rules] [:_last-run] [:from 0 1] [:from 0 0] [:from 0] [:from] [:order-by 0 1] [:order-by 0 0] [:order-by 0] [:order-by] [:refresh-every] [:cache?] [:select 10] [:select 9] [:select 8] [:select 7] [:select 6] [:select 5] [:select 4] [:select 3] [:select 2] [:select 1] [:select 0] [:select])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:select [:ack :client_latency :client_name :client_subs :last_seen :last_seen_seconds :push :recent_messages_per_second :server_subs :memory :ts], :cache? false, :refresh-every 20, :order-by [[:client_name :asc]], :from [[:client_stats :ww254]], :_last-run \"06:04:42\", :style-rules {[:* :highlight-8717] {:logic [:= :client_name :*client-name-str], :style {:border \"1px solid #cac18255\"}}}, :col-widths {:server_subs 111, :push 91, :client_subs 111, :recent_messages_per_second 251, :memory 111, :ts 151, :client_latency 141, :ack 81, :client_name 231}}"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:select [:ack :client_latency :client_name :client_subs :last_seen :last_seen_seconds :push :recent_messages_per_second :server_subs :memory :ts], :cache? false, :refresh-every 20, :order-by [[:client_name :asc]], :from [[:client_stats :ww254]], :_last-run \"06:04:42\", :style-rules {[:* :highlight-8717] {:logic [:= :client_name :*client-name-str], :style {:border \"1px solid #cac18255\"}}}, :col-widths {:server_subs 111, :push 91, :client_subs 111, :recent_messages_per_second 251, :memory 111, :ts 151, :client_latency 141, :ack 81, :client_name 231}}"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
+  :query-11325 {:fields {}, :rowcount 0},
+  :tmp-769805907-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-4109 :views :cell-drop-7398]" 5},
+     :cardinality 20},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":cell-drop-7398" 5},
+     :cardinality 20},
+    :updated
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"2024-05-29 19:16:40" 2, "2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 80},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":views" 5},
+     :cardinality 20},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-4109" 5},
+     :cardinality 20},
+    :diff_kp
     {:data-type "string",
      :distinct 3,
      :group-by? true,
-     :commons {"" 33, ":reech" 3, ":grid" 1},
-     :cardinality 8},
-    :run_id
-    {:data-type "integer",
+     :commons
+     {"([10 1 4] [10 1 3] [10 1 2 :margin-top] [10 1 2 :font-size] [10 1 2] [10 1 1] [10 1 0] [10 1] [10 0 2 1] [10 0 2 0] [10 0 2] [10 0 1] [10 0 0] [10 0] [10] [9] [8 :transition] [8 :font-weight] [8 :color] [8 :font-size] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      2,
+      "([10 1 2 :margin-top] [10 1 2] [10 1 1] [10 1 0] [10 1] [10 0] [10] [9] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      2,
+      "([10 1 4] [10 1 3] [10 1 2] [10 1 1] [10 1 0] [10 1] [10 0] [10] [9] [8] [7] [6] [5] [4] [3] [2] [1] [0])"
+      1},
+     :cardinality 60},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":prominent-plum-serval-0" 4, ":instantaneous-emerald-toad-33" 1},
+     :cardinality 40},
+    :pre_data
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"nil" 2,
+      "[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"60px\", :color \"#8884d8\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>memory]] [:box :style {:font-size \"18px\", :margin-top \"-12px\"} :child \"js used heap (mb)\"]]]"
+      1,
+      "[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"60px\", :color \"#8884d8\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>memory]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"js used heap (mb)\"]]]"
+      1},
+     :cardinality 80},
+    :diff
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"60px\", :color \"#8884d8\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>memory]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"js used heap (mb)\"]]]"
+      2,
+      "[nil nil nil nil nil nil nil nil nil nil [nil [nil nil {:margin-top \"-15px\"}]]]"
+      1,
+      "[nil nil nil nil nil nil nil nil nil nil [nil [nil nil {:margin-top \"-12px\"}]]]"
+      1},
+     :cardinality 80},
+    :data
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"60px\", :color \"#8884d8\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>memory]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"js used heap (mb)\"]]]"
+      2,
+      "[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"60px\", :color \"#8884d8\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>memory]] [:box :style {:font-size \"18px\", :margin-top \"-15px\"} :child \"js used heap (mb)\"]]]"
+      1,
+      "[:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"60px\", :color \"#8884d8\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>memory]] [:box :style {:font-size \"18px\", :margin-top \"-12px\"} :child \"js used heap (mb)\"]]]"
+      1},
+     :cardinality 80}},
+   :rowcount 5},
+  :tmp-1149099949-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {0 37},
-     :cardinality 2},
-    :shape_name
+     :commons {"[:block-901 :queries :gen-viz-1002-clone-38]" 2},
+     :cardinality 50},
+    :key
     {:data-type "string",
-     :distinct 37,
+     :distinct 1,
      :group-by? true,
-     :commons
-     {"scatterplot_nivo_color" 1, "point_map_freq" 1, "basic_h_bar_avg_color" 1},
+     :commons {":gen-viz-1002-clone-38" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
      :cardinality 100},
-    :sql_maps
+    :type
     {:data-type "string",
-     :distinct 23,
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-901" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
      :group-by? true,
      :commons
-     {"[{:select [[[[:sum :y-field]] :y-field] :x-field], :from [:table], :group-by [:x-field]}]"
-      8,
-      "[{:select [[[[:sum :y-field]] :y-field] :x-field :color-field], :from [:table], :group-by [:x-field :color-field]}]"
-      5,
-      "[{:select [[[[:sum :y-field]] :agg] :x-field], :from [:table], :order-by [[:x-field :desc]], :group-by [:x-field]} {:select [[[:max [:round [:raw [\"(100 * ((\" :query-preview/agg.0 \".0 - \" :query-preview/agg.1 \".0) / \" :query-preview/agg.0 \".0))\"]] 2]] :diff]]}]"
+     {"([:post-process-fn] [:select 1 1] [:select 1 0 1] [:select 1 0 0] [:select 1 0] [:select 1] [:select 0 1] [:select 0 0 1 1] [:select 0 0 1 0] [:select 0 0 1] [:select 0 0 0] [:select 0 0] [:select 0] [:select] [:order-by 0 1] [:order-by 0 0] [:order-by 0] [:order-by] [:from 0 1] [:from 0 0 :select 1] [:from 0 0 :select 0 1] [:from 0 0 :select 0 0 0 1] [:from 0 0 :select 0 0 0 0] [:from 0 0 :select 0 0 0] [:from 0 0 :select 0 0] [:from 0 0 :select 0] [:from 0 0 :select] [:from 0 0 :order-by 0 1] [:from 0 0 :order-by 0 0] [:from 0 0 :order-by 0] [:from 0 0 :order-by] [:from 0 0 :from 0 :order-by 0 1] [:from 0 0 :from 0 :order-by 0 0] [:from 0 0 :from 0 :order-by 0] [:from 0 0 :from 0 :order-by] [:from 0 0 :from 0 :from 0 1] [:from 0 0 :from 0 :from 0 0] [:from 0 0 :from 0 :from 0] [:from 0 0 :from 0 :from] [:from 0 0 :from 0 :select 8] [:from 0 0 :from 0 :select 7] [:from 0 0 :from 0 :select 6] [:from 0 0 :from 0 :select 5] [:from 0 0 :from 0 :select 4] [:from 0 0 :from 0 :select 3 1] [:from 0 0 :from 0 :select 3 0 3] [:from 0 0 :from 0 :select 3 0 2] [:from 0 0 :from 0 :select 3 0 1] [:from 0 0 :from 0 :select 3 0 0] [:from 0 0 :from 0 :select 3 0] [:from 0 0 :from 0 :select 3] [:from 0 0 :from 0 :select 2 1] [:from 0 0 :from 0 :select 2 0] [:from 0 0 :from 0 :select 2] [:from 0 0 :from 0 :select 1] [:from 0 0 :from 0 :select 0] [:from 0 0 :from 0 :select] [:from 0 0 :from 0] [:from 0 0 :from] [:from 0 0 :group-by 0] [:from 0 0 :group-by] [:from 0 0] [:from 0] [:from] [:refresh-every] [:_last-run] [:group-by 0] [:group-by] [:limit] [:cache?])"
       2},
-     :cardinality 62}},
-   :rowcount 37},
-  :query-11325 {:fields {}, :rowcount 0},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :limit 24, :group-by [2], :_last-run \"06:02:36\", :refresh-every 300, :from [[{:group-by [:ts1], :from [{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]}], :order-by [[:ts1 :asc]], :select [[[[:avg :used_memory_mb]] :used_memory_mb] :ts1]} :mm308]], :order-by [[2 :desc]], :select [[[:round [:avg :used_memory_mb]] :used_memory_mb] [[:raw \"strftime('%d-%H', ts1)\"] :ts1]], :post-process-fn (fn [x] (vec (for [idx (range (count x)) :let [rx (vec (reverse x)) prev-row (get rx (- idx 1) {:used_memory_mb 0}) row (get rx idx {:used_memory_mb 0}) pre-mb (get prev-row :used_memory_mb) mb (get row :used_memory_mb) diff (Math/round (- mb pre-mb)) pos (cond (> diff 0) \"+\" (< diff 0) \"\" :else \"\")]] (merge row {:diff (if (= idx 0) (str (Math/round mb) \" MB\") (str pos diff))}))))}"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :limit 24, :group-by [2], :_last-run \"06:02:36\", :refresh-every 300, :from [[{:group-by [:ts1], :from [{:select [:sql_cache_size :thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :queries_run :sniffs_run :internal_queries_run :used_memory_mb :ws_peers], :from [[:jvm_stats :kke192]], :order-by [[3 :desc]]}], :order-by [[:ts1 :asc]], :select [[[[:avg :used_memory_mb]] :used_memory_mb] :ts1]} :mm308]], :order-by [[2 :desc]], :select [[[:round [:avg :used_memory_mb]] :used_memory_mb] [[:raw \"strftime('%d-%H', ts1)\"] :ts1]], :post-process-fn (fn [x] (vec (for [idx (range (count x)) :let [rx (vec (reverse x)) prev-row (get rx (- idx 1) {:used_memory_mb 0}) row (get rx idx {:used_memory_mb 0}) pre-mb (get prev-row :used_memory_mb) mb (get row :used_memory_mb) diff (Math/round (- mb pre-mb)) pos (cond (> diff 0) \"+\" (< diff 0) \"\" :else \"\")]] (merge row {:diff (if (= idx 0) (str (Math/round mb) \" MB\") (str pos diff))}))))}"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
+  :tmp-937003173-hist-sys
+  {:fields
+   {:kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"[:block-7876 :queries :new-query]" 2},
+     :cardinality 50},
+    :key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":new-query" 2},
+     :cardinality 50},
+    :updated
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-05-29 03:22:26" 1, "2024-05-29 06:29:42" 1},
+     :cardinality 100},
+    :type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":queries" 2},
+     :cardinality 50},
+    :panel_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {":block-7876" 2},
+     :cardinality 50},
+    :diff_kp
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"([:post-process-fn] [:select 1 1] [:select 1 0 3] [:select 1 0 2] [:select 1 0 1] [:select 1 0 0] [:select 1 0] [:select 1] [:select 0 1] [:select 0 0 0 1] [:select 0 0 0 0] [:select 0 0 0] [:select 0 0] [:select 0] [:select] [:connection-id] [:order-by 0 1] [:order-by 0 0] [:order-by 0] [:order-by] [:from 0 :order-by 0 1] [:from 0 :order-by 0 0] [:from 0 :order-by 0] [:from 0 :order-by] [:from 0 :from 0 1] [:from 0 :from 0 0] [:from 0 :from 0] [:from 0 :from] [:from 0 :where 2] [:from 0 :where 1] [:from 0 :where 0] [:from 0 :where] [:from 0 :select 6] [:from 0 :select 5] [:from 0 :select 4] [:from 0 :select 3] [:from 0 :select 2] [:from 0 :select 1] [:from 0 :select 0] [:from 0 :select] [:from 0] [:from] [:refresh-every] [:_last-run] [:group-by 0] [:group-by] [:limit] [:where 2] [:where 1] [:where 0] [:where] [:cache?])"
+      2},
+     :cardinality 50},
+    :client_name
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {":instantaneous-emerald-toad-33" 1, ":prominent-plum-serval-0" 1},
+     :cardinality 100},
+    :pre_data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 2},
+     :cardinality 50},
+    :diff
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :where [:= :client_name :*client-name-str], :limit 26, :group-by [2], :_last-run \"06:04:53\", :refresh-every 230, :from [{:select [:client_name :recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts], :where [:= :client_name :*client-name-str], :from [[:client_memory :ee183]], :order-by [[:mem_time :desc]]}], :order-by [[:ts :desc]], :connection-id \"system-db\", :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 13] :ts_hour]], :post-process-fn (fn [x] (vec (for [idx (range (count x)) :let [rx (vec (reverse x)) prev-row (get rx (- idx 1) {:mem_used 0}) row (get rx idx {:mem_used 0}) pre-mb (/ (get prev-row :mem_used) 1048576) mb (/ (get row :mem_used) 1048576) diff (Math/round (- mb pre-mb)) pos (cond (> diff 0) \"+\" (< diff 0) \"\" :else \"\")]] (merge row {:diff (if (= idx 0) (str (Math/round mb) \" MB\") (str pos diff))}))))}"
+      2},
+     :cardinality 50},
+    :data
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons
+     {"{:cache? false, :where [:= :client_name :*client-name-str], :limit 26, :group-by [2], :_last-run \"06:04:53\", :refresh-every 230, :from [{:select [:client_name :recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts], :where [:= :client_name :*client-name-str], :from [[:client_memory :ee183]], :order-by [[:mem_time :desc]]}], :order-by [[:ts :desc]], :connection-id \"system-db\", :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 13] :ts_hour]], :post-process-fn (fn [x] (vec (for [idx (range (count x)) :let [rx (vec (reverse x)) prev-row (get rx (- idx 1) {:mem_used 0}) row (get rx idx {:mem_used 0}) pre-mb (/ (get prev-row :mem_used) 1048576) mb (/ (get row :mem_used) 1048576) diff (Math/round (- mb pre-mb)) pos (cond (> diff 0) \"+\" (< diff 0) \"\" :else \"\")]] (merge row {:diff (if (= idx 0) (str (Math/round mb) \" MB\") (str pos diff))}))))}"
+      2},
+     :cardinality 50}},
+   :rowcount 2},
   :query-291
   {:fields
    {:rowcnt
@@ -1318,37 +2251,58 @@
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 2,
+     :distinct 23,
      :group-by? true,
-     :commons {"-137" 1, "1782 MB" 1},
-     :cardinality 100},
+     :commons {"+41" 2, "-6" 1, "+47" 1},
+     :cardinality 95},
     :used_memory_mb
     {:data-type "float",
-     :distinct 2,
+     :distinct 24,
      :group-by? true,
-     :commons {1645 1, 1782 1},
+     :commons {3513 1, 3245 1, 3053 1},
      :cardinality 100},
     :ts1
     {:data-type "string",
-     :distinct 2,
+     :distinct 24,
      :group-by? true,
-     :commons {"26-06" 1, "26-05" 1},
+     :commons {"28-23" 1, "29-17" 1, "29-12" 1},
      :cardinality 100}},
-   :rowcount 2},
+   :rowcount 24},
   :reco-counts {:fields {}, :rowcount 0}},
  :default-col-widths
- {:block-494 {:jvm-stats-drag-40 100},
-  :block-8179 {:client-stats-drag-33 141},
-  :block-3438 {:new-query-1 112},
-  :block-7876 {:new-query 170},
-  :block-9727 {:gen-viz-553 170},
-  :block-901 {:gen-viz-1002-clone-38 170},
-  :block-10778 {:gen-viz-1002 127}},
+ {:block-494
+  {:jvm-stats-drag-40 100,
+   :jvm-stats-drag-40-hist-842076301579 100,
+   :jvm-stats-drag-40-hist-1092076301579 100},
+  :block-8179
+  {:client-stats-drag-33 141,
+   :client-stats-drag-33-hist-63-697048898 100,
+   :client-stats-drag-33-hist-1-697048898 100},
+  :block-3438
+  {:new-query-1 112,
+   :new-query-1-hist-119-5281255 ##Inf,
+   :new-query-1-hist-22-5281255 ##Inf},
+  :block-10778
+  {:gen-viz-1002 127,
+   :gen-viz-1002-hist-721662951003 177,
+   :gen-viz-1002-hist-1031662951003 177},
+  :block-7876
+  {:new-query 170,
+   :new-query-hist-651346511255 253,
+   :new-query-hist-211346511255 253},
+  :block-9727
+  {:gen-viz-553 170,
+   :gen-viz-553-hist-771571579950 237,
+   :gen-viz-553-hist-611571579950 237},
+  :block-901
+  {:gen-viz-1002-clone-38 170,
+   :gen-viz-1002-clone-38-hist-82-537221545 487,
+   :gen-viz-1002-clone-38-hist-107-537221545 487}},
  :runstream-drops nil,
- :data-hash -1302297514,
+ :data-hash 268470763,
  :tabs ["welcome to the party pal" "reassuring sand dollar" "byzantium rabbit"],
  :auto-run? true,
- :selected-cols nil,
+ :selected-cols {},
  :server
  {:settings
   {:harvest-on-boot? true,
@@ -1562,66 +2516,65 @@
  :runstreams nil,
  :editor? false,
  :buffy? false,
- :memory [375650318 318247670 4294705152],
+ :memory [488232420 459363028 4294705152],
  :sched
- {:jvm-stats-drag-40 210790,
-  :gen-viz-1002 210790,
-  :gen-viz-553 210790,
-  :new-query-1 210790,
-  :gen-viz-1002-clone-38 210790,
-  :client-stats-drag-33 210330,
-  :new-query 210550},
+ {:jvm-stats-drag-40 46235,
+  :gen-viz-1002 46235,
+  :gen-viz-553 46235,
+  :new-query-1 46235,
+  :gen-viz-1002-clone-38 46235,
+  :new-query 46255,
+  :client-stats-drag-33 46093},
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-26 06:04:24",
+      :at "2024-05-29 19:17:33",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
- [:client/*client-name*>stats>recent-messages-per-second
-  :server/uptime
-  :client/*client-name*>stats>memory
-  :flow/live-scratch-flow>*running?
+ [:client/*client-name*>stats>client-latency
   :client/*client-name*>stats>messages-per-second
-  :client/*client-name*>stats>client-latency],
- :client-name :brilliant-gold-mallard-13,
+  :client/*client-name*>stats>memory
+  :client/*client-name*>stats>recent-messages-per-second
+  :server/uptime
+  :flow/live-scratch-flow>*running?],
+ :client-name :prominent-plum-serval-0,
  :flow-editor? true,
  :openai-api-key "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",
  :window {:w 2437, :h 1520},
  :post-meta
- {:gen-viz-553 {:* {:rowcount 7}},
-  :status-drag-0 {:* {:rowcount 132}},
-  :new-query {:* {:rowcount 2}},
+ {:gen-viz-553 {:* {:rowcount 18}},
+  :status-drag-0 {:* {:rowcount 12578}},
+  :new-query {:* {:rowcount 14}},
   :new-query-1 {:* {:rowcount 50}},
   :client-stats-drag-33 {:* {:rowcount 11}},
   :query-4704 {:* {:rowcount 0}},
-  :jvm-stats-drag-40 {:* {:rowcount 212}},
-  :gen-viz-1002 {:* {:rowcount 7}},
-  :status-drag-28 {:* {:rowcount 11}},
+  :jvm-stats-drag-40 {:* {:rowcount 15640}},
+  :gen-viz-1002 {:* {:rowcount 18}},
+  :status-drag-28 {:* {:rowcount 12}},
   :tests-drag-12 {:* {:rowcount 0}},
   :query-11325 {:* {:rowcount 0}},
   :query-291 {:* {:rowcount 1}},
   :query-6018 {:* {:rowcount 0}},
-  :gen-viz-1002-clone-38 {:* {:rowcount 2}}},
+  :gen-viz-1002-clone-38 {:* {:rowcount 24}}},
  :status
  {:heartbeat
   {:kick
-   [:client/*client-name*>stats>recent-messages-per-second
-    :server/uptime
-    :client/*client-name*>stats>memory
-    :flow/live-scratch-flow>*running?
+   [:client/*client-name*>stats>client-latency
     :client/*client-name*>stats>messages-per-second
-    :client/*client-name*>stats>client-latency]}},
+    :client/*client-name*>stats>memory
+    :client/*client-name*>stats>recent-messages-per-second
+    :server/uptime
+    :flow/live-scratch-flow>*running?]}},
  :screen-name "server-stats",
  :recos-page2 0,
  :selected-tab "welcome to the party pal",
- :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
@@ -1632,66 +2585,51 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   210326
-   1100038046]],
+   46089
+   -1247625457]],
  :recos-page 0,
- :repl-output
- {:client-stats-drag-33
-  {:error
-   "java.sql.SQLTransientConnectionException: system-db - Connection is not available, request timed out after 30001ms."},
-  :new-query
-  {:error
-   "java.sql.SQLTransientConnectionException: system-db - Connection is not available, request timed out after 30000ms."}},
  :rs-overrides-hashmap {},
  :base-sniff-queries
  {:jvm_stats 1498154063, :kke192 -995149087, :client_stats -175748261},
- :panels-hash 2945433,
+ :panels-hash 343611115,
  :sessions
- (["light-sapphire-serval-22.edn" "1 hour, 29 minutes, 39 seconds" 5379949]
-   ["smile-elliptic-heron-10.edn" "1 hour, 31 minutes, 18 seconds" 5478558]
-   ["generous-globular-hog-18.edn" "10 hours, 13 minutes, 18 seconds" 36798686]
+ (["prominent-plum-serval-0.edn" "1 minute, 10 seconds" 70398]
+   ["beaming-gray-opossum-6.edn" "1045 hours, 15 minutes, 7 seconds" 3762907993]
    ["certain-icosahedral-hound-19.edn"
-    "1008 hours, 30 minutes, 44 seconds"
-    3630644107]
-   ["wholesome-salmon-peafowl-19.edn" "102 hours, 0 second" 367200112]
-   ["trusting-cerise-gnu-5.edn" "1034 hours, 49 minutes, 0 second" 3725340398]
-   ["meritorious-hexagonal-louse-7.edn"
-    "1034 hours, 55 minutes, 11 seconds"
-    3725711398]
-   ["happy-prismatic-hornet-6.edn" "1035 hours, 35 minutes, 26 seconds" 3728126045]
-   ["pleasurable-spherical-louse-10.edn"
-    "1035 hours, 55 minutes, 47 seconds"
-    3729347145]),
+    "1093 hours, 44 minutes, 7 seconds"
+    3937447921]
+   ["nutritious-ovoid-spider-1.edn" "110 hours, 24 minutes, 53 seconds" 397493220]
+   ["fine-short-pronghorn-35.edn" "110 hours, 27 minutes, 38 seconds" 397658788]
+   ["thrilling-jungle-green-horse-40.edn"
+    "110 hours, 32 minutes, 23 seconds"
+    397943382]
+   ["knowledgeable-linear-yellow-jacket-12.edn"
+    "111 hours, 24 minutes, 0 second"
+    401040353]
+   ["legendary-cylindrical-panda-41.edn"
+    "112 hours, 14 minutes, 54 seconds"
+    404094892]
+   ["famous-desert-lion-36.edn" "112 hours, 24 minutes, 46 seconds" 404686349]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
-   :persist? false,
-   :type :clojure,
-   :default -1,
-   :data (+ 1 2 3 88)},
+   :type :clojure2,
+   :data (+ 1 2 3 88 (rand-int 1234))},
   :dazzling-gnu-solver
   {:signal :signal/hourly?,
-   :persist? false,
    :type :clojure,
-   :default -1,
-   :data (+ 1 2 3 90)},
-  :polished-kangaroo-solver
+   :cache? true,
+   :data (+ 1 2 3 90 (rand-int 12345))},
+  :static-data
   {:signal :signal/genius-gnat-signal,
-   :persist? false,
    :type :clojure,
-   :default -1,
-   :data (+ 1 2 3 50)},
-  :color-theft
-  {:signal :signal/every-5-minutes,
-   :persist? false,
-   :type :flow,
-   :default -1,
-   :data {:flowmap "node-color-thief-js", :opts {}, :return nil}},
+   :data
+   [(apply + [1 2 3])
+    :solver/wallpaper-of-the-moment
+    :solver/wallpaper-of-the-moment-8k]},
   :wallpaper-of-the-moment-8k
   {:signal :signal/every-5-minutes,
-   :persist? false,
    :type :clojure2,
-   :default -1,
    :data
    (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
          rel-dir "./images/large/"
@@ -1706,9 +2644,7 @@
      (str rel-dir random-file))},
   :wallpaper-of-the-moment
   {:signal :signal/every-5-minutes,
-   :persist? false,
    :type :clojure,
-   :default -1,
    :data
    (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
          rel-dir "./images/large/"
@@ -1721,19 +2657,40 @@
                  (map (fn [x] (.getName x)))
                  (shuffle))
          random-file (first files)]
-     (str rel-dir random-file))}},
+     (str rel-dir random-file))},
+  :png-wallpaper?
+  {:signal :signal/changed-wallpaper?,
+   :type :clojure,
+   :cache? true,
+   :data
+   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))},
+  :colors-of-the-moment-8k
+  {:signal :signal/changed-wallpaper-8k?,
+   :cache? false,
+   :type :flow,
+   :data
+   {:flowmap "node-color-thief-js-webp",
+    :opts {:overrides {:image-path :solver/wallpaper-of-the-moment-8k}},
+    :return nil}},
+  :colors-of-the-moment
+  {:signal :signal/changed-wallpaper?,
+   :cache? false,
+   :type :flow,
+   :data
+   {:flowmap "node-color-thief-js-webp",
+    :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
+    :return nil}}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1167421697,
+ :user-params-hash -925812560,
  :grid-recos? true,
- :preview-keys2 [],
- :session-hash 808328223,
+ :session-hash -1175337577,
  :no-ui? true,
  :resolved-queries
  {:gen-viz-553
   {:cache? false,
    :limit 18,
    :group-by [3],
-   :_last-run "06:02:35",
+   :_last-run "19:15:16",
    :refresh-every 300,
    :from
    [{:select
@@ -1764,7 +2721,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 26,
    :group-by [2],
-   :_last-run "06:04:53",
+   :_last-run "19:17:01",
    :refresh-every 230,
    :from
    [{:select
@@ -1821,7 +2778,7 @@
      {:background-color [:heatmap :PuRd :9 :asc],
       :border "1px solid #00000000",
       :color "#ffffff"}}},
-   :_last-run "06:02:36",
+   :_last-run "19:15:16",
    :refresh-every 300,
    :from [[:jvm_stats :zz596]],
    :order-by [[:ts :desc]],
@@ -1844,7 +2801,7 @@
    :refresh-every 20,
    :order-by [[:client_name :asc]],
    :from [[:client_stats :ww254]],
-   :_last-run "06:04:42",
+   :_last-run "19:17:57",
    :style-rules
    {[:* :highlight-8717]
     {:logic [:= :client_name :*client-name-str],
@@ -1909,12 +2866,12 @@
    :cache? false,
    :from [[:jvm_stats :kke192]],
    :order-by [[3 :desc]],
-   :_last-run "06:02:35"},
+   :_last-run "19:15:16"},
   :gen-viz-1002
   {:cache? false,
    :limit 18,
    :group-by [3],
-   :_last-run "06:02:35",
+   :_last-run "19:15:16",
    :refresh-every 300,
    :from
    [{:select
@@ -2080,7 +3037,7 @@
   {:cache? false,
    :limit 24,
    :group-by [2],
-   :_last-run "06:02:36",
+   :_last-run "19:15:16",
    :refresh-every 300,
    :from
    [[{:group-by [:ts1],
@@ -2158,7 +3115,7 @@
      :cache? false,
      :from [[:jvm_stats :kke192]],
      :order-by [[3 :desc]],
-     :_last-run "06:02:35"}},
+     :_last-run "19:15:16"}},
    :tab "welcome to the party pal",
    :minimized? false},
   :block-4808
@@ -2210,7 +3167,7 @@
     {:cache? false,
      :limit 18,
      :group-by [3],
-     :_last-run "06:02:35",
+     :_last-run "19:15:16",
      :refresh-every 300,
      :from [:query/jvm-stats-drag-40],
      :order-by [[3 :desc]],
@@ -2336,7 +3293,7 @@
      :refresh-every 20,
      :order-by [[:client_name :asc]],
      :from [[:client_stats :ww254]],
-     :_last-run "06:04:42",
+     :_last-run "19:17:57",
      :style-rules
      {[:* :highlight-8717]
       {:logic [:= :client_name :*client-name-str],
@@ -2396,7 +3353,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 26,
      :group-by [2],
-     :_last-run "06:04:53",
+     :_last-run "19:17:01",
      :refresh-every 230,
      :from
      [{:select
@@ -2522,7 +3479,7 @@
     {:cache? false,
      :limit 18,
      :group-by [3],
-     :_last-run "06:02:35",
+     :_last-run "19:15:16",
      :refresh-every 300,
      :from [:query/jvm-stats-drag-40],
      :order-by [[:ts :desc]],
@@ -2662,7 +3619,7 @@
        {:background-color [:heatmap :PuRd :9 :asc],
         :border "1px solid #00000000",
         :color "#ffffff"}}},
-     :_last-run "06:02:36",
+     :_last-run "19:15:16",
      :refresh-every 300,
      :from [[:jvm_stats :zz596]],
      :order-by [[:ts :desc]],
@@ -2713,7 +3670,7 @@
     {:cache? false,
      :limit 24,
      :group-by [2],
-     :_last-run "06:02:36",
+     :_last-run "19:15:16",
      :refresh-every 300,
      :from
      [[{:group-by [:ts1],
@@ -3042,9 +3999,9 @@
      [[:box :child [:number :client/*client-name*>stats>memory]]
       [:box
        :style
-       {:font-size "18px", :margin-top "-10px"}
+       {:font-size "18px", :margin-top "-15px"}
        :child
-       "js used heap (mb)"]]]}},
+       "client js used (mb)"]]]}},
   :block-11754
   {:name "block-5659",
    :w 4,
@@ -3294,7 +4251,7 @@
        "live clients"]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}}},
- :selected-block "none!",
+ :selected-block :block-4109,
  :signals-map
  {:fun-gorilla
   {:signal
@@ -3326,6 +4283,7 @@
   :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
   :dragging-to-potential-cross-breed?
   {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
+  :every-minute {:signal [:changed? :time/minute]},
   :every-5-minutes
   {:signal
    [:or
@@ -3341,6 +4299,12 @@
     [:= :time/minute 45]
     [:= :time/minute 50]
     [:= :time/minute 55]]},
+  :changed-wallpaper-8k?
+  {:signal
+   [:and [:<> :time/minute -1] [:changed? :solver/wallpaper-of-the-moment-8k]]},
+  :changed-wallpaper?
+  {:signal
+   [:and [:<> :time/second -1] [:changed? :solver/wallpaper-of-the-moment]]},
   :special-lion-signal
   {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
   :optimistic-sheep-signal
@@ -3410,7 +4374,7 @@
   :error-str-drag-13.* {},
   :flow {:live-scratch-flow>*running? false},
   :server
-  {:uptime "55 minutes, 39 seconds",
+  {:uptime "65 hours, 14 minutes, 10 seconds",
    :conway-render
    [:box
     :style
@@ -10670,43 +11634,47 @@
   {:*client-name*>stats>messages-per-second 0.53,
    :easy-narrow-wolf-19>stats>recent-messages-per-second nil,
    :easy-narrow-wolf-19>stats>messages-per-second nil,
+   :prominent-plum-serval-0>stats>client-latency nil,
    :upstanding-indigo-locust-39>stats>recent-messages-per-second 0.6,
+   :prominent-plum-serval-0>stats>memory nil,
    :brilliant-gold-mallard-13>stats>memory 298,
    :upstanding-indigo-locust-39>stats>client-latency 514,
+   :prominent-plum-serval-0>stats>messages-per-second nil,
    :easy-narrow-wolf-19>stats>client-latency nil,
    :upstanding-indigo-locust-39>stats>memory 1006,
    :brilliant-gold-mallard-13>stats>recent-messages-per-second 0.47,
    :upstanding-indigo-locust-39>stats>messages-per-second 0.56,
-   :*client-name*>stats>memory 306,
+   :*client-name*>stats>memory 324,
    :brilliant-gold-mallard-13>stats>client-latency 277,
-   :*client-name*>stats>recent-messages-per-second 0.73,
+   :*client-name*>stats>recent-messages-per-second 0.53,
+   :prominent-plum-serval-0>stats>recent-messages-per-second nil,
    :brilliant-gold-mallard-13>stats>messages-per-second 0.54,
-   :*client-name*>stats>client-latency 181,
+   :*client-name*>stats>client-latency 1016,
    :easy-narrow-wolf-19>stats>memory nil},
   :fields-drag-16.* {:table_name ["db_conn_drag_13" "error_str_drag_13"]},
   :param
-  {:selected-view [:queries :jvm-stats-drag-40],
+  {:selected-view [:views :cell-drop-7398],
    :selected-view-data
-   {:select
-    [:sql_cache_size
-     :thread_count
-     [:ts :ts1]
-     [[:substr :ts 0 16] :ts]
-     :queries_run
-     :sniffs_run
-     :recent_messages_per_second
-     :recent_queries_per_second
-     :internal_queries_run
-     :open_flow_channels
-     :sys_load
-     :used_memory_mb
-     :ws_peers],
-    :refresh-every 300,
-    :cache? false,
-    :from [[:jvm_stats :kke192]],
-    :order-by [[3 :desc]],
-    :_last-run "06:02:35"},
-   :selected-block :block-494},
+   [:v-box
+    :size
+    "auto"
+    :align
+    :center
+    :justify
+    :center
+    :style
+    {:font-size "60px",
+     :color "#8884d8",
+     :font-weight 700,
+     :transition "all 0.6s ease-in-out"}
+    :children
+    [[:box :child [:number :client/*client-name*>stats>memory]]
+     [:box
+      :style
+      {:font-size "18px", :margin-top "-10px"}
+      :child
+      "js used heap (mb)"]]],
+   :selected-block :block-4109},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",

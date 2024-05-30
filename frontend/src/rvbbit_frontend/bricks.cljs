@@ -2651,9 +2651,259 @@
 
 (def widget (atom nil))
 
+;; (defn highlight-codes-only [codes css hiccup-fn] ;; full note
+;;   ;; (tap> [:highlight-codes-only [codes css hiccup-fn]])
+;;   (let [css-string (ut/hiccup-css-to-string css)]
+;;     (when-let [editor @cm-instance-panel-code-box]
+;;       (let [doc (.getDoc editor)]
+;;         ;; Clear existing markers
+;;         (doseq [marker @markers-panel-code-box]
+;;           (.clear marker))
+;;         (reset! markers-panel-code-box [])
+;;         (doseq [code codes]
+;;           (let [code (str code)
+;;                 code-lines (clojure.string/split-lines code)]
+;;             (loop [line 0]
+;;               (when (< line (.lineCount doc))
+;;                 (when (clojure.string/includes? (.getLine doc line) (first code-lines))
+;;                   (let [start-line line
+;;                         end-line (loop [line start-line]
+;;                                    (when (< line (.lineCount doc))
+;;                                      (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+;;                                        line
+;;                                        (recur (inc line)))))
+;;                         start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+;;                         end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+;;                         marker (try
+;;                                  (let [node (js/document.createElement "span")
+;;                                        _ (.setAttribute node "style" css-string)
+;;                                        _ (.appendChild node (js/document.createTextNode code))
+;;                                        widget-node (js/document.createElement "div")]
+;;                                    (.addEventListener node "mouseover" (fn []
+;;                                                                          (when-not @widget
+;;                                                                            (let [react-element (reagent/as-element (hiccup-fn code))]
+;;                                                                              (rdom/render react-element widget-node)
+;;                                                                              (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))}))))))  ;; Render widget above if on last line
+;;                                    (.addEventListener node "mouseout" (fn []
+;;                                                                         (when @widget
+;;                                                                           (.clear @widget)
+;;                                                                           (reset! widget nil))))
+;;                                    (.addEventListener node "mouseleave" (fn []
+;;                                                                           (when @widget
+;;                                                                             (.clear @widget)
+;;                                                                             (reset! widget nil))))
+;;                                    (.markText doc
+;;                                               #js {:line start-line, :ch start-ch}
+;;                                               #js {:line end-line, :ch end-ch}
+;;                                               #js {:replacedWith node}))
+;;                                  (catch :default e (tap> [:marker-error (str e)])))]
+;;                     (swap! markers-panel-code-box conj marker)))
+;;                 (recur (inc line))))))))))
+
+;; (defn highlight-codes-only [codes css hiccup-fn] ;;; pre autocomplete clicks ?
+;;   (let [css-string (ut/hiccup-css-to-string css)]
+;;     (when-let [editor @cm-instance-panel-code-box]
+;;       (let [doc (.getDoc editor)]
+;;         ;; Clear existing markers
+;;         (doseq [marker @markers-panel-code-box]
+;;           (.clear marker))
+;;         (reset! markers-panel-code-box [])
+;;         (doseq [code codes]
+;;           (let [code (str code)
+;;                 code-lines (clojure.string/split-lines code)]
+;;             (loop [line 0]
+;;               (when (< line (.lineCount doc))
+;;                 (when (clojure.string/includes? (.getLine doc line) (first code-lines))
+;;                   (let [start-line line
+;;                         end-line (loop [line start-line]
+;;                                    (when (< line (.lineCount doc))
+;;                                      (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+;;                                        line
+;;                                        (recur (inc line)))))
+;;                         code-parts (let [ff (vec (clojure.string/split code #"/"))
+;;                                          vv (vec (clojure.string/split (get ff 1) #">"))
+;;                                          cc (vec (into [(first ff)] vv))] cc)
+;;                   ;;  _ (tap> [:code code :code-parts code-parts])
+;;                         ]
+;;                     (loop [code-parts code-parts
+;;                            start-ch 0]
+;;                       (when (seq code-parts)
+;;                         (let [code-part (first code-parts)
+;;                               start-ch (clojure.string/index-of (.getLine doc start-line) code-part start-ch)
+;;                               end-ch (+ start-ch (count code-part))
+;;                               marker (try
+;;                                        (let [node (js/document.createElement "span")
+;;                                              _ (.setAttribute node "style" css-string)
+;;                                              _ (.appendChild node (js/document.createTextNode code-part))
+;;                                              widget-node (js/document.createElement "div")]
+;;                                          (.addEventListener node "mouseover" (fn []
+;;                                                                                (when-not @widget
+;;                                                                                  (let [react-element (reagent/as-element (hiccup-fn code))] ;; Pass the original code to hiccup-fn
+;;                                                                                    (tap> [:hover code code-part])
+;;                                                                                    (rdom/render react-element widget-node)
+;;                                                                                    (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))}))))))  ;; Render widget above if on last line
+;;                                          (.addEventListener node "mouseout" (fn []
+;;                                                                               (when @widget
+;;                                                                                 (.clear @widget)
+;;                                                                                 (reset! widget nil))))
+;;                                          (.addEventListener node "mouseleave" (fn []
+;;                                                                                 (when @widget
+;;                                                                                   (.clear @widget)
+;;                                                                                   (reset! widget nil))))
+;;                                          (.markText doc
+;;                                                     #js {:line start-line, :ch start-ch}
+;;                                                     #js {:line end-line, :ch end-ch}
+;;                                                     #js {:replacedWith node}))
+;;                                        (catch :default e (tap> [:marker-error (str e)])))]
+;;                           (when (clojure.string/includes? (.getLine doc start-line) code-part) ;; Check if the entire code-part is present in the line
+;;                             (swap! markers-panel-code-box conj marker))
+;;                           (recur (rest code-parts) end-ch)))))) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
+;;                 (recur (inc line))))))))))
+
+(declare custom-hint-fn)
+
+;; (defn highlight-codes-only [codes css hiccup-fn]
+;;   (let [css-string (ut/hiccup-css-to-string css)]
+;;     (when-let [editor @cm-instance-panel-code-box]
+;;       (let [doc (.getDoc editor)]
+;;         ;; Clear existing markers
+;;         (doseq [marker @markers-panel-code-box]
+;;           (.clear marker))
+;;         (reset! markers-panel-code-box [])
+;;         (doseq [code codes]
+;;           (let [code (str code)
+;;                 code-lines (clojure.string/split-lines code)]
+;;             (loop [line 0]
+;;               (when (< line (.lineCount doc))
+;;                 (when (clojure.string/includes? (.getLine doc line) (first code-lines))
+;;                   (let [start-line line
+;;                         end-line (loop [line start-line]
+;;                                    (when (< line (.lineCount doc))
+;;                                      (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+;;                                        line
+;;                                        (recur (inc line)))))
+;;                         code-parts (let [ff (vec (clojure.string/split code #"/"))
+;;                                          vv (vec (clojure.string/split (get ff 1) #">"))
+;;                                          cc (vec (into [(first ff)] vv))] cc)
+;;                         full-code-parts code-parts
+;;                   ;;  _ (tap> [:code code :code-parts code-parts])
+;;                         ]
+;; (loop [code-parts code-parts
+;;        start-ch 0
+;;        code-part-start-ch 0
+;;        code-part-end-ch 0] ;; Add a new variable to track the end position of the last segment
+;;   (when (seq code-parts)
+;;     (let [code-part (first code-parts)
+;;           start-ch (clojure.string/index-of (.getLine doc start-line) code-part start-ch)
+;;           end-ch (+ start-ch (count code-part))
+;;           code-part-start-ch (if (= code-part (first full-code-parts)) start-ch code-part-start-ch) ;; Update code-part-start-ch only if it's the first segment
+;;           code-part-end-ch end-ch ;; Update code-part-end-ch at the end of each iteration
+;;           marker (try
+;;                    (let [node (js/document.createElement "span")
+;;                          _ (.setAttribute node "style" css-string)
+;;                          _ (.appendChild node (js/document.createTextNode code-part))
+;;                          widget-node (js/document.createElement "div")]
+;;                      (.addEventListener node "click" (fn [event]
+;;                                                        (let [this-token-idx (.indexOf full-code-parts code-part)
+;;                                                              token-parts (subvec full-code-parts 0 this-token-idx)
+;;                                                              seeded-token (str (first token-parts) "/" (cstr/join ">" (rest token-parts)))]
+;;                                                          (.showHint editor #js {:completeSingle false :hint (fn [] (custom-hint-fn editor seeded-token start-line code-part-start-ch code-part-end-ch))})))) ;; Use code-part-start-ch and code-part-end-ch here
+;;                      (.addEventListener node "mouseover" (fn []
+;;                                                            (when-not @widget
+;;                                                              (let [react-element (reagent/as-element (hiccup-fn code))] ;; Pass the original code to hiccup-fn
+;;                                                                ;;(tap> [:hover code code-part])
+;;                                                                (rdom/render react-element widget-node)
+;;                                                                (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))}))))))  ;; Render widget above if on last line
+;;                      (.addEventListener node "mouseout" (fn []
+;;                                                           (when @widget
+;;                                                             (.clear @widget)
+;;                                                             (reset! widget nil))))
+;;                      (.addEventListener node "mouseleave" (fn []
+;;                                                             (when @widget
+;;                                                               (.clear @widget)
+;;                                                               (reset! widget nil))))
+;;                      (.markText doc
+;;                                 #js {:line start-line, :ch start-ch}
+;;                                 #js {:line end-line, :ch end-ch}
+;;                                 #js {:replacedWith node}))
+;;                    (catch :default e (tap> [:marker-error (str e)])))]
+;;       (when (clojure.string/includes? (.getLine doc start-line) code-part) ;; Check if the entire code-part is present in the line
+;;         (swap! markers-panel-code-box conj marker))
+;;       (recur (rest code-parts) end-ch code-part-start-ch code-part-end-ch)))) ;; Recur with the rest of the code parts, the end character of the current part as the start character for the next part, and the start and end characters of the first and last segments
+                          
+;;                           )) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
+;;                 (recur (inc line))))))))))
+
+
+;; (defn highlight-codes-only [codes css hiccup-fn]
+;;   (let [css-string (ut/hiccup-css-to-string css)]
+;;     (when-let [editor @cm-instance-panel-code-box]
+;;       (let [doc (.getDoc editor)]
+;;         ;; Clear existing markers
+;;         (doseq [marker @markers-panel-code-box]
+;;           (.clear marker))
+;;         (reset! markers-panel-code-box [])
+;;         (doseq [code codes]
+;;           (let [code (str code)
+;;                 code-lines (clojure.string/split-lines code)]
+;;             (loop [line 0]
+;;               (when (< line (.lineCount doc))
+;;                 (when (clojure.string/includes? (.getLine doc line) (first code-lines))
+;;                   (let [start-line line
+;;                         end-line (loop [line start-line]
+;;                                    (when (< line (.lineCount doc))
+;;                                      (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+;;                                        line
+;;                                        (recur (inc line)))))
+;;                         code-parts (let [ff (vec (clojure.string/split code #"/"))
+;;                                          vv (vec (clojure.string/split (get ff 1) #">"))
+;;                                          cc (vec (into [(first ff)] vv))] cc)
+;;                         full-code-parts code-parts
+;;                         ;; Calculate the start and end positions of the entire match before the loop
+;;                         code-part-start-ch (clojure.string/index-of (.getLine doc start-line) (first full-code-parts))
+;;                         code-part-end-ch (+ (clojure.string/index-of (.getLine doc start-line) (last full-code-parts)) (count (last full-code-parts)))]
+;;                     (loop [code-parts code-parts
+;;                            start-ch 0]
+;;                       (when (seq code-parts)
+;;                         (let [code-part (first code-parts)
+;;                               start-ch (clojure.string/index-of (.getLine doc start-line) code-part start-ch)
+;;                               end-ch (+ start-ch (count code-part))
+;;                               marker (try
+;;                                        (let [node (js/document.createElement "span")
+;;                                              _ (.setAttribute node "style" css-string)
+;;                                              _ (.appendChild node (js/document.createTextNode code-part))
+;;                                              widget-node (js/document.createElement "div")]
+;;                                          (.addEventListener node "click" (fn [event]
+;;                                                                            (let [this-token-idx (.indexOf full-code-parts code-part)
+;;                                                                                  token-parts (subvec full-code-parts 0 this-token-idx)
+;;                                                                                  seeded-token (str (first token-parts) "/" (cstr/join ">" (rest token-parts)))]
+;;                                                                              (.showHint editor #js {:completeSingle false :hint (fn [] (custom-hint-fn editor seeded-token start-line code-part-start-ch code-part-end-ch))}))))
+;;                                          (.addEventListener node "mouseover" (fn []
+;;                                                                                (when-not @widget
+;;                                                                                  (let [react-element (reagent/as-element (hiccup-fn code))]
+;;                                                                                    (rdom/render react-element widget-node)
+;;                                                                                    (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))}))))))
+;;                                          (.addEventListener node "mouseout" (fn []
+;;                                                                               (when @widget
+;;                                                                                 (.clear @widget)
+;;                                                                                 (reset! widget nil))))
+;;                                          (.addEventListener node "mouseleave" (fn []
+;;                                                                                 (when @widget
+;;                                                                                   (.clear @widget)
+;;                                                                                   (reset! widget nil))))
+;;                                          (.markText doc
+;;                                                     #js {:line start-line, :ch start-ch}
+;;                                                     #js {:line end-line, :ch end-ch}
+;;                                                     #js {:replacedWith node}))
+;;                                        (catch :default e (tap> [:marker-error (str e)])))]
+;;                           (when (clojure.string/includes? (.getLine doc start-line) code-part)
+;;                             (swap! markers-panel-code-box conj marker))
+;;                           (recur (rest code-parts) end-ch)))))) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
+;;                     (recur (inc line))))))))))
+
 (defn highlight-codes-only [codes css hiccup-fn]
-  ;; (tap> [:highlight-codes-only [codes css hiccup-fn]])
-  (let [css-string (ut/hiccup-css-to-string css)]
+  (let [;;css-string (ut/hiccup-css-to-string css)
+        react! [@db/param-code-hover]]
     (when-let [editor @cm-instance-panel-code-box]
       (let [doc (.getDoc editor)]
         ;; Clear existing markers
@@ -2672,121 +2922,71 @@
                                      (if (clojure.string/includes? (.getLine doc line) (last code-lines))
                                        line
                                        (recur (inc line)))))
-                        start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
-                        end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
-                        marker (try
-                                 (let [node (js/document.createElement "span")
-                                       _ (.setAttribute node "style" css-string)
-                                       _ (.appendChild node (js/document.createTextNode code))
-                                       widget-node (js/document.createElement "div")]
-                                   (.addEventListener node "mouseover" (fn []
-                                                                         (when-not @widget
-                                                                           (let [react-element (reagent/as-element (hiccup-fn code))]
-                                                                             (rdom/render react-element widget-node)
-                                                                             (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))}))))))  ;; Render widget above if on last line
-                                   (.addEventListener node "mouseout" (fn []
-                                                                        (when @widget
-                                                                          (.clear @widget)
-                                                                          (reset! widget nil))))
-                                   (.addEventListener node "mouseleave" (fn []
-                                                                          (when @widget
-                                                                            (.clear @widget)
-                                                                            (reset! widget nil))))
-                                   (.markText doc
-                                              #js {:line start-line, :ch start-ch}
-                                              #js {:line end-line, :ch end-ch}
-                                              #js {:replacedWith node}))
-                                 (catch :default e (tap> [:marker-error (str e)])))]
-                    (swap! markers-panel-code-box conj marker)))
-                (recur (inc line))))))))))
+                        code-parts (let [ff (vec (clojure.string/split code #"/"))
+                                         vv (vec (clojure.string/split (get ff 1) #">"))
+                                         cc (vec (into [(first ff)] vv))] cc)
+                        full-code-parts code-parts
+                        ;; Calculate the start and end positions of the entire match before the loop
+                        code-part-start-ch (clojure.string/index-of (.getLine doc start-line) (first full-code-parts))
+                        code-part-end-ch (+ (clojure.string/index-of (.getLine doc start-line) (last full-code-parts)) (count (last full-code-parts)))]
+                    (loop [code-parts code-parts
+                           start-ch 0]
+                      (when (seq code-parts)
+                        (let [code-part (first code-parts)
+                              start-ch (clojure.string/index-of (.getLine doc start-line) code-part start-ch)
+                              end-ch (+ start-ch (count code-part))
+                              marker (try
+                                       (let [node (js/document.createElement "span")
+                                             _ (.setAttribute node "style" (ut/hiccup-css-to-string
+                                                                            (merge css (when (= (str code) (str @db/param-code-hover))
+                                                                                         ;{:filter (str (get css :filter) " scale(1.2)")}
+                                                                                         {;:transform "scale(1.2)"
+                                                                                          :box-shadow (str "0 0 10px 5px " (ut/invert-hex-color (theme-pull :theme/editor-outer-rim-color nil)))
+                                                                                          }))))
+                                             _ (.appendChild node (js/document.createTextNode code-part))
+                                             ;widget-node (js/document.createElement "div")
+                                             ]
+                                         (.addEventListener node "click" (fn []
+                                                                           (let [this-token-idx (.indexOf full-code-parts code-part)
+                                                                                 token-parts (subvec full-code-parts 0 this-token-idx)
+                                                                                 seeded-token (str (first token-parts) "/" (cstr/join ">" (rest token-parts)))]
+                                                                             (.setCursor editor #js {:line start-line, :ch code-part-start-ch})
+                                                                             (.showHint editor #js {:completeSingle false :hint (fn [] (custom-hint-fn editor seeded-token start-line code-part-start-ch code-part-end-ch))})
+                                                                             ;; Set the cursor to the end of the replacement
+                                                                             ;(.setCursor doc #js {:line end-line, :ch code-part-end-ch})
+                                                                             
+                                                                             )))
+                                         (.addEventListener node "mouseover" (fn []
+                                                                               ;(tap> [:param-code-hover code])
+                                                                              ;;  (reset! db/param-code-hover code)
+                                                                              ;;  (when-not @widget
+                                                                              ;;   ;;  (let [react-element (reagent/as-element (hiccup-fn code))]
+                                                                              ;;   ;;    (rdom/render react-element widget-node)
+                                                                              ;;   ;;    (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))})))
+                                                                              ;;    (reset! widget code)
+                                                                              ;;    (tap> [:hovered code])
+                                                                              ;;    )
+                                                                               (when-not @db/param-code-hover (reset! db/param-code-hover code))))
+                                         (.addEventListener node "mouseenter" (fn []
+                                                                               (when-not @db/param-code-hover (reset! db/param-code-hover code))))
+                                         (.addEventListener node "mouseout" (fn []
+                                                                              ;(when @db/param-code-hover
+                                                                                ;(.clear @db/param-code-hover)
+                                                                                (reset! db/param-code-hover nil)));)
+                                         (.addEventListener node "mouseleave" (fn []
+                                                                                ;(when @widget
+                                                                                  ;(.clear @db/param-code-hover)
+                                                                                  (reset! db/param-code-hover nil)));)
+                                         (.markText doc
+                                                    #js {:line start-line, :ch start-ch}
+                                                    #js {:line end-line, :ch end-ch}
+                                                    #js {:replacedWith node}))
+                                       (catch :default e (tap> [:marker-error (str e)])))]
+                          (when (clojure.string/includes? (.getLine doc start-line) code-part)
+                            (swap! markers-panel-code-box conj marker))
+                          (recur (rest code-parts) end-ch)))))) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
+                    (recur (inc line))))))))))
 
-
-
-
-
-;; (defn highlight-codes [codes hiccup-fn]
-;;   (when-let [editor @cm-instance-panel-code-box]
-;;     (let [doc (.getDoc editor)]
-;;       ;; Clear existing markers
-;;       (doseq [marker @markers-panel-code-box]
-;;         (.clear marker))
-;;       (reset! markers-panel-code-box [])
-;;       (doseq [code codes]
-;;         (let [code (str code)
-;;               _ (tap> [:highlighted-code-panel-code-box code])
-;;               code-lines (clojure.string/split-lines code)
-;;               start-line (loop [line 0]
-;;                            (when (< line (.lineCount doc))
-;;                              (if (clojure.string/includes? (.getLine doc line) (first code-lines))
-;;                                line
-;;                                (recur (inc line)))))
-;;               end-line (loop [line start-line]
-;;                          (when (< line (.lineCount doc))
-;;                            (if (clojure.string/includes? (.getLine doc line) (last code-lines))
-;;                              line
-;;                              (recur (inc line)))))
-;;               start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
-;;               end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
-;;               marker (try
-;;                        (let [node (js/document.createElement "span")
-;;                              _ (.setAttribute node "style" "display: inline;")
-;;                              react-element (reagent/as-element (hiccup-fn code))
-;;                              _ (rdom/render react-element node)
-;;                              widget-node (js/document.createElement "div")
-;;                              widget (atom nil)]
-;;                          (.addEventListener node "mouseenter" (fn []
-;;                                                                (reset! widget (.addLineWidget doc (inc end-line) widget-node))))
-;;                          (.addEventListener node "mouseover" (fn []
-;;                                                                (reset! widget (.addLineWidget doc (inc end-line) widget-node))))
-;;                          (.addEventListener node "mouseleave" (fn []
-;;                                                               (when @widget
-;;                                                                 (.clear @widget)
-;;                                                                 (reset! widget nil))))
-;;                          (.addEventListener node "mouseout" (fn []
-;;                                                               (when @widget
-;;                                                                 (.clear @widget)
-;;                                                                 (reset! widget nil))))
-;;                          (.markText doc
-;;                                     #js {:line start-line, :ch start-ch}
-;;                                     #js {:line end-line, :ch end-ch}
-;;                                     #js {:replacedWith node}))
-;;                        (catch :default e (tap> [:marker-error (str e)])))]
-;;           (swap! markers-panel-code-box conj marker))))))
-
-;; (defn highlight-codes [codes hiccup-fn]
-;;   (when-let [editor @cm-instance-panel-code-box]
-;;     (let [doc (.getDoc editor)]
-;;       ;; Clear existing markers
-;;       (doseq [marker @markers-panel-code-box]
-;;         (.clear marker))
-;;       (reset! markers-panel-code-box [])
-;;       (doseq [code codes]
-;;         (let [code (str code)
-;;               _ (tap> [:highlighted-code-panel-code-box code])
-;;               code-lines (clojure.string/split-lines code)
-;;               start-line (loop [line 0]
-;;                            (when (< line (.lineCount doc))
-;;                              (if (clojure.string/includes? (.getLine doc line) (first code-lines))
-;;                                line
-;;                                (recur (inc line)))))
-;;               end-line (loop [line start-line]
-;;                          (when (< line (.lineCount doc))
-;;                            (if (clojure.string/includes? (.getLine doc line) (last code-lines))
-;;                              line
-;;                              (recur (inc line)))))
-;;               start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
-;;               end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
-;;               marker (try
-;;                        (let [node (js/document.createElement "span")
-;;                              _ (.setAttribute node "style" "display: inline;")
-;;                              react-element (reagent/as-element (hiccup-fn code))
-;;                              _ (rdom/render react-element node)]
-;;                          (.markText doc
-;;                                     #js {:line start-line, :ch start-ch}
-;;                                     #js {:line end-line, :ch end-ch}
-;;                                     #js {:replacedWith node}))
-;;                        (catch :default e (tap> [:marker-error (str e)])))]
-;;           (swap! markers-panel-code-box conj marker))))))
 
 (defn unhighlight-code []
   (when-let [editor @cm-instance-panel-code-box]
@@ -2843,12 +3043,26 @@
          codes (vec (into themes (into flow-subs click-params)))]
      codes)))
 
-(defn custom-hint-fn [cm options]
+(defn get-surrounding-tokens [cm cursor token]
+  (try
+    (let [line (.-line cursor)
+          token (try (.-string token) (catch :default _ (str token))) 
+          line-string (.getLine cm line)
+          prev-line-string (if (> line 0) (.getLine cm (dec line)) "")
+          next-line-string (if (< line (dec (.lineCount cm))) (.getLine cm (inc line)) "")
+          big-line-string (str prev-line-string " " line-string " " next-line-string)]
+      [token big-line-string])
+    (catch :default e (tap> [:err (str e)]))))
+
+(defn custom-hint-simple-fn [cm input-token]
   (let [cursor (.getCursor cm)
         token (.getTokenAt cm cursor)]
-    (tap> ["Current token:" (.-string token)]) ;; Debugging
+    (tap> ["Current token:" (.-string token) ":input token:" input-token]) ;; Debugging
     ;; Define your list of suggestions here
-    (let [input (.-string token)
+    (let [input (.-string token) ;;(or input-token (.-string token))
+          input (if (string? input-token) input-token input)
+          surrounds (get-surrounding-tokens cm cursor token)
+          _ (tap> [:surrounds-simp surrounds])
           list (vec (map str @(rfa/sub ::parameters-available {})))
           ;list [":keyword1" ":k!" ":keyword2" ":keyword44" ":kiwi/farts" ":liwi/limes"]
           filtered-list (filter #(clojure.string/starts-with? % input) list)] ;; Dynamic filtering
@@ -2857,14 +3071,41 @@
                 :from (clj->js {:line (.-line cursor) :ch (.-start token)})
                 :to (clj->js {:line (.-line cursor) :ch (.-end token)})}))))
 
+(defn custom-hint-fn [cm input-token & [start-line start-ch end-ch]]
+  (let [cursor (clj->js {:line start-line :ch start-ch}) ;; Create a cursor object from start-line and start-ch
+        token (.getTokenAt cm cursor)
+        input (if (string? input-token) input-token (.-string token)) ;; Use input-token if it's a string, otherwise use the current token
+        surrounds (get-surrounding-tokens cm cursor input-token)
+        _ (tap> [:surrounds surrounds])
+        list (vec (map str @(rfa/sub ::parameters-available {})))
+        filtered-list (filter #(clojure.string/starts-with? % input) list)] ;; Filter the list with the input
+         (tap> [:custom-hint-called input-token start-line start-ch end-ch])
+    ;; Return a hint object expected by CodeMirror
+    (clj->js {:list filtered-list
+              :from cursor
+              :to (clj->js {:line start-line :ch end-ch}) ;; Use start-line and end-ch to create the to cursor
+              :pick (fn [cm hint]
+                      (let [doc (.getDoc cm)
+                            ;; Calculate the end position of the replacement
+                            replacement-end-ch (+ start-ch (count hint))]
+                        (.replaceRange doc hint cursor (clj->js {:line start-line :ch end-ch}))
+                        ;; Set the selection to the end of the replacement without scrolling
+                        (js/setTimeout #(do (.setSelection doc (clj->js {:line start-line :ch replacement-end-ch}) (clj->js {:line start-line :ch replacement-end-ch}) (clj->js {:scroll false}))
+                                             ;; Force a blur on the CodeMirror instance
+                                             ;; (.blur cm)
+                                            ) 10)))
+              :close (fn [cm]
+                       (js/setTimeout #(do (.focus cm)) 100))})))
+
+
+
 (defn panel-code-box [_ _ width-int height-int value]
   (let [sql-hint? (cstr/includes? (str value) ":::sql-string")
         selected-kp @(ut/tracked-subscribe [::editor-panel-selected-view])
         selected-kp (if (nil? (first selected-kp)) nil selected-kp)
         key selected-kp
         font-size (if (nil? key) 13 17)
-        code-width (if (nil? key) (- width-int 24) (- width-int 130))
-        ]
+        code-width (if (nil? key) (- width-int 24) (- width-int 130))]
     ;(tap> [:code-panel key selected-kp])
     [re-com/box
      :size "none"
@@ -2906,20 +3147,10 @@
                                 (tap> [:cc (.-string token)])
                                (when (= (.-string token) ":")
                                  (tap> [:hit-auto?])
-                                 (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
+                                 (js/setTimeout (fn []
+                                                  (.execCommand cm "autocomplete")) 0))))
               :options {:mode              (if sql-hint? "sql" "clojure")
-                        ;; :extraKeys        {"Ctrl-Space" "autocomplete"}
-                        ;; ;;:extraKeys        {"Ctrl-Space" (fn [cm] (custom-completions cm))}
-                        ;; :hintOptions {:hint custom-hint-fn}
-                        ;; :extraKeys {"Ctrl-Space" "autocomplete"
-                        ;;             "Tab" "autocomplete"
-                        ;;             }
-                        :hintOptions {:hint custom-hint-fn
-                                      ;; :endCompletion  (fn [cm _]
-                                      ;;                    (js/setTimeout (fn [] (.focus cm)) 0))
-                                      ;; :close (fn [cm _]
-                                      ;;          (js/setTimeout (fn [] (.focus cm)) 0))
-                                      }
+                        :hintOptions {:hint custom-hint-simple-fn}
                         :lineWrapping      true
                         :lineNumbers       true
                         :matchBrackets     true
@@ -2958,10 +3189,14 @@
           (highlight-codes-only codes {;:color "white" 
                                        :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
                                        :filter "invert(1.2)"
+                                       :cursor "pointer"
+                                       ;:filter (str "invert(1.2)" (when @db/param-code-hover " outer-glow(0px 0px 10px white)"))
                                   ;:font-weight 700
                                        :border-radius "5px"}
-                                (fn [code] (let [code (try (edn/read-string code) (catch :default _ code))
-                                                 vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})]
+                                (fn [code] (let [;code (try (edn/read-string code) (catch :default _ code))
+                                                 ;vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})
+                                                 ]
+                                             ;; ^^ deprecated since we removed the renderer for this... leaving for now
                                              [re-com/box
                                               ;:min-height "80px"
                                               :size "auto"
@@ -2969,7 +3204,7 @@
                                               :align :center :justify :center
                                               :style {:font-size "15px"}
                                               ;;:child (pr-str vv)
-                                              :child [shape/map-boxes2 vv nil "" [] nil "map"]
+                                              :child " " ;;[shape/map-boxes2 vv nil "" [] nil "map"]
                                               ;;:child [map-boxes2 vv nil nil [] :output nil]
                                               :style {;:color "white" 
                                                       ;:color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
@@ -3273,11 +3508,54 @@
         ;panel-q-str         (str (first panel-queries))
         ]
 
+    
+
    ;; (tap> [current-tab-queries click-params])
 
-    [re-com/v-box 
+    (if false ;@db/param-code-hover
+      
+      [re-com/v-box
+       :padding "6px"
+       :width (px (- width-int 33))
+       ;:style {:border "1px solid green"}
+       :align :center :justify :between
+       :gap "10px"
+       :children [[re-com/box 
+                   :style {:font-size "14px"
+                           :font-weight 700
+                           :border-radius "5px"
+                           :color (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")) ;; (theme-pull :theme/editor-font-color nil)
+                           :padding "4px"
+                           :background-color (get (theme-pull :theme/data-colors nil) "keyword")
+                           }
+                   :align :center :justify :center
+                   :child (str @db/param-code-hover)]
+                  
+                  (let [code @db/param-code-hover
+                        code (try (edn/read-string code) (catch :default _ code))
+                        vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})]
+                    [re-com/box
+                     :size "auto"
+                     :width "100%"
+                     ;:width (px (- width-int 33))
+                     ;:align :center :justify :center
+                     :style {:font-size "15px"}
+                                                                ;;:child (pr-str vv)
+                     :child [map-boxes2 vv nil "" [] nil nil]
+                     ;[shape/map-boxes2 vv nil "" [] nil "map"]
+                                                                ;;:child [map-boxes2 vv nil nil [] :output nil]
+                     :style {;:color "white" 
+                                                                        ;:color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
+                                                                        ;:background-color (get (theme-pull :theme/data-colors nil) "keyword")
+                             :border-radius "4px"}])
+                  ;[map-boxes2 {:test @db/param-code-hover} nil "" [] nil nil]
+                  ]]
+     
+     [re-com/v-box 
      :children 
      [
+
+      
       ;; [re-com/box 
       ;;  :child "search me daddy" 
       ;;  :height "33px"
@@ -3326,7 +3604,8 @@
                :overflow-x  "hidden"}
        :child [re-com/v-box
                :gap "10px"
-               :children (for [grp click-params]
+               :children (for [grp (if @db/param-code-hover [{}]  ;;overriding with a single value that gets injected below
+                                       click-params)]
                            (let [filtered-params (into {} (filter #(and ;; filter out from the top bar toggle first....
                                                                     (not (= (str (first %)) ":/")) ;; sometimes a garbo param sneaks in, harmless, but lets avoid rendering it
                                                                     (not (cstr/starts-with? (str (first %)) ":conn-list/"))
@@ -3347,6 +3626,16 @@
                                                                   grp))
                                  filter-keys (vec (filter-search @searcher-atom (keys filtered-params)))
                                  filtered-params (select-keys filtered-params filter-keys)
+
+                                 filtered-params (if @db/param-code-hover
+                                                   (let [code @db/param-code-hover
+                                                         code (try (edn/read-string code) (catch :default _ code))
+                                                         vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})]
+                                                     {code vv})
+                                                   filtered-params)
+                                 
+                                 
+                                 
                                  is-not-empty?   (ut/ne? (remove empty? filtered-params))]
                            ;(tap> [filtered-params (empty? (remove empty? filtered-params)) (into {} filtered-params)])
                              (when is-not-empty?
@@ -3471,7 +3760,7 @@
                                                                  :padding-bottom "2px"}
                                                                 (if (nil? v) {:font-style "italic"
                                                                               :opacity    0.3} {}))
-                                                  :align :end]]])))])))]]]])) ;]
+                                                  :align :end]]])))])))]]]]))) ;]
 
 
 (defonce query-hover (reagent/atom nil))
