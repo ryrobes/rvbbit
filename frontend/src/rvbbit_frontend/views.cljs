@@ -1389,7 +1389,7 @@
         single-width-bricks (js/Math.floor (/ bricks-wide panel-count))
         single-width (* single-width-bricks bricks/brick-size)
         single-width-px (px single-width)
-        hh1 [@db/mad-libs-waiting-room @db/data-browser-query-con @db/item-browser-mode] ;; reactivity hack!
+        hh1 [@db/mad-libs-waiting-room @db/data-browser-query-con @db/item-browser-mode @db/scrubbers @db/value-spy] ;; reactivity hack! react! [@db/scrubbers @db/value-spy] ;; hackermans
         ;double-width (* single-width-bricks bricks/brick-size)
         ;double-width-px (px single-width)
         ;single-height-px (px (* (js/Math.floor (/ bricks-tall 4)) bricks/brick-size))
@@ -1914,6 +1914,7 @@
                                                                               ])]]]]])]]])
 
                                            :else (let [selected-kp @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
+                                                       
                                                        selected-kp (if (nil? (first selected-kp)) nil selected-kp)] ;; if viz-gen or :* then nil
                                                    ;(tap> [:selected-kp selected-kp])
                                                    (if ;(and ;view-selected?
@@ -2253,24 +2254,41 @@
                                                                         (count (distinct (map :combo_hash mad-libs-combos))) " combos, "
                                                                         " combo-hash: " (get (first mad-libs-combos) :combo_hash) ")")]
 
-                                                           (let [view-scrubbers? (get-in @db/scrubbers [selected-block data-key] false)]
+                                                           (let [view-scrubbers? (get-in @db/scrubbers [selected-block data-key] false)
+                                                                 value-spy?      (get-in @db/value-spy [selected-block data-key] false)]
 
-                                                             [re-com/box
-                                                              ;:padding "3px"
-                                                              :size "none"
-                                                              :width "90px"
-                                                              :child (if view-scrubbers? "scrubber on" "scrubber off")
-                                                              :attr {:on-click #(swap! db/scrubbers assoc-in
-                                                                                       [selected-block data-key]
-                                                                                       (not view-scrubbers?))}
-                                                              :style {:color (if view-scrubbers? "yellow" "grey")
-                                                                      :z-index 100
-                                                                      :user-select "none"
-                                                                      :margin-top (if query-box? "9px" "inherit")
-                                                                    ;:z-index 300
-                                                                      :cursor "pointer"
-                                                                      :font-size "11px"
-                                                                      :font-weight 700}]))]]))]]
+                                                             [re-com/h-box
+                                                              :gap "10px"
+                                                              :children [[re-com/box
+                                                                          :size "none"
+                                                                          :width "90px"
+                                                                          :child (if view-scrubbers? "scrubber on" "scrubber off")
+                                                                          :attr {:on-click #(swap! db/scrubbers assoc-in
+                                                                                                   [selected-block data-key]
+                                                                                                   (not view-scrubbers?))}
+                                                                          :style {:color (if view-scrubbers? "yellow" "grey")
+                                                                                  :z-index 100
+                                                                                  :user-select "none"
+                                                                                  :margin-top (if query-box? "9px" "inherit")
+                                                                                  :cursor "pointer"
+                                                                                  :font-size "11px"
+                                                                                  :font-weight 700}]
+                                                                         
+                                                                         [re-com/box
+                                                                          :size "none"
+                                                                          :width "90px"
+                                                                          :child "value spy"
+                                                                          :attr {:on-click #(swap! db/value-spy assoc-in
+                                                                                                   [selected-block data-key]
+                                                                                                   (not value-spy?))}
+                                                                          :style {:color (if value-spy? "yellow" "grey")
+                                                                                  :z-index 100
+                                                                                  :user-select "none"
+                                                                                  :text-decoration (when (not value-spy?) "strikethrough")
+                                                                                  :margin-top (if query-box? "9px" "inherit")
+                                                                                  :cursor "pointer"
+                                                                                  :font-size "11px"
+                                                                                  :font-weight 700}]]]))]]))]]
                       :height (px (- ttl-height 24))
                       :width single-width-px
                       :style {:overflow "hidden"}])

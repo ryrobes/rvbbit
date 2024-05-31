@@ -2906,9 +2906,8 @@
 
 (defonce param-hover (reagent/atom nil))
 
-(defn highlight-codes-only [codes css ]
-  (let [;;css-string (ut/hiccup-css-to-string css)
-        react! [@db/param-code-hover]]
+(defn highlight-codes-only [codes css]
+  (let [react! [@db/param-code-hover]]
     (when-let [editor @cm-instance-panel-code-box]
       (let [doc (.getDoc editor)]
         ;; Clear existing markers
@@ -2946,8 +2945,7 @@
                                                                             (merge css (when (= (str code) (str @db/param-code-hover))
                                                                                          ;{:filter (str (get css :filter) " scale(1.2)")}
                                                                                          {;:transform "scale(1.2)"
-                                                                                          :box-shadow (str "0 0 10px 5px " (ut/invert-hex-color (theme-pull :theme/editor-outer-rim-color nil)))
-                                                                                          }))))
+                                                                                          :box-shadow (str "0 0 10px 5px " (ut/invert-hex-color (theme-pull :theme/editor-outer-rim-color nil)))}))))
                                              _ (.appendChild node (js/document.createTextNode code-part))
                                              ;widget-node (js/document.createElement "div")
                                              ]
@@ -2956,62 +2954,24 @@
                                                                                  token-parts (subvec full-code-parts 0 this-token-idx)
                                                                                  seeded-token (str (first token-parts) "/" (cstr/join ">" (rest token-parts)))]
                                                                              (.setCursor editor #js {:line start-line, :ch code-part-start-ch})
-                                                                             (.showHint editor #js {:completeSingle false :hint (fn [] (custom-hint-fn editor seeded-token start-line code-part-start-ch code-part-end-ch))})
-                                                                             ;; Set the cursor to the end of the replacement
-                                                                             ;(.setCursor doc #js {:line end-line, :ch code-part-end-ch})
-                                                                             
-                                                                             )))
+                                                                             (.showHint editor #js {:completeSingle false :hint (fn [] (custom-hint-fn editor seeded-token start-line code-part-start-ch code-part-end-ch))}))))
                                          (.addEventListener node "mouseover" (fn []
-                                                                               ;(tap> [:param-code-hover code])
-                                                                              ;;  (reset! db/param-code-hover code)
-                                                                              ;;  (when-not @widget
-                                                                              ;;   ;;  (let [react-element (reagent/as-element (hiccup-fn code))]
-                                                                              ;;   ;;    (rdom/render react-element widget-node)
-                                                                              ;;   ;;    (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))})))
-                                                                              ;;    (reset! widget code)
-                                                                              ;;    (tap> [:hovered code])
-                                                                              ;;    )
-                                                                               ;(when-not @param-hover
-                                                                                (let [code (try (edn/read-string code) (catch :default _  code))
-                                                                                      ;this-token-idx (.indexOf full-code-parts code-part)
-                                                                                      ;token-parts (subvec full-code-parts 0 this-token-idx)
-                                                                                      ;seeded-token (str (first token-parts) "/" (cstr/join ">" (rest token-parts)))
-                                                                                      psplit      (cstr/split (ut/unkeyword (str code)) "/")
+                                                                               (let [code (try (edn/read-string code) (catch :default _  code))
+                                                                                     psplit      (cstr/split (ut/unkeyword (str code)) "/")
                                                                                      table       (-> (first psplit) (ut/replacer  #":" "") (ut/replacer  ".*" "") keyword)
                                                                                      field       (keyword (last psplit))]
-                                                                                ;;  (when-not @db/param-code-hover 
-                                                                                ;;    (reset! db/param-code-hover code)
-                                                                                ;;    )
-                                                                                  ;(tap> [:hh [full-code-parts code table field]])
-                                                                                 (reset! param-hover [code table field])
-                                                                                 )));)
+                                                                                 (reset! param-hover [code table field]))))
                                          (.addEventListener node "mouseenter" (fn []
-                                                                               ;(when-not @db/param-code-hover (reset! db/param-code-hover code))
                                                                                 (let [code (try (edn/read-string code) (catch :default _  code))
-                                                                                      ;this-token-idx (.indexOf full-code-parts code-part)
-                                                                                      ;token-parts (subvec full-code-parts 0 this-token-idx)
-                                                                                      ;seeded-token (str (first token-parts) "/" (cstr/join ">" (rest token-parts)))
                                                                                       psplit      (cstr/split (ut/unkeyword (str code)) "/")
                                                                                       table       (-> (first psplit) (ut/replacer  #":" "") (ut/replacer  ".*" "") keyword)
                                                                                       field       (keyword (last psplit))]
-                                                                                                                                                                ;;  (when-not @db/param-code-hover 
-                                                                                                                                                                ;;    (reset! db/param-code-hover code)
-                                                                                                                                                                ;;    )
                                                                                   (tap> [:hh2 [full-code-parts code table field]])
-                                                                                  (reset! param-hover [code table field]))
-                                                                                ))
+                                                                                  (reset! param-hover [code table field]))))
                                          (.addEventListener node "mouseout" (fn []
-                                                                              ;(when @db/param-code-hover
-                                                                                ;(.clear @db/param-code-hover)
-                                                                                ;;(reset! db/param-code-hover nil)
-                                                                              (reset! param-hover nil)
-                                                                              ));)
+                                                                              (reset! param-hover nil)))
                                          (.addEventListener node "mouseleave" (fn []
-                                                                                ;(when @widget
-                                                                                  ;(.clear @db/param-code-hover)
-                                                                                  ;;(reset! db/param-code-hover nil)
-                                                                                (reset! param-hover nil)
-                                                                                ));)
+                                                                                (reset! param-hover nil)))
                                          (.markText doc
                                                     #js {:line start-line, :ch start-ch}
                                                     #js {:line end-line, :ch end-ch}
@@ -3019,8 +2979,43 @@
                                        (catch :default e (tap> [:marker-error (str e)])))]
                           (when (clojure.string/includes? (.getLine doc start-line) code-part)
                             (swap! markers-panel-code-box conj marker))
-                          (recur (rest code-parts) end-ch)))))) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
-                    (recur (inc line))))))))))
+                          (recur (rest code-parts) end-ch)))))) 
+                (recur (inc line))))))))))
+
+
+(defn highlight-codes-values [codes css]
+  (let [react! [@db/param-code-hover]]
+    (when-let [editor @cm-instance-panel-code-box]
+      (let [doc (.getDoc editor)]
+        ;; Clear existing markers
+        (doseq [marker @markers-panel-code-box]
+          (.clear marker))
+        (reset! markers-panel-code-box [])
+        (doseq [[code value] codes]
+          (let [code (str code)
+                value (if (string? value) (pr-str value) value)
+                code-lines (clojure.string/split-lines code)]
+            (loop [line 0]
+              (when (< line (.lineCount doc))
+                (when (clojure.string/includes? (.getLine doc line) (first code-lines))
+                  (let [start-line line
+                        end-line (loop [line start-line]
+                                   (when (< line (.lineCount doc))
+                                     (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+                                       line
+                                       (recur (inc line)))))
+                        code-part-start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
+                        code-part-end-ch (+ (clojure.string/index-of (.getLine doc start-line) (last code-lines)) (count (last code-lines)))
+                        node (js/document.createElement "span")
+                        _ (.setAttribute node "style" (ut/hiccup-css-to-string css))
+                        _ (.appendChild node (js/document.createTextNode value))
+                        marker (.markText doc
+                                          #js {:line start-line, :ch code-part-start-ch}
+                                          #js {:line end-line, :ch code-part-end-ch}
+                                          #js {:replacedWith node})]
+                    (swap! markers-panel-code-box conj marker)))
+                (recur (inc line))))))))))
+
 
 
 (defn unhighlight-code []
@@ -3441,6 +3436,9 @@
  ::highlight-panel-code
  (fn [db _]
    (let [flow-subs (get db :flow-subs)
+         [_ data-key] @(ut/tracked-sub ::editor-panel-selected-view {})
+         selected-block (get db :selected-block)
+         value-spy?      (get-in @db/value-spy [selected-block data-key] false)
          click-params (vec (for [e (keys (get-in db [:click-param :param]))]
                              (keyword (str "param/" (cstr/replace (str e) ":" "")))))
          themes (vec (for [e (keys (get-in db [:click-param :theme]))]
@@ -3450,42 +3448,29 @@
          view-code-hash (hash [(get-in db [:panels (get db :selected-block)])  part-kp])]
 
      (reset! last-view-highlighted-hash view-code-hash)
-         
+
     ;;  (when (cstr/includes? (str (get db :client-name)) "-short-") 
     ;;    (tap> [:highlight-panel-code!! (get db :client-name) view-code-hash]))
 
-    ;;  (highlight-codes-only codes {;:color "white" 
-    ;;                               :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")) )
-    ;;                               :filter "invert(0.8)"
-    ;;                               ;:font-weight 700
-    ;;                               :border-radius "5px"})
-     (highlight-codes-only codes {;:color "white" 
-                                  :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
-                                  :filter "invert(1.2)"
-                                  :cursor "pointer"
-                                       ;:filter (str "invert(1.2)" (when @db/param-code-hover " outer-glow(0px 0px 10px white)"))
+     (if (not value-spy?)
+       (highlight-codes-only codes {;:color "white" 
+                                    :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
+                                    :filter "invert(1.2)"
+                                    :cursor "pointer"
+                                  ;:filter (str "invert(1.2)" (when @db/param-code-hover " outer-glow(0px 0px 10px white)"))
                                   ;:font-weight 700
-                                  :border-radius "5px"}
-                          ;;  (fn [code] (let [;code (try (edn/read-string code) (catch :default _ code))
-                          ;;                        ;vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})
-                          ;;                   ]
-                          ;;                    ;; ^^ deprecated since we removed the renderer for this... leaving for now
-                          ;;               [re-com/box
-                          ;;                     ;:min-height "80px"
-                          ;;                :size "auto"
-                          ;;                :width "100%"
-                          ;;                :align :center :justify :center
-                          ;;                :style {:font-size "15px"}
-                          ;;                     ;;:child (pr-str vv)
-                          ;;                :child " " ;;[shape/map-boxes2 vv nil "" [] nil "map"]
-                          ;;                     ;;:child [map-boxes2 vv nil nil [] :output nil]
-                          ;;                :style {;:color "white" 
-                          ;;                             ;:color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
-                          ;;                             ;:background-color (get (theme-pull :theme/data-colors nil) "keyword")
-                          ;;                        :border-radius "4px"}]))
-                           )
-     ;;(highlight-codes codes (fn [code][re-com/box :child (str code) :style {:color "white" :background-color "teal" :border-radius "4px"}]))
-     )
+                                    :border-radius "5px"})
+
+       (highlight-codes-values (into {}
+                                     (for [c codes] {c @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                        {:keypath [(try (edn/read-string c) (catch :default _ c))]})}))
+                               {;:color "white" 
+                                :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
+                                :filter "invert(1.2)"
+                                :cursor "pointer"
+                              ;:filter (str "invert(1.2)" (when @db/param-code-hover " outer-glow(0px 0px 10px white)"))
+                              ;:font-weight 700
+                                :border-radius "5px"})))
    db))
 
 

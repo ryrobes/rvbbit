@@ -21,6 +21,8 @@
 
 (defonce cm-focused? (reagent/atom false))
 
+(defonce value-spy (reagent/atom {}))
+
 (def param-code-hover (atom nil))
 
 (def running-blocks (reagent/atom {}))
