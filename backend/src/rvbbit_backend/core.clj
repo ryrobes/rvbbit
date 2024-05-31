@@ -111,31 +111,38 @@
         screen-data (read-screen f-path)
         screen-name (get screen-data :screen-name "unnamed-screen!")
         resolved-queries (get screen-data :resolved-queries)
-        screen-data (if (not (empty? resolved-queries))
+        screen-data (if (ut/ne? resolved-queries)
                       (assoc screen-data :panels
                              (into {}
                                    (for [[k v] (get screen-data :panels)]
                                      {k (assoc v :queries (select-keys resolved-queries (keys (get v :queries))))}))) 
                       screen-data)
         theme-map (get-in screen-data [:click-param :theme])
-        has-theme? (and (not (nil? theme-map)) (not (empty? theme-map)))
+        has-theme? (and (not (nil? theme-map)) (ut/ne? theme-map))
         theme-name (if (and has-theme? (not (nil? (get theme-map :theme-name))))
                      (str ", " (get theme-map :theme-name) " ") "")
         blocks (remove nil? (conj (keys (get-in screen-data [:panels])) (when has-theme? :*theme*)))
         boards (distinct (for [[_ v] (get-in screen-data [:panels])] (get v :tab)))
         blocks (into blocks boards) ; (map #(str "board/" %) boards))
         params (get-in screen-data [:click-param])
-        rel-params (fn [obj params]
-                     (let [kks (filter #(and (keyword? %)
-                                             (cstr/starts-with? (str %) ":param")
-                                             (cstr/includes? (str %) "/")) (ut/deep-flatten obj))
-                           kps (vec (for [e kks] (vec (map keyword (cstr/split (str (ut/unkeyword e)) #"/")))))
-                           pp1 (ut/select-keypaths params kps)]
-                       ;;(ut/pp [pp1 kps])
-                       (or pp1 {})))
+        ;; rel-params (fn [obj params]
+        ;;              (let [kks (filter #(and (keyword? %)
+        ;;                                      (cstr/starts-with? (str %) ":param")
+        ;;                                      (cstr/includes? (str %) "/")) (ut/deep-flatten obj))
+        ;;                    kps (vec (for [e kks] (vec (map keyword (cstr/split (str (ut/unkeyword e)) #"/")))))
+        ;;                    pp1 (ut/select-keypaths params kps)]
+        ;;                ;;(ut/pp [pp1 kps])
+        ;;                (or pp1 {})))
         board-map (into {} (for [b boards] {b (into {} (for [[k v] (get-in screen-data [:panels])
                                                              :when (= (get v :tab) b)] {k v}))}))
         queries (into {} (for [b blocks] (get-in screen-data [:panels b :queries])))]
+    
+    (doseq [b blocks]  ;; collect keywords from all views for autocomplete - might get expensive, but easy to fix later if so. for now it's fine since screens updating is infrequent after boot
+      (doseq [[_ vv] (get-in screen-data [:panels b :views])] 
+        (reset! wss/autocomplete-view-atom
+                (vec (filter #(and (not (cstr/includes? (str %) "/")) (keyword? %))
+                             (distinct (into (vec (distinct (ut/deep-flatten vv))) @wss/autocomplete-view-atom)))))))
+    
     (swap! wss/screens-atom assoc screen-name screen-data) ;; update master screen atom for param reactions etc 
     ;; (search/add-or-update-document search/index-writer (str :screen "-" screen-name) 
     ;;                                {:content screen-name ;screen-data 
@@ -568,7 +575,12 @@
     (tt/start!)
     (def mon (tt/every! 15 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30 seconds (excessive, lenghten in prod..)
     ;(instrument-jvm instrument/metric-registry)
-    (wss/subscribe-to-session-changes)
+
+    ;; (wss/subscribe-to-session-changes)  ;; suddenly started getting this error... weird... 5/31/24, not currently using external edit anyways... but this is very weird. will try again after a reboot
+    ;; [:beholder-watching "./live/"]
+    ;; Execution error (IOException) at sun.nio.fs.LinuxWatchService/<init> (LinuxWatchService.java:62) .
+    ;; User limit of inotify instances reached or too many open files
+
 
       ;;(wss/start-thread-worker) ;; used for side-car sniffs
       ;(def worker-thread (wss/start-thread-worker))
@@ -579,11 +591,16 @@
     ;; (def lunchbreak3 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker3))))
     ;; (def lunchbreak4 (tt/every! 36000 2 (bound-fn [] (wss/recycle-worker4))))
 
-    (wss/recycle-worker)
-    (wss/recycle-worker2)
-    (wss/recycle-worker3)
+    (wss/recycle-worker) ;; single blocking
+    (wss/recycle-worker2) ;; single blocking
+    (wss/recycle-worker3) ;; single blocking
+
     (wss/recycle-workers4 3) ;; run-solver only
     (wss/recycle-workers5 5) ;; push-to-client only
+
+    ;; ;;blocking thread pools, tracked and cancellable - TAKES ALL CPU AND DOESNT WORK PROPERLY. lol
+    ;; (wss/recycle-workers7 3) ;; run-solver only
+    ;; (wss/recycle-workers8 5) ;; push-to-client only
 
         ;;(def lucene-commiter (tt/every! 30 2 (bound-fn [] (search/commit-writer search/index-writer))))
     (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))
@@ -597,51 +614,51 @@
     (def last-look (atom {}))
     (def saved-uids (atom []))
 
-    
-    ;; enrich training data?
-    ;(async/thread 
-      (let [tdata (into {} (take 5 (seq (dissoc @wss/clover-sql-training-atom nil)))) ;;@wss/clover-sql-training-atom
-                        ]
-                    (doseq [[clover-sql {:keys [db-type sql-string table-metadata]}] tdata
-                             :let [;;{:keys [db-type sql-string table-metadata]} v
-                                   req {:body {:model "gpt-4" ;;"gpt-4-turbo" ;; gpt-3.5-turbo-0125"
-                                               :messages [{:role "system"
-                                                           :content "You are a training enrichment bot. Here we have data for Clover-SQL which is DSL for a SQL-like language based on Clojure's honey-sql. 
-                                                                     It is a completely data-based and declarative and doesn't not contain Clojure list unless explicitly noted (i.e. :post-process-fn key allows Clojure functions).
-                                                                     Clover-SQL is used for a front-end tool called RVBBIT, there will inevitably be front-end only keys and values in the clover-sql calls - these are important,
-                                                                     since they capture the users intent / presentation and are used to generate the final SQL query. 
-                                                                     There may be special keys such as :pivot, etc that are important, since the SQL query is generated FROM the user clover-sql map.
-                                                                     Client name variables like *client-name-str mean that user wants data from IT'S client, which is populated automatically at runtime - 
-                                                                     so in these cases please refer to this as 'my client' regardless of what the materialized sql string says, this is dynamic session-based names.
 
-                                                                     You will be given 3 things: 
-                                                                       The Clover-SQL query map, 
-                                                                           the database type, 
-                                                                           the SQL string that was generated from the Clover-SQL query map, 
-                                                                       as well as the metadata for the tables involved.
-                                                                     
-                                                                     Given this context - please return ONLY a human-english natural language description of the SQL query and what they user was trying to do. 
-                                                                     For example, if THIS is the output - what was the users natural language query to arrive here?
-                                                                     Phrase the question as if YOU were the user and not in the 3rd person. Be as general as possible while still allowing the intet to be understood.
-                                                                     "}
-                                                          {:role "user"
-                                                           :content (pr-str {:clover-sql clover-sql 
-                                                                             ;:database-type db-type
-                                                                             :sql-string sql-string 
-                                                                             :table-metadata table-metadata})}
-                                                          ]}
-                                        :headers {"Authorization" "Bearer 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", "Content-Type" "application/json"},
-                                        :method :post,
-                                        :url "https://api.openai.com/v1/chat/completions"}] ]
-                      (let [resp (wss/make-http-call req)
-                            full-data {:question (get-in resp [:choices 0 :message :content]) :clover-sql clover-sql :database-type db-type :sql-string sql-string :table-metadata table-metadata}]
-                        (ut/pp [:TRAINING-RESP! full-data])
-                        (swap! wss/clover-sql-enriched-training-atom assoc clover-sql full-data) )
-                        )
-                      
-                      
-                    )
-                    ;)
+    ;; ;; enrich training data?
+    ;; ;(async/thread 
+    ;;   (let [tdata (into {} (take 5 (seq (dissoc @wss/clover-sql-training-atom nil)))) ;;@wss/clover-sql-training-atom
+    ;;                     ]
+    ;;                 (doseq [[clover-sql {:keys [db-type sql-string table-metadata]}] tdata
+    ;;                          :let [;;{:keys [db-type sql-string table-metadata]} v
+    ;;                                req {:body {:model "gpt-4" ;;"gpt-4-turbo" ;; gpt-3.5-turbo-0125"
+    ;;                                            :messages [{:role "system"
+    ;;                                                        :content "You are a training enrichment bot. Here we have data for Clover-SQL which is DSL for a SQL-like language based on Clojure's honey-sql. 
+    ;;                                                                  It is a completely data-based and declarative and doesn't not contain Clojure list unless explicitly noted (i.e. :post-process-fn key allows Clojure functions).
+    ;;                                                                  Clover-SQL is used for a front-end tool called RVBBIT, there will inevitably be front-end only keys and values in the clover-sql calls - these are important,
+    ;;                                                                  since they capture the users intent / presentation and are used to generate the final SQL query. 
+    ;;                                                                  There may be special keys such as :pivot, etc that are important, since the SQL query is generated FROM the user clover-sql map.
+    ;;                                                                  Client name variables like *client-name-str mean that user wants data from IT'S client, which is populated automatically at runtime - 
+    ;;                                                                  so in these cases please refer to this as 'my client' regardless of what the materialized sql string says, this is dynamic session-based names.
+
+    ;;                                                                  You will be given 3 things: 
+    ;;                                                                    The Clover-SQL query map, 
+    ;;                                                                        the database type, 
+    ;;                                                                        the SQL string that was generated from the Clover-SQL query map, 
+    ;;                                                                    as well as the metadata for the tables involved.
+
+    ;;                                                                  Given this context - please return ONLY a human-english natural language description of the SQL query and what they user was trying to do. 
+    ;;                                                                  For example, if THIS is the output - what was the users natural language query to arrive here?
+    ;;                                                                  Phrase the question as if YOU were the user and not in the 3rd person. Be as general as possible while still allowing the intet to be understood.
+    ;;                                                                  "}
+    ;;                                                       {:role "user"
+    ;;                                                        :content (pr-str {:clover-sql clover-sql 
+    ;;                                                                          ;:database-type db-type
+    ;;                                                                          :sql-string sql-string 
+    ;;                                                                          :table-metadata table-metadata})}
+    ;;                                                       ]}
+    ;;                                     :headers {"Authorization" "Bearer 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", "Content-Type" "application/json"},
+    ;;                                     :method :post,
+    ;;                                     :url "https://api.openai.com/v1/chat/completions"}] ]
+    ;;                   (let [resp (wss/make-http-call req)
+    ;;                         full-data {:question (get-in resp [:choices 0 :message :content]) :clover-sql clover-sql :database-type db-type :sql-string sql-string :table-metadata table-metadata}]
+    ;;                     (ut/pp [:TRAINING-RESP! full-data])
+    ;;                     (swap! wss/clover-sql-enriched-training-atom assoc clover-sql full-data) )
+    ;;                     )
+
+
+    ;;                 )
+    ;;                 ;)
 
     (shutdown/add-hook! ::the-pool-is-now-closing
                         #(do (reset! wss/shutting-down? true)
@@ -655,7 +672,7 @@
                                                             :child
                                                             [:speak-always (str "Heads up: data-rabbit system going offline.")]
                                                             ;[:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]
-                                                            ]]] 10 1 5)))
+                                                            ]]]10 1 5)))
                              ;(wss/destroy-websocket-server!)
                              (Thread/sleep 2000)
                              (wss/destroy-websocket-server!)
@@ -666,8 +683,7 @@
                              (wss/stop-workers4)
                              (wss/stop-workers5)
                              (Thread/sleep 2000)
-                             (wss/destroy-websocket-server!)
-                             ))
+                             (wss/destroy-websocket-server!)))
 
     (shutdown/add-hook! ::the-pool-is-now-closed
                         #(doseq [[conn-name conn] @wss/conn-map]
@@ -1185,6 +1201,17 @@
           _ (Thread/sleep 13000) ;; 10 enough? want everything cranking before clients come online
           _ (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options))] ;; wut?
       (start-services)
+      (let [destinations (vec (keys @wss/client-queues))]
+        (doseq [d destinations]
+          (wss/alert! d [:v-box
+                         :justify :center
+                         :style {:opacity 0.7}
+                         :children [[:box
+                                     :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                     :child
+                                     [:speak-always (str "heeeeyya - data-rabbit system is now online.")]
+                                     ;[:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]
+                                     ]]]10 1 5)))
 
 
     ;; (.start wssr)

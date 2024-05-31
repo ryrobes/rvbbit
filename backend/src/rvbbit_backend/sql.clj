@@ -94,8 +94,8 @@
 
 
 (def system-db {:datasource @(pool-create {;;:jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL" &mode=memory ; "jdbc:sqlite:db/system.db"
-                                           ;:jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE"  ; "jdbc:sqlite:db/system.db"
-                                           :jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE"  ; "jdbc:sqlite:db/system.db"
+                                           :jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE"  ; "jdbc:sqlite:db/system.db"
+                                           ;;:jdbc-url "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE"  ; "jdbc:sqlite:db/system.db" on disk
                                            :idle-timeout        600000  ;;;; LAST KNOW GOOD SQLITE 10/25/23 
                                            :max-lifetime       1800000
                                            ;:auto_vacuum        "FULL"

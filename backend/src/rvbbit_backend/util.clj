@@ -228,7 +228,8 @@
              (binding [*out* wtr] ;; selective pretty print formatting 
                (if (or (cstr/includes? (str file-path) "signals.")
                        (cstr/includes? (str file-path) "rules.")
-                       (cstr/includes? (str file-path) "errors.")
+                       (cstr/includes? (str file-path) "errors.") 
+                       (cstr/includes? (str file-path) "autocomplete") 
                        (cstr/includes? (str file-path) "training-atom.")
                        (cstr/includes? (str file-path) "sql-cache.")
                        (cstr/includes? (str file-path) "solvers."))

@@ -71,6 +71,13 @@
  ::dispatch-subscriptions
  (fn [_ [_ x]]
    {:dispatch-n [[::wfx/subscribe socket-id :server-push2 (subscription x :server-push2)]
+                 [::wfx/request :default
+                  {:message    {:kind :get-settings
+                                :client-name x}
+                   :on-response [::simple-response-boot-no-load] ;; just get settings, in case they changed since the client booted, but the server might have rebooted and changed them
+                   :on-timeout [::imeout-response [:boot :get-settings]]
+                   :timeout    15000}]
+                 [::get-autocomplete-values]
                  ;[::wfx/subscribe socket-id :server-push3 (subscription x :server-push3)]
                  ;[::wfx/subscribe socket-id :server-push4 (subscription x :server-push4)]
                  ]}))
@@ -188,11 +195,38 @@
      (assoc-in db [:click-param base-key sub-key] value))))
 
 (re-frame/reg-event-db
+ ::autocomplete-response
+ (fn [db [_ result]]
+   (tap> [:pulled-auto-complete (get db :client-name) (into {} (for [[k v] result] [k (count v)]))])
+   (assoc db :autocomplete result)))
+
+  ;; {:clover-params @autocomplete-clover-param-atom
+  ;; :view-keywords @autocomplete-view-atom})
+
+(re-frame/reg-event-db
  ::timeout-response
  (fn [db [_ result what-req]]
    (let [client-name (get db :client-name)]
      (tap> [:websocket-timeout! client-name result what-req])
      db)))
+
+;;:autocomplete [{:keys [client-name surrounding panel-key view]}]
+
+(re-frame/reg-event-db
+ ::get-autocomplete-values
+ (fn [db _]
+   ;(tap> [:ran-condi])
+   (let [client-name (get db :client-name)]
+     (ut/tracked-dispatch [::wfx/request :default
+                           {:message    {:kind :autocomplete
+                                         :surrounding nil
+                                         :panel-key nil
+                                         :view nil 
+                                         :client-name client-name}
+                            :on-response [::autocomplete-response]
+                            :on-timeout  [::timeout-response ::autocomplete]
+                            :timeout    15000000}]))
+   db))
 
 (re-frame/reg-event-db
  ::sub-to-flow-value

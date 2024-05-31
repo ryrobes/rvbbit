@@ -19,6 +19,8 @@
 (def last-mouse-activity (atom nil))
 (def snap-to-grid 25)
 
+(defonce cm-focused? (reagent/atom false))
+
 (def param-code-hover (atom nil))
 
 (def running-blocks (reagent/atom {}))

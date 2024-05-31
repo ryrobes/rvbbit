@@ -493,7 +493,9 @@
          ]
      (doall
       (doseq [n deads]
-        (ut/tracked-dispatch [::http/unsub-to-flow-value n])))
+        (ut/tracked-dispatch [::http/unsub-to-flow-value n])
+        (ut/tracked-dispatch [::conn/declick-parameter (vec (map keyword (cstr/split (cstr/replace (str n) ":" "") #"/")))]) ;; remove from click-param altogether
+        ))
      (assoc db :flow-subs new))))
 
 
@@ -2901,7 +2903,10 @@
 ;;                           (recur (rest code-parts) end-ch)))))) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
 ;;                     (recur (inc line))))))))))
 
-(defn highlight-codes-only [codes css hiccup-fn]
+
+(defonce param-hover (reagent/atom nil))
+
+(defn highlight-codes-only [codes css ]
   (let [;;css-string (ut/hiccup-css-to-string css)
         react! [@db/param-code-hover]]
     (when-let [editor @cm-instance-panel-code-box]
@@ -2966,17 +2971,47 @@
                                                                               ;;    (reset! widget code)
                                                                               ;;    (tap> [:hovered code])
                                                                               ;;    )
-                                                                               (when-not @db/param-code-hover (reset! db/param-code-hover code))))
+                                                                               ;(when-not @param-hover
+                                                                                (let [code (try (edn/read-string code) (catch :default _  code))
+                                                                                      ;this-token-idx (.indexOf full-code-parts code-part)
+                                                                                      ;token-parts (subvec full-code-parts 0 this-token-idx)
+                                                                                      ;seeded-token (str (first token-parts) "/" (cstr/join ">" (rest token-parts)))
+                                                                                      psplit      (cstr/split (ut/unkeyword (str code)) "/")
+                                                                                     table       (-> (first psplit) (ut/replacer  #":" "") (ut/replacer  ".*" "") keyword)
+                                                                                     field       (keyword (last psplit))]
+                                                                                ;;  (when-not @db/param-code-hover 
+                                                                                ;;    (reset! db/param-code-hover code)
+                                                                                ;;    )
+                                                                                  ;(tap> [:hh [full-code-parts code table field]])
+                                                                                 (reset! param-hover [code table field])
+                                                                                 )));)
                                          (.addEventListener node "mouseenter" (fn []
-                                                                               (when-not @db/param-code-hover (reset! db/param-code-hover code))))
+                                                                               ;(when-not @db/param-code-hover (reset! db/param-code-hover code))
+                                                                                (let [code (try (edn/read-string code) (catch :default _  code))
+                                                                                      ;this-token-idx (.indexOf full-code-parts code-part)
+                                                                                      ;token-parts (subvec full-code-parts 0 this-token-idx)
+                                                                                      ;seeded-token (str (first token-parts) "/" (cstr/join ">" (rest token-parts)))
+                                                                                      psplit      (cstr/split (ut/unkeyword (str code)) "/")
+                                                                                      table       (-> (first psplit) (ut/replacer  #":" "") (ut/replacer  ".*" "") keyword)
+                                                                                      field       (keyword (last psplit))]
+                                                                                                                                                                ;;  (when-not @db/param-code-hover 
+                                                                                                                                                                ;;    (reset! db/param-code-hover code)
+                                                                                                                                                                ;;    )
+                                                                                  (tap> [:hh2 [full-code-parts code table field]])
+                                                                                  (reset! param-hover [code table field]))
+                                                                                ))
                                          (.addEventListener node "mouseout" (fn []
                                                                               ;(when @db/param-code-hover
                                                                                 ;(.clear @db/param-code-hover)
-                                                                                (reset! db/param-code-hover nil)));)
+                                                                                ;;(reset! db/param-code-hover nil)
+                                                                              (reset! param-hover nil)
+                                                                              ));)
                                          (.addEventListener node "mouseleave" (fn []
                                                                                 ;(when @widget
                                                                                   ;(.clear @db/param-code-hover)
-                                                                                  (reset! db/param-code-hover nil)));)
+                                                                                  ;;(reset! db/param-code-hover nil)
+                                                                                (reset! param-hover nil)
+                                                                                ));)
                                          (.markText doc
                                                     #js {:line start-line, :ch start-ch}
                                                     #js {:line end-line, :ch end-ch}
@@ -3035,12 +3070,16 @@
  ::parameters-available
  (fn [db _]
    (let [;;codes [:theme/base-font :font-family :height]
+         server-params (get-in db [:autocomplete :clover-params] [])
+         view-codes (get-in db [:autocomplete :view-keywords] [])
          flow-subs (get db :flow-subs)
          click-params (vec (for [e (keys (get-in db [:click-param :param]))]
                              (keyword (str "param/" (cstr/replace (str e) ":" "")))))
          themes (vec (for [e (keys (get-in db [:click-param :theme]))]
                        (keyword (str "theme/" (cstr/replace (str e) ":" "")))))
-         codes (vec (into themes (into flow-subs click-params)))]
+         ;;codes (vec (into server-params (into themes (into flow-subs click-params))))
+         codes (vec (apply concat [server-params view-codes themes flow-subs click-params])) ;; not faster, but just less retarded than above
+         ]
      codes)))
 
 (defn get-surrounding-tokens [cm cursor token]
@@ -3054,18 +3093,213 @@
       [token big-line-string])
     (catch :default e (tap> [:err (str e)]))))
 
+;; (defn autocomplete-suggestions
+;;   [input all-keywords]
+;;   (let [end-with-gt? (cstr/ends-with? input ">")
+;;         input-clean (if end-with-gt? (subs input 0 (dec (count input))) input)
+;;         input-parts (cstr/split input-clean #">")
+;;         input-depth (count input-parts)]
+;;     (->> all-keywords
+;;          ;; Filter keywords to start with the cleaned input (excluding trailing '>').
+;;          (filter #(cstr/starts-with? % input-clean))
+;;          ;; Map each keyword to limit its depth appropriately.
+;;          (map (fn [keyword]
+;;                 (let [k-parts (cstr/split keyword #">")
+;;                       shown-depth (if end-with-gt? (inc input-depth) input-depth)]
+;;                   (cstr/join ">" (take shown-depth k-parts)))))
+;;          (distinct) ;; Remove duplicates after processing.
+;;          ;; Append '>' to indicate further sublevels only when appropriate.
+;;          (map #(let [splits (cstr/split % #">")]
+;;                  (if (and end-with-gt? (< input-depth (count splits)))
+;;                    (str % ">")
+;;                    %)))
+;;          ;; Convert to vector for consistent output.
+;;          (vec))))
+
+
+
+
+(defn autocomplete-suggestions-fn
+  [input all-keywords]
+  (let [end-with-gt? (cstr/ends-with? input ">")
+        input-clean (if end-with-gt? (subs input 0 (dec (count input))) input)
+        input-parts (cstr/split input-clean #">")
+        input-depth (count input-parts)]
+    (->> all-keywords
+         ;; Filter keywords to start with the cleaned input (excluding trailing '>').
+         (filter #(cstr/starts-with? % input-clean))
+         ;; Collect keywords up to the intended depth or one more level.
+         (map (fn [keyword]
+                (let [k-parts (cstr/split keyword #">")
+                      shown-depth (if end-with-gt? (inc input-depth) input-depth)]
+                  [(cstr/join ">" (take shown-depth k-parts))
+                   ;; Check if there's a next level beyond the current showing depth.
+                   (> (count k-parts) shown-depth)])))
+         ;; Remove duplicates after processing.
+         (distinct)
+         ;; Map to append '>' if there are further levels indicated by the boolean flag.
+         (map (fn [[path has-more]]
+                (if has-more
+                  (str path ">")
+                  path)))
+         (vec))))
+
+(defn autocomplete-suggestions [input all-keywords]
+  (if (not (cstr/ends-with? input ">"))
+    (let [regs (first (filter #(and (not= % input)
+                                    (clojure.string/starts-with? % input)) all-keywords))
+          match? (cstr/starts-with? (cstr/replace regs input "") ">")]
+      (if match?
+        (autocomplete-suggestions-fn (str input ">") all-keywords)
+        (autocomplete-suggestions-fn input all-keywords)))
+    (autocomplete-suggestions-fn input all-keywords)))
+
+
+;; (defn autocomplete-suggestions
+;;   [input all-keywords]
+;;   (let [end-with-gt? (cstr/ends-with? input ">")
+;;         input-clean (if end-with-gt? (subs input 0 (dec (count input))) input)
+;;         input-parts (cstr/split input-clean #"/") ; Splitting at '/' for namespace consideration.
+;;         base-namespace (first input-parts)
+;;         base-keypath (second input-parts)]
+;;     (->> all-keywords
+;;          ;; Map to break down each keyword into [namespace keypath].
+;;          (map (fn [kw] (let [parts (cstr/split kw #"/")]
+;;                          [(first parts) (when (> (count parts) 1) (second parts))])))
+;;          ;; Filter based on namespace and start of keypath if specified.
+;;          (filter (fn [[ns kp]]
+;;                    (and (cstr/starts-with? ns base-namespace)
+;;                         (or (not base-keypath) ; No keypath specified, match namespace.
+;;                             (and kp (cstr/starts-with? kp base-keypath))))))
+;;          ;; Build back the full path for keywords with further structure.
+;;          (mapcat (fn [[ns kp]]
+;;                    (if kp
+;;                      (let [full-kpath (str ns "/" kp)
+;;                            parts (cstr/split full-kpath #">")
+;;                            shown-depth (if end-with-gt? (inc (count (cstr/split input-clean #">"))) (count (cstr/split input-clean #">")))]
+;;                        [(str (cstr/join ">" (take shown-depth parts))
+;;                              (when (< shown-depth (count parts)) ">"))])
+;;                      [(str ns "/")]))) ; Append '/' if namespace has deeper keypaths.
+;;          (distinct) ; Remove duplicates.
+;;          (remove nil?)
+;;          (vec))))
+
+
+
+;; (defn autocomplete-suggestions-fn
+;;   [input all-keywords]
+;;   (let [end-with-gt? (cstr/ends-with? input ">")
+;;         input-clean (if end-with-gt? (subs input 0 (dec (count input))) input)
+;;         input-parts (cstr/split input-clean #"/") ; Splitting at '/' for namespace consideration.
+;;         base-namespace (first input-parts)
+;;         base-keypath (second input-parts)]
+;;     (->> all-keywords
+;;          ;; Map to break down each keyword into [namespace keypath].
+;;          (map (fn [kw] (let [parts (cstr/split kw #"/")]
+;;                          [(first parts) (when (> (count parts) 1) (second parts))])))
+;;          ;; Filter based on namespace and start of keypath if specified.
+;;          (filter (fn [[ns kp]]
+;;                    (and (cstr/starts-with? ns base-namespace)
+;;                         (or (not base-keypath) ; No keypath specified, match namespace.
+;;                             (and kp (cstr/starts-with? kp base-keypath))))))
+;;          ;; Check if any children exist for exact matches and modify behavior accordingly.
+;;          (mapcat (fn [[ns kp]]
+;;                    (if kp
+;;                      (let [full-kpath (str ns "/" kp)
+;;                            parts (cstr/split full-kpath #">")
+;;                            has-children (some #(cstr/starts-with? % (str full-kpath ">")) all-keywords)
+;;                            shown-depth (if (or end-with-gt? has-children)
+;;                                          (inc (count (cstr/split input-clean #">")))
+;;                                          (count (cstr/split input-clean #">")))]
+;;                        [(str (cstr/join ">" (take shown-depth parts))
+;;                              (when (< shown-depth (count parts)) ">"))])
+;;                      [(str ns "/")]))) ; Only append '/' if namespace has deeper keypaths.
+;;          (distinct) ; Remove duplicates.
+;;          (remove nil?)
+;;          (vec))))
+
+;; (defn autocomplete-suggestions  [input all-keywords]
+;;   (let [aa (autocomplete-suggestions-fn input all-keywords)]
+;;     (if (and (some #(= % (str input ">")) aa) (<= (count aa) 2))
+;;       (autocomplete-suggestions-fn (str input ">") all-keywords)
+;;       aa)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+;; (def keywordss
+;;   [":flow/colors-of-the-moment-solver-flow--44>temp-name"
+;;    ":flow/colors-of-the-moment-solver-flow--44>waiter-fn>34>565"
+;;    ":flow/colors-of-the-moment-solver-flow--44>shell-command-in>34>84"
+;;    ":flow/colors-of-the-moment-solver-flow--44>shell-command-in>testse>testsets454"
+;;    ":flow/colors-of-the-moment-solver-flow--44"
+;;    ":flow/colors-of-the-moment-solver-flow--46>run-id"
+;;    ":flow/colors-of-the-moment-solver-flow--46>join-output-as-string"
+;;    ":flow/colors-of-the-moment-solver-flow--46>clojure-string-join-1delimiter"
+;;    ":flow/colors-of-the-moment-solver-flow--46>image-path"
+;;    ":flow/colors-of-the-moment-solver-flow--46>clojure-string-join-1"
+;;    ":flow/colors-of-the-moment-solver-flow--46>convert-to-png"
+;;    ":flow/colors-of-the-moment-solver-flow--46>done"
+;;    ":flow/colors-of-the-moment-solver-flow--36>temp-name"
+;;    ":flow/colors-of-the-moment-solver-flow--36>waiter-fn"
+;;    ":flow/colors-of-the-moment-solver-flow--36>shell-command-in"
+;;    ":flow/colors-of-the-moment-solver-flow--36>run-id"
+;;    ":flow/colors-of-the-moment-solver-flow--36>join-output-as-string"
+;;    ":flow/colors-of-the-moment-solver-flow--36>clojure-string-join-1delimiter"
+;;    ":flow/colors-of-the-moment-solver-flow--36>image-path"
+;;    ":flow/colors-of-the-moment-solver-flow--36>clojure-string-join-1"
+;;    ":flow/colors-of-the-moment-solver-flow--36>convert-to-png"
+;;    ":flow/colors-of-the-moment-solver-flow--36>done"])
+
+;; (tap> [:autocomplete-test! (into {}
+;;                                 (for [ss [":flow/colors-of-the-moment-solver-flow--36>"
+;;                                           ":flow/colors-of-the-moment-solver-flow--44>shell-command-in"
+;;                                           ":flow/colors-of-the-moment-solver-flow--44>shell-command-in>"
+;;                                           ":flow/colors-of-the-moment-solver-flow--36"
+;;                                           ":flow/colors-of-the-moment-solver-flow--44"
+;;                                           ":flow/colors-of-the-moment-solver-flow--44>"
+;;                                           ":flow/colors-of-the-moment-solver-flow--44>s"
+;;                                           ":flow/colors-of-the-moment-solver-flow"]]
+;;                                   {ss (autocomplete-suggestions ss keywordss)}))])
+
+(defonce last-view-highlighted-hash (atom "lets-fucking-go!"))
+
+(re-frame/reg-sub
+ ::panel-code-up?
+ (fn [db _]
+   (let [editor? (get db :editor? false)
+         part-kp @(ut/tracked-sub ::editor-panel-selected-view {})
+         view-code-hash (hash [(get-in db [:panels (get db :selected-block)])  part-kp])
+         old-view-code-hash @last-view-highlighted-hash]
+    ;;  (tap> [:runhighlioght? (and editor? (not= view-code-hash old-view-code-hash))])
+     ;(and editor? (not= view-code-hash old-view-code-hash))
+     true
+     )))
+
+
 (defn custom-hint-simple-fn [cm input-token]
   (let [cursor (.getCursor cm)
         token (.getTokenAt cm cursor)]
-    (tap> ["Current token:" (.-string token) ":input token:" input-token]) ;; Debugging
+    ;(tap> ["Current token:" (.-string token) ":input token:" input-token]) ;; Debugging
     ;; Define your list of suggestions here
     (let [input (.-string token) ;;(or input-token (.-string token))
           input (if (string? input-token) input-token input)
-          surrounds (get-surrounding-tokens cm cursor token)
-          _ (tap> [:surrounds-simp surrounds])
+          ;surrounds (get-surrounding-tokens cm cursor token)
+          ;_ (tap> [:surrounds-simp surrounds])
           list (vec (map str @(rfa/sub ::parameters-available {})))
           ;list [":keyword1" ":k!" ":keyword2" ":keyword44" ":kiwi/farts" ":liwi/limes"]
-          filtered-list (filter #(clojure.string/starts-with? % input) list)] ;; Dynamic filtering
+          ;filtered-list (sort (filter #(clojure.string/starts-with? % input) list)) ;; Dynamic filtering
+          filtered-list (sort (autocomplete-suggestions input list))
+    ]
       ;; Return a hint object expected by CodeMirror
       (clj->js {:list filtered-list
                 :from (clj->js {:line (.-line cursor) :ch (.-start token)})
@@ -3075,11 +3309,13 @@
   (let [cursor (clj->js {:line start-line :ch start-ch}) ;; Create a cursor object from start-line and start-ch
         token (.getTokenAt cm cursor)
         input (if (string? input-token) input-token (.-string token)) ;; Use input-token if it's a string, otherwise use the current token
-        surrounds (get-surrounding-tokens cm cursor input-token)
-        _ (tap> [:surrounds surrounds])
+        ;surrounds (get-surrounding-tokens cm cursor input-token)
+        ;_ (tap> [:surrounds surrounds])
         list (vec (map str @(rfa/sub ::parameters-available {})))
-        filtered-list (filter #(clojure.string/starts-with? % input) list)] ;; Filter the list with the input
-         (tap> [:custom-hint-called input-token start-line start-ch end-ch])
+        ;;filtered-list (sort (filter #(clojure.string/starts-with? % input) list))] ;; Filter the list with the input
+        filtered-list (sort (autocomplete-suggestions input list))
+  ]
+         ;(tap> [:custom-hint-called input-token start-line start-ch end-ch])
     ;; Return a hint object expected by CodeMirror
     (clj->js {:list filtered-list
               :from cursor
@@ -3096,6 +3332,27 @@
                                             ) 10)))
               :close (fn [cm]
                        (js/setTimeout #(do (.focus cm)) 100))})))
+
+(defn can-be-autocompleted? [token-string]
+  
+  (let [list (vec (map str @(rfa/sub ::parameters-available {})))
+        can? (ut/ne? (filter #(clojure.string/starts-with? % token-string) list))
+        _ (tap> [:can-be-autocompleted? can? token-string])
+        ]
+    ;;(contains? list token-string)
+    can?
+    ))
+
+;; (defn remove-highlight-watcher []
+;;   (remove-watch cm-instance-panel-code-box :highlight-panel-code))
+
+;; (defn add-highlight-watcher []
+;;   ;(remove-highlight-watcher)
+;;   (add-watch cm-instance-panel-code-box :highlight-panel-code
+;;              (fn [_ _ _ _]
+;;                (ut/tracked-dispatch [::highlight-panel-code]))))
+
+;; (add-highlight-watcher)
 
 
 
@@ -3121,8 +3378,13 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value (ut/format-map code-width (str value)) ;; value will be pre filtered by caller
               :onBeforeChange (fn [editor _ _] ;; data value]
-                                (reset! cm-instance-panel-code-box editor))
-              :onBlur  #(let [parse        (try (read-string
+                                (reset! cm-instance-panel-code-box editor)
+                                ;(ut/tracked-dispatch [::highlight-panel-code])
+                                )
+              :onFocus (fn [_] (reset! db/cm-focused? true))
+              ;; :onMount (fn [_] (ut/tracked-dispatch [::highlight-panel-code]))
+              :onBlur  #(let [_            (reset! db/cm-focused? false)
+                              parse        (try (read-string
                                                   ;(ut/rs-save-floats ;-preserve-floats
                                                  (cstr/join " " (ut/cm-deep-values %)))
                                                 (catch :default e [:cannot-parse (str (.-message e))]))
@@ -3139,14 +3401,21 @@
                             (do (reset! db/bad-form? false)
                                 (if (nil? key)
                                   (ut/tracked-dispatch-sync [::update-selected parse])
-                                  (ut/tracked-dispatch-sync [::update-selected-key-cons key parse])))))
+                                  (ut/tracked-dispatch-sync [::update-selected-key-cons key parse]))
+                                (ut/dispatch-delay [::highlight-panel-code] 200))))
               :onInputRead (fn [cm]
-                             (tap> "onInputRead called")
+                             ;(tap> "onInputRead called")
                              (let [cursor (.getCursor cm)
-                                   token (.getTokenAt cm cursor)]
-                                (tap> [:cc (.-string token)])
-                               (when (= (.-string token) ":")
-                                 (tap> [:hit-auto?])
+                                   token (.getTokenAt cm cursor)
+                                   token-string (.-string token)
+                                   token-end (= (.-ch cursor) (.-end token))]
+                               ;(tap> [:cc token-string])
+                               (when (or (= token-string ":")
+                                         (and token-end 
+                                              (can-be-autocompleted? token-string)
+                                              ;true
+                                              ))
+                                 ;(tap> [:hit-auto?])
                                  (js/setTimeout (fn []
                                                   (.execCommand cm "autocomplete")) 0))))
               :options {:mode              (if sql-hint? "sql" "clojure")
@@ -3155,7 +3424,7 @@
                         :lineNumbers       true
                         :matchBrackets     true
                         :autoCloseBrackets true
-                        :autofocus         true ;false
+                        :autofocus         false
                         :autoScroll        false
                         :detach            true
                         :readOnly          false            ;true
@@ -3171,46 +3440,50 @@
 (re-frame/reg-event-db
  ::highlight-panel-code
  (fn [db _]
-   (let [;;codes [:theme/base-font :font-family :height]
-         flow-subs (get db :flow-subs)
-         click-params (vec (for [e (keys (get-in db [:click-param :param]))] 
-                        (keyword (str "param/" (cstr/replace (str e) ":" "")))))
+   (let [flow-subs (get db :flow-subs)
+         click-params (vec (for [e (keys (get-in db [:click-param :param]))]
+                             (keyword (str "param/" (cstr/replace (str e) ":" "")))))
          themes (vec (for [e (keys (get-in db [:click-param :theme]))]
                        (keyword (str "theme/" (cstr/replace (str e) ":" "")))))
          codes (vec (into themes (into flow-subs click-params)))
+         part-kp @(ut/tracked-sub ::editor-panel-selected-view {})
+         view-code-hash (hash [(get-in db [:panels (get db :selected-block)])  part-kp])]
+
+     (reset! last-view-highlighted-hash view-code-hash)
          
-         ]
-     
+    ;;  (when (cstr/includes? (str (get db :client-name)) "-short-") 
+    ;;    (tap> [:highlight-panel-code!! (get db :client-name) view-code-hash]))
+
     ;;  (highlight-codes-only codes {;:color "white" 
     ;;                               :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")) )
     ;;                               :filter "invert(0.8)"
     ;;                               ;:font-weight 700
     ;;                               :border-radius "5px"})
-          (highlight-codes-only codes {;:color "white" 
-                                       :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
-                                       :filter "invert(1.2)"
-                                       :cursor "pointer"
+     (highlight-codes-only codes {;:color "white" 
+                                  :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
+                                  :filter "invert(1.2)"
+                                  :cursor "pointer"
                                        ;:filter (str "invert(1.2)" (when @db/param-code-hover " outer-glow(0px 0px 10px white)"))
                                   ;:font-weight 700
-                                       :border-radius "5px"}
-                                (fn [code] (let [;code (try (edn/read-string code) (catch :default _ code))
-                                                 ;vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})
-                                                 ]
-                                             ;; ^^ deprecated since we removed the renderer for this... leaving for now
-                                             [re-com/box
-                                              ;:min-height "80px"
-                                              :size "auto"
-                                              :width "100%"
-                                              :align :center :justify :center
-                                              :style {:font-size "15px"}
-                                              ;;:child (pr-str vv)
-                                              :child " " ;;[shape/map-boxes2 vv nil "" [] nil "map"]
-                                              ;;:child [map-boxes2 vv nil nil [] :output nil]
-                                              :style {;:color "white" 
-                                                      ;:color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
-                                                      ;:background-color (get (theme-pull :theme/data-colors nil) "keyword")
-                                                      :border-radius "4px"}]))
-                                )
+                                  :border-radius "5px"}
+                          ;;  (fn [code] (let [;code (try (edn/read-string code) (catch :default _ code))
+                          ;;                        ;vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})
+                          ;;                   ]
+                          ;;                    ;; ^^ deprecated since we removed the renderer for this... leaving for now
+                          ;;               [re-com/box
+                          ;;                     ;:min-height "80px"
+                          ;;                :size "auto"
+                          ;;                :width "100%"
+                          ;;                :align :center :justify :center
+                          ;;                :style {:font-size "15px"}
+                          ;;                     ;;:child (pr-str vv)
+                          ;;                :child " " ;;[shape/map-boxes2 vv nil "" [] nil "map"]
+                          ;;                     ;;:child [map-boxes2 vv nil nil [] :output nil]
+                          ;;                :style {;:color "white" 
+                          ;;                             ;:color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
+                          ;;                             ;:background-color (get (theme-pull :theme/data-colors nil) "keyword")
+                          ;;                        :border-radius "4px"}]))
+                           )
      ;;(highlight-codes codes (fn [code][re-com/box :child (str code) :style {:color "white" :background-color "teal" :border-radius "4px"}]))
      )
    db))
@@ -3481,7 +3754,17 @@
                               (when (not (nil? (get-in v [:queries query-name]))) k))))
         (catch :default e nil))))
 
-(defonce param-hover (reagent/atom nil))
+(re-frame/reg-sub
+ ::clover-params-in-view
+ (fn [db _]
+   (let [part-kp @(ut/tracked-sub ::editor-panel-selected-view {})
+         panel (get-in db (vec (into [:panels (get db :selected-block)] (vec part-kp))))
+         parts (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten panel)))
+         ;;_ (tap> [:pp parts])
+         ]
+     parts)))
+
+
 
 (defonce searcher-atom (reagent/atom nil))
 
@@ -3504,6 +3787,7 @@
                                           (vec @(ut/tracked-subscribe [::current-tab-blocks])))
                                     (vec @(ut/tracked-subscribe [::current-tab-condis])))
                               (catch :default _ []))
+        clover-params        (if @db/cm-focused? @(ut/tracked-sub ::clover-params-in-view {}) {})
         ;panel-queries       @(ut/tracked-subscribe [::panel-sql-call-keys selected-block])
         ;panel-q-str         (str (first panel-queries))
         ]
@@ -3568,31 +3852,37 @@
        :width (px (- width-int 33))
        :align :center :justify :between
        ;:style {:border "1px solid orange" }
-       :children [[re-com/input-text
-                   :src (at)
-                   :model             searcher-atom
-                   :width             "93%"
-                   :on-change #(reset! searcher-atom (let [vv (str %) ;; (cstr/trim (str %))
-                                                           ]
-                                                       (if (empty? vv) nil vv)))
+       :children (if @db/cm-focused?
+                   [[re-com/box 
+                     :size "auto"
+                     :align :center :justify :center 
+                     :style {:color "#ffffff99" :font-size "14px" :font-weight 500}
+                     :child "clover params used in this view"]]
+                   [[re-com/input-text
+                     :src (at)
+                     :model             searcher-atom
+                     :width             "93%"
+                     :on-change #(reset! searcher-atom (let [vv (str %) ;; (cstr/trim (str %))
+                                                             ]
+                                                         (if (empty? vv) nil vv)))
                      ;:validation-regex  flow-id-regex
-                   :placeholder "(search parameters)"
-                   :change-on-blur?   false
-                   :style  {:text-decoration (when (ut/ne? @searcher-atom) "underline")
-                            :color "inherit"
-                            :border "none"
+                     :placeholder "(search parameters)"
+                     :change-on-blur?   false
+                     :style  {:text-decoration (when (ut/ne? @searcher-atom) "underline")
+                              :color "inherit"
+                              :border "none"
                               ;:margin-top "3px"
                               ;:margin-left "-4px"
-                            :outline "none"
-                            :text-align "center"
-                            :background-color "#00000000"}]
-                  [re-com/box
-                   :style {;:border "1px solid maroon"
-                           :opacity (if @searcher-atom 1.0 0.45)
-                           :cursor "pointer"}
-                   :width "20px" :align :center :justify :center
-                   :attr {:on-click #(reset! searcher-atom nil)}
-                   :child "x"]]]
+                              :outline "none"
+                              :text-align "center"
+                              :background-color "#00000000"}]
+                    [re-com/box
+                     :style {;:border "1px solid maroon"
+                             :opacity (if @searcher-atom 1.0 0.45)
+                             :cursor "pointer"}
+                     :width "20px" :align :center :justify :center
+                     :attr {:on-click #(reset! searcher-atom nil)}
+                     :child "x"]])]
 
       [re-com/box
        :size "none"
@@ -3604,8 +3894,7 @@
                :overflow-x  "hidden"}
        :child [re-com/v-box
                :gap "10px"
-               :children (for [grp (if @db/param-code-hover [{}]  ;;overriding with a single value that gets injected below
-                                       click-params)]
+               :children (for [grp click-params] ;; [grp (if @db/param-code-hover [{}] click-params)]
                            (let [filtered-params (into {} (filter #(and ;; filter out from the top bar toggle first....
                                                                     (not (= (str (first %)) ":/")) ;; sometimes a garbo param sneaks in, harmless, but lets avoid rendering it
                                                                     (not (cstr/starts-with? (str (first %)) ":conn-list/"))
@@ -3627,15 +3916,23 @@
                                  filter-keys (vec (filter-search @searcher-atom (keys filtered-params)))
                                  filtered-params (select-keys filtered-params filter-keys)
 
-                                 filtered-params (if @db/param-code-hover
-                                                   (let [code @db/param-code-hover
-                                                         code (try (edn/read-string code) (catch :default _ code))
-                                                         vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})]
-                                                     {code vv})
+                                ;;  filtered-params (if @db/param-code-hover
+                                ;;                    (let [code @db/param-code-hover
+                                ;;                          code (try (edn/read-string code) (catch :default _ code))
+                                ;;                          vv @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [code]})]
+                                ;;                      {code vv})
+                                ;;                    filtered-params)
+
+                                 filtered-params (if @db/cm-focused?
+                                                   (select-keys grp clover-params)
                                                    filtered-params)
-                                 
-                                 
-                                 
+                                ;;  _ (tap> [:wtf (if @db/cm-focused?
+                                ;;                  (select-keys (apply concat click-params) (keys clover-params))
+                                ;;                  filtered-params)])
+                                ;;  _ (tap> [:grp clover-params grp])
+
+
+
                                  is-not-empty?   (ut/ne? (remove empty? filtered-params))]
                            ;(tap> [filtered-params (empty? (remove empty? filtered-params)) (into {} filtered-params)])
                              (when is-not-empty?

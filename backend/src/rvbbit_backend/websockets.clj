@@ -125,6 +125,10 @@
 (def last-solvers-history-atom (ut/thaw-atom {} "./data/atoms/last-solvers-history-atom.edn"))
 
 
+(def autocomplete-view-atom (ut/thaw-atom [] "./data/atoms/autocomplete-view-atom.edn"))
+(def autocomplete-clover-param-atom (ut/thaw-atom [] "./data/atoms/autocomplete-clover-param-atom.edn"))
+
+
 (def time-atom (ut/thaw-atom {} "./data/atoms/time-atom.edn"))
 
 (def clover-sql-training-atom (ut/thaw-atom {} "./data/training/clover-sql-training-atom.edn"))
@@ -346,94 +350,142 @@
 
 
 
-(def task-queue6 (java.util.concurrent.LinkedBlockingQueue.))
-(def workers6 (atom {})) ; Holds a map of task IDs to futures, start times, and task strings
+;; (def task-queue6 (java.util.concurrent.LinkedBlockingQueue.))
+;; (def workers6 (atom {})) ; Holds a map of task IDs to futures, start times, and task strings
 
-(defn enqueue-task6 [task]
-  (let [id (str (java.util.UUID/randomUUID))
-        task-str (pr-str (take 10 task))] ; Stringify the task, taking only the first 10 elements to limit the length
-    (.put task-queue6 {:task task :id id :task-str task-str})))
+;; (defn enqueue-task6 [task]
+;;   (let [id (str (java.util.UUID/randomUUID))
+;;         task-str (pr-str task)] ; Stringify the task, taking only the first 10 elements to limit the length
+;;     (.put task-queue6 {:task task :id id :task-str task-str})))
 
-(defn worker-loop6 []
-  (loop []
-    (when-let [{:keys [task id task-str]} (.poll task-queue6)] ; Use poll instead of take to avoid blocking when the queue is empty
-      (let [future-task (async/future-timeout (task) (* 10 60 1000))] ; Add a 10 minute timeout to the task
-        (swap! workers6 assoc id {:future future-task :start-time (System/currentTimeMillis) :task-str task-str}) ; Store the future, start time, and task string in workers6
-        (task)
-        (swap! workers6 dissoc id))))
-  (recur))
+;; (defn worker-loop6 []
+;;   (loop []
+;;     (when-let [{:keys [task id task-str]} (.poll task-queue6)] ; Use poll instead of take to avoid blocking when the queue is empty
+;;       (let [future-task (async/future-timeout (task) (* 10 60 1000))] ; Add a 10 minute timeout to the task
+;;         (swap! workers6 assoc id {:future future-task :start-time (System/currentTimeMillis) :task-str task-str}) ; Store the future, start time, and task string in workers6
+;;         (task)
+;;         (swap! workers6 dissoc id))))
+;;   (recur))
 
-(defn start-workers6 [num-workers]
-  (ut/pp [:starting-sync-worker-thread-*pool 6])
-  (reset! workers6 {})
-  (doall (map (fn [_] (future (worker-loop6))) (range num-workers))))
+;; (defn start-workers6 [num-workers]
+;;   (ut/pp [:starting-sync-worker-thread-*pool 6])
+;;   (reset! workers6 {})
+;;   (doall (map (fn [_] (future (worker-loop6))) (range num-workers))))
 
-(defn stop-workers6 []
-  (doseq [[id {:keys [future]}] @workers6]
-    (future-cancel future)
-    (while (not (.isDone future)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60)))
-  (while (not (.isEmpty task-queue6)) ; Wait until the task queue is empty
-    (Thread/sleep 60)))
+;; (defn stop-workers6 []
+;;   (doseq [[id {:keys [future]}] @workers6]
+;;     (future-cancel future)
+;;     (while (not (.isDone future)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (while (not (.isEmpty task-queue6)) ; Wait until the task queue is empty
+;;     (Thread/sleep 60)))
 
-(defn cancel-task [id] ; Function to cancel a task by its ID
-  (let [{:keys [future]} (get @workers6 id)]
-    (when future
-      (future-cancel future)
-      (swap! workers6 dissoc id))))
+;; (defn cancel-task [id] ; Function to cancel a task by its ID
+;;   (let [{:keys [future]} (get @workers6 id)]
+;;     (when future
+;;       (future-cancel future)
+;;       (swap! workers6 dissoc id))))
 
-(defn recycle-workers6 [num-workers]
-  (stop-workers6)
-  (start-workers6 num-workers))
-
-
+;; (defn recycle-workers6 [num-workers]
+;;   (stop-workers6)
+;;   (start-workers6 num-workers))
 
 
 
-;;; same with timeout and diff setup and tracker / cancel
-(def task-queue7 (java.util.concurrent.LinkedBlockingQueue.))
-(def workers7 (atom {})) ; Holds a map of task IDs to futures, start times, and task strings
-(def executor (java.util.concurrent.Executors/newScheduledThreadPool 1)) ; Executor for cancelling tasks after the timeout
 
-(defn enqueue-task7 [task]
-  (let [id (str (java.util.UUID/randomUUID))
-        task-str (pr-str (take 10 task))] ; Stringify the task, taking only the first 10 elements to limit the length
-    (.put task-queue7 {:task task :id id :task-str task-str})))
 
-(defn worker-loop7 []
-  (loop []
-    (when-let [{:keys [task id task-str]} (.poll task-queue7)] ; Use poll instead of take to avoid blocking when the queue is empty
-      (let [future-task (future (task))
-            cancel-task (reify Runnable (run [_] (future-cancel future-task)))] ; Task to cancel the future after the timeout
-        (.schedule executor cancel-task 10 java.util.concurrent.TimeUnit/MINUTES) ; Schedule the cancellation task to run after 10 minutes
-        (swap! workers7 assoc id {:future future-task :start-time (System/currentTimeMillis) :task-str task-str}) ; Store the future, start time, and task string in workers7
-        (task)
-        (swap! workers7 dissoc id))))
-  (recur))
+;; ;;; same with timeout and diff setup and tracker / cancel
+;; (def task-queue7 (java.util.concurrent.LinkedBlockingQueue.))
+;; (def workers7 (atom {})) ; Holds a map of task IDs to futures, start times, and task strings
+;; (def executor7 (java.util.concurrent.Executors/newScheduledThreadPool 1)) ; Executor for cancelling tasks after the timeout
 
-(defn start-workers7 [num-workers]
-  (ut/pp [:starting-sync-worker-thread-*pool 7])
-  (reset! workers7 {})
-  (doall (map (fn [_] (future (worker-loop7))) (range num-workers))))
+;; (defn enqueue-task7 [task]
+;;   (let [id (str (java.util.UUID/randomUUID))
+;;         task-str (pr-str task)] ; Stringify the task, taking only the first 10 elements to limit the length
+;;     (.put task-queue7 {:task task :id id :task-str task-str})))
 
-(defn stop-workers7 []
-  (doseq [[id {:keys [future]}] @workers7]
-    (future-cancel future)
-    (while (not (.isDone future)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60)))
-  (while (not (.isEmpty task-queue7)) ; Wait until the task queue is empty
-    (Thread/sleep 60))
-  (reset! workers7 {})) ; Clear the workers7 atom
+;; (defn worker-loop7 []
+;;   (loop []
+;;     (when-let [{:keys [task id task-str]} (.poll task-queue7)] ; Use poll instead of take to avoid blocking when the queue is empty
+;;       (let [future-task (future (task))
+;;             cancel-task (reify Runnable (run [_] (future-cancel future-task)))] ; Task to cancel the future after the timeout
+;;         (.schedule executor7 cancel-task 10 java.util.concurrent.TimeUnit/MINUTES) ; Schedule the cancellation task to run after 10 minutes
+;;         (swap! workers7 assoc id {:future future-task :start-time (System/currentTimeMillis) :task-str task-str}) ; Store the future, start time, and task string in workers7
+;;         (task)
+;;         (swap! workers7 dissoc id))))
+;;   (recur))
 
-(defn cancel-task [id] ; Function to cancel a task by its ID
-  (let [{:keys [future]} (get @workers7 id)]
-    (when future
-      (future-cancel future)
-      (swap! workers7 dissoc id))))
+;; (defn start-workers7 [num-workers]
+;;   (ut/pp [:starting-sync-worker-thread-*pool 7])
+;;   (reset! workers7 {})
+;;   (doall (map (fn [_] (future (worker-loop7))) (range num-workers))))
 
-(defn recycle-workers7 [num-workers]
-  (stop-workers7)
-  (start-workers7 num-workers))
+;; (defn stop-workers7 []
+;;   (doseq [[id {:keys [future]}] @workers7]
+;;     (future-cancel future)
+;;     (while (not (.isDone future)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (while (not (.isEmpty task-queue7)) ; Wait until the task queue is empty
+;;     (Thread/sleep 60))
+;;   (reset! workers7 {})) ; Clear the workers7 atom
+
+;; (defn cancel-task [id] ; Function to cancel a task by its ID
+;;   (let [{:keys [future]} (get @workers7 id)]
+;;     (when future
+;;       (future-cancel future)
+;;       (swap! workers7 dissoc id))))
+
+;; (defn recycle-workers7 [num-workers]
+;;   (stop-workers7)
+;;   (start-workers7 num-workers))
+
+
+
+;; ;;; same with timeout and diff setup and tracker / cancel
+;; (def task-queue8 (java.util.concurrent.LinkedBlockingQueue.))
+;; (def workers8 (atom {})) ; Holds a map of task IDs to futures, start times, and task strings
+;; (def executor8 (java.util.concurrent.Executors/newScheduledThreadPool 1)) ; Executor for cancelling tasks after the timeout
+
+;; (defn enqueue-task8 [task]
+;;   (let [id (str (java.util.UUID/randomUUID))
+;;         task-str (pr-str task)] ; Stringify the task, taking only the first 10 elements to limit the length
+;;     (.put task-queue8 {:task task :id id :task-str task-str})))
+
+;; (defn worker-loop8 []
+;;   (loop []
+;;     (when-let [{:keys [task id task-str]} (.poll task-queue8)] ; Use poll instead of take to avoid blocking when the queue is empty
+;;       (let [future-task (future (task))
+;;             cancel-task (reify Runnable (run [_] (future-cancel future-task)))] ; Task to cancel the future after the timeout
+;;         (.schedule executor8 cancel-task 10 java.util.concurrent.TimeUnit/MINUTES) ; Schedule the cancellation task to run after 10 minutes
+;;         (swap! workers8 assoc id {:future future-task :start-time (System/currentTimeMillis) :task-str task-str}) ; Store the future, start time, and task string in workers8
+;;         (task)
+;;         (swap! workers8 dissoc id))))
+;;   (recur))
+
+;; (defn start-workers8 [num-workers]
+;;   (ut/pp [:starting-sync-worker-thread-*pool 8])
+;;   (reset! workers8 {})
+;;   (doall (map (fn [_] (future (worker-loop8))) (range num-workers))))
+
+;; (defn stop-workers8 []
+;;   (doseq [[id {:keys [future]}] @workers8]
+;;     (future-cancel future)
+;;     (while (not (.isDone future)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (while (not (.isEmpty task-queue8)) ; Wait until the task queue is empty
+;;     (Thread/sleep 60))
+;;   (reset! workers8 {})) ; Clear the workers8 atom
+
+;; (defn cancel-task [id] ; Function to cancel a task by its ID
+;;   (let [{:keys [future]} (get @workers8 id)]
+;;     (when future
+;;       (future-cancel future)
+;;       (swap! workers8 dissoc id))))
+
+;; (defn recycle-workers8 [num-workers]
+;;   (stop-workers8)
+;;   (start-workers8 num-workers))
+
 
 
 
@@ -1998,6 +2050,16 @@
 ;(def last-values (atom {}))
 (def last-values (ut/thaw-atom {} "./data/atoms/last-values.edn"))
 (def last-values-per (ut/thaw-atom {} "./data/atoms/last-values-per.edn"))
+
+
+(defmethod wl/handle-request :autocomplete [{:keys [client-name surrounding panel-key view]}]
+  (ut/pp [:get-smart-autocomplete-vector client-name panel-key view {:context surrounding}])
+  {:clover-params @autocomplete-clover-param-atom
+   :view-keywords @autocomplete-view-atom})
+
+;; (def autocomplete-view-atom (ut/thaw-atom [] "./data/atoms/autocomplete-view-atom.edn"))
+;; (def autocomplete-clover-param-atom (ut/thaw-atom [] "./data/atoms/autocomplete-clover-param-atom.edn"))
+
 
 (defmethod wl/handle-request :client-ui [{:keys [client-name atom-name value]}]
   (swap! params-atom assoc-in [client-name (keyword atom-name)] value)
@@ -6478,6 +6540,37 @@
                       nil]
                      ;(conj (conj e (str ":client/" (cstr/replace (cstr/join ">" e) ":" ""))) (some #(= (first e) %) live-clients))
                      )
+
+
+        solver-rows (ut/keypaths2 @last-solvers-atom)
+        solver-rows (vec (distinct (map (fn [x] (vec (take 3 x))) solver-rows)))
+        solver-rows (for [e solver-rows]
+                      [(cstr/replace (str (first e)) ":" "")
+                       "solvers"
+                       (cstr/replace (str (second e)) ":" "")
+                       (str ":solver/" (cstr/replace (cstr/join ">" e) ":" ""))
+                       false ;(true? (some #(= (first e) %) live-clients))
+                       (strunc (ut/replace-large-base64 (get-in @last-solvers-atom e)))
+                       (display-name e)
+                       nil])
+
+        signal-rows (ut/keypaths2 
+                     ;;@last-signals-atom
+                     (into {} (filter (fn [[k _]] (keyword? k)) @last-signals-atom))
+                     )
+        signal-rows (vec (distinct (map (fn [x] (vec (take 3 x))) signal-rows)))
+        signal-rows (for [e signal-rows]
+                      [(cstr/replace (str (first e)) ":" "")
+                       "signals"
+                       (cstr/replace (str (second e)) ":" "")
+                       (str ":signal/" (cstr/replace (cstr/join ">" e) ":" ""))
+                       false ;(true? (some #(= (first e) %) live-clients))
+                       (strunc (ut/replace-large-base64 (get-in @last-signals-atom e)))
+                       (display-name e)
+                       nil])
+
+
+
         panel-rows (vec (filter #(and
                                   (or (= (get % 2) :views)
                                       (= (get % 2) :queries))
@@ -6537,9 +6630,16 @@
                       ;(when (not block?) (str (vec (drop-last e))))
                       ])
         ;prows (vec (filter #(cstr/includes? (str (get % 6) "") "-preview-") (distinct (into (into (into param-rows flow-rows) block-rows) panel-rows))))
-        prows (vec (distinct (into (into (into param-rows flow-rows) block-rows) panel-rows)))
+        ;;prows (vec (distinct (into (into (into param-rows flow-rows) block-rows) panel-rows)))
+        prows (vec (apply concat [param-rows flow-rows block-rows panel-rows solver-rows signal-rows]))
         ;;keys (vec (distinct (map first prows)))
         rows (vec (for [r prows] (zipmap [:item_key :item_type :item_sub_type :value :is_live :sample :display_name :block_meta] r)))
+
+        _ (reset! autocomplete-clover-param-atom (vec (distinct (filter #(not
+                                                                          (or (cstr/starts-with? (str %) ":panel/")
+                                                                              (cstr/starts-with? (str %) ":client/")))
+                                                                        (mapv :value rows)))))
+
         delete-sql {:delete-from [:client_items] :where [:= 1 1]} ;; (cons :or (vec (for [k keys] [:= :item_key k])))}
         ;insert-sql {:insert-into [:client_items] :values rows}
         ]
@@ -6698,6 +6798,7 @@
 (def mps-helper (atom {}))
 (def last-stats-row (atom {}))
 (def booted (atom nil))
+(def clients-alive (atom nil))
 
 (defn jvm-stats []
   (when (not @shutting-down?)
@@ -6947,6 +7048,9 @@
 
         ;; (ut/pp [:ack-scoreboard ack-scoreboardv])
 
+        ;; (ut/pp [:queue-stats! :push  @workers8])
+        ;; (ut/pp [:queue-stats! :solver @workers7])
+
         (ut/pp [:date-map @time-atom])
 
         (ut/pp [:sql-errors! {:ttl (count @sql/errors)
@@ -7013,46 +7117,47 @@
           (catch Throwable e (ut/pp [:printing-shit-error? (str e)])))
 
 
-      ;; (when
-      ;;  (or booted? (zero? (mod @stats-cnt 100)))
-      ;;   (doseq [[client-name v] @atoms-and-watchers]
-      ;; ;(ut/pp [:watchers (for [[k f] v] [k (first f)])])
-      ;;     (let [clients (count @wl/sockets)]
-      ;;       (alert! client-name [:v-box
-      ;;                            :justify :center
-      ;;                            :style {;:margin-top "-6px"
-      ;;                                    :opacity 0.7} ;:color (if error? "red" "inherit")}
-      ;;                            :children [[:box
-      ;;                                        :style {:font-weight 700 :font-size "18px"}
-      ;;                                        :child (str "[sys-stats] " client-name)]
-      ;;                                       [:box
-      ;;                                        :style {:font-weight 700 :font-size "11px" :opacity 0.6}
-      ;;                                        :child (str thread-count " threads,  "
-      ;;                                                    (ut/nf mm) " MB used on server, "
-      ;;                                                    (ut/nf ttl) " active client subs, "
-      ;;                                                    clients " client" (when (> clients 1) "s")  " connected")]
-      ;;                                       [:box
-      ;;                                        :style {:font-weight 700 :font-size "11px" :opacity 0.6}
-      ;;                                        :child (str "uptime: " (ut/format-duration-seconds (ut/uptime-seconds)))]
-      ;;                                       [:box
-      ;;                                        :style {:font-weight 700 :font-size "11px" :opacity 0.6}
-      ;;                                        :child (str "you have " (count (keys v)) " (server) watcher subs")]
+      (when
+       (or booted? (zero? (mod @stats-cnt 100)))
+        (doseq [[client-name v] @atoms-and-watchers]
+      ;(ut/pp [:watchers (for [[k f] v] [k (first f)])])
+          (let [clients (count @wl/sockets)]
+            (alert! client-name [:v-box
+                                 :justify :center
+                                 :style {;:margin-top "-6px"
+                                         :opacity 0.7} ;:color (if error? "red" "inherit")}
+                                 :children [[:box
+                                             :style {:font-weight 700 :font-size "18px"}
+                                             :child (str "[sys-stats] " client-name)]
+                                            [:box
+                                             :style {:font-weight 700 :font-size "11px" :opacity 0.6}
+                                             :child (str thread-count " threads,  "
+                                                         (ut/nf mm) " MB used on server, "
+                                                         (ut/nf ttl) " active client subs, "
+                                                         clients " client" (when (> clients 1) "s")  " connected")]
+                                            [:box
+                                             :style {:font-weight 700 :font-size "11px" :opacity 0.6}
+                                             :child (str "uptime: " (ut/format-duration-seconds (ut/uptime-seconds)))]
+                                            [:box
+                                             :style {:font-weight 700 :font-size "11px" :opacity 0.6}
+                                             :child (str "you have " (count (keys v)) " (server) watcher subs")]
 
-      ;;                                       (when booted?
-      ;;                                         [:box
-      ;;                                          :style {:color :theme/editor-outer-rim-color :font-weight 700}
-      ;;                                          :child
-      ;;                                      ;[:speak-always (str "Hello. R-V-B-B-I-T system is online." )]
-      ;;                                          [:box :child (str "Hello. R-V-B-B-I-T system is online.")]])
+                                            (when booted?
+                                              [:box
+                                               :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                               :child
+                                           [:speak-always (str "Hello. data rabbit system is now online." )]
+                                           ;[:box :child (str "Hello. R-V-B-B-I-T system is online.")]
+                                               ])
 
-      ;;                                 ;; [:box
-      ;;                                 ;;  :style {:font-weight 700 :font-size "11px" :opacity 0.6}
-      ;;                                 ;;  :child (str "internal-watchers-count " (count-watchers flow-db/results-atom) )]
-      ;;                                       ]]10 (if booted? 2.2 1.7) 6)
-      ;;       (alert! client-name (load-view  (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
-      ;;       (alert! client-name (load-view  (last-x-items @stats-shadow 50)) 10 4 5)
-      ;;       (alert! client-name (chart-view (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
-      ;;       (alert! client-name (chart-view (last-x-items @stats-shadow 50)) 10 4 5))))
+                                      ;; [:box
+                                      ;;  :style {:font-weight 700 :font-size "11px" :opacity 0.6}
+                                      ;;  :child (str "internal-watchers-count " (count-watchers flow-db/results-atom) )]
+                                            ]]10 (if booted? 2.2 1.7) 6)
+            ;(alert! client-name (load-view  (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
+            ;(alert! client-name (load-view  (last-x-items @stats-shadow 50)) 10 4 5)
+            (alert! client-name (chart-view (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
+            (alert! client-name (chart-view (last-x-items @stats-shadow 50)) 10 4 5))))
 
 
     ;(ut/pp [:watchers (for [[k f] @atoms-and-watchers] [k (first f)])])

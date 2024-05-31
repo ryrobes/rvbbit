@@ -39,5 +39,7 @@
                      ;:default "import foo\nprint(foo.bar())"
                      :default-view [:box :child [:string :*query-id]]
                      :icon "images/python3.png"}}
- :eleven-labs-api-key nil}
+ :eleven-labs-api-key nil
+ :eleven-labs-default-voice-name "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
+ }
 

@@ -503,7 +503,7 @@
      :expandable? true,
      :drag-meta {:type :open-fn}}}}},
  :zoom [-1342.64 -2618.11 1.591],
- :opts {:close-on-done? true, :retry-on-error? false, :timeout 320000, :retries 0},
+ :opts {:close-on-done? true, :retry-on-error? false, :timeout 800000, :retries 0},
  :flow-id "node-color-thief-js-webp",
  :flowmaps-connections
  [[:shell-command-in :clojure-string-join-1/value-1]

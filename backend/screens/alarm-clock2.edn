@@ -1,52 +1,19 @@
 {:orders
- {:flow-fn-sys
-  [:name :description :full_map :inputs :icon :input_types :output_types :category],
-  :blocks-sys
-  [:block_key :block_name :queries :views :block_data :view_names :query_names],
-  :fields-sys [:field_name :field_type :data_type],
+ {:reco-counts [:table_name :cnt],
+  :gen-viz-516 (:mb :mem_used :messages_per_second :ts),
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :flows-sys [:flow_id :file_path :last_modified],
-  :files-sys [:file_path :screen_name :blocks :queries :ts],
-  :jvm_stats
-  [:used_memory_mb
-   :thread_count
-   :messages
-   :unix_ms
-   :messages_per_second
-   :recent_messages
-   :recent_messages_per_second
-   :recent_queries_run
-   :recent_queries_per_second
-   :queries_per_second
-   :sql_cache_size
-   :ws_peers
-   :subscriptions
-   :open_flow_channels
-   :uptime_seconds
-   :seconds_since_last_update
-   :queries_run
-   :internal_queries_run
-   :sniffs_run
-   :sys_load
-   :ts],
-  :flow-fn-categories-sys [:category],
-  :connections-sys [:database_name :connection_id],
-  :reco-counts [:table_name :cnt],
-  :gen-viz-516 (:mb :mem_used :messages_per_second :ts),
-  :flow-fn-all-sys [:name]},
+  :fields-sys [:field_name :field_type :data_type],
+  :connections-sys [:database_name :connection_id]},
  :reco-preview nil,
  :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
- :flow? false,
  :sql-source
- {:jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
-  :gen-viz-516
+ {:gen-viz-516
   {:cache? false,
    :where [:= :client_name :*client-name-str],
    :limit 13,
    :group-by [:ts],
-   :_last-run "04:40:05",
+   :_last-run "00:29:21",
    :refresh-every 20,
    :from
    [{:select
@@ -71,120 +38,9 @@
      (vec
        (reverse
          (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
+ :audio-playing? false,
  :meta
- {:flow-fn-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 128,
-     :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
-     :cardinality 100},
-    :description
-    {:data-type "string",
-     :distinct 33,
-     :group-by? true,
-     :commons
-     {"" 94, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
-     :cardinality 25},
-    :full_map
-    {:data-type "string",
-     :distinct 128,
-     :group-by? true,
-     :commons
-     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
-      1},
-     :cardinality 100},
-    :inputs
-    {:data-type "string",
-     :distinct 67,
-     :group-by? true,
-     :commons
-     {"[:open-input-1 :open-input]" 10,
-      "[:value1 :value2]" 7,
-      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
-     :cardinality 52},
-    :icon
-    {:data-type "string",
-     :distinct 21,
-     :group-by? true,
-     :commons {"zmdi-puzzle-piece" 94, "zmdi-pizza" 3, "zmdi-file-text" 3},
-     :cardinality 16},
-    :input_types
-    {:data-type "string",
-     :distinct 57,
-     :group-by? true,
-     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
-     :cardinality 44},
-    :output_types
-    {:data-type "string",
-     :distinct 14,
-     :group-by? true,
-     :commons {":any" 66, "" 19, ":boolean" 12},
-     :cardinality 10},
-    :category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 94, ":rabbit-base" 18, ":clojure-base" 16},
-     :cardinality 2}},
-   :rowcount 128},
-  :blocks-sys
-  {:fields
-   {:block_key
-    {:data-type "string",
-     :distinct 17,
-     :group-by? true,
-     :commons {":block-3108" 1, ":block-6003" 1, ":block-7377" 1},
-     :cardinality 100},
-    :block_name
-    {:data-type "string",
-     :distinct 17,
-     :group-by? true,
-     :commons {"block-12050" 1, "block-8670" 1, "block-4424" 1},
-     :cardinality 100},
-    :queries
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {0 13, 1 4},
-     :cardinality 11},
-    :views
-    {:data-type "integer",
-     :distinct 5,
-     :group-by? true,
-     :commons {1 7, 2 5, 0 3},
-     :cardinality 29},
-    :block_data
-    {:data-type "string",
-     :distinct 17,
-     :group-by? true,
-     :commons
-     {"{:name \"client latency callout\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :hi, :root [35 7], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:hi [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>client-latency]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"client latency (ms)\"]]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}"
-      1,
-      "{:h 8, :w 26, :connection-id \"system-db\", :name \"select-all-client_stats\", :queries {:client-stats-drag-36 {:select [:ack :client_latency :client_name :last_seen :last_seen_seconds :memory :recent_messages_per_second :push :queue_distro :server_subs :uptime], :from [[:client_stats :gg588]], :refresh-every 10, :cache? false, :_last-run \"21:58:32\", :col-widths {:ack 81, :client_latency 141, :client_name 261, :memory 81, :push 91, :server_subs 111, :uptime 201, :last_seen 171}, :order-by [[:last_seen_seconds :asc]], :style-rules {[:* :highlight-8717] {:logic [:= :client_name :*client-name-str], :style {:border \"1px solid #cac18255\"}}}}}, :root [14 13], :tab \"generated lass of the woodlands\"}"
-      1,
-      "{:panels {:block-8670 {:h 2, :w 12, :root [28 21], :tab \"generated lass of the woodlands\", :selected-view :hi, :name \"block-8670\", :views {:hi [:box :size \"auto\" :align :center :justify :center :style {:font-size \"27px\", :font-weight 700, :padding-right \"20px\", :padding-top \"6px\", :color \"#cac182\", :transition \"all 0.6s ease-in-out\"} :child [:string [\"\" :client/*client-name*>stats>client-name]]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-7377 {:name \"block-7377\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :cell-drop-5164, :root [23 21], :h 2, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:cell-drop-5164 [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"35px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client-memory-drag-36/packets.0]] [:box :style {:font-size \"14px\", :margin-top \"-10px\"} :child \"client packets\"]]]}}, :block-6441 {:h 2, :w 13, :root [1 17], :tab \"generated lass of the woodlands\", :selected-view :hi, :name \"block-6441\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-3341.:hi\"} :style {:font-size \"44px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color \"#cac182\", :font-family :theme/base-font} :child [:string :time/now]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}, :block-7453 {:name \"block-7453\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :cell-drop-2732, :root [23 23], :h 2, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:cell-drop-2732 [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"35px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client-memory-drag-36/batches.0]] [:box :style {:font-size \"14px\", :margin-top \"-10px\"} :child \"client batches\"]]]}}, :block-3108 {:h 5, :w 22, :connection-id \"system-db\", :name \"select-all-client_memory\", :queries {:client-memory-drag-36 {:select [:client_name :recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts], :where [:= :client_name :*client-name-str], :from [[:client_memory :ee183]], :refresh-every 20, :cache? false, :_last-run \"21:58:21\", :order-by [[:mem_time :desc]]}}, :root [1 21], :tab \"generated lass of the woodlands\", :selected-view :client-memory-drag-36}, :block-6003 {:h 4, :w 7, :root [7 13], :tab \"generated lass of the woodlands\", :selected-view :hi, :name \"block-6003\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-6003.:hi\"} :style {:font-size \"95px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color \"#cac182\", :font-family :theme/base-font} :child [:string :signal/cool-raccoon-signal-yo]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}], :params {:my-dash-killswitch? true}}, :queries {}}, :block-2505 {:name \"client latency callout\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :hi, :root [35 7], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:hi [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>client-latency]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"client latency (ms)\"]]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}, :block-5659 {:name \"block-5659\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :hi, :root [35 10], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:hi [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:string :client/*client-name*>stats>messages-per-second]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"messages/sec (all)\"]]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}}, :block-9994 {:name \"block-9994\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :cell-drop-11937, :root [35 1], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:cell-drop-11937 [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"56px\", :color \"#82ca9d\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:string :client/*client-name*>stats>recent-messages-per-second]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"messages/sec (recent)\"]]]}}, :block-4424 {:h 2, :w 13, :root [1 19], :tab \"generated lass of the woodlands\", :selected-view :cell-drop-4478, :name \"block-4424\", :views {:cell-drop-4478 [:box :size \"auto\" :align :center :justify :center :style {:font-size \"23px\", :font-weight 700, :color \"#cac182\", :padding-right \"20px\", :transition \"all 0.6s ease-in-out\"} :child [:string [\"uptime: \" :client/*client-name*>stats>uptime]]]}, :queries {}}, :block-285 {:name \"block-285\", :w 5, :style {:background-color \"#00000075\"}, :selected-view :cell-drop-7398, :root [35 4], :h 3, :queries {}, :tab \"generated lass of the woodlands\", :ghosted? true, :views {:cell-drop-7398 [:v-box :size \"auto\" :align :center :justify :center :style {:font-size \"60px\", :color \"#8884d8\", :font-weight 700, :transition \"all 0.6s ease-in-out\"} :children [[:box :child [:number :client/*client-name*>stats>memory]] [:box :style {:font-size \"18px\", :margin-top \"-10px\"} :child \"js used heap (mb)\"]]]}}, :block-12050 {:name \"block-12050\", :w 34, :selected-view :every-45-seconds, :root [1 1], :h 6, :connection-id \"system-db\", :queries {:gen-viz-516 {:cache? false, :where [:= :client_name :*client-name-str], :limit 50, :group-by [:ts], :_last-run \"21:58:32\", :refresh-every 20, :from [{:select [:client_name :recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts], :where [:= :client_name :*client-name-str], :from [[:client_memory :ee183]], :order-by [[:mem_time :desc]]}], :order-by [[:ts :desc]], :connection-id \"system-db\", :select [[[[:sum :mem_used]] :mem_used] [[:sum :recent_messages_per_second] :messages_per_second] :ts], :post-process-fn (fn [x] (vec (reverse (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}}, :tab \"generated lass of the woodlands\", :views {:every-45-seconds [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :ComposedChart {:data :gen-viz-516, :style {:font-family :theme/base-font}, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:reagent-gt :CartesianGrid {:strokeDasharray \"0 0\", :opacity 0}] [:reagent-gt :Tooltip {:content-style {:background-color \"#00000099\", :font-weight 700, :border \"1px solid transparent\", :border-radius \"4px\"}}] [:reagent-gt :XAxis {:dataKey :ts}] [:reagent-gt :YAxis {:yAxisId \"left\", :label {:value \"MB\", :angle -90, :fill \"#8884d8\", :style {:font-size \"20px\", :font-weight 700}, :position \"middle\", :dx -25}, :domain [\"auto\" \"auto\"]}] [:reagent-gt :YAxis {:yAxisId \"right\", :label {:value \"Messages per Second\", :angle 90, :fill \"#82ca9d\", :style {:font-weight 700, :font-size \"15px\"}, :position \"middle\", :dx 20}, :domain [\"auto\" \"auto\"], :orientation \"right\"}] [:reagent-gt :Line {:type \"monotone\", :dataKey :mb, :yAxisId \"left\", :stroke-width 3, :stroke \"#8884d8\", :activeDot {:r 8}}] [:reagent-gt :Bar {:type \"monotone\", :dataKey :messages_per_second, :yAxisId \"right\", :fill \"#00000000\", :stroke-width 3, :stroke \"#82ca9d\"}]]]}}, :block-2618 {:h 8, :w 26, :connection-id \"system-db\", :name \"select-all-client_stats\", :queries {:client-stats-drag-36 {:select [:ack :client_latency :client_name :last_seen :last_seen_seconds :memory :recent_messages_per_second :push :queue_distro :server_subs :uptime], :from [[:client_stats :gg588]], :refresh-every 10, :cache? false, :_last-run \"21:58:32\", :col-widths {:ack 81, :client_latency 141, :client_name 261, :memory 81, :push 91, :server_subs 111, :uptime 201, :last_seen 171}, :order-by [[:last_seen_seconds :asc]], :style-rules {[:* :highlight-8717] {:logic [:= :client_name :*client-name-str], :style {:border \"1px solid #cac18255\"}}}}}, :root [14 13], :tab \"generated lass of the woodlands\"}, :block-2178 {:h 6, :w 34, :root [1 7], :tab \"generated lass of the woodlands\", :selected-view :every-10-min-avg, :name \"block-2178\", :views {:every-10-min-avg [:reagent-gt :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:reagent-gt :BarChart {:data :new-query, :style {:font-family :theme/base-font}, :margin {:top 25, :right 30, :left 20, :bottom 5}} [:reagent-gt :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0}] [:reagent-gt :Tooltip {:content-style {:background-color \"#00000099\", :font-weight 700, :border \"1px solid transparent\", :border-radius \"4px\"}}] [:reagent-gt :XAxis {:dataKey :ts_hour}] [:reagent-gt :YAxis {:domain [\"auto\" \"auto\"]}] [:reagent-gt :Bar {:type \"monotone\", :dataKey :mem_used, :stroke \"#8884d8\", :stroke-width 3, :fill \"#8884d801\"} [:reagent-gt :LabelList {:dataKey :diff, :fill \"#8884d8\", :style {:font-size \"18px\", :font-weight 700}, :position \"top\"}]]]]}, :queries {:new-query {:cache? false, :where [:= :client_name :*client-name-str], :limit 26, :group-by [2], :_last-run \"21:58:32\", :refresh-every 10, :from [{:select [:client_name :recent_messages_per_second :messages_per_second :mem_used :batches :packets :ts], :where [:= :client_name :*client-name-str], :from [[:client_memory :ee183]], :order-by [[:mem_time :desc]]}], :order-by [[:ts :desc]], :connection-id \"system-db\", :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 15] :ts_hour]], :post-process-fn (fn [x] (vec (for [idx (range (count x)) :let [rx (vec (reverse x)) prev-row (get rx (- idx 1) {:mem_used 0}) row (get rx idx {:mem_used 0}) pre-mb (/ (get prev-row :mem_used) 1048576) mb (/ (get row :mem_used) 1048576) diff (Math/round (- mb pre-mb)) pos (cond (> diff 0) \"+\" (< diff 0) \"\" :else \"\")]] (merge row {:diff (if (= idx 0) (str (Math/round mb) \" MB\") (str pos diff))}))))}}}, :block-12288 {:h 4, :w 6, :root [1 13], :tab \"generated lass of the woodlands\", :selected-view :hi, :name \"block-12288\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-12288.:hi\"} :style {:font-size \"106px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color \"#cac182\", :font-family :theme/base-font} :child [:string :time/second]], :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}, :queries {}}}, :click-param {:param {:selected-view [nil :*], :selected-view-data nil, :selected-block :block-7453, :my-dash-killswitch? false, :upstanding-crimson-frog \"new parameter value!\", :super-cobalt-mole [\"1121pm - 229mb\"]}}}"
-      1},
-     :cardinality 100},
-    :view_names
-    {:data-type "string",
-     :distinct 11,
-     :group-by? true,
-     :commons {":hi :stack" 5, "" 3, ":every-10-min-avg" 1},
-     :cardinality 64},
-    :query_names
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons {"" 13, ":client-stats-drag-36" 1, ":client-memory-drag-36" 1},
-     :cardinality 29}},
-   :rowcount 17},
-  :fields-sys {:fields {}, :rowcount 0},
+ {:fields-sys {:fields {}, :rowcount 0},
   :tables-sys {:fields {}, :rowcount 0},
   :gen-viz-797
   {:fields
@@ -201,69 +57,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :flows-sys
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 93,
-     :group-by? true,
-     :commons {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "map-pull-test2" 1},
-     :cardinality 96},
-    :file_path
-    {:data-type "string",
-     :distinct 96,
-     :group-by? true,
-     :commons
-     {"./flows/stitches-math.edn" 1,
-      "./flows/openai-image-gen-ladder3.edn" 1,
-      "./flows/hey-rabbit-pathfinder.edn" 1},
-     :cardinality 100},
-    :last_modified
-    {:data-type "string",
-     :distinct 30,
-     :group-by? true,
-     :commons
-     {"2024-03-12 02:37:43" 67, "2024-05-03 21:13:48" 1, "2024-03-14 07:50:09" 1},
-     :cardinality 31}},
-   :rowcount 96},
-  :files-sys
-  {:fields
-   {:file_path
-    {:data-type "string",
-     :distinct 163,
-     :group-by? true,
-     :commons
-     {"./screens/weave-test122.edn" 1,
-      "./screens/nightcity-cape-cod.edn" 1,
-      "./screens/counting-lord-of-the-woods.edn" 1},
-     :cardinality 100},
-    :screen_name
-    {:data-type "string",
-     :distinct 156,
-     :group-by? true,
-     :commons
-     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
-     :cardinality 95},
-    :blocks
-    {:data-type "integer",
-     :distinct 49,
-     :group-by? true,
-     :commons {3 45, 12 6, 6 6},
-     :cardinality 30},
-    :queries
-    {:data-type "integer",
-     :distinct 34,
-     :group-by? true,
-     :commons {0 53, 5 13, 11 9},
-     :cardinality 20},
-    :ts
-    {:data-type "string",
-     :distinct 8,
-     :group-by? true,
-     :commons
-     {"2024-05-27 02:04:18" 47, "2024-05-27 02:04:17" 46, "2024-05-27 02:04:16" 42},
-     :cardinality 4}},
-   :rowcount 163},
   :gen-viz-94
   {:fields
    {:diff
@@ -273,136 +66,6 @@
      :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
-  :jvm_stats
-  {:fields
-   {:queries_run
-    {:data-type "integer",
-     :distinct 109,
-     :group-by? true,
-     :commons {0 3, 390 1, 177 1},
-     :cardinality 98},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 102,
-     :group-by? true,
-     :commons {27.07 3, 28.14 3, 25.47 2},
-     :cardinality 91},
-    :uptime_seconds
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {1259 1, 390 1, 915 1},
-     :cardinality 100},
-    :queries_per_second
-    {:data-type "float",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :sql_cache_size
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {1 63, 0 48},
-     :cardinality 1},
-    :ts
-    {:data-type "string",
-     :distinct 111,
-     :group-by? true,
-     :commons
-     {"2024-05-27 02:14:44" 1, "2024-05-27 02:06:44" 1, "2024-05-27 02:18:14" 1},
-     :cardinality 100},
-    :subscriptions
-    {:data-type "integer",
-     :distinct 6,
-     :group-by? true,
-     :commons {182 71, 184 29, 183 4},
-     :cardinality 5},
-    :messages_per_second
-    {:data-type "float",
-     :distinct 91,
-     :group-by? true,
-     :commons {27.73 3, 27.11 3, 27.81 3},
-     :cardinality 81},
-    :messages
-    {:data-type "integer",
-     :distinct 110,
-     :group-by? true,
-     :commons {0 2, 29612 1, 10971 1},
-     :cardinality 99},
-    :sniffs_run
-    {:data-type "integer",
-     :distinct 19,
-     :group-by? true,
-     :commons {12 13, 15 13, 20 13},
-     :cardinality 17},
-    :sys_load
-    {:data-type "float",
-     :distinct 103,
-     :group-by? true,
-     :commons {3.98 2, 2.79 2, 3.29 2},
-     :cardinality 92},
-    :unix_ms
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {1716790619942 1, 1716790229882 1, 1716791114900 1},
-     :cardinality 100},
-    :used_memory_mb
-    {:data-type "integer",
-     :distinct 110,
-     :group-by? true,
-     :commons {1757 2, 2220 1, 2705 1},
-     :cardinality 99},
-    :recent_queries_run
-    {:data-type "integer",
-     :distinct 19,
-     :group-by? true,
-     :commons {4 30, 2 24, 6 13},
-     :cardinality 17},
-    :thread_count
-    {:data-type "integer",
-     :distinct 39,
-     :group-by? true,
-     :commons {423 7, 417 7, 404 6},
-     :cardinality 35},
-    :internal_queries_run
-    {:data-type "integer",
-     :distinct 95,
-     :group-by? true,
-     :commons {0 3, 80 2, 10 2},
-     :cardinality 85},
-    :open_flow_channels
-    {:data-type "integer",
-     :distinct 9,
-     :group-by? true,
-     :commons {11 53, 104 20, 0 18},
-     :cardinality 8},
-    :ws_peers
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {12 108, 0 3},
-     :cardinality 1},
-    :recent_messages
-    {:data-type "integer",
-     :distinct 109,
-     :group-by? true,
-     :commons {0 3, 29612 1, 10971 1},
-     :cardinality 98},
-    :recent_queries_per_second
-    {:data-type "float",
-     :distinct 20,
-     :group-by? true,
-     :commons {0.27 30, 0.13 24, 0.4 13},
-     :cardinality 18},
-    :seconds_since_last_update
-    {:data-type "integer",
-     :distinct 3,
-     :group-by? true,
-     :commons {15 60, 14 50, -1 1},
-     :cardinality 2}},
-   :rowcount 111},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -427,15 +90,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :flow-fn-categories-sys
-  {:fields
-   {:category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
-     :cardinality 100}},
-   :rowcount 3},
   :gen-viz-84
   {:fields
    {:rows
@@ -588,30 +242,29 @@
   {:fields
    {:mb
     {:data-type "integer",
-     :distinct 13,
+     :distinct 2,
      :group-by? true,
-     :commons {1362 1, 1269 1, 1426 1},
+     :commons {1709 1, 1498 1},
      :cardinality 100},
     :mem_used
     {:data-type "integer",
-     :distinct 13,
+     :distinct 2,
      :group-by? true,
-     :commons {1750543515 1, 1331124285 1, 1602901975 1},
+     :commons {1792437748 1, 1571333457 1},
      :cardinality 100},
     :messages_per_second
     {:data-type "float",
-     :distinct 11,
+     :distinct 2,
      :group-by? true,
-     :commons {3.27 2, 3.6 2, 3.87 1},
-     :cardinality 84},
+     :commons {2.67 1, nil 1},
+     :cardinality 100},
     :ts
     {:data-type "string",
-     :distinct 13,
+     :distinct 2,
      :group-by? true,
-     :commons
-     {"2024-05-28 04:34:49" 1, "2024-05-28 04:37:49" 1, "2024-05-28 04:39:19" 1},
+     :commons {"2024-05-31 00:29:42" 1, "2024-05-31 00:28:57" 1},
      :cardinality 100}},
-   :rowcount 13},
+   :rowcount 2},
   :shape-drag-7
   {:fields
    {:shape
@@ -626,26 +279,14 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30},
-  :flow-fn-all-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 128,
-     :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
-     :cardinality 100}},
-   :rowcount 128}},
+   :rowcount 30}},
  :default-col-widths
- {:virtual-panel {:kick--1764769189 152},
+ {:block-4284 {:gen-viz-516 127},
   :system-connections-list* {:connections-sys 111},
   :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf},
-  :files-list* {:files-sys 178},
-  :blocks-list* {:blocks-sys 127},
-  :block-4284 {:gen-viz-516 127}},
+  :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
- :data-hash 1828743346,
+ :data-hash -1880615054,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -702,6 +343,7 @@
      :icon "zmdi-cocktail",
      :run-on :queries,
      :description "What does Buffy think about this data? Who knows!"}},
+   :eleven-labs-default-voice-name "Sofia-AI-frye",
    :graphite-host "127.0.0.1",
    :openapi-org-id nil,
    :debug-level 1,
@@ -864,17 +506,18 @@
     "wow-board"],
    :openapi-key "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"}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? false,
+ :lines? true,
+ :editor? true,
  :buffy? false,
- :memory [1586276946 1517799870 4294705152],
- :sched {:gen-viz-516 88548},
+ :memory [1868089726 1826139162 4294705152],
+ :sched {:gen-viz-516 157265},
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-28 04:40:03",
+      :at "2024-05-31 00:29:41",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -884,7 +527,7 @@
   {:file-changed
    {:data
     [{:path
-      "./live/engaging-teal-duck-15/star-shaped wallaby/block-12050/views/every-45-seconds.edn",
+      "./live/grin-bulbous-turtle-14/star-shaped wallaby/block-12050/views/every-45-seconds.edn",
       :type :modify,
       :panel-key :block-4284,
       :block-data
@@ -893,7 +536,7 @@
        :style {:border-radius "0px 0px 0px 30px"},
        :block-key ":block-12050",
        :selected-view :every-45-seconds,
-       :root [26 23],
+       :root [26 22],
        :h 6,
        :file-path "./screens/blackberries3-narrow.edn",
        :connection-id "system-db",
@@ -903,7 +546,7 @@
          :where [:= :client_name :*client-name-str],
          :limit 13,
          :group-by [:ts],
-         :_last-run "04:36:53",
+         :_last-run "04:44:16",
          :refresh-every 20,
          :from
          [{:select
@@ -930,65 +573,7 @@
                (for
                  [row x]
                  (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
-       :tab "star-shaped wallaby",
-       :views
-       {:every-45-seconds
-        [:>
-         :ResponsiveContainer
-         {:width "100%", :height :panel-height+50}
-         [:>
-          :ComposedChart
-          {:data :gen-viz-516,
-           :style {:font-family :theme/base-font},
-           :margin {:top 5, :bottom 5, :right 30, :left 20}}
-          [:> :CartesianGrid {:strokeDasharray "0 0", :opacity 0}]
-          [:>
-           :Tooltip
-           {:content-style
-            {:background-color "#00000099",
-             :font-weight 700,
-             :border "1px solid transparent",
-             :border-radius "4px"}}]
-          [:> :XAxis {:dataKey :ts}]
-          [:>
-           :YAxis
-           {:yAxisId "left",
-            :label
-            {:value "MB",
-             :angle -90,
-             :fill :solver/colors-of-the-moment>colors>1,
-             :style {:font-size "20px", :font-weight 700},
-             :position "middle",
-             :dx -25},
-            :domain ["auto" "auto"]}]
-          [:>
-           :YAxis
-           {:yAxisId "right",
-            :label
-            {:value "Messages per Second",
-             :angle 90,
-             :fill :solver/colors-of-the-moment>highest-saturation,
-             :style {:font-weight 700, :color "#ffffff", :font-size "15px"},
-             :position "middle",
-             :dx 20},
-            :domain ["auto" "auto"],
-            :orientation "right"}]
-          [:>
-           :Line
-           {:type "monotone",
-            :dataKey :mb,
-            :yAxisId "left",
-            :stroke-width 4,
-            :stroke :solver/colors-of-the-moment>contrast-with-dominant,
-            :activeDot {:r 8}}]
-          [:>
-           :Bar
-           {:type "monotone",
-            :dataKey :messages_per_second,
-            :yAxisId "right",
-            :fill "#00000000",
-            :stroke-width 4,
-            :stroke :solver/colors-of-the-moment>highest-saturation}]]]}}}
+       :tab "star-shaped wallaby"}}
      nil],
     :elapsed-ms nil,
     :reco-count nil}},
@@ -1003,239 +588,38 @@
        :children
        [[:box
          :style
-         {:font-weight 700, :font-size "11px", :opacity 0.6}
+         {:color :theme/editor-outer-rim-color, :font-weight 700}
          :child
-         "successfully saved screen"]
-        [:box :style {:font-weight 700, :font-size "18px"} :child "alarm-clock2"]
-        [:box
-         :style
-         {:font-weight 700, :font-size "11px", :opacity 0.6}
-         :child
-         "@ /home/ryanr/rvbbit/backend/screens/alarm-clock2.edn"]]]
+         [:speak-always "Heads up: data-rabbit system going offline."]]]]
       10
-      1.6
-      8]
+      1
+      5]
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
  :flow-subs
  [:time/now-seconds
   :flow/flow-forever>*running?
-  :solver/colors-of-the-moment>highest-saturation
   :time/minute
   :time/hour
   :client/*client-name*>stats>memory
   :solver/colors-of-the-moment>data-colors
+  :solver/colors-of-the-moment>colors>2
   :solver/colors-of-the-moment>colors>1
   :solver/colors-of-the-moment>brightest
   :flow/live-scratch-flow>*running?
   :solver/colors-of-the-moment
   :solver/wallpaper-of-the-moment
   :solver/colors-of-the-moment>colors>0
-  :solver/colors-of-the-moment>contrast-with-dominant
   :time/second
   :flow/flow-forever>:final-math
   :solver/colors-of-the-moment>second-brightest
   :solver/colors-of-the-moment>darkest],
- :client-name :engaging-teal-duck-15,
- :signals-history
- {[:= :time/minute 25]
-  [[true 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 40]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 5]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 15]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 30]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [true 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:or
-   [:= :time/minute 0]
-   [:= :time/minute 5]
-   [:= :time/minute 10]
-   [:= :time/minute 15]
-   [:= :time/minute 20]
-   [:= :time/minute 25]
-   [:= :time/minute 30]
-   [:= :time/minute 35]
-   [:= :time/minute 40]
-   [:= :time/minute 45]
-   [:= :time/minute 50]
-   [:= :time/minute 55]]
-  [[true 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [true 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [true 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 35]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [true 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 55]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 20]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 45]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 10]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 0]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]],
-  [:= :time/minute 50]
-  [[false 1716884700908]
-   [false 1716884760919]
-   [false 1716884820914]
-   [false 1716884880910]
-   [false 1716884940908]
-   [false 1716885000911]
-   [false 1716885060905]
-   [false 1716885120924]
-   [false 1716885180908]
-   [false 1716885240923]
-   [false 1716885300921]
-   [false 1716885360904]
-   [false 1716885420900]]},
+ :client-name :grin-bulbous-turtle-14,
+ :alt-key-held? false,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2490, :h 1427},
+ :window {:w 2489, :h 1498},
  :post-meta
  {:gen-viz-797 {:* {:rowcount 317}},
   :gen-viz-94 {:* {:rowcount 1}},
@@ -1246,25 +630,24 @@
   :duration-hours-drag-43 {:* {:rowcount 8349}},
   :city-drag-26 {:* {:rowcount 19899}},
   :state-drag-3 {:* {:rowcount 68}},
-  :gen-viz-516 {:* {:rowcount 13}},
+  :gen-viz-516 {:* {:rowcount 1}},
   :shape-drag-7 {:* {:rowcount 30}}},
  :status
  {:heartbeat
   {:kick
    [:time/now-seconds
     :flow/flow-forever>*running?
-    :solver/colors-of-the-moment>highest-saturation
     :time/minute
     :time/hour
     :client/*client-name*>stats>memory
     :solver/colors-of-the-moment>data-colors
+    :solver/colors-of-the-moment>colors>2
     :solver/colors-of-the-moment>colors>1
     :solver/colors-of-the-moment>brightest
     :flow/live-scratch-flow>*running?
     :solver/colors-of-the-moment
     :solver/wallpaper-of-the-moment
     :solver/colors-of-the-moment>colors>0
-    :solver/colors-of-the-moment>contrast-with-dominant
     :time/second
     :flow/flow-forever>:final-math
     :solver/colors-of-the-moment>second-brightest
@@ -1273,7 +656,6 @@
   :alert1 {:alerts :alert2}},
  :screen-name "alarm-clock2",
  :recos-page2 0,
- :selected-warren-item :every-5-minutes,
  :selected-tab "star-shaped wallaby",
  :col-names nil,
  :snapshots nil,
@@ -1286,24 +668,27 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   88555
-   1100038046]],
+   157253
+   -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :base-sniff-queries {:jvm_stats 1498154063},
- :panels-hash 1704451998,
+ :panels-hash -148020891,
  :sessions
- (["beaming-gray-opossum-6.edn" "1002 hours, 34 minutes, 0 second" 3609240806]
-   ["nutritious-round-donkey-34.edn" "101 hours, 16 minutes, 32 seconds" 364592246]
-   ["smile-rectangular-tiger-5.edn" "101 hours, 53 minutes, 30 seconds" 366810416]
-   ["independent-conical-leopard-22.edn"
-    "102 hours, 36 minutes, 27 seconds"
-    369387283]
-   ["victorious-tan-hog-37.edn" "102 hours, 43 minutes, 52 seconds" 369832048]
-   ["active-purple-toad-14.edn" "102 hours, 45 minutes, 48 seconds" 369948228]
-   ["quiet-red-llama-26.edn" "102 hours, 52 minutes, 3 seconds" 370323057]
-   ["thriving-yellow-pig-39.edn" "102 hours, 59 minutes, 9 seconds" 370749769]
-   ["brave-cobalt-echidna-43.edn" "104 hours, 3 minutes, 52 seconds" 374632913]),
+ (["vital-bulbous-mosquito-0.edn" "1019 hours, 19 minutes, 35 seconds" 3669575653]
+   ["refined-round-llama-8.edn" "1021 hours, 21 minutes, 42 seconds" 3676902166]
+   ["beaming-gray-opossum-6.edn" "1072 hours, 40 minutes, 41 seconds" 3861641771]
+   ["certain-icosahedral-hound-19.edn"
+    "1121 hours, 9 minutes, 41 seconds"
+    4036181698]
+   ["smile-elliptic-heron-10.edn" "114 hours, 10 minutes, 16 seconds" 411016149]
+   ["lovely-scarlet-pigeon-31.edn" "114 hours, 48 minutes, 58 seconds" 413338211]
+   ["trusting-cerise-gnu-5.edn" "1147 hours, 27 minutes, 57 seconds" 4130877989]
+   ["meritorious-hexagonal-louse-7.edn"
+    "1147 hours, 34 minutes, 8 seconds"
+    4131248989]
+   ["happy-prismatic-hornet-6.edn"
+    "1148 hours, 14 minutes, 23 seconds"
+    4133663636]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
@@ -1375,10 +760,9 @@
     :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
     :return nil}}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -2094983820,
+ :user-params-hash -1538920871,
  :grid-recos? true,
- :session-hash -402822752,
- :no-ui? false,
+ :session-hash -1294255910,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1557,7 +941,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 13,
    :group-by [:ts],
-   :_last-run "04:40:05",
+   :_last-run "00:29:21",
    :refresh-every 20,
    :from
    [{:select
@@ -2246,7 +1630,7 @@
    :style {:border-radius "0px 0px 0px 30px"},
    :block-key ":block-12050",
    :selected-view :every-45-seconds,
-   :root [26 23],
+   :root [26 22],
    :h 6,
    :file-path "./screens/blackberries3-narrow.edn",
    :connection-id "system-db",
@@ -2256,7 +1640,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 13,
      :group-by [:ts],
-     :_last-run "04:40:05",
+     :_last-run "00:29:21",
      :refresh-every 20,
      :from
      [{:select
@@ -2411,7 +1795,7 @@
       :color [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]}
      :child
      [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]]}}},
- :selected-block "none!",
+ :selected-block :block-4284,
  :signals-map
  {:fun-gorilla
   {:signal
@@ -2477,22 +1861,21 @@
   :glowing-bat-signal
   {:signal [:and [:= :time/day 1] [:changed? :time/second] [:= :time/hour 9]]}},
  :theme-colors-hashmap
- {"float" "#b8bef0",
-  "boolean" "#c5cdcf",
-  "map" "#b69cd4",
-  "list" "#ad796c",
+ {"float" "#dfc0be",
+  "boolean" "#9ebcd6",
+  "map" "#c7b299",
+  "list" "#892db8",
   "string" "#ffffff",
-  "any" "#cb86c1",
-  "vector" "#dcd793",
-  "keyword" "#e4f8ed",
-  "rabbit-code" "#b7da84",
-  "datetime" "#64994b",
-  "integer" "#d1cece",
-  "unknown" "#631b58",
-  "date" "#2b3e2f"},
+  "any" "#625dc1",
+  "vector" "#90b492",
+  "keyword" "#dbeddc",
+  "rabbit-code" "#ba55ee",
+  "datetime" "#6a6183",
+  "integer" "#f48bde",
+  "unknown" "#6d2e29",
+  "date" "#3a551d"},
  :click-param
- {nil {nil nil},
-  :blocks-sys
+ {:blocks-sys
   {:block_key ":block-12050",
    :block_name "block-12050",
    :queries 1,
@@ -2516,16 +1899,18 @@
   :time
   {:month-name "MAY",
    :day 4,
-   :hour 4,
+   :hour 0,
    :now "Saturday, May 25th 3:05AM",
-   :second 27,
+   :second 45,
    :now-second nil,
-   :now-seconds "Tuesday, May 28th 4:40:27AM",
+   :now-seconds "Friday, May 31st 12:29:45AM",
    :nth "th",
    :month 4,
-   :minute 40},
+   :minute 29},
   :client
-  {:engaging-teal-duck-15>stats>memory 268, :*client-name*>stats>memory 1323},
+  {:engaging-teal-duck-15>stats>memory 268,
+   :*client-name*>stats>memory 1498,
+   :grin-bulbous-turtle-14>stats>memory 1419},
   :param
   {:selected-view [:views :every-45-seconds],
    :selected-view-data
@@ -2552,7 +1937,7 @@
        :label
        {:value "MB",
         :angle -90,
-        :fill :solver/colors-of-the-moment>contrast-with-dominant,
+        :fill :solver/colors-of-the-moment>colors>0,
         :style {:font-size "20px", :font-weight 700},
         :position "middle",
         :dx -25},
@@ -2563,7 +1948,7 @@
        :label
        {:value "Messages per Second",
         :angle 90,
-        :fill :solver/colors-of-the-moment>highest-saturation,
+        :fill :solver/colors-of-the-moment>brightest,
         :style {:font-weight 700, :color "#ffffff", :font-size "15px"},
         :position "middle",
         :dx 20},
@@ -2575,7 +1960,7 @@
        :dataKey :mb,
        :yAxisId "left",
        :stroke-width 4,
-       :stroke :solver/colors-of-the-moment>contrast-with-dominant,
+       :stroke :solver/colors-of-the-moment>brightest,
        :activeDot {:r 8}}]
      [:>
       :Bar
@@ -2584,12 +1969,14 @@
        :yAxisId "right",
        :fill "#00000000",
        :stroke-width 4,
-       :stroke :solver/colors-of-the-moment>highest-saturation}]]],
+       :stroke :solver/colors-of-the-moment>colors>1}]]],
+   :testme :solver/colors-of-the-moment>colors>1,
    :test [:string [:get-in [:solver/colors-of-the-moment [:colors 2]]]],
    :selected-block :block-4284},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
+   :pop-2 :solver/colors-of-the-moment>colors>2,
    :base-block-style {:text-shadow "4px 4px 4px #00000088"},
    :vega-defaults
    {:view {:stroke "transparent"},
@@ -2671,12 +2058,14 @@
    {:background-image [:string3 "url(" :solver/wallpaper-of-the-moment ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
+    :background-position "center",
     :background-color "#424f57"},
    :editor-font-color "#ffffff",
    :base-font "Poppins",
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
-   :editor-grid-font-color "#ffffff"},
+   :editor-grid-font-color "#ffffff",
+   :pop-1 :solver/colors-of-the-moment>colors>1},
   :ufo-sightings-drag-9
   {:duration_seconds_int 20,
    :comments
@@ -2859,48 +2248,49 @@
    :glowing-bat-signal false},
   :solver
   {:colors-of-the-moment
-   {:second-darkest "#1a2a48",
-    :highest-saturation "#71a4d6",
-    :most-contrasting "#bd5174",
-    :darkest "#23262f",
-    :contrast-with-dominant "#bd5174",
+   {:second-darkest "#244150",
+    :highest-saturation "#de7e49",
+    :most-contrasting "#d25027",
+    :darkest "#1a303e",
+    :contrast-with-dominant "#d25027",
     :colors
-    ["#d1cece"
-     "#3f5971"
-     "#93c9dc"
-     "#23262f"
-     "#71a4d6"
-     "#9498a4"
-     "#699bb3"
-     "#5882ac"
-     "#1a2a48"
-     "#bd5174"
-     "#536d86"],
-    :most-frequent "#93c9dc",
+    ["#dfd0be"
+     "#1a303e"
+     "#99c2c7"
+     "#917769"
+     "#6aa0b5"
+     "#458598"
+     "#2c6785"
+     "#4d6263"
+     "#d25027"
+     "#de7e49"
+     "#244150"],
+    :most-frequent "#1a303e",
     :data-colors
-    {"float" "#b8bef0",
-     "boolean" "#c5cdcf",
-     "map" "#b69cd4",
-     "list" "#ad796c",
+    {"float" "#dfc0be",
+     "boolean" "#9ebcd6",
+     "map" "#c7b299",
+     "list" "#892db8",
      "string" "#ffffff",
-     "any" "#cb86c1",
-     "vector" "#dcd793",
-     "keyword" "#e4f8ed",
-     "rabbit-code" "#b7da84",
-     "datetime" "#64994b",
-     "integer" "#d1cece",
-     "unknown" "#631b58",
-     "date" "#2b3e2f"},
-    :dominant "#536d86",
-    :most-contrasting-dark "#bd5174",
-    :second-brightest "#93c9dc",
-    :brightest "#d1cece",
-    :most-contrasting-light "#d1cece"},
+     "any" "#625dc1",
+     "vector" "#90b492",
+     "keyword" "#dbeddc",
+     "rabbit-code" "#ba55ee",
+     "datetime" "#6a6183",
+     "integer" "#f48bde",
+     "unknown" "#6d2e29",
+     "date" "#3a551d"},
+    :dominant "#244150",
+    :most-contrasting-dark "#1a303e",
+    :second-brightest "#99c2c7",
+    :brightest "#dfd0be",
+    :most-contrasting-light "#d25027"},
    :colors-of-the-moment>most-contrasting-light "#66b6c6",
-   :colors-of-the-moment>colors>0 "#d1cece",
-   :colors-of-the-moment>contrast-with-dominant "#bd5174",
-   :colors-of-the-moment>brightest "#d1cece",
-   :colors-of-the-moment>second-brightest "#93c9dc",
+   :colors-of-the-moment>colors>0 "#dfd0be",
+   :colors-of-the-moment>contrast-with-dominant "#cd5a51",
+   :colors-of-the-moment>brightest "#dfd0be",
+   :colors-of-the-moment>second-brightest "#99c2c7",
+   :colors-of-the-moment>0 nil,
    :colors-of-the-moment-8k
    {:second-darkest "#474c5d",
     :highest-saturation "#ce7446",
@@ -2939,238 +2329,41 @@
     :second-brightest "#95c3bc",
     :brightest "#d9c2a3",
     :most-contrasting-light "#ce7446"},
+   :colors-of-the-moment>colors
+   ["#ceced7"
+    "#5ab9d4"
+    "#202b62"
+    "#1c1018"
+    "#3b79c8"
+    "#227b9f"
+    "#b63cb2"
+    "#683596"
+    "#2450a5"
+    "#13537b"
+    "#243c77"],
    :vibrant-antelope-solver 193,
-   :colors-of-the-moment>darkest "#23262f",
-   :colors-of-the-moment>highest-saturation "#71a4d6",
+   :colors-of-the-moment>darkest "#1a303e",
+   :colors-of-the-moment>colors>3 "#2e1b24",
+   :colors-of-the-moment>highest-saturation "#0c66a1",
    :colors-of-the-moment>most-contrasting "#a1543e",
-   :wallpaper-of-the-moment "./images/large/b64-image-63928-58971-4k.webp",
+   :colors-of-the-moment>2 nil,
+   :wallpaper-of-the-moment "./images/large/b64-image-2520-55155-4k.webp",
+   :colors-of-the-moment>colors>2 "#99c2c7",
    :dazzling-gnu-solver 11214,
-   :colors-of-the-moment>colors>1 "#3f5971",
+   :colors-of-the-moment>colors>1 "#1a303e",
    :colors-of-the-moment>data-colors
-   {"float" "#b8bef0",
-    "boolean" "#c5cdcf",
-    "map" "#b69cd4",
-    "list" "#ad796c",
+   {"float" "#dfc0be",
+    "boolean" "#9ebcd6",
+    "map" "#c7b299",
+    "list" "#892db8",
     "string" "#ffffff",
-    "any" "#cb86c1",
-    "vector" "#dcd793",
-    "keyword" "#e4f8ed",
-    "rabbit-code" "#b7da84",
-    "datetime" "#64994b",
-    "integer" "#d1cece",
-    "unknown" "#631b58",
-    "date" "#2b3e2f"}}},
+    "any" "#625dc1",
+    "vector" "#90b492",
+    "keyword" "#dbeddc",
+    "rabbit-code" "#ba55ee",
+    "datetime" "#6a6183",
+    "integer" "#f48bde",
+    "unknown" "#6d2e29",
+    "date" "#3a551d"}}},
  :selected-flow "live-scratch-flow",
- :flow-statuses
- {"openai-image-gen-ladder5"
-  {:last-updated "2 seconds",
-   :blocks_finished 31,
-   :block-overrides [:prompt],
-   :channels 93,
-   :channels-open 93,
-   :since-start "2 seconds",
-   :*started-by :meaningful-jungle-green-hummingbird-34,
-   :time-running "less than a second",
-   :last-update {:oai-api-call :start},
-   :*running? true,
-   :waiting-blocks
-   [:node-js-color-thief-script
-    :dominant-color
-    :create-png-path/x
-    :done
-    :shell-command-1
-    :open-fn-1
-    :execute-shell-command
-    :stringify-exif-map/img-path
-    :pop-color
-    :write-exif-to-image-command/x
-    :save-base64-to-webp-file5
-    :relative-url-path-for-png-version/bang
-    :color-palette
-    :dominant-color/x
-    :stringify-exif-map
-    :hiccup-image-box-w-png/bg-color
-    :write-file-1
-    :output-revised-prompt/x
-    :color-palette/x
-    :write-file-1/file-data
-    :node-js-color-thief-script-dominantColor
-    :hiccup-image-box-w-png/x
-    :create-png-path
-    :node-js-color-thief-script/image-path
-    :write-exif-to-image-command/img-path
-    :execute-shell-command-command/in
-    :save-base64-to-webp-file5/b64-data
-    :create-convert-command-line
-    :write-file-1_file-path/x
-    :execute-shell-command/command
-    :hiccup-image-box-w-png
-    :hiccup-image-box-w-png/color
-    :exif-map/revised
-    :pop-color/x
-    :relative-url-path-for-png-version
-    :relative-url-path-for-png-version/x
-    :execute-shell-command-command
-    :exif-map
-    :hiccup-image-box-w-png/_
-    :open-fn-1/_
-    :create-convert-command-line/x
-    :shell-command-1/command
-    :stringify-exif-map/x
-    :write-file-1/full-path
-    :node-js-color-thief-script-dominantColor/in
-    :stringify-exif-map/bang
-    :write-exif-to-image-command
-    :just-the-image
-    :write-file-1_file-path
-    :output-revised-prompt
-    :just-the-image/x],
-   :last-update-seconds 2,
-   :channels-open? true,
-   :retries-left 2,
-   :running-blocks [:oai-api-call]},
-  "openai-image-gen-ladder/node-js-color-thief-script"
-  {:last-updated nil,
-   :blocks_finished 16,
-   :block-overrides [:image-path],
-   :channels 0,
-   :channels-open 0,
-   :since-start "less than a second",
-   :*started-by :angelic-cerise-dolphin-32,
-   :time-running "less than a second",
-   :last-update {:done :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "openai-image-gen-ladder2/node-js-color-thief-script"
-  {:last-updated nil,
-   :blocks_finished 16,
-   :block-overrides [:image-path],
-   :channels 0,
-   :channels-open 0,
-   :since-start "less than a second",
-   :*started-by :handsome-cylindrical-grasshopper-7,
-   :time-running "less than a second",
-   :last-update {:done :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "openai-image-gen-ladder"
-  {:last-updated nil,
-   :blocks_finished 83,
-   :block-overrides [:prompt :style-param :prompt-2 :prompt-3 :prompt-4 :prompt-5],
-   :channels 0,
-   :channels-open 0,
-   :since-start "45 seconds",
-   :*started-by :angelic-cerise-dolphin-32,
-   :time-running "45 seconds",
-   :last-update {:done :start},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "colors-of-the-moment-solver-flow-"
-  {:last-updated nil,
-   :blocks_finished 33,
-   :block-overrides [:image-path],
-   :channels 0,
-   :channels-open 0,
-   :since-start "4 seconds",
-   :*started-by :rvbbit-solver,
-   :time-running "4 seconds",
-   :last-update {:done :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "game-of-life-test1"
-  {:last-updated nil,
-   :blocks_finished 12,
-   :block-overrides [:iterations-max :tick-delay-ms],
-   :channels 0,
-   :channels-open 0,
-   :since-start "13 minutes, 23 seconds",
-   :*started-by :rvbbit-scheduler,
-   :time-running "13 minutes, 23 seconds",
-   :last-update {:done :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "openai-image-gen-ladder5/node-js-color-thief-script"
-  {:last-updated nil,
-   :blocks_finished 16,
-   :block-overrides [:image-path],
-   :channels 0,
-   :channels-open 0,
-   :since-start "less than a second",
-   :*started-by :meaningful-jungle-green-hummingbird-34,
-   :time-running "less than a second",
-   :last-update {:done :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "counting-loop"
-  {:last-updated nil,
-   :blocks_finished 13,
-   :block-overrides [],
-   :channels 0,
-   :channels-open 0,
-   :since-start "6 seconds",
-   :*started-by :rvbbit-scheduler,
-   :time-running "6 seconds",
-   :last-update {:sleep-then-pass :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "openai-image-gen-ladder2"
-  {:last-updated nil,
-   :blocks_finished 83,
-   :block-overrides [:prompt],
-   :channels 0,
-   :channels-open 0,
-   :since-start "42 seconds",
-   :*started-by :handsome-cylindrical-grasshopper-7,
-   :time-running "42 seconds",
-   :last-update {:done :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "colors-of-the-moment-8k-solver-flow-"
-  {:last-updated nil,
-   :blocks_finished 33,
-   :block-overrides [:image-path],
-   :channels 0,
-   :channels-open 0,
-   :since-start "13 seconds",
-   :*started-by :rvbbit-solver,
-   :time-running "13 seconds",
-   :last-update {:done :end},
-   :*running? false,
-   :waiting-blocks [],
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []}},
  :post-condi {:c345-up-or-down? [{:v 0}]}}

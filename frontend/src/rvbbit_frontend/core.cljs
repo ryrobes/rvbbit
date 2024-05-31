@@ -186,7 +186,7 @@
    [::poll/set-rules
     [{:interval                 10 ;; 1 terrible idea. test
       :event                    [::bricks/dispatch-auto-queries]
-      :poll-when                [::bricks/auto-run-and-connected?] 
+      :poll-when                [::bricks/auto-run-and-connected?]
       :dispatch-event-on-start? false}
 
      {:interval                 5
@@ -218,12 +218,12 @@
       :event                    [::bricks/get-memory-usage]
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
       :dispatch-event-on-start? false}
-     
+
      {:interval                 15
       :event                    [::signals/run-signals-history]
       :poll-when                [::signals/run-signals-history?]
       :dispatch-event-on-start? false}
-     
+
     ;;  {:interval                 240
     ;;   :event                    [::purge-sub-cache!]
     ;;   ;:poll-when                [::memory-usage-breached-threshold?]
@@ -238,10 +238,10 @@
     ;;   :event                    [::bricks/check-status]
     ;;   :poll-when                [::bricks/something-running?]
     ;;   :dispatch-event-on-start? false}
-     
-      {:interval                 4  ;;; test
+
+     {:interval                 1  ;;; test
       :event                    [::bricks/highlight-panel-code]
-      ;:poll-when                [::bricks/something-running?]
+      :poll-when                [::bricks/panel-code-up?]
       :dispatch-event-on-start? false}
 
      {:interval                 2 ;; push sample data to runstream when running ?
@@ -253,12 +253,12 @@
       :event                    [::bricks/sub-to-flows]
       :poll-when                [::bricks/new-flow-subs?]
       :dispatch-event-on-start? false}
-     
+
      {:interval                 5 ;; subscribe to server data from flows if we see it
       :event                    [::bricks/unsub-to-flows]
       :poll-when                [::bricks/stale-flow-subs?]
       :dispatch-event-on-start? false}
-     
+
     ;;  {:interval                 30
     ;;   :event                    [::bricks/sub-to-flows-all]
     ;;   ;:poll-when                [::bricks/new-flow-subs?]
@@ -268,6 +268,13 @@
    ;   :event                    [::bricks/update-metadata-styles]
    ;   ;:poll-when                [::subs/get-the :auto-run-enabled?]
    ;   :dispatch-event-on-start? false}
+
+
+
+     {:interval                 600 ;; hella expensive, testing
+      :event                    [::http/get-autocomplete-values]
+      ;:poll-when                [::bricks/new-flow-subs?]
+      :dispatch-event-on-start? true}
 
      {:interval                 1000
       :event                    [::bricks/update-metadata-tabs]

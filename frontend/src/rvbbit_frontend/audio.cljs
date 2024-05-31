@@ -801,7 +801,8 @@
    (let [voices? (nil? text-to-speak)
          xi-api-key (get db :elevenlabs-api-key)
          method (if voices? :GET :POST)
-         vname (get-in db [:blocks block-id :req :voice_name] "Not OG Buffy")
+         voice-key (get-in db [:server :settings :eleven-labs-default-voice-name] "Not OG Buffy") ;; "Not OG Buffy"
+         vname (get-in db [:blocks block-id :req :voice_name] voice-key)
          vid (first (remove nil? (for [v (get-in db [:http-reqs :elevenlabs :audio :message :voices])]
                                    (when (= (get v :name) vname) (get v :voice_id)))))
          ;vid "ecjGKdrYybHS1XMO2PWR"
