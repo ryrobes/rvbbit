@@ -144,7 +144,7 @@
 (re-frame/reg-sub
  ::selected-flow
  (fn [db]
-   (let [animal (cstr/replace (str (tales/animal)) #" " "-")
+   (let [animal (ut/replacer (str (tales/animal)) #" " "-")
          flow-id (str animal "-flow-" (rand-int 1000))]
      (get db :selected-flow flow-id))))
 
@@ -155,7 +155,7 @@
    (let [flow-id (str flow-id)
          curr-flow-id (get db :selected-flow)
          curr-flow (get-in db [:flows curr-flow-id] {})]
-    ;(reset! db/flow-results (walk/postwalk-replace {curr-flow-id flow-id} @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
+    ;(reset! db/flow-results (ut/postwalk-replacer {curr-flow-id flow-id} @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
      (-> db
         ;(assoc-in [:flows flow-id] curr-flow)
         ;(ut/dissoc-in [:flows curr-flow-id])
@@ -170,12 +170,12 @@
         ;curr-flow-id (get db :selected-flow)
         ;curr-flow (get-in db [:flows curr-flow-id] {})
 
-     ;(reset! db/flow-results (walk/postwalk-replace {old-flow-id new-flow-id} @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
-     (ut/tracked-dispatch [::http/set-flow-results (walk/postwalk-replace {old-flow-id new-flow-id} @(ut/tracked-subscribe [::http/flow-results]))])
+     ;(reset! db/flow-results (ut/postwalk-replacer {old-flow-id new-flow-id} @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
+     (ut/tracked-dispatch [::http/set-flow-results (ut/postwalk-replacer {old-flow-id new-flow-id} @(ut/tracked-subscribe [::http/flow-results]))])
      (-> db
         ;(assoc-in [:flows flow-id] curr-flow)
         ;(ut/dissoc-in [:flows curr-flow-id])
-         (assoc :flows (walk/postwalk-replace {old-flow-id new-flow-id} (get db :flows)))
+         (assoc :flows (ut/postwalk-replacer {old-flow-id new-flow-id} (get db :flows)))
          (assoc :selected-flow new-flow-id)))))
 
 (re-frame/reg-event-db
@@ -189,20 +189,20 @@
          new-bid (keyword new-bid)
          new-bid (ut/safe-key new-bid @(ut/tracked-subscribe [::conn/reserved-type-keywords]))
          input-replacements (into {}
-                                  (for [k inputs] {(keyword (str (ut/unkeyword old-bid) "/" (ut/unkeyword k)))
-                                                   (keyword (str (ut/unkeyword new-bid) "/" (ut/unkeyword k)))}))
+                                  (for [k inputs] {(keyword (str (ut/safe-name old-bid) "/" (ut/safe-name k)))
+                                                   (keyword (str (ut/safe-name new-bid) "/" (ut/safe-name k)))}))
          output-replacements (into {}
-                                   (for [k outputs] {(keyword (str (ut/unkeyword old-bid) "/" (ut/unkeyword k)))
-                                                     (keyword (str (ut/unkeyword new-bid) "/" (ut/unkeyword k)))}))
+                                   (for [k outputs] {(keyword (str (ut/safe-name old-bid) "/" (ut/safe-name k)))
+                                                     (keyword (str (ut/safe-name new-bid) "/" (ut/safe-name k)))}))
          pw-replace-map (merge input-replacements output-replacements {old-bid new-bid})]
      (tap> [:rename-block old-bid :to new-bid :with pw-replace-map]) ;; block id needs to be keyword,
      (if (not (some #(= new-bid %) block-ids)) ;; only if is unique, else do nothing
        (do
-;         (reset! db/flow-results (walk/postwalk-replace pw-replace-map @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
-         (ut/tracked-dispatch [::http/set-flow-results (walk/postwalk-replace pw-replace-map @(ut/tracked-subscribe [::http/flow-results]))])
+;         (reset! db/flow-results (ut/postwalk-replacer pw-replace-map @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
+         (ut/tracked-dispatch [::http/set-flow-results (ut/postwalk-replacer pw-replace-map @(ut/tracked-subscribe [::http/flow-results]))])
          (-> db
              (assoc :selected-flow-block new-bid)
-             (assoc-in [:flows curr-flow-id] (walk/postwalk-replace pw-replace-map (get-in db [:flows curr-flow-id])))))
+             (assoc-in [:flows curr-flow-id] (ut/postwalk-replacer pw-replace-map (get-in db [:flows curr-flow-id])))))
        db))))
 
 (re-frame/reg-sub
@@ -294,7 +294,7 @@
  ::new-flow
  (undoable)
  (fn [db _]
-   (let [animal (cstr/replace (str (tales/animal)) #" " "-")
+   (let [animal (ut/replacer (str (tales/animal)) #" " "-")
          flow-id (str animal "-flow-" (rand-int 1000))]
      (reset! editor-mode :part-browser)
      (-> db
@@ -513,25 +513,25 @@
                               {k {:w w :h h :x x :y y :view-mode "text"}}))
         flowmaps-connections (vec (for [[c1 c2] flowmaps-connections]
                                     (if (cstr/ends-with? (str c1) "/*")
-                                      [(keyword (-> (ut/unkeyword (str c1)) (cstr/replace "/*" "") (cstr/replace ":" ""))) c2] [c1 c2])))
+                                      [(keyword (-> (ut/safe-name (str c1)) (ut/replacer "/*" "") (ut/replacer ":" ""))) c2] [c1 c2])))
         components-key (into {} (for [[k {:keys [data ports view file-path flow-path raw-fn sub-flow-id flow-id sub-flow]}] flowmap ;; <-- flow-id refers to the subflow embed, not the parent
                                       :let [ttype (or (get-in data [:flow-item :type])                        ;; ^^-- fid is the parent flow-id
                                                       (get-in data [:drag-meta :type]))
                                             try-read  (fn [x] (try (edn/read-string x) (catch :default _ x)))
                                             view-swap (fn [obody flow-id bid push-key]
-                                                        (let [pkey       (keyword (str (cstr/replace (str push-key) ":" "") ">"))
+                                                        (let [pkey       (keyword (str (ut/replacer (str push-key) ":" "") ">"))
                                                               kps        (ut/extract-patterns obody pkey 2)
                                                               logic-kps  (into {} (for [v kps]
                                                                                     (let [[_ that] v]
                                                                                       {v [:push> [flow-id (str bid) that]]})))]
-                                                          (walk/postwalk-replace logic-kps obody)))
+                                                          (ut/postwalk-replacer logic-kps obody)))
                                             view-swap2 (fn [obody flow-id bid push-key]
-                                                         (let [pkey       (keyword (str (cstr/replace (str push-key) ":" "") ">"))
+                                                         (let [pkey       (keyword (str (ut/replacer (str push-key) ":" "") ">"))
                                                                kps        (ut/extract-patterns obody pkey 1)
                                                                logic-kps  (into {} (for [v kps]
                                                                                      (let [[_] v]
                                                                                        {v [:push>> [flow-id (str bid)]]})))]
-                                                           (walk/postwalk-replace logic-kps obody)))
+                                                           (ut/postwalk-replacer logic-kps obody)))
                                             view-swaps (fn [obody flow-id push-key-bid-pairs]
                                                          (reduce (fn [body [push-key bid]]
                                                                    (-> body
@@ -540,7 +540,7 @@
                                                                  obody
                                                                  push-key-bid-pairs))
                                             view (when view (let [conns (vec (filter #(cstr/includes? (str (first %)) "/push-path") flowmaps-connections))
-                                                                  push-key-bid-pairs (vec (for [[c1 c2] conns] [(keyword (last (cstr/split (str c1) #"/"))) c2]))
+                                                                  push-key-bid-pairs (vec (for [[c1 c2] conns] [(keyword (last (ut/splitter (str c1) #"/"))) c2]))
                                                                   view (view-swaps view fid push-key-bid-pairs)]
                                                               ;(tap> [:view-builder k push-key-bid-pairs view fid])
                                                               view))
@@ -594,10 +594,10 @@
                                (if (not (empty? (get v :cond)))
                                  (let [ccond (into {}
                                                    (for [[c1 c2] flowmaps-connections
-                                                         :let [link (keyword (str (cstr/replace (str k) ":" "") "/cond-path"))
-                                                               ff (cstr/split (str c1) #"/")
+                                                         :let [link (keyword (str (ut/replacer (str k) ":" "") "/cond-path"))
+                                                               ff (ut/splitter (str c1) #"/")
                                                                cname (keyword (last ff))
-                                                               c2wo (keyword (first (cstr/split (cstr/replace (str c2) ":" "") #"/")))] ;; w/o port id.... TEST
+                                                               c2wo (keyword (first (ut/splitter (ut/replacer (str c2) ":" "") #"/")))] ;; w/o port id.... TEST
                                                          :when (cstr/starts-with? (str c1) (str link))]
                                                      {c2wo (get-in v [:cond cname :fn])}))]
                                    {k (assoc (get components-key k) :cond ccond)})
@@ -640,7 +640,7 @@
                   comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
                   ;;curr-flow-subs (get db :flow-subs)
                   running-view-subs (vec (for [[k v] comps :when (get v :view)]
-                                           [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
+                                           [flow-id (keyword (str (ut/replacer (str k) ":" "") "-vw"))]))
                   running-subs (vec (for [k (keys comps)] [flow-id k]))
                   running-subs (vec (into running-subs running-view-subs))
                   
@@ -859,7 +859,7 @@
                        :align :end :justify :end
                        :style {:word-break "break-all"}
                        :child (str "\"" s "\"")]
-          :else (cstr/replace (str s) #"clojure.core/" ""))))
+          :else (ut/replacer (str s) #"clojure.core/" ""))))
 
 (declare draggable-port)
 
@@ -1463,8 +1463,8 @@
                            (for [e (keys vval)
                                  :when (cstr/ends-with? (str e) "+")]
                              {(-> (str e)
-                                  (cstr/replace "+" "")
-                                  (cstr/replace ":" "")
+                                  (ut/replacer "+" "")
+                                  (ut/replacer ":" "")
                                   keyword) e})) {})]
      (if (nil? kkey) ;; fulll body update
        (assoc-in db [:flows (get db :selected-flow) :map bid] vval)
@@ -1472,10 +1472,10 @@
          (-> db
              (assoc-in (vec (into [:flows (get db :selected-flow) :map bid] kkey)) vval)
              (assoc-in [:flows (get db :selected-flow) :map bid :types]
-                       (walk/postwalk-replace arg-walks
+                       (ut/postwalk-replacer arg-walks
                                               (get-in db [:flows (get db :selected-flow) :map bid :types])))
              (assoc-in [:flows (get db :selected-flow) :map bid :inputs]
-                       (walk/postwalk-replace arg-walks
+                       (ut/postwalk-replacer arg-walks
                                               (get-in db [:flows (get db :selected-flow) :map bid :inputs]))))
          (assoc-in db (vec (into [:flows (get db :selected-flow) :map bid] kkey)) vval))))))
 
@@ -1536,7 +1536,7 @@
  (fn [db [_ bid pid direction]]
    (let [ports (get-in db [:flows (get db :selected-flow) :map bid :ports direction] {})
        ;cnt (count (keys ports))
-        ;label (try (first (cstr/split (-> (str (first (keys ports))) (cstr/replace #":" "") (cstr/replace "*" "")) #"-"))
+        ;label (try (first (ut/splitter (-> (str (first (keys ports))) (ut/replacer #":" "") (ut/replacer "*" "")) #"-"))
         ;           (catch :default _ "val"))
          inputs (try (edn/read-string (get-in db [:flows (get db :selected-flow) :map bid :data :flow-item :inputs] [])) (catch :default _ []))
         ;sorted-inputs (sort-new-keys inputs (keys ports))
@@ -1886,7 +1886,7 @@
         ;;                                               (generate-coords nil nil))) [-1 -1])
 
 
-         data (let [subkey (str flow-id ">" (cstr/replace (str bid) #":" ""))
+         data (let [subkey (str flow-id ">" (ut/replacer (str bid) #":" ""))
                     param-full (keyword (str "flow/" subkey)) ;:flow/map-pull-test2>open-fn-6
                     param-field (keyword subkey)]
                 {:h 3
@@ -1943,7 +1943,7 @@
 
 (defn draggable-play [element flow-id]
   [(reagent/adapt-react-class rdnd/Draggable)
-   (let [data (let [];subkey (str flow-id ">" (cstr/replace (str bid) #":" ""))
+   (let [data (let [];subkey (str flow-id ">" (ut/replacer (str bid) #":" ""))
                    ;param-full (keyword (str "flow/" subkey)) ;:flow/map-pull-test2>open-fn-6
                    ;param-field (keyword subkey)
 
@@ -2056,7 +2056,7 @@
 ;; (defn conn/add-flow-block [x y & [body bid no-select?]]
 ;;   (let [;bid (if bid bid (keyword (str "open-input-" (count @(ut/tracked-subscribe [::flowmap])))))
 ;;         _ (tap> [:conn/add-flow-block bid])
-;;         bid (keyword (cstr/replace (str (gn bid)) #"/" "-"))
+;;         bid (keyword (ut/replacer (str (gn bid)) #"/" "-"))
 ;;         bid (if bid bid :open-input)
 ;;         _ (tap> [:ADD-pre-safe-bid bid])
 ;;         safe-keys-reserved @(ut/tracked-subscribe [::conn/reserved-type-keywords])
@@ -2126,9 +2126,9 @@
   (let [flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
         conns (vec (filter #(not (= (last %) :done)) flowmaps-connections))
         src (if (cstr/ends-with? (str src) "/*") ;; no need for *, will only confuse things. w/o it is implied. (since the multi-output ports are "fake" anyways. lol)
-              (keyword (first (-> (str src) (cstr/replace #":" "") (cstr/split #"/")))) src)
+              (keyword (first (-> (str src) (ut/replacer #":" "") (ut/splitter #"/")))) src)
         ;base-src (if (cstr/includes? (str src) "/") (keyword (gns src)) src)
-        ;; src (if (cstr/ends-with? (str src) "/*") (keyword (-> (str src) (cstr/replace ":" "") (cstr/replace "/*" ""))) src)
+        ;; src (if (cstr/ends-with? (str src) "/*") (keyword (-> (str src) (ut/replacer ":" "") (ut/replacer "/*" ""))) src)
         done? (= dest :done)
         conn-vec (vec (distinct
                        (conj
@@ -2368,7 +2368,7 @@
              styler (if selected? styler-selected styler)
            ;; sub-flow-lookup (when (= ttype :sub-flow)
            ;;                   (let [subby-results (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps])
-           ;;                         sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (cstr/split (str k) "/"))) k}))
+           ;;                         sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (ut/splitter (str k) "/"))) k}))
            ;;                         sfl (get sub-flow-lookup bid)] sfl))
             ;; dt (if (some #(= % :*) (keys outputs)) :map ;; if its a map always use map color for base block
             ;;        (gn (first (vals outputs))))
@@ -2393,7 +2393,7 @@
              value (if (and port-multi? (not (= pid :*))) ;; if :* just pass the whole value
                      (try
                        (let [idx? (cstr/starts-with? (str pid) ":idx")
-                             pkey (if idx? (edn/read-string (cstr/replace (str pid) ":idx" ""))
+                             pkey (if idx? (edn/read-string (ut/replacer (str pid) ":idx" ""))
                                       pid)]
                          (get value pkey))
                        (catch :default _ value))
@@ -2759,7 +2759,7 @@
                                  20 17]))]]
                 (when (>= h 75)
                   (let [pval @(ut/tracked-subscribe [::port-color flow-id bid :out :data-value])
-                        view-pval @(ut/tracked-subscribe [::port-color flow-id (keyword (str (cstr/replace (str bid) ":" "") "-vw")) :out :data-value])
+                        view-pval @(ut/tracked-subscribe [::port-color flow-id (keyword (str (ut/replacer (str bid) ":" "") "-vw")) :out :data-value])
                         out-of-date? @(ut/tracked-subscribe [::input-out-of-date? bid])]
 
                     ;; [re-com/box
@@ -3126,7 +3126,7 @@
 ;;                             h (if (< h orig-h) orig-h h)
 ;;                             sub-flow-lookup (when (= ttype :sub-flow)
 ;;                                               (let [subby-results (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps])
-;;                                                     sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (cstr/split (str k) "/"))) k}))
+;;                                                     sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (ut/splitter (str k) "/"))) k}))
 ;;                                                     sfl (get sub-flow-lookup bid)] sfl))
 ;;                             bcolor (try
 ;;                                      (cond error? "red"
@@ -3524,7 +3524,7 @@
   (let [all-sql-call-keys      @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
         sql-aliases-used       @(ut/tracked-subscribe [::bricks/panel-sql-aliases-in-views-body panel-key body])
         valid-body-params      (vec (ut/deep-flatten @(ut/tracked-subscribe [::bricks/valid-body-params-in body])))
-        possible-datasets-used (set (for [e valid-body-params] (keyword (nth (cstr/split (ut/unkeyword e) #"/") 0))))
+        possible-datasets-used (set (for [e valid-body-params] (keyword (nth (ut/splitter (ut/safe-name e) #"/") 0))))
         used-datasets          (vec (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys))))
         value-walks-targets    [] ;(filter (fn [x] (and (cstr/includes? (str x) ".") (not (cstr/includes? (str %) ".*")))) valid-body-params)
         condi-walks-targets    [] ;(distinct (filter (fn [x] (cstr/includes? (str x) "condi/")) valid-body-params))
@@ -3644,7 +3644,7 @@
                                                        canned-fn (if (vector? kp)
                                                                    '(fn [x] (get-in x :kp))
                                                                    '(fn [x] x))
-                                                       canned-fn (walk/postwalk-replace {:kp kp} canned-fn)]
+                                                       canned-fn (ut/postwalk-replacer {:kp kp} canned-fn)]
                                                    {:fn canned-fn ;'(fn [x] x)
                                                     :w 125
                                                     :raw-fn canned-fn ;'(fn [x] x)
@@ -3666,7 +3666,7 @@
                                       sub-flow-drop?
                                       (let [;poss-inputs (vec (for [[k v] (get sub-flow :map)]
                                          ;                   (for [i (get-in v [:ports :in])]
-                                         ;                     (keyword (str (ut/unkeyword k) "/" (ut/unkeyword i))))))
+                                         ;                     (keyword (str (ut/safe-name k) "/" (ut/safe-name i))))))
                                             blocks     (set (keys (get sub-flow :map)))
                                             base-conns (set (for [[_ v2] (get sub-flow :connections)] (keyword (gns v2))))
                                             no-inputs (cset/difference blocks base-conns)
@@ -3787,14 +3787,14 @@
                                     :else (or (get-in rooted-data [:drag-meta :source-table])
                                               (get-in rooted-data [:drag-meta :param-full])))
                           safe-keys-reserved @(ut/tracked-subscribe [::conn/reserved-type-keywords])
-                          src-block (cstr/replace (str (get-in rooted-data [:drag-meta :src-bid])) ":" "")
-                          src-port (cstr/replace (str (get-in rooted-data [:drag-meta :src-pid])) ":" "")
+                          src-block (ut/replacer (str (get-in rooted-data [:drag-meta :src-bid])) ":" "")
+                          src-port (ut/replacer (str (get-in rooted-data [:drag-meta :src-pid])) ":" "")
                           check-port-drop (cond
                                             port-meta? (ut/safe-key (keyword (str "<" src-port)) safe-keys-reserved)
                                             get-in-drag? ;; use the get-in keypath to name
-                                            (let [;kp-str (cstr/replace (str (apply (comp merge str) kp)) ":" ">")
+                                            (let [;kp-str (ut/replacer (str (apply (comp merge str) kp)) ":" ">")
                                                   kp-str (cstr/join ">" kp)
-                                                  kp-str (-> kp-str (cstr/replace ":" "") (cstr/replace " " "") (cstr/replace "'" ""))]
+                                                  kp-str (-> kp-str (ut/replacer ":" "") (ut/replacer " " "") (ut/replacer "'" ""))]
                                               (ut/safe-key (keyword (str src-block "_" kp-str)) safe-keys-reserved))
                                             :else (ut/safe-key (keyword (str src-block "_" src-port)) safe-keys-reserved))]
 
@@ -3820,10 +3820,10 @@
                                 (when from-port?
                                   (if port-meta? ;; in to out
                                     (connect-ports ;(keyword (if (= src-port "out") src-block (str src-block "/" src-port)))
-                                     check-port-drop ;(keyword (str (cstr/replace (str check-port-drop) ":" "")))
+                                     check-port-drop ;(keyword (str (ut/replacer (str check-port-drop) ":" "")))
                                      (keyword (if (= src-port "out") src-block (str src-block "/" src-port))))
                                     (connect-ports (keyword (if (= src-port "out") src-block (str src-block "/" src-port)))
-                                                   (keyword (str (cstr/replace (str check-port-drop) ":" "") "/x")))))))))
+                                                   (keyword (str (ut/replacer (str check-port-drop) ":" "") "/x")))))))))
 
                                     ;(do (tap> [:port-drop-on-port :do-nothing (get (js->clj %"flow-port"))]) nil)
                   )}
@@ -4281,7 +4281,7 @@
         ;; value (if (and stringify?
         ;;                (not (string? value))
         ;;                (not (vector? value)))
-        ;;         (vec (cstr/split (str value) "\n"))
+        ;;         (vec (ut/splitter (str value) "\n"))
         ;;         value)
 
     [rc/catch [re-com/box
@@ -4306,7 +4306,7 @@
                                           ;_ (tap> [:code-box-rwo_template-find inputs])
                                           ;_ (tap> [:code-box-rwo_saving-string ddata inputs])
                                           input-map (into {} (for [e (range (count inputs))
-                                                                   :let [name (keyword (cstr/replace (str (ut/unkeyword (get inputs e))) "/" "-"))]]
+                                                                   :let [name (keyword (ut/replacer (str (ut/safe-name (get inputs e))) "/" "-"))]]
                                                                {name :any}))]
 
                                       (ut/tracked-dispatch [::update-flowmap-key-in bid [:ports :in] input-map])
@@ -4472,7 +4472,7 @@
                      :else (if (or selected? hovered?) out-color (str out-color 75)))
         flow-id-regex #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores, hypens, numbers
         read-only-flow? (true? (cstr/includes? flow-id "/"))
-        str-id (cstr/replace (str id) #":" "")
+        str-id (ut/replacer (str id) #":" "")
         block-renamer (if (= @rename-block id)
                         [re-com/input-text
                          :src (at)
@@ -4607,7 +4607,7 @@
                     ;flow-id @(ut/tracked-subscribe [::selected-flow])
                     ;flow-map @(ut/tracked-subscribe [::flowmap])
                         subby-results (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps])
-                        sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (cstr/split (str k) "/"))) k}))
+                        sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (ut/splitter (str k) "/"))) k}))
                         sfl (get sub-flow-lookup id)]
                     ;(tap> [:lookups sub-flow-lookup sfl])
                     [re-com/box
@@ -4755,7 +4755,7 @@
 
 (defn run-gantt-chart [flow-id]
   [buffy/render-honey-comb-fragments (let [reaction! [@trig-atom-test]]
-                                       (walk/postwalk-replace
+                                       (ut/postwalk-replacer
                                         {:fflow-id flow-id
                                          :ttttt @trig-atom-test}
                                         {:queries {:live-dat {:select [:*]
@@ -5538,7 +5538,7 @@
                             :justify :between
                    ;:style {:border (str "1px solid " (theme-pull :theme/editor-outer-rim-color nil) 22)}
                             :children [[re-com/box :child (if (cstr/includes? (str fid) "/")
-                                                            (let [spl (cstr/split (str fid) #"/")
+                                                            (let [spl (ut/splitter (str fid) #"/")
                                                                   parent (first spl)
                                                                   sub (last spl)]
                                                               [re-com/v-box
@@ -5572,7 +5572,7 @@
                                                            ;server-flowmap (process-flowmap2 flowmap flowmaps-connections fid)
                                                            ;comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
                                                            ;running-view-subs (vec (for [[k v] comps :when (get v :view)]
-                                                           ;                         [fid (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
+                                                           ;                         [fid (keyword (str (ut/replacer (str k) ":" "") "-vw"))]))
                                                            ;running-subs (vec (for [k (keys comps)] [fid k]))
                                                            ;running-subs (vec (into running-subs running-view-subs))
                                                            flowmap @(ut/tracked-subscribe [::flowmap])
@@ -5585,7 +5585,7 @@
                                                            comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
                                                                              ;;curr-flow-subs (get db :flow-subs)
                                                            running-view-subs (vec (for [[k v] comps :when (get v :view)]
-                                                                                    [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
+                                                                                    [flow-id (keyword (str (ut/replacer (str k) ":" "") "-vw"))]))
                                                            running-subs (vec (for [k (keys comps)] [flow-id k]))
                                                            running-subs (vec (into running-subs running-view-subs))
                                                            ;watched? (ut/ne? (get @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
@@ -5682,7 +5682,7 @@
                                :order-by [[3 :desc]]}}]
 
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -6027,7 +6027,7 @@
 ;;  ::re-order-connection
 ;;  (fn [db [_ conn direction]] ;; direction = :up or :down
 
-;;    (let [conn (vec (map #(cstr/replace (str %) ":" "") conn))
+;;    (let [conn (vec (map #(ut/replacer (str %) ":" "") conn))
 ;;          conn [(keyword (str (first conn) (when (not= (second conn) "out") (str "/" (second conn)))))
 ;;                (keyword (str (nth conn 2) "/" (nth conn 3)))] ;; item to match what is in conns
 ;;          conns (get-in db [:flows (get db :selected-flow) :connections])
@@ -6047,7 +6047,7 @@
 (re-frame/reg-event-db
  ::re-order-connection
  (fn [db [_ conn direction]] ;; direction = :up or :down
-   (let [conn (vec (map #(cstr/replace (str %) ":" "") conn))
+   (let [conn (vec (map #(ut/replacer (str %) ":" "") conn))
          conn [(keyword (str (first conn) (when (not= (second conn) "out") (str "/" (second conn)))))
                (keyword (str (nth conn 2) "/" (nth conn 3)))] ;; item to match what is in conns
          conns (get-in db [:flows (get db :selected-flow) :connections])
@@ -6100,7 +6100,7 @@
  (undoable)
  (fn [db [_ bid name]]
    (-> db (assoc-in [:flows (get db :selected-flow) :connections]
-                    (vec (remove #(cstr/ends-with? (str (first %)) (str "/" (cstr/replace (str name) ":" "")))
+                    (vec (remove #(cstr/ends-with? (str (first %)) (str "/" (ut/replacer (str name) ":" "")))
                                  (get-in db [:flows (get db :selected-flow) :connections]))))
        (ut/dissoc-in [:flows (get db :selected-flow) :map bid :push name]))))
 
@@ -6133,7 +6133,7 @@
  (undoable)
  (fn [db [_ bid name]]
    (-> db (assoc-in [:flows (get db :selected-flow) :connections]
-                    (vec (remove #(cstr/ends-with? (str (first %)) (str "/" (cstr/replace (str name) ":" "")))
+                    (vec (remove #(cstr/ends-with? (str (first %)) (str "/" (ut/replacer (str name) ":" "")))
                                  (get-in db [:flows (get db :selected-flow) :connections]))))
        (ut/dissoc-in [:flows (get db :selected-flow) :map bid :cond name]))))
 
@@ -6210,7 +6210,7 @@
                                                          (= vk (get @sniffy-sniff 1)))
                                                         ;; hover from canvas sniffer
                                                     (= select-vec selected))
-                                      default (get defaults vk) ;;(walk/postwalk-replace {:cline} (get defaults vk))
+                                      default (get defaults vk) ;;(ut/postwalk-replacer {:cline} (get defaults vk))
                                       default? (not (nil? default))
                                       scrubber (get-in port-meta [vk :scrubber])
                                     ;_ (tap> [:port-meta port-meta scrubber])
@@ -6271,7 +6271,7 @@
                                                   "#ffffff80")
 
                                      ;:background-color (str (get (theme-pull :theme/data-colors db/data-colors)
-                                     ;                            (cstr/replace (str vv) ":" "") "black") 19)
+                                     ;                            (ut/replacer (str vv) ":" "") "black") 19)
                                      ;:background-color (theme-pull :theme/editor-outer-rim-color nil)
                                        :background-color (str pcolor
                                                               (if (and (not connected?) (not selected?) (= type :out))
@@ -6341,7 +6341,7 @@
                                                  ;:height "100px"
                                                 ;;  :description-fn (fn [m] [re-com/box
                                                 ;;                           :child (str "data type of "
-                                                ;;                                       (cstr/replace (str (get m :label)) ":" "")
+                                                ;;                                       (ut/replacer (str (get m :label)) ":" "")
                                                 ;;                                       " according to Clojure(script) conventions")
                                                 ;;                           :style {;:font-weight 700
                                                 ;;                                   :color (str (ut/invert-hex-color (theme-pull :theme/editor-font-color nil)) 89)}])
@@ -6889,7 +6889,7 @@
 
 (defn block-renamer [bid]
   (let [flow-id-regex #"^[a-zA-Z0-9_-]+$" ;; alpha, underscores, hypens, numbers
-        str-bid (cstr/replace (str bid) ":" "")]
+        str-bid (ut/replacer (str bid) ":" "")]
     (if (= @rename-block bid)
       [re-com/input-text
        :src (at)
@@ -7582,7 +7582,7 @@
                                     fmap (get blocks flow-select)
                                     inputs? (not (empty? (keys (get-in fmap [:ports :in]))))
                                     pval @(ut/tracked-subscribe [::port-color flow-id flow-select :out :data-value])
-                                    view-pval @(ut/tracked-subscribe [::port-color flow-id (keyword (str (cstr/replace (str flow-select) ":" "") "-vw")) :out :data-value])
+                                    view-pval @(ut/tracked-subscribe [::port-color flow-id (keyword (str (ut/replacer (str flow-select) ":" "") "-vw")) :out :data-value])
                                     browsable? (true? (or (vector? pval) (map? pval)))
                                     rabbit-code? (or (and (vector? pval) (keyword? (first pval))) ;; is it renderable rabbit-code?
                                                      (and (map? pval) (contains? pval :queries) (contains? pval :view)))
@@ -8125,7 +8125,7 @@
          ;flow-parts (vec (sort-by :name (into fflowparts-sys fflow-sys)))
          flow-parts (vec (sort-by :name fflowparts-sys))
          flow-parts-key (when part-key
-                          (let [ss (cstr/split (cstr/replace (str part-key) ":" "") "/")
+                          (let [ss (ut/splitter (ut/replacer (str part-key) ":" "") "/")
                                 cat (keyword (first ss))
                                 name (keyword (second ss))]
                             (first (filter #(and (= (get % :category) (str cat))
@@ -8194,8 +8194,8 @@
 ;;                                        (for [e (keys f2i)
 ;;                                              :when (cstr/ends-with? (str e) "+")]
 ;;                                          {(-> (str e)
-;;                                               (cstr/replace "+" "")
-;;                                               (cstr/replace ":" "")
+;;                                               (ut/replacer "+" "")
+;;                                               (ut/replacer ":" "")
 ;;                                               keyword) e}))]
 ;;                    (merge
 ;;                     (if sub-flow? {:flow-path (get lookup-map :flow-path)  ;; for unpacking later
@@ -8207,9 +8207,9 @@
 ;;                        :type (if (not sub-flow?) (try-read (get lookup-map :name)) (get lookup-map :name))  ;; important for client render (expects keyword)
 ;;                        :name (get lookup-map :name)  ;; important for lookup server-side! (string fine)
 ;;                        :icon (get lookup-map :icon)
-;;                        :inputs (walk/postwalk-replace arg-walks (get lookup-map :inputs))
+;;                        :inputs (ut/postwalk-replacer arg-walks (get lookup-map :inputs))
 ;;                        :defaults (get lookup-map :defaults)
-;;                        :types (walk/postwalk-replace arg-walks (get lookup-map :types))
+;;                        :types (ut/postwalk-replacer arg-walks (get lookup-map :types))
 ;;                        :style (get lookup-map :style)
 ;;                        :selected-style (get lookup-map :selected-style)
 ;;                        :expandable? true
@@ -8239,8 +8239,8 @@
 ;;                           ;;                  (for [e (keys port-map)
 ;;                           ;;                        :when (cstr/ends-with? (str e) "+")]
 ;;                           ;;                    {(-> (str e)
-;;                           ;;                         (cstr/replace "+" "")
-;;                           ;;                         (cstr/replace ":" "")
+;;                           ;;                         (ut/replacer "+" "")
+;;                           ;;                         (ut/replacer ":" "")
 ;;                           ;;                         keyword) e}))
 ;;                            ]
 ;;                        {:fn starting-val
@@ -8333,7 +8333,7 @@
                         [re-com/typeahead
                          :width "250px"
                          :suggestion-to-string (fn [item]
-                                                 (str (get item :category) "/" (cstr/replace (str (get item :name)) ":" ""))) ;; render in input box (must be string, no hiccup :())
+                                                 (str (get item :category) "/" (ut/replacer (str (get item :name)) ":" ""))) ;; render in input box (must be string, no hiccup :())
                          :render-suggestion (fn [ss _] ;; render in dropdown
                                               [re-com/h-box
                                                :style {:border-top  "1px solid #00000009"}
@@ -8373,7 +8373,7 @@
                         ;;                                          (cstr/includes? (cstr/lower-case (str (get % :description))) xt))
                         ;;                                     flow-parts))))
                          :data-source (fn [x]
-                                        (let [words (cstr/split (cstr/lower-case (cstr/trim x)) #" ")
+                                        (let [words (ut/splitter (cstr/lower-case (cstr/trim x)) #" ")
                                               matches-word (fn [field word] (cstr/includes? (cstr/lower-case (str field)) word))]
                                           (if (or (nil? x) (empty? x)) flow-parts
                                               (filter (fn [item]
@@ -8519,7 +8519,7 @@
         ;flow-id @(ut/tracked-subscribe [::selected-flow])
 
         ;coords (generate-coords x y)
-        ;fart (cstr/replace nil "5" "55") ;; error test
+        ;fart (ut/replacer nil "5" "55") ;; error test
         ;choices [[:yo :yo] [:yo1 :yo1] [:fook :fook]]
         ;; choices [[:o (str "@bricks/over-flow? " @bricks/over-flow?)]
         ;;          [:o0 (str "@bricks/swap-layers?" @bricks/swap-layers?)]
@@ -9236,7 +9236,7 @@
                                                                                                server-flowmap (process-flowmap2 flowmap flowmaps-connections flow-id)
                                                                                                comps (get server-flowmap :components) ;; (assoc (get server-flowmap :components) :*running? {})
                                                                                                running-view-subs (vec (for [[k v] comps :when (get v :view)]
-                                                                                                                        [flow-id (keyword (str (cstr/replace (str k) ":" "") "-vw"))]))
+                                                                                                                        [flow-id (keyword (str (ut/replacer (str k) ":" "") "-vw"))]))
                                                                                                running-subs (vec (for [k (keys comps)] [flow-id k]))
                                                                                                running-subs (vec (into running-subs running-view-subs))]
                                                                                            (ut/tracked-dispatch [::wfx/request :default

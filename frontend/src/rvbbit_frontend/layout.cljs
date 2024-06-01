@@ -16,7 +16,7 @@
   (let [{:keys [root w h]} block
         [start-x start-y] root
         all-blocks (vec (remove #(= block %) (vals all-blocks-map)))
-        ;view-ref (cstr/replace (str view-ref) #":view/" ":vu/")
+        ;view-ref (ut/replacer (str view-ref) #":view/" ":vu/")
 
 
         ;all-blocks (filter #(contains? processed-blocks %) all-blocks)

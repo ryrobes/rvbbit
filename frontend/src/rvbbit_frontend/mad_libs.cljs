@@ -9,7 +9,7 @@
 ;;   (let [all-sql-call-keys @(ut/tracked-subscribe [::all-sql-call-keys])
 ;;         grid-reco? @(ut/tracked-subscribe [::grid-reco?])
 ;;         recos-page @(ut/tracked-subscribe [::recos-page])
-;;         all-sql-call-keys-str (for [e all-sql-call-keys] (cstr/replace (ut/unkeyword e) "-" "_"))
+;;         all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/safe-name e) "-" "_"))
 ;;         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-tables-sys/table_name
 ;;                                      :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn :user-dropdown-sys/req-field]]
 ;;                               {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
@@ -88,7 +88,7 @@
 ;;                                     :padding-left "5px" :padding-right "5px"}
 ;;                             :child (str table_name " (" recos ")")])
 ;;         combo-singles (vec (distinct (flatten (doall (for [{:keys [combo_edn recos]} combo-list]
-;;                                                        (cstr/split (cstr/replace combo_edn #"\"" "") ", "))))))
+;;                                                        (ut/splitter (ut/replacer combo_edn #"\"" "") ", "))))))
 ;;         pkeys @(ut/tracked-subscribe [::preview-keys])
 ;;         preview-keys (vec (for [k pkeys] (keyword (str "reco-preview" k))))
 ;;         preview-maps (into {} (for [{:keys [combo_hash shape_name combo_edn query_map viz_map condis]} full-recos]
@@ -107,7 +107,7 @@
 ;;                                        viz_map (get-in preview-maps [panel-key :viz_map])
 ;;                                        condis (get-in preview-maps [panel-key :condis])
 ;;                                        combo_hash (get-in preview-maps [panel-key :combo_hash])
-;;                                        combo_edn (try (when (not (nil? ce)) (cstr/replace ce #"\"" "")) (catch :default _ "")) ;; TODO, why bombing?
+;;                                        combo_edn (try (when (not (nil? ce)) (ut/replacer ce #"\"" "")) (catch :default _ "")) ;; TODO, why bombing?
 ;;                                        shape_name (get-in preview-maps [panel-key :shape_name])
 ;;                                        sel? (= reco-selected panel-key)
 ;;                                        body [re-com/v-box
@@ -190,7 +190,7 @@
 ;;     ;(tap> sql-params)
 ;;     ;(tap> combo-singles)
 ;;     (dorun (for [[k v] sql-calls]
-;;              (let [query (walk/postwalk-replace sql-params v)
+;;              (let [query (ut/postwalk-replacer sql-params v)
 ;;                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
 ;;                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
 ;;                (when (or (not data-exists?) unrun-sql?)

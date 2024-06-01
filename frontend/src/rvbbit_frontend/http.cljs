@@ -77,7 +77,7 @@
                    :on-response [::simple-response-boot-no-load] ;; just get settings, in case they changed since the client booted, but the server might have rebooted and changed them
                    :on-timeout [::imeout-response [:boot :get-settings]]
                    :timeout    15000}]
-                 [::get-autocomplete-values]
+                 ;[::get-autocomplete-values]
                  ;[::wfx/subscribe socket-id :server-push3 (subscription x :server-push3)]
                  ;[::wfx/subscribe socket-id :server-push4 (subscription x :server-push4)]
                  ]}))
@@ -100,16 +100,16 @@
 ;;    db))
 
 (def server-http-port 8888)
-(def url-base (str (cstr/join ":" (drop-last (cstr/split (.. js/document -location -href) #":"))) ":" server-http-port)) ;; no trailing slash
+(def url-base (str (cstr/join ":" (drop-last (ut/splitter (.. js/document -location -href) #":"))) ":" server-http-port)) ;; no trailing slash
 
 
 (re-frame/reg-sub
  ::url-vec
  (fn [_ _]
    (let [url-str (.. js/document -location -href)
-         url-vec (if (and (cstr/includes? url-str "/#/") (> (count (cstr/split url-str "/#/")) 1))
-                   (cstr/split
-                    (last (cstr/split url-str "/#/"))
+         url-vec (if (and (cstr/includes? url-str "/#/") (> (count (ut/splitter url-str "/#/")) 1))
+                   (ut/splitter
+                    (last (ut/splitter url-str "/#/"))
                     "/") [])]
      url-vec)))
 
@@ -127,9 +127,9 @@
 (re-frame/reg-event-db
  ::url-changed
  (fn [db [_ new-url]]
-   (let [url-vec (if (and (cstr/includes? new-url "#") (> (count (cstr/split new-url "#")) 1))
-                   (cstr/split
-                    (last (cstr/split new-url "#"))
+   (let [url-vec (if (and (cstr/includes? new-url "#") (> (count (ut/splitter new-url "#")) 1))
+                   (ut/splitter
+                    (last (ut/splitter new-url "#"))
                     "/") [])
          base-dir "./screens/"
          screen (str base-dir (last url-vec) ".edn")]
@@ -194,11 +194,26 @@
      ;(tap> [:subbed-to-server-value result])
      (assoc-in db [:click-param base-key sub-key] value))))
 
+;;(reset! db/autocomplete-keywords (vec (sort (map str @(rfa/sub ::parameters-available {})))))
+
 (re-frame/reg-event-db
  ::autocomplete-response
  (fn [db [_ result]]
+   (let [;;codes [:theme/base-font :font-family :height]
+         server-params (get result :clover-params [])
+         view-codes (get result :view-keywords [])
+         flow-subs (get db :flow-subs)
+         click-params (vec (for [e (keys (get-in db [:click-param :param]))]
+                             (keyword (str "param/" (ut/replacer (str e) ":" "")))))
+         themes (vec (for [e (keys (get-in db [:click-param :theme]))]
+                       (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
+         codes (vec (apply concat [server-params view-codes themes flow-subs click-params]))
+         ]
+     
    (tap> [:pulled-auto-complete (get db :client-name) (into {} (for [[k v] result] [k (count v)]))])
-   (assoc db :autocomplete result)))
+   ;(assoc db :autocomplete result)
+   (reset! db/autocomplete-keywords (vec (sort (map str codes))))
+   db)))
 
   ;; {:clover-params @autocomplete-clover-param-atom
   ;; :view-keywords @autocomplete-view-atom})
@@ -504,8 +519,8 @@
            estimate?        (assoc db :flow-estimates (merge (get db :flow-estimates) (get result :status)))
 
            flow-runner-sub? (let [rtn (get result :status)
-                                ;mp-key (walk/postwalk-replace {:flow-runner :return-map} task-id)
-                                  mps-key (vec (walk/postwalk-replace {:flow-runner :return-maps} task-id))
+                                ;mp-key (ut/postwalk-replacer {:flow-runner :return-map} task-id)
+                                  mps-key (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
                                   return-maps (get-in db [:flow-results :return-maps] {})]
                                 ;;(tap> [:sub-return-maps! task-id rtn mp-key mps-key (vec (drop 1  mps-key)) return-maps])
                               (if (= rtn :started)
@@ -996,9 +1011,9 @@
    (let [url (str url-base "/load")
          method :get
          request {:file-path file-path}
-         ;_ (change-url (cstr/replace (str (last (cstr/split file-path "/"))) #".edn" ""))
-         _ (change-url (str "/" (cstr/replace (str (last (cstr/split file-path "/"))) #".edn" "")))]
-        ; _ (tap> [file-path (str (last (cstr/split file-path "/"))) (cstr/replace (str (last (cstr/split file-path "/"))) #".edn" "")])
+         ;_ (change-url (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" ""))
+         _ (change-url (str "/" (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" "")))]
+        ; _ (tap> [file-path (str (last (ut/splitter file-path "/"))) (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" "")])
           ;; TODO, sketchy w/o checking
      {:db   (assoc-in db [:http-reqs :load-flowset]
                       {:status "running"

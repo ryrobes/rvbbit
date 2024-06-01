@@ -55,7 +55,7 @@
 (defn theme-pull-fn [cmp-key fallback & test-fn] ;; dupe from bricks.cljs refactor into its own ns?
   (let [v                   @(ut/tracked-subscribe [::conn/clicked-parameter-key [cmp-key]])
         ;v                   (resolver/logic-and-params v nil)
-        t0                  (cstr/split (str (ut/unkeyword cmp-key)) #"/")
+        t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
         t1                  (keyword (first t0))
         t2                  (keyword (last t0))
         self-ref-keys       (distinct (filter #(and (keyword? %) (namespace %)) (ut/deep-flatten db/base-theme)))
@@ -63,7 +63,7 @@
                                   (for [k self-ref-keys     ;; todo add a reurziver version of this
                                         :let [bk (keyword (ut/replacer (str k) ":theme/" ""))]]
                                     {k (get db/base-theme bk)}))
-        resolved-base-theme (walk/postwalk-replace self-ref-pairs db/base-theme)
+        resolved-base-theme (ut/postwalk-replacer self-ref-pairs db/base-theme)
         base-theme-keys     (keys resolved-base-theme)
         theme-key?          (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
         fallback0           (if theme-key? (get resolved-base-theme t2) fallback)
@@ -114,7 +114,7 @@
                        :align :end :justify :end
                        :style {:word-break "break-all"}
                        :child (str "\"" s "\"")]
-          :else (cstr/replace (str s) #"clojure.core/" ""))))
+          :else (ut/replacer (str s) #"clojure.core/" ""))))
 
 (defn map-boxes2 [data block-id flow-name keypath kki init-data-type & [draggable?]]  ;; dupe of a fn inside flows, but w/o dragging - TODO refactor to single fn - 3/15/24
   ;(tap> [:pre-data data])

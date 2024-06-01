@@ -40,7 +40,7 @@
                        :align :end :justify :end
                        :style {:word-break "break-all"}
                        :child (str "\"" s "\"")]
-          :else (cstr/replace (str s) #"clojure.core/" ""))))
+          :else (ut/replacer (str s) #"clojure.core/" ""))))
 
 (defn draggable-pill [_ _ element] element) ;; stub
 

@@ -85,8 +85,8 @@
                                        (for [e (keys f2i)
                                              :when (cstr/ends-with? (str e) "+")]
                                          {(-> (str e)
-                                              (cstr/replace "+" "")
-                                              (cstr/replace ":" "")
+                                              (ut/replacer "+" "")
+                                              (ut/replacer ":" "")
                                               keyword) e}))]
                    (merge
                     (when sub-flow? {:flow-path (get lookup-map :flow-path)  ;; for unpacking later
@@ -98,9 +98,9 @@
                        :type (if (not sub-flow?) (try-read (get lookup-map :name)) (get lookup-map :name))  ;; important for client render (expects keyword)
                        :name (get lookup-map :name)  ;; important for lookup server-side! (string fine)
                        :icon (get lookup-map :icon)
-                       :inputs (walk/postwalk-replace arg-walks (get lookup-map :inputs))
+                       :inputs (ut/postwalk-replacer arg-walks (get lookup-map :inputs))
                        :defaults (get lookup-map :defaults)
-                       :types (walk/postwalk-replace arg-walks (get lookup-map :types))
+                       :types (ut/postwalk-replacer arg-walks (get lookup-map :types))
                        :style (get lookup-map :style)
                        :selected-style (get lookup-map :selected-style)
                        :expandable? true
@@ -130,8 +130,8 @@
                           ;;                  (for [e (keys port-map)
                           ;;                        :when (cstr/ends-with? (str e) "+")]
                           ;;                    {(-> (str e)
-                          ;;                         (cstr/replace "+" "")
-                          ;;                         (cstr/replace ":" "")
+                          ;;                         (ut/replacer "+" "")
+                          ;;                         (ut/replacer ":" "")
                           ;;                         keyword) e}))
                            ]
                        {:fn starting-val
@@ -197,7 +197,7 @@
 (defn add-flow-block [x y & [body bid no-select?]]
   (let [;bid (if bid bid (keyword (str "open-input-" (count @(ut/tracked-subscribe [::flowmap])))))
         _ (tap> [:add-block bid x y  body])
-        bid (keyword (cstr/replace (str (gn bid)) #"/" "-"))
+        bid (keyword (ut/replacer (str (gn bid)) #"/" "-"))
         bid (if bid bid :open-input)
         ;;_ (tap> [:ADD-pre-safe-bid bid])
         safe-keys-reserved @(ut/tracked-subscribe [::reserved-type-keywords])
@@ -251,8 +251,8 @@
                                              @(rfa/sub ::clicked-parameter-key-alpha {:keypath [k]})}))
           value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
           value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
-                                            (let [fs    (cstr/split (ut/unkeyword k) "/")
-                                                  gs    (cstr/split (last fs) ".")
+                                            (let [fs    (ut/splitter (ut/safe-name k) "/")
+                                                  gs    (ut/splitter (last fs) ".")
                                                   ds    (keyword (first fs))
                                                   row   (try (int (last gs)) (catch :default _ "label"))
                                                 ;row (int (last gs))
@@ -267,15 +267,15 @@
 
           condi-walks-targets    (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
           condi-walks            (into {} (for [k condi-walks-targets]
-                                            {k @(rfa/sub ::condi-value {:condi-key (keyword (last (cstr/split (ut/unkeyword k) "/")))})}))
-          into-walk-map2           (fn [obody] (let [;obody (walk/postwalk-replace condi-walks orig-body)
+                                            {k @(rfa/sub ::condi-value {:condi-key (keyword (last (ut/splitter (ut/safe-name k) "/")))})}))
+          into-walk-map2           (fn [obody] (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                                                      kps       (ut/extract-patterns obody :into 3) ;(kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
                                                      logic-kps (into {} (for [v kps]
                                                                           (let [[_ this that] v]
                                                                                 ;(tap> [:if-walk panel-key kps l this that])
                                                                             {v (into this that)})))]
-                                                 (walk/postwalk-replace logic-kps obody)))
-          if-walk-map2           (fn [obody] (let [;obody (walk/postwalk-replace condi-walks orig-body)
+                                                 (ut/postwalk-replacer logic-kps obody)))
+          if-walk-map2           (fn [obody] (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                                                    kps       (ut/extract-patterns obody :if 4) ;(kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
                                                    logic-kps (into {} (for [v kps]
                                                                         (let [[_ l this that] v]
@@ -283,18 +283,18 @@
                                                                           {v (if 
                                                                               (logic-and-params-fn l nil) ;; l
                                                                                this that)})))]
-                                               (walk/postwalk-replace logic-kps obody)))
+                                               (ut/postwalk-replacer logic-kps obody)))
         ;; when-walk-map          (fn [obody] (let [kps       (kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
         ;;                                          logic-kps (into {} (for [[_ v]
         ;;                                                                   (into {} (filter #(cstr/starts-with? (str (last %)) "[:when") kps))]
         ;;                                                               (let [[_ l this] v]
         ;;                                                                 {v (when l this)})))]
-        ;;                                      (walk/postwalk-replace logic-kps obody)))
+        ;;                                      (ut/postwalk-replacer logic-kps obody)))
           when-walk-map2         (fn [obody] (let [kps       (ut/extract-patterns obody :when 3)
                                                    logic-kps (into {} (for [v kps]
                                                                         (let [[_ l this] v]
                                                                           {v (when l this)})))]
-                                               (walk/postwalk-replace logic-kps obody)))
+                                               (ut/postwalk-replacer logic-kps obody)))
         ;; =-walk-map             (fn [obody] (let [kps       (kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
         ;;                                          logic-kps (into {} (for [[_ v]
         ;;                                                                   (into {} (filter #(cstr/starts-with? (str (last %)) "[:=") kps))]
@@ -302,14 +302,14 @@
         ;;                                                                 ;(tap> [:=-walk panel-key kps this that])
         ;;                                                                 {v (= (str that) (str this))})))]
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
-        ;;                                      (walk/postwalk-replace logic-kps obody)))
+        ;;                                      (ut/postwalk-replacer logic-kps obody)))
           =-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody := 3)
                                                    logic-kps (into {} (for [v kps]
                                                                         (let [[_ that this] v]
                                                                         ;(tap> [:=-walk panel-key kps this that])
                                                                           {v (= (str that) (str this))})))]
                                              ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
-                                               (walk/postwalk-replace logic-kps obody)))
+                                               (ut/postwalk-replacer logic-kps obody)))
         ;; auto-size-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :auto-size-px 2)
         ;;                                                  logic-kps (into {} (for [v kps]
         ;;                                                                       (let [[_ l] v]
@@ -317,7 +317,7 @@
         ;;                                                                         {v (ut/auto-font-size-px l h w) ;(= (str that) (str this))
         ;;                                                                          })))]
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
-        ;;                                              (walk/postwalk-replace logic-kps obody)))
+        ;;                                              (ut/postwalk-replacer logic-kps obody)))
         ;; onclick-walk-map       (fn [obody] (let [kps       (kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
         ;;                                          logic-kps (into {} (for [[_ v]
         ;;                                                                   (into {} (filter #(cstr/starts-with? (str (last %)) "[:set-parameter") kps))]
@@ -327,7 +327,7 @@
         ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
         ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
         ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
-        ;;                                      (walk/postwalk-replace logic-kps obody)))
+        ;;                                      (ut/postwalk-replacer logic-kps obody)))
         ;; onclick-walk-map2      (fn [obody] (let [kps       (ut/extract-patterns obody :set-parameter 3)
         ;;                                          logic-kps (into {} (for [v kps]
         ;;                                                               (let [[_ pkey pval] v
@@ -336,7 +336,7 @@
         ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
         ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
         ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
-        ;;                                      (walk/postwalk-replace logic-kps obody)))
+        ;;                                      (ut/postwalk-replacer logic-kps obody)))
         ;; map-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :map 3)
         ;;                                            logic-kps (into {} (for [v kps]
         ;;                                                                 (let [[_ that this] v]
@@ -347,19 +347,19 @@
         ;;                                                                  ;(= (str that) (str this))
         ;;                                                                    })))]
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
-        ;;                                        (walk/postwalk-replace logic-kps obody)))
+        ;;                                        (ut/postwalk-replacer logic-kps obody)))
 
           string-walk            (fn [num obody] (let [kps       (ut/extract-patterns obody :string3 num)
                                                        logic-kps (into {} (for [v kps]
                                                                             (let [[_ & this] v]
                                                                               {v (apply str this)})))]
-                                                   (walk/postwalk-replace logic-kps obody)))
+                                                   (ut/postwalk-replacer logic-kps obody)))
 
           case-walk         (fn [obody] (let [kps       (ut/extract-patterns obody :case 2)
                                               logic-kps (into {} (for [v kps]
                                                                    (let [[_ l] v]
                                                                      {v (ut/vectorized-case l)})))]
-                                          (walk/postwalk-replace logic-kps obody)))
+                                          (ut/postwalk-replacer logic-kps obody)))
 
         ;; scrubber-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :scrubber 2)
         ;;                                                 kps2       (ut/extract-patterns obody :scrubber 3)
@@ -369,7 +369,7 @@
         ;;                                                                        {v [scrubber-panel true
         ;;                                                                            @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                            :param
-        ;;                                                                            (str (last (cstr/split (str this) #"/")))
+        ;;                                                                            (str (last (ut/splitter (str this) #"/")))
         ;;                                                                            {:fm true :canvas? true}]})))
         ;;                                                 logic-kps2 (into {} (for [v kps2]
         ;;                                                                       (let [[_ this opts] v]
@@ -377,9 +377,9 @@
         ;;                                                                         {v [scrubber-panel true
         ;;                                                                             @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                             :param
-        ;;                                                                             (str (last (cstr/split (str this) #"/")))
+        ;;                                                                             (str (last (ut/splitter (str this) #"/")))
         ;;                                                                             {:fm true :canvas? true :opts opts}]})))]
-        ;;                                             (walk/postwalk-replace (merge logic-kps2 logic-kps) obody)))
+        ;;                                             (ut/postwalk-replacer (merge logic-kps2 logic-kps) obody)))
           singles               {:text                  str
                                                                  ;:case (fn [x] (ut/vectorized-case x))
                                  :>> (fn [[x y]] (true? (> x y)))
@@ -395,7 +395,7 @@
                                ;:string str
                               ; :strings               (fn [_ x] (apply str x))
                               ; :string                (fn [x] (try
-                              ;                                  (let [x (for [e x] (ut/unkeyword e))] (apply str x))
+                              ;                                  (let [x (for [e x] (ut/safe-name e))] (apply str x))
                               ;                                  (catch :default _ (str x))))
                                ;:number                (fn [x] (str (nf x)))
                                ;:percent               (fn [x] (str (nf x) "%"))
@@ -404,10 +404,10 @@
 
           out-block-map (cond->> block-map
                           true (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
-                          true (walk/postwalk-replace {:*this-block* panel-key})
-                          (ut/ne? value-walks) (walk/postwalk-replace value-walks)
-                          (ut/ne? condi-walks) (walk/postwalk-replace condi-walks)
-                          (ut/ne? workspace-params) (walk/postwalk-replace workspace-params)
+                          true (ut/postwalk-replacer {:*this-block* panel-key})
+                          (ut/ne? value-walks) (ut/postwalk-replacer value-walks)
+                          (ut/ne? condi-walks) (ut/postwalk-replacer condi-walks)
+                          (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
 
                           (has-fn? :string3) (string-walk 2) ;; TODO, remove all these extra string replacements and make a [:string & x] ver
                           (has-fn? :string3) (string-walk 3)
@@ -419,7 +419,7 @@
                           (has-fn? :if) if-walk-map2
                           (has-fn? :when) when-walk-map2
                           (has-fn? :into) into-walk-map2
-                          (ut/ne? singles) (walk/postwalk-replace singles)
+                          (ut/ne? singles) (ut/postwalk-replacer singles)
                           (has-fn? :case) case-walk)
 
           templated-strings-vals (vec (filter #(cstr/includes? (str %) "/")
@@ -427,7 +427,7 @@
           templates?              (ut/ne? templated-strings-vals)
           _ (when templates? (tap> [:replacing-string-templates... templated-strings-vals out-block-map]))
           templated-strings-walk (if templates?
-                                   (walk/postwalk-replace {nil ""}
+                                   (ut/postwalk-replacer {nil ""}
                                                           (into {} (for [k templated-strings-vals]
                                                                      {k
                                                                       ;;@(ut/tracked-subscribe [::clicked-parameter-key [k]])
@@ -540,8 +540,8 @@
                   (let [slp (vec (map keyword ;; memoize this in ut?
                                       (-> kw
                                           str
-                                          (cstr/replace ":" "")
-                                          (cstr/split #"/")
+                                          (ut/replacer ":" "")
+                                          (ut/splitter #"/")
                                           (vec))))
                         val (get-in db (vec (cons :click-param slp)))]
                     val))]
@@ -568,8 +568,8 @@
 (re-frame/reg-sub ;; RESOLVE KEYPATH
  ::clicked-parameter-key  ;;; important, common, and likely more expensive than need be. TODO
  (fn [db [_ keypath]]
-   (let [cmp (cstr/split (ut/unkeyword (nth keypath 0)) "/")
-         kkey (keyword (cstr/replace (nth cmp 0) "-parameter" ""))
+   (let [cmp (ut/splitter (ut/safe-name (nth keypath 0)) "/")
+         kkey (keyword (ut/replacer (nth cmp 0) "-parameter" ""))
          vkey (keyword (peek cmp))
 ;;         _ (when (cstr/includes? (str keypath) ":query") (tap> [:? keypath kkey vkey (get-in db (cons :click-param [kkey vkey]))]))
          val0 (get-in db (cons :click-param [kkey vkey]))
@@ -578,14 +578,14 @@
                                                                        (let [kws (vec (filter #(cstr/includes? (str %) "/") (ut/deep-flatten v)))
                                                                              ;wm @(ut/tracked-subscribe [::resolve-click-param kws])
                                                                              wm @(rfa/sub ::resolve-click-param {:long-keyword kws})
-                                                                             v0 (walk/postwalk-replace wm v)
+                                                                             v0 (ut/postwalk-replacer wm v)
                                                                              [_ l this that] v0]
                                                                         ;(tap> [:if-walk keypath v kps l this that kws (if l this that)])
                                                                          {v (if l this that)})))]
-                                              (walk/postwalk-replace logic-kps obody)))
+                                              (ut/postwalk-replacer logic-kps obody)))
          ;;val0 (resolver/logic-and-params val0 nil)
          val0 (try (if (= (first val0) :if) (if-walk-map2 val0) val0) (catch :default _ val0)) ;; TODO
-        ;;  val0 (walk/postwalk-replace {:text                  str
+        ;;  val0 (ut/postwalk-replacer {:text                  str
         ;;                               :case (fn [x] (ut/vectorized-case x))
         ;;                               :str (fn [args]
         ;;                                 ;  (cstr/join "" args)
@@ -597,24 +597,24 @@
          ;      
          ;      )
          val (cond ns-kw?
-                   (get-in db (let [sp (cstr/split (str val0) "/")]
-                                [:click-param (ut/unre-qword (cstr/replace (str (first sp)) ":" ""))
+                   (get-in db (let [sp (ut/splitter (str val0) "/")]
+                                [:click-param (ut/unre-qword (ut/replacer (str (first sp)) ":" ""))
                                  (ut/unre-qword (last sp))]))
                    (map? val0)
-                   (let [km (into {} (distinct (map #(when (>= (count %) 2) {(str (cstr/replace (str (get % 0)) ":" "") "/"
-                                                                                  (cstr/replace (str (get % 1)) ":" "")) [(get % 0) (get % 1)]})
+                   (let [km (into {} (distinct (map #(when (>= (count %) 2) {(str (ut/replacer (str (get % 0)) ":" "") "/"
+                                                                                  (ut/replacer (str (get % 1)) ":" "")) [(get % 0) (get % 1)]})
                                                     (ut/keypaths (get db :click-param)))))
                          rep-map (into {} (for [[k v] km] {(keyword k) (get-in db (cons :click-param v))}))]
                      ;(tap> [:replace-map val0 rep-map])
-                     (walk/postwalk-replace rep-map val0))
+                     (ut/postwalk-replacer rep-map val0))
                    :else val0)
-         ;;val (walk/postwalk-replace {:case (fn [x] (ut/vectorized-case x))} val)
+         ;;val (ut/postwalk-replacer {:case (fn [x] (ut/vectorized-case x))} val)
         ;;  _ (tap> [:val keypath val])
 
 
          ;;; recursize resolve parameter IF WHEN ETC here! TODO - need to recur see if-walk, else will be true due to keywords
          val      (if (and (string? val) (cstr/starts-with? (str val) ":") (not (cstr/includes? (str val) " ")))
-       ;(cstr/replace (str val) ":" "")
+       ;(ut/replacer (str val) ":" "")
                     (edn/read-string val) ;; temp hacky param work around (since we cant save keywords in the DB).. TODO :/
                     val)
          ;_ (tap> [:resolver (logic-and-params-fn val nil)])
@@ -628,8 +628,8 @@
     ; (when (cstr/includes? (str val) "theme") 
     ;   (tap> [:clicked-param-key? keypath val (if-walk-map2 val) val0]))
     ; (when ns-kw?
-    ;   (tap> [:click-param ns-kw? val val0 (when ns-kw? (let [sp (cstr/split (str val0) "/")]
-    ;                                                      [:click-param (ut/unre-qword (cstr/replace (str (first sp)) ":" ""))
+    ;   (tap> [:click-param ns-kw? val val0 (when ns-kw? (let [sp (ut/splitter (str val0) "/")]
+    ;                                                      [:click-param (ut/unre-qword (ut/replacer (str (first sp)) ":" ""))
     ;                                                       (ut/unre-qword (last sp))])) val [kkey vkey]]))
      ;(if (nil? val) (str "(nil val)") val)
 
@@ -644,8 +644,8 @@
 (re-frame/reg-sub ;; RESOLVE KEYPATH TEMP FOR TESTING
  ::clicked-parameter-key-alpha  ;;; important, common, and likely more expensive than need be. TODO
  (fn [db {:keys [keypath]}]
-   (let [cmp (cstr/split (ut/unkeyword (nth keypath 0)) "/")
-         kkey (keyword (cstr/replace (nth cmp 0) "-parameter" ""))
+   (let [cmp (ut/splitter (ut/safe-name (nth keypath 0)) "/")
+         kkey (keyword (ut/replacer (nth cmp 0) "-parameter" ""))
          vkey (keyword (peek cmp))
 ;;         _ (when (cstr/includes? (str keypath) ":query") (tap> [:? keypath kkey vkey (get-in db (cons :click-param [kkey vkey]))]))
          val0 (get-in db (cons :click-param [kkey vkey]))
@@ -654,14 +654,14 @@
                                                                        (let [kws (vec (filter #(cstr/includes? (str %) "/") (ut/deep-flatten v)))
                                                                              ;wm @(ut/tracked-subscribe [::resolve-click-param kws])
                                                                              wm @(rfa/sub ::resolve-click-param {:long-keyword kws})
-                                                                             v0 (walk/postwalk-replace wm v)
+                                                                             v0 (ut/postwalk-replacer wm v)
                                                                              [_ l this that] v0]
                                                                         ;(tap> [:if-walk keypath v kps l this that kws (if l this that)])
                                                                          {v (if l this that)})))]
-                                              (walk/postwalk-replace logic-kps obody)))
+                                              (ut/postwalk-replacer logic-kps obody)))
          ;;val0 (resolver/logic-and-params val0 nil)
          val0 (try (if (= (first val0) :if) (if-walk-map2 val0) val0) (catch :default _ val0)) ;; TODO
-        ;;  val0 (walk/postwalk-replace {:text                  str
+        ;;  val0 (ut/postwalk-replacer {:text                  str
         ;;                               :case (fn [x] (ut/vectorized-case x))
         ;;                               :str (fn [args]
         ;;                                 ;  (cstr/join "" args)
@@ -673,24 +673,24 @@
          ;      
          ;      )
          val (cond ns-kw?
-                   (get-in db (let [sp (cstr/split (str val0) "/")]
-                                [:click-param (ut/unre-qword (cstr/replace (str (first sp)) ":" ""))
+                   (get-in db (let [sp (ut/splitter (str val0) "/")]
+                                [:click-param (ut/unre-qword (ut/replacer (str (first sp)) ":" ""))
                                  (ut/unre-qword (last sp))]))
                    (map? val0)
-                   (let [km (into {} (distinct (map #(when (>= (count %) 2) {(str (cstr/replace (str (get % 0)) ":" "") "/"
-                                                                                  (cstr/replace (str (get % 1)) ":" "")) [(get % 0) (get % 1)]})
+                   (let [km (into {} (distinct (map #(when (>= (count %) 2) {(str (ut/replacer (str (get % 0)) ":" "") "/"
+                                                                                  (ut/replacer (str (get % 1)) ":" "")) [(get % 0) (get % 1)]})
                                                     (ut/keypaths (get db :click-param)))))
                          rep-map (into {} (for [[k v] km] {(keyword k) (get-in db (cons :click-param v))}))]
                      ;(tap> [:replace-map val0 rep-map])
-                     (walk/postwalk-replace rep-map val0))
+                     (ut/postwalk-replacer rep-map val0))
                    :else val0)
-         ;;val (walk/postwalk-replace {:case (fn [x] (ut/vectorized-case x))} val)
+         ;;val (ut/postwalk-replacer {:case (fn [x] (ut/vectorized-case x))} val)
         ;;  _ (tap> [:val keypath val])
 
 
          ;;; recursize resolve parameter IF WHEN ETC here! TODO - need to recur see if-walk, else will be true due to keywords
          val      (if (and (string? val) (cstr/starts-with? (str val) ":") (not (cstr/includes? (str val) " ")))
-       ;(cstr/replace (str val) ":" "")
+       ;(ut/replacer (str val) ":" "")
                     (edn/read-string val) ;; temp hacky param work around (since we cant save keywords in the DB).. TODO :/
                     val)
          ;_ (tap> [:resolver (logic-and-params-fn val nil)])
@@ -704,8 +704,8 @@
     ; (when (cstr/includes? (str val) "theme") 
     ;   (tap> [:clicked-param-key? keypath val (if-walk-map2 val) val0]))
     ; (when ns-kw?
-    ;   (tap> [:click-param ns-kw? val val0 (when ns-kw? (let [sp (cstr/split (str val0) "/")]
-    ;                                                      [:click-param (ut/unre-qword (cstr/replace (str (first sp)) ":" ""))
+    ;   (tap> [:click-param ns-kw? val val0 (when ns-kw? (let [sp (ut/splitter (str val0) "/")]
+    ;                                                      [:click-param (ut/unre-qword (ut/replacer (str (first sp)) ":" ""))
     ;                                                       (ut/unre-qword (last sp))])) val [kkey vkey]]))
      ;(if (nil? val) (str "(nil val)") val)
 
@@ -866,7 +866,7 @@
          rules (when has-rules?
                  (vec (for [[[col name] logic] style-rules]
                         [[:case (:logic logic) 1 :else 0]
-                         (keyword (str "styler_" (ut/unkeyword name)))])))
+                         (keyword (str "styler_" (ut/safe-name name)))])))
         ;;  query (-> query
         ;;            (dissoc :col-widths)
         ;;            (dissoc :row-height)
@@ -997,7 +997,7 @@
 (defn theme-pull [cmp-key fallback & test-fn]
   (let [;v                   @(ut/tracked-subscribe [::clicked-parameter-key [cmp-key]])
         v                   @(rfa/sub ::clicked-parameter-key-alpha {:keypath [cmp-key]})
-        t0                  (cstr/split (str (ut/unkeyword cmp-key)) #"/")
+        t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
         t1                  (keyword (first t0))
         t2                  (keyword (last t0))
         self-ref-keys       (distinct (filter #(and (keyword? %) (namespace %)) (ut/deep-flatten db/base-theme)))
@@ -1005,7 +1005,7 @@
                                   (for [k self-ref-keys     ;; todo add a reurziver version of this
                                         :let [bk (keyword (ut/replacer (str k) ":theme/" ""))]]
                                     {k (get db/base-theme bk)}))
-        resolved-base-theme (walk/postwalk-replace self-ref-pairs db/base-theme)
+        resolved-base-theme (ut/postwalk-replacer self-ref-pairs db/base-theme)
         base-theme-keys     (keys resolved-base-theme)
         theme-key?          (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
         fallback0           (if theme-key? (get resolved-base-theme t2) fallback)]
@@ -1239,7 +1239,7 @@
          rules (when has-rules?
                  (vec (for [[[col name] logic] style-rules]
                         [[:case (:logic logic) 1 :else 0]
-                         (keyword (str "styler_" (ut/unkeyword name)))])))
+                         (keyword (str "styler_" (ut/safe-name name)))])))
          panel-key @(rfa/sub ::lookup-panel-key-by-query-key-alpha {:query-key (first keypath)})
          clover-sql (assoc honey-sql :connection-id "system-db")
          honey-sql (ut/clean-sql-from-ui-keys honey-sql)
@@ -1253,7 +1253,7 @@
                         (assoc honey-sql :select (apply merge hselect rules))
                         honey-sql)
          client-name @(ut/tracked-subscribe [::client-name])
-         honey-modded (walk/postwalk-replace {:*client-name client-name
+         honey-modded (ut/postwalk-replacer {:*client-name client-name
                                               :*client-name-str (pr-str client-name)} honey-modded)]
      (ut/tracked-dispatch [::wfx/request :default
                          {:message    {:kind (if (or connection-id literal-data?)
@@ -1304,7 +1304,7 @@
           rules (when has-rules?
                   (vec (for [[[col name] logic] style-rules]
                          [[:case (:logic logic) 1 :else 0]
-                          (keyword (str "styler_" (ut/unkeyword name)))])))
+                          (keyword (str "styler_" (ut/safe-name name)))])))
           connection-id (cond (get honey-sql :connection-id) (get honey-sql :connection-id)
                               (nil? connection-id) "cache.db"
                               (= connection-id "system") "system-db"
@@ -1330,7 +1330,7 @@
                          (assoc honey-sql :select (apply merge hselect rules))
                          honey-sql)
           client-name @(ut/tracked-subscribe [::client-name])
-          honey-modded (walk/postwalk-replace {:*client-name client-name
+          honey-modded (ut/postwalk-replacer {:*client-name client-name
                                                :*client-name-str (str client-name)} honey-modded)]
           
 

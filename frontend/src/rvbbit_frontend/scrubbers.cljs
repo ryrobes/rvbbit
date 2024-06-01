@@ -21,15 +21,15 @@
 
 ;; (defn theme-pull [cmp-key fallback & test-fn] ;;; dupe of bricks/theme-pull TODO
 ;;   (let [v @(ut/tracked-subscribe [::conn/clicked-parameter-key [cmp-key]])
-;;         t0 (cstr/split (str (ut/unkeyword cmp-key)) #"/")
+;;         t0 (ut/splitter (str (ut/safe-name cmp-key)) #"/")
 ;;         t1 (keyword (first t0))
 ;;         t2 (keyword (last t0))
 ;;         self-ref-keys (distinct (filter #(and (keyword? %) (namespace %)) (ut/deep-flatten db/base-theme)))
 ;;         self-ref-pairs (into {}
 ;;                              (for [k self-ref-keys ;; todo add a reurziver version of this
-;;                                    :let [bk (keyword (cstr/replace (str k) ":theme/" ""))]]
+;;                                    :let [bk (keyword (ut/replacer (str k) ":theme/" ""))]]
 ;;                                {k (get db/base-theme bk)}))
-;;         resolved-base-theme (walk/postwalk-replace self-ref-pairs db/base-theme)
+;;         resolved-base-theme (ut/postwalk-replacer self-ref-pairs db/base-theme)
 ;;         base-theme-keys (keys resolved-base-theme)
 ;;         theme-key? (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
 ;;         fallback0 (if theme-key? (get resolved-base-theme t2) fallback)]
@@ -76,8 +76,8 @@
                   kps2       (ut/extract-patterns obody :scrubber 3)
                   logic-kps2 (into {} (for [v kps2]
                                         (let [[_ param opts] v
-                                              ;pkey-vec (vec (map keyword (cstr/split (cstr/replace (str param) #":" "") #"/")))
-                                              pkey-vec [(keyword (last (cstr/split (cstr/replace (str param) #":" "") #"/")))]]
+                                              ;pkey-vec (vec (map keyword (ut/splitter (ut/replacer (str param) #":" "") #"/")))
+                                              pkey-vec [(keyword (last (ut/splitter (ut/replacer (str param) #":" "") #"/")))]]
                                           {pkey-vec opts})))]
               logic-kps2)))
 
@@ -296,7 +296,7 @@
    ;:style {:border "1px solid white"}
    :child
    (let [v (if (= ext :px)
-             ;;(int (cstr/replace (str v) "px" ""))
+             ;;(int (ut/replacer (str v) "px" ""))
              (int (first (clojure.string/split v "px")))
              v)
          values (get (first (remove nil? ;;; slider values should be [:min :step :max]
@@ -614,7 +614,7 @@
       (let [pos (- (count kp) 1)
             lpos (last kp)
             src-table (first (flatten (get @(ut/tracked-subscribe [::query-by-query-key view-key]) :from)))
-            src-table-base (if (cstr/starts-with? (str src-table) ":query/") (keyword (last (cstr/split (str src-table) "/"))) src-table)
+            src-table-base (if (cstr/starts-with? (str src-table) ":query/") (keyword (last (ut/splitter (str src-table) "/"))) src-table)
             metad @(ut/tracked-subscribe [::conn/sql-merged-metadata [view-key]])
             src-metad @(ut/tracked-subscribe [::conn/sql-merged-metadata [src-table-base]])
             pos-meaning (cond
@@ -1209,7 +1209,7 @@
 (defn scrubbers []
   (let [layout-box-maps @(ut/tracked-subscribe [::keypaths-of-layout-panels])
         user-scrubbers @(ut/tracked-subscribe [::user-scrubbers])
-        user-scrubbers (walk/postwalk-replace {:button-panel button-panel
+        user-scrubbers (ut/postwalk-replacer {:button-panel button-panel
                                                :string? string?
                                                :vector? vector?
                                                :integer? integer?

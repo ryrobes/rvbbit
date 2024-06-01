@@ -27,8 +27,8 @@
                                              @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
           value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
           value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
-                                            (let [fs    (cstr/split (ut/unkeyword k) "/")
-                                                  gs    (cstr/split (last fs) ".")
+                                            (let [fs    (ut/splitter (ut/safe-name k) "/")
+                                                  gs    (ut/splitter (last fs) ".")
                                                   ds    (keyword (first fs))
                                                   row   (try (int (last gs)) (catch :default _ "label"))
                                                 ;row (int (last gs))
@@ -43,15 +43,15 @@
 
           condi-walks-targets    (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
           condi-walks            (into {} (for [k condi-walks-targets]
-                                            {k @(ut/tracked-subscribe [::conn/condi-value (keyword (last (cstr/split (ut/unkeyword k) "/")))])}))
-          into-walk-map2           (fn [obody] (let [;obody (walk/postwalk-replace condi-walks orig-body)
+                                            {k @(ut/tracked-subscribe [::conn/condi-value (keyword (last (ut/splitter (ut/safe-name k) "/")))])}))
+          into-walk-map2           (fn [obody] (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                                                      kps       (ut/extract-patterns obody :into 3) ;(kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
                                                      logic-kps (into {} (for [v kps]
                                                                           (let [[_ this that] v]
                                                                                 ;(tap> [:if-walk panel-key kps l this that])
                                                                             {v (into this that)})))]
-                                                 (walk/postwalk-replace logic-kps obody)))
-          if-walk-map2           (fn [obody] (let [;obody (walk/postwalk-replace condi-walks orig-body)
+                                                 (ut/postwalk-replacer logic-kps obody)))
+          if-walk-map2           (fn [obody] (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                                                    kps       (ut/extract-patterns obody :if 4) ;(kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
                                                    logic-kps (into {} (for [v kps]
                                                                         (let [[_ l this that] v]
@@ -59,18 +59,18 @@
                                                                           {v (if 
                                                                               (logic-and-params-fn l nil) ;; l 
                                                                                this that)})))]
-                                               (walk/postwalk-replace logic-kps obody)))
+                                               (ut/postwalk-replacer logic-kps obody)))
         ;; when-walk-map          (fn [obody] (let [kps       (kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
         ;;                                          logic-kps (into {} (for [[_ v]
         ;;                                                                   (into {} (filter #(cstr/starts-with? (str (last %)) "[:when") kps))]
         ;;                                                               (let [[_ l this] v]
         ;;                                                                 {v (when l this)})))]
-        ;;                                      (walk/postwalk-replace logic-kps obody)))
+        ;;                                      (ut/postwalk-replacer logic-kps obody)))
           when-walk-map2         (fn [obody] (let [kps       (ut/extract-patterns obody :when 3)
                                                    logic-kps (into {} (for [v kps]
                                                                         (let [[_ l this] v]
                                                                           {v (when l this)})))]
-                                               (walk/postwalk-replace logic-kps obody)))
+                                               (ut/postwalk-replacer logic-kps obody)))
         ;; =-walk-map             (fn [obody] (let [kps       (kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
         ;;                                          logic-kps (into {} (for [[_ v]
         ;;                                                                   (into {} (filter #(cstr/starts-with? (str (last %)) "[:=") kps))]
@@ -78,14 +78,14 @@
         ;;                                                                 ;(tap> [:=-walk panel-key kps this that])
         ;;                                                                 {v (= (str that) (str this))})))]
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
-        ;;                                      (walk/postwalk-replace logic-kps obody)))
+        ;;                                      (ut/postwalk-replacer logic-kps obody)))
           =-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody := 3)
                                                    logic-kps (into {} (for [v kps]
                                                                         (let [[_ that this] v]
                                                                         ;(tap> [:=-walk panel-key kps this that])
                                                                           {v (= (str that) (str this))})))]
                                              ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
-                                               (walk/postwalk-replace logic-kps obody)))
+                                               (ut/postwalk-replacer logic-kps obody)))
         ;; auto-size-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :auto-size-px 2)
         ;;                                                  logic-kps (into {} (for [v kps]
         ;;                                                                       (let [[_ l] v]
@@ -93,7 +93,7 @@
         ;;                                                                         {v (ut/auto-font-size-px l h w) ;(= (str that) (str this))
         ;;                                                                          })))]
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
-        ;;                                              (walk/postwalk-replace logic-kps obody)))
+        ;;                                              (ut/postwalk-replacer logic-kps obody)))
         ;; onclick-walk-map       (fn [obody] (let [kps       (kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
         ;;                                          logic-kps (into {} (for [[_ v]
         ;;                                                                   (into {} (filter #(cstr/starts-with? (str (last %)) "[:set-parameter") kps))]
@@ -103,7 +103,7 @@
         ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
         ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
         ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
-        ;;                                      (walk/postwalk-replace logic-kps obody)))
+        ;;                                      (ut/postwalk-replacer logic-kps obody)))
         ;; onclick-walk-map2      (fn [obody] (let [kps       (ut/extract-patterns obody :set-parameter 3)
         ;;                                          logic-kps (into {} (for [v kps]
         ;;                                                               (let [[_ pkey pval] v
@@ -112,7 +112,7 @@
         ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
         ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
         ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
-        ;;                                      (walk/postwalk-replace logic-kps obody)))
+        ;;                                      (ut/postwalk-replacer logic-kps obody)))
         ;; map-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :map 3)
         ;;                                            logic-kps (into {} (for [v kps]
         ;;                                                                 (let [[_ that this] v]
@@ -123,19 +123,19 @@
         ;;                                                                  ;(= (str that) (str this))
         ;;                                                                    })))]
         ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
-        ;;                                        (walk/postwalk-replace logic-kps obody)))
+        ;;                                        (ut/postwalk-replacer logic-kps obody)))
 
           string-walk            (fn [num obody] (let [kps       (ut/extract-patterns obody :string3 num)
                                                        logic-kps (into {} (for [v kps]
                                                                             (let [[_ & this] v]
                                                                               {v (apply str this)})))]
-                                                   (walk/postwalk-replace logic-kps obody)))
+                                                   (ut/postwalk-replacer logic-kps obody)))
 
           case-walk         (fn [obody] (let [kps       (ut/extract-patterns obody :case 2)
                                               logic-kps (into {} (for [v kps]
                                                                    (let [[_ l] v]
                                                                      {v (ut/vectorized-case l)})))]
-                                          (walk/postwalk-replace logic-kps obody)))
+                                          (ut/postwalk-replacer logic-kps obody)))
 
         ;; scrubber-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :scrubber 2)
         ;;                                                 kps2       (ut/extract-patterns obody :scrubber 3)
@@ -145,7 +145,7 @@
         ;;                                                                        {v [scrubber-panel true
         ;;                                                                            @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                            :param
-        ;;                                                                            (str (last (cstr/split (str this) #"/")))
+        ;;                                                                            (str (last (ut/splitter (str this) #"/")))
         ;;                                                                            {:fm true :canvas? true}]})))
         ;;                                                 logic-kps2 (into {} (for [v kps2]
         ;;                                                                       (let [[_ this opts] v]
@@ -153,9 +153,9 @@
         ;;                                                                         {v [scrubber-panel true
         ;;                                                                             @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                             :param
-        ;;                                                                             (str (last (cstr/split (str this) #"/")))
+        ;;                                                                             (str (last (ut/splitter (str this) #"/")))
         ;;                                                                             {:fm true :canvas? true :opts opts}]})))]
-        ;;                                             (walk/postwalk-replace (merge logic-kps2 logic-kps) obody)))
+        ;;                                             (ut/postwalk-replacer (merge logic-kps2 logic-kps) obody)))
           singles               {:text                  str
                                  ;:case (fn [x] (ut/vectorized-case x))
                                  :>> (fn [[x y]] (true? (> x y)))
@@ -171,7 +171,7 @@
                                ;:string str
                               ; :strings               (fn [_ x] (apply str x))
                               ; :string                (fn [x] (try
-                              ;                                  (let [x (for [e x] (ut/unkeyword e))] (apply str x))
+                              ;                                  (let [x (for [e x] (ut/safe-name e))] (apply str x))
                               ;                                  (catch :default _ (str x))))
                                ;:number                (fn [x] (str (nf x)))
                                ;:percent               (fn [x] (str (nf x) "%"))
@@ -180,10 +180,10 @@
 
           out-block-map (cond->> block-map
                           true (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
-                          true (walk/postwalk-replace {:*this-block* panel-key})
-                          (ut/ne? value-walks) (walk/postwalk-replace value-walks)
-                          (ut/ne? condi-walks) (walk/postwalk-replace condi-walks)
-                          (ut/ne? workspace-params) (walk/postwalk-replace workspace-params)
+                          true (ut/postwalk-replacer {:*this-block* panel-key})
+                          (ut/ne? value-walks) (ut/postwalk-replacer value-walks)
+                          (ut/ne? condi-walks) (ut/postwalk-replacer condi-walks)
+                          (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
 
                           (has-fn? :string3) (string-walk 2) ;; TODO, remove all these extra string replacements and make a [:string & x] ver
                           (has-fn? :string3) (string-walk 3)
@@ -195,7 +195,7 @@
                           (has-fn? :if) if-walk-map2
                           (has-fn? :when) when-walk-map2
                           (has-fn? :into) into-walk-map2
-                          (ut/ne? singles) (walk/postwalk-replace singles)
+                          (ut/ne? singles) (ut/postwalk-replacer singles)
                           (has-fn? :case) case-walk)
 
           templated-strings-vals (vec (filter #(cstr/includes? (str %) "/")
@@ -203,7 +203,7 @@
           templates?              (ut/ne? templated-strings-vals)
           _ (when templates? (tap> [:replacing-string-templates... templated-strings-vals out-block-map]))
           templated-strings-walk (if templates?
-                                   (walk/postwalk-replace {nil ""}
+                                   (ut/postwalk-replacer {nil ""}
                                                           (into {} (for [k templated-strings-vals]
                                                                      {k
                                                                       ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])

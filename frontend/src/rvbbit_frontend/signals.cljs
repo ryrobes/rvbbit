@@ -61,7 +61,7 @@
    (tap> [:edit? content adding])
    (let [curr (get-in db [:signals-map (get db :selected-warren-item) :signal])]
      (assoc-in db [:signals-map (get db :selected-warren-item) :signal] 
-               (walk/postwalk-replace
+               (ut/postwalk-replacer
                 {content
                  (vec (conj content (if (vector? adding) adding [adding])))
                                        ;(vec (cons adding content))
@@ -84,7 +84,7 @@
    (tap> [:edit2? content adding])
    (let [curr (get-in db [:signals-map (get db :selected-warren-item) :signal])]
      (assoc-in db [:signals-map (get db :selected-warren-item) :signal]
-               (walk/postwalk-replace
+               (ut/postwalk-replacer
                 {content (vec (conj content adding))} curr)))))
 
 (defn draggable-item [element type data]
@@ -136,7 +136,7 @@
   (let [idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
         ;selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
         selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
-        sigkw (keyword (str "signal/part-" (cstr/replace (str selected-warren-item) ":" "") "-" idx))
+        sigkw (keyword (str "signal/part-" (ut/replacer (str selected-warren-item) ":" "") "-" idx))
         ;vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
         vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
         ;;vv (if (nil? vv) "err!" vv)
@@ -150,7 +150,7 @@
         idx (.indexOf (vec (ut/where-dissect full-coll)) coll)
         ;selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
         selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
-        sigkw (keyword (str "signal/part-" (cstr/replace (str selected-warren-item) ":" "") "-" idx))
+        sigkw (keyword (str "signal/part-" (ut/replacer (str selected-warren-item) ":" "") "-" idx))
         ;;vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
         vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
         vv (if (nil? vv) "err!" vv)]
@@ -464,7 +464,7 @@
  ::edit-basic
  (undoable)
  (fn [db [_ parsed ttype]] 
-   (let [sver (fn [x] (cstr/replace (str x) ":" ""))
+   (let [sver (fn [x] (ut/replacer (str x) ":" ""))
          item-type-str (sver ttype)
          item-type-key (keyword (str item-type-str "s-map"))]
      (assoc-in db [item-type-key (get db :selected-warren-item)] parsed))))
@@ -473,7 +473,7 @@
  ::delete-signal
  (undoable)
  (fn [db [_ signal-name item-type]]
-   (let [sver (fn [x] (cstr/replace (str x) ":" ""))
+   (let [sver (fn [x] (ut/replacer (str x) ":" ""))
          item-type-str (sver item-type)
          item-type-key (keyword (str item-type-str "s-map"))] ;; :signals-map , etc
      (-> db
@@ -491,7 +491,7 @@
                                     (keys (get db :solvers-map {})))
                               (keys (get db :rules-map {}))))
          signal-name (ut/safe-key rr existing-keys)
-         sver (fn [x] (cstr/replace (str x) ":" ""))
+         sver (fn [x] (ut/replacer (str x) ":" ""))
          item-type-str (sver item-type)
          item-type-key (keyword (str item-type-str "s-map"))
          starting-data (cond (= item-type :signal)
@@ -544,17 +544,17 @@
         signal? (= warren-type-string "signals")
         ;selected-warren-item @(ut/tracked-subscribe [::selected-warren-item])
         warren-item-type @(ut/tracked-sub ::warren-item-type {})
-        ssr (cstr/replace (str @(ut/tracked-sub ::warren-item-type {})) ":" "")
+        ssr (ut/replacer (str @(ut/tracked-sub ::warren-item-type {})) ":" "")
         selected-type (str ssr "s")
         results (cond signal?
                       (into {} (for [[name _] signals]
-                                 (let [sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
+                                 (let [sigkw (keyword (str "signal/" (ut/replacer (str name) ":" "")))
                                        vv (if (= warren-type-string "signals")
                                             @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
                                             "")]
                                    {name vv})))
                       solver? (into {} (for [[name _] signals]
-                                         (let [sigkw (keyword (str "solver-meta/" (cstr/replace (str name) ":" "") ">extra"))
+                                         (let [sigkw (keyword (str "solver-meta/" (ut/replacer (str name) ":" "") ">extra"))
                                                vv (if (= warren-type-string "solvers")
                                                     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
                                                     "")]
@@ -592,12 +592,12 @@
        ;:height (px (- ph 94))
        :children (for [[name {:keys [signal]}] signals
                        :let [selected? (= name selected-warren-item)
-                             sigkw (keyword (str "signal/" (cstr/replace (str name) ":" "")))
+                             sigkw (keyword (str "signal/" (ut/replacer (str name) ":" "")))
                              vv (when signal? (get results name))
                              ext-map (when solver?
                                        @(ut/tracked-sub
                                          ::conn/clicked-parameter-key-alpha
-                                         {:keypath [(keyword (str "solver-meta/" (cstr/replace (str name) ":" "") ">extra"))]}))]]
+                                         {:keypath [(keyword (str "solver-meta/" (ut/replacer (str name) ":" "") ">extra"))]}))]]
                    
                    [draggable-item
                     [re-com/v-box
@@ -862,7 +862,7 @@
                                    ;:style {:color "#000000"}
                    :data-source (fn [x]
                                   (let [flow-parts (vec (map (fn [n] {:id n :label n}) server-flows))
-                                        words (cstr/split (cstr/lower-case (cstr/trim x)) #" ")
+                                        words (ut/splitter (cstr/lower-case (cstr/trim x)) #" ")
                                         matches-word (fn [field word] (cstr/includes? (cstr/lower-case (str field)) word))]
                                     (if (or (nil? x) (empty? x)) flow-parts
                                         (filter (fn [item]
@@ -1031,7 +1031,7 @@
  ::rename-item
  (undoable)
  (fn [db [_ old new item-type]]
-   (let [sver (fn [x] (cstr/replace (str x) ":" ""))
+   (let [sver (fn [x] (ut/replacer (str x) ":" ""))
          item-type-str (sver item-type)
          item-type-key (keyword (str item-type-str "s-map"))
          
@@ -1044,9 +1044,9 @@
 
      (-> db
 
-         (assoc :signals-map  (walk/postwalk-replace (if (= item-type-key :signals-map) (merge {old new} refs) refs) (get db :signals-map {}))) ;; change all fqns refs
-         (assoc :rules-map    (walk/postwalk-replace (if (= item-type-key :rules-map) (merge {old new} refs) refs) (get db :rules-map {})))
-         (assoc :solvers-map  (walk/postwalk-replace (if (= item-type-key :solvers-map) (merge {old new} refs) refs) (get db :solvers-map {})))
+         (assoc :signals-map  (ut/postwalk-replacer (if (= item-type-key :signals-map) (merge {old new} refs) refs) (get db :signals-map {}))) ;; change all fqns refs
+         (assoc :rules-map    (ut/postwalk-replacer (if (= item-type-key :rules-map) (merge {old new} refs) refs) (get db :rules-map {})))
+         (assoc :solvers-map  (ut/postwalk-replacer (if (= item-type-key :solvers-map) (merge {old new} refs) refs) (get db :solvers-map {})))
 
          (assoc :selected-warren-item new))))) ;; set as selected item
 
@@ -1076,7 +1076,7 @@
        :child (str item-name)]
       [re-com/input-text
        :src (at)
-       :model             (cstr/replace (str item-name) ":" "")
+       :model             (ut/replacer (str item-name) ":" "")
        :width             (px (- w 6))
        :height            "45px"
        :on-change         #(do (ut/tracked-dispatch
@@ -1148,7 +1148,7 @@
         selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
         warren-item-type @(ut/tracked-sub ::warren-item-type {})
 
-        sver (fn [x] (cstr/replace (str x) ":" ""))
+        sver (fn [x] (ut/replacer (str x) ":" ""))
         item-type-str (sver warren-item-type)
         item-type-key (keyword (str item-type-str "s-map"))
 
@@ -1172,7 +1172,7 @@
 
         results (cond signal?
                   (into {} (for [idx (range (count signal-vec-parts))]
-                             (let [sigkw (keyword (str "signal/part-" (cstr/replace (str name) ":" "") "-" idx))
+                             (let [sigkw (keyword (str "signal/part-" (ut/replacer (str name) ":" "") "-" idx))
                                    name (get signal-vec-parts idx)
                                    ;; vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
                                    vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})]
@@ -1219,7 +1219,7 @@
                            :width (px (* ww 0.1))
                            :child (str @(ut/tracked-sub
                                          ::conn/clicked-parameter-key-alpha
-                                         {:keypath [(keyword (str "signal/" (cstr/replace (str selected-warren-item) ":" "")))]}))]
+                                         {:keypath [(keyword (str "signal/" (ut/replacer (str selected-warren-item) ":" "")))]}))]
                           [re-com/gap :size "10px"] ;; placeholder
                           )]])
 
@@ -1281,7 +1281,7 @@
                                                :child
                                                [bricks/map-boxes2 @(ut/tracked-sub
                                                                     ::conn/clicked-parameter-key-alpha
-                                                                    {:keypath [(keyword (str "solver/" (cstr/replace (str selected-warren-item) ":" "")))]})
+                                                                    {:keypath [(keyword (str "solver/" (ut/replacer (str selected-warren-item) ":" "")))]})
                                                 nil :solver-meta [] :output nil false]]
                                               
                                               ;; [re-com/gap :size "20px"]
@@ -1294,12 +1294,12 @@
                                               ;;  ;;;data block-id selected-view keypath kki init-data-type & [draggable?]
                                               ;;  [bricks/map-boxes2 @(ut/tracked-sub
                                               ;;                       ::conn/clicked-parameter-key-alpha
-                                              ;;                       {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "") ">extra"))]})
+                                              ;;                       {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") ">extra"))]})
                                               ;;   nil :solver-meta [] :output nil false]]
                                               
                                                                               ;; (str @(ut/tracked-sub
                                                                               ;;        ::conn/clicked-parameter-key-alpha
-                                                                              ;;        {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "")))]}))
+                                                                              ;;        {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "")))]}))
                                               ]]
                                   
                                   )
@@ -1410,18 +1410,18 @@
                                 ;;  :children [[re-com/box :child "latest returned value"]
                                 ;;                          [re-com/box :child [bricks/map-boxes2 @(ut/tracked-sub
                                 ;;                                                                  ::conn/clicked-parameter-key-alpha
-                                ;;                                                                  {:keypath [(keyword (str "solver/" (cstr/replace (str selected-warren-item) ":" "")))]})
+                                ;;                                                                  {:keypath [(keyword (str "solver/" (ut/replacer (str selected-warren-item) ":" "")))]})
                                 ;;                                              nil
                                 ;;                                              :solver-meta [] :output nil]]
                                 ;;                          [re-com/box :child "latest returned value metadata"]
                                 ;;                          [re-com/box :child [bricks/map-boxes2 @(ut/tracked-sub
                                 ;;                                                                  ::conn/clicked-parameter-key-alpha
-                                ;;                                                                  {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "") ">extra"))]})
+                                ;;                                                                  {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") ">extra"))]})
                                 ;;                                              nil
                                 ;;                                              :solver-meta [] :output nil]]
                                 ;;             ;; (str @(ut/tracked-sub
                                 ;;             ;;        ::conn/clicked-parameter-key-alpha
-                                ;;             ;;        {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "")))]}))
+                                ;;             ;;        {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "")))]}))
                                 ;;             ]
                                 ;;                          ]
 
@@ -1453,7 +1453,7 @@
                                            :child
                                            [bricks/map-boxes2 @(ut/tracked-sub
                                                                 ::conn/clicked-parameter-key-alpha
-                                                                {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "") ">extra"))]})
+                                                                {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") ">extra"))]})
                                             nil :solver-meta [] :output nil false]]
 
                                           [re-com/box
@@ -1462,7 +1462,7 @@
                                            :child
                                            [bricks/map-boxes2 @(ut/tracked-sub
                                                                 ::conn/clicked-parameter-key-alpha
-                                                                {:keypath [(keyword (str "solver-meta/" (cstr/replace (str selected-warren-item) ":" "") ">history"))]})
+                                                                {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") ">history"))]})
                                             nil :solver-meta [] :output nil false]]]]]
 
 
@@ -1516,7 +1516,7 @@
    (get db :signals-history)))
 
 (defn panel-options [get-map-evt-vec selected-item item-type]
-  (let [item-type-str (cstr/replace (str item-type) ":" "" )
+  (let [item-type-str (ut/replacer (str item-type) ":" "" )
         server-fn (keyword (str "save-" item-type-str "s-map"))
         data-map (cond (= item-type :solver)  @(ut/tracked-sub ::solvers-map {})
                        (= item-type :rule)    @(ut/tracked-sub ::rules-map {})
@@ -1577,7 +1577,7 @@
         warren-item-type @(ut/tracked-sub ::warren-item-type {})
         ;; signals-map @(ut/tracked-sub ::signals-map {})
 
-        sver (fn [x] (cstr/replace (str x) ":" ""))
+        sver (fn [x] (ut/replacer (str x) ":" ""))
          item-type-str (sver warren-item-type)
          item-type-key (keyword (str item-type-str "s-map"))
 

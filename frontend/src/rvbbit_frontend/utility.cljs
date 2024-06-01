@@ -20,6 +20,196 @@
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))
 
+
+(re-frame/reg-sub ;; for benchmarks
+ ::client-name
+ (fn [db]
+   (get db :client-name)))
+
+
+
+
+
+(defonce deep-flatten-data (atom {}))
+(defonce deep-flatten-cache (atom {}))
+
+(defn deep-flatten-real [x]
+  (if (coll? x)
+    (mapcat deep-flatten-real x)
+    [x]))
+
+(defn deep-flatten [x]
+  (let [hx (hash x)]
+    (swap! deep-flatten-cache update hx (fnil inc 0))
+    (or (@deep-flatten-data hx)
+        (let [deep (deep-flatten-real x)]
+          (swap! deep-flatten-data assoc hx deep)
+          deep))))
+
+(defn purge-deep-flatten-cache [percent]
+  (let [sorted-cache (->> @deep-flatten-cache
+                          (sort-by val)
+                          reverse)
+        cutoff (int (* (count sorted-cache) percent))
+        keys-to-keep (set (map first (take cutoff sorted-cache)))
+        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
+        client-name @(re-frame/subscribe [::client-name])
+        above-threshold (count keys-to-keep)
+        below-threshold (- (count sorted-cache) above-threshold)]
+    (tap> [client-name :purge :deep-flatten-cache {:top-pct percent
+                                                   :cutoff-frequency cutoff-frequency
+                                                   :above-threshold above-threshold
+                                                   :below-threshold below-threshold}])
+    (swap! deep-flatten-data (fn [old-cache]
+                               (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+    (reset! deep-flatten-cache {})))
+
+
+
+
+
+
+(defonce replacer-data (atom {}))
+(defonce replacer-cache (atom {}))
+
+(defn replacer [x1 x2 x3]
+  (let [x (hash [x1 x2 x3])]
+    (swap! replacer-cache update x (fnil inc 0))
+    (or (@replacer-data x)
+        (let [deep (cstr/replace (str x1) x2 x3)]
+          (swap! replacer-data assoc x deep)
+          deep))))
+
+(defn purge-replacer-cache [percent]
+  (let [sorted-cache (->> @replacer-cache
+                          (sort-by val)
+                          reverse)
+        cutoff (int (* (count sorted-cache) percent))
+        keys-to-keep (set (map first (take cutoff sorted-cache)))
+        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
+        client-name @(re-frame/subscribe [::client-name])
+        above-threshold (count keys-to-keep)
+        below-threshold (- (count sorted-cache) above-threshold)]
+    (tap> [client-name :purge :replacer-cache {:top-pct percent
+                                               :cutoff-frequency cutoff-frequency
+                                               :above-threshold above-threshold
+                                               :below-threshold below-threshold}])
+    (swap! replacer-data (fn [old-cache]
+                           (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+    (reset! replacer-cache {})))
+
+
+
+
+
+
+(defn safe-name-fn [x]
+  (cstr/replace (str x) ":" "")) ;; tons of issues with using (name x), just going to cache it
+
+;; (defn safe-name-fn [x]
+;;   (if (keyword? x) (str (name x))
+;;     (cstr/replace (str x) ":" ""))) 
+
+(defonce safe-name-cache (atom {}))
+
+(defn safe-name [x]
+  (if-let [cached-result (get @safe-name-cache x)]
+    cached-result
+    (let [result (safe-name-fn x)]
+      (swap! safe-name-cache assoc x result)
+      result)))
+
+
+
+
+(defonce split-cache-data (atom {}))
+(defonce split-cache (atom {}))
+
+(defn splitter [s delimiter]
+  (let [key (hash [s delimiter])]
+    (swap! split-cache update key (fnil inc 0))
+    (or (@split-cache-data key)
+        (let [result (cstr/split s delimiter)]
+          (swap! split-cache-data assoc key result)
+          result))))
+
+(defn purge-splitter-cache [percent]
+  (let [sorted-cache (->> @split-cache
+                          (sort-by val)
+                          reverse)
+        cutoff (int (* (count sorted-cache) percent))
+        keys-to-keep (set (map first (take cutoff sorted-cache)))
+        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
+        client-name @(re-frame/subscribe [::client-name])
+        above-threshold (count keys-to-keep)
+        below-threshold (- (count sorted-cache) above-threshold)]
+    (tap> [client-name :purge :splitter-cache {:top-pct percent
+                                               :cutoff-frequency cutoff-frequency
+                                               :above-threshold above-threshold
+                                               :below-threshold below-threshold}])
+    (swap! split-cache-data (fn [old-cache]
+                              (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+    (reset! split-cache {})))
+
+
+
+
+
+
+(defonce postwalk-replace-data-cache (atom {}))
+(defonce postwalk-replace-cache (atom {}))
+
+;; (defn postwalk-replacer [walk-map target]
+;;   (let [hash-key (hash [walk-map target])]
+;;     (swap! postwalk-replace-cache update hash-key (fnil inc 0))
+;;     (walk/postwalk-replace walk-map target)))
+
+(defn postwalk-replacer [walk-map target]
+  (let [hash-key (hash [walk-map target])]
+    (swap! postwalk-replace-cache update hash-key (fnil inc 0))
+    (or (@postwalk-replace-data-cache hash-key)
+        (let [result (walk/postwalk-replace walk-map target)]
+          (swap! postwalk-replace-data-cache assoc hash-key result)
+          result))))
+
+(defn purge-postwalk-cache [percent]
+  (let [sorted-cache (->> @postwalk-replace-cache
+                          (sort-by val)
+                          reverse)
+        cutoff (int (* (count sorted-cache) percent))
+        keys-to-keep (set (map first (take cutoff sorted-cache)))
+        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
+        client-name @(re-frame/subscribe [::client-name])
+        above-threshold (count keys-to-keep)
+        below-threshold (- (count sorted-cache) above-threshold)]
+    (tap> [client-name :purge :postwalk-cache {:top-pct percent
+                                               :cutoff-frequency cutoff-frequency
+                                               :above-threshold above-threshold
+                                               :below-threshold below-threshold}])
+    (swap! postwalk-replace-data-cache (fn [old-cache]
+                                         (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+    (reset! postwalk-replace-cache {})))
+
+;; (defn distribution []
+;;   (let [sorted-cache (->> @postwalk-replace-cache
+;;                           (sort-by val)
+;;                           reverse)
+;;         total (count sorted-cache)
+;;         top-10-percent (count (take (int (* total 0.1)) sorted-cache))
+;;         bottom-10-percent (count (take-last (int (* total 0.1)) sorted-cache))
+;;         middle-80-percent (- total top-10-percent bottom-10-percent)]
+;;     {:total-entries total
+;;      :top-10-percent top-10-percent
+;;      :middle-80-percent middle-80-percent
+;;      :bottom-10-percent bottom-10-percent}))
+
+;; (tap> [:postwalk-freq! @(re-frame/subscribe [::client-name]) (distribution)])
+
+
+;;;; ^^^ bigly used caching utils for all my string clover nonsense ^^^^
+
+
+
 (defonce parameter-keys-hit (atom {}))
 
 (defonce subscription-counts (atom {}))
@@ -155,7 +345,7 @@
   (let [hash (goog.crypt.Sha256.)
         bytes (apply str (mapv cljs.core/char s))]
     (.update hash bytes)
-    (cstr/replace (str (base64/encodeByteArray (.digest hash))) "/" "")))
+    (replacer (str (base64/encodeByteArray (.digest hash))) "/" "")))
 
 ;;(tap> [:sha256 (sha-256 "hello")])
 
@@ -163,12 +353,12 @@
   (let [;quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
         names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) ;(rand-nth quals) (tales/landform)
                ]]
-    (keyword (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
+    (keyword (str (replacer (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
 (defn gen-signal-name [suff]
   (let [names [(tales/quality) (tales/animal)]]
-    (cstr/replace 
-     (cstr/lower-case (str (cstr/join "-" names) "-" (cstr/replace (str suff) ":" "")))
+    (replacer 
+     (cstr/lower-case (str (cstr/join "-" names) "-" (replacer (str suff) ":" "")))
      " " "-")))
 
 
@@ -315,7 +505,7 @@
     (let [new-name (if (= new-counter 0)
                      base-name
                      (str base-name "-" new-counter))
-          new-name (if (keyword? base-name) (keyword (cstr/replace (str new-name) #":" "")) new-name)]
+          new-name (if (keyword? base-name) (keyword (replacer (str new-name) #":" "")) new-name)]
       (if (contains? all-names new-name)
         (recur (inc new-counter))
         new-name))))
@@ -363,13 +553,13 @@
          reco (unique-block-id proposed all-keys [])]
      ;;(tap> [:safe-key proposed all-keys :ret reco])
      (cond (and incoming-keyword? (keyword? reco)) reco
-           (and incoming-keyword? (not (keyword? reco))) (keyword (cstr/replace (str reco) #":" ""))
+           (and incoming-keyword? (not (keyword? reco))) (keyword (replacer (str reco) #":" ""))
            :else reco))))
 
 (defn safe-key [proposed & [locals]] @(tracked-subscribe [::safe-key proposed locals]))
 
 (defn get-time-format-str []
-  (cstr/join " " (drop 4 (drop-last 4 (cstr/split (str (js/Date.)) #" ")))))
+  (cstr/join " " (drop 4 (drop-last 4 (splitter (str (js/Date.)) #" ")))))
 
 (defn base64-to-uint8-array [base64]
   (let [binary-string (.atob js/window base64)
@@ -476,17 +666,110 @@
   (try ;; 'name' always causes me issues...
     (if (keyword? x)
       (-> (str x)
-          (cstr/replace #":" "")
-        ;(cstr/replace #"-" "_")
+          (replacer #":" "")
+        ;(replacer #"-" "_")
           )
       (str x))
     (catch :default _ (do (tap> [:error-in-unkeyword x])
                           (str x)))))
 
+
+
+
+;; (defonce safe! (atom #{}))
+
+;(tap> [:safe! @safe!])
+
+;; (defn safe-name2 [x]
+;;   (swap! safe! conj x)
+;;   (replacer (str x) ":" ""))
+
+;; [:meaningful-linear-weasel-3
+;;  [["safe-name-cached" 249.39999997615814]
+;;   ["safe-name2" 373.2999999523163]
+;;   ["unkeyword" 575.3999999761581]
+;;   ["raw-replace-name" 1206.3000000715256]
+;;   ["safe-name" 1453.5]]]
+
+
+
+;; (defn clear-split-cache []
+;;   (reset! split-cache {}))
+
+
+;; (defn benchmark [f arg delimiter n]
+;;   (let [start (js/performance.now)]
+;;     (dotimes [_ n] (f arg delimiter))
+;;     (- (js/performance.now) start)))
+
+;; (let [client-name @(re-frame/subscribe [::client-name])
+;;       string-test "exampled:fart-police>zissle>ziss2.fork"
+;;       delimiter #"\>"
+;;       n 820000
+;;       results {"split" (benchmark splitter string-test delimiter n)
+;;                "split-cached" (benchmark split-cached string-test delimiter n)}]
+;;   (tap> [client-name (vec (sort-by val results))]))
+
+
+;; (tap> [:tt (replacer (str nil) ":" "")])
+
+;; (tap> [:freq @(re-frame/subscribe [::client-name]) (frequencies (for [e @safe!] (type e)))])
+
+;; (defn replace-name [x]
+;;   (clojure.string/replace (str x) ":" "")) 
+
+;; (defn benchmark [f arg n] ;;; ttl over iterations of the same
+;;   (let [start (js/performance.now)]
+;;     (dotimes [_ n] (f arg))
+;;     (/ (- (js/performance.now) start) n)))
+
+;; (defn benchmark [f arg n] ;;  avg over iterations of the same 
+;;   (let [start (js/performance.now)]
+;;     (dotimes [_ n] (f arg))
+;;     (- (js/performance.now) start)))
+
+;; (let [client-name @(re-frame/subscribe [::client-name])
+;;       keyword-test :exampled/fart-police>zissle>ziss2.fork
+;;       n 820000
+;;       results {"safe-name" (benchmark safe-name keyword-test n)
+;;                "safe-name-cached" (benchmark safe-name-cached keyword-test n)
+;;                "unkeyword" (benchmark unkeyword keyword-test n)
+;;                "replace-name" (benchmark replace-name keyword-test n)}]
+;;   (tap> [client-name (vec (sort-by val results))]))
+
+;; (defn benchmark [f arg-atom]
+;;   (let [start (js/performance.now)
+;;         n 450000]
+;;     (doseq [arg (take n (cycle @arg-atom))] (f arg))
+;;     (- (js/performance.now) start)))
+
+;; (let [client-name @(re-frame/subscribe [::client-name])
+;;       keyword-test-atom safe!
+;;       results {"safe-name" (benchmark safe-name keyword-test-atom)
+;;                "safe-name2" (benchmark safe-name2 keyword-test-atom)
+;;                "safe-name-cached" (benchmark safe-name-cached keyword-test-atom)
+;;                "unkeyword" (benchmark unkeyword keyword-test-atom)
+;;                "raw-replace-name" (benchmark replace-name keyword-test-atom)}]
+;;   (tap> [client-name (vec (sort-by val results))]))
+
+
+;; (defn benchmark [f arg n]
+;;   (let [start (js/performance.now)]
+;;     (dotimes [_ n] (f arg))
+;;     (- (js/performance.now) start)))
+
+;; (let [test-arg {}
+;;       n 8320000
+;;       client-name @(re-frame/subscribe [::client-name])
+;;       results {"not-empty" (benchmark (fn [x] (not (empty? x))) test-arg n)
+;;                "ne" (benchmark ne? test-arg n)}]
+;;   (tap> [:NOT-EMPTY? client-name (vec (sort-by val results))]))
+
+
 (defn template-replace [replacements s]
   (reduce (fn [str [key value]]
             (let [value (get :code value value)]
-              (cstr/replace str (re-pattern (cstr/join ["\\{\\{" key "\\}\\}"])) value)))
+              (replacer str (re-pattern (cstr/join ["\\{\\{" key "\\}\\}"])) value)))
           s
           replacements))
 
@@ -542,6 +825,15 @@
     (map remove-temp-keys coll)
 
     :else coll))
+
+(defn bytes-to-mb-int [bytes]
+  (let [mb (/ bytes 1048576.0)
+        formatted-mb0 (-> mb
+                          (.toFixed 0)
+                          js/parseFloat
+                          str
+                          (.toLocaleString js/Intl.NumberFormat "en-US"))]
+    formatted-mb0))
 
 (defn bytes-to-mb [bytes]
   (let [mb (/ bytes 1048576.0)
@@ -603,9 +895,17 @@
             (let [size-bytes (-> @a
                                  pr-str
                                  .-length)
-                  size-mb (/ size-bytes 1048576.0)]
+                  ;;size-mb (/ size-bytes 1048576.0)
+                  size-mb (-> size-bytes
+                              (/ 1048576.0)
+                              (* 1e6)
+                              Math/round
+                              (/ 1e6))]
 
-              {name [size-bytes :bytes size-mb :mb (try (count (keys @a)) (catch :default _ -1)) :keys]})
+              {name {;:bytes size-bytes 
+                     :mb size-mb :keys (try (count (keys @a)) (catch :default _ -1))}}
+              ;{name [size-bytes :bytes size-mb :mb (try (count (keys @a)) (catch :default _ -1)) :keys]}
+              )
             (catch :default e {name [:error (str e)]})))))
 
 (defn template-find [s]
@@ -626,7 +926,7 @@
   (letfn [(replace-in-str [s]
             (reduce (fn [sstr [key value]]
                       (let [value-str (str (get :code value value))] ; Convert value to string
-                        (cstr/replace sstr (re-pattern (cstr/join ["\\{\\{" key "\\}\\}"])) value-str)))
+                        (replacer sstr (re-pattern (cstr/join ["\\{\\{" key "\\}\\}"])) value-str)))
                     s
                     replacements))]
     (walk/postwalk (fn [x] (if (string? x) (replace-in-str x) x)) data)))
@@ -634,24 +934,25 @@
 
 ;; (defn unkeyword [x]
 ;;   (try (str (name x)) (catch :default _
-;;                         (cstr/replace (str x) #":" ""))))
+;;                         (replacer (str x) #":" ""))))
 
 
-(defn replacer-fn [x1 x2 x3]
-  (let [res (try (cstr/replace (str x1) x2 x3)
-                 (catch :default _ (do (when (not (nil? x1)) ;; no need to alert me of null
-                                         (tap> [:string-replace-issue x1 x2 x3]))
-                                       x1)))] res))
+;; (defn replacer-fn [x1 x2 x3]
+;;   (let [res (try (replacer (str x1) x2 x3)
+;;                  (catch :default _ (do (when (not (nil? x1)) ;; no need to alert me of null
+;;                                          (tap> [:string-replace-issue x1 x2 x3]))
+;;                                        x1)))] res))
+;; (def replacer-atom (atom {}))
 
-(def replacer-atom (atom {}))
+;; (defn replacer [x1 x2 x3]
+;;   (let [x (str [x1 x2 x3])
+;;         cache (get @replacer-atom x)]
+;;     (if (not (nil? cache)) cache
+;;         (let [deep (replacer-fn x1 x2 x3)]
+;;           (swap! replacer-atom assoc x deep)
+;;           deep))))
 
-(defn replacer [x1 x2 x3]
-  (let [x (str [x1 x2 x3])
-        cache (get @replacer-atom x)]
-    (if (not (nil? cache)) cache
-        (let [deep (replacer-fn x1 x2 x3)]
-          (swap! replacer-atom assoc x deep)
-          deep))))
+
 
 (defn unkey [k]
   (let [s (try (name k)
@@ -662,16 +963,16 @@
 (defn unre-qword [x]
   (if (keyword? x)
     (-> (str x)
-        (cstr/replace #":" "")
-        (cstr/replace #"query/" "")
+        (replacer #":" "")
+        (replacer #"query/" "")
         (keyword))
     (keyword x)))
 
 (defn sql-keyword [x]
   (if (not (keyword? x))
     (-> (str x)
-        (cstr/replace #":" "")
-        (cstr/replace #"-" "_")
+        (replacer #":" "")
+        (replacer #"-" "_")
         keyword)
     x))
 
@@ -710,7 +1011,7 @@
   (walk/postwalk-replace
    {:ONE-POINT-OH 1.0}
    (-> s
-       (cstr/replace #"1.0" ":ONE-POINT-OH")
+       (replacer #"1.0" ":ONE-POINT-OH")
        read-string)))
 
 ;; (defn deep-remove-keys [data keys-to-remove]
@@ -787,7 +1088,8 @@
        (or (= (count s) 4) (= (count s) 7) (= (count s) 9))))
 
 (defn invert-hex-color [hex]
-  (let [rgb (js/parseInt (subs hex 1) 16)
+  ;(try 
+    (let [rgb (js/parseInt (subs hex 1) 16)
         r (bit-and (bit-shift-right rgb 16) 255)
         g (bit-and (bit-shift-right rgb 8) 255)
         b (bit-and rgb 255)
@@ -795,7 +1097,10 @@
         inverted-g (js/Number.prototype.toString.call (- 255 g) 16)
         inverted-b (js/Number.prototype.toString.call (- 255 b) 16)
         pad (fn [s] (if (< (count s) 2) (str "0" s) s))]
-    (str "#" (pad inverted-r) (pad inverted-g) (pad inverted-b))))
+    (str "#" (pad inverted-r) (pad inverted-g) (pad inverted-b)))
+  ;  (catch :default e (do (tap> [:invert-hex-color-error (str e)]) "#ffffff"))
+  ;  )
+  )
 
 
 
@@ -902,14 +1207,14 @@
 
 (defn remove-punctuation [s]
   (try
-    ;(cstr/replace s #"[^\p{Alpha}\p{Space}]" "")
-    ;(cstr/replace s #"[\\p{Punct}]+" "")
+    ;(replacer s #"[^\p{Alpha}\p{Space}]" "")
+    ;(replacer s #"[\\p{Punct}]+" "")
     ;s
     (-> s
-        (cstr/replace "." "")
-        (cstr/replace "," "")
-        (cstr/replace "?" "")
-        (cstr/replace "!" ""))
+        (replacer "." "")
+        (replacer "," "")
+        (replacer "?" "")
+        (replacer "!" ""))
     (catch :default _ s)))
 
 (defn map->css [m]
@@ -918,7 +1223,7 @@
                     (str selector " { "
                          (cstr/join " "
                                     (map (fn [[prop val]]
-                                           (str (cstr/replace (name prop) #"_" "-") ": " val ";")) styles))
+                                           (str (replacer (name prop) #"_" "-") ": " val ";")) styles))
                          "}"))
                   m)))
 
@@ -973,19 +1278,7 @@
 ;;     (mapcat deep-flatten x)
 ;;     [x]))
 
-(defn deep-flatten-real [x]
-  (if (coll? x)
-    (mapcat deep-flatten-real x)
-    [x]))
 
-(defonce deep-flatten-atom (atom {}))
-
-(defn deep-flatten [x]
-  (let [hx (hash x)
-        cache (get @deep-flatten-atom hx)]
-    (if cache cache (let [deep (deep-flatten-real x)]
-                      (swap! deep-flatten-atom assoc hx deep)
-                      deep))))
 
 (def format-map-atom (atom {}))
 
@@ -993,7 +1286,7 @@
   (let [cache (get @format-map-atom [w s])]
     (if (not (nil? cache))
       cache
-      (let [;s (cstr/replace s #"1.0" "\"ONE-POINT-ZERO\"")
+      (let [;s (replacer s #"1.0" "\"ONE-POINT-ZERO\"")
             type (cond (cstr/includes? s "(") :community
                        (cstr/starts-with? (cstr/trim-newline s) "[:") :hiccup
                        :else :justified)
@@ -1130,8 +1423,8 @@
                               :else s)]  ;; handle all other cases
     (-> formatted-value
         (cstr/lower-case)
-        (cstr/replace " " "_")
-        (cstr/replace "-" "_")
+        (replacer " " "_")
+        (replacer "-" "_")
         keyword)))
 
 (defn remove-key ;; for sql select field and aliased fields
@@ -1222,11 +1515,11 @@
 
 (defn keypath-munger [kp]
   (let [nkp (sanitize-name
-             (cstr/replace (cstr/join "_"
+             (replacer (cstr/join "_"
                                       kp) ":" ""))]
     (-> nkp
-        (cstr/replace "-" "_")
-        (cstr/replace "." "_"))))
+        (replacer "-" "_")
+        (replacer "." "_"))))
 
 (defn set-and-reset! [atom value delay-ms]
   (async/go

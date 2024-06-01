@@ -269,6 +269,10 @@
    ;   ;:poll-when                [::subs/get-the :auto-run-enabled?]
    ;   :dispatch-event-on-start? false}
 
+     {:interval                 600  
+      :event                    [::bricks/purge-cache-atoms]
+      ;:poll-when                [::bricks/new-flow-subs?]
+      :dispatch-event-on-start? false}
 
 
      {:interval                 600 ;; hella expensive, testing

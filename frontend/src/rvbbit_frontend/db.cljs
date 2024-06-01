@@ -23,6 +23,8 @@
 
 (defonce value-spy (reagent/atom {}))
 
+(defonce autocomplete-keywords (atom []))
+
 (def param-code-hover (atom nil))
 
 (def running-blocks (reagent/atom {}))

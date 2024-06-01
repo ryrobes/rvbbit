@@ -109,7 +109,7 @@
         sql-params (into {} (for [k [:connections-sys/connection_id]]
                               {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -125,7 +125,7 @@
                  :child [bricks/magic-table :system-tables-list* [:tables-sys] 9 10 [:db_schema :connection_id :db_catalog]]]]]))
 
 (defn search-panel-metadata []
-  (let [client-name (cstr/replace (str @(ut/tracked-subscribe [::bricks/client-name])) ":" "")
+  (let [client-name (ut/replacer (str @(ut/tracked-subscribe [::bricks/client-name])) ":" "")
         sql-calls {:searches-types-sys {:select [:item_type] ;; :searches-types-sys/item_type 
                                         :where [:and [:not [:like :item_sub_type "%preview%"]]
                                                 [:not [:= :item_type "saved-block"]]]
@@ -148,7 +148,7 @@
                               {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
     ;;(tap> [:sql-params! sql-params])
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -180,7 +180,7 @@
                                        :from [:client_items]}}]
 
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -246,7 +246,7 @@
                    ; incoming (first (read-string reco-query)) ;; read-string will ruin my internal namespaced keywords
                    ; ffrom (ut/replacer (first (get incoming :from)) "_" "-")
                    ; query (assoc incoming :from [(keyword ffrom)])
-                   ; query (walk/postwalk-replace {[[:sum :rows]] [:count 1]} query)
+                   ; query (ut/postwalk-replacer {[[:sum :rows]] [:count 1]} query)
 
                  q-data (read-string reco-query)
                  incoming (first q-data) ;; read-string will ruin my internal namespaced keywords
@@ -254,7 +254,7 @@
                     ;original-conn @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key (keyword ffrom)])
                     ;      ;query (assoc incoming :from [(keyword ffrom)])
                  query (vec (for [q q-data] (assoc q :from [(keyword ffrom)])))
-                 query (walk/postwalk-replace {[[:sum :rows]] [:count 1]} query)]
+                 query (ut/postwalk-replacer {[[:sum :rows]] [:count 1]} query)]
                 ;(tap> [:rec-preview-block 1 view query original-conn reco-selected])
              (bricks/insert-rec-preview-block
               view
@@ -268,7 +268,7 @@
                           ;q-cnt (count q-data)
                        incoming (first q-data) ;; read-string will ruin my internal namespaced keywords
                        ffrom (ut/replacer (first (get incoming :from)) "_" "-")
-                       original-conn @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key (keyword (last (cstr/split ffrom "/")))])
+                       original-conn @(ut/tracked-subscribe [::bricks/lookup-connection-id-by-query-key (keyword (last (ut/splitter ffrom "/")))])
                           ;query (assoc incoming :from [(keyword ffrom)])
                        query (vec (for [q q-data]
                                     (if (nil? (find q :vselect))
@@ -276,7 +276,7 @@
                                       q
                                         ;(assoc q :from (keyword ffrom))
                                       )))
-                       query (walk/postwalk-replace {[:sum :rows] [:count 1]} query)]
+                       query (ut/postwalk-replacer {[:sum :rows] [:count 1]} query)]
 
                 ;(tap> [:rec-preview-block 2 view query reco-condis original-conn reco-selected])
                    (bricks/insert-rec-preview-block
@@ -290,7 +290,7 @@
   (let [all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
         grid-reco? @(ut/tracked-subscribe [::bricks/grid-reco?])
         recos-page @(ut/tracked-subscribe [::bricks/recos-page])
-        all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/unkeyword e) "-" "_"))
+        all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/safe-name e) "-" "_"))
         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-tables-sys/table_name
                                      :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn :user-dropdown-sys/req-field]]
                               {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
@@ -370,7 +370,7 @@
                                     :padding-left "5px" :padding-right "5px"}
                             :child (str table_name " (" recos ")")])
         combo-singles (vec (distinct (flatten (doall (for [{:keys [combo_edn recos]} combo-list]
-                                                       (cstr/split (ut/replacer combo_edn #"\"" "") ", "))))))
+                                                       (ut/splitter (ut/replacer combo_edn #"\"" "") ", "))))))
         pkeys @(ut/tracked-subscribe [::bricks/preview-keys])
         preview-keys (vec (for [k pkeys] (keyword (str "reco-preview" k))))
         preview-maps (into {} (for [{:keys [combo_hash shape_name combo_edn query_map viz_map condis h w selected_view]} full-recos]
@@ -498,7 +498,7 @@
 
 
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -637,7 +637,7 @@
 
 (defn editor-panel-viz []
   (let [all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
-        all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/unkeyword e) "-" "_"))
+        all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/safe-name e) "-" "_"))
         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape]]
                               {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         sql-calls {:viz-tables-sys {:select [:table_name [[:count 1] :recos]]
@@ -671,7 +671,7 @@
     ;(tap> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
     ;(tap> sql-params)
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -692,7 +692,7 @@
 
 (defn editor-panel-status []
   (let [;all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
-       ; all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/unkeyword e) "-" "_"))
+       ; all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/safe-name e) "-" "_"))
         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape]]
                               {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
         client-name (str @(ut/tracked-subscribe [::bricks/client-name]))
@@ -708,7 +708,7 @@
     ;(tap> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
     ;(tap> sql-params)
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -730,7 +730,7 @@
         sql-params (into {} (for [k [:connections-sys/connection_id]]
                               {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -1023,7 +1023,7 @@
         ]
     ;;(tap> [:test sql-params])
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -1067,7 +1067,7 @@
         grid? (= gmode :data)]
     ;;(tap> [:test sql-params])
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -1120,7 +1120,7 @@
                                          [:= :shape_name :viz-shapes0-sys/shape])]}}]
     ;;(tap> [:test sql-params])
     (dorun (for [[k v] sql-calls]
-             (let [query (walk/postwalk-replace sql-params v)
+             (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -1239,15 +1239,25 @@
                        "bricks/dragging-editor?" @bricks/dragging-editor?
                        "bricks/over-block?" @bricks/over-block?
                        "bricks/new-block-atom" @bricks/new-block-atom})
-        atom-sizes (ut/calculate-atom-sizes {:replacer-atom ut/replacer-atom
-                                             ;:db/flow-results db/flow-results
+        atom-sizes (ut/calculate-atom-sizes {:ut/replacer-data ut/replacer-data
+                                             :ut/replacer-cache ut/replacer-cache
+                                             :ut/deep-flatten-data ut/deep-flatten-data
+                                             :ut/deep-flatten-cache ut/deep-flatten-cache
+                                             :ut/split-cache ut/split-cache
+                                             :ut/split-cache-data ut/split-cache-data
+                                             :ut/postwalk-replace-data-cache ut/postwalk-replace-data-cache
+                                             :ut/postwalk-replace-cache ut/postwalk-replace-cache
+                                            
+                                             :db/flow-results db/flow-results
                                              :db/scrubbers db/scrubbers
                                              :ut/is-base64-atom ut/is-base64-atom
-                                             :tu/is-large-base64-atom ut/is-large-base64-atom
-                                             ;:websocket-fx.core/CONNECTIONS websocket-fx.core/CONNECTIONS
+                                             :ut/is-large-base64-atom ut/is-large-base64-atom
+                                              ;:websocket-fx.core/CONNECTIONS websocket-fx.core/CONNECTIONS
+                                             :ut/safe-name-cache ut/safe-name-cache
+                                            
                                              :re-frame.db/app-db re-frame.db/app-db
                                              :ut/clean-sql-atom ut/clean-sql-atom
-                                             :ut/deep-flatten-atom ut/deep-flatten-atom
+
                                              :ut/format-map-atom ut/format-map-atom
                                              :ut/body-set-atom ut/body-set-atom
                                              :ut/data-typer-atom ut/data-typer-atom
@@ -1411,7 +1421,7 @@
         mad-libs-combos (when mad-libs-combo?
                           @(ut/tracked-subscribe [::bricks/get-combo-rows
                                                 selected-block (get selected-panel-map :mad-libs-combo-hash)]))
-        screen-name (ut/unkeyword @(ut/tracked-subscribe [::bricks/screen-name]))
+        screen-name (ut/safe-name @(ut/tracked-subscribe [::bricks/screen-name]))
         screen-name-regex #"(.|\s)*\S(.|\s)*"
         websocket-status (select-keys @(ut/tracked-subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])
         ;websocket-status @(ut/tracked-subscribe [::http/websocket-status])
@@ -2403,7 +2413,7 @@
                                                         ;:width "200px"
                                                         :style {:font-size "11px" :margin-top "3px"}
                                                         :children (vec (for [f (keys @db/param-filter)]
-                                                                         [re-com/box :child (ut/unkeyword f)
+                                                                         [re-com/box :child (ut/safe-name f)
                                                                           :attr {:on-click #(swap! db/param-filter assoc f (not (get @db/param-filter f false)))}
                                                                           :style {:text-decoration (if (get @db/param-filter f true) "none" "line-through")
                                                                                   :opacity (if (get @db/param-filter f true) 1 0.4)
@@ -2954,7 +2964,7 @@
  ::update-user-params-hash
  (fn [db _]
    (let [fs (vec (for [kk (get db :flow-subs)
-                  :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
+                  :let [[f1 f2] (ut/splitter (ut/replacer (str kk) ":" "") "/")]]
               [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
          pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client :solver :solver-meta nil]))
@@ -2979,7 +2989,7 @@
  ::watch-user-params
  (fn [db]
    (let [fs (vec (for [kk (get db :flow-subs)
-                       :let [[f1 f2] (cstr/split (cstr/replace (str kk) ":" "") "/")]]
+                       :let [[f1 f2] (ut/splitter (ut/replacer (str kk) ":" "") "/")]]
                    [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
          ;;pp-without-fs (ut/remove-keys pp (map first fs))
@@ -3106,7 +3116,7 @@
         (doseq [[k v] rs-overrides
                 :when (not= (get rs-overrides-hashmap k) v)]
           (tap> [:runstream-override! k v])
-          (when (not (empty? rs-overrides-hashmap)) ;; on first run, dont want to trigger all...
+          (when (ut/ne? rs-overrides-hashmap) ;; on first run, dont want to trigger all...
             (run-flow k v))))
       (ut/tracked-dispatch [::set-rs-overrides-hashmap rs-overrides]))
 
@@ -3151,7 +3161,7 @@
        :children (for [[e name] min-panels
                        :let [nn (try (if (empty? name) e name) (catch :default _ e))
                              sys-panel? (true? (some #(= name %) panels))
-                             nn (if sys-panel? (-> (str nn) (cstr/replace ":" "") (cstr/replace "?" "")) nn)
+                             nn (if sys-panel? (-> (str nn) (ut/replacer ":" "") (ut/replacer "?" "")) nn)
                              icon (if sys-panel? "zmdi-developer-board" @(ut/tracked-subscribe [::bricks/panel-icon e]))]]
                    [re-com/h-box
                     :align :center :justify :center
@@ -3191,12 +3201,12 @@
   (let [timestamp (reagent/atom (js/Date.now))]
     (js/setInterval #(reset! timestamp (js/Date.now)) 5000) ; refresh every 5 seconds
     (fn []
-      (let [url (str "snaps/" (cstr/replace (str s) ".edn" ".jpg")
+      (let [url (str "snaps/" (ut/replacer (str s) ".edn" ".jpg")
                      "?timestamp=" @timestamp)
             client-name @(ut/tracked-subscribe [::bricks/client-name])
-            client-name (cstr/replace (str client-name) ":" "")
+            client-name (ut/replacer (str client-name) ":" "")
             s-loading @(ut/tracked-subscribe [::session-loading])
-            current? (= (cstr/replace (str s) ".edn" "") client-name)
+            current? (= (ut/replacer (str s) ".edn" "") client-name)
             loading? (= s s-loading)]
         [re-com/v-box
          :size "auto"
@@ -3326,7 +3336,7 @@
         selected-block @(ut/tracked-subscribe [::bricks/selected-block])
         selected-tab @(ut/tracked-subscribe [::bricks/selected-tab])
         selected-block? (true? (not (or (nil? selected-block) (= selected-block "none!"))))
-        screen-name (ut/unkeyword @(ut/tracked-subscribe [::bricks/screen-name]))
+        screen-name (ut/safe-name @(ut/tracked-subscribe [::bricks/screen-name]))
         client-name @(ut/tracked-subscribe [::bricks/client-name]) 
         ;bricks-high (+ (js/Math.floor (/ hh bricks/brick-size)) 1)
         ;bricks-wide (+ (js/Math.floor (/ ww bricks/brick-size)) 1)
@@ -3426,7 +3436,7 @@
                                                   #_{:clj-kondo/ignore [:unresolved-symbol]}
                                                   (bricks/tag-screen-position %) ;; event is magic in handler-fn
                                                   (when (and (not @bricks/over-block?) (not @bricks/over-flow?))
-                                                    (let [x  (keyword (cstr/replace (str (talltale.core/quality-color-animal)) " " "-"))
+                                                    (let [x  (keyword (ut/replacer (str (talltale.core/quality-color-animal)) " " "-"))
                                                           x (ut/safe-key x)
                                                           kp [:param x]]
                                                       (bricks/insert-new-block [(js/Math.floor (/ (first @db/context-modal-pos) bricks/brick-size))

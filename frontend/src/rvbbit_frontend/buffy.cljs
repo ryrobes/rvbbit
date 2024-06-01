@@ -651,11 +651,11 @@
 
 (defn parse-output [text kp role]
   (let [pre-text text
-        text (cstr/replace (str text) #"\n" "")
-        splt (vec (remove #(= % "rabbit-view") (doall (cstr/split text "```"))))
-        ;splt (map cstr/trim-newline (cstr/split text "```"))
+        text (ut/replacer (str text) #"\n" "")
+        splt (vec (remove #(= % "rabbit-view") (doall (ut/splitter text "```"))))
+        ;splt (map cstr/trim-newline (ut/splitter text "```"))
         type (second kp)
-        pre-splt (vec (remove #(= % "rabbit-view") (doall (cstr/split pre-text "```"))))]
+        pre-splt (vec (remove #(= % "rabbit-view") (doall (ut/splitter pre-text "```"))))]
     (tap> [:tt text splt])
     ;text
     [rc/catch
@@ -678,14 +678,14 @@
                            [re-com/v-box
                             :gap "12px"
                             :children (let [s (-> (str s)
-                                                  (cstr/replace "rabbit-view" "")
-                                                  (cstr/replace "Clojure" "")
-                                                  (cstr/replace "clojure" "")
-                                                  (cstr/replace "clj" "")
-                                                  (cstr/replace "(" "[")
-                                                  (cstr/replace ")" "]")
-                                                   ;(cstr/replace "'" "\"")
-                                         ;(cstr/replace "rabbit-view" "")
+                                                  (ut/replacer "rabbit-view" "")
+                                                  (ut/replacer "Clojure" "")
+                                                  (ut/replacer "clojure" "")
+                                                  (ut/replacer "clj" "")
+                                                  (ut/replacer "(" "[")
+                                                  (ut/replacer ")" "]")
+                                                   ;(ut/replacer "'" "\"")
+                                         ;(ut/replacer "rabbit-view" "")
                                                   )
                                             is-meta? (and (cstr/includes? s ":commons")
                                                           (cstr/includes? s ":group-by?")
@@ -749,18 +749,18 @@
                                                      [re-com/gap :size "10px"]]]])]
 
                            (let [ss (-> (str st)
-                                        (cstr/replace "rabbit-view" ""))
+                                        (ut/replacer "rabbit-view" ""))
                                  user? (not (= role "assistant"))]
                              [re-com/box
                               :style {:padding-left "15px" :margin-right "15px"
                                       :opacity (if user? 0.6 1)
                                       :font-style (if user? "italic" "normal")}
-                              :child [re-com/v-box :children (for [line (cstr/split ss #"\n")] [re-com/box :child (str line)])]]))
+                              :child [re-com/v-box :children (for [line (ut/splitter ss #"\n")] [re-com/box :child (str line)])]]))
                 ;;  (cond (cstr/starts-with? s "clojure")
                 ;;    ;[re-com/box :child (ut/replacer (str s) "clojure" "") :style {:font-family "Consolas"}]
                 ;;        (let [ss (ut/replacer (str s) "clojure" "")
                 ;;              sdata (try (edn/read-string ss) (catch :default _ {}))
-                ;;              tbl-src (keyword (last (cstr/split (str (first (flatten (get sdata :from)))) "/")))]
+                ;;              tbl-src (keyword (last (ut/splitter (str (first (flatten (get sdata :from)))) "/")))]
                 ;;      ;(tap> [:ttest tbl-src sdata (flatten (get sdata :from))])
                 ;;          (bricks/draggable
                 ;;           (bricks/sql-spawner-chat tbl-src sdata) "meta-menu"
@@ -770,7 +770,7 @@
                 ;;    ;[re-com/box :child (ut/replacer (str s) "clojure" "") :style {:font-family "Consolas"}]
                 ;;        (let [ss (ut/replacer (str s) "rabbit-view" "")
                 ;;              sdata (try (edn/read-string ss) (catch :default _ {}))
-                ;;              tbl-src (keyword (last (cstr/split (str (first (flatten (get sdata :from)))) "/")))]
+                ;;              tbl-src (keyword (last (ut/splitter (str (first (flatten (get sdata :from)))) "/")))]
                 ;;      ;(tap> [:ttest tbl-src sdata (flatten (get sdata :from))])
                 ;;          (bricks/draggable
                 ;;           (bricks/sql-spawner-chat tbl-src sdata) "meta-menu"
@@ -778,7 +778,7 @@
 
                 ;;    ;[re-com/box :child [:pre s]]
                 ;;        :else [re-com/box :child (str s)
-                ;;               ;[re-com/v-box :children (for [r (cstr/split s #"\n")] [re-com/box :child (str r)])]
+                ;;               ;[re-com/v-box :children (for [r (ut/splitter s #"\n")] [re-com/box :child (str r)])]
                 ;;               ])
                          ))]]))
 
@@ -1113,7 +1113,7 @@
            :color (theme-pull :theme/editor-outer-rim-color nil)}
    :data-source (fn [x]
                   (let [flow-parts (vec (map (fn [n] {:id n :label n}) items))
-                        words (cstr/split (cstr/lower-case (cstr/trim x)) #" ")
+                        words (ut/splitter (cstr/lower-case (cstr/trim x)) #" ")
                         matches-word (fn [field word] (cstr/includes? (cstr/lower-case (str field)) word))]
                     (if (or (nil? x) (empty? x)) flow-parts
                         (filter (fn [item]
@@ -2014,7 +2014,7 @@
                                                            ;:style {:color "#000000"}
                                                            :data-source (fn [x]
                                                                           (let [flow-parts (vec (map (fn [n] {:id n :label n}) server-flows))
-                                                                                words (cstr/split (cstr/lower-case (cstr/trim x)) #" ")
+                                                                                words (ut/splitter (cstr/lower-case (cstr/trim x)) #" ")
                                                                                 matches-word (fn [field word] (cstr/includes? (cstr/lower-case (str field)) word))]
                                                                             (if (or (nil? x) (empty? x)) flow-parts
                                                                                 (filter (fn [item]
@@ -2154,19 +2154,19 @@
                                                    {q (keyword (if sys-name 
                                                                  (str (ut/replacer (str q) #":" "") "-" sys-name)
                                                                  (str (ut/replacer (str q) #":" "") "-kick-" (hash data_d))))}))
-                                  ndata (walk/postwalk-replace qkeys data_d)
+                                  ndata (ut/postwalk-replacer qkeys data_d)
                                   h (get data_d :_h (or h 11))
                                   w (get data_d :_w (or w 9))
                                   ;h (get data_d :_h 11)
                                   ;w (get data_d :_w 9)
                                   ]
-                                                                                  ;(tap> [:qkeys (get data_d :selected-view) qkeys views (walk/postwalk-replace qkeys views)])
+                                                                                  ;(tap> [:qkeys (get data_d :selected-view) qkeys views (ut/postwalk-replacer qkeys views)])
                               [bricks/honeycomb panel-key
                                                                                    ;(or (first (keys views)) (first (keys queries)))
                                key ;:view ;(get data_d :selected-view)
                                h w
-                               {key (get ndata :view)} ;views ;(walk/postwalk-replace qkeys views)
-                               (get ndata :queries) ;(walk/postwalk-replace qkeys queries)
+                               {key (get ndata :view)} ;views ;(ut/postwalk-replacer qkeys views)
+                               (get ndata :queries) ;(ut/postwalk-replacer qkeys queries)
                                ])
           :else [bricks/honeycomb panel-key key 11 9])))
 
@@ -2289,7 +2289,7 @@
     ;(when (or wait? queued?) (ut/tracked-dispatch [::conn/clear-query-history [:kit-results-sys]]))
 
     (doseq [[k query] sql-calls]
-      (let [;query (walk/postwalk-replace sql-params v)
+      (let [;query (ut/postwalk-replacer sql-params v)
             data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
             unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
         (when (and (or (not data-exists?) unrun-sql?) (not (or wait? queued?)))
@@ -2353,20 +2353,20 @@
                                                         (for [[k v] parameters]
                                                           {(keyword
                                                             (-> (str
-                                                                 (ut/unkeyword kit-context-name) ">"
-                                                                 (ut/unkeyword curr-narrative) ">"
-                                                                 (ut/unkeyword k))
+                                                                 (ut/safe-name kit-context-name) ">"
+                                                                 (ut/safe-name curr-narrative) ">"
+                                                                 (ut/safe-name k))
                                                                 (ut/replacer "/" "-")
                                                                 (ut/replacer "." "-"))) v}))
                                      rereparameters (into {} ;; for ui
                                                           (for [[k v] parameters]
                                                             {(keyword
                                                               (str
-                                                               (ut/unkeyword kit-name) "/"
+                                                               (ut/safe-name kit-name) "/"
                                                                (-> (str
-                                                                    (ut/unkeyword kit-context-name) ">"
-                                                                    (ut/unkeyword curr-narrative) ">"
-                                                                    (ut/unkeyword k))
+                                                                    (ut/safe-name kit-context-name) ">"
+                                                                    (ut/safe-name curr-narrative) ">"
+                                                                    (ut/safe-name k))
                                                                    (ut/replacer "/" "-")
                                                                    (ut/replacer "." "-")))) v}))
                                      _ (when (and (not (empty? step-mutates)) selected? allow-mutate?)
@@ -2591,7 +2591,7 @@
     ;; (tap> [:history-log history-log kp "!"])
     ;; (reset! db/active-tmp-history hist-key)
     ;; (dorun (for [[k query] sql-calls]
-    ;;          (let [;query (walk/postwalk-replace sql-params v)
+    ;;          (let [;query (ut/postwalk-replacer sql-params v)
     ;;                data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
     ;;                unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
     ;;            (when (or (not data-exists?) unrun-sql?)
@@ -2633,7 +2633,7 @@
                                    removed (dissoc (ut/dissoc-in d2 [:params :user-sys]) :user-sys)
                                    added (if (= added {:params nil}) nil added)
                                    removed (if (= removed {:params nil}) nil removed)
-                                   diffy (walk/postwalk-replace
+                                   diffy (ut/postwalk-replacer
                                           {:block-states :blocks :panels :_} ;; just for readability again, we have limited space
                                           {:added added
                                            :removed removed})
@@ -2811,7 +2811,7 @@
         hist-key  (keyword (str "tmp-" (hash (first kp)) "-hist-sys")) ;;  :history-log-sys
         ;kp (vec (ut/replacer (remove nil? kp) #" :* " " :base "))
         kp (if (some #(or (= % :viz-gen) (= % :*)) kp)
-             (vec (walk/postwalk-replace {:* :base :viz-gen :base} (remove nil? kp)))
+             (vec (ut/postwalk-replacer {:* :base :viz-gen :base} (remove nil? kp)))
              kp)
         sql-calls {hist-key {:select [:client_name
                                       :data :diff
@@ -2827,7 +2827,7 @@
     (tap> [:history-log history-log kp "!"])
     (reset! db/active-tmp-history hist-key)
     (dorun (for [[k query] sql-calls]
-             (let [;query (walk/postwalk-replace sql-params v)
+             (let [;query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql? @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
@@ -2860,7 +2860,7 @@
                                       data_d (try (edn/read-string data) (catch :default _ :nope-cant-work-data_d))
                                       kp_d (try (edn/read-string kp) (catch :default _ :nope-cant-work-kp_d))
                                       kp_d (if (some #(or (= % :viz-gen) (= % :*) (= % :base)) kp_d)
-                                             [(first kp_d)] ;(vec (walk/postwalk-replace {:* :base :viz-gen :base} (remove nil? kp)))
+                                             [(first kp_d)] ;(vec (ut/postwalk-replacer {:* :base :viz-gen :base} (remove nil? kp)))
                                              kp_d)
                                       has-flow-drop? @(ut/tracked-subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
                                       key (try (edn/read-string key) (catch :default _ :nope-cant-work-key))
@@ -2914,14 +2914,14 @@
                                                                                       views (get data_d :views)
                                                                                       qkeys (into {} (for [q (keys queries)]
                                                                                                        {q (keyword (str (ut/replacer (str q) #":" "") "-hist-" (rand-int 123) (hash data_d)))}))
-                                                                                      ndata (walk/postwalk-replace qkeys data_d)]
-                                                                                  ;(tap> [:qkeys (get data_d :selected-view) qkeys views (walk/postwalk-replace qkeys views)])
+                                                                                      ndata (ut/postwalk-replacer qkeys data_d)]
+                                                                                  ;(tap> [:qkeys (get data_d :selected-view) qkeys views (ut/postwalk-replacer qkeys views)])
                                                                                   [bricks/honeycomb panel_key
                                                                                    ;(or (first (keys views)) (first (keys queries)))
                                                                                    (get data_d :selected-view)
                                                                                    11 9
-                                                                                   (get ndata :views) ;views ;(walk/postwalk-replace qkeys views)
-                                                                                   (get ndata :queries) ;(walk/postwalk-replace qkeys queries)
+                                                                                   (get ndata :views) ;views ;(ut/postwalk-replacer qkeys views)
+                                                                                   (get ndata :queries) ;(ut/postwalk-replacer qkeys queries)
                                                                                    ])
                                                             :else [bricks/honeycomb panel_key key 11 9])]
                                               [code-box 580 nil diff]
