@@ -541,8 +541,7 @@
          new @(rfa/sub ::get-new-flow-subs {})
          old (get db :flow-subs [])
          old (filterv #(not (cstr/includes? (str %) "||")) old)
-         _ (tap> [:flow-sub-change! (get db :client-name) {:old old :new new}])
-         ;all (get db :flow-subs [])
+        ;;  _ (tap> [:flow-sub-change! (get db :client-name) {:old old :new new}])
          subbed (vec (for [n new]
                        (do (ut/tracked-dispatch [::http/sub-to-flow-value n])
                            n)))]
@@ -1906,7 +1905,7 @@
              selected-panel (get db :selected-block)
              panel-idx      (.indexOf panel-keys selected-panel)
              next-panel     (nth (cycle panel-keys) (+ panel-idx 1))]
-         (tap> [:next-panel :from selected-panel :to next-panel])
+        ;;  (tap> [:next-panel :from selected-panel :to next-panel])
          (-> db
              (assoc-in [:click-param :param :selected-block] next-panel)
              (assoc :selected-block next-panel)))))))
@@ -3338,8 +3337,8 @@
          view-code-hash (hash [(get-in db [:panels (get db :selected-block)])  part-kp])
          old-view-code-hash @last-view-highlighted-hash]
     ;;  (tap> [:runhighlioght? (and editor? (not= view-code-hash old-view-code-hash))])
-     ;(and editor? (not= view-code-hash old-view-code-hash))
-     true
+     (and editor? (not= view-code-hash old-view-code-hash))
+     ;;true
      )))
 
 
@@ -9623,6 +9622,15 @@
      db)))
 
 (re-frame/reg-event-db
+ ::clear-cache-atoms
+ (fn [_ _]
+   (doseq [a [ut/replacer-data ut/replacer-cache ut/deep-flatten-data ut/deep-flatten-cache
+              ut/split-cache ut/split-cache-data ut/extract-patterns-data ut/extract-patterns-cache
+              ut/postwalk-replace-data-cache ut/postwalk-replace-cache ut/is-base64-atom ut/is-large-base64-atom
+              ut/safe-name-cache ut/format-map-atom ut/body-set-atom ut/data-typer-atom ut/coord-cache]]
+     (reset! a {}))))
+
+(re-frame/reg-event-db
  ::purge-cache-atoms
  (fn [db _]
    ;;(tap> [:prune-alert alert-id])
@@ -9638,6 +9646,9 @@
 
                                                  :ut/split-cache ut/split-cache
                                                  :ut/split-cache-data ut/split-cache-data
+
+                                                 :ut/extract-patterns-data ut/extract-patterns-data
+                                                 :ut/extract-patterns-cache ut/extract-patterns-cache
 
                                                  :ut/postwalk-replace-data-cache ut/postwalk-replace-data-cache
                                                  :ut/postwalk-replace-cache ut/postwalk-replace-cache
@@ -9660,27 +9671,31 @@
                  js/Number.
                  (.toFixed 3)
                  js/parseFloat)]
-     (tap> [:atom-sizes client-name :js-heap js-heap js-heap-int  :atoms-raw-ttl (str ttl "MB")  atom-size-map])
+      (tap> [:atom-sizes client-name :js-heap js-heap js-heap-int  :atoms-raw-ttl (str ttl "MB")  atom-size-map])
+      (js/console.log [:atom-sizes client-name :js-heap js-heap js-heap-int  :atoms-raw-ttl (str ttl "MB")  atom-size-map])
           (do
            ;;     (reset! ut/subscription-counts {}) ;; temp
            ;;     (reset! ut/dispatch-counts {}) ;; temp
            ;;     (reset! ut/simple-subscription-counts [])
            ;;     (reset! ut/simple-dispatch-counts [])
      ;;(tap> [client-name :purge-postwalk? (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) (> (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) 15)])
-       (when (> (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) 25)
-         (ut/purge-postwalk-cache 0.3))  ;; keep top 40% of freq cache hits
-     
-       (when (> (get-in atom-size-map [:ut/split-cache-data :mb]) 15)
-         (ut/purge-splitter-cache 0.3))
-     
-       (when (> (get-in atom-size-map [:ut/replacer-data :mb]) 15)
-         (ut/purge-replacer-cache 0.3))
-     
-       (when (> (get-in atom-size-map [:ut/deep-flatten-data :mb]) 15)
-         (ut/purge-deep-flatten-cache 0.3))
-     
+            (when (> (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) 35)
+              (ut/purge-postwalk-cache 0.3))  ;; keep top 40% of freq cache hits
+
+            (when (> (get-in atom-size-map [:ut/split-cache-data :mb]) 25)
+              (ut/purge-splitter-cache 0.3))
+
+            (when (> (get-in atom-size-map [:ut/replacer-data :mb]) 25)
+              (ut/purge-replacer-cache 0.3))
+
+            (when (> (get-in atom-size-map [:ut/deep-flatten-data :mb]) 25)
+              (ut/purge-deep-flatten-cache 0.3))
+
+            (when (> (get-in atom-size-map [:ut/extract-patterns-data :mb]) 25)
+              (ut/purge-extract-patterns-cache 0.3))
+
             ;(tap> [:hello? "you fucking idiots"])
-     
+
            ;;     ;(reset! ut/safe-name-cache [])
            ;;     ;(reset! ut/split-cache [])
            ;;     ;(reset! ut/replacer-atom {})
@@ -9689,7 +9704,7 @@
            ;;     ;(reset! ut/format-map-atom {})
            ;;     ;(reset! ut/data-typer-atom {})
            ;;     ;(reset! ut/coord-cache {})
-       )
+            )
      db)))
 
 (re-frame/reg-event-db
@@ -11095,7 +11110,7 @@
                         ;;@(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]])
                    vvv ;;@(rfa/sub ::resolver/logic-and-params {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
                         ;;; ^^^^ :brave-red-butterfly is not sequable? what? so I wrapped in a vec. started after caching madness....
-                   )(catch :default e (do (tap> [:rs-value-fuck-up vvv flow-id kkey src e]) vvv)))]
+                   ) (catch :default e (do (tap> [:rs-value-fuck-up-bricks vvv flow-id kkey src e]) vvv)))]
          ;(tap> [:sketchy-rs-value? flow-id kkey vvv vv])
          vv)
        (get-in db [:runstreams flow-id :values kkey :value])))))
@@ -13100,7 +13115,7 @@
                  {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace-sub vv)})))}))
            new-h (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
-       (tap> [:!!!!!!!panels-pushed!!!!!! client-name (get db :panels-hash) ppr new-h])
+      ;;  (tap> [:!!!!!!!panels-pushed!!!!!! client-name (get db :panels-hash) ppr new-h])
        (conn/push-panels-to-server pp ppr client-name)
        (ut/dispatch-delay 2000 [::refresh-history-log])
        (assoc db :panels-hash new-h)) db)))
@@ -13356,14 +13371,36 @@
 
 (def rs-debug (atom []))
 
+;; (defn rs [edn brick-vec-key]
+;;   (let [rr (resolver/logic-and-params edn brick-vec-key)]
+;;     ;(tap> [:rs-d rr])
+;;     (swap! rs-debug conj [rr edn brick-vec-key])
+;;     rr))
+
 (defn rs [edn brick-vec-key]
-  (let [rr (resolver/logic-and-params edn brick-vec-key)]
+  (let [
+        ;;rr (resolver/logic-and-params edn brick-vec-key)
+        ]
     ;(tap> [:rs-d rr])
-    (swap! rs-debug conj [rr edn brick-vec-key])
-    rr))
+    (swap! rs-debug conj [edn brick-vec-key])
+    edn)) ;; something very fucked up here, need to revise this whole appraoch. slow and weird.
+
+
+(re-frame/reg-sub
+ ::resolved-block-body-shell 
+ (fn [db [_ {:keys [panel-key]}]]
+   (let [body (get-in db [:panels panel-key])
+          ;;_ (tap> [:oo panel-key body])
+         body (-> body (dissoc :views) (dissoc :queries))]
+     (resolver/logic-and-params-fn body panel-key)
+     ;@(rfa/sub ::logic-and-params {:m body :p panel-key})
+     ;body
+     )))
+
+
 
 (defn grid [& [tab]]
-  (try 
+  ;;(try 
     (let [;reaction-hack! @hover-square ;; seems less expensive than doall-for ?
         ;reaction-hack2! @edit-mode?
         ;editor? @(ut/tracked-subscribe [::get-in [:editor?]])
@@ -13468,11 +13505,16 @@
                         ;;                        brick-vec-key
                         ;;                        )
                          ;;_ (tap> [:tab tab brick-vec-key])
+                         ;;body-shell           @(rfa/sub ::resolved-block-body-shell {:panel-key brick-vec-key})
+                         body-shell           @(re-frame/subscribe [::resolved-block-body-shell {:panel-key brick-vec-key}])
                          ;;rs                  (fn [edn] (resolver/logic-and-params edn brick-vec-key))
-                         w                   (rs @(ut/tracked-subscribe [::panel-width brick-vec-key]) brick-vec-key)
-                         h                   (rs @(ut/tracked-subscribe [::panel-height brick-vec-key]) brick-vec-key)
-                         name                (rs @(ut/tracked-subscribe [::panel-name brick-vec-key]) brick-vec-key)
-                         z                   (rs @(ut/tracked-subscribe [::panel-depth brick-vec-key]) brick-vec-key)
+                         ;w                   (rs @(ut/tracked-subscribe [::panel-width brick-vec-key]) brick-vec-key)
+                         ;h                   (rs @(ut/tracked-subscribe [::panel-height brick-vec-key]) brick-vec-key)
+                         ;name                (rs @(ut/tracked-subscribe [::panel-name brick-vec-key]) brick-vec-key)
+                         ;z                   (rs @(ut/tracked-subscribe [::panel-depth brick-vec-key]) brick-vec-key)
+                         {:keys [w h name z]} body-shell
+                        ;;  _ (tap>  [:pp brick-vec-key body-shell w h name z])
+
                          trunc-name          (when (not (nil? name))
                                                (let [charpx      5.75
                                                      pixel-width (* (count (str name)) charpx)
@@ -13514,11 +13556,19 @@
                                                   editor?
                                                   (= @db/editor-mode :vvv))
                          ;current-tab         @(ut/tracked-subscribe [::selected-tab])
-                         ghosted?            (rs @(ut/tracked-subscribe [::ghosted? brick-vec-key]) brick-vec-key)
-                         no-ui?              (or (rs @(ut/tracked-subscribe [::no-ui? brick-vec-key]) brick-vec-key) (not (nil? tab)))
-                         hidden?             (rs @(ut/tracked-subscribe [::hidden? brick-vec-key]) brick-vec-key)
-                         minimized?          (rs @(ut/tracked-subscribe [::minimized? brick-vec-key]) brick-vec-key)
-                         panel-style         (rs @(ut/tracked-subscribe [::panel-style brick-vec-key]) brick-vec-key)
+                         ;ghosted?            (rs @(ut/tracked-subscribe [::ghosted? brick-vec-key]) brick-vec-key)
+                         ;no-ui?              (or (rs @(ut/tracked-subscribe [::no-ui? brick-vec-key]) brick-vec-key) (not (nil? tab)))
+                         ;hidden?             (rs @(ut/tracked-subscribe [::hidden? brick-vec-key]) brick-vec-key)
+                         ;minimized?          (rs @(ut/tracked-subscribe [::minimized? brick-vec-key]) brick-vec-key)
+                         {:keys [ghosted? 
+                                 no-ui? 
+                                 hidden? 
+                                 minimized?]} body-shell
+                         no-ui?              (or no-ui? (not (nil? tab)))
+                         ;panel-style         ;(rs 
+                         ;                     @(ut/tracked-subscribe [::panel-style brick-vec-key])
+                         ;                    ; brick-vec-key)
+                         panel-style         (get body-shell  :style)
                          tab-color           (cond
                                                selected? "#9973e0"
                                                viz-reco? "#ffb400"
@@ -13543,7 +13593,8 @@
                           ;;; all below are for bottom tab bar
                          single-view?        @(ut/tracked-subscribe [::is-single-view? brick-vec-key])
                          no-view?            @(ut/tracked-subscribe [::has-no-view? brick-vec-key])
-                         selected-view       (rs @(ut/tracked-subscribe [::selected-view brick-vec-key]) brick-vec-key)
+                         ;;selected-view       (rs @(ut/tracked-subscribe [::selected-view brick-vec-key]) brick-vec-key) ;;; SUSPICOUS? todo - 6/1/24, cRASHING TO JS SOMEWHERE
+                         selected-view       @(ut/tracked-subscribe [::selected-view brick-vec-key])
                          selected-view       (cond viz-reco? reco-selected
                                                    (and (nil? selected-view) no-view? (seq sql-keys))
                                                    (first sql-keys)
@@ -13553,7 +13604,9 @@
                          col-selected?       @(ut/tracked-subscribe [::column-selected-any-field? brick-vec-key selected-view])
                          ;;views               @(ut/tracked-subscribe [::views brick-vec-key])
                          views               @(rfa/sub ::views {:panel-key brick-vec-key})
-                         views               (if (keyword? views) (rs views brick-vec-key) views)
+
+                         ;views               (if (keyword? views) (rs views brick-vec-key) views) ;; for full view aliase... sketch REVISIT
+
                         ; reco-statuses       @(ut/tracked-subscribe [::queries-reco-status brick-vec-key]) ;; in for reactions
                          all-views           (if single-view? [] (vec (keys views)))
                           ;multiple-oz-views? @(ut/tracked-subscribe [::multiple-oz-views? brick-vec-key])
@@ -13564,9 +13617,14 @@
                          ;tab-parent-offset   (if tab @(ut/tracked-subscribe [::tab-offset tab]) [0 0])
                          tab-offset          (if tab @(ut/tracked-subscribe [::tab-offset2 tab]) [0 0])
                          click-delay         100
-                         mixed-keys          (cond (and single-view? (seq sql-keys)) (conj sql-keys base-view-name)
+                         mixed-keys          ;;(try 
+                                               (cond (and single-view? (seq sql-keys)) (conj sql-keys base-view-name)
                                                    (and no-view? (seq sql-keys)) sql-keys
                                                    :else (into all-views sql-keys))
+                                              ;;  (catch :default e
+                                              ;;    (do (tap> [:MIXED-KEYS-ERROR! (str e) (.-message e) :stack (.-stack e)])
+                                              ;;        (js/console.log (str :MIXED-KEYS-ERROR! (str e) (.-message e) :stack (.-stack e)))
+                                              ;;        [])))
                          zz                  (if (or selected? hover-q?)
                                                (+ z 50) (+ z 10))]
                       ; (tap> [:subq-blocks subq-blocks])
@@ -13775,7 +13833,7 @@
                                                        :else "#55afb344")
                                    :top              (px top)
                                    :left             (px left)}
-                                  (theme-pull :theme/base-block-style {})
+                                  (or (theme-pull :theme/base-block-style {}) {})
                                   panel-style)
                           :child                               ;(if root?
                           ^{:key (str "brick-" brick-vec "-root")}
@@ -14232,12 +14290,10 @@
                                                                     ^{:key (str "brick-" brick-vec "-resize-handle-gap")}
                                                                     [re-com/gap :size "12px"])]]])
                                         [re-com/gap :size "18px"])]]])))))]]) 
-                                        (catch :default e 
-                                          (tap> [:GRID-ERROR! (str e) 
-                                                 ;;(theme-pull :theme/data-colors db/data-colors) 
-                                                 :rs-debug (take-last 10 @rs-debug) ])
-                                          )
-                                        ))
+                                          ;; (catch :default e
+                                          ;;   (do (tap> [:GRID-ERROR! (str e) (.-message e) :stack (.-stack e) e])
+                                          ;;       (js/console.log (str :GRID-ERROR! (str e) (.-message e) :stack (.-stack e) e)))))
+                                        )
 
                        ;; unreachable - if false, remove later after refactor
                         ;; (droppable ["meta-menu"] brick-vec

@@ -1480,7 +1480,7 @@
 (defn sub-push-loop [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 100))] ;; was (async/sliding-buffer 450)
+  (let [results (async/chan (async/sliding-buffer 50))] ;; was 100, was (async/sliding-buffer 450)
     (try
       (async/go-loop []
         (async/<! (async/timeout 600)) ;; was 70 ?

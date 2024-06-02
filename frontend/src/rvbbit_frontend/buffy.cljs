@@ -321,13 +321,30 @@
        (assoc-in [:runstreams flow-id :values kkey :value] value)
        (assoc-in [:runstreams flow-id :values kkey :source] source))))
 
+;; (re-frame/reg-sub
+;;  ::rs-value ;; duped in AUDIO TOO, OMG please condense !!!!!
+;;  (fn [db [_ flow-id kkey]]  ;;; has a dupe in bricks!!! TODO, please unify LOGIC!!!!
+;;    (let [src (get-in db [:runstreams flow-id :values kkey :source])]
+;;      (if (= src :param)
+;;        ;(get-in db [:runstreams flow-id :values kkey :value])
+;;        (first @(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]]))
+;;        (get-in db [:runstreams flow-id :values kkey :value])))))
+
 (re-frame/reg-sub
- ::rs-value ;; duped in AUDIO TOO, OMG please condense !!!!!
- (fn [db [_ flow-id kkey]]  ;;; has a dupe in bricks!!! TODO, please unify LOGIC!!!!
+ ::rs-value
+ (fn [db {:keys [flow-id kkey]}]  ;;; dupe from buffy
    (let [src (get-in db [:runstreams flow-id :values kkey :source])]
      (if (= src :param)
        ;(get-in db [:runstreams flow-id :values kkey :value])
-       (first @(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]]))
+       (let [vvv @(ut/tracked-sub ::resolver/logic-and-params {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
+             vv (try
+                  (first
+                        ;;@(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]])
+                   vvv ;;@(rfa/sub ::resolver/logic-and-params {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
+                        ;;; ^^^^ :brave-red-butterfly is not sequable? what? so I wrapped in a vec. started after caching madness....
+                   )(catch :default e (do (tap> [:rs-value-fuck-up-buffy vvv flow-id kkey src e]) vvv)))]
+         ;(tap> [:sketchy-rs-value? flow-id kkey vvv vv])
+         vv)
        (get-in db [:runstreams flow-id :values kkey :value])))))
 
 (defn code-box-rs-value [width-int height-int flow-id kkey value & [param?]]

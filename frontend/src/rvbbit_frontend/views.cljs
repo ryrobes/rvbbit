@@ -2971,9 +2971,9 @@
          new-h (hash pp-without-fs)
          client-name (get db :client-name)
          ]
-     (tap> [:push-params! client-name new-h pp-without-fs
-            {:new
-             (get (vec (cdata/diff pp-without-fs @temp-atom)) 0)}])
+;;      (tap> [:push-params! client-name new-h pp-without-fs
+;;             {:new
+;;              (get (vec (cdata/diff pp-without-fs @temp-atom)) 0)}])
      (ut/tracked-dispatch [::wfx/request   :default ;; just a push, no response handling
                          {:message      {:kind         :sync-client-params
                                          :params-map   pp-without-fs ;; pp ;; why send things we are getting shipped? just too much. revist this, in case it was a mistake
@@ -3092,7 +3092,8 @@
     (tap> [:no-fire-on-change flow-id :skipping])))
 
 (defn task-bar []
-  (let [min-panels @(ut/tracked-subscribe [::bricks/all-panels-minimized])
+  (try 
+    (let [min-panels @(ut/tracked-subscribe [::bricks/all-panels-minimized])
         user-param-hash2 @(ut/tracked-subscribe [::watch-user-params])
         selected-view @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
         sselected-view  @(ut/tracked-subscribe [::conn/clicked-parameter [:param :selected-view]])
@@ -3121,7 +3122,7 @@
       (ut/tracked-dispatch [::set-rs-overrides-hashmap rs-overrides]))
 
     (when (not= theme-colors theme-colors-hashmap) ;; execute flows when mutated
-      (tap> [:theme-colors-change! theme-colors theme-colors-hashmap])
+;;       (tap> [:theme-colors-change! theme-colors theme-colors-hashmap])
       (ut/apply-theme (bricks/code-mirror-theme))
       (ut/tracked-dispatch [::set-theme-colors-hashmap theme-colors]))
 
@@ -3185,7 +3186,10 @@
                             :color (theme-pull :theme/editor-outer-rim-color nil)
                             :backdrop-filter "blur(2px)"}
                     :children [[re-com/box :child (str nn)]
-                               [render-icon icon]]])])))
+                               [render-icon icon]]])]))
+                               (catch :default e
+                                 (do (tap> [:TASK-BAR-ERROR! (str e) (.-message e) :stack (.-stack e)])
+                                     (js/console.log (str :TASK-BAR-ERROR! (str e) (.-message e) :stack (.-stack e)))))))
 
 (re-frame/reg-event-db
  ::set-session-loading
@@ -3537,9 +3541,9 @@
 
                                          ; [bricks/squareql-logo (- bricks-wide 3) (- bricks-high 3)]
 
-                                         ; [rc/catch
+                                          [rc/catch
                                           [bricks/grid]
-                                         ;  ]
+                                           ]
 
 
                                           [re-com/box
@@ -3750,7 +3754,8 @@
                                         ;;            :background-color "#00000000"
                                         ;;            :color "white"}]
 
-                                          [task-bar]
+                                          [rc/catch
+                                           [task-bar]]
 
                                           [flows/alert-box]
 

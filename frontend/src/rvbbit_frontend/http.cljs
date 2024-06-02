@@ -210,7 +210,7 @@
          codes (vec (apply concat [server-params view-codes themes flow-subs click-params]))
          ]
      
-   (tap> [:pulled-auto-complete (get db :client-name) (into {} (for [[k v] result] [k (count v)]))])
+  ;;  (tap> [:pulled-auto-complete (get db :client-name) (into {} (for [[k v] result] [k (count v)]))])
    ;(assoc db :autocomplete result)
    (reset! db/autocomplete-keywords (vec (sort (map str codes))))
    db)))
@@ -851,7 +851,7 @@
          request {:image image
                   :session (ut/deselect-keys db compund-keys)
                   :client-name client-name}]
-     (tap> [:save-snap! (get db :client-name)])
+    ;;  (tap> [:save-snap! (get db :client-name)])
      ;(tap> [:save-flow request])
      {:db   (assoc-in db [:http-reqs :save-snap]
                       {:status "running"

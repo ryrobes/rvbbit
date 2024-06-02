@@ -1482,21 +1482,21 @@
  ::signals-map-response
  (fn [db [_ result]]
    (let []
-     (tap> [:signals-map-in result])
+    ;;  (tap> [:signals-map-in result])
      (assoc db :signals-map result))))
 
 (re-frame/reg-event-db
  ::rules-map-response
  (fn [db [_ result]]
    (let []
-     (tap> [:rules-map-in result])
+    ;;  (tap> [:rules-map-in result])
      (assoc db :rules-map result))))
 
 (re-frame/reg-event-db
  ::solvers-map-response
  (fn [db [_ result]]
    (let []
-     (tap> [:solvers-map-in result])
+    ;;  (tap> [:solvers-map-in result])
      (assoc db :solvers-map result))))
 
 (re-frame/reg-event-db

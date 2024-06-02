@@ -269,8 +269,13 @@
    ;   ;:poll-when                [::subs/get-the :auto-run-enabled?]
    ;   :dispatch-event-on-start? false}
 
-     {:interval                 600  
+     {:interval                 600 ;; ten mins. less? more?
       :event                    [::bricks/purge-cache-atoms]
+      ;:poll-when                [::bricks/new-flow-subs?]
+      :dispatch-event-on-start? false}
+
+     {:interval                 3600 ;; one hour. more?
+      :event                    [::bricks/clear-cache-atoms]
       ;:poll-when                [::bricks/new-flow-subs?]
       :dispatch-event-on-start? false}
 

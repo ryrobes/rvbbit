@@ -18,7 +18,7 @@
 
    [goog.i18n NumberFormat]
    [goog.i18n.NumberFormat Format]
-   [goog.events EventType]))
+   [goog.events EventType]))  
 
 
 (re-frame/reg-sub ;; for benchmarks
@@ -27,7 +27,12 @@
    (get db :client-name)))
 
 
-
+(defn safe-conj [coll & items] ;;; temp until we find the error!!
+  (if (sequential? coll)
+    (apply conj coll items)
+    (do
+      (tap> ["Error: trying to conj onto a non-sequence" "Caller:" (.-stack (js/Error.))  :coll coll :items items])
+      coll)))
 
 
 (defonce deep-flatten-data (atom {}))
@@ -56,10 +61,11 @@
         client-name @(re-frame/subscribe [::client-name])
         above-threshold (count keys-to-keep)
         below-threshold (- (count sorted-cache) above-threshold)]
-    (tap> [client-name :purge :deep-flatten-cache {:top-pct percent
-                                                   :cutoff-frequency cutoff-frequency
-                                                   :above-threshold above-threshold
-                                                   :below-threshold below-threshold}])
+    ;; (tap> [client-name :purge :deep-flatten-cache {:top-pct percent
+    ;;                                                :cutoff-frequency cutoff-frequency
+    ;;                                                :above-threshold above-threshold
+    ;;                                                :below-threshold below-threshold}])
+    ;; (js/console.log "purging deep-flatten cache")
     (swap! deep-flatten-data (fn [old-cache]
                                (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
     (reset! deep-flatten-cache {})))
@@ -94,9 +100,67 @@
                                                :cutoff-frequency cutoff-frequency
                                                :above-threshold above-threshold
                                                :below-threshold below-threshold}])
+    (js/console.log "purging replacer cache")
     (swap! replacer-data (fn [old-cache]
                            (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
     (reset! replacer-cache {})))
+
+
+
+
+(defonce extract-patterns-data (atom {}))
+(defonce extract-patterns-cache (atom {}))
+
+(defn matches-pattern? [item kw num]
+  (and (vector? item) (= (count item) num) (= (first item) kw)))
+
+(defn extract-patterns [data kw num]
+  (let [x (hash [data kw num])]
+    (swap! extract-patterns-cache update x (fnil inc 0))
+    (or (@extract-patterns-data x)
+        (let [matches (atom [])]
+          (walk/prewalk
+           (fn [item]
+             (when (matches-pattern? item kw num)
+               (swap! matches conj item))
+             item)
+           data)
+          (let [result @matches]
+            (swap! extract-patterns-data assoc x result)
+            result)))))
+
+(defn purge-extract-patterns-cache [percent]
+  (let [sorted-cache (->> @extract-patterns-cache
+                          (sort-by val)
+                          reverse)
+        cutoff (int (* (count sorted-cache) percent))
+        keys-to-keep (set (map first (take cutoff sorted-cache)))
+        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
+        client-name @(re-frame/subscribe [::client-name])
+        above-threshold (count keys-to-keep)
+        below-threshold (- (count sorted-cache) above-threshold)]
+    ;; (tap> [client-name :purge :extract-patterns-cache {:top-pct percent
+    ;;                                                    :cutoff-frequency cutoff-frequency
+    ;;                                                    :above-threshold above-threshold
+    ;;                                                    :below-threshold below-threshold}])
+    ;; (js/console.log "purging extract-patterns cache")
+    (swap! extract-patterns-data (fn [old-cache]
+                                   (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+    (reset! extract-patterns-cache {})))
+
+;; (defn extract-patterns [data kw num]
+;;   (let [matches (atom [])]
+;;     (walk/prewalk
+;;      (fn [item]
+;;        (when (matches-pattern? item kw num)
+;;          (swap! matches conj item))
+;;        item)
+;;      data)
+;;     @matches))
+
+
+
+
 
 
 
@@ -143,10 +207,11 @@
         client-name @(re-frame/subscribe [::client-name])
         above-threshold (count keys-to-keep)
         below-threshold (- (count sorted-cache) above-threshold)]
-    (tap> [client-name :purge :splitter-cache {:top-pct percent
-                                               :cutoff-frequency cutoff-frequency
-                                               :above-threshold above-threshold
-                                               :below-threshold below-threshold}])
+    ;; (tap> [client-name :purge :splitter-cache {:top-pct percent
+    ;;                                            :cutoff-frequency cutoff-frequency
+    ;;                                            :above-threshold above-threshold
+    ;;                                            :below-threshold below-threshold}])
+    ;; (js/console.log "purging splitter cache")
     (swap! split-cache-data (fn [old-cache]
                               (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
     (reset! split-cache {})))
@@ -182,10 +247,11 @@
         client-name @(re-frame/subscribe [::client-name])
         above-threshold (count keys-to-keep)
         below-threshold (- (count sorted-cache) above-threshold)]
-    (tap> [client-name :purge :postwalk-cache {:top-pct percent
-                                               :cutoff-frequency cutoff-frequency
-                                               :above-threshold above-threshold
-                                               :below-threshold below-threshold}])
+    ;; (tap> [client-name :purge :postwalk-cache {:top-pct percent
+    ;;                                            :cutoff-frequency cutoff-frequency
+    ;;                                            :above-threshold above-threshold
+    ;;                                            :below-threshold below-threshold}])
+    ;; (js/console.log "purging postwalk cache")
     (swap! postwalk-replace-data-cache (fn [old-cache]
                                          (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
     (reset! postwalk-replace-cache {})))
@@ -1443,23 +1509,7 @@
                    :else [item]))
            coll)))
 
-(defn matches-pattern? [item kw num]
-  ;(or ;(and (vector? item) (= (count item) 3) (= (first item) :=))
-  ;    ;(and (vector? item) (= (count item) 3) (= (first item) :when))
-  (and (vector? item) (= (count item) num) (= (first item) kw))
-  ;    ;(and (vector? item) (= (count item) 3) (= (first item) :set-parameter))
-  ;    )
-  )
 
-(defn extract-patterns [data kw num]
-  (let [matches (atom [])]
-    (walk/prewalk
-     (fn [item]
-       (when (matches-pattern? item kw num)
-         (swap! matches conj item))
-       item)
-     data)
-    @matches))
 
 ;; (def matches-pattern? (memoize
 ;;                        (fn [item kw num]

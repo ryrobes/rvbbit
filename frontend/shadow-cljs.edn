@@ -5,6 +5,7 @@
   [reagent "1.1.1"]
   ;[re-frame "1.3.0"]
   [re-frame "1.4.3"]
+  ;;[org.clojars.ryrobes/re-frame "0.11-SNAPSHOT"] ;; fork of "1.4.3"
   [day8.re-frame/tracing "0.6.2"]
   ;[re-com "2.13.2"]
   ;[org.clojars.ryrobes/re-com "2.13.2-119-fcebaee-SNAPSHOT"]
@@ -12,7 +13,7 @@
   [garden "1.3.10"]
   ;[org.clojars.ryrobes/re-com "2.13.2-122-d2b8d22-SNAPSHOT"]
   ;[org.clojars.ryrobes/re-com "2.13.2-126-7fffce1-SNAPSHOT"] ;; 1/31/24 11pm
-  [org.clojars.ryrobes/re-com "0.11-SNAPSHOT"] ;; 2/29/2024 modal outer rim hack
+  [org.clojars.ryrobes/re-com "0.11-SNAPSHOT" ] ;; 2/29/2024 modal outer rim hack
   [re-pressed "0.3.2"]
   [binaryage/devtools "1.0.6"]
   [day8.re-frame/undo "0.3.3"]
@@ -48,7 +49,8 @@
    {:preloads [day8.re-frame-10x.preload]}
    :dev
    {:compiler-options
-    {:closure-defines
+    {:source-map true
+     :closure-defines
      {re-frame.trace.trace-enabled? true
       day8.re-frame.tracing.trace-enabled? true
       re-com.config/root-url-for-compiler-output (System/getenv "ROOT_URL")}}} ;; "http://localhost:8290/js/compiled/app/cljs-runtime/"}}}
