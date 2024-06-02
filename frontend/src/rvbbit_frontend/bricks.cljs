@@ -73,6 +73,7 @@
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))
 
+
 (def brick-size 50)
 
 (def dragging? (reagent/atom false))
@@ -100,7 +101,7 @@
 (re-frame/reg-event-fx
  ::ship-atom
  (fn [{:keys [db]} [_ atom-name aval]]
-   (tap> [:setting :atom-name (get db :client-name) atom-name aval])
+   (ut/tapp>> [:setting :atom-name (get db :client-name) atom-name aval])
    {:dispatch [::wfx/request :default
                {:message    {:kind :client-ui
                              :atom-name atom-name
@@ -118,7 +119,7 @@
 (defonce drop-last-tracker (reagent/atom {}))
 (defonce drop-last-tracker-refs (reagent/atom {}))
 
-;; (tap> [(st/transform {:transform-select [[[:sum :sales] :total-sales]
+;; (ut/tapp>> [(st/transform {:transform-select [[[:sum :sales] :total-sales]
 ;;                                             ;[[:sum :items-sold] :total-items]
 ;;                                          :product :category :rep]
 ;;                       :from [:data]
@@ -159,7 +160,7 @@
 (re-frame/reg-event-db
  ::save-sessions
  (fn [db [_ res]]
-   ;(tap> [:res (get db :client-name) res])
+   ;(ut/tapp>> [:res (get db :client-name) res])
    (assoc db :sessions res)))
 
 (re-frame/reg-event-db
@@ -175,18 +176,18 @@
                              ;(get db :click-param)
                              (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client :solver :solver-meta nil]))])
          ]
-     ;(tap> [:pushed-snap? (get db :client-name)])
+     ;(ut/tapp>> [:pushed-snap? (get db :client-name)])
      (.then (html2canvas element)
             (fn [canvas]
               (let [dataUrl (.toDataURL canvas "image/jpeg" 0.75)]
               ;(reset! screenshot dataUrl)
                 (when (not (nil? dataUrl))
-                  ;(tap> [:push-snap? (get db :client-name)])
+                  ;(ut/tapp>> [:push-snap? (get db :client-name)])
                   (ut/tracked-dispatch [(if save? 
                                         ::http/save-screen-snap
                                         ::http/save-snap) dataUrl]))))
             (fn [error]
-              (tap> ["Error taking screenshot:" error])))
+              (ut/tapp>> ["Error taking screenshot:" error])))
 
      (when (not save?)
        (ut/tracked-dispatch [::wfx/request :default
@@ -217,7 +218,7 @@
      (and (not= session-hash (get db :session-hash))
           (not (true? (mouse-active-recently? 5)))))))
 
-;;(tap> [:screenshot @screenshot])
+;;(ut/tapp>> [:screenshot @screenshot])
 
 ;; (re-frame/reg-event-db
 ;;  ::save-screenshot
@@ -233,7 +234,7 @@
    (let [tt (get-in db [:click-param :theme])
          tt (ut/postwalk-replacer {:text :_text} tt)
          tt (resolver/logic-and-params tt nil)]
-     (tap> [:materialized-theme
+     (ut/tapp>> [:materialized-theme
             (get db :client-name)
             (ut/postwalk-replacer {:_text :text} tt)]))
    nil))
@@ -454,11 +455,11 @@
                                                       (ut/replacer (str warren-item) ":" "") "-"
                                                       (.indexOf pps pp)))))))
          signal-subs (if signals-mode? (vec (into signal-ui-refs signal-ui-part-refs)) [])
-         ;;_ (when (ut/ne? signal-subs) (tap> [:signal-subs  signal-subs]))
-        ;; _ (tap> [:signal-subs signal-subs])
+         ;;_ (when (ut/ne? signal-subs) (ut/tapp>> [:signal-subs  signal-subs]))
+        ;; _ (ut/tapp>> [:signal-subs signal-subs])
 
          theme-refs (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/") (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))]
-     ;(tap> [:flow-refs flow-refs])
+     ;(ut/tapp>> [:flow-refs flow-refs])
      ;;(vec (distinct (into signal-subs (into drop-refs (into runstream-refs (into runstreams (into theme-refs flow-refs)))))))
      (filterv 
       #(not (cstr/includes? (str %) "||")) ;; live running subs ignore
@@ -476,7 +477,7 @@
          deads (filterv #(not (cstr/includes? (str %) "||")) deads)] ;; dont mess with running-sub pseudo flows
    
     ;;  (when (ut/ne? deads) 
-    ;;    (tap> [:unsub-check (get db :client-name) {:new new :old old :deads deads}]))
+    ;;    (ut/tapp>> [:unsub-check (get db :client-name) {:new new :old old :deads deads}]))
      (ut/ne? deads))))
 
 (re-frame/reg-event-db
@@ -488,8 +489,8 @@
          old (filterv #(not (cstr/includes? (str %) "||")) old)
          deads (vec (cset/difference (set old) (set new)))
          deads (filterv #(not (cstr/includes? (str %) "||")) deads)  ;; dont mess with running-sub pseudo flows
-         _ (tap> [:flow-unsub-change! (get db :client-name) {:old old :new new :removing deads}])
-         ;;_ (tap> [:deads-exec! deads (get db :client-name)])
+         _ (ut/tapp>> [:flow-unsub-change! (get db :client-name) {:old old :new new :removing deads}])
+         ;;_ (ut/tapp>> [:deads-exec! deads (get db :client-name)])
          ]
      (doall
       (doseq [n deads]
@@ -509,7 +510,7 @@
     ;;  (when (or (= (get db :client-name) :independent-linear-swallow-39)
     ;;            ;(= (get db :client-name) :restored-gray-dove-32)
     ;;            ) 
-    ;;    (tap> [:new-flow-subs (ut/ne? (vec (cset/difference (set flow-refs) (set subbed)))) flow-refs 
+    ;;    (ut/tapp>> [:new-flow-subs (ut/ne? (vec (cset/difference (set flow-refs) (set subbed)))) flow-refs 
     ;;           (get db :flow-subs []) 
     ;;           subbed 
     ;;           (vec (cset/difference (set flow-refs) (set subbed)))]))
@@ -531,8 +532,8 @@
  (fn [db _]
    (get db :alerts)))
 
-;(tap> [:flow-refs @(ut/tracked-subscribe [::get-flow-subs])])
-;(tap> [:new-flow-refs @(ut/tracked-subscribe [::get-new-flow-subs])])
+;(ut/tapp>> [:flow-refs @(ut/tracked-subscribe [::get-flow-subs])])
+;(ut/tapp>> [:new-flow-refs @(ut/tracked-subscribe [::get-new-flow-subs])])
 
 (re-frame/reg-event-db
  ::sub-to-flows
@@ -541,7 +542,7 @@
          new @(rfa/sub ::get-new-flow-subs {})
          old (get db :flow-subs [])
          old (filterv #(not (cstr/includes? (str %) "||")) old)
-        ;;  _ (tap> [:flow-sub-change! (get db :client-name) {:old old :new new}])
+        ;;  _ (ut/tapp>> [:flow-sub-change! (get db :client-name) {:old old :new new}])
          subbed (vec (for [n new]
                        (do (ut/tracked-dispatch [::http/sub-to-flow-value n])
                            n)))]
@@ -597,7 +598,7 @@
 ;; (re-frame/reg-event-db
 ;;  ::refresh-runstreams
 ;;  (fn [db [_]]
-;;    (tap> [:tt :refresh-runstreams])
+;;    (ut/tapp>> [:tt :refresh-runstreams])
 ;;    (dissoc db :runstreams-lookups)))
 
 (re-frame/reg-event-db
@@ -612,7 +613,7 @@
  ::refresh-runstreams
  ;;(undoable)
  (fn [db _]
-   ;(tap> [:refresh-runstream-panel (keys (get db :runstreams))])
+   ;(ut/tapp>> [:refresh-runstream-panel (keys (get db :runstreams))])
    (when  (ut/ne? (keys (get db :runstreams)))
      (doseq [flow-id (keys (get db :runstreams))]
        (ut/tracked-dispatch [::wfx/request :default
@@ -681,7 +682,7 @@
          view-key     (get @db/data-browser-query panel-key)
          scrubber-on? true]                                 ; (get-in @db/scrubbers [panel-key view-key] false)
 
-      ;(tap> [:db panel-key view-key scrubber-on?])
+      ;(ut/tapp>> [:db panel-key view-key scrubber-on?])
 
      (and (true? scrubber-on?)
           (true? (some #(= % :layout)
@@ -695,7 +696,7 @@
 ;; (re-frame/reg-event-db
 ;;  ::resub!
 ;;  (fn [db _]
-;;    (tap> [:initiating-resub-for (get db :client-name)])
+;;    (ut/tapp>> [:initiating-resub-for (get db :client-name)])
 ;;    (let [client-name (get db :client-name)
 ;;          new-client-name (ut/gen-client-name) ;; (keyword (str (ut/replacer (str client-name) ":" "") "-resub*-" (rand-int 12345)))
 ;;          ]
@@ -704,11 +705,11 @@
 ;;      (ut/tracked-dispatch [::wfx/disconnect http/socket-id])
 
 ;;      (ut/tracked-dispatch [::set-client-name new-client-name]) ;; helps?
-;;      (tap> [:initiating-resub-for-new new-client-name])
+;;      (ut/tapp>> [:initiating-resub-for-new new-client-name])
 
 ;;      (ut/tracked-dispatch [::wfx/connect http/socket-id (http/options client-name)])
 ;;      (ut/tracked-dispatch [::wfx/subscribe   http/socket-id :server-push2 (http/subscription client-name)])
-;;      (tap> [:initiating-resub-for-new new-client-name :done?])
+;;      (ut/tapp>> [:initiating-resub-for-new new-client-name :done?])
 ;;      db)))
 
 ;; (re-frame/reg-sub
@@ -722,7 +723,7 @@
 ;; (re-frame.core/reg-event-fx
 ;;  ::resub!-fx ;; test fx version 2/4/24
 ;;  (fn [{:keys [db]} _]
-;;    (tap> [:initiating-resub-for (get db :client-name)])
+;;    (ut/tapp>> [:initiating-resub-for (get db :client-name)])
 ;;    (let [client-name (get db :client-name)]
 ;;      {:db db
 ;;       :dispatch-n [[::wfx/unsubscribe http/socket-id :server-push2]
@@ -737,7 +738,7 @@
 (re-frame.core/reg-event-fx
  ::save
  (fn [{:keys [db]} _]
-   ;(tap> [:saving? 1])
+   ;(ut/tapp>> [:saving? 1])
    (let [flow-id @(ut/tracked-subscribe [:rvbbit-frontend.flows/selected-flow])
          flowmaps @(ut/tracked-subscribe [:rvbbit-frontend.flows/flowmap-raw])
          flowmaps-connections @(ut/tracked-subscribe [:rvbbit-frontend.flows/flowmap-connections])
@@ -746,7 +747,7 @@
         ;;  resolved-queries (for [[qk q] (apply merge (for [[_ p] (get db :panels)] (get p :queries)))] {qk q})
          flow? (get db :flow? false)
          ttype (if flow? :flow :screen)]
-     (tap> [:saving ttype])
+     (ut/tapp>> [:saving ttype])
      (ut/tracked-dispatch [::http/insert-alert [:box :child (str "sent " (ut/replacer (str ttype) ":" "") " save request to server... Please wait.") :style {:font-size "12px" :opacity 0.66}] 11 0.5 6])
      (if flow?
        {;;:db db ;; if ommitted, it is IMPLIED that we are not modding the app-db at all (but could always mutate it here)
@@ -935,7 +936,7 @@
          curr-idx (.indexOf tabs tab-name)
          new-tabs (vec (remove #(= % tab-name) (get db :tabs)))
          new-curr (nth (cycle new-tabs) curr-idx)]
-     (tap> [:boo curr-idx new-curr])
+     (ut/tapp>> [:boo curr-idx new-curr])
      (-> db
          (assoc :tabs (vec (remove #(= % tab-name) (get db :tabs))))
          (assoc :panels (into {} (filter #(not (= tab-name (get (val %) :tab))) (get db :panels))))))))
@@ -943,7 +944,7 @@
 (re-frame/reg-event-db
  ::rename-tab
  (fn [db [_ old new]]
-    ;(tap> [:panels (update-nested-tabs (get db :panels) old new)
+    ;(ut/tapp>> [:panels (update-nested-tabs (get db :panels) old new)
     ;       (get db :tabs)
     ;       (map (fn [item] (if (= item old) new item)) (get db :tabs))])
    (-> db
@@ -1035,7 +1036,7 @@
 (re-frame/reg-event-db
  ::flow-statuses-response
  (fn [db [_ ss]]
-   ;(tap> [:flow-statuses-in ss])
+   ;(ut/tapp>> [:flow-statuses-in ss])
    (assoc db :flow-statuses ss)))
 
 (re-frame/reg-sub
@@ -1062,7 +1063,7 @@
                 (try (keyword (ut/replacer (str (first (ut/splitter (str c2) #"/"))) ":" ""))
                      (catch :default _ :error!)))
          kkey (first conn)]
-    ;;  (tap> [:condi-valve-open? flow-id condi-key kkey
+    ;;  (ut/tapp>> [:condi-valve-open? flow-id condi-key kkey
     ;;         (get-in db [:flow-results :condis flow-id kkey] false)
     ;;         ])
      (get-in db [:flow-results :condis flow-id kkey] false))))
@@ -1075,7 +1076,7 @@
 (re-frame/reg-event-db
  ::update-flow-statuses
  (fn [db [_]]
-   ;(tap> [:flow-statuses-ask (get db :client-name)])
+   ;(ut/tapp>> [:flow-statuses-ask (get db :client-name)])
    (ut/tracked-dispatch [::wfx/request :default
                        {:message {:kind         :get-flow-statuses
                                   :client-name  (get db :client-name)}
@@ -1187,7 +1188,7 @@
  ::add-board
  (undoable)
  (fn [db [_ board-map]]
-   (tap> [:board-map board-map])
+   (ut/tapp>> [:board-map board-map])
    (-> db
        (assoc-in [:click-param :param]
                  (merge
@@ -1319,7 +1320,7 @@
         ;;                                          both-maps))))
         ;;             (catch :default _ []))
          matchers (vec (map last (keys (filter #(and (or (last %) (vector? (last (first %)))) (cstr/starts-with? (str (first (first %))) (str query-key))) both-maps))))]
-     ;;;(tap> [:vbp cell-query-key query-key both-maps matchers])
+     ;;;(ut/tapp>> [:vbp cell-query-key query-key both-maps matchers])
      matchers)))
 
 (re-frame/reg-event-db
@@ -1386,7 +1387,7 @@
  ::update-workspace
  (undoable)
  (fn [db [_ keypath value]]
-   ;(tap> [:updating (cons :panels keypath) :with value])
+   ;(ut/tapp>> [:updating (cons :panels keypath) :with value])
   ;;  (-> db
   ;;      (ut/dissoc-in [:data :history-log])
   ;;      (assoc-in (cons :panels keypath) value))
@@ -1397,7 +1398,7 @@
  (undoable)
  (fn [db [_ keypath value]]
    (if (not (= (get-in db keypath) value))
-     (do ;(tap> [:updating keypath :with value])
+     (do ;(ut/tapp>> [:updating keypath :with value])
          (assoc-in db keypath value))
      db)))
 
@@ -1405,7 +1406,7 @@
  ::add-query
  (undoable)
  (fn [db [_ panel-key query-key query]]
-   (tap> [:adding-query query-key :to panel-key])
+   (ut/tapp>> [:adding-query query-key :to panel-key])
    (assoc-in db [:panels panel-key :queries query-key] query)))
 
 (re-frame/reg-event-db
@@ -1414,13 +1415,13 @@
  (fn [db [_ panel-key type body]]
    (let [name (if (= type :queries) "new-query" "new-view")
          name (ut/safe-key (keyword name))]
-     (tap> [:adding-new type :to panel-key])
+     (ut/tapp>> [:adding-new type :to panel-key])
      (assoc-in db [:panels panel-key type name] body))))
 
 (re-frame/reg-event-db
  ::update-workspace-noundo
  (fn [db [_ keypath value]]
-    ;(tap> [:updating-noundo (cons :panels keypath) :with value])
+    ;(ut/tapp>> [:updating-noundo (cons :panels keypath) :with value])
   ;;  (-> db
   ;;      (ut/dissoc-in [:data :history-log])
   ;;      (assoc-in (cons :panels keypath) value))
@@ -1430,7 +1431,7 @@
  ::update-selected
  (undoable)
  (fn [db [_ value]]
-   (tap> [:updating-selected [:panels (get db :selected-block)] :with value])
+   (ut/tapp>> [:updating-selected [:panels (get db :selected-block)] :with value])
   ;;  (-> db
   ;;      (ut/dissoc-in [:data :history-log])
   ;;      (assoc-in [:panels (get db :selected-block)] value)
@@ -1441,7 +1442,7 @@
  ::update-selected-key
  (undoable)
  (fn [db [_ key value]]
-   (tap> [:updating-selected [:panels (get db :selected-block) key] :with value])
+   (ut/tapp>> [:updating-selected [:panels (get db :selected-block) key] :with value])
    (assoc-in db [:panels (get db :selected-block) key] value)))
 
 (re-frame/reg-event-db
@@ -1449,14 +1450,14 @@
  (undoable)
  (fn [db [_ key value]]
    (let [kp (vec (into [:panels (get db :selected-block)] key))]
-     (tap> [:updating-selected2 kp :with value])
+     (ut/tapp>> [:updating-selected2 kp :with value])
      (assoc-in db kp value))))
 
 (re-frame/reg-event-db
  ::update-selected-field
  (undoable)
  (fn [db [_ kp value]]
-   (tap> [:updating-selected-field kp :with value])
+   (ut/tapp>> [:updating-selected-field kp :with value])
    (assoc-in db kp value)))
 
 (re-frame/reg-event-db
@@ -1465,7 +1466,7 @@
    (let [pp (doall (for [r (filter #(cstr/starts-with? (str %) ":reco-preview") (keys (get-in db [:panels])))] r))
          pl (keys (get db :panels))
          p0 (cset/difference (set pl) (set pp))]
-      ;(tap> p0)
+      ;(ut/tapp>> p0)
       ;(doseq [p pp] (ut/dissoc-in db p))
      (assoc db :panels (select-keys (get db :panels) p0)))))
 
@@ -1619,7 +1620,7 @@
  ::change-drop-type                                        ;; experiment
   ;(undoable)
  (fn [db]
-   (tap> [::change-drop-type])
+   (ut/tapp>> [::change-drop-type])
    (assoc db :drop-type (rand-int 99))))
 
 (re-frame/reg-sub
@@ -1681,14 +1682,14 @@
  ::add-runstream
  (undoable)
  (fn [db [_ flow-id]]
-   (tap> [:adding-flow-id-to-runstream flow-id (get db :client-name)])
+   (ut/tapp>> [:adding-flow-id-to-runstream flow-id (get db :client-name)])
    (assoc-in db [:runstreams flow-id] {:open? true})))
 
 (re-frame/reg-event-db
  ::remove-runstream
  (undoable)
  (fn [db [_ flow-id]]
-   (tap> [:removing-flow-id-from-runstream flow-id (get db :client-name)])
+   (ut/tapp>> [:removing-flow-id-from-runstream flow-id (get db :client-name)])
    (ut/dissoc-in db [:runstreams flow-id])))
 
 (re-frame/reg-sub
@@ -1704,7 +1705,7 @@
          runstreams @(rfa/sub ::runstreams {})]
          ;runstreams (vec (filter #(get % :run-on-change?) runstreams))
 
-     ;(tap> [:rs-list? runstreams])
+     ;(ut/tapp>> [:rs-list? runstreams])
          ;runstream-keys (vec (map :flow-id runstreams))
          ;runstreams-lookups @(ut/tracked-subscribe [::bricks/runstreams-lookups])
      (into {}
@@ -1767,7 +1768,7 @@
            col-mode?    (true? (not (nil? curr-field)))
            x            (get-in db [:panels panel-id :root 0])
            y            (get-in db [:panels panel-id :root 1])]
-      ;(tap> [:move col-mode? panel-id curr-field sel-col (= (safe-nth sel-col 0) panel-id)  (safe-nth sel-col 1) query-key])
+      ;(ut/tapp>> [:move col-mode? panel-id curr-field sel-col (= (safe-nth sel-col 0) panel-id)  (safe-nth sel-col 1) query-key])
        (if col-mode?
          (let [modfields          (get db :col-names)
                modfields?         (not (nil? modfields))
@@ -1851,7 +1852,7 @@
  ::select-block
   ;(undoable)
  (fn [db [_ block-key]]
-   (tap> [:selecting-block block-key])
+   (ut/tapp>> [:selecting-block block-key])
    (-> db                                                  ;; plus reset selected cols, just in case... (would cause user confusion possibly)
        (assoc :selected-block block-key)
        (assoc-in [:click-param :param :selected-block] block-key)
@@ -1886,7 +1887,7 @@
              selected-panel (get db :selected-flow-block)
              panel-idx      (.indexOf panel-keys selected-panel)
              next-panel     (nth (cycle panel-keys) (+ panel-idx 1))]
-         (tap> [:next-flow-block :from selected-panel :to next-panel])
+         (ut/tapp>> [:next-flow-block :from selected-panel :to next-panel])
         ;;  (-> db
         ;;      ;(assoc-in [:click-param :param :selected-block] next-panel)
         ;;      (assoc :selected-block next-panel))
@@ -1905,7 +1906,7 @@
              selected-panel (get db :selected-block)
              panel-idx      (.indexOf panel-keys selected-panel)
              next-panel     (nth (cycle panel-keys) (+ panel-idx 1))]
-        ;;  (tap> [:next-panel :from selected-panel :to next-panel])
+        ;;  (ut/tapp>> [:next-panel :from selected-panel :to next-panel])
          (-> db
              (assoc-in [:click-param :param :selected-block] next-panel)
              (assoc :selected-block next-panel)))))))
@@ -2008,7 +2009,7 @@
   (fn [evt]
     (let [start-x       (.-clientX evt)
           start-y       (.-clientY evt)
-          ;_ (tap> [:move block tab-offset])
+          ;_ (ut/tapp>> [:move block tab-offset])
           ;block         @(ut/tracked-subscribe [::selected-block])
           selected-root @(ut/tracked-subscribe [::root block]) ;;[-1 -1] ; @(ut/tracked-subscribe [::selected-root])
           off-x         (:x offset)
@@ -2028,7 +2029,7 @@
                             curr-tab @(ut/tracked-subscribe [::selected-tab])
                             tab-over (or (first (is-inside? [x1 y1] containers)) curr-tab)
                             base-tab? (= curr-tab tab-over)]
-                        ;;(tap> [:containers  started-in-container? base-tab? tab-over x y x1 y1])
+                        ;;(ut/tapp>> [:containers  started-in-container? base-tab? tab-over x y x1 y1])
                         (cond
                           (and started-in-container? (not base-tab?))  [x1 y1 tab-over]
                           (and started-in-container? base-tab?) (let [[offx offy] (for [[x y w h [t]] containers
@@ -2039,9 +2040,9 @@
                           ;;                                         :when (= t tab-over)] [x y])]
                           ;;                                         [(- x1 offx) (- y1 offy) tab-over])
                           :else [x y tab-over])))]
-        ;; _ (tap> [:in-container translate])
+        ;; _ (ut/tapp>> [:in-container translate])
 
-      ;(tap> [shift? x y])
+      ;(ut/tapp>> [shift? x y])
       (when (not (= selected-root [x y]))
         (if (and icon? translate)
           (do (when (not (= @dragging-block block)) (reset! dragging-block block))
@@ -2085,7 +2086,7 @@
        (not= n (js/Math.floor n))))
 
 (defn insert-new-block [root width height & body]
- ; (tap> [:insert?])
+ ; (ut/tapp>> [:insert?])
   (when (not @over-flow?)
     (let [new-key        (str "block-" (rand-int 12345))
           req-block-name (get-in (first body) [:drag-meta :block-name])
@@ -2168,11 +2169,11 @@
                                       ;:stack [:layout {:panels {:hello-there {:h 0.99 :w 0.99 :root [0 0]}}}]
                                       }
                             :queries {}})]
-    ;(tap> [:param-drop @(ut/tracked-subscribe [::conn/clicked-parameter [(get-in (first body) [:drag-meta :param-table]) (get-in (first body) [:drag-meta :param-field])]])])
-    ;(tap> [:param-drop (first body)])
+    ;(ut/tapp>> [:param-drop @(ut/tracked-subscribe [::conn/clicked-parameter [(get-in (first body) [:drag-meta :param-table]) (get-in (first body) [:drag-meta :param-field])]])])
+    ;(ut/tapp>> [:param-drop (first body)])
     ;(when (and (not (nil? root)) (not (nil? height)) (nil? @dyn-dropper-hover)
     ;           (not (nil? width)) (>= height 2) (>= width 2))
-      ;;(tap> [:insert? [new-keyw] base-map])
+      ;;(ut/tapp>> [:insert? [new-keyw] base-map])
       (ut/tracked-dispatch [::update-workspace [new-keyw] base-map])
     ;  )
       (reset! hover-square nil))))
@@ -2258,8 +2259,8 @@
                         (assoc base-map :conditionals (read-string condis)))
         base-map    (ut/postwalk-replacer condi-walks base-map)
         base-map    (if (not single?) (ut/postwalk-replacer queriesrep base-map) base-map)]
-    ;(tap> [:insert-test panel? combohash selected-view h w viz query queries (when (not single?) queriesrep)])
-    ;(tap> [:insert-condis condis :condi-keys condi-keys :condi-walks condi-walks])
+    ;(ut/tapp>> [:insert-test panel? combohash selected-view h w viz query queries (when (not single?) queriesrep)])
+    ;(ut/tapp>> [:insert-condis condis :condi-keys condi-keys :condi-walks condi-walks])
     ;(when (and (not (nil? root)) (not (nil? height)) (nil? @dyn-dropper-hover)
     ;           (not (nil? width)) (>= height 2) (>= width 2))
     (ut/tracked-dispatch [::update-workspace-noundo [new-keyw] base-map])))
@@ -2270,12 +2271,12 @@
   [(reagent/adapt-react-class rdnd/Draggable)
    {:type          type
     ;:on-drag #(tag-screen-position %)
-    ;:on-drag #(tap> [(.-clientX %) (.-clientY %)])
+    ;:on-drag #(ut/tapp>> [(.-clientX %) (.-clientY %)])
     :on-drag-end   #(do (reset! dragging? false)
                         (reset! dyn-dropper-hover false)
                         (reset! dragging-size [0 0])
                         ;(reset! on-block? false)
-                        ;(tap> [(.-clientX %) (.-clientY %)])
+                        ;(ut/tapp>> [(.-clientX %) (.-clientY %)])
                         ; (tag-screen-position %)
                         (reset! dragging-body false))
     :on-drag-start #(do (reset! dragging? true)
@@ -2289,22 +2290,22 @@
   [re-com/box :size "auto" :child element ])
 
 (defn droppable [types-vec root element]
-  ;(tap> [:dropped? types-vec @dragging-body root])
+  ;(ut/tapp>> [:dropped? types-vec @dragging-body root])
   (if true ;(not @over-flow?) ;; dont trigger if we are cross breeding from flow canvas to prezi canvas
     [(reagent/adapt-react-class rdnd/Droppable)
      {:types   types-vec
       ;:on-drag #(tag-screen-position %)
-      ;:on-drag-enter #(tap> [:entered-outside?])
-      ;:on-drag-over #(tap> [:enter-base-canvas-droppable @over-flow?])
+      ;:on-drag-enter #(ut/tapp>> [:entered-outside?])
+      ;:on-drag-over #(ut/tapp>> [:enter-base-canvas-droppable @over-flow?])
       :on-drop #(let [incoming    (js->clj %)
-                      _ (tap> [:incoming incoming @dragging-body])
-                      ;_ (tap> [:start? types-vec (last (last incoming)) (map? (last (last incoming))) (try (read-string (last (last incoming))) (catch :default e (str e)))])
+                      _ (ut/tapp>> [:incoming incoming @dragging-body])
+                      ;_ (ut/tapp>> [:start? types-vec (last (last incoming)) (map? (last (last incoming))) (try (read-string (last (last incoming))) (catch :default e (str e)))])
                       data        (read-string (last (last incoming)))
                       data        (ut/postwalk-replacer {:reagent-gt :>} data) ;; unfuck "invalid EDN" reagent keywords....
                       type        (first (first incoming))
                       rooted-data (assoc data :root root)
                       dm-type     (get-in rooted-data [:drag-meta :type])
-                      ;;_ (tap> [:drop-data rooted-data])
+                      ;;_ (ut/tapp>> [:drop-data rooted-data])
                       ;new-key (str "block-" (rand-int 12345))
                       ;new-keyw (keyword new-key)
                       ok-new?     (or
@@ -2312,13 +2313,13 @@
                                         (or (false? @dyn-dropper-hover)
                                             (nil? @dyn-dropper-hover)))
                                    (= dm-type :viz-reco))]
-                  ;(tap> :sofar?)
+                  ;(ut/tapp>> :sofar?)
 
                   (when (= dm-type :viz-reco)
                     (let [cc          @(ut/tracked-subscribe [::conn/clicked-parameter [:recos-sys]])
                           combo-keys  (select-keys cc [:context_hash :combo_hash])
                           client-name @(ut/tracked-subscribe [::conn/client-name])]
-                      (tap> [:dropped-viz-reco! data combo-keys cc])
+                      (ut/tapp>> [:dropped-viz-reco! data combo-keys cc])
                       (ut/tracked-dispatch [::wfx/request :default
                                           {:message {:kind         :selected-reco
                                                      :dm-type      :viz-reco
@@ -2332,7 +2333,7 @@
                           ;combo-keys (select-keys cc [:context_hash :combo_hash])
                           cc          (get rooted-data :drag-meta)
                           client-name @(ut/tracked-subscribe [::conn/client-name])]
-                      (tap> [:dropped-field-usage data cc cc])
+                      (ut/tapp>> [:dropped-field-usage data cc cc])
                       (ut/tracked-dispatch [::wfx/request :default
                                           {:message {:kind        :selected-reco
                                                      :dm-type     :meta-fields
@@ -2342,7 +2343,7 @@
                                                      :client-name client-name}
                                            :timeout 50000}])))
 
-                  (tap> [:dropped type :ok-new? :drag-meta-type dm-type [@on-block? @dyn-dropper-hover] ok-new? rooted-data root])
+                  (ut/tapp>> [:dropped type :ok-new? :drag-meta-type dm-type [@on-block? @dyn-dropper-hover] ok-new? rooted-data root])
                   (reset! dragging? false)
                   (cond
                     (= dm-type :meta-screens)
@@ -2484,7 +2485,7 @@
         mm      (do (doall (for [[k v] users] (swap! cheater assoc (first v) (flatten (conj (get @cheater (first v)) k)))))
                     (ut/postwalk-replacer (dissoc @cheater nil) subq-map))
         mm2     (into {} (for [[k {:keys [uses produces]}] mm] {k {:uses (flatten uses) :produces (flatten produces)}}))]
-    ;(tap> [:subq-map subq-map :users users :all-users2 @cheater :mm mm  :mm2 mm2])
+    ;(ut/tapp>> [:subq-map subq-map :users users :all-users2 @cheater :mm mm  :mm2 mm2])
 
     ; (defn ww2 [id x]
     ;   (let [;iid (try (first (get-in mm2 [id :produces])) (catch :default e nil))
@@ -2507,7 +2508,7 @@
           ;; code (ut/format-map 640 ;; 539 ;;(- 634.4 95) 
           ;;                     (str code))
           code (str code)
-          _ (tap> [:highlighted-code-panel-code-box code])]
+          _ (ut/tapp>> [:highlighted-code-panel-code-box code])]
       ;; Clear existing markers
       (doseq [marker @markers-panel-code-box]
         (.clear marker))
@@ -2530,7 +2531,7 @@
                                 #js {:line start-line, :ch start-ch}
                                 #js {:line end-line, :ch end-ch}
                                 #js {:css (str "filter: invert(233%); color: white; font-weight: 700; background-color: teal; font-size: 15px;")})
-                     (catch :default e (tap> [:marker-error (str e)])))]
+                     (catch :default e (ut/tapp>> [:marker-error (str e)])))]
         (swap! markers-panel-code-box conj marker)))))
 
 ;; (defn highlight-codes [codes css]
@@ -2543,7 +2544,7 @@
 ;;         (reset! markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
-;;                 _ (tap> [:highlighted-code-panel-code-box code])
+;;                 _ (ut/tapp>> [:highlighted-code-panel-code-box code])
 ;;                 code-lines (clojure.string/split-lines code)
 ;;                 start-line (loop [line 0]
 ;;                              (when (< line (.lineCount doc))
@@ -2562,7 +2563,7 @@
 ;;                                     #js {:line start-line, :ch start-ch}
 ;;                                     #js {:line end-line, :ch end-ch}
 ;;                                     #js {:css css-string})
-;;                          (catch :default e (tap> [:marker-error (str e)])))]
+;;                          (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;             (swap! markers-panel-code-box conj marker)))))))
 
 ;; (defn highlight-codes-only [codes css]
@@ -2575,7 +2576,7 @@
 ;;         (reset! markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
-;;                 _ (tap> [:highlighted-code-panel-code-box code])
+;;                 _ (ut/tapp>> [:highlighted-code-panel-code-box code])
 ;;                 code-lines (clojure.string/split-lines code)
 ;;                 start-line (loop [line 0]
 ;;                              (when (< line (.lineCount doc))
@@ -2597,13 +2598,13 @@
 ;;                                       #js {:line start-line, :ch start-ch}
 ;;                                       #js {:line end-line, :ch end-ch}
 ;;                                       #js {:replacedWith node}))
-;;                          (catch :default e (tap> [:marker-error (str e)])))]
+;;                          (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;             (swap! markers-panel-code-box conj marker)))))))
 
 
 
 ;; (defn highlight-codes-only [codes css hiccup-fn]
-;;   (tap> [:highlight-codes-only [codes css hiccup-fn]])
+;;   (ut/tapp>> [:highlight-codes-only [codes css hiccup-fn]])
 ;;   (let [css-string (ut/hiccup-css-to-string css)]
 ;;     (when-let [editor @cm-instance-panel-code-box]
 ;;       (let [doc (.getDoc editor)]
@@ -2613,7 +2614,7 @@
 ;;         (reset! markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
-;;                 ;_ (tap> [:highlighted-code-panel-code-box code])
+;;                 ;_ (ut/tapp>> [:highlighted-code-panel-code-box code])
 ;;                 code-lines (clojure.string/split-lines code)
 ;;                 start-line (loop [line 0]
 ;;                              (when (< line (.lineCount doc))
@@ -2649,13 +2650,13 @@
 ;;                                       #js {:line start-line, :ch start-ch}
 ;;                                       #js {:line end-line, :ch end-ch}
 ;;                                       #js {:replacedWith node}))
-;;                          (catch :default e (tap> [:marker-error (str e)])))]
+;;                          (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;             (swap! markers-panel-code-box conj marker)))))))
 
 (def widget (atom nil))
 
 ;; (defn highlight-codes-only [codes css hiccup-fn] ;; full note
-;;   ;; (tap> [:highlight-codes-only [codes css hiccup-fn]])
+;;   ;; (ut/tapp>> [:highlight-codes-only [codes css hiccup-fn]])
 ;;   (let [css-string (ut/hiccup-css-to-string css)]
 ;;     (when-let [editor @cm-instance-panel-code-box]
 ;;       (let [doc (.getDoc editor)]
@@ -2699,7 +2700,7 @@
 ;;                                               #js {:line start-line, :ch start-ch}
 ;;                                               #js {:line end-line, :ch end-ch}
 ;;                                               #js {:replacedWith node}))
-;;                                  (catch :default e (tap> [:marker-error (str e)])))]
+;;                                  (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;                     (swap! markers-panel-code-box conj marker)))
 ;;                 (recur (inc line))))))))))
 
@@ -2726,7 +2727,7 @@
 ;;                         code-parts (let [ff (vec (clojure.string/split code #"/"))
 ;;                                          vv (vec (clojure.string/split (get ff 1) #">"))
 ;;                                          cc (vec (into [(first ff)] vv))] cc)
-;;                   ;;  _ (tap> [:code code :code-parts code-parts])
+;;                   ;;  _ (ut/tapp>> [:code code :code-parts code-parts])
 ;;                         ]
 ;;                     (loop [code-parts code-parts
 ;;                            start-ch 0]
@@ -2742,7 +2743,7 @@
 ;;                                          (.addEventListener node "mouseover" (fn []
 ;;                                                                                (when-not @widget
 ;;                                                                                  (let [react-element (reagent/as-element (hiccup-fn code))] ;; Pass the original code to hiccup-fn
-;;                                                                                    (tap> [:hover code code-part])
+;;                                                                                    (ut/tapp>> [:hover code code-part])
 ;;                                                                                    (rdom/render react-element widget-node)
 ;;                                                                                    (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))}))))))  ;; Render widget above if on last line
 ;;                                          (.addEventListener node "mouseout" (fn []
@@ -2757,7 +2758,7 @@
 ;;                                                     #js {:line start-line, :ch start-ch}
 ;;                                                     #js {:line end-line, :ch end-ch}
 ;;                                                     #js {:replacedWith node}))
-;;                                        (catch :default e (tap> [:marker-error (str e)])))]
+;;                                        (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;                           (when (clojure.string/includes? (.getLine doc start-line) code-part) ;; Check if the entire code-part is present in the line
 ;;                             (swap! markers-panel-code-box conj marker))
 ;;                           (recur (rest code-parts) end-ch)))))) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
@@ -2789,7 +2790,7 @@
 ;;                                          vv (vec (clojure.string/split (get ff 1) #">"))
 ;;                                          cc (vec (into [(first ff)] vv))] cc)
 ;;                         full-code-parts code-parts
-;;                   ;;  _ (tap> [:code code :code-parts code-parts])
+;;                   ;;  _ (ut/tapp>> [:code code :code-parts code-parts])
 ;;                         ]
 ;; (loop [code-parts code-parts
 ;;        start-ch 0
@@ -2814,7 +2815,7 @@
 ;;                      (.addEventListener node "mouseover" (fn []
 ;;                                                            (when-not @widget
 ;;                                                              (let [react-element (reagent/as-element (hiccup-fn code))] ;; Pass the original code to hiccup-fn
-;;                                                                ;;(tap> [:hover code code-part])
+;;                                                                ;;(ut/tapp>> [:hover code code-part])
 ;;                                                                (rdom/render react-element widget-node)
 ;;                                                                (reset! widget (.addLineWidget doc end-line widget-node #js {:above (= end-line (dec (.lineCount doc)))}))))))  ;; Render widget above if on last line
 ;;                      (.addEventListener node "mouseout" (fn []
@@ -2829,7 +2830,7 @@
 ;;                                 #js {:line start-line, :ch start-ch}
 ;;                                 #js {:line end-line, :ch end-ch}
 ;;                                 #js {:replacedWith node}))
-;;                    (catch :default e (tap> [:marker-error (str e)])))]
+;;                    (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;       (when (clojure.string/includes? (.getLine doc start-line) code-part) ;; Check if the entire code-part is present in the line
 ;;         (swap! markers-panel-code-box conj marker))
 ;;       (recur (rest code-parts) end-ch code-part-start-ch code-part-end-ch)))) ;; Recur with the rest of the code parts, the end character of the current part as the start character for the next part, and the start and end characters of the first and last segments
@@ -2898,7 +2899,7 @@
 ;;                                                     #js {:line start-line, :ch start-ch}
 ;;                                                     #js {:line end-line, :ch end-ch}
 ;;                                                     #js {:replacedWith node}))
-;;                                        (catch :default e (tap> [:marker-error (str e)])))]
+;;                                        (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;                           (when (clojure.string/includes? (.getLine doc start-line) code-part)
 ;;                             (swap! markers-panel-code-box conj marker))
 ;;                           (recur (rest code-parts) end-ch)))))) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
@@ -2967,7 +2968,7 @@
                                                                                       psplit      (ut/splitter (ut/safe-name (str code)) "/")
                                                                                       table       (-> (first psplit) (ut/replacer  #":" "") (ut/replacer  ".*" "") keyword)
                                                                                       field       (keyword (last psplit))]
-                                                                                  ;; (tap> [:hh2 [full-code-parts code table field]])
+                                                                                  ;; (ut/tapp>> [:hh2 [full-code-parts code table field]])
                                                                                   (reset! param-hover [code table field]))))
                                          (.addEventListener node "mouseout" (fn []
                                                                               (reset! param-hover nil)))
@@ -2977,7 +2978,7 @@
                                                     #js {:line start-line, :ch start-ch}
                                                     #js {:line end-line, :ch end-ch}
                                                     #js {:replacedWith node}))
-                                       (catch :default e (tap> [:marker-error (str e)])))]
+                                       (catch :default e (ut/tapp>> [:marker-error (str e)])))]
                           (when (clojure.string/includes? (.getLine doc start-line) code-part)
                             (swap! markers-panel-code-box conj marker))
                           (recur (rest code-parts) end-ch)))))) 
@@ -3041,7 +3042,7 @@
 ;; (defn custom-hint-fn [cm options]
 ;;   (let [cursor (.-doc cm) ;; Get the current cursor position
 ;;         token (.getRange cursor (.getCursor cursor) (.getCursor cursor "end"))] ;; Get the current token
-;;     (tap> ["Current token:" token]) ;; Optional: for debugging
+;;     (ut/tapp>> ["Current token:" token]) ;; Optional: for debugging
 ;;     ;; Define your list of suggestions here
 ;;     (let [list [":keyword1" ":k!" ":keyword2" ":keyword44"]]
 ;;       ;; Return a hint object expected by CodeMirror
@@ -3052,7 +3053,7 @@
 ;; (defn custom-hint-fn [cm options]
 ;;   (let [;cursor (.-doc cm)
 ;;         token (.getTokenAt cm (.getCursor cm) "end")]
-;;     (tap> ["Current token:" (.-string token)]) ;; Debugging
+;;     (ut/tapp>> ["Current token:" (.-string token)]) ;; Debugging
 ;;     ;; Define your list of suggestions here
 ;;     (let [input (.-string token)
 ;;           list [":keyword1" ":k!" ":keyword2" ":keyword44" ":kiwi/farts" ":liwi/limes"]
@@ -3087,7 +3088,7 @@
           next-line-string (if (< line (dec (.lineCount cm))) (.getLine cm (inc line)) "")
           big-line-string (str prev-line-string " " line-string " " next-line-string)]
       [token big-line-string])
-    (catch :default e (tap> [:err (str e)]))))
+    (catch :default e (ut/tapp>> [:err (str e)]))))
 
 ;; (defn autocomplete-suggestions
 ;;   [input all-keywords]
@@ -3206,7 +3207,7 @@
 ;;                "autocomplete-suggestions-atom" (benchmark autocomplete-suggestions arg-pairs2)
 ;;                ;;"autocomplete-suggestions-atomb" (benchmark autocomplete-suggestionsb arg-pairs2)
 ;;                }]
-;;   (tap> [client-name (vec (sort-by val results))]))
+;;   (ut/tapp>> [client-name (vec (sort-by val results))]))
 
 
 
@@ -3316,7 +3317,7 @@
 ;;    ":flow/colors-of-the-moment-solver-flow--36>convert-to-png"
 ;;    ":flow/colors-of-the-moment-solver-flow--36>done"])
 
-;; (tap> [:autocomplete-test! (into {}
+;; (ut/tapp>> [:autocomplete-test! (into {}
 ;;                                 (for [ss [":flow/colors-of-the-moment-solver-flow--36>"
 ;;                                           ":flow/colors-of-the-moment-solver-flow--44>shell-command-in"
 ;;                                           ":flow/colors-of-the-moment-solver-flow--44>shell-command-in>"
@@ -3336,7 +3337,7 @@
          part-kp @(ut/tracked-sub ::editor-panel-selected-view {})
          view-code-hash (hash [(get-in db [:panels (get db :selected-block)])  part-kp])
          old-view-code-hash @last-view-highlighted-hash]
-    ;;  (tap> [:runhighlioght? (and editor? (not= view-code-hash old-view-code-hash))])
+    ;;  (ut/tapp>> [:runhighlioght? (and editor? (not= view-code-hash old-view-code-hash))])
      (and editor? (not= view-code-hash old-view-code-hash))
      ;;true
      )))
@@ -3345,12 +3346,12 @@
 (defn custom-hint-simple-fn [cm input-token]
   (let [cursor (.getCursor cm)
         token (.getTokenAt cm cursor)]
-    ;(tap> ["Current token:" (.-string token) ":input token:" input-token]) ;; Debugging
+    ;(ut/tapp>> ["Current token:" (.-string token) ":input token:" input-token]) ;; Debugging
     ;; Define your list of suggestions here
     (let [input (.-string token) ;;(or input-token (.-string token))
           input (if (string? input-token) input-token input)
           ;surrounds (get-surrounding-tokens cm cursor token)
-          ;_ (tap> [:surrounds-simp surrounds])
+          ;_ (ut/tapp>> [:surrounds-simp surrounds])
           list @db/autocomplete-keywords ;;(vec (map str @(rfa/sub ::parameters-available {})))
           ;list [":keyword1" ":k!" ":keyword2" ":keyword44" ":kiwi/farts" ":liwi/limes"]
           ;filtered-list (sort (filter #(clojure.string/starts-with? % input) list)) ;; Dynamic filtering
@@ -3366,12 +3367,12 @@
         token (.getTokenAt cm cursor)
         input (if (string? input-token) input-token (.-string token)) ;; Use input-token if it's a string, otherwise use the current token
         ;surrounds (get-surrounding-tokens cm cursor input-token)
-        ;_ (tap> [:surrounds surrounds])
+        ;_ (ut/tapp>> [:surrounds surrounds])
         list @db/autocomplete-keywords ;; (vec (map str @(rfa/sub ::parameters-available {})))
         ;;filtered-list (sort (filter #(clojure.string/starts-with? % input) list))] ;; Filter the list with the input
         filtered-list (sort (autocomplete-suggestions input list))
   ]
-         ;(tap> [:custom-hint-called input-token start-line start-ch end-ch])
+         ;(ut/tapp>> [:custom-hint-called input-token start-line start-ch end-ch])
     ;; Return a hint object expected by CodeMirror
     (clj->js {:list filtered-list
               :from cursor
@@ -3393,7 +3394,7 @@
   
   (let [list @db/autocomplete-keywords ;;(vec (map str @(rfa/sub ::parameters-available {})))
         can? (ut/ne? (filter #(clojure.string/starts-with? % token-string) list))
-        _ (tap> [:can-be-autocompleted? can? token-string])
+        _ (ut/tapp>> [:can-be-autocompleted? can? token-string])
         ]
     ;;(contains? list token-string)
     can?
@@ -3419,7 +3420,7 @@
         key selected-kp
         font-size (if (nil? key) 13 17)
         code-width (if (nil? key) (- width-int 24) (- width-int 130))]
-    ;(tap> [:code-panel key selected-kp])
+    ;(ut/tapp>> [:code-panel key selected-kp])
     [re-com/box
      :size "none"
      :width (px (- width-int 24))
@@ -3460,18 +3461,18 @@
                                   (ut/tracked-dispatch-sync [::update-selected-key-cons key parse]))
                                 (ut/dispatch-delay [::highlight-panel-code] 200))))
               :onInputRead (fn [cm]
-                             ;(tap> "onInputRead called")
+                             ;(ut/tapp>> "onInputRead called")
                              (let [cursor (.getCursor cm)
                                    token (.getTokenAt cm cursor)
                                    token-string (.-string token)
                                    token-end (= (.-ch cursor) (.-end token))]
-                               ;(tap> [:cc token-string])
+                               ;(ut/tapp>> [:cc token-string])
                                (when (or (= token-string ":")
                                          (and token-end 
                                               (can-be-autocompleted? token-string)
                                               ;true
                                               ))
-                                 ;(tap> [:hit-auto?])
+                                 ;(ut/tapp>> [:hit-auto?])
                                  (js/setTimeout (fn []
                                                   (.execCommand cm "autocomplete")) 0))))
               :options {:mode              (if sql-hint? "sql" "clojure")
@@ -3559,7 +3560,7 @@
      (reset! last-view-highlighted-hash view-code-hash)
 
     ;;  (when (cstr/includes? (str (get db :client-name)) "-short-") 
-    ;;    (tap> [:highlight-panel-code!! (get db :client-name) view-code-hash]))
+    ;;    (ut/tapp>> [:highlight-panel-code!! (get db :client-name) view-code-hash]))
 
      (if (not value-spy?)
        (highlight-codes-only codes {;:color "white" 
@@ -3610,7 +3611,7 @@
               :onBlur #(let [rr (ut/cm-deep-values %)
                              rrd (try (read-string (cstr/join " " rr))
                                       (catch :default _ (pr-str (cstr/join "\n" rr))))]
-                         (tap> [:open-input stringify? kp rr rrd value])
+                         (ut/tapp>> [:open-input stringify? kp rr rrd value])
                          (if stringify?
                            (when (not= value rr) (ut/tracked-dispatch [::conn/click-parameter kp rr]))
                            (ut/tracked-dispatch [::conn/click-parameter kp rrd])))
@@ -3823,7 +3824,7 @@
          table     (keyword (ut/replacer (first psplit) #":" ""))
          field     (keyword (last psplit))
          fmetadata (get-in db [:meta table :fields field])]
-      ;(tap> [:meta-lkup table field fmetadata])
+      ;(ut/tapp>> [:meta-lkup table field fmetadata])
      (cond
        (= table :condi)                                    ;; condis are special
        {:data-type (ut/data-typer                          ;; todo: change this hardcoding when we move to global calcs
@@ -3854,7 +3855,7 @@
    (let [part-kp @(ut/tracked-sub ::editor-panel-selected-view {})
          panel (get-in db (vec (into [:panels (get db :selected-block)] (vec part-kp))))
          parts (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten panel)))
-         ;;_ (tap> [:pp parts])
+         ;;_ (ut/tapp>> [:pp parts])
          ]
      parts)))
 
@@ -3888,7 +3889,7 @@
 
     
 
-   ;; (tap> [current-tab-queries click-params])
+   ;; (ut/tapp>> [current-tab-queries click-params])
 
     (if false ;@db/param-code-hover
       
@@ -4020,15 +4021,15 @@
                                  filtered-params (if @db/cm-focused?
                                                    (select-keys grp clover-params)
                                                    filtered-params)
-                                ;;  _ (tap> [:wtf (if @db/cm-focused?
+                                ;;  _ (ut/tapp>> [:wtf (if @db/cm-focused?
                                 ;;                  (select-keys (apply concat click-params) (keys clover-params))
                                 ;;                  filtered-params)])
-                                ;;  _ (tap> [:grp clover-params grp])
+                                ;;  _ (ut/tapp>> [:grp clover-params grp])
 
 
 
                                  is-not-empty?   (ut/ne? (remove empty? filtered-params))]
-                           ;(tap> [filtered-params (empty? (remove empty? filtered-params)) (into {} filtered-params)])
+                           ;(ut/tapp>> [filtered-params (empty? (remove empty? filtered-params)) (into {} filtered-params)])
                              (when is-not-empty?
                                [re-com/v-box
                               ;:gap "1px"
@@ -4075,8 +4076,8 @@
                                             ;;               "**huge base64 string**"
                                             ;;               param-value)
 
-                                            ;(tap> [:param-table table])
-                                            ;(tap> @param-hover)
+                                            ;(ut/tapp>> [:param-table table])
+                                            ;(ut/tapp>> @param-hover)
 
 ;[re-com/box :size "auto"  ;;; 26
                                             ;:child
@@ -4205,7 +4206,7 @@
                                upstream?           (some #(= % query-panel) (upstream-search subq-mapping selected-block))
                                downstream?         (some #(= % query-panel) (downstream-search subq-mapping selected-block))
                                selected?           @(ut/tracked-subscribe [::has-query? selected-block k])]
-                           ;(tap> @param-hover)
+                           ;(ut/tapp>> @param-hover)
                            [re-com/v-box
                             :attr {:on-mouse-enter #(reset! query-hover k)
                                    :on-mouse-leave #(reset! query-hover nil)
@@ -4280,7 +4281,7 @@
        ; queries queries-in-this-tab ;; TODO clean up, incoming queries is unneeded here, we got a local sub
         blocks (map keyword @(ut/tracked-sub ::current-tab-blocks {}))]
 
-    ;(tap> ph)
+    ;(ut/tapp>> ph)
     [re-com/box
      :size "none"
      ;:width (px (- width-int 24))
@@ -4316,7 +4317,7 @@
                                upstream?           (some #(= % query-panel) (upstream-search subq-mapping selected-block))
                                downstream?         (some #(= % query-panel) (downstream-search subq-mapping selected-block))
                                selected?           @(ut/tracked-subscribe [::has-query? selected-block k])]
-                           ;(tap> @param-hover)
+                           ;(ut/tapp>> @param-hover)
                            [re-com/v-box
                             :attr {:on-mouse-enter #(reset! query-hover k)
                                    :on-mouse-leave #(reset! query-hover nil)
@@ -4428,7 +4429,7 @@
         new-flow-map (when flow-item? (let [pval @(ut/tracked-subscribe [::conn/clicked-parameter [:flow-fn-sys]])
                                             modded (conn/spawn-open-input-block pval)
                                             body (get modded 2)]
-                                        ;(tap> [:new-flow-map-on-old modded])
+                                        ;(ut/tapp>> [:new-flow-map-on-old modded])
                                         body))
         flow-item            (when flow-item? (try (merge
                                                                                (-> (edn/read-string
@@ -4439,7 +4440,7 @@
                                                                                selected-field)
                                                                               (catch :default _ {})))
        ; flow-item (if (= (get flow-item :type) :open-fn) (assoc flow-item :raw-fn (get flow-item :fn)) flow-item)
-       ; _ (tap> [:building-flow-item selected-field (-> (edn/read-string
+       ; _ (ut/tapp>> [:building-flow-item selected-field (-> (edn/read-string
        ;                                                  (get selected-field :full_map))
        ;                                                 (dissoc :view) (dissoc :fn)) flow-item])
         sql-name             (keyword sql-name-base)
@@ -4574,9 +4575,9 @@
 ;;                                                            vs   (ut/splitter vv "/")
 ;;                                                            qstr (ut/safe-name (first (ut/postwalk-replacer key-walk [(keyword (first vs))])))
 ;;                                                            vstr (last vs)]
-;;                                                        (tap> [:value-walk vv vs qstr vstr v (keyword (str qstr "/" vstr))])
+;;                                                        (ut/tapp>> [:value-walk vv vs qstr vstr v (keyword (str qstr "/" vstr))])
 ;;                                                        {v (keyword (str qstr "/" vstr))})))]
-;;               ;(tap> [:poss-value-walks poss-value-walks :key-walk key-walk :value-walk value-walk])
+;;               ;(ut/tapp>> [:poss-value-walks poss-value-walks :key-walk key-walk :value-walk value-walk])
 ;;   (merge (ut/postwalk-replacer (merge key-walk value-walk)
 ;;                                 ddata)
 ;;          {;:mad-libs-viz []
@@ -4670,7 +4671,7 @@
                                                          ; (keyword (str field-name "_avg"))]
 
                                                 :from   [(keyword qual-table-name)]}}}]
-    ;(tap> [:builder-fields selected-fields])
+    ;(ut/tapp>> [:builder-fields selected-fields])
     (cond
       (= type :viz-reco) (let [;; we need to change all the generic aliases into real rando keys
                                ;; inlcuding potential value aliases :query-key/field.row combo keys
@@ -4688,9 +4689,9 @@
                                                                                     vs   (ut/splitter vv "/")
                                                                                     qstr (ut/safe-name (first (ut/postwalk-replacer key-walk [(keyword (first vs))])))
                                                                                     vstr (last vs)]
-                                                                                (tap> [:value-walk vv vs qstr vstr v (keyword (str qstr "/" vstr))])
+                                                                                (ut/tapp>> [:value-walk vv vs qstr vstr v (keyword (str qstr "/" vstr))])
                                                                                 {v (keyword (str qstr "/" vstr))})))]
-                           ;(tap> [:poss-value-walks poss-value-walks :key-walk key-walk :value-walk value-walk])
+                           ;(ut/tapp>> [:poss-value-walks poss-value-walks :key-walk key-walk :value-walk value-walk])
                            (merge (ut/postwalk-replacer (merge key-walk value-walk)
                                                          ddata)
                                   {;:mad-libs-viz []
@@ -4717,9 +4718,9 @@
                                                                        vs   (ut/splitter vv "/")
                                                                        qstr (ut/safe-name (first (ut/postwalk-replacer key-walk [(keyword (first vs))])))
                                                                        vstr (last vs)]
-                                                                   (tap> [:value-walk vv vs qstr vstr v (keyword (str qstr "/" vstr))])
+                                                                   (ut/tapp>> [:value-walk vv vs qstr vstr v (keyword (str qstr "/" vstr))])
                                                                    {v (keyword (str qstr "/" vstr))})))]
-              ;(tap> [:poss-value-walks poss-value-walks :key-walk key-walk :value-walk value-walk])
+              ;(ut/tapp>> [:poss-value-walks poss-value-walks :key-walk key-walk :value-walk value-walk])
               (merge (ut/postwalk-replacer (merge key-walk value-walk)
                                             ddata)
                      {;:mad-libs-viz []
@@ -4787,7 +4788,7 @@
                                                                :size "auto"
                                                                :child [:string shortcode]]}
                                       :name      (str "subscription " item_key display_name rando)})]
-    ;(tap> [:hmmm panel-map])
+    ;(ut/tapp>> [:hmmm panel-map])
     new-panel))
 
 
@@ -4832,7 +4833,7 @@
                                       ;           :from [[(keyword (str "query/" (ut/safe-name table-name)))
                                       ;                   (keyword (str "clone-" (ut/safe-name table-name) rando))]]}}
 
-    ;(tap> [:hmmm panel-map])
+    ;(ut/tapp>> [:hmmm panel-map])
     new-panel))
 
 ;; (re-frame/reg-sub
@@ -4844,7 +4845,7 @@
 ;;          query-sources   (into {} (remove empty? (flatten (for [[k v] (get db :panels)]
 ;;                                                             (flatten (for [kk (keys (get v :queries))]
 ;;                                                                        {kk k}))))))]
-;;       ;(tap> [:root-query-keys root-query-keys :query-sources query-sources])
+;;       ;(ut/tapp>> [:root-query-keys root-query-keys :query-sources query-sources])
 ;;      (vec (remove nil? (for [q root-query-keys] (get query-sources q)))))))
 
 (re-frame/reg-sub
@@ -4878,7 +4879,7 @@
          all-sql-call-keys (keys (into {} (for [[_ v] panels]
                                             (into {} (for [[kk vv] (get v :queries)]
                                                        (when (nil? (find vv :vselect)) {kk vv}))))))]
-      ;(tap> [:ttt all-sql-call-keys])
+      ;(ut/tapp>> [:ttt all-sql-call-keys])
      (into {} (for [[k v] panels]
                 {k (merge {:uses (apply concat (for [[_ v1] (merge (get v :queries)
                                                                     (get v :views))]
@@ -4900,7 +4901,7 @@
          all-sql-call-keys (keys (into {} (for [[_ v] panels]
                                             (into {} (for [[kk vv] (get v :queries)]
                                                        (when (nil? (find vv :vselect)) {kk vv}))))))]
-      ;(tap> [:ttt all-sql-call-keys])
+      ;(ut/tapp>> [:ttt all-sql-call-keys])
      (into {} (for [[k v] panels]
                 {k (merge {:uses (apply concat (for [[_ v1] (merge (get v :queries)
                                                                    (get v :views))]
@@ -4929,7 +4930,7 @@
          query-sources     (into {} (remove empty? (flatten (for [[k v] panels]
                                                               (flatten (for [kk (keys (get v :queries))]
                                                                          {kk k}))))))]
-      ;(tap> [:root-query-keys root-query-keys :query-sources query-sources])
+      ;(ut/tapp>> [:root-query-keys root-query-keys :query-sources query-sources])
      (vec (remove #(or (nil? %) (= (get db :selected-block) %)) (for [q root-query-keys] (get query-sources q)))))))
 
 
@@ -4948,7 +4949,7 @@
          query-sources     (into {} (remove empty? (flatten (for [[k v] panels]
                                                               (flatten (for [kk (keys (get v :queries))]
                                                                          {kk k}))))))]
-      ;(tap> [:root-query-keys root-query-keys :query-sources query-sources])
+      ;(ut/tapp>> [:root-query-keys root-query-keys :query-sources query-sources])
      (vec (remove #(or (nil? %) (= (get db :selected-block) %)) (for [q root-query-keys] (get query-sources q)))))))
 
 
@@ -4974,7 +4975,7 @@
      all-qs)))
 
 (defn scrubber-panel [view? keypath-map view-key & [wildcard full-map]]
-  ;(tap> [:scrubber-panel :keypath-map view-key keypath-map])
+  ;(ut/tapp>> [:scrubber-panel :keypath-map view-key keypath-map])
   [rc/catch
    (let [type-key            (if view? :views :queries)
          canvas?             (get full-map :canvas? false)
@@ -4984,9 +4985,9 @@
          panel-key           @(ut/tracked-subscribe [::selected-block])
          block-map           @(ut/tracked-subscribe [::selected-block-map])
          wild?               (true? (and (not (= (cstr/trim (str wildcard)) "")) (not (nil? wildcard))))
-        ; _ (tap> [:keypath=map keypath-map])
+        ; _ (ut/tapp>> [:keypath=map keypath-map])
          scrubber-boxes      (into (sorted-map) (for [[kp [v [scrub-type [ffn ffnx]]]] keypath-map]
-                                                      ;:let [_ (tap> [scrub-type kp])]
+                                                      ;:let [_ (ut/tapp>> [scrub-type kp])]
 
                                                   {kp (when (and (and (not (nil? scrub-type))
                                                                       (not (nil? v))
@@ -5018,7 +5019,7 @@
                                                                 ;(= kp [:logic]) ;; temp sql testing for shapes
                                                                 ;(= kp [:group-by]) ;; temp sql testing for shapes
  ;; might want these...
-                                                        (let [;; _ (tap> [:here? kp v])
+                                                        (let [;; _ (ut/tapp>> [:here? kp v])
                                                               ft            (first (remove nil? (for [[k v] (scrub/friendly-text)]
                                                                                                   (when (scrub/ordered-keys-in-kp-multi? k kp) v))))
                                                               message       (get ft :message nil)
@@ -5033,14 +5034,14 @@
                                                                                      (ut/replacer "[" "")
                                                                                      (ut/replacer "]" "")))
                                                               display-kp    (if system-param? (str display-kp " *sys*") display-kp)]
-                                                          ;(tap> [:ft kp ft])
+                                                          ;(ut/tapp>> [:ft kp ft])
                                                           [re-com/v-box
                                                            ;:width "100px"
                                                            :padding "4px"
                                                            :gap "3px"
-                                                           :attr {:on-mouse-enter #(do ;(tap> [:enter-scrub-area :pause-replication])
+                                                           :attr {:on-mouse-enter #(do ;(ut/tapp>> [:enter-scrub-area :pause-replication])
                                                                                      (reset! on-scrubber? true))
-                                                                  :on-mouse-leave #(do ;(tap> [:exit-scrub-area :resume-replication])
+                                                                  :on-mouse-leave #(do ;(ut/tapp>> [:exit-scrub-area :resume-replication])
                                                                                      (reset! on-scrubber? false))}
                                                            :style (if canvas? {:margin-top "-12px"}
                                                                       {:border-top (if (or (= kp [:select]) (= kp [:from]) (= kp [:where]) (= kp [:group-by]))
@@ -5103,7 +5104,7 @@
                                                                                    :child [ffn kp v view-key type-key]])]]]))}))
          flat-scrubber-boxes (vals scrubber-boxes)
          queries             (get block-map :queries {})
-         has-query?          (not (empty? queries))
+         has-query?          (ut/ne? queries)
          final-children      (if (and has-query? (not view?))
                                (vec (conj flat-scrubber-boxes
                             ;[re-com/box :child (str (keys queries))]
@@ -5113,7 +5114,7 @@
                                                         :children [;[re-com/box :child (str k)]
                                                                    [shape/map-boxes2 v panel-key (str k) [] panel-key "map"]]])]))
                                flat-scrubber-boxes)]
-     ;;(tap> [:SSscrubber  keypath-map block-map panel-key keypath-map (and has-query? (not view?)) flat-scrubber-boxes final-children scrubber-boxes])
+     ;;(ut/tapp>> [:SSscrubber  keypath-map block-map panel-key keypath-map (and has-query? (not view?)) flat-scrubber-boxes final-children scrubber-boxes])
      (cond
       ;;  runstreams? [re-com/v-box
       ;;  ;:align :center ;:justify :center
@@ -5247,7 +5248,7 @@
                                                                  (not (ut/is-sql-sql-alias? k))) k)))))
         valid-params        (cset/difference (set valid-params) (set (filter #(and (keyword? %) (cstr/includes? (str %) "/")) vpaths)))
         valid-params-left   (cset/intersection (set deep-flat-query) (set valid-params))
-        ;_ (when (some #(= :sseason %) deep-flat-query) (tap> [:sql-alias-replace (count valid-params-left) (filter #(and (keyword? %) (cstr/includes? (str %) "/")) vpaths)]))
+        ;_ (when (some #(= :sseason %) deep-flat-query) (ut/tapp>> [:sql-alias-replace (count valid-params-left) (filter #(and (keyword? %) (cstr/includes? (str %) "/")) vpaths)]))
         value-walks-targets (filter #(and (cstr/includes? (str %) ".")
                                           (not (cstr/includes? (str %) ".*")) ;; dont want to treat multi params like this, they are 'sql-params' below instead
                                           (not (cstr/includes? (str %) "*."))) valid-params)
@@ -5287,7 +5288,7 @@
                                  (ut/postwalk-replacer value-walks)
                                  (ut/postwalk-replacer meta-walks)
                                  (ut/postwalk-replacer sql-params))]
-        ;_ (tap> [:master-replace query valid-params all-clicked-walks value-walks meta-walks])
+        ;_ (ut/tapp>> [:master-replace query valid-params all-clicked-walks value-walks meta-walks])
 
     (if
      (ut/ne? valid-params-left)
@@ -5331,7 +5332,7 @@
      (reset! over-block? false)
      (reset! dyn-dropper-hover nil) ;; weird bug where hover stays on after drop - late 2023
 
-     (tap> [:execute-pill-drop! clause-conform drops panel-key query-key clause drop-data])
+     (ut/tapp>> [:execute-pill-drop! clause-conform drops panel-key query-key clause drop-data])
 
      (cond                                                 ;p = clause-conform
 
@@ -5364,13 +5365,13 @@
                             :child [clause-conform param-key]]]
 
          (if (not (and row-num src-table param-field))
-           (do (tap> [:cant-drop-text-view :missing-parts  src-table "/" param-field "." row-num])
+           (do (ut/tapp>> [:cant-drop-text-view :missing-parts  src-table "/" param-field "." row-num])
                db)
            (-> db
                (assoc-in [:panels target-block :views cell-drop] new-view)
                (assoc-in [:panels target-block :selected-view] cell-drop))))
 
-         ;(tap> [:DROP! dd])
+         ;(ut/tapp>> [:DROP! dd])
          ;db
 
 
@@ -5436,7 +5437,7 @@
             ;;                                 :when (<= (get-in local-meta [p :distinct]) 20)] p))
 
 
-         (tap> [:view-body-drop ; weave-by view-data-ref view-body modded-query
+         (ut/tapp>> [:view-body-drop ; weave-by view-data-ref view-body modded-query
                 host-query-modded])
          (assoc-in db [:panels panel-key :queries query-key] host-query-modded))
          ;db
@@ -5447,14 +5448,14 @@
              incoming-view-src  (get-in drop-data [:drag-body :source-table])
              incoming-block-src (get-in drop-data [:drag-body :source-panel-key] :query)
              incoming-block-src (if (= (get-in drop-data [:drag-body :type]) :query) :query incoming-block-src) ;; override with query keyword prefix
-             compound-key       (try (keyword (str "view/" (name incoming-block-src) "." (name incoming-view-src))) (catch :default e (do (tap> [:error e]) nil)))
+             compound-key       (try (keyword (str "view/" (name incoming-block-src) "." (name incoming-view-src))) (catch :default e (do (ut/tapp>> [:error e]) nil)))
              target-kp          (vec (flatten (get clause-conform :kp)))
              exists?            (not (nil? (get-in db (conj target-kp compound-key))))]
 
-              ;_ (tap> [:adding-view-to-layout target-kp compound-key])
+              ;_ (ut/tapp>> [:adding-view-to-layout target-kp compound-key])
 
 
-         (tap> [:adding-view-to-layout target-kp compound-key (conj target-kp compound-key) exists? (conj target-kp target) (get-in db (conj target-kp target))])
+         (ut/tapp>> [:adding-view-to-layout target-kp compound-key (conj target-kp compound-key) exists? (conj target-kp target) (get-in db (conj target-kp target))])
          (if exists?
            (-> db                                          ;; save the old pos with a new name, remove the old compound key version, insert new one
                (assoc-in (conj target-kp (keyword (str "empty-panel" (rand-int 123)))) (get-in db (conj target-kp compound-key)))
@@ -5475,7 +5476,7 @@
 
        (and (= clause-conform :text)
             (= (get-in drop-data [:drag-body :type]) :where)) ;; basic single cell drag
-       (let [;_ (tap> [:started?])
+       (let [;_ (ut/tapp>> [:started?])
              row-num      (get-in drop-data [:drag-body :row-num])
              src-table    (get-in drop-data [:drag-body :source-query])
              param-field  (get-in drop-data [:drag-body :param-field])
@@ -5518,9 +5519,9 @@
                                                              :width :panel-width+80-px
                                                              :height :panel-height+80-px}}]
                                          :else [:string param-key])]]
-         (tap> [:text-drop param-key drop-data])
+         (ut/tapp>> [:text-drop param-key drop-data])
          (if (not (and row-num src-table param-field))
-           (do (tap> [:cant-drop-text-view :missing-parts  src-table "/" param-field "." row-num])
+           (do (ut/tapp>> [:cant-drop-text-view :missing-parts  src-table "/" param-field "." row-num])
                db)
            (-> db
                (assoc-in [:panels target-block :views cell-drop] new-view)
@@ -5554,7 +5555,7 @@
                         [:and where-exist stmt]
                         stmt)
              kpath   (vec (conj (vec (drop-last kpath)) :where))]
-         ;(tap> [:in where-exist exist? new kpath])
+         ;(ut/tapp>> [:in where-exist exist? new kpath])
          (assoc-in db kpath new))
 
        (= clause-conform :filter-shadow)
@@ -5607,7 +5608,7 @@
                                [:and where-exist stmt]
                                stmt)
              kpath           (vec (conj (vec (drop-last kpath)) :where))]
-         ;(tap> [:click-filter target-query gb1 gb2 group-bys drop-data])
+         ;(ut/tapp>> [:click-filter target-query gb1 gb2 group-bys drop-data])
          (assoc-in db kpath new))
 
         ;; "🌶️pivot-on/"
@@ -5630,7 +5631,7 @@
                               ;                           ))
 
                          new-query)]
-         (tap> [:pivot pivot-field existing-q drop-data new-query])
+         (ut/tapp>> [:pivot pivot-field existing-q drop-data new-query])
          (assoc-in db [:panels panel-key :queries query-key] new-query))
 
        (cstr/starts-with? (str clause-conform) ":join-on/")
@@ -5667,7 +5668,7 @@
                                                                      [:= (add-alias incoming-table-alias join-field)
                                                                       (add-alias existing-table-alias join-field)]]))
              aliased-q                     (assoc aliased-q :select (vec (apply merge (get aliased-q :select) (vec incoming-table-fields-aliased))))]
-         (tap> [:join-debug existing-selects (add-alias incoming-table-alias join-field) (name join-field) (first (filter #(cstr/includes? (str %) (str "/" (name join-field))) existing-selects))])
+         (ut/tapp>> [:join-debug existing-selects (add-alias incoming-table-alias join-field) (name join-field) (first (filter #(cstr/includes? (str %) (str "/" (name join-field))) existing-selects))])
          (-> db                                            ;; step 1 - alias all table fields in existing query (postwalk on whole map using source fields?)
               ;; step 2 - add :join clause with ON
               ;; step 3 - add joined select fields with aliases (unless they clash with existing ones)
@@ -5732,7 +5733,7 @@
              cla            [:*when new-param
                              [:*all= new-param [target-field]]]
              new-where      (if exists? [:and src-where cla] cla)]
-        ; (tap> [:dropper! panel-key drop-data])
+        ; (ut/tapp>> [:dropper! panel-key drop-data])
          (-> db
              (assoc-in [:panels panel-key :selected-view] new-q-key)
              (assoc-in [:panels panel-key :queries new-q-key]
@@ -5896,7 +5897,7 @@
     :on-drop #(let [incoming (js->clj %)
                     data     (read-string (last (last incoming)))
                     type     (first (first incoming))]
-                (tap> [:dropped-pill type data
+                (ut/tapp>> [:dropped-pill type data
                        [::execute-pill-drop
                         (get drop-data :target-panel)
                         (get drop-data :target-query)
@@ -5950,7 +5951,7 @@
 
 (defn dynamic-spawner-targets [table-source dbody panel-key query-key width-int height-int]
   ;(when true ;(= panel-key :block-4778)
-  ;(tap> [:dynamic-spawner-targets panel-key query-key [table-source dbody width-int height-int]])
+  ;(ut/tapp>> [:dynamic-spawner-targets panel-key query-key [table-source dbody width-int height-int]])
   (let [drag-body              (get dbody :drag-meta)
         selected-view          @(ut/tracked-subscribe [::selected-view-w-queries panel-key])
         is-layout?             @(ut/tracked-subscribe [::is-layout? panel-key selected-view])
@@ -5962,7 +5963,7 @@
                                                   [v [:panels panel-key :views selected-view kvs1 :panels]]))
         view-data-ref         (get-in dbody (or (first (filter #(= (last %) :data) (ut/kvpaths dbody))) [:nope]))
        ; _                      (when (= panel-key :block-4778)
-       ;                          (tap> [:view-data-ref view-data-ref]))
+       ;                          (ut/tapp>> [:view-data-ref view-data-ref]))
         viz-for-each-fields     (when (and (keyword view-data-ref) (not (nil? query-key)))
                                   (let [fxky                (fn [k] (if (cstr/starts-with? (str k) ":query/") (keyword (ut/replacer k #":query/" "")) k))
                                         base-query          @(ut/tracked-subscribe [::find-query (fxky view-data-ref)])
@@ -5977,7 +5978,7 @@
                                         possibles           (vec (cset/intersection (set local-fields) (set base-query-fields)))
                                         possibles-vec       (vec (for [p possibles
                                                                        :when (<= (get-in local-meta [p :distinct]) 50)] p))]
-                                   ;(tap> [:for-each-viz-fn? possibles possibles-vec base-query-fields local-fields])
+                                   ;(ut/tapp>> [:for-each-viz-fn? possibles possibles-vec base-query-fields local-fields])
                                     possibles-vec))
 
         ;source-table (get drag-body :source-table)
@@ -6075,7 +6076,7 @@
                                                      (when (and not-view? not-sys? table? common-fields? (not self?) same-db? (not union?))
                                                        (let [poss-joins (vec (take 10 (for [f common-fields] (keyword (str "join-on/" (ut/safe-name f))))))
                                                              poss-cnt   (count poss-joins)]
-                                                          ;(tap> [:poss poss-joins])
+                                                          ;(ut/tapp>> [:poss poss-joins])
                                                          (if (> poss-cnt 3)
                                                            (partition-all 2 poss-joins)
                                                            (partition-all 1 poss-joins))))
@@ -6097,7 +6098,7 @@
         viz-options            [[:x :y :color] [:size :row :column] [:shapes :label]]
         action-typer           (try (keyword (get-in dbody [:drag-meta :data-type])) (catch :default _ :error!)) ;; (get-in dbody [:drag-meta :param-full]) == actual value (or fqdn param I suppose)
         drops                  @(ut/tracked-subscribe [::all-drops-of action-typer])
-        ;;_ (tap> [:spawner-drops action-typer panel-key drops])
+        ;;_ (ut/tapp>> [:spawner-drops action-typer panel-key drops])
         view-options           (remove nil? [[:text]
                                              (when (ut/ne? drops) drops)
                                              ;(when dim? [:dropdown])
@@ -6220,7 +6221,7 @@
                                                                                        [:delete-view])]} {})))
         option-count           (count (flatten (apply concat (vals all-options))))]
 
-    ;; (tap> [:dyn-spawn :dragged-obj view-drag?  source-panel-key :src-view source-table
+    ;; (ut/tapp>> [:dyn-spawn :dragged-obj view-drag?  source-panel-key :src-view source-table
     ;;        :clicked-fields clicked-fields :commons common-fields
     ;;       ;(vec (vals clicked-fields))
     ;;       ; :db drag-body
@@ -6229,23 +6230,23 @@
 
 
 
-    ;(when partial-union? (tap> [query-key panel-key :shadows? partial-union? not-view? not-sys? partial-union? (not self?)]))
-    ;(tap> [:drag-body drag-body])
-    ;;(tap> [:pivot-meta? query-key pivot-dim-query-fields @(ut/tracked-subscribe [::conn/sql-merged-metadata [query-key]])])
+    ;(when partial-union? (ut/tapp>> [query-key panel-key :shadows? partial-union? not-view? not-sys? partial-union? (not self?)]))
+    ;(ut/tapp>> [:drag-body drag-body])
+    ;;(ut/tapp>> [:pivot-meta? query-key pivot-dim-query-fields @(ut/tracked-subscribe [::conn/sql-merged-metadata [query-key]])])
 
     ;(when is-layout?
-    ;  (tap> [:find-layout-map layout-map]))
+    ;  (ut/tapp>> [:find-layout-map layout-map]))
 
     ;selected? "2px solid #9973e0"
     ;hover-q? "2px solid #c7005d"
     ;parent-of-selected? "2px solid #9973e0"
     ;upstream? "2px solid #7be073"
-    ;(tap> [:dyn-targets agg? (keys pivot-dim-query-fields)])
-    ;(tap> [:tt @(ut/tracked-subscribe [::conn/sql-metadata [query-key]])
+    ;(ut/tapp>> [:dyn-targets agg? (keys pivot-dim-query-fields)])
+    ;(ut/tapp>> [:tt @(ut/tracked-subscribe [::conn/sql-metadata [query-key]])
     ;           @(ut/tracked-subscribe [::conn/sql-merged-metadata [query-key]])])
-    ;(tap> [{(str selected-view "1") sql-options}])
-    ;(tap> [:drag panel-key source-panel-key table-source table-source-k source-table drag-body panel-key])
-    ;(tap> [:targets-run-in panel-key :from table-source :w query-key :err? drag-body])
+    ;(ut/tapp>> [{(str selected-view "1") sql-options}])
+    ;(ut/tapp>> [:drag panel-key source-panel-key table-source table-source-k source-table drag-body panel-key])
+    ;(ut/tapp>> [:targets-run-in panel-key :from table-source :w query-key :err? drag-body])
 
     ;;(let [reactivity-hack @dyn-dropper-hover] ;; moved down the chain for less expensive reactions
 
@@ -6341,8 +6342,8 @@
                                                                                                              :top              top} pstyle)}
                                                                               ;leftovers (-> p (dissoc :style) (dissoc :h) (dissoc :w) (dissoc :root))
                                                                               leftovers     (dissoc p :style :h :w :root :k :z :view-ref :hidden? :id)]
-                                                                          ;(tap> [:test x (is-float? x)])
-                                                                          ;(tap> [:layoutz view-ref leftovers layout-map])
+                                                                          ;(ut/tapp>> [:test x (is-float? x)])
+                                                                          ;(ut/tapp>> [:layoutz view-ref leftovers layout-map])
                                                                           (when root-visible?
                                                                             (droppable-pills
                                                                              ["meta-menu"] {:clause       (if (= tname :layout-map) {:layout-drop view-ref :kp (last layout-map)} view-ref)
@@ -6351,7 +6352,7 @@
                                                                                             :target-query query-key}
                                                                              (ut/mapply re-com/box (merge leftovers box-map)))))))]
 
-                                            ;(tap> [:boxes? opts layout-map (get (first layout-map) :panels) boxes])
+                                            ;(ut/tapp>> [:boxes? opts layout-map (get (first layout-map) :panels) boxes])
 
                                             [re-com/h-box
                                              :size "none"
@@ -6399,7 +6400,7 @@
                                             ;;               :size "auto"])]
 
                                           (= tname :view-opts)
-                                          (do (tap> [:view-opts-footer opts toptions])
+                                          (do (ut/tapp>> [:view-opts-footer opts toptions])
                                               [re-com/h-box
                                                :gap "5px"
                                                :style {;:padding-left "0px"
@@ -6557,14 +6558,14 @@
                   ;                    (honey/format {:pretty true :inline true}))
                   ;                (catch js/Error e [(str "\n -- honey-sql error - cannot parse: \n /* " e " */ ")]))
                    str-query [@(ut/tracked-subscribe [::get-sql-server-string k])]]
-               ;(tap> [:sql-parse query data-key k v])
+               ;(ut/tapp>> [:sql-parse query data-key k v])
                (str "-- " k "\n" (first str-query)))))))
 
 (defn formula-code-box [panel-id key width-int height-int type]
   (let [;sql-hint? (cstr/includes? (str value) ":::sql-string")
         honey-sql  @(ut/tracked-subscribe [::query panel-id key])
         sql-string (materialize-one-sql panel-id key)]
-    ;(tap> (ut/splitter (str sql-string) #"\n"))
+    ;(ut/tapp>> (ut/splitter (str sql-string) #"\n"))
     [re-com/box
      :size "auto"
      :width (px (- width-int 24))
@@ -6621,7 +6622,7 @@
         bins       (/ 100 num-scheme)
         wbin       (js/Math.ceil (/ weight bins))
         scale      (get scheme wbin)]
-    ;(tap> [:color-val weight num-scheme bins wbin])
+    ;(ut/tapp>> [:color-val weight num-scheme bins wbin])
     ;(str "hsl(" hue ",100%,50%)")
     ;temp
     (if (= 0 num-scheme) temp scale)))
@@ -6642,7 +6643,7 @@
          idx          (.indexOf other-vals val)
          weight       (Math/round (* (/ idx vals-cnt) 100))
          wmix         (get-color-temp weight scheme depth)]
-      ;(tap> [:heatmap-color-val panel-key query-key field val (keyword (str "styler_" (ut/safe-name styler-keys)))])
+      ;(ut/tapp>> [:heatmap-color-val panel-key query-key field val (keyword (str "styler_" (ut/safe-name styler-keys)))])
      wmix)))
 
 (re-frame/reg-sub
@@ -6768,7 +6769,7 @@
 
 (defn insert-hidden-reco-preview [reco-selected reco-viz reco-query reco-condis combo-name shape-name single?]
   (let []
-    ;(tap> [:insert-hidden-reco-preview reco-selected reco-viz reco-query reco-condis single?])
+    ;(ut/tapp>> [:insert-hidden-reco-preview reco-selected reco-viz reco-query reco-condis single?])
     (dorun
      (when single? (ut/tracked-dispatch [::new-reco-preview reco-selected]))
 
@@ -6815,7 +6816,7 @@
 
                        query         (ut/postwalk-replacer {[:sum :rows] [:count 1]} query)]
 
-                    ;(tap> [:rec-preview-block 2 view query reco-condis original-conn reco-selected])
+                    ;(ut/tapp>> [:rec-preview-block 2 view query reco-condis original-conn reco-selected])
                    (insert-rec-preview-block
                     view
                     query                                 ; reco-h reco-w
@@ -6833,7 +6834,7 @@
                ;recos @(re-frame.core/subscribe [::conn/sql-data [:recos-sys2]])
                ;recos-keys (vec (for [{:keys [combo_hash]} recos] combo_hash))
 
-           (tap> [:clear-mad-libs-recos prev-preview-keys])
+           ;(ut/tapp>> [:clear-mad-libs-recos prev-preview-keys])
            (doseq [k prev-preview-keys] (ut/tracked-dispatch [::quick-delete-panel k]))
            (ut/tracked-dispatch [::set-preview-keys2 []])
            (ut/tracked-dispatch [::clear-query :recos-sys2]))))
@@ -6965,7 +6966,7 @@
                                                               (color-vector idx)
                                                               nil)))
                                        selected-view (try (edn/read-string (get-in preview-maps [panel-key :selected_view])) (catch :default _ nil))
-                                       ;;_ (tap> [selected-view pk pnum])
+                                       ;;_ (ut/tapp>> [selected-view pk pnum])
                                        ;condis (get-in preview-maps [panel-key :condis])
                                        ;combo_hash (get-in preview-maps [panel-key :combo_hash])
                                        ;query (first @(ut/tracked-subscribe [::panel-sql-call-keys panel-key]))
@@ -7098,7 +7099,7 @@
         per-page          (* charts-wide charts-high)
         pages             (/ recos-count per-page)]
 
-    (tap> [:full-recos recos-page preview-maps preview-keys query-id full-recos (select-keys preview-maps preview-keys)])
+    (ut/tapp>> [:full-recos recos-page preview-maps preview-keys query-id full-recos (select-keys preview-maps preview-keys)])
 
     (dorun (let [prev-preview-keys (for [k @(ut/tracked-subscribe [::preview-keys2])] (keyword (str "reco-preview" k)))
                  ;per-page per-page ;; if we ever get more room...
@@ -7115,7 +7116,7 @@
              (let [query        (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
-               ;(tap> [:mad-libs-sql k query])
+               ;(ut/tapp>> [:mad-libs-sql k query])
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query)))))
 
@@ -7245,7 +7246,7 @@
                          :when (get fv :group-by?)] f))
          qgb2 (vec (for [[f fv] (get-in db [:meta query-key2 :fields])
                          :when (get fv :group-by?)] f))]
-     (tap> [qgb1 qgb2])
+     (ut/tapp>> [qgb1 qgb2])
      [])))
 
 (re-frame/reg-sub
@@ -7285,7 +7286,7 @@
         ;;                                   (cstr/includes? (str (get % :ui-keypath)) (str query-key)))
         ;;                             messages))
 
-     ;(tap> [:yo ])
+     ;(ut/tapp>> [:yo ])
      [waitings single-wait])))
 
 (re-frame/reg-event-db
@@ -7315,10 +7316,10 @@
  ::server-kits
  (fn [db [_ type]] ;; TODO add "who is asking" deets like panel, query, so we can do kit WHEN filtering on fields, data, etc
    (let [all (get-in db [:server :settings :kits])
-         ;_ (tap> all)
+         ;_ (ut/tapp>> all)
          curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
          kits (vec (sort-by :name (for [[k v] all
-                                        ;:let [_ (tap> [:0 [(get v :package-name) (get v :kit-name)] curr])]
+                                        ;:let [_ (ut/tapp>> [:0 [(get v :package-name) (get v :kit-name)] curr])]
                                         :when (and (some #(= [(get v :package-name) (get v :kit-name)] %) curr) ;; is enabled in params?
                                                    (= (get v :run-on) type))]
                                     (merge {:kit-name k} v))))]
@@ -7328,13 +7329,13 @@
  ::installed-kits
  (fn [db _] ;; TODO add "who is asking" deets like panel, query, so we can do kit WHEN filtering on fields, data, etc
    (let [all (get-in db [:server :settings :kits])
-        ; _ (tap> [:all-kits (get db :client-name) all (get db :server)])
+        ; _ (ut/tapp>> [:all-kits (get db :client-name) all (get db :server)])
          kits (vec (sort-by :name (for [[k v] all]
                                     (merge {:installed? true
                                             :kit-name k} v))))]
      kits)))
 
-;(tap> [:installed-kits @(ut/tracked-subscribe [::installed-kits])])
+;(ut/tapp>> [:installed-kits @(ut/tracked-subscribe [::installed-kits])])
 
 
 (re-frame/reg-sub
@@ -7351,7 +7352,7 @@
 
 (defn magic-table [panel-key data-keypath & [ww hh hide-fields]]
   ;[rc/catch ;(try
-  ;(tap> [:magic-table [panel-key data-keypath [ww hh hide-fields] ]])
+  ;(ut/tapp>> [:magic-table [panel-key data-keypath [ww hh hide-fields] ]])
   (let [viewer-sourced?           (try (and (cstr/starts-with? (first data-keypath) "::") (string? (first data-keypath))) (catch :default _ false))
         data-keypath              (if viewer-sourced? (try [(edn/read-string (ut/replacer (first data-keypath) "::" ":"))] (catch :default _ nil)) data-keypath) ;; unpack the viewer string
         panel-map                 @(ut/tracked-subscribe [::workspace [panel-key]])
@@ -7380,7 +7381,7 @@
         subq-blocks               @(ut/tracked-sub ::subq-panels-alpha {:panel-id selected-block})
         parent-of-selected?       (some #(= % panel-key) subq-blocks)
         server-kits               @(ut/tracked-subscribe [::server-kits :queries])
-        ;_ (tap> server-kits)
+        ;_ (ut/tapp>> server-kits)
         ;child-parts (if parent-of-selected? (vec (ut/deep-flatten @(ut/tracked-subscribe [::panel-sql-calls selected-block]))) [])
         ;subq-mapping @(ut/tracked-subscribe [::subq-mapping])
         ;; running?                  (some #(= % query-key)
@@ -7571,21 +7572,21 @@
         double-click-timeout 400]
     
     (when (not= default-col-widths equal-width-final)
-      ;;(tap> [:default-col-widths panel-key query-key default-col-widths equal-width-final])
+      ;;(ut/tapp>> [:default-col-widths panel-key query-key default-col-widths equal-width-final])
       (ut/tracked-dispatch [::set-column-default-widths panel-key query-key equal-width-final])) ;; bad side effect TODO: pure fn to calc equal widths from anywhere
 
-    ;; (tap> [:ff col-selected? col-names ff])
-    ;(tap> [:hohoho @hover-field])
-    ;(tap> [:max-rows max-rows])
-    ;(tap> [:magic-table-meta metadata])
-    ;(tap> [:grid-param-highlight data-keypath parameters-used-in-cell parameters-used-in-sql parameters-used-in])
+    ;; (ut/tapp>> [:ff col-selected? col-names ff])
+    ;(ut/tapp>> [:hohoho @hover-field])
+    ;(ut/tapp>> [:max-rows max-rows])
+    ;(ut/tapp>> [:magic-table-meta metadata])
+    ;(ut/tapp>> [:grid-param-highlight data-keypath parameters-used-in-cell parameters-used-in-sql parameters-used-in])
 
-    ;(tap> [:post-styles-cells post-styles-cells])
-    ;(tap> [table-source table-source-root])
-    ;(tap> [panel-key data-keypath modded-width fields (count fields) equal-width equal-width-final :hide? hide? hide-fields])
-    ;(when @dragging? (tap> @dragging-body))
-    ;;(tap> @rowset)
-    ;;(tap> [:parts child-parts])
+    ;(ut/tapp>> [:post-styles-cells post-styles-cells])
+    ;(ut/tapp>> [table-source table-source-root])
+    ;(ut/tapp>> [panel-key data-keypath modded-width fields (count fields) equal-width equal-width-final :hide? hide? hide-fields])
+    ;(when @dragging? (ut/tapp>> @dragging-body))
+    ;;(ut/tapp>> @rowset)
+    ;;(ut/tapp>> [:parts child-parts])
 
     (if (seq @rowset)                                       ;(and (seq @rowset) (not running?))
 
@@ -7605,7 +7606,7 @@
               labelsz       (* height-int 0.1)
               agg?          (not (get-in metadata [:fields label :group-by?]))
               pxlabel       (px (if (< labelsz 20) 20 labelsz))]
-          ;(tap> [charw])
+          ;(ut/tapp>> [charw])
           ^{:key (str "magic-table-callout-parent" query-key)}
           [re-com/v-box
            :size "auto"
@@ -7843,7 +7844,7 @@
                                                        ; :child
                                                          (cond
                                                         ;;  (and (= c :country) (= (get % c) "us"))
-                                                        ;;  (do ;(tap> [:usa!])
+                                                        ;;  (do ;(ut/tapp>> [:usa!])
                                                         ;;    [re-com/box :size "auto" :justify :center :align :center ;:height "33px"
                                                         ;;     :child (str (get % c)) :style {:background-color "white"
                                                         ;;                                    :font-family "Source Code Pro"
@@ -8007,7 +8008,7 @@
                     ;;                    (do
                     ;;                      (js/clearTimeout @timer-id)
                     ;;                      (reset! timer-id nil)
-                    ;;                      (tap> (str "Double clicked row!"  )))
+                    ;;                      (ut/tapp>> (str "Double clicked row!"  )))
                     ;;                    (do
                     ;;                      (if (= clicked-row (get @rowset %))
                     ;;                        (ut/tracked-dispatch [::conn/click-parameter data-keypath nil])
@@ -8017,7 +8018,7 @@
                     ;;                                          (reset! timer-id nil))
                     ;;                                        double-click-timeout))))
                     ;;  :on-click-row (fn [x]
-                    ;;                  ;(tap> [:click!])
+                    ;;                  ;(ut/tapp>> [:click!])
                     ;;                  (if @timer-id ;(and @timer-id @hover-field)
                     ;;                    (let [query-key    (keyword
                     ;;                                        (str (ut/replacer (str query-key) #":" "")
@@ -8032,17 +8033,17 @@
                     ;;                                          (try (sql-alias-replace-sub base-table) (catch :default _ {:select [["error in sql-alias-replace-sub1" :err]]}))
                     ;;                                          (map? base-table) (try (sql-alias-replace base-table) (catch :default _ {:select [["error in sql-alias-replace-sub2" :err]]}))
                     ;;                                          :else {:select [:*] :from table-source})]
-                    ;;                        ;(tap> [:double!])
+                    ;;                        ;(ut/tapp>> [:double!])
                     ;;                      (ut/tracked-dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])
 
-                    ;;                       ; (tap> [:q-insert table-source (when is-sub? (sql-alias-replace-sub base-table))
+                    ;;                       ; (ut/tapp>> [:q-insert table-source (when is-sub? (sql-alias-replace-sub base-table))
                     ;;                       ;        (get-in table-source [0 0])
                     ;;                       ;        ])
                     ;;                      (when agg? ;(and agg? (= panel-key clicked-panel-key))  ;;  (= panel-key (last @hover-field))
                     ;;                        (do
                     ;;                          (js/clearTimeout @timer-id)
                     ;;                          (reset! timer-id nil)
-                    ;;                          ;(tap> (str "Double click! " @hover-field " " (get-in @rowset [x @hover-field]) " " @hover-field))
+                    ;;                          ;(ut/tapp>> (str "Double click! " @hover-field " " (get-in @rowset [x @hover-field]) " " @hover-field))
                     ;;                          (reset! animate? true)
                     ;;                          (ut/tracked-dispatch [::add-query panel-key query-key new-query])
                     ;;                          (js/setTimeout #(do ;; change view tab
@@ -8053,7 +8054,7 @@
                     ;;                      )
 
                     ;;                    (do ;; single click
-                    ;;                      ;(tap> (str "Single click!" x))
+                    ;;                      ;(ut/tapp>> (str "Single click!" x))
                     ;;                        ;(when (nil? @timer-id)
                     ;;                      (ut/tracked-dispatch-sync [::conn/click-parameter data-keypath (get @rowset x)])
                     ;;                      (reset! timer-id (js/setTimeout
@@ -8087,7 +8088,7 @@
                                                              :else {:select [:*] :from table-source})
                                              new-query (assoc new-query :where [:*when clicked-keyword
                                                                                 [:*all= clicked-keyword group-bys]])]
-                                             ;;(tap> [:safe @(ut/tracked-subscribe [::group-by-intersection query-key query-key])])
+                                             ;;(ut/tapp>> [:safe @(ut/tracked-subscribe [::group-by-intersection query-key query-key])])
                                          (reset! animate? true)
                                          (ut/tracked-dispatch [::add-query panel-key query-key new-query])
                                          (js/setTimeout #(do ;; change view tab
@@ -8112,7 +8113,7 @@
                                          row-num (try (.indexOf @rowset row)
                                                       (catch :default _ -1))
                                          cell-alias (keyword (str (-> (str id) (ut/replacer #":" "")) "." row-num))
-                                         ;;_ (tap> [:id cell-alias parameters-used-in-sql])
+                                         ;;_ (ut/tapp>> [:id cell-alias parameters-used-in-sql])
                                          cell-used?       (true? (some #(= % cell-alias) parameters-used-in-sql))
                                          multi-cell-used? (true? (some #(and (= (first %) id)
                                                                              (some (fn [x] (= x (get row id))) (last %)))
@@ -8138,7 +8139,7 @@
                                                                                                  {v @(ut/tracked-subscribe [::heatmap-color-val panel-key query-key
                                                                                                                           id (get row id) heatmap-styles
                                                                                                                           scheme depth direction])})))]
-                                                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
+                                                                      ;(ut/tapp>> [:=-walk/logic-kps logic-kps kps workspace-params])
                                                                       (ut/postwalk-replacer logic-kps obody)))
                                          styles         (apply merge (for [s styler-keys] (if (or (= (get-in stylers [s :cols]) id)
                                                                                                   (try (some #(= id %) (get-in stylers [s :cols])) (catch :default _ false)))
@@ -8156,10 +8157,10 @@
                                          agg? (and (not non-panel?) (not (get-in metadata [:fields id :group-by?])))
                                          used-in-a-query? (true? (some #(= id %) parameters-used-in-sql))
                                          clicked-row? (= row clicked-row)]                  ;; color on row doesnt work, overriding here...
-                                   ;;  (when sel? (tap> [:color id data-type-color (get-in metadata [:fields id :data-type])  @(ut/tracked-subscribe [::conn/data-colors]) ]))
-                                     ;;(tap> [:row-id id parameters-used-in-cell row])
+                                   ;;  (when sel? (ut/tapp>> [:color id data-type-color (get-in metadata [:fields id :data-type])  @(ut/tracked-subscribe [::conn/data-colors]) ]))
+                                     ;;(ut/tapp>> [:row-id id parameters-used-in-cell row])
                                     ;;  (when (and (= id :country) (= (get row id) "us"))
-                                    ;;    (tap> [:call id row  ]))
+                                    ;;    (ut/tapp>> [:call id row  ]))
                                     ; (if
                                      (merge
 
@@ -8276,8 +8277,8 @@
                                                                                          (get-in stylers [s :style]) {})))
                                         base {}] ;; merge for all
 
-                                    ;;(tap> [:poss poss-stylers styler-keys stylers styles])
-                                    ;(tap> [:row id column row])
+                                    ;;(ut/tapp>> [:poss poss-stylers styler-keys stylers styles])
+                                    ;(ut/tapp>> [:row id column row])
                                     (cond (and (= row clicked-row) has-rabbit-code?)
                                              ;  (= row clicked-row)
  ; (= (get-in metadata [:fields id :data-type]) "rabbit-code") ;(= (get row :country) "us")
@@ -8308,7 +8309,7 @@
                      ;:column-border-color "#00000011"
                      :column-header-height 39
                      :column-header-renderer (fn [cols parts sort-by-col]
-                                               ;(tap> [{:cols cols} {:parts parts} {:sort-by-col sort-by-col}])
+                                               ;(ut/tapp>> [{:cols cols} {:parts parts} {:sort-by-col sort-by-col}])
                                                [re-com/h-box
                                                 ;:height "26px"
                                                 :children (for [c cols]
@@ -8398,7 +8399,7 @@
                               block-w        (or ww w)
                               ;label-px-width (* brick-size (js/Math.floor (/ block-w 2.4)))
                               label-px-width (js/Math.floor (* brick-size (- block-w 0.45)))]
-                          (tap> [:formula-bar-open? panel-key query-key block-h block-w column-selected selected-field-idx ff])
+                          (ut/tapp>> [:formula-bar-open? panel-key query-key block-h block-w column-selected selected-field-idx ff])
                           [re-com/h-box
                            ;:gap "4px"
                            :size "auto"
@@ -8486,7 +8487,7 @@
 
                               ;waits (count waitings)
 
-                          ;(tap> [:tt waitings])
+                          ;(ut/tapp>> [:tt waitings])
 
 
                           [re-com/h-box
@@ -8560,7 +8561,7 @@
                                          :children (vec (cons [re-com/gap :size "6px"]
                                                               (vec (for [{:keys [description kit-name name icon]} server-kits
                                                                          :let [wait?  @(ut/tracked-subscribe [::reco-running? query-key kit-name])
-                                                                                 ;_ (tap> [:kit-name kit-name])
+                                                                                 ;_ (ut/tapp>> [:kit-name kit-name])
                                                                                queued?  @(ut/tracked-subscribe [::reco-queued? query-key kit-name])]]
 
                                                                      [re-com/md-icon-button
@@ -8612,7 +8613,7 @@
                                                                                      (= k1 column-selected))]
                                                                       {[k1 k2] v})))
                                           has-one? (not (empty? heat-keys))]
-                          ;(tap> [:heat-keys heat-keys])
+                          ;(ut/tapp>> [:heat-keys heat-keys])
                                       [re-com/h-box
                                        :size "none"
                                        :height "10px"
@@ -8922,7 +8923,7 @@
          ;(and (not (nil? (get-in db [:panels panel-key :tab-rules])))
          ;                (>= (+ (count queries) (count views)) 2))
          ]
-      ;(tap> [:pp panel-key oz-layers? (count oz-layers) (assoc-in vega-lite-shell [1 :layer] oz-layers) oz-layers])
+      ;(ut/tapp>> [:pp panel-key oz-layers? (count oz-layers) (assoc-in vega-lite-shell [1 :layer] oz-layers) oz-layers])
      (if (map? views)
        (merge views                                        ;(get-in db [:panels panel-key :views])
               (if oz-layers?
@@ -9081,7 +9082,7 @@
          used-click-params2 (set (vec (remove nil? (for [k (ut/deep-flatten (get-in db [:panels panel-key :views]))]
                                                      (when (and (keyword? k) (cstr/includes? (str k) "/")) k)))))
          used-click-params  (set (ut/deep-flatten (get-in db [:panels panel-key :views])))]
-      ;(tap> [panel-key used-click-params used-click-params2])
+      ;(ut/tapp>> [panel-key used-click-params used-click-params2])
      (cset/intersection all-click-params used-click-params))))
 
 (re-frame/reg-sub
@@ -9129,7 +9130,7 @@
                                                   {kk vv}))))}
          clicks     (get-in db [:click-param])
          cc         (merge clicks all-condis)]
-      ; (tap> [:clicks clicks :condis all-condis])
+      ; (ut/tapp>> [:clicks clicks :condis all-condis])
      (vec (remove empty?
                   (for [[k v] cc]
                     (into {} (for [[kk vv] v]
@@ -9183,8 +9184,8 @@
          kvpaths-vals         (into {} (for [p (sort (into layout-map-scrubbers kvpaths))]
                                          {p (let [v (get-in view p)]
                                               [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
-      ;(tap> [:kvpaths kvpaths :kvpaths-vals kvpaths-vals :adds layout-map-scrubbers])
-      ;(tap> [:keypaths-of-layout-panels @(ut/tracked-subscribe [::keypaths-of-layout-panels panel-key view-key])])
+      ;(ut/tapp>> [:kvpaths kvpaths :kvpaths-vals kvpaths-vals :adds layout-map-scrubbers])
+      ;(ut/tapp>> [:keypaths-of-layout-panels @(ut/tracked-subscribe [::keypaths-of-layout-panels panel-key view-key])])
       ;(into (sorted-map) kvpaths-vals)
       ;(sort-by key kvpaths-vals)
       ;(reverse kvpaths-vals)
@@ -9212,11 +9213,11 @@
            kvpaths-vals (into (sorted-map) (for [p kvpaths]
                                              {p (let [v (get-in params p)]
                                                   [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
-           ;_ (tap> [:keypaths-in-rs-values flow-id bid pp params kvpaths kvpaths-vals])
+           ;_ (ut/tapp>> [:keypaths-in-rs-values flow-id bid pp params kvpaths kvpaths-vals])
 
        kvpaths-vals)
      (catch :default e
-       (do (tap> [:error-in :keypaths-in-rs-values e :passed bid]) {})))))
+       (do (ut/tapp>> [:error-in :keypaths-in-rs-values e :passed bid]) {})))))
 
 (re-frame/reg-sub
  ::keypaths-in-flow
@@ -9232,11 +9233,11 @@
            kvpaths-vals (into (sorted-map) (for [p kvpaths]
                                              {p (let [v (get-in params p)]
                                                   [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
-           ;_ (tap> [:keypaths-in-flow  bid  params kvpaths kvpaths-vals])
+           ;_ (ut/tapp>> [:keypaths-in-flow  bid  params kvpaths kvpaths-vals])
 
        kvpaths-vals)
      (catch :default e
-       (do (tap> [:error-in :keypaths-in-flow e :passed bid]) {})))))
+       (do (ut/tapp>> [:error-in :keypaths-in-flow e :passed bid]) {})))))
 
 (re-frame/reg-sub
  ::keypaths-in-flow-opts
@@ -9249,7 +9250,7 @@
                                                   [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
        kvpaths-vals)
      (catch :default e
-       (do (tap> [:error-in :keypaths-in-flow-opts e]) {})))))
+       (do (ut/tapp>> [:error-in :keypaths-in-flow-opts e]) {})))))
 
 (re-frame/reg-sub
  ::keypaths-in-params
@@ -9262,7 +9263,7 @@
                                                   [v (try (scrub/get-type p v) (catch :default e (str e)))])}))]
        kvpaths-vals)
      (catch :default e
-       (do (tap> [:error-in :keypaths-in-params e :passed key-type]) {})))))
+       (do (ut/tapp>> [:error-in :keypaths-in-params e :passed key-type]) {})))))
 
 (re-frame/reg-sub
  ::keypaths-in-query
@@ -9281,7 +9282,7 @@
  (fn [db {:keys [panel-key]}]
    (let [dat   (get-in db [:panels panel-key :views])
          flats (ut/deep-flatten dat)]
-      ;(tap> [:valids panel-key flats dat])
+      ;(ut/tapp>> [:valids panel-key flats dat])
      (vec (remove nil? (for [k flats]
                          (when (and (keyword? k) (cstr/includes? (str k) "/")
                                     (not (cstr/includes? (str k) ":view/"))
@@ -9293,7 +9294,7 @@
  (fn [db _]
    (let [dat   (for [[_ v] (get-in db [:panels])] (get v :views))
          flats (ut/deep-flatten dat)]
-      ;(tap> [:valids panel-key flats dat])
+      ;(ut/tapp>> [:valids panel-key flats dat])
      (vec (remove nil? (for [k flats]
                          (when (and (keyword? k) (cstr/includes? (str k) "/")
                                     (cstr/starts-with? (str k) ":condi/"))
@@ -9314,7 +9315,7 @@
                        (when (and (keyword? k) (cstr/includes? (str k) "/")) k))))))
 
 (defn vsql-map [hm]
-  ;(tap> [:vselect hm])
+  ;(ut/tapp>> [:vselect hm])
   (let [select     (get hm :vselect)                        ;; check if vector
         from       (get hm :from)
         where      (get hm :where)
@@ -9333,17 +9334,17 @@
                            logic-kps (into {} (for [[_ v]
                                                     (into {} (filter #(cstr/starts-with? (str (last %)) "{:vselect") kps))]
                                                 {v (vsql-map v)}))]
-                       ;(tap> [:inny logic-kps kps])
+                       ;(ut/tapp>> [:inny logic-kps kps])
                        (ut/postwalk-replacer logic-kps obody)))]
     (vec (for [row rowset]
-           (do                                              ;(tap> [:vsql-loop-row row])
+           (do                                              ;(ut/tapp>> [:vsql-loop-row row])
              (vec (for [r (ut/postwalk-replacer row select)]
-                    (do                                     ;(when (not (or (string? r) (keyword? r))) (tap> [:vsql-loop-w r]))
+                    (do                                     ;(when (not (or (string? r) (keyword? r))) (ut/tapp>> [:vsql-loop-w r]))
                       (cond (and (map? r) (:vselect r))
-                            (do                             ;(tap> [:vsql-recur-fn r])
+                            (do                             ;(ut/tapp>> [:vsql-recur-fn r])
                               (vsql-map r))
                             (some #(= % :vselect) (ut/deep-flatten r))
-                            (do                             ;(tap> [:run-inside r])
+                            (do                             ;(ut/tapp>> [:run-inside r])
                               (inside-job r))
                             :else r)))))))))
 
@@ -9461,7 +9462,7 @@
                          (get-in db [:panels block-id :views view-name]))]
           ;in-layout? ()
 
-      ;(tap> [:resolve-view-alias ref-key  block-id is-query? panel-key view-name lw lh])
+      ;(ut/tapp>> [:resolve-view-alias ref-key  block-id is-query? panel-key view-name lw lh])
      view-body)))
 
 (re-frame/reg-sub
@@ -9473,7 +9474,7 @@
          pw-int         (get-in db [:panels panel-key :w])
          ph-int         (get-in db [:panels panel-key :h])
          layout-map     (lay/process-layout layout-map-pre pw-int ph-int)]
-      ;(tap> [:layouts-for panel-key view k layout-map])
+      ;(ut/tapp>> [:layouts-for panel-key view k layout-map])
      (get layout-map k))))
 
 (defn view-alias-replace [view panel-key selected-view]
@@ -9503,7 +9504,7 @@
                                    ;[:box :child "turd-nuggets"]
 
         replaced     (ut/postwalk-replacer sql-params view)]
-    ;(tap> [:view-alias? panel-key replaced view sql-params ])
+    ;(ut/tapp>> [:view-alias? panel-key replaced view sql-params ])
     (if (cstr/includes? (str replaced) ":view/")            ;(cstr/includes? (str replaced) ":query/")
       (view-alias-replace replaced panel-key selected-view)
       replaced)))
@@ -9542,10 +9543,10 @@
                     :when (>= ticktock timer)]
               (doseq [query queries]
                 (dorun (let []
-                         ;(tap> [:running-sched :tick ticktock :timer timer query])
+                         ;(ut/tapp>> [:running-sched :tick ticktock :timer timer query])
                          (ut/tracked-dispatch [::remove-schedule query])
                          (ut/tracked-dispatch [::conn/clear-query-history query]))))))
-     ;(tap> [:scheds-cron-debug :tick ticktock scheds scheds-reverse])
+     ;(ut/tapp>> [:scheds-cron-debug :tick ticktock scheds scheds-reverse])
      db)))
 
 
@@ -9581,7 +9582,7 @@
  (fn [db _]
    ;(assoc-in db [:sql-source query-id] sql-source)
    (let [client-name (get db :client-name)]
-     ;(tap> [:checking-server-status... client-name])
+     ;(ut/tapp>> [:checking-server-status... client-name])
      (ut/tracked-dispatch [::wfx/request :default
                          {:message {:kind         :get-status
                                     :client-name  client-name}
@@ -9594,7 +9595,7 @@
  ::something-running?
  (fn [db _]
    (let [status (get db :status)]
-     ;(tap> [:status status])
+     ;(ut/tapp>> [:status status])
     ;;  (not (empty?
     ;;        (for [[k [v1 v2]] status
     ;;              :when (not (= v2 :done))] {k {(first v1) v2}})))
@@ -9603,7 +9604,7 @@
 (re-frame/reg-event-db
  ::prune-alerts
  (fn [db [_ & [all?]]]
-   ;(tap> [:all? all?])
+   ;(ut/tapp>> [:all? all?])
    (if (not @db/pause-alerts)
      (let [alerts (get db :alerts)
            ticktock (get-in db [:re-pollsive.core/polling :counter])]
@@ -9615,7 +9616,7 @@
 (re-frame/reg-event-db
  ::prune-alert
  (fn [db [_ alert-id]]
-   (tap> [:prune-alert alert-id])
+   (ut/tapp>> [:prune-alert alert-id])
    (if alert-id
      (let [alerts (get db :alerts)]
        (assoc db :alerts (vec (remove #(= (last %) alert-id) alerts))))
@@ -9623,21 +9624,23 @@
 
 (re-frame/reg-event-db
  ::clear-cache-atoms
- (fn [_ _]
+ (fn [db _]
+   (ut/tapp>> [:clearing-cache-atoms (get db :client-name)])
    (doseq [a [ut/replacer-data ut/replacer-cache ut/deep-flatten-data ut/deep-flatten-cache
-              ut/split-cache ut/split-cache-data ut/extract-patterns-data ut/extract-patterns-cache
+              ut/split-cache ut/split-cache-data ut/extract-patterns-data ut/extract-patterns-cache ut/clean-sql-atom ut/auto-font-atom
               ut/postwalk-replace-data-cache ut/postwalk-replace-cache ut/is-base64-atom ut/is-large-base64-atom
               ut/safe-name-cache ut/format-map-atom ut/body-set-atom ut/data-typer-atom ut/coord-cache]]
-     (reset! a {}))))
+     (reset! a {}))
+   db))
 
 (re-frame/reg-event-db
  ::purge-cache-atoms
  (fn [db _]
-   ;;(tap> [:prune-alert alert-id])
    (let [mem (get db :memory)
          js-heap (str (ut/bytes-to-mb (get mem 1)))
          js-heap-int (ut/bytes-to-mb-int (get mem 1))
          client-name (get db :client-name)
+         _ (ut/tapp>> [:purge-cache-atoms client-name])
          atom-size-map (ut/calculate-atom-sizes {:ut/replacer-data ut/replacer-data
                                                  :ut/replacer-cache ut/replacer-cache
 
@@ -9653,15 +9656,17 @@
                                                  :ut/postwalk-replace-data-cache ut/postwalk-replace-data-cache
                                                  :ut/postwalk-replace-cache ut/postwalk-replace-cache
 
+                                                 :ut/auto-font-atom ut/auto-font-atom
+
                                                  :db/flow-results db/flow-results
                                                  :db/scrubbers db/scrubbers
                                                  :ut/is-base64-atom ut/is-base64-atom
                                                  :ut/is-large-base64-atom ut/is-large-base64-atom
-                                                                           ;:websocket-fx.core/CONNECTIONS websocket-fx.core/CONNECTIONS
+                                                 ;:websocket-fx.core/CONNECTIONS websocket-fx.core/CONNECTIONS
                                                  :ut/safe-name-cache ut/safe-name-cache
                                                  :re-frame.db/app-db re-frame.db/app-db
                                                  :ut/clean-sql-atom ut/clean-sql-atom
-                                                                            ;:ut/deep-flatten-atom ut/deep-flatten-atom
+                                                 ;:ut/deep-flatten-atom ut/deep-flatten-atom
                                                  :ut/format-map-atom ut/format-map-atom
                                                  :ut/body-set-atom ut/body-set-atom
                                                  :ut/data-typer-atom ut/data-typer-atom
@@ -9671,30 +9676,30 @@
                  js/Number.
                  (.toFixed 3)
                  js/parseFloat)]
-      (tap> [:atom-sizes client-name :js-heap js-heap js-heap-int  :atoms-raw-ttl (str ttl "MB")  atom-size-map])
+      (ut/tapp>> [:atom-sizes client-name :js-heap js-heap js-heap-int  :atoms-raw-ttl (str ttl "MB")  atom-size-map])
       (js/console.log [:atom-sizes client-name :js-heap js-heap js-heap-int  :atoms-raw-ttl (str ttl "MB")  atom-size-map])
           (do
            ;;     (reset! ut/subscription-counts {}) ;; temp
            ;;     (reset! ut/dispatch-counts {}) ;; temp
            ;;     (reset! ut/simple-subscription-counts [])
            ;;     (reset! ut/simple-dispatch-counts [])
-     ;;(tap> [client-name :purge-postwalk? (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) (> (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) 15)])
+     ;;(ut/tapp>> [client-name :purge-postwalk? (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) (> (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) 15)])
             (when (> (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) 35)
-              (ut/purge-postwalk-cache 0.3))  ;; keep top 40% of freq cache hits
+              (ut/purge-postwalk-cache 0.25))  ;; keep top 25% of freq cache hits distro
 
-            (when (> (get-in atom-size-map [:ut/split-cache-data :mb]) 25)
-              (ut/purge-splitter-cache 0.3))
+            (when (> (get-in atom-size-map [:ut/split-cache-data :mb]) 35)
+              (ut/purge-splitter-cache 0.25))
 
-            (when (> (get-in atom-size-map [:ut/replacer-data :mb]) 25)
-              (ut/purge-replacer-cache 0.3))
+            (when (> (get-in atom-size-map [:ut/replacer-data :mb]) 35)
+              (ut/purge-replacer-cache 0.25))
 
-            (when (> (get-in atom-size-map [:ut/deep-flatten-data :mb]) 25)
-              (ut/purge-deep-flatten-cache 0.3))
+            (when (> (get-in atom-size-map [:ut/deep-flatten-data :mb]) 35)
+              (ut/purge-deep-flatten-cache 0.25))
 
-            (when (> (get-in atom-size-map [:ut/extract-patterns-data :mb]) 25)
-              (ut/purge-extract-patterns-cache 0.3))
+            (when (> (get-in atom-size-map [:ut/extract-patterns-data :mb]) 35)
+              (ut/purge-extract-patterns-cache 0.25))
 
-            ;(tap> [:hello? "you fucking idiots"])
+            ;(ut/tapp>> [:hello? "you fucking idiots"])
 
            ;;     ;(reset! ut/safe-name-cache [])
            ;;     ;(reset! ut/split-cache [])
@@ -9728,8 +9733,8 @@
 
          ]
 
-    ;; (tap> [:clean-up-on-isle-4 client-name run-it? :before (count ks-all) :after (count ks) :remove bye  :keep keepers])
-    ;;  (tap> [:ut-atom-sizes
+    ;; (ut/tapp>> [:clean-up-on-isle-4 client-name run-it? :before (count ks-all) :after (count ks) :remove bye  :keep keepers])
+    ;;  (ut/tapp>> [:ut-atom-sizes
     ;;         (count (keys @ut/replacer-atom)) (count (keys @ut/clean-sql-atom))
     ;;         (count (keys @ut/deep-flatten-atom)) (count (keys @ut/format-map-atom))
     ;;         (count (keys @ut/data-typer-atom))
@@ -9793,13 +9798,13 @@
                                  (let [p (get-in e [:message :ui-keypath])]
                                    p))))
          reco-counts @(ut/tracked-subscribe [::query-reco-counts table-name])]
-      ;(tap> [:mad-libs [combo-hash table-name] reco-counts])
-      ;;  (tap> [:yy (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
+      ;(ut/tapp>> [:mad-libs [combo-hash table-name] reco-counts])
+      ;;  (ut/tapp>> [:yy (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
       ;;               (let [p (get-in e [:message :ui-keypath])]
       ;;                 p))])
-     ;(tap> [:heehaw (empty? (get-in db [:data :viz-shapes])) (not (running? [:viz-shapes])) ])
+     ;(ut/tapp>> [:heehaw (empty? (get-in db [:data :viz-shapes])) (not (running? [:viz-shapes])) ])
      (when (and (empty? (get-in db [:data :viz-shapes])) (not (running? [:viz-shapes])))
-       ;(do (tap> "hey?")
+       ;(do (ut/tapp>> "hey?")
        (conn/sql-data [:viz-shapes]
                       {:select [:axes_logic :base_score
                                 :connection_id :library_shapes :selected_view
@@ -9835,11 +9840,11 @@
 (re-frame/reg-sub
  ::get-mad-libs-options
  (fn [db [_ panel-id src-table-id-str combo-hash]]
-    ;(tap> [:get-mad-libs-options panel-id src-table-id-str])
+    ;(ut/tapp>> [:get-mad-libs-options panel-id src-table-id-str])
    (let [rows          (get-in db [:data :mad-libs-viz panel-id src-table-id-str])
          shape-name    (get (first rows) :shape_name)
          current-combo (filter #(= (get % :combo_hash) combo-hash) rows)]
-      ;(tap> [:rows (first rows)])
+      ;(ut/tapp>> [:rows (first rows)])
      {:shape_name    shape-name
       :current-combo (into {} (for [[k v] (group-by :axes current-combo)] {k (first v)}))
       :data          (group-by (juxt :talias :field_name :walk1 :walk2 :walk3 :walka :axes) rows)})))
@@ -9867,7 +9872,7 @@
                             [:= :shape_name shape-name]]}]
                     ;:where [:= :key_hashes_hash hm]
                                       ; [rows (get-in db [:data :mad-libs-viz panel-id src-table-id-str])]
-      ;(tap> [:lookup kp2 :running? (not have-it?) (get (first (get-in db kp1)) :key_hashes) (pr-str axes-map)])
+      ;(ut/tapp>> [:lookup kp2 :running? (not have-it?) (get (first (get-in db kp1)) :key_hashes) (pr-str axes-map)])
       ;(filter #(= (sort (edn/read-string (get % :key_hashes))) (sort axes-map)) rows)
      (when (and (not have-it?) (not (running? kp2)))
        (conn/sql-data kp2 lk-sql))
@@ -9916,7 +9921,7 @@
                                            (assoc q :from [(keyword ffrom)]) q)))
                     query         (ut/postwalk-replacer {[:sum :rows] [:count 1]} query)]
 
-                ;(tap> [:rec-preview-block 2 view query reco-condis original-conn reco-selected])
+                ;(ut/tapp>> [:rec-preview-block 2 view query reco-condis original-conn reco-selected])
 
                 {:view   view
                  :query  query
@@ -9981,9 +9986,9 @@
                                                              vs   (ut/splitter vv "/")
                                                              qstr (ut/safe-name (first (ut/postwalk-replacer key-walk [(keyword (first vs))])))
                                                              vstr (last vs)]
-                                                         (tap> [:value-walk vv vs qstr vstr v (keyword (str qstr "/" vstr))])
+                                                         (ut/tapp>> [:value-walk vv vs qstr vstr v (keyword (str qstr "/" vstr))])
                                                          {v (keyword (str qstr "/" vstr))})))]
-    (tap> [:poss-value-walks poss-value-walks :key-walk key-walk :value-walk value-walk :query-keys query-keys])
+    (ut/tapp>> [:poss-value-walks poss-value-walks :key-walk key-walk :value-walk value-walk :query-keys query-keys])
     (merge (ut/postwalk-replacer (merge key-walk value-walk) ddata))))
 
 (re-frame/reg-event-db
@@ -10006,7 +10011,7 @@
                             [:= :key_hashes (pr-str axes-map)]
                             [:= :table_name src-table-id-str]
                             [:= :shape_name shape-name]]}]
-      ;(tap> [:lookup kp2 :running? (not exists?) (get (first (get-in db kp1)) :key_hashes) (pr-str axes-map)])
+      ;(ut/tapp>> [:lookup kp2 :running? (not exists?) (get (first (get-in db kp1)) :key_hashes) (pr-str axes-map)])
       ;(filter #(= (sort (edn/read-string (get % :key_hashes))) (sort axes-map)) rows)
      (when (and (not exists?) (not (running? kp2)))
        (conn/sql-data kp2 lk-sql))
@@ -10038,7 +10043,7 @@
          new-base-map  (modify-combo-viz view query condis conn combo-hash combo-name shape-name false src-table-id-str)
          query-keys    (keys (get-in db [:panels panel-id :queries])) ;; existing keyword aliases
          final-map     (final-combo-viz new-base-map panel-id query-keys)]
-     (tap> [:new-base-map new-base-map
+     (ut/tapp>> [:new-base-map new-base-map
             :final-combo-viz final-map
             :new-combo-block [view query condis conn error]
             :new-combo-row (first new-combo-row)])
@@ -10077,7 +10082,7 @@
 (re-frame/reg-sub
  ::get-viz-shape
  (fn [db [_ shape-name]]
-    ;(tap> [:get-mad-libs-options panel-id src-table-id-str])
+    ;(ut/tapp>> [:get-mad-libs-options panel-id src-table-id-str])
    (first (get (group-by :shape_name (get-in db [:data :viz-shapes])) shape-name))))
 
 (re-frame/reg-sub
@@ -10179,8 +10184,8 @@
                                               :panel-key k}}))))]
           ;kp (keyword (str (ut/safe-name panel-key) "-tab-rules"))
 
-      ;(tap> [:tab-rules tab-rules])
-      ;(tap> [:run-tab-fn-w tab-rules])
+      ;(ut/tapp>> [:tab-rules tab-rules])
+      ;(ut/tapp>> [:run-tab-fn-w tab-rules])
      (doseq [[[tab-name rule-name] {:keys [logic panel-key]}] tab-rules]
        (conn/sql-tab-meta [panel-key] [[tab-name rule-name]
                                         ;logic
@@ -10194,7 +10199,7 @@
                                           {kk vv}))))]
           ;connection-id (get-in db [:panels selected-block :connection-id])
 
-      ;(tap> [:all-condis all-condis])
+      ;(ut/tapp>> [:all-condis all-condis])
      (doseq [[k v] all-condis]
        (conn/sql-condi-meta [k] (sql-alias-replace-sub v))))))
       ;; do nothing
@@ -10219,7 +10224,7 @@
 
 ;;         ;(dorun
 ;;         (when (or (not data-exists?) unrun-sql?)
-;;           ;(do (tap> [:query-inner query])
+;;           ;(do (ut/tapp>> [:query-inner query])
 ;;           (if (or (empty? connection-id) (nil? connection-id))
 ;;             (conn/sql-data [k] query)
 ;;             (conn/sql-data [k] query connection-id)))       ;)
@@ -10241,7 +10246,7 @@
 ;;     :direction                 "horizontal"
 ;;     :preventSnapRefocus        true
 ;;     :calendarFocus             "backwards"
-;;     ;:onChange #(tap> (js->clj %))
+;;     ;:onChange #(ut/tapp>> (js->clj %))
 ;;     :onChange                  #()}])
 
 (defn sql-explanations-kp []
@@ -10296,12 +10301,12 @@
    (let [view (get-in db [:panels block-id :views selected-view])
          ;view-vec (ut/deep-flatten view)
          ]
-     ;;(tap> [:vv block-id selected-view (ut/find-next view-vec :data-viewer) (data-viewer-source view)])
+     ;;(ut/tapp>> [:vv block-id selected-view (ut/find-next view-vec :data-viewer) (data-viewer-source view)])
      ;;(ut/find-next view-vec :data-viewer)
      (data-viewer-source view))))
 
 (defn map-boxes2 [data block-id selected-view keypath kki init-data-type & [draggable?]]  ;; dupe of a fn inside flows, but w/o dragging - TODO refactor to single fn - 3/15/24
-  ;(tap> [:pre-data data])
+  ;(ut/tapp>> [:pre-data data])
   (let [sql-explanations (sql-explanations-kp)
         flow-name (ut/data-typer data)
         data (if (or (string? data) (number? data) (boolean? data)) [data] data)
@@ -10640,7 +10645,7 @@
                 (apply f args)))))))
 
 (defn nivo-data-check [edn-mass try-block]
-  ;(tap> [:nivo-data-check edn-mass])
+  ;(ut/tapp>> [:nivo-data-check edn-mass])
   (let [data     (get edn-mass :data)
         h        (get edn-mass :height "100%")
         w        (get edn-mass :width "100%")
@@ -10663,7 +10668,7 @@
      (catch :default e [re-com/box :child (str "reagent/adapt-react-class nivo-render-straight err: " e)]))))
 
 (defn nivo-render [edn-mass nivo-fn panel-key]              ;; nivo-line/Line
-  ;(tap> [:nivo (get edn-mass :data)])
+  ;(ut/tapp>> [:nivo (get edn-mass :data)])
   (let [data               (get edn-mass :data)
         transformation-map (get edn-mass :transformation-map)
         t-map?             (not (empty? transformation-map))
@@ -10689,7 +10694,7 @@
                                                   ;m-pair (merge m-pair1 m-pair2)
                                          m-pair  (into {} (for [[k v] m-pair2]
                                                             (when (not (nil? v)) {k v})))]
-                                     (tap> [:nivo-click-params (js->clj %) m-pair])
+                                     (ut/tapp>> [:nivo-click-params (js->clj %) m-pair])
                                      (doseq [[m1 m2] m-pair]
                                        (ut/tracked-dispatch [::conn/click-parameter [panel-key m1] m2]))
                                      ))
@@ -10703,26 +10708,26 @@
         node-size?         (keyword? (get edn-mass :nodeSize))
         edn-mass           (if node-size?
                              (assoc edn-mass :nodeSize #(do
-                                                          ;(tap> (js->clj %))
+                                                          ;(ut/tapp>> (js->clj %))
                                                           (get (walk/keywordize-keys (js->clj %))
                                                                (get edn-mass :nodeSize) 14)))
                              edn-mass)
         node-size2?        (and (keyword? (get edn-mass :size)) (= nivo-fn nivo-swarmplot/SwarmPlot))
         edn-mass           (if node-size2?
                              (assoc edn-mass :size #(do
-                                                      ;(tap> (js->clj %))
+                                                      ;(ut/tapp>> (js->clj %))
                                                       (get (walk/keywordize-keys (js->clj %))
                                                            (get edn-mass :size) 14)))
                              edn-mass)
         ;edn-mass (assoc-in edn-mass [:theme :grid :line :stroke] "green")
         ;edn-mass (assoc-in edn-mass [:theme] (get data :theme))
         ]
-   ;(tap> [:edn-mas edn-mass])
+   ;(ut/tapp>> [:edn-mas edn-mass])
     ;; (when (and (not has-keys?) t-map? (not (empty? (get transformation-map :pivot-by))))
-    ;;   (tap> [:keys (vec (cset/difference
+    ;;   (ut/tapp>> [:keys (vec (cset/difference
     ;;                      (set (keys (first post-data)))
     ;;                      (set (ut/deep-flatten transformation-map))))]))
-    ;(tap> [:nivo-nesting :transformed? t-map? data post-data])
+    ;(ut/tapp>> [:nivo-nesting :transformed? t-map? data post-data])
     [re-com/box
      :style {:overflow "hidden"}
      :child (nivo-data-check
@@ -10798,7 +10803,7 @@
  (fn [db [_ panel-key view-key layout-key root]]
    (let [[layout-kp layout-map] @(ut/tracked-subscribe [::get-layout-in panel-key view-key])
          target-kp (into layout-kp [:panels layout-key])]
-     (tap> [:deleting-layout-shape target-kp layout-key])
+     (ut/tapp>> [:deleting-layout-shape target-kp layout-key])
      (ut/dissoc-in db target-kp))))
 
 (re-frame/reg-event-db
@@ -10808,7 +10813,7 @@
    (let [[layout-kp layout-map] @(ut/tracked-subscribe [::get-layout-in panel-key view-key])
          target-kp (into layout-kp [:panels layout-key])
          new-kp (into layout-kp [:panels (keyword (str "cleared-" (rand-int 1234)))])]
-     (tap> [:clear-layout-assignment target-kp layout-key])
+     (ut/tapp>> [:clear-layout-assignment target-kp layout-key])
      (-> db
          (assoc-in new-kp (get-in db target-kp)) ;; insert new blank panel with all settings
          (ut/dissoc-in target-kp))))) ;; remove old one
@@ -10827,7 +10832,7 @@
           ;half-of (fn [x] (cond (and (> 0 x) (is-float? x)) (/ x 2)) )
          fck       (fn [x] (if (= x 0.99) 1.0 x))
          rup       (fn [x] (if (= x 1) 0.99 x))]
-     (tap> [:split-v-layout-shape target-kp layout-key])
+     (ut/tapp>> [:split-v-layout-shape target-kp layout-key])
      (-> db
          (ut/dissoc-in target-kp)
          (assoc-in (into layout-kp [:panels (keyword (str "empty-v-" (rand-int 1234)))])
@@ -10851,7 +10856,7 @@
           ;half-of (fn [x] (cond (and (> 0 x) (is-float? x)) (/ x 2)) )
          fck       (fn [x] (if (= x 0.99) 1.0 x))
          rup       (fn [x] (if (= x 1) 0.99 x))]           ;; "unfuck"
-     (tap> [:split-h-layout-shape target-kp layout-key])
+     (ut/tapp>> [:split-h-layout-shape target-kp layout-key])
      (-> db
          (ut/dissoc-in target-kp)
          (assoc-in (into layout-kp [:panels (keyword (str "empty-h-" (rand-int 1234)))])
@@ -11022,16 +11027,16 @@
                                                                            :top      top} pstyle)}
                                             ;leftovers (-> p (dissoc :style) (dissoc :h) (dissoc :w) (dissoc :root) (dissoc :k) (dissoc :id) (dissoc :view-ref) (dissoc :hidden?))
                                             leftovers     (dissoc p :style :h :w :z :root :k :view-ref :hidden? :id)]
-                                        ;(tap> [:occupied (all-occupied-coordinates (vals panels))])
-                                        ;(tap> [:test x (is-float? x)])
-                                        ;(tap> [:layoutz view-ref leftovers layout-map])
+                                        ;(ut/tapp>> [:occupied (all-occupied-coordinates (vals panels))])
+                                        ;(ut/tapp>> [:test x (is-float? x)])
+                                        ;(ut/tapp>> [:layoutz view-ref leftovers layout-map])
                                         (when (and root-visible? (not hidden?))
                                           (ut/mapply re-com/box (merge leftovers (if (or (keyword? view-ref) (and scrubber-on? (= panel-key selected-block) editor?))
                                                                                    blank-map box-map))))))))]
 
-    ;(tap> [:panels :proc hover-key1 processed-layout panels gli pp  ])
-    ;(tap> [:layout-maps panel-key layout-map pw-int ph-int p-x p-y boxes])
-    ;(tap> [:scrub-borders? scrub-borders?])
+    ;(ut/tapp>> [:panels :proc hover-key1 processed-layout panels gli pp  ])
+    ;(ut/tapp>> [:layout-maps panel-key layout-map pw-int ph-int p-x p-y boxes])
+    ;(ut/tapp>> [:scrub-borders? scrub-borders?])
     [re-com/h-box
      :size "none"
      :width (brix pw-int -10)
@@ -11049,14 +11054,14 @@
      :children boxes]))
 
 (defn dropdown [{:keys [choices field panel-key width button-style style placeholder]}]
-  ;(tap> [:dropdown? [choices @(ut/tracked-subscribe [::conn/clicked-parameter-key [:block-36/season]]) field]])
+  ;(ut/tapp>> [:dropdown? [choices @(ut/tracked-subscribe [::conn/clicked-parameter-key [:block-36/season]]) field]])
   
   (let [choice @(ut/tracked-subscribe [::conn/clicked-parameter-key [(try (keyword (str (name panel-key) "/" (name field))) (catch :default _ :error/error))]])
         choice (if (string? (get-in choices [0 :id])) (str choice) choice)
         choice (if (and (string? choice) (empty? (cstr/trim choice))) nil choice) ;; in case we get a blank string it wont register as not selected for the placeholder
         ;; choices (if all (conj all choices) choices)
         ;choices (vec (conj {:id nil :label (str placeholder)} choices))
-        ;; _ (tap> [:dropdown? panel-key choice  choices field  width style field])
+        ;; _ (ut/tapp>> [:dropdown? panel-key choice  choices field  width style field])
         width (if (string? width) (try (edn/read-string (ut/replacer width "px" "")) (catch :default _ 100)) width)
         ]
     [re-com/h-box
@@ -11095,7 +11100,7 @@
                                (if (get click-params k)
                                  {k (merge v (get click-params k))}
                                  {k v})))]
-     ;(tap> [query-key click-params merged-multis])
+     ;(ut/tapp>> [query-key click-params merged-multis])
      (merge click-params merged-multis))))
 
 (re-frame/reg-sub
@@ -11110,8 +11115,8 @@
                         ;;@(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]])
                    vvv ;;@(rfa/sub ::resolver/logic-and-params {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
                         ;;; ^^^^ :brave-red-butterfly is not sequable? what? so I wrapped in a vec. started after caching madness....
-                   ) (catch :default e (do (tap> [:rs-value-fuck-up-bricks vvv flow-id kkey src e]) vvv)))]
-         ;(tap> [:sketchy-rs-value? flow-id kkey vvv vv])
+                   ) (catch :default e (do (ut/tapp>> [:rs-value-fuck-up-bricks vvv flow-id kkey src e]) vvv)))]
+         ;(ut/tapp>> [:sketchy-rs-value? flow-id kkey vvv vv])
          vv)
        (get-in db [:runstreams flow-id :values kkey :value])))))
 
@@ -11128,7 +11133,7 @@
                                             ] ;;; dupe from buffy
                                         (if (and (vector? vv) (every? string? vv))
                                           (cstr/join "\n" vv) vv)))}))]
-     ;(when (cstr/includes? (str (get db :client-name)) "copper") (tap> [:override-map values override-map]))
+     ;(when (cstr/includes? (str (get db :client-name)) "copper") (ut/tapp>> [:override-map values override-map]))
      override-map)))
 
 (re-frame/reg-sub
@@ -11190,7 +11195,7 @@
                                   ;h (get data_d :_h 11)
                                   ;w (get data_d :_w 9)
 
-                                                                                  ;(tap> [:qkeys (get data_d :selected-view) qkeys views (ut/postwalk-replacer qkeys views)])
+                                                                                  ;(ut/tapp>> [:qkeys (get data_d :selected-view) qkeys views (ut/postwalk-replacer qkeys views)])
                               [honeycomb panel-key
                                                                                    ;(or (first (keys views)) (first (keys queries)))
                                key ;:view ;(get data_d :selected-view)
@@ -11227,7 +11232,7 @@
 ;;  (fn [db [_ type flow-id bid value]]
 ;;    (let [alerts (get db :alerts)]
 ;;      (filter #(let [un (vec (distinct (ut/deep-flatten %)))]
-;;                 (tap> [:alerts-flat un])
+;;                 (ut/tapp>> [:alerts-flat un])
 ;;                 ;false
 ;;                 )
 ;;              alerts)
@@ -11252,7 +11257,7 @@
  ::push-value
  (fn [db [_ flow-id bid value & [alert?]]]
    (let [client-name (get db :client-name)]
-     (tap> [:push-value flow-id bid value client-name])
+     (ut/tapp>> [:push-value flow-id bid value client-name])
      ;(ut/dispatch-delay 100 [::http/insert-alert [:box :child (str [:push-value-to flow-id bid value]) :style {:font-size "14px"}] 11 0.5 5])
      (ut/tracked-dispatch [::wfx/request :default
                          {:message    (merge
@@ -11373,7 +11378,7 @@
 (declare grid)
 
 (defn honeycomb [panel-key & [override-view fh fw replacement-view replacement-query]]         ;; can sub lots of this TODO. no need to pass it all
-  ;;(tap> [:repo panel-key override-view fh fw replacement-view replacement-query])
+  ;;(ut/tapp>> [:repo panel-key override-view fh fw replacement-view replacement-query])
   (let [;block-map panel-map ;@(ut/tracked-subscribe [::panel-map panel-key]) ;(get workspace panel-key) ;; ?
         ;da-sched @(ut/tracked-subscribe [::da-sched])
         ;;all-sql-call-keys      @(ut/tracked-subscribe [::all-sql-call-keys]) ;(into {} (for [[k v] workspace] (get v :queries)))
@@ -11405,8 +11410,8 @@
                                      (and (not (nil? override-view)) (not (some #(= % override-view) all-keys))) ; not nil, and doesnt exist - get first
                                      (first all-keys)
                                      :else nil)             ; else just do wahtever
-        ; _ (tap> [:sneaky panel-key orig-override-view override-view all-view-keys all-keys (and (not (nil? override-view)) (some #(= % override-view) all-keys))])
-        ;; _ (tap> [:kwrep (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") {:a :*this-block*/key-a
+        ; _ (ut/tapp>> [:sneaky panel-key orig-override-view override-view all-view-keys all-keys (and (not (nil? override-view)) (some #(= % override-view) all-keys))])
+        ;; _ (ut/tapp>> [:kwrep (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") {:a :*this-block*/key-a
         ;;                                                                                             :b {:c [:*this-block*/key-b
         ;;                                                                                                     :another/key "some value!!" 1 2 3 [:bananas/this.123]
         ;;                                                                                                     :*this-block*/key-c]
@@ -11426,7 +11431,7 @@
         ;name @(ut/tracked-subscribe [::panel-name brick-vec-key])
         px-width-int           (- ww 100)
         px-height-int          (- hh 105)
-       ; _ (tap> [:pp panel-key override-view sql-calls])
+       ; _ (ut/tapp>> [:pp panel-key override-view sql-calls])
         ;px-widthf-int (- ww 20)  ;(- ww 100)
         ;px-heightf-int (- hh 55) ;(- hh 105)
 
@@ -11439,12 +11444,12 @@
                                                [:box :child [:string x "hey"]
                                                 :style {:color "red"}])}))
                                           ;; drop map will have unresolved stuff, so we want to resolve it early-ish
-        ;_ (when (not (empty? drop-walks)) (tap> [:drop-walks drop-walks]))
+        ;_ (when (not (empty? drop-walks)) (ut/tapp>> [:drop-walks drop-walks]))
         walk-map               (merge
                                 ;drop-walks
                                 {;:re-com/box re-com/box ;; basics
                                  :box                   re-com/box
-                                ;;  :auto                  (fn [x] (tap> [:auto (ut/data-typer x)])
+                                ;;  :auto                  (fn [x] (ut/tapp>> [:auto (ut/data-typer x)])
                                 ;;                                     [re-com/box :child x])
                                   ;:re-com/h-box re-com/h-box
                                   ;:re-com/v-box re-com/v-box
@@ -11529,7 +11534,7 @@
                                         (apply str args))
 
                                 ;;  :get-in (fn [[m kp]]
-                                ;;            (tap> [:get-in panel-key m kp])
+                                ;;            (ut/tapp>> [:get-in panel-key m kp])
                                 ;;            (get-in m kp))
                                  :left-pad (fn [[num len]]
                                              (let [num-str (str num)
@@ -11790,7 +11795,7 @@
                                                                  (edn/read-string bid)
                                                                  (edn/read-string (str ":" bid))) (catch :default _ nil))
                                                       alert-id @(ut/tracked-subscribe [::lookup-alert-id :dialog-push flow-id bid value])]
-                                                  ;;(tap> [:alert-id alert-id])
+                                                  ;;(ut/tapp>> [:alert-id alert-id])
                                                   [re-com/box
                                                    :style {:cursor "pointer"}
                                                            ;D:font-size "11px"
@@ -11839,7 +11844,7 @@
                                                          (let [hid (hash [kk vv])
                                                                already? (some #(= hid (hash %)) @mutation-log)]
                                                            (when (not already?)
-                                                             (do (tap> [:forced-execution-from-honey-execute kk vv])
+                                                             (do (ut/tapp>> [:forced-execution-from-honey-execute kk vv])
                                                                  (swap! mutation-log conj hid)
                                                                  (ut/tracked-dispatch [::update-workspace-raw kk vv])))))
                                                        [re-com/box
@@ -11874,7 +11879,7 @@
                                                                overrides)
                                                    overrides? (ut/ne? overrides)]
 
-                                              ;;  (tap> [:overrides overrides])
+                                              ;;  (ut/tapp>> [:overrides overrides])
 
                                                [re-com/h-box
                                                 :size "auto"
@@ -11897,7 +11902,7 @@
                                                                         :on-click (fn [] (when (not running?) ;(not (some (fn [x] (= x text)) @db/speech-log))
                                                                                            (let [fstr (str "running flow " flow-id (when overrides? " (with overrides)"))
                                                                                                  w (/ (count fstr) 4.1)]
-                                                                                             ;(tap> [:fuck-me flow-id client-name overrides])
+                                                                                             ;(ut/tapp>> [:fuck-me flow-id client-name overrides])
                                                                                              (ut/tracked-dispatch
                                                                                               [::wfx/request :default
                                                                                                {:message    {:kind :run-flow
@@ -11941,7 +11946,7 @@
                                 ;;                                      :on-timeout [::http/timeout-response]
                                 ;;                                      :timeout    500000}])
 
-                                ;;  :run-flow-fn #(tap> [:cc (js->clj %)])
+                                ;;  :run-flow-fn #(ut/tapp>> [:cc (js->clj %)])
 
                                  :case (fn [x] (ut/vectorized-case x))
 
@@ -11966,7 +11971,7 @@
                                 ; :data-color #(get @(ut/tracked-subscribe [::conn/data-colors]) (ut/data-typer %))
 
                                 ; :condi-fill-fn #(let [dd (js->clj % :keywordize-keys true)]
-                                ;                         (tap> [:dd dd])
+                                ;                         (ut/tapp>> [:dd dd])
                                 ;                         (if (= (get dd :season) "Summer")
                                 ;                           "#ffffff" "#8884d8"))
 
@@ -11996,7 +12001,7 @@
                                  :test-params-fn #(ut/tracked-dispatch [::conn/click-parameter [panel-key] (str %)]) ;; (walk/keywordize-keys (js->clj (.-features %)))
                                  :params> #(ut/tracked-dispatch [::conn/click-parameter [panel-key] (js->clj % :keywordize-keys true)])
 
-                                 ;:viewport-params-fn #(tap> (str %))
+                                 ;:viewport-params-fn #(ut/tapp>> (str %))
                                  ;;(fn [new-viewport] (reset! viewport new-viewport))
 
                                  :as-e (fn [x] [reagent/as-element x])
@@ -12031,7 +12036,7 @@
         ; (get block-map :queries)
         ;;body                   @(ut/tracked-subscribe [::views panel-key])
         body                   @(rfa/sub ::views {:panel-key panel-key})
-       ; _ (tap> [:body replacement-view body])
+       ; _ (ut/tapp>> [:body replacement-view body])
         body (if replacement-view
                replacement-view ;{selected-view replacement-view}
               ; (try {selected-view (edn/read-string replacement-view)}
@@ -12070,7 +12075,7 @@
                                                 ;data-subbed-modded (read-string (ut/replacer (str data-subbed-src) #":box "
                                                 ;                                 (str ":box :attr {:on-click #(re-frame.core/dispatch [::rvbbit-frontend.connections/click-parameter [" k "] \"test\"])} ")))
 
-                                            ; (tap> [:vsql k (vsql-map v) data-subbed-src])
+                                            ; (ut/tapp>> [:vsql k (vsql-map v) data-subbed-src])
                                             {k (vsql-map data-subbed-src)})))
         ;body orig-body ;@(ut/tracked-subscribe [::views panel-key]) ;(get block-map :views)
         ;layered-body @(ut/tracked-subscribe [::layered-oz-views panel-key])
@@ -12130,7 +12135,7 @@
                                           {k
                                            ;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
                                            @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
-        ;;_ (when (= panel-key :block-55) (tap> [:workspace-params workspace-params]))  
+        ;;_ (when (= panel-key :block-55) (ut/tapp>> [:workspace-params workspace-params]))  
         value-walks-targets    (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
         value-walks            (into {} (for [k value-walks-targets] ;all-sql-call-keys]
                                           (let [fs    (ut/splitter (ut/safe-name k) "/")
@@ -12183,21 +12188,21 @@
         ;;                                          logic-kps (into {} (for [[_ v]
         ;;                                                                   (into {} (filter #(cstr/starts-with? (str (last %)) "[:if") kps))]
         ;;                                                               (let [[_ l this that] v]
-        ;;                                                                 ;(tap> [:if-walk panel-key kps l this that])
+        ;;                                                                 ;(ut/tapp>> [:if-walk panel-key kps l this that])
         ;;                                                                 {v (if l this that)})))]
         ;;                                      (ut/postwalk-replacer logic-kps obody)))
         into-walk-map2           (fn [obody] (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                                                    kps       (ut/extract-patterns obody :into 3) ;(kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
                                                    logic-kps (into {} (for [v kps]
                                                                         (let [[_ this that] v]
-                                                                                ;(tap> [:if-walk panel-key kps l this that])
+                                                                                ;(ut/tapp>> [:if-walk panel-key kps l this that])
                                                                           {v (into this that)})))]
                                                (ut/postwalk-replacer logic-kps obody)))
         if-walk-map2           (fn [obody] (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                                                  kps       (ut/extract-patterns obody :if 4) ;(kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
                                                  logic-kps (into {} (for [v kps]
                                                                       (let [[_ l this that] v]
-                                                                        ;(tap> [:if-walk panel-key kps l this that])
+                                                                        ;(ut/tapp>> [:if-walk panel-key kps l this that])
                                                                         {v (if
                                                                             (if (vector? l)
                                                                               (resolver/logic-and-params l nil)
@@ -12219,24 +12224,24 @@
         ;;                                          logic-kps (into {} (for [[_ v]
         ;;                                                                   (into {} (filter #(cstr/starts-with? (str (last %)) "[:=") kps))]
         ;;                                                               (let [[_ that this] v]
-        ;;                                                                 ;(tap> [:=-walk panel-key kps this that])
+        ;;                                                                 ;(ut/tapp>> [:=-walk panel-key kps this that])
         ;;                                                                 {v (= (str that) (str this))})))]
-        ;;                                      ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
+        ;;                                      ;(ut/tapp>> [:=-walk/logic-kps logic-kps kps workspace-params])
         ;;                                      (ut/postwalk-replacer logic-kps obody)))
         =-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody := 3)
                                                  logic-kps (into {} (for [v kps]
                                                                       (let [[_ that this] v]
-                                                                        ;(tap> [:=-walk panel-key kps this that])
+                                                                        ;(ut/tapp>> [:=-walk panel-key kps this that])
                                                                         {v (= (str that) (str this))})))]
-                                             ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
+                                             ;(ut/tapp>> [:=-walk/logic-kps logic-kps kps workspace-params])
                                              (ut/postwalk-replacer logic-kps obody)))
         auto-size-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :auto-size-px 2)
                                                          logic-kps (into {} (for [v kps]
                                                                               (let [[_ l] v]
-                                                                        ;(tap> [:=-walk panel-key kps this that])
+                                                                        ;(ut/tapp>> [:=-walk panel-key kps this that])
                                                                                 {v (ut/auto-font-size-px l h w)})))] ;(= (str that) (str this))
 
-                                             ;(tap> [:=-walk/logic-kps logic-kps kps workspace-params])
+                                             ;(ut/tapp>> [:=-walk/logic-kps logic-kps kps workspace-params])
                                                      (ut/postwalk-replacer logic-kps obody)))
         ;; onclick-walk-map       (fn [obody] (let [kps       (kv-map-fn obody) ;(into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
         ;;                                          logic-kps (into {} (for [[_ v]
@@ -12244,24 +12249,24 @@
         ;;                                                               (let [[_ pkey pval] v
         ;;                                                                     raw-param-key (get-in vsql-calls (conj (vec (first (filter #(= (last %) :on-click)
         ;;                                                                                                                                (ut/kvpaths vsql-calls)))) 1) pkey)]
-        ;;                                                                 ;(tap> [:on-click-hack panel-key v raw-param-key])
+        ;;                                                                 ;(ut/tapp>> [:on-click-hack panel-key v raw-param-key])
         ;;                                                                 {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
-        ;;                                      ;(tap> [:set-param/logic-kps logic-kps kps])
+        ;;                                      ;(ut/tapp>> [:set-param/logic-kps logic-kps kps])
         ;;                                      (ut/postwalk-replacer logic-kps obody)))
         onclick-walk-map2      (fn [obody] (let [kps       (ut/extract-patterns obody :set-parameter 3)
                                                  logic-kps (into {} (for [v kps]
                                                                       (let [[_ pkey pval] v
                                                                             raw-param-key (get-in vsql-calls (conj (vec (first (filter #(= (last %) :on-click)
                                                                                                                                        (ut/kvpaths vsql-calls)))) 1) pkey)]
-                                                                        ;(tap> [:on-click-hack panel-key v raw-param-key])
+                                                                        ;(ut/tapp>> [:on-click-hack panel-key v raw-param-key])
                                                                         {v (fn [] (ut/tracked-dispatch [::conn/click-parameter [panel-key] {raw-param-key pval}]))})))]
-                                             ;(tap> [:set-param/logic-kps logic-kps kps])
+                                             ;(ut/tapp>> [:set-param/logic-kps logic-kps kps])
                                              (ut/postwalk-replacer logic-kps obody)))
 
         map-walk-map2            (fn [obody] (let [kps       (ut/extract-patterns obody :map 3)
                                                    logic-kps (into {} (for [v kps]
                                                                         (let [[_ that this] v]
-                                                                        ;(tap> [:=-walk panel-key kps this that])
+                                                                        ;(ut/tapp>> [:=-walk panel-key kps this that])
                                                                           {v ;(resolver/logic-and-params
                                                                            (resolver/logic-and-params (if (vector? this)
                                                                                                         (vec (for [r this]
@@ -12274,13 +12279,13 @@
                                                                              ; panel-key)
                                                                          ;(= (str that) (str this))
 
-                                              ; (tap> [:=map/logic-kps logic-kps kps  ])
+                                              ; (ut/tapp>> [:=map/logic-kps logic-kps kps  ])
                                                (ut/postwalk-replacer logic-kps obody)))
 
         ;; map-walk-map3            (fn [obody] (let [kps       (ut/extract-patterns obody :map2 3) ;;; TEMP!!
         ;;                                            logic-kps (into {} (for [v kps]
         ;;                                                                 (let [[_ that this] v]
-        ;;                                                                 ;(tap> [:=-walk panel-key kps this that])
+        ;;                                                                 ;(ut/tapp>> [:=-walk panel-key kps this that])
         ;;                                                                   {v ;(resolver/logic-and-params
         ;;                                                                    (if (vector? this)
         ;;                                                                      (vec (for [r this]
@@ -12290,7 +12295,7 @@
         ;;                                                                      ; panel-key)
         ;;                                                                  ;(= (str that) (str this))
 
-        ;;                                        ;(tap> [:=map2/logic-kps logic-kps kps  ])
+        ;;                                        ;(ut/tapp>> [:=map2/logic-kps logic-kps kps  ])
         ;;                                        (ut/postwalk-replacer logic-kps obody)))
 
         ;; scrubber-walk-map2            (fn [obody] (try
@@ -12298,7 +12303,7 @@
         ;;                                                   kps2       (ut/extract-patterns obody :scrubber3 3)
         ;;                                                   logic-kps (into {} (for [v kps]
         ;;                                                                        (let [[_ this] v]
-        ;;                                                                        ;(tap> [:scrubber2 panel-key kps this])
+        ;;                                                                        ;(ut/tapp>> [:scrubber2 panel-key kps this])
         ;;                                                                          {v [scrubber-panel true
         ;;                                                                              @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                              :param
@@ -12306,7 +12311,7 @@
         ;;                                                                              {:fm true :canvas? true}]})))
         ;;                                                   logic-kps2 (into {} (for [v kps2]
         ;;                                                                         (let [[_ this opts] v]
-        ;;                                                                         ;(tap> [:scrubber3 panel-key kps this])
+        ;;                                                                         ;(ut/tapp>> [:scrubber3 panel-key kps this])
         ;;                                                                           {v [scrubber-panel true
         ;;                                                                               @(ut/tracked-subscribe [::keypaths-in-params :param])
         ;;                                                                               :param
@@ -12315,7 +12320,7 @@
         ;;                                                   ;; logic-kps2 {}
         ;;                                                   ]
         ;;                                               (ut/postwalk-replacer (merge logic-kps2 logic-kps) obody))
-        ;;                                             (catch :default e (do (tap> [:scrubber-honey-comb-error (str e)]) obody))))
+        ;;                                             (catch :default e (do (ut/tapp>> [:scrubber-honey-comb-error (str e)]) obody))))
 
         string-walk            (fn [num obody] (let [kps       (ut/extract-patterns obody :string3 num)
                                                      logic-kps (into {} (for [v kps]
@@ -12352,7 +12357,7 @@
         ;; honey-walk            (fn [obody] (let [kps       (ut/extract-patterns obody :*render* 2)
         ;;                                         logic-kps (into {} (for [v kps]
         ;;                                                              (let [[_ data_d] v]
-        ;;                                                                (tap> [:data_d data_d])
+        ;;                                                                (ut/tapp>> [:data_d data_d])
         ;;                                                                {v ;(keyword (ut/replacer (str that this) #":" ""))
         ;;                                                                 (let [queries (get data_d :queries)
         ;;                                                                  ;views {:view (get data_d :view)}
@@ -12364,7 +12369,7 @@
         ;;                                                                     ;                                [:= nil :country] [:= 1 1]} ndata)
         ;;                                                                      ; ndata data_d
 
-        ;;                                                                   (tap> [:qkeys panel-key qkeys ndata])
+        ;;                                                                   (ut/tapp>> [:qkeys panel-key qkeys ndata])
         ;;                                                                   [honeycomb :block-213 ;panel-key
         ;;                                                                            ;(or (first (keys views)) (first (keys queries)))
         ;;                                                                    :new-view ;(get data_d :selected-view)
@@ -12394,7 +12399,7 @@
                         (when (not running?) ;(not (some (fn [x] (= x text)) @db/speech-log))
                           (let [fstr (str panel-key " DROP running flow " flow-id " (with double overrides)")
                                 w (/ (count fstr) 4.1)]
-                            ;(tap> [:run? flow-id-inst])
+                            ;(ut/tapp>> [:run? flow-id-inst])
                             (ut/tracked-dispatch [::wfx/request :default
                                                   {:message    {:kind :run-flow
                                                                 :flow-id flow-id
@@ -12425,8 +12430,8 @@
                          out (get drop-deets :out)
                          out-param (keyword (str "flow/" flow-id-inst ">" out))]
                       ;; :flow/choppa-my-addy>:addy-baddie
-                    ;; (tap> [:drop-deets out-param val drop-deets @drop-last-tracker-refs @drop-last-tracker])
-                     ;;(tap> [:dd drop-id val out-param flow-id flow-id-inst w h])
+                    ;; (ut/tapp>> [:drop-deets out-param val drop-deets @drop-last-tracker-refs @drop-last-tracker])
+                     ;;(ut/tapp>> [:dd drop-id val out-param flow-id flow-id-inst w h])
                     ;;  [:box
                     ;;   :style {:color "red"}
                     ;;   :child [:strings "we dropped! " drop-id " " val]]
@@ -12437,7 +12442,7 @@
                             ;(not= (hash [drop-id val]) (get-in @drop-last-tracker [panel-key drop-id val]))
                             (not= (hash val) (get-in @drop-last-tracker [panel-key drop-id])))
                        ;(swap! drop-last-tracker assoc-in [panel-key drop-id val] (hash [drop-id val]))
-                       ;(tap> [:drop-running? drop-id val out-param flow-id flow-id-inst])
+                       ;(ut/tapp>> [:drop-running? drop-id val out-param flow-id flow-id-inst])
                        (swap! drop-last-tracker assoc-in [panel-key drop-id] (hash val))
                        (swap! drop-last-tracker-refs assoc [panel-key drop-id] out-param)
                        (run-rs-flow flow-id flow-id-inst panel-key drop-overrides))
@@ -12481,7 +12486,7 @@
         ;body (ut/postwalk-replacer data-walks body)
         ;body (ut/postwalk-replacer workspace-params body)
         ;body (if (string? body) [re-com/box :child "YOOOOO"] body)
-        ;_ (when (= panel-key :block-5474) (tap> [:prebody body]))
+        ;_ (when (= panel-key :block-5474) (ut/tapp>> [:prebody body]))
         ;obody-key-set (set (filter keyword? (ut/deep-flatten body))) ;; cache in atom if unchanged? cheaper? TODO
 
 
@@ -12489,9 +12494,9 @@
         has-fn? (fn [k] (some #(= % k) obody-key-set))
         ;has-drops? (not (empty? (cset/intersection (set all-drops) obody-key-set)))
         has-drops? (boolean (some obody-key-set all-drops)) ;; faster?
-        ;;_ (tap> [:all-drops all-drops has-drops? panel-key])
+        ;;_ (ut/tapp>> [:all-drops all-drops has-drops? panel-key])
         ;pre-body               body
-        ;; _ (when (= panel-key :block-1774) (tap> [:prebody selected-view body]))
+        ;; _ (when (= panel-key :block-1774) (ut/tapp>> [:prebody selected-view body]))
         body                   (cond->> body
                                  true (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
                                     ;;(ut/postwalk-replacer walk-map) ;;; moved up from after like 6470 - 10/17/23
@@ -12545,15 +12550,15 @@
         
         ;body      (drop-walk-replace body (vec (keys drop-walks))) ;; sketch? but only way we can retain data struct and not functionize like the others
                                                                    ;; since we STILL want to be resolved like it was regular honeycomb
-       ; _ (when (= panel-key :block-5474) (tap> [:midbody body]))
+       ; _ (when (= panel-key :block-5474) (ut/tapp>> [:midbody body]))
         ; body (let []
-        ;        (tap> [:body-pre body])
+        ;        (ut/tapp>> [:body-pre body])
         ;        (onclick-walk-map body))
         ;body (ut/postwalk-replacer drop-walks body)
         body                   (ut/postwalk-replacer walk-map body)
 
-        ;; _ (when (= panel-key :block-1774) (tap> [:postbody selected-view body]))
-       ; _ (when (= panel-key :block-5474) (tap> [:postbody body]))
+        ;; _ (when (= panel-key :block-1774) (ut/tapp>> [:postbody selected-view body]))
+       ; _ (when (= panel-key :block-5474) (ut/tapp>> [:postbody body]))
         ;; body (-> body
         ;;          =-walk-map ;; test, needs to be first - "and" after... THEN if...
         ;;          if-walk-map ;; ifs needs special treatment - must replace BEFORE reg view vecs
@@ -12601,23 +12606,23 @@
 
     ;; (when templates?
     ;;   (let []
-    ;;     (tap> [:honeyresolver templated-strings-vals
+    ;;     (ut/tapp>> [:honeyresolver templated-strings-vals
     ;;            templated-strings-walk
     ;;            (ut/deep-template-replace templated-strings-walk body)
     ;;            body panel-key valid-body-params]))
     ;;   )
 
 
-      ;;(tap> [:pok! ww hh panel-key selected-view orig-override-view all-keys override-view sql-calls override-view fh fw replacement-view replacement-query body])
+      ;;(ut/tapp>> [:pok! ww hh panel-key selected-view orig-override-view all-keys override-view sql-calls override-view fh fw replacement-view replacement-query body])
 
    ; (when (= panel-key :block-10980)
-   ;   (tap> [:honeycomb-params panel-key workspace-params value-walks body]))
+   ;   (ut/tapp>> [:honeycomb-params panel-key workspace-params value-walks body]))
 
-    ;(tap> [:react-me-baby @on-block?]) ;; TODO this is horseshit, testing something
+    ;(ut/tapp>> [:react-me-baby @on-block?]) ;; TODO this is horseshit, testing something
 
-    ;(tap> [:base-tables base-tables])
+    ;(ut/tapp>> [:base-tables base-tables])
     ;(when (= panel-key :block-10550) ;(cstr/includes? (str body) "fark")
-    ;;  (tap> [:honeycomb panel-key
+    ;;  (ut/tapp>> [:honeycomb panel-key
     ;;         ;;(get-in @dragging-body [:drag-meta :type])
     ;;         ;(ut/extract-patterns pre-body :if 4) (if-walk-map2 pre-body)
     ;;         body
@@ -12644,11 +12649,11 @@
     ;;       ;;    (into {} (for [v (ut/kvpaths dd)] {v (get-in dd v)})))
     ;;        ])
     ; )
-    ;(tap> {:mapply (ut/mapply re-com/box {:align :center :child "" :size "auto"})})
-    ;(tap> [:tt overlay? @mad-libs-view selected-view selected-view-is-sql? override-view-is-sql? (and (= selected-view @mad-libs-view) (or selected-view-is-sql? override-view-is-sql?))])
-    ; (tap> [:base-tables base-tables :base-table-sniffs base-table-sniffs])
-    ; (tap> [:body-post body])
-    ; (tap> [:condi condi-walks
+    ;(ut/tapp>> {:mapply (ut/mapply re-com/box {:align :center :child "" :size "auto"})})
+    ;(ut/tapp>> [:tt overlay? @mad-libs-view selected-view selected-view-is-sql? override-view-is-sql? (and (= selected-view @mad-libs-view) (or selected-view-is-sql? override-view-is-sql?))])
+    ; (ut/tapp>> [:base-tables base-tables :base-table-sniffs base-table-sniffs])
+    ; (ut/tapp>> [:body-post body])
+    ; (ut/tapp>> [:condi condi-walks
     ;        :body (let [obody (ut/postwalk-replacer condi-walks orig-body)
     ;                    kps (into {} (for [p (ut/kvpaths
     ;                                          obody)] {p (get-in obody p)}))
@@ -12660,13 +12665,13 @@
     ;                logic-kps
     ;                ;(ut/postwalk-replacer logic-kps obody)
     ;                )])
-    ;(tap> [:condi-walks condi-walks])
-    ;(tap> [:honeycomb panel-key valid-body-params value-walks])
-    ;(when selected-view-is-ref? (tap> [:ref selected-view (get body selected-view)
+    ;(ut/tapp>> [:condi-walks condi-walks])
+    ;(ut/tapp>> [:honeycomb panel-key valid-body-params value-walks])
+    ;(when selected-view-is-ref? (ut/tapp>> [:ref selected-view (get body selected-view)
     ;                                   (view-alias-replace (get body selected-view))]))
-    ;(tap> [:honeycomb panel-key single-view? selected-view selected-view-is-sql?])
-    ;(tap> [:doruns (merge sql-calls base-table-sniffs)])
-    ;(tap> [:base-tables base-tables])
+    ;(ut/tapp>> [:honeycomb panel-key single-view? selected-view selected-view-is-sql?])
+    ;(ut/tapp>> [:doruns (merge sql-calls base-table-sniffs)])
+    ;(ut/tapp>> [:base-tables base-tables])
     (doseq [[k v] (merge sql-calls base-table-sniffs)] ;; base-table-sniffs allow us to get metadata for the root tables quietly
       (let [
             query        (sql-alias-replace-sub v)
@@ -12680,7 +12685,7 @@
                    ;query (assoc query :last-know-fields last-known-fields)
 
 
-              ;;  (tap> [:query-all-clicked k data-exists? unrun-sql? query])
+              ;;  (ut/tapp>> [:query-all-clicked k data-exists? unrun-sql? query])
 
         (when (or (not data-exists?) unrun-sql?)
           (let [src @(rfa/sub ::conn/sql-source {:kkey k})
@@ -12692,7 +12697,7 @@
               (ut/tracked-dispatch [::insert-sql-source k query]))))))
 
     ;(when (= panel-key :block-289)
-    ;  (tap> [:honeycomb panel-key (keys sql-calls) (true? (seq body)) override-view selected-view body (get body selected-view) (first (keys body)) sql-aliases-used used-datasets]))
+    ;  (ut/tapp>> [:honeycomb panel-key (keys sql-calls) (true? (seq body)) override-view selected-view body (get body selected-view) (first (keys body)) sql-aliases-used used-datasets]))
 
     (cond ;;replacement-all? [rc/catch [re-com/box :child (get body selected-view)]] ;[re-com/box :child (get body override-view)]
 
@@ -12702,7 +12707,7 @@
             (if (= override-view :base)
 
               (let []
-                    ;(tap> [:here?])
+                    ;(ut/tapp>> [:here?])
                 [re-com/box ;:size "auto"
                  :style {:filter (if overlay? "blur(3px) opacity(60%)" "none")}
                  :child body])
@@ -12713,7 +12718,7 @@
                  [magic-table panel-key [override-view]]]
 
                 (let []
-                      ;(tap> [:here? override-view (get body override-view)])
+                      ;(ut/tapp>> [:here? override-view (get body override-view)])
                   [rc/catch
                    [re-com/box
                     :width (px ww)
@@ -13071,7 +13076,7 @@
         valid-body-params      @(rfa/sub ::valid-body-params {:panel-key panel-key})
         possible-datasets-used (set (for [e (merge sql-calls valid-body-params)] (keyword (nth (ut/splitter (ut/safe-name e) #"/") 0))))
         used-datasets          (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys)))]
-    (tap> [:pos panel-key possible-datasets-used])
+    (ut/tapp>> [:pos panel-key possible-datasets-used])
     (vec (for [d used-datasets] @(ut/tracked-subscribe [::lookup-panel-key-by-query-key d])))))
 
 (defn draw-lines [coords]
@@ -13087,8 +13092,8 @@
                  ; involved? (and involved1? involved2?)
                  ; peek? @(ut/tracked-subscribe [::peek?])
 
-            ;; (tap> [:coords coords])
-             ; (tap> [:lines z1 z2 same-tab? @(ut/tracked-subscribe [::what-tab z1]) @(ut/tracked-subscribe [::what-tab z2])])
+            ;; (ut/tapp>> [:coords coords])
+             ; (ut/tapp>> [:lines z1 z2 same-tab? @(ut/tracked-subscribe [::what-tab z1]) @(ut/tracked-subscribe [::what-tab z2])])
              [:path {:stroke-width (if involved? 16 13)
                      :stroke       (if involved? color "#ffffff22") ;(if (or involved? nothing-selected?)
                      ;(if (nil? color) "pink" color) "#E6E6FA")
@@ -13115,7 +13120,7 @@
                  {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace-sub vv)})))}))
            new-h (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
-      ;;  (tap> [:!!!!!!!panels-pushed!!!!!! client-name (get db :panels-hash) ppr new-h])
+      ;;  (ut/tapp>> [:!!!!!!!panels-pushed!!!!!! client-name (get db :panels-hash) ppr new-h])
        (conn/push-panels-to-server pp ppr client-name)
        (ut/dispatch-delay 2000 [::refresh-history-log])
        (assoc db :panels-hash new-h)) db)))
@@ -13192,7 +13197,7 @@
          [hh ww]  (ut/canvas-size coords+)
          corner [(* -1 (first corner)) (* -1 (last corner))]
          [hh ww] [(+ hh (first corner)) (+ ww (last corner))]]
-     ;(tap> [:tab-recenter corner [hh ww] coords])
+     ;(ut/tapp>> [:tab-recenter corner [hh ww] coords])
      (vec (into corner [hh ww])))))
 
 (re-frame/reg-sub
@@ -13203,7 +13208,7 @@
                            @(rfa/sub ::all-roots-tab {:tab tab})
                            ] [x y]))
          corner (try (ut/min-at-least-pos coords) (catch :default _ [0 0]))]
-     ;(tap> [:tab-recenter corner [hh ww] coords])
+     ;(ut/tapp>> [:tab-recenter corner [hh ww] coords])
      corner)))
 
 (re-frame/reg-sub
@@ -13303,13 +13308,13 @@
                  p)
          any? (not (empty? finds))]
     ;;  (when (= panel-key :block-5474)
-    ;;    (tap> [:flow-view panel-key view any?   finds]))
+    ;;    (ut/tapp>> [:flow-view panel-key view any?   finds]))
      any?)))
 
 (re-frame/reg-sub
  ::has-a-running-flow-view?
  (fn [db [_ panel-key view]]
-   ;(tap> [panel-key])
+   ;(ut/tapp>> [panel-key])
    (let [panel-map (get-in db [:panels panel-key :views view])
          ppile (ut/deep-flatten panel-map)
          ;pile (filter #(cstr/starts-with? (str %) ":flow/") (ut/deep-flatten panel-map)) ;; lol, this is a rabbit-code, not the resulting params
@@ -13324,7 +13329,7 @@
                                              runkey (keyword (str (first spl) ">*running?"))]
                                          (get-in db [:click-param :flow runkey]))))]
     ;;  (when (= panel-key :block-5474)
-    ;;    (tap> [:running-flow-view panel-key view   running?   finds]))
+    ;;    (ut/tapp>> [:running-flow-view panel-key view   running?   finds]))
      running?)))
 
 
@@ -13373,7 +13378,7 @@
 
 ;; (defn rs [edn brick-vec-key]
 ;;   (let [rr (resolver/logic-and-params edn brick-vec-key)]
-;;     ;(tap> [:rs-d rr])
+;;     ;(ut/tapp>> [:rs-d rr])
 ;;     (swap! rs-debug conj [rr edn brick-vec-key])
 ;;     rr))
 
@@ -13381,7 +13386,7 @@
   (let [
         ;;rr (resolver/logic-and-params edn brick-vec-key)
         ]
-    ;(tap> [:rs-d rr])
+    ;(ut/tapp>> [:rs-d rr])
     (swap! rs-debug conj [edn brick-vec-key])
     edn)) ;; something very fucked up here, need to revise this whole appraoch. slow and weird.
 
@@ -13390,7 +13395,7 @@
  ::resolved-block-body-shell 
  (fn [db [_ {:keys [panel-key]}]]
    (let [body (get-in db [:panels panel-key])
-          ;;_ (tap> [:oo panel-key body])
+          ;;_ (ut/tapp>> [:oo panel-key body])
          body (-> body (dissoc :views) (dissoc :queries))]
      (resolver/logic-and-params-fn body panel-key)
      ;@(rfa/sub ::logic-and-params {:m body :p panel-key})
@@ -13455,8 +13460,8 @@
         ;diff-grid (merge (remove used-bricks current-grid) brick-roots)
         top-start      (* start-y brick-size)               ;-100 ;; if shifted some bricks away...
         left-start     (* start-x brick-size)]
-    ;(tap> @panels-hash)
-    ;(tap> [:something-running? @(ut/tracked-subscribe [::something-running?])])
+    ;(ut/tapp>> @panels-hash)
+    ;(ut/tapp>> [:something-running? @(ut/tracked-subscribe [::something-running?])])
 
     (when (not @on-scrubber?) ;true ; external?
       (when (not (= panels-hash2 panels-hash1))  ;; core update for blind backend updating / external editing 2-way
@@ -13465,18 +13470,18 @@
     ;; ^^  TODO should this be at the honeycomb level instead? grid is one hell of a tick to key off of... feels overly sledgehammer-y.
 
 
-    ;; (tap> [:sub-tracker @(rfa/sub ::client-name) (vec (take 40 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/subscription-counts)))))])
-    ;; (tap> [:dispatch-tracker @(rfa/sub ::client-name) (vec (take 40 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/dispatch-counts)))))])
-    ;; (tap> [:dispatch-peek! (vec (map first @ut/dispatch-counts))])
-    ;; (tap> [:sub-counter @(rfa/sub ::client-name) @ut/parameter-keys-hit])
+    ;; (ut/tapp>> [:sub-tracker @(rfa/sub ::client-name) (vec (take 40 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/subscription-counts)))))])
+    ;; (ut/tapp>> [:dispatch-tracker @(rfa/sub ::client-name) (vec (take 40 (reverse (map (fn [x] [(last x) (first x)]) (sort-by last @ut/dispatch-counts)))))])
+    ;; (ut/tapp>> [:dispatch-peek! (vec (map first @ut/dispatch-counts))])
+    ;; (ut/tapp>> [:sub-counter @(rfa/sub ::client-name) @ut/parameter-keys-hit])
 
     (when false ;; (cstr/includes? (str @(rfa/sub ::client-name)) "emerald")
-      (tap> [:dispatch-peek! @(rfa/sub ::client-name)  (vec (reverse (sort-by val (frequencies @ut/simple-dispatch-counts))))])
-      (tap> [:sub-peek! @(rfa/sub ::client-name)  (vec (reverse (sort-by val (frequencies @ut/simple-subscription-counts))))]))
+      (ut/tapp>> [:dispatch-peek! @(rfa/sub ::client-name)  (vec (reverse (sort-by val (frequencies @ut/simple-dispatch-counts))))])
+      (ut/tapp>> [:sub-peek! @(rfa/sub ::client-name)  (vec (reverse (sort-by val (frequencies @ut/simple-subscription-counts))))]))
 
-    ;(tap> [:grid-render])
-    ;(when @over-block? (tap> [:over]))
-    ;(tap> [:grid bricks-high bricks-wide brick-offset-y brick-offset-x current-grid]) ;current-grid])
+    ;(ut/tapp>> [:grid-render])
+    ;(when @over-block? (ut/tapp>> [:over]))
+    ;(ut/tapp>> [:grid bricks-high bricks-wide brick-offset-y brick-offset-x current-grid]) ;current-grid])
 
 
     ^{:key (str "base-brick-grid")}
@@ -13489,7 +13494,7 @@
      ;         ;:font-family "Lato"
      ;         }
      ;:style {:transform "scale(0.75)"}
-     ;:attr {:on-drag-enter #(tap> [:dragging-over [ tab]])}
+     ;:attr {:on-drag-enter #(ut/tapp>> [:dragging-over [ tab]])}
      :children [(doall
                  (for [[bw bh brick-vec-key] brick-roots]                ;diff-grid1] ;(if @dragging? current-grid brick-roots)] @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
                    (let [bricksw             (* bw brick-size)
@@ -13504,7 +13509,7 @@
                         ;;                        ;@(ut/tracked-subscribe [::lookup-root-key brick-vec])
                         ;;                        brick-vec-key
                         ;;                        )
-                         ;;_ (tap> [:tab tab brick-vec-key])
+                         ;;_ (ut/tapp>> [:tab tab brick-vec-key])
                          ;;body-shell           @(rfa/sub ::resolved-block-body-shell {:panel-key brick-vec-key})
                          body-shell           @(re-frame/subscribe [::resolved-block-body-shell {:panel-key brick-vec-key}])
                          ;;rs                  (fn [edn] (resolver/logic-and-params edn brick-vec-key))
@@ -13513,7 +13518,7 @@
                          ;name                (rs @(ut/tracked-subscribe [::panel-name brick-vec-key]) brick-vec-key)
                          ;z                   (rs @(ut/tracked-subscribe [::panel-depth brick-vec-key]) brick-vec-key)
                          {:keys [w h name z]} body-shell
-                        ;;  _ (tap>  [:pp brick-vec-key body-shell w h name z])
+                        ;;  _ (ut/tapp>>  [:pp brick-vec-key body-shell w h name z])
 
                          trunc-name          (when (not (nil? name))
                                                (let [charpx      5.75
@@ -13622,23 +13627,25 @@
                                                    (and no-view? (seq sql-keys)) sql-keys
                                                    :else (into all-views sql-keys))
                                               ;;  (catch :default e
-                                              ;;    (do (tap> [:MIXED-KEYS-ERROR! (str e) (.-message e) :stack (.-stack e)])
+                                              ;;    (do (ut/tapp>> [:MIXED-KEYS-ERROR! (str e) (.-message e) :stack (.-stack e)])
                                               ;;        (js/console.log (str :MIXED-KEYS-ERROR! (str e) (.-message e) :stack (.-stack e)))
                                               ;;        [])))
                          zz                  (if (or selected? hover-q?)
-                                               (+ z 50) (+ z 10))]
-                      ; (tap> [:subq-blocks subq-blocks])
-                      ; (tap> [:subq-mapping subq-mapping :ups (upstream-search subq-mapping selected-block) :downs (downstream-search subq-mapping selected-block)])
-                      ; (when root? (tap> [:subq-blocks brick-vec-key ;subq-blocks
+                                               (+ z 50) (+ z 10))
+                         theme-base-block-style (theme-pull :theme/base-block-style {})
+                         theme-base-block-style-map (when (map? theme-base-block-style) theme-base-block-style)]
+                      ; (ut/tapp>> [:subq-blocks subq-blocks])
+                      ; (ut/tapp>> [:subq-mapping subq-mapping :ups (upstream-search subq-mapping selected-block) :downs (downstream-search subq-mapping selected-block)])
+                      ; (when root? (ut/tapp>> [:subq-blocks brick-vec-key ;subq-blocks
                       ;                    ;(map :p (filter #(>= (get % :d) 1) (downstream-map selected-block nil subq-mapping 0 [])))
                       ;                    ;(upstream-search subq-mapping brick-vec-key)
                       ;                    ;(downstream-lookups subq-mapping brick-vec-key)
                       ;                    ;subq-mapping
                       ;                    ]))
-                      ;; (tap> [:rr reco-selected sql-keys viz-reco? selected-block])
-                      ;; (tap> [brick-vec-key :params-used (param-usage brick-vec-key)])
-                      ;; (tap> [brick-vec-key subq-mapping subq-blocks])
-                      ;; (tap> [:up-from-sel (upstream-search subq-mapping selected-block)
+                      ;; (ut/tapp>> [:rr reco-selected sql-keys viz-reco? selected-block])
+                      ;; (ut/tapp>> [brick-vec-key :params-used (param-usage brick-vec-key)])
+                      ;; (ut/tapp>> [brick-vec-key subq-mapping subq-blocks])
+                      ;; (ut/tapp>> [:up-from-sel (upstream-search subq-mapping selected-block)
                       ;       :down-from-sel (downstream-search subq-mapping selected-block)])
 
                      (if (and (not (nil? iconization)) (ut/not-empty? iconization))
@@ -13653,7 +13660,7 @@
                           :align :center :justify :center
                           :attr {;:on-click #(js/alert (if tab "in container" "not in container"))
                                  :on-context-menu #(when (not tab) (ut/tracked-dispatch [::toggle-icon-block brick-vec-key]))
-                                 ;:on-mouse-enter #(tap> [:dragging-over [current-tab tab]])
+                                 ;:on-mouse-enter #(ut/tapp>> [:dragging-over [current-tab tab]])
                                  :on-mouse-down #(mouse-down-handler % brick-vec-key tab-offset true)
                                  ;:on-mouse-up (fn [_] (reset! mouse-down? false))
                                  :on-mouse-over  #(when (and (not @over-block?) (not (= brick-vec-key @over-block)))
@@ -13681,7 +13688,7 @@
                                    :background-color (theme-pull :theme/base-block-color nil)
                                    :top              (px top)
                                    :left             (px left)}
-                                  (theme-pull :theme/base-block-style {})
+                                  theme-base-block-style-map ;; just in case
                                   panel-style)
                           :child [honeycomb-fragments vv icon-w icon-h]])
 
@@ -13833,14 +13840,14 @@
                                                        :else "#55afb344")
                                    :top              (px top)
                                    :left             (px left)}
-                                  (or (theme-pull :theme/base-block-style {}) {})
+                                  theme-base-block-style-map
                                   panel-style)
                           :child                               ;(if root?
                           ^{:key (str "brick-" brick-vec "-root")}
                           [re-com/v-box
                            :gap "1px"
                            :size "1" :justify :between
-                           ;:attr {:on-drag-over   #(tap> [:dragging-over [current-tab tab]])}
+                           ;:attr {:on-drag-over   #(ut/tapp>> [:dragging-over [current-tab tab]])}
                         ;:style {:filter "drop-shadow(0.35rem 0.35rem 0.4rem rgba(0, 0, 0, 0.5))" } ;; really cool actually. INNER CONTENT drop shadow
                            :children [;(when (not editor-panel?)
 
@@ -14140,8 +14147,8 @@
                                                                                                              (= s :dyn-tab) "#FFA50087" ;(theme-pull :theme/block-tab-selected-font-color "#FFA50087") ;"#FFA50087"
                                                                                                              :else (theme-pull :theme/block-title-font-color "#ffffff50"))
                                                                                            bcolor          (if is-param? (str fcolor "22") (if selected? tab-color "inherit"))]
-                                                                             ;(tap> [:tt @(ut/tracked-subscribe [::http/websocket-status]) ])
-                                                                             ;(tap> [:s s is-param? param-keyword @(ut/tracked-subscribe [::conn/clicked-parameter-key param-keyword])])
+                                                                             ;(ut/tapp>> [:tt @(ut/tracked-subscribe [::http/websocket-status]) ])
+                                                                             ;(ut/tapp>> [:s s is-param? param-keyword @(ut/tracked-subscribe [::conn/clicked-parameter-key param-keyword])])
                                                                                        (draggable
                                                                                         (if is-param? ;; drop as a resgular param, not some view object
                                                                                           (let [k           (first param-keyword)
@@ -14291,7 +14298,7 @@
                                                                     [re-com/gap :size "12px"])]]])
                                         [re-com/gap :size "18px"])]]])))))]]) 
                                           ;; (catch :default e
-                                          ;;   (do (tap> [:GRID-ERROR! (str e) (.-message e) :stack (.-stack e) e])
+                                          ;;   (do (ut/tapp>> [:GRID-ERROR! (str e) (.-message e) :stack (.-stack e) e])
                                           ;;       (js/console.log (str :GRID-ERROR! (str e) (.-message e) :stack (.-stack e) e)))))
                                         )
 
@@ -14323,7 +14330,7 @@
 ;; (defn multi-grid []
 ;;   (let [bricks-high (+ (js/Math.floor (/ @(ut/tracked-subscribe [::subs/h]) brick-size)) 1)
 ;;         bricks-wide (+ (js/Math.floor (/ @(ut/tracked-subscribe [::subs/w]) brick-size)) 1)]
-;;     ;(tap> [bricks-high bricks-wide])
+;;     ;(ut/tapp>> [bricks-high bricks-wide])
 ;;     ;; brick-offset-y brick-offset-x
 ;;     ;[grid bricks-high bricks-wide 0 0]
 ;;     ;(grid bricks-high bricks-wide 0 0) ;; start-y end-y start-x end-x

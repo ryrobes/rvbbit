@@ -56,7 +56,7 @@
                       topper (* (- bricks-high 12) bricks/brick-size) ;; size of editor plus 2 buffer bricks
                       lefty (* 2 bricks/brick-size) ;; always 2 brick from the left...
                       ]
-                  ;(tap> [:coords-editor [lefty topper] bricks-high hh ww])
+                  ;(ut/tapp>> [:coords-editor [lefty topper] bricks-high hh ww])
                   [lefty topper])))
 
 (defn mouse-move-handler [offset]
@@ -146,7 +146,7 @@
                                             :from [:client_items] :group-by [1 2]}}
         sql-params (into {} (for [k [:searches-types-sys/item_type]]
                               {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
-    ;;(tap> [:sql-params! sql-params])
+    ;;(ut/tapp>> [:sql-params! sql-params])
     (dorun (for [[k v] sql-calls]
              (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -206,7 +206,7 @@
 
 (defn insert-hidden-reco-preview [reco-selected reco-viz reco-query reco-condis combo-name shape-name single?]
   (let []
-    ;(tap> [:insert-hidden-reco-preview reco-selected reco-viz reco-query reco-condis single?])
+    ;(ut/tapp>> [:insert-hidden-reco-preview reco-selected reco-viz reco-query reco-condis single?])
     (dorun
      (when single? (ut/tracked-dispatch [::bricks/new-reco-preview reco-selected]))
 
@@ -255,7 +255,7 @@
                     ;      ;query (assoc incoming :from [(keyword ffrom)])
                  query (vec (for [q q-data] (assoc q :from [(keyword ffrom)])))
                  query (ut/postwalk-replacer {[[:sum :rows]] [:count 1]} query)]
-                ;(tap> [:rec-preview-block 1 view query original-conn reco-selected])
+                ;(ut/tapp>> [:rec-preview-block 1 view query original-conn reco-selected])
              (bricks/insert-rec-preview-block
               view
               query ;reco-h reco-w
@@ -278,7 +278,7 @@
                                       )))
                        query (ut/postwalk-replacer {[:sum :rows] [:count 1]} query)]
 
-                ;(tap> [:rec-preview-block 2 view query reco-condis original-conn reco-selected])
+                ;(ut/tapp>> [:rec-preview-block 2 view query reco-condis original-conn reco-selected])
                    (bricks/insert-rec-preview-block
                     view
                     query; reco-h reco-w
@@ -439,7 +439,7 @@
                                                                  :font-weight 400
                                                                  :font-size "22px"}
                                                          :child (str shape_name)]]]]
-                                   ;(tap> [:?? (get-in preview-maps [panel-key :selected_view] nil)])
+                                   ;(ut/tapp>> [:?? (get-in preview-maps [panel-key :selected_view] nil)])
 
                                    (if sel? (bricks/draggable
                                              (bricks/sql-spawner-meta :viz-reco) "meta-menu"
@@ -472,7 +472,7 @@
                                     :child "n/a" ;(str e)
                                     ])))
         pages (/ recos-count 6)]
-;(tap> [:full-recos (map :table_name block-list)
+;(ut/tapp>> [:full-recos (map :table_name block-list)
 ;       (filter (fn [x] (some #(= % (get x :table_name)) current-tab-queries)) block-list)
 ;       ;(filter #(= (get % :table_name) ) block-list)
 ;       current-tab-queries ])
@@ -492,9 +492,9 @@
                (insert-hidden-reco-preview combo_hash viz_map query_map condis combo_edn shape_name false))))
 
 
-    ;(tap> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
-    ;(tap> sql-params)
-    ;(tap> combo-singles)
+    ;(ut/tapp>> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
+    ;(ut/tapp>> sql-params)
+    ;(ut/tapp>> combo-singles)
 
 
     (dorun (for [[k v] sql-calls]
@@ -645,7 +645,7 @@
                                     ;:where [:in :table_name all-sql-call-keys-str]
                                     :where [:and [:not [:like :table_name "query_preview%"]]
                                             (let [lst (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t]))))]
-                                              ;(tap> [lst])
+                                              ;(ut/tapp>> [lst])
                                               (if (> (count (flatten lst)) 1) lst false))]
                                     :order-by [:table_name]
                                     :group-by [:table_name]}
@@ -668,8 +668,8 @@
                                     ;:order-by [:schema_cat :table_name]
 }}  ;;  (ut/tracked-subscribe [::conn/clicked-parameter-key [:viz-tables-sys/table_name]])
         ]
-    ;(tap> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
-    ;(tap> sql-params)
+    ;(ut/tapp>> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
+    ;(ut/tapp>> sql-params)
     (dorun (for [[k v] sql-calls]
              (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -705,8 +705,8 @@
                                 ;:order-by [:table_name]
                                 ;:group-by [:table_name]
                                 }}]
-    ;(tap> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
-    ;(tap> sql-params)
+    ;(ut/tapp>> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
+    ;(ut/tapp>> sql-params)
     (dorun (for [[k v] sql-calls]
              (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -755,7 +755,7 @@
         kit-market {:installed-packages pkits1
                     :available-packages market}
         hackreact [@db/kit-browser]]
-    ;(tap> [:pkits1 pkits1])
+    ;(ut/tapp>> [:pkits1 pkits1])
     [re-com/v-box
      :size "auto"
      :style {:color (str (theme-pull :theme/editor-font-color nil)) :margin-top "6px"
@@ -885,7 +885,7 @@
                                                                       {:enabled (vec (remove (fn [x] (= x @db/kit-browser)) curr))}])}
                                 :child "disabled"
                                 :width "240px"]]]]
-    ;(tap> [:boo curr (merge market pkits1) pkits1])
+    ;(ut/tapp>> [:boo curr (merge market pkits1) pkits1])
 
     (if (empty? kit-body)
       [re-com/box
@@ -950,7 +950,7 @@
         ;selected-panel-map {:param1 123
         ;                    :param2 [2 3 4]}
         ]
-   ;;; (tap> [:param-map @(ut/tracked-subscribe [::bricks/user-parameter-doubles])])
+   ;;; (ut/tapp>> [:param-map @(ut/tracked-subscribe [::bricks/user-parameter-doubles])])
 
     [re-com/v-box
      :gap "2px"
@@ -1021,7 +1021,7 @@
         ;combos? (= gmode :combos)
         ;grid? (= gmode :data)
         ]
-    ;;(tap> [:test sql-params])
+    ;;(ut/tapp>> [:test sql-params])
     (dorun (for [[k v] sql-calls]
              (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -1065,7 +1065,7 @@
         attribs? (= gmode :attribs)
         combos? (= gmode :combos)
         grid? (= gmode :data)]
-    ;;(tap> [:test sql-params])
+    ;;(ut/tapp>> [:test sql-params])
     (dorun (for [[k v] sql-calls]
              (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -1118,7 +1118,7 @@
                                          [:= :combo_edn :viz-shapes-sys/combo_edn])
                                        (when shape-picked?
                                          [:= :shape_name :viz-shapes0-sys/shape])]}}]
-    ;;(tap> [:test sql-params])
+    ;;(ut/tapp>> [:test sql-params])
     (dorun (for [[k v] sql-calls]
              (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -1142,7 +1142,7 @@
   (let [pending @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])
         client-name @(ut/tracked-subscribe [::bricks/client-name])
         pending (remove #(cstr/ends-with? (str (get-in % [:message :ui-keypath 0])) "-sys") pending)]
-    ;(tap> [:pending pending])
+    ;(ut/tapp>> [:pending pending])
 ;;     [re-com/v-box
 ;;      :size "auto"
 ;;      :style {:color (theme-pull :theme/editor-font-color nil)}
@@ -1178,7 +1178,7 @@
                                       :children (if (and (nil? l) (nil? ff))
 
                                                   (do (when (= client-name :glamorous-carmine-leopard-exiled-from-archipelago)
-                                                        (tap> [:msg (get e :message)
+                                                        (ut/tapp>> [:msg (get e :message)
                                                                @(ut/tracked-subscribe [::bricks/runstream-running?])]))
                                                       [[re-com/box :child (str (get e :message))]])
 
@@ -1198,7 +1198,7 @@
 ;(defonce file-mode? (reagent/atom false))
 ;(defonce db/editor-mode (reagent/atom :meta))
 
-;; (tap> [:atom-sizes (ut/calculate-atom-sizes {:replacer-atom ut/replacer-atom
+;; (ut/tapp>> [:atom-sizes (ut/calculate-atom-sizes {:replacer-atom ut/replacer-atom
 ;;                                                                 ;:db/flow-results db/flow-results
 ;;                                              :db/scrubbers db/scrubbers
 ;;                                              :ut/is-base64-atom ut/is-base64-atom
@@ -1315,7 +1315,7 @@
                          :model @db/search-box
                  ;:change-on-blur? false
                          :on-change #(do (reset! db/search-box %)
-                                         (when (not (empty? (cstr/trim (str %))))
+                                         (when (ut/ne? (cstr/trim (str %)))
                                            (ut/tracked-dispatch [::wfx/request :default
                                                                {:message    {:kind :search-groups
                                                                              :client-name client-name
@@ -1427,15 +1427,15 @@
         ;websocket-status @(ut/tracked-subscribe [::http/websocket-status])
         ]
 
-   ; (tap> @bricks/dragging-editor?)
+   ; (ut/tapp>> @bricks/dragging-editor?)
 
     (when (nil? (get @db/data-browser-query selected-block)) ;; at this point lets just populate the atom key with the tab
       (swap! db/data-browser-query assoc selected-block data-key))
 
-    ;(tap> [:mad-libs-scrubber mad-libs-combo? mad-libs-combo])
+    ;(ut/tapp>> [:mad-libs-scrubber mad-libs-combo? mad-libs-combo])
 
-    ;(tap> [reco-selected reco-preview])
-    ;(tap> [:pending (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
+    ;(ut/tapp>> [reco-selected reco-preview])
+    ;(ut/tapp>> [:pending (for [e @(ut/tracked-subscribe [::wfx/pending-requests http/socket-id])]
     ;                   (get-in e [:message :ui-keypath])
     ;                 ; e
     ;                  ) ])
@@ -1447,9 +1447,9 @@
 
    ; (when (and (empty? (get websocket-status :open-subs)) (= (get websocket-status :status) :connected))
    ;   (debounce (ut/tracked-dispatch [::wfx/subscribe http/socket-id :server-push0 db/subscription]) 500) )
-    ;(tap> [:views (get @db/data-browser-query selected-block) data-key view-key queries? views? view-selected? (keys sql-calls) (keys views)])
-    ;(tap> [panel-count bricks-wide])
-    ;(tap> @(ut/tracked-subscribe [::bricks/descendant-panels2 selected-block]))
+    ;(ut/tapp>> [:views (get @db/data-browser-query selected-block) data-key view-key queries? views? view-selected? (keys sql-calls) (keys views)])
+    ;(ut/tapp>> [panel-count bricks-wide])
+    ;(ut/tapp>> @(ut/tracked-subscribe [::bricks/descendant-panels2 selected-block]))
     [rc/catch
      [re-com/h-box
       :size "none"
@@ -1651,7 +1651,7 @@
                                                  ;viz-shape (get viz-shapes shape-name)
                                                  axes-logic-map (try (edn/read-string (get viz-shape :axes_logic)) (catch :default _ {}))
                                                  opts-data (get opts :data)]
-                                             ;(tap> [:is-shapes? viz-shape opts ])
+                                             ;(ut/tapp>> [:is-shapes? viz-shape opts ])
                                              [re-com/v-box
                                               :children
                                               [[re-com/h-box
@@ -1898,14 +1898,14 @@
                                                                                                   (let []
                                                                                                     (ut/tracked-dispatch [::bricks/get-combo-hash
                                                                                                                         selected-block src-table-id-str shape-name new-curr-axe])
-                                                                                                ;;   (tap> [:lookup-combo-hash
+                                                                                                ;;   (ut/tapp>> [:lookup-combo-hash
                                                                                                 ;;          @(ut/tracked-subscribe
                                                                                                 ;;            [::bricks/lookup-combo-hash
                                                                                                 ;;             selected-block
                                                                                                 ;;             src-table-id-str
                                                                                                 ;;             shape-name
                                                                                                 ;;             new-curr-axe])])
-                                                                                                ;;   (tap> [fname drname cur? cur-rev?
+                                                                                                ;;   (ut/tapp>> [fname drname cur? cur-rev?
                                                                                                 ;;          (value-to-color all-score2 colors1 score2)
                                                                                                 ;;          score2 all-score2 colors1
                                                                                                 ;;          cur-axes-rev (last ov) ;(first ov)
@@ -1926,7 +1926,7 @@
                                            :else (let [selected-kp @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
                                                        
                                                        selected-kp (if (nil? (first selected-kp)) nil selected-kp)] ;; if viz-gen or :* then nil
-                                                   ;(tap> [:selected-kp selected-kp])
+                                                   ;(ut/tapp>> [:selected-kp selected-kp])
                                                    (if ;(and ;view-selected?
                                                     (get-in @db/scrubbers [selected-block data-key] false)
                                            ; )
@@ -1989,7 +1989,7 @@
                                                   :background (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
                                                   ;:background-color (theme-pull :theme/editor-rim-color "#a3a3a3")
                                                   }]
-                                          ;(tap> [:dmenu @db/data-browser-query data-key])
+                                          ;(ut/tapp>> [:dmenu @db/data-browser-query data-key])
                                              ;(when queries? ;data-key
 
                                          [re-com/h-box
@@ -2053,7 +2053,7 @@
                                                           :padding "5px" :style {:font-weight 700 :color "#dddddd"}
                                                           :children (for [k (keys sql-calls)]
                                                                       (let [console-output @(ut/tracked-subscribe [::bricks/repl-output k])
-                                                                            repl? (not (empty? console-output))
+                                                                            repl? (ut/ne? console-output)
                                                                             dyn-color (if (= k data-key)
                                                                                         (theme-pull :theme/editor-background-color nil)
                                                                                         (str (theme-pull :theme/editor-font-color nil) 77))]
@@ -2198,7 +2198,7 @@
                                                                 (some #(= % data-key) (keys sql-calls)))
                                                  is-layout? @(ut/tracked-subscribe [::bricks/is-layout? selected-block data-key])
                                                  viz-gen? (= :viz-gen (get @db/data-browser-query selected-block))]
-                                               ;; (tap> [:as selected-block data-key] )
+                                               ;; (ut/tapp>> [:as selected-block data-key] )
                                              [re-com/v-box
                                               :children [(cond query-box?
 
@@ -2239,7 +2239,7 @@
                                                                      viz-shape @(ut/tracked-subscribe [::bricks/get-viz-shape shape-name])
                                                                      default-shape-view (get viz-shape :selected_view)
                                                                      default-shape-view (try (when (not (empty? default-shape-view)) (keyword (ut/replacer default-shape-view #":" ""))) (catch :default _ nil))]
-                                                                 (tap> [:def-sel default-shape-view viz-shape])
+                                                                 (ut/tapp>> [:def-sel default-shape-view viz-shape])
                                                                  [re-com/box
                                                                   :size "none"
                                                                      ;:style {:position "absolute" :right 0 :top 10}
@@ -2630,15 +2630,15 @@
                              (let [^js/File file0 (-> files (aget 0))
                                    fname (-> file0 .-name)]
                               ;(js/alert (-> file0 .-name)) ;; is .csv?
-                               (tap> [:run? (cstr/lower-case fname)])
+                               (ut/tapp>> [:run? (cstr/lower-case fname)])
                                (if (cstr/ends-with? (cstr/lower-case fname) ".csv")
                                  (do
-                                   (tap> [:saving-csv-to-server fname])
+                                   (ut/tapp>> [:saving-csv-to-server fname])
                                    (ut/read-file file0
-                                             ;#(tap> (str %))
+                                             ;#(ut/tapp>> (str %))
                                                  #(ut/tracked-dispatch [::http/save-csv fname (str %)]))
                                    (set! (-> files .-value) ""))
-                                 (tap> [:invalid-file fname])))))})
+                                 (ut/tapp>> [:invalid-file fname])))))})
 
 (defn ifnil [x n] (if (nil? x) n x))
 
@@ -2669,8 +2669,8 @@
                                                                           :children
                                                                           [[re-com/input-text
                                                                             :model (str t)
-                                                                            :on-change #(do (tap> [:changed-tab-name (str t) :to (str %)])
-                                                                                            (when (and (not (empty? (cstr/trim (str %))))
+                                                                            :on-change #(do (ut/tapp>> [:changed-tab-name (str t) :to (str %)])
+                                                                                            (when (and (ut/ne? (cstr/trim (str %)))
                                                                                                        (not (some (fn [x] (= x %)) tabs)))
                                                                                               (ut/tracked-dispatch [::bricks/rename-tab (str t) (str %)])) ;; dont want to update with empty string or dupe
                                                                                             (reset! title-edit-idx nil))
@@ -2796,7 +2796,7 @@
         react-hack [@db/show-snaps? @db/vertical-snaps?] ;; important
         ;is-last? (fn [t] (try (= (count tabs) (+ 1 (.indexOf tabs t))) (catch :default _ false)))
         ]
-    ;;(tap> [:matching matching tabs])
+    ;;(ut/tapp>> [:matching matching tabs])
     (when (ut/ne? tabs)
       [(if @db/vertical-snaps? re-com/v-box re-com/h-box)
        :children (reverse (conj (vec (conj (for [t (reverse tabs)] [re-com/box
@@ -2905,7 +2905,7 @@
           x      (- start-x off-x) ;
           y      (- start-y off-y)]
       ;(reset! detached-coords [x y])
-      (tap> [:newey x y @on-canvas?]))))
+      (ut/tapp>> [:newey x y @on-canvas?]))))
 
 (defn mouse-up-handler2 [on-move]
   (fn me [evt]
@@ -2971,7 +2971,7 @@
          new-h (hash pp-without-fs)
          client-name (get db :client-name)
          ]
-;;      (tap> [:push-params! client-name new-h pp-without-fs
+;;      (ut/tapp>> [:push-params! client-name new-h pp-without-fs
 ;;             {:new
 ;;              (get (vec (cdata/diff pp-without-fs @temp-atom)) 0)}])
      (ut/tracked-dispatch [::wfx/request   :default ;; just a push, no response handling
@@ -3089,7 +3089,7 @@
         ;;   (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
         ;;                       [:flow (keyword (str flow-id ">*running?"))] true])
           )))
-    (tap> [:no-fire-on-change flow-id :skipping])))
+    (ut/tapp>> [:no-fire-on-change flow-id :skipping])))
 
 (defn task-bar []
   (try 
@@ -3105,24 +3105,24 @@
         rs-overrides-hashmap @(ut/tracked-subscribe [::rs-overrides-hashmap])
         theme-colors-hashmap @(ut/tracked-subscribe [::theme-colors-hashmap])
         theme-colors (theme-pull :theme/data-colors db/data-colors)
-        ;_ (tap> [:min min-panels minimized-system-panels])
+        ;_ (ut/tapp>> [:min min-panels minimized-system-panels])
         min-panels (vec (into min-panels minimized-system-panels))
         ;;mats @(ut/tracked-subscribe [::bricks/materialized-theme]) ;; prints out the materilized theme w/o refs
         ]
-    ;;(tap> [selected-view sselected-view])
+    ;;(ut/tapp>> [selected-view sselected-view])
 
     (when (not= rs-overrides rs-overrides-hashmap) ;; execute flows when mutated
       (do
-        (tap> [:runstream-overides-change! rs-overrides rs-overrides-hashmap])
+        (ut/tapp>> [:runstream-overides-change! rs-overrides rs-overrides-hashmap])
         (doseq [[k v] rs-overrides
                 :when (not= (get rs-overrides-hashmap k) v)]
-          (tap> [:runstream-override! k v])
+          (ut/tapp>> [:runstream-override! k v])
           (when (ut/ne? rs-overrides-hashmap) ;; on first run, dont want to trigger all...
             (run-flow k v))))
       (ut/tracked-dispatch [::set-rs-overrides-hashmap rs-overrides]))
 
     (when (not= theme-colors theme-colors-hashmap) ;; execute flows when mutated
-;;       (tap> [:theme-colors-change! theme-colors theme-colors-hashmap])
+;;       (ut/tapp>> [:theme-colors-change! theme-colors theme-colors-hashmap])
       (ut/apply-theme (bricks/code-mirror-theme))
       (ut/tracked-dispatch [::set-theme-colors-hashmap theme-colors]))
 
@@ -3135,7 +3135,7 @@
 
     (when (and editor? (not (= selected-view sselected-view)))
       (let [view-data @(ut/tracked-subscribe [::view-data selected-view])]
-        ;(tap> [:view-data selected-view view-data])
+        ;(ut/tapp>> [:view-data selected-view view-data])
         (ut/tracked-dispatch [::conn/click-parameter [:param :selected-view] selected-view])
         (ut/tracked-dispatch [::conn/click-parameter [:param :selected-view-data] view-data])))
 
@@ -3188,7 +3188,7 @@
                     :children [[re-com/box :child (str nn)]
                                [render-icon icon]]])]))
                                (catch :default e
-                                 (do (tap> [:TASK-BAR-ERROR! (str e) (.-message e) :stack (.-stack e)])
+                                 (do (ut/tapp>> [:TASK-BAR-ERROR! (str e) (.-message e) :stack (.-stack e)])
                                      (js/console.log (str :TASK-BAR-ERROR! (str e) (.-message e) :stack (.-stack e)))))))
 
 (re-frame/reg-event-db
@@ -3393,19 +3393,19 @@
                                                                              :else "orange")
                                                             ;"#E6E6FA"
                                                                        k d nil]))))))))))]
-                   ;(tap> [:vv selected-block involved])
+                   ;(ut/tapp>> [:vv selected-block involved])
                    lmap) [])
 
 
         ;lines-test [[145 145 453 543 0 0 0] [456 456 65 457 0 0 0] [575 567 859 567 0 0 0]]
         ]
 
-    ;;(tap> [:bgg (theme-pull :theme/canvas-background-css nil)])
-    ;(tap> (px (js/Math.ceil (* 225 (+ 0.5 (get @db/audio-data :audio))))))
-    ;(tap> [:view hh ww])
-    ;(tap> [:coords coords])
+    ;;(ut/tapp>> [:bgg (theme-pull :theme/canvas-background-css nil)])
+    ;(ut/tapp>> (px (js/Math.ceil (* 225 (+ 0.5 (get @db/audio-data :audio))))))
+    ;(ut/tapp>> [:view hh ww])
+    ;(ut/tapp>> [:coords coords])
 
-    ;;;(tap> [@db/context-modal-pos @bricks/dyn-dropper-hover @bricks/on-block?])
+    ;;;(ut/tapp>> [@db/context-modal-pos @bricks/dyn-dropper-hover @bricks/on-block?])
 
 
     (bricks/droppable (if @rvbbit-frontend.flows/dragging-port? ["meta-menu" :flow-port] ["meta-menu"]) ;; eyes emoji. crossing the streams :flow-port
@@ -3418,11 +3418,11 @@
                               ;:transform-style "preserve-3d"
                               ;:transform "scale(0.5)"
                               
-                              ;:on-click (fn [x] (tap> [(.-clientX x)
+                              ;:on-click (fn [x] (ut/tapp>> [(.-clientX x)
                               ;                         (.-clientY x)]))
                               ;:on-drag mouse-down-handler2
-                             ; :on-drag-enter #(tap> [:entered?])
-                             ; :on-drag-leave #(when true (tap> [:enter?]))
+                             ; :on-drag-enter #(ut/tapp>> [:entered?])
+                             ; :on-drag-leave #(when true (ut/tapp>> [:enter?]))
                              ; :on-mouse-over #(reset! on-canvas? true)
                              ; :on-mouse-leave #(reset! on-canvas? false)
                              ; :on-mouse-down mouse-down-handler2
@@ -3481,6 +3481,7 @@
                        :child [re-com/v-box
                                :size "1"
                                :style (let [custom-map (theme-pull :theme/canvas-background-css nil)
+                                            custom-map (when (map? custom-map) custom-map)
                                             cc (str ;(ut/invert-hex-color 
                                                      (theme-pull :theme/editor-outer-rim-color nil)
                                                     ;"#000000"
@@ -3515,8 +3516,9 @@
                               ;;          :background-repeat "repeat"
                               ;;          :background-color "#47555e"}
 
-                               :children [[tab-menu]
-                                          [snapshot-menu]
+                               :children [
+                                          [rc/catch [tab-menu]]
+                                          [rc/catch  [snapshot-menu]]
 
                                           (when session? [session-modal])
 
@@ -3725,7 +3727,7 @@
                                                                                  [re-com/box :style {:opacity 0.5} :child (str cnt)]
                                                                                  [re-com/md-icon-button :md-icon-name "zmdi-close"
                                                                                   :style {:cursor "pointer" :color "white" :font-size "15px" :height "10px" :margin-top "-3px"}
-                                                                                  :on-click #(do (tap> [:remove-flow-watchers client-name kk])
+                                                                                  :on-click #(do (ut/tapp>> [:remove-flow-watchers client-name kk])
                                                                                                  (ut/tracked-dispatch [::wfx/request :default
                                                                                                                        {:message    {:kind :remove-flow-watcher
                                                                                                                                      :client-name client-name
@@ -3754,10 +3756,9 @@
                                         ;;            :background-color "#00000000"
                                         ;;            :color "white"}]
 
-                                          [rc/catch
-                                           [task-bar]]
+                                          [rc/catch [task-bar]]
 
-                                          [flows/alert-box]
+                                          [rc/catch [flows/alert-box]]
 
                                           [re-com/box
                                            :child [re-com/md-icon-button :src (at)
@@ -3846,7 +3847,7 @@
                                         ;;            :color "white"}]
 
 
-                                          (when (not (empty? coords))
+                                          (when (ut/ne? coords)
                                             [:svg
                                              {:style {:width  (px ww) ;"6200px" ;; big ass render nothing gets cut off svg-wise + zoom and pannable
                                                       :height (px hh) ;"6200px"

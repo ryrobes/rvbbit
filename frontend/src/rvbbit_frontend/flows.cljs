@@ -151,7 +151,7 @@
 (re-frame/reg-event-db
  ::set-selected-flow
  (fn [db [_ flow-id]]
-   (tap> [:set-flow flow-id])
+   (ut/tapp>> [:set-flow flow-id])
    (let [flow-id (str flow-id)
          curr-flow-id (get db :selected-flow)
          curr-flow (get-in db [:flows curr-flow-id] {})]
@@ -165,7 +165,7 @@
 (re-frame/reg-event-db
  ::rename-flow
  (fn [db [_ old-flow-id new-flow-id]]
-   (tap> [:rename-flow old-flow-id :to new-flow-id])
+   (ut/tapp>> [:rename-flow old-flow-id :to new-flow-id])
    (let [];flow-id (str flow-id)
         ;curr-flow-id (get db :selected-flow)
         ;curr-flow (get-in db [:flows curr-flow-id] {})
@@ -195,7 +195,7 @@
                                    (for [k outputs] {(keyword (str (ut/safe-name old-bid) "/" (ut/safe-name k)))
                                                      (keyword (str (ut/safe-name new-bid) "/" (ut/safe-name k)))}))
          pw-replace-map (merge input-replacements output-replacements {old-bid new-bid})]
-     (tap> [:rename-block old-bid :to new-bid :with pw-replace-map]) ;; block id needs to be keyword,
+     (ut/tapp>> [:rename-block old-bid :to new-bid :with pw-replace-map]) ;; block id needs to be keyword,
      (if (not (some #(= new-bid %) block-ids)) ;; only if is unique, else do nothing
        (do
 ;         (reset! db/flow-results (ut/postwalk-replacer pw-replace-map @(ut/tracked-subscribe [::http/flow-results]))) ;; unnecessary, but keeps the UI in sync
@@ -252,7 +252,7 @@
                                              (get-in db [:flows (get db :selected-flow) :map bid-o :push pid-o]) ;; push port
                                              )
                                   _ (when (not valid?)
-                                      (tap> [:removed-invalid-connection
+                                      (ut/tapp>> [:removed-invalid-connection
                                              [o i] [[bid-i pid-i] [bid-o pid-o]]
                                              (or (get-in port-map-in [bid-i pid-i]) (= bid-i :done))
                                              (get-in port-map-out [bid-o pid-o])
@@ -311,7 +311,7 @@
  ::refresh-live-dat
  (fn [db _]
    (let [kks (filter #(cstr/starts-with? (str %) ":live-dat-") (keys (get db :data)))]
-     ;(tap> [::kks kks])
+     ;(ut/tapp>> [::kks kks])
      (reset! trig-atom-test (str "refreshed live dat " (rand-int 1000)))
      (doseq [k kks]
        (ut/tracked-dispatch [::conn/clear-query-history k])))))
@@ -330,7 +330,7 @@
                     (or (= dtype "vector") (= dtype "rowset")) ;(= dtype "vector")
                     (assoc (into {} (for [k (range (count ddata)) :let [v (get ddata k)]] {(keyword (str "idx" k)) (keyword (ut/data-typer v))})) :* :vector)
                     :else ports)
-        _ (tap> [:create-out-map-ports ddata dtype ports])
+        _ (ut/tapp>> [:create-out-map-ports ddata dtype ports])
         full (-> (get @(ut/tracked-subscribe [::flowmap]) bid)
                 ;(assoc-in [:data :user-input] ddata)
                  (assoc-in [:ports :out] ports))]
@@ -369,9 +369,9 @@
                (create-out-map-ports ddata fid bid)))]
                         ;{[fid bid] ddata}
 
-     (tap> [:flow-in result @http/subsequent-runs])
+     (ut/tapp>> [:flow-in result @http/subsequent-runs])
      (ut/dispatch-delay 600 [::refresh-live-dat])
-    ;;  (tap> [:fn-history-order (vec (for [{:keys [block start]}  ;; doesnt really give what youd want...
+    ;;  (ut/tapp>> [:fn-history-order (vec (for [{:keys [block start]}  ;; doesnt really give what youd want...
     ;;                           (sort-by :start
     ;;                                    (get-in result [:fn-history flow-id])
     ;;                                    )
@@ -407,7 +407,7 @@
  ::timeout-response
  (fn [db [_ result what-req]]
    (let [client-name (get db :client-name)]
-     (tap> [:websocket-timeout! client-name result what-req])
+     (ut/tapp>> [:websocket-timeout! client-name result what-req])
      db)))
 
 (defn process-flow-map [fmap]  ;;; IF CHANGING LOGIC HERE, ALSO CHANGE IN THE SERVER VERSION
@@ -419,13 +419,13 @@
              ;;  (= ttype :sub-flow222) ;; kek
              ;;  (let [subs (get v :sub-flow)
              ;;        post-subs (process-flow-map (get subs :map))]
-             ;;   ; (tap> [:sub-flow-preporocess subs post-subs])
+             ;;   ; (ut/tapp>> [:sub-flow-preporocess subs post-subs])
              ;;    {k (-> v
              ;;           (assoc :sub-flow post-subs))})
 
                (= ttype :query)
                (let [pfull (first (vals (get-in v [:data :queries])))
-                      ;; _ (tap> [:param-fmaps ttype k pfull])
+                      ;; _ (ut/tapp>> [:param-fmaps ttype k pfull])
                     ;ddata @(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
                      ddata (first @(ut/tracked-sub ::resolver/logic-and-params {:m [pfull] :p nil}))
                      dtype (ut/data-typer ddata)
@@ -442,7 +442,7 @@
 
                (= ttype :param)
                (let [pfull (get-in v [:data :drag-meta :param-full])
-                      ;; _ (tap> [:param-fmaps ttype k pfull])
+                      ;; _ (ut/tapp>> [:param-fmaps ttype k pfull])
                      ddata @(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
                      dtype (ut/data-typer ddata)
                    ;;  ports {:out {:out (keyword dtype)}}
@@ -459,7 +459,7 @@
 
                (= ttype :cell)
                (let [pfull (get-in v [:data :drag-meta :param-full])
-                      ;; _ (tap> [:param-fmaps ttype k pfull])
+                      ;; _ (ut/tapp>> [:param-fmaps ttype k pfull])
                            ;ddata @(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
                      ddata (first @(ut/tracked-sub ::resolver/logic-and-params {:m [pfull] :p nil}))
                      dtype (ut/data-typer ddata)
@@ -483,10 +483,10 @@
                                (cstr/join "\n" (get-in v [:data :user-input]))
                                ;(get-in v [:data :user-input])
                                (catch :default _
-                                 (do (tap> [:error-convering-string-types v :line 347 :flows-cljs])
+                                 (do (ut/tapp>> [:error-convering-string-types v :line 347 :flows-cljs])
                                      [(str (get-in v [:data :user-input]))])))) ;; converting raw data to stringified data, to avoid issues with edn/read-string
 
-                       ;;     _ (tap> [:user-input-fmaps ttype k pfull])
+                       ;;     _ (ut/tapp>> [:user-input-fmaps ttype k pfull])
                            ;ddata (resolver/logic-and-params pfull nil) ;@(ut/tracked-subscribe [::conn/clicked-parameter-key [pfull]])
                      ddata (first @(ut/tracked-sub ::resolver/logic-and-params {:m [pfull] :p nil}))
                      dtype (ut/data-typer ddata)
@@ -503,7 +503,7 @@
                      full (-> v
                               (assoc-in [:data :user-input] ddata)
                               (assoc-in [:ports] ports))]
-             ; (tap> [:param-step {k full}])
+             ; (ut/tapp>> [:param-step {k full}])
                  {k full})
                :else {k v}))))
 
@@ -542,7 +542,7 @@
                                             view (when view (let [conns (vec (filter #(cstr/includes? (str (first %)) "/push-path") flowmaps-connections))
                                                                   push-key-bid-pairs (vec (for [[c1 c2] conns] [(keyword (last (ut/splitter (str c1) #"/"))) c2]))
                                                                   view (view-swaps view fid push-key-bid-pairs)]
-                                                              ;(tap> [:view-builder k push-key-bid-pairs view fid])
+                                                              ;(ut/tapp>> [:view-builder k push-key-bid-pairs view fid])
                                                               view))
                                             nname (get-in data [:flow-item :name] ":unknown!")
                                             fn-key (if flow-path nname (try-read nname))
@@ -627,7 +627,7 @@
 (re-frame/reg-event-db
  ::run-current-flowmap
  (fn [db _]
-  ;(tap> [:ran-condi ])
+  ;(ut/tapp>> [:ran-condi ])
    (when (get db :flow?) ;; and has-done?
    ;; only when flow is up and runnable
      (doall (let [flowmap @(ut/tracked-subscribe [::flowmap])
@@ -645,7 +645,7 @@
                   running-subs (vec (into running-subs running-view-subs))
                   
                   watched? (ut/ne? (get @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
-                  _ (tap> [:comps comps running-subs watched?])
+                  _ (ut/tapp>> [:comps comps running-subs watched?])
                   fstr (str "running flow " flow-id)
                   w (/ (count fstr) 4.1)]
               (reset! editor-tooltip-atom (str flow-id " is running"))
@@ -653,14 +653,14 @@
             ;(reset! db/flow-results {:status :started})
               (ut/tracked-dispatch [::http/set-flow-results {:status :started} nil flow-id])
               (swap! db/running-blocks assoc flow-id (vec (keys flowmap)))
-              (tap> [:flowmap-send-it flowmap server-flowmap running-subs])
+              (ut/tapp>> [:flowmap-send-it flowmap server-flowmap running-subs])
               (reset! http/subsequent-runs [])
               (when true 
               ;;  (or (not watched?) 
               ;;      (not= (count (vec (filter #(cstr/includes? (str %) (str "blocks||" flow-id "||")) curr-flow-subs))) ;;; not granular enough, remove on and add one, still same
               ;;            (count (vec (map last running-subs)))))
               ;; we need to add new blocks if we are building. TODO selectivly re-sub, or not (dupes should be fine server-side)
-                ;;(tap> [:resub? (vec (filter #(cstr/includes? (str %) (str "blocks||" flow-id "||")) curr-flow-subs)) (vec (map last running-subs))])
+                ;;(ut/tapp>> [:resub? (vec (filter #(cstr/includes? (str %) (str "blocks||" flow-id "||")) curr-flow-subs)) (vec (map last running-subs))])
                 (ut/tracked-dispatch [::add-live-flow-subs running-subs])
                 (ut/tracked-dispatch [::wfx/request :default
                                     {:message    {:kind :sub-to-running-values
@@ -700,7 +700,7 @@
    (and (not (empty? (get @db/running-blocks flow-id [])))
         (= (get-in db [:flow-runner flow-id bid] :started) :started))))
 
-;(tap> [:results-atom @(ut/tracked-subscribe [::http/flow-results])])
+;(ut/tapp>> [:results-atom @(ut/tracked-subscribe [::http/flow-results])])
 
 
                      ;@flowmaps-connections
@@ -877,7 +877,7 @@
 ;(defn _draggable-piu)
 
 (defn map-boxes2 [data block-id flow-name keypath kki init-data-type & [draggable?]]
-  ;(tap> [:pre-data data])
+  ;(ut/tapp>> [:pre-data data])
   (let [;data (if (seq? data) data [data])
         sql-explanations (sql-explanations-kp)
         ;eval? false
@@ -1177,7 +1177,7 @@
                                  >=zero (fn [x] (if (< x 0) (- (count ok) 1) x)) ;; in case we can't find the port, default to the last position
                                  i-idx (>=zero (.indexOf ik pid-i))
                                  o-idx (>=zero (.indexOf ok pid-o))
-                               ; _ (tap> [o i i-idx o-idx ox oy])
+                               ; _ (ut/tapp>> [o i i-idx o-idx ox oy])
                                  y-offset 44
                                  port-size 17
                                  x1 (+ ox w -25)
@@ -1189,7 +1189,7 @@
                                                  ;(gn (get-in flow-map [bid-i :ports :in pid-i]))
                                              (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500"))]]
                        [x1 y1 x2 y2 true dcolor bid-o bid-i])]
-         ;(tap> [:coords coords])
+         ;(ut/tapp>> [:coords coords])
          ;(swap! ut/coord-cache assoc cachekey coords)
           coords))))
 
@@ -1199,7 +1199,7 @@
         flow-id @(ut/tracked-subscribe [::selected-flow])
         react! [@(ut/tracked-subscribe [::http/flow-results])]
         cache (get @ut/coord-cache cachekey)]
-   ;(tap> [:conns conns])
+   ;(ut/tapp>> [:conns conns])
     (if false cache ;; disable for now
         (let [coords (for [[o i] conns
                            :let [ns-i? (gns i)
@@ -1215,7 +1215,7 @@
                                  oopp (get-in flow-map [bid-o :push] {}) ;; push pathing
                                  ooo (get-in flow-map [bid-o :ports :out] {:out "unknown"})
                                  oo (merge ooo oop)
-                                ;;_ (tap> [:ii bid-i ii :oo bid-o oo])
+                                ;;_ (ut/tapp>> [:ii bid-i ii :oo bid-o oo])
 
                                 ;[w cw iox iix] (calc-block-widths ii oo 0)
                                 ;w 25
@@ -1223,11 +1223,11 @@
 
                                  ik (keys ii)
                                  ok (try (into (into (vec (sort-by str (keys ooo))) (vec (keys oop))) (vec (keys oopp)))
-                                         (catch :default e (do (tap> [:error-sorting-keys e (keys oo) :flows.cljs :ln 1148])
+                                         (catch :default e (do (ut/tapp>> [:error-sorting-keys e (keys oo) :flows.cljs :ln 1148])
                                                                (into (into (vec (sort-by str (keys ooo))) (vec (keys oop))) (vec (keys oopp))))))
                                 ;;  _ (when
                                 ;;     (= bid-o :open-fn-3)
-                                ;;      (tap> [:ok bid-o  ok oop]))
+                                ;;      (ut/tapp>> [:ok bid-o  ok oop]))
                                  [ix iy iw] [(get-in flow-map [bid-i :x])
                                              (get-in flow-map [bid-i :y])
                                              (get-in flow-map [bid-i :w])]
@@ -1243,7 +1243,7 @@
 
                                  i-idx (try (>=zero (.indexOf ik pid-i)) (catch :default _ -1))
                                  o-idx (try (>=zero (.indexOf ok pid-o)) (catch :default _ -1))
-                               ;;  _ (tap> [:t o i i-idx o-idx ox oy])
+                               ;;  _ (ut/tapp>> [:t o i i-idx o-idx ox oy])
                                  y-offset 0 ;44
                                  iport-size (/ (- iw 4) (count ik))
                                  oport-size (/ (- ow 4) (count ok))
@@ -1253,7 +1253,7 @@
 
                                  x2 (+ ix (* i-idx iport-size) 10.5)
                                  y2 (+ (+ 3 iy) 3)
-                               ;;  _ (tap> [:zz ox oy :ff x1 y1 x2 y2])
+                               ;;  _ (ut/tapp>> [:zz ox oy :ff x1 y1 x2 y2])
                                 ;;  dcolor (get (theme-pull :theme/data-colors db/data-colors)
                                 ;;              (gn (get-in flow-map [bid-o :ports :out pid-o]))
                                 ;;              (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500"))
@@ -1266,7 +1266,7 @@
                        [x1 y1 x2 y2 true dcolor bid-o bid-i pid-o pid-i])]
                       ;[500 500 1200 1200 true "#ffffff" :tet :tete]
 
-         ;(tap> [:coords coords])
+         ;(ut/tapp>> [:coords coords])
         ; (swap! ut/coord-cache assoc cachekey coords)
           coords))))
 
@@ -1289,7 +1289,7 @@
              (- x2 xx)
              (- y2 yy)
              false dcolor nil nil]]
-   ;(tap> [:tentacle-row @tentacle-pos @tentacle-start row])
+   ;(ut/tapp>> [:tentacle-row @tentacle-pos @tentacle-start row])
     row))
 
 (defn generate-tentacle-coord []
@@ -1302,7 +1302,7 @@
         row [x1 (+ y1 11)
              (- x2 xx 8) (- y2 yy 25)
              false dcolor nil nil]]
-   ;(tap> [:tentacle-row @tentacle-pos @tentacle-start row])
+   ;(ut/tapp>> [:tentacle-row @tentacle-pos @tentacle-start row])
     row))
 
 (defn generate-coords [xx yy]
@@ -1312,7 +1312,7 @@
        ;;tt @tentacle-pos
         flow-map @(ut/tracked-subscribe [::flowmap])
         fconns (coord-cacher conns flow-map)]
-   ;;(tap> [:generate-coords conns fconns])
+   ;;(ut/tapp>> [:generate-coords conns fconns])
    ;; (if @dragging-port?
    ;;   (conj fconns (generate-tentacle-coord))
    ;;   fconns)
@@ -1362,7 +1362,7 @@
                  done? (and flow-running? @(ut/tracked-subscribe [::is-done? z2 flow-id]))]
 
                 ;;  (when true ;(cstr/starts-with? (str z1a) ":push-path") ;; (or (= z1 :open-fn-1) (= z2 :open-fn-1))
-                ;;    (tap> [:cc push-path? waiting? selected? selected-i selected-o  z1 z1a z2 z2a]))
+                ;;    (ut/tapp>> [:cc push-path? waiting? selected? selected-i selected-o  z1 z1a z2 z2a]))
 
                  ;selected-dash "" ;@(ut/tracked-subscribe [::selected-dash]) ;;; (get (theme-pull :theme/data-colors db/data-colors) "unknown")
                 ; relations "" ;@(ut/tracked-subscribe [::relations selected-dash])
@@ -1374,8 +1374,8 @@
                 ; involved? (and involved1? involved2?)
                 ; peek? @(ut/tracked-subscribe [::peek?])
 
-           ;; (tap> [:coords coords])
-            ; (tap> [:lines z1 z2 same-tab? @(ut/tracked-subscribe [::what-tab z1]) @(ut/tracked-subscribe [::what-tab z2])])
+           ;; (ut/tapp>> [:coords coords])
+            ; (ut/tapp>> [:lines z1 z2 same-tab? @(ut/tracked-subscribe [::what-tab z1]) @(ut/tracked-subscribe [::what-tab z2])])
              ^{:key (str uid-hash)}
              [:path {:stroke-width (if (or done? running?) 10 7) ;(if selected? 11 6) ;(if involved? 16 13)
                      :stroke       (if (or selected? involved?) color (str color 75)) ;(if (or involved? nothing-selected?)
@@ -1444,7 +1444,7 @@
  ::update-flowmap-key
  (undoable)
  (fn [db [_ bid kkey vval]]
-   ;(tap> [:update bid (get db :selected-flow-block) kkey vval])
+   ;(ut/tapp>> [:update bid (get db :selected-flow-block) kkey vval])
    (let [bid (get db :selected-flow-block)] ;; override due to slow reacting?
      (if (nil? kkey) ;; fulll body update
        (assoc-in db [:flows (get db :selected-flow) :map bid] vval)
@@ -1454,7 +1454,7 @@
  ::update-flowmap-key-in
  (undoable)
  (fn [db [_ bid kkey vval]]
-   (tap> [:update bid (get db :selected-flow-block) kkey vval])
+   (ut/tapp>> [:update bid (get db :selected-flow-block) kkey vval])
    (let [bid (get db :selected-flow-block)
          pin? (= kkey [:ports :in]) ;; ut/function-to-inputs :args+ overrides
          ;;f2i (ut/function-to-inputs lookup-map)
@@ -1491,7 +1491,7 @@
  ::update-flowmap-key-others
  (undoable)
  (fn [db [_ bid fid kkey vval]]
-   ;(tap> [:update bid (get db :selected-flow-block) fid kkey vval])
+   ;(ut/tapp>> [:update bid (get db :selected-flow-block) fid kkey vval])
    (if (nil? kkey) ;; fulll body update
      (assoc-in db [:flows fid :map bid] vval)
      (assoc-in db [:flows fid :map bid kkey] vval))))
@@ -1576,7 +1576,7 @@
  ::get-flow-brick
  (fn [db _]
    (let [ordered1 (reverse (sort-by last (for [[k v] (get-in db [:flows (get db :selected-flow) :map])] [k (get v :x)])))]
-         ;_ (tap> [:ordered1 ordered1])
+         ;_ (ut/tapp>> [:ordered1 ordered1])
          ;bb (keys (get-in db [:flows (get db :selected-flow) :map]))
 
      (str "flow-brick-" (first (first ordered1))))))
@@ -1586,7 +1586,7 @@
     (let [[positionX positionY scale] @(ut/tracked-subscribe [::zoom-start])]
           ;bb @(ut/tracked-subscribe [::get-flow-brick])
 
-      (tap> [positionX positionY scale])
+      (ut/tapp>> [positionX positionY scale])
       ;(.setTransform z positionX positionY scale 0)
       ;(.setTransform z 100 100 1)
       ;(.zoomToElement z bb 1200)
@@ -1664,7 +1664,7 @@
 ;;             grid-size db/snap-to-grid ;20
 ;;             snapped-x (* grid-size (Math/round (/ x grid-size)))
 ;;             snapped-y (* grid-size (Math/round (/ y grid-size)))]
-;;         ;(tap> [:snapper bid snapped-x snapped-y])
+;;         ;(ut/tapp>> [:snapper bid snapped-x snapped-y])
 ;;         (when (or (not= snapped-x (first @last-coords))
 ;;                   (not= snapped-y (second @last-coords)))
 ;;           (reset! last-coords [snapped-x snapped-y])
@@ -1735,7 +1735,7 @@
         raw-x (.-clientX evt)
         raw-y (.-clientY evt)]
        ;raw-y (- raw-y (* yy zoom-multi))
-       ;_ (tap> [:offs @db/pan-zoom-offsets raw-x raw-y])
+       ;_ (ut/tapp>> [:offs @db/pan-zoom-offsets raw-x raw-y])
        ;; x      (- (- (/ raw-x zoom-multi) (/ zoom-offset-x zoom-multi)) xx)
        ;; y      (- (- (/ raw-y zoom-multi) (/ zoom-offset-y zoom-multi)) yy)
 
@@ -1879,7 +1879,7 @@
          keypath (if browser-pull? (get pid :keypath-in) nil)
          input-pid (if browser-pull? (get pid :input-pid) nil)
          port-meta (if browser-pull? (get pid :port-meta) nil)
-          ;;_ (when browser-pull? (tap> [:draggable-port keypath browser-pull? bid pid])) ;; pid is a map in browser-pull
+          ;;_ (when browser-pull? (ut/tapp>> [:draggable-port keypath browser-pull? bid pid])) ;; pid is a map in browser-pull
          pid (if browser-pull? :* pid)
         ;;  [_ _ sx sy] (if browser-pull? (first (filter
         ;;                                        #(cstr/includes? (str %) (str " " bid " "))
@@ -1908,13 +1908,13 @@
      ;:on-drag tag-tentacle-pos
       :on-drag (when (not browser-pull?) tag-screen-position)
      ;:on-drag (debounce tag-screen-position 100)
-     ;:on-drag #(tap> [(.-clientX %) (.-clientY %)])
+     ;:on-drag #(ut/tapp>> [(.-clientX %) (.-clientY %)])
     ; :on-drag       #(reset! tentacle-pos [(+ (.-clientX %) xx) (+ (.-clientY %) yy)])
       :on-drag-end   #(do (reset! dragging-port? false))
                        ;(reset! dyn-dropper-hover false)
                        ;(reset! dragging-size [0 0])
                        ;(reset! on-block? false)
-                       ;(tap> [(.-clientX %) (.-clientY %)])
+                       ;(ut/tapp>> [(.-clientX %) (.-clientY %)])
                        ; (tag-screen-position %)
                        ;(reset! dragging-body false)
 
@@ -1928,7 +1928,7 @@
                                                 (- (.-clientY %) yy 40)])
                         (reset! tentacle-pos [0 0])
                        ;(reset! tentacle-start [xs ys])
-                       ;(tap> [:tstart xs ys])
+                       ;(ut/tapp>> [:tstart xs ys])
                        ;(reset! tentacle-pos [xs ys])
                        ;(reset! on-block? false)
                         (reset! bricks/dragging-size [(get data :w) (get data :h)])
@@ -1979,7 +1979,7 @@
    ;:on-drag (debounce #(tag-screen-position %) 100)
    ;:on-drag tag-screen-position
    ;:on-drag (debounce tag-screen-position 10)
-     ;:on-drag #(tap> [(.-clientX %) (.-clientY %)])
+     ;:on-drag #(ut/tapp>> [(.-clientX %) (.-clientY %)])
       :on-drag-end   #(do (reset! dragging-port? false))
       :on-drag-start #(do
                         (reset! dragging-port? true)
@@ -1997,7 +1997,7 @@
 
 
 ;; (defn droppable-port [element bid pid]
-;;   ;(tap> [:dropped? types-vec root element])
+;;   ;(ut/tapp>> [:dropped? types-vec root element])
 ;;   (if true ; @dragging-port? ;; no point since it doesnt render anyways
 ;;     [(reagent/adapt-react-class rdnd/Droppable)
 ;;      {:types   [:flow-port]
@@ -2007,7 +2007,7 @@
 ;;                               (keyword (str (gn srcf) "/" (gn srcl))))
 ;;                       dest (if (= pid :in) bid
 ;;                                (keyword (str (gn bid) "/" (gn pid))))]
-;;                   (tap> [:dropped src :to dest])
+;;                   (ut/tapp>> [:dropped src :to dest])
 ;;                   (reset! flowmaps-connections (conj @flowmaps-connections [src dest])))}
 ;;      [re-com/box
 ;;       :size "auto"
@@ -2030,7 +2030,7 @@
                                        (= (side-fn %) bid)
                                        false)) ;; unnamed ports assumed
                                 flowmaps-connections)]
-    (tap> [:removing bid pid (if input? :in :out) conns-count])
+    (ut/tapp>> [:removing bid pid (if input? :in :out) conns-count])
     (ut/tracked-dispatch [::update-flowmap-connections new-connections])
     conns-count))
 
@@ -2055,13 +2055,13 @@
 
 ;; (defn conn/add-flow-block [x y & [body bid no-select?]]
 ;;   (let [;bid (if bid bid (keyword (str "open-input-" (count @(ut/tracked-subscribe [::flowmap])))))
-;;         _ (tap> [:conn/add-flow-block bid])
+;;         _ (ut/tapp>> [:conn/add-flow-block bid])
 ;;         bid (keyword (ut/replacer (str (gn bid)) #"/" "-"))
 ;;         bid (if bid bid :open-input)
-;;         _ (tap> [:ADD-pre-safe-bid bid])
+;;         _ (ut/tapp>> [:ADD-pre-safe-bid bid])
 ;;         safe-keys-reserved @(ut/tracked-subscribe [::conn/reserved-type-keywords])
 ;;         bid (ut/safe-key bid safe-keys-reserved)
-;;         _ (tap> [:ADD-post-safe-bid bid])
+;;         _ (ut/tapp>> [:ADD-post-safe-bid bid])
 ;;         zoom-multi (get @db/pan-zoom-offsets 2)
 ;;         zoom-offset-x (get @db/pan-zoom-offsets 0)
 ;;         zoom-offset-y (get @db/pan-zoom-offsets 1)
@@ -2078,7 +2078,7 @@
 ;;                   :x drop-x :y drop-y :z 0
 ;;                   :ports {:in {:in :string}
 ;;                           :out {:out :string}}})]
-;;    ;(tap> [:adding-flow-block bid x y @(ut/tracked-subscribe [::flowmap])])
+;;    ;(ut/tapp>> [:adding-flow-block bid x y @(ut/tracked-subscribe [::flowmap])])
 ;;    ;(swap! flowmaps assoc bid body)
 ;;     (when (not no-select?) (ut/tracked-dispatch [::select-block bid]))
 ;;     (ut/tracked-dispatch [::update-flowmap-key2 bid nil body])))
@@ -2090,7 +2090,7 @@
                                      (cstr/starts-with? (str (last %)) (str bid "/")))
                                ;; base refs and name ports
                                 flowmaps-connections)]
-    (tap> [:removing-block bid])
+    (ut/tapp>> [:removing-block bid])
 ;;     (reset! flowmaps-connections
 ;;             (remove #(or (= (first %) bid) (= (last %) bid)
 ;;                          (cstr/starts-with? (str (first %)) (str bid "/"))
@@ -2118,11 +2118,11 @@
 ;   (dorun (smooth-scroll-to-element "scrolly-boy" bid)
  ;(reset! flow-select (if (= bid @flow-select) nil bid))
  ;(reset! flow-select bid)
-  (tap> [:selecting-block2 bid])
+  (ut/tapp>> [:selecting-block2 bid])
   (ut/tracked-dispatch [::select-block bid]))
 
 (defn connect-ports [src dest]
-  (tap> [:connecting src dest])
+  (ut/tapp>> [:connecting src dest])
   (let [flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
         conns (vec (filter #(not (= (last %) :done)) flowmaps-connections))
         src (if (cstr/ends-with? (str src) "/*") ;; no need for *, will only confuse things. w/o it is implied. (since the multi-output ports are "fake" anyways. lol)
@@ -2135,7 +2135,7 @@
                         (if done? conns flowmaps-connections)
                         [src ;(if done? base-src src)
                          dest])))]
-    (tap> [:new-conn-vec conn-vec])
+    (ut/tapp>> [:new-conn-vec conn-vec])
 ;;       (reset! flowmaps-connections
 ;;               (conj conns [src dest])))
 ;;     (reset! flowmaps-connections
@@ -2191,14 +2191,14 @@
 (defn droppable-port [element bid pid]
   [(reagent/adapt-react-class rdnd/Droppable)
    {:types   [:flow-port]
-    :on-drop #(let [_ (tap> [:dropped-on-port bid pid @dragged-port])
+    :on-drop #(let [_ (ut/tapp>> [:dropped-on-port bid pid @dragged-port])
                     [srcf srcl _] @dragged-port
                     src (if (= srcl :out) srcf ;; no alias for simple */out
                             (keyword (str (gn srcf) "/" (gn srcl))))
                     dest (if (= pid :in) bid
                              (keyword (str (gn bid) "/" (gn pid))))]
                 (reset! dragging-port? false)
-                (tap> [:dropped src :to dest])
+                (ut/tapp>> [:dropped src :to dest])
                 (connect-ports src dest))}
    element])
 
@@ -2209,7 +2209,7 @@
                                              (catch :default _ nil)))
                                      (= (val %) :any))
                                 inputs)]
-    ;(tap> [:valid-drop-ports (last @dragged-port) inputs filtered-inputs ])
+    ;(ut/tapp>> [:valid-drop-ports (last @dragged-port) inputs filtered-inputs ])
     (if (= :any (last @dragged-port))
       (keys inputs) ;; if we dont know what it is (like a fresh open-fn) just allow whatever 
       (keys filtered-inputs))))
@@ -2299,7 +2299,7 @@
 (defn code-box-smol [width-int height-int value & [syntax]]
   (let [syntax (or (if (= syntax "raw (clojure)") "clojure" syntax) "clojure")
         stringify? (not (= syntax "clojure"))]
-    ;(tap> [:smol stringify? syntax value])
+    ;(ut/tapp>> [:smol stringify? syntax value])
     [re-com/box
      :size "none"
      :width (px (- width-int 24))
@@ -2351,7 +2351,7 @@
          data (get fmap :data)
          value (if override-value override-value (get data :user-input))
          port-multi? (true? (or (map? value) (vector? value)))]
-     ;(when (= bid :open-fn-1) (tap> [:pc1 bid pid return-type override-value value]))
+     ;(when (= bid :open-fn-1) (ut/tapp>> [:pc1 bid pid return-type override-value value]))
      (if (nil? pid)
        (let [flow-select @(ut/tracked-subscribe [::selected-flow-block])
              selected? (= bid flow-select)
@@ -2374,9 +2374,9 @@
             ;;        (gn (first (vals outputs))))
              ;value (if port-multi? )
              dt (ut/data-typer value)
-            ; _ (when (= bid :open-fn-1) (tap> [:pc2 dt bid pid return-type override-value value]))
+            ; _ (when (= bid :open-fn-1) (ut/tapp>> [:pc2 dt bid pid return-type override-value value]))
             ;;  dt (gn (first (vals outputs)))
-             ;;_ (tap> [:dt dt bid pid return-type])
+             ;;_ (ut/tapp>> [:dt dt bid pid return-type])
              bcolor (try
                       (cond error? "red"
                             python? "#F0E68C"
@@ -2402,10 +2402,10 @@
              color (get (theme-pull :theme/data-colors db/data-colors)
                         (gn dt)
                         (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500"))
-             ;_ (when (= bid :static-value-2-out) (tap> [:pc3 dt value bid pid return-type override-value value]))
+             ;_ (when (= bid :static-value-2-out) (ut/tapp>> [:pc3 dt value bid pid return-type override-value value]))
              ]
         ;;  (when (and (= bid :open-input-3) (= pid :rando*))
-        ;;    (tap> [:cc dt color bid pid return-type]))
+        ;;    (ut/tapp>> [:cc dt color bid pid return-type]))
          (cond (= return-type :data-type) dt ;(or dt :none)
                (= return-type :data-value) value
                :else color))))))
@@ -2442,14 +2442,14 @@
         condi-valves (when condi-ports @(ut/tracked-subscribe [::bricks/condi-valves flow-id])) ;; react!
         outport-keys (into (into (vec (sort-by str (keys ports))) (keys condi-ports)) (keys push-ports))
         ;; _ (when (not (empty? condi-ports))
-        ;;     (tap> [:ports bid input? condi-ports ports ]))
+        ;;     (ut/tapp>> [:ports bid input? condi-ports ports ]))
         ports (if (not input?) (let [cports (into {} (for [n (into (keys condi-ports) (keys push-ports))] {n (get ports :out :any)}))]
                                  (merge ports cports)) ports)
         inputs-vec (try
                      (edn/read-string binputs) ;; some legacy flows have a string here...
                      (catch :default _ binputs))
         port-width (/ (- w 5) (count ports))]
-   ;(tap> [:valid-drops @dragged-port valid-drops])
+   ;(ut/tapp>> [:valid-drops @dragged-port valid-drops])
     [re-com/h-box
      :size "none"
      :height "15px"
@@ -2467,7 +2467,7 @@
                              ;ports
                              (sort-map-keys
                               (try outport-keys ;(sort (keys ports))
-                                   (catch :default e (do (tap> [:key-sorting-error e
+                                   (catch :default e (do (ut/tapp>> [:key-sorting-error e
                                                                 ;(keys ports)
                                                                 outport-keys
                                                                 :flows.cljs :ln 1802])
@@ -2486,7 +2486,7 @@
                            filled? (if input?
                                      @(ut/tracked-subscribe [::get-incoming-port bid :in k])
                                      (ut/ne? @(ut/tracked-subscribe [::get-outgoing-port bid (if input? :in :out) k])))
-                          ;;  _ (when (= bid :unpack-results-map) (tap> [:filler @(ut/tracked-subscribe [::get-outgoing-port bid :out k]) bid k]))
+                          ;;  _ (when (= bid :unpack-results-map) (ut/tapp>> [:filler @(ut/tracked-subscribe [::get-outgoing-port bid :out k]) bid k]))
                            ;ptype @(ut/tracked-subscribe  [::port-color flow-id (or ibid bid) (or ivk k) :data-type])
                            multi? (cstr/ends-with? (str k) "+")
                            pval1 (when (> (count ports) 1)
@@ -2500,7 +2500,7 @@
                           ; port-color @(ut/tracked-subscribe [::port-color flow-id bid k])
                           ;out? (not input?)
                           ;[xs ys] [(if out? (+ x w) x) (+ y 4 (+ 6 (* 1 22)))]
-                           ;;_ (tap> [:port-color bid input? port-color k ivk pval1 @(ut/tracked-subscribe [::port-color flow-id bid k :data-type])])
+                           ;;_ (ut/tapp>> [:port-color bid input? port-color k ivk pval1 @(ut/tracked-subscribe [::port-color flow-id bid k :data-type])])
                            icon [re-com/md-icon-button
                                  :src (at)
                                 ;;  :md-icon-name (if done?
@@ -2526,7 +2526,7 @@
                                                      (and filled? panel-hovered?)) "zmdi-circle"
                                                  :else "zmdi-circle-o")
                                  :attr (if valid-drop?
-                                         {:on-drag-over #(do ;(tap> [:h hovered? hover-key @port-hover])
+                                         {:on-drag-over #(do ;(ut/tapp>> [:h hovered? hover-key @port-hover])
                                                            (when (not (= @port-hover hover-key))
                                                              (reset! port-hover hover-key)))
                                           :on-drag-leave #(do
@@ -2563,7 +2563,7 @@
                                              :on-mouse-enter #(reset! sniffy-sniff [input? k pval1])
                                              :on-mouse-leave #(reset! sniffy-sniff nil)})
                                           {:on-context-menu #(let [removed-count (remove-connections bid k input?)]
-                                                               ;(tap> [:click!])
+                                                               ;(ut/tapp>> [:click!])
                                                                (doseq [e (range removed-count)
                                                                        :let [disconnected-string (str bid "/" k "(" e "/" removed-count ")")
                                                                              ts (str (.toISOString (js/Date.)))]]
@@ -2676,11 +2676,11 @@
         
         tbid (let [cc (/ w 7) ;; px to char width
                    llen (count (str bid))]
-               ;;(tap> [:tbid cc bid w])
+               ;;(ut/tapp>> [:tbid cc bid w])
                (if (< cc llen) (str (subs (str bid) 0 cc) "..") bid))]
-    ;(tap> [:center bid h w])
-    ;;(tap> [:image-check (count @(ut/tracked-subscribe [::image-check])) @(ut/tracked-subscribe [::image-check])])
-    ;(tap> [:checker (ut/is-base64? "Lato") (ut/is-base64? "")])
+    ;(ut/tapp>> [:center bid h w])
+    ;;(ut/tapp>> [:image-check (count @(ut/tracked-subscribe [::image-check])) @(ut/tracked-subscribe [::image-check])])
+    ;(ut/tapp>> [:checker (ut/is-base64? "Lato") (ut/is-base64? "")])
     ^{:key (str "flow-brick-center-" bid)}
     [re-com/v-box
      :height (px (- h 36))
@@ -2897,9 +2897,9 @@
                                         (gn (first (vals (get-in flow-map [done-block :ports :out])))))
                                     (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500")))]
 
-   ;;(tap> [:run @(ut/tracked-subscribe [::http/flow-results])])
+   ;;(ut/tapp>> [:run @(ut/tracked-subscribe [::http/flow-results])])
 
-   ;(tap> [:flow-hover @flow-hover])
+   ;(ut/tapp>> [:flow-hover @flow-hover])
 ;;    (zoom-to-element "flow-brick-:open-input-1" 10)
     [re-com/h-box
      :size "none" :align :center :justify :center
@@ -2928,7 +2928,7 @@
                            ;running?        (is-running? bid flow-id)
                                  running?         @(ut/tracked-subscribe [::is-running? bid flow-id])
                                  error?        @(ut/tracked-subscribe [::is-error? bid flow-id])
-                           ;_ (tap> [:inny? (get-in @flow-details-block-container-atom [flow-id :involved])])
+                           ;_ (ut/tapp>> [:inny? (get-in @flow-details-block-container-atom [flow-id :involved])])
                            ;; python?         (= (get data :syntax) "python")
                            ;; styler          (get-in data [:flow-item :style] {})
                                  did             (str "flow-brick-" bid)
@@ -2947,8 +2947,8 @@
                            ;;                               (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500"))))
                            ;;          (catch :default _ "orange"))
                                  bcolor @(ut/tracked-subscribe [::port-color flow-id bid])
-                           ;_ (when (= bid :open-fn-1) (tap> [bid :bcolor bcolor]))
-                           ;_ (tap> selected?)
+                           ;_ (when (= bid :open-fn-1) (ut/tapp>> [bid :bcolor bcolor]))
+                           ;_ (ut/tapp>> selected?)
                                  ]
 
                            :when true]
@@ -3071,10 +3071,10 @@
 ;;                                         (gn (first (vals (get-in flow-map [done-block :ports :out])))))
 ;;                                     (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500")))]
 
-;;    ;(tap> [:done-block done-block flow-map])
-;;    ;(tap> [:reserved-type-keywords @(ut/tracked-subscribe [::conn/reserved-type-keywords])])
-;;    ;(tap> [:generate-coords coords])
-;;    ;(tap> [:db/flow-results @(ut/tracked-subscribe [::http/flow-results])])
+;;    ;(ut/tapp>> [:done-block done-block flow-map])
+;;    ;(ut/tapp>> [:reserved-type-keywords @(ut/tracked-subscribe [::conn/reserved-type-keywords])])
+;;    ;(ut/tapp>> [:generate-coords coords])
+;;    ;(ut/tapp>> [:db/flow-results @(ut/tracked-subscribe [::http/flow-results])])
 
 ;;     ^{:key (str "flow-brick-grid")}
 ;;     [re-com/h-box
@@ -3387,7 +3387,7 @@
 ;;                                                                                                                                dest (if (= pid :in) bid
 ;;                                                                                                                                         (keyword (str (gn bid) "/" (gn pid))))]
 ;;                                                                                                                            (reset! dragging-port? false)
-;;                                                                                                                            (tap> [:dropped src :to dest])
+;;                                                                                                                            (ut/tapp>> [:dropped src :to dest])
 ;;                                                                                                                            (connect-ports src dest))}
 ;;                                                                                                               [re-com/box
 ;;                                                                                                                :align :center :justify :center
@@ -3518,7 +3518,7 @@
       (ut/replacer #">" "/")
       keyword))
 
-;(tap> [:safe-cpk (safe-cpk :theme/panel-1) (unsafe-cpk :theme>panel-1)])
+;(ut/tapp>> [:safe-cpk (safe-cpk :theme/panel-1) (unsafe-cpk :theme>panel-1)])
 
 (defn get-flow-deps [panel-key body]
   (let [all-sql-call-keys      @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
@@ -3558,7 +3558,7 @@
 ;; ^^ TODO this is deprecated due to the superior & simplier conn/spawn-open-input-block that is used in the right-click modal
 ;; HOWEVER, it is very much hacked deep into the draggable/droppable system, a refactor will have to wait. 
 ;; we will have to deal with this fucking shit for now.
- ;(tap> [:we-dropped?  @port-hover types-vec root @bricks/dragging-body element])
+ ;(ut/tapp>> [:we-dropped?  @port-hover types-vec root @bricks/dragging-body element])
   (if true ;(not @dragging-port?)  ;; for. fucks. sake.
     [(reagent/adapt-react-class rdnd/Droppable)
      {:types   types-vec
@@ -3572,23 +3572,23 @@
                               inc-loaded @(ut/tracked-subscribe [::sub-flow-loaded?])]
                           (when (and (not (= inc-path inc-loaded)) (not (= inc-path @last-loaded)))
                             (reset! last-loaded inc-path)
-                            (tap> [:loading-sub-flow! inc-path inc-loaded])
+                            (ut/tapp>> [:loading-sub-flow! inc-path inc-loaded])
                             (ut/tracked-dispatch [::http/load-sub-flow inc-path]))))
       :on-drop #(when (or (empty? @port-hover) (nil? @port-hover)) ;; is not a port drop and intended to be a canvas drop
                   ;(do
-                  (tap> [:dropped? @port-hover @dragged-port types-vec root @bricks/dragging-body element])
+                  (ut/tapp>> [:dropped? @port-hover @dragged-port types-vec root @bricks/dragging-body element])
                   (if (and (= (get-in @bricks/dragging-body [:drag-meta :source-query]) :flows-sys) (not @drop-toggle?))
                     (let [file-path @(ut/tracked-subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]])]
                       (ut/tracked-dispatch [::http/load-flow file-path])
-                      (tap> [:load-flow file-path])
+                      (ut/tapp>> [:load-flow file-path])
                       ;(center-zoom-and-pan)
                       ;(center-to-saved-coords)
                       )
 
                     (let [incoming   (js->clj %)
-                     ;_ (tap> [:start? types-vec (last (last incoming)) (map? (last (last incoming))) (try (read-string (last (last incoming))) (catch :default e (str e)))])
+                     ;_ (ut/tapp>> [:start? types-vec (last (last incoming)) (map? (last (last incoming))) (try (read-string (last (last incoming))) (catch :default e (str e)))])
                             ;data       (read-string (get incoming "meta-menu"))  ;(read-string (last (last incoming)))
-                          _ (tap> [:incoming? incoming (first incoming) (get (first incoming) "meta-menu") (get incoming "meta-menu") (read-string (last (last incoming)))])
+                          _ (ut/tapp>> [:incoming? incoming (first incoming) (get (first incoming) "meta-menu") (get incoming "meta-menu") (read-string (last (last incoming)))])
                           data         (read-string (get incoming "meta-menu"))
                           cdata        (read-string (get incoming "flow-port"))
                           from-port?   (not (empty? cdata))
@@ -3596,7 +3596,7 @@
 
                           browser-pull? (or (get data :browser-pull?) (get cdata :browser-pull?))
 
-                          _ (tap> [:incoming-data data])
+                          _ (ut/tapp>> [:incoming-data data])
                           [x y]      root
                             ;port-drop?     (get incoming "flow-port")
                           sub-flow-part? (not (empty? (get-in @bricks/dragging-body [:flow-item :file-path])))
@@ -3605,9 +3605,9 @@
                           file-path (when sub-flow-drop? (if sub-flow-part?
                                                            (get-in @bricks/dragging-body [:flow-item :file-path])
                                                            @(ut/tracked-subscribe [::conn/clicked-parameter-key [:flows-sys/file_path]])))
-                          _ (tap> [:dropper file-path sub-flow-part? sub-flow-drop?])
+                          _ (ut/tapp>> [:dropper file-path sub-flow-part? sub-flow-drop?])
                           sub-flow (when sub-flow-drop? @(ut/tracked-subscribe [::sub-flow-incoming]))
-                          _ (when sub-flow-drop? (tap> [:sub-flow-drop! (get sub-flow :file-path)]))
+                          _ (when sub-flow-drop? (ut/tapp>> [:sub-flow-drop! (get sub-flow :file-path)]))
                           zoom-multi (get @db/pan-zoom-offsets 2)
                           zoom-offset-x (get @db/pan-zoom-offsets 0)
                           zoom-offset-y (get @db/pan-zoom-offsets 1)
@@ -3620,7 +3620,7 @@
                           port-meta? (and (not (empty? port-meta)) (map? port-meta))
                           get-in-drag? (and (vector? kp) (not (empty? kp)))
                           dm-type     (get-in rooted-data [:drag-meta :type])
-                          _ (tap> [:dropeed-offsets root dm-type zoom-multi zoom-offset-x zoom-offset-y drop-x drop-y rooted-data])
+                          _ (ut/tapp>> [:dropeed-offsets root dm-type zoom-multi zoom-offset-x zoom-offset-y drop-x drop-y rooted-data])
                           flow-item (get @bricks/dragging-body :flow-item)
                           flow-body (cond
                                         ;; from-port? {:w 125 :h 60
@@ -3676,7 +3676,7 @@
                                                                  (get-in sub-flow [:map i :ports :out (first (keys (get-in sub-flow [:map i :ports :out])))])}))
                                             done-block (try (first (first (filter (fn [x] (= (second x) :done)) (get sub-flow :connections))))
                                                             (catch :default _ :error))]
-                                        (tap> [:sub-flow-build no-inputs base-conns])
+                                        (ut/tapp>> [:sub-flow-build no-inputs base-conns])
                                         {:w 200 :h 100
                                          :x drop-x :y drop-y :z 0
                                          :data (-> rooted-data
@@ -3692,7 +3692,7 @@
 
                                       flow-item ;; item picked from grid rows
                                       (let []
-                                        (tap> [:flow-item flow-item])
+                                        (ut/tapp>> [:flow-item flow-item])
                                         (merge
                                          {:w 200 :h 100
                                           :x drop-x :y drop-y :z 0
@@ -3711,7 +3711,7 @@
                                             panel-key              (get-in rooted-data [:drag-meta :source-panel-key])
                                             body                   @(ut/tracked-subscribe [::bricks/resolve-view-alias view-ref])
                                             res-params-map-types (get-flow-deps panel-key body)]
-                                   ;(tap> [:view view-ref body all-params res-params-map res-params-map-types])
+                                   ;(ut/tapp>> [:view view-ref body all-params res-params-map res-params-map-types])
                                         {:w 200 :h 100
                                          :x drop-x :y drop-y :z 0
                                          :data (-> @bricks/dragging-body
@@ -3741,7 +3741,7 @@
                                                       (str (gn (get-in rooted-data [:drag-meta :param-table])) "/"
                                                            (gn (get-in rooted-data [:drag-meta :param-field])) "."
                                                            (get-in rooted-data [:drag-meta :row-num])))]
-                                   ;(tap> [:hit? cell-ref (resolver/logic-and-params [cell-ref] nil)])
+                                   ;(ut/tapp>> [:hit? cell-ref (resolver/logic-and-params [cell-ref] nil)])
                                         {:w 200 :h 60
                                          :x drop-x :y drop-y :z 0
                                          :data (-> @bricks/dragging-body
@@ -3759,7 +3759,7 @@
                                             qid                    (get-in rooted-data [:drag-meta :source-table])
                                             body                   @(ut/tracked-subscribe [::bricks/find-query qid])
                                             res-params-map-types   (get-flow-deps panel-key body)]
-                                        (tap> [:qbody body])
+                                        (ut/tapp>> [:qbody body])
                                         {:w 200 :h 60
                                          :x drop-x :y drop-y :z 0
                                          :data @bricks/dragging-body
@@ -3807,7 +3807,7 @@
                    ;;                (= dm-type :viz-reco))
 
 
-                 ;(tap> [:dropped type :ok-new? :drag-meta-type dm-type [@on-block? @dyn-dropper-hover] ok-new? rooted-data root])
+                 ;(ut/tapp>> [:dropped type :ok-new? :drag-meta-type dm-type [@on-block? @dyn-dropper-hover] ok-new? rooted-data root])
                       (reset! dragging? false)
                       (reset! bricks/dragging? false)
                  ;(reset! bricks/over-block? false)
@@ -3815,7 +3815,7 @@
                         false "hey"
 
                    ; (get rooted-data :file_path) ;; (get @(ut/tracked-subscribe [::conn/clicked-parameter [:files-sys]]) :file_path)
-                        :else (do ;;(tap> [:flow-inherits-drag-body? @bricks/dragging-body data drop-x drop-y flow-body flow-id check-port-drop])
+                        :else (do ;;(ut/tapp>> [:flow-inherits-drag-body? @bricks/dragging-body data drop-x drop-y flow-body flow-id check-port-drop])
                                 (conn/add-flow-block drop-x drop-y flow-body (if from-port? check-port-drop flow-id) browser-pull?)
                                 (when from-port?
                                   (if port-meta? ;; in to out
@@ -3825,7 +3825,7 @@
                                     (connect-ports (keyword (if (= src-port "out") src-block (str src-block "/" src-port)))
                                                    (keyword (str (ut/replacer (str check-port-drop) ":" "") "/x")))))))))
 
-                                    ;(do (tap> [:port-drop-on-port :do-nothing (get (js->clj %"flow-port"))]) nil)
+                                    ;(do (ut/tapp>> [:port-drop-on-port :do-nothing (get (js->clj %"flow-port"))]) nil)
                   )}
 
      [re-com/box :child element]] element))
@@ -3860,19 +3860,19 @@
         items (vec (keys @(ut/tracked-subscribe [::flowmap])))
        ;curr-value @flow-hover
         new-index (max 0 (min (count items) (+ @current-index direction)))]
-    (tap> [:scrolled-to new-index])
+    (ut/tapp>> [:scrolled-to new-index])
     (reset! current-index new-index)
     (reset! flow-hover (get items new-index))))
 
 (defn add-wheel-listener [element-id]
   (let [element (gdom/getElement element-id)]
-    (tap> [:add-wheel-listener])
+    (ut/tapp>> [:add-wheel-listener])
     (.removeEventListener element "wheel" handle-wheel)
     (.addEventListener element "wheel" handle-wheel)))
 
 (defn remove-wheel-listener [element-id]
   (let [element (gdom/getElement element-id)]
-    (tap> [:REMOVE-wheel-listener])
+    (ut/tapp>> [:REMOVE-wheel-listener])
     (.removeEventListener element "wheel" handle-wheel)))
 
 ;;(defonce db/flow-browser-panel? (reagent/atom true))
@@ -3893,7 +3893,7 @@
                   (let [progress (/ (- timestamp @start) duration)
                         flow-select @(ut/tracked-subscribe [::selected-flow-block])
                         new-scroll-left (+ container-left (* progress (- element-left container-left)))]
-                   ;(tap> [:scroll-assholes container-left element-left (Math/floor new-scroll-left)])
+                   ;(ut/tapp>> [:scroll-assholes container-left element-left (Math/floor new-scroll-left)])
                     (reset! scrolly-pos flow-select)
                     (set! (.-scrollLeft container) new-scroll-left)
                     (when (< progress 1)
@@ -3960,7 +3960,7 @@
               :onBlur #(try
                          (let [new-vals (read-string (cstr/join " " (ut/cm-deep-values %)))]
                            (swap! channel-holster assoc-in [flow-id bid :value] new-vals))
-                         (catch :default _ (tap> [:error-saving-channel-data flow-id bid])))
+                         (catch :default _ (ut/tapp>> [:error-saving-channel-data flow-id bid])))
               :options {:mode              "clojure"
                         :lineWrapping      true
                         :lineNumbers       true
@@ -4020,7 +4020,7 @@
               :onBlur #(try
                          (let [new-vals (ut/cm-deep-values %)]
                            (ut/tracked-dispatch [::update-flowmap-key bid :description new-vals]))
-                         (catch :default _ (tap> [:issue-saving bid :text-rw (ut/cm-deep-values %)])))
+                         (catch :default _ (ut/tapp>> [:issue-saving bid :text-rw (ut/cm-deep-values %)])))
               :options {:mode              "text"
                         :lineWrapping      true
                         :lineNumbers       false ;true
@@ -4039,7 +4039,7 @@
                             (catch :default _ []))
                        (filter keyword? (ut/deep-flatten value)))
                      (catch :default _ []))
-        ;_ (tap> [:value value])
+        ;_ (ut/tapp>> [:value value])
         opts @(ut/tracked-subscribe [::opts-map])
         uses (vec (cset/intersection (set value-keys) (set (keys opts))))
         using-opts? (not (empty? uses))]
@@ -4059,12 +4059,12 @@
                              (let [new-vals (read-string (cstr/join " " (ut/cm-deep-values %)))
                                    fin (ut/function-to-inputs new-vals)]
                               ;;  ports (try (second new-vals)
-                              ;;             (catch :default _ (do (tap> [:error-making-arity-to-ports bid value new-vals]) [])))
+                              ;;             (catch :default _ (do (ut/tapp>> [:error-making-arity-to-ports bid value new-vals]) [])))
 
                                (ut/tracked-dispatch [::update-flowmap-key-in bid [:ports :in] fin])
                                (ut/tracked-dispatch [::update-flowmap-key bid :raw-fn new-vals])
                                (ut/tracked-dispatch [::clean-connections]))
-                             (catch :default e (do (tap> [:error-saving-fn! (str e)])
+                             (catch :default e (do (ut/tapp>> [:error-saving-fn! (str e)])
                                                    (ut/tracked-dispatch [::update-flowmap-key bid :raw-fn value]))))
                   :options {:mode              "clojure"
                             :lineWrapping      true
@@ -4146,7 +4146,7 @@
                   :child [(reagent/adapt-react-class cm/UnControlled)
                           {:value   (ut/format-map (- width-int 50)
                                                    (str value))
-                           :onBlur #(do (tap> [:edit-view-fn bid (cstr/join " " (ut/cm-deep-values %))
+                           :onBlur #(do (ut/tapp>> [:edit-view-fn bid (cstr/join " " (ut/cm-deep-values %))
                                                (try (read-string (cstr/join " " (ut/cm-deep-values %)))
                                                     (catch :default e (str :error e)))])
                                         (ut/tracked-dispatch [::edit-view-fn bid (read-string (cstr/join " " (ut/cm-deep-values %)))]))
@@ -4275,7 +4275,7 @@
 (defn code-box-rwo [width-int height-int value bid & [syntax]]
   (let [syntax (or (if (= syntax "raw (clojure)") "clojure" syntax) "clojure") ;; Error: true is not ISeqable
         stringify? (not (= syntax "clojure"))
-        ;_ (tap> [:code-box-rwo bid syntax stringify? value])
+        ;_ (ut/tapp>> [:code-box-rwo bid syntax stringify? value])
         value (if (and stringify? (empty? value)) " " value) ;; just in case we get in a bad way with raw text edit...
         ]
         ;; value (if (and stringify?
@@ -4303,8 +4303,8 @@
 
                                     (let [ddata (ut/cm-deep-values %)
                                           inputs (ut/template-find (str ddata))
-                                          ;_ (tap> [:code-box-rwo_template-find inputs])
-                                          ;_ (tap> [:code-box-rwo_saving-string ddata inputs])
+                                          ;_ (ut/tapp>> [:code-box-rwo_template-find inputs])
+                                          ;_ (ut/tapp>> [:code-box-rwo_saving-string ddata inputs])
                                           input-map (into {} (for [e (range (count inputs))
                                                                    :let [name (keyword (ut/replacer (str (ut/safe-name (get inputs e))) "/" "-"))]]
                                                                {name :any}))]
@@ -4319,10 +4319,10 @@
 
                                     (try (let [ddata (read-string (cstr/join " " (ut/cm-deep-values %)))
                                                dtype (ut/data-typer ddata)
-                                               ;_ (tap> [:code-box-rwo_write-clj ddata dtype])
+                                               ;_ (ut/tapp>> [:code-box-rwo_write-clj ddata dtype])
                                                ports {;:in (get-in v [:ports :in])
                                                       :out {:out (keyword dtype)}}
-                                     ;;_ (tap> [:fn-to-inputs (ut/function-to-inputs ddata)])
+                                     ;;_ (ut/tapp>> [:fn-to-inputs (ut/function-to-inputs ddata)])
                                                ports (cond (= dtype "map")
                                                            {:out (assoc (into {} (for [[k v] ddata] {k (keyword (ut/data-typer v))})) :* :map)}
                                                            (or (= dtype "vector") (= dtype "rowset")) ; = dtype "vector")
@@ -4348,7 +4348,7 @@
                                            (ut/tracked-dispatch [::update-flowmap-key-in bid [:data :user-input] ddata])
                                            (ut/tracked-dispatch [::update-flowmap-key-in bid [:ports :out] ports])
                                            (ut/tracked-dispatch [::clean-connections]))
-                                         (catch :default e (tap> [:saving-issue :code-box-rwo bid (str e) :parse-issue?]))))
+                                         (catch :default e (ut/tapp>> [:saving-issue :code-box-rwo bid (str e) :parse-issue?]))))
                                                 ;;(swap! flowmaps assoc-in [bid :data :user-input] value)
                                                 ;;(ut/tracked-dispatch [::update-flowmap-key bid nil vval])
                         :options {:mode              syntax ;"clojure"
@@ -4373,8 +4373,8 @@
         flow-select @(ut/tracked-subscribe [::selected-flow-block])
         sys? (nil? flow-select)
         dyn-width (if (not sys?) 600 (last @db/flow-editor-system-mode))]
-    ;;(tap> [:panel-deets open? title flow-id bid])
-    ;;(tap> [:dbg? (cstr/includes? (str title) "debugger")])
+    ;;(ut/tapp>> [:panel-deets open? title flow-id bid])
+    ;;(ut/tapp>> [:dbg? (cstr/includes? (str title) "debugger")])
     [re-com/v-box
      ;:padding "2px"
      :width "100%" ;(px (- dyn-width 15)) ;; "586px"
@@ -4466,7 +4466,7 @@
                                  (gn (first (vals outputs))))
                              (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500")))
                     (catch :default _ "orange"))
-        ;_ (tap> [ :works? id])
+        ;_ (ut/tapp>> [ :works? id])
         ccolor (cond error? "red"
                      python? "#F0E68C"
                      :else (if (or selected? hovered?) out-color (str out-color 75)))
@@ -4549,7 +4549,7 @@
                                          [re-com/box
                                           :size "none" :height "280px" :width (px ccw) ;"350px"
                                           :child [code-box ccw 280 (if (string? return-val) (pr-str return-val) return-val)]])]]]
-   ; (tap> [:blocks id fmap])
+   ; (ut/tapp>> [:blocks id fmap])
     [re-com/v-box
      :attr {:id (str id)
             :on-drag-over #(when @bricks/swap-layers? (reset! bricks/swap-layers? false))
@@ -4609,7 +4609,7 @@
                         subby-results (get-in @(ut/tracked-subscribe [::http/flow-results]) [:return-maps])
                         sub-flow-lookup (into {} (for [k (keys subby-results)] {(keyword (last (ut/splitter (str k) "/"))) k}))
                         sfl (get sub-flow-lookup id)]
-                    ;(tap> [:lookups sub-flow-lookup sfl])
+                    ;(ut/tapp>> [:lookups sub-flow-lookup sfl])
                     [re-com/box
                      ;:width "460px"
                      :height "380px" :size "none"
@@ -4671,7 +4671,7 @@
                                              widths [200 350 750]
                                              width (get-in fmap [:data :width] 350)
                                              syntax (get-in fmap [:data :syntax] "raw (clojure)")]
-                                         ;(tap> [:oo id fmap])
+                                         ;(ut/tapp>> [:oo id fmap])
                                          [re-com/v-box :size "none" :gap "9px" :padding "6px"
                                           :align :center :justify :center
                                           :width (px width) :height "380px"
@@ -5374,7 +5374,7 @@
                                                      ;:padding-top "10px"
                                            ;          :text-align "right"
                                    :background-color "#00000000"}])]
-                                           ;_ (tap> [:flow-list comps])
+                                           ;_ (ut/tapp>> [:flow-list comps])
 
                                                    ;:color (theme-pull :theme/editor-font-color nil)
                                            ;          :padding-top "1px"
@@ -5912,7 +5912,7 @@
                         {:name k :type (get-in v [:ports :out :out]) :number 1}))
                         ;[k {:name k :type (get-in v [:ports :out :out]) :number 1}]
 
-        _ (tap> [:waffled-data data])
+        _ (ut/tapp>> [:waffled-data data])
         square-size 20
         max-width w
         num-squares-max-width (quot max-width square-size)
@@ -5934,7 +5934,7 @@
                                    :number number
                                    :tooltip name}) data)
         ccolors (theme-pull :theme/data-colors db/data-colors)
-        _ (tap> [:waffle-chart-data chart-data])]
+        _ (ut/tapp>> [:waffle-chart-data chart-data])]
     [:vega-lite
      {:width chart-width
       :height (* square-size num-squares-height)
@@ -5991,7 +5991,7 @@
          types (if (= (count types) 1) (first types) types)]
          ;types (if (not (empty? types)) types :any)
 
-     (tap> [:set-port-type [_ flow-id bid dir pid] :to types])
+     (ut/tapp>> [:set-port-type [_ flow-id bid dir pid] :to types])
      (assoc-in db [:flows flow-id :map bid :ports dir pid] types))))
 
 (re-frame/reg-sub
@@ -6012,7 +6012,7 @@
          conn-map (group-by first connections)
          filled (filter #(= % [bid vk]) (for [[b k _ _] (map rest (get conn-map type))] [b k]))]
         ;;  _ (when (= bid :unpack-results-map)
-        ;;      (tap> [:parsed-connections
+        ;;      (ut/tapp>> [:parsed-connections
         ;;             type filled?
         ;;             conn-map [vk bid]
         ;;             (for [[b k _ _] (map rest (get conn-map type))] [b k])]))
@@ -6033,7 +6033,7 @@
 ;;          conns (get-in db [:flows (get db :selected-flow) :connections])
 
 ;;          ]
-;;      (tap> [:re-order direction conn conns])
+;;      (ut/tapp>> [:re-order direction conn conns])
 ;;      db)))
 
 (defn index-of [coll item]
@@ -6125,7 +6125,7 @@
  ::edit-view-fn
  (undoable)
  (fn [db [_ bid fn]]
-   ;(tap> [:bid bid])
+   ;(ut/tapp>> [:bid bid])
    (assoc-in db [:flows (get db :selected-flow) :map (get db :selected-flow-block) :view] fn)))
 
 (re-frame/reg-event-db
@@ -6158,7 +6158,7 @@
                      (catch :default _ (get-in fmap [:data :flow-item :inputs])))]
                      ;; important for keeping defined order!
 
-    ;;(tap> [:parsed-connections conn-map (map rest (get conn-map type))])
+    ;;(ut/tapp>> [:parsed-connections conn-map (map rest (get conn-map type))])
     [re-com/v-box
      :gap "8px"
      :children
@@ -6203,7 +6203,7 @@
                           (for [[vk vv] (if (= type :in) (sort-map-keys (vec (or inputs-vec (sort-by str (keys v)))) v)
                                           ;v
                                             (sort-map-keys (try (sort-by str (keys v)) 
-                                                                (catch :default e (do (tap> [:fucking-sorting-error e :flows.cljs :ln 4216 (keys v)]) (keys v)))) v))
+                                                                (catch :default e (do (ut/tapp>> [:fucking-sorting-error e :flows.cljs :ln 4216 (keys v)]) (keys v)))) v))
 
                                 :let [select-vec [bid vk]
                                       selected? (or (and @sniffy-sniff (= @port-hover2 bid)
@@ -6213,10 +6213,10 @@
                                       default (get defaults vk) ;;(ut/postwalk-replacer {:cline} (get defaults vk))
                                       default? (not (nil? default))
                                       scrubber (get-in port-meta [vk :scrubber])
-                                    ;_ (tap> [:port-meta port-meta scrubber])
+                                    ;_ (ut/tapp>> [:port-meta port-meta scrubber])
                                       desc (get-in port-meta [vk :desc])
-                                    ;_ (when selected? (tap> [:inputs? (get-in fmap [:data :flow-item :inputs] (keys v))]))
-                                    ;_ (tap> [:sniff bid @sniffy-sniff @port-hover2 vk])
+                                    ;_ (when selected? (ut/tapp>> [:inputs? (get-in fmap [:data :flow-item :inputs] (keys v))]))
+                                    ;_ (ut/tapp>> [:sniff bid @sniffy-sniff @port-hover2 vk])
 
                                     ;react? [@(ut/tracked-subscribe [::get-raw-port-types flow-id bid type vk])]
                                     ;vv @(ut/tracked-subscribe [::get-raw-port-types flow-id bid type vk])
@@ -6238,7 +6238,7 @@
                                       connected? (not (empty? conns))
                                       involved (vec (distinct (conj conn-list bid)))
                                       multi? (cstr/ends-with? (str vk) "+")
-                                    ;;_ (tap> [:involved involved])
+                                    ;;_ (ut/tapp>> [:involved involved])
                                       hover-bundle-only {:on-mouse-enter #(do
                                                                             (swap! flow-details-block-container-atom assoc-in [flow-id :involved] involved)
                                                                             (swap! flow-details-block-container-atom assoc-in [flow-id bid :port-panel type] select-vec))
@@ -6440,7 +6440,7 @@
                                                     ;;      :md-icon-name "zmdi-chevron-down"]]])
                                                       ]]]]
                               (when true ;(= type :in)
-                              ;;(tap> [:pp1 bid default?  conns vk type pval1 ])
+                              ;;(ut/tapp>> [:pp1 bid default?  conns vk type pval1 ])
                                 (for [conn (cond
                                              (and (= type :in) (empty? conns)) [nil]
                                              (= type :in) conns
@@ -6450,15 +6450,15 @@
                                                @(ut/tracked-subscribe [::port-color flow-id b1 p1 :data-value])
                                                pval1)
                                         c-line (vec (into conn [bid vk]))
-                                      ;_ (when (= type :in) (tap> [:conn c-line]))
+                                      ;_ (when (= type :in) (ut/tapp>> [:conn c-line]))
                                         show-default? (and (nil? pval)
                                                            (empty? conn) ;conns ;(empty? (remove nil? conns))
                                                            default?)
                                         show-scrubber? (and scrubber default? show-default?)
                                         pval (if show-default? default pval)]
-                                  ;(tap> [:pp bid default? show-default? conns vk type pval1 b1 p1 pval])
-                                ;(tap> [:ss @(ut/tracked-subscribe [::bricks/keypaths-in-flow bid])])
-                                ;(when (nil? pval) (tap> [:pp bid vk type pval1 b1 p1 pval]))
+                                  ;(ut/tapp>> [:pp bid default? show-default? conns vk type pval1 b1 p1 pval])
+                                ;(ut/tapp>> [:ss @(ut/tracked-subscribe [::bricks/keypaths-in-flow bid])])
+                                ;(when (nil? pval) (ut/tapp>> [:pp bid vk type pval1 b1 p1 pval]))
                                     (when vopen?
                                       [re-com/v-box
                                        :children [[re-com/h-box
@@ -6509,7 +6509,7 @@
                                                               ]]
 
                                                   (when show-scrubber? ;; scrubber?
-                                                         ;;(tap> [:kk @(ut/tracked-subscribe [::bricks/keypaths-in-flow bid])])
+                                                         ;;(ut/tapp>> [:kk @(ut/tracked-subscribe [::bricks/keypaths-in-flow bid])])
 
                                                     [re-com/box
                                                           ;:padding "4px"
@@ -6757,7 +6757,7 @@
         opts-map @(ut/tracked-subscribe [::opts-map])
         has-override? (ut/ne? (get-in opts-map [:overrides flow-select]))
         bg-shade "#00000055"]
-    ;(tap> [:fmap? flow-select fmap ttype flow-id])
+    ;(ut/tapp>> [:fmap? flow-select fmap ttype flow-id])
 
     (if (= ttype :open-fn)
 
@@ -6772,7 +6772,7 @@
 
       (let [syntaxes ["raw (clojure)" "python" "r" "julia"]
             syntax (get-in fmap [:data :syntax] "raw (clojure)")
-            ;_ (tap> [:syntax syntax ttype flow-select])
+            ;_ (ut/tapp>> [:syntax syntax ttype flow-select])
             ]
         [re-com/v-box :size "none"
         ;:width (px (- w 8)) ;:height (px h)
@@ -7049,14 +7049,14 @@
 ;;            (and (not (empty? transformed-data))
 ;;                (not (= transformed-data (get @db/last-gantt flow-id))))
 
-;;         ;; (tap> [:gantt "updating" counter (zero? (mod counter 5))
+;;         ;; (ut/tapp>> [:gantt "updating" counter (zero? (mod counter 5))
 ;;         ;;           (or (and running? (zero? (mod counter 5)))
 ;;         ;;               (and (not (empty? transformed-data))
 ;;         ;;                    (not (= transformed-data (get @db/last-gantt flow-id)))))
 ;;         ;;           running?
 ;;         ;;           (= transformed-data (get @db/last-gantt flow-id))
 ;;         ;;           flow-id])
-;;         ;(tap> [:gantt "updating" ])
+;;         ;(ut/tapp>> [:gantt "updating" ])
 ;;            (swap! db/last-gantt assoc flow-id transformed-data))
 
 ;(def last-duration (reagent/atom nil))
@@ -7109,7 +7109,7 @@
 ;;         transformed-data (transform-data data svg-width flow-id)
 ;;         height 26
 ;;         current-time (.now js/Date)]
-;;     ;; (tap> [:gantt-data data])
+;;     ;; (ut/tapp>> [:gantt-data data])
 ;;     (when
 ;;      (and (not (empty? transformed-data))
 ;;           (not (= transformed-data (get @db/last-gantt flow-id)))
@@ -7201,14 +7201,14 @@
 ;;         data (select-keys data orderb)
 ;;         sorted-data-pairs (mapcat (fn [[k v]] (map (fn [run] [k run]) v)) data)
 ;;         sorted-data-pairs (vec (sort-by-order sorted-data-pairs orderb))
-;;         _ (tap> [:sorted-data-pairs sorted-data-pairs orderb])
+;;         _ (ut/tapp>> [:sorted-data-pairs sorted-data-pairs orderb])
 ;;         start-times (mapv #(-> % second :start) sorted-data-pairs)
 ;;         end-times (mapv #(-> % second :end) sorted-data-pairs)
 ;;         min-start (apply min start-times)
 ;;         max-end (apply max end-times)
 ;;         ;; Define the scale based on the total display time in ms
 ;;         total-display-time-ms (- max-end min-start)
-;;         _ (tap> [:tt-data total-display-time-ms max-end min-start (count sorted-data-pairs) sorted-data-pairs data])
+;;         _ (ut/tapp>> [:tt-data total-display-time-ms max-end min-start (count sorted-data-pairs) sorted-data-pairs data])
 ;;         scale-factor (/ svg-width total-display-time-ms)
 ;;         output (mapv (fn [[step run]]
 ;;                        (let [{:keys [start end fake?]} run
@@ -7300,7 +7300,7 @@
                        (not (= grouped-by-step (get @db/last-gantt flow-id {})))
                        (if running? (>= (- current-time @db/last-update) 1000) true))]
 
-    ;;(tap> [:t-group data transformed-data grouped-by-step has-data? (= -1 @db/last-update) (empty? (get @db/last-gantt flow-id {})) grouped-by-step transformed-data])
+    ;;(ut/tapp>> [:t-group data transformed-data grouped-by-step has-data? (= -1 @db/last-update) (empty? (get @db/last-gantt flow-id {})) grouped-by-step transformed-data])
 
     (when (or has-data? ;;true 
               (= -1 @db/last-update)
@@ -7356,20 +7356,20 @@
         ;data (get-in @(ut/tracked-subscribe [::http/flow-results]) [:tracker flow-id] {})
         data  @(ut/tracked-subscribe [::http/flow-results-tracker flow-id])
         ddata (apply concat (for [[_ v] data] v))
-        ;;_ (tap> [:ddata ddata])
+        ;;_ (ut/tapp>> [:ddata ddata])
         sstart (apply min (for [{:keys [start]} ddata] start))
         eend (if running? (.now js/Date) ;@db/last-update
                  (apply max (for [{:keys [end]} ddata] end)))
         duration (str (ut/nf (- eend sstart)) " ms")
         bdr (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))]
     
-    ;; (tap> [:gantt-container flow-id data orderb in-sidebar? pw max-height   sstart eend duration bdr])
+    ;; (ut/tapp>> [:gantt-container flow-id data orderb in-sidebar? pw max-height   sstart eend duration bdr])
 
     (if in-sidebar?
 
       (let [blocks @(ut/tracked-subscribe [::flowmap])
             flow-select @(ut/tracked-subscribe [::selected-flow-block])]
-        ;(tap> [:blocks blocks])
+        ;(ut/tapp>> [:blocks blocks])
         [re-com/h-box
          :size "none"
          :gap "6px"
@@ -7601,7 +7601,7 @@
                                                           (not (nil? (get-in port-meta [:* :scrubber]))))
                                     flow-select @(ut/tracked-subscribe [::selected-flow-block]) ;; dupe here from above to force re-render
                                     opts-map @(ut/tracked-subscribe [::opts-map])]
-                               ;; (tap> [:ss @(ut/tracked-subscribe [::bricks/keypaths-in-flow flow-select])])
+                               ;; (ut/tapp>> [:ss @(ut/tracked-subscribe [::bricks/keypaths-in-flow flow-select])])
 
                                 [re-com/v-box
                                  :align :center
@@ -8052,7 +8052,7 @@
          box-width (+ 80 max-w) ;420
 
          edge-hide (* (- box-width 50) -1)]
-     ;(tap> [:widths max-w all-h edge-hide])
+     ;(ut/tapp>> [:widths max-w all-h edge-hide])
      (when (= alerts-cnt 0) (reset! db/kick-alert false))
      (when (> alerts-cnt 0) (reset! db/kick-alert true))
      [re-com/box
@@ -8153,7 +8153,7 @@
 ;;                            starting-val)
 ;;                           (catch :default _ {}))
 ;;                      {})
-;;         _ (tap> [:full-lookup-map part-key? flow? starting-val lookup-map])
+;;         _ (ut/tapp>> [:full-lookup-map part-key? flow? starting-val lookup-map])
 ;;         raw-fn?         (and (= dtype :list)
 ;;                              (= (first starting-val) 'fn))
 
@@ -8177,7 +8177,7 @@
 ;;                                                   (get-in sub-flow [:map i :ports :out (first (keys (get-in sub-flow [:map i :ports :out])))])}))
 ;;                              done-block (try (first (first (filter (fn [x] (= (second x) :done)) (get sub-flow :connections))))
 ;;                                              (catch :default _ :error))]
-;;                          (tap> [:sub-flow-build no-inputs base-conns])
+;;                          (ut/tapp>> [:sub-flow-build no-inputs base-conns])
 ;;                          {:w 200 :h 100 :z 0
 ;;                           :data (-> {} ;; (edn/read-string (get starting-val :full_map)) ;;rooted-data
 ;;                                     (assoc-in [:drag-meta :done-block] done-block)
@@ -8274,7 +8274,7 @@
 ;;                     part-key? (try-read (get lookup-map :name)) ;;:test ;(get lookup-map )
 ;;                     flow? (try-read (get sub-flow :flow-id))
 ;;                     :else :open-input)]
-;;     ;(tap> [:spawner @(ut/tracked-subscribe [::flow-parts-lookup :clojure-base/*])])
+;;     ;(ut/tapp>> [:spawner @(ut/tracked-subscribe [::flow-parts-lookup :clojure-base/*])])
 ;;     (conn/add-flow-block snapped-x snapped-y block-body bname)))
 
 ;;; conn/add-flow-block [x y & [body bid no-select?]]
@@ -8306,7 +8306,7 @@
                    (conn/sql-data [k] query (get query :connection-id))
                    (conn/sql-data [k] query))))))
 
-    ;;(tap> [:flow-parts flow-parts ])
+    ;;(ut/tapp>> [:flow-parts flow-parts ])
 
     [re-com/modal-panel
      :style {:z-index 999
@@ -8401,7 +8401,7 @@
                                  :border-radius "8px"
                                  :cursor "pointer"}
                          :attr {:on-click #(let [lval (conn/spawn-open-input-block @lookup-val)]
-                                             (tap> [:adding-block :conn/spawn-open-input-block @lookup-val :w lval])
+                                             (ut/tapp>> [:adding-block :conn/spawn-open-input-block @lookup-val :w lval])
                                              (apply conn/add-flow-block lval) ;; being passed [snapped-x snapped-y block-body bname]
                                              (reset! lookup-modal? false))}]
 
@@ -8510,7 +8510,7 @@
         flow-select @(ut/tracked-subscribe [::selected-flow-block])
         opts-map @(ut/tracked-subscribe [::opts-map])
         has-override? (ut/ne? (get opts-map :overrides))
-        ;; _ (tap> [:sizes ww hh
+        ;; _ (ut/tapp>> [:sizes ww hh
         ;;          (.-innerWidth js/window)
         ;;          (.-innerHeight js/window)])
 
@@ -8530,9 +8530,9 @@
 
         ;;choices []
 
-    ;; (tap> [:port-hover @port-hover])
-    ;;(tap> [:db/flow-results @(ut/tracked-subscribe [::http/flow-results])])
-    ;(tap> [:wtf-man flow-id running? chans-open?])
+    ;; (ut/tapp>> [:port-hover @port-hover])
+    ;;(ut/tapp>> [:db/flow-results @(ut/tracked-subscribe [::http/flow-results])])
+    ;(ut/tapp>> [:wtf-man flow-id running? chans-open?])
 
     [rc/catch
      [re-com/box
@@ -8757,7 +8757,7 @@
                               ;:transition_NOT "all 0.1s ease-in-out"
                               ;:transform-style "preserve-3d"
                               ;:transform "scale(0.5)"
-                              ;:on-click (fn [x] (tap> [(.-clientX x)
+                              ;:on-click (fn [x] (ut/tapp>> [(.-clientX x)
                               ;                         (.-clientY x)]))
                               ;:on-drag mouse-down-handler2
                              ; :on-mouse-over #(reset! on-canvas? true)
@@ -8884,7 +8884,7 @@
                                                                                         (<= rel-x x-bounds)
                                                                                         (<= rel-y y-bounds))]
 
-                                                                  ; (tap> [:stuff @bricks/dragging? @bricks/on-block? @bricks/over-flow?])
+                                                                  ; (ut/tapp>> [:stuff @bricks/dragging? @bricks/on-block? @bricks/over-flow?])
 
                                                                    (if (not in-bounds?) (do ;very weird, but have lots of drop/drag in-fighting with crossing the streams. TODO
                                                                                             ; it works though!
@@ -9164,7 +9164,7 @@
                                                                                                src (if (= srcl :out) srcf ;; no alias for simple */out
                                                                                                        (keyword (str (gn srcf) "/" (gn srcl))))]
                                                                                            (reset! dragging-port? false)
-                                                                                           (tap> [:dropped src :to :done])
+                                                                                           (ut/tapp>> [:dropped src :to :done])
                                                                                            (set-delay! port-hover nil 2500)
                                                                                            (connect-ports src :done))}
                                                                               (let [ccolor (theme-pull :theme/editor-outer-rim-color nil)]

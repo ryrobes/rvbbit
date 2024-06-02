@@ -61,7 +61,7 @@
         host-without-port (clojure.string/replace host #":\d+$" "")
         ws-port "3030"
         url (str protocol "://" host-without-port ":" ws-port "/ws")]
-    (tap> [:http-ws-connect-url! url])
+    (ut/tapp>> [:http-ws-connect-url! url])
     {:url    url
      :format :edn ;;:transit-json
      :on-disconnect [::dispatch-unsubscriptions]
@@ -133,7 +133,7 @@
                     "/") [])
          base-dir "./screens/"
          screen (str base-dir (last url-vec) ".edn")]
-     (tap> [:url-changed new-url url-vec :loading-new-screen])
+     (ut/tapp>> [:url-changed new-url url-vec :loading-new-screen])
      (ut/tracked-dispatch [::load screen])
      (assoc db :current-url new-url))))
 
@@ -152,7 +152,7 @@
          ;new-map (if (= new-map '(1)) [{:sql :error :recvd (:result result)}] new-map)
 
 
-     (tap> [:screens screens :url-vec url])
+     (ut/tapp>> [:screens screens :url-vec url])
 
      (when default-screen ;; load default canvas settings
        (ut/tracked-dispatch [::load default-screen]))
@@ -172,7 +172,7 @@
          ;default-screen (get result :default)
 
 
-    ;; (tap> [:def (get result :default)])
+    ;; (ut/tapp>> [:def (get result :default)])
 
     ;;  (when default-screen ;; load default canvas settings
     ;;    (ut/tracked-dispatch [::load default-screen]))
@@ -191,7 +191,7 @@
          sub-key (get result :sub-key) ;; including .step
         ; client-name (get db :client-name)
          value (get result :value)]
-     ;(tap> [:subbed-to-server-value result])
+     ;(ut/tapp>> [:subbed-to-server-value result])
      (assoc-in db [:click-param base-key sub-key] value))))
 
 ;;(reset! db/autocomplete-keywords (vec (sort (map str @(rfa/sub ::parameters-available {})))))
@@ -210,7 +210,7 @@
          codes (vec (apply concat [server-params view-codes themes flow-subs click-params]))
          ]
      
-  ;;  (tap> [:pulled-auto-complete (get db :client-name) (into {} (for [[k v] result] [k (count v)]))])
+  ;;  (ut/tapp>> [:pulled-auto-complete (get db :client-name) (into {} (for [[k v] result] [k (count v)]))])
    ;(assoc db :autocomplete result)
    (reset! db/autocomplete-keywords (vec (sort (map str codes))))
    db)))
@@ -222,7 +222,7 @@
  ::timeout-response
  (fn [db [_ result what-req]]
    (let [client-name (get db :client-name)]
-     (tap> [:websocket-timeout! client-name result what-req])
+     (ut/tapp>> [:websocket-timeout! client-name result what-req])
      db)))
 
 ;;:autocomplete [{:keys [client-name surrounding panel-key view]}]
@@ -230,7 +230,7 @@
 (re-frame/reg-event-db
  ::get-autocomplete-values
  (fn [db _]
-   ;(tap> [:ran-condi])
+   ;(ut/tapp>> [:ran-condi])
    (let [client-name (get db :client-name)]
      (ut/tracked-dispatch [::wfx/request :default
                            {:message    {:kind :autocomplete
@@ -246,7 +246,7 @@
 (re-frame/reg-event-db
  ::sub-to-flow-value
  (fn [db [_ key]]
-   ;(tap> [:ran-condi])
+   ;(ut/tapp>> [:ran-condi])
    (let [client-name (get db :client-name)]
      (ut/tracked-dispatch [::wfx/request :default
                            {:message    {:kind :sub-to-flow-value
@@ -260,7 +260,7 @@
 (re-frame/reg-event-db
  ::unsub-to-flow-value
  (fn [db [_ key]]
-   ;(tap> [:ran-condi])
+   ;(ut/tapp>> [:ran-condi])
    (let [client-name (get db :client-name)]
      (ut/tracked-dispatch [::wfx/request :default
                            {:message    {:kind :unsub-to-flow-value
@@ -304,7 +304,7 @@
    (let [ticktock (get-in db [:re-pollsive.core/polling :counter])
          alert-id (or alert-id (hash content))
          duration (or duration 30)]
-     ;(tap> [:insert-alert [w h duration] (map first (get db :alerts []))])
+     ;(ut/tapp>> [:insert-alert [w h duration] (map first (get db :alerts []))])
      (if (some #(= % (str content)) (for [[cc _ _ _ _] (get db :alerts [])] (str cc)))
        db ;; no dupes now
        (assoc db :alerts (vec (conj (get db :alerts []) [content w h (+ ticktock duration) alert-id])))))))
@@ -321,7 +321,7 @@
  ::refresh-runstreams-sly
  ;;(undoable)
  (fn [db _]
-   (tap> [:refresh-runstream-panelF (keys (get db :runstreams))])
+   (ut/tapp>> [:refresh-runstream-panelF (keys (get db :runstreams))])
    (when  (not (empty? (keys (get db :runstreams))))
      (doseq [flow-id (keys (get db :runstreams))]
        (ut/tracked-dispatch [::wfx/request :default
@@ -396,7 +396,7 @@
 (defonce batches-received (atom 0))
 (defonce packets-received-log (atom []))
 
-;; (tap> [:packets-received-log [(count @packets-received-log) @packets-received] (frequencies @packets-received-log)])
+;; (ut/tapp>> [:packets-received-log [(count @packets-received-log) @packets-received] (frequencies @packets-received-log)])
 
 (def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :solver-meta :panel :client})
 
@@ -404,14 +404,14 @@
  ::simple-response
  (fn [db [_ result & [batched?]]]
    (if (vector? result)
-     (do ;; (tap> [:batch-of-messages (count result) (vec (for [r result] (get r :task-id))) (get-in db [:re-pollsive.core/polling :counter])])
+     (do ;; (ut/tapp>> [:batch-of-messages (count result) (vec (for [r result] (get r :task-id))) (get-in db [:re-pollsive.core/polling :counter])])
        (swap! batches-received inc)
        (doseq [res result] (re-frame/dispatch [::simple-response res true]))
        db)
      (try
        (let [ui-keypath (first (get result :ui-keypath))
             ;;  _ (when (not batched?)
-            ;;      (tap> [:single-message (get result :task-id) (get-in db [:re-pollsive.core/polling :counter])]))
+            ;;      (ut/tapp>> [:single-message (get result :task-id) (get-in db [:re-pollsive.core/polling :counter])]))
             ;;  _ (swap! packets-received-log conj (get result :task-id))
            ;new-map (:data result)
            ;name (:name result)
@@ -452,7 +452,7 @@
 
 
          (when heartbeat?
-          ;;  (tap> [:hb client-name (get result :status) (get db :flow-subs)]) ;; server subs confirm 
+          ;;  (ut/tapp>> [:hb client-name (get result :status) (get db :flow-subs)]) ;; server subs confirm 
            (ut/tracked-dispatch [::wfx/request :default
                                  {:message    {:kind :ack
                                                :memory (let [mem (when (exists? js/window.performance.memory)
@@ -486,7 +486,7 @@
          (when (or (= task-id :reco) (= task-id :outliers)) ;; kinda deprecated, won't need soon TODO 
            (update-context-boxes result task-id ms reco-count))
 
-       ;(tap> [:simple-response result])
+       ;(ut/tapp>> [:simple-response result])
 
          (cond
 
@@ -502,14 +502,14 @@
                                              flow-id (get-in result [:task-id 1])
                                              filtered-blocks (into {} (for [[k v] (get result :status)] {k (vec (cset/intersection (set block-keys) (set v)))}))]
                                           ;;  (when (cstr/starts-with? (str client-name) ":trust")
-                                          ;;    (tap> [:flow-runner-tracker-blocks filtered-blocks]))
+                                          ;;    (ut/tapp>> [:flow-runner-tracker-blocks filtered-blocks]))
                                          (assoc-in db [:flow-results :tracker-blocks flow-id] filtered-blocks))
 
            flow-runner-acc-tracker? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
                                           flow-id (get-in result [:task-id 1])
                                           trackers (select-keys (get result :status) block-keys)]
                                         ;; (when (cstr/starts-with? (str client-name) ":trust") 
-                                        ;;   (tap> [:flow-runner-acc-tracker trackers]))
+                                        ;;   (ut/tapp>> [:flow-runner-acc-tracker trackers]))
                                       (-> db
                                           (ut/dissoc-in (if (or (empty? trackers) (= (count (keys trackers)) 1)) ;; TODO this could wipe an early value - have server send the wipe command instead
                                                           [:flow-results :return-maps flow-id]
@@ -522,7 +522,7 @@
                                 ;mp-key (ut/postwalk-replacer {:flow-runner :return-map} task-id)
                                   mps-key (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
                                   return-maps (get-in db [:flow-results :return-maps] {})]
-                                ;;(tap> [:sub-return-maps! task-id rtn mp-key mps-key (vec (drop 1  mps-key)) return-maps])
+                                ;;(ut/tapp>> [:sub-return-maps! task-id rtn mp-key mps-key (vec (drop 1  mps-key)) return-maps])
                               (if (= rtn :started)
                                 (assoc-in db task-id rtn)
 
@@ -553,7 +553,7 @@
                      (ut/dissoc-in [:query-history :viz-shapes-sys])
                      (ut/dissoc-in [:query-history :viz-shapes0-sys])
                      (ut/dissoc-in [:query-history :viz-tables-sys]))))
-       (catch :default e (do (tap> [:simple-response-error! (str e)])
+       (catch :default e (do (ut/tapp>> [:simple-response-error! (str e)])
                              db))))))
 
 (re-frame/reg-event-db
@@ -569,12 +569,12 @@
          fixeddata (into {} (for [[k v] data] {k (into {} (map (fn [[kk vv]] {(first kk) vv}) v))}))]
 
     ;;  (when (= client-name :wealthy-apricot-skunk-hailing-from-cuspate-foreland)
-    ;;    (tap> [:status-response data]))
+    ;;    (ut/tapp>> [:status-response data]))
 
     ;;  (when (or (not (nil? new-statuses)) (not (nil? new-status-data)))
-    ;;    (tap> [:new-statues-diffs! :statuses new-statuses :data new-status-data]))
+    ;;    (ut/tapp>> [:new-statues-diffs! :statuses new-statuses :data new-status-data]))
      ;(doseq (update-context-boxes result task-id ms reco-count))
-     ;(tap> [:server-running-says fixeddata fixedmap])
+     ;(ut/tapp>> [:server-running-says fixeddata fixedmap])
      (-> db
          (assoc :status fixedmap)
          (assoc :status-data fixeddata)))))
@@ -583,7 +583,7 @@
  ::timeout-response
  (fn [db [_ result what-req]]
    (let [client-name (get db :client-name)]
-     (tap> [:websocket-timeout! client-name result what-req])
+     (ut/tapp>> [:websocket-timeout! client-name result what-req])
      db)))
 
 (re-frame/reg-event-db
@@ -603,9 +603,9 @@
          new-map (if (= new-map '(1)) [{:sql :error :recvd (:result result)}] new-map)]
 
     ;;  (when (= client-name :wealthy-apricot-skunk-hailing-from-cuspate-foreland)
-    ;;    (tap> [:socket-response result]))
+    ;;    (ut/tapp>> [:socket-response result]))
 
-     ;(tap> [:socket-response result ui-keypath new-map map-order meta :insertable? (not (nil? map-order))])
+     ;(ut/tapp>> [:socket-response result ui-keypath new-map map-order meta :insertable? (not (nil? map-order))])
      (if (not (nil? map-order)) ;; indicates bigger problem, too risky
        (if (and (not (nil? repl-output)) (ut/ne? repl-output))
          (-> db
@@ -627,7 +627,7 @@
 (re-frame/reg-event-db
  ::socket-response-post-meta
  (fn [db [_ result]]
-   ;(tap> [db-key result])
+   ;(ut/tapp>> [db-key result])
    (let [ui-keypath (get result :ui-keypath)
          ;server-map (get db ui-keypath)
          new-map (first (vals (first (:result result))))
@@ -638,7 +638,7 @@
 (re-frame/reg-event-db
  ::socket-response-post-style
  (fn [db [_  style result]]
-   ;(tap> [db-key result])
+   ;(ut/tapp>> [db-key result])
    (let [ui-keypath (drop-last (get result :ui-keypath))]
          ;server-map (get db ui-keypath)
       ;   new-map (first (vals (first (:result result))))
@@ -700,7 +700,7 @@
  ::failure-http-save-flowset
  (fn [db [_ result]]
    (let [old-status (get-in db [:http-reqs :save-flowset])]
-     (tap> [:failure-http-save-flowset result])
+     (ut/tapp>> [:failure-http-save-flowset result])
      (assoc-in db [:http-reqs :save-flowset] ; comp key from ::get-http-data
                (merge old-status
                       {:status "failed"
@@ -728,10 +728,10 @@
          pl (keys (get db :panels))
          client-name (get db :client-name)
          p0 (cset/difference (set pl) (set pp))
-        ;;  _ (tap> [:resolved-queries resolved-queries])
+        ;;  _ (ut/tapp>> [:resolved-queries resolved-queries])
 
          ;; (assoc db :panels (select-keys (get db :panels) p0)
-     ;(tap> p0)
+     ;(ut/tapp>> p0)
      ;(doseq [p pp] (ut/dissoc-in db p))
 
          ;prevs (for [r (filter #(cstr/starts-with? (str %) ":reco-preview") (keys (get-in db [:panels])))] [:panels r])
@@ -755,7 +755,7 @@
          request {:image (assoc image :resolved-queries resolved-queries)
                   :client-name client-name
                   :screen-name screen-name}
-         _ (tap> [:saving screen-name "!" request])]
+         _ (ut/tapp>> [:saving screen-name "!" request])]
      {:db   (assoc-in db [:http-reqs :save-flowset]
                       {:status "running"
                        :url url
@@ -802,14 +802,14 @@
          ;pl (keys (get db :panels))
          ;p0 (cset/difference (set pl) (set pp))
          ;; (assoc db :panels (select-keys (get db :panels) p0)
-     ;(tap> p0)
+     ;(ut/tapp>> p0)
      ;(doseq [p pp] (ut/dissoc-in db p))
 
          ;prevs (for [r (filter #(cstr/starts-with? (str %) ":reco-preview") (keys (get-in db [:panels])))] [:panels r])
          request {:image flow-body
                   :client-name client-name
                   :flow-id flow-name}]
-     (tap> [:save-flow request])
+     (ut/tapp>> [:save-flow request])
      {:db   (assoc-in db [:http-reqs :save-flow]
                       {:status "running"
                        :url url
@@ -851,8 +851,8 @@
          request {:image image
                   :session (ut/deselect-keys db compund-keys)
                   :client-name client-name}]
-    ;;  (tap> [:save-snap! (get db :client-name)])
-     ;(tap> [:save-flow request])
+    ;;  (ut/tapp>> [:save-snap! (get db :client-name)])
+     ;(ut/tapp>> [:save-flow request])
      {:db   (assoc-in db [:http-reqs :save-snap]
                       {:status "running"
                        :url url
@@ -875,7 +875,7 @@
  ::failure-http-save-screen-snap
  (fn [db [_]]
    (let [old-status (get-in db [:http-reqs :save-screen-snap])]
-     (tap> [:saving-screen-snap-for (get db :client-name)])
+     (ut/tapp>> [:saving-screen-snap-for (get db :client-name)])
      (assoc-in db [:http-reqs :save-screen-snap] ; comp key from ::get-http-data
                (merge old-status
                       {:status "failed"
@@ -898,7 +898,7 @@
          screen-name (get db :screen-name)
          request {:image image
                   :screen-name screen-name}]
-     (tap> [:save-screen-snap! (get db :client-name) screen-name])
+     (ut/tapp>> [:save-screen-snap! (get db :client-name) screen-name])
      {:db   (assoc-in db [:http-reqs :save-screen-snap]
                       {:status "running"
                        :url url
@@ -1007,13 +1007,13 @@
 (re-frame/reg-event-fx
  ::load
  (fn [{:keys [db]} [_ file-path]]
-   (tap> [:loads? file-path])
+   (ut/tapp>> [:loads? file-path])
    (let [url (str url-base "/load")
          method :get
          request {:file-path file-path}
          ;_ (change-url (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" ""))
          _ (change-url (str "/" (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" "")))]
-        ; _ (tap> [file-path (str (last (ut/splitter file-path "/"))) (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" "")])
+        ; _ (ut/tapp>> [file-path (str (last (ut/splitter file-path "/"))) (ut/replacer (str (last (ut/splitter file-path "/"))) #".edn" "")])
           ;; TODO, sketchy w/o checking
      {:db   (assoc-in db [:http-reqs :load-flowset]
                       {:status "running"
@@ -1060,7 +1060,7 @@
 (re-frame/reg-event-fx
  ::load-session
  (fn [{:keys [db]} [_ file-path]]
-   (tap> [:loads? file-path])
+   (ut/tapp>> [:loads? file-path])
    (let [url (str url-base "/load")
          method :get
          request {:file-path file-path}]
@@ -1088,7 +1088,7 @@
 
 
 ;; (defn set-zoom-pan [[positionX positionY scale]]
-;;   (tap> [:set-zoom-pan [positionX positionY scale]])
+;;   (ut/tapp>> [:set-zoom-pan [positionX positionY scale]])
 ;;   (when-let [z @db/zoomer]
 ;;     (.setTransform z positionX positionY scale 0)))
 
@@ -1120,7 +1120,7 @@
          opts (get new-db :opts)
          flow-id (get new-db :flow-id)
          coords (get new-db :zoom db/based)
-         _ (tap> coords)
+         _ (ut/tapp>> coords)
          flowmaps-connections (get new-db :flowmaps-connections)]
      ;(set-zoom-pan (if (empty? coords) db/based coords))
      ;(set-zoom-pan coords)
@@ -1179,9 +1179,9 @@
          opts (get new-db :opts)
          flow-id (get new-db :flow-id)
          coords (get new-db :zoom db/based)
-         _ (tap> coords)
+         _ (ut/tapp>> coords)
          flowmaps-connections (get new-db :flowmaps-connections)]
-     ;;(tap> [:load-flow-history result])
+     ;;(ut/tapp>> [:load-flow-history result])
      ;(set-zoom-pan (if (empty? coords) db/based coords))
      ;(set-zoom-pan coords)
      ;(swap! db/last-gantt assoc flow-id {})
@@ -1211,7 +1211,7 @@
                    :start-ts start-ts}
                   (when (nil? start-ts)
                     {:runner? true}))]
-     ;(tap> [:req request])
+     ;(ut/tapp>> [:req request])
      {:db   (assoc-in db [:http-reqs :load-flow-history]
                       {:status "running"
                        :url url

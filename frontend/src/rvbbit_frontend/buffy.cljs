@@ -54,7 +54,7 @@
                       bricks-wide (+ (js/Math.floor (/ ww bricks/brick-size)) 1)
                       topper (* 2 bricks/brick-size)
                       lefty (* (- bricks-wide 15) bricks/brick-size)]
-                  ;(tap> [:coords-editor [lefty topper] bricks-high hh ww])
+                  ;(ut/tapp>> [:coords-editor [lefty topper] bricks-high hh ww])
                   [lefty topper])))
 
 (defn mouse-move-handler [offset]
@@ -97,18 +97,18 @@
  ::valid-kits
  (fn [db _]
    (let [kits (get-in db [:server :settings :kits])
-        ;_ (tap> [:kits kits])
+        ;_ (ut/tapp>> [:kits kits])
          ;selected-block (get db :selected-block)
          curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
          [item-type item] @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
          valid-where? true ;; TODO
-        ; _ (tap> [:kits kits item-type item])
+        ; _ (ut/tapp>> [:kits kits item-type item])
          filtered-map (into {}
                             (for [[k v] kits
                                   :when (and  (some #(= [(get v :package-name) (get v :kit-name)] %) curr) ;; is enabled in params?
                                               valid-where? (= (get v :run-on) item-type))]
                               {k v}))]
-     ;(tap> [:filtered-map filtered-map])
+     ;(ut/tapp>> [:filtered-map filtered-map])
      filtered-map)))
 
 (defonce hide-diffs? (reagent/atom false))
@@ -210,7 +210,7 @@
          view-code (get-in db (cons :panels kp))
          view-code-kps (first (filter #(= (last %) :data)
                                       (ut/kvpaths view-code)))
-        ; _ (tap> [:view-code-kps kp (get-in view-code view-code-kps)])
+        ; _ (ut/tapp>> [:view-code-kps kp (get-in view-code view-code-kps)])
          ;qid (or ())
          vt-flat (ut/deep-flatten view-code)
          view-type (cond (some #(= % :ResponsiveContainer) vt-flat) :recharts
@@ -278,7 +278,7 @@
 (re-frame/reg-event-db
  ::click-parameter
  (fn [db [_ keypath value]]
-   (tap> [:setting-kit-sourced-click-params keypath value])
+   (ut/tapp>> [:setting-kit-sourced-click-params keypath value])
    (let [curr (get-in db (cons :click-param keypath))]
      (assoc-in db (cons :click-param keypath) (merge curr value)))))
 ;;; DUPE OF CONN/CLICK-PARAMETER due to diff logic
@@ -342,15 +342,15 @@
                         ;;@(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]])
                    vvv ;;@(rfa/sub ::resolver/logic-and-params {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
                         ;;; ^^^^ :brave-red-butterfly is not sequable? what? so I wrapped in a vec. started after caching madness....
-                   )(catch :default e (do (tap> [:rs-value-fuck-up-buffy vvv flow-id kkey src e]) vvv)))]
-         ;(tap> [:sketchy-rs-value? flow-id kkey vvv vv])
+                   )(catch :default e (do (ut/tapp>> [:rs-value-fuck-up-buffy vvv flow-id kkey src e]) vvv)))]
+         ;(ut/tapp>> [:sketchy-rs-value? flow-id kkey vvv vv])
          vv)
        (get-in db [:runstreams flow-id :values kkey :value])))))
 
 (defn code-box-rs-value [width-int height-int flow-id kkey value & [param?]]
   (let [param? (if (nil? param?) false true)
         stringify? (and (vector? value) (every? string? value))]
-    ;;(tap> [:vv value stringify?])
+    ;;(ut/tapp>> [:vv value stringify?])
     [re-com/box
      :size "auto"
      :width (px (- width-int 24))
@@ -430,7 +430,7 @@
         kit-name         (get @db/kit-mode kp)
         kick-kit-name    (last (keys (get kits :kits)))
         kit-name         (if (or (= kit-name :kick) (= kit-name :ai/calliope)) kick-kit-name kit-name)
-        ;_ (tap> [:kit-name kit-name])
+        ;_ (ut/tapp>> [:kit-name kit-name])
         ;kit-base-name    kit-name
         kit-context-name (last kp) ;; :base
         kit-context-name (if (nil? kit-context-name) :base kit-context-name)
@@ -458,14 +458,14 @@
                                          {:task-type ":maintain" :item-type ":flow" :item "calliope-loop2" :reqs 0 :need-feedback "false" :wip "false"}
                                          {:task-type ":create"   :item-type ":board" :item "ufo-basic-countries" :reqs 0 :need-feedback "true" :wip "true"}
                                          {:task-type ":watch" :item-type ":metric"  :item ":system-db/errors.count" :reqs 0 :need-feedback "false" :wip "false"}]}]}
-        ;_ (tap> [:options-buttons kit-name kit-context-name curr-narrative ik item-key kits])
+        ;_ (ut/tapp>> [:options-buttons kit-name kit-context-name curr-narrative ik item-key kits])
         react-hack @hide-diffs?
         meta-object-msg (when (= mode :buffy2) @(ut/tracked-subscribe [::object-meta-chat kp]))]
 
     (when (or (nil? (get @db/kit-keys kp)) (not (some #(= (get @db/kit-keys kp) %) narratives)))
       (swap! db/kit-keys assoc kp item-key))
-    ;(tap> [:options-buttons kp  (get @db/kit-keys kp) (get @kit-pages kp)])
-    ;(tap> [:meta-fields meta-fields-msg :recos-fields-msg recos-fields-msg :obj meta-object-msg])
+    ;(ut/tapp>> [:options-buttons kp  (get @db/kit-keys kp) (get @kit-pages kp)])
+    ;(ut/tapp>> [:meta-fields meta-fields-msg :recos-fields-msg recos-fields-msg :obj meta-object-msg])
     [(if (or (= mode :narratives)
              (or (= mode :kick) (= mode :buffy)))
        re-com/v-box re-com/h-box)
@@ -673,7 +673,7 @@
         ;splt (map cstr/trim-newline (ut/splitter text "```"))
         type (second kp)
         pre-splt (vec (remove #(= % "rabbit-view") (doall (ut/splitter pre-text "```"))))]
-    (tap> [:tt text splt])
+    (ut/tapp>> [:tt text splt])
     ;text
     [rc/catch
      [re-com/v-box
@@ -778,7 +778,7 @@
                 ;;        (let [ss (ut/replacer (str s) "clojure" "")
                 ;;              sdata (try (edn/read-string ss) (catch :default _ {}))
                 ;;              tbl-src (keyword (last (ut/splitter (str (first (flatten (get sdata :from)))) "/")))]
-                ;;      ;(tap> [:ttest tbl-src sdata (flatten (get sdata :from))])
+                ;;      ;(ut/tapp>> [:ttest tbl-src sdata (flatten (get sdata :from))])
                 ;;          (bricks/draggable
                 ;;           (bricks/sql-spawner-chat tbl-src sdata) "meta-menu"
                 ;;           [code-box 580 nil ss]))
@@ -788,7 +788,7 @@
                 ;;        (let [ss (ut/replacer (str s) "rabbit-view" "")
                 ;;              sdata (try (edn/read-string ss) (catch :default _ {}))
                 ;;              tbl-src (keyword (last (ut/splitter (str (first (flatten (get sdata :from)))) "/")))]
-                ;;      ;(tap> [:ttest tbl-src sdata (flatten (get sdata :from))])
+                ;;      ;(ut/tapp>> [:ttest tbl-src sdata (flatten (get sdata :from))])
                 ;;          (bricks/draggable
                 ;;           (bricks/sql-spawner-chat tbl-src sdata) "meta-menu"
                 ;;           [code-box 580 nil ss]))
@@ -883,7 +883,7 @@
  ;(undoable)
  (fn [db [_ result]]
    ;(assoc-in db [:data :kit-results-sys] (vec (filter #(not (= (get % :id) id)) (get-in db [:data :kit-results-sys]))))
-   ;(tap> [:runstream-item result])
+   ;(ut/tapp>> [:runstream-item result])
    (-> db
        (assoc-in [:runstreams-lookups (get result :flow-id) :open-inputs] (get result :open-inputs))
        (assoc-in [:runstreams-lookups (get result :flow-id) :blocks] (get result :blocks)))))
@@ -892,7 +892,7 @@
  ::get-runstream-ports
  ;(undoable)
  (fn [db [_ flow-id]]
-   ;;(tap> [::get-runstream-ports flow-id])
+   ;;(ut/tapp>> [::get-runstream-ports flow-id])
    (ut/tracked-dispatch [::wfx/request :default
                        {:message    {:kind :get-flow-open-ports
                                      :flow-id flow-id
@@ -947,7 +947,7 @@
 (defonce add-flow-shelf (reagent/atom nil))
 
 (defn prepare-output-param-drag [k flow-id dtype]
-  ;(tap> [:out-drag k flow-id dtype])
+  ;(ut/tapp>> [:out-drag k flow-id dtype])
   (let [is-image?   false
         is-video?   false ;; maybe later re-enable, but would require me to sample the entire output, which in this case is bad news bears
         pwidth      5 ;(js/Math.floor (/ (count (str param-value)) 1.7))
@@ -974,7 +974,7 @@
 
 (defn runstream-output-boxes [flow-id blocks-map panel-width open-outputs? open-inputs]
   (let [open-input-keys (vec (keys open-inputs))]
-    ;(tap> [:open-inputs open-inputs])
+    ;(ut/tapp>> [:open-inputs open-inputs])
     [re-com/v-box
      :width (px (- panel-width 35))
      :children
@@ -1013,7 +1013,7 @@
                                             view? (= type "rabbit-code")
                                             ccolor (get (theme-pull :theme/data-colors db/data-colors) type)
                                             is-input? (true? (some #(= % k) open-input-keys))
-                                            ;_ (tap> [:inn k type sample])
+                                            ;_ (ut/tapp>> [:inn k type sample])
                                             ]]
                                   (bricks/draggable
                                    (prepare-output-param-drag k flow-id type)
@@ -1155,7 +1155,7 @@
      (let [other-names @(ut/tracked-subscribe [::bricks/all-drops-of :*])
            name (keyword name)
            name (ut/safe-key name other-names)
-           _ (tap> [:other-names other-names name])]
+           _ (ut/tapp>> [:other-names other-names name])]
        (assoc-in db [:runstream-drops flow-id name] {:in in :out out :type (or type (set [:string]))}))
      db)))
 
@@ -1174,7 +1174,7 @@
        ; rs-hash @(ut/tracked-subscribe [::runstream-override-map])
         redrops! [@bricks/dragging-body @bricks/dragging?]]
 
-    ;; (tap> [:rs-hash rs-hash])
+    ;; (ut/tapp>> [:rs-hash rs-hash])
 
     ;(reagent.core/next-tick #(scroll-to-bottom "chat-v-box"))
 
@@ -1201,7 +1201,7 @@
 
                                 (let [open-inputs (get-in runstreams-lookups [flow-id :open-inputs])
                                       blocks-map (get-in runstreams-lookups [flow-id :blocks])
-                                      ;; _ (tap> [:blocks-map blocks-map])
+                                      ;; _ (ut/tapp>> [:blocks-map blocks-map])
                                       no-open-inputs? (true? (empty? open-inputs))
                                       shouts @(ut/tracked-subscribe [::shouts flow-id])
                                       shouts? (ut/ne? (cstr/trim (str shouts)))
@@ -1209,7 +1209,7 @@
                                       drops?  @(ut/tracked-subscribe [::drops? flow-id])
                                       sshout-panel? (get @shout-panel? flow-id false)
                                       [xx yy] @detached-coords
-                                        ;_ (tap> [:open-inputs flow-id open-inputs])
+                                        ;_ (ut/tapp>> [:open-inputs flow-id open-inputs])
                                       override-map (into {} (for [[k {:keys [value source]}] values
                                                                   :when (not (nil? value))]
                                                               {k (if (= source :input)
@@ -1226,7 +1226,7 @@
                                       output-ports (vec (cset/difference (set (keys blocks-map)) (set input-ports)))
                                       drops @(ut/tracked-subscribe [::drops flow-id])]
 
-                             ;(tap> [:override-map flow-id override-map])
+                             ;(ut/tapp>> [:override-map flow-id override-map])
 
                                   (when no-data? ;; fetch updated port info from server
                                     (ut/tracked-dispatch [::get-runstream-ports flow-id]))
@@ -1494,7 +1494,7 @@
                                                                                       "stuf stuf suts inny"
                                                                                       "stuf stuf suts outtie")]]])
                                                       t-dropdown (fn [m]
-                                                                   ;(tap> [:m m])
+                                                                   ;(ut/tapp>> [:m m])
                                                                    [re-com/tag-dropdown
                                                                     :model (if m m (set (or @add-action-shelf-type [:string])))
                                                                     :parts {:main {:style {:background-color "#00000000" ;(str (theme-pull :theme/editor-rim-color nil) "11")
@@ -1737,19 +1737,19 @@
                                                                (let [is-first? (= batch (first parted))
                                                                      is-last? (= batch (last parted))
                                                                      is-both? (and is-first? is-last?)
-                                                                     ;;_ (tap> [:batch batch])
+                                                                     ;;_ (ut/tapp>> [:batch batch])
                                                                      b1 (first batch)
                                                                      b2 (last batch)
                                                                      b1-meta (get-in blocks-map [(first b1) :meta :* :scrubber])
                                                                      b2-meta (get-in blocks-map [(first b2) :meta :* :scrubber])
                                                                      ;;single-scrubber? (or (= ttype :open-block) (= ttype :open-input)) ;; implied by 'open-blocks'?
-                                                                     ;_ (when b1-meta (tap> [:b1-meta b1-meta b1]))
-                                                                     ;_ (when b2-meta (tap> [:b2-meta b2-meta b1]))
+                                                                     ;_ (when b1-meta (ut/tapp>> [:b1-meta b1-meta b1]))
+                                                                     ;_ (when b2-meta (ut/tapp>> [:b2-meta b2-meta b1]))
                                                                      fix-type (fn [x] (get x :out x)) ;; TODO remove when input fixed upstream
                                                                      ttype1 (fix-type (get (last b1) :type))
                                                                      ttype2 (fix-type (get (last b2) :type))
-                                                                     ;;_ (tap> [:inn b1 b2 ttype1 ttype2 ])
-                                                                     droppable? (fn [x] ;(tap> [:gg (gn x) (get-in @bricks/dragging-body [:drag-meta :param-type])])
+                                                                     ;;_ (ut/tapp>> [:inn b1 b2 ttype1 ttype2 ])
+                                                                     droppable? (fn [x] ;(ut/tapp>> [:gg (gn x) (get-in @bricks/dragging-body [:drag-meta :param-type])])
                                                                                   (try (or
                                                                                         (and @bricks/dragging? ;; all parameters that are valid
                                                                                              (or (= (gn x) (get-in @bricks/dragging-body [:drag-meta :param-type]))
@@ -1763,7 +1763,7 @@
                                                                                        (catch :default _ false)))
                                                                      b1-droppable? (droppable? ttype1)
                                                                      b2-droppable? (droppable? ttype2)
-                                                                ;_ (tap> [:tgt @bricks/dragging? b1-droppable? b2-droppable? batch ])
+                                                                ;_ (ut/tapp>> [:tgt @bricks/dragging? b1-droppable? b2-droppable? batch ])
                                                                      outcolor1 (try
                                                                                  (get (theme-pull :theme/data-colors db/data-colors)
                                                                                       (gn ttype1))
@@ -1780,7 +1780,7 @@
                                                                                   ttype (get (last bbb) :type)
                                                                                   ttype (get (last bbb) :ttype)
                                                                                   ;; meta? (or (map? meta) (vector? meta))
-                                                                                  ;;_ (tap> [:bbb bbb meta])
+                                                                                  ;;_ (ut/tapp>> [:bbb bbb meta])
                                                                                   user-input-val (get (last bbb) :user-input defaults)
                                                                                   overridden? (and (not (nil? override)) (not= user-input-val override))
                                                                                   curr-val (if overridden? override user-input-val)
@@ -1814,7 +1814,7 @@
                                                                                                               :padding-left "12px"
                                                                                                               :padding-right "12px"}
                                                                                                       :child (str param-value)]]
-                                                                             ;_ (tap> [:curr-val curr-val])
+                                                                             ;_ (ut/tapp>> [:curr-val curr-val])
                                                                                   the-box [re-com/box
                                                                                            :height "100%"
                                                                                            :style {:border-radius (cond is-both? "11px"
@@ -1967,7 +1967,7 @@
                                                                      :connection-id "flows-db"
                                                                      :order-by [[3 :desc]]}}]
 
-                                          ;;(tap> [:server-flows server-flows])
+                                          ;;(ut/tapp>> [:server-flows server-flows])
 
                                           (dorun (for [[k query] sql-calls]
                                                    (let [data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -2177,7 +2177,7 @@
                                   ;h (get data_d :_h 11)
                                   ;w (get data_d :_w 9)
                                   ]
-                                                                                  ;(tap> [:qkeys (get data_d :selected-view) qkeys views (ut/postwalk-replacer qkeys views)])
+                                                                                  ;(ut/tapp>> [:qkeys (get data_d :selected-view) qkeys views (ut/postwalk-replacer qkeys views)])
                               [bricks/honeycomb panel-key
                                                                                    ;(or (first (keys views)) (first (keys queries)))
                                key ;:view ;(get data_d :selected-view)
@@ -2250,7 +2250,7 @@
 (def mutation-log (reagent/atom []))
 
 (defn narrative-box [panel-height panel-width kp]
-  ;(tap> [:narrative-up kp (get @db/kit-mode kp) @db/kit-mode])
+  ;(ut/tapp>> [:narrative-up kp (get @db/kit-mode kp) @db/kit-mode])
   (let [;hist-key  (keyword (str "tmp-" (hash (first kp)) "-hist-sys")) ;;  :history-log-sys
         ;reaction-hack [@hide-diffs? @hide-block-diffs?  ];; important to force re-render
         ;snapshots @(re-frame.core/subscribe [::bricks/snapshots])
@@ -2297,10 +2297,10 @@
         sql-calls {:kit-results-sys {:select [:*]
                                      :from [:kits]
                                      :where where-filter}}]
-     ;(tap> [:kitz where-filter [kit-name kit-context-name curr-narrative] kits narratives])
-    ;;   (tap> [:safe-key (ut/safe-key "snapshot")])
-    ;;    (tap> [:safe-key @(ut/tracked-subscribe [::ut/safe-key "snapshot"])])
-    ;; (tap> [:history-log history-log kp "!"])
+     ;(ut/tapp>> [:kitz where-filter [kit-name kit-context-name curr-narrative] kits narratives])
+    ;;   (ut/tapp>> [:safe-key (ut/safe-key "snapshot")])
+    ;;    (ut/tapp>> [:safe-key @(ut/tracked-subscribe [::ut/safe-key "snapshot"])])
+    ;; (ut/tapp>> [:history-log history-log kp "!"])
     ;; (reset! db/active-tmp-history hist-key)
 
     ;(when (or wait? queued?) (ut/tracked-dispatch [::conn/clear-query-history [:kit-results-sys]]))
@@ -2312,9 +2312,9 @@
         (when (and (or (not data-exists?) unrun-sql?) (not (or wait? queued?)))
           (sql-data [k] query))))
 
-    ;;(tap> [:narratives-gets kp kit-name running? (count kit-results) kits])
+    ;;(ut/tapp>> [:narratives-gets kp kit-name running? (count kit-results) kits])
 
-    (tap> [:narratives kit-name kits @db/chat-mode @db/kit-mode])
+    (ut/tapp>> [:narratives kit-name kits @db/chat-mode @db/kit-mode])
 
     (if false ; true
       (reagent.core/next-tick #(scroll-to-bottom "chat-v-box")) ;; temp calliope demo
@@ -2390,7 +2390,7 @@
                                          (doseq [[kk vv] step-mutates]
                                            (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv])))
                                      _ (when (and (not (empty? parameters)) viewable?)
-                                         (dorun (tap> [:reparameters reparameters])
+                                         (dorun (ut/tapp>> [:reparameters reparameters])
                                                 (ut/tracked-dispatch [::click-parameter [kit-name] reparameters])))]
                                :when (if as-pages? selected? true)]
 
@@ -2461,7 +2461,7 @@
                                                             :font-weight 500}
                                                     :gap "14px"
                                                     :children (for [c content
-                                                                    :let [;_ (tap> [:render type data_d key temp-key])
+                                                                    :let [;_ (ut/tapp>> [:render type data_d key temp-key])
                                                                           type (cond (vector? c) :view
                                                                                      (string? c) :view
                                                                                      (and (map? c)
@@ -2476,12 +2476,12 @@
                                                                                    (dissoc :view))
                                                                                c)
                                                                           execute? (and (vector? c) (= :execute (first c)))
-                                                                          ;_ (tap> [:content-render execute? (when execute? (get c 1))])
+                                                                          ;_ (ut/tapp>> [:content-render execute? (when execute? (get c 1))])
                                                                           mods (when execute? (count (keys (get c 1))))
                                                                           _ (when execute?
                                                                               ;(ut/tracked-dispatch [::bricks/execute-kit-item [kit-name] c])
                                                                               (let [pp (get c 1)
-                                                                                    ;_ (tap> [:pp id idx pp])
+                                                                                    ;_ (ut/tapp>> [:pp id idx pp])
                                                                                     ;kk (first pp)
                                                                                     ;vv (last pp)
                                                                                     ]
@@ -2489,7 +2489,7 @@
                                                                                   (let [hid (hash [kk vv])
                                                                                         already? (some #(= hid (hash %)) @mutation-log)]
                                                                                     (when (not already?)
-                                                                                      (do (tap> [:forced-execution-from-kick kk vv])
+                                                                                      (do (ut/tapp>> [:forced-execution-from-kick kk vv])
                                                                                           (swap! mutation-log conj hid)
                                                                                           (ut/tracked-dispatch [::bricks/update-workspace-raw kk vv])))))))
                                                                           draggable-spawn-fn (if (or both? query?)
@@ -2603,9 +2603,9 @@
         ;;                      :where [:= :kp (str kp)]}}
         ;; history-log @(re-frame.core/subscribe [::conn/sql-data [hist-key]])
         ]
-    ;;   (tap> [:safe-key (ut/safe-key "snapshot")])
-    ;;    (tap> [:safe-key @(ut/tracked-subscribe [::ut/safe-key "snapshot"])])
-    ;; (tap> [:history-log history-log kp "!"])
+    ;;   (ut/tapp>> [:safe-key (ut/safe-key "snapshot")])
+    ;;    (ut/tapp>> [:safe-key @(ut/tracked-subscribe [::ut/safe-key "snapshot"])])
+    ;; (ut/tapp>> [:history-log history-log kp "!"])
     ;; (reset! db/active-tmp-history hist-key)
     ;; (dorun (for [[k query] sql-calls]
     ;;          (let [;query (ut/postwalk-replacer sql-params v)
@@ -2654,7 +2654,7 @@
                                           {:block-states :blocks :panels :_} ;; just for readability again, we have limited space
                                           {:added added
                                            :removed removed})
-                                   ;_  (tap> [:diffy diffy])
+                                   ;_  (ut/tapp>> [:diffy diffy])
                                    ]]
 
                          [re-com/v-box
@@ -2693,7 +2693,7 @@
                                                                  :children
                                                                  [[re-com/input-text
                                                                    :model (str key)
-                                                                   :on-change #(do (tap> [:changed-snapshot-name (str key) :to (str %)])
+                                                                   :on-change #(do (ut/tapp>> [:changed-snapshot-name (str key) :to (str %)])
                                                                                    (when (and (not (empty? (cstr/trim (str %))))
                                                                                               (not (some (fn [x] (= x %)) (keys snapshots))))
                                                                                      (ut/tracked-dispatch [::rename-snapshot key (str %)]))
@@ -2841,7 +2841,7 @@
                              :order-by [[:updated :desc]]
                              :where [:= :kp (str kp)]}}
         history-log @(re-frame.core/subscribe [::conn/sql-data [hist-key]])]
-    (tap> [:history-log history-log kp "!"])
+    (ut/tapp>> [:history-log history-log kp "!"])
     (reset! db/active-tmp-history hist-key)
     (dorun (for [[k query] sql-calls]
              (let [;query (ut/postwalk-replacer sql-params v)
@@ -2882,7 +2882,7 @@
                                       has-flow-drop? @(ut/tracked-subscribe [::bricks/has-a-flow-view? panel_key (last kp_d)])
                                       key (try (edn/read-string key) (catch :default _ :nope-cant-work-key))
                                       temp-key (keyword (str (ut/replacer (str key) #":" "") "-hist-" (rand-int 123) (hash data)))]
-                                 ; (tap> [:prev-q temp-key data])
+                                 ; (ut/tapp>> [:prev-q temp-key data])
 
                                   [re-com/v-box
                                    ;:padding "10px"
@@ -2932,7 +2932,7 @@
                                                                                       qkeys (into {} (for [q (keys queries)]
                                                                                                        {q (keyword (str (ut/replacer (str q) #":" "") "-hist-" (rand-int 123) (hash data_d)))}))
                                                                                       ndata (ut/postwalk-replacer qkeys data_d)]
-                                                                                  ;(tap> [:qkeys (get data_d :selected-view) qkeys views (ut/postwalk-replacer qkeys views)])
+                                                                                  ;(ut/tapp>> [:qkeys (get data_d :selected-view) qkeys views (ut/postwalk-replacer qkeys views)])
                                                                                   [bricks/honeycomb panel_key
                                                                                    ;(or (first (keys views)) (first (keys queries)))
                                                                                    (get data_d :selected-view)
@@ -2987,11 +2987,11 @@
                                      ;:runstreams
 )) ;; default to snap if unselected
         kmode (get @db/kit-mode kp)
-        ;;_ (tap> [:kp kp mode kmode])
+        ;;_ (ut/tapp>> [:kp kp mode kmode])
         text-box? (or (= mode :snapshots) (= mode :buffy) (= mode :narratives) (= mode :kick))
         valid-kits @(ut/tracked-subscribe [::valid-kits])
         narrative-mode? (some #(= % (last kp)) (keys valid-kits))
-        ;_ (tap> [:valid-kits2 (vec (keys valid-kits))])
+        ;_ (ut/tapp>> [:valid-kits2 (vec (keys valid-kits))])
         choices (into
                  (if (and (not
                            ;(nil? (second kp))
@@ -3009,10 +3009,10 @@
 
                                     [:kick :kick]])))]
 
-    ;; (tap> [:shit mode (vals @db/kit-mode) @db/kit-keys @db/kit-mode])
-    ;(tap> [:valid-kits valid-kits selected-block selected-view kp])
-    ;(tap> [:choices choices mode kmode])
-    ;(tap> [:buffy-modes mode kmode])
+    ;; (ut/tapp>> [:shit mode (vals @db/kit-mode) @db/kit-keys @db/kit-mode])
+    ;(ut/tapp>> [:valid-kits valid-kits selected-block selected-view kp])
+    ;(ut/tapp>> [:choices choices mode kmode])
+    ;(ut/tapp>> [:buffy-modes mode kmode])
 
     [rc/catch
      [re-com/box

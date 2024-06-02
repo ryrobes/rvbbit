@@ -33,8 +33,8 @@
 ;;         base-theme-keys (keys resolved-base-theme)
 ;;         theme-key? (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
 ;;         fallback0 (if theme-key? (get resolved-base-theme t2) fallback)]
-;;     ;(tap> [:theme-test theme-key? resolved-base-theme])
-;;     ;(tap> [:color-pull cmp-key t1 t2 fallback fallback0 theme-key? (get db/base-theme t2) base-theme-keys])
+;;     ;(ut/tapp>> [:theme-test theme-key? resolved-base-theme])
+;;     ;(ut/tapp>> [:color-pull cmp-key t1 t2 fallback fallback0 theme-key? (get db/base-theme t2) base-theme-keys])
 ;;     (if (not (nil? v)) v fallback0)))
 
 (defn theme-pull [cmp-key fallback & test-fn] @(ut/tracked-subscribe [:rvbbit-frontend.bricks/theme-pull-sub cmp-key fallback test-fn]))
@@ -45,7 +45,7 @@
    (let [rs-scrubber-meta     (when (and (get db :buffy?) (= (get @db/chat-mode ["none!" nil nil]) :runstreams))
                                 (apply merge (for [f (keys (get-in db [:runstreams]))]
                                                (into {} (for [[k v] (get-in db [:runstreams-lookups f :blocks])
-                                    ;:let [_ (tap> [:v v])]
+                                    ;:let [_ (ut/tapp>> [:v v])]
                                                               :when (or (vector? (get-in v [:meta :* :scrubber]))
                                                                         (map? (get-in v [:meta :* :scrubber])))]
                                                           {[k] (get-in v [:meta :* :scrubber])})))))
@@ -54,8 +54,8 @@
                                                :when (or (vector? (get v :scrubber))
                                                          (map? (get v :scrubber)))]
                                            {[k] (get v :scrubber)})))]
-     ;(tap> [:rs-scrubber-meta rs-scrubber-meta])
-     ;(tap> [:flow-scrubber-meta flow-scrubber-meta])
+     ;(ut/tapp>> [:rs-scrubber-meta rs-scrubber-meta])
+     ;(ut/tapp>> [:flow-scrubber-meta flow-scrubber-meta])
      (merge
                 ;;  {[:flow-item :defaults :test1*] {:message "ytodad" :values ["area" "bar" "circle" "line" "point" "rect" "rule" "square" "text" "tick"]}
                 ;;   [:test1*] {:message "ytodad" :values ["area" "bar" "circle" "line" "point" "rect" "rule" "square" "text" "tick"]}}
@@ -101,7 +101,7 @@
   (let [theme-parameters @(ut/tracked-subscribe [::user-scrubber-options])
         ;layout-box-maps @(ut/tracked-subscribe [::keypaths-of-layout-panels])
         canvas-overrides @(ut/tracked-subscribe [::canvas-overrides])]
-    ;(tap> [:scrubber-dyn theme-parameters canvas-overrides])
+    ;(ut/tapp>> [:scrubber-dyn theme-parameters canvas-overrides])
     ;; get available fields in selected-block / selected-tab IN EDITOR so we can dynamically populate the button row
     (merge
      {[:mark :type] {:message "vega-lite viz mark type"
@@ -241,7 +241,7 @@
  (fn [db [_ kp v view-key type-key]]
    (let [selected-block (get db :selected-block)
          rs? (and (vector? view-key) (= (first view-key) :runstreams))
-         _ (tap> [:scrubber-view-update kp v view-key type-key])
+         _ (ut/tapp>> [:scrubber-view-update kp v view-key type-key])
          full-kp (cond
                    (and (vector? view-key) (= (first view-key) :opts))
                    [:flows (get db :selected-flow) :opts]
@@ -257,7 +257,7 @@
                    :else [:panels selected-block type-key view-key])
          kkp (if rs? full-kp (apply merge full-kp kp))
          kkp (if (= kp [:*]) (vec (drop-last kkp)) kkp)]
-     (tap> [:scrubber-update kkp :with v view-key type-key kp full-kp])
+     (ut/tapp>> [:scrubber-update kkp :with v view-key type-key kp full-kp])
      (assoc-in db kkp v))))
 
 (defn is-hex-color? [s]
@@ -307,7 +307,7 @@
          step-val (if has-values? (nth values 1) 1)
          max-val (if has-values? (nth values 2) 200)]
 
-     ;(tap> [:view-key type-key view-key kp v])
+     ;(ut/tapp>> [:view-key type-key view-key kp v])
 
      [re-com/h-box
       :src (at)
@@ -387,7 +387,7 @@
                             :font-weight 400}])])
 
 (defn color-farmer [kp v view-key type-key]
- ; (tap> [:colors-used @(ut/tracked-subscribe [::colors-used view-key])])
+ ; (ut/tapp>> [:colors-used @(ut/tracked-subscribe [::colors-used view-key])])
   (let [colors-used @(ut/tracked-subscribe [::colors-used view-key])
         cccolor (if (= (count v) 9) (subs v 0 7) v)
         colors-used (vec (distinct (conj colors-used cccolor))) ;(if (empty? colors-used) [cccolor] colors-used)
@@ -467,7 +467,7 @@
   (let [[a1 a2 a3 a4] (get shape-nubs data-type [0 0 0 0])
         new? (= v :*new)
         color (if new? "#ffffff" color)]
-    ;(tap> [data-type v])
+    ;(ut/tapp>> [data-type v])
     [re-com/h-box
      :style {:filter (if new? "none"
                          (str "drop-shadow(0px 0px 1px " color ") drop-shadow(0px 0px 1px " color ") drop-shadow(0px 0px 1px " color ") drop-shadow(0px 0px 1px " color ")"))
@@ -708,8 +708,8 @@
      ;        (= pos-meaning :base-field))
      ;   (swap! lookup-atom-f assoc-in [view-key idx] pos-meaning))
 
-      ;(tap> [:scrub-watch idx data-type])
-      ;(tap> [:scrub-meta (get-in @lookup-atom [view-key pos]) @(ut/tracked-subscribe [::conn/data-colors]) ])
+      ;(ut/tapp>> [:scrub-watch idx data-type])
+      ;(ut/tapp>> [:scrub-meta (get-in @lookup-atom [view-key pos]) @(ut/tracked-subscribe [::conn/data-colors]) ])
         (if (and (not (nil? data-type)) (= pos-meaning :fn-val))
 
           [shapes [re-com/v-box
@@ -731,7 +731,7 @@
                 :padding "8px"
                 ;:background-image "url('images/select-clause-bg5.png')"
                 }]
-    ;(tap> [:v v])
+    ;(ut/tapp>> [:v v])
     (if parted?
       [re-com/v-box
        :justify :between
@@ -855,7 +855,7 @@
               ;;                                  (cstr/join " " (ut/cm-deep-values %)))
               ;;                                 (catch :default e [:cannot-parse (str (.-message e))]))
               ;;                      unparseable? (= (first parse) :cannot-parse)]
-              ;;                  (tap> [:edit parse unparseable? v])
+              ;;                  (ut/tapp>> [:edit parse unparseable? v])
               ;;                  (if unparseable?
               ;;         ;                          (js/alert "BAD FORM!!")
               ;;                    (do (reset! db/bad-form? true)
@@ -868,7 +868,7 @@
               ;;                        (ut/tracked-dispatch [::scrubber-view-update kp parse view-key type-key])
               ;;                          ;  (ut/tracked-dispatch-sync [::update-selected-key key parse])
               ;;                          ;  )
-              ;;                        )))(catch :default e (tap> [:error! e])))
+              ;;                        )))(catch :default e (ut/tapp>> [:error! e])))
                :readOnly true ;false
                :theme (theme-pull :theme/codemirror-theme nil) ;"ayu-mirage"; "hopscotch"
                }}]])
@@ -879,7 +879,7 @@
 (defonce use-percents? (reagent/atom true))
 
 (defn layout-box [kp v view-key type-key]
- ; (tap> [:scrubber-layout-box kp v view-key type-key])
+ ; (ut/tapp>> [:scrubber-layout-box kp v view-key type-key])
   ;[re-com/box :child "layout scrubber"]
   (let [;reacthack @pixel-pusher-hover ;; imp!
         ;use-percents? @use-percents? ;; keep the reactivity working in the upper let
@@ -1159,7 +1159,7 @@
   (let [values (get (first (remove nil?
                                    (for [[k v] (friendly-text)]
                                      (when (ordered-keys-in-kp-multi? k kp) v)))) :values)]
-    ;(tap> [:values values kp])
+    ;(ut/tapp>> [:values values kp])
     [re-com/box
      :style {:padding-left "11px"}
      :align :center :justify :center

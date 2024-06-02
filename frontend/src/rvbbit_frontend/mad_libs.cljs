@@ -169,7 +169,7 @@
 ;;                                     :child "n/a" ;(str e)
 ;;                                     ])))
 ;;         pages (/ recos-count 6)]
-;; ;(tap> [:full-recos (map :table_name block-list) 
+;; ;(ut/tapp>> [:full-recos (map :table_name block-list) 
 ;; ;       (filter (fn [x] (some #(= % (get x :table_name)) current-tab-queries)) block-list)
 ;; ;       ;(filter #(= (get % :table_name) ) block-list)
 ;; ;       current-tab-queries ]) 
@@ -186,9 +186,9 @@
 ;;                (insert-hidden-reco-preview combo_hash viz_map query_map condis combo_edn shape_name false))))
 
 
-;;     ;(tap> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
-;;     ;(tap> sql-params)
-;;     ;(tap> combo-singles)
+;;     ;(ut/tapp>> (vec (cons :or (vec (for [t all-sql-call-keys-str] [:= :table_name t])))))
+;;     ;(ut/tapp>> sql-params)
+;;     ;(ut/tapp>> combo-singles)
 ;;     (dorun (for [[k v] sql-calls]
 ;;              (let [query (ut/postwalk-replacer sql-params v)
 ;;                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])

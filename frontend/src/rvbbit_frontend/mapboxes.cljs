@@ -117,7 +117,7 @@
           :else (ut/replacer (str s) #"clojure.core/" ""))))
 
 (defn map-boxes2 [data block-id flow-name keypath kki init-data-type & [draggable?]]  ;; dupe of a fn inside flows, but w/o dragging - TODO refactor to single fn - 3/15/24
-  ;(tap> [:pre-data data])
+  ;(ut/tapp>> [:pre-data data])
   (let [sql-explanations (sql-explanations-kp)
         flow-name (ut/data-typer data)
         data (if (or (string? data) (number? data) (boolean? data)) [data] data)

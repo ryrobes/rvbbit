@@ -57,7 +57,7 @@
                                        (= x pw-int)) ; assuming 12 as the parent boundary
                                  x
                                  (recur (inc x)))))]
-                       ;(tap> [:posw? possible-widths start-y start-x h w])
+                       ;(ut/tapp>> [:posw? possible-widths start-y start-x h w])
                        (- (apply min possible-widths) start-x))
                      w))
 
@@ -71,7 +71,7 @@
                                     (= y ph-int)) ; assuming 12 as the parent boundary
                               y
                               (recur (inc y)))))]
-                    ;(tap> [:posh? possible-heights])
+                    ;(ut/tapp>> [:posh? possible-heights])
                     (- (apply min possible-heights) start-y 0))
                   h)))))
 
@@ -121,7 +121,7 @@
         dyns (select-keys blocks-map dyn-keys)
         res-dyn (resolve-percents dyns pw-int ph-int)]
 
-    ;; (tap> [:process-layout-step-1
+    ;; (ut/tapp>> [:process-layout-step-1
     ;;        {:dyns dyns         :dyns-r res-dyn
     ;;         :statics statics   :statics-r (resolve-percents statics pw-int ph-int)
     ;;         :percents percents :percents-r (resolve-percents percents pw-int ph-int)}])

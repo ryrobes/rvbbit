@@ -164,7 +164,7 @@
 ;;          {:keys [total used _]} (get db :memory)
 ;;          pct-used (/ used total)
 ;;          pct-used-str (str (.. pct-used (toFixed 1)) "%")]
-;;      (tap> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
+;;      (ut/tapp>> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
 ;;      (clear-cache-and-reload!)
 ;;      db)))
 
@@ -173,10 +173,10 @@
  (fn [db]
    (let [client-name (get db :client-name)
          [total used heap] (get db :memory)]
-     (tap> [:debug "total memory:" (ut/bytes-to-mb total) "used memory:" (ut/bytes-to-mb used) "heap:" (ut/bytes-to-mb heap)])
+     (ut/tapp>> [:debug "total memory:" (ut/bytes-to-mb total) "used memory:" (ut/bytes-to-mb used) "heap:" (ut/bytes-to-mb heap)])
      (let [pct-used (/ used total)
            pct-used-str (str (.. pct-used (toFixed 1)) "%")]
-       (tap> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
+       (ut/tapp>> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
        (clear-cache-and-reload!)
        db))))
 

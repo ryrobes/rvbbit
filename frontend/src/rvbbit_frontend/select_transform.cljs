@@ -1,6 +1,7 @@
 (ns rvbbit-frontend.select-transform
   (:require [clojure.string :as cstr]
             [clojure.set :as cset]
+            [rvbbit-frontend.utility :as ut]
             [clojure.edn :as edn]))
 
 (defn process-dim-spec
@@ -43,7 +44,7 @@
 (defn transform-pre-deep-nest
   [dsl data]
   (if (get @transform-cache [(hash dsl) (hash data)])
-    (do ;(tap> [:transform-cache-for dsl (take 2 data)])
+    (do ;(ut/tapp>> [:transform-cache-for dsl (take 2 data)])
         (get @transform-cache [(hash dsl) (hash data)]))
 
     (let [{:keys [transform-select from fill-gaps? pivot-by order-nest-by nest-by]} dsl
@@ -130,21 +131,21 @@
                            grouped))))
           output (cond single-nest-string? (assoc-in output [0 :id] nest-key)
                        nest-key (let [x-vals (vec (sort (distinct (apply concat (for [{:keys [data]} output] (distinct (map :x data)))))))]
-                                  ;(tap> [:xvals x-vals])
+                                  ;(ut/tapp>> [:xvals x-vals])
                                   (vec (for [{:keys [id data]} output]
                                          {:id id
                                           :data (let [this-x (vec (sort (distinct (map :x data))))
                                                       whole? (= this-x x-vals)
                                                       missing (vec (cset/difference (set x-vals) (set this-x)))
                                                       empties (vec (for [m missing] {:x m :y 0}))]
-                                                  ;(when (not whole?) (tap> [id :missing-keys this-x x-vals missing]))
+                                                  ;(when (not whole?) (ut/tapp>> [id :missing-keys this-x x-vals missing]))
                                                   (vec (sort-by (or order-nest-by :x)
                                                                 (if (and fill-gaps? (not whole?))
                                                                   (into data empties) data))))})))
                        :else output)]
-      (tap> [:transform-NOT-cached-for dsl (take 2 data) output])
+      (ut/tapp>> [:transform-NOT-cached-for dsl (take 2 data) output])
       (swap! transform-cache assoc [(hash dsl) (hash data)] output)
-    ;(when nest-key (tap> [:ts-output output]))
+    ;(when nest-key (ut/tapp>> [:ts-output output]))
       output)))
 
 (defn deep-nest
@@ -171,7 +172,7 @@
 (defn transform
   [dsl data]
   (if (get @transform-cache [(hash dsl) (hash data)])
-    (do ;(tap> [:transform-cache-for dsl (take 2 data)])
+    (do ;(ut/tapp>> [:transform-cache-for dsl (take 2 data)])
         (get @transform-cache [(hash dsl) (hash data)]))
 
     (let [{:keys [transform-select from fill-gaps? pivot-by order-nest-by nest-by]} dsl
@@ -263,7 +264,7 @@
                                  (repeat 0))
                                 pivot-map)))
                            grouped))))]
-      (tap> [:transform-NOT-cached-for dsl (take 2 data) output])
+      (ut/tapp>> [:transform-NOT-cached-for dsl (take 2 data) output])
       (swap! transform-cache assoc [(hash dsl) (hash data)] output)
       output)))
 
@@ -419,9 +420,9 @@
    :from [:data]
    :nest-by [:region :category :rep]})
 
- ;(tap> [:dsl-pivot-region (transform dsl-pivot-region data)])
- ;(tap> [:dsl-nested-category (transform dsl-nested-category data)])
- ;(tap> [:dsl-deep-nest (transform dsl-deep-nest data)])
- ;(tap> [:dsl-pivot-rep (transform dsl-pivot-rep data)])
- ;(tap> [:dsl-pivot-rep2 (transform dsl-pivot-rep2 data)])
+ ;(ut/tapp>> [:dsl-pivot-region (transform dsl-pivot-region data)])
+ ;(ut/tapp>> [:dsl-nested-category (transform dsl-nested-category data)])
+ ;(ut/tapp>> [:dsl-deep-nest (transform dsl-deep-nest data)])
+ ;(ut/tapp>> [:dsl-pivot-rep (transform dsl-pivot-rep data)])
+ ;(ut/tapp>> [:dsl-pivot-rep2 (transform dsl-pivot-rep2 data)])
 

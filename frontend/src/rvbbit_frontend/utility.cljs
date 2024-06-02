@@ -26,12 +26,16 @@
  (fn [db]
    (get db :client-name)))
 
+(defn tapp>> [data] ;; doubletap! 
+  (.log js/console data)
+  (tap> data))
+
 
 (defn safe-conj [coll & items] ;;; temp until we find the error!!
   (if (sequential? coll)
     (apply conj coll items)
     (do
-      (tap> ["Error: trying to conj onto a non-sequence" "Caller:" (.-stack (js/Error.))  :coll coll :items items])
+      (tapp>> ["Error: trying to conj onto a non-sequence" "Caller:" (.-stack (js/Error.))  :coll coll :items items])
       coll)))
 
 
@@ -44,7 +48,7 @@
     [x]))
 
 (defn deep-flatten [x]
-  (let [hx (hash x)]
+  (let [hx (pr-str x)]  ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! deep-flatten-cache update hx (fnil inc 0))
     (or (@deep-flatten-data hx)
         (let [deep (deep-flatten-real x)]
@@ -61,10 +65,10 @@
         client-name @(re-frame/subscribe [::client-name])
         above-threshold (count keys-to-keep)
         below-threshold (- (count sorted-cache) above-threshold)]
-    ;; (tap> [client-name :purge :deep-flatten-cache {:top-pct percent
-    ;;                                                :cutoff-frequency cutoff-frequency
-    ;;                                                :above-threshold above-threshold
-    ;;                                                :below-threshold below-threshold}])
+    (tapp>> [client-name :purge :deep-flatten-cache {:top-pct percent
+                                                   :cutoff-frequency cutoff-frequency
+                                                   :above-threshold above-threshold
+                                                   :below-threshold below-threshold}])
     ;; (js/console.log "purging deep-flatten cache")
     (swap! deep-flatten-data (fn [old-cache]
                                (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
@@ -79,7 +83,7 @@
 (defonce replacer-cache (atom {}))
 
 (defn replacer [x1 x2 x3]
-  (let [x (hash [x1 x2 x3])]
+  (let [x (pr-str [x1 x2 x3])] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! replacer-cache update x (fnil inc 0))
     (or (@replacer-data x)
         (let [deep (cstr/replace (str x1) x2 x3)]
@@ -96,11 +100,11 @@
         client-name @(re-frame/subscribe [::client-name])
         above-threshold (count keys-to-keep)
         below-threshold (- (count sorted-cache) above-threshold)]
-    (tap> [client-name :purge :replacer-cache {:top-pct percent
+    (tapp>> [client-name :purge :replacer-cache {:top-pct percent
                                                :cutoff-frequency cutoff-frequency
                                                :above-threshold above-threshold
                                                :below-threshold below-threshold}])
-    (js/console.log "purging replacer cache")
+    ;; (js/console.log "purging replacer cache")
     (swap! replacer-data (fn [old-cache]
                            (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
     (reset! replacer-cache {})))
@@ -115,7 +119,7 @@
   (and (vector? item) (= (count item) num) (= (first item) kw)))
 
 (defn extract-patterns [data kw num]
-  (let [x (hash [data kw num])]
+  (let [x (pr-str [data kw num])] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! extract-patterns-cache update x (fnil inc 0))
     (or (@extract-patterns-data x)
         (let [matches (atom [])]
@@ -139,10 +143,10 @@
         client-name @(re-frame/subscribe [::client-name])
         above-threshold (count keys-to-keep)
         below-threshold (- (count sorted-cache) above-threshold)]
-    ;; (tap> [client-name :purge :extract-patterns-cache {:top-pct percent
-    ;;                                                    :cutoff-frequency cutoff-frequency
-    ;;                                                    :above-threshold above-threshold
-    ;;                                                    :below-threshold below-threshold}])
+    (tapp>> [client-name :purge :extract-patterns-cache {:top-pct percent
+                                                       :cutoff-frequency cutoff-frequency
+                                                       :above-threshold above-threshold
+                                                       :below-threshold below-threshold}])
     ;; (js/console.log "purging extract-patterns cache")
     (swap! extract-patterns-data (fn [old-cache]
                                    (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
@@ -190,7 +194,7 @@
 (defonce split-cache (atom {}))
 
 (defn splitter [s delimiter]
-  (let [key (hash [s delimiter])]
+  (let [key (pr-str [s delimiter])] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! split-cache update key (fnil inc 0))
     (or (@split-cache-data key)
         (let [result (cstr/split s delimiter)]
@@ -207,10 +211,10 @@
         client-name @(re-frame/subscribe [::client-name])
         above-threshold (count keys-to-keep)
         below-threshold (- (count sorted-cache) above-threshold)]
-    ;; (tap> [client-name :purge :splitter-cache {:top-pct percent
-    ;;                                            :cutoff-frequency cutoff-frequency
-    ;;                                            :above-threshold above-threshold
-    ;;                                            :below-threshold below-threshold}])
+    (tapp>> [client-name :purge :splitter-cache {:top-pct percent
+                                               :cutoff-frequency cutoff-frequency
+                                               :above-threshold above-threshold
+                                               :below-threshold below-threshold}])
     ;; (js/console.log "purging splitter cache")
     (swap! split-cache-data (fn [old-cache]
                               (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
@@ -230,7 +234,7 @@
 ;;     (walk/postwalk-replace walk-map target)))
 
 (defn postwalk-replacer [walk-map target]
-  (let [hash-key (hash [walk-map target])]
+  (let [hash-key (pr-str [walk-map target])]  ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! postwalk-replace-cache update hash-key (fnil inc 0))
     (or (@postwalk-replace-data-cache hash-key)
         (let [result (walk/postwalk-replace walk-map target)]
@@ -247,10 +251,10 @@
         client-name @(re-frame/subscribe [::client-name])
         above-threshold (count keys-to-keep)
         below-threshold (- (count sorted-cache) above-threshold)]
-    ;; (tap> [client-name :purge :postwalk-cache {:top-pct percent
-    ;;                                            :cutoff-frequency cutoff-frequency
-    ;;                                            :above-threshold above-threshold
-    ;;                                            :below-threshold below-threshold}])
+    (tapp>> [client-name :purge :postwalk-cache {:top-pct percent
+                                               :cutoff-frequency cutoff-frequency
+                                               :above-threshold above-threshold
+                                               :below-threshold below-threshold}])
     ;; (js/console.log "purging postwalk cache")
     (swap! postwalk-replace-data-cache (fn [old-cache]
                                          (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
@@ -269,9 +273,13 @@
 ;;      :middle-80-percent middle-80-percent
 ;;      :bottom-10-percent bottom-10-percent}))
 
-;; (tap> [:postwalk-freq! @(re-frame/subscribe [::client-name]) (distribution)])
+;; (tapp>> [:postwalk-freq! @(re-frame/subscribe [::client-name]) (distribution)])
 
 
+
+
+;;;; ^^^ bigly used caching utils for all my string clover nonsense ^^^^
+;;;; ^^^ bigly used caching utils for all my string clover nonsense ^^^^
 ;;;; ^^^ bigly used caching utils for all my string clover nonsense ^^^^
 
 
@@ -294,7 +302,7 @@
   (cond
 
     (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query) :rvbbit-frontend.connections/clicked-parameter-key)
-    (do ;(tap> [:cpk! (last query)])
+    (do ;(tapp>> [:cpk! (last query)])
       ;(swap! parameter-keys-hit update (first (last query)) (fnil inc 0))
       ;;(re-frame.core/subscribe query)
       (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))
@@ -413,7 +421,7 @@
     (.update hash bytes)
     (replacer (str (base64/encodeByteArray (.digest hash))) "/" "")))
 
-;;(tap> [:sha256 (sha-256 "hello")])
+;;(tapp>> [:sha256 (sha-256 "hello")])
 
 (defn gen-client-name []
   (let [;quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
@@ -523,7 +531,7 @@
 
 (defn function-to-inputs [lookup-map]
   (let [ordered (atom [])
-        ;_ (tap> [:function-to-inputs-w lookup-map])
+        ;_ (tapp>> [:function-to-inputs-w lookup-map])
         port-map (if (or (vector? lookup-map) (map? lookup-map) (list? lookup-map))
                    (try
                     ;;  (into {} (for [e (take-while #(not= "&" (str %)) (second (get lookup-map :fn))) ;; quit before optional params ??
@@ -550,7 +558,7 @@
                                           _ (swap! ordered conj kk)]]
                                 {kk :any})) ;; we dont know what types yet
                      (catch :default _ {:value :any})))]
-    ;(tap> [:ordered-arities @ordered (map? lookup-map)])
+    ;(tapp>> [:ordered-arities @ordered (map? lookup-map)])
     port-map))
 
 ;; (defn unique-block-id-helper [base-name counter all-names]
@@ -617,7 +625,7 @@
          query-names (mapcat (fn [[_ v]] (keys (get v :queries))) (get db :panels)) ;; faster than apply into?
          all-keys (vec (apply concat [block-names user-param-names locals view-names snapshot-names tab-names query-names]))
          reco (unique-block-id proposed all-keys [])]
-     ;;(tap> [:safe-key proposed all-keys :ret reco])
+     ;;(tapp>> [:safe-key proposed all-keys :ret reco])
      (cond (and incoming-keyword? (keyword? reco)) reco
            (and incoming-keyword? (not (keyword? reco))) (keyword (replacer (str reco) #":" ""))
            :else reco))))
@@ -736,7 +744,7 @@
         ;(replacer #"-" "_")
           )
       (str x))
-    (catch :default _ (do (tap> [:error-in-unkeyword x])
+    (catch :default _ (do (tapp>> [:error-in-unkeyword x])
                           (str x)))))
 
 
@@ -744,7 +752,7 @@
 
 ;; (defonce safe! (atom #{}))
 
-;(tap> [:safe! @safe!])
+;(tapp>> [:safe! @safe!])
 
 ;; (defn safe-name2 [x]
 ;;   (swap! safe! conj x)
@@ -774,12 +782,12 @@
 ;;       n 820000
 ;;       results {"split" (benchmark splitter string-test delimiter n)
 ;;                "split-cached" (benchmark split-cached string-test delimiter n)}]
-;;   (tap> [client-name (vec (sort-by val results))]))
+;;   (tapp>> [client-name (vec (sort-by val results))]))
 
 
-;; (tap> [:tt (replacer (str nil) ":" "")])
+;; (tapp>> [:tt (replacer (str nil) ":" "")])
 
-;; (tap> [:freq @(re-frame/subscribe [::client-name]) (frequencies (for [e @safe!] (type e)))])
+;; (tapp>> [:freq @(re-frame/subscribe [::client-name]) (frequencies (for [e @safe!] (type e)))])
 
 ;; (defn replace-name [x]
 ;;   (clojure.string/replace (str x) ":" "")) 
@@ -801,7 +809,7 @@
 ;;                "safe-name-cached" (benchmark safe-name-cached keyword-test n)
 ;;                "unkeyword" (benchmark unkeyword keyword-test n)
 ;;                "replace-name" (benchmark replace-name keyword-test n)}]
-;;   (tap> [client-name (vec (sort-by val results))]))
+;;   (tapp>> [client-name (vec (sort-by val results))]))
 
 ;; (defn benchmark [f arg-atom]
 ;;   (let [start (js/performance.now)
@@ -816,7 +824,7 @@
 ;;                "safe-name-cached" (benchmark safe-name-cached keyword-test-atom)
 ;;                "unkeyword" (benchmark unkeyword keyword-test-atom)
 ;;                "raw-replace-name" (benchmark replace-name keyword-test-atom)}]
-;;   (tap> [client-name (vec (sort-by val results))]))
+;;   (tapp>> [client-name (vec (sort-by val results))]))
 
 
 ;; (defn benchmark [f arg n]
@@ -829,7 +837,7 @@
 ;;       client-name @(re-frame/subscribe [::client-name])
 ;;       results {"not-empty" (benchmark (fn [x] (not (empty? x))) test-arg n)
 ;;                "ne" (benchmark ne? test-arg n)}]
-;;   (tap> [:NOT-EMPTY? client-name (vec (sort-by val results))]))
+;;   (tapp>> [:NOT-EMPTY? client-name (vec (sort-by val results))]))
 
 
 (defn template-replace [replacements s]
@@ -1006,7 +1014,7 @@
 ;; (defn replacer-fn [x1 x2 x3]
 ;;   (let [res (try (replacer (str x1) x2 x3)
 ;;                  (catch :default _ (do (when (not (nil? x1)) ;; no need to alert me of null
-;;                                          (tap> [:string-replace-issue x1 x2 x3]))
+;;                                          (tapp>> [:string-replace-issue x1 x2 x3]))
 ;;                                        x1)))] res))
 ;; (def replacer-atom (atom {}))
 
@@ -1058,7 +1066,7 @@
               (catch :default _ false))))
 
 ;(let [kk (gen-sql-sql-alias)]
-;  (tap> [:poop kk (is-sql-sql-alias? kk)]))
+;  (tapp>> [:poop kk (is-sql-sql-alias? kk)]))
 
 (defn read-string-preserve-floats [s]
   (-> s
@@ -1101,7 +1109,7 @@
         parent-element (.-parentNode element) ;; Get the parent of the target element
         computed-style (js/getComputedStyle parent-element) ;; Get the computed style of the parent element
         z-index (.-zIndex computed-style)] ;; Extract the z-index from the computed style
-    (tap> [:parent-z-index z-index]) ;; Print or use the z-index as needed
+    (tapp>> [:parent-z-index z-index]) ;; Print or use the z-index as needed
     z-index)) ;; Return the z-index
 
 (defn deep-remove-keys [data keys-to-remove]
@@ -1164,7 +1172,7 @@
         inverted-b (js/Number.prototype.toString.call (- 255 b) 16)
         pad (fn [s] (if (< (count s) 2) (str "0" s) s))]
     (str "#" (pad inverted-r) (pad inverted-g) (pad inverted-b)))
-  ;  (catch :default e (do (tap> [:invert-hex-color-error (str e)]) "#ffffff"))
+  ;  (catch :default e (do (tapp>> [:invert-hex-color-error (str e)]) "#ffffff"))
   ;  )
   )
 
@@ -1212,7 +1220,7 @@
         ;agg?          (not (get-in metadata [:fields label :group-by?]))
         ;pxlabel       (px (if (< labelsz 20) 20 labelsz))
         ]
-    ;(tap> [:auto-font pxsize value h w])
+    ;(tapp>> [:auto-font pxsize value h w])
     pxsize))
 
 (defn auto-font-size-px [value h w]
@@ -1240,7 +1248,7 @@
         ;agg?          (not (get-in metadata [:fields label :group-by?]))
         ;pxlabel       (px (if (< labelsz 20) 20 labelsz))
         ]
-    ;(tap> [:auto-font pxsize value h w])
+    ;(tapp>> [:auto-font pxsize value h w])
     charw))
 
 (defn auto-font-size [value h w]
@@ -1261,7 +1269,7 @@
 (defn not-empty?
   [coll]
   (try (boolean (seq coll)) (catch :default e
-                              (do (tap> [:no-empty-failed coll e])
+                              (do (tapp>> [:no-empty-failed coll e])
                                   false))))
 
 (defn canvas-size [rects]

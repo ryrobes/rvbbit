@@ -140,7 +140,7 @@
 (re-frame/reg-event-db
  ::save-webcam-stream
  (fn [db [_ stream]]
-   (tap> [:stream-started!])
+   (ut/tapp>> [:stream-started!])
    (assoc db :webcam-feed stream)))
 
 (defn get-webcam-stream []
@@ -151,7 +151,7 @@
  ::start-webcam
  (fn []
    (let [stream-promise (get-webcam-stream)]
-     (tap> [:starting-webcam])
+     (ut/tapp>> [:starting-webcam])
      (.then stream-promise
             (fn [stream]
               ;; Process the stream here. For example, you can dispatch an event to save it in the app-db.
@@ -180,7 +180,7 @@
 
 
 ;; (defn stop-webcam [recorder]
-;;   (tap> ["stop-recording-fn - state:" (.-state recorder)])
+;;   (ut/tapp>> ["stop-recording-fn - state:" (.-state recorder)])
 ;;   (let [stream (.-stream recorder)]
 ;;     (doseq [track (.getTracks stream)]
 ;;       (.stop track)))
@@ -190,7 +190,7 @@
 ;;  ::stop-webcam
 ;;  (fn [db [_]]
 ;;    (let [stream (get-in db [:webcam-feed])]
-;;      (tap> [:stopping-webcam])
+;;      (ut/tapp>> [:stopping-webcam])
 ;;      (when stream
 ;;        (doseq [track (.-getTracks stream)]
 ;;          (.stop track)))
@@ -233,7 +233,7 @@
 ;;                 (on-data-available recorder
 ;;                                    (fn [audio-data]
 ;;                                      (let [form-data (create-form-data audio-data)]
-;;                                        (tap> [:call-back-data-inner (count (str form-data))]))))
+;;                                        (ut/tapp>> [:call-back-data-inner (count (str form-data))]))))
 ;;                       ;; you now have a FormData object that you can send to the Google Speech-to-Text API
 ;;                       ;; use your existing HTTP request code to send this data
 
@@ -250,7 +250,7 @@
    ;;  (ut/tracked-dispatch [::text-to-speech11 :audio :speak chat-text])
      ;(assoc-in db [:post-meta ui-keypath field name] new-map)
      ;(ut/dissoc-in db [:query-history])
-     (tap> [:chat-response result])
+     (ut/tapp>> [:chat-response result])
      (assoc-in db [:chats kp] new-chats))))
 
 (re-frame/reg-event-db
@@ -258,7 +258,7 @@
  (fn [db [_  kp result]]
    (let []
      (reset! waiting-for-response (vec (remove #(= % kp) @waiting-for-response)))
-     (tap> [:chat-timeout! result kp])
+     (ut/tapp>> [:chat-timeout! result kp])
      db)))
 
 (defn push-oai-message [convo-vec client-name panels panel-key kp]
@@ -328,8 +328,8 @@
                         ;;@(ut/tracked-subscribe [::resolver/logic-and-params [(get-in db [:runstreams flow-id :values kkey :value])]])
                    vvv ;;@(rfa/sub ::resolver/logic-and-params {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
                         ;;; ^^^^ :brave-red-butterfly is not sequable? what? so I wrapped in a vec. started after caching madness....
-                   ) (catch :default e (do (tap> [:rs-value-fuck-up-audio vvv flow-id kkey src e]) vvv)))]
-         ;(tap> [:sketchy-rs-value? flow-id kkey vvv vv])
+                   ) (catch :default e (do (ut/tapp>> [:rs-value-fuck-up-audio vvv flow-id kkey src e]) vvv)))]
+         ;(ut/tapp>> [:sketchy-rs-value? flow-id kkey vvv vv])
          vv)
        (get-in db [:runstreams flow-id :values kkey :value])))))
 
@@ -344,7 +344,7 @@
                                       (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])] ;;; dupe from buffy
                                         (if (and (vector? vv) (every? string? vv))
                                           (cstr/join "\n" vv) vv)))}))]
-     ;(tap> [:override-map override-map])
+     ;(ut/tapp>> [:override-map override-map])
      override-map)))
 
 (re-frame/reg-sub
@@ -415,16 +415,16 @@
          shout-flows-to-run (vec (flatten (for [k (keys shouts)
                                                 :let [k (ut/remove-punctuation (cstr/lower-case k))
                                                       lines (ut/remove-punctuation (cstr/lower-case lines))
-                                                           ;_ (tap> [:k k lines])
+                                                           ;_ (ut/tapp>> [:k k lines])
                                                       ]
                                                 :when (and (and (not (empty? (cstr/trim k))) (not (empty? (cstr/trim lines))))
                                                            (cstr/starts-with? lines (str k)))]
                                             (get shouts k))))]
-     (tap> [:voice-trigger lines shout-flows-to-run])
+     (ut/tapp>> [:voice-trigger lines shout-flows-to-run])
      (doseq [flow-id shout-flows-to-run]
        (let [txt (str "shout trigger '" (get sshouts flow-id) "': " flow-id)
              cnt (js/Math.ceil (/ (count txt) 5))]
-         (try (start-flow flow-id) (catch :default e (tap> [:error flow-id e])))
+         (try (start-flow flow-id) (catch :default e (ut/tapp>> [:error flow-id e])))
          (ut/dispatch-delay 400 [::http/insert-alert [:box :child txt] cnt 1 6])))
 
      ;;(ut/tracked-dispatch [::add-chat (str lines)]) ;; sends to oai as a chat content resp
@@ -492,15 +492,15 @@
   (js/MediaRecorder. stream))
 
 (defn start-recording [recorder]
-  (tap> ["start-recording-fn - state:" (.-state recorder)])
+  (ut/tapp>> ["start-recording-fn - state:" (.-state recorder)])
   (.start recorder))
 
 ;; (defn stop-recording [recorder]
-;;   (tap> ["stop-recording-fn - state:" (.-state recorder)])
+;;   (ut/tapp>> ["stop-recording-fn - state:" (.-state recorder)])
 ;;   (.stop recorder))
 
 (defn stop-recording [recorder]
-  (tap> ["stop-recording-fn - state:" (.-state recorder)])
+  (ut/tapp>> ["stop-recording-fn - state:" (.-state recorder)])
   (let [stream (.-stream recorder)]
     (doseq [track (.getTracks stream)]
       (.stop track)))
@@ -551,10 +551,10 @@
 (defn draw [analyser block-id]
   (let [buffer-length (.-frequencyBinCount analyser)
         data-array (js/Uint8Array. buffer-length)]
-    ;(tap> [:rms? @playing?])
+    ;(ut/tapp>> [:rms? @playing?])
     (letfn [(frame []
               (do
-                ;(tap> [:audio-playing? @playing?])
+                ;(ut/tapp>> [:audio-playing? @playing?])
                 (when @playing?
                   (.getByteTimeDomainData analyser data-array)
                   (let [rms (->> (range buffer-length)
@@ -574,20 +574,20 @@
                         peak (->> (range buffer-length)
                                   (map #(js/Math.abs (- (aget data-array %) 128)))
                                   (reduce max))]
-                    ;(tap> [:RMS-data rms])
+                    ;(ut/tapp>> [:RMS-data rms])
                     ;(when (js/isNaN rms)
-                    ;  (tap> [:problematic-data-array data-array]))
+                    ;  (ut/tapp>> [:problematic-data-array data-array]))
                     (swap! db/audio-data2 assoc block-id peak)
                     (swap! db/audio-data assoc block-id rms))
                   (js/requestAnimationFrame frame))))]
-      ;(tap> [:frame-called])
+      ;(ut/tapp>> [:frame-called])
       (frame))))
 
 (defn play-audio-blob [audio-data block-id]
   (reset! playing? true)
   (ut/tracked-dispatch [::audio-started])
   (reset! db/speaking block-id)
-  ;(tap> audio-data)
+  ;(ut/tapp>> audio-data)
   (let [audio-context (js/AudioContext.)
         url (js/URL.createObjectURL audio-data)
         audio-element (js/document.createElement "audio")
@@ -621,7 +621,7 @@
                        (let [audio-data (.-data event)
                              form-data (create-form-data audio-data)]
                          ;;(play-audio-blob audio-data "echo") ;; uncomment to hear the echo
-                         (tap> [:audio-data-received-callback (count (str form-data))])
+                         (ut/tapp>> [:audio-data-received-callback (count (str form-data))])
                          (blob-to-base64 audio-data)
                          (ut/tracked-dispatch [::save-recording-data {:form form-data :raw audio-data}])))))
         ;; you now have a FormData object that you can send to the Google Speech-to-Text API
@@ -667,7 +667,7 @@
                 (on-data-available recorder
                                    (fn [audio-data]
                                      (let [form-data (create-form-data audio-data)]
-                                       (tap> [:call-back-data-inner (count (str form-data))]))))
+                                       (ut/tapp>> [:call-back-data-inner (count (str form-data))]))))
                       ;; you now have a FormData object that you can send to the Google Speech-to-Text API
                       ;; use your existing HTTP request code to send this data
 
@@ -678,8 +678,8 @@
 ;;  ::start-recording
 ;;  (fn [db _]
 ;;    (let [recorder (start-recording-stream)]
-;;      (tap> ["Attempting to start recording..."])
-;;      (tap> ["Current state:" (.-state recorder)])
+;;      (ut/tapp>> ["Attempting to start recording..."])
+;;      (ut/tapp>> ["Current state:" (.-state recorder)])
 ;;      (assoc db :recorder recorder))))
 
 (re-frame/reg-event-db
@@ -687,8 +687,8 @@
  (fn [db _]
    (let [recorder (:recorder db)] ;(or (:recorder db) (:webcam-feed db))
 
-     (tap> ["Attempting to stop recording..."])
-     (tap> ["state:" (.-state recorder)])
+     (ut/tapp>> ["Attempting to stop recording..."])
+     (ut/tapp>> ["state:" (.-state recorder)])
      (.stop recorder)
      (stop-recording recorder)
      (-> db
@@ -783,7 +783,7 @@
 (re-frame/reg-event-db
  ::success-text-to-speech11
  (fn [db [_ block-type block-id voices? result]]
-   (tap> [:speak? block-type block-id voices?])
+   (ut/tapp>> [:speak? block-type block-id voices?])
    (if voices?
      (let [old-status (get-in db [:http-reqs block-type block-id])]
        (-> db
@@ -799,7 +799,7 @@
            blob       (js/Blob. #js [byte-array] #js {:type "audio/mpeg"})]
          ;url        (js/URL.createObjectURL blob)
 
-     ;(tap> (type result))
+     ;(ut/tapp>> (type result))
        (play-audio-blob blob block-id)
      ;(swap! db/audio-blob-queue assoc block-id (vec (conj (get @db/audio-blob-queue block-id []) blob)))
        (-> db
@@ -839,7 +839,7 @@
                 {:path text-to-speak}
                 (if voices? {}
                     (dissoc (assoc (get-in db [:blocks block-id :req]) :text text-to-speak) :speak)))]
-     (tap> [method url data voices? vname vid])
+     (ut/tapp>> [method url data voices? vname vid])
      {:db   (assoc-in db [:http-reqs block-type block-id]
                       {:status "running"
                        :url url
@@ -974,7 +974,7 @@
                        (.append data "voice_id" vid)
                        (.append data "name" voice-name)
                        data))]
-     (tap> [:training-voice voice-name :is-new? new?])
+     (ut/tapp>> [:training-voice voice-name :is-new? new?])
      {:db   (assoc-in db [:http-reqs block-type block-id]
                       {:status "running"
                        :url url

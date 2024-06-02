@@ -58,7 +58,7 @@
  ::edit-signal-drop
  (undoable)
  (fn [db [_ content adding]]
-   (tap> [:edit? content adding])
+   (ut/tapp>> [:edit? content adding])
    (let [curr (get-in db [:signals-map (get db :selected-warren-item) :signal])]
      (assoc-in db [:signals-map (get db :selected-warren-item) :signal] 
                (ut/postwalk-replacer
@@ -73,7 +73,7 @@
  (undoable)
  (fn [db [_ content]]
    (let [curr (get-in db [:signals-map (get db :selected-warren-item) :signal])]
-     (tap> [:kill-nested? content :from curr])
+     (ut/tapp>> [:kill-nested? content :from curr])
      (assoc-in db [:signals-map (get db :selected-warren-item) :signal]
                (ut/remove-subvec curr content)))))
 
@@ -81,7 +81,7 @@
  ::edit-signal-drop2
  (undoable)
  (fn [db [_ content adding]]
-   (tap> [:edit2? content adding])
+   (ut/tapp>> [:edit2? content adding])
    (let [curr (get-in db [:signals-map (get db :selected-warren-item) :signal])]
      (assoc-in db [:signals-map (get db :selected-warren-item) :signal]
                (ut/postwalk-replacer
@@ -104,7 +104,7 @@
                     ii (last (last (first incoming)))
                     ]
                 (ut/tracked-dispatch [::edit-signal-drop (vec (cons operator content)) ii])
-                (tap> [:drop-signal-item ii incoming content]))}
+                (ut/tapp>> [:drop-signal-item ii incoming content]))}
    element])
 
 (defn droppable-area2 [element types-vec content]
@@ -114,7 +114,7 @@
                     incoming (into [] (for [[k v] incoming] {k (edn/read-string v)}))
                     ii (last (last (first incoming)))]
                 (ut/tracked-dispatch [::edit-signal-drop2 content ii])
-                (tap> [:drop-signal-item2 ii incoming content]))}
+                (ut/tapp>> [:drop-signal-item2 ii incoming content]))}
    element])
 
 (defn kill-nest [op]
@@ -127,7 +127,7 @@
    ;:padding "6px"
    :style {:cursor "pointer"}
    :attr {:on-click #(do
-                       (tap> [:kill-nested op])
+                       (ut/tapp>> [:kill-nested op])
                        (ut/tracked-dispatch [::edit-signal-drop-kill op]))}])
 
 (def hover-tools-atom (reagent/atom nil))
@@ -154,18 +154,18 @@
         ;;vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
         vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})
         vv (if (nil? vv) "err!" vv)]
-    ;(tap> [:coll-hover coll])
+    ;(ut/tapp>> [:coll-hover coll])
     [re-com/v-box
      :attr {:on-mouse-enter #(reset! hover-tools-atom coll)
             ;; :on-mouse-over #(when (not= @hover-tools-atom coll)
             ;;                   (highlight-code (str coll))
             ;;                   (reset! hover-tools-atom coll))
             :on-mouse-over #(do
-                              ;(tap> "on-mouse-over")
+                              ;(ut/tapp>> "on-mouse-over")
                               (when true ;(not= @hover-tools-atom coll)
-                                ;(tap> "before highlight-code")
+                                ;(ut/tapp>> "before highlight-code")
                                 (highlight-code (str coll))
-                                ;(tap> "after highlight-code")
+                                ;(ut/tapp>> "after highlight-code")
                                 (reset! hover-tools-atom coll)))
             :on-mouse-leave #(do 
                                (unhighlight-code)
@@ -193,7 +193,7 @@
   [clause level & [contents full-clause]]
   (let [is-operator? (fn [c] (and (vector? c) (keyword? (first c))
                                   (contains? #{:and :or :not} (first c))))
-        ;_ (tap> [:clause contents])
+        ;_ (ut/tapp>> [:clause contents])
         render-operator (fn [operator contents lvl]
                           (let [body (vec (cons operator contents))
                                 hovered? (= @hover-tools-atom body)]
@@ -373,7 +373,7 @@
     (let [doc (.getDoc editor)
           code (ut/format-map 640 ;; 539 ;;(- 634.4 95) 
                               (str code))
-          _ (tap> [:highlighted-code code])]
+          _ (ut/tapp>> [:highlighted-code code])]
       ;; Clear existing markers
       (doseq [marker @markers]
         (.clear marker))
@@ -396,7 +396,7 @@
                                 #js {:line start-line, :ch start-ch}
                                 #js {:line end-line, :ch end-ch}
                                 #js {:css (str "filter: invert(233%); color: white; font-weight: 700; background-color: teal; font-size: 15px;" )})
-                     (catch :default e (tap> [:marker-error (str e)])))]
+                     (catch :default e (ut/tapp>> [:marker-error (str e)])))]
         (swap! markers conj marker)))))
 
 (defn unhighlight-code []
@@ -508,7 +508,7 @@
          kp (if (= item-type :signal)
               [:signals-map signal-name :signal]
               [item-type-key signal-name])]
-     (tap> [:add-item? item-type signal-name kp rr])
+     (ut/tapp>> [:add-item? item-type signal-name kp rr])
      (-> db
          (assoc-in kp starting-data)
          (assoc :selected-warren-item signal-name)))))
@@ -565,7 +565,7 @@
         ;;                            (ut/drop-last-char warren-type-string)
         ;;                            warren-type-string)
         ]
-    ;; (tap> [:warren selected-type warren-type-string])
+    ;; (ut/tapp>> [:warren selected-type warren-type-string])
     [re-com/v-box
      :children
      [[re-com/h-box
@@ -668,7 +668,7 @@
 
 
 (defn selector-panel [name items icon & [style wide?]]
-  ;; (tap> [:db/selectors-open @db/selectors-open])
+  ;; (ut/tapp>> [:db/selectors-open @db/selectors-open])
   (let [open? (some #(= name %) @db/selectors-open)
         items-count (count items)
         partition? (integer? wide?)]
@@ -769,7 +769,7 @@
 ;;  ::refresh-open-blocks
 ;;  ;;(undoable)
 ;;  (fn [db [_ flow-id]]
-;;    ;(tap> [:refresh-runstream-panel (keys (get db :runstreams))])
+;;    ;(ut/tapp>> [:refresh-runstream-panel (keys (get db :runstreams))])
 ;;    (ut/tracked-dispatch [::wfx/request :default
 ;;                        {:message    {:kind :get-flow-open-ports
 ;;                                      :flow-id flow-id
@@ -1040,7 +1040,7 @@
          ;;old-item (get-in db [item-type-key old])
          ]
      
-     (tap> [:rename-item! old new item-type item-type-str item-type-key refs])
+     (ut/tapp>> [:rename-item! old new item-type item-type-str item-type-key refs])
 
      (-> db
 
@@ -1098,7 +1098,7 @@
 (re-frame/reg-event-db
  ::run-signals-history
  (fn [db _]
-  ;;  (tap> [:signals-history!])
+  ;;  (ut/tapp>> [:signals-history!])
    (ut/tracked-dispatch
     [::wfx/request :default
      {:message    {:kind :signals-history
@@ -1182,7 +1182,7 @@
         ;; ^^^ this is a weird hack we need to revisit - by invoking the param-keys we are summoning them from the server to be read and reactive
         ;; even though it is dereffed in a "safe" place...
     
-    ;; (tap> [:signals-history signals-history])
+    ;; (ut/tapp>> [:signals-history signals-history])
     
     ;; (ut/tracked-dispatch
     ;;  [::wfx/request :default
@@ -1193,7 +1193,7 @@
     ;;    :timeout    15000000}])
     
 
-    ;; (tap> [:right-col ph signals selected-warren-item signal-vec @db/flow-editor-system-mode])
+    ;; (ut/tapp>> [:right-col ph signals selected-warren-item signal-vec @db/flow-editor-system-mode])
     [re-com/v-box
      :width "65%"
      :children [(when selected-warren-item
@@ -1354,7 +1354,7 @@
                                         {tt (vec (for [kk (keys signals-history)]
                                                    [kk (get-in signals-history [kk tt])]))}
                                         ))]
-                  ;; (tap> [:signals-history2 signals-history2])
+                  ;; (ut/tapp>> [:signals-history2 signals-history2])
                   [re-com/box
                    :padding "6px"
                    :align :center :justify :center
@@ -1366,7 +1366,7 @@
                                  :width "600px"
                                  :children (for [[e vv] signals-history2
                                                  :let [main (reduce (fn [a b] (if (> (count a) (count b)) a b)) (map first vv)) ;; largest vector is likely the main
-                                                       ;;_ (tap> [:main e main])
+                                                       ;;_ (ut/tapp>> [:main e main])
                                                        ff (first (filter #(= main (first %)) vv))
                                                        main-true? (true? (first (last ff)))]]
                                              ^{:key (str selected-warren-item e vv "h-box")}
@@ -1475,28 +1475,28 @@
  ::timeout-response
  (fn [db [_ result what-req]]
    (let [client-name (get db :client-name)]
-     (tap> [:websocket-timeout! client-name result what-req])
+     (ut/tapp>> [:websocket-timeout! client-name result what-req])
      db)))
 
 (re-frame/reg-event-db
  ::signals-map-response
  (fn [db [_ result]]
    (let []
-    ;;  (tap> [:signals-map-in result])
+    ;;  (ut/tapp>> [:signals-map-in result])
      (assoc db :signals-map result))))
 
 (re-frame/reg-event-db
  ::rules-map-response
  (fn [db [_ result]]
    (let []
-    ;;  (tap> [:rules-map-in result])
+    ;;  (ut/tapp>> [:rules-map-in result])
      (assoc db :rules-map result))))
 
 (re-frame/reg-event-db
  ::solvers-map-response
  (fn [db [_ result]]
    (let []
-    ;;  (tap> [:solvers-map-in result])
+    ;;  (ut/tapp>> [:solvers-map-in result])
      (assoc db :solvers-map result))))
 
 (re-frame/reg-event-db
@@ -1504,10 +1504,10 @@
  (fn [db [_ result]]
    (if (not (= result :no-updates))
      (let []
-       ;;(tap> [:signals-history-in result])
+       ;;(ut/tapp>> [:signals-history-in result])
        (assoc db :signals-history result))
      (let []
-       ;;(tap> [:nothing-new-in-signal-history :skipping])
+       ;;(ut/tapp>> [:nothing-new-in-signal-history :skipping])
        db))))
 
 (re-frame/reg-sub
