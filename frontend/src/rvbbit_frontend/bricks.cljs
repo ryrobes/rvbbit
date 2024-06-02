@@ -73,7 +73,6 @@
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))
 
-
 (def brick-size 50)
 
 (def dragging? (reagent/atom false))

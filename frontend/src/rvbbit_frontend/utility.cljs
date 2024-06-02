@@ -27,9 +27,8 @@
    (get db :client-name)))
 
 (defn tapp>> [data] ;; doubletap! 
-  (.log js/console data)
-  (tap> data))
-
+    (js/console.info (clj->js data))
+    (tap> data))
 
 (defn safe-conj [coll & items] ;;; temp until we find the error!!
   (if (sequential? coll)

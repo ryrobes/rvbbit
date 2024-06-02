@@ -1,15 +1,9 @@
-{:orders
- {:reco-counts [:table_name :cnt],
-  :fields-sys [:field_name :field_type :data_type],
-  :connections-sys [:database_name :connection_id],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
+{:orders {:reco-counts [:table_name :cnt]},
  :reco-preview nil,
  :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
  :sql-source {},
  :meta
- {:fields-sys {:fields {}, :rowcount 0},
-  :gen-viz-1132
+ {:gen-viz-1132
   {:fields
    {:rows
     {:data-type "integer",
@@ -24,45 +18,6 @@
      :commons {"unknown" 1, "string" 1, "integer" 1},
      :cardinality 100}},
    :rowcount 7},
-  :tables-sys
-  {:fields
-   {:db_schema
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"none" 9},
-     :cardinality 11},
-    :db_catalog
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? true,
-     :commons {nil 9},
-     :cardinality 11},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"bigfoot-ufos" 9},
-     :cardinality 11},
-    :schema_cat
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? false,
-     :commons {nil 9},
-     :cardinality 11},
-    :table_name
-    {:data-type "string",
-     :distinct 9,
-     :group-by? true,
-     :commons {"us_states" 1, "ufo_sightings_vw" 1, "test_me" 1},
-     :cardinality 100},
-    :fields
-    {:data-type "integer",
-     :distinct 9,
-     :group-by? false,
-     :commons {42 1, 14 1, 11 1},
-     :cardinality 100}},
-   :rowcount 9},
   :client-items-drag-item-key-5
   {:fields
    {:item_type
@@ -453,21 +408,6 @@
      :commons {1 500},
      :cardinality 0}},
    :rowcount 500},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -656,12 +596,8 @@
      :commons {1 5, 199 1, 1092 1},
      :cardinality 86}},
    :rowcount 29}},
- :default-col-widths
- {:system-connections-list* {:connections-sys ##Inf},
-  :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
- :data-hash 1732443099,
+ :data-hash 359686701,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -719,6 +655,7 @@
      :icon "zmdi-cocktail",
      :run-on :queries,
      :description "What does Buffy think about this data? Who knows!"}},
+   :eleven-labs-default-voice-name "Taylor - Cute - Gentle",
    :graphite-host "127.0.0.1",
    :openapi-org-id nil,
    :debug-level 1,
@@ -892,14 +829,14 @@
     :prompt-5 {:value :param/beautiful-lilac-butterfly, :source :param}}}},
  :editor? false,
  :buffy? false,
- :memory [812096238 635418278 4294705152],
+ :memory [681362560 424939288 4294705152],
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-05-30 06:55:48",
+      :at "2024-06-02 12:13:58",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -908,27 +845,61 @@
   :alert1
   {:alerts
    {:data
-    [[[:v-box
-       :justify
-       :center
-       :style
-       {:margin-top "-6px", :color "inherit"}
-       :children
-       [[:box :child "flow openai-image-gen-ladder5 has finished"]
-        nil
-        [:box
-         :style
-         {:font-weight 700, :font-size "10px", :opacity 0.7}
-         :child
-         "43 seconds "]
-        [:box
-         :style
-         {:font-weight 700, :font-size "10px", :opacity 0.7}
-         :child
-         "returns: ./images/gen/b64-image5-55562-22897.png"]]]
+    [[[:>
+       :ResponsiveContainer
+       {:width "100%", :height :panel-height+50}
+       [:>
+        :ComposedChart
+        {:data
+         [{:mem 4738.74, :threads 432.1, :load 4.486006, :subs 221.08}
+          {:mem 4683.94, :threads 433.1, :load 4.8970604, :subs 234}
+          {:mem 4345.8, :threads 432.78, :load 5.3116603, :subs 234}
+          {:mem 4641.46, :threads 433.1, :load 7.3552833, :subs 234}
+          {:mem 4827.44, :threads 432.6, :load 5.708213, :subs 234}
+          {:mem 4496.76, :threads 432.98, :load 6.443838, :subs 234}
+          {:mem 4513.62, :threads 435.26, :load 5.1709666, :subs 269.02}
+          {:mem 4964.88, :threads 440.44, :load 6.0971484, :subs 285}
+          {:mem 4717.74, :threads 434.86, :load 5.1856346, :subs 280.92}
+          {:mem 4772.593, :threads 442.51852, :load 8.046911, :subs 269.8889}],
+         :margin {:top 5, :bottom 5, :right 30, :left 20}}
+        [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
+        [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
+        [:> :XAxis {:dataKey :tick, :hide true}]
+        [:> :YAxis {:yAxisId "left", :hide true, :dataKey :mem}]
+        [:>
+         :YAxis
+         {:yAxisId "right", :hide true, :dataKey :threads, :orientation "right"}]
+        [:>
+         :Bar
+         {:yAxisId "left",
+          :dataKey :mem,
+          :isAnimationActive false,
+          :stroke :theme/editor-outer-rim-color,
+          :fill [:string :theme/editor-outer-rim-color "33"]}]
+        [:>
+         :Line
+         {:yAxisId "right",
+          :strokeWidth 4,
+          :type "monotone",
+          :dot false,
+          :dataKey :threads,
+          :isAnimationActive false,
+          :stroke :theme/editor-grid-selected-background-color,
+          :fill :theme/editor-grid-selected-background-color}]
+        [:>
+         :Line
+         {:stroke :theme/block-tab-selected-font-color,
+          :fill :theme/block-tab-selected-font-color,
+          :type "monotone",
+          :yAxisId "right",
+          :dataKey :subs,
+          :strokeWidth 3,
+          :strokeDasharray "5 5",
+          :dot false,
+          :isAnimationActive false}]]]
       10
-      1.35
-      9]
+      4
+      5]
      nil],
     :elapsed-ms nil,
     :reco-count nil}}},
@@ -947,32 +918,31 @@
   :time/second
   :flow/flow-forever>:final-math
   :flow/openai-image-gen-ladder5>:relative-url-path-for-png-version],
- :client-name :robust-circular-gorilla-44,
- :alt-key-held? false,
+ :client-name :resounding-circular-wombat-6,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2003, :h 1441},
+ :window {:w 2030, :h 1458},
  :post-meta
  {:gen-viz-1132 {:* {:rowcount 7}},
-  :client-items-drag-item-key-5 {:* {:rowcount 27797}},
-  :client-items-drag-20 {:* {:rowcount 66310}},
-  :client-items-drag-35 {:* {:rowcount 66310}},
+  :client-items-drag-item-key-5 {:* {:rowcount 32353}},
+  :client-items-drag-20 {:* {:rowcount 79959}},
+  :client-items-drag-35 {:* {:rowcount 79959}},
   :rowcnt-drag-7 {:* {:rowcount 1}},
-  :blocks-drag-44 {:* {:rowcount 3247}},
+  :blocks-drag-44 {:* {:rowcount 3252}},
   :rowcnt-drag-2 {:* {:rowcount 1}},
-  :fields-drag-16 {:* {:rowcount 1002}},
+  :fields-drag-16 {:* {:rowcount 1052}},
   :city-drag-26-1 {:* {:rowcount 3755}},
   :ufo-sightings-drag-9 {:* {:rowcount 67662}},
-  :item-type-drag-5 {:* {:rowcount 7}},
-  :item-type-drag-0 {:* {:rowcount 3772}},
+  :item-type-drag-5 {:* {:rowcount 9}},
+  :item-type-drag-0 {:* {:rowcount 3801}},
   :duration-hours-drag-43 {:* {:rowcount 7103}},
   :city-drag-26 {:* {:rowcount 12346}},
-  :gen-viz-555 {:* {:rowcount 22}},
+  :gen-viz-555 {:* {:rowcount 10}},
   :state-drag-3 {:* {:rowcount 59}},
   :shape-drag-7 {:* {:rowcount 29}}},
  :flow-estimates
  {"openai-image-gen-ladder5"
-  {:times 43, :run-id "b4d3c84a-54b9-4965-9eff-d0e329ade520"}},
+  {:times 44, :run-id "dedc2f58-41d5-4b56-ad31-295655d3e2e8"}},
  :status
  {:heartbeat
   {:kick
@@ -1005,7 +975,7 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   65644
+   26456
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap
@@ -1020,21 +990,21 @@
    "  Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A Caucasian woman in her late 20s, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights emanating from the forest radiate off her voluptuous figure. She accessorizes with a ribbon choker and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork takes inspiration from pinup, noir, femme fatale and cyberpunk aesthetics, with a noticeable burlesque influence.",
    :prompt-5
    "For testing purposes, use the prompt EXACTLY as is please:\n\nA high-resolution, artistically rendered widescreen highly stylized & exaggerated pinup noir femme fatale Playboy  style cyberpunk illustrationn that captures a scene from magical Scotland. In the heartland of tradition but with an aura of fantasy, a youthful, beautiful Caucasian woman, of Scottish descent, with raven hair, is depicted. She is in her late twenties, boasting full, expressive lips with the lower one pronounced, and a playfully upturned nose, giving her an alluring, captivating visage. Her hair flows like a river in the night, reaching to her waist. Intricate Celtic-inspired tattoos of rabbits and wilderness designs grace her neck, collarbone, and shoulder areas, enhancing her enchanting visage. Fantasy-like blue and pink lights from the forest glimmers against her curvaceous figure, amplifying her radiant beauty. She has a lush and curvy figure, and her culturally-inspired attire includes a ribbon choker and a long necklace which adds a sprinkle of glamour to her style. Playful yet sophisticated, she leans against a wall, offering the viewer a teasing, engaging glance."}},
- :panels-hash 10774708,
+ :panels-hash -831018904,
  :sessions
- (["grin-bulbous-turtle-14.edn" "1 hour, 43 minutes, 12 seconds" 6192986]
-   ["prominent-plum-serval-0.edn" "1 hour, 9 minutes, 47 seconds" 4187183]
-   ["enthusiastic-Persian-blue-nightingale-41.edn"
-    "10 hours, 20 minutes, 35 seconds"
-    37235191]
-   ["friendly-lime-eagle-10.edn" "10 hours, 7 minutes, 32 seconds" 36452556]
-   ["perfect-hexagonal-nightingale-39.edn"
-    "100 hours, 55 minutes, 15 seconds"
-    363315063]
-   ["vital-bulbous-mosquito-0.edn" "1003 hours, 13 minutes, 18 seconds" 3611598547]
-   ["refined-round-llama-8.edn" "1005 hours, 15 minutes, 25 seconds" 3618925061]
-   ["imaginative-sangria-donkey-7.edn" "101 hours, 47 seconds" 363647732]
-   ["vibrant-bulbous-yak-10.edn" "102 hours, 32 minutes, 4 seconds" 369124450]),
+ (["enthusiastic-green-ferret-14.edn" "100 hours, 10 minutes, 38 seconds" 360638680]
+   ["upbeat-ochre-cattle-3.edn" "104 hours, 30 minutes, 20 seconds" 376220563]
+   ["brilliant-gold-mallard-13.edn" "104 hours, 30 minutes, 50 seconds" 376250199]
+   ["vital-bulbous-mosquito-0.edn" "1073 hours, 28 minutes, 18 seconds" 3864498491]
+   ["refined-round-llama-8.edn" "1075 hours, 30 minutes, 25 seconds" 3871825005]
+   ["beaming-gray-opossum-6.edn" "1126 hours, 49 minutes, 24 seconds" 4056564609]
+   ["certain-icosahedral-hound-19.edn"
+    "1175 hours, 18 minutes, 24 seconds"
+    4231104537]
+   ["meaningful-jungle-green-hummingbird-34.edn"
+    "118 hours, 22 minutes, 55 seconds"
+    426175916]
+   ["angelic-cerise-dolphin-32.edn" "118 hours, 27 minutes, 20 seconds" 426440370]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
@@ -1045,13 +1015,7 @@
    :type :clojure,
    :cache? true,
    :data (+ 1 2 3 90 (rand-int 12345))},
-  :static-data
-  {:signal :signal/genius-gnat-signal,
-   :type :clojure,
-   :data
-   [(apply + [1 2 3])
-    :solver/wallpaper-of-the-moment
-    :solver/wallpaper-of-the-moment-8k]},
+  :static-data {:signal false, :type :clojure, :data [(apply + [1 2 3])]},
   :wallpaper-of-the-moment-8k
   {:signal :signal/every-5-minutes,
    :type :clojure2,
@@ -1108,7 +1072,7 @@
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
  :user-params-hash 502861909,
  :grid-recos? true,
- :session-hash -2146462001,
+ :session-hash 1754642939,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -1911,7 +1875,7 @@
        "freeze-ladder!"
        {:prompt
         [:string3
-         " Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.  "
+         " Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter. But more intricate, more whimsical, and more sultry and seductive. "
          :flow/openai-image-gen-ladder5>:output-revised-prompt]}]]]},
    :queries {}},
   :block-5866
@@ -2875,9 +2839,9 @@
    :openai-image-gen-ladder>pop-color "#c6652b",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :openai-image-gen-ladder5>relative-url-path-for-png-version
-   "./images/gen/b64-image5-55562-22897.png",
+   "./images/gen/b64-image5-29361-72868.png",
    :crow-flow-201>*running? false,
-   :openai-image-gen-ladder5>dominant-color "#dfb5ad",
+   :openai-image-gen-ladder5>dominant-color "#1a5468",
    :openai-image-gen-ladder>relative-url-path-for-png-version
    "./images/gen/b64-image4-39253-84360.png",
    :counting-loop>open-fn-2 44,
@@ -2912,7 +2876,7 @@
         :style {:border-radius "30px"}}]]]],
    :counting-loop>*running? false,
    :counting-loop>open-fn-3 45,
-   :openai-image-gen-ladder5>pop-color "#e1bab1",
+   :openai-image-gen-ladder5>pop-color "#d598a6",
    :flow-forever>*running? false,
    :node-color-thief-js>*running? false,
    :openai-image-gen-ladder>execute-shell-command
@@ -2922,7 +2886,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :openai-image-gen-ladder5>output-revised-prompt
-   "Produce a picture of a powerful Scandinavian woman in her thirties, wearing classic pinup-style garments. Her abundant, dark curls cascade down her back. The surroundings resemble Cape Cod's wilderness in America. The image is infused with shades of teal and pink, reflecting the vibe of a Cyberpunk-Vaporwave sunset. She gazes directly at the observer, her captivating eyes heightened by the intense lighting and noticeable makeup. A welcoming, mischievous grin adorns her face. Detailed tattoos stretch across her shoulders and collarbones, extending up to her neck, each narrating a distinct tale. A pendant with a rabbit motif dangles from her neck and delicate rabbit features are incorporated within her tattoos. This depiction beautifully combines intrigue, mystery, and attraction against the backdrop of the colorful sunrise.",
+   "A highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, flowing dark hair, buxom pinup build. The setting is in the picturesque wilderness of Cape Code America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise.",
    :counting-loop>final-value 44,
    :openai-image-gen-ladder>dominant-color "#221e2f",
    :flow-forever>final-math nil},
@@ -2936,7 +2900,7 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
-  :time {:seconds nil, :second 8},
+  :time {:seconds nil, :second 59},
   :viz-tables-sys2 {:table_name :ufo-sightings-drag-9},
   :user-dropdown-sys {:req-field nil},
   :searches-types-sys {:item_type "client-queries"},
@@ -3567,7 +3531,10 @@
     "#247c49"
     "#693e43"
     "#15b856"],
-   :static-data [6 "./images/large/b64-image-14333-80632-4k.webp" nil],
+   :static-data
+   [6
+    "./images/large/b64-image-69745-81881-4k.webp"
+    "./images/large/b64-image-59769-44968-8k.webp"],
    :color-theft>colorPalette>0 nil,
    :color-theft2 nil,
    :color-theft3>colorPalette>0 "#cbd1c8"}},
