@@ -12734,7 +12734,7 @@
 
               ;;  (ut/tapp>> [:query-all-clicked k data-exists? unrun-sql? query])
 
-        ;; (ut/tapp>>  [:unrun? k data-exists? unrun-sql? (or (not data-exists?) unrun-sql?)])
+        ;; (ut/tapp>>  [:unrun? (or (not data-exists?) unrun-sql?) k data-exists? unrun-sql? ])
         (when (or (not data-exists?) unrun-sql?)
           (let [src @(rfa/sub ::conn/sql-source {:kkey k})
                 srcnew? (not= src query)]

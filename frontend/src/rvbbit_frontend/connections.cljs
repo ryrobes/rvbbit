@@ -865,30 +865,20 @@
  ::sql-query-not-run?
  (fn [db [_ keypath query]] ;; LOGIC HERE NEEDS TO BE THE SAME AS conn/sql-data ore shit gets weird
    (let [;query (dissoc query :col-widths)
-         style-rules (get query :style-rules) ;; rules code dupe from conn/sql-data
-         has-rules? (and (not (nil? style-rules)) (ut/ne? style-rules))
-         rules (when has-rules?
-                 (vec (for [[[col name] logic] style-rules]
-                        [[:case (:logic logic) 1 :else 0]
-                         (keyword (str "styler_" (ut/safe-name name)))])))
-        ;;  query (-> query
-        ;;            (dissoc :col-widths)
-        ;;            (dissoc :row-height)
-        ;;            (dissoc :render-all?)
-        ;;            (dissoc :cache?)
-        ;;            (dissoc :refresh-every)
-        ;;            (dissoc :deep-meta?)
-        ;;            (dissoc :clicked-row-height)
-        ;;            (dissoc :style-rules))
+        ;;  style-rules (get query :style-rules) ;; rules code dupe from conn/sql-data
+        ;;  has-rules? (and (not (nil? style-rules)) (ut/ne? style-rules))
+        ;;  rules (when has-rules?
+        ;;          (vec (for [[[col name] logic] style-rules]
+        ;;                 [[:case (:logic logic) 1 :else 0]
+        ;;                  (keyword (str "styler_" (ut/safe-name name)))])))
          query (ut/clean-sql-from-ui-keys query)
          ;;_ (ut/tapp>> [keypath 0 (hash query) (str query)])
-         hselect (get query :select)
-         query (if has-rules?
-                 (assoc query :select (apply merge hselect rules))
-                 query)
-         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))
-         ]
-    ;;  (ut/tapp>> [:not-col-sel? not-col-sel? (hash query) (get-in db (cons :query-history keypath)) has-rules?])
+        ;;  hselect (get query :select)
+        ;;  query (if has-rules?
+        ;;          (assoc query :select (apply merge hselect rules))
+        ;;          query)
+         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
+    ;;  (ut/tapp>> [:not-col-sel? keypath (hash query) (get-in db (cons :query-history keypath))  ])
      (and not-col-sel?
           (not (= (hash query) (get-in db (cons :query-history keypath))))))))
 
@@ -897,7 +887,17 @@
  (fn [db [_ keypath query]]
    ;(ut/tapp>> [:ran keypath query])
    (let [;query (dissoc query :col-widths)
+        ;;  style-rules (get query :style-rules) ;; rules code dupe from conn/sql-data
+        ;;  has-rules? (and (not (nil? style-rules)) (ut/ne? style-rules))
+        ;;  rules (when has-rules?
+        ;;          (vec (for [[[col name] logic] style-rules]
+        ;;                 [[:case (:logic logic) 1 :else 0]
+        ;;                  (keyword (str "styler_" (ut/safe-name name)))])))
          query (ut/clean-sql-from-ui-keys query)
+        ;;  hselect (get query :select)
+        ;;  query (if has-rules?
+        ;;          (assoc query :select (apply merge hselect rules))
+        ;;          query)
          base-sniff? (true? (= (get query :limit) 111))]
      ;;(ut/tapp>> [keypath (hash query) (str query)])
      (if base-sniff?
@@ -1228,7 +1228,7 @@
 (re-frame/reg-event-db
  ::set-query-schedule
  (fn [db [_ query-id schedule]]
-  ;; (ut/tapp>> [:set-query-schedule query-id schedule (+ (get-in db [:re-pollsive.core/polling :counter]) schedule)])
+  ;;(ut/tapp>> [:set-query-schedule query-id schedule (+ (get-in db [:re-pollsive.core/polling :counter]) schedule)])
    (let [timer (+ (get-in db [:re-pollsive.core/polling :counter]) schedule)]
      (assoc-in db [:sched query-id] timer))))
 

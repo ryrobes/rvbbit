@@ -5391,7 +5391,7 @@
 
 
 (defn query-runstream [kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key clover-sql]
-  (ut/pp [:honey-sql client-name :wants  honey-sql])
+  ;; (ut/pp [:honey-sql client-name :wants  honey-sql])
   (doall
    (let [;;_ (ut/pp [:honey-sql honey-sql])
          post-process-fn (get honey-sql :post-process-fn) ;; allowed at the top level only - will be discarded elsewhere FOR NOW...
