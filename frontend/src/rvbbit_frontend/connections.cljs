@@ -881,11 +881,14 @@
         ;;            (dissoc :clicked-row-height)
         ;;            (dissoc :style-rules))
          query (ut/clean-sql-from-ui-keys query)
+         ;;_ (ut/tapp>> [keypath 0 (hash query) (str query)])
          hselect (get query :select)
          query (if has-rules?
                  (assoc query :select (apply merge hselect rules))
                  query)
-         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
+         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))
+         ]
+    ;;  (ut/tapp>> [:not-col-sel? not-col-sel? (hash query) (get-in db (cons :query-history keypath)) has-rules?])
      (and not-col-sel?
           (not (= (hash query) (get-in db (cons :query-history keypath))))))))
 
@@ -893,8 +896,10 @@
  ::add-to-sql-history ;; :ran tap is good
  (fn [db [_ keypath query]]
    ;(ut/tapp>> [:ran keypath query])
-   (let [query (dissoc query :col-widths)
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)
          base-sniff? (true? (= (get query :limit) 111))]
+     ;;(ut/tapp>> [keypath (hash query) (str query)])
      (if base-sniff?
        (-> db
            (assoc-in (cons :base-sniff-queries keypath) (hash query))
@@ -905,7 +910,9 @@
  ::add-to-sql-history-meta ;; :ran tap is good
  (fn [db [_ keypath query]]
    ;(ut/tapp>> [:ran-meta keypath query])
-   (let [query (dissoc query :col-widths)]
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)
+         ]
      (assoc-in db (cons :query-history-meta keypath) (hash query)))))
 
 (re-frame/reg-sub
@@ -938,7 +945,8 @@
 (re-frame/reg-sub
  ::sql-meta-not-run?
  (fn [db {:keys [keypath query]}]
-   (let [query (dissoc query :col-widths)
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)
          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
      (and not-col-sel?
           (not (= (hash query) (get-in db (cons :query-history-meta keypath))))))))
@@ -946,7 +954,8 @@
 (re-frame/reg-sub
  ::sql-style-not-run?
  (fn [db {:keys [keypath query pquery]}]
-   (let [query (dissoc query :col-widths)
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)
          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
      (and not-col-sel?
           (not (= (hash (str pquery query)) (get-in db (cons :query-history-style keypath))))))))
@@ -954,7 +963,8 @@
 (re-frame/reg-sub
  ::sql-tab-not-run?
  (fn [db [_ keypath query pquery]]
-   (let [query (dissoc query :col-widths)
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)
          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
      (and not-col-sel?
           (not (= (hash (str pquery query)) (get-in db (cons :query-history-tab keypath))))))))
@@ -963,20 +973,23 @@
  ::add-to-sql-history-tab
  (fn [db [_ keypath query pquery]]
    ;(ut/tapp>> [:ran-tab keypath query])
-   (let [query (dissoc query :col-widths)]
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)]
      (assoc-in db (cons :query-history-tab keypath) (hash (str pquery query))))))
 
 (re-frame/reg-event-db
  ::add-to-sql-history-style ;; :ran tap is good
  (fn [db [_ keypath query pquery]]
    (ut/tapp>> [:ran-style keypath query])
-   (let [query (dissoc query :col-widths)]
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)]
      (assoc-in db (cons :query-history-style keypath) (hash (str pquery query))))))
 
 (re-frame/reg-sub
  ::sql-condi-not-run?
  (fn [db {:keys [keypath query pquery]}]
-   (let [query (dissoc query :col-widths)
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)
          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
      (and not-col-sel?
           (not (= (hash (str pquery query)) (get-in db (cons :query-history-condi keypath))))))))
@@ -985,7 +998,8 @@
  ::add-to-sql-history-condi
  (fn [db [_ keypath query pquery]]
    ;(ut/tapp>> [:ran-condi keypath query])
-   (let [query (dissoc query :col-widths)]
+   (let [;query (dissoc query :col-widths)
+         query (ut/clean-sql-from-ui-keys query)]
      (assoc-in db (cons :query-history-condi keypath) (hash (str pquery query))))))
 
 (re-frame/reg-sub
@@ -1214,7 +1228,7 @@
 (re-frame/reg-event-db
  ::set-query-schedule
  (fn [db [_ query-id schedule]]
-   ;(ut/tapp>> [:set-query-schedule query-id schedule])
+  ;; (ut/tapp>> [:set-query-schedule query-id schedule (+ (get-in db [:re-pollsive.core/polling :counter]) schedule)])
    (let [timer (+ (get-in db [:re-pollsive.core/polling :counter]) schedule)]
      (assoc-in db [:sched query-id] timer))))
 
@@ -1315,6 +1329,7 @@
                               :else connection-id)
           clover-sql (assoc honey-sql :connection-id connection-id)
           refresh-every (get honey-sql :refresh-every)
+          ;;_ (ut/tapp>> refresh-every)
           cache? (get honey-sql :cache? true)
           page (get honey-sql :page)
           ;;panel-key @(ut/tracked-subscribe [::lookup-panel-key-by-query-key (first keypath)])
@@ -1362,7 +1377,7 @@
 
     ;;  (when (not (= 111 (get honey-sql :limit)))
     ;;    (ut/tracked-dispatch-sync [::set-reco-status (first keypath) :started]))
-          (ut/tracked-dispatch [::add-to-sql-history keypath honey-modded]))))
+          (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql]))))
    ;(ut/tracked-dispatch-sync [::add-to-sql-history keypath honey-sql])
    ;(sql-deep-meta keypath honey-sql connection-id)
    ))

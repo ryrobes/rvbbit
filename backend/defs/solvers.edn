@@ -8,12 +8,7 @@
   :cache? true,
   :data (+ 1 2 3 90 (rand-int 12345))},
  :static-data
- {:signal :signal/genius-gnat-signal,
-  :type :clojure,
-  :data
-  [(apply + [1 2 3])
-   :solver/wallpaper-of-the-moment
-   :solver/wallpaper-of-the-moment-8k]},
+ {:signal false, :type :clojure, :data [(apply + [1 2 3])]},
  :wallpaper-of-the-moment-8k
  {:signal :signal/every-5-minutes,
   :type :clojure2,

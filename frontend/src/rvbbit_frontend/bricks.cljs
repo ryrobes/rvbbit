@@ -68,7 +68,7 @@
    [cljs.core.async :as async :refer [<! >! chan]]
    [rvbbit-frontend.shapes :as shape]
    [websocket-fx.core :as wfx])
-  (:require-macros [rvbbit-frontend.macros :refer [time-expr]])
+  ;;(:require-macros [rvbbit-frontend.macros :refer [time-expr]])
   (:import
    [goog.i18n NumberFormat]
    [goog.i18n.NumberFormat Format]
@@ -9548,7 +9548,7 @@
                          ;(ut/tapp>> [:running-sched :tick ticktock :timer timer query])
                          (ut/tracked-dispatch [::remove-schedule query])
                          (ut/tracked-dispatch [::conn/clear-query-history query]))))))
-     ;(ut/tapp>> [:scheds-cron-debug :tick ticktock scheds scheds-reverse])
+    ;;  (ut/tapp>> [:scheds-cron-debug :tick ticktock scheds scheds-reverse])
      db)))
 
 
@@ -12734,6 +12734,7 @@
 
               ;;  (ut/tapp>> [:query-all-clicked k data-exists? unrun-sql? query])
 
+        ;; (ut/tapp>>  [:unrun? k data-exists? unrun-sql? (or (not data-exists?) unrun-sql?)])
         (when (or (not data-exists?) unrun-sql?)
           (let [src @(rfa/sub ::conn/sql-source {:kkey k})
                 srcnew? (not= src query)]
@@ -13544,7 +13545,7 @@
      ;         }
      ;:style {:transform "scale(0.75)"}
      ;:attr {:on-drag-enter #(ut/tapp>> [:dragging-over [ tab]])}
-     :children [;(doall
+     :children [(doall
                  (for [[bw bh brick-vec-key] brick-roots]                ;diff-grid1] ;(if @dragging? current-grid brick-roots)] @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
                    (let [bricksw             (* bw brick-size)
                          bricksh             (* bh brick-size)
@@ -14346,7 +14347,7 @@
                                                                     ^{:key (str "brick-" brick-vec "-resize-handle-gap")}
                                                                     [re-com/gap :size "12px"])]]])
                                         [re-com/gap :size "18px"])]]]))))
-                                        ;)
+                                        )
                                         ]])
                                         
                                           ;; (catch :default e
