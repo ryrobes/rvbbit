@@ -193,7 +193,7 @@
                            {:message    {:kind :session-snaps
                                          :client-name (get db :client-name)}
                             :on-response [::save-sessions]
-                            :timeout    500000}]))
+                            :timeout    15000}]))
      
      (assoc db :session-hash session-hash))))
 
@@ -2461,42 +2461,8 @@
 ;;             (ww iid (conj x id)))))
 ;;     (ww panel-id [])))
 
-(defn upstream-search [subq-map panel-id]
-  (let [producers     (into {} (for [[k v] subq-map] {k (get v :produces)}))
-        all-producers (into {} (for [[k v] producers]
-                                 (into {} (for [p v]
-                                            {p k}))))
-        mm            (ut/postwalk-replacer all-producers subq-map)]
-    (defn ww [id x visited] ;; recursion stoppage w visited
-      (let [iid (try (first (get-in mm [id :uses])) (catch :default _ nil))]
-        (if (or (nil? iid) (visited id)) (conj x id)
-            (ww iid (conj x id) (conj visited id)))))
-    (ww panel-id [] #{})))
 
-(defn downstream-search [subq-map panel-id]
-  (let [users   (into {} (for [[k v] subq-map] {k (get v :uses)}))
-        ; all-users (into {} (for [[k v] users]
-        ;                          (into {} (for [p v]
-        ;                                     {p k}))))
-        cheater (reagent/atom {})                           ;; ugly TODO this in a pure way. refact the data struc to make it a less annoying lookup
-        ;all-users2 (doall (for [[k v] users] (swap! cheater assoc (first v) (conj (get @cheater (first v)) k))))
-        ;mm (ut/postwalk-replacer all-users subq-map)
-        mm      (do (doall (for [[k v] users] (swap! cheater assoc (first v) (flatten (conj (get @cheater (first v)) k)))))
-                    (ut/postwalk-replacer (dissoc @cheater nil) subq-map))
-        mm2     (into {} (for [[k {:keys [uses produces]}] mm] {k {:uses (flatten uses) :produces (flatten produces)}}))]
-    ;(ut/tapp>> [:subq-map subq-map :users users :all-users2 @cheater :mm mm  :mm2 mm2])
 
-    ; (defn ww2 [id x]
-    ;   (let [;iid (try (first (get-in mm2 [id :produces])) (catch :default e nil))
-    ;         iid (try (get-in mm [id :produces]) (catch :default e nil))
-    ;         ]
-    ;     (if (or (nil? iid) (empty? iid))
-    ;       (flatten (conj x id)) ;; return
-    ;         (ww2 iid (conj x id)) ;; else run again
-    ;         )
-    ;     ))
-    ; (ww2 panel-id [])
-    (flatten (get-in mm [panel-id :produces]))))              ;; single depth
 
 (defonce cm-instance-panel-code-box (atom nil)) ;; for highlighting
 (defonce markers-panel-code-box (atom []))
@@ -3122,7 +3088,7 @@
     (->> all-keywords
          ;; Filter keywords to start with the cleaned input (excluding trailing '>').
          (filter #(cstr/starts-with? % input-clean))
-         ((fn [x] (take 300 x))) ;;; ?
+         ;((fn [x] (take 300 x))) ;;; ?
          ;; Collect keywords up to the intended depth or one more level.
          (map (fn [keyword]
                 (let [k-parts (ut/splitter keyword #">")
@@ -4202,8 +4168,8 @@
                                subq-mapping        @(ut/tracked-sub ::subq-mapping-alpha {})
                                ;;; subq-mapping        @(ut/tracked-subscribe [::subq-mapping])
                                parent-of-selected? (some #(= % query-panel) subq-blocks)
-                               upstream?           (some #(= % query-panel) (upstream-search subq-mapping selected-block))
-                               downstream?         (some #(= % query-panel) (downstream-search subq-mapping selected-block))
+                               upstream?           (some #(= % query-panel) (ut/cached-upstream-search subq-mapping selected-block))
+                               downstream?         (some #(= % query-panel) (ut/cached-downstream-search subq-mapping selected-block))
                                selected?           @(ut/tracked-subscribe [::has-query? selected-block k])]
                            ;(ut/tapp>> @param-hover)
                            [re-com/v-box
@@ -4313,8 +4279,8 @@
                                ;subq-blocks         @(ut/tracked-sub ::subq-panels-alpha {:panel-id selected-block})
                                ;subq-mapping        @(ut/tracked-sub ::subq-mapping {})
                                parent-of-selected? (some #(= % query-panel) subq-blocks)
-                               upstream?           (some #(= % query-panel) (upstream-search subq-mapping selected-block))
-                               downstream?         (some #(= % query-panel) (downstream-search subq-mapping selected-block))
+                               upstream?           (some #(= % query-panel) (ut/cached-upstream-search subq-mapping selected-block))
+                               downstream?         (some #(= % query-panel) (ut/cached-downstream-search subq-mapping selected-block))
                                selected?           @(ut/tracked-subscribe [::has-query? selected-block k])]
                            ;(ut/tapp>> @param-hover)
                            [re-com/v-box
@@ -4872,9 +4838,8 @@
 
 (re-frame/reg-sub
  ::subq-mapping
- (fn [db [_]]                                              ;; filter has got to be faster than for loops. TODO for other subs im using FOR for
-    ;(let [qs (keys (get-in db [:panels panel-id :queries]))]
-   (let [panels            (get db :panels)                ;(into {} (filter #(= (get db :selected-tab) (get (val %) :tab "")) (get db :panels))) ;(get db :panels)
+ (fn [db [_]]
+   (let [panels            (get db :panels)
          all-sql-call-keys (keys (into {} (for [[_ v] panels]
                                             (into {} (for [[kk vv] (get v :queries)]
                                                        (when (nil? (find vv :vselect)) {kk vv}))))))]
@@ -4892,27 +4857,33 @@
                                                    (keyword (last (ut/splitter (ut/safe-name qq) "/"))))))}
                           {:produces (keys (get-in db [:panels k :queries]))})})))))
 
+
+
 (re-frame/reg-sub
  ::subq-mapping-alpha
- (fn [db {}]                                              ;; filter has got to be faster than for loops. TODO for other subs im using FOR for
-    ;(let [qs (keys (get-in db [:panels panel-id :queries]))]
-   (let [panels            (get db :panels)                ;(into {} (filter #(= (get db :selected-tab) (get (val %) :tab "")) (get db :panels))) ;(get db :panels)
-         all-sql-call-keys (keys (into {} (for [[_ v] panels]
-                                            (into {} (for [[kk vv] (get v :queries)]
-                                                       (when (nil? (find vv :vselect)) {kk vv}))))))]
-      ;(ut/tapp>> [:ttt all-sql-call-keys])
-     (into {} (for [[k v] panels]
-                {k (merge {:uses (apply concat (for [[_ v1] (merge (get v :queries)
-                                                                   (get v :views))]
-                                                 (for [qq (filter #(or (cstr/includes? (str %) ":query/")
-                                                                       (some #{%} all-sql-call-keys))
-                                                                  (flatten (conj (ut/deep-flatten v1)
-                                                                                 (apply (fn [x] ;; get partial matches from param use (filters, etc)...
-                                                                                          (keyword (first (ut/splitter (str (ut/safe-name x)) #"/"))))
-                                                                                        (filter #(cstr/includes? (str %) "/")
-                                                                                                (ut/deep-flatten v1))))))]
-                                                   (keyword (last (ut/splitter (ut/safe-name qq) "/"))))))}
-                          {:produces (keys (get-in db [:panels k :queries]))})})))))
+ (fn [db {}]  
+   (let [px (hash (ut/remove-underscored (get db :panels)))
+         cc (get @ut/subq-mapping-alpha px)]
+     (if cc cc  
+         (let [panels            (get db :panels)
+               all-sql-call-keys (keys (into {} (for [[_ v] panels]
+                                                  (into {} (for [[kk vv] (get v :queries)]
+                                                             (when (nil? (find vv :vselect)) {kk vv}))))))
+               res (into {} (for [[k v] panels]
+                              {k (merge {:uses (apply concat (for [[_ v1] (merge (get v :queries)
+                                                                                 (get v :views))]
+                                                               (for [qq (filter #(or (cstr/includes? (str %) ":query/")
+                                                                                     (some #{%} all-sql-call-keys))
+                                                                                (flatten (conj (ut/deep-flatten v1)
+                                                                                               (apply (fn [x] ;; get partial matches from param use (filters, etc)...
+                                                                                                        (keyword (first (ut/splitter (str (ut/safe-name x)) #"/"))))
+                                                                                                      (filter #(cstr/includes? (str %) "/")
+                                                                                                              (ut/deep-flatten v1))))))]
+                                                                 (keyword (last (ut/splitter (ut/safe-name qq) "/"))))))}
+                                        {:produces (keys (get-in db [:panels k :queries]))})}))]
+           (swap! ut/subq-mapping-alpha assoc px res)
+           res
+           )))))
 
 (re-frame/reg-sub
  ::subq-panels
@@ -4936,20 +4907,27 @@
 (re-frame/reg-sub
  ::subq-panels-alpha
  (fn [db {:keys [panel-id]}]                                     ;; filter has got to be faster than for loops. TODO for other subs im using FOR for
-   (let [panels            (into {} (filter #(= (get db :selected-tab) (get (val %) :tab "")) (get db :panels))) ;(get db :panels)
-         all-sql-call-keys (keys (into {} (for [[_ v] panels]
-                                            (into {} (for [[kk vv] (get v :queries)]
-                                                       (when (nil? (find vv :vselect)) {kk vv}))))))
-         queries-used      (filter #(or (cstr/includes? (str %) ":query/")
-                                        (some #{%} all-sql-call-keys))
-                                   (ut/deep-flatten (merge (get-in db [:panels panel-id :queries])
-                                                           (get-in db [:panels panel-id :views]))))
-         root-query-keys   (for [k queries-used] (keyword (last (ut/splitter (ut/safe-name k) "/"))))
-         query-sources     (into {} (remove empty? (flatten (for [[k v] panels]
-                                                              (flatten (for [kk (keys (get v :queries))]
-                                                                         {kk k}))))))]
+   (let [px (hash [panel-id (get db :selected-tab) (ut/remove-underscored (get db :panels))])
+         cc (get @ut/subq-panels-alpha px)]
+     
+     (if cc cc
+         (let [panels            (into {} (filter #(= (get db :selected-tab) (get (val %) :tab "")) (get db :panels))) ;(get db :panels)
+               all-sql-call-keys (keys (into {} (for [[_ v] panels]
+                                                  (into {} (for [[kk vv] (get v :queries)]
+                                                             (when (nil? (find vv :vselect)) {kk vv}))))))
+               queries-used      (filter #(or (cstr/includes? (str %) ":query/")
+                                              (some #{%} all-sql-call-keys))
+                                         (ut/deep-flatten (merge (get-in db [:panels panel-id :queries])
+                                                                 (get-in db [:panels panel-id :views]))))
+               root-query-keys   (for [k queries-used] (keyword (last (ut/splitter (ut/safe-name k) "/"))))
+               query-sources     (into {} (remove empty? (flatten (for [[k v] panels]
+                                                                    (flatten (for [kk (keys (get v :queries))]
+                                                                               {kk k}))))))
+               res (vec (remove #(or (nil? %) (= (get db :selected-block) %)) (for [q root-query-keys] (get query-sources q))))]
       ;(ut/tapp>> [:root-query-keys root-query-keys :query-sources query-sources])
-     (vec (remove #(or (nil? %) (= (get db :selected-block) %)) (for [q root-query-keys] (get query-sources q)))))))
+           (swap! ut/subq-panels-alpha assoc px res)
+           res)))
+   ))
 
 
 (re-frame/reg-sub
@@ -7396,7 +7374,7 @@
         ;                  (some #(= % reco-selected) sql-keys)
         ;                  (= @db/editor-mode :viz))
 
-        deeper-upstream?          false                     ; (some #(= % panel-key) (upstream-search subq-mapping selected-block))
+        deeper-upstream?          false                     ; (some #(= % panel-key) (ut/cached-upstream-search subq-mapping selected-block))
         kit-callout-fields        []
         child-parts               (into kit-callout-fields
                                         (cond parent-of-selected?
@@ -9624,8 +9602,9 @@
 (re-frame/reg-event-db
  ::clear-cache-atoms
  (fn [db _]
-   (ut/tapp>> [:clearing-cache-atoms (get db :client-name)])
+   (ut/tapp>> [:clearing-cache-atoms! (get db :client-name)])
    (doseq [a [ut/replacer-data ut/replacer-cache ut/deep-flatten-data ut/deep-flatten-cache
+              ut/upstream-cache ut/upstream-cache-tracker ut/downstream-cache ut/downstream-cache-tracker
               ut/split-cache ut/split-cache-data ut/extract-patterns-data ut/extract-patterns-cache ut/clean-sql-atom ut/auto-font-atom
               ut/postwalk-replace-data-cache ut/postwalk-replace-cache ut/is-base64-atom ut/is-large-base64-atom
               ut/safe-name-cache ut/format-map-atom ut/body-set-atom ut/data-typer-atom ut/coord-cache]]
@@ -9637,9 +9616,9 @@
  (fn [db _]
    (let [mem (get db :memory)
          js-heap (str (ut/bytes-to-mb (get mem 1)))
-         js-heap-int (ut/bytes-to-mb-int (get mem 1))
-         client-name (get db :client-name)
-         _ (ut/tapp>> [:purge-cache-atoms client-name])
+         ;js-heap-int (ut/bytes-to-mb-int (get mem 1))
+         ;client-name (get db :client-name)
+        ;;  _ (ut/tapp>> [:purge-cache-atoms client-name])
          atom-size-map (ut/calculate-atom-sizes {:ut/replacer-data ut/replacer-data
                                                  :ut/replacer-cache ut/replacer-cache
 
@@ -9655,7 +9634,16 @@
                                                  :ut/postwalk-replace-data-cache ut/postwalk-replace-data-cache
                                                  :ut/postwalk-replace-cache ut/postwalk-replace-cache
 
+                                                 :ut/upstream-cache ut/upstream-cache
+                                                 :ut/upstream-cache-tracker ut/upstream-cache-tracker
+
+                                                 :ut/downstream-cache ut/downstream-cache
+                                                 :ut/downstream-cache-tracker ut/downstream-cache-tracker
+
                                                  :ut/auto-font-atom ut/auto-font-atom
+
+                                                 :ut/subq-panels-alpha ut/subq-panels-alpha
+                                                 :ut/subq-mapping-alpha ut/subq-mapping-alpha
 
                                                  :db/flow-results db/flow-results
                                                  :db/scrubbers db/scrubbers
@@ -9675,28 +9663,28 @@
                  js/Number.
                  (.toFixed 3)
                  js/parseFloat)]
-      (ut/tapp>> [:atom-sizes client-name :js-heap js-heap js-heap-int  :atoms-raw-ttl (str ttl "MB")  atom-size-map])
-      (js/console.log [:atom-sizes client-name :js-heap js-heap js-heap-int  :atoms-raw-ttl (str ttl "MB")  atom-size-map])
+      (ut/tapp>> [:atom-sizes :js-heap js-heap :atoms-raw-ttl (str ttl "MB")  atom-size-map])
+      ;;(js/console.log [:atom-sizes client-name :js-heap js-heap js-heap-int  :atoms-raw-ttl (str ttl "MB")  atom-size-map])
           (do
            ;;     (reset! ut/subscription-counts {}) ;; temp
            ;;     (reset! ut/dispatch-counts {}) ;; temp
            ;;     (reset! ut/simple-subscription-counts [])
            ;;     (reset! ut/simple-dispatch-counts [])
      ;;(ut/tapp>> [client-name :purge-postwalk? (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) (> (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) 15)])
-            (when (> (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) 35)
-              (ut/purge-postwalk-cache 0.25))  ;; keep top 25% of freq cache hits distro
+            (when (> (get-in atom-size-map [:ut/postwalk-replace-data-cache :mb]) 40)
+              (ut/purge-postwalk-cache 0.99 200))  ;; keep top 70% of freq cache hits distro
 
-            (when (> (get-in atom-size-map [:ut/split-cache-data :mb]) 35)
-              (ut/purge-splitter-cache 0.25))
+            (when (> (get-in atom-size-map [:ut/split-cache-data :mb]) 40)
+              (ut/purge-splitter-cache 0.99 100))
 
-            (when (> (get-in atom-size-map [:ut/replacer-data :mb]) 35)
-              (ut/purge-replacer-cache 0.25))
+            (when (> (get-in atom-size-map [:ut/replacer-data :mb]) 40)
+              (ut/purge-replacer-cache 0.99  50))
 
-            (when (> (get-in atom-size-map [:ut/deep-flatten-data :mb]) 35)
-              (ut/purge-deep-flatten-cache 0.25))
+            (when (> (get-in atom-size-map [:ut/deep-flatten-data :mb]) 40)
+              (ut/purge-deep-flatten-cache 0.99 100))
 
-            (when (> (get-in atom-size-map [:ut/extract-patterns-data :mb]) 35)
-              (ut/purge-extract-patterns-cache 0.25))
+            (when (> (get-in atom-size-map [:ut/extract-patterns-data :mb]) 40)
+              (ut/purge-extract-patterns-cache 0.99 100))
 
             ;(ut/tapp>> [:hello? "you fucking idiots"])
 
@@ -13548,8 +13536,8 @@
                           ;subq-produced (if root? @(ut/tracked-subscribe [::subq-produced selected-block]) [])
                           ;subq-used2 (if root? @(ut/tracked-subscribe [::subq-used brick-vec-key]) [])
                          subq-mapping        (if root? @(ut/tracked-subscribe [::subq-mapping]) [])
-                         upstream?           (some #(= % brick-vec-key) (upstream-search subq-mapping selected-block))
-                         downstream?         (some #(= % brick-vec-key) (downstream-search subq-mapping selected-block))
+                         upstream?           (some #(= % brick-vec-key) (ut/cached-upstream-search subq-mapping selected-block))
+                         downstream?         (some #(= % brick-vec-key) (ut/cached-downstream-search subq-mapping selected-block))
                           ;hovered? false
                          sql-keys            @(ut/tracked-subscribe [::panel-sql-call-keys brick-vec-key])
                          reco-selected       (let [;;rr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:viz-tables-sys/table_name]])
@@ -13634,18 +13622,18 @@
                          theme-base-block-style (theme-pull :theme/base-block-style {})
                          theme-base-block-style-map (when (map? theme-base-block-style) theme-base-block-style)]
                       ; (ut/tapp>> [:subq-blocks subq-blocks])
-                      ; (ut/tapp>> [:subq-mapping subq-mapping :ups (upstream-search subq-mapping selected-block) :downs (downstream-search subq-mapping selected-block)])
+                      ; (ut/tapp>> [:subq-mapping subq-mapping :ups (ut/cached-upstream-search subq-mapping selected-block) :downs (ut/cached-downstream-search subq-mapping selected-block)])
                       ; (when root? (ut/tapp>> [:subq-blocks brick-vec-key ;subq-blocks
                       ;                    ;(map :p (filter #(>= (get % :d) 1) (downstream-map selected-block nil subq-mapping 0 [])))
-                      ;                    ;(upstream-search subq-mapping brick-vec-key)
+                      ;                    ;(ut/cached-upstream-search subq-mapping brick-vec-key)
                       ;                    ;(downstream-lookups subq-mapping brick-vec-key)
                       ;                    ;subq-mapping
                       ;                    ]))
                       ;; (ut/tapp>> [:rr reco-selected sql-keys viz-reco? selected-block])
                       ;; (ut/tapp>> [brick-vec-key :params-used (param-usage brick-vec-key)])
                       ;; (ut/tapp>> [brick-vec-key subq-mapping subq-blocks])
-                      ;; (ut/tapp>> [:up-from-sel (upstream-search subq-mapping selected-block)
-                      ;       :down-from-sel (downstream-search subq-mapping selected-block)])
+                      ;; (ut/tapp>> [:up-from-sel (ut/cached-upstream-search subq-mapping selected-block)
+                      ;       :down-from-sel (ut/cached-downstream-search subq-mapping selected-block)])
 
                      (if (and (not (nil? iconization)) (ut/not-empty? iconization))
 

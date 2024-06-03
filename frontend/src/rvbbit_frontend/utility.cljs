@@ -26,9 +26,22 @@
  (fn [db]
    (get db :client-name)))
 
+(declare calculate-atom-size)
+
+(defn stringify-keywords [x]
+  (cond
+    (keyword? x) (str ":" (name x))
+    (string? x) x
+    (map? x) (into {} (map (fn [[k v]] [(stringify-keywords k) (stringify-keywords v)]) x))
+    (coll? x) (map stringify-keywords x)
+    :else x))
+
 (defn tapp>> [data] ;; doubletap! 
-    (js/console.info (clj->js data))
-    (tap> data))
+    (js/console.info
+     ;;(clj->js data)
+     (clj->js (stringify-keywords data)))
+    ;(tap> data) ;; fuck it
+  )
 
 (defn safe-conj [coll & items] ;;; temp until we find the error!!
   (if (sequential? coll)
@@ -37,9 +50,73 @@
       (tapp>> ["Error: trying to conj onto a non-sequence" "Caller:" (.-stack (js/Error.))  :coll coll :items items])
       coll)))
 
+;; (defn distribution [tracker-atom]
+;;   (let [sorted-cache (->> @tracker-atom
+;;                           (sort-by val)
+;;                           reverse)
+;;         total (count sorted-cache)
+;;         top-10-percent (count (take (int (* total 0.1)) sorted-cache))
+;;         bottom-10-percent (count (take-last (int (* total 0.1)) sorted-cache))
+;;         middle-80-percent (- total top-10-percent bottom-10-percent)]
+;;     {:total-entries total
+;;      :top-10-percent top-10-percent
+;;      :middle-80-percent middle-80-percent
+;;      :bottom-10-percent bottom-10-percent}))
+
+(defn distribution [tracker-atom percent]
+  (let [values (vals @tracker-atom)
+        sorted-values (if (every? number? values) (sort values) [])
+        total (count sorted-values)
+        top-10-percent-threshold (if (not-empty sorted-values) (nth sorted-values (int (* total 0.9))) 0)
+        bottom-10-percent-threshold (if (not-empty sorted-values) (nth sorted-values (int (* total 0.1))) 0)
+        counts (group-by #(cond
+                            (< % bottom-10-percent-threshold) :bottom-10-percent
+                            (> % top-10-percent-threshold) :top-10-percent
+                            :else :middle-80-percent)
+                         sorted-values)
+        frequency-buckets (group-by #(cond
+                                       (and (>= % 1) (< % 5)) "1 - 4"
+                                       (and (>= % 5) (< % 20)) "5 - 19"
+                                       (and (>= % 20) (< % 100)) "20 - 99"
+                                       (and (>= % 100) (< % 500)) "100 - 499"
+                                       (>= % 500) "500+")
+                                    sorted-values)
+        dd (distinct values)
+        ;; dupe of culling purge math
+        total-hit-count (reduce + (vals @tracker-atom))
+        cutoff-hit-count (* total-hit-count percent)   
+        sorted-cache (->> @tracker-atom
+                          (sort-by val)
+                          reverse)
+        accumulated-hits (reductions + (map second sorted-cache))
+        cutoff-index (->> accumulated-hits
+                          (map-indexed vector)
+                          (drop-while (fn [[idx acc]] (< acc cutoff-hit-count)))
+                          ffirst)
+        keys-to-keep (set (map first (take (inc cutoff-index) sorted-cache)))
+        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0)
+        above-threshold (count keys-to-keep)
+        below-threshold (- (count sorted-cache) above-threshold)
+        
+        ]
+    {:culling {:cutoff-frequency cutoff-frequency
+               :above-threshold above-threshold
+               :below-threshold below-threshold}
+     :total-entries total
+     :top-10-freq-vals (vec (take 10 (reverse (sort dd))))
+     :bottom-10-freq-vals (vec (take 10 (sort dd)))
+     :top-10-percent (count (get counts :top-10-percent))
+     :middle-80-percent (count (get counts :middle-80-percent))
+     :bottom-10-percent (count (get counts :bottom-10-percent))
+     :frequency-buckets (into {} (map (fn [[k v]] [k (count v)]) frequency-buckets))}))
+
+
+
 
 (defonce deep-flatten-data (atom {}))
 (defonce deep-flatten-cache (atom {}))
+
+;; (tapp>> (distribution deep-flatten-cache))
 
 (defn deep-flatten-real [x]
   (if (coll? x)
@@ -54,24 +131,83 @@
           (swap! deep-flatten-data assoc hx deep)
           deep))))
 
-(defn purge-deep-flatten-cache [percent]
-  (let [sorted-cache (->> @deep-flatten-cache
+(defn purge-cache [name percent tracker-atom data-atom & [hard-limit]]
+  (let [total-hit-count (reduce + (vals @tracker-atom))
+        cutoff-hit-count (* total-hit-count percent)
+        sorted-cache (->> @tracker-atom
                           (sort-by val)
                           reverse)
-        cutoff (int (* (count sorted-cache) percent))
-        keys-to-keep (set (map first (take cutoff sorted-cache)))
-        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
-        client-name @(re-frame/subscribe [::client-name])
+        accumulated-hits (reductions + (map second sorted-cache))
+        cutoff-index (->> accumulated-hits
+                          (map-indexed vector)
+                          (drop-while (fn [[idx acc]] (< acc cutoff-hit-count)))
+                          ffirst)
+        cutoff-frequency (if hard-limit hard-limit
+                             (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0))
+        keys-to-keep (if hard-limit
+                       (set (map first (filter (fn [[k v]] (>= v hard-limit)) sorted-cache)))
+                       (set (map first (take (inc cutoff-index) sorted-cache))))
         above-threshold (count keys-to-keep)
-        below-threshold (- (count sorted-cache) above-threshold)]
-    (tapp>> [client-name :purge :deep-flatten-cache {:top-pct percent
-                                                   :cutoff-frequency cutoff-frequency
-                                                   :above-threshold above-threshold
-                                                   :below-threshold below-threshold}])
-    ;; (js/console.log "purging deep-flatten cache")
-    (swap! deep-flatten-data (fn [old-cache]
-                               (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
-    (reset! deep-flatten-cache {})))
+        below-threshold (- (count sorted-cache) above-threshold)
+        distro (distribution tracker-atom percent)
+        pre-mb (get-in (calculate-atom-size :temp data-atom) [:temp :mb])]
+    (swap! data-atom (fn [old-cache]
+                       (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+    (reset! tracker-atom {})
+    (let [post-mb (get-in (calculate-atom-size :temp data-atom) [:temp :mb])]
+      (tapp>> [:atom-culling! name (str pre-mb "mb") "->" (str post-mb  "mb")
+               {:top-pct percent
+                :hard-limit hard-limit
+                :cutoff-frequency cutoff-frequency
+                :pre-mb pre-mb
+                :distribution distro
+                :post-mb post-mb
+                :keeping above-threshold
+                :purging below-threshold}]))))
+
+(defn purge-deep-flatten-cache [percent & [hard-limit]]
+  (purge-cache "deep-flatten-cache" percent deep-flatten-cache deep-flatten-data hard-limit)
+  ;; (let [total-hit-count (reduce + (vals @deep-flatten-cache))
+  ;;       cutoff-hit-count (* total-hit-count percent)
+  ;;       sorted-cache (->> @deep-flatten-cache
+  ;;                         (sort-by val)
+  ;;                         reverse)
+  ;;       accumulated-hits (reductions + (map second sorted-cache))
+  ;;       cutoff-index (->> accumulated-hits
+  ;;                         (map-indexed vector)
+  ;;                         (drop-while (fn [[idx acc]] (< acc cutoff-hit-count)))
+  ;;                         ffirst)
+  ;;       cutoff-frequency (if hard-limit hard-limit
+  ;;                            (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0))
+  ;;       keys-to-keep (if hard-limit
+  ;;                      (set (map first (filter (fn [[k v]] (>= v hard-limit)) sorted-cache)))
+  ;;                      (set (map first (take (inc cutoff-index) sorted-cache))))
+  ;;       above-threshold (count keys-to-keep)
+  ;;       below-threshold (- (count sorted-cache) above-threshold)
+  ;;       distro (distribution deep-flatten-cache percent)
+  ;;       pre-mb (get-in (calculate-atom-size :temp deep-flatten-data) [:temp :mb])]
+  ;;   (swap! deep-flatten-data (fn [old-cache]
+  ;;                              (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+  ;;   (reset! deep-flatten-cache {})
+  ;;   (let [post-mb (get-in (calculate-atom-size :temp deep-flatten-data) [:temp :mb])]
+  ;;     (tapp>> [:atom-culling! :deep-flatten-cache (str pre-mb "mb") "->" (str post-mb  "mb")
+  ;;              {:top-pct percent
+  ;;               :hard-limit hard-limit
+  ;;               :cutoff-frequency cutoff-frequency
+  ;;               :pre-mb pre-mb
+  ;;               :distribution distro
+  ;;               :post-mb post-mb
+  ;;               :keeping above-threshold
+  ;;               :purging below-threshold}])))
+                )
+;; (purge-deep-flatten-cache 0.99 20)
+
+
+
+
+
+
+
 
 
 
@@ -89,24 +225,40 @@
           (swap! replacer-data assoc x deep)
           deep))))
 
-(defn purge-replacer-cache [percent]
-  (let [sorted-cache (->> @replacer-cache
-                          (sort-by val)
-                          reverse)
-        cutoff (int (* (count sorted-cache) percent))
-        keys-to-keep (set (map first (take cutoff sorted-cache)))
-        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
-        client-name @(re-frame/subscribe [::client-name])
-        above-threshold (count keys-to-keep)
-        below-threshold (- (count sorted-cache) above-threshold)]
-    (tapp>> [client-name :purge :replacer-cache {:top-pct percent
-                                               :cutoff-frequency cutoff-frequency
-                                               :above-threshold above-threshold
-                                               :below-threshold below-threshold}])
-    ;; (js/console.log "purging replacer cache")
-    (swap! replacer-data (fn [old-cache]
-                           (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
-    (reset! replacer-cache {})))
+(defn purge-replacer-cache [percent & [hard-limit]]
+  (purge-cache "replacer-cache" percent replacer-cache replacer-data hard-limit)
+  ;; (let [total-hit-count (reduce + (vals @replacer-cache))
+  ;;       cutoff-hit-count (* total-hit-count percent)
+  ;;       sorted-cache (->> @replacer-cache
+  ;;                         (sort-by val)
+  ;;                         reverse)
+  ;;       accumulated-hits (reductions + (map second sorted-cache))
+  ;;       cutoff-index (->> accumulated-hits
+  ;;                         (map-indexed vector)
+  ;;                         (drop-while (fn [[idx acc]] (< acc cutoff-hit-count)))
+  ;;                         ffirst)
+  ;;       cutoff-frequency (if hard-limit hard-limit
+  ;;                            (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0))
+  ;;       keys-to-keep (if hard-limit
+  ;;                      (set (map first (filter (fn [[k v]] (>= v hard-limit)) sorted-cache)))
+  ;;                      (set (map first (take (inc cutoff-index) sorted-cache))))
+  ;;       above-threshold (count keys-to-keep)
+  ;;       below-threshold (- (count sorted-cache) above-threshold)
+  ;;       distro (distribution replacer-cache percent)
+  ;;       pre-mb (get-in (calculate-atom-size :replacer-data replacer-data) [:replacer-data :mb])]
+  ;;   (swap! replacer-data (fn [old-cache]
+  ;;                          (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+  ;;   (reset! replacer-cache {})
+  ;;   (let [post-mb (get-in (calculate-atom-size :replacer-data replacer-data) [:replacer-data :mb])]
+  ;;     (tapp>> [:atom-culling! :replacer-cache (str pre-mb "mb") "->" (str post-mb  "mb")
+  ;;              {:top-pct percent
+  ;;               :cutoff-frequency cutoff-frequency
+  ;;               :pre-mb pre-mb
+  ;;               :distribution distro
+  ;;               :post-mb post-mb
+  ;;               :keeping above-threshold
+  ;;               :purging below-threshold}])))
+                )
 
 
 
@@ -132,24 +284,40 @@
             (swap! extract-patterns-data assoc x result)
             result)))))
 
-(defn purge-extract-patterns-cache [percent]
-  (let [sorted-cache (->> @extract-patterns-cache
-                          (sort-by val)
-                          reverse)
-        cutoff (int (* (count sorted-cache) percent))
-        keys-to-keep (set (map first (take cutoff sorted-cache)))
-        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
-        client-name @(re-frame/subscribe [::client-name])
-        above-threshold (count keys-to-keep)
-        below-threshold (- (count sorted-cache) above-threshold)]
-    (tapp>> [client-name :purge :extract-patterns-cache {:top-pct percent
-                                                       :cutoff-frequency cutoff-frequency
-                                                       :above-threshold above-threshold
-                                                       :below-threshold below-threshold}])
-    ;; (js/console.log "purging extract-patterns cache")
-    (swap! extract-patterns-data (fn [old-cache]
-                                   (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
-    (reset! extract-patterns-cache {})))
+(defn purge-extract-patterns-cache [percent & [hard-limit]]
+  (purge-cache "extract-patterns-cache" percent extract-patterns-cache extract-patterns-data hard-limit)
+  ;; (let [total-hit-count (reduce + (vals @extract-patterns-cache))
+  ;;       cutoff-hit-count (* total-hit-count percent)
+  ;;       sorted-cache (->> @extract-patterns-cache
+  ;;                         (sort-by val)
+  ;;                         reverse)
+  ;;       accumulated-hits (reductions + (map second sorted-cache))
+  ;;       cutoff-index (->> accumulated-hits
+  ;;                         (map-indexed vector)
+  ;;                         (drop-while (fn [[idx acc]] (< acc cutoff-hit-count)))
+  ;;                         ffirst)
+  ;;       cutoff-frequency (if hard-limit hard-limit
+  ;;                            (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0))
+  ;;       keys-to-keep (if hard-limit
+  ;;                      (set (map first (filter (fn [[k v]] (>= v hard-limit)) sorted-cache)))
+  ;;                      (set (map first (take (inc cutoff-index) sorted-cache))))
+  ;;       above-threshold (count keys-to-keep)
+  ;;       below-threshold (- (count sorted-cache) above-threshold)
+  ;;       distro (distribution extract-patterns-cache percent)
+  ;;       pre-mb (get-in (calculate-atom-size :extract-patterns-data extract-patterns-data) [:extract-patterns-data :mb])]
+  ;;   (swap! extract-patterns-data (fn [old-cache]
+  ;;                                  (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+  ;;   (reset! extract-patterns-cache {})
+  ;;   (let [post-mb (get-in (calculate-atom-size :extract-patterns-data extract-patterns-data) [:extract-patterns-data :mb])]
+  ;;     (tapp>> [:atom-culling! :extract-patterns-cache (str pre-mb "mb") "->" (str post-mb  "mb")
+  ;;              {:top-pct percent
+  ;;               :cutoff-frequency cutoff-frequency
+  ;;               :pre-mb pre-mb
+  ;;               :distribution distro
+  ;;               :post-mb post-mb
+  ;;               :keeping above-threshold
+  ;;               :purging below-threshold}])))
+                )
 
 ;; (defn extract-patterns [data kw num]
 ;;   (let [matches (atom [])]
@@ -170,22 +338,21 @@
 
 
 
-(defn safe-name-fn [x]
-  (cstr/replace (str x) ":" "")) ;; tons of issues with using (name x), just going to cache it
-
 ;; (defn safe-name-fn [x]
-;;   (if (keyword? x) (str (name x))
-;;     (cstr/replace (str x) ":" ""))) 
+;;   (cstr/replace (str x) ":" "")
+;;   (replacer (str x) ":" "")
+;;   ) ;; tons of issues with using (name x), just going to cache it
 
 (defonce safe-name-cache (atom {}))
 
-(defn safe-name [x]
-  (if-let [cached-result (get @safe-name-cache x)]
-    cached-result
-    (let [result (safe-name-fn x)]
-      (swap! safe-name-cache assoc x result)
-      result)))
+;; (defn safe-name [x]
+;;   (if-let [cached-result (get @safe-name-cache x)]
+;;     cached-result
+;;     (let [result (safe-name-fn x)]
+;;       (swap! safe-name-cache assoc x result)
+;;       result)))
 
+(defn safe-name [x] (replacer (str x) ":" ""))
 
 
 
@@ -200,24 +367,40 @@
           (swap! split-cache-data assoc key result)
           result))))
 
-(defn purge-splitter-cache [percent]
-  (let [sorted-cache (->> @split-cache
-                          (sort-by val)
-                          reverse)
-        cutoff (int (* (count sorted-cache) percent))
-        keys-to-keep (set (map first (take cutoff sorted-cache)))
-        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
-        client-name @(re-frame/subscribe [::client-name])
-        above-threshold (count keys-to-keep)
-        below-threshold (- (count sorted-cache) above-threshold)]
-    (tapp>> [client-name :purge :splitter-cache {:top-pct percent
-                                               :cutoff-frequency cutoff-frequency
-                                               :above-threshold above-threshold
-                                               :below-threshold below-threshold}])
-    ;; (js/console.log "purging splitter cache")
-    (swap! split-cache-data (fn [old-cache]
-                              (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
-    (reset! split-cache {})))
+(defn purge-splitter-cache [percent & [hard-limit]]
+  (purge-cache "splitter-cache" percent split-cache split-cache-data hard-limit)
+  ;; (let [total-hit-count (reduce + (vals @split-cache))
+  ;;       cutoff-hit-count (* total-hit-count percent)
+  ;;       sorted-cache (->> @split-cache
+  ;;                         (sort-by val)
+  ;;                         reverse)
+  ;;       accumulated-hits (reductions + (map second sorted-cache))
+  ;;       cutoff-index (->> accumulated-hits
+  ;;                         (map-indexed vector)
+  ;;                         (drop-while (fn [[idx acc]] (< acc cutoff-hit-count)))
+  ;;                         ffirst)
+  ;;       cutoff-frequency (if hard-limit hard-limit
+  ;;                            (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0))
+  ;;       keys-to-keep (if hard-limit
+  ;;                      (set (map first (filter (fn [[k v]] (>= v hard-limit)) sorted-cache)))
+  ;;                      (set (map first (take (inc cutoff-index) sorted-cache))))
+  ;;       above-threshold (count keys-to-keep)
+  ;;       below-threshold (- (count sorted-cache) above-threshold)
+  ;;       distro (distribution split-cache percent)
+  ;;       pre-mb (get-in (calculate-atom-size :split-cache-data split-cache-data) [:split-cache-data :mb])]
+  ;;   (swap! split-cache-data (fn [old-cache]
+  ;;                             (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+  ;;   (reset! split-cache {})
+  ;;   (let [post-mb (get-in (calculate-atom-size :split-cache-data split-cache-data) [:split-cache-data :mb])]
+  ;;     (tapp>> [:atom-culling! :split-cache (str pre-mb "mb") "->" (str post-mb  "mb")
+  ;;              {:top-pct percent
+  ;;               :cutoff-frequency cutoff-frequency
+  ;;               :pre-mb pre-mb
+  ;;               :distribution distro
+  ;;               :post-mb post-mb
+  ;;               :keeping above-threshold
+  ;;               :purging below-threshold}])))
+                )
 
 
 
@@ -240,61 +423,130 @@
           (swap! postwalk-replace-data-cache assoc hash-key result)
           result))))
 
-(defn purge-postwalk-cache [percent]
-  (let [sorted-cache (->> @postwalk-replace-cache
-                          (sort-by val)
-                          reverse)
-        cutoff (int (* (count sorted-cache) percent))
-        keys-to-keep (set (map first (take cutoff sorted-cache)))
-        cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff)) 0)
-        client-name @(re-frame/subscribe [::client-name])
-        above-threshold (count keys-to-keep)
-        below-threshold (- (count sorted-cache) above-threshold)]
-    (tapp>> [client-name :purge :postwalk-cache {:top-pct percent
-                                               :cutoff-frequency cutoff-frequency
-                                               :above-threshold above-threshold
-                                               :below-threshold below-threshold}])
-    ;; (js/console.log "purging postwalk cache")
-    (swap! postwalk-replace-data-cache (fn [old-cache]
-                                         (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
-    (reset! postwalk-replace-cache {})))
+(defn purge-postwalk-cache [percent & [hard-limit]]
+  (purge-cache "postwalk-cache" percent postwalk-replace-cache postwalk-replace-data-cache hard-limit)
+  ;; (let [total-hit-count (reduce + (vals @postwalk-replace-cache))
+  ;;       cutoff-hit-count (* total-hit-count percent)
+  ;;       sorted-cache (->> @postwalk-replace-cache
+  ;;                         (sort-by val)
+  ;;                         reverse)
+  ;;       accumulated-hits (reductions + (map second sorted-cache))
+  ;;       cutoff-index (->> accumulated-hits
+  ;;                         (map-indexed vector)
+  ;;                         (drop-while (fn [[idx acc]] (< acc cutoff-hit-count)))
+  ;;                         ffirst)
+  ;;       cutoff-frequency (if hard-limit hard-limit 
+  ;;                            (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0))
+  ;;       keys-to-keep (if hard-limit
+  ;;                      (set (map first (filter (fn [[k v]] (>= v hard-limit)) sorted-cache)))
+  ;;                      (set (map first (take (inc cutoff-index) sorted-cache))))
+  ;;       above-threshold (count keys-to-keep)
+  ;;       below-threshold (- (count sorted-cache) above-threshold)
+  ;;       distro (distribution postwalk-replace-cache percent)
+  ;;       pre-mb (get-in (calculate-atom-size :postwalk-replace-data-cache postwalk-replace-data-cache) [:postwalk-replace-data-cache :mb])]
+  ;;   (swap! postwalk-replace-data-cache (fn [old-cache]
+  ;;                                        (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+  ;;   (reset! postwalk-replace-cache {})
+  ;;   (let [post-mb (get-in (calculate-atom-size :postwalk-replace-data-cache postwalk-replace-data-cache) [:postwalk-replace-data-cache :mb])]
+  ;;     (tapp>> [:atom-culling! :postwalk-replace-cache (str pre-mb "mb") "->" (str post-mb  "mb")
+  ;;              {:top-pct percent
+  ;;               :cutoff-frequency cutoff-frequency
+  ;;               :pre-mb pre-mb
+  ;;               :distribution distro
+  ;;               :post-mb post-mb
+  ;;               :keeping above-threshold
+  ;;               :purging below-threshold}])))
+                )
 
-;; (defn distribution []
-;;   (let [sorted-cache (->> @postwalk-replace-cache
-;;                           (sort-by val)
-;;                           reverse)
-;;         total (count sorted-cache)
-;;         top-10-percent (count (take (int (* total 0.1)) sorted-cache))
-;;         bottom-10-percent (count (take-last (int (* total 0.1)) sorted-cache))
-;;         middle-80-percent (- total top-10-percent bottom-10-percent)]
-;;     {:total-entries total
-;;      :top-10-percent top-10-percent
-;;      :middle-80-percent middle-80-percent
-;;      :bottom-10-percent bottom-10-percent}))
-
-;; (tapp>> [:postwalk-freq! @(re-frame/subscribe [::client-name]) (distribution)])
+;; (purge-cache "postwalk-cache" 0.99 postwalk-replace-cache postwalk-replace-data-cache 50)
 
 
 
+;; ugly and confusing, but pure and expensive enough to
+(def upstream-cache (atom {}))
+(def upstream-cache-tracker (atom {}))
+
+(defn upstream-search [subq-map panel-id]
+  (let [producers     (into {} (for [[k v] subq-map] {k (get v :produces)}))
+        all-producers (into {} (for [[k v] producers]
+                                 (into {} (for [p v]
+                                            {p k}))))
+        mm            (postwalk-replacer all-producers subq-map)]
+    (defn ww [id x visited] ;; recursion stoppage w visited
+      (let [iid (try (first (get-in mm [id :uses])) (catch :default _ nil))]
+        (if (or (nil? iid) (visited id)) (conj x id)
+            (ww iid (conj x id) (conj visited id)))))
+    (ww panel-id [] #{})))
+
+(defn downstream-search [subq-map panel-id]
+  (let [users   (into {} (for [[k v] subq-map] {k (get v :uses)}))
+        ; all-users (into {} (for [[k v] users]
+        ;                          (into {} (for [p v]
+        ;                                     {p k}))))
+        cheater (atom {})                           ;; ugly TODO this in a pure way. refact the data struc to make it a less annoying lookup
+        ;all-users2 (doall (for [[k v] users] (swap! cheater assoc (first v) (conj (get @cheater (first v)) k))))
+        ;mm (ut/postwalk-replacer all-users subq-map)
+        mm      (do (doall (for [[k v] users] (swap! cheater assoc (first v) (flatten (conj (get @cheater (first v)) k)))))
+                    (postwalk-replacer (dissoc @cheater nil) subq-map))
+        ;mm2     (into {} (for [[k {:keys [uses produces]}] mm] {k {:uses (flatten uses) :produces (flatten produces)}}))
+        ]
+    ;(ut/tapp>> [:subq-map subq-map :users users :all-users2 @cheater :mm mm  :mm2 mm2])
+    (flatten (get-in mm [panel-id :produces]))))
+
+(defn cached-upstream-search [subq-map panel-id]
+  (let [args (pr-str [subq-map panel-id])]
+    (if-let [result (@upstream-cache args)]
+      (do
+        (swap! upstream-cache-tracker update args (fnil inc 0))
+        result)
+      (let [result (upstream-search subq-map panel-id)]
+        (swap! upstream-cache assoc args result)
+        (swap! upstream-cache-tracker update args (fnil inc 0))
+        result))))
+
+(def downstream-cache (atom {}))
+(def downstream-cache-tracker (atom {}))
+
+(defn cached-downstream-search [subq-map panel-id]
+  (let [args (pr-str [subq-map panel-id])]
+    (if-let [result (@downstream-cache args)]
+      (do
+        (swap! downstream-cache-tracker update args (fnil inc 0))
+        result)
+      (let [result (downstream-search subq-map panel-id)]
+        (swap! downstream-cache assoc args result)
+        (swap! downstream-cache-tracker update args (fnil inc 0))
+        result))))
+
+(defonce subq-mapping-alpha (atom {}))
+(defonce subq-panels-alpha (atom {}))
 
 ;;;; ^^^ bigly used caching utils for all my string clover nonsense ^^^^
 ;;;; ^^^ bigly used caching utils for all my string clover nonsense ^^^^
 ;;;; ^^^ bigly used caching utils for all my string clover nonsense ^^^^
+
+
+
 
 
 
 (defonce parameter-keys-hit (atom {}))
 
 (defonce subscription-counts (atom {}))
+(defonce subscription-counts-alpha (atom {}))
+
 (defonce simple-subscription-counts (atom []))
 
+;(tapp>> [:sub-counts (vec (take 45 (reverse (sort-by val @subscription-counts))))])
+;(tapp>> [:sub-counts-alpha (vec (take 45 (reverse (sort-by val @subscription-counts-alpha))))])
+
 (defn tracked-sub [sub-key sub-map] ;;; lmao - hack to track subscriptions for debugging
-  ;(swap! subscription-counts update query (fnil inc 0))
+  (swap! subscription-counts-alpha update sub-key (fnil inc 0))
   ;(swap! simple-subscription-counts conj (first query))
   (rfa/sub sub-key sub-map))
 
 (defn tracked-subscribe [query] ;;; lmao - hack to track subscriptions for debugging
-  ;(swap! subscription-counts update query (fnil inc 0))
+  (swap! subscription-counts update (first query) (fnil inc 0))
   ;(swap! simple-subscription-counts conj (first query))
   ;(apply re-frame.core/subscribe query args)
 
@@ -642,6 +894,7 @@
       (aset bytes i (.charCodeAt binary-string i)))
     bytes))
 
+
 (defn ne? [x]
   (if (seqable? x)
     (boolean (seq x))
@@ -961,25 +1214,28 @@
           (swap! is-large-base64-atom assoc hx deep)
           deep))))
 
+(defn calculate-atom-size [name a]
+  (try
+    (let [size-bytes (-> @a
+                         pr-str
+                         .-length)
+                    ;;size-mb (/ size-bytes 1048576.0)
+          size-mb (-> size-bytes
+                      (/ 1048576.0)
+                      (* 1e6)
+                      Math/round
+                      (/ 1e6))]
+
+      {name {;:bytes size-bytes 
+             :mb size-mb :keys (try (count (keys @a)) (catch :default _ -1))}}
+                ;{name [size-bytes :bytes size-mb :mb (try (count (keys @a)) (catch :default _ -1)) :keys]}
+      )
+    (catch :default e {name [:error (str e)]})))
+
 (defn calculate-atom-sizes [atom-map]
   (into {}
         (for [[name a] atom-map]
-          (try
-            (let [size-bytes (-> @a
-                                 pr-str
-                                 .-length)
-                  ;;size-mb (/ size-bytes 1048576.0)
-                  size-mb (-> size-bytes
-                              (/ 1048576.0)
-                              (* 1e6)
-                              Math/round
-                              (/ 1e6))]
-
-              {name {;:bytes size-bytes 
-                     :mb size-mb :keys (try (count (keys @a)) (catch :default _ -1))}}
-              ;{name [size-bytes :bytes size-mb :mb (try (count (keys @a)) (catch :default _ -1)) :keys]}
-              )
-            (catch :default e {name [:error (str e)]})))))
+          (calculate-atom-size name a))))
 
 (defn template-find [s]
   (let [s (str s)

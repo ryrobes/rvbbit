@@ -189,15 +189,15 @@
       :poll-when                [::bricks/auto-run-and-connected?]
       :dispatch-event-on-start? false}
 
-     {:interval                 5
-      :event                    [::bricks/update-metadata]
-      ;:poll-when                [::subs/get-the :auto-run-enabled?]
-      :dispatch-event-on-start? false}
+    ;;  {:interval                 5 ;;; lets do this on the server side and just push the results after the query results come in...
+    ;;   :event                    [::bricks/update-metadata]
+    ;;   ;:poll-when                [::subs/get-the :auto-run-enabled?]
+    ;;   :dispatch-event-on-start? false}
 
-     {:interval                 30 ;;;; ?????
-      :event                    [::bricks/take-screenshot]
-      :poll-when                [::bricks/is-mouse-active?]
-      :dispatch-event-on-start? false}
+    ;;  {:interval                 30 ;;;; ?????
+    ;;   :event                    [::bricks/take-screenshot]
+    ;;   :poll-when                [::bricks/is-mouse-active?]
+    ;;   :dispatch-event-on-start? false}
 
      {:interval                 5
       :event                    [::bricks/update-flow-statuses]
@@ -209,7 +209,7 @@
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
       :dispatch-event-on-start? false}
 
-     {:interval                 2
+     {:interval                 3
       :event                    [::bricks/prune-alerts]
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
       :dispatch-event-on-start? false}
@@ -280,7 +280,7 @@
       :dispatch-event-on-start? false}
 
 
-     {:interval                 600 ;; hella expensive, testing
+     {:interval                 3600 ;; hella expensive, testing
       :event                    [::http/get-autocomplete-values]
       ;:poll-when                [::bricks/new-flow-subs?]
       :dispatch-event-on-start? true}

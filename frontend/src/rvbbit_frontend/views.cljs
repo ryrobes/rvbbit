@@ -3349,12 +3349,12 @@
         ;lines? true ;false
         coords (if lines? ;; expensive otherwise
                  (let [subq-mapping (if lines? @(ut/tracked-subscribe [::bricks/subq-mapping]) {})
-                       dwn-from-here (vec (bricks/downstream-search subq-mapping selected-block))
-                       up-from-here (vec (bricks/upstream-search subq-mapping selected-block))
+                       dwn-from-here (vec (ut/cached-downstream-search subq-mapping selected-block))
+                       up-from-here (vec (ut/cached-upstream-search subq-mapping selected-block))
                        involved (vec (distinct (into dwn-from-here up-from-here)))
                        subq-blocks @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
                        ;parent-of-selected? (some #(= % brick-vec-key) subq-blocks)
-                       smap (into {} (for [b (keys subq-mapping)] {b (bricks/downstream-search subq-mapping b)}))
+                       smap (into {} (for [b (keys subq-mapping)] {b (ut/cached-downstream-search subq-mapping b)}))
                        lmap (vec (distinct
                                   (apply concat (for [[k downs] smap]
                                                   (remove nil?
@@ -3388,8 +3388,8 @@
                                                                        involved?
                                                                        (cond (= dd selected-block) "#9973e0"
                                                                              (some #(= % dd) subq-blocks) "#e6ed21" ;; parent-of-selected
-                                                                             (some #(= % dd) (bricks/upstream-search subq-mapping selected-block)) "#7be073" ;; upstream?
-                                                                             (some #(= % dd) (bricks/downstream-search subq-mapping selected-block)) "#05dfff" ;; downstream?
+                                                                             (some #(= % dd) (ut/cached-upstream-search subq-mapping selected-block)) "#7be073" ;; upstream?
+                                                                             (some #(= % dd) (ut/cached-downstream-search subq-mapping selected-block)) "#05dfff" ;; downstream?
                                                                              :else "orange")
                                                             ;"#E6E6FA"
                                                                        k d nil]))))))))))]
