@@ -84,7 +84,7 @@
         dd (distinct values)
         ;; dupe of culling purge math
         total-hit-count (reduce + (vals @tracker-atom))
-        cutoff-hit-count (* total-hit-count percent)   
+        cutoff-hit-count (* total-hit-count percent)
         sorted-cache (->> @tracker-atom
                           (sort-by val)
                           reverse)
@@ -96,9 +96,7 @@
         keys-to-keep (set (map first (take (inc cutoff-index) sorted-cache)))
         cutoff-frequency (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0)
         above-threshold (count keys-to-keep)
-        below-threshold (- (count sorted-cache) above-threshold)
-        
-        ]
+        below-threshold (- (count sorted-cache) above-threshold)]
     {:culling {:cutoff-frequency cutoff-frequency
                :above-threshold above-threshold
                :below-threshold below-threshold}
@@ -113,22 +111,31 @@
 
 
 
+
+
+
+
 (defonce deep-flatten-data (atom {}))
 (defonce deep-flatten-cache (atom {}))
 
 ;; (tapp>> (distribution deep-flatten-cache))
 
+;; (defn deep-flatten-real [x]
+;;   (if (coll? x)
+;;     (mapcat deep-flatten-real x)
+;;     [x]))
+
 (defn deep-flatten-real [x]
   (if (coll? x)
-    (mapcat deep-flatten-real x)
-    [x]))
+    (into #{} (mapcat deep-flatten-real x))
+    #{x}))
 
 (defn deep-flatten [x]
   (let [hx (pr-str x)]  ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! deep-flatten-cache update hx (fnil inc 0))
     (or (@deep-flatten-data hx)
         (let [deep (deep-flatten-real x)]
-          (swap! deep-flatten-data assoc hx deep)
+          (swap! deep-flatten-data assoc hx deep) 
           deep))))
 
 (defn purge-cache [name percent tracker-atom data-atom & [hard-limit]]
@@ -204,9 +211,71 @@
 
 
 
+(defonce clover-walk-singles-map (atom {})) 
+
+(defonce process-key-cache (atom {}))
+(defonce process-key-tracker (atom {}))
+
+(defn process-key2 [k]
+  (let [args (str k)]
+    (if-let [result (@process-key-cache args)]
+      (do
+        (swap! process-key-tracker update args (fnil inc 0))
+        result)
+      (let [result (when (and (keyword? k) (cstr/includes? (str k) "/")) k)]
+        (swap! process-key-cache assoc args result)
+        (swap! process-key-tracker update args (fnil inc 0))
+        result))))
+
+(defn process-key [k] ;; WAAAAAAAY faster w/o cache....
+  (when (when (keyword? k) (namespace k)) k))
+
+(defn purge-process-key-cache [percent & [hard-limit]]
+  (purge-cache "process-key-cache" percent process-key-tracker process-key-cache hard-limit))
+
+
+;; (defn  pp1 [valid-body-params] (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params))
+;; (defn  pp2 [valid-body-params] (filter #(and (namespace %) (not (.includes (name %) "*"))) valid-body-params))
+
+;; (defn benchmark []
+;;   (let [iterations 100000
+;;         keywords (set [:keyword1 :keyword2/tsetse.234r :keyword3 :farts/rserser ":testsete" nil 123 :toots/trtrtr :farts/gsfdfggd.4444 :farts/gsfdddddfggd.4444])
+;;         start-time1 (.now js/performance)
+;;         _ (dotimes [i iterations] 
+;;             (pp1 keywords)
+;;             ;(process-key (nth keywords (mod i (count keywords))))
+;;             )
+;;         end-time1 (.now js/performance)
+;;         start-time2 (.now js/performance)
+;;         _ (dotimes [i iterations] 
+;;             (pp2 keywords)
+;;             ;(process-key2 (nth keywords (mod i (count keywords))))
+;;             )
+;;         end-time2 (.now js/performance)]
+;;     (tapp>> ["pprocess-key time: " (- end-time1 start-time1)])
+;;     (tapp>> ["pprocess-key2 time: " (- end-time2 start-time2)])))
+
+;; (benchmark)
 
 
 
+
+(defonce compound-keys-cache (atom {}))
+(defonce compound-keys-tracker (atom {}))
+
+(defn get-compound-keys [data]
+  (let [args (pr-str data)]
+    (if-let [result (@compound-keys-cache data)]
+      (do
+        (swap! compound-keys-tracker update args (fnil inc 0))
+        result)
+      (let [result (filter process-key (deep-flatten data))]
+        (swap! compound-keys-cache assoc args result)
+        (swap! compound-keys-tracker update args (fnil inc 0))
+        result))))
+
+(defn purge-compound-keys-cache [percent & [hard-limit]]
+  (purge-cache "compound-keys-cache" percent compound-keys-tracker compound-keys-cache hard-limit))
 
 
 

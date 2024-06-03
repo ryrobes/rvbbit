@@ -829,14 +829,14 @@
     :prompt-5 {:value :param/beautiful-lilac-butterfly, :source :param}}}},
  :editor? false,
  :buffy? false,
- :memory [681362560 424939288 4294705152],
+ :memory [737177004 715747580 4294705152],
  :status-data
  {:heartbeat
   {:kick
    {:data
     [{:sent! :heartbeat,
       :to :all,
-      :at "2024-06-02 12:13:58",
+      :at "2024-06-03 02:19:58",
       :payload nil,
       :payload-kp [:heartbeat :heartbeat]}
      nil],
@@ -851,16 +851,56 @@
        [:>
         :ComposedChart
         {:data
-         [{:mem 4738.74, :threads 432.1, :load 4.486006, :subs 221.08}
-          {:mem 4683.94, :threads 433.1, :load 4.8970604, :subs 234}
-          {:mem 4345.8, :threads 432.78, :load 5.3116603, :subs 234}
-          {:mem 4641.46, :threads 433.1, :load 7.3552833, :subs 234}
-          {:mem 4827.44, :threads 432.6, :load 5.708213, :subs 234}
-          {:mem 4496.76, :threads 432.98, :load 6.443838, :subs 234}
-          {:mem 4513.62, :threads 435.26, :load 5.1709666, :subs 269.02}
-          {:mem 4964.88, :threads 440.44, :load 6.0971484, :subs 285}
-          {:mem 4717.74, :threads 434.86, :load 5.1856346, :subs 280.92}
-          {:mem 4772.593, :threads 442.51852, :load 8.046911, :subs 269.8889}],
+         [{:mem 5873, :tick 118827, :threads 425, :subs 217, :load 4.4638671875}
+          {:mem 6122, :tick 118828, :threads 426, :subs 217, :load 4.212890625}
+          {:mem 5807, :tick 118829, :threads 452, :subs 217, :load 5.9033203125}
+          {:mem 4808, :tick 118830, :threads 456, :subs 217, :load 5.623046875}
+          {:mem 5520, :tick 118831, :threads 454, :subs 217, :load 5.20166015625}
+          {:mem 3779, :tick 118832, :threads 451, :subs 217, :load 5.04638671875}
+          {:mem 4344, :tick 118833, :threads 424, :subs 217, :load 5.12890625}
+          {:mem 6720, :tick 118834, :threads 429, :subs 217, :load 5.2666015625}
+          {:mem 6701, :tick 118835, :threads 424, :subs 217, :load 5.34912109375}
+          {:mem 5865, :tick 118836, :threads 424, :subs 217, :load 5.59814453125}
+          {:mem 6540, :tick 118837, :threads 425, :subs 217, :load 6.28955078125}
+          {:mem 5087, :tick 118838, :threads 422, :subs 217, :load 6.17041015625}
+          {:mem 5744, :tick 118839, :threads 424, :subs 217, :load 6.00341796875}
+          {:mem 4851, :tick 118840, :threads 423, :subs 217, :load 5.73193359375}
+          {:mem 4745, :tick 118841, :threads 421, :subs 217, :load 5.50830078125}
+          {:mem 3776, :tick 118842, :threads 425, :subs 217, :load 5.8818359375}
+          {:mem 5127, :tick 118843, :threads 426, :subs 217, :load 5.685546875}
+          {:mem 6971, :tick 118844, :threads 423, :subs 217, :load 5.18310546875}
+          {:mem 3915, :tick 118845, :threads 428, :subs 217, :load 5.38330078125}
+          {:mem 6637, :tick 118846, :threads 428, :subs 217, :load 5.40966796875}
+          {:mem 6379, :tick 118847, :threads 423, :subs 217, :load 5.63818359375}
+          {:mem 6590, :tick 118848, :threads 428, :subs 217, :load 5.85498046875}
+          {:mem 3891, :tick 118849, :threads 454, :subs 217, :load 9.140625}
+          {:mem 5894, :tick 118850, :threads 452, :subs 217, :load 8.20458984375}
+          {:mem 6509, :tick 118851, :threads 454, :subs 217, :load 7.35888671875}
+          {:mem 5565, :tick 118852, :threads 454, :subs 217, :load 7.16259765625}
+          {:mem 5738, :tick 118853, :threads 420, :subs 217, :load 7.11474609375}
+          {:mem 4581, :tick 118854, :threads 425, :subs 217, :load 6.81884765625}
+          {:mem 5509, :tick 118855, :threads 423, :subs 217, :load 6.9951171875}
+          {:mem 3806, :tick 118856, :threads 420, :subs 217, :load 6.94091796875}
+          {:mem 4268, :tick 118857, :threads 421, :subs 217, :load 7.3115234375}
+          {:mem 6989, :tick 118858, :threads 422, :subs 217, :load 7.17529296875}
+          {:mem 6901, :tick 118859, :threads 420, :subs 217, :load 6.68701171875}
+          {:mem 5830, :tick 118860, :threads 427, :subs 217, :load 7.19482421875}
+          {:mem 6466, :tick 118861, :threads 425, :subs 217, :load 6.92333984375}
+          {:mem 4721, :tick 118862, :threads 423, :subs 217, :load 6.8779296875}
+          {:mem 5530, :tick 118863, :threads 425, :subs 217, :load 7.5341796875}
+          {:mem 4569, :tick 118864, :threads 426, :subs 217, :load 7.34765625}
+          {:mem 4562, :tick 118865, :threads 420, :subs 217, :load 8.3359375}
+          {:mem 6666, :tick 118866, :threads 425, :subs 217, :load 7.95947265625}
+          {:mem 4475, :tick 118867, :threads 426, :subs 217, :load 8.22119140625}
+          {:mem 4325, :tick 118868, :threads 425, :subs 217, :load 7.80810546875}
+          {:mem 5048, :tick 118869, :threads 452, :subs 217, :load 7.9306640625}
+          {:mem 4962, :tick 118870, :threads 451, :subs 217, :load 7.58203125}
+          {:mem 4853, :tick 118871, :threads 447, :subs 217, :load 7.22509765625}
+          {:mem 3859, :tick 118872, :threads 448, :subs 217, :load 7.14501953125}
+          {:mem 4288, :tick 118873, :threads 421, :subs 217, :load 7.59423828125}
+          {:mem 6414, :tick 118874, :threads 417, :subs 217, :load 7.62890625}
+          {:mem 7029, :tick 118875, :threads 422, :subs 217, :load 7.44677734375}
+          {:mem 5871, :tick 118876, :threads 420, :subs 217, :load 7.23095703125}],
          :margin {:top 5, :bottom 5, :right 30, :left 20}}
         [:> :CartesianGrid {:strokeDasharray "1 4", :opacity 0.33}]
         [:> :Tooltip {:contentStyle {:backgroundColor "#00000099"}}]
@@ -942,7 +982,7 @@
   :shape-drag-7 {:* {:rowcount 29}}},
  :flow-estimates
  {"openai-image-gen-ladder5"
-  {:times 44, :run-id "dedc2f58-41d5-4b56-ad31-295655d3e2e8"}},
+  {:times 41, :run-id "d30f90d8-99ee-4e64-a7c7-20c69a32a9de"}},
  :status
  {:heartbeat
   {:kick
@@ -975,7 +1015,7 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   26456
+   77113
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap
@@ -992,19 +1032,19 @@
    "For testing purposes, use the prompt EXACTLY as is please:\n\nA high-resolution, artistically rendered widescreen highly stylized & exaggerated pinup noir femme fatale Playboy  style cyberpunk illustrationn that captures a scene from magical Scotland. In the heartland of tradition but with an aura of fantasy, a youthful, beautiful Caucasian woman, of Scottish descent, with raven hair, is depicted. She is in her late twenties, boasting full, expressive lips with the lower one pronounced, and a playfully upturned nose, giving her an alluring, captivating visage. Her hair flows like a river in the night, reaching to her waist. Intricate Celtic-inspired tattoos of rabbits and wilderness designs grace her neck, collarbone, and shoulder areas, enhancing her enchanting visage. Fantasy-like blue and pink lights from the forest glimmers against her curvaceous figure, amplifying her radiant beauty. She has a lush and curvy figure, and her culturally-inspired attire includes a ribbon choker and a long necklace which adds a sprinkle of glamour to her style. Playful yet sophisticated, she leans against a wall, offering the viewer a teasing, engaging glance."}},
  :panels-hash -831018904,
  :sessions
- (["enthusiastic-green-ferret-14.edn" "100 hours, 10 minutes, 38 seconds" 360638680]
-   ["upbeat-ochre-cattle-3.edn" "104 hours, 30 minutes, 20 seconds" 376220563]
-   ["brilliant-gold-mallard-13.edn" "104 hours, 30 minutes, 50 seconds" 376250199]
-   ["vital-bulbous-mosquito-0.edn" "1073 hours, 28 minutes, 18 seconds" 3864498491]
-   ["refined-round-llama-8.edn" "1075 hours, 30 minutes, 25 seconds" 3871825005]
-   ["beaming-gray-opossum-6.edn" "1126 hours, 49 minutes, 24 seconds" 4056564609]
-   ["certain-icosahedral-hound-19.edn"
-    "1175 hours, 18 minutes, 24 seconds"
-    4231104537]
-   ["meaningful-jungle-green-hummingbird-34.edn"
-    "118 hours, 22 minutes, 55 seconds"
-    426175916]
-   ["angelic-cerise-dolphin-32.edn" "118 hours, 27 minutes, 20 seconds" 426440370]),
+ (["friendly-lime-eagle-10.edn" "100 hours, 47 minutes, 20 seconds" 362840647]
+   ["enthusiastic-Persian-blue-nightingale-41.edn"
+    "101 hours, 23 seconds"
+    363623282]
+   ["adorable-desert-lark-5.edn" "1014 hours, 46 minutes, 7 seconds" 3653167466]
+   ["vital-bulbous-mosquito-0.edn" "1093 hours, 53 minutes, 6 seconds" 3937986638]
+   ["refined-round-llama-8.edn" "1095 hours, 55 minutes, 13 seconds" 3945313152]
+   ["enchanting-coral-frog-28.edn" "11 hours, 26 minutes, 38 seconds" 41198714]
+   ["bountiful-harlequin-bird-23.edn" "114 hours, 34 minutes, 24 seconds" 412464484]
+   ["charming-coral-serval-22.edn" "114 hours, 44 minutes, 45 seconds" 413085229]
+   ["distinguished-orange-coyote-23.edn"
+    "114 hours, 59 minutes, 45 seconds"
+    413985808]),
  :solvers-map
  {:vibrant-antelope-solver
   {:signal :signal/cool-raccoon-signal-yo,
@@ -1070,9 +1110,9 @@
     :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
     :return nil}}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 502861909,
+ :user-params-hash 1443280008,
  :grid-recos? true,
- :session-hash 1754642939,
+ :session-hash 1207015246,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -2839,9 +2879,9 @@
    :openai-image-gen-ladder>pop-color "#c6652b",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :openai-image-gen-ladder5>relative-url-path-for-png-version
-   "./images/gen/b64-image5-29361-72868.png",
+   "./images/gen/b64-image5-27116-71801.png",
    :crow-flow-201>*running? false,
-   :openai-image-gen-ladder5>dominant-color "#1a5468",
+   :openai-image-gen-ladder5>dominant-color "#162a28",
    :openai-image-gen-ladder>relative-url-path-for-png-version
    "./images/gen/b64-image4-39253-84360.png",
    :counting-loop>open-fn-2 44,
@@ -2876,7 +2916,7 @@
         :style {:border-radius "30px"}}]]]],
    :counting-loop>*running? false,
    :counting-loop>open-fn-3 45,
-   :openai-image-gen-ladder5>pop-color "#d598a6",
+   :openai-image-gen-ladder5>pop-color "#11201d",
    :flow-forever>*running? false,
    :node-color-thief-js>*running? false,
    :openai-image-gen-ladder>execute-shell-command
@@ -2886,7 +2926,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :openai-image-gen-ladder5>output-revised-prompt
-   "A highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, flowing dark hair, buxom pinup build. The setting is in the picturesque wilderness of Cape Code America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise.",
+   "Generate an image of a powerful and robust Scandinavian woman in her early 30s with a full face, long, dark, flowing hair, and a buxom silhouette. She is in the picturesque wilderness of Cape Cod, America. The scene is bathed in the teal and pink hues of dusk, hinting at a Cyberpunk-Vaporwave aesthetic. She confidently gazes at the viewer, her alluring presence amplified by the dramatic lighting and her striking dark makeup. A sly, playful smile plays on her lips, adding an air of mystery and seduction. Intricate and detailed tattoos covering her shoulders, collarbone, and neck tell their unique stories. Around her neck hangs a rabbit pendant, and subtle rabbit motifs are integrated into her tattoos. The composition is filled with intrigue, wonder, and temptation, all under the gentle glow of dawn.",
    :counting-loop>final-value 44,
    :openai-image-gen-ladder>dominant-color "#221e2f",
    :flow-forever>final-math nil},
@@ -2900,7 +2940,7 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
-  :time {:seconds nil, :second 59},
+  :time {:seconds nil, :second 22},
   :viz-tables-sys2 {:table_name :ufo-sightings-drag-9},
   :user-dropdown-sys {:req-field nil},
   :searches-types-sys {:item_type "client-queries"},
@@ -2976,20 +3016,12 @@
     :center
     :justify
     :center
+    :padding
+    "13px"
     :style
-    {:font-weight 700,
-     :font-size "25px",
-     :padding-top "6px",
-     :padding-left "14px",
-     :margin-top "-8px",
-     :color :theme/editor-outer-rim-color,
-     :font-family :theme/base-font}
+    {:font-size "45px"}
     :child
-    [:run-flow
-     ["openai-image-gen-ladder5"
-      "run-cyber!"
-      {:prompt
-       "Create a 16:9 proportioned highly stylized illustration in high definition, showcasing a setting reminiscent of traditional myths from New England, enriched with majestic, other-worldly charm. Centralize around a charming woman in her late twenties of Caucasian descent, with beautifully flowing hair. Detail her facial features to have full, pouty lips, and an upturned nose, reflecting a mix of delight and enchantment. Embellish her neck, collarbone, and shoulders with intricate Celtic-styled tattoos featuring rabbits and wilderness. Her physique can best be described as mystical and curvaceous. Illuminate her in abstract blue and pink lights that emphasize her form. Contrast her pale skin with dark makeup. Adorn her with a choker ribbon and a long necklace as she leans against a wall, offering an enticingly playful gaze. The scene delivers an intense feeling of a cyberpunk environment in a heavily stylized and exaggerated pinup style   "}]]],
+    [:string :flow/openai-image-gen-ladder5>:dominant-color]],
    :skillful-viridian-falcon
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please: "
     ""
@@ -3002,7 +3034,7 @@
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:"
     ""
     "Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork is inspired by the pinup noir femme fatale and cyberpunk aesthetics, having a strong burlesque influence."],
-   :selected-view [:views :hi],
+   :selected-view [:views :param-val],
    :fabulous-pink-eagle
    ["I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS:"
     ""
@@ -3040,7 +3072,7 @@
     "She is buxom, robust, hyper curvaceous. She wears a choker ribbon and a long necklace. "
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
-   :selected-block :block-10031,
+   :selected-block :block-11372,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""

@@ -244,7 +244,8 @@
                  (keyword? block-map)))
         (catch :default _ false))
     ;; try to save some work
-    (let [valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten block-map)))
+    (let [;;valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten block-map)))
+          valid-body-params      (vec (ut/get-compound-keys block-map))
           workspace-params       (into {} (for [k valid-body-params] ;; deref here?
                                             {k
                                              ;;@(ut/tracked-subscribe [::clicked-parameter-key [k]])
@@ -436,7 +437,10 @@
 
       ;;(ut/tapp>> [:pp panel-key (ut/deep-template-find out-block-map)])
       ;;(ut/tapp>> [:resolver-val-walks panel-key valid-body-params workspace-params valid-body-params out-block-map])
-      (if (ut/ne? (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten out-block-map))))
+      (if (ut/ne? (vec 
+                   ;;(filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten out-block-map))
+                   (ut/get-compound-keys out-block-map)
+                   ))
         (logic-and-params-fn out-block-map panel-key)
         out-block-map))
     block-map))
