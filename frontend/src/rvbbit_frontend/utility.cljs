@@ -14,6 +14,7 @@
             [goog.crypt.Sha256 :as Sha256]
             [goog.crypt.base64 :as base64]
             [zprint.core :as zp])
+  (:require-macros [rvbbit-frontend.macros :refer [time-expr]])
   (:import
 
    [goog.i18n NumberFormat]
@@ -49,6 +50,36 @@
     (do
       (tapp>> ["Error: trying to conj onto a non-sequence" "Caller:" (.-stack (js/Error.))  :coll coll :items items])
       coll)))
+
+(defonce timing-data (atom {}))
+
+(defn timed [exp note]
+  (let [output (time-expr exp note)
+        timing (last output)]
+    (swap! timing-data update note conj timing)
+    (first output)))
+
+(defn stats [timing-data]
+  (let [values (->> timing-data
+                    (map (fn [[k v]]
+                           (let [numbers (map #(js/parseFloat %) v)
+                                 count (count numbers)
+                                 sum (reduce + numbers)
+                                 avg (/ sum count)
+                                ; sorted (sort < numbers)
+                                ; mid (quot count 2)
+                                ; median (if (odd? count)
+                                ;          (nth sorted mid)
+                                ;          (/ (+ (nth sorted mid) (nth sorted (dec mid))) 2.0))
+                                 ]
+                             {k {:average avg
+                                 :sample-size count
+                                 ;:median median
+                                 }})))
+                    (into {}))]
+    values))
+
+
 
 ;; (defn distribution [tracker-atom]
 ;;   (let [sorted-cache (->> @tracker-atom
@@ -109,12 +140,7 @@
      :frequency-buckets (into {} (map (fn [[k v]] [k (count v)]) frequency-buckets))}))
 
 
-
-
-
-
-
-
+(defonce pre-leaf-clover (atom {}))
 (defonce deep-flatten-data (atom {}))
 (defonce deep-flatten-cache (atom {}))
 
@@ -283,6 +309,9 @@
 
 
 
+
+
+
 (defonce replacer-data (atom {}))
 (defonce replacer-cache (atom {}))
 
@@ -293,6 +322,9 @@
         (let [deep (cstr/replace (str x1) x2 x3)]
           (swap! replacer-data assoc x deep)
           deep))))
+
+(defn replacer22 [x1 x2 x3]
+  (cstr/replace (str x1) x2 x3))
 
 (defn purge-replacer-cache [percent & [hard-limit]]
   (purge-cache "replacer-cache" percent replacer-cache replacer-data hard-limit)
@@ -475,7 +507,6 @@
 
 
 
-
 (defonce postwalk-replace-data-cache (atom {}))
 (defonce postwalk-replace-cache (atom {}))
 
@@ -491,6 +522,9 @@
         (let [result (walk/postwalk-replace walk-map target)]
           (swap! postwalk-replace-data-cache assoc hash-key result)
           result))))
+
+(defn postwalk-replacer22 [walk-map target]
+  (walk/postwalk-replace walk-map target))
 
 (defn purge-postwalk-cache [percent & [hard-limit]]
   (purge-cache "postwalk-cache" percent postwalk-replace-cache postwalk-replace-data-cache hard-limit)
