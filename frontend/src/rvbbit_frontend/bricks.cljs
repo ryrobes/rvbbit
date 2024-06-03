@@ -3381,7 +3381,9 @@
 
 (defn panel-code-box [_ _ width-int height-int value]
   (let [sql-hint? (cstr/includes? (str value) ":::sql-string")
-        selected-kp @(ut/tracked-subscribe [::editor-panel-selected-view])
+        ;selected-block @(ut/tracked-sub ::selected-block {})
+        selected-kp @(ut/tracked-sub ::editor-panel-selected-view {})
+        ;extra-kp (into [selected-block] selected-kp)
         selected-kp (if (nil? (first selected-kp)) nil selected-kp)
         key selected-kp
         font-size (if (nil? key) 13 17)
@@ -3451,26 +3453,6 @@
                         :autoScroll        false
                         :detach            true
                         :readOnly          false
-                        ;; :extraKeys (clj->js {"Ctrl-Left"  (fn [^js cm]
-                        ;;                                     (let [cursor (.getCursor cm)
-                        ;;                                           match (.findMatchingBracket cm cursor nil)]
-                        ;;                                       (when match
-                        ;;                                         (.setCursor cm (.-to match)))))
-                        ;;                      "Ctrl-Right" (fn [^js cm]
-                        ;;                                     (let [cursor (.getCursor cm)
-                        ;;                                           match (.findMatchingBracket cm cursor nil)]
-                        ;;                                       (when match
-                        ;;                                         (.setCursor cm (.-to match)))))
-                        ;;                      "Shift-Ctrl-Left" (fn [^js cm]
-                        ;;                                          (let [cursor (.getCursor cm)
-                        ;;                                                match (.findMatchingBracket cm cursor nil)]
-                        ;;                                            (when match
-                        ;;                                              (.setSelection cm cursor (.-to match)))))
-                        ;;                      "Shift-Ctrl-Right" (fn [^js cm]
-                        ;;                                           (let [cursor (.getCursor cm)
-                        ;;                                                 match (.findMatchingBracket cm cursor nil)]
-                        ;;                                             (when match
-                        ;;                                               (.setSelection cm cursor (.-to match)))))})
                         :extraKeys (clj->js {"Ctrl-Right" (fn [^js cm]
                                                             (let [cursor (.getCursor cm)
                                                                   match (.findMatchingBracket cm cursor true)]
@@ -3495,10 +3477,6 @@
                                                                     (if (and match (.-match match))
                                                                       (.setSelection cm cursor (.-to match))
                                                                       (.execCommand cm "goGroupLeft"))))})
-
-
-
-
                         :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
 
 
@@ -12604,8 +12582,8 @@
 
 
                                  has-drops? (drop-walk-replace (vec (keys drop-walks))))
-                               ;;  (str panel-key ".all-caching.1-walk")
-                                ;; ) 
+                                 ;;(str panel-key ".all-caching.1-walk")
+                               ;;  ) 
                                   ;; TODO make this conditional
                                     ;(walk/postwalk-replace workspace-params)    ;; in case drop-walk run - TODO make this conditional
 
@@ -13566,7 +13544,7 @@
      ;         }
      ;:style {:transform "scale(0.75)"}
      ;:attr {:on-drag-enter #(ut/tapp>> [:dragging-over [ tab]])}
-     :children [(doall
+     :children [;(doall
                  (for [[bw bh brick-vec-key] brick-roots]                ;diff-grid1] ;(if @dragging? current-grid brick-roots)] @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
                    (let [bricksw             (* bw brick-size)
                          bricksh             (* bh brick-size)
@@ -14367,7 +14345,9 @@
                                                                     :else
                                                                     ^{:key (str "brick-" brick-vec "-resize-handle-gap")}
                                                                     [re-com/gap :size "12px"])]]])
-                                        [re-com/gap :size "18px"])]]])))))]])
+                                        [re-com/gap :size "18px"])]]]))))
+                                        ;)
+                                        ]])
                                         
                                           ;; (catch :default e
                                           ;;   (do (ut/tapp>> [:GRID-ERROR! (str e) (.-message e) :stack (.-stack e) e])

@@ -156,13 +156,18 @@
     (into #{} (mapcat deep-flatten-real x))
     #{x}))
 
-(defn deep-flatten [x]
+(defn deep-flatten22 [x]
   (let [hx (pr-str x)]  ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! deep-flatten-cache update hx (fnil inc 0))
     (or (@deep-flatten-data hx)
         (let [deep (deep-flatten-real x)]
           (swap! deep-flatten-data assoc hx deep) 
           deep))))
+
+(defn deep-flatten [x] ;; raw 
+  (if (coll? x)
+    (into #{} (mapcat deep-flatten x))
+    #{x}))
 
 (defn purge-cache [name percent tracker-atom data-atom & [hard-limit]]
   (let [total-hit-count (reduce + (vals @tracker-atom))
@@ -289,7 +294,7 @@
 (defonce compound-keys-cache (atom {}))
 (defonce compound-keys-tracker (atom {}))
 
-(defn get-compound-keys [data]
+(defn get-compound-keys22 [data]
   (let [args (pr-str data)]
     (if-let [result (@compound-keys-cache data)]
       (do
@@ -299,6 +304,9 @@
         (swap! compound-keys-cache assoc args result)
         (swap! compound-keys-tracker update args (fnil inc 0))
         result))))
+
+(defn get-compound-keys [data] ;; raw 
+  (filter process-key (deep-flatten data)))
 
 (defn purge-compound-keys-cache [percent & [hard-limit]]
   (purge-cache "compound-keys-cache" percent compound-keys-tracker compound-keys-cache hard-limit))
@@ -315,7 +323,7 @@
 (defonce replacer-data (atom {}))
 (defonce replacer-cache (atom {}))
 
-(defn replacer [x1 x2 x3]
+(defn replacer22 [x1 x2 x3]
   (let [x (pr-str [x1 x2 x3])] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! replacer-cache update x (fnil inc 0))
     (or (@replacer-data x)
@@ -323,7 +331,7 @@
           (swap! replacer-data assoc x deep)
           deep))))
 
-(defn replacer22 [x1 x2 x3]
+(defn replacer [x1 x2 x3]
   (cstr/replace (str x1) x2 x3))
 
 (defn purge-replacer-cache [percent & [hard-limit]]
@@ -370,7 +378,7 @@
 (defn matches-pattern? [item kw num]
   (and (vector? item) (= (count item) num) (= (first item) kw)))
 
-(defn extract-patterns [data kw num]
+(defn extract-patterns22 [data kw num]
   (let [x (pr-str [data kw num])] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! extract-patterns-cache update x (fnil inc 0))
     (or (@extract-patterns-data x)
@@ -384,6 +392,16 @@
           (let [result @matches]
             (swap! extract-patterns-data assoc x result)
             result)))))
+
+(defn extract-patterns [data kw num]  ;; raw
+  (let [matches (atom [])]
+    (walk/prewalk
+     (fn [item]
+       (when (matches-pattern? item kw num)
+         (swap! matches conj item))
+       item)
+     data)
+    @matches))
 
 (defn purge-extract-patterns-cache [percent & [hard-limit]]
   (purge-cache "extract-patterns-cache" percent extract-patterns-cache extract-patterns-data hard-limit)
@@ -460,13 +478,16 @@
 (defonce split-cache-data (atom {}))
 (defonce split-cache (atom {}))
 
-(defn splitter [s delimiter]
+(defn splitter22 [s delimiter]
   (let [key (pr-str [s delimiter])] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! split-cache update key (fnil inc 0))
     (or (@split-cache-data key)
         (let [result (cstr/split s delimiter)]
           (swap! split-cache-data assoc key result)
           result))))
+
+(defn splitter [s delimiter] ;; raw
+  (cstr/split s delimiter))
 
 (defn purge-splitter-cache [percent & [hard-limit]]
   (purge-cache "splitter-cache" percent split-cache split-cache-data hard-limit)
@@ -515,7 +536,7 @@
 ;;     (swap! postwalk-replace-cache update hash-key (fnil inc 0))
 ;;     (walk/postwalk-replace walk-map target)))
 
-(defn postwalk-replacer [walk-map target]
+(defn postwalk-replacer22 [walk-map target]
   (let [hash-key (pr-str [walk-map target])]  ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! postwalk-replace-cache update hash-key (fnil inc 0))
     (or (@postwalk-replace-data-cache hash-key)
@@ -523,7 +544,7 @@
           (swap! postwalk-replace-data-cache assoc hash-key result)
           result))))
 
-(defn postwalk-replacer22 [walk-map target]
+(defn postwalk-replacer [walk-map target]
   (walk/postwalk-replace walk-map target))
 
 (defn purge-postwalk-cache [percent & [hard-limit]]
@@ -569,7 +590,7 @@
 (def upstream-cache (atom {}))
 (def upstream-cache-tracker (atom {}))
 
-(defn upstream-search [subq-map panel-id]
+(defn cached-upstream-search [subq-map panel-id]
   (let [producers     (into {} (for [[k v] subq-map] {k (get v :produces)}))
         all-producers (into {} (for [[k v] producers]
                                  (into {} (for [p v]
@@ -581,7 +602,7 @@
             (ww iid (conj x id) (conj visited id)))))
     (ww panel-id [] #{})))
 
-(defn downstream-search [subq-map panel-id]
+(defn cached-downstream-search [subq-map panel-id]
   (let [users   (into {} (for [[k v] subq-map] {k (get v :uses)}))
         ; all-users (into {} (for [[k v] users]
         ;                          (into {} (for [p v]
@@ -596,30 +617,30 @@
     ;(ut/tapp>> [:subq-map subq-map :users users :all-users2 @cheater :mm mm  :mm2 mm2])
     (flatten (get-in mm [panel-id :produces]))))
 
-(defn cached-upstream-search [subq-map panel-id]
-  (let [args (pr-str [subq-map panel-id])]
-    (if-let [result (@upstream-cache args)]
-      (do
-        (swap! upstream-cache-tracker update args (fnil inc 0))
-        result)
-      (let [result (upstream-search subq-map panel-id)]
-        (swap! upstream-cache assoc args result)
-        (swap! upstream-cache-tracker update args (fnil inc 0))
-        result))))
+;; (defn cached-upstream-search22 [subq-map panel-id]
+;;   (let [args (pr-str [subq-map panel-id])]
+;;     (if-let [result (@upstream-cache args)]
+;;       (do
+;;         (swap! upstream-cache-tracker update args (fnil inc 0))
+;;         result)
+;;       (let [result (upstream-search subq-map panel-id)]
+;;         (swap! upstream-cache assoc args result)
+;;         (swap! upstream-cache-tracker update args (fnil inc 0))
+;;         result))))
 
 (def downstream-cache (atom {}))
 (def downstream-cache-tracker (atom {}))
 
-(defn cached-downstream-search [subq-map panel-id]
-  (let [args (pr-str [subq-map panel-id])]
-    (if-let [result (@downstream-cache args)]
-      (do
-        (swap! downstream-cache-tracker update args (fnil inc 0))
-        result)
-      (let [result (downstream-search subq-map panel-id)]
-        (swap! downstream-cache assoc args result)
-        (swap! downstream-cache-tracker update args (fnil inc 0))
-        result))))
+;; (defn cached-downstream-search22 [subq-map panel-id]
+;;   (let [args (pr-str [subq-map panel-id])]
+;;     (if-let [result (@downstream-cache args)]
+;;       (do
+;;         (swap! downstream-cache-tracker update args (fnil inc 0))
+;;         result)
+;;       (let [result (downstream-search subq-map panel-id)]
+;;         (swap! downstream-cache assoc args result)
+;;         (swap! downstream-cache-tracker update args (fnil inc 0))
+;;         result))))
 
 (defonce subq-mapping-alpha (atom {}))
 (defonce subq-panels-alpha (atom {}))
@@ -644,12 +665,12 @@
 ;(tapp>> [:sub-counts-alpha (vec (take 45 (reverse (sort-by val @subscription-counts-alpha))))])
 
 (defn tracked-sub [sub-key sub-map] ;;; lmao - hack to track subscriptions for debugging
-  (swap! subscription-counts-alpha update sub-key (fnil inc 0))
+  ;(swap! subscription-counts-alpha update sub-key (fnil inc 0))
   ;(swap! simple-subscription-counts conj (first query))
   (rfa/sub sub-key sub-map))
 
 (defn tracked-subscribe [query] ;;; lmao - hack to track subscriptions for debugging
-  (swap! subscription-counts update (first query) (fnil inc 0))
+  ;(swap! subscription-counts update (first query) (fnil inc 0))
   ;(swap! simple-subscription-counts conj (first query))
   ;(apply re-frame.core/subscribe query args)
 
@@ -1033,7 +1054,7 @@
           ;(and (vector? x) (string-or-hiccup? x)) "hiccup"
           (or (and (or (list? x)
                        (vector? x))
-                   (not (empty? x)) (every? map? x))
+                   (ne? x) (every? map? x))
               (and (vector-of-maps? x)
                    (not (has-nested-map-values? x))))
           "rowset"  ;;; breaks shit? TODO
@@ -1061,7 +1082,9 @@
 
 (def data-typer-atom (atom {}))
 
-(defn data-typer [x]
+(defn data-typer [x] (data-typer-fn x)) ;; raw
+
+(defn data-typer22 [x]
   (let [;x (str [x1 x2 x3])
         cache (get @data-typer-atom x)]
     (if (not (nil? cache)) cache
@@ -1542,7 +1565,9 @@
 
 (def clean-sql-atom (atom {}))
 
-(defn clean-sql-from-ui-keys [x] ; <-- gets called hundreds of times
+(defn clean-sql-from-ui-keys [x] (clean-sql-from-ui-keys-fn x))  ;; raw
+
+(defn clean-sql-from-ui-keys22 [x] ; <-- gets called hundreds of times
   (let [hx (hash x)
         cache (get @clean-sql-atom hx)]
     (if cache cache (let [deep (clean-sql-from-ui-keys-fn x)]
@@ -1749,10 +1774,13 @@
 
 (def body-set-atom (atom {}))
 
-(defn body-set-fn [body] ;; expensive
+(defn body-set-fn [body] ;; expensive?
   (set (filter keyword? (deep-flatten body))))
 
-(defn body-set [body]
+(defn body-set [body] ;; raw
+  (set (filter keyword? (deep-flatten body))))
+
+(defn body-set22 [body]
   (let [hx (hash body)
         cache (get @body-set-atom hx)]
     (if cache cache

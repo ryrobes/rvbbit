@@ -13,4 +13,7 @@
          end# (.now js/performance)
          elapsed# (- end# start#)]
      ;(js/console.info (str [(-> elapsed# (.toFixed 5)) ~note]))
-     [result# elapsed#]))
+     [result# 
+      ;;;elapsed#
+      (-> elapsed# (.toFixed 5)) 
+      ]))
