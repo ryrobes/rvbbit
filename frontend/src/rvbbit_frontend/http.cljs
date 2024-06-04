@@ -685,9 +685,10 @@
          subs1 (vec (for [s subs] (get-in s [:message :kind])))
          datas (count (keys (get db :data)))
          panels (count (keys (get db :panels)))
-         pendings
+         pendings (vals (get-in db [:websocket-fx.core/sockets socket-id :requests]))
          ;;@(ut/tracked-subscribe [::wfx/pending-requests socket-id])
-         @(rfa/sub ::pending-requests {:socket-id socket-id})]
+         ;;@(rfa/sub ::pending-requests {:socket-id socket-id})
+         ]
      {;;:status @(ut/tracked-subscribe [::wfx/status socket-id])
       :status (get-in db [:websocket-fx.core/sockets socket-id :status]) ;;; trying to not sub-witin-a-sub
       :waiting (count pendings)
