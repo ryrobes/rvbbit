@@ -23,6 +23,9 @@
 
 (defonce value-spy (reagent/atom {}))
 
+(defonce cm-instance-panel-code-box (atom nil)) ;; for highlighting
+(defonce markers-panel-code-box (atom []))
+
 (defonce autocomplete-keywords (atom []))
 
 (def param-code-hover (atom nil))

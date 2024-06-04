@@ -411,6 +411,7 @@
     ;;(ut/thaw-atom {} "./data/atoms/flow-db-results-atom.edn" flow-db/results-atom true)
     (thaw-flow-results)
     (sql/start-worker-sql) ;; test
+    (wss/recycle-workers-sql-meta 5) ;; sql meta cnts 
 
     #_{:clj-kondo/ignore [:inline-def]}
     (defonce start-conn-watcher (watch-connections-folder))
@@ -597,6 +598,8 @@
 
     (wss/recycle-workers4 3) ;; run-solver only
     (wss/recycle-workers5 5) ;; push-to-client only
+
+;;    (wss/recycle-workers-sql-meta 5) ;; sql meta cnts 
 
     ;; ;;blocking thread pools, tracked and cancellable - TAKES ALL CPU AND DOESNT WORK PROPERLY. lol
     ;; (wss/recycle-workers7 3) ;; run-solver only

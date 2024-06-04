@@ -3737,8 +3737,12 @@
                                           (let [mem @(ut/tracked-subscribe [::bricks/memory])]
                                             [re-com/box
                                              :size "none"
-                                             :style {:position "fixed" :left 2 :bottom 20 :font-weight 700 :color "#ffffff88"}
-                                             :child (str (ut/bytes-to-mb (get mem 1)))
+                                             :style {:position "fixed" :left 2 :bottom 20 :font-weight 700 :color "#ffffff99"}
+                                             :child (str 
+                                                     (ut/bytes-to-mb (get mem 1))
+                                                     ;" .."
+                                                     (str " (lazy-grid? " (not (or @bricks/param-hover @bricks/query-hover)) ")")
+                                                     )
                                              ;:child (str mem)
                                              ])
 

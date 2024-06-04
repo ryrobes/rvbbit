@@ -425,6 +425,7 @@
              elapsed-ms (get result :elapsed-ms)
              reco-count (get result :reco-count)
              kick? (= ui-keypath :kick)
+             counts? (= task-id :cnts)
              heartbeat? (= task-id :heartbeat)
              alert? (= task-id :alert1)
            ;not-sys-stats? (not (cstr/includes? (str (get result :data)) "[sys-stats]"))
@@ -446,6 +447,9 @@
              flow-runner-acc-tracker? (and kick? (= (get-in result [:task-id 0]) :acc-tracker) (not heartbeat?))
              condi-tracker? (and kick? (= (get-in result [:task-id 0]) :condis) (not heartbeat?))
              estimate? (and kick? (= (get-in result [:task-id 0]) :estimate) (not heartbeat?))]
+         
+        ;;  (when counts?
+        ;;    (ut/tapp>> [:counts ui-keypath (get result :status)]))
 
          (swap! packets-received inc)
 
@@ -489,6 +493,27 @@
        ;(ut/tapp>> [:simple-response result])
 
          (cond
+
+           counts?
+
+           (let [;emeta-map (get-in db [:meta ui-keypath])
+                 ss (get result :status)
+                 ;rowcount (get ss  :*)
+                 ;new-map (assoc emeta-map :rowcount rowcount)
+                 ;distincts? (> (count (keys ss)) 1)
+                 ;new-map-kps (if distincts?
+                 ;             (into {} (for [[k v] (dissoc ss :*)]  {[:fields k :distinct] v}))
+                 ;             {})
+                 ;new-map (ut/apply-assoc-ins new-map new-map-kps)
+                 post-meta-shape (into {}  (for [[k v] ss]  {k {(if (= k :*) :rowcount :distinct) v}}))]
+             
+             (-> db
+                 ;(dissoc :post-meta)
+                 (assoc-in [:post-meta ui-keypath] post-meta-shape)
+                 ;(assoc-in [:meta ui-keypath] new-map)
+                 ))
+
+          ;; (assoc-in db [:post-meta ui-keypath :fields] (get result :status))
 
            (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
            (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))

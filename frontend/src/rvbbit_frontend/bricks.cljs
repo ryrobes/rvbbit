@@ -440,6 +440,8 @@
          solver (if (and (get-in db [:solvers-map warren-item :data]) solver-open?)
                   [(keyword (str "solver/" (ut/replacer (str warren-item) ":" "")))
                    (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">extra"))
+                   (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">output"))
+                   (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">error"))
                    (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">history"))
                    ] [])
          solvers (if (and solver-open? (some #(= % "solvers") @db/selectors-open))
@@ -2465,20 +2467,20 @@
 
 
 
-(defonce cm-instance-panel-code-box (atom nil)) ;; for highlighting
-(defonce markers-panel-code-box (atom []))
+;; (defonce db/cm-instance-panel-code-box (atom nil)) ;; for highlighting
+;; (defonce db/markers-panel-code-box (atom []))
 
 (defn highlight-code [code]
-  (when-let [editor @cm-instance-panel-code-box]
+  (when-let [editor @db/cm-instance-panel-code-box]
     (let [doc (.getDoc editor)
           ;; code (ut/format-map 640 ;; 539 ;;(- 634.4 95) 
           ;;                     (str code))
           code (str code)
           _ (ut/tapp>> [:highlighted-code-panel-code-box code])]
       ;; Clear existing markers
-      (doseq [marker @markers-panel-code-box]
+      (doseq [marker @db/markers-panel-code-box]
         (.clear marker))
-      (reset! markers-panel-code-box [])
+      (reset! db/markers-panel-code-box [])
       (let [code-lines (clojure.string/split-lines code)
             start-line (loop [line 0]
                          (when (< line (.lineCount doc))
@@ -2498,16 +2500,16 @@
                                 #js {:line end-line, :ch end-ch}
                                 #js {:css (str "filter: invert(233%); color: white; font-weight: 700; background-color: teal; font-size: 15px;")})
                      (catch :default e (ut/tapp>> [:marker-error (str e)])))]
-        (swap! markers-panel-code-box conj marker)))))
+        (swap! db/markers-panel-code-box conj marker)))))
 
 ;; (defn highlight-codes [codes css]
 ;;   (let [css-string (ut/hiccup-css-to-string css)]
-;;     (when-let [editor @cm-instance-panel-code-box]
+;;     (when-let [editor @db/cm-instance-panel-code-box]
 ;;       (let [doc (.getDoc editor)]
 ;;         ;; Clear existing markers
-;;         (doseq [marker @markers-panel-code-box]
+;;         (doseq [marker @db/markers-panel-code-box]
 ;;           (.clear marker))
-;;         (reset! markers-panel-code-box [])
+;;         (reset! db/markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
 ;;                 _ (ut/tapp>> [:highlighted-code-panel-code-box code])
@@ -2530,16 +2532,16 @@
 ;;                                     #js {:line end-line, :ch end-ch}
 ;;                                     #js {:css css-string})
 ;;                          (catch :default e (ut/tapp>> [:marker-error (str e)])))]
-;;             (swap! markers-panel-code-box conj marker)))))))
+;;             (swap! db/markers-panel-code-box conj marker)))))))
 
 ;; (defn highlight-codes-only [codes css]
 ;;   (let [css-string (ut/hiccup-css-to-string css)]
-;;     (when-let [editor @cm-instance-panel-code-box]
+;;     (when-let [editor @db/cm-instance-panel-code-box]
 ;;       (let [doc (.getDoc editor)]
 ;;         ;; Clear existing markers
-;;         (doseq [marker @markers-panel-code-box]
+;;         (doseq [marker @db/markers-panel-code-box]
 ;;           (.clear marker))
-;;         (reset! markers-panel-code-box [])
+;;         (reset! db/markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
 ;;                 _ (ut/tapp>> [:highlighted-code-panel-code-box code])
@@ -2565,19 +2567,19 @@
 ;;                                       #js {:line end-line, :ch end-ch}
 ;;                                       #js {:replacedWith node}))
 ;;                          (catch :default e (ut/tapp>> [:marker-error (str e)])))]
-;;             (swap! markers-panel-code-box conj marker)))))))
+;;             (swap! db/markers-panel-code-box conj marker)))))))
 
 
 
 ;; (defn highlight-codes-only [codes css hiccup-fn]
 ;;   (ut/tapp>> [:highlight-codes-only [codes css hiccup-fn]])
 ;;   (let [css-string (ut/hiccup-css-to-string css)]
-;;     (when-let [editor @cm-instance-panel-code-box]
+;;     (when-let [editor @db/cm-instance-panel-code-box]
 ;;       (let [doc (.getDoc editor)]
 ;;         ;; Clear existing markers
-;;         (doseq [marker @markers-panel-code-box]
+;;         (doseq [marker @db/markers-panel-code-box]
 ;;           (.clear marker))
-;;         (reset! markers-panel-code-box [])
+;;         (reset! db/markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
 ;;                 ;_ (ut/tapp>> [:highlighted-code-panel-code-box code])
@@ -2617,19 +2619,19 @@
 ;;                                       #js {:line end-line, :ch end-ch}
 ;;                                       #js {:replacedWith node}))
 ;;                          (catch :default e (ut/tapp>> [:marker-error (str e)])))]
-;;             (swap! markers-panel-code-box conj marker)))))))
+;;             (swap! db/markers-panel-code-box conj marker)))))))
 
 (def widget (atom nil))
 
 ;; (defn highlight-codes-only [codes css hiccup-fn] ;; full note
 ;;   ;; (ut/tapp>> [:highlight-codes-only [codes css hiccup-fn]])
 ;;   (let [css-string (ut/hiccup-css-to-string css)]
-;;     (when-let [editor @cm-instance-panel-code-box]
+;;     (when-let [editor @db/cm-instance-panel-code-box]
 ;;       (let [doc (.getDoc editor)]
 ;;         ;; Clear existing markers
-;;         (doseq [marker @markers-panel-code-box]
+;;         (doseq [marker @db/markers-panel-code-box]
 ;;           (.clear marker))
-;;         (reset! markers-panel-code-box [])
+;;         (reset! db/markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
 ;;                 code-lines (clojure.string/split-lines code)]
@@ -2667,17 +2669,17 @@
 ;;                                               #js {:line end-line, :ch end-ch}
 ;;                                               #js {:replacedWith node}))
 ;;                                  (catch :default e (ut/tapp>> [:marker-error (str e)])))]
-;;                     (swap! markers-panel-code-box conj marker)))
+;;                     (swap! db/markers-panel-code-box conj marker)))
 ;;                 (recur (inc line))))))))))
 
 ;; (defn highlight-codes-only [codes css hiccup-fn] ;;; pre autocomplete clicks ?
 ;;   (let [css-string (ut/hiccup-css-to-string css)]
-;;     (when-let [editor @cm-instance-panel-code-box]
+;;     (when-let [editor @db/cm-instance-panel-code-box]
 ;;       (let [doc (.getDoc editor)]
 ;;         ;; Clear existing markers
-;;         (doseq [marker @markers-panel-code-box]
+;;         (doseq [marker @db/markers-panel-code-box]
 ;;           (.clear marker))
-;;         (reset! markers-panel-code-box [])
+;;         (reset! db/markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
 ;;                 code-lines (clojure.string/split-lines code)]
@@ -2726,7 +2728,7 @@
 ;;                                                     #js {:replacedWith node}))
 ;;                                        (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;                           (when (clojure.string/includes? (.getLine doc start-line) code-part) ;; Check if the entire code-part is present in the line
-;;                             (swap! markers-panel-code-box conj marker))
+;;                             (swap! db/markers-panel-code-box conj marker))
 ;;                           (recur (rest code-parts) end-ch)))))) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
 ;;                 (recur (inc line))))))))))
 
@@ -2734,12 +2736,12 @@
 
 ;; (defn highlight-codes-only [codes css hiccup-fn]
 ;;   (let [css-string (ut/hiccup-css-to-string css)]
-;;     (when-let [editor @cm-instance-panel-code-box]
+;;     (when-let [editor @db/cm-instance-panel-code-box]
 ;;       (let [doc (.getDoc editor)]
 ;;         ;; Clear existing markers
-;;         (doseq [marker @markers-panel-code-box]
+;;         (doseq [marker @db/markers-panel-code-box]
 ;;           (.clear marker))
-;;         (reset! markers-panel-code-box [])
+;;         (reset! db/markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
 ;;                 code-lines (clojure.string/split-lines code)]
@@ -2798,7 +2800,7 @@
 ;;                                 #js {:replacedWith node}))
 ;;                    (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;       (when (clojure.string/includes? (.getLine doc start-line) code-part) ;; Check if the entire code-part is present in the line
-;;         (swap! markers-panel-code-box conj marker))
+;;         (swap! db/markers-panel-code-box conj marker))
 ;;       (recur (rest code-parts) end-ch code-part-start-ch code-part-end-ch)))) ;; Recur with the rest of the code parts, the end character of the current part as the start character for the next part, and the start and end characters of the first and last segments
                           
 ;;                           )) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
@@ -2807,12 +2809,12 @@
 
 ;; (defn highlight-codes-only [codes css hiccup-fn]
 ;;   (let [css-string (ut/hiccup-css-to-string css)]
-;;     (when-let [editor @cm-instance-panel-code-box]
+;;     (when-let [editor @db/cm-instance-panel-code-box]
 ;;       (let [doc (.getDoc editor)]
 ;;         ;; Clear existing markers
-;;         (doseq [marker @markers-panel-code-box]
+;;         (doseq [marker @db/markers-panel-code-box]
 ;;           (.clear marker))
-;;         (reset! markers-panel-code-box [])
+;;         (reset! db/markers-panel-code-box [])
 ;;         (doseq [code codes]
 ;;           (let [code (str code)
 ;;                 code-lines (clojure.string/split-lines code)]
@@ -2867,7 +2869,7 @@
 ;;                                                     #js {:replacedWith node}))
 ;;                                        (catch :default e (ut/tapp>> [:marker-error (str e)])))]
 ;;                           (when (clojure.string/includes? (.getLine doc start-line) code-part)
-;;                             (swap! markers-panel-code-box conj marker))
+;;                             (swap! db/markers-panel-code-box conj marker))
 ;;                           (recur (rest code-parts) end-ch)))))) ;; Recur with the rest of the code parts and the end character of the current part as the start character for the next part
 ;;                     (recur (inc line))))))))))
 
@@ -2876,12 +2878,12 @@
 
 (defn highlight-codes-only [codes css]
   (let [react! [@db/param-code-hover]]
-    (when-let [editor @cm-instance-panel-code-box]
+    (when-let [editor @db/cm-instance-panel-code-box]
       (let [doc (.getDoc editor)]
         ;; Clear existing markers
-        (doseq [marker @markers-panel-code-box]
+        (doseq [marker @db/markers-panel-code-box]
           (.clear marker))
-        (reset! markers-panel-code-box [])
+        (reset! db/markers-panel-code-box [])
         (doseq [code codes]
           (let [code (str code)
                 code-lines (clojure.string/split-lines code)]
@@ -2946,19 +2948,19 @@
                                                     #js {:replacedWith node}))
                                        (catch :default e (ut/tapp>> [:marker-error (str e)])))]
                           (when (clojure.string/includes? (.getLine doc start-line) code-part)
-                            (swap! markers-panel-code-box conj marker))
+                            (swap! db/markers-panel-code-box conj marker))
                           (recur (rest code-parts) end-ch)))))) 
                 (recur (inc line))))))))))
 
 
 (defn highlight-codes-values [codes css]
   (let [react! [@db/param-code-hover]]
-    (when-let [editor @cm-instance-panel-code-box]
+    (when-let [editor @db/cm-instance-panel-code-box]
       (let [doc (.getDoc editor)]
         ;; Clear existing markers
-        (doseq [marker @markers-panel-code-box]
+        (doseq [marker @db/markers-panel-code-box]
           (.clear marker))
-        (reset! markers-panel-code-box [])
+        (reset! db/markers-panel-code-box [])
         (doseq [[code value] codes]
           (let [code (str code)
                 value (if (string? value) (pr-str value) value)
@@ -2981,18 +2983,18 @@
                                           #js {:line start-line, :ch code-part-start-ch}
                                           #js {:line end-line, :ch code-part-end-ch}
                                           #js {:replacedWith node})]
-                    (swap! markers-panel-code-box conj marker)))
+                    (swap! db/markers-panel-code-box conj marker)))
                 (recur (inc line))))))))))
 
 
 
 (defn unhighlight-code []
-  (when-let [editor @cm-instance-panel-code-box]
+  (when-let [editor @db/cm-instance-panel-code-box]
     (let [doc (.getDoc editor)]
-      (doseq [marker @markers-panel-code-box]
+      (doseq [marker @db/markers-panel-code-box]
         (when marker
           (.clear marker)))
-      (reset! markers-panel-code-box []))))
+      (reset! db/markers-panel-code-box []))))
 
 
 ;; (defn custom-completions [cm]
@@ -3367,11 +3369,11 @@
     ))
 
 ;; (defn remove-highlight-watcher []
-;;   (remove-watch cm-instance-panel-code-box :highlight-panel-code))
+;;   (remove-watch db/cm-instance-panel-code-box :highlight-panel-code))
 
 ;; (defn add-highlight-watcher []
 ;;   ;(remove-highlight-watcher)
-;;   (add-watch cm-instance-panel-code-box :highlight-panel-code
+;;   (add-watch db/cm-instance-panel-code-box :highlight-panel-code
 ;;              (fn [_ _ _ _]
 ;;                (ut/tracked-dispatch [::highlight-panel-code]))))
 
@@ -3403,7 +3405,7 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value (ut/format-map code-width (str value)) ;; value will be pre filtered by caller
               :onBeforeChange (fn [editor _ _] ;; data value]
-                                (reset! cm-instance-panel-code-box editor)
+                                (reset! db/cm-instance-panel-code-box editor)
                                 ;(ut/tracked-dispatch [::highlight-panel-code])
                                 )
               :onFocus (fn [_] (reset! db/cm-focused? true))
@@ -7369,8 +7371,7 @@
                                                                  ;;@(ut/tracked-subscribe [::panel-sql-calls selected-block])
                                                                  @(rfa/sub ::panel-sql-calls {:panel-key selected-block})
                                                                  ;;@(ut/tracked-subscribe [::views selected-block])
-                                                                 @(rfa/sub ::views {:panel-key selected-block})
-                                                                 )))
+                                                                 @(rfa/sub ::views {:panel-key selected-block}))))
                                         ;  viz-reco? (vec (for [f (ut/splitter
                                         ;                    (ut/replacer @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_edn]]) #"\"" "") ", ")]
                                         ;              (keyword f)))
@@ -7398,7 +7399,7 @@
                                     col-names
                                     ff)
         ;; (try (vec (for [r (get result :result)] (ut/asort r map-order))) (catch :default _ (get result :result)))
-        selected-field-code       (get-in 
+        selected-field-code       (get-in
                                    ;;@(ut/tracked-subscribe [::panel-sql-calls selected-block])
                                    @(rfa/sub ::panel-sql-calls {:panel-key selected-block})
                                    [query-key :select selected-field-idx])
@@ -7414,8 +7415,13 @@
         ;parent-sql (get-in panel-map [:views query-key])
         equal-width-min           100
         row-height                (if (not (nil? row-height)) row-height 25) ;50 ;100 ;25 ;25
-        metadata                  @(ut/tracked-subscribe [::conn/sql-metadata data-keypath])
-        post-metadata             @(ut/tracked-subscribe [::conn/sql-post-metadata data-keypath])
+
+        ;metadata                  @(ut/tracked-subscribe [::conn/sql-metadata data-keypath])
+        ;post-metadata             @(ut/tracked-subscribe [::conn/sql-post-metadata data-keypath])
+
+        metadata                  @(ut/tracked-sub ::conn/sql-metadata-alpha {:keypath data-keypath})
+        post-metadata             @(ut/tracked-sub ::conn/sql-post-metadata-alpha {:keypath data-keypath})
+
         ;post-styles @(ut/tracked-subscribe [::conn/sql-post-styles data-keypath])
         ;post-styles-rows @(ut/tracked-subscribe [::conn/sql-post-styles-row-lookups data-keypath])
         ;post-styles-cells @(ut/tracked-subscribe [::conn/sql-post-styles-cell-lookups data-keypath])
@@ -12722,7 +12728,11 @@
     (doseq [[k v] (merge sql-calls base-table-sniffs)] ;; base-table-sniffs allow us to get metadata for the root tables quietly
       (let [
             query        (sql-alias-replace-sub v)
-                   ;last-known-fields (vec (keys (get @(ut/tracked-subscribe [::conn/sql-metadata [k]]) :fields))) ;; only used for :*all= ATM
+            ;last-known-fields (vec (keys (get @(ut/tracked-subscribe [::conn/sql-metadata [k]]) :fields))) ;; only used for :*all= ATM
+            editor?        @(ut/tracked-sub ::editor? {})
+            selected-block @(ut/tracked-sub ::selected-block {})
+            being-edited? (and @db/cm-focused? editor? (= selected-block panel-key)) ;; dont run while the query is being edited...
+            ;; _ (when being-edited? (ut/tapp>> [:being-edited? @db/cm-focused? "NOT RUNNING" panel-key selected-block]))
             data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
             unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
             connection-id (get query :connection-id connection-id)
@@ -12735,7 +12745,7 @@
               ;;  (ut/tapp>> [:query-all-clicked k data-exists? unrun-sql? query])
 
         ;; (ut/tapp>>  [:unrun? (or (not data-exists?) unrun-sql?) k data-exists? unrun-sql? ])
-        (when (or (not data-exists?) unrun-sql?)
+        (when (and (or (not data-exists?) unrun-sql?) (not being-edited?))
           (let [src @(rfa/sub ::conn/sql-source {:kkey k})
                 srcnew? (not= src query)]
             (if (or (empty? connection-id) (nil? connection-id))
@@ -13451,7 +13461,10 @@
      ;body
      )))
 
-
+(defn maybedoall []
+  (let [hover-highlight? (or @param-hover @query-hover)]
+    (if hover-highlight?
+      doall seq)))
 
 (defn grid [& [tab]]
   ;;(try 
@@ -13545,7 +13558,7 @@
      ;         }
      ;:style {:transform "scale(0.75)"}
      ;:attr {:on-drag-enter #(ut/tapp>> [:dragging-over [ tab]])}
-     :children [(doall
+     :children [((maybedoall)
                  (for [[bw bh brick-vec-key] brick-roots]                ;diff-grid1] ;(if @dragging? current-grid brick-roots)] @(ut/tracked-subscribe [::bricks/subq-panels selected-block])
                    (let [bricksw             (* bw brick-size)
                          bricksh             (* bh brick-size)

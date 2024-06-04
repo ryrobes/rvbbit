@@ -328,8 +328,13 @@
      :child [(reagent/adapt-react-class cm/UnControlled)
              {:value   (ut/format-map 640 ;; (- width-int 95)
                                       (str value))
+              ;; :onBeforeChange (fn [editor _ _] ;; data value]
+              ;;                   (reset! db/cm-instance-panel-code-box editor)
+              ;;                                 ;(ut/tracked-dispatch [::highlight-panel-code])
+              ;;                   )
               ;:value  (str value)
               :onBeforeChange (fn [editor data value]
+                                ;(reset! db/cm-instance-panel-code-box editor)
                                 (reset! cm-instance editor))
               :onBlur  #(let [parse        (try (read-string
                                                  (cstr/join " " (ut/cm-deep-values %)))
@@ -344,18 +349,17 @@
                                 (do (reset! db/bad-form-signals? true)
                                     (reset! db/bad-form-msg-signals "Empty signal"))
 
-                                (and (not (vector? parse)) signal?)
-                                (do (reset! db/bad-form-signals? true)
-                                    (reset! db/bad-form-msg-signals "Needs to be a vector / honey-sql where clause format"))
- 
+                              ;  (and (not (vector? parse)) signal?)
+                              ;  (do (reset! db/bad-form-signals? true)
+                              ;      (reset! db/bad-form-msg-signals "Needs to be a vector / honey-sql where clause format"))
+
                                 :else (if signal?
-                                        
-                                       (do (reset! db/bad-form-signals? false)
-                                          (ut/tracked-dispatch [::edit-signal parse]))
-                                        
+
                                         (do (reset! db/bad-form-signals? false)
-                                            (ut/tracked-dispatch [::edit-basic parse ttype])))
-                                ))
+                                            (ut/tracked-dispatch [::edit-signal parse]))
+
+                                        (do (reset! db/bad-form-signals? false)
+                                            (ut/tracked-dispatch [::edit-basic parse ttype])))))
               :options {:mode              "clojure"
                         ;:lineWrapping      true
                         :lineNumbers       false ;true
@@ -366,7 +370,6 @@
                         :detach            true
                         :readOnly          false
                         :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
-
 
 (defn highlight-code [code]
   (when-let [editor @cm-instance]
@@ -513,7 +516,8 @@
          (assoc-in kp starting-data)
          (assoc :selected-warren-item signal-name)))))
 
-(defn code-box-smol [width-int height-int value & [syntax]]
+(defn code-box-smol [width-int height-int value & [ww]]
+  ;; (ut/tapp>> ["value" value])
   [re-com/box
    :size "auto"
      ;:width "100%" ;(px (- width-int 24))
@@ -524,8 +528,10 @@
            :border-radius "12px"
            :font-weight   700}
    :child [(reagent/adapt-react-class cm/UnControlled)
-           {:value   (ut/format-map 350 ;; (- width-int 95)
-                                    (str value))
+           {:value   (try
+                       (ut/format-map (or ww 350) ;; (- width-int 95)
+                                      (str value))
+                       (catch :default _ value))
             :options {:mode              "clojure"
                       :lineWrapping      true
                       :lineNumbers       false ; true
@@ -1169,7 +1175,7 @@
         other (cond (= warren-item-type :solver) (get @(ut/tracked-sub ::solvers-map {}) selected-warren-item)
                     (= warren-item-type :rule) (get @(ut/tracked-sub ::rules-map {}) selected-warren-item)
                     :else {})
-
+        wwidth (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; pixel calc instead of pct if needed
         results (cond signal?
                   (into {} (for [idx (range (count signal-vec-parts))]
                              (let [sigkw (keyword (str "signal/part-" (ut/replacer (str name) ":" "") "-" idx))
@@ -1195,7 +1201,7 @@
 
     ;; (ut/tapp>> [:right-col ph signals selected-warren-item signal-vec @db/flow-editor-system-mode])
     [re-com/v-box
-     :width "65%"
+     :width "65%" ;; :gap "3px"
      :children [(when selected-warren-item
                   [re-com/v-box
                    :style {;:font-family   (theme-pull :theme/monospaced-font nil)
@@ -1224,21 +1230,28 @@
                           )]])
 
                     [re-com/box
-                     :style {;:border "1px solid orange"
+                     :style {:border (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
+                             :border-radius "4px"
+                             ;;"1px solid orange"
                              }
-                     :height (px (- (* (* ph 0.7) 0.25) 12)) ;; "24%" 
+                     :height (if signal? 
+                               (px (- (* (* ph 0.7) 0.25) 12))
+                               (px (- (* (* ph 0.7) 0.55) 12))
+                               )
                      :padding "6px"
                      :child [code-box
                              (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
 
+                             ;;(- (* (* ph 0.7) 0.25) 5)
                              (if signal?
                                (- (* (* ph 0.7) 0.25) 5)
-                               (- (* (* ph 0.7) 0.25) 5))
+                               (- (* (* ph 0.7) 0.55) 5))
 
                              (if (not signal?)
                                (str other)
                                (str signal-vec))
                              warren-item-type]]
+                    
                     
                     ;;;(when solver? [re-com/box :child "hey"])
 
@@ -1246,16 +1259,18 @@
                       [re-com/box
                        :height (px (if signal? 
                                      (- (* (* ph 0.7) 0.75) 50)
-                                     (- (* (* ph 0.7) 0.75) 50)
+                                     (- (* (* ph 0.7) 0.45) 50)
                                      ;(- (* (* ph 0.9) 0.9) 80)
                                      
                                      )
                                    ) :size "none"
                        :padding "6px"
                        :style (merge
-                               {;:border "1px solid pink" 
+                               {:border (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
+                               :border-radius "4px" 
                                 :overflow "auto"}
                                (when solver? {:border-top (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 88)
+                                              ;:margin-top (px (* (* ph 0.7) 0.30)) 
                                               :border-radius "12px"}))
                        :child (if @db/bad-form-signals?
                                 [re-com/box
@@ -1272,7 +1287,7 @@
                                   [re-com/v-box
                                    :padding "6px"
                                    ;:style {:border "1px solid green"}
-                                   :children [[re-com/box 
+                                   :children [[re-com/box
                                                :style {:font-size "19px"
                                                        :padding-top "6px"
                                                        :font-weight 700}
@@ -1284,23 +1299,24 @@
                                                                     {:keypath [(keyword (str "solver/" (ut/replacer (str selected-warren-item) ":" "")))]})
                                                 nil :solver-meta [] :output nil false]]
                                               
-                                              ;; [re-com/gap :size "20px"]
-                                              ;; [re-com/box
-                                              ;;  :style {:font-size "22px"
-                                              ;;          :font-weight 700}
-                                              ;;  :child "latest returned value metadata"]
-                                              ;; [re-com/box
-                                              ;;  :child
-                                              ;;  ;;;data block-id selected-view keypath kki init-data-type & [draggable?]
-                                              ;;  [bricks/map-boxes2 @(ut/tracked-sub
-                                              ;;                       ::conn/clicked-parameter-key-alpha
-                                              ;;                       {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") ">extra"))]})
-                                              ;;   nil :solver-meta [] :output nil false]]
-                                              
-                                                                              ;; (str @(ut/tracked-sub
-                                                                              ;;        ::conn/clicked-parameter-key-alpha
-                                                                              ;;        {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "")))]}))
-                                              ]]
+                                              [re-com/gap  :size "8px"]
+
+                                              [re-com/box
+                                               :style {:font-size "19px"
+                                                       :padding-top "6px"
+                                                       :font-weight 700}
+                                               :child "latest full output"]
+
+                                              (let [full-output @(ut/tracked-sub
+                                                                  ::conn/clicked-parameter-key-alpha
+                                                                  {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") ">output"))]})]
+                                                [re-com/box
+                                                 :child ;(str "more shit here... error.. println, etc " (str "solver/" (ut/replacer (str selected-warren-item) ":" "")))
+                                                 [code-box-smol nil nil (pr-str full-output) 
+                                                  (- wwidth 100)
+                                                  ;300
+                                                  ]
+                                                 ])]]
                                   
                                   )
                               ;[re-com/box :child "yo"]
@@ -1451,19 +1467,46 @@
                                            :size "auto"
                                            ;:width "600px"
                                            :child
-                                           [bricks/map-boxes2 @(ut/tracked-sub
-                                                                ::conn/clicked-parameter-key-alpha
-                                                                {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") ">extra"))]})
-                                            nil :solver-meta [] :output nil false]]
+                                          ;;  [bricks/map-boxes2 @(ut/tracked-sub
+                                          ;;                       ::conn/clicked-parameter-key-alpha
+                                          ;;                       {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") 
+                                          ;;                                                ">extra"
+                                          ;;                                                ))]})
+                                          ;;   nil :solver-meta [] :output nil false]
+                                           
+                                           [code-box-smol nil nil (pr-str @(ut/tracked-sub
+                                                                            ::conn/clicked-parameter-key-alpha
+                                                                            {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "")
+                                                                                                     ">extra"))]})) (- wwidth 100)]
+                                           
+                                           ]
+                                          
+                                          [re-com/gap :size "8px"]
+                                          
+                                          [re-com/box
+                                           ;:padding "6px"
+                                           :style {:font-size "19px"
+                                                   :padding-top "6px"
+                                                   :font-weight 700}
+                                           :child "recent run history"]
 
                                           [re-com/box
                                            :size "auto"
                                            ;:width "600px"
                                            :child
-                                           [bricks/map-boxes2 @(ut/tracked-sub
-                                                                ::conn/clicked-parameter-key-alpha
-                                                                {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") ">history"))]})
-                                            nil :solver-meta [] :output nil false]]]]]
+                                          ;;  [bricks/map-boxes2 @(ut/tracked-sub
+                                          ;;                       ::conn/clicked-parameter-key-alpha
+                                          ;;                       {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "") 
+                                          ;;                                                ">history"
+                                          ;;                                                ))]})
+                                          ;;   nil :solver-meta [] :output nil false]
+                                           
+                                           [code-box-smol nil nil (pr-str @(ut/tracked-sub
+                                                                            ::conn/clicked-parameter-key-alpha
+                                                                            {:keypath [(keyword (str "solver-meta/" (ut/replacer (str selected-warren-item) ":" "")
+                                                                                                     ">history"))]})) (- wwidth 100)]
+
+                                           ]]]]
 
 
                                 :else "(no signal / rule / solver selected)")])

@@ -13,44 +13,81 @@
  {:signal :signal/every-5-minutes,
   :type :clojure2,
   :data
-  (let
-   [dir
-    "/home/ryanr/rvbbit/frontend/resources/public/images/large"
-    rel-dir
-    "./images/large/"
-    files
-    (->>
-     (file-seq (clojure.java.io/file dir))
-     (filter (fn [x] (.isFile x)))
-     (filter
-      (fn [x] (clojure.string/includes? (str (.getName x)) "8k")))
-     (map (fn [x] (.getName x)))
-     (shuffle))
-    random-file
-    (first files)]
-   (str rel-dir random-file))},
+  (do
+   (defonce selected-files (atom []))
+   (let
+    [dir
+     "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+     rel-dir
+     "./images/large/"
+     files
+     (->>
+      (file-seq (clojure.java.io/file dir))
+      (filter (fn [x] (.isFile x)))
+      (filter
+       (fn [x] (clojure.string/includes? (str (.getName x)) "8k")))
+      (map (fn [x] (.getName x)))
+      (shuffle))
+     random-file
+     (first (remove (set (deref selected-files)) files))
+     _
+     (if
+      random-file
+      (swap! selected-files conj random-file)
+      (do
+       (reset! selected-files [])
+       (let
+        [random-file (first files)]
+        (swap! selected-files conj random-file))))
+     res
+     (str rel-dir random-file)]
+    (println res)
+    (println
+     "("
+     (count (deref selected-files))
+     " files selected previously)")
+    res))},
  :wallpaper-of-the-moment
  {:signal :signal/every-5-minutes,
   :type :clojure,
+  :things? true,
   :data
-  (let
-   [dir
-    "/home/ryanr/rvbbit/frontend/resources/public/images/large"
-    rel-dir
-    "./images/large/"
-    files
-    (->>
-     (file-seq (clojure.java.io/file dir))
-     (filter (fn [x] (.isFile x)))
-     (filter
-      (fn
-       [x]
-       (not (clojure.string/includes? (str (.getName x)) "8k"))))
-     (map (fn [x] (.getName x)))
-     (shuffle))
-    random-file
-    (first files)]
-   (str rel-dir random-file))},
+  (do
+   (defonce selected-files-4k (atom []))
+   (let
+    [dir
+     "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+     rel-dir
+     "./images/large/"
+     files
+     (->>
+      (file-seq (clojure.java.io/file dir))
+      (filter (fn [x] (.isFile x)))
+      (filter
+       (fn
+        [x]
+        (not (clojure.string/includes? (str (.getName x)) "8k"))))
+      (map (fn [x] (.getName x)))
+      (shuffle))
+     random-file
+     (first (remove (set (deref selected-files-4k)) files))
+     _
+     (if
+      random-file
+      (swap! selected-files-4k conj random-file)
+      (do
+       (reset! selected-files-4k [])
+       (let
+        [random-file (first files)]
+        (swap! selected-files-4k conj random-file))))
+     res
+     (str rel-dir random-file)]
+    (println res)
+    (println
+     "("
+     (count (deref selected-files-4k))
+     " files selected previously)")
+    res))},
  :png-wallpaper?
  {:signal :signal/changed-wallpaper?,
   :type :clojure,

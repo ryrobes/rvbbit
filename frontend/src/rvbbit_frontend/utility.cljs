@@ -21,11 +21,22 @@
    [goog.i18n.NumberFormat Format]
    [goog.events EventType]))  
 
+(defn apply-assoc-ins [target-map kv-map]
+  (reduce (fn [acc [k v]] (assoc-in acc k v)) target-map kv-map))
 
 (re-frame/reg-sub ;; for benchmarks
  ::client-name
  (fn [db]
    (get db :client-name)))
+
+(re-frame/reg-sub
+ ::param-lookup
+ (fn [db {:keys [kk]}]
+   (get-in db [:click-param :param kk])
+   ;true
+   ))
+
+(def cache? false)
 
 (declare calculate-atom-size)
 
@@ -43,13 +54,6 @@
      (clj->js (stringify-keywords data)))
     ;(tap> data) ;; fuck it
   )
-
-(defn safe-conj [coll & items] ;;; temp until we find the error!!
-  (if (sequential? coll)
-    (apply conj coll items)
-    (do
-      (tapp>> ["Error: trying to conj onto a non-sequence" "Caller:" (.-stack (js/Error.))  :coll coll :items items])
-      coll)))
 
 ;; (defonce timing-data (atom {}))
 
@@ -140,6 +144,12 @@
      :frequency-buckets (into {} (map (fn [[k v]] [k (count v)]) frequency-buckets))}))
 
 
+;; {:postwalk-replacer-cache? false
+;;  :get-compound-keys-cache? false
+;;  :deep-flatten-cache? false
+;;  :splitter-cache? false
+;;  :replacer-cache? true}
+
 (defonce pre-leaf-clover (atom {}))
 (defonce deep-flatten-data (atom {}))
 (defonce deep-flatten-cache (atom {}))
@@ -156,7 +166,7 @@
     (into #{} (mapcat deep-flatten-real x))
     #{x}))
 
-(defn deep-flatten22 [x]
+(defn deep-flatten* [x]
   (let [hx (pr-str x)]  ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! deep-flatten-cache update hx (fnil inc 0))
     (or (@deep-flatten-data hx)
@@ -164,10 +174,15 @@
           (swap! deep-flatten-data assoc hx deep) 
           deep))))
 
-(defn deep-flatten [x] ;; raw 
-  (if (coll? x)
-    (into #{} (mapcat deep-flatten x))
-    #{x}))
+;; (defn deep-flatten [x] ;; raw 
+;;   (if (coll? x)
+;;     (into #{} (mapcat deep-flatten x))
+;;     #{x}))
+
+(defn deep-flatten [x] ;; param based
+  (if cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?}))
+    (deep-flatten* x)
+    (deep-flatten-real x)))
 
 (defn purge-cache [name percent tracker-atom data-atom & [hard-limit]]
   (let [total-hit-count (reduce + (vals @tracker-atom))
@@ -261,7 +276,7 @@
 (defonce compound-keys-cache (atom {}))
 (defonce compound-keys-tracker (atom {}))
 
-(defn get-compound-keys22 [data]
+(defn get-compound-keys* [data]
   (let [args (pr-str data)]
     (if-let [result (@compound-keys-cache data)]
       (do
@@ -272,8 +287,13 @@
         (swap! compound-keys-tracker update args (fnil inc 0))
         result))))
 
-(defn get-compound-keys [data] ;; raw 
+(defn get-compound-keys-real [data] ;; raw 
   (filter process-key (deep-flatten data)))
+
+(defn get-compound-keys [x] ;; param based
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :get-compound-keys-cache?}))
+    (get-compound-keys* x)
+    (get-compound-keys-real x)))
 
 (defn purge-compound-keys-cache [percent & [hard-limit]]
   (purge-cache "compound-keys-cache" percent compound-keys-tracker compound-keys-cache hard-limit))
@@ -290,7 +310,7 @@
 (defonce replacer-data (atom {}))
 (defonce replacer-cache (atom {}))
 
-(defn replacer22 [x1 x2 x3]
+(defn replacer* [x1 x2 x3]
   (let [x (pr-str [x1 x2 x3])] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! replacer-cache update x (fnil inc 0))
     (or (@replacer-data x)
@@ -298,8 +318,13 @@
           (swap! replacer-data assoc x deep)
           deep))))
 
-(defn replacer [x1 x2 x3]
-  (cstr/replace (str x1) x2 x3))
+;; (defn replacer [x1 x2 x3]
+;;   (cstr/replace (str x1) x2 x3))
+
+(defn replacer [x1 x2 x3] ;; param based
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :replacer-cache?}))
+    (replacer* x1 x2 x3)
+    (cstr/replace (str x1) x2 x3)))
 
 (defn purge-replacer-cache [percent & [hard-limit]]
   (purge-cache "replacer-cache" percent replacer-cache replacer-data hard-limit))
@@ -313,7 +338,7 @@
 (defn matches-pattern? [item kw num]
   (and (vector? item) (= (count item) num) (= (first item) kw)))
 
-(defn extract-patterns22 [data kw num]
+(defn extract-patterns* [data kw num]
   (let [x (pr-str [data kw num])] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! extract-patterns-cache update x (fnil inc 0))
     (or (@extract-patterns-data x)
@@ -328,7 +353,7 @@
             (swap! extract-patterns-data assoc x result)
             result)))))
 
-(defn extract-patterns [data kw num]  ;; raw
+(defn extract-patterns-real [data kw num]  ;; raw
   (let [matches (atom [])]
     (walk/prewalk
      (fn [item]
@@ -337,6 +362,11 @@
        item)
      data)
     @matches))
+
+(defn extract-patterns [data kw num] ;; param based
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
+    (extract-patterns* data kw num)
+    (extract-patterns-real data kw num)))
 
 (defn purge-extract-patterns-cache [percent & [hard-limit]]
   (purge-cache "extract-patterns-cache" percent extract-patterns-cache extract-patterns-data hard-limit))
@@ -381,7 +411,7 @@
 (defonce split-cache-data (atom {}))
 (defonce split-cache (atom {}))
 
-(defn splitter22 [s delimiter]
+(defn splitter* [s delimiter]
   (let [key (pr-str [s delimiter])] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! split-cache update key (fnil inc 0))
     (or (@split-cache-data key)
@@ -389,8 +419,13 @@
           (swap! split-cache-data assoc key result)
           result))))
 
-(defn splitter [s delimiter] ;; raw
-  (cstr/split s delimiter))
+;; (defn splitter [s delimiter] ;; raw
+;;   (cstr/split s delimiter))
+
+(defn splitter [s delimiter] ;; param based
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :splitter-cache?}))
+    (splitter* s delimiter)
+    (cstr/split s delimiter)))
 
 (defn purge-splitter-cache [percent & [hard-limit]]
   (purge-cache "splitter-cache" percent split-cache split-cache-data hard-limit))
@@ -407,7 +442,7 @@
 ;;     (swap! postwalk-replace-cache update hash-key (fnil inc 0))
 ;;     (walk/postwalk-replace walk-map target)))
 
-(defn postwalk-replacer22 [walk-map target]
+(defn postwalk-replacer* [walk-map target]
   (let [hash-key (pr-str [walk-map target])]  ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! postwalk-replace-cache update hash-key (fnil inc 0))
     (or (@postwalk-replace-data-cache hash-key)
@@ -415,8 +450,13 @@
           (swap! postwalk-replace-data-cache assoc hash-key result)
           result))))
 
-(defn postwalk-replacer [walk-map target]
-  (walk/postwalk-replace walk-map target))
+;; (defn postwalk-replacer [walk-map target]
+;;   (walk/postwalk-replace walk-map target))
+
+(defn postwalk-replacer [walk-map target] ;; param based
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :postwalk-replacer-cache?}))
+    (postwalk-replacer* walk-map target)
+    (walk/postwalk-replace walk-map target)))
 
 (defn purge-postwalk-cache [percent & [hard-limit]]
   (purge-cache "postwalk-cache" percent postwalk-replace-cache postwalk-replace-data-cache hard-limit))
