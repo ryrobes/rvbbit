@@ -6,12 +6,13 @@
  {:signal :signal/hourly?,
   :type :clojure,
   :cache? true,
-  :data (+ 1 2 3 90 (rand-int 12345))},
+  :data (+ 1 2 3 90 (rand-int 124345))},
  :static-data
  {:signal false, :type :clojure, :data [(apply + [1 2 3])]},
  :wallpaper-of-the-moment-8k
  {:signal :signal/every-5-minutes,
   :type :clojure2,
+  :cache? false,
   :data
   (do
    (defonce selected-files (atom []))
@@ -99,7 +100,7 @@
     ".png"))},
  :colors-of-the-moment-8k
  {:signal :signal/changed-wallpaper-8k?,
-  :cache? false,
+  :cache? true,
   :type :flow,
   :data
   {:flowmap "node-color-thief-js-webp",
@@ -107,7 +108,7 @@
    :return nil}},
  :colors-of-the-moment
  {:signal :signal/changed-wallpaper?,
-  :cache? false,
+  :cache? true,
   :type :flow,
   :data
   {:flowmap "node-color-thief-js-webp",

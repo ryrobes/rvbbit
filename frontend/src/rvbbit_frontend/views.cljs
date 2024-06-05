@@ -2960,27 +2960,42 @@
 
 (defonce temp-atom (atom {}))
 
+(defn create-clover-keys-from-data [data prefix] ;; prefix as in "theme/"
+  (vec (distinct (flatten
+                  (for [[k v] data]
+                    (if (or (map? v) (vector? v))
+                      (conj
+                       (for [ee (ut/kvpaths v)]
+                         (str (keyword (ut/replacer (str prefix k ">" (cstr/join ">" ee)) ":" ""))))
+                       (str (keyword (str prefix (ut/unkeyword k)))))
+                      (str (keyword (str prefix (ut/unkeyword k)))))))))
+  )
+
 (re-frame/reg-event-db
  ::update-user-params-hash
  (fn [db _]
    (let [fs (vec (for [kk (get db :flow-subs)
-                  :let [[f1 f2] (ut/splitter (ut/replacer (str kk) ":" "") "/")]]
-              [(keyword f1) (keyword f2)]))
+                       :let [[f1 f2] (ut/splitter (ut/replacer (str kk) ":" "") "/")]]
+                   [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
-         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client :solver :solver-meta nil]))
+         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client :solver :signal-history :solver-meta nil]))
+         new-autocompletes (vec (into (create-clover-keys-from-data (get pp-without-fs :param)  "param/")
+                                      (create-clover-keys-from-data (get pp-without-fs :theme)  "theme/")))
          new-h (hash pp-without-fs)
-         client-name (get db :client-name)
-         ]
+         client-name (get db :client-name)]
+;;      (ut/tapp>> [:dd (count @db/autocomplete-keywords)])
 ;;      (ut/tapp>> [:push-params! client-name new-h pp-without-fs
 ;;             {:new
 ;;              (get (vec (cdata/diff pp-without-fs @temp-atom)) 0)}])
+     (reset! db/autocomplete-keywords (set (into new-autocompletes @db/autocomplete-keywords))) ;; dont want to wait for server to push back
+;;      (ut/tapp>> [:dd2 (count @db/autocomplete-keywords)])
      (ut/tracked-dispatch [::wfx/request   :default ;; just a push, no response handling
-                         {:message      {:kind         :sync-client-params
-                                         :params-map   pp-without-fs ;; pp ;; why send things we are getting shipped? just too much. revist this, in case it was a mistake
+                           {:message      {:kind         :sync-client-params
+                                           :params-map   pp-without-fs ;; pp ;; why send things we are getting shipped? just too much. revist this, in case it was a mistake
                                          ;; ^^ I just dont see why we would need to reference a reference, we only want shit that is OWNED by this client/session/screen rabbit-env
                                          ;:flow-params-map 
-                                         :client-name  client-name}
-                          :timeout 10000}])
+                                           :client-name  client-name}
+                            :timeout 10000}])
      (reset! temp-atom pp-without-fs)
      (assoc db :user-params-hash new-h)
      )))
@@ -2993,7 +3008,7 @@
                    [(keyword f1) (keyword f2)]))
          pp (get db :click-param)
          ;;pp-without-fs (ut/remove-keys pp (map first fs))
-         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client :solver :solver-meta nil]))
+         pp-without-fs (ut/remove-keys pp (into (map first fs) [:flow :time :server :flows-sys :client :solver :signal-history :solver-meta nil]))
          ]
      (hash pp-without-fs)))) ;; was :param
 
@@ -3083,7 +3098,7 @@
                                         ;;                  :flowmaps-connections @(ut/tracked-subscribe [::bricks/flowmap-connections])}
                                             :client-name client-name}
                                :on-response [::http/socket-response]
-                               :on-timeout [::http/timeout-response]
+                               :on-timeout [::http/timeout-response :views/run-flow]
                                :timeout    500000}])
           (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
         ;;   (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better

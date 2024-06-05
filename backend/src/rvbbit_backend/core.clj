@@ -596,8 +596,8 @@
     (wss/recycle-worker2) ;; single blocking
     (wss/recycle-worker3) ;; single blocking
 
-    (wss/recycle-workers4 3) ;; run-solver only
-    (wss/recycle-workers5 5) ;; push-to-client only
+    (wss/recycle-workers4 8) ;; run-solver only
+    (wss/recycle-workers5 8) ;; push-to-client only
 
 ;;    (wss/recycle-workers-sql-meta 5) ;; sql meta cnts 
 
@@ -617,6 +617,8 @@
     (def last-look (atom {}))
     (def saved-uids (atom []))
 
+    
+    (ut/pp [:warren-flow? (wss/warren-flow-map [[:thing1 :thing2] [:thing2 :thing3] [:thing1 :thing4] [:thing4 :thing6]] )])
 
     ;; ;; enrich training data?
     ;; ;(async/thread 

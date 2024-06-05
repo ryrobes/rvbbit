@@ -1,0 +1,1824 @@
+{:orders
+ {:flow-fn-sys
+  [:name :description :full_map :inputs :icon :input_types :output_types :category],
+  :fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :gen-viz-797 [:rows :date_posted],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :gen-viz-94 [:diff],
+  :jvm_stats
+  [:used_memory_mb
+   :thread_count
+   :messages
+   :unix_ms
+   :messages_per_second
+   :recent_messages
+   :recent_messages_per_second
+   :recent_queries_run
+   :recent_queries_per_second
+   :queries_per_second
+   :sql_cache_size
+   :ws_peers
+   :subscriptions
+   :open_flow_channels
+   :uptime_seconds
+   :seconds_since_last_update
+   :queries_run
+   :internal_queries_run
+   :sniffs_run
+   :sys_load
+   :ts],
+  :rowcnt-drag-2 [:rowcnt_sum],
+  :gen-viz-828 [:agg :date_posted],
+  :ufo_sightings (:query_error),
+  :flow-fn-categories-sys [:category],
+  :gen-viz-84 [:rows :country],
+  :connections-sys [:database_name :connection_id],
+  :ufo-sightings-drag-9
+  [:city
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :latitude
+   :longitude
+   :shape
+   :state],
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :state-drag-3 [:state :rowcnt],
+  :shape-drag-7 [:shape :rowcnt],
+  :flow-fn-all-sys [:name]},
+ :reco-preview nil,
+ :flow? false,
+ :sql-source
+ {:gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]}},
+ :audio-playing? false,
+ :meta
+ {:flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 128,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100},
+    :description
+    {:data-type "string",
+     :distinct 33,
+     :group-by? true,
+     :commons
+     {"" 94, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 25},
+    :full_map
+    {:data-type "string",
+     :distinct 128,
+     :group-by? true,
+     :commons
+     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
+      1},
+     :cardinality 100},
+    :inputs
+    {:data-type "string",
+     :distinct 67,
+     :group-by? true,
+     :commons
+     {"[:open-input-1 :open-input]" 10,
+      "[:value1 :value2]" 7,
+      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
+     :cardinality 52},
+    :icon
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"zmdi-puzzle-piece" 94, "zmdi-pizza" 3, "zmdi-file-text" 3},
+     :cardinality 16},
+    :input_types
+    {:data-type "string",
+     :distinct 57,
+     :group-by? true,
+     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
+     :cardinality 44},
+    :output_types
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {":any" 67, "" 15, ":string" 13},
+     :cardinality 10},
+    :category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 94, ":rabbit-base" 18, ":clojure-base" 16},
+     :cardinality 2}},
+   :rowcount 128},
+  :fields-sys {:fields {}, :rowcount 0},
+  :tables-sys {:fields {}, :rowcount 0},
+  :gen-viz-797
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 230,
+     :group-by? false,
+     :commons {76 5, 146 4, 116 4},
+     :cardinality 72},
+    :date_posted
+    {:data-type "string",
+     :distinct 317,
+     :group-by? true,
+     :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
+     :cardinality 100}},
+   :rowcount 317},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 93,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "map-pull-test2" 1},
+     :cardinality 96},
+    :file_path
+    {:data-type "string",
+     :distinct 96,
+     :group-by? true,
+     :commons
+     {"./flows/stitches-math.edn" 1,
+      "./flows/openai-image-gen-ladder3.edn" 1,
+      "./flows/hey-rabbit-pathfinder.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 30,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 67, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
+     :cardinality 31}},
+   :rowcount 96},
+  :gen-viz-94
+  {:fields
+   {:diff
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :jvm_stats
+  {:fields
+   {:queries_run
+    {:data-type "integer",
+     :distinct 110,
+     :group-by? true,
+     :commons {114 2, 84 1, 190 1},
+     :cardinality 99},
+    :recent_messages_per_second
+    {:data-type "float",
+     :distinct 78,
+     :group-by? true,
+     :commons {24.07 5, 24.27 4, 25 4},
+     :cardinality 70},
+    :uptime_seconds
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {1259 1, 1364 1, 1004 1},
+     :cardinality 100},
+    :queries_per_second
+    {:data-type "float",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 111},
+     :cardinality 0},
+    :sql_cache_size
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 111},
+     :cardinality 0},
+    :ts
+    {:data-type "string",
+     :distinct 111,
+     :group-by? true,
+     :commons
+     {"2024-06-05 14:44:08" 1, "2024-06-05 14:36:23" 1, "2024-06-05 14:38:08" 1},
+     :cardinality 100},
+    :subscriptions
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {188 107, 16 2, 133 1},
+     :cardinality 3},
+    :messages_per_second
+    {:data-type "float",
+     :distinct 76,
+     :group-by? true,
+     :commons {25.62 5, 25.53 5, 25.39 4},
+     :cardinality 68},
+    :messages
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {19928 1, 17667 1, 8 1},
+     :cardinality 100},
+    :sniffs_run
+    {:data-type "integer",
+     :distinct 104,
+     :group-by? true,
+     :commons {94 2, 42 2, 5 2},
+     :cardinality 93},
+    :sys_load
+    {:data-type "float",
+     :distinct 101,
+     :group-by? true,
+     :commons {9.08 2, 5.58 2, 7.27 2},
+     :cardinality 90},
+    :unix_ms
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {1717612373751 1, 1717612538749 1, 1717613738752 1},
+     :cardinality 100},
+    :used_memory_mb
+    {:data-type "integer",
+     :distinct 109,
+     :group-by? true,
+     :commons {971 2, 884 2, 764 1},
+     :cardinality 98},
+    :recent_queries_run
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? true,
+     :commons {3 43, 4 30, 2 20},
+     :cardinality 8},
+    :thread_count
+    {:data-type "integer",
+     :distinct 29,
+     :group-by? true,
+     :commons {136 12, 133 10, 134 10},
+     :cardinality 26},
+    :internal_queries_run
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 111},
+     :cardinality 0},
+    :open_flow_channels
+    {:data-type "integer",
+     :distinct 8,
+     :group-by? true,
+     :commons {11 46, 104 35, 0 14},
+     :cardinality 7},
+    :ws_peers
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {6 110, 0 1},
+     :cardinality 1},
+    :recent_messages
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {19928 1, 17667 1, 8 1},
+     :cardinality 100},
+    :recent_queries_per_second
+    {:data-type "float",
+     :distinct 9,
+     :group-by? true,
+     :commons {0.2 43, 0.27 30, 0.13 20},
+     :cardinality 8},
+    :seconds_since_last_update
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {14 56, 15 54, -1 1},
+     :cardinality 2}},
+   :rowcount 111},
+  :rowcnt-drag-2
+  {:fields
+   {:rowcnt_sum
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {80332 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :gen-viz-828
+  {:fields
+   {:agg
+    {:data-type "integer",
+     :distinct 230,
+     :group-by? false,
+     :commons {76 5, 146 4, 116 4},
+     :cardinality 72},
+    :date_posted
+    {:data-type "string",
+     :distinct 317,
+     :group-by? true,
+     :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
+     :cardinality 100}},
+   :rowcount 317},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings)"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
+     :cardinality 100}},
+   :rowcount 3},
+  :gen-viz-84
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 6,
+     :group-by? false,
+     :commons {65114 1, 1905 1, 105 1},
+     :cardinality 100},
+    :country
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons {"us" 1, "gb" 1, "de" 1},
+     :cardinality 100}},
+   :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
+  :ufo-sightings-drag-9
+  {:fields
+   {:duration_seconds_int
+    {:data-type "integer",
+     :distinct 54,
+     :group-by? true,
+     :commons {120 53, 180 45, 300 45},
+     :cardinality 10},
+    :city
+    {:data-type "string",
+     :distinct 157,
+     :group-by? true,
+     :commons {"akron" 41, "abilene" 32, "aberdeen" 19},
+     :cardinality 31},
+    :date_posted
+    {:data-type "string",
+     :distinct 194,
+     :group-by? true,
+     :commons {"2001-08-05" 20, "2008-10-31" 12, "2009-12-12" 11},
+     :cardinality 38},
+    :longitude
+    {:data-type "float",
+     :distinct 178,
+     :group-by? true,
+     :commons {-81.5191667 41, 138.598633 37, -99.7327778 30},
+     :cardinality 35},
+    :state
+    {:data-type "string",
+     :distinct 45,
+     :group-by? true,
+     :commons {nil 120, "oh" 48, "tx" 39},
+     :cardinality 9},
+    :duration_seconds
+    {:data-type "string",
+     :distinct 54,
+     :group-by? true,
+     :commons {"120" 53, "300" 45, "180" 45},
+     :cardinality 10},
+    :duration_hours
+    {:data-type "string",
+     :distinct 225,
+     :group-by? true,
+     :commons {"2 minutes" 21, "3 minutes" 18, "1 minute" 18},
+     :cardinality 44},
+    :shape
+    {:data-type "string",
+     :distinct 22,
+     :group-by? true,
+     :commons {"light" 103, "triangle" 62, "fireball" 49},
+     :cardinality 4},
+    :datetime
+    {:data-type "string",
+     :distinct 492,
+     :group-by? true,
+     :commons
+     {"1989-06-04 22:30:00.000000" 3,
+      "2010-05-29 21:50:00.000000" 2,
+      "2006-11-30 12:17:00.000000" 2},
+     :cardinality 98},
+    :latitude
+    {:data-type "string",
+     :distinct 178,
+     :group-by? true,
+     :commons {"41.0813889" 41, "-34.928661" 37, "32.4486111" 30},
+     :cardinality 35},
+    :country
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons {"us" 288, nil 113, "au" 37},
+     :cardinality 1}},
+   :rowcount 500},
+  :duration-hours-drag-43
+  {:fields
+   {:duration_hours
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"30 min." 1, "3 days" 1, "5-7 min" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 162,
+     :group-by? false,
+     :commons {12 29, 13 23, 14 22},
+     :cardinality 32}},
+   :rowcount 500},
+  :city-drag-26
+  {:fields
+   {:city
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons {"ottawa (canada)" 1, "burlington (canada)" 1, "cary" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 118,
+     :group-by? false,
+     :commons {27 35, 26 24, 29 23},
+     :cardinality 23}},
+   :rowcount 500},
+  :reco-counts {:fields {}, :rowcount 0},
+  :state-drag-3
+  {:fields
+   {:state
+    {:data-type "string",
+     :distinct 68,
+     :group-by? true,
+     :commons {"nd" 1, "az" 1, "in" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 68,
+     :group-by? false,
+     :commons {183 1, 968 1, 633 1},
+     :cardinality 100}},
+   :rowcount 68},
+  :shape-drag-7
+  {:fields
+   {:shape
+    {:data-type "string",
+     :distinct 30,
+     :group-by? true,
+     :commons {"formation" 1, "cone" 1, "rectangle" 1},
+     :cardinality 100},
+    :rowcnt
+    {:data-type "integer",
+     :distinct 25,
+     :group-by? false,
+     :commons {1 5, 2 2, 1283 1},
+     :cardinality 83}},
+   :rowcount 30},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 128,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100}},
+   :rowcount 128}},
+ :default-col-widths
+ {:block-11262 {:new-query 153},
+  :virtual-panel {:kick--1764769189 152},
+  :block-11609 {:city-drag-26 180},
+  :block-7416 {:rowcnt-drag-2 161},
+  :block-8805 {:duration-hours-drag-43 180},
+  :system-connections-list* {:connections-sys 111},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-7319 {:shape-drag-7 180},
+  :block-3777 {:state-drag-3 180},
+  :block-4167 {:query-11824 211},
+  :block-1449 {:ufo-sightings-drag-9 141},
+  :system-tables-list* {:tables-sys ##Inf}},
+ :runstream-drops nil,
+ :tabs
+ ["through the rabbit hole and out the other side"
+  "sapphire ape"
+  "fat zebra"
+  "star-shaped wallaby"],
+ :selected-cols nil,
+ :server
+ {:settings
+  {:harvest-on-boot? true,
+   :default "./screens/looking-glass-redux.edn",
+   :eleven-labs-api-key nil,
+   :kits
+   {:outliers
+    {:description
+     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
+     :image-url "images/outliers-image.png",
+     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
+     :name "Outliers",
+     :icon "zmdi-functions",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :outliers,
+     :package-name :query-basics-1},
+    :forecast
+    {:description "WIP: basic timeseries forecasting based on previous values",
+     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
+     :name "Forecasting",
+     :icon "zmdi-brightness-7",
+     :author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :run-on :queries,
+     :repl {:host "127.0.0.1", :port 42999},
+     :kit-name :forecast,
+     :package-name :query-basics-1},
+    :buffy
+    {:author
+     {:name "Ryan Robitaille",
+      :email "ryan.robitaille@gmail.com",
+      :x "@ryrobes",
+      :site "https://ryrob.es/"},
+     :kit-name :buffy,
+     :package-name :grab-bag,
+     :fn (rvbbit-backend.assistants/buffy :query-name),
+     :name "Ask Buffy!",
+     :icon "zmdi-cocktail",
+     :run-on :queries,
+     :description "What does Buffy think about this data? Who knows!"}},
+   :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive",
+   :graphite-host "127.0.0.1",
+   :openapi-org-id nil,
+   :debug-level 1,
+   :screens
+   ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
+    "SSSSSSuccessful-oval-sea-urchin-of-mountain-range"
+    "SSuccessful-oval-sea-urchin-of-mountain-range"
+    "aaa-run-amok"
+    "aaaaah-esday-the-day"
+    "aaaaah-wednesday-the-day"
+    "aaaah-wednesday-the-day"
+    "alarm-clock1"
+    "alarm-clock2"
+    "alice-puzzle-1"
+    "asdasdasdasd"
+    "autumn-theme"
+    "battle-mage"
+    "bigfoot-snapshots"
+    "bigfoot-snapshots2"
+    "bigfoot-snapshots3"
+    "blackberries"
+    "blackberries2"
+    "blackberries3"
+    "blackberries3-narrow"
+    "blackberries3-narrow2"
+    "blank-sizzle"
+    "blank-sizzle2"
+    "blue-pines"
+    "boston-test-10-3-23"
+    "broken-jacket"
+    "bunch of bullshit"
+    "bunch of bullshit2"
+    "bunch of bullshit4"
+    "caliope"
+    "calliope"
+    "canvas-scrubber-test1"
+    "capecod-viking"
+    "chaos simple"
+    "chaos-views"
+    "chompers"
+    "claude-testing2"
+    "clean-grey-defaults"
+    "code-data-literal-stonks-test"
+    "conifer-boughs"
+    "counting-lord-of-the-woods"
+    "crazy-alice"
+    "dark-crested-jackelope"
+    "data-literals-test-sunday"
+    "data-literals-test-sundaydd"
+    "demo-dark-pumpkin-bkgrd-sept23"
+    "demo-light-bkgrd-sept23"
+    "demo-lime-green-slime"
+    "desktops-and-broomsticks"
+    "error-monitor"
+    "error-monitor-vanessa"
+    "error-monitor-vanessa2"
+    "error-monitor-vanessa3"
+    "error-monitor-vanessa4"
+    "error-monitor-vanessa5"
+    "evil-main-street"
+    "fake-books-1"
+    "fake-bricks"
+    "fetching-pentagonal-termite-of-tghe-submarine-canyon"
+    "final-fantasy-dorchester"
+    "fox-hills"
+    "game-of-life"
+    "glass-fish-board-test"
+    "green-storm-city"
+    "hue-board-1"
+    "late-winter-theme"
+    "lavender-side-eye"
+    "layout-test-1"
+    "layout-test-12"
+    "light-theme"
+    "literal-data-test"
+    "looking-glass-conway"
+    "looking-glass-redux"
+    "looking-glass-redux-conway2"
+    "looking-glass-redux-mix5"
+    "looking-glass-redux-viking"
+    "looking-glass-redux-viking2"
+    "looking-glass-redux2"
+    "looking-glass-redux23a"
+    "looking-glass-redux23abb"
+    "looking-glass-redux23b"
+    "looking-glass-redux2a"
+    "looking-glass-redux2aa"
+    "looking-glass-redux45"
+    "looking-glass-redux79"
+    "looking-glass-sine-wave"
+    "luck-of-the-irish"
+    "mapbox-test"
+    "may-20"
+    "my-goodness"
+    "my-goodness-the-sequel"
+    "neverwinter-amy"
+    "night-city-never-sleeps"
+    "nightcity-cape-cod"
+    "nivo-getting-better!"
+    "nivo-hacking-2023"
+    "nivo-hacking-2023333"
+    "nivo-hacking-october-2nd"
+    "old-defaults"
+    "old-fashioned-christmas"
+    "old-town-snow-stars"
+    "pensive-look"
+    "pensive-look2"
+    "pine-wood-dawn"
+    "pink-and-green-elk"
+    "pink-dusk-falls"
+    "pinup-rabbit-fields"
+    "poor-touring-me"
+    "pres-sql-test-1"
+    "purple-dusk-old-town"
+    "purple-nightshades"
+    "purple-techno-sunset"
+    "recharts-test-blocks"
+    "refresh-test"
+    "retro-machines"
+    "riffle-test"
+    "server-stats"
+    "sick-of-your-shit"
+    "sizzle-board-1"
+    "sneaky-swamp-creatures1"
+    "solver-test"
+    "stop-drawing-dead-dashboards"
+    "swamp-nightgown"
+    "swamp-reacher"
+    "tallica-param-test2"
+    "tangerine-dreams"
+    "technicolor-shanny"
+    "the-future-soon"
+    "the-generated-lass"
+    "the-generated-lass-glow"
+    "the-generated-lass-ne"
+    "the-generated-lass-sgt"
+    "the-generated-lassff"
+    "the-memo"
+    "the-memo2"
+    "the-outer-blues"
+    "trad-hybrid"
+    "tweet-bigfoot-is-blurry"
+    "tweet-demo-thing-bigfoot-is-blurry"
+    "unnamed-screen!"
+    "viking-pastels"
+    "weave-test"
+    "weave-test1"
+    "weave-test122"
+    "who ya gonna call?"
+    "who ya gonna call? again"
+    "winter-theme"
+    "winter-theme-choom"
+    "winter-theme2"
+    "winter-theme33"
+    "winter-theme45"
+    "winter-theme47"
+    "winter-twin-peaks"
+    "witchy425"
+    "wonderland-horror-interface"
+    "wow-board"],
+   :openapi-key "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"}},
+ :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
+ :editor? false,
+ :buffy? false,
+ :memory [959390313 894640001 4294705152],
+ :flow-subs
+ [:time/now :flow/flow-forever>*running? :flow/live-scratch-flow>*running?],
+ :client-name :transforming-globular-weasel-12,
+ :flow-editor? true,
+ :openai-api-key "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",
+ :window {:w 1958, :h 1289},
+ :post-meta
+ {:jvm_stats {:* {:rowcount 111}},
+  :gen-viz-797 {:* {:rowcount 317}},
+  :gen-viz-94 {:* {:rowcount 1}},
+  :ufo-sightings-drag-9 {:* {:rowcount 80332}}},
+ :status
+ {:heartbeat
+  {:kick
+   [:time/now :flow/flow-forever>*running? :flow/live-scratch-flow>*running?]},
+  :alert1 {:alerts :alert2}},
+ :screen-name "blank-blue",
+ :recos-page2 0,
+ :selected-warren-item :fun-gorilla,
+ :selected-tab "star-shaped wallaby",
+ :col-names nil,
+ :snapshots nil,
+ :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
+ :alerts
+ [[[:box
+    :child
+    "sent screen save request to server... Please wait."
+    :style
+    {:font-size "12px", :opacity 0.66}]
+   11
+   0.5
+   5164
+   1100038046]],
+ :recos-page 0,
+ :rs-overrides-hashmap {"flow-forever" nil},
+ :base-sniff-queries {:jvm_stats 1498154063, :ufo_sightings 484893751},
+ :panels-hash 826849949,
+ :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
+ :user-params-hash 739004904,
+ :grid-recos? true,
+ :session-hash -2095043751,
+ :resolved-queries
+ {:gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]}},
+ :panels
+ {:block-414
+  {:mad-libs-combo-hash ["572062609" "ufo_sightings_drag_9"],
+   :name "basic_timeseries - \"date_posted, rows\" - 769",
+   :w 9,
+   :root [5 13],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-797
+    {:select [[[:count 1] :rows] :date_posted],
+     :from [:query/ufo-sightings-drag-9],
+     :group-by [:date_posted]}},
+   :tab "sapphire ape",
+   :conditionals nil,
+   :views
+   {:oz
+    [:vega-lite
+     {:layer
+      [{:encoding
+        {:x {:field :date_posted, :type "temporal", :sort "x"},
+         :y {:aggregate "sum", :field :rows, :type "quantitative"},
+         :row {:field nil, :legend nil},
+         :size {:legend nil},
+         :shape {:legend nil},
+         :column {:field nil, :legend nil},
+         :color
+         {:scale :theme/vega-default-color-scheme,
+          :legend nil,
+          :field nil,
+          :type "ordinal"}},
+        :mark
+        {:type "area",
+         :interpolate "monotone",
+         :point "transparent",
+         :tooltip {:content "encoding"}}}],
+      :data {:values :gen-viz-797},
+      :config :theme/vega-defaults,
+      :width "container",
+      :height :panel-height,
+      :padding 4,
+      :background "transparent"}
+     {:actions false}]}},
+  :block-11251
+  {:name "block-11251",
+   :w 6,
+   :selected-view :hi,
+   :root [5 7],
+   :h 2,
+   :queries {},
+   :tab "through the rabbit hole and out the other side",
+   :minimized? true,
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11251.:hi"}
+     :style
+     {:font-size "14px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:push ["flow-forever" ":open-input" 21555]]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-11609
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:city-drag-26
+    {:select [:city [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :ff571]],
+     :group-by [:city],
+     :order-by [[:rowcnt :desc]]}},
+   :root [1 8],
+   :tab "sapphire ape"},
+  :block-3341
+  {:h 3,
+   :w 21,
+   :root [1 21],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-3341",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3341.:hi"}
+     :style
+     {:font-size "66px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:string :time/now]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-7416
+  {:h 5,
+   :w 4,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-drag-from-select-all-ufo_sightings",
+   :queries
+   {:rowcnt-drag-2
+    {:select [[[:sum :rowcnt] :rowcnt_sum]], :from [[:query/city-drag-26 :yy403]]}},
+   :root [1 13],
+   :tab "sapphire ape"},
+  :block-204
+  {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
+   :name "compound_trend_1 - \"date_posted, rows\" - 1141",
+   :w 10,
+   :root [23 13],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-828
+    {:select [[[[:count 1]] :agg] :date_posted],
+     :from [:query/ufo-sightings-drag-9],
+     :order-by [[:date_posted :desc]],
+     :group-by [:date_posted]},
+    :gen-viz-94
+    {:select
+     [[[:max
+        [:round
+         [:raw
+          ["(100 * (("
+           :query-preview/agg.0
+           ".0 - "
+           :query-preview/agg.1
+           ".0) / "
+           :query-preview/agg.0
+           ".0))"]]
+         2]]
+       :diff]],
+     :from [:query/ufo-sightings-drag-9]}},
+   :tab "sapphire ape",
+   :conditionals {:c345-up-or-down? [:> :query-preview/agg.0 :query-preview/agg.1]},
+   :views
+   {:oz
+    [:v-box
+     :size
+     "auto"
+     :height
+     :half-panel-height-px
+     :style
+     {:padding-left "8px", :padding-right "8px"}
+     :children
+     [[:h-box
+       :justify
+       :between
+       :children
+       [[:box
+         :padding
+         "16px"
+         :child
+         [:number :query-preview/agg.0]
+         :style
+         {:font-size "39px", :color "#ffffff"}]
+        [:h-box
+         :padding
+         "13px"
+         :size
+         "auto"
+         :children
+         [[:icon
+           :md-icon-name
+           [:if :condi/c345-up-or-down? "zmdi-chevron-up" "zmdi-chevron-down"]
+           :style
+           {:font-size "55px",
+            :color [:if :condi/c345-up-or-down? "#20f323" "#f36464"],
+            :opacity 0.5,
+            :margin-top "8px"}]
+          [:box
+           :child
+           [:percent :query-preview-2/diff.0]
+           :style
+           {:font-size "25px", :padding "15px"}]]]]]
+      [:box
+       :style
+       {:margin-top "-10px"}
+       :size
+       "auto"
+       :child
+       [:vega-lite
+        {:layer
+         [{:encoding
+           {:x {:field :date_posted, :type "temporal", :title nil, :sort "x"},
+            :y
+            {:aggregate "sum",
+             :field :agg,
+             :title nil,
+             :scale {:zero false},
+             :type "quantitative"},
+            :row {:field nil, :legend nil},
+            :size {:legend nil},
+            :shape {:legend nil},
+            :column {:field nil, :legend nil},
+            :color
+            {:scale {:scheme "purples"}, :legend nil, :field 1, :type "ordinal"}},
+           :mark
+           {:type "line",
+            :interpolate "monotone",
+            :line true,
+            :point true,
+            :tooltip {:content "encoding"}}}],
+         :data {:values :gen-viz-828},
+         :config
+         {:view {:stroke "transparent"},
+          :line {:strokeWidth 3},
+          :axis
+          {:domainColor "#ffffff22",
+           :grid true,
+           :font "Lato",
+           :labelColor "#afafaf",
+           :titleFont "Lato",
+           :titleColor "#282828",
+           :labelFont "Lato",
+           :domain false,
+           :gridColor "#ffffff22",
+           :tickColor "#ffffff22",
+           :axisFont "Lato"},
+          :legend
+          {:labelFont "Lato",
+           :legendFont "Lato",
+           :labelColor "#ffffff99",
+           :titleColor "#ffffff99",
+           :stroke "#ffffff99",
+           :titleFont "Lato"},
+          :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+          :mark {:font "Lato"},
+          :title
+          {:font "Lato",
+           :subtitleFont "Lato",
+           :labelFont "Lato",
+           :titleFont "Lato",
+           :titleColor "#ffffff99"}},
+         :width :panel-width,
+         :height :half-panel-height,
+         :padding 4,
+         :background "transparent"}
+        {:actions false}]]
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :style
+       {:padding-top "133px", :font-size "20px"}
+       :child
+       [:string [:date_posted " vs " :rows]]]]]}},
+  :block-2536
+  {:h 2,
+   :w 16,
+   :root [0 1],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-2536",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-6121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Did you ever need a flow to stop and present an operator with some choices? Static or dynamic we need help to continue processing. How about this ALSO happening headlessly & seamlessly with your data UI?"]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-8805
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:duration-hours-drag-43
+    {:select [:duration_hours [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :cc350]],
+     :group-by [:duration_hours],
+     :order-by [[:rowcnt :desc]]}},
+   :root [25 8],
+   :tab "sapphire ape"},
+  :block-94
+  {:mad-libs-combo-hash ["1561519308" "ufo_sightings_drag_9"],
+   :name "basic_v_bar - \"country, rows\" - 559",
+   :w 9,
+   :root [14 13],
+   :h 5,
+   :connection-id "bigfoot-ufos",
+   :queries
+   {:gen-viz-84
+    {:select [[[:count 1] :rows] :country],
+     :from [:query/ufo-sightings-drag-9],
+     :group-by [:country]}},
+   :tab "sapphire ape",
+   :conditionals nil,
+   :views
+   {:oz
+    [:vega-lite
+     {:layer
+      [{:encoding
+        {:y {:field :country, :type "ordinal"},
+         :x {:aggregate "sum", :field :rows, :type "quantitative"},
+         :row {:field nil, :legend nil},
+         :size {:legend nil},
+         :shape {:legend nil},
+         :column {:field nil, :legend nil},
+         :color
+         {:scale :theme/vega-default-color-scheme,
+          :legend nil,
+          :field 1,
+          :type "ordinal"}},
+        :mark {:type "bar", :tooltip {:content "encoding"}}}],
+      :data {:values :gen-viz-84},
+      :config :theme/vega-defaults,
+      :width "container",
+      :height :panel-height,
+      :padding 4,
+      :background "transparent"}
+     {:actions false}]}},
+  :block-1913
+  {:h 2,
+   :w 16,
+   :root [0 15],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-1913",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-4121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Pretty cool, if you ask me. Regular Dashboards are, like, totally lame - reactive flow-powered data boards...  thats where its at."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-9369
+  {:h 3,
+   :w 16,
+   :root [0 11],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-9369",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-9363.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-7319
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:shape-drag-7
+    {:select [:shape [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :hh354]],
+     :group-by [:shape],
+     :order-by [[:rowcnt :desc]]}},
+   :root [9 8],
+   :tab "sapphire ape"},
+  :block-4121
+  {:h 3,
+   :w 16,
+   :root [0 7],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-4121",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-4121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-3777
+  {:h 5,
+   :w 8,
+   :connection-id "bigfoot-ufos",
+   :name "drag-from-select-all-ufo_sightings",
+   :queries
+   {:state-drag-3
+    {:select [:state [[:count 1] :rowcnt]],
+     :from [[:query/ufo-sightings-drag-9 :uu58]],
+     :group-by [:state],
+     :order-by [[:rowcnt :desc]]}},
+   :root [17 8],
+   :tab "sapphire ape"},
+  :block-6121
+  {:h 2,
+   :w 16,
+   :root [0 4],
+   :tab "through the rabbit hole and out the other side",
+   :selected-view :hi,
+   :name "block-6121",
+   :views
+   {:hi
+    [:box
+     :attr
+     {:id ":block-6121.:hi"}
+     :style
+     {:font-size "15px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     [:speak-click
+      "Here you can see that while running the flow interactively, we get the dialog push, as well as the ability to manipulate the options on the flow directly."]],
+    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-1449
+  {:h 7,
+   :w 32,
+   :connection-id "bigfoot-ufos",
+   :name "select-all-ufo_sightings",
+   :queries
+   {:ufo-sightings-drag-9
+    {:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}},
+   :root [1 1],
+   :tab "sapphire ape",
+   :selected-view :ufo-sightings-drag-9}},
+ :selected-block "none!",
+ :theme-colors-hashmap
+ {"float" "#ff2050",
+  "boolean" "#8EA2A8",
+  "map" "#379fb5",
+  "list" "#36fb04",
+  "string" "#CEEFD1",
+  "any" "#eeeeee",
+  "vector" "#2C4761",
+  "keyword" "#006666",
+  "rabbit-code" "#9F93AE",
+  "datetime" "#A7B2B4",
+  "integer" "#723c5f",
+  "unknown" "#77919B",
+  "date" "#6A6391",
+  "nil" "#68beff"},
+ :click-param
+ {:flow
+  {:crow-flow-201a>*running? false,
+   :counting-loop>*running? false,
+   :live-scratch-flow>*running? false,
+   :flow-forever>*running? false},
+  :time
+  {:now "Wednesday, June 5th 4:35PM",
+   :second 24,
+   :now-seconds "Wednesday, April 24 1:43:57PM",
+   :month 4},
+  :param
+  {:selected-view [nil nil], :selected-view-data nil, :selected-block :block-3341},
+  :theme
+  {:codemirror-theme "rvbbit-dynamic",
+   :editor-param-background-color "#000000",
+   :base-block-style {:backdrop-filter "blur(2px) brightness(30%) "},
+   :vega-defaults
+   {:view {:stroke "transparent"},
+    :axis
+    {:domainColor "#ffffff22",
+     :grid true,
+     :font "Lato",
+     :labelColor "#ffffff88",
+     :titleFont "Lato",
+     :titleColor "#ffffff99",
+     :labelFont "Lato",
+     :domain false,
+     :gridColor "#ffffff22",
+     :tickColor "#ffffff22",
+     :axisFont "Lato"},
+    :legend
+    {:labelFont "Lato",
+     :legendFont "Lato",
+     :labelColor "#ffffff99",
+     :titleColor "#ffffff99",
+     :stroke "#ffffff99",
+     :titleFont "Lato"},
+    :header {:labelFont "Lato", :titleFont "Lato", :titleColor "#ffffff99"},
+    :mark {:font "Lato"},
+    :title
+    {:font "Lato",
+     :subtitleFont "Lato",
+     :labelFont "Lato",
+     :titleFont "Lato",
+     :titleColor "#ffffff99"}},
+   :grid-selected-column-css
+   {:background-color "#00000088", :filter "brightness(200%)"},
+   :base-block-color-selected "#00030a",
+   :block-title-font-color "#ffffff",
+   :base-block-color "#04041e82",
+   :editor-rim-color "#379fb5",
+   :base-block-filter-selected
+   "drop-shadow(0.35rem 0.35rem 0.4rem #8dceff) drop-shadow(-0.35rem -0.35rem 0.4rem #8dceff)",
+   :vega-default-color-scheme {:scheme "pastel2"},
+   :data-colors
+   {"float" "#ff2050",
+    "boolean" "#8EA2A8",
+    "map" "#379fb5",
+    "list" "#36fb04",
+    "string" "#CEEFD1",
+    "any" "#eeeeee",
+    "vector" "#2C4761",
+    "keyword" "#006666",
+    "rabbit-code" "#9F93AE",
+    "datetime" "#A7B2B4",
+    "integer" "#723c5f",
+    "unknown" "#77919B",
+    "date" "#6A6391",
+    "nil" "#68beff"},
+   :editor-grid-selected-font-color "#000000",
+   :monospaced-font "Nova Mono",
+   :editor-grid-selected-background-color "#dc9cb0",
+   :nivo-defaults
+   {:font-family "Instagram Sans",
+    :labels
+    {:text
+     {:fill "#ffffff",
+      :font-size "16px",
+      :font-family "Instagram Sans",
+      :font-weight 700}},
+    :tooltip
+    {:container
+     {:background "#000",
+      :color "#ffffff",
+      :text {:fill "#eeeeee"},
+      :fontSize "18px",
+      :borderRadius "4px",
+      :boxShadow "0 1px 2px rgba(0, 0, 0, 0.55)",
+      :padding "5px 9px"},
+     :basic {:whiteSpace "pre", :display "flex", :alignItems "center"},
+     :tableCell {:padding "3px 5px"}},
+    :axis
+    {:legend
+     {:text
+      {:fill "#ffffff",
+       :font-size "14px",
+       :font-family "Instagram Sans",
+       :font-weight 700}},
+     :ticks
+     {:line {:stroke "#ffffff60"}, :text {:fill "#ffffff60", :font-weight 700}}},
+    :grid {:line {:stroke "#ffffff", :strokeWidth 0, :strokeDasharray "0 0"}}},
+   :editor-outer-rim-color "#379fb5",
+   :grid-selected-font-color "#000000",
+   :block-title-selected-font-color "#ffffff",
+   :grid-selected-background-color "#a3d3ff",
+   :grid-font-color "#ffffff",
+   :canvas-background-css
+   {:background-image "url(images/large/b64-image-98275-59630-4k.webp)",
+    :transition "all 0.8s ease-in-out",
+    :background-size "cover",
+    :background-color "#424f57"},
+   :editor-font-color "#ffffff",
+   :base-font "Nova Square",
+   :block-tab-selected-font-color "#c9d1ff",
+   :editor-background-color "#000006",
+   :editor-grid-font-color "#ffffff"},
+  :ufo-sightings-drag-9
+  {:duration_seconds_int 20,
+   :comments
+   "My older brother and twin sister were leaving the only Edna theater at about 9 PM&#44...we had our bikes and I took a different route home",
+   :city "edna",
+   :date_posted "2004-01-17",
+   :longitude -96.6458333,
+   :state "tx",
+   :duration_seconds "20",
+   :duration_hours "1/2 hour",
+   :id 4,
+   :shape "circle",
+   :datetime "1956-10-10 21:00:00.000000",
+   :latitude "28.9783333",
+   :country "us"},
+  :solver-meta {},
+  :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3},
+  :signal {},
+  :solver {}},
+ :selected-flow "live-scratch-flow",
+ :post-condi {:c345-up-or-down? [{:v 0}]}}

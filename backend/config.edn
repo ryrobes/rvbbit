@@ -40,6 +40,6 @@
                      :default-view [:box :child [:string :*query-id]]
                      :icon "images/python3.png"}}
  :eleven-labs-api-key nil
- :eleven-labs-default-voice-name "Sofia-AI-frye" ;; "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
+ :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive" ;;  "Alicia Speaks-Unique and Pleasant"  ;; "Sofia-AI-frye" ;; "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
  }
 

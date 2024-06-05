@@ -218,24 +218,73 @@
 ;;           (clojure.pprint/pprint @a)
 ;;           (prn @a))))))
 
+;; (defn freeze-atoms
+;;   "Freezes all managed atoms to disk."
+;;   []
+;;   (doall
+;;    (pmap (fn [[file-path a]]
+;;            (pp ["  " :freezing-atom file-path])
+;;            (with-open [wtr (io/writer file-path)]
+;;              (binding [*out* wtr] ;; selective pretty print formatting 
+;;                (if (or (cstr/includes? (str file-path) "signals.")
+;;                        (cstr/includes? (str file-path) "rules.")
+;;                        (cstr/includes? (str file-path) "errors.") 
+;;                        (cstr/includes? (str file-path) "autocomplete") 
+;;                        (cstr/includes? (str file-path) "training-atom.")
+;;                        (cstr/includes? (str file-path) "sql-cache.")
+;;                        (cstr/includes? (str file-path) "solvers."))
+;;                  (clojure.pprint/pprint @a)
+;;                  (prn @a)))))
+;;          @managed-atoms)))
+
+
+;; (defn freeze-atoms
+;;   "Freezes all managed atoms to disk."
+;;   []
+;;   (doall
+;;    (pmap (fn [[file-path a]]
+;;            (with-open [wtr (io/writer file-path)]
+;;              (binding [*out* wtr] ;; selective pretty print formatting 
+;;                (if (or (cstr/includes? (str file-path) "signals.")
+;;                        (cstr/includes? (str file-path) "rules.")
+;;                        (cstr/includes? (str file-path) "errors.")
+;;                        (cstr/includes? (str file-path) "autocomplete")
+;;                        (cstr/includes? (str file-path) "training-atom.")
+;;                        (cstr/includes? (str file-path) "sql-cache.")
+;;                        (cstr/includes? (str file-path) "solvers."))
+;;                  (clojure.pprint/pprint @a)
+;;                  (prn @a))))
+;;            (let [size-in-bytes (java.nio.file.Files/size (java.nio.file.Paths/get file-path (into-array String [])))
+;;                  size-in-mb (/ size-in-bytes 1048576.0)]
+;;              (pp ["  " :freezing-atom file-path :is-now (format "%.2f" size-in-mb) "MB"])))
+;;          @managed-atoms)))
+
+
 (defn freeze-atoms
   "Freezes all managed atoms to disk."
   []
   (doall
    (pmap (fn [[file-path a]]
-           (pp ["  " :freezing-atom file-path])
-           (with-open [wtr (io/writer file-path)]
-             (binding [*out* wtr] ;; selective pretty print formatting 
-               (if (or (cstr/includes? (str file-path) "signals.")
-                       (cstr/includes? (str file-path) "rules.")
-                       (cstr/includes? (str file-path) "errors.") 
-                       (cstr/includes? (str file-path) "autocomplete") 
-                       (cstr/includes? (str file-path) "training-atom.")
-                       (cstr/includes? (str file-path) "sql-cache.")
-                       (cstr/includes? (str file-path) "solvers."))
-                 (clojure.pprint/pprint @a)
-                 (prn @a)))))
+           (let [wtr (io/writer file-path)]
+             (try
+               (binding [*out* wtr] ;; selective pretty print formatting 
+                 (if (or (cstr/includes? (str file-path) "signals.")
+                         (cstr/includes? (str file-path) "rules.")
+                         (cstr/includes? (str file-path) "errors.")
+                         (cstr/includes? (str file-path) "autocomplete")
+                         (cstr/includes? (str file-path) "training-atom.")
+                         (cstr/includes? (str file-path) "sql-cache.")
+                         (cstr/includes? (str file-path) "solvers."))
+                   (clojure.pprint/pprint @a)
+                   (prn @a)))
+               (finally
+                 (.close wtr))))
+           (let [size-in-bytes (java.nio.file.Files/size (java.nio.file.Paths/get file-path (into-array String [])))
+                 size-in-mb (/ size-in-bytes 1048576.0)
+                 size-in-mb-rounded (/ (Math/round (* size-in-mb 100.0)) 100.0)]
+             (pp ["  " :freezing-atom file-path size-in-mb-rounded :mb])))
          @managed-atoms)))
+
 
 ;; (defn freeze-atoms ;; slow as all hell
 ;;   "Freezes all managed atoms to disk."

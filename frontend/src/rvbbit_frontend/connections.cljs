@@ -514,7 +514,7 @@
                                     :extras {:requested? true
                                              :rando (rand-int 1234234525)}}
                        :on-response [::http/socket-response]
-                       :on-timeout [::http/timeout-response]
+                       :on-timeout [::http/timeout-response :conn/refresh]
                        :timeout    50000}]))
 
 (re-frame/reg-sub
@@ -534,7 +534,7 @@
                                     :extras {:requested? true
                                              :rando (rand-int 1234234525)}}
                        :on-response [::http/socket-response]
-                       :on-timeout [::http/timeout-response]
+                       :on-timeout [::http/timeout-response :conn/field-count]
                        :timeout    50000}]))
 
 (re-frame/reg-sub ;; RESOLVE COMPOUND KEY 

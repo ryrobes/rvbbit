@@ -1,0 +1,84 @@
+{:flowmaps
+ {:open-fn-1
+  {:y 1375,
+   :w 125,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 2075,
+   :data {}},
+  :open-fn-2
+  {:y 1475,
+   :w 125,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 2075,
+   :data {}},
+  :open-fn-3
+  {:y 1575,
+   :w 125,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 2075,
+   :data {}},
+  :open-fn-4
+  {:y 1475,
+   :w 125,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 1925,
+   :data {}},
+  :open-fn-5
+  {:y 1475,
+   :w 125,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 1775,
+   :data {}},
+  :open-fn-6
+  {:y 1575,
+   :w 125,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 1775,
+   :data {}},
+  :open-fn-7
+  {:y 1675,
+   :w 125,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 1775,
+   :data {}},
+  :open-fn-8
+  {:y 1675,
+   :w 125,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :h 60,
+   :x 2075,
+   :data {}}},
+ :opts {},
+ :zoom [-784 -862 0.925],
+ :flow-id "base-solver-map",
+ :flowmaps-connections
+ [[:open-fn-1 :open-fn-2/x]
+  [:open-fn-2 :open-fn-3/x]
+  [:open-fn-1 :open-fn-4/x]
+  [:open-fn-5 :open-fn-6/x]
+  [:open-fn-4 :open-fn-6/x]
+  [:open-fn-6 :open-fn-7/x]
+  [:open-fn-3 :open-fn-8/x]]}

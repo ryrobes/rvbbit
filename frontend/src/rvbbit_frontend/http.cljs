@@ -207,12 +207,11 @@
                              (keyword (str "param/" (ut/replacer (str e) ":" "")))))
          themes (vec (for [e (keys (get-in db [:click-param :theme]))]
                        (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
-         codes (vec (apply concat [server-params view-codes themes flow-subs click-params]))
-         ]
+         codes (vec (apply concat [server-params view-codes themes flow-subs click-params]))]
      
   ;;  (ut/tapp>> [:pulled-auto-complete (get db :client-name) (into {} (for [[k v] result] [k (count v)]))])
    ;(assoc db :autocomplete result)
-   (reset! db/autocomplete-keywords (vec (sort (map str codes))))
+   (reset! db/autocomplete-keywords (set (map str codes)))
    db)))
 
   ;; {:clover-params @autocomplete-clover-param-atom
@@ -398,7 +397,7 @@
 
 ;; (ut/tapp>> [:packets-received-log [(count @packets-received-log) @packets-received] (frequencies @packets-received-log)])
 
-(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :solver-meta :panel :client})
+(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :solver-meta :signal-history :panel :client})
 
 (re-frame/reg-event-db
  ::simple-response
@@ -745,6 +744,9 @@
                        :ended-unix (.getTime (js/Date.))
                        :status "success"})))))
 
+(defn find-bogus-keywords [m]
+  (filter (fn [[k v]] (re-find #"[^\w?-]" (name k))) m))
+
 (re-frame/reg-event-fx
  ::save
  (fn [{:keys [db]} [_ save-type screen-name resolved-queries]]
@@ -770,6 +772,14 @@
                      (dissoc :query-history-meta)
                      (dissoc :flow-results)
                      (dissoc :webcam-feed)
+                     (dissoc :rules-map)
+                     (dissoc :sessions)
+                     (dissoc :status-data)
+                     (dissoc :solvers-map)
+                     (dissoc :flow-statuses)
+                     (dissoc :signals-map)
+                     (dissoc :repl-output)
+                     (ut/dissoc-in [:click-param :signal-history])
                      (dissoc :data)
                      (dissoc :flows) ;;; mostly ephemeral with the UI....
                      (dissoc :http-reqs)
@@ -778,10 +788,12 @@
                      (dissoc :file-changed)
                      (assoc :panels (select-keys (get db :panels) p0)))
                  db)
+         bogus-kw (vec (find-bogus-keywords image))
+         image (apply dissoc image (map first bogus-kw))
          request {:image (assoc image :resolved-queries resolved-queries)
                   :client-name client-name
                   :screen-name screen-name}
-         _ (ut/tapp>> [:saving screen-name "!" request])]
+         _ (ut/tapp>> [:saving screen-name "!" request :removed-bogus-keywords bogus-kw])]
      {:db   (assoc-in db [:http-reqs :save-flowset]
                       {:status "running"
                        :url url

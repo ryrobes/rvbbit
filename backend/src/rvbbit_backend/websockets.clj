@@ -442,6 +442,108 @@
 
 
 
+;;; dynamic pool size...
+(def task-queue5d (java.util.concurrent.LinkedBlockingQueue.))
+(def running5d (atom true))
+(def workers5d (atom nil)) ; Holds the futures of the worker threads
+(defonce desired-workers (atom 0))
+
+(defn enqueue-task5d [task]
+  (.put task-queue5d task))
+
+(defn worker-loop5d []
+  (loop []
+    (when (and @running5d (pos? @desired-workers))
+      (let [task (.take task-queue5d)]
+        (task))
+      (swap! desired-workers dec))
+    (recur)))
+
+(defn start-workers5d [num-workers]
+  (ut/pp [:starting-sync-worker-thread-*pool 5 :dynamic])
+  (reset! running5d true)
+  (swap! desired-workers + num-workers)
+  (reset! workers5d (doall (map (fn [_] (future (worker-loop5d))) (range num-workers)))))
+
+(defn stop-workers5d []
+  (reset! running5d false)
+  (doseq [w @workers5d]
+    (future-cancel w)
+    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+      (Thread/sleep 60)))
+  (while (not (.isEmpty task-queue5d)) ; Wait until the task queue is empty
+    (Thread/sleep 60)))
+
+(defn recycle-workers5d [num-workers]
+  (stop-workers5d)
+  (start-workers5d num-workers))
+
+(defn set-desired-workers [num-workers]
+  (reset! desired-workers num-workers))
+
+
+
+
+
+
+
+(def task-queues-slot (atom {})) ; Holds the queues for each keyword
+(def running-slot (atom true))
+(def workers-slot (atom {})) ; Holds the futures of the worker threads for each keyword
+
+;; (defn enqueue-task-slot [keyword task]
+;;   (let [queue (or (@task-queues-slot keyword)
+;;                   (do (swap! task-queues-slot assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
+;;                       (@task-queues-slot keyword)))]
+;;     (.put queue task)))
+
+(defn worker-loop-slot [keyword]
+  (loop []
+    (when @running-slot
+      (let [queue (@task-queues-slot keyword)
+            task (when queue (.take queue))]
+        (when task (task))))
+    (recur)))
+
+(defn start-workers-slot [keyword num-workers]
+  (reset! running-slot true)
+  (swap! workers-slot assoc keyword (doall (map (fn [_] (future (worker-loop-slot keyword))) (range num-workers)))))
+
+(defn enqueue-task-slot [keyword task]
+  (let [queue (or (@task-queues-slot keyword)
+                  (do (swap! task-queues-slot assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
+                      (@task-queues-slot keyword)))]
+    (.put queue task)
+    (when (not (@workers-slot keyword))
+      (start-workers-slot keyword 1))))
+
+
+
+
+
+(defn stop-workers-slot [keyword]
+  (reset! running-slot false)
+  (doseq [w (@workers-slot keyword)]
+    (future-cancel w)
+    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+      (Thread/sleep 60)))
+  (let [queue (@task-queues-slot keyword)]
+    (while (and queue (not (.isEmpty queue))) ; Wait until the task queue is empty
+      (Thread/sleep 60))))
+
+(defn recycle-workers-slot [keyword num-workers]
+  (stop-workers-slot keyword)
+  (start-workers-slot keyword num-workers))
+
+
+
+
+
+
+
+
+
+
 ;; (def task-queue6 (java.util.concurrent.LinkedBlockingQueue.))
 ;; (def workers6 (atom {})) ; Holds a map of task IDs to futures, start times, and task strings
 
@@ -1572,15 +1674,19 @@
 (defn sub-push-loop [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 50))] ;; was 100, was (async/sliding-buffer 450)
+  (let [results (async/chan (async/sliding-buffer 300))] ;; was 100, was (async/sliding-buffer 450)
     (try
       (async/go-loop []
-        (async/<! (async/timeout 600)) ;; was 70 ?
+        (async/<! (async/timeout 450)) ;; was 70 ?
         (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
           (let [items (loop [res []]
                         (if-let [item (ut/dequeue! queue-atom)]
                           (recur (conj res item))
                           res))
+                ;items (loop [res [] count 0] ;;; we cant limit batching since we need to see ALL the messages in the queue in order to find the latest/expired ones...
+                ;        (if-let [item (and (< count 20) (ut/dequeue! queue-atom))]
+                ;          (recur (conj res item) (inc count))
+                ;          res))
                 items-by-task-id (group-by :task-id items)
                 latest-items (mapv (fn [group]
                                      (if
@@ -1605,6 +1711,36 @@
         (async/go-loop [] (recur))))
     results))
 
+;; (defn sub-push-loop [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
+;;   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
+;;   (inc-score! client-name :booted true)
+;;   (let [results (async/chan (async/sliding-buffer 100))] ;; was 100, was (async/sliding-buffer 450)
+;;     (try
+;;       (async/go-loop []
+;;         (async/<! (async/timeout 800)) ;; was 70 ?
+;;         (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
+;;           (let [items (loop [res [] count 0]
+;;                         (if-let [item (and (< count 25) (ut/dequeue! queue-atom))]
+;;                           (recur (conj res item) (inc count))
+;;                           res))
+;;                 items-by-task-id (group-by :task-id items)
+;;                 latest-items (mapv (fn [[task-id group]]
+;;                                      (if (contains? valid-groups task-id)
+;;                                        group
+;;                                        (last group)))
+;;                                    items-by-task-id)]
+;;             (if (not-empty latest-items)
+;;               (let [message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
+;;                 (when (async/>! results message)
+;;                   (recur)))
+;;               (recur)))
+;;           (recur)))
+;;       (catch Throwable e
+;;         (ut/pp [:subscription-err!! sub-name (str e) data])
+;;         (async/go-loop [] (recur))))
+;;     results))
+
+
 (defmethod wl/handle-subscription :server-push2 [{:keys [kind client-name] :as data}]
   (sub-push-loop client-name data client-queues kind))
 
@@ -1616,7 +1752,8 @@
 
 (defn push-to-client [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
   ;(doall
-  (enqueue-task5
+  ;(enqueue-task5
+  (enqueue-task-slot client-name 
    (fn []
      (try
        (let [rr 0 ;(rand-int 3)
@@ -3176,6 +3313,15 @@
   ;; ^^  dont let the web kick off a double run, in case their client state gets fucked up and accidentally allows it (it shouldnt, but still)
     (flow! client-name flowmap file-image flow-id opts true)))
 
+(declare run-solver)
+
+(defmethod wl/handle-request :run-solver [{:keys [solver-name client-name override-map]}]
+  (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
+  (swap! last-solvers-atom-meta assoc-in [solver-name :output] [:warning!
+                                                                {:running-manually-via client-name
+                                                                 :with-override-map override-map}])
+  (run-solver solver-name override-map))
+
 (defn flow-kill! [flow-id client-name]
   (future
     ;;(Thread/sleep 1000) ; wait for 5 seconds for the rest to die so we dont get overwritten by a dying thread
@@ -3216,6 +3362,55 @@
     (stop-process flow-id)
     (flow-kill! flow-id client-name))
   [:assassin-sent!])
+
+(defn warren-flow-map [connections]
+  (let [children (reduce (fn [m [p c]]
+                           (update m p conj c))
+                         {}
+                         connections)
+        assign-levels (fn assign-levels [levels node level]
+                        (if (contains? levels node)
+                          levels
+                          (reduce (fn [acc child]
+                                    (assign-levels acc child (inc level)))
+                                  (assoc levels node level)
+                                  (children node []))))
+        levels (reduce (fn [acc node]
+                         (assign-levels acc node 0))
+                       {}
+                       (keys children))
+        level-nodes (group-by #(get levels %) (keys levels))
+        node-x (reduce-kv (fn [m lvl nodes]
+                            (let [spacing 150
+                                  start-x 100]
+                              (reduce (fn [acc [node idx]]
+                                        (assoc acc node (+ start-x (* idx spacing))))
+                                      m
+                                      (map vector nodes (range)))))
+                          {}
+                          level-nodes)
+        flowmaps (reduce-kv (fn [acc k _]
+                              (assoc acc k {:y (* 125 (get levels k))
+                                            :x (get node-x k)
+                                            :w 125
+                                            :h 60
+                                            :icon "zmdi-functions"
+                                            :z 0
+                                            :ports {:in {:x :any} :out {:out :any}}
+                                            :data {}}))
+                            {}
+                            levels)
+        connections-formatted (map (fn [[from to]]
+                                     [(keyword from) (keyword (str to "/x"))])
+                                   connections)]
+    {:flowmaps flowmaps
+     :flowmaps-connections connections-formatted
+     :opts {}
+     :zoom [-784 -862 0.925]
+     :flow-id "generated-flow-map"}))
+
+
+
 
 
 
@@ -3669,6 +3864,7 @@
         signal?  (= base-type :signal)
         solver?  (= base-type :solver)
         solver-meta?  (= base-type :solver-meta)
+        signal-history? (= base-type :signal-history)
         server?  (= base-type :server)]
     (cond status? flow-status
           tracker? flow-db/tracker
@@ -3677,6 +3873,7 @@
           signal? last-signals-atom ;; no need to split for now, will keep an eye on it
           solver? last-solvers-atom ;; no need to split for now, will keep an eye on it - besides, there is not "natural" keypath split ATM..
           solver-meta? last-solvers-atom-meta
+          signal-history? last-signals-history-atom 
           server? server-atom ;; no need to split for now, will keep an eye on it - don't expect LOTS of writes... but who knows
           time?   time-atom ;; zero need to split ever. lol, its like 6 keys
           panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
@@ -3710,11 +3907,13 @@
         signal?  (= base-type :signal)
         solver?  (= base-type :solver)
         solver-meta?  (= base-type :solver-meta)
+        signal-history? (= base-type :signal-history)
         server?  (= base-type :server)
         keypath  (cond ;flow? keypath 
                    signal? (vec (rest keypath))
                    solver? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec (rest keypath))
                    solver-meta? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec (rest keypath))
+                   signal-history? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec (rest keypath))
                    time?   (vec (rest keypath))
                    server? (vec (rest keypath))
                    screen? (vec (rest sub-path))
@@ -3733,6 +3932,7 @@
                             signal? last-signals-atom ;; no need to split for now, will keep an eye on it - besides there is not natural parent key "work" distribution like others
                             solver? last-solvers-atom ;; no need to split for now, will keep an eye on it - besides there is not natural parent key "work" distribution like others
                             solver-meta? last-solvers-atom-meta
+                            signal-history? last-signals-history-atom
                             server? server-atom ;; no need to split for now, will keep an eye on it - I don't expect LOTS of writes... but who knows
                             time?   time-atom ;; zero need to split ever. lol, its like 6 keys
                             panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
@@ -3780,11 +3980,13 @@
              signal?  (= base-type :signal)
              solver?  (= base-type :solver)
              solver-meta?  (= base-type :solver-meta)
+             signal-history? (= base-type :signal-history)
              server?  (= base-type :server)
              keypath  (cond ;flow? keypath 
                         signal? (vec (rest keypath))
                         solver? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;; (vec (rest keypath))
                         solver-meta? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec (rest keypath))
+                        signal-history? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec (rest keypath))
                         time?   (vec (rest keypath))
                         screen? (vec (rest sub-path))
                         server? (vec (rest sub-path))
@@ -3804,6 +4006,7 @@
                                  signal? last-signals-atom ;; no need to split for now, will keep an eye on it
                                  solver? last-solvers-atom ;; no need to split for now, will keep an eye on it - besides there is not natural parent key "work" distribution like others
                                  solver-meta? last-solvers-atom-meta
+                                 signal-history? last-signals-history-atom
                                  server? server-atom ;; no need to split for now, will keep an eye on it - don't expect LOTS of writes... but who knows
                                  time?   time-atom ;; zero need to split ever. lol, its like 6 keys
                                  panel?  (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
@@ -3927,6 +4130,7 @@
           (= base-type :signal) (get @last-signals-atom client-param-path)
           (= base-type :solver) (get-in @last-solvers-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv) ;; (get @last-solvers-atom client-param-path)
           (= base-type :solver-meta) (get-in @last-solvers-atom-meta (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+          (= base-type :signal-history) (get-in @last-signals-history-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
           (= base-type :server) (get @server-atom client-param-path lv)
           (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
           (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
@@ -3950,9 +4154,9 @@
         formatter (java.time.format.DateTimeFormatter/ofPattern "yyyy-MM-dd HH:mm:ss SSS")]
     (.format zdt formatter)))
 
-(defn run-solver [solver-name]
-  (let [solver-map (get @solvers-atom solver-name)
-        use-cache? (get solver-map :cache? false)
+(defn run-solver [solver-name & [override-map]]
+  (let [solver-map (if (ut/ne? override-map) override-map (get @solvers-atom solver-name))
+        use-cache? (true? (get solver-map :cache? false))
         ;;solver-map (walk/postwalk-replace {} solver-map) ;; we need a universal solver for compund keys - finds needed, resolves them, and replaces them. similar to make-watcher / click-param resolver?
         vdata (get solver-map :data -1)
         vdata-clover-kps (vec (filter
@@ -3976,10 +4180,11 @@
         runner-map (get-in config/settings [:runners runner-name] {})
         runner-type (get runner-map :type runner-name)
         timestamp (System/currentTimeMillis)
-        _ (ut/pp [:trying solver-name runner-type timestamp {:runner-map runner-map :vdata vdata}])
-        cache-key (when use-cache? (hash [vdata runner-name])) ;; since we could have 2 connections with the same data... I suppose.
-        cache-val (when use-cache? (get @solvers-cache-atom cache-key))
-        cache-hit? (true? (and use-cache? (vector? cache-val)))
+        ;;_ (ut/pp [:trying solver-name runner-type timestamp {:runner-map runner-map :vdata vdata}])
+        cache-key [vdata runner-name] ;; since we could have 2 connections with the same data... I suppose.
+        cache-val (get @solvers-cache-atom cache-key)
+        cache-hit? (and use-cache? (ut/ne? cache-val))
+        _ (ut/pp [:solver-cache-key cache-key cache-hit? (ut/ne? cache-val) cache-val use-cache?])
         err? (fn [s] (let [s (str s)] (or (cstr/includes? s "Exception") (cstr/includes? s ":err") (cstr/includes? s ":error"))))
         timestamp-str (cstr/trim (str (when use-cache? "^")
                                       (when cache-hit? "*") " " (millis-to-date timestamp)))]
@@ -3991,7 +4196,7 @@
                        meta-extra {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms 0}}
                        timestamp-str (str timestamp-str " (cache hit)")
                        new-history (vec (conj (get @last-solvers-history-atom solver-name []) timestamp-str))] ;; regardless of what it is, if its cached and enabled, we send it. IFYKYK
-                   (ut/pp [:solver-cache-hit solver-name {:output output :output-full (assoc output-full :cache-hit? true)}])
+                   (ut/pp [:solver-cache-hit! solver-name {:output output :output-full (assoc output-full :cache-hit? true)}])
                    (swap! last-solvers-atom assoc solver-name output)
                    (swap! last-solvers-atom-meta assoc solver-name
                           (merge meta-extra {:history (vec (reverse (take-last 20 new-history)))
@@ -4028,7 +4233,7 @@
                                     :error "none"
                                     :output output-full}))
           (swap! last-solvers-history-atom assoc solver-name new-history)
-          (when use-cache? (swap! solvers-cache-atom assoc cache-key [output output-full])))
+          (swap! solvers-cache-atom assoc cache-key [output output-full]))
         (catch Throwable e
           (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
               (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
@@ -4075,7 +4280,7 @@
                                     :error "none"
                                     :output output-full}))
           (swap! last-solvers-history-atom assoc solver-name new-history)
-          (when use-cache? (swap! solvers-cache-atom assoc cache-key [output output-full])))
+          (swap! solvers-cache-atom assoc cache-key [output-val output-full]))
         (catch Throwable e
           (do (ut/pp [:SOLVER-FLOW-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
               (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
@@ -4094,6 +4299,8 @@
                                   :output output-full}))
         (swap! last-solvers-history-atom assoc solver-name new-history)
         vdata))))
+
+(defonce last-signals-history-atom-temp (atom {}))
 
 (defn process-signal [signal-name & [solver-dep?]]
   (doall
@@ -4137,11 +4344,11 @@
                                                     ;;_ (ut/pp [:part-key kk part-key vvv])
 
                                                      _ (when true ;(not= result (get @last-signals-atom part-key))  ;; no need for dupe histories
-                                                         (swap! last-signals-history-atom assoc-in [kk part-key]
-                                                                (into (vec (take-last 12 (sort-by second (get-in @last-signals-history-atom [kk part-key])))) [[result nowah]])))
+                                                         (swap! last-signals-history-atom-temp assoc-in [kk part-key]
+                                                                (into (vec (take-last 12 (sort-by second (get-in @last-signals-history-atom-temp [kk part-key])))) [[result nowah]])))
                                                      _ (when true ;(not= result (get @last-signals-atom vvv)) ;; no need for dupe histories
-                                                         (swap! last-signals-history-atom assoc-in [kk vvv]
-                                                                (into (vec (take-last 12 (sort-by second (get-in @last-signals-history-atom [kk vvv])))) [[result nowah]])))
+                                                         (swap! last-signals-history-atom-temp assoc-in [kk vvv]
+                                                                (into (vec (take-last 12 (sort-by second (get-in @last-signals-history-atom-temp [kk vvv])))) [[result nowah]])))
                                                      _ (swap! last-signals-atom-stamp assoc vvv nowah)
                                                      _ (swap! last-signals-atom assoc vvv result)
                                                      _ (swap! last-signals-atom assoc part-key result)]] ;; last time we resolved this signal, will be used to stop re-runs on the same signal
@@ -4153,8 +4360,8 @@
                                            result (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))
 
                                            _ (when true ;(not= result (get @last-signals-atom kk))  ;; no need for dupe histories
-                                               (swap! last-signals-history-atom assoc-in [kk kk]
-                                                      (into (vec (take-last 19 (sort-by second (get-in @last-signals-history-atom [kk kk])))) [[result nowah]])))
+                                               (swap! last-signals-history-atom-temp assoc-in [kk kk]
+                                                      (into (vec (take-last 19 (sort-by second (get-in @last-signals-history-atom-temp [kk kk])))) [[result nowah]])))
                                            _ (swap! last-signals-atom assoc kk result)
                                            _ (when (and solver-dep? (true? result)) ;; singal resolved as true and is a solver trigger..
                                                ;(ut/pp [:...solver-dep-TRUE! :GO kk result])
@@ -4162,9 +4369,21 @@
                                                        :when (or (= (get sv :signal) kk)
                                                                  (= (get sv :signal) (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
                                                  ;(ut/pp [:running-solver! sk :dep-met kk])
+
                                                  (enqueue-task4 (fn [] (run-solver sk)))))
+                                           
+                                          ;;  _ (let [signal-vec-parts (get signals-parts-map kk)
+                                          ;;          walk-map (into {} (for [idx (range (count signal-vec-parts))]
+                                          ;;                              (let [sigkw (keyword (str "part-" (cstr/replace (str kk) ":" "") "-" idx))
+                                          ;;                                    name (get signal-vec-parts idx)]
+                                          ;;                                {sigkw name})))]
+                                          ;;      (swap! last-signals-history-atom assoc kk (select-keys (walk/postwalk-replace walk-map (get @last-signals-history-atom-temp kk)) signal-vec-parts)))
+                                           
+                                           _ (swap! last-signals-history-atom assoc kk (get @last-signals-history-atom-temp kk))  ;; one write, to limit client reactions...
+                                           
                                            _ (swap! last-signals-atom-stamp assoc kk nowah)]]
-                                 {[kk vv] result}))]
+                                 {[kk vv] result}))
+         ]
      (doseq [[k v] signals-resolve-map]
        (doseq [[kk vv] v]
          (swap! last-signal-value-atom assoc-in [k kk] vv))) ;; when all done, set "last-value" so future :changed statements work - has to be PER signal, else we miss some                                
@@ -4434,6 +4653,7 @@
         (= base-type :signal) client-param-path
         (= base-type :solver) client-param-path
         (= base-type :solver-meta) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec sub-path) ;; client-param-path
+        (= base-type :signal-history) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec sub-path) ;; client-param-path
         (= base-type :server) client-param-path
         (= base-type :screen) (vec (rest sub-path))
         (= base-type :client) (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -4509,6 +4729,7 @@
                   (= base-type :signal) (get @last-signals-atom client-param-path)
                   (= base-type :solver) (get-in @last-solvers-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv) ;; (get @last-solvers-atom client-param-path)
                   (= base-type :solver-meta) (get-in @last-solvers-atom-meta (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
+                  (= base-type :signal-history) (get-in @last-signals-history-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
                   (= base-type :server) (get @server-atom client-param-path lv)
                   (= base-type :screen) (get-in @screens-atom (vec (rest sub-path)) lv)
                   (= base-type :client) (get-in @params-atom (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) lv)
@@ -6429,7 +6650,7 @@
 
   (defn save [request]
   ;(time 
-    (do
+    (try
       (let [screen-name (get-in request [:edn-params :screen-name])
             client-name (get-in request [:edn-params :client-name] "unknown")
             file-base-name (ut/sanitize-name (str screen-name))
@@ -6439,14 +6660,20 @@
 
         (do (ut/pp [:saved-file file-path])
                ;(ut/pretty-spit file-path (get-in request [:edn-params :image])) ;; file looks good, but SO fuggin slow
-            (ut/pretty-spit file-path (get-in request [:edn-params :image]))
+            (try
+              (ut/pretty-spit file-path (get-in request [:edn-params :image]))
+              (catch Throwable e  (do (ut/pp [:pretty-spit-error-bad-edn? e :saving-raw])
+                                      (spit file-path (get-in request [:edn-params :image])))))
                 ;(spit file-path (get-in request [:edn-params :image]))
 
          ; (async/go
          ;   (async/<! (ut/pretty-spit file-path (get-in request [:edn-params :image])))
          ;   ;(ut/ppln [:finished :prety-spit-fn])
          ;   )
-            (save-alert-notification client-name screen-name fpath false))))
+            (save-alert-notification client-name screen-name fpath false)))
+      (catch Exception e (ut/pp [:error-saving-screen-outer 
+                                 (get-in request [:edn-params :screen-name])
+                                 (get-in request [:edn-params :client-name] "unknown")e])))
    ;)
 
 
@@ -6737,10 +6964,15 @@
         ;;keys (vec (distinct (map first prows)))
           rows (vec (for [r prows] (zipmap [:item_key :item_type :item_sub_type :value :is_live :sample :display_name :block_meta] r)))
 
-          _ (reset! autocomplete-clover-param-atom (vec (distinct (filter #(not
-                                                                            (or (cstr/starts-with? (str %) ":panel/")
-                                                                                (cstr/starts-with? (str %) ":client/")))
-                                                                          (mapv :value rows)))))
+          _ (reset! autocomplete-clover-param-atom
+                    (vec
+                     (distinct
+                      (filter
+                       #(and
+                         (not (or (cstr/starts-with? (str %) ":panel/")
+                                  (cstr/starts-with? (str %) ":client/")))
+                         (<= (count (re-seq #"/" (str %))) 1))
+                       (mapv :value rows)))))
 
           delete-sql {:delete-from [:client_items] :where [:= 1 1]} ;; (cons :or (vec (for [k keys] [:= :item_key k])))}
         ;insert-sql {:insert-into [:client_items] :values rows}
@@ -7431,8 +7663,8 @@
     {:port                 websocket-port
      :join?                false
      :async?               true
-     :min-threads          300
-     :max-threads          1000  ;; Increased max threads
+     ;:min-threads          300
+     ;:max-threads          1000  ;; Increased max threads
      :idle-timeout         10000  ;; Increased idle timeout
      :queue-size           5000  ;; Increased queue size
      :max-idle-time        60000  ;; Increased max idle time

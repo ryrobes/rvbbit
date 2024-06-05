@@ -1,0 +1,11 @@
+{:flow-id "generated-flow-map",
+  :flowmaps {:thing1 {:data {}, :h 60, :icon "zmdi-functions", :ports {:in {:x :any}, :out {:out :any}}, :w 125, :x 100, :y 0, :z 0},
+             :thing2 {:data {}, :h 60, :icon "zmdi-functions", :ports {:in {:x :any}, :out {:out :any}}, :w 125, :x 250, :y 125, :z 0},
+             :thing3 {:data {}, :h 60, :icon "zmdi-functions", :ports {:in {:x :any}, :out {:out :any}}, :w 125, :x 250, :y 250, :z 0},
+             :thing4 {:data {}, :h 60, :icon "zmdi-functions", :ports {:in {:x :any}, :out {:out :any}}, :w 125, :x 100, :y 125, :z 0},
+             :thing6 {:data {}, :h 60, :icon "zmdi-functions", :ports {:in {:x :any}, :out {:out :any}}, :w 125, :x 100, :y 250, :z 0}},
+  :flowmaps-connections ([:thing1 :thing2/x] [:thing2 :thing3/x] [:thing1 :thing4/x] [:thing4 :thing6/x]),
+  :opts {},
+  :zoom [-784 -862 0.925]}
+
+

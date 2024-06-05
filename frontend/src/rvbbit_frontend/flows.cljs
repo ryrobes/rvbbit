@@ -2896,6 +2896,8 @@
                                     (if (some #(= % :*) (keys (get-in flow-map [done-block :ports :out]))) :map
                                         (gn (first (vals (get-in flow-map [done-block :ports :out])))))
                                     (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500")))]
+    
+    (ut/tapp>> [:raw-dogs flowmaps-connections flow-id flow-map])
 
    ;;(ut/tapp>> [:run @(ut/tracked-subscribe [::http/flow-results])])
 
@@ -8510,6 +8512,9 @@
         flow-select @(ut/tracked-subscribe [::selected-flow-block])
         opts-map @(ut/tracked-subscribe [::opts-map])
         has-override? (ut/ne? (get opts-map :overrides))
+        warren-open? (and (= (get @db/flow-editor-system-mode 0) "signals") ;; signals tab selected 
+                          @(ut/tracked-subscribe [::bricks/flow?]) ;; flow panel open
+                          )
         ;; _ (ut/tapp>> [:sizes ww hh
         ;;          (.-innerWidth js/window)
         ;;          (.-innerHeight js/window)])
@@ -8953,7 +8958,9 @@
                                                                         [(reagent/adapt-react-class zpan/TransformComponent)
                                                                          [re-com/v-box ;:style {:border "1px dashed hotpink"}
                                                                           :children [[rc/catch
-                                                                                      [flow-grid panel-width ppanel-height x y flowmaps-connections flow-id flow-map]]
+                                                                                      (if warren-open?
+                                                                                        [flow-grid panel-width ppanel-height x y flowmaps-connections flow-id flow-map]
+                                                                                        [flow-grid panel-width ppanel-height x y flowmaps-connections flow-id flow-map])]
 
                                                                                      (let [;ph 6-0-0 ;; siz hundo
                                                                                            ;pw (* (.-innerWidth js/window) 0.7)

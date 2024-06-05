@@ -376,7 +376,7 @@
   (let [client-name @(ut/tracked-subscribe [::client-name])
         base-opts {:increment-id? false}
         overrides @(ut/tracked-subscribe [::runstream-overrides flow-id])
-        overrides? (not (empty? overrides))
+        overrides? (ut/ne? overrides)
         fstr (str "running flow " flow-id (when overrides? " (with overrides)"))
         w (/ (count fstr) 4.1)]
     (ut/tracked-dispatch [::wfx/request :default
@@ -417,7 +417,7 @@
                                                       lines (ut/remove-punctuation (cstr/lower-case lines))
                                                            ;_ (ut/tapp>> [:k k lines])
                                                       ]
-                                                :when (and (and (not (empty? (cstr/trim k))) (not (empty? (cstr/trim lines))))
+                                                :when (and (and (ut/ne? (cstr/trim k)) (ut/ne? (cstr/trim lines)))
                                                            (cstr/starts-with? lines (str k)))]
                                             (get shouts k))))]
      (ut/tapp>> [:voice-trigger lines shout-flows-to-run])

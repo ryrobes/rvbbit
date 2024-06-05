@@ -312,8 +312,13 @@
 
 (declare highlight-code)
 
-(defn code-box [width-int height-int value ttype]
-  (let [signal? (= ttype :signal)] 
+(defn code-box [width-int height-int value]
+  
+  (doall (let [warren-type-string @(ut/tracked-sub ::warren-item-type {})
+               selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
+               ttype (keyword (ut/replacer warren-type-string ":" ""))
+               signal? (= ttype :signal)] 
+           (ut/tapp>> [:code-box-called-wtih width-int height-int value warren-type-string selected-warren-item ttype])
     [re-com/box
      :size "none"
      ;:width (px (- width-int 24))
@@ -336,30 +341,31 @@
               :onBeforeChange (fn [editor data value]
                                 ;(reset! db/cm-instance-panel-code-box editor)
                                 (reset! cm-instance editor))
-              :onBlur  #(let [parse        (try (read-string
-                                                 (cstr/join " " (ut/cm-deep-values %)))
-                                                (catch :default e [:cannot-parse (str (.-message e))]))
-                              unparseable? (= (first parse) :cannot-parse)]
-                          (cond unparseable?
+              :onBlur  (fn [e]
+                         (let [parse        (try (read-string
+                                                  (cstr/join " " (ut/cm-deep-values e)))
+                                                 (catch :default e [:cannot-parse (str (.-message e))]))
+                               warren-type-string @(ut/tracked-sub ::warren-item-type {}) ;; they dont pass through from parent binding...
+                               selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
+                               ttype (keyword (ut/replacer warren-type-string ":" ""))
+                               signal? (= ttype :signal)
+                               unparseable? (= (first parse) :cannot-parse)]
+                           (ut/tapp>> [:edit-warren-thing value ttype selected-warren-item signal?])
+                           (cond unparseable?
                             ; (js/alert "BAD FORM MATE!!")
-                                (do (reset! db/bad-form-signals? true)
-                                    (reset! db/bad-form-msg-signals (str (last parse))))
+                                 (do (reset! db/bad-form-signals? true)
+                                     (reset! db/bad-form-msg-signals (str (last parse))))
 
-                                (empty? parse)
-                                (do (reset! db/bad-form-signals? true)
-                                    (reset! db/bad-form-msg-signals "Empty signal"))
+                                 (empty? parse)
+                                 (do (reset! db/bad-form-signals? true)
+                                     (reset! db/bad-form-msg-signals "Empty signal"))
 
                               ;  (and (not (vector? parse)) signal?)
                               ;  (do (reset! db/bad-form-signals? true)
                               ;      (reset! db/bad-form-msg-signals "Needs to be a vector / honey-sql where clause format"))
 
-                                :else (if signal?
-
-                                        (do (reset! db/bad-form-signals? false)
-                                            (ut/tracked-dispatch [::edit-signal parse]))
-
-                                        (do (reset! db/bad-form-signals? false)
-                                            (ut/tracked-dispatch [::edit-basic parse ttype])))))
+                                 :else (do (reset! db/bad-form-signals? false)
+                                           (ut/tracked-dispatch [::edit-basic parse ttype selected-warren-item])))))
               :options {:mode              "clojure"
                         ;:lineWrapping      true
                         :lineNumbers       false ;true
@@ -369,7 +375,7 @@
                         :autoScroll        false
                         :detach            true
                         :readOnly          false
-                        :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
+                        :theme             (theme-pull :theme/codemirror-theme nil)}}]])))
 
 (defn highlight-code [code]
   (when-let [editor @cm-instance]
@@ -460,17 +466,21 @@
 (re-frame/reg-event-db
  ::edit-signal
  (undoable)
- (fn [db [_ signal]]
-   (assoc-in db [:signals-map (get db :selected-warren-item) :signal] signal)))
+ (fn [db [_ signal name]]
+   (assoc-in db [:signals-map name :signal] signal)))
 
 (re-frame/reg-event-db
  ::edit-basic
  (undoable)
- (fn [db [_ parsed ttype]] 
+ (fn [db [_ parsed ttype name]]
+   (ut/tapp>> [:edit-basic-called-with parsed ttype name])
    (let [sver (fn [x] (ut/replacer (str x) ":" ""))
          item-type-str (sver ttype)
-         item-type-key (keyword (str item-type-str "s-map"))]
-     (assoc-in db [item-type-key (get db :selected-warren-item)] parsed))))
+         item-type-key (keyword (str item-type-str "s-map"))
+         kp (if (= ttype :signal)
+              [item-type-key name :signal]
+              [item-type-key name])]
+     (assoc-in db kp parsed))))
 
 (re-frame/reg-event-db
  ::delete-signal
@@ -1154,9 +1164,9 @@
         selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
         warren-item-type @(ut/tracked-sub ::warren-item-type {})
 
-        sver (fn [x] (ut/replacer (str x) ":" ""))
-        item-type-str (sver warren-item-type)
-        item-type-key (keyword (str item-type-str "s-map"))
+        ;sver (fn [x] (ut/replacer (str x) ":" ""))
+        ;item-type-str (sver warren-item-type)
+        ;item-type-key (keyword (str item-type-str "s-map"))
 
         signal? (true? (= warren-item-type :signal))
         solver? (true? (= warren-item-type :solver))
@@ -1170,20 +1180,42 @@
         ;;                  @(rfa/sub ::signals-history {})
         ;;                  signal-vec-parts) ;; sometimes we get weird other items if we change fast
 
-        signals-history (when signal? @(rfa/sub ::signals-history {}))
+        ;; signals-history (when signal?
+        ;;                   @(rfa/sub ::signals-history {})
+        ;;                   ;; @(ut/tracked-sub
+        ;;                   ;;   ::conn/clicked-parameter-key-alpha
+        ;;                   ;;   {:keypath [(keyword (str "signal-history/" (ut/unkeyword selected-warren-item)))]})
+        ;;                   )
+        walk-map (cond signal?
+                       (into {} (for [idx (range (count signal-vec-parts))]
+                                  (let [sigkw (keyword (str "part-" (ut/replacer (str selected-warren-item) ":" "") "-" idx))
+                                        name (get signal-vec-parts idx)]
+                                    {sigkw name})))
+                       :else {})
+        signals-history (when signal?
+                            ;;@(rfa/sub ::signals-history {})
+                           @(ut/tracked-sub
+                             ::conn/clicked-parameter-key-alpha
+                             {:keypath [(keyword (str "signal-history/" (ut/unkeyword selected-warren-item)))]})) 
+        signals-history (select-keys (walk/postwalk-replace walk-map signals-history) signal-vec-parts)
+        
 
         other (cond (= warren-item-type :solver) (get @(ut/tracked-sub ::solvers-map {}) selected-warren-item)
                     (= warren-item-type :rule) (get @(ut/tracked-sub ::rules-map {}) selected-warren-item)
                     :else {})
         wwidth (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; pixel calc instead of pct if needed
-        results (cond signal?
-                  (into {} (for [idx (range (count signal-vec-parts))]
-                             (let [sigkw (keyword (str "signal/part-" (ut/replacer (str name) ":" "") "-" idx))
-                                   name (get signal-vec-parts idx)
-                                   ;; vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
-                                   vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})]
-                               {name vv})))
-                  :else {})]
+        ;; results (cond signal?
+        ;;               (into {} (for [idx (range (count signal-vec-parts))]
+        ;;                          (let [sigkw (keyword (str "signal/part-" (ut/replacer (str name) ":" "") "-" idx))
+        ;;                                name (get signal-vec-parts idx)
+        ;;                            ;; vv @(ut/tracked-subscribe [::conn/clicked-parameter-key [sigkw]])
+        ;;                                vv @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sigkw]})]
+        ;;                            {name vv})))
+        ;;               :else {})
+        ]
+    
+    ;; (ut/tapp>> [:singals-history signals-history    ])
+    ;(ut/tapp>> [:singals-history-moded (filter #(cstr/starts-with? (str %) (str ":part-" )) (keys signals-history2))])
 
         ;; ^^^ this is a weird hack we need to revisit - by invoking the param-keys we are summoning them from the server to be read and reactive
         ;; even though it is dereffed in a "safe" place...
@@ -1215,7 +1247,9 @@
                        :justify :between :align :center
                        :children
                        [[edit-item-name selected-warren-item warren-item-type (* ww 0.9)]
-                        (if signal?
+                        (cond
+
+                          signal?
                           [re-com/box
                            :align :center :justify :center
                            :style {;:border "1px solid yellow"
@@ -1226,7 +1260,22 @@
                            :child (str @(ut/tracked-sub
                                          ::conn/clicked-parameter-key-alpha
                                          {:keypath [(keyword (str "signal/" (ut/replacer (str selected-warren-item) ":" "")))]}))]
-                          [re-com/gap :size "10px"] ;; placeholder
+
+                          solver?
+                          [re-com/md-icon-button :src (at)
+                           :md-icon-name "zmdi-play"
+                           :on-click #(ut/tracked-dispatch
+                                       [::wfx/request :default
+                                        {:message    {:kind :run-solver
+                                                      :solver-name selected-warren-item
+                                                      :override-map (get @(ut/tracked-sub ::solvers-map {}) selected-warren-item)
+                                                      :client-name @(ut/tracked-sub ::bricks/client-name {})}
+                                         :timeout    15000000}])
+                           :style {:font-size "17px"
+                                   :cursor "pointer"
+                                   :color (theme-pull :theme/editor-outer-rim-color nil)}]
+
+                          :else [re-com/gap :size "10px"] ;; placeholder
                           )]])
 
                     [re-com/box
@@ -1250,7 +1299,9 @@
                              (if (not signal?)
                                (str other)
                                (str signal-vec))
-                             warren-item-type]]
+                             ;warren-item-type
+                             ;selected-warren-item
+                             ]]
                     
                     
                     ;;;(when solver? [re-com/box :child "hey"])
@@ -1366,11 +1417,28 @@
 
                 ;;               :else "(no signal / rule / solver selected)")]
 
+                (when signal? 
+                  (let [reaktsz [@db/signal-history-ticker?]]
+                  [re-com/h-box
+                   :gap "10px" :align :center 
+                   :style {:font-size "13px" :padding-left "21px"}
+                   :children [[re-com/box :child (str (if @db/signal-history-ticker? "stop" "play"))
+                               :style {:color (if @db/signal-history-ticker? "red" "green")
+                                       :cursor "pointer"
+                                       :font-weight 700}
+                               :attr {:on-click #(reset! db/signal-history-ticker? (not @db/signal-history-ticker?))}]
+                              [re-com/box :child " live history ticker"]
+                              [re-com/md-icon-button :src (at)
+                               :md-icon-name "zmdi-time-countdown"
+                               :style {:font-size "17px"}]
+                              ]]))
+
                 (let [signals-history2 (into {} (for [tt (range (count (get signals-history (first (keys signals-history)))))]
                                         {tt (vec (for [kk (keys signals-history)]
                                                    [kk (get-in signals-history [kk tt])]))}
                                         ))]
                   ;; (ut/tapp>> [:signals-history2 signals-history2])
+                  
                   [re-com/box
                    :padding "6px"
                    :align :center :justify :center
@@ -1387,7 +1455,7 @@
                                                        main-true? (true? (first (last ff)))]]
                                              ^{:key (str selected-warren-item e vv "h-box")}
                                              [re-com/v-box
-                                              :height (px (- (* ph 0.3) 48))
+                                              :height (px (- (* ph 0.3) 85))
                                               :size "auto"
                                               ;:width "600px"
                                               :children (for [[kk [ee tt]] vv
@@ -1650,5 +1718,5 @@
                   [re-com/gap :size "36px"]
                   [panel-options get-map-evt-vec selected-warren-item warren-item-type])
                 [re-com/gap :size "5px"]
-                [re-com/h-box :children [[left-col ph]
-                                         [right-col ph]]]]]))
+                (doall [re-com/h-box :children [[left-col ph]
+                                         [right-col ph]]])]]))

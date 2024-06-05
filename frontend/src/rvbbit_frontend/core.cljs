@@ -219,10 +219,10 @@
       ;:poll-when                [::subs/get-the :auto-run-enabled?]
       :dispatch-event-on-start? false}
 
-     {:interval                 15
-      :event                    [::signals/run-signals-history]
-      :poll-when                [::signals/run-signals-history?]
-      :dispatch-event-on-start? false}
+    ;;  {:interval                 15
+    ;;   :event                    [::signals/run-signals-history]
+    ;;   :poll-when                [::signals/run-signals-history?]
+    ;;   :dispatch-event-on-start? false}
 
     ;;  {:interval                 240
     ;;   :event                    [::purge-sub-cache!]

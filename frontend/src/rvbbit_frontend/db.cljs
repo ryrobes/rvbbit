@@ -22,6 +22,7 @@
 (defonce cm-focused? (reagent/atom false))
 
 (defonce value-spy (reagent/atom {}))
+(defonce signal-history-ticker?  (reagent/atom true))  
 
 (defonce cm-instance-panel-code-box (atom nil)) ;; for highlighting
 (defonce markers-panel-code-box (atom []))

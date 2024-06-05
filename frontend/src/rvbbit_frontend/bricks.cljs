@@ -174,7 +174,7 @@
                    [(keyword f1) (keyword f2)]))
          session-hash (hash [(ut/remove-underscored (get db :panels))
                              ;(get db :click-param)
-                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client :solver :solver-meta nil]))])
+                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client :solver :signal-history :solver-meta nil]))])
          ]
      ;(ut/tapp>> [:pushed-snap? (get db :client-name)])
      (.then (html2canvas element)
@@ -213,7 +213,7 @@
                    [(keyword f1) (keyword f2)]))
          session-hash (hash [(ut/remove-underscored (get db :panels))
                              ;(get db :click-param)
-                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client :solver :solver-meta nil]))
+                             (ut/remove-keys (get db :click-param) (into (map first fs) [:flow :time :server :flows-sys :client :solver :signal-history :solver-meta nil]))
                              ])]
      (and (not= session-hash (get db :session-hash))
           (not (true? (mouse-active-recently? 5)))))))
@@ -425,6 +425,7 @@
                                             (cstr/starts-with? (str %) ":ext-param/")
                                             (cstr/starts-with? (str %) ":solver/")
                                             (cstr/starts-with? (str %) ":solver-meta/")
+                                            (cstr/starts-with? (str %) ":signal-history/")
                                             (cstr/starts-with? (str %) ":panel/")
                                             (cstr/starts-with? (str %) ":client/"))
                                        (filter keyword?
@@ -442,21 +443,28 @@
                    (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">extra"))
                    (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">output"))
                    (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">error"))
-                   (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">history"))
-                   ] [])
+                   (keyword (str "solver-meta/" (ut/replacer (str warren-item) ":" "") ">history"))] [])
          solvers (if (and solver-open? (some #(= % "solvers") @db/selectors-open))
                    (vec (for [ss (keys (get db :solvers-map))] (keyword (str "solver-meta/" (ut/replacer (str ss) ":" "") ">extra")))) [])
          signals-mode?  (and (= (get @db/flow-editor-system-mode 0) "signals") ;; signals tab selected 
                              (get db :flow?) ;; flow panel open
-                             (some #(= % "signals") @db/selectors-open)) ;; signal subbox open
-         signal-ui-refs (when signals-mode? (vec (for [ss (keys (get db :signals-map))] (keyword (str "signal/" (ut/replacer (str ss) ":" ""))))))
+                             ;(some #(= % "signals") @db/selectors-open)
+                             ) ;; signal subbox open
+         signals-box-open? (some #(= % "signals") @db/selectors-open)
+         signal-ui-refs (when signals-box-open? (vec (for [ss (keys (get db :signals-map))] (keyword (str "signal/" (ut/replacer (str ss) ":" ""))))))
          signal-ui-part-refs (when (and warren-item signals-mode?)
                                (let [pps (ut/where-dissect (get-in db [:signals-map warren-item :signal]))]
                                  (vec (for [pp pps]
                                         (keyword (str "signal/part-"
                                                       (ut/replacer (str warren-item) ":" "") "-"
                                                       (.indexOf pps pp)))))))
-         signal-subs (if signals-mode? (vec (into signal-ui-refs signal-ui-part-refs)) [])
+         signal-hist (if (and 
+                          (get-in db [:signals-map warren-item :signal]) 
+                          @db/signal-history-ticker?  ;; unless the ticker is turned off by the user...
+                          signals-mode?)
+                       [(keyword (str "signal-history/" (ut/replacer (str warren-item) ":" "")))] [])
+
+         signal-subs (if signals-mode? (vec (into signal-hist (into signal-ui-refs signal-ui-part-refs))) [])
          ;;_ (when (ut/ne? signal-subs) (ut/tapp>> [:signal-subs  signal-subs]))
         ;; _ (ut/tapp>> [:signal-subs signal-subs])
 
@@ -624,7 +632,7 @@
                                          :flowmap flow-id
                                          :client-name (get db :client-name)}
                             :on-response [::runstream-item]
-                        ;:on-timeout [::http/timeout-response]
+                            ;:on-timeout [::http/timeout-response]
                             :timeout    500000}])))
    db))
 
@@ -3359,11 +3367,9 @@
                        (js/setTimeout #(do (.focus cm)) 100))})))
 
 (defn can-be-autocompleted? [token-string]
-  
   (let [list @db/autocomplete-keywords ;;(vec (map str @(rfa/sub ::parameters-available {})))
         can? (ut/ne? (filter #(clojure.string/starts-with? % token-string) list))
-        _ (ut/tapp>> [:can-be-autocompleted? can? token-string])
-        ]
+        _ (ut/tapp>> [:can-be-autocompleted? can? token-string])]
     ;;(contains? list token-string)
     can?
     ))
@@ -11885,7 +11891,7 @@
                                                                                                      :client-name client-name
                                                                                                      :keypath [:panels panel-key :views selected-view]}
                                                                                         :on-response [::http/socket-response]
-                                                                                        :on-timeout [::http/timeout-response]
+                                                                                        :on-timeout [::http/timeout-response :run-flow-clover]
                                                                                         :timeout    500000}])
                                                                                      (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5]))))
                                                                                               ;;  (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
@@ -12460,7 +12466,7 @@
                                                                 :client-name client-name
                                                                 :keypath [:panels panel-key :views selected-view]}
                                                    :on-response [::http/socket-response]
-                                                   :on-timeout [::http/timeout-response]
+                                                   :on-timeout [::http/timeout-response :run-rs-flow]
                                                    :timeout    500000}])
                             (ut/dispatch-delay 800 [::http/insert-alert [:box :child fstr :style {:font-size "14px"}] w 0.5 5])))))
                             ;; (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
