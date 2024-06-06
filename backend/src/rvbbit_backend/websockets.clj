@@ -3363,8 +3363,59 @@
     (flow-kill! flow-id client-name))
   [:assassin-sent!])
 
+;; (defn warren-flow-map [connections]
+;;   (let [x-offset 784
+;;         y-offset 862
+;;         children (reduce (fn [m [p c]]
+;;                            (update m p conj c))
+;;                          {}
+;;                          connections)
+;;         assign-levels (fn assign-levels [levels node level]
+;;                         (if (contains? levels node)
+;;                           levels
+;;                           (reduce (fn [acc child]
+;;                                     (assign-levels acc child (inc level)))
+;;                                   (assoc levels node level)
+;;                                   (children node []))))
+;;         levels (reduce (fn [acc node]
+;;                          (assign-levels acc node 0))
+;;                        {}
+;;                        (keys children))
+;;         level-nodes (group-by #(get levels %) (keys levels))
+;;         node-x (reduce-kv (fn [m lvl nodes]
+;;                             (let [spacing 150
+;;                                   start-x 100]
+;;                               (reduce (fn [acc [node idx]]
+;;                                         (assoc acc node (+ x-offset start-x (* idx spacing))))
+;;                                       m
+;;                                       (map vector nodes (range)))))
+;;                           {}
+;;                           level-nodes)
+;;         flowmaps (reduce-kv (fn [acc k _]
+;;                               (assoc acc k {:y (+ y-offset (* 125 (get levels k)))
+;;                                             :x (get node-x k)
+;;                                             :w 125
+;;                                             :h 60
+;;                                             :icon "zmdi-functions"
+;;                                             :z 0
+;;                                             :ports {:in {:x :any} :out {:out :any}}
+;;                                             :data {}}))
+;;                             {}
+;;                             levels)
+;;         connections-formatted (map (fn [[from to]]
+;;                                      [(keyword from) (keyword (cstr/replace (str to "/x") ":" ""))])
+;;                                    connections)]
+;;     {:flowmaps flowmaps
+;;      :flowmaps-connections connections-formatted
+;;      :opts {}
+;;      ;;:zoom [x-offset (* y-offset -1) 0.925]
+;;      :flow-id "generated-flow-map"}))
+
+
 (defn warren-flow-map [connections]
-  (let [children (reduce (fn [m [p c]]
+  (let [x-offset 784
+        y-offset 862
+        children (reduce (fn [m [p c]]
                            (update m p conj c))
                          {}
                          connections)
@@ -3380,18 +3431,25 @@
                        {}
                        (keys children))
         level-nodes (group-by #(get levels %) (keys levels))
-        node-x (reduce-kv (fn [m lvl nodes]
-                            (let [spacing 150
-                                  start-x 100]
-                              (reduce (fn [acc [node idx]]
-                                        (assoc acc node (+ start-x (* idx spacing))))
-                                      m
-                                      (map vector nodes (range)))))
-                          {}
-                          level-nodes)
-        flowmaps (reduce-kv (fn [acc k _]
-                              (assoc acc k {:y (* 125 (get levels k))
-                                            :x (get node-x k)
+        node-positions (reduce-kv (fn [m lvl nodes]
+                                    (let [child-nodes (mapcat children nodes)
+                                          parent-avg-x (if (seq child-nodes)
+                                                         (/ (reduce + (keep #(when-let [pos (get m %)]
+                                                                               (first pos))
+                                                                            (map #(get m % [0]) child-nodes)))
+                                                            (count child-nodes))
+                                                         0)
+                                          spacing 150
+                                          start-x (+ x-offset (max 100 parent-avg-x))]
+                                      (reduce (fn [acc [node idx]]
+                                                (assoc acc node [(+ start-x (* idx spacing)) (* 125 lvl)]))
+                                              m
+                                              (map vector nodes (range)))))
+                                  {}
+                                  level-nodes)
+        flowmaps (reduce-kv (fn [acc k [x y]]
+                              (assoc acc k {:y (+ y y-offset)
+                                            :x x
                                             :w 125
                                             :h 60
                                             :icon "zmdi-functions"
@@ -3399,15 +3457,17 @@
                                             :ports {:in {:x :any} :out {:out :any}}
                                             :data {}}))
                             {}
-                            levels)
+                            node-positions)
         connections-formatted (map (fn [[from to]]
-                                     [(keyword from) (keyword (str to "/x"))])
+                                     [(keyword from) (keyword (cstr/replace (str to "/x") ":" ""))])
                                    connections)]
     {:flowmaps flowmaps
      :flowmaps-connections connections-formatted
      :opts {}
-     :zoom [-784 -862 0.925]
+     ;:zoom [x-offset y-offset 0.925]
      :flow-id "generated-flow-map"}))
+
+
 
 
 

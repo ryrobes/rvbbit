@@ -618,7 +618,26 @@
     (def saved-uids (atom []))
 
     
-    (ut/pp [:warren-flow? (wss/warren-flow-map [[:thing1 :thing2] [:thing2 :thing3] [:thing1 :thing4] [:thing4 :thing6]] )])
+    (let [signals (vec  (keys @wss/signals-atom))
+          signalsv (vec (apply concat
+                               (for [[k v] @wss/signals-atom]
+                                 (for [e (filter #(and (keyword? %) (or (some (fn [x] (= x %)) signals)
+                                                      (cstr/includes? (str %) "/"))) (ut/deep-flatten (get v :signal)))]
+                                   [e (keyword (str "signal/" (cstr/replace (str k) ":" "")))]))))
+          solvers (vec (for [[k v] @wss/solvers-atom
+                        :when (keyword? (get v :signal))] 
+                    [(get v :signal) (keyword (str "solver/" (cstr/replace (str k) ":" "")))]))
+          conns (vec (distinct (into signalsv solvers)))
+          fmap (wss/warren-flow-map conns)]
+      (ut/pretty-spit "./flows/generated-flow-map.edn" fmap)
+      (ut/pp [:warren-flow? 
+              ;signalsv
+              ;solvers  
+              conns
+              ;;fmap
+              ]))
+    
+    ;;(System/exit 0)
 
     ;; ;; enrich training data?
     ;; ;(async/thread 

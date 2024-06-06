@@ -1713,7 +1713,11 @@
      :height (px ph)
      :style {;;:border "1px solid cyan"
              :border-radius "8px"
-             :background-color (str (theme-pull :theme/editor-rim-color nil) "18")}
+             :background-color (let [tc (theme-pull :theme/editor-rim-color nil)
+                                     len (count tc)
+                                     has-opacity? (= len 9)
+                                     cc (if has-opacity? (subs tc 0 7) tc)]
+                                 (str cc "18"))}
      :children [(if (= warren-item-type :unknown)
                   [re-com/gap :size "36px"]
                   [panel-options get-map-evt-vec selected-warren-item warren-item-type])
