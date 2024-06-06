@@ -336,12 +336,12 @@
    [:time/day :signal/glowing-bat-signal/x]
    [:time/second :signal/glowing-bat-signal/x]
    [:time/hour :signal/glowing-bat-signal/x]
-   [:signal/cool-raccoon-signal-yo :solver/vibrant-antelope-solver/x]
-   [:signal/hourly? :solver/dazzling-gnu-solver/x]
+   [:signal/changed-wallpaper? :solver/colors-of-the-moment/x]
    [:signal/every-5-minutes :solver/wallpaper-of-the-moment-8k/x]
-   [:signal/every-5-minutes :solver/wallpaper-of-the-moment/x]
-   [:signal/changed-wallpaper? :solver/png-wallpaper?/x]
    [:signal/changed-wallpaper-8k? :solver/colors-of-the-moment-8k/x]
-   [:signal/changed-wallpaper? :solver/colors-of-the-moment/x]),
+   [:signal/cool-raccoon-signal-yo :solver/vibrant-antelope-solver/x]
+   [:signal/changed-wallpaper? :solver/png-wallpaper?/x]
+   [:signal/every-5-minutes :solver/wallpaper-of-the-moment/x]
+   [:signal/hourly? :solver/dazzling-gnu-solver/x]),
  :opts {},
  :flow-id "generated-flow-map"}

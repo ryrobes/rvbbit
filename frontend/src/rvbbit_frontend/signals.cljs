@@ -331,7 +331,7 @@
              ;:border "1px solid yellow"
              :font-weight   700}
      :child [(reagent/adapt-react-class cm/UnControlled)
-             {:value   (ut/format-map 640 ;; (- width-int 95)
+             {:value   (ut/format-map 550 ;; (- width-int 95)
                                       (str value))
               ;; :onBeforeChange (fn [editor _ _] ;; data value]
               ;;                   (reset! db/cm-instance-panel-code-box editor)
@@ -1289,7 +1289,7 @@
                                )
                      :padding "6px"
                      :child [code-box
-                             (* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
+                             nil ;(* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width
 
                              ;;(- (* (* ph 0.7) 0.25) 5)
                              (if signal?
@@ -1343,12 +1343,21 @@
                                                        :padding-top "6px"
                                                        :font-weight 700}
                                                :child "latest returned value"]
-                                              [re-com/box
-                                               :child
-                                               [bricks/map-boxes2 @(ut/tracked-sub
-                                                                    ::conn/clicked-parameter-key-alpha
-                                                                    {:keypath [(keyword (str "solver/" (ut/replacer (str selected-warren-item) ":" "")))]})
-                                                nil :solver-meta [] :output nil false]]
+                                              (let [vv @(ut/tracked-sub
+                                                         ::conn/clicked-parameter-key-alpha
+                                                         {:keypath [(keyword (str "solver/" (ut/replacer (str selected-warren-item) ":" "")))]})
+                                                    sql-solver? (try (some #(= % :_cache-query) (keys vv)) (catch :default _ false))]
+                                                (if sql-solver?
+                                                  [re-com/box 
+                                                   ;:style {:border "1px solid yellow"}
+                                                   :align :center :justify :center 
+                                                   :child [bricks/honeycomb-fragments vv 11 5]]
+                                                  ;; [re-com/box :child (str vv)]
+                                                  [re-com/box
+                                                   :child
+                                                   [bricks/map-boxes2 vv
+                                                    nil :solver-meta [] :output nil false]]
+                                                  ))
                                               
                                               [re-com/gap  :size "8px"]
 
@@ -1683,11 +1692,9 @@
         panel-height (* hh hpct)
         details-panel-height (/ panel-height 1.25) ;; batshit math from flow.cljs panel parent
         ppanel-height (+ panel-height details-panel-height)
-
         selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
         warren-item-type @(ut/tracked-sub ::warren-item-type {})
         ;; signals-map @(ut/tracked-sub ::signals-map {})
-
         sver (fn [x] (ut/replacer (str x) ":" ""))
          item-type-str (sver warren-item-type)
          item-type-key (keyword (str item-type-str "s-map"))

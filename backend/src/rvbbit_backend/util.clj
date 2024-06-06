@@ -319,6 +319,8 @@
 ;;   (when (seq nums)
 ;;     (/ (reduce + nums) (count nums))))
 
+(defn safe-name [x] (cstr/replace (str x) ":" ""))
+
 (defn avg [nums]
   (when (seq nums)
     (Math/round (/ (reduce + nums) (double (count nums))))))
@@ -1233,6 +1235,11 @@
 
       :else data)))
 
+(defn clean-sql-from-ui-keys [query]
+  (let [res (deep-remove-keys
+             query
+             [:cache? :col-widths :row-height :render-all? :refresh-every :page :connection-id :deep-meta? :clicked-row-height :style-rules])]
+    res))
 
 (defn deep-remove-keys2 [data keys-to-remove] ;; doent automatically remove underscore keys 
   (let [key-remove-set (set keys-to-remove)]

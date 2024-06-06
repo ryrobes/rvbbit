@@ -694,8 +694,8 @@
                                                 :children [[:box
                                                             :style {:color :theme/editor-outer-rim-color :font-weight 700}
                                                             :child
-                                                            [:speak-always (str "Heads up: data-rabbit system going offline.")]
-                                                            ;[:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]
+                                                            ;[:speak-always (str "Heads up: data-rabbit system going offline.")]
+                                                            [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]
                                                             ]]]10 1 5)))
                              ;(wss/destroy-websocket-server!)
                              (Thread/sleep 2000)
@@ -1233,8 +1233,8 @@
                          :children [[:box
                                      :style {:color :theme/editor-outer-rim-color :font-weight 700}
                                      :child
-                                     [:speak-always (str "heeeeyya - data-rabbit system is now online.")]
-                                     ;[:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]
+                                     ;;[:speak-always (str "heeeeyya - data-rabbit system is now online.")]
+                                     [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]
                                      ]]]10 1 5)))
 
 

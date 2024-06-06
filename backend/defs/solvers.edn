@@ -1,14 +1,11 @@
-{:vibrant-antelope-solver
- {:signal :signal/cool-raccoon-signal-yo,
-  :type :clojure2,
-  :data (+ 1 2 3 88 (rand-int 1234))},
- :dazzling-gnu-solver
- {:signal :signal/hourly?,
-  :type :clojure,
+{:colors-of-the-moment
+ {:signal :signal/changed-wallpaper?,
   :cache? true,
-  :data (+ 1 2 3 90 (rand-int 124345))},
- :static-data
- {:signal false, :type :clojure, :data [(apply + [1 2 3])]},
+  :type :flow,
+  :data
+  {:flowmap "node-color-thief-js-webp",
+   :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
+   :return nil}},
  :wallpaper-of-the-moment-8k
  {:signal :signal/every-5-minutes,
   :type :clojure2,
@@ -48,6 +45,61 @@
      (count (deref selected-files))
      " files selected previously)")
     res))},
+ :colors-of-the-moment-8k
+ {:signal :signal/changed-wallpaper-8k?,
+  :cache? true,
+  :type :flow,
+  :data
+  {:flowmap "node-color-thief-js-webp",
+   :opts {:overrides {:image-path :solver/wallpaper-of-the-moment-8k}},
+   :return nil}},
+ :vibrant-antelope-solver
+ {:signal :signal/cool-raccoon-signal-yo,
+  :type :clojure2,
+  :data (+ 1 2 3 88 (rand-int 1234))},
+ :sql-solver-1
+ {:signal false,
+  :type :sql,
+  :data
+  {:cache? false,
+   :limit 25,
+   :group-by [:ts],
+   :refresh-every 20,
+   :from
+   [{:select
+     [:recent_messages_per_second
+      :messages_per_second
+      :mem_used
+      :batches
+      :packets
+      :ts],
+     :from [[:client_memory :ee183]],
+     :order-by [[:mem_time :desc]]}],
+   :order-by [[:ts :desc]],
+   :connection-id "system-db",
+   :select
+   [[[[:sum :mem_used]] :mem_used]
+    [[:sum :recent_messages_per_second] :messages_per_second]
+    :ts],
+   :post-process-fn
+   (fn
+    [x]
+    (vec
+     (reverse
+      (for
+       [row x]
+       (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}},
+ :static-data
+ {:signal false, :type :clojure, :data [(apply + [1 2 3])]},
+ :png-wallpaper?
+ {:signal :signal/changed-wallpaper?,
+  :type :clojure,
+  :cache? true,
+  :data
+  (true?
+   (clojure.string/ends-with?
+    :solver/wallpaper-of-the-moment
+    ".png"))},
  :wallpaper-of-the-moment
  {:signal :signal/every-5-minutes,
   :type :clojure,
@@ -89,28 +141,8 @@
      (count (deref selected-files-4k))
      " files selected previously)")
     res))},
- :png-wallpaper?
- {:signal :signal/changed-wallpaper?,
+ :dazzling-gnu-solver
+ {:signal :signal/hourly?,
   :type :clojure,
   :cache? true,
-  :data
-  (true?
-   (clojure.string/ends-with?
-    :solver/wallpaper-of-the-moment
-    ".png"))},
- :colors-of-the-moment-8k
- {:signal :signal/changed-wallpaper-8k?,
-  :cache? true,
-  :type :flow,
-  :data
-  {:flowmap "node-color-thief-js-webp",
-   :opts {:overrides {:image-path :solver/wallpaper-of-the-moment-8k}},
-   :return nil}},
- :colors-of-the-moment
- {:signal :signal/changed-wallpaper?,
-  :cache? true,
-  :type :flow,
-  :data
-  {:flowmap "node-color-thief-js-webp",
-   :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
-   :return nil}}}
+  :data (+ 1 2 3 90 (rand-int 124345))}}
