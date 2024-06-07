@@ -225,11 +225,11 @@
 ;;    (pmap (fn [[file-path a]]
 ;;            (pp ["  " :freezing-atom file-path])
 ;;            (with-open [wtr (io/writer file-path)]
-;;              (binding [*out* wtr] ;; selective pretty print formatting 
+;;              (binding [*out* wtr] ;; selective pretty print formatting
 ;;                (if (or (cstr/includes? (str file-path) "signals.")
 ;;                        (cstr/includes? (str file-path) "rules.")
-;;                        (cstr/includes? (str file-path) "errors.") 
-;;                        (cstr/includes? (str file-path) "autocomplete") 
+;;                        (cstr/includes? (str file-path) "errors.")
+;;                        (cstr/includes? (str file-path) "autocomplete")
 ;;                        (cstr/includes? (str file-path) "training-atom.")
 ;;                        (cstr/includes? (str file-path) "sql-cache.")
 ;;                        (cstr/includes? (str file-path) "solvers."))
@@ -237,14 +237,13 @@
 ;;                  (prn @a)))))
 ;;          @managed-atoms)))
 
-
 ;; (defn freeze-atoms
 ;;   "Freezes all managed atoms to disk."
 ;;   []
 ;;   (doall
 ;;    (pmap (fn [[file-path a]]
 ;;            (with-open [wtr (io/writer file-path)]
-;;              (binding [*out* wtr] ;; selective pretty print formatting 
+;;              (binding [*out* wtr] ;; selective pretty print formatting
 ;;                (if (or (cstr/includes? (str file-path) "signals.")
 ;;                        (cstr/includes? (str file-path) "rules.")
 ;;                        (cstr/includes? (str file-path) "errors.")
@@ -259,7 +258,6 @@
 ;;              (pp ["  " :freezing-atom file-path :is-now (format "%.2f" size-in-mb) "MB"])))
 ;;          @managed-atoms)))
 
-
 (defn freeze-atoms
   "Freezes all managed atoms to disk."
   []
@@ -267,7 +265,7 @@
    (pmap (fn [[file-path a]]
            (let [wtr (io/writer file-path)]
              (try
-               (binding [*out* wtr] ;; selective pretty print formatting 
+               (binding [*out* wtr] ;; selective pretty print formatting
                  (if (or (cstr/includes? (str file-path) "signals.")
                          (cstr/includes? (str file-path) "rules.")
                          (cstr/includes? (str file-path) "errors.")
@@ -284,7 +282,6 @@
                  size-in-mb-rounded (/ (Math/round (* size-in-mb 100.0)) 100.0)]
              (pp ["  " :freezing-atom file-path size-in-mb-rounded :mb])))
          @managed-atoms)))
-
 
 ;; (defn freeze-atoms ;; slow as all hell
 ;;   "Freezes all managed atoms to disk."
@@ -480,10 +477,9 @@
   (let [[r g b] (hex-to-rgb hex)
         [h s l] (rgb-to-hsl r g b)
         hue-scaled (* h (/ 65535 360))] ; Scale hue to Philips Hue range
-    [(int hue-scaled) 
+    [(int hue-scaled)
      ;(int s)
-     254
-     ])) ; Scale saturation to [0, 254]
+     254])) ; Scale saturation to [0, 254]
 
 ;; (defn bytes-to-mb [bytes]
 ;;   (let [mb (/ bytes 1048576.0)
@@ -497,7 +493,6 @@
 ;;     ;(str (nf formatted-mb) "MB, (" (nf formatted-mb0) "MB)")
 ;;     (str (nf formatted-mb0) "MB")))
 
-
 (defn bytes-to-mb [bytes]
   (let [mb (/ bytes 1048576.0)
         formatted-mb0 (format "%.0f" mb)]
@@ -505,7 +500,6 @@
 
 ;; Example usage
 ;(hex-to-cie "#ff0000")  ;; For red color
-
 
 (defn interpolate-hsl [hsl1 hsl2 factor]
   (map (fn [v1 v2] (+ v1 (* (- v2 v1) factor))) hsl1 hsl2))
@@ -528,7 +522,6 @@
              (rgb-to-hex rgb)))
          (range steps))))
 
-
 ;; (defn save-base64-json-to-png [b64-json file-path]
 ;;   (let [decoder (java.util.Base64/getDecoder)
 ;;         data (.decode decoder (get (json2/read-str b64-json :key-fn keyword) :data))
@@ -547,7 +540,6 @@
 ;;     (.close output-stream)
 ;;     (println "Saved PNG to" file-path)
 ;;     (spit (str "/home/ryanr/b64-blob.txt") b64-string)))
-
 
 (defn base64-decode [b64-string]
   (.decode (java.util.Base64/getDecoder) b64-string))
@@ -594,7 +586,6 @@
 ;;       (.write out-stream data-bytes))
 ;;     (println "Saved PNG to" file-path)))
 
-
 ;; (defn base64-to-buffered-image [base64-str]
 ;;   (let [image-bytes (Base64/decodeBase64 base64-str)
 ;;         input-stream (ByteArrayInputStream. image-bytes)]
@@ -607,7 +598,6 @@
 ;;   (let [img (base64-to-buffered-image base64-str)]
 ;;     (save-image-to-file img file-path)
 ;;     (println "Saved PNG to" file-path)))
-
 
 (defn uptime-seconds []
   (let [runtime-bean (java.lang.management.ManagementFactory/getRuntimeMXBean)
@@ -670,7 +660,6 @@
   (str ;(.getAbsolutePath (clojure.java.io/file fpath))
    (.getCanonicalPath (clojure.java.io/file fpath))))
 
-
 ;; odds and ends
 
 ;; (defn time-seq [v]
@@ -731,7 +720,6 @@
 
 ;;       :else
 ;;       (throw (IllegalArgumentException. "Unsupported time unit")))))
-
 
 (defn time-seq [v]
   (let [{:keys [days minutes seconds hours weeks months at starts tz]
@@ -814,6 +802,11 @@
         fmt (SimpleDateFormat. "yyyy-MM-dd")]
     (.format fmt (.getTime cal))))
 
+(defn today-yyyymmdd-hhmm []
+  (let [cal (Calendar/getInstance)
+        fmt (SimpleDateFormat. "yyyy-MM-dd HH:mm")]
+    (.format fmt (.getTime cal)))) 
+
 (defn date-str-to-unix [date-str]
   (let [fmt (SimpleDateFormat. "yyyy-MM-dd")
         date (.parse fmt date-str)]
@@ -864,14 +857,12 @@
                       acc (into [] entry)))
             {} data)))
 
-
 ;; (defn limit-elements [x]
 ;;   (try (cond
 ;;          (map? x) x ;; dont limit maps elements at all
 ;;          (instance? clojure.lang.IPending x) (doall (take db/sample-limit x))
 ;;          :else x)
 ;;        (catch Exception _ x)))
-
 
 (defn format-duration [start-ms end-ms]
   (let [duration (java.time.Duration/ofMillis (- end-ms start-ms))
@@ -895,11 +886,8 @@
     (if (= out "0 second")
       "less than a second" out)))
 
-
-
 ;; (defn limited-t [x]
 ;;   (walk/postwalk limited2 x))
-
 
 (defn nf [i]
   (pprint/cl-format nil "~:d" i))
@@ -1241,7 +1229,7 @@
              [:cache? :col-widths :row-height :render-all? :refresh-every :page :connection-id :deep-meta? :clicked-row-height :style-rules])]
     res))
 
-(defn deep-remove-keys2 [data keys-to-remove] ;; doent automatically remove underscore keys 
+(defn deep-remove-keys2 [data keys-to-remove] ;; doent automatically remove underscore keys
   (let [key-remove-set (set keys-to-remove)]
     (cond
       (map? data)
@@ -1304,7 +1292,6 @@
 ;;                 :else x))]
 ;;       (limited-helper x))))
 
-
 ;; (defn limited-deep [x]
 ;;   (walk/postwalk limited x))
 
@@ -1339,8 +1326,6 @@
 ;;       (puget/cprint x))
 ;;     ((fn [& _]) x)))
 
-
-
 ;; (defn ppa [x] ;; always print
 ;;   (puget/with-options {:width (get-terminal-width)}
 ;;     (puget/cprint x)))
@@ -1374,7 +1359,6 @@
 ;;       (finally ;; pass
 ;;         ))))
 
-
 (defn ppln [x]
   (if (>= debug-level 2)
     (safe-cprint x)
@@ -1401,7 +1385,6 @@
 ;; (defn ppln [& _]
 ;;   ;; Do nothing
 ;;   )
-
 
 (defn keywordize-string [s] ;; technically spaces are valid in keywords, but they make it a bitch to reference properly
   (-> (str s)

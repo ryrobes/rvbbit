@@ -369,7 +369,9 @@
                (create-out-map-ports ddata fid bid)))]
                         ;{[fid bid] ddata}
 
-     (ut/tapp>> [:flow-in result @http/subsequent-runs])
+     (ut/tapp>> [:flow-in result 
+                 ;;@http/subsequent-runs
+                 ])
      (ut/dispatch-delay 600 [::refresh-live-dat])
     ;;  (ut/tapp>> [:fn-history-order (vec (for [{:keys [block start]}  ;; doesnt really give what youd want...
     ;;                           (sort-by :start
@@ -654,7 +656,7 @@
               (ut/tracked-dispatch [::http/set-flow-results {:status :started} nil flow-id])
               (swap! db/running-blocks assoc flow-id (vec (keys flowmap)))
               (ut/tapp>> [:flowmap-send-it flowmap server-flowmap running-subs])
-              (reset! http/subsequent-runs [])
+              ;;(reset! http/subsequent-runs [])
               (when true 
               ;;  (or (not watched?) 
               ;;      (not= (count (vec (filter #(cstr/includes? (str %) (str "blocks||" flow-id "||")) curr-flow-subs))) ;;; not granular enough, remove on and add one, still same
@@ -2897,7 +2899,7 @@
                                         (gn (first (vals (get-in flow-map [done-block :ports :out])))))
                                     (get (theme-pull :theme/data-colors db/data-colors) "unknown" "#FFA500")))]
     
-    (ut/tapp>> [:raw-dogs flowmaps-connections flow-id flow-map])
+    ;; (ut/tapp>> [:raw-dogs flowmaps-connections flow-id flow-map])
 
    ;;(ut/tapp>> [:run @(ut/tracked-subscribe [::http/flow-results])])
 
@@ -3523,8 +3525,10 @@
 ;(ut/tapp>> [:safe-cpk (safe-cpk :theme/panel-1) (unsafe-cpk :theme>panel-1)])
 
 (defn get-flow-deps [panel-key body]
-  (let [all-sql-call-keys      @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
-        sql-aliases-used       @(ut/tracked-subscribe [::bricks/panel-sql-aliases-in-views-body panel-key body])
+  (let [;;all-sql-call-keys      @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
+        all-sql-call-keys      @(ut/tracked-sub ::bricks/all-sql-call-keys {})
+        ;;sql-aliases-used       @(ut/tracked-subscribe [::bricks/panel-sql-aliases-in-views-body panel-key body])
+        sql-aliases-used       @(ut/tracked-sub ::bricks/panel-sql-aliases-in-views-body {:panel-key panel-key :body body})
         valid-body-params      (vec (ut/deep-flatten @(ut/tracked-subscribe [::bricks/valid-body-params-in body])))
         possible-datasets-used (set (for [e valid-body-params] (keyword (nth (ut/splitter (ut/safe-name e) #"/") 0))))
         used-datasets          (vec (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys))))
@@ -8491,26 +8495,26 @@
         y-px (px y)
         [wpct hpct] db/flow-panel-pcts ;; [0.85 0.50]
         panel-width (* (.-innerWidth js/window) wpct)
-        hh @(ut/tracked-subscribe [::subs/h]) ;; to ensure we get refreshed when the browser changes
-        ww @(ut/tracked-subscribe [::subs/w])
-        flow-id @(ut/tracked-subscribe [::selected-flow])
-        watched? (ut/ne? (get @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped]) flow-id))
-        zoom-unlocked? @(ut/tracked-subscribe [::zoom-unlocked?])
-        flow-drop-down? @(ut/tracked-subscribe [::flow-drop-down?])
-        flowmaps @(ut/tracked-subscribe [::flowmap-raw])
+        hh @(ut/tracked-sub ::subs/h {}) ;; to ensure we get refreshed when the browser changes
+        ww @(ut/tracked-sub ::subs/w {})
+        flow-id @(ut/tracked-sub ::selected-flow {})
+        watched? (ut/ne? (get @(ut/tracked-sub ::bricks/flow-watcher-subs-grouped {}) flow-id))
+        zoom-unlocked? @(ut/tracked-sub ::zoom-unlocked? {})
+        flow-drop-down? @(ut/tracked-sub ::flow-drop-down? {})
+        flowmaps @(ut/tracked-sub ::flowmap-raw {})
        ;; flowmappp [@(ut/tracked-subscribe [::flowmap]) @ports-react-render]
-        flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
+        flowmaps-connections @(ut/tracked-sub ::flowmap-connections {})
        ;flowmaps-connections @(ut/tracked-subscribe [::flowmap-connections])
         ;flow-id @(ut/tracked-subscribe [::selected-flow])
-        flow-map @(ut/tracked-subscribe [::flowmap])
-        audio-playing? @(ut/tracked-subscribe [::audio/audio-playing?])
+        flow-map @(ut/tracked-sub ::flowmap  {})
+        audio-playing? @(ut/tracked-sub ::audio/audio-playing? {})
         ;running? (is-running? :* flow-id)
         running? @(ut/tracked-subscribe [::is-running? :* flow-id true])
-        chans-open? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
+        ;;chans-open? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
         has-done? (has-done?)
         panel-height (* (.-innerHeight js/window) hpct)
-        flow-select @(ut/tracked-subscribe [::selected-flow-block])
-        opts-map @(ut/tracked-subscribe [::opts-map])
+        flow-select @(ut/tracked-sub ::selected-flow-block {})
+        opts-map @(ut/tracked-sub ::opts-map {})
         has-override? (ut/ne? (get opts-map :overrides))
         warren-open? (and (= (get @db/flow-editor-system-mode 0) "signals") ;; signals tab selected 
                           @(ut/tracked-subscribe [::bricks/flow?]) ;; flow panel open
@@ -8959,7 +8963,8 @@
                                                                          [re-com/v-box ;:style {:border "1px dashed hotpink"}
                                                                           :children [[rc/catch
                                                                                       (if warren-open?
-                                                                                        [flow-grid panel-width ppanel-height x y flowmaps-connections flow-id flow-map]
+                                                                                        ;[flow-grid panel-width ppanel-height x y flowmaps-connections flow-id flow-map]
+                                                                                        [re-com/gap :size "10px"] ;; no need to render a flow if we have other things to worry about?
                                                                                         [flow-grid panel-width ppanel-height x y flowmaps-connections flow-id flow-map])]
 
                                                                                      (let [;ph 6-0-0 ;; siz hundo

@@ -224,9 +224,18 @@
    :z 0,
    :ports {:in {:x :any}, :out {:out :any}},
    :data {}},
-  :signal/fun-gorilla
+  :solver/sql-solver-1
   {:y 987,
    :x 2534,
+   :w 125,
+   :h 60,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :data {}},
+  :signal/fun-gorilla
+  {:y 987,
+   :x 2684,
    :w 125,
    :h 60,
    :icon "zmdi-functions",
@@ -262,15 +271,6 @@
    :data {}},
   :signal/genius-gnat-signal
   {:y 987,
-   :x 2684,
-   :w 125,
-   :h 60,
-   :icon "zmdi-functions",
-   :z 0,
-   :ports {:in {:x :any}, :out {:out :any}},
-   :data {}},
-  :signal/hourly?
-  {:y 987,
    :x 2834,
    :w 125,
    :h 60,
@@ -278,7 +278,7 @@
    :z 0,
    :ports {:in {:x :any}, :out {:out :any}},
    :data {}},
-  :solver/vibrant-antelope-solver
+  :solver/sql-snapshot-solver-1
   {:y 987,
    :x 2984,
    :w 125,
@@ -287,9 +287,36 @@
    :z 0,
    :ports {:in {:x :any}, :out {:out :any}},
    :data {}},
-  :signal/fair-armadillo-signal
+  :signal/hourly?
   {:y 987,
    :x 3134,
+   :w 125,
+   :h 60,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :data {}},
+  :solver/count-sql-solver-1
+  {:y 1112,
+   :x 1334,
+   :w 125,
+   :h 60,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :data {}},
+  :solver/vibrant-antelope-solver
+  {:y 987,
+   :x 3284,
+   :w 125,
+   :h 60,
+   :icon "zmdi-functions",
+   :z 0,
+   :ports {:in {:x :any}, :out {:out :any}},
+   :data {}},
+  :signal/fair-armadillo-signal
+  {:y 987,
+   :x 3434,
    :w 125,
    :h 60,
    :icon "zmdi-functions",
@@ -338,8 +365,11 @@
    [:time/hour :signal/glowing-bat-signal/x]
    [:signal/changed-wallpaper? :solver/colors-of-the-moment/x]
    [:signal/every-5-minutes :solver/wallpaper-of-the-moment-8k/x]
+   [:solver/sql-solver-1 :solver/count-sql-solver-1/x]
    [:signal/changed-wallpaper-8k? :solver/colors-of-the-moment-8k/x]
    [:signal/cool-raccoon-signal-yo :solver/vibrant-antelope-solver/x]
+   [:signal/every-5-minutes :solver/sql-snapshot-solver-1/x]
+   [:signal/every-5-minutes :solver/sql-solver-1/x]
    [:signal/changed-wallpaper? :solver/png-wallpaper?/x]
    [:signal/every-5-minutes :solver/wallpaper-of-the-moment/x]
    [:signal/hourly? :solver/dazzling-gnu-solver/x]),

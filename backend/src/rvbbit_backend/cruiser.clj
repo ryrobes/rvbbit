@@ -1640,7 +1640,7 @@
 
 (defn lets-give-it-a-whirl [f-path target-db system-db sniff-tests-map field-attributes-map derived-field-map viz-shape-map & sql-filter]
   ;(create-sys-tables-if-needed! system-db)
-  (ut/pp [:connecting-to target-db])
+  ;; (ut/pp [:lets-give-it-a-whirl :connecting-to target-db])
   (doall
    (try (let [connect-meta (surveyor/jdbc-connect-meta target-db f-path)
              ;conn-name (str (cstr/replace (cstr/lower-case (last (cstr/split f-path #"/"))) ".edn" ""))
@@ -1670,7 +1670,7 @@
                                 (rowset-sql-query field-vectors-all full-sql-filter col-names))
                               field-vectors-all)]
           (insert-current-rules! system-db connection_id this-run-id sniff-tests-map field-attributes-map derived-field-map viz-shape-map default-flow-functions)
-          (ut/pp [:run-id this-run-id :field-count (count field-vectors)])
+          ;; (ut/pp [:lets-give-it-a-whirl :run-id this-run-id :field-count (count field-vectors)])
          ;(sql-exec system-db (to-sql {:insert-into [:fields]
          ;                             :columns [:db_type :connection_id :table_type :db_schema :db_catalog :table_name :field_name :field_type :data_type] ;; :run_id
          ;                             :values field-vectors}))
@@ -1697,7 +1697,7 @@
             (find-all-viz-combos! system-db viz-shape-map connection_id [:= :connection-id connection_id]))
 
          ;(ut/pp [:orphaned-attribs? (count (clean-up-previous-run-orphan-tests! system-db connection_id this-run-id))])
-          (ut/pp [:completed target-db :run-id this-run-id])
+          ;; (ut/pp [:completed target-db :run-id this-run-id])
           (update-connection-data! system-db this-run-id connection_id)
           ;(println " ")
           )
@@ -1713,7 +1713,7 @@
   ;(sql-exec system-db (to-sql {:insert-into [:status]
   ;                             :columns [:client_name :op_name :status]
   ;                             :values [[client-name op-name "examining table..."]]}))
-  (ut/pp [:connecting-to target-db])
+  ;; (ut/pp [:lets-give-it-a-whirl-no-viz :connecting-to target-db])
   (doall
    (try
      (let [connect-meta (surveyor/jdbc-connect-meta target-db f-path)
@@ -1742,7 +1742,7 @@
                            field-vectors-all)]
        ;(ut/pp [:DEBUG :connection_id connection_id :orig-conn orig-conn])
        ;(insert-current-rules! system-db connection_id this-run-id sniff-tests-map field-attributes-map derived-field-map viz-shape-map)
-       (ut/pp [:run-id this-run-id :field-count (count field-vectors)])
+      ;;  (ut/pp [:lets-give-it-a-whirl-no-viz :run-id this-run-id :field-count (count field-vectors)])
        (insert-field-vectors! field-vectors system-db sql-filter)
        (insert-connection-data! orig-conn ; target-db ;; getting original connection map
                                 system-db this-run-id connect-meta sql-filter)
@@ -1765,7 +1765,7 @@
     ;;   (find-all-viz-combos! system-db viz-shape-map connection_id [:= :connection-id connection_id]))
 
     ;(ut/pp [:orphaned-attribs? (count (clean-up-previous-run-orphan-tests! system-db connection_id this-run-id))])
-       (ut/pp [:completed target-db :run-id this-run-id])
+      ;;  (ut/pp [:completed target-db :run-id this-run-id])
        (update-connection-data! system-db this-run-id connection_id)
        ;(println " ")
        )
@@ -1989,85 +1989,85 @@
 ;;        nil))))
 
 
-(defn captured-sniff-OLD [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset]]
-  (ut/pp [:starting-captured-sniff! src-conn-id base-conn-id src-conn result-hash sql-filter :using-tmp-src-db? (not (nil? resultset))])
-  (let [res? (not (nil? resultset))
-        tmp-src {:jdbc-url (str "jdbc:sqlite:file:tmpsniffdb" (rand-int 12345) "?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
-                       ;:maximum-pool-size 60
-                 :max-lifetime       1800000
-                 :transaction_mode "IMMEDIATE"
-                 :journal_mode "WAL"
-                 :cache "shared"}
-              ;cache? (get @sniff-cache result-hash)
-              ;connect-meta (surveyor/jdbc-connect-meta src-conn base-conn-id)
-              ;run-id (get-latest-run-id system-db connect-meta)
-        dest-jdbc {:jdbc-url (str "jdbc:sqlite:file:sniffdb" (rand-int 12345) "?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
-                         ;:jdbc-url (str "jdbc:sqlite:memory:sniffdb" (rand-int 12345) "?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
-                         ;:jdbc-url (str "jdbc:sqlite:memory:?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
-                         ;:jdbc-url "jdbc:sqlite::memory:?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL" ; "jdbc:sqlite:db/cache.db"
-                         ;:idle-timeout        600000
-                   :max-lifetime       1800000
-                         ;:maximum-pool-size 60
-                   :transaction_mode "IMMEDIATE"
-                   :journal_mode "WAL"
-                   :cache "shared"}
-             ; src-jdbc {:jdbc-url "jdbc:duckdb:db/duck.system"  ; "jdbc:sqlite:db/system.db"
-             ;           :idle-timeout        600000
-             ;           :max-lifetime       1800000}
-                ;src-jdbc {:jdbc-url "jdbc:mysql://root:notofox@10.174.1.248:3306/rabbit"}
-             ; src {:datasource @(pool-create src-jdbc "biden-sniffs-kids")}
+;; (defn captured-sniff-OLD [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset]]
+;;   (ut/pp [:starting-captured-sniff! src-conn-id base-conn-id src-conn result-hash sql-filter :using-tmp-src-db? (not (nil? resultset))])
+;;   (let [res? (not (nil? resultset))
+;;         tmp-src {:jdbc-url (str "jdbc:sqlite:file:tmpsniffdb" (rand-int 12345) "?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
+;;                        ;:maximum-pool-size 60
+;;                  :max-lifetime       1800000
+;;                  :transaction_mode "IMMEDIATE"
+;;                  :journal_mode "WAL"
+;;                  :cache "shared"}
+;;               ;cache? (get @sniff-cache result-hash)
+;;               ;connect-meta (surveyor/jdbc-connect-meta src-conn base-conn-id)
+;;               ;run-id (get-latest-run-id system-db connect-meta)
+;;         dest-jdbc {:jdbc-url (str "jdbc:sqlite:file:sniffdb" (rand-int 12345) "?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
+;;                          ;:jdbc-url (str "jdbc:sqlite:memory:sniffdb" (rand-int 12345) "?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
+;;                          ;:jdbc-url (str "jdbc:sqlite:memory:?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL")
+;;                          ;:jdbc-url "jdbc:sqlite::memory:?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL" ; "jdbc:sqlite:db/cache.db"
+;;                          ;:idle-timeout        600000
+;;                    :max-lifetime       1800000
+;;                          ;:maximum-pool-size 60
+;;                    :transaction_mode "IMMEDIATE"
+;;                    :journal_mode "WAL"
+;;                    :cache "shared"}
+;;              ; src-jdbc {:jdbc-url "jdbc:duckdb:db/duck.system"  ; "jdbc:sqlite:db/system.db"
+;;              ;           :idle-timeout        600000
+;;              ;           :max-lifetime       1800000}
+;;                 ;src-jdbc {:jdbc-url "jdbc:mysql://root:notofox@10.174.1.248:3306/rabbit"}
+;;              ; src {:datasource @(pool-create src-jdbc "biden-sniffs-kids")}
 
-        src-conn (if res? {:datasource @(pool-create tmp-src (str "tmpsniffdb" (rand-int 12345) (last sql-filter)))} src-conn)
-        dest {:datasource @(pool-create dest-jdbc (str "sniff" (rand-int 12345) (last sql-filter)))}]
-          ;(ut/pp [:solo-sniff? sql-filter])
-    (when res? (Thread/sleep 300))
-    (when res? (insert-rowset resultset (last sql-filter) src-conn (keys (first resultset)))) ;; if passed results, insert them into our temp src db
-    (create-sqlite-sys-tables-if-needed! dest)
-    ((if quick?
-       lets-give-it-a-whirl-no-viz
-       lets-give-it-a-whirl)
-     src-conn-id ; needs to be "cache.db", always passed in
-     src-conn ;cruiser/cache-db 
-           ;base-conn-id
-           ;target-db
-           ;src-conn
+;;         src-conn (if res? {:datasource @(pool-create tmp-src (str "tmpsniffdb" (rand-int 12345) (last sql-filter)))} src-conn)
+;;         dest {:datasource @(pool-create dest-jdbc (str "sniff" (rand-int 12345) (last sql-filter)))}]
+;;           ;(ut/pp [:solo-sniff? sql-filter])
+;;     (when res? (Thread/sleep 300))
+;;     (when res? (insert-rowset resultset (last sql-filter) src-conn (keys (first resultset)))) ;; if passed results, insert them into our temp src db
+;;     (create-sqlite-sys-tables-if-needed! dest)
+;;     ((if quick?
+;;        lets-give-it-a-whirl-no-viz
+;;        lets-give-it-a-whirl)
+;;      src-conn-id ; needs to be "cache.db", always passed in
+;;      src-conn ;cruiser/cache-db 
+;;            ;base-conn-id
+;;            ;target-db
+;;            ;src-conn
 
-     dest
-     default-sniff-tests
-     default-field-attributes
-     default-derived-fields
-     default-viz-shapes
-     sql-filter) ;[:= :table-name "viz_recos_vw"]
-    (let [sniff-rows (sql/fetch-all-tables dest quick?)
-          sniff-deets (first (get sniff-rows :connections))
-          sniff-rows (into {} (for [[k v] sniff-rows
-                                    :when (not (empty? v))]
-                                (let [v (if (get (first v) :run_id)
-                                          (vec (map #(assoc % :run_id (get sniff-deets :run_id)) v)) v)]
-                                  {k v})))
-          sniff-rows (-> sniff-rows
-                               ;(dissoc :connections)
-                         (dissoc :rules_maps_attributes)
-                         (dissoc :rules_maps_derived_fields)
-                         (dissoc :rules_maps_tests)
-                         (dissoc :rules_maps_viz_shapes)
-                         (dissoc :status))
-          combos-found (get (first (sql-query dest (to-sql {:select [[[:count 1] :cnt]] :from [:combos]}))) :cnt)]
-            ;(when (> combos-found 0) (swap! sniff-cache assoc result-hash sniff-rows))
-      (ut/pp [:captured-sniff-done!
-              :sql-filter sql-filter
-              :result-hash result-hash
-              :deets sniff-deets
-                    ;:attribs (sql-query dest (to-sql {:select [:*] :from [:attributes] :where  [:= :attribute_name "is_sqlite?"]}))
-              :combos-found combos-found])
-           ; (send-off insert-agent1 (fn [_] 
-      (sql/insert-all-tables (dissoc sniff-rows :connections) (last sql-filter))
-           ;                           )) ;; keeps inserts mostly serialized and in order
-            ;; ^ take away connections last, since we want it in the cache atom but not to be used
-      (hik/close-datasource (get dest :datasource)) ;; close to free memory
-      (ut/pp [:captured-sniff-inserted! sql-filter]))
-          ;(hik/close-datasource (get src :datasource))
-    ))
+;;      dest
+;;      default-sniff-tests
+;;      default-field-attributes
+;;      default-derived-fields
+;;      default-viz-shapes
+;;      sql-filter) ;[:= :table-name "viz_recos_vw"]
+;;     (let [sniff-rows (sql/fetch-all-tables dest quick?)
+;;           sniff-deets (first (get sniff-rows :connections))
+;;           sniff-rows (into {} (for [[k v] sniff-rows
+;;                                     :when (not (empty? v))]
+;;                                 (let [v (if (get (first v) :run_id)
+;;                                           (vec (map #(assoc % :run_id (get sniff-deets :run_id)) v)) v)]
+;;                                   {k v})))
+;;           sniff-rows (-> sniff-rows
+;;                                ;(dissoc :connections)
+;;                          (dissoc :rules_maps_attributes)
+;;                          (dissoc :rules_maps_derived_fields)
+;;                          (dissoc :rules_maps_tests)
+;;                          (dissoc :rules_maps_viz_shapes)
+;;                          (dissoc :status))
+;;           combos-found (get (first (sql-query dest (to-sql {:select [[[:count 1] :cnt]] :from [:combos]}))) :cnt)]
+;;             ;(when (> combos-found 0) (swap! sniff-cache assoc result-hash sniff-rows))
+;;       (ut/pp [:captured-sniff-done!
+;;               :sql-filter sql-filter
+;;               :result-hash result-hash
+;;               :deets sniff-deets
+;;                     ;:attribs (sql-query dest (to-sql {:select [:*] :from [:attributes] :where  [:= :attribute_name "is_sqlite?"]}))
+;;               :combos-found combos-found])
+;;            ; (send-off insert-agent1 (fn [_] 
+;;       (sql/insert-all-tables (dissoc sniff-rows :connections) (last sql-filter))
+;;            ;                           )) ;; keeps inserts mostly serialized and in order
+;;             ;; ^ take away connections last, since we want it in the cache atom but not to be used
+;;       (hik/close-datasource (get dest :datasource)) ;; close to free memory
+;;       (ut/pp [:captured-sniff-inserted! sql-filter]))
+;;           ;(hik/close-datasource (get src :datasource))
+;;     ))
 
 
 

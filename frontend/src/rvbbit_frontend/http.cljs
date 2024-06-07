@@ -12,6 +12,7 @@
    ["react-zoom-pan-pinch" :as zpan]
    [rvbbit-frontend.utility :as ut]
    [rvbbit-frontend.db :as db]
+   ;;[rvbbit-frontend.signals :as signals]
    [day8.re-frame.http-fx]
    [reagent.core :as reagent]))
 
@@ -77,6 +78,13 @@
                    :on-response [::simple-response-boot-no-load] ;; just get settings, in case they changed since the client booted, but the server might have rebooted and changed them
                    :on-timeout [::imeout-response [:boot :get-settings]]
                    :timeout    15000}]
+                ;;  [::wfx/request :default
+                ;;   {:message    {:kind :signals-map
+                ;;                 :client-name nil}s
+                ;;    :on-response [::signals/signals-map-response]
+                ;;    :timeout    15000000}]
+                 
+
                  ;[::get-autocomplete-values]
                  ;[::wfx/subscribe socket-id :server-push3 (subscription x :server-push3)]
                  ;[::wfx/subscribe socket-id :server-push4 (subscription x :server-push4)]
@@ -390,14 +398,14 @@
                       acc (into [] entry)))
             {} data)))
 
-(defonce subsequent-runs (atom [])) ;; no need for a ratom, not rendering related
+;;(defonce subsequent-runs (atom [])) ;; no need for a ratom, not rendering related
 (defonce packets-received (atom 0))
 (defonce batches-received (atom 0))
-(defonce packets-received-log (atom []))
+;;(defonce packets-received-log (atom []))
 
 ;; (ut/tapp>> [:packets-received-log [(count @packets-received-log) @packets-received] (frequencies @packets-received-log)])
 
-(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :solver-meta :signal-history :panel :client})
+(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-meta :signal-history :panel :client})
 
 (re-frame/reg-event-db
  ::simple-response
@@ -405,6 +413,7 @@
    (if (vector? result)
      (do ;; (ut/tapp>> [:batch-of-messages (count result) (vec (for [r result] (get r :task-id))) (get-in db [:re-pollsive.core/polling :counter])])
        (swap! batches-received inc)
+       ;;(ut/tapp>> [:message-batch-of! (count result)])
        (doseq [res result] (re-frame/dispatch [::simple-response res true]))
        db)
      (try
@@ -452,7 +461,7 @@
 
          (swap! packets-received inc)
 
-
+         ;(ut/tapp>> [:message! (str task-id) ])
 
          (when heartbeat?
           ;;  (ut/tapp>> [:hb client-name (get result :status) (get db :flow-subs)]) ;; server subs confirm 

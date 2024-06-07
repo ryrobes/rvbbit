@@ -318,7 +318,7 @@
                selected-warren-item @(ut/tracked-sub ::selected-warren-item {})
                ttype (keyword (ut/replacer warren-type-string ":" ""))
                signal? (= ttype :signal)] 
-           (ut/tapp>> [:code-box-called-wtih width-int height-int value warren-type-string selected-warren-item ttype])
+          ;;  (ut/tapp>> [:code-box-called-wtih width-int height-int value warren-type-string selected-warren-item ttype])
     [re-com/box
      :size "none"
      ;:width (px (- width-int 24))
@@ -350,7 +350,7 @@
                                ttype (keyword (ut/replacer warren-type-string ":" ""))
                                signal? (= ttype :signal)
                                unparseable? (= (first parse) :cannot-parse)]
-                           (ut/tapp>> [:edit-warren-thing value ttype selected-warren-item signal?])
+                          ;;  (ut/tapp>> [:edit-warren-thing value ttype selected-warren-item signal?])
                            (cond unparseable?
                             ; (js/alert "BAD FORM MATE!!")
                                  (do (reset! db/bad-form-signals? true)
@@ -1171,8 +1171,8 @@
         signal? (true? (= warren-item-type :signal))
         solver? (true? (= warren-item-type :solver))
 
-        signal-vec (get-in signals [selected-warren-item :signal])
-        signal-vec-parts (vec (ut/where-dissect signal-vec))
+        signal-vec (when signal? (get-in signals [selected-warren-item :signal]))
+        signal-vec-parts (when signal? (vec (ut/where-dissect signal-vec)))
 
         warren-item-type @(ut/tracked-sub ::warren-item-type {})
         ;; signals-history (select-keys 
@@ -1197,7 +1197,8 @@
                            @(ut/tracked-sub
                              ::conn/clicked-parameter-key-alpha
                              {:keypath [(keyword (str "signal-history/" (ut/unkeyword selected-warren-item)))]})) 
-        signals-history (select-keys (walk/postwalk-replace walk-map signals-history) signal-vec-parts)
+        signals-history (when signal? 
+                          (select-keys (walk/postwalk-replace walk-map signals-history) signal-vec-parts))
         
 
         other (cond (= warren-item-type :solver) (get @(ut/tracked-sub ::solvers-map {}) selected-warren-item)
@@ -1352,7 +1353,7 @@
                                                    ;:style {:border "1px solid yellow"}
                                                    :align :center :justify :center 
                                                    :child [bricks/honeycomb-fragments vv 11 5]]
-                                                  ;; [re-com/box :child (str vv)]
+                                                          ;;[re-com/box :child (str vv)]]
                                                   [re-com/box
                                                    :child
                                                    [bricks/map-boxes2 vv
@@ -1442,10 +1443,11 @@
                                :style {:font-size "17px"}]
                               ]]))
 
-                (let [signals-history2 (into {} (for [tt (range (count (get signals-history (first (keys signals-history)))))]
+                (let [signals-history2 (when signal? 
+                                         (into {} (for [tt (range (count (get signals-history (first (keys signals-history)))))]
                                         {tt (vec (for [kk (keys signals-history)]
                                                    [kk (get-in signals-history [kk tt])]))}
-                                        ))]
+                                        )))]
                   ;; (ut/tapp>> [:signals-history2 signals-history2])
                   
                   [re-com/box

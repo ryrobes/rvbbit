@@ -107,7 +107,9 @@
                                 :group-by [:db_schema :db_catalog :connection_id :table_name]
                                 :order-by [:schema_cat :table_name]}}
         sql-params (into {} (for [k [:connections-sys/connection_id]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
+                              {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))]
     (dorun (for [[k v] sql-calls]
              (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -145,7 +147,9 @@
                                                                     }}}
                                             :from [:client_items] :group-by [1 2]}}
         sql-params (into {} (for [k [:searches-types-sys/item_type]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
+                              {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))]
     ;;(ut/tapp>> [:sql-params! sql-params])
     (dorun (for [[k v] sql-calls]
              (let [query (ut/postwalk-replacer sql-params v)
@@ -168,7 +172,9 @@
   (let [sql-params (into {} (for [k [:searches-types-sys/item_type
                                      :searches-rows-sys/value
                                      :searches-sub-types-sys/item_key]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))
         selected-shortcode (get sql-params :searches-rows-sys/value)
         sql-calls {:searches-rows-sys {:select [:item_sub_type :item_type :item_key :display_name :sample :value :is_live :block_meta] ;; :searches-types-sys/item_type 
                                        :where [:and
@@ -293,7 +299,9 @@
         all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/safe-name e) "-" "_"))
         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-tables-sys/table_name
                                      :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn :user-dropdown-sys/req-field]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))
         combo-picked? (not (nil? (get sql-params :viz-shapes-sys/combo_edn)))
         shape-picked? (not (nil? (get sql-params :viz-shapes0-sys/shape)))
         clear-filters-fn (fn [] (do (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes0-sys :shape] nil])
@@ -383,7 +391,10 @@
                                   :viz_map viz_map
                                   :condis condis
                                   :combo_edn combo_edn}}))
-        reco-selected (keyword (str "reco-preview" @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])))
+        reco-selected (keyword (str "reco-preview" 
+                                    ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])
+                                    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/combo_hash]})
+                                    ))
         preview-container (fn [preview-maps pk pnum]
                             (try (let [panel-key (nth pk pnum)
                                        ce (get-in preview-maps [panel-key :combo_edn])
@@ -639,7 +650,9 @@
   (let [all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
         all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/safe-name e) "-" "_"))
         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k  ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))
         sql-calls {:viz-tables-sys {:select [:table_name [[:count 1] :recos]]
                                     :from [:viz_recos_vw]
                                     ;:where [:in :table_name all-sql-call-keys-str]
@@ -694,7 +707,9 @@
   (let [;all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
        ; all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/safe-name e) "-" "_"))
         sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))
         client-name (str @(ut/tracked-subscribe [::bricks/client-name]))
         sql-calls {:status-sys {:select [:*]
                                 :from [:latest_status]
@@ -728,7 +743,9 @@
                   ;              :order-by [:schema_cat :table_name]}
                    }
         sql-params (into {} (for [k [:connections-sys/connection_id]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))]
+                              {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))]
     (dorun (for [[k v] sql-calls]
              (let [query (ut/postwalk-replacer sql-params v)
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
@@ -751,7 +768,8 @@
         ;;               {:kit-name :boogers2 :name "boogs2" :description "market placeholder2" :package-name :boo}]}
         market (group-by :package-name @(ut/tracked-subscribe [::bricks/market-kits]))
         pkits1 (group-by :package-name @(ut/tracked-subscribe [::bricks/installed-kits]))
-        curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
+        ;;curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
+        curr @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:kits-sys/enabled]})
         kit-market {:installed-packages pkits1
                     :available-packages market}
         hackreact [@db/kit-browser]]
@@ -841,7 +859,8 @@
         kit-body (filter #(= (get % :kit-name) (second @db/kit-browser)) (get pkits (first @db/kit-browser) {}))
         display-map (dissoc (first kit-body) :fn :when)
        ; display-map (assoc display-map :image-url "images/outliers-image.png")
-        curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
+        ;; curr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:kits-sys/enabled]])
+        curr @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:kits-sys/enabled]})
         install-box [re-com/h-box
                      :height "60px"
                      :size "none"
@@ -1009,7 +1028,9 @@
 
 (defn editor-panel-metadata-ext-files []
   (let [sql-params (into {} (for [k [:files-sys/file_path]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))
         sql-calls {:blocks-sys {:select [:block_key :block_name :queries :views :block_data :view_names :query_names]
                                 :from [:blocks]
                                 :where [:= :file_path :files-sys/file_path]
@@ -1045,7 +1066,9 @@
 
 (defn editor-panel-metadata-ext []
   (let [sql-params (into {} (for [k [:connections-sys/connection_id :tables-sys/table_name]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))
         sql-calls {:fields-sys {:select [:field_name :field_type :data_type]
                                 :from [:fields]
                                 :where [:and
@@ -1106,7 +1129,9 @@
 
 (defn editor-panel-metadata-viz []
   (let [sql-params (into {} (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn]]
-                              {k @(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])}))
+                              {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
+                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})
+                               }))
         combo-picked? (not (nil? (get sql-params :viz-shapes-sys/combo_edn)))
         shape-picked? (not (nil? (get sql-params :viz-shapes0-sys/shape)))
         sql-calls {:recos-sys {:select [:*]
@@ -1406,21 +1431,31 @@
         single-height ttl-height
         single-height-px ttl-height-px
         click-params @(ut/tracked-subscribe [::bricks/all-click-params])
-        all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
-        all-vsql-call-keys @(ut/tracked-subscribe [::bricks/all-vsql-call-keys])
+        ;all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
+        ;all-vsql-call-keys @(ut/tracked-subscribe [::bricks/all-vsql-call-keys])
         sql-string (bricks/materialize-one-sql selected-block data-key)
-        reco-selected @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])
-        reco-combo @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_edn]])
-        shape-name @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/shape_name]])
-        reco-query @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/query_map]])
-        reco-viz @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/viz_map]])
-        reco-condis @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/condis]])
+
+        ;; reco-selected @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_hash]])
+        ;; reco-combo @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/combo_edn]])
+        ;; shape-name @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/shape_name]])
+        ;; reco-query @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/query_map]])
+        ;; reco-viz @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/viz_map]])
+        ;; reco-condis @(ut/tracked-subscribe [::conn/clicked-parameter-key [:recos-sys/condis]])
+
+
+        reco-selected @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/combo_hash]})
+        reco-combo @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/combo_edn]})
+        shape-name @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/shape_name]})
+        reco-query @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/query_map]})
+        reco-viz @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/viz_map]})
+        reco-condis @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/condis]})
+
         reco-preview @(ut/tracked-subscribe [::bricks/reco-preview])
         reco-selected? (not (nil? reco-selected))
-        mad-libs-combo? (not (empty? (get selected-panel-map :mad-libs-combo-hash)))
+        mad-libs-combo? (ut/ne? (get selected-panel-map :mad-libs-combo-hash))
         mad-libs-combos (when mad-libs-combo?
                           @(ut/tracked-subscribe [::bricks/get-combo-rows
-                                                selected-block (get selected-panel-map :mad-libs-combo-hash)]))
+                                                  selected-block (get selected-panel-map :mad-libs-combo-hash)]))
         screen-name (ut/safe-name @(ut/tracked-subscribe [::bricks/screen-name]))
         screen-name-regex #"(.|\s)*\S(.|\s)*"
         websocket-status (select-keys @(ut/tracked-subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])

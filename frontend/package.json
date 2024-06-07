@@ -38,6 +38,6 @@
 		"vega-lite": "^5.6.0"
 	},
 	"devDependencies": {
-		"shadow-cljs": "2.20.5"
+		"shadow-cljs": "2.28.8"
 	}
 }
