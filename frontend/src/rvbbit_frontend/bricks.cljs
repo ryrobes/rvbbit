@@ -274,7 +274,9 @@
 
 (defn theme-pull [cmp-key fallback & test-fn]
   ;@(ut/tracked-subscribe [::theme-pull-sub cmp-key fallback test-fn])
-  @(rfa/sub ::theme-pull-sub {:cmp-key cmp-key :fallback fallback :test-fn test-fn}))
+  @(rfa/sub ::theme-pull-sub {:cmp-key cmp-key :fallback fallback :test-fn test-fn})
+  ;(theme-pull-fn cmp-key fallback test-fn) ;; just run directly? faster? wont get any caching, but maybe thats okay? NO, the sub is def faster..
+  )
 
 
 ;; (re-frame/reg-sub
@@ -9061,7 +9063,7 @@
 
 (re-frame/reg-sub
  ::panel-sql-call-keys
- (fn [db [_ panel-key]]
+ (fn [db {:keys [panel-key]}]
    (keys (into {} (for [[k v] (get-in db [:panels panel-key :queries])]
                     (when (nil? (find v :vselect)) {k v}))))))
 
@@ -11705,7 +11707,7 @@
                                   ;;                                                     :on-timeout [::http/timeout-response]
                                   ;;                                                     :timeout    500000}])))
                                   ;;                            (str flow-id)))
-                         :the-grid (fn [tab] [rc/catch [grid tab]]) ;;; TODO :grid was clashing with nivo configs
+                         :grid (fn [tab] [rc/catch [grid tab]]) ;;; TODO :grid was clashing with nivo configs
 
                                   ;;  :unixtime (fn [] '(fn [unixTime]
                                   ;;              (let [date (js/Date. unixTime)]
@@ -13533,10 +13535,10 @@
      )))
 
 (defn maybedoall []
-  ;; (let [hover-highlight? (or @param-hover @query-hover)]
-  ;;   (if hover-highlight?
-  ;;     doall seq))
-   doall
+  (let [hover-highlight? (or @param-hover @query-hover)]
+    (if hover-highlight?
+      doall seq))
+  ;;  doall
   )
 
 (defn grid [& [tab]]
@@ -13553,7 +13555,7 @@
         ;; meant for subbing to flows which seem to have their own memory and caching semantics
         panels-hash2    (hash (ut/remove-underscored @(ut/tracked-sub ::panels {})))
         [tab-x tab-y]   (if tab
-                          (let [tt @(ut/tracked-subscribe [::tab-recenter tab])]
+                          (let [tt @(ut/tracked-subscribe [::tab-recenter tab])] 
                             [(get tt 0 0) (get tt 1 0)])
                           [0 0])
         start-y        (if tab tab-y 0)
@@ -13569,7 +13571,7 @@
         ;;selected-block @(ut/tracked-subscribe [::selected-block])
         lines?         @(ut/tracked-sub ::lines? {})
         peek?          @(ut/tracked-sub ::peek? {})
-        full-no-ui?   @(ut/tracked-sub ::full-no-ui? {})
+        full-no-ui?    @(ut/tracked-sub ::full-no-ui? {})
         ;editor-panels-map (editor-panels bricks-high bricks-wide)
         ;meta-menu (meta-menu-panel bricks-high bricks-wide)
         ;editor-keys (keys editor-panels-map)
@@ -13587,9 +13589,10 @@
         ;brick-roots (vec (for [[k v] brick-map] (:root v))) ;(vec (keys brick-map))
         brick-roots    (if tab
                          ;@(ut/tracked-subscribe [::all-roots-tab tab])
-                         @(rfa/sub ::all-roots-tab tab)
+                         @(rfa/sub ::all-roots-tab {:tab tab})
                          ;@(ut/tracked-subscribe [::all-roots])
-                         @(rfa/sub ::all-roots))
+                         @(rfa/sub ::all-roots {})
+                         )
         audio-playing? @(ut/tracked-sub ::audio/audio-playing? {})
         ;brick-roots @(ut/tracked-subscribe [::all-roots2 start-y end-y start-x end-x])
         ;diff-grid1 (cset/union (set brick-roots) (cset/difference (set current-grid) (set used-bricks)))
@@ -13675,7 +13678,7 @@
                          parent-of-selected? (some #(= % brick-vec-key) subq-blocks)
                           ;param-hover-query (try (nth @param-hover 1) (catch :default e nil))
                          ;;editor?             @(ut/tracked-subscribe [::editor?])
-                         editor?             @(rfa/sub ::editor?)
+                         editor?             @(rfa/sub ::editor? {})
                          hover-q?            (if (and editor? root?)
                                                (or @(ut/tracked-subscribe [::has-query? brick-vec-key
                                                                            (try (nth @param-hover 1) (catch :default _ nil))])
@@ -13685,11 +13688,14 @@
                           ;subq-used (if root? @(ut/tracked-subscribe [::subq-used selected-block]) [])
                           ;subq-produced (if root? @(ut/tracked-subscribe [::subq-produced selected-block]) [])
                           ;subq-used2 (if root? @(ut/tracked-subscribe [::subq-used brick-vec-key]) [])
-                         subq-mapping        (if root? @(ut/tracked-subscribe [::subq-mapping]) [])
+                         subq-mapping        (if root? 
+                                               ;;@(ut/tracked-subscribe [::subq-mapping])
+                                               @(ut/tracked-sub ::subq-mapping-alpha {})
+                                               [])
                          upstream?           (some #(= % brick-vec-key) (ut/cached-upstream-search subq-mapping selected-block))
                          downstream?         (some #(= % brick-vec-key) (ut/cached-downstream-search subq-mapping selected-block))
                           ;hovered? false
-                         sql-keys            @(ut/tracked-subscribe [::panel-sql-call-keys brick-vec-key])
+                         sql-keys            @(ut/tracked-sub ::panel-sql-call-keys {:panel-key brick-vec-key})
                          reco-selected       (let [;;rr @(ut/tracked-subscribe [::conn/clicked-parameter-key [:viz-tables-sys/table_name]])
                                                    rr @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [:viz-tables-sys/table_name]})
                                                    rr (if (not (nil? rr)) (keyword (ut/replacer rr "_" "-")) nil)] rr)
@@ -13737,7 +13743,8 @@
                          single-view?        @(ut/tracked-subscribe [::is-single-view? brick-vec-key])
                          no-view?            @(ut/tracked-subscribe [::has-no-view? brick-vec-key])
                          ;;selected-view       (rs @(ut/tracked-subscribe [::selected-view brick-vec-key]) brick-vec-key) ;;; SUSPICOUS? todo - 6/1/24, cRASHING TO JS SOMEWHERE
-                         selected-view       @(ut/tracked-subscribe [::selected-view brick-vec-key])
+                         ;;selected-view       @(ut/tracked-subscribe [::selected-view brick-vec-key])
+                         selected-view       @(ut/tracked-sub ::selected-view-alpha {:panel-key brick-vec-key})
                          selected-view       (cond viz-reco? reco-selected
                                                    (and (nil? selected-view) no-view? (seq sql-keys))
                                                    (first sql-keys)
@@ -13786,7 +13793,7 @@
                       ;; (ut/tapp>> [:up-from-sel (ut/cached-upstream-search subq-mapping selected-block)
                       ;       :down-from-sel (ut/cached-downstream-search subq-mapping selected-block)])
 
-                     (if (and (not (nil? iconization)) (ut/not-empty? iconization))
+                     (if (and (not (nil? iconization)) (ut/not-empty? iconization)) ;; remove all this for now? TOO MUCH STUFF. make it WORK to be put back...
 
                        (let [icon-h (get iconization :h 1)
                              icon-w (get iconization :w 1)

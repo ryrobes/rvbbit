@@ -13,7 +13,9 @@
             [goog.crypt.Hash :as Hash]
             [goog.crypt.Sha256 :as Sha256]
             [goog.crypt.base64 :as base64]
-            [zprint.core :as zp])
+            [zprint.core :as zp]
+            ;[clojure.core.cache :as cache]
+            )
   ;; (:require-macros [rvbbit-frontend.macros :refer [time-expr]])
   (:import
 
@@ -180,7 +182,7 @@
 ;;     #{x}))
 
 (defn deep-flatten [x] ;; param based
-  (if cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?}))
+  (if true  ;;cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES seem to make the grid/honeycomb more responsvie.... TBD
     (deep-flatten* x)
     (deep-flatten-real x)))
 
@@ -290,7 +292,7 @@
 (defn get-compound-keys-real [data] ;; raw 
   (filter process-key (deep-flatten data)))
 
-(defn get-compound-keys [x] ;; param based
+(defn get-compound-keys [x] ;; param based 
   (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :get-compound-keys-cache?}))
     (get-compound-keys* x)
     (get-compound-keys-real x)))
@@ -479,7 +481,7 @@
       (let [iid (try (first (get-in mm [id :uses])) (catch :default _ nil))]
         (if (or (nil? iid) (visited id)) (conj x id)
             (ww iid (conj x id) (conj visited id)))))
-    (ww panel-id [] #{})))
+    (set (ww panel-id [] #{}))))
 
 (defn downstream-search [subq-map panel-id]
   (let [users   (into {} (for [[k v] subq-map] {k (get v :uses)}))
@@ -494,10 +496,11 @@
         ;mm2     (into {} (for [[k {:keys [uses produces]}] mm] {k {:uses (flatten uses) :produces (flatten produces)}}))
         ]
     ;(ut/tapp>> [:subq-map subq-map :users users :all-users2 @cheater :mm mm  :mm2 mm2])
-    (flatten (get-in mm [panel-id :produces]))))
+    (set (flatten (get-in mm [panel-id :produces])))))
 
-(defn cached-upstream-search [subq-map panel-id]
-  (let [args (pr-str [subq-map panel-id])]
+(defn cached-upstream-search [subq-map panel-id];; this actually IS noticably faster when cached
+  (if true ;cache? 
+    (let [args (pr-str [subq-map panel-id])]
     (if-let [result (@upstream-cache args)]
       (do
         (swap! upstream-cache-tracker update args (fnil inc 0))
@@ -505,13 +508,16 @@
       (let [result (upstream-search subq-map panel-id)]
         (swap! upstream-cache assoc args result)
         (swap! upstream-cache-tracker update args (fnil inc 0))
-        result))))
+        result)))
+    (upstream-search subq-map panel-id)
+    ))
 
 (def downstream-cache (atom {}))
 (def downstream-cache-tracker (atom {}))
 
-(defn cached-downstream-search [subq-map panel-id]
-  (let [args (pr-str [subq-map panel-id])]
+(defn cached-downstream-search [subq-map panel-id] ;; this actually IS noticably faster when cached
+  (if true ;cache? 
+    (let [args (pr-str [subq-map panel-id])]
     (if-let [result (@downstream-cache args)]
       (do
         (swap! downstream-cache-tracker update args (fnil inc 0))
@@ -519,7 +525,17 @@
       (let [result (downstream-search subq-map panel-id)]
         (swap! downstream-cache assoc args result)
         (swap! downstream-cache-tracker update args (fnil inc 0))
-        result))))
+        result)))
+    (downstream-search subq-map panel-id)
+    ))
+
+
+
+
+;; (defn subq-upstream? [query-panel subq-mapping selected-block] 
+;;   (some #(= % query-panel) (cached-upstream-search subq-mapping selected-block)))
+
+
 
 (defonce subq-mapping-alpha (atom {}))
 (defonce subq-panels-alpha (atom {}))
@@ -961,9 +977,9 @@
 
 (def data-typer-atom (atom {}))
 
-(defn data-typer [x] (data-typer-fn x)) ;; raw
+(defn data-typer22 [x] (data-typer-fn x)) ;; raw
 
-(defn data-typer22 [x]
+(defn data-typer [x]
   (let [;x (str [x1 x2 x3])
         cache (get @data-typer-atom x)]
     (if (not (nil? cache)) cache
@@ -1187,12 +1203,15 @@
 (def is-base64-atom (atom {}))
 
 (defn is-base64? [s] ;; this is called a lot and semi-expensive
-  (let [hx (hash s)
+  (if cache? 
+    (let [hx (hash s)
         cache (get @is-base64-atom hx)]
     (if (not (nil? cache)) cache
         (let [deep (is-base64-fn? s)]
           (swap! is-base64-atom assoc hx deep)
-          deep))))
+          deep)))
+    (is-base64-fn? s)
+    ))
 
 (def is-large-base64-atom (atom {}))
 
@@ -1212,12 +1231,14 @@
     :else data))
 
 (defn replace-large-base64 [data]
-  (let [hx (hash data)
-        cache (get @is-large-base64-atom hx)]
-    (if (not (nil? cache)) cache
-        (let [deep (replace-large-base64-fn data)]
-          (swap! is-large-base64-atom assoc hx deep)
-          deep))))
+  (if cache?
+    (let [hx (hash data)
+          cache (get @is-large-base64-atom hx)]
+      (if (not (nil? cache)) cache
+          (let [deep (replace-large-base64-fn data)]
+            (swap! is-large-base64-atom assoc hx deep)
+            deep)))
+    (replace-large-base64-fn data)))
 
 (defn calculate-atom-size [name a]
   (try
@@ -1447,11 +1468,14 @@
 ;;(defn clean-sql-from-ui-keys [x] (clean-sql-from-ui-keys-fn x))  ;; raw
 
 (defn clean-sql-from-ui-keys [x] ; <-- gets called hundreds of times
-  (let [hx (hash x)
+  (if true ;;cache?
+    (let [hx (hash x)
         cache (get @clean-sql-atom hx)]
     (if cache cache (let [deep (clean-sql-from-ui-keys-fn x)]
                       (swap! clean-sql-atom assoc hx deep)
-                      deep))))
+                      deep)))
+    (clean-sql-from-ui-keys-fn x)
+    ))
 
 (def auto-font-atom (atom {}))
 
