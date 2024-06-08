@@ -6104,8 +6104,8 @@
 
         viz-options            [[:x :y :color] [:size :row :column] [:shapes :label]]
         action-typer           (try (keyword (get-in dbody [:drag-meta :data-type])) (catch :default _ :error!)) ;; (get-in dbody [:drag-meta :param-full]) == actual value (or fqdn param I suppose)
-        ;;drops                  @(ut/tracked-subscribe [::all-drops-of action-typer])
-        drops                  @(ut/tracked-sub ::all-drops-of {:ttype action-typer})
+        drops                  @(ut/tracked-subscribe [::all-drops-of action-typer])
+        ;;drops                  @(ut/tracked-sub ::all-drops-of {:ttype action-typer})
         ;;_ (ut/tapp>> [:spawner-drops action-typer panel-key drops])
         view-options           (remove nil? [[:text]
                                              (when (ut/ne? drops) drops)
@@ -13536,7 +13536,7 @@
   ;; (let [hover-highlight? (or @param-hover @query-hover)]
   ;;   (if hover-highlight?
   ;;     doall seq))
-  doall
+   doall
   )
 
 (defn grid [& [tab]]
@@ -13569,6 +13569,7 @@
         ;;selected-block @(ut/tracked-subscribe [::selected-block])
         lines?         @(ut/tracked-sub ::lines? {})
         peek?          @(ut/tracked-sub ::peek? {})
+        full-no-ui?   @(ut/tracked-sub ::full-no-ui? {})
         ;editor-panels-map (editor-panels bricks-high bricks-wide)
         ;meta-menu (meta-menu-panel bricks-high bricks-wide)
         ;editor-keys (keys editor-panels-map)
@@ -13705,7 +13706,8 @@
                                  no-ui?
                                  hidden?
                                  minimized?]} body-shell
-                         no-ui?              (or no-ui? (not (nil? tab)))
+                        ;;  _ (ut/tapp>> [:body-shell body-shell])
+                         no-ui?              (or no-ui? (not (nil? tab)) full-no-ui?)
                          ;panel-style         ;(rs
                          ;                     @(ut/tracked-subscribe [::panel-style brick-vec-key])
                          ;                    ; brick-vec-key)
