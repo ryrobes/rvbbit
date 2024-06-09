@@ -1,7 +1,6 @@
 (ns rvbbit-backend.resolver)
 
 
-;(defn resolve [])
 
 
 (defmulti resolve (fn [x] (type x)))
