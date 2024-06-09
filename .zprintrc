@@ -1,0 +1,15 @@
+{;:parse-string? true, ;; was :parse-string-all?
+ ;:style  [:community :extend-nl :hiccup :sort-require :ns-justify :require-justify :require-pair :justified-original ]
+ :style justified-original ;;[:community :extend-nl :hiccup :justified-original]
+ ;:pair {:force-nl? true},
+ ;:pair-fn {:hang? true},
+ ;:binding {:force-nl? true},
+ ;:style :hiccup :style :keyword-respect-nl
+ ;:fn-map {:double :just-float}
+ ;:comment {:smart-wrap? false}
+ ;:vector {:respect-nl? true},
+ ;:map {:comma? false, :sort? false},
+ :parse {:interpose "\n\n"}}
+
+
+  ;;; zprint '{:style [:community :sort-require :ns-justify :require-pair :require-justify :respect-bl :respect-nl :justified-original] :comment {:smart-wrap? true} :width 110 :map {:comma? false :sort? false}}' <  frontend/src/rvbbit_frontend/bricks.cljs > ./bricks2.cljs

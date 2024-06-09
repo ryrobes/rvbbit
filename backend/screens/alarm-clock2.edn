@@ -1,19 +1,12 @@
-{:orders
- {:reco-counts [:table_name :cnt],
-  :gen-viz-516 (:mb :mem_used :messages_per_second :ts),
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :fields-sys [:field_name :field_type :data_type],
-  :connections-sys [:database_name :connection_id]},
+{:orders {:gen-viz-516 (:mb :mem_used :messages_per_second :ts)},
  :reco-preview nil,
- :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
  :sql-source
  {:gen-viz-516
   {:cache? false,
    :where [:= :client_name :*client-name-str],
-   :limit 13,
+   :limit 77,
    :group-by [:ts],
-   :_last-run "00:29:21",
+   :_last-run "07:07:58",
    :refresh-every 20,
    :from
    [{:select
@@ -38,11 +31,8 @@
      (vec
        (reverse
          (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
- :audio-playing? false,
  :meta
- {:fields-sys {:fields {}, :rowcount 0},
-  :tables-sys {:fields {}, :rowcount 0},
-  :gen-viz-797
+ {:gen-viz-797
   {:fields
    {:rows
     {:data-type "integer",
@@ -105,21 +95,6 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -242,29 +217,30 @@
   {:fields
    {:mb
     {:data-type "integer",
-     :distinct 2,
+     :distinct 53,
      :group-by? true,
-     :commons {1709 1, 1498 1},
-     :cardinality 100},
+     :commons {197 4, 198 3, 241 3},
+     :cardinality 68},
     :mem_used
     {:data-type "integer",
-     :distinct 2,
+     :distinct 77,
      :group-by? true,
-     :commons {1792437748 1, 1571333457 1},
+     :commons {203298083 1, 220618473 1, 211795264 1},
      :cardinality 100},
     :messages_per_second
     {:data-type "float",
-     :distinct 2,
+     :distinct 8,
      :group-by? true,
-     :commons {2.67 1, nil 1},
-     :cardinality 100},
+     :commons {2.13 47, 2.07 11, 2.2 7},
+     :cardinality 10},
     :ts
     {:data-type "string",
-     :distinct 2,
+     :distinct 77,
      :group-by? true,
-     :commons {"2024-05-31 00:29:42" 1, "2024-05-31 00:28:57" 1},
+     :commons
+     {"2024-06-08 06:38:37" 1, "2024-06-08 06:18:22" 1, "2024-06-08 06:20:37" 1},
      :cardinality 100}},
-   :rowcount 2},
+   :rowcount 77},
   :shape-drag-7
   {:fields
    {:shape
@@ -280,13 +256,8 @@
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
    :rowcount 30}},
- :default-col-widths
- {:block-4284 {:gen-viz-516 127},
-  :system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf}},
+ :default-col-widths {:block-4284 {:gen-viz-516 127}},
  :runstream-drops nil,
- :data-hash -1880615054,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -343,7 +314,7 @@
      :icon "zmdi-cocktail",
      :run-on :queries,
      :description "What does Buffy think about this data? Who knows!"}},
-   :eleven-labs-default-voice-name "Sofia-AI-frye",
+   :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive",
    :graphite-host "127.0.0.1",
    :openapi-org-id nil,
    :debug-level 1,
@@ -369,6 +340,7 @@
     "blackberries3"
     "blackberries3-narrow"
     "blackberries3-narrow2"
+    "blank-blue"
     "blank-sizzle"
     "blank-sizzle2"
     "blue-pines"
@@ -465,6 +437,7 @@
     "retro-machines"
     "riffle-test"
     "server-stats"
+    "server-stats2"
     "sick-of-your-shit"
     "sizzle-board-1"
     "sneaky-swamp-creatures1"
@@ -506,103 +479,16 @@
     "wow-board"],
    :openapi-key "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"}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :lines? true,
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [1868089726 1826139162 4294705152],
- :sched {:gen-viz-516 157265},
- :status-data
- {:heartbeat
-  {:kick
-   {:data
-    [{:sent! :heartbeat,
-      :to :all,
-      :at "2024-05-31 00:29:41",
-      :payload nil,
-      :payload-kp [:heartbeat :heartbeat]}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  :file-change
-  {:file-changed
-   {:data
-    [{:path
-      "./live/grin-bulbous-turtle-14/star-shaped wallaby/block-12050/views/every-45-seconds.edn",
-      :type :modify,
-      :panel-key :block-4284,
-      :block-data
-      {:name "block-12050",
-       :w 24,
-       :style {:border-radius "0px 0px 0px 30px"},
-       :block-key ":block-12050",
-       :selected-view :every-45-seconds,
-       :root [26 22],
-       :h 6,
-       :file-path "./screens/blackberries3-narrow.edn",
-       :connection-id "system-db",
-       :queries
-       {:gen-viz-516
-        {:cache? false,
-         :where [:= :client_name :*client-name-str],
-         :limit 13,
-         :group-by [:ts],
-         :_last-run "04:44:16",
-         :refresh-every 20,
-         :from
-         [{:select
-           [:client_name
-            :recent_messages_per_second
-            :messages_per_second
-            :mem_used
-            :batches
-            :packets
-            :ts],
-           :where [:= :client_name :*client-name-str],
-           :from [[:client_memory :ee183]],
-           :order-by [[:mem_time :desc]]}],
-         :order-by [[:ts :desc]],
-         :connection-id "system-db",
-         :select
-         [[[[:sum :mem_used]] :mem_used]
-          [[:sum :recent_messages_per_second] :messages_per_second]
-          :ts],
-         :post-process-fn
-         (fn [x]
-           (vec
-             (reverse
-               (for
-                 [row x]
-                 (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
-       :tab "star-shaped wallaby"}}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}},
-  :alert1
-  {:alerts
-   {:data
-    [[[:v-box
-       :justify
-       :center
-       :style
-       {:opacity 0.7}
-       :children
-       [[:box
-         :style
-         {:color :theme/editor-outer-rim-color, :font-weight 700}
-         :child
-         [:speak-always "Heads up: data-rabbit system going offline."]]]]
-      10
-      1
-      5]
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}}},
+ :memory [358817754 273437470 4294705152],
+ :sched {:gen-viz-516 26315},
  :flow-subs
  [:time/now-seconds
   :flow/flow-forever>*running?
+  :client/*client-name*>stats>memory
   :time/minute
   :time/hour
-  :client/*client-name*>stats>memory
   :solver/colors-of-the-moment>data-colors
   :solver/colors-of-the-moment>colors>2
   :solver/colors-of-the-moment>colors>1
@@ -615,31 +501,19 @@
   :flow/flow-forever>:final-math
   :solver/colors-of-the-moment>second-brightest
   :solver/colors-of-the-moment>darkest],
- :client-name :grin-bulbous-turtle-14,
- :alt-key-held? false,
+ :client-name :fit-star-shaped-ape-9,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2489, :h 1498},
- :post-meta
- {:gen-viz-797 {:* {:rowcount 317}},
-  :gen-viz-94 {:* {:rowcount 1}},
-  :rowcnt-drag-2 {:* {:rowcount 1}},
-  :gen-viz-828 {:* {:rowcount 317}},
-  :gen-viz-84 {:* {:rowcount 6}},
-  :ufo-sightings-drag-9 {:* {:rowcount 80332}},
-  :duration-hours-drag-43 {:* {:rowcount 8349}},
-  :city-drag-26 {:* {:rowcount 19899}},
-  :state-drag-3 {:* {:rowcount 68}},
-  :gen-viz-516 {:* {:rowcount 1}},
-  :shape-drag-7 {:* {:rowcount 30}}},
+ :window {:w 2370, :h 1658},
+ :post-meta {:gen-viz-516 {:* {:rowcount 77}}},
  :status
  {:heartbeat
   {:kick
    [:time/now-seconds
     :flow/flow-forever>*running?
+    :client/*client-name*>stats>memory
     :time/minute
     :time/hour
-    :client/*client-name*>stats>memory
     :solver/colors-of-the-moment>data-colors
     :solver/colors-of-the-moment>colors>2
     :solver/colors-of-the-moment>colors>1
@@ -652,7 +526,6 @@
     :flow/flow-forever>:final-math
     :solver/colors-of-the-moment>second-brightest
     :solver/colors-of-the-moment>darkest]},
-  :file-change {:file-changed :done},
   :alert1 {:alerts :alert2}},
  :screen-name "alarm-clock2",
  :recos-page2 0,
@@ -668,101 +541,14 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   157253
+   26310
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :panels-hash -148020891,
- :sessions
- (["vital-bulbous-mosquito-0.edn" "1019 hours, 19 minutes, 35 seconds" 3669575653]
-   ["refined-round-llama-8.edn" "1021 hours, 21 minutes, 42 seconds" 3676902166]
-   ["beaming-gray-opossum-6.edn" "1072 hours, 40 minutes, 41 seconds" 3861641771]
-   ["certain-icosahedral-hound-19.edn"
-    "1121 hours, 9 minutes, 41 seconds"
-    4036181698]
-   ["smile-elliptic-heron-10.edn" "114 hours, 10 minutes, 16 seconds" 411016149]
-   ["lovely-scarlet-pigeon-31.edn" "114 hours, 48 minutes, 58 seconds" 413338211]
-   ["trusting-cerise-gnu-5.edn" "1147 hours, 27 minutes, 57 seconds" 4130877989]
-   ["meritorious-hexagonal-louse-7.edn"
-    "1147 hours, 34 minutes, 8 seconds"
-    4131248989]
-   ["happy-prismatic-hornet-6.edn"
-    "1148 hours, 14 minutes, 23 seconds"
-    4133663636]),
- :solvers-map
- {:vibrant-antelope-solver
-  {:signal :signal/cool-raccoon-signal-yo,
-   :type :clojure2,
-   :data (+ 1 2 3 88 (rand-int 1234))},
-  :dazzling-gnu-solver
-  {:signal :signal/hourly?,
-   :type :clojure,
-   :cache? true,
-   :data (+ 1 2 3 90 (rand-int 12345))},
-  :static-data
-  {:signal :signal/genius-gnat-signal,
-   :type :clojure,
-   :data
-   [(apply + [1 2 3])
-    :solver/wallpaper-of-the-moment
-    :solver/wallpaper-of-the-moment-8k]},
-  :wallpaper-of-the-moment-8k
-  {:signal :signal/every-5-minutes,
-   :type :clojure2,
-   :data
-   (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
-         rel-dir "./images/large/"
-         files (->>
-                 (file-seq (clojure.java.io/file dir))
-                 (filter (fn [x] (.isFile x)))
-                 (filter
-                   (fn [x] (clojure.string/includes? (str (.getName x)) "8k")))
-                 (map (fn [x] (.getName x)))
-                 (shuffle))
-         random-file (first files)]
-     (str rel-dir random-file))},
-  :wallpaper-of-the-moment
-  {:signal :signal/every-5-minutes,
-   :type :clojure,
-   :data
-   (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
-         rel-dir "./images/large/"
-         files (->>
-                 (file-seq (clojure.java.io/file dir))
-                 (filter (fn [x] (.isFile x)))
-                 (filter
-                   (fn [x]
-                     (not (clojure.string/includes? (str (.getName x)) "8k"))))
-                 (map (fn [x] (.getName x)))
-                 (shuffle))
-         random-file (first files)]
-     (str rel-dir random-file))},
-  :png-wallpaper?
-  {:signal :signal/changed-wallpaper?,
-   :type :clojure,
-   :cache? true,
-   :data
-   (true? (clojure.string/ends-with? :solver/wallpaper-of-the-moment ".png"))},
-  :colors-of-the-moment-8k
-  {:signal :signal/changed-wallpaper-8k?,
-   :cache? false,
-   :type :flow,
-   :data
-   {:flowmap "node-color-thief-js-webp",
-    :opts {:overrides {:image-path :solver/wallpaper-of-the-moment-8k}},
-    :return nil}},
-  :colors-of-the-moment
-  {:signal :signal/changed-wallpaper?,
-   :cache? false,
-   :type :flow,
-   :data
-   {:flowmap "node-color-thief-js-webp",
-    :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
-    :return nil}}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1538920871,
+ :user-params-hash 1057240131,
  :grid-recos? true,
- :session-hash -1294255910,
+ :no-ui? true,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -939,9 +725,9 @@
   :gen-viz-516
   {:cache? false,
    :where [:= :client_name :*client-name-str],
-   :limit 13,
+   :limit 77,
    :group-by [:ts],
-   :_last-run "00:29:21",
+   :_last-run "07:07:58",
    :refresh-every 20,
    :from
    [{:select
@@ -1083,7 +869,7 @@
     :background-color [:string3 :solver/colors-of-the-moment>darkest 99],
     :backdrop-filter "blur(4px)"},
    :selected-view :hi,
-   :root [16 0],
+   :root [19 0],
    :h 3,
    :queries {},
    :tab "star-shaped wallaby",
@@ -1387,7 +1173,7 @@
    :style {:backdrop-filter "blur(4px) brightness(70%)"},
    :selected-view :hi,
    :root [0 1],
-   :h 25,
+   :h 24,
    :queries {},
    :tab "star-shaped wallaby",
    :minimized? false,
@@ -1498,6 +1284,50 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-2194
+  {:name "block-2194",
+   :w 5,
+   :style
+   {:border-radius "0px 0px 0px 40px",
+    :_border-left
+    [:string3 "3px solid " :solver/colors-of-the-moment>second-brightest],
+    :_border-top
+    [:string3 "3px solid " :solver/colors-of-the-moment>second-brightest],
+    :background-color [:string3 :solver/colors-of-the-moment>darkest 99],
+    :backdrop-filter "blur(4px)"},
+   :selected-view :hi,
+   :root [42 3],
+   :h 3,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :views
+   {:hi
+    [:v-box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "60px",
+      :color :param/theme-color1,
+      :font-weight 700,
+      :transition "all 0.6s ease-in-out"}
+     :children
+     [[:box :child [:number :client/*client-name*>stats>memory]]
+      [:box
+       :style
+       {:font-size "18px",
+        :text-shadow
+        [:string3
+         "2px 2px 10px "
+         :solver/colors-of-the-moment>darkest
+         ", 2px 2px 10px "
+         :solver/colors-of-the-moment>darkest],
+        :margin-top "-15px"}
+       :child
+       "client js used (mb)"]]]}},
   :block-1827
   {:h 10,
    :w 12,
@@ -1626,11 +1456,11 @@
    :tab "sapphire ape"},
   :block-4284
   {:name "block-12050",
-   :w 24,
+   :w 47,
    :style {:border-radius "0px 0px 0px 30px"},
    :block-key ":block-12050",
    :selected-view :every-45-seconds,
-   :root [26 22],
+   :root [0 25],
    :h 6,
    :file-path "./screens/blackberries3-narrow.edn",
    :connection-id "system-db",
@@ -1638,9 +1468,9 @@
    {:gen-viz-516
     {:cache? false,
      :where [:= :client_name :*client-name-str],
-     :limit 13,
+     :limit 77,
      :group-by [:ts],
-     :_last-run "00:29:21",
+     :_last-run "07:07:58",
      :refresh-every 20,
      :from
      [{:select
@@ -1795,85 +1625,21 @@
       :color [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]}
      :child
      [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]]}}},
- :selected-block :block-4284,
- :signals-map
- {:fun-gorilla
-  {:signal
-   [:and
-    [:= :client/cute-prismatic-human-7>click-param>param>jessica "jessica"]
-    [:changed? :time/second]
-    [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
-    [:or [:= 2 1] [:< 9 4]]
-    [:signal/worthy-fish-signal]]},
-  :cool-raccoon-signal-yo
-  {:signal
-   [:or
-    [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
-    [:and
-     [:or [:> :time/hour 12] [:< :time/hour 6]]
-     [:or
-      [:= :time/second 10]
-      [:= :time/second 20]
-      [:= :time/second 45]
-      [:= :time/second 25]]]]},
-  :worthy-fish-signal {:signal [:or [:= :time/hour 16] [:= 221 22]]},
-  :hourly? {:signal [:or [:changed? :time/hour] [:<> :time/minute -1]]},
-  :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
-  :elegant-grasshopper-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :exciting-cheetah-signal
-  {:signal [:and [:> :time/day 1] [:= "cheese" "cheese"] [:= :time/hour 9]]},
-  :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
-  :dragging-to-potential-cross-breed?
-  {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
-  :every-minute {:signal [:changed? :time/minute]},
-  :every-5-minutes
-  {:signal
-   [:or
-    [:= :time/minute 0]
-    [:= :time/minute 5]
-    [:= :time/minute 10]
-    [:= :time/minute 15]
-    [:= :time/minute 20]
-    [:= :time/minute 25]
-    [:= :time/minute 30]
-    [:= :time/minute 35]
-    [:= :time/minute 40]
-    [:= :time/minute 45]
-    [:= :time/minute 50]
-    [:= :time/minute 55]]},
-  :changed-wallpaper-8k?
-  {:signal
-   [:and [:<> :time/minute -1] [:changed? :solver/wallpaper-of-the-moment-8k]]},
-  :changed-wallpaper?
-  {:signal
-   [:and [:<> :time/second -1] [:changed? :solver/wallpaper-of-the-moment]]},
-  :special-lion-signal
-  {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
-  :optimistic-sheep-signal
-  {:signal
-   [:and
-    [:= :time/day 1]
-    [:= :time/hour 9]
-    [:changed? :time/minute]
-    [:changed? :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]]},
-  :glowing-bat-signal
-  {:signal [:and [:= :time/day 1] [:changed? :time/second] [:= :time/hour 9]]}},
+ :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#dfc0be",
-  "boolean" "#9ebcd6",
-  "map" "#c7b299",
-  "list" "#892db8",
+ {"float" "#e1c89d",
+  "boolean" "#d45496",
+  "map" "#b0bf61",
+  "list" "#439570",
   "string" "#ffffff",
-  "any" "#625dc1",
-  "vector" "#90b492",
-  "keyword" "#dbeddc",
-  "rabbit-code" "#ba55ee",
-  "datetime" "#6a6183",
-  "integer" "#f48bde",
-  "unknown" "#6d2e29",
-  "date" "#3a551d"},
+  "any" "#37b47a",
+  "vector" "#848087",
+  "keyword" "#d9cdcc",
+  "rabbit-code" "#d021c1",
+  "datetime" "#1a2782",
+  "integer" "#98d2dd",
+  "unknown" "#4d272d",
+  "date" "#2b420f"},
  :click-param
  {:blocks-sys
   {:block_key ":block-12050",
@@ -1899,80 +1665,25 @@
   :time
   {:month-name "MAY",
    :day 4,
-   :hour 0,
+   :hour 7,
    :now "Saturday, May 25th 3:05AM",
-   :second 45,
+   :second 6,
    :now-second nil,
-   :now-seconds "Friday, May 31st 12:29:45AM",
+   :now-seconds "Saturday, June 8th 7:08:06AM",
    :nth "th",
    :month 4,
-   :minute 29},
+   :minute 8},
   :client
   {:engaging-teal-duck-15>stats>memory 268,
-   :*client-name*>stats>memory 1498,
-   :grin-bulbous-turtle-14>stats>memory 1419},
+   :*client-name*>stats>memory 323,
+   :grin-bulbous-turtle-14>stats>memory 1419,
+   :fit-star-shaped-ape-9>stats>memory nil},
   :param
-  {:selected-view [:views :every-45-seconds],
-   :selected-view-data
-   [:>
-    :ResponsiveContainer
-    {:width "100%", :height :panel-height+50}
-    [:>
-     :ComposedChart
-     {:data :gen-viz-516,
-      :style {:font-family :theme/base-font},
-      :margin {:top 5, :bottom 5, :right 30, :left 20}}
-     [:> :CartesianGrid {:strokeDasharray "0 0", :opacity 0}]
-     [:>
-      :Tooltip
-      {:content-style
-       {:background-color "#00000099",
-        :font-weight 700,
-        :border "1px solid transparent",
-        :border-radius "4px"}}]
-     [:> :XAxis {:dataKey :ts}]
-     [:>
-      :YAxis
-      {:yAxisId "left",
-       :label
-       {:value "MB",
-        :angle -90,
-        :fill :solver/colors-of-the-moment>colors>0,
-        :style {:font-size "20px", :font-weight 700},
-        :position "middle",
-        :dx -25},
-       :domain ["auto" "auto"]}]
-     [:>
-      :YAxis
-      {:yAxisId "right",
-       :label
-       {:value "Messages per Second",
-        :angle 90,
-        :fill :solver/colors-of-the-moment>brightest,
-        :style {:font-weight 700, :color "#ffffff", :font-size "15px"},
-        :position "middle",
-        :dx 20},
-       :domain ["auto" "auto"],
-       :orientation "right"}]
-     [:>
-      :Line
-      {:type "monotone",
-       :dataKey :mb,
-       :yAxisId "left",
-       :stroke-width 4,
-       :stroke :solver/colors-of-the-moment>brightest,
-       :activeDot {:r 8}}]
-     [:>
-      :Bar
-      {:type "monotone",
-       :dataKey :messages_per_second,
-       :yAxisId "right",
-       :fill "#00000000",
-       :stroke-width 4,
-       :stroke :solver/colors-of-the-moment>colors>1}]]],
+  {:selected-view [nil :*],
+   :selected-view-data nil,
    :testme :solver/colors-of-the-moment>colors>1,
    :test [:string [:get-in [:solver/colors-of-the-moment [:colors 2]]]],
-   :selected-block :block-4284},
+   :selected-block :block-3341},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -2248,48 +1959,48 @@
    :glowing-bat-signal false},
   :solver
   {:colors-of-the-moment
-   {:second-darkest "#244150",
-    :highest-saturation "#de7e49",
-    :most-contrasting "#d25027",
-    :darkest "#1a303e",
-    :contrast-with-dominant "#d25027",
+   {:second-darkest "#212b39",
+    :highest-saturation "#953b25",
+    :most-contrasting "#953b25",
+    :darkest "#0f1e30",
+    :contrast-with-dominant "#cdd9cc",
     :colors
-    ["#dfd0be"
-     "#1a303e"
-     "#99c2c7"
-     "#917769"
-     "#6aa0b5"
-     "#458598"
-     "#2c6785"
-     "#4d6263"
-     "#d25027"
-     "#de7e49"
-     "#244150"],
-    :most-frequent "#1a303e",
+    ["#c38563"
+     "#0f1e30"
+     "#336b83"
+     "#61b2bf"
+     "#6e4439"
+     "#1b475e"
+     "#cdd9cc"
+     "#3988ab"
+     "#656863"
+     "#953b25"
+     "#212b39"],
+    :most-frequent "#cdd9cc",
     :data-colors
-    {"float" "#dfc0be",
-     "boolean" "#9ebcd6",
-     "map" "#c7b299",
-     "list" "#892db8",
+    {"float" "#e1c89d",
+     "boolean" "#d45496",
+     "map" "#b0bf61",
+     "list" "#439570",
      "string" "#ffffff",
-     "any" "#625dc1",
-     "vector" "#90b492",
-     "keyword" "#dbeddc",
-     "rabbit-code" "#ba55ee",
-     "datetime" "#6a6183",
-     "integer" "#f48bde",
-     "unknown" "#6d2e29",
-     "date" "#3a551d"},
-    :dominant "#244150",
-    :most-contrasting-dark "#1a303e",
-    :second-brightest "#99c2c7",
-    :brightest "#dfd0be",
-    :most-contrasting-light "#d25027"},
+     "any" "#37b47a",
+     "vector" "#848087",
+     "keyword" "#d9cdcc",
+     "rabbit-code" "#d021c1",
+     "datetime" "#1a2782",
+     "integer" "#98d2dd",
+     "unknown" "#4d272d",
+     "date" "#2b420f"},
+    :dominant "#212b39",
+    :most-contrasting-dark "#953b25",
+    :second-brightest "#61b2bf",
+    :brightest "#cdd9cc",
+    :most-contrasting-light "#cdd9cc"},
    :colors-of-the-moment>most-contrasting-light "#66b6c6",
-   :colors-of-the-moment>colors>0 "#dfd0be",
+   :colors-of-the-moment>colors>0 "#c38563",
    :colors-of-the-moment>contrast-with-dominant "#cd5a51",
-   :colors-of-the-moment>brightest "#dfd0be",
-   :colors-of-the-moment>second-brightest "#99c2c7",
+   :colors-of-the-moment>brightest "#cdd9cc",
+   :colors-of-the-moment>second-brightest "#61b2bf",
    :colors-of-the-moment>0 nil,
    :colors-of-the-moment-8k
    {:second-darkest "#474c5d",
@@ -2342,28 +2053,28 @@
     "#13537b"
     "#243c77"],
    :vibrant-antelope-solver 193,
-   :colors-of-the-moment>darkest "#1a303e",
+   :colors-of-the-moment>darkest "#0f1e30",
    :colors-of-the-moment>colors>3 "#2e1b24",
    :colors-of-the-moment>highest-saturation "#0c66a1",
    :colors-of-the-moment>most-contrasting "#a1543e",
    :colors-of-the-moment>2 nil,
-   :wallpaper-of-the-moment "./images/large/b64-image-2520-55155-4k.webp",
-   :colors-of-the-moment>colors>2 "#99c2c7",
+   :wallpaper-of-the-moment "./images/large/b64-image-75430-17203-4k.webp",
+   :colors-of-the-moment>colors>2 "#336b83",
    :dazzling-gnu-solver 11214,
-   :colors-of-the-moment>colors>1 "#1a303e",
+   :colors-of-the-moment>colors>1 "#0f1e30",
    :colors-of-the-moment>data-colors
-   {"float" "#dfc0be",
-    "boolean" "#9ebcd6",
-    "map" "#c7b299",
-    "list" "#892db8",
+   {"float" "#e1c89d",
+    "boolean" "#d45496",
+    "map" "#b0bf61",
+    "list" "#439570",
     "string" "#ffffff",
-    "any" "#625dc1",
-    "vector" "#90b492",
-    "keyword" "#dbeddc",
-    "rabbit-code" "#ba55ee",
-    "datetime" "#6a6183",
-    "integer" "#f48bde",
-    "unknown" "#6d2e29",
-    "date" "#3a551d"}}},
+    "any" "#37b47a",
+    "vector" "#848087",
+    "keyword" "#d9cdcc",
+    "rabbit-code" "#d021c1",
+    "datetime" "#1a2782",
+    "integer" "#98d2dd",
+    "unknown" "#4d272d",
+    "date" "#2b420f"}}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

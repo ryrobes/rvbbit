@@ -1109,7 +1109,7 @@
   ;(flow/schedule! [:seconds 6] (test-client :quick-blue-dinosaur-banned-from-erg) {:flow-id "client-1" :increment-id? false :close-on-done? true :debug? false})
   ;(flow/schedule! [:seconds 4] (test-client :appealing-white-hyena-hailing-from-hogback) {:flow-id "client-1" :increment-id? false :close-on-done? true :debug? false})
 
-  (wss/schedule! [:seconds 45] (heartbeat :all)
+  (wss/schedule! [:seconds 15] (heartbeat :all)
                  {:flow-id "client-keepalive" :increment-id? false :close-on-done? true :debug? false})
 
   ;; (wss/schedule! [:minutes 5] fex/looping-net

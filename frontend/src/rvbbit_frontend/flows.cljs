@@ -689,7 +689,7 @@
                                                 :client-name client-name}
                                    :on-response [::socket-response-flow]
                                    :on-timeout  [::timeout-response :run-flow flowmap] ;; requeue?
-                                   :timeout    15000000}])
+                                   :timeout    150000000}])
               (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
             ;;  (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
             ;;                      [:flow (keyword (str flow-id ">*running?"))] true])

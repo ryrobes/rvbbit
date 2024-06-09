@@ -10763,7 +10763,7 @@
   ;(ut/tapp>> [:nivo (get edn-mass :data)])
   (let [data               (get edn-mass :data)
         transformation-map (get edn-mass :transformation-map)
-        t-map?             (not (empty? transformation-map))
+        t-map?             (ut/ne? transformation-map)
         post-data          (if t-map? (st/transform transformation-map data) data)
         has-keys?          (not (nil? (get edn-mass :keys)))
         edn-mass           (assoc edn-mass :data post-data)
@@ -11471,7 +11471,6 @@
 (declare grid)
 
 (defn clover-walk-singles [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view]
-
   (let [kk (pr-str [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view])
         cc (get @ut/clover-walk-singles-map kk)]
     (if (ut/ne? cc) cc
@@ -11952,7 +11951,7 @@
                                                                                                      :keypath [:panels panel-key :views selected-view]}
                                                                                         :on-response [::http/socket-response]
                                                                                         :on-timeout [::http/timeout-response :run-flow-clover]
-                                                                                        :timeout    500000}])
+                                                                                        :timeout    50000000}])
                                                                                      (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5]))))
                                                                                               ;;  (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
                                                                                               ;;                      [:flow (keyword (str flow-id ">*running?"))] true])
@@ -12530,7 +12529,7 @@
                                                                 :keypath [:panels panel-key :views selected-view]}
                                                    :on-response [::http/socket-response]
                                                    :on-timeout [::http/timeout-response :run-rs-flow]
-                                                   :timeout    500000}])
+                                                   :timeout    50000000}])
                             (ut/dispatch-delay 800 [::http/insert-alert [:box :child fstr :style {:font-size "14px"}] w 0.5 5])))))
                             ;; (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
                             ;;                     [:flow (keyword (str flow-id ">*running?"))] true])
@@ -12675,6 +12674,8 @@
         ;        (ut/tapp>> [:body-pre body])
         ;        (onclick-walk-map body))
         ;body (walk/postwalk-replace drop-walks body)
+        ;;walk-map (select-keys walk-map obody-key-set) ;;; reduce size of replacement walk map? any faster? unsure. 
+        ;;  ^^ no, slower. unnecessary since postwalk-replace is mostly target structure bound and map GETS are constant time operations (O(1)),
         body                   ;;(ut/timed
                                 (ut/postwalk-replacer walk-map body)
                                ;; (str panel-key ".all-caching.2-walk"))
@@ -12691,13 +12692,17 @@
         ;body (ut/postwalk-replacer full-rep-map body)
         ;not-editor-and-not-empty? (and (not editor-panel?) (seq body))
         ;editor-and-not-empty? (and editor-panel? (seq body)
-        relevant-for-dyn-drop? (or (and is-layout? (or (= :query (get-in @dragging-body [:drag-meta :type]))
-                                                       (= :view (get-in @dragging-body [:drag-meta :type]))))
-                                   (and (nil? (get @dragging-body :cloned-from)) (not is-layout?)
-                                        (not (= :meta-screens (get-in @dragging-body [:drag-meta :type]))) ;; temp
-                                        (not (= :meta-theme (get-in @dragging-body [:drag-meta :type]))) ;; temp
-                                        (not (= :meta-board (get-in @dragging-body [:drag-meta :type]))) ;; temp
-                                        (not (= :meta-blocks (get-in @dragging-body [:drag-meta :type]))))) ;; temp
+        dbody-type (get-in @dragging-body [:drag-meta :type])
+        relevant-for-dyn-drop? (or (and is-layout? (or (= :query dbody-type)
+                                                       (= :view dbody-type)))
+                                   (and 
+                                    ;(nil? (get @dragging-body :cloned-from))
+                                    (not (contains? @dragging-body :cloned-from))
+                                    (not is-layout?)
+                                        (not (= :meta-screens dbody-type)) ;; temp
+                                        (not (= :meta-theme dbody-type)) ;; temp
+                                        (not (= :meta-board dbody-type)) ;; temp
+                                        (not (= :meta-blocks dbody-type)))) ;; temp
         ; overlay? (or (and (= selected-view @mad-libs-view) (or selected-view-is-sql? override-view-is-sql?))
         ;           (and @dragging? relevant-for-dyn-drop?))
         overlay?               (and @dragging? relevant-for-dyn-drop?)

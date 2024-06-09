@@ -1561,6 +1561,13 @@
   ;(ut/pp [" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - "])
   {})
 
+
+(defmethod wl/handle-request :ack2 [{:keys [client-name body]}]
+  ;(ut/pp [:thank-you-from client-name])
+  (inc-score! client-name :last-ack true)
+  {})
+
+
 ;;; ORIGINAL HUMAN VERSION
 
 (defonce client-queues (atom {}))
@@ -7638,14 +7645,14 @@
   {:port                 websocket-port
    :join?                false
    :async?               true
-     ;:min-threads          300
-     ;:max-threads          1000  ;; Increased max threads
-   :idle-timeout         10000  ;; Increased idle timeout
-   :queue-size           5000  ;; Increased queue size
-   :max-idle-time        60000  ;; Increased max idle time
-   :input-buffer-size    32768  ;; Increased buffer sizes
-   :output-buffer-size   32768
-   :max-message-size     2097152  ;; Increased max message size
+   :min-threads          300
+    :max-threads         1000  ;; Increased max threads
+   :idle-timeout         1000000  ;; Increased idle timeout
+   ;:queue-size           5000  ;; Increased queue size
+   :max-idle-time        6000000  ;; Increased max idle time
+   :input-buffer-size    131072 ;;32768  ;; Increased buffer sizes
+   :output-buffer-size   131072 ;;32768
+   :max-message-size     6291456 ;;2097152  ;; Increased max message size
    :websockets           ws-endpoints
    :allow-null-path-info true})
 

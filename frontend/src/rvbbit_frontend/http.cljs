@@ -463,7 +463,7 @@
 
          ;(ut/tapp>> [:message! (str task-id) ])
 
-         (when heartbeat?
+         (if heartbeat? ;; test
           ;;  (ut/tapp>> [:hb client-name (get result :status) (get db :flow-subs)]) ;; server subs confirm 
            (ut/tracked-dispatch [::wfx/request :default
                                  {:message    {:kind :ack
@@ -480,9 +480,19 @@
                                                                       :mem_limit (last mem)}]
                                                          mem-row)
                                                :flow-subs (get db :flow-subs)
-                                           ;;:memory (get-in db [:data :memory])
+                                               ;;:memory (get-in db [:data :memory])
                                                :client-name (get db :client-name)}
-                                  :timeout    50000}]))
+                                  :timeout    50000}])
+           
+          ;;  (ut/tracked-dispatch [::wfx/request :default
+          ;;                        {:message    {:kind :ack2
+          ;;                                      :body "thanks"}
+          ;;                         :timeout    50000}])
+           )
+         
+
+         
+
 
 
          (when alert? ;(and alert? not-sys-stats?) ; (and alert? (string? (first (get result :data))))

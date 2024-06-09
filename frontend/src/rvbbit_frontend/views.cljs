@@ -3134,7 +3134,7 @@
                                             :client-name client-name}
                                :on-response [::http/socket-response]
                                :on-timeout [::http/timeout-response :views/run-flow]
-                               :timeout    500000}])
+                               :timeout    50000000}])
           (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
         ;;   (ut/tracked-dispatch [::conn/click-parameter ;; kinda cheating, but feels better
         ;;                       [:flow (keyword (str flow-id ">*running?"))] true])
