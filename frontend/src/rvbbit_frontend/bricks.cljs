@@ -43,7 +43,7 @@
     [re-frame.alpha :as rfa]
     [re-frame.core :as re-frame]
     [reagent.core :as reagent]
-    [reagent.dom :as rdom]
+    ;[reagent.dom :as rdom]
     [rvbbit-frontend.audio :as audio]
     [rvbbit-frontend.connections :as conn]
     [rvbbit-frontend.db :as db]
@@ -71,36 +71,37 @@
 (def dragging-body (reagent/atom []))
 (def dyn-dropper-hover (reagent/atom nil))
 (def on-scrubber? (reagent/atom false))
-(defonce mad-libs-view (reagent/atom nil))                  ;; will be query ids
+(defonce mad-libs-view (reagent/atom nil))
 (defonce mad-libs-top? (reagent/atom true))
 (def swap-layers? (reagent/atom false))
 
-
-
-
-
-(defn- render-error-component [{:keys [error info]}]
-  [:div
-   {:style {:width           "100%"
-            :min-width       300
-            :backgroundColor "rgba(255,0,0,0.2)"
-            :padding         8}}
-   [:h6 error]
-   [:pre info]])
+;; (defn- render-error-component [{:keys [error info]}]
+;;   [:div
+;;    {:style {:width           "100%"
+;;             :min-width       300
+;;             :backgroundColor "rgba(255,0,0,0.2)"
+;;             :padding         8}}
+;;    [:h6 error]
+;;    [:pre info]])
 
 (declare theme-pull)
 
 (defn error-code-box
   [value width-int height-int]
   (let []
-    [re-com/box :size "auto" :width (px (- width-int 24)) :height (px (- height-int 24)) :style
-     {:font-family (theme-pull :theme/monospaced-font nil) ; "Fira Code" ; "Chivo Mono"
-      :font-size   "14px"
+    [re-com/box :size "auto" 
+     ;:width (px (- width-int 24)) 
+     ;:height (px (- height-int 24))
+     :align :center :justify :center 
+     :style
+     {:font-family (theme-pull :theme/monospaced-font nil) 
+      :font-size   "16px"
       :overflow    "auto"
+      :text-shadow "4px 4px 4px #00000099"
       :font-weight 700} :child
      [(reagent/adapt-react-class cm/UnControlled)
       {:value   (str value)
-       :options {:mode              "clojure" ;;(if (= type :string) "sql" "clojure")
+       :options {:mode              "clojure"
                  :lineWrapping      true
                  :lineNumbers       false
                  :matchBrackets     true
@@ -108,48 +109,71 @@
                  :autofocus         false
                  :autoScroll        false
                  :detach            true
-                 :readOnly          false ;true
+                 :readOnly          true
                  :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
 
-;; (defn- render-error-component [{:keys [error info]}]
-;;   [re-com/v-box 
-;;    :size "none"
-;;    :children [[re-com/box 
-;;                :style {:font-size "20px" :color (ut/invert-hex-color (theme-pull :theme/editor-outer-rim-color nil))}
-;;                :child (str error)]
-;;               ;[re-com/box :child (str info)]
-;;               [re-com/box 
-;;                :size "auto"
-;;                :child [error-code-box (str info)]]
-;;               ]])
+;;(def error-hover-state (reagent/atom false))
+
+(defn- render-error-component [{:keys [error info] :as error-map}]
+  [re-com/v-box
+   :height "100%"
+   :width "100%"
+   :size "auto"
+   :gap  "5px"
+   :padding "6px" ;:margin "6px"
+   :style {:background-image "url(images/error-skull2.png)"
+           :background-size "auto 100%" ;; "cover"  ;;contain"
+           :background-repeat "no-repeat"
+           :border-radius "20px"
+           ;;:margin-right "12px"
+           ;:filter "brightness(55%)"
+           :background-color "#00000099"
+           :background-blend-mode "overlay"
+           ;:background-blend-mode "difference"
+           ;:background-blend-mode "multiply"
+           :background-position "center"}
+   :children [[re-com/box
+               ;:height "20%" :width "100%"
+               :min-height "20%"
+               :size "auto"
+               :align :center :justify :center
+               :style {:font-size "28px"
+                       :font-weight 700
+                       ;:background-color "#00000055"
+                       ;:background-blend-mode "multiply"
+                       :border-radius "20px"
+                       :font-family "Share Tech Mono"
+                       :text-shadow "0 0 10px #FF0000, 0 0 20px #FF0000, 0 0 30px #FF0000, 0 0 40px #FF0000"
+                       :color (theme-pull :theme/editor-outer-rim-color nil)}
+               :child (str error)]
+              [re-com/box
+               ;:max-height "50%" 
+               ;:width "90%"
+               :align :center :justify :center
+               :style {:background-color "#00000045"
+                       ;:background-blend-mode "multiply"
+                       :border-radius "20px"}
+               :padding "6px"
+               :size "auto"
+               :child [error-code-box (str info)]]
+              ;; [:<>
+              ;;  [:div {:style {:position "absolute"
+              ;;                 :top "0"
+              ;;                 :left "0"
+              ;;                 :width "100%"
+              ;;                 :height "100%"
+              ;;                 :opacity 0.45
+              ;;                 :background-image "url(images/error-skull2.png)"
+              ;;                 :background-size "auto 100%"
+              ;;                 :background-repeat "no-repeat"
+              ;;                 :background-blend-mode "darken"
+              ;;                 :background-position "center"
+              ;;                 :filter "brightness(55%)"}}]]
+              ]])
 
 (def ^:dynamic *render-error* render-error-component)
 
-;; (defn reecatch [] ;;; fork of re-catch, will push to own forked credited lib before release
-;;   (let [error-state (reagent/atom nil)
-;;         info-state  (reagent/atom nil)]
-;;     (reagent/create-class
-;;      {:component-did-catch
-;;       (fn re-catch-block [this error info]
-;;         (reset! error-state (let [max-error-lenght 200]
-;;                               (when-let [err (str error)]
-;;                                 (if (-> err count (< max-error-lenght))
-;;                                   (-> err
-;;                                       (subs 0 max-error-lenght)
-;;                                       (str " ..."))))))
-;;         (reset! info-state (some->> info
-;;                                     .-componentStack
-;;                                     (cstr/split-lines)
-;;                                     (remove cstr/blank?)
-;;                                     (drop-while #(re-find #"re_catch" %))
-;;                                     (take 3)
-;;                                     (cstr/join "\n"))))
-;;       :reagent-render (fn [& body]
-;;                         (if @error-state
-;;                           [*render-error*
-;;                            {:error @error-state :info @info-state}]
-;;                           (when-not (->> body (remove nil?) empty?)
-;;                             (into [:<>] body))))})))
+;;(def reecatch rc/catch)
 
 (defn reecatch [] ;;; fork of re-catch, will push to own forked credited lib before release
   (let [error-state (reagent/atom nil)
@@ -159,18 +183,14 @@
     (reagent/create-class
      {:component-did-catch
       (fn re-catch-block [this error info]
-        (reset! error-state (let [max-error-lenght 200]
-                              (when-let [err (str error)]
-                                (if (-> err count (< max-error-lenght))
-                                  (-> err
-                                      (subs 0 max-error-lenght)
-                                      (str " ..."))))))
+        (reset! error-state (str error))
         (reset! info-state (some->> info
                                     .-componentStack
                                     (cstr/split-lines)
                                     (remove cstr/blank?)
                                     (drop-while #(re-find #"re_catch" %))
-                                    (take 3)
+                                    (drop-while #(re-find #"reecatch" %))
+                                    (take 4)
                                     (cstr/join "\n")))
         ;; Schedule a re-render after 5 seconds
         (reset! retry-timer (js/setTimeout #(swap! retry-count inc) 3000))) ; Increment the retry count
@@ -193,10 +213,6 @@
                             (into [:<>] body))))})))
 
 
-
-
-
-
 (re-frame/reg-event-fx ::ship-atom
                        (fn [{:keys [db]} [_ atom-name aval]]
                          (ut/tapp>> [:setting :atom-name (get db :client-name) atom-name aval])
@@ -206,6 +222,7 @@
                                                 :value       aval ;; (if (false? aval) nil aval)
                                                 :client-name (get db :client-name)}
                                       :timeout 500000}]}))
+
 
 (defn watch-fn
   [key ref old-state new-state]
@@ -455,7 +472,10 @@
                                                                 (ut/deep-flatten (get-all-values
                                                                                   (get db :click-param))))))
                                           current-flow-open)))
-          clover-solvers          (vec (apply concat (for [[_ v] @db/solver-fn-runs] (for [[_ v1] v] v1))))
+          clover-solvers          (vec (apply concat (for [[_ v] @db/solver-fn-runs] (keys v)))) 
+          ;; (swap! db/solver-fn-runs assoc-in [panel-key sub-param] resolved-input-map)
+          ;; _ (ut/tapp>> [:clover-solverss clover-solvers @db/solver-fn-runs])
+          ;;clover-solvers          (vec (for [[k v] @db/solver-fn-runs])
           warren-item             (get db :selected-warren-item)
           solver-open?            (and (= (get @db/flow-editor-system-mode 0) "signals")
                                        (get db :flow?))
@@ -2937,21 +2957,29 @@
                  {:cursor           "grab"
                   :background-color (theme-pull :theme/editor-param-background-color nil)} :children
                  (for [[k v] filtered-params]
-                   (let [meta        @(ut/tracked-sub ::meta-from-param-name {:param-name k})
-                         dtype       (get meta :data-type)
-                         dtype       (try (if (and (= dtype "vector") (every? string? v))
-                                            "string"
-                                            dtype)
-                                          (catch :default _ dtype)) ;; since stringified code is
-                         dcolor      (get @(ut/tracked-sub ::conn/data-colors {}) dtype)
-                         psplit      (ut/splitter (ut/safe-name (str k)) "/")
+                   (let [psplit      (ut/splitter (ut/safe-name (str k)) "/")
                          table       (-> (first psplit)
                                          (ut/replacer #":" "")
                                          (ut/replacer ".*" "")
                                          keyword)
                          field       (keyword (last psplit))
-                         param-value (str @(ut/tracked-subscribe [::conn/clicked-parameter
-                                                                  [table field]]))
+                         param-has-fn? (try (and (= (first v) :run-solver) (= table :param)) (catch :default _ false))
+                         ;;param-value (str @(ut/tracked-subscribe [::conn/clicked-parameter [table field]]))
+                         param-value  @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(keyword (cstr/join "/" (map #(cstr/replace (str %) ":" "") [table field])))]})
+                         v (str (or param-value v))
+                         meta        @(ut/tracked-sub ::meta-from-param-name {:param-name k})
+                         dtype       (if param-has-fn?
+                                       (ut/data-typer param-value)
+                                       (get meta :data-type))
+                         dtype       (try (if (and (= dtype "vector") (every? string? v))
+                                            "string"
+                                            dtype)
+                                          (catch :default _ dtype)) ;; since stringified code is
+                         dcolor      (get @(ut/tracked-sub ::conn/data-colors {}) dtype)
+                         param-value (str param-value) ;; since the rest expects it
+
+                        ;;  _ (ut/tapp>> [[table field]  param-value])
+
                          is-image?   (and (or (cstr/ends-with? (cstr/lower-case (str param-value))
                                                                ".png")
                                               (cstr/ends-with? (cstr/lower-case (str param-value))
@@ -2968,8 +2996,8 @@
                                                              "http"))
                          is-b64?     (ut/is-base64? (str param-value))
                          is-video?   (or
-                                       (cstr/ends-with? (cstr/lower-case (str param-value)) ".mp4")
-                                       (cstr/ends-with? (cstr/lower-case (str param-value)) ".mov"))
+                                      (cstr/ends-with? (cstr/lower-case (str param-value)) ".mp4")
+                                      (cstr/ends-with? (cstr/lower-case (str param-value)) ".mov"))
                          selected?   @(ut/tracked-subscribe [::has-query? selected-block table])
                          pwidth      (js/Math.floor (/ (count (str param-value)) 1.7))
                          pwidth      (cond (> pwidth 30) 30
@@ -3003,12 +3031,15 @@
                                              (if selected? (str dcolor 20) "inherit"))} :children
                         [[re-com/h-box :justify :between :children
                           [[re-com/box :child
-                            (if hovered?
+                            (str 
+                             (if hovered?
                               (let [chars (count (str k))
                                     len   40
                                     wide? (> chars len)]
                                 (if wide? (str (subs (str k) 0 len) "...") (str k)))
-                              (str k)) :style
+                              (str k))
+                             (when param-has-fn? " *ƒ")
+                             ) :style
                             {:color         dcolor
                              :font-weight   700
                              :font-size     "13px"
@@ -7493,6 +7524,9 @@
                            (not (= @db/editor-mode :vvv))
                            (not (= (count ks-all) (count ks))))
                       (and (get db :flow?) (get db :flow-editor?)))]
+      
+      ;;(reset! db/solver-fn-runs {})
+
       (if run-it?
         (-> db
             (ut/dissoc-in [:panels nil]) ;; garbage keys created by external edit with bad
@@ -9173,12 +9207,15 @@
                                                                             {:keypath [ds]})}))
                                   data-subbed-src     (ut/postwalk-replacer data-subbed-rep-map v)]
                               {k (vsql-map data-subbed-src)})))
-        selected-view-is-sql? (true? (some #(= selected-view %) (keys sql-calls)))
-        override-view-is-sql? (true? (some #(= override-view %) (keys sql-calls)))
+        ;; selected-view-is-sql? (true? (some #(= selected-view %) (keys sql-calls)))
+        ;; override-view-is-sql? (true? (some #(= override-view %) (keys sql-calls)))
+        selected-view-is-sql? (contains? sql-calls selected-view)
+        override-view-is-sql? (contains? sql-calls override-view)
         valid-body-params (ut/deep-flatten (merge ;;@(ut/tracked-subscribe [::valid-body-params
                                             @(rfa/sub ::valid-body-params {:panel-key panel-key})
                                             @(rfa/sub ::valid-body-params-all-condis)
-                                            (for [[_ v] (get @db/solver-fn-runs panel-key [])] v)
+                                            (keys (get @db/solver-fn-runs panel-key {}))
+                                            ;;(for [[_ v] @db/solver-fn-runs] (vals v))
                                             @(rfa/sub ::valid-body-params-in {:body body})
                                             @(rfa/sub ::valid-body-params-in {:body vsql-calls})))
         possible-datasets-used (set (for [e valid-body-params]
@@ -9402,7 +9439,7 @@
                                                                     :client-name client-name}
                                                            websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                                            online? (true? (= websocket-status :connected))
-                                                           run? (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
+                                                           run? (= (get-in @db/solver-fn-runs [panel-key sub-param]) resolved-input-map)
                                                            lets-go? (and online? (not run?))
                                                             ;; _ (when true ;;lets-go?
                                                             ;;     (ut/tapp>> [:run-solver-req-map-bricks! lets-go? (not run?) req-map @db/solver-fn-runs]))
@@ -9410,8 +9447,11 @@
                                                                (ut/tracked-dispatch
                                                                 [::wfx/push :default req-map]))
                                                            _ (when lets-go?
-                                                               (swap! db/solver-fn-runs ut/dissoc-in [panel-key])
-                                                               (swap! db/solver-fn-runs assoc-in [panel-key (hash resolved-input-map)] sub-param))]
+                                                              ;;  (swap! db/solver-fn-runs ut/dissoc-in [panel-key])
+                                                               ;(swap! db/solver-fn-lookup assoc (ut/lists-to-vectors (first kps)) sub-param)
+                                                               (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
+                                                               (swap! db/solver-fn-runs assoc-in [panel-key sub-param] resolved-input-map)
+                                                               )]
                                                         {v sub-param}
                                                         )))]
                                (walk/postwalk-replace logic-kps obody)))
@@ -9444,7 +9484,7 @@
                                                            (ut/replacer (str panel-key) #":" ""))
           (has-fn? :*this-block*)   (ut/postwalk-replacer {:*this-block* panel-key})
           ;;(has-fn? :run-solver)     (ut/postwalk-replacer solver-clover-fn-walk-map) ;; has to run first since it'll contain a clover sub param 
-          (has-fn? :run-solver)     solver-clover-walk  
+          (has-fn? :run-solver)     solver-clover-walk ;;(conn/solver-clover-walk client-name panel-key)
           (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
           (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
           (ut/ne? data-walks)       (ut/postwalk-replacer data-walks)

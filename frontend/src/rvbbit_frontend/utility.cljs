@@ -37,7 +37,7 @@
 
 (defn stringify-keywords
   [x]
-  (cond (keyword? x) (str ":" (name x))
+  (cond (keyword? x) (str x)
         (string? x)  x
         (map? x)     (into {} (map (fn [[k v]] [(stringify-keywords k) (stringify-keywords v)]) x))
         (coll? x)    (map stringify-keywords x)
@@ -301,7 +301,13 @@
 
 
 
-
+(defn lists-to-vectors [data]
+  (walk/postwalk
+   (fn [x]
+     (if (list? x)
+       (vec x)
+       x))
+   data))
 
 
 
@@ -1252,7 +1258,7 @@
       cache
       (let [;s (replacer s #"1.0" "\"ONE-POINT-ZERO\"")
             type (cond (cstr/includes? s "(")                         :community
-                       (cstr/starts-with? (cstr/trim-newline s) "[:") :hiccup
+                       (cstr/starts-with? (cstr/trim-newline s) "[:") [:hiccup :justified]
                        :else                                          :justified)
             o    (zp/zprint-str s
                                 (js/Math.floor (/ w 9))

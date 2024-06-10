@@ -224,6 +224,37 @@
     (when (not no-select?) (ut/tracked-dispatch [::select-block bid]))
     (ut/tracked-dispatch [::update-flowmap-key2 bid nil body])))
 
+(declare  logic-and-params)
+
+(defn solver-clover-walk [client-name panel-key obody]
+  (let [kps       (ut/extract-patterns obody :run-solver 2)
+        logic-kps (into {}
+                        (for [v kps]
+                          (let [[_ & this]                   v
+                                [[solver-name input-map]] this
+                                unresolved-req-hash (hash [solver-name input-map client-name])
+                                resolved-input-map (logic-and-params input-map nil) ;; and we need to 'pre-resolve' it's inputs i n case they are client local
+                                new-solver-name (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
+                                sub-param (keyword (str "solver/" new-solver-name))
+                                req-map {:kind        :run-solver-custom ;; solver-name temp-solver-name client-name input-map
+                                         :solver-name solver-name
+                                         :temp-solver-name  (keyword new-solver-name)
+                                         :input-map  resolved-input-map
+                                         :client-name client-name}
+                                websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
+                                online? (true? (= websocket-status :connected))
+                                run? (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
+                                lets-go? (and online? (not run?))
+                                                            ;; _ (when true ;;lets-go?
+                                                            ;;     (ut/tapp>> [:run-solver-req-map-bricks! lets-go? (not run?) req-map @db/solver-fn-runs]))
+                                _ (when lets-go?
+                                    (ut/tracked-dispatch
+                                     [::wfx/push :default req-map]))
+                                _ (when lets-go?
+                                    (swap! db/solver-fn-runs ut/dissoc-in [panel-key])
+                                    (swap! db/solver-fn-runs assoc-in [panel-key (hash resolved-input-map)] sub-param))]
+                            {v sub-param})))]
+    (walk/postwalk-replace logic-kps obody)))
 
 (defn logic-and-params-fn
   [block-map panel-key]
@@ -318,7 +349,7 @@
                                               (cstr/join "" (apply str args))
                                               (str args)))}
 
-          solver-clover-walk (fn [obody]
+          solver-clover-walk (fn [obody] 
                                (let [kps       (ut/extract-patterns obody :run-solver 2)
                                      logic-kps (into {}
                                                      (for [v kps]
@@ -335,7 +366,8 @@
                                                                       :client-name client-name}
                                                              websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                                              online? (true? (= websocket-status :connected))
-                                                             run? (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
+                                                             ;;run? (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
+                                                             run? (= (get-in @db/solver-fn-runs [panel-key sub-param]) resolved-input-map)
                                                              lets-go? (and online? (not run?))
                                                             ;;  _ (when lets-go?
                                                             ;;      (ut/tapp>> [:run-solver-req-map! (not run?) req-map @db/solver-fn-runs]))
@@ -343,8 +375,11 @@
                                                                  (ut/tracked-dispatch
                                                                   [::wfx/push :default req-map]))
                                                              _ (when lets-go?
-                                                                 (swap! db/solver-fn-runs ut/dissoc-in [panel-key])
-                                                                 (swap! db/solver-fn-runs assoc-in [panel-key (hash resolved-input-map)] sub-param))]
+                                                                 ;(swap! db/solver-fn-runs ut/dissoc-in [panel-key])
+                                                                 ;(swap! db/solver-fn-runs assoc-in [panel-key (hash resolved-input-map)] sub-param)
+                                                                 (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
+                                                                 (swap! db/solver-fn-runs assoc-in [panel-key sub-param] resolved-input-map)
+                                                                 )]
                                                          {v sub-param})))]
                                  (walk/postwalk-replace logic-kps obody)))
 
@@ -358,7 +393,7 @@
                                                                            ""))
                                    true                      (ut/postwalk-replacer {:*this-block*
                                                                                     panel-key})
-                                   (has-fn? :run-solver)     solver-clover-walk
+                                   (has-fn? :run-solver)     solver-clover-walk  ;;(solver-clover-walk client-name panel-key)
                                    (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
                                    (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
                                    (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
@@ -474,7 +509,21 @@
             :else                                            nil))))
 
 (re-frame/reg-sub ::clicked-parameter
-                  (fn [db [_ keypath]] (let [val (get-in db (cons :click-param keypath))] val)))
+                  (fn [db [_ keypath]]
+                    (if false ;(= (first keypath) :param)
+                      
+                      (let [kk (keyword (cstr/join "/" (map #(cstr/replace (str %) ":" "") keypath)))]
+                        @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [kk]})) 
+                      
+                      (let [val (get-in db (cons :click-param keypath))] 
+                      val))
+                    
+                    ;; (let [kk (keyword (ut/replacer (cstr/join "/" keypath) ":" ""))] ;; resolved...
+                    ;;   (ut/tapp>> [:resolve-click-param kk keypath
+                    ;;               (edn/read-string (str ":" (cstr/replace (str (first keypath)) ":" "") "/"
+                    ;;                    (cstr/replace (str (last keypath)) ":" "")))])
+                    ;;   @(ut/tracked-sub ::clicked-parameter-key {:keypath [kk]}))
+                    ))
 
 (defn contains-namespaced-keyword?
   [data]
@@ -569,18 +618,37 @@
           kkey             (keyword (ut/replacer (nth cmp 0) "-parameter" ""))
           vkey             (keyword (peek cmp))
           kp-encoded-param? (and (= kkey :param) (cstr/includes? (str keypath) ">"))
-          param-has-fn? (when kp-encoded-param? 
-                          (some #(= % :run-solver) (ut/deep-flatten (get-in db (vec (cons :click-param [kkey (split-back vkey)]))))))
+          ;; param-has-fn? (when kp-encoded-param? ;;(= kkey :param) ;;kp-encoded-param?
+          ;;                 (some #(= % :run-solver) (ut/deep-flatten (get-in db (vec (cons :click-param [kkey (split-back vkey)]))))))
+          param-has-fn? (when (= kkey :param) (= (get-in db (vec (cons :click-param [kkey (split-back vkey) 0]))) :run-solver))
+
           full-kp (cons :click-param
                         (if kp-encoded-param?
                           (vec (cons kkey (break-up-flow-key vkey)))
                           [kkey vkey]))
-          val0             (if 
-                            (and param-has-fn? kp-encoded-param?) ;; we need to render the value in order to fake the natural kp
-                             (get-in @(ut/tracked-sub ::clicked-parameter-key-alpha 
-                                                      {:keypath [(keyword (ut/replacer (first (cstr/split (str (first keypath))  #">"))  ":" ""))]}) 
+          ;; _ (when (= (first keypath) :param/huger)
+          ;;     (ut/tapp>> [:param (first keypath)  kp-encoded-param? param-has-fn?  (get-in db full-kp)  
+          ;;                 @db/solver-fn-runs  @db/solver-fn-lookup (get @db/solver-fn-lookup (str (get-in db full-kp)))
+          ;;                 ;; @(ut/tracked-sub ::clicked-parameter-key-alpha
+          ;;                 ;;                  {:keypath [(get @db/solver-fn-lookup (str (get-in db full-kp)))]})
+          ;;                 (try 
+          ;;                   (get-in db (vec (cons :click-param (map keyword (map #(cstr/replace (str %) ":" "") (cstr/split (get @db/solver-fn-lookup (str (get-in db full-kp))) #"/")))))) 
+          ;;                      (catch :default _  nil))
+          ;;                 ]))
+          val0             (cond
+                             (and param-has-fn? kp-encoded-param?) ;; we need to render the value in order to fake the natural kp
+                             (get-in @(ut/tracked-sub ::clicked-parameter-key-alpha
+                                                      {:keypath [(keyword (ut/replacer (first (cstr/split (str (first keypath))  #">"))  ":" ""))]})
                                      (vec (rest (break-up-flow-key vkey))))
+                             param-has-fn?
+                            (try
+                              (get-in db (vec (cons :click-param (map keyword 
+                                                                      (map #(cstr/replace (str %) ":" "") 
+                                                                                   (cstr/split (get @db/solver-fn-lookup (str (get-in db full-kp))) #"/"))))))
+                              (catch :default _  nil)) ;; get the sub ref and return that data
+                             :else
                              (get-in db full-kp))
+          ;; _ (when (= (first keypath) :param/huger) (ut/tapp>> [val0]))
           ;; _ (when kp-encoded-param? (ut/tapp>> [:clicked-parameter-key-alpha-w-ext-kp keypath kp-encoded-param? param-has-fn?
           ;;                                       (vec (rest (break-up-flow-key vkey)))
           ;;                                       @(ut/tracked-sub ::clicked-parameter-key-alpha
@@ -595,18 +663,18 @@
           if-walk-map2     (fn [obody]
                              (let [kps       (ut/extract-patterns obody :if 4)
                                    logic-kps (into
-                                               {}
-                                               (for [v kps]
-                                                 (let [kws             (vec (filter #(cstr/includes?
-                                                                                       (str %)
-                                                                                       "/")
-                                                                              (ut/deep-flatten v)))
-                                                       wm              @(rfa/sub
-                                                                          ::resolve-click-param
-                                                                          {:long-keyword kws})
-                                                       v0              (ut/postwalk-replacer wm v)
-                                                       [_ l this that] v0]
-                                                   {v (if l this that)})))]
+                                              {}
+                                              (for [v kps]
+                                                (let [kws             (vec (filter #(cstr/includes?
+                                                                                     (str %)
+                                                                                     "/")
+                                                                                   (ut/deep-flatten v)))
+                                                      wm              @(rfa/sub
+                                                                        ::resolve-click-param
+                                                                        {:long-keyword kws})
+                                                      v0              (ut/postwalk-replacer wm v)
+                                                      [_ l this that] v0]
+                                                  {v (if l this that)})))]
                                (ut/postwalk-replacer logic-kps obody)))
           val0             (try (if (= (first val0) :if) (if-walk-map2 val0) val0)
                                 (catch :default _ val0)) ;; TODO
@@ -618,27 +686,27 @@
                                                  (let [sp (ut/splitter (str val0) "/")]
                                                    [:click-param
                                                     (ut/unre-qword
-                                                      (ut/replacer (str (first sp)) ":" ""))
+                                                     (ut/replacer (str (first sp)) ":" ""))
                                                     (ut/unre-qword (last sp))]))
                              (map? val0) (let [km      (into
-                                                         {}
-                                                         (distinct
-                                                           (map #(when (>= (count %) 2)
-                                                                   {(str
-                                                                      (ut/replacer (str (get % 0))
-                                                                                   ":"
-                                                                                   "")
-                                                                      "/"
-                                                                      (ut/replacer (str (get % 1))
-                                                                                   ":"
-                                                                                   ""))
-                                                                      [(get % 0) (get % 1)]})
-                                                             (ut/keypaths (get db :click-param)))))
+                                                        {}
+                                                        (distinct
+                                                         (map #(when (>= (count %) 2)
+                                                                 {(str
+                                                                   (ut/replacer (str (get % 0))
+                                                                                ":"
+                                                                                "")
+                                                                   "/"
+                                                                   (ut/replacer (str (get % 1))
+                                                                                ":"
+                                                                                ""))
+                                                                  [(get % 0) (get % 1)]})
+                                                              (ut/keypaths (get db :click-param)))))
                                                rep-map (into {}
                                                              (for [[k v] km]
                                                                {(keyword k)
-                                                                  (get-in db
-                                                                          (cons :click-param v))}))]
+                                                                (get-in db
+                                                                        (cons :click-param v))}))]
                                            (ut/postwalk-replacer rep-map val0))
                              :else       val0)
           val              (if (and (string? val)

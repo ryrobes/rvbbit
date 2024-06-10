@@ -3051,8 +3051,7 @@
                                                                                    ":"
                                                                                    "")))))
                                            (ut/deep-flatten vdata)))
-        solver-name (if (and temp-solver-name ;; if we are doing override params like with a clover call, we don't want to overwrite the legit solver it's using
-                         (ut/ne? override-input)) 
+        solver-name (if temp-solver-name ;; we might be passed a blank input-map, but as long as we have a temp-solver-name, we can still run it independently 
                       temp-solver-name 
                       solver-name)
         vdata-clover-walk-map (into {}

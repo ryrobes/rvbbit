@@ -15,6 +15,10 @@
    [rvbbit-frontend.http :as http]
    [rvbbit-frontend.utility :as ut]))
 
+ (declare logic-and-params)
+
+ 
+
 (re-frame/reg-sub ::client-name (fn [db] (get db :client-name)))
 
 (defn logic-and-params-fn
@@ -129,7 +133,8 @@
                                                                       :client-name client-name}
                                                              websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                                              online? (true? (= websocket-status :connected))
-                                                             run? (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
+                                                             ;;run? (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
+                                                             run? (= (get-in @db/solver-fn-runs [panel-key sub-param]) resolved-input-map)
                                                              lets-go? (and online? (not run?))
                                                               ;; _ (when lets-go?
                                                               ;;     (ut/tapp>> [:run-solver-req-map! (not run?) req-map @db/solver-fn-runs]))
@@ -137,8 +142,11 @@
                                                                  (ut/tracked-dispatch
                                                                   [::wfx/push :default req-map]))
                                                              _ (when lets-go?
-                                                                 (swap! db/solver-fn-runs ut/dissoc-in [panel-key])
-                                                                 (swap! db/solver-fn-runs assoc-in [panel-key (hash resolved-input-map)] sub-param))]
+                                                                 ;(swap! db/solver-fn-runs ut/dissoc-in [panel-key])
+                                                                 ;(swap! db/solver-fn-runs assoc-in [panel-key (hash resolved-input-map)] sub-param)
+                                                                 (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
+                                                                 (swap! db/solver-fn-runs assoc-in [panel-key sub-param] resolved-input-map)
+                                                                 )]
                                                          {v sub-param})))]
                                  (walk/postwalk-replace logic-kps obody)))
 
@@ -151,7 +159,7 @@
                                                                            ""))
                                    true                      (ut/postwalk-replacer {:*this-block*
                                                                                     panel-key})
-                                   (has-fn? :run-solver)     solver-clover-walk
+                                   (has-fn? :run-solver)     solver-clover-walk  ;;(conn/solver-clover-walk client-name panel-key)
                                    (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
                                    (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
                                    (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)

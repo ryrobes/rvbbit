@@ -23,7 +23,7 @@ find "$DIRECTORY" -type f \( -name "*.clj" -o -name "*.cljs" -o -name "*.cljc" \
   # zprint formatting
   echo "zprint formatting $file"
   #zprint '{:style [:sort-require :ns-justify :justified-original] :comment {:smart-wrap? false} :width 120 :map {:comma? false :sort? false}}' < "$file.nocomments" > "$file.tmp" && mv "$file.tmp" "$file"
-  zprint '{:style [:sort-require :ns-justify :respect-nl :respect-bl :justified-original] :comment {:smart-wrap? false} :width 120 :map {:comma? false :sort? false}}' < "$file.nocomments" > "$file.tmp" && mv "$file.tmp" "$file"
+  zprint '{:style [:sort-require :ns-justify :respect-nl :respect-bl :justified-original] :comment {:smart-wrap? true} :width 120 :map {:comma? false :sort? false}}' < "$file.nocomments" > "$file.tmp" && mv "$file.tmp" "$file"
 
   # Clean up temporary file
   rm -f "$file.nocomments"

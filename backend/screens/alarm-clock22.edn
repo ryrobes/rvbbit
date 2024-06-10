@@ -41,7 +41,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 77,
    :group-by [:ts],
-   :_last-run "20:27:15",
+   :_last-run "13:18:12",
    :refresh-every 20,
    :from
    [{:select
@@ -494,28 +494,28 @@
   {:fields
    {:mb
     {:data-type "integer",
-     :distinct 70,
+     :distinct 74,
      :group-by? true,
-     :commons {732 2, 787 2, 849 2},
-     :cardinality 90},
+     :commons {2838 2, 3177 2, 2930 2},
+     :cardinality 96},
     :mem_used
     {:data-type "integer",
      :distinct 77,
      :group-by? true,
-     :commons {900537121 1, 807739009 1, 687389295 1},
+     :commons {3072382348 1, 3235744360 1, 3342619149 1},
      :cardinality 100},
     :messages_per_second
     {:data-type "float",
-     :distinct 17,
+     :distinct 26,
      :group-by? true,
-     :commons {2.27 23, 2.13 12, 2.4 9},
-     :cardinality 22},
+     :commons {2.27 14, 3.13 9, 3.2 8},
+     :cardinality 33},
     :ts
     {:data-type "string",
      :distinct 77,
      :group-by? true,
      :commons
-     {"2024-06-09 20:13:17" 1, "2024-06-09 20:20:47" 1, "2024-06-09 20:10:47" 1},
+     {"2024-06-10 13:13:17" 1, "2024-06-10 13:15:33" 1, "2024-06-10 13:15:03" 1},
      :cardinality 100}},
    :rowcount 77},
   :shape-drag-7
@@ -773,8 +773,8 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? true,
  :buffy? false,
- :memory [873042407 667045991 4294705152],
- :sched {:gen-viz-516 9264},
+ :memory [3518828656 2961658044 4294705152],
+ :sched {:gen-viz-516 69694},
  :flow-subs
  [:time/now-seconds
   :flow/flow-forever>*running?
@@ -845,15 +845,15 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   9255
+   69684
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :base-sniff-queries {:jvm_stats 1498154063},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 2114263124,
+ :user-params-hash -1892869026,
  :grid-recos? true,
- :session-hash 823857948,
+ :session-hash 1668142472,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1032,7 +1032,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 77,
    :group-by [:ts],
-   :_last-run "20:27:15",
+   :_last-run "13:18:12",
    :refresh-every 20,
    :from
    [{:select
@@ -1206,7 +1206,7 @@
   :block-2133
   {:h 3,
    :w 7,
-   :root [13 18],
+   :root [47 5],
    :tab "star-shaped wallaby",
    :selected-view :hi,
    :name "block-2133",
@@ -1268,7 +1268,7 @@
   :block-1944
   {:h 3,
    :w 5,
-   :root [19 13],
+   :root [47 24],
    :tab "star-shaped wallaby",
    :selected-view :hi,
    :name "block-1944",
@@ -1295,7 +1295,7 @@
   :block-2593
   {:h 4,
    :w 5,
-   :root [22 17],
+   :root [39 22],
    :tab "star-shaped wallaby",
    :selected-view :hi,
    :name "block-2593",
@@ -1322,7 +1322,7 @@
   :block-6003
   {:h 3,
    :w 6,
-   :root [28 15],
+   :root [33 18],
    :tab "star-shaped wallaby",
    :selected-view :hi,
    :name "block-6003",
@@ -1371,7 +1371,7 @@
   :block-744
   {:h 4,
    :w 5,
-   :root [13 13],
+   :root [46 19],
    :tab "star-shaped wallaby",
    :selected-view :hi,
    :name "block-744",
@@ -1726,7 +1726,7 @@
   {:h 4,
    :w 6,
    :tab "star-shaped wallaby",
-   :root [28 19],
+   :root [48 27],
    :name "block-8156",
    :views
    {:pulled-val
@@ -1962,7 +1962,7 @@
    :style {:border-radius "0px 0px 0px 30px"},
    :block-key ":block-12050",
    :selected-view :every-45-seconds,
-   :root [0 25],
+   :root [1 13],
    :h 6,
    :file-path "./screens/blackberries3-narrow.edn",
    :connection-id "system-db",
@@ -1972,7 +1972,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 77,
      :group-by [:ts],
-     :_last-run "20:27:15",
+     :_last-run "13:18:12",
      :refresh-every 20,
      :from
      [{:select
@@ -2056,6 +2056,36 @@
         :fill "#00000000",
         :stroke-width 4,
         :stroke :solver/colors-of-the-moment>colors>1}]]]}},
+  :block-10684
+  {:h 8,
+   :w 14,
+   :root [12 4],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-10684",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-10684.:hi"}
+     :style
+     {:color :theme/editor-outer-rim-color,
+      :font-size "106px",
+      :font-weight 700,
+      :background-color "#00000044",
+      :margin-top "-8px",
+      :background-image "images/error-skull.webp",
+      :padding-top "6px",
+      :padding-left "14px",
+      :background-position "center",
+      :font-family :theme/base-font}
+     :child
+     "2"]},
+   :queries {}},
   :block-6121
   {:h 2,
    :w 16,
@@ -2187,21 +2217,21 @@
       :color [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]}
      :child
      [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]]}}},
- :selected-block "none!",
+ :selected-block :block-10684,
  :theme-colors-hashmap
- {"float" "#f2c6c3",
-  "boolean" "#e0c6ac",
-  "map" "#40a7ea",
-  "list" "#434586",
+ {"float" "#d3cbca",
+  "boolean" "#b6d77b",
+  "map" "#9879d0",
+  "list" "#aa64b3",
   "string" "#ffffff",
-  "any" "#167db9",
-  "vector" "#5f0def",
-  "keyword" "#ffffff",
-  "rabbit-code" "#7b6583",
-  "datetime" "#820f82",
-  "integer" "#d9eeb2",
-  "unknown" "#4c1515",
-  "date" "#254009"},
+  "any" "#ad7d9b",
+  "vector" "#8be761",
+  "keyword" "#b0fae2",
+  "rabbit-code" "#b967ca",
+  "datetime" "#a36c57",
+  "integer" "#757cea",
+  "unknown" "#2f7f4f",
+  "date" "#012728"},
  :click-param
  {:blocks-sys
   {:block_key ":block-12050",
@@ -2227,24 +2257,43 @@
   :time
   {:month-name "MAY",
    :day 4,
-   :hour 20,
+   :hour 13,
    :now "Saturday, May 25th 3:05AM",
-   :second 19,
+   :second 15,
    :now-second nil,
-   :now-seconds "Sunday, June 9th 8:27:19PM",
+   :now-seconds "Monday, June 10th 1:18:15PM",
    :nth "th",
    :month 4,
-   :minute 27},
+   :minute 18},
   :client
   {:engaging-teal-duck-15>stats>memory 268,
-   :*client-name*>stats>memory 722,
+   :*client-name*>stats>memory 2752,
    :grin-bulbous-turtle-14>stats>memory 1419,
    :fit-star-shaped-ape-9>stats>memory nil,
    :electrifying-jungle-green-yak-27>stats>memory nil,
    :fetching-ivory-hornet-15>stats>memory 611},
   :param
-  {:selected-view [nil nil],
-   :selected-view-data nil,
+  {:selected-view [:views :hi],
+   :selected-view-data
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :attr
+    {:id ":block-10684.:hi"}
+    :style
+    {:color :theme/editor-outer-rim-color,
+     :font-size "106px",
+     :font-weight 700,
+     :background-color "#00000044",
+     :margin-top "-8px",
+     :background-image "images/error-skull.webp",
+     :padding-top "6px",
+     :padding-left "14px",
+     :background-position "center",
+     :font-family :theme/base-font}
+    :child],
    :my-mpa {:mm {:pp {:zz 123}}},
    :testme :solver/colors-of-the-moment>colors>1,
    :test [:string [:get-in [:solver/colors-of-the-moment [:colors 2]]]],
@@ -2256,7 +2305,7 @@
    :huger
    [:run-solver
     [:solver-fn-test1 {:some-number :time/minute, :some-string "Huge!"}]],
-   :selected-block :block-2593},
+   :selected-block :block-10684},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -2455,7 +2504,6 @@
    :every-minute true,
    :part-optimistic-sheep-signal-0 false,
    :part-every-5-minutes-6 false,
-   :every-5-minutes false,
    :changed-wallpaper-8k? false,
    :part-every-5-minutes-1 false,
    :changed-wallpaper? false,
@@ -2470,49 +2518,49 @@
    :glowing-bat-signal false},
   :solver
   {:colors-of-the-moment
-   {:second-darkest "#142237",
-    :highest-saturation "#1982aa",
-    :most-contrasting "#f2d6c3",
-    :darkest "#0b192e",
-    :contrast-with-dominant "#f2d6c3",
+   {:second-darkest "#432a5d",
+    :highest-saturation "#1d0413",
+    :most-contrasting "#1d0413",
+    :darkest "#1d0413",
+    :contrast-with-dominant "#61cbe7",
     :colors
-    ["#c07371"
-     "#0b192e"
-     "#26abc0"
-     "#1c5f84"
-     "#1982aa"
-     "#633845"
-     "#f2d6c3"
-     "#133c5d"
-     "#505f63"
-     "#eeb2c4"
-     "#142237"],
-    :most-frequent "#26abc0",
+    ["#d3cad0"
+     "#61cbe7"
+     "#432a5d"
+     "#3e9ad1"
+     "#1d0413"
+     "#4c8cb2"
+     "#4670a5"
+     "#4d638b"
+     "#895d86"
+     "#ba4b8a"
+     "#494879"],
+    :most-frequent "#432a5d",
     :data-colors
-    {"float" "#f2c6c3",
-     "boolean" "#e0c6ac",
-     "map" "#40a7ea",
-     "list" "#434586",
+    {"float" "#d3cbca",
+     "boolean" "#b6d77b",
+     "map" "#9879d0",
+     "list" "#aa64b3",
      "string" "#ffffff",
-     "any" "#167db9",
-     "vector" "#5f0def",
-     "keyword" "#ffffff",
-     "rabbit-code" "#7b6583",
-     "datetime" "#820f82",
-     "integer" "#d9eeb2",
-     "unknown" "#4c1515",
-     "date" "#254009"},
-    :dominant "#142237",
-    :most-contrasting-dark "#0b192e",
-    :second-brightest "#eeb2c4",
-    :brightest "#f2d6c3",
-    :most-contrasting-light "#f2d6c3"},
+     "any" "#ad7d9b",
+     "vector" "#8be761",
+     "keyword" "#b0fae2",
+     "rabbit-code" "#b967ca",
+     "datetime" "#a36c57",
+     "integer" "#757cea",
+     "unknown" "#2f7f4f",
+     "date" "#012728"},
+    :dominant "#494879",
+    :most-contrasting-dark "#1d0413",
+    :second-brightest "#61cbe7",
+    :brightest "#d3cad0",
+    :most-contrasting-light "#61cbe7"},
    :colors-of-the-moment>most-contrasting-light "#66b6c6",
-   :colors-of-the-moment>colors>0 "#c07371",
+   :colors-of-the-moment>colors>0 "#d3cad0",
    :colors-of-the-moment>contrast-with-dominant "#cd5a51",
    :solver-fn-test1-1728349450 "Huge!1433446",
-   :colors-of-the-moment>brightest "#f2d6c3",
-   :colors-of-the-moment>second-brightest "#eeb2c4",
+   :colors-of-the-moment>brightest "#d3cad0",
+   :colors-of-the-moment>second-brightest "#61cbe7",
    :colors-of-the-moment>0 nil,
    :colors-of-the-moment-8k
    {:second-darkest "#474c5d",
@@ -2565,7 +2613,7 @@
     "#13537b"
     "#243c77"],
    :vibrant-antelope-solver 193,
-   :colors-of-the-moment>darkest "#0b192e",
+   :colors-of-the-moment>darkest "#1d0413",
    :get-my-colors137816905
    {:second-darkest "#17344a",
     :highest-saturation "#0e6a83",
@@ -2604,7 +2652,7 @@
     :second-brightest "#c9a1a7",
     :brightest "#29d5bc",
     :most-contrasting-light "#29d5bc"},
-   :solver-fn-test1794743035 "Huge!150",
+   :solver-fn-test1794743035 "Huge!141",
    :solver-fn-test1603802830 "booobs143446",
    :solver-fn-test1771509803 "Huge!143446",
    :get-my-colors-1416867304
@@ -2650,25 +2698,25 @@
    :colors-of-the-moment>most-contrasting "#a1543e",
    :colors-of-the-moment>2 nil,
    :solver-fn-test11722011302 "huge!143446",
-   :solver-fn-test1421530310 "HHHuge!132",
-   :wallpaper-of-the-moment "./images/large/b64-image-11392-70340-4k.webp",
+   :solver-fn-test1421530310 "HHHuge!138",
+   :wallpaper-of-the-moment "./images/large/b64-image-8543-32750-4k.webp",
    :solver-fn-test1-1218464503 "booobs14446",
-   :colors-of-the-moment>colors>2 "#26abc0",
+   :colors-of-the-moment>colors>2 "#432a5d",
    :dazzling-gnu-solver 11214,
-   :colors-of-the-moment>colors>1 "#0b192e",
+   :colors-of-the-moment>colors>1 "#61cbe7",
    :colors-of-the-moment>data-colors
-   {"float" "#f2c6c3",
-    "boolean" "#e0c6ac",
-    "map" "#40a7ea",
-    "list" "#434586",
+   {"float" "#d3cbca",
+    "boolean" "#b6d77b",
+    "map" "#9879d0",
+    "list" "#aa64b3",
     "string" "#ffffff",
-    "any" "#167db9",
-    "vector" "#5f0def",
-    "keyword" "#ffffff",
-    "rabbit-code" "#7b6583",
-    "datetime" "#820f82",
-    "integer" "#d9eeb2",
-    "unknown" "#4c1515",
-    "date" "#254009"}}},
+    "any" "#ad7d9b",
+    "vector" "#8be761",
+    "keyword" "#b0fae2",
+    "rabbit-code" "#b967ca",
+    "datetime" "#a36c57",
+    "integer" "#757cea",
+    "unknown" "#2f7f4f",
+    "date" "#012728"}}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}
