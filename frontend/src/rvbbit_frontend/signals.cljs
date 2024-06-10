@@ -947,7 +947,7 @@
                  :padding          "6px"
                  :font-size        "20px"} :child (str @db/bad-form-msg-signals)]
                (if signal?
-                 [rc/catch (visualize-clause signal-vec 0 nil signal-vec)]
+                 [bricks/reecatch (visualize-clause signal-vec 0 nil signal-vec)]
                  [re-com/v-box :padding "6px" :children
                   [[re-com/box :style {:font-size "19px" :padding-top "6px" :font-weight 700} :child
                     "latest returned value"]

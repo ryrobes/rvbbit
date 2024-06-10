@@ -1135,7 +1135,7 @@
                                   reco-combo
                                   shape-name
                                   true))
-    [rc/catch
+    [bricks/reecatch
      [re-com/h-box :size "none" :children
       [[re-com/box :size "none" :child
         [re-com/v-box :size "1" :children
@@ -2654,8 +2654,8 @@
                     :background-size  (str "50px 50px, 50px 50px"
                                            (when (get custom-map :background-size) ", ")
                                            (get custom-map :background-size))}))) :children
-        [[rc/catch [tab-menu]] [rc/catch [snapshot-menu]] (when session? [session-modal])
-         (when (and editor? (not @bricks/mouse-dragging-panel?)) [rc/catch [editor-panel 33 10]])
+        [[bricks/reecatch [tab-menu]] [bricks/reecatch [snapshot-menu]] (when session? [session-modal])
+         (when (and editor? (not @bricks/mouse-dragging-panel?)) [bricks/reecatch [editor-panel 33 10]])
          (when (or (and @bricks/dragging? (not @bricks/on-block?) (not @bricks/over-flow?))
                    @bricks/swap-layers?)
            [re-com/box :child " " :style
@@ -2669,9 +2669,9 @@
                                   bricks/brick-size)} :width
             (px (* (get @bricks/dragging-body :w) bricks/brick-size)) :height
             (px (* (get @bricks/dragging-body :h) bricks/brick-size))])
-         (when (and buffy? (not @bricks/mouse-dragging-panel?)) [rc/catch [buffy/chat-panel]])
+         (when (and buffy? (not @bricks/mouse-dragging-panel?)) [bricks/reecatch [buffy/chat-panel]])
          (when flows? ;(and flows? (not @bricks/mouse-dragging-panel?))
-           [rc/catch [flows/flow-panel]]) [rc/catch [bricks/grid]]
+           [bricks/reecatch [flows/flow-panel]]) [bricks/reecatch [bricks/grid]]
          [re-com/box :child
           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-pizza" :tooltip
            "  toggle floating editor panel (SPACE)" :style
@@ -2832,7 +2832,7 @@
             {:position "fixed" :left 2 :bottom 20 :font-weight 700 :color "#ffffff99"} :child
             (str (ut/bytes-to-mb (get mem 1))
                  (str " (lazy-grid? " (not (or @bricks/param-hover @bricks/query-hover)) ")"))])
-         [rc/catch [task-bar]] [rc/catch [flows/alert-box]]
+         [bricks/reecatch [task-bar]] [bricks/reecatch [flows/alert-box]]
          [re-com/box :child
           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-labels" :tooltip
            "toggle display mode" :on-click #(ut/tracked-dispatch [::bricks/toggle-no-ui]) :style

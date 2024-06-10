@@ -1,16 +1,21 @@
 (ns rvbbit-frontend.resolver
   (:require
-    [clojure.edn             :as edn]
-    [clojure.string          :as cstr]
-    [clojure.walk            :as walk]
-    [day8.re-frame.undo      :as    undo
-                             :refer [undoable]]
-    [goog.i18n.NumberFormat.Format]
-    [re-frame.alpha          :as rfa]
-    [re-frame.core           :as re-frame]
-    [reagent.core            :as reagent]
-    [rvbbit-frontend.connections :as conn]
-    [rvbbit-frontend.utility :as ut]))
+   [clojure.edn             :as edn]
+   [clojure.string          :as cstr]
+   [clojure.walk            :as walk]
+   [day8.re-frame.undo      :as    undo
+    :refer [undoable]]
+   [goog.i18n.NumberFormat.Format]
+   [re-frame.alpha          :as rfa]
+   [re-frame.core           :as re-frame]
+   [reagent.core            :as reagent]
+   [rvbbit-frontend.connections :as conn]
+   [websocket-fx.core       :as wfx]
+   [rvbbit-frontend.db :as db]
+   [rvbbit-frontend.http :as http]
+   [rvbbit-frontend.utility :as ut]))
+
+(re-frame/reg-sub ::client-name (fn [db] (get db :client-name)))
 
 (defn logic-and-params-fn
   [block-map panel-key]
@@ -24,28 +29,28 @@
                                                       {:keypath [k]})}))
           value-walks-targets    (filter #(and (cstr/includes? (str %) ".")
                                                (not (cstr/includes? (str %) ".*")))
-                                   valid-body-params)
+                                         valid-body-params)
           value-walks            (into
-                                   {}
-                                   (for [k value-walks-targets] ;all-sql-call-keys]
-                                     (let [fs    (ut/splitter (ut/safe-name k) "/")
-                                           gs    (ut/splitter (last fs) ".")
-                                           ds    (keyword (first fs))
-                                           row   (try (int (last gs)) (catch :default _ "label"))
-                                           field (keyword (first gs))]
-                                       {k (if (not (integer? row))
-                                            (str field)
-                                            (get-in @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]})
-                                                    [row field]))})))
+                                  {}
+                                  (for [k value-walks-targets] ;all-sql-call-keys]
+                                    (let [fs    (ut/splitter (ut/safe-name k) "/")
+                                          gs    (ut/splitter (last fs) ".")
+                                          ds    (keyword (first fs))
+                                          row   (try (int (last gs)) (catch :default _ "label"))
+                                          field (keyword (first gs))]
+                                      {k (if (not (integer? row))
+                                           (str field)
+                                           (get-in @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]})
+                                                   [row field]))})))
           condi-walks-targets    (distinct (filter #(cstr/includes? (str %) "condi/")
-                                             valid-body-params))
+                                                   valid-body-params))
           condi-walks            (into {}
                                        (for [k condi-walks-targets]
                                          {k @(ut/tracked-sub ::conn/condi-value
                                                              {:condi-key (keyword
-                                                                           (last (ut/splitter
-                                                                                   (ut/safe-name k)
-                                                                                   "/")))})}))
+                                                                          (last (ut/splitter
+                                                                                 (ut/safe-name k)
+                                                                                 "/")))})}))
           into-walk-map2         (fn [obody]
                                    (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                                          kps       (ut/extract-patterns obody :into 3) ;(kv-map-fn
@@ -105,15 +110,48 @@
                                               (cstr/join "" (apply str args))
                                               (str args)))}
           obody-key-set          (ut/body-set block-map)
+
+          client-name            @(ut/tracked-sub ::client-name {})
+          solver-clover-walk (fn [obody]
+                               (let [kps       (ut/extract-patterns obody :run-solver 2)
+                                     logic-kps (into {}
+                                                     (for [v kps]
+                                                       (let [[_ & this]                   v
+                                                             [[solver-name input-map]] this
+                                                             unresolved-req-hash (hash [solver-name input-map client-name])
+                                                             resolved-input-map (logic-and-params-fn input-map nil) ;; and we need to 'pre-resolve' it's inputs i n case they are client local
+                                                             new-solver-name (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
+                                                             sub-param (keyword (str "solver/" new-solver-name))
+                                                             req-map {:kind        :run-solver-custom ;; solver-name temp-solver-name client-name input-map
+                                                                      :solver-name solver-name
+                                                                      :temp-solver-name  (keyword new-solver-name)
+                                                                      :input-map  resolved-input-map
+                                                                      :client-name client-name}
+                                                             websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
+                                                             online? (true? (= websocket-status :connected))
+                                                             run? (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
+                                                             lets-go? (and online? (not run?))
+                                                              ;; _ (when lets-go?
+                                                              ;;     (ut/tapp>> [:run-solver-req-map! (not run?) req-map @db/solver-fn-runs]))
+                                                             _ (when lets-go?
+                                                                 (ut/tracked-dispatch
+                                                                  [::wfx/push :default req-map]))
+                                                             _ (when lets-go?
+                                                                 (swap! db/solver-fn-runs ut/dissoc-in [panel-key])
+                                                                 (swap! db/solver-fn-runs assoc-in [panel-key (hash resolved-input-map)] sub-param))]
+                                                         {v sub-param})))]
+                                 (walk/postwalk-replace logic-kps obody)))
+
           has-fn?                (fn [k] (some #(= % k) obody-key-set))
           out-block-map          (cond->> block-map
                                    true                      (ut/namespaced-swapper
-                                                               "this-block"
-                                                               (ut/replacer (str panel-key)
-                                                                            #":"
-                                                                            ""))
+                                                              "this-block"
+                                                              (ut/replacer (str panel-key)
+                                                                           #":"
+                                                                           ""))
                                    true                      (ut/postwalk-replacer {:*this-block*
-                                                                                      panel-key})
+                                                                                    panel-key})
+                                   (has-fn? :run-solver)     solver-clover-walk
                                    (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
                                    (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
                                    (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
@@ -130,17 +168,17 @@
                                    (ut/ne? singles)          (ut/postwalk-replacer singles)
                                    (has-fn? :case)           case-walk)
           templated-strings-vals (vec (filter #(cstr/includes? (str %) "/")
-                                        (ut/deep-template-find out-block-map))) ;; ignore non
+                                              (ut/deep-template-find out-block-map))) ;; ignore non
           templates?             (ut/ne? templated-strings-vals)
           _ (when templates?
               (ut/tapp>> [:replacing-string-templates... templated-strings-vals out-block-map]))
           templated-strings-walk (if templates?
                                    (ut/postwalk-replacer
-                                     {nil ""}
-                                     (into {}
-                                           (for [k templated-strings-vals]
-                                             {k @(rfa/sub ::conn/clicked-parameter-key-alpha
-                                                          {:keypath [k]})})))
+                                    {nil ""}
+                                    (into {}
+                                          (for [k templated-strings-vals]
+                                            {k @(rfa/sub ::conn/clicked-parameter-key-alpha
+                                                         {:keypath [k]})})))
                                    {})
           out-block-map          (if templates?
                                    (ut/deep-template-replace templated-strings-walk out-block-map)

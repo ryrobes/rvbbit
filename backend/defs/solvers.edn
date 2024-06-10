@@ -57,6 +57,13 @@
   {:flowmap "node-color-thief-js-webp",
    :opts {:overrides {:image-path :solver/wallpaper-of-the-moment-8k}},
    :return nil}},
+ :get-my-colors
+ {:signal false,
+  :cache? true,
+  :type :flow,
+  :data
+  {:flowmap "node-color-thief-js-webp",
+   :opts {:overrides {:image-path :input-image-path}}}},
  :vibrant-antelope-solver
  {:signal :signal/cool-raccoon-signal-yo,
   :type :clojure2,
@@ -92,6 +99,11 @@
       (for
        [row x]
        (assoc row :mb (int (/ (get row :mem_used 0) 1048576)))))))}},
+ :solver-fn-test1
+ {:signal false,
+  :type :clojure,
+  :input-map {:some-string "HEYa!", :some-number 123},
+  :data (str :some-string (+ 123 :some-number))},
  :sql-solver-1
  {:signal :signal/every-5-minutes,
   :type :sql,

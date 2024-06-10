@@ -168,7 +168,7 @@
 
 
 
-(defonce clover-walk-singles-map (atom {}))
+(def clover-walk-singles-map (atom {}))
 
 (defonce process-key-cache (atom {}))
 (defonce process-key-tracker (atom {}))

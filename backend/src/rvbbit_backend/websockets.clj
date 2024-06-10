@@ -2216,13 +2216,19 @@
      :description desc
      :open-inputs flow-inputs
      :blocks      blocks-types
-     :found?      (true? (not (empty? raw)))}))
+     :found?      (true? (ut/ne? raw))}))
 
 (defmethod wl/handle-request :get-flow-open-ports
   [{:keys [client-name flowmap flow-id]}]
   (get-flow-open-ports flowmap flow-id client-name))
 
 (defmethod wl/handle-request :run-flow
+  [{:keys [client-name flowmap file-image flow-id opts no-return?]}]
+  (ut/pp [:running-flow-map-from client-name])
+  (when (not (get-in (flow-statuses) [flow-id :*running?] false))
+    (flow! client-name flowmap file-image flow-id opts true)))
+
+(defmethod wl/handle-push :run-flow
   [{:keys [client-name flowmap file-image flow-id opts no-return?]}]
   (ut/pp [:running-flow-map-from client-name])
   (when (not (get-in (flow-statuses) [flow-id :*running?] false))
@@ -2237,6 +2243,19 @@
     [solver-name :output]
     [:warning! {:running-manually-via client-name :with-override-map override-map}])
   (run-solver solver-name override-map))
+
+;;[[[ run-solver
+;;    [solver-name & [override-map override-input temp-solver-name]]]]]
+
+(defmethod wl/handle-push :run-solver-custom
+  [{:keys [solver-name temp-solver-name client-name input-map]}]
+  (ut/pp [:custom-solver-run! solver-name :from client-name :input-map input-map])
+  (swap! last-solvers-atom-meta assoc-in
+         [temp-solver-name :output]
+         [:warning! {:running-custom-inputs-via client-name :with-input-map input-map}])
+  ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
+  (run-solver solver-name nil input-map temp-solver-name)
+  temp-solver-name)
 
 (defn flow-kill!
   [flow-id client-name]
@@ -3014,21 +3033,28 @@
 
 
 (defn run-solver
-  [solver-name & [override-map]]
+  [solver-name & [override-map override-input temp-solver-name]]
   (let [solver-map            (if (ut/ne? override-map)
                                 override-map
                                 (get @solvers-atom solver-name))
+        input-map            (get solver-map :input-map {})
+        input-map             (if (ut/ne? override-input)
+                                (merge input-map override-input)
+                                input-map)
         use-cache?            (true? (get solver-map :cache? false))
-        vdata                 (get solver-map :data -1)
-        vdata-clover-kps      (vec (filter #(and (keyword? %)
+        vdata                 (walk/postwalk-replace input-map (get solver-map :data)) ;; if we have input maps or overrides, do that first so it's part of vdata now
+        vdata-clover-kps      (vec (filter #(and (keyword? %) ;; get any resolvable keys in the struct before we operate on it
                                                  (cstr/includes? (str %) "/")
                                                  (not= %
                                                        (keyword (str "solver/"
                                                                      (cstr/replace (str solver-name)
                                                                                    ":"
-                                                                                   "")))) ;; dont
-                                            )
-                                     (ut/deep-flatten vdata)))
+                                                                                   "")))))
+                                           (ut/deep-flatten vdata)))
+        solver-name (if (and temp-solver-name ;; if we are doing override params like with a clover call, we don't want to overwrite the legit solver it's using
+                         (ut/ne? override-input)) 
+                      temp-solver-name 
+                      solver-name)
         vdata-clover-walk-map (into {}
                                     (for [kp vdata-clover-kps]
                                       {kp (try (clover-lookup :rvbbit-solver kp)
@@ -3054,6 +3080,7 @@
                                               (when cache-hit? "*")
                                               " "
                                               (millis-to-date timestamp)))]
+    ;; (when override-input (ut/pp [:SOLVER-INPUT-OVERRIDE! temp-solver-name :wants input-map]))
     (cond
       cache-hit? (let [[output output-full] cache-val
                        meta-extra           {:extra {:last-processed timestamp-str

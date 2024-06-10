@@ -563,7 +563,7 @@
         type     (second kp)
         pre-splt (vec (remove #(= % "rabbit-view") (doall (ut/splitter pre-text "```"))))]
     (ut/tapp>> [:tt text splt])
-    [rc/catch
+    [bricks/reecatch
      [re-com/v-box :gap "10px" :width "580px" :children
       (doall
         (for [idx  (range (count splt))
@@ -591,7 +591,7 @@
                [;[re-com/box :child (str s)]
                 [re-com/v-box :padding "8px" :width "560px" :size "auto" :style
                  {:border (when (not is-meta?) "2px dashed orange")} :gap "8px" :children
-                 [(try [rc/catch
+                 [(try [bricks/reecatch
                         [re-com/v-box :padding "6px" :children
                          [(when (not is-meta?)
                             [re-com/h-box :justify :between :align :center :children
@@ -2284,7 +2284,7 @@
                                       (if (= "none!" (first kp)) ; (nil? (second kp))
                                         [:snapshots :snapshots]
                                         [:history :history]) [:kick :kick]])))]
-    [rc/catch
+    [bricks/reecatch
      [re-com/box :size "none" :width (px panel-width) :height (px panel-height) :attr
       {:on-mouse-enter #(reset! bricks/over-block? true)
        :on-mouse-leave #(reset! bricks/over-block? false)} :style

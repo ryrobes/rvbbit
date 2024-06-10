@@ -2977,7 +2977,7 @@
         stringify? (not (= syntax "clojure"))
         value      (if (and stringify? (empty? value)) " " value) ;; just in case we get in a
        ]
-    [rc/catch
+    [bricks/reecatch
      [re-com/box :size "none" :width (px (- width-int 24)) :height (px (- height-int 24)) :style
       {:font-family   (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
        :font-size     "14px"
@@ -5433,7 +5433,7 @@
 
 (defn alert-box
   []
-  [rc/catch
+  [bricks/reecatch
    (let [rekt [@db/kick-alert @db/pause-alerts]
          rs-running @(ut/tracked-subscribe [::bricks/runstreams-running])
          rs-running-list @(ut/tracked-subscribe [::bricks/runstreams-running-list])
@@ -5713,7 +5713,7 @@
                              )
         details-panel-height (/ panel-height 1.25)
         ppanel-height        (+ panel-height details-panel-height)]
-    [rc/catch
+    [bricks/reecatch
      [re-com/box :size "none" :width (px panel-width) :height (px ppanel-height) ;(if
                                                                                  ;@flow-details-panel?
                                                                                  ;(px (+
@@ -5916,7 +5916,7 @@
                       (px (* 2 ;(get @bricks/dragging-body :h)
                              bricks/brick-size))])))
                (when (and (or (nil? @flow-hover) (not @flow-hover)) @lookup-modal?)
-                 [rc/catch [lookup-modal]])
+                 [bricks/reecatch [lookup-modal]])
                [re-com/box :size "none" :style
                 {;:border "2px solid red"
                  :overflow "hidden"} :width (px (- panel-width 12)) :height
@@ -5948,7 +5948,7 @@
                  [(reagent/adapt-react-class zpan/TransformComponent)
                   [re-com/v-box ;:style {:border "1px dashed hotpink"}
                    :children
-                   [[rc/catch
+                   [[bricks/reecatch
                      (if warren-open?
                        [re-com/gap :size "10px"] ;; no need to render a flow if we have other
                        [flow-grid panel-width ppanel-height x y flowmaps-connections flow-id
@@ -6190,7 +6190,7 @@
                            :position       "fixed"
                            :pointer-events "none"
                            :z-index        100}} (draw-tentacle [(generate-tentacle-coord)])])
-               [rc/catch
+               [bricks/reecatch
                 [flow-details-panel panel-height panel-width details-panel-height]]]]])]])]]))
 
 

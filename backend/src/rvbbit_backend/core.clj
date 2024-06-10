@@ -470,17 +470,17 @@
   (shutdown/add-hook!
     ::the-pool-is-now-closing
     #(do (reset! wss/shutting-down? true)
-         (let [destinations (vec (keys @wss/client-queues))]
-           (doseq [d destinations]
-             (wss/alert! d
-                         [:v-box :justify :center :style {:opacity 0.7} :children
-                          [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
-                            :child
-                            [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]]
-                         10
-                         1
-                         5)))
-         (Thread/sleep 2000)
+        ;;  (let [destinations (vec (keys @wss/client-queues))]
+        ;;    (doseq [d destinations]
+        ;;      (wss/alert! d
+        ;;                  [:v-box :justify :center :style {:opacity 0.7} :children
+        ;;                   [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+        ;;                     :child
+        ;;                     [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]]
+        ;;                  10
+        ;;                  1
+        ;;                  5)))
+        ;;  (Thread/sleep 2000)
          (wss/destroy-websocket-server!)
          (tt/stop!)
          (wss/stop-worker)
