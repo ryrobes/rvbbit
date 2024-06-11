@@ -11,8 +11,7 @@
     [org.apache.lucene.index               IndexWriterConfig DirectoryReader]
     [org.apache.lucene.store               Directory FSDirectory]
     [org.apache.lucene.queryparser.classic QueryParser]
-    [org.apache.lucene.search              IndexSearcher BooleanClause$Occur TermQuery
-                                           BooleanQuery$Builder WildcardQuery]
+    [org.apache.lucene.search              IndexSearcher BooleanClause$Occur TermQuery BooleanQuery$Builder WildcardQuery]
     [java.nio.file                         Paths]))
 
 (def idx-path "./data/search-index")
@@ -29,8 +28,7 @@
 
 (defn generate-ngrams
   [text n]
-  (let [words  (try (clojure.string/split (str text) #"\s+")
-                    (catch Exception _ (do (println (str "ngrams-issue! " text)) [])))
+  (let [words  (try (clojure.string/split (str text) #"\s+") (catch Exception _ (do (println (str "ngrams-issue! " text)) [])))
         ngrams (mapcat (fn [word]
                          (let [word-length      (count word)
                                max-ngram-length (min n word-length)]
@@ -54,21 +52,15 @@
 
 (defn count-documents
   [index-path]
-  (let [reader (DirectoryReader/open (FSDirectory/open (Paths/get index-path
-                                                                  (into-array String []))))]
-    (.numDocs reader)))
+  (let [reader (DirectoryReader/open (FSDirectory/open (Paths/get index-path (into-array String []))))] (.numDocs reader)))
 
 (defn count-documents-by-type
   [index-path]
-  (let [reader   (DirectoryReader/open (FSDirectory/open (Paths/get index-path
-                                                                    (into-array String []))))
+  (let [reader   (DirectoryReader/open (FSDirectory/open (Paths/get index-path (into-array String []))))
         searcher (IndexSearcher. reader)
         max-doc  (.maxDoc reader)
         counts   (atom {})]
-    (dotimes [i max-doc]
-      (let [doc  (.doc searcher i)
-            type (str (.get doc "type"))]
-        (swap! counts update type (fnil inc 0))))
+    (dotimes [i max-doc] (let [doc (.doc searcher i) type (str (.get doc "type"))] (swap! counts update type (fnil inc 0))))
     @counts))
 
 (defn delete-document [writer id] (.deleteDocuments writer (into-array Term [(Term. "id" id)])))
@@ -77,8 +69,7 @@
 
 (defn search-index
   [index-path query-str & [max-hits type]]
-  (let [reader       (DirectoryReader/open (FSDirectory/open (Paths/get index-path
-                                                                        (into-array String []))))
+  (let [reader       (DirectoryReader/open (FSDirectory/open (Paths/get index-path (into-array String []))))
         searcher     (IndexSearcher. reader)
         query-parser (QueryParser. "content" (StandardAnalyzer.))
         base-query   (.parse query-parser query-str)
@@ -94,10 +85,14 @@
         hits         (.scoreDocs topDocs)]
     (into {}
           (map (fn [hit]
-                 (let [doc    (.doc searcher (.doc hit)) ; Fetch the document
-                       fields (into {}
-                                    (map (fn [field] [(keyword (.name field)) (.stringValue field)])
-                                      (.getFields doc))) ; Extract field values as strings
+                 (let [doc    (.doc searcher (.doc hit))                                                                   ; Fetch
+                                                                                                                           ; the
+                                                                                                                           ; document
+                       fields (into {} (map (fn [field] [(keyword (.name field)) (.stringValue field)]) (.getFields doc))) ; Extract
+                                                                                                                           ; field
+                                                                                                                           ; values
+                                                                                                                           ; as
+                                                                                                                           ; strings
                        doc-id (:id fields) ; Retrieve the document ID
                        fields (dissoc fields :content :id)] ; Remove the content and id fields
                    [doc-id fields])) ; Return a map entry with the document ID as the key and

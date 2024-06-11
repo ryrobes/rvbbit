@@ -41,59 +41,53 @@
 
 (re-frame/reg-event-db ::alt-key-up (fn [db _] (assoc db :alt-key-held? false)))
 
-(re-frame/reg-event-db ::alt-key-toggle
-                       (fn [db _] (assoc db :alt-key-held? (not (get db :alt-key-held? false)))))
+(re-frame/reg-event-db ::alt-key-toggle (fn [db _] (assoc db :alt-key-held? (not (get db :alt-key-held? false)))))
 
 (defn dispatch-keydown-rules
   []
   (ut/tracked-dispatch-sync
     [::rp/set-keydown-rules
-     {:event-keys [;[[::bricks/shift-down] [{:keyCode 16 :shiftKey true}]]
-                   [[::bricks/esc-unselect-current] [{:keyCode 27}]] ; ESC
-                   [[::bricks/redo-one] [{:keyCode 90 :ctrlKey true :shiftKey true}]] ; Z
-                   [[::bricks/undo-one] [{:keyCode 90 :ctrlKey true :shiftKey false}]]
-                   [[::bricks/toggle-buffy] [{:keyCode 32 :shiftKey true :ctrlKey false}]] ; space
-                   [[::bricks/toggle-editor] [{:keyCode 32 :shiftKey false :ctrlKey false}]] ; space
-                   [[::bricks/toggle-flow] [{:keyCode 32 :shiftKey false :ctrlKey true}]] ; space
-                   [[::bricks/next-panel] [{:keyCode 9}]] ; tab
-                   [[::bricks/toggle-kick-alert] [{:keyCode 75}]] ; k
-                   [[::bricks/toggle-peek] [{:keyCode 80}]] ; p
-                   [[::bricks/toggle-lines] [{:keyCode 76}]] ; l
-                   [[::bricks/toggle-auto-run] [{:keyCode 79}]] ; O
-                   [[::bricks/delete-selected-panel] [{:keyCode 46 :shiftKey true}]] ; shift-delete
-                   [[::bricks/cycle-column-select false] [{:keyCode 81}]] ; q
-                   [[::bricks/cycle-column-select true] [{:keyCode 69}]] ; e
-                   [[::audio/start-recording] [{:keyCode 84}]] ; t
-                   [[::audio/stop-recording] [{:keyCode 89}]] ; y
-                   [[::bricks/stretch-panel :wider] [{:keyCode 68 :shiftKey true}]] ; shift-d
-                   [[::bricks/stretch-panel :longer] [{:keyCode 83 :shiftKey true}]] ; shift-s
-                   [[::bricks/stretch-panel :narrower] [{:keyCode 65 :shiftKey true}]] ; shift-a
-                   [[::bricks/stretch-panel :shorter] [{:keyCode 87 :shiftKey true}]] ; shift-w
-                   [[::bricks/panel-depth-up] [{:keyCode 82 :shiftKey true}]] ; shift-r
-                   [[::bricks/panel-depth-down] [{:keyCode 70 :shiftKey true}]] ; shift-f
-                   [[::flows/run-current-flowmap] [{:keyCode 70} {:keyCode 70}]] ; f f
-                   [[::bricks/toggle-session-modal] [{:keyCode 192}]] ; ` tilde
-                   [[::bricks/save] [{:keyCode 83 :shiftKey false :ctrlKey true}]] ;; ctrl-s
-                   [[::bricks/nudge-panel :up] [{:keyCode 87}]] ; w
-                   [[::bricks/nudge-panel :down] [{:keyCode 83}]] ; s
-                   [[::bricks/nudge-panel :left] [{:keyCode 65}]] ; a
-                   [[::bricks/nudge-panel :right] [{:keyCode 68}]] ; d
-                   [[::alt-key-toggle] [{:keyCode 86}]] ;; v
-                   [[::alt-key-down] [{:keyCode 67}]]] ;; alt key down
-      :prevent-default-keys [{:keyCode 32} {:keyCode 86} {:keyCode 46 :shiftKey true}
-                             {:keyCode 83 :ctrlKey true} {:keyCode 83 :shiftKey false :ctrlKey true}
-                             {:keyCode 9} {:keyCode 70 :ctrlKey true}]}]))
+     {:event-keys           [;[[::bricks/shift-down] [{:keyCode 16 :shiftKey true}]]
+                             [[::bricks/esc-unselect-current] [{:keyCode 27}]] ; ESC
+                             [[::bricks/redo-one] [{:keyCode 90 :ctrlKey true :shiftKey true}]] ; Z
+                             [[::bricks/undo-one] [{:keyCode 90 :ctrlKey true :shiftKey false}]]
+                             [[::bricks/toggle-buffy] [{:keyCode 32 :shiftKey true :ctrlKey false}]] ; space
+                             [[::bricks/toggle-editor] [{:keyCode 32 :shiftKey false :ctrlKey false}]] ; space
+                             [[::bricks/toggle-flow] [{:keyCode 32 :shiftKey false :ctrlKey true}]] ; space
+                             [[::bricks/next-panel] [{:keyCode 9}]] ; tab
+                             [[::bricks/toggle-kick-alert] [{:keyCode 75}]] ; k
+                             [[::bricks/toggle-peek] [{:keyCode 80}]] ; p
+                             [[::bricks/toggle-lines] [{:keyCode 76}]] ; l
+                             [[::bricks/toggle-auto-run] [{:keyCode 79}]] ; O
+                             [[::bricks/delete-selected-panel] [{:keyCode 46 :shiftKey true}]] ; shift-delete
+                             [[::bricks/cycle-column-select false] [{:keyCode 81}]] ; q
+                             [[::bricks/cycle-column-select true] [{:keyCode 69}]] ; e
+                             [[::audio/start-recording] [{:keyCode 84}]] ; t
+                             [[::audio/stop-recording] [{:keyCode 89}]] ; y
+                             [[::bricks/stretch-panel :wider] [{:keyCode 68 :shiftKey true}]] ; shift-d
+                             [[::bricks/stretch-panel :longer] [{:keyCode 83 :shiftKey true}]] ; shift-s
+                             [[::bricks/stretch-panel :narrower] [{:keyCode 65 :shiftKey true}]] ; shift-a
+                             [[::bricks/stretch-panel :shorter] [{:keyCode 87 :shiftKey true}]] ; shift-w
+                             [[::bricks/panel-depth-up] [{:keyCode 82 :shiftKey true}]] ; shift-r
+                             [[::bricks/panel-depth-down] [{:keyCode 70 :shiftKey true}]] ; shift-f
+                             [[::flows/run-current-flowmap] [{:keyCode 70} {:keyCode 70}]] ; f f
+                             [[::bricks/toggle-session-modal] [{:keyCode 192}]] ; ` tilde
+                             [[::bricks/save] [{:keyCode 83 :shiftKey false :ctrlKey true}]] ;; ctrl-s
+                             [[::bricks/nudge-panel :up] [{:keyCode 87}]] ; w
+                             [[::bricks/nudge-panel :down] [{:keyCode 83}]] ; s
+                             [[::bricks/nudge-panel :left] [{:keyCode 65}]] ; a
+                             [[::bricks/nudge-panel :right] [{:keyCode 68}]] ; d
+                             [[::alt-key-toggle] [{:keyCode 86}]] ;; v
+                             [[::alt-key-down] [{:keyCode 67}]]] ;; alt key down
+      :prevent-default-keys [{:keyCode 32} {:keyCode 86} {:keyCode 46 :shiftKey true} {:keyCode 83 :ctrlKey true}
+                             {:keyCode 83 :shiftKey false :ctrlKey true} {:keyCode 9} {:keyCode 70 :ctrlKey true}]}]))
 
 
 
-(defn dispatch-keyup-rules
-  []
-  (ut/tracked-dispatch-sync [::rp/set-keyup-rules
-                             {:event-keys [[[::alt-key-up] [{:keyCode 67}]]]}]))
+(defn dispatch-keyup-rules [] (ut/tracked-dispatch-sync [::rp/set-keyup-rules {:event-keys [[[::alt-key-up] [{:keyCode 67}]]]}]))
 
 (re-frame/reg-sub ::memory-usage-breached-threshold?
-                  (fn [db _]
-                    (let [{:keys [_ used ttl-heap]} (get db :memory)] (> (/ used ttl-heap) 0.75))))
+                  (fn [db _] (let [{:keys [_ used ttl-heap]} (get db :memory)] (> (/ used ttl-heap) 0.75))))
 
 (defonce root-key (reagent.core/atom (cljs.core/random-uuid)))
 
@@ -113,12 +107,11 @@
                        (fn [db]
                          (let [client-name       (get db :client-name)
                                [total used heap] (get db :memory)]
-                           (ut/tapp>> [:debug "total memory:" (ut/bytes-to-mb total) "used memory:"
-                                       (ut/bytes-to-mb used) "heap:" (ut/bytes-to-mb heap)])
+                           (ut/tapp>> [:debug "total memory:" (ut/bytes-to-mb total) "used memory:" (ut/bytes-to-mb used) "heap:"
+                                       (ut/bytes-to-mb heap)])
                            (let [pct-used     (/ used total)
                                  pct-used-str (str (.. pct-used (toFixed 1)) "%")]
-                             (ut/tapp>> [:purging-sub-cache-for! client-name :pct-used
-                                         pct-used-str])
+                             (ut/tapp>> [:purging-sub-cache-for! client-name :pct-used pct-used-str])
                              (clear-cache-and-reload!)
                              db))))
 
@@ -134,8 +127,7 @@
       {:interval                 5
        :event                    [::bricks/update-flow-statuses]
        :poll-when                [::bricks/update-flow-statuses?]
-       :dispatch-event-on-start? true}
-      {:interval 120 :event [::bricks/clean-up-reco-previews] :dispatch-event-on-start? false}
+       :dispatch-event-on-start? true} {:interval 120 :event [::bricks/clean-up-reco-previews] :dispatch-event-on-start? false}
       {:interval 3 :event [::bricks/prune-alerts] :dispatch-event-on-start? false}
       {:interval 5 :event [::bricks/get-memory-usage] :dispatch-event-on-start? false}
       {:interval                 1 ;;; test
@@ -162,8 +154,7 @@
        :dispatch-event-on-start? false}
       {:interval                 3600 ;; hella expensive, testing
        :event                    [::http/get-autocomplete-values]
-       :dispatch-event-on-start? true}
-      {:interval 1000 :event [::bricks/update-metadata-tabs] :dispatch-event-on-start? false}
+       :dispatch-event-on-start? true} {:interval 1000 :event [::bricks/update-metadata-tabs] :dispatch-event-on-start? false}
       {:interval 1 :event [::bricks/update-conditionals] :dispatch-event-on-start? false}
       {:interval                 4
        :event                    [::bricks/refresh-status]
@@ -191,18 +182,15 @@
                          :on-timeout  [::http/timeout-response [:boot :get-settings]]
                          :timeout     15000}])
   (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind        :signals-map
-                                       :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                        {:message     {:kind :signals-map :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                          :on-response [::signals/signals-map-response]
                          :timeout     15000000}])
   (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind        :rules-map
-                                       :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                        {:message     {:kind :rules-map :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                          :on-response [::signals/rules-map-response]
                          :timeout     15000000}])
   (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind        :solvers-map
-                                       :client-name @(ut/tracked-subscribe [::bricks/client-name])}
+                        {:message     {:kind :solvers-map :client-name @(ut/tracked-subscribe [::bricks/client-name])}
                          :on-response [::signals/solvers-map-response]
                          :timeout     15000000}])
   (undo/undo-config! {:harvest-fn   (fn [ratom] (select-keys @ratom [:panels :signals-map :flows]))
@@ -210,22 +198,17 @@
   (track-mouse-activity)
   (let [press-fn   (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event
                      (when (and (= (.-keyCode event) 71) (not @g-key-down?))
-                       (do (reset! g-key-down? true)
-                           (reset! flows/drop-toggle? (not @flows/drop-toggle?)))))
-        release-fn (fn [event]
-                     (when (= (.-keyCode event) 71)
-                       (do (reset! g-key-down? false) (reset! flows/drop-toggle? false))))]
+                       (do (reset! g-key-down? true) (reset! flows/drop-toggle? (not @flows/drop-toggle?)))))
+        release-fn (fn [event] (when (= (.-keyCode event) 71) (do (reset! g-key-down? false) (reset! flows/drop-toggle? false))))]
     (.addEventListener js/window "keydown" press-fn)
     (.addEventListener js/window "keyup" release-fn))
-  (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind :session-snaps :client-name client-name}
-                         :on-response [::bricks/save-sessions]
-                         :timeout     15000}])
+  (ut/tracked-dispatch
+    [::wfx/request :default
+     {:message {:kind :session-snaps :client-name client-name} :on-response [::bricks/save-sessions] :timeout 15000}])
   (let [url-vec  @(ut/tracked-subscribe [::http/url-vec])
         base-dir "./screens/"]
     (if (>= (count url-vec) 1) ;; if we have a url with a flowset, load that, oitherwise load
-      (ut/tracked-dispatch-sync [::http/load
-                                 (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
+      (ut/tracked-dispatch-sync [::http/load (str base-dir (js/decodeURIComponent (first url-vec)) ".edn")])
       (ut/tracked-dispatch [::wfx/request :default ;; load default boot flowset
                             {:message     {:kind :get-settings :client-name client-name}
                              :on-response [::http/simple-response-boot]

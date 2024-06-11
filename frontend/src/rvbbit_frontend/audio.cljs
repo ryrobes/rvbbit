@@ -22,26 +22,21 @@
 
 (def waiting-for-response (reagent.core/atom []))
 
-(re-frame/reg-sub ::transcriptions
-                  (fn [db _]
-                    (vec (for [e (get db :audio-transcribed)] (get-in e [:alternatives])))))
+(re-frame/reg-sub ::transcriptions (fn [db _] (vec (for [e (get db :audio-transcribed)] (get-in e [:alternatives])))))
 
 (re-frame/reg-sub ::recording? (fn [db _] (not (nil? (get db :recorder)))))
 
 (re-frame/reg-sub ::latest-transcription (fn [db _] (str (last (get db :audio-transcribed-vec)))))
 
-(re-frame/reg-event-db
-  ::chat-back ;; basically ::append-block-body w/o blocking
-  (fn [db [_ block-id text]]
-    (if (some #{@listening-block} (keys (get db :blocks)))
-      (assoc-in db [:blocks block-id :body] (str (get-in db [:blocks block-id :body]) "\n" text))
-      db)))
+(re-frame/reg-event-db ::chat-back ;; basically ::append-block-body w/o blocking
+                       (fn [db [_ block-id text]]
+                         (if (some #{@listening-block} (keys (get db :blocks)))
+                           (assoc-in db [:blocks block-id :body] (str (get-in db [:blocks block-id :body]) "\n" text))
+                           db)))
 
 (re-frame/reg-sub ::self-voice-name (fn [db _] (get db :self-voice-name "(this you?)")))
 
-(re-frame/reg-event-db ::set-self-voice-name
-                       (undoable)
-                       (fn [db [_ new-name]] (assoc db :self-voice-name new-name)))
+(re-frame/reg-event-db ::set-self-voice-name (undoable) (fn [db [_ new-name]] (assoc db :self-voice-name new-name)))
 
 (re-frame/reg-sub ::auto-train-voice? (fn [db _] (get db :auto-train-voice? false)))
 
@@ -53,9 +48,7 @@
 
 
 
-(re-frame/reg-event-db
-  ::save-webcam-stream
-  (fn [db [_ stream]] (ut/tapp>> [:stream-started!]) (assoc db :webcam-feed stream)))
+(re-frame/reg-event-db ::save-webcam-stream (fn [db [_ stream]] (ut/tapp>> [:stream-started!]) (assoc db :webcam-feed stream)))
 
 (defn get-webcam-stream
   []
@@ -74,8 +67,7 @@
 (re-frame/reg-event-db ::stop-webcam
                        (fn [db [_]]
                          (let [stream (get-in db [:webcam-feed])]
-                           (when stream
-                             (doseq [track (array-seq (.getTracks stream))] (.stop track)))
+                           (when stream (doseq [track (array-seq (.getTracks stream))] (.stop track)))
                            (assoc-in db [:webcam-feed] nil))))
 
 
@@ -97,83 +89,65 @@
 
 
 
-(re-frame/reg-event-db
-  ::chat-response
-  (fn [db [_ kp result]]
-    (reset! waiting-for-response (vec (remove #(= % kp) @waiting-for-response)))
-    (let [chat-text (get-in result [:convo :choices 0 :message :content])
-          new-chats (conj
-                      (get-in db [:chats kp] [])
-                      {:content chat-text :role "assistant" :timestamp (ut/get-time-format-str)})]
-      (ut/tapp>> [:chat-response result])
-      (assoc-in db [:chats kp] new-chats))))
+(re-frame/reg-event-db ::chat-response
+                       (fn [db [_ kp result]]
+                         (reset! waiting-for-response (vec (remove #(= % kp) @waiting-for-response)))
+                         (let [chat-text (get-in result [:convo :choices 0 :message :content])
+                               new-chats (conj (get-in db [:chats kp] [])
+                                               {:content chat-text :role "assistant" :timestamp (ut/get-time-format-str)})]
+                           (ut/tapp>> [:chat-response result])
+                           (assoc-in db [:chats kp] new-chats))))
 
 (re-frame/reg-event-db ::chat-timeout-response
                        (fn [db [_ kp result]]
                          (let []
-                           (reset! waiting-for-response (vec (remove #(= % kp)
-                                                               @waiting-for-response)))
+                           (reset! waiting-for-response (vec (remove #(= % kp) @waiting-for-response)))
                            (ut/tapp>> [:chat-timeout! result kp])
                            db)))
 
 (defn push-oai-message
   [convo-vec client-name panels panel-key kp]
   (swap! waiting-for-response conj kp)
-  (ut/tracked-dispatch [::wfx/request :default
-                        {:message     {:kind        :open-ai-push
-                                       :client-name client-name
-                                       :panel-key   panel-key
-                                       :query-key   0
-                                       :panels      panels
-                                       :convo       convo-vec}
-                         :on-response [::chat-response kp]
-                         :on-timeout  [::chat-timeout-response kp]
-                         :timeout     500000}]))
+  (ut/tracked-dispatch
+    [::wfx/request :default
+     {:message {:kind :open-ai-push :client-name client-name :panel-key panel-key :query-key 0 :panels panels :convo convo-vec}
+      :on-response [::chat-response kp]
+      :on-timeout [::chat-timeout-response kp]
+      :timeout 500000}]))
 
-(re-frame/reg-event-db
-  ::add-chat
-  (fn [db [_ chat-text kp]]
-    (let [new-chats (conj (get-in db [:chats kp] [])
-                          {:content chat-text :role "user" :timestamp (ut/get-time-format-str)})]
-      (push-oai-message new-chats
-                        (get db :client-name)
-                        (get db :panels)
-                        (get db :selected-block)
-                        kp)
-      (assoc-in db [:chats kp] new-chats))))
+(re-frame/reg-event-db ::add-chat
+                       (fn [db [_ chat-text kp]]
+                         (let [new-chats (conj (get-in db [:chats kp] [])
+                                               {:content chat-text :role "user" :timestamp (ut/get-time-format-str)})]
+                           (push-oai-message new-chats (get db :client-name) (get db :panels) (get db :selected-block) kp)
+                           (assoc-in db [:chats kp] new-chats))))
 
 (re-frame/reg-event-db ::clear-chat (fn [db [_ kp]] (assoc-in db [:chats kp] [])))
 
-(re-frame/reg-event-db ::failure-speech-to-text
-                       (fn [db [_ result]]
-                         (let [old-status (get-in db [:http-reqs :speech-to-text])]
-                           (assoc-in db
-                             [:http-reqs :speech-to-text]
-                             (merge old-status
-                                    {:status     "failed"
-                                     :ended      (ut/get-time-format-str)
-                                     :ended-unix (.getTime (js/Date.))
-                                     :message    result})))))
+(re-frame/reg-event-db
+  ::failure-speech-to-text
+  (fn [db [_ result]]
+    (let [old-status (get-in db [:http-reqs :speech-to-text])]
+      (assoc-in db
+        [:http-reqs :speech-to-text]
+        (merge old-status
+               {:status "failed" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result})))))
 
-(defn invert-map
-  [m]
-  (reduce (fn [acc [k v]] (update acc v (fn [existing] (if existing (conj existing k) [k])))) {} m))
+(defn invert-map [m] (reduce (fn [acc [k v]] (update acc v (fn [existing] (if existing (conj existing k) [k])))) {} m))
 
 
-(re-frame/reg-sub
-  ::rs-value
-  (fn [db {:keys [flow-id kkey]}] ;;; dupe from buffy
-    (let [src (get-in db [:runstreams flow-id :values kkey :source])]
-      (if (= src :param)
-        (let [vvv @(ut/tracked-sub ::resolver/logic-and-params
-                                   {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
-              vv  (try (first vvv ;;@(rfa/sub ::resolver/logic-and-params {:m [(get-in db
-                                  ;;[:runstreams
-                       )
-                       (catch :default e
-                         (do (ut/tapp>> [:rs-value-fuck-up-audio vvv flow-id kkey src e]) vvv)))]
-          vv)
-        (get-in db [:runstreams flow-id :values kkey :value])))))
+(re-frame/reg-sub ::rs-value
+                  (fn [db {:keys [flow-id kkey]}] ;;; dupe from buffy
+                    (let [src (get-in db [:runstreams flow-id :values kkey :source])]
+                      (if (= src :param)
+                        (let [vvv @(ut/tracked-sub ::resolver/logic-and-params
+                                                   {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
+                              vv  (try (first vvv ;;@(rfa/sub ::resolver/logic-and-params {:m [(get-in db
+                                                  ;;[:runstreams
+                                       )
+                                       (catch :default e (do (ut/tapp>> [:rs-value-fuck-up-audio vvv flow-id kkey src e]) vvv)))]
+                          vv)
+                        (get-in db [:runstreams flow-id :values kkey :value])))))
 
 (re-frame/reg-sub ::runstream-overrides
                   (fn [db [_ flow-id]]
@@ -183,11 +157,8 @@
                                                    :when                      (not (nil? value))]
                                                {k (if (= source :input)
                                                     value
-                                                    (let [vv @(ut/tracked-subscribe [::rs-value
-                                                                                     flow-id k])] ;;; dupe
-                                                      (if (and (vector? vv) (every? string? vv))
-                                                        (cstr/join "\n" vv)
-                                                        vv)))}))]
+                                                    (let [vv @(ut/tracked-subscribe [::rs-value flow-id k])] ;;; dupe
+                                                      (if (and (vector? vv) (every? string? vv)) (cstr/join "\n" vv) vv)))}))]
                       override-map)))
 
 (re-frame/reg-sub ::client-name (fn [db _] (get db :client-name)))
@@ -207,9 +178,7 @@
                           {:message     {:kind        :run-flow
                                          :flow-id     flow-id
                                          :flowmap     flow-id
-                                         :opts        (if (map? overrides)
-                                                        (merge base-opts {:overrides overrides})
-                                                        base-opts)
+                                         :opts        (if (map? overrides) (merge base-opts {:overrides overrides}) base-opts)
                                          :client-name client-name}
                            :on-response [::http/socket-response]
                            :on-timeout  [::http/timeout-response]
@@ -225,12 +194,9 @@
           sshouts            (get db :shouts)
           shouts             (invert-map sshouts)
           shout-flows-to-run (vec (flatten (for [k     (keys shouts)
-                                                 :let  [k     (ut/remove-punctuation
-                                                                (cstr/lower-case k))
-                                                        lines (ut/remove-punctuation
-                                                                (cstr/lower-case lines))]
-                                                 :when (and (and (ut/ne? (cstr/trim k))
-                                                                 (ut/ne? (cstr/trim lines)))
+                                                 :let  [k     (ut/remove-punctuation (cstr/lower-case k))
+                                                        lines (ut/remove-punctuation (cstr/lower-case lines))]
+                                                 :when (and (and (ut/ne? (cstr/trim k)) (ut/ne? (cstr/trim lines)))
                                                             (cstr/starts-with? lines (str k)))]
                                              (get shouts k))))]
       (ut/tapp>> [:voice-trigger lines shout-flows-to-run])
@@ -239,19 +205,15 @@
               cnt (js/Math.ceil (/ (count txt) 5))]
           (try (start-flow flow-id) (catch :default e (ut/tapp>> [:error flow-id e])))
           (ut/dispatch-delay 400 [::http/insert-alert [:box :child txt] cnt 1 6])))
-      (ut/tracked-dispatch
-        [::wfx/request :default
-         {:message {:kind :voice-trigger :client-name client-name :voice-text lines}
-          :timeout 500000}])
+      (ut/tracked-dispatch [::wfx/request :default
+                            {:message {:kind :voice-trigger :client-name client-name :voice-text lines} :timeout 500000}])
       (-> db
           (assoc-in [:incoming-voice] lines)
           (assoc-in [:click-param :param :voice] lines)
           (assoc-in [:http-reqs :speech-to-text]
-                    (merge old-status
-                           {:status     "success"
-                            :ended      (ut/get-time-format-str)
-                            :ended-unix (.getTime (js/Date.))
-                            :message    result}))))))
+                    (merge
+                      old-status
+                      {:status "success" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result}))))))
 
 (re-frame/reg-event-fx
   ::speech-to-text
@@ -260,9 +222,7 @@
           openapi-key       (get db :openai-api-key)
           openapi-org-id    (get db :openai-org-id)
           headers           (merge {"Authorization" (str "Bearer " openapi-key)}
-                                   (if (not (nil? openapi-org-id))
-                                     {"OpenAI-Organization" openapi-org-id}
-                                     {}))
+                                   (if (not (nil? openapi-org-id)) {"OpenAI-Organization" openapi-org-id} {}))
           blob              (get-in db [:audio-data-recorded :blob])
           audio-file        (js/File. [(clj->js blob)] "audio.wav" {"type" "audio/wav"})
           form-data         (let [data (js/FormData.)]
@@ -274,10 +234,7 @@
       (when auto-train-voice? (ut/tracked-dispatch [::edit-voice "me" "me"]))
       {:db         (assoc-in db
                      [:http-reqs :speech-to-text]
-                     {:status     "running"
-                      :url        url
-                      :started    (ut/get-time-format-str)
-                      :start-unix (.getTime (js/Date.))})
+                     {:status "running" :url url :started (ut/get-time-format-str) :start-unix (.getTime (js/Date.))})
        :http-xhrio {:method          method
                     :uri             url
                     :body            form-data
@@ -294,10 +251,7 @@
 
 (defn create-media-recorder [stream] (js/MediaRecorder. stream))
 
-(defn start-recording
-  [recorder]
-  (ut/tapp>> ["start-recording-fn - state:" (.-state recorder)])
-  (.start recorder))
+(defn start-recording [recorder] (ut/tapp>> ["start-recording-fn - state:" (.-state recorder)]) (.start recorder))
 
 
 (defn stop-recording
@@ -322,9 +276,7 @@
                   (fn [db [_ voice-name]]
                     (let [voice-map (into {}
                                           (for [{:keys [name voice_id]}
-                                                  (get-in db
-                                                          [:http-reqs "elevenlabs-test"
-                                                           "elevenlabs-test" :message :voices])]
+                                                  (get-in db [:http-reqs "elevenlabs-test" "elevenlabs-test" :message :voices])]
                                             {name voice_id}))]
                       (get voice-map voice-name))))
 
@@ -378,8 +330,7 @@
     (.play audio-element)
     (draw analyser block-id)))
 
-(re-frame/reg-event-db ::save-recording-data
-                       (fn [db [_ audio-map]] (assoc db :audio-data-recorded audio-map)))
+(re-frame/reg-event-db ::save-recording-data (fn [db [_ audio-map]] (assoc db :audio-data-recorded audio-map)))
 
 (defn blob-to-base64
   [blob]
@@ -397,17 +348,15 @@
                              form-data  (create-form-data audio-data)]
                          (ut/tapp>> [:audio-data-received-callback (count (str form-data))])
                          (blob-to-base64 audio-data)
-                         (ut/tracked-dispatch [::save-recording-data
-                                               {:form form-data :raw audio-data}])))))
+                         (ut/tracked-dispatch [::save-recording-data {:form form-data :raw audio-data}])))))
 
 (re-frame/reg-event-db ::recorder-created (fn [db [_ recorder]] (assoc db :recorder recorder)))
 
 (re-frame/reg-event-fx ::start-recording (fn [_ _] {::start-recording nil}))
 
-(re-frame/reg-sub
-  ::kits ;; dupe from canvas
-  (fn [db [_ block-id]]
-    (vec (remove nil? (for [[k v] (get db :blocks)] (when (= (get v :kit-parent) block-id) k))))))
+(re-frame/reg-sub ::kits ;; dupe from canvas
+                  (fn [db [_ block-id]]
+                    (vec (remove nil? (for [[k v] (get db :blocks)] (when (= (get v :kit-parent) block-id) k))))))
 
 (re-frame/reg-sub ::face-block ;; modded dupe from canvas
                   (fn [db [_ block-id]]
@@ -429,8 +378,7 @@
                                 (on-data-available recorder
                                                    (fn [audio-data]
                                                      (let [form-data (create-form-data audio-data)]
-                                                       (ut/tapp>> [:call-back-data-inner
-                                                                   (count (str form-data))]))))
+                                                       (ut/tapp>> [:call-back-data-inner (count (str form-data))]))))
                                 (ut/tracked-dispatch [::recorder-created recorder])
                                 (start-recording recorder)))))))
 
@@ -456,41 +404,38 @@
 
 
 
-(re-frame/reg-event-db ::failure-text-to-speech11
-                       (fn [db [_ block-type block-id result]]
-                         (let [old-status (get-in db [:http-reqs block-type block-id])]
-                           (assoc-in db
-                             [:http-reqs block-type block-id]
-                             (merge old-status
-                                    {:status     "failed"
-                                     :ended      (ut/get-time-format-str)
-                                     :ended-unix (.getTime (js/Date.))
-                                     :message    result})))))
+(re-frame/reg-event-db
+  ::failure-text-to-speech11
+  (fn [db [_ block-type block-id result]]
+    (let [old-status (get-in db [:http-reqs block-type block-id])]
+      (assoc-in db
+        [:http-reqs block-type block-id]
+        (merge old-status
+               {:status "failed" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result})))))
 
-(re-frame/reg-event-db ::success-text-to-speech11
-                       (fn [db [_ block-type block-id voices? result]]
-                         (ut/tapp>> [:speak? block-type block-id voices?])
-                         (if voices?
-                           (let [old-status (get-in db [:http-reqs block-type block-id])]
-                             (-> db
-                                 (assoc-in [:http-reqs block-type block-id]
-                                           (merge old-status
-                                                  {:status     "success"
-                                                   :ended      (ut/get-time-format-str)
-                                                   :ended-unix (.getTime (js/Date.))
-                                                   :message    result}))))
-                           (let [old-status (get-in db [:http-reqs block-type block-id])
-                                 byte-nums  result ;; This is already a vector of byte values
-                                 byte-array (js/Uint8Array. byte-nums)
-                                 blob       (js/Blob. #js [byte-array] #js {:type "audio/mpeg"})]
-                             (play-audio-blob blob block-id)
-                             (-> db
-                                 (assoc-in [:http-reqs block-type block-id]
-                                           (merge old-status
-                                                  {:status     "success"
-                                                   :ended      (ut/get-time-format-str)
-                                                   :ended-unix (.getTime (js/Date.))
-                                                   :message    {:audio-blob blob}})))))))
+(re-frame/reg-event-db
+  ::success-text-to-speech11
+  (fn [db [_ block-type block-id voices? result]]
+    (ut/tapp>> [:speak? block-type block-id voices?])
+    (if voices?
+      (let [old-status (get-in db [:http-reqs block-type block-id])]
+        (-> db
+            (assoc-in [:http-reqs block-type block-id]
+                      (merge
+                        old-status
+                        {:status "success" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result}))))
+      (let [old-status (get-in db [:http-reqs block-type block-id])
+            byte-nums  result ;; This is already a vector of byte values
+            byte-array (js/Uint8Array. byte-nums)
+            blob       (js/Blob. #js [byte-array] #js {:type "audio/mpeg"})]
+        (play-audio-blob blob block-id)
+        (-> db
+            (assoc-in [:http-reqs block-type block-id]
+                      (merge old-status
+                             {:status     "success"
+                              :ended      (ut/get-time-format-str)
+                              :ended-unix (.getTime (js/Date.))
+                              :message    {:audio-blob blob}})))))))
 
 (re-frame/reg-event-fx
   ::text-to-speech11
@@ -517,17 +462,11 @@
           header     {"xi-api-key" xi-api-key}
           data       (if audio-file?
                        {:path text-to-speak}
-                       (if voices?
-                         {}
-                         (dissoc (assoc (get-in db [:blocks block-id :req]) :text text-to-speak)
-                           :speak)))]
+                       (if voices? {} (dissoc (assoc (get-in db [:blocks block-id :req]) :text text-to-speak) :speak)))]
       (ut/tapp>> [method url data voices? vname vid])
       {:db         (assoc-in db
                      [:http-reqs block-type block-id]
-                     {:status     "running"
-                      :url        url
-                      :started    (ut/get-time-format-str)
-                      :start-unix (.getTime (js/Date.))})
+                     {:status "running" :url url :started (ut/get-time-format-str) :start-unix (.getTime (js/Date.))})
        :http-xhrio {:method          method
                     :uri             url
                     :params          data
@@ -536,10 +475,7 @@
                     :format          (ajax/json-request-format {:keywords? true})
                     :response-format (if voices?
                                        (ajax/json-response-format {:keywords? true})
-                                       {:read         pr/-body
-                                        :description  "rawww"
-                                        :type         :arraybuffer
-                                        :content-type "audio/mpeg"})
+                                       {:read pr/-body :description "rawww" :type :arraybuffer :content-type "audio/mpeg"})
                     :on-success      [::success-text-to-speech11 block-type block-id voices?]
                     :on-failure      [::failure-text-to-speech11 block-type block-id]}})))
 
@@ -547,27 +483,24 @@
 
 
 
-(re-frame/reg-event-db ::failure-edit-voice
-                       (fn [db [_ block-type block-id result]]
-                         (let [old-status (get-in db [:http-reqs block-type block-id])]
-                           (assoc-in db
-                             [:http-reqs block-type block-id]
-                             (merge old-status
-                                    {:status     "failed"
-                                     :ended      (ut/get-time-format-str)
-                                     :ended-unix (.getTime (js/Date.))
-                                     :message    result})))))
+(re-frame/reg-event-db
+  ::failure-edit-voice
+  (fn [db [_ block-type block-id result]]
+    (let [old-status (get-in db [:http-reqs block-type block-id])]
+      (assoc-in db
+        [:http-reqs block-type block-id]
+        (merge old-status
+               {:status "failed" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result})))))
 
-(re-frame/reg-event-db ::success-edit-voice
-                       (fn [db [_ block-type block-id result]]
-                         (let [old-status (get-in db [:http-reqs block-type block-id])]
-                           (-> db
-                               (assoc-in [:http-reqs block-type block-id]
-                                         (merge old-status
-                                                {:status     "success"
-                                                 :ended      (ut/get-time-format-str)
-                                                 :ended-unix (.getTime (js/Date.))
-                                                 :message    result}))))))
+(re-frame/reg-event-db
+  ::success-edit-voice
+  (fn [db [_ block-type block-id result]]
+    (let [old-status (get-in db [:http-reqs block-type block-id])]
+      (-> db
+          (assoc-in [:http-reqs block-type block-id]
+                    (merge
+                      old-status
+                      {:status "success" :ended (ut/get-time-format-str) :ended-unix (.getTime (js/Date.)) :message result}))))))
 
 (re-frame/reg-event-fx
   ::edit-voice
@@ -597,10 +530,7 @@
       (ut/tapp>> [:training-voice voice-name :is-new? new?])
       {:db         (assoc-in db
                      [:http-reqs block-type block-id]
-                     {:status     "running"
-                      :url        url
-                      :started    (ut/get-time-format-str)
-                      :start-unix (.getTime (js/Date.))})
+                     {:status "running" :url url :started (ut/get-time-format-str) :start-unix (.getTime (js/Date.))})
        :http-xhrio {:method          method
                     :uri             url
                     :body            form-data

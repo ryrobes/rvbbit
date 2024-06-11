@@ -18,6 +18,4 @@
 (re-frame/reg-sub ::w (fn [db] (get-in db [:window :w])))
 (re-frame/reg-sub ::h (fn [db] (get-in db [:window :h])))
 
-(re-frame/reg-event-fx ::window-fx-watcher
-                       (fn []
-                         {:window/on-resize {:dispatch [::window-resized] :debounce-ms 200}}))
+(re-frame/reg-event-fx ::window-fx-watcher (fn [] {:window/on-resize {:dispatch [::window-resized] :debounce-ms 200}}))

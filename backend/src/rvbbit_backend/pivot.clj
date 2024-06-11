@@ -18,9 +18,7 @@
 
 (defn- pivot-case
   [field value agg-fn agg-field]
-  (if (= agg-fn :count)
-    [:case [:= field value] 1 :else 0]
-    [:case [:= field value] agg-field :else 0]))
+  (if (= agg-fn :count) [:case [:= field value] 1 :else 0] [:case [:= field value] agg-field :else 0]))
 
 (defn- pivot-select
   [base-select pivot-config]
@@ -35,8 +33,7 @@
     (vec (concat base-select ;; wrap with vec to convert to vector
                  (for [v values]
                    (let [field-name (keywordify v)]
-                     [[(if just-count? :sum agg-fn) (pivot-case field v agg-fn agg-field)]
-                      field-name]))))))
+                     [[(if just-count? :sum agg-fn) (pivot-case field v agg-fn agg-field)] field-name]))))))
 
 (defn pivot-query
   [query]
@@ -50,9 +47,7 @@
   [query]
   (letfn [(walk-query [q]
             (cond (and (map? q) (contains? q :pivot-by)) (pivot-query q)
-                  (map? q)                               (into {}
-                                                               (map (fn [[k v]] [k (walk-query v)])
-                                                                 q))
+                  (map? q)                               (into {} (map (fn [[k v]] [k (walk-query v)]) q))
                   (vector? q)                            (mapv walk-query q)
                   :else                                  q))]
     (walk-query query)))
@@ -112,8 +107,7 @@
   {:select   [:summer [[:count 1] :cnt] :field1]
    :group-by [:field1]
    :from     [[{:select   [:field1 :field2 :field3]
-                :pivot-by {:season [[:sum :rainfall_int]
-                                    ["Winter" "Fall" "Summer" "Spring" nil 23]]}
+                :pivot-by {:season [[:sum :rainfall_int] ["Winter" "Fall" "Summer" "Spring" nil 23]]}
                 :group-by [:field1 :field2 :field3]
                 :where    [:= :field1 "Bigfoot"]
                 :from     [[:table1 :table-alias]]}] :aliasedpivot]})
@@ -122,20 +116,16 @@
   {:select   [:summer [[:count 1] :cnt] :field1]
    :group-by [:field1]
    :from     [[{:select   [:field1 :field2 :field3]
-                :pivot-by {:season [[:sum :rainfall_int]
-                                    ["Winter" "Fall" "Summer" "Spring" nil 23]]}
+                :pivot-by {:season [[:sum :rainfall_int] ["Winter" "Fall" "Summer" "Spring" nil 23]]}
                 :group-by [:field1 :field2 :field3]
                 :where    [:= :field1 "Bigfoot"]
                 :from     [[{:select   [:summer [[:count 1] :cnt] :field1]
                              :group-by [:field1]
                              :from     [[{:select   [:field1 :field2 :field3]
-                                          :pivot-by {:season [[:sum :rainfall_int]
-                                                              ["Winter" "Fall" "Summer" "Spring" nil
-                                                               23]]}
+                                          :pivot-by {:season [[:sum :rainfall_int] ["Winter" "Fall" "Summer" "Spring" nil 23]]}
                                           :group-by [:field1 :field2 :field3]
                                           :where    [:= :field1 "Bigfoot"]
-                                          :from     [[:table1 :table-alias]]}] :aliasedpivot]}
-                            :table-alias]]}] :aliasedpivot]})
+                                          :from     [[:table1 :table-alias]]}] :aliasedpivot]} :table-alias]]}] :aliasedpivot]})
 
 (def nested-query3
   {:select [:summer [[:count 1] :cnt] :field1]
@@ -144,41 +134,30 @@
             :pivot-by {:season [[:sum :rainfall_int] ["Winter" "Fall" "Summer" "Spring" nil 23]]}
             :group-by [:field1 :field2 :field3]
             :where    [:= :field1 "Bigfoot"]
-            :from     [[{:select [:summer [[:count 1] :cnt] :field1]
+            :from     [[{:select   [:summer [[:count 1] :cnt] :field1]
                          :group-by [:field1]
-                         :from [[{:select [:field1 :field2 :field3]
-                                  :pivot-by {:season [[:sum :rainfall_int]
-                                                      ["Winter" "Fall" "Summer" "Spring" nil 23]]}
-                                  :group-by [:field1 :field2 :field3]
-                                  :where [:= :field1 "Bigfoot"]
-                                  :from [[{:select [:summer [[:count 1] :cnt] :field1]
-                                           :group-by [:field1]
-                                           :from
-                                             [[{:select   [:field1 :field2 :field3]
-                                                :pivot-by {:season [[:sum :rainfall_int]
-                                                                    ["Winter" "Fall" "Summer"
-                                                                     "Spring" nil 23]]}
-                                                :group-by [:field1 :field2 :field3]
-                                                :where    [:= :field1 "Bigfoot"]
-                                                :from     [[{:select   [:summer [[:count 1] :cnt]
-                                                                        :field1]
-                                                             :group-by [:field1]
-                                                             :from     [[{:select [:field1 :field2
-                                                                                   :field3]
-                                                                          :pivot-by
-                                                                            {:season
-                                                                               [[:sum :rainfall_int]
-                                                                                ["Winter" "Fall"
-                                                                                 "Summer" "Spring"
-                                                                                 nil 23]]}
-                                                                          :group-by [:field1 :field2
-                                                                                     :field3]
-                                                                          :where [:= :field1
-                                                                                  "Bigfoot"]
-                                                                          :from [[:table1
-                                                                                  :table-alias]]}]
-                                                                        :aliasedpivot]}
-                                                            :table-alias]]}] :aliasedpivot]}
-                                          :table-alias]]}] :aliasedpivot]} :table-alias]]}]
+                         :from     [[{:select   [:field1 :field2 :field3]
+                                      :pivot-by {:season [[:sum :rainfall_int] ["Winter" "Fall" "Summer" "Spring" nil 23]]}
+                                      :group-by [:field1 :field2 :field3]
+                                      :where    [:= :field1 "Bigfoot"]
+                                      :from     [[{:select   [:summer [[:count 1] :cnt] :field1]
+                                                   :group-by [:field1]
+                                                   :from     [[{:select   [:field1 :field2 :field3]
+                                                                :pivot-by {:season [[:sum :rainfall_int]
+                                                                                    ["Winter" "Fall" "Summer" "Spring" nil 23]]}
+                                                                :group-by [:field1 :field2 :field3]
+                                                                :where    [:= :field1 "Bigfoot"]
+                                                                :from     [[{:select   [:summer [[:count 1] :cnt] :field1]
+                                                                             :group-by [:field1]
+                                                                             :from     [[{:select   [:field1 :field2 :field3]
+                                                                                          :pivot-by {:season [[:sum :rainfall_int]
+                                                                                                              ["Winter" "Fall"
+                                                                                                               "Summer" "Spring"
+                                                                                                               nil 23]]}
+                                                                                          :group-by [:field1 :field2 :field3]
+                                                                                          :where    [:= :field1 "Bigfoot"]
+                                                                                          :from     [[:table1 :table-alias]]}]
+                                                                                        :aliasedpivot]} :table-alias]]}]
+                                                              :aliasedpivot]} :table-alias]]}] :aliasedpivot]} :table-alias]]}]
           :aliasedpivot]})
 

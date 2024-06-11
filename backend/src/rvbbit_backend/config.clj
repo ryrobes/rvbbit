@@ -15,9 +15,7 @@
                                                  (cstr/replace ".edn" "")
                                                  (cstr/replace " " "-")))]
                        (if (map? content) (assoc m base-key content) m))
-                     (catch Exception e
-                       (println "Error reading file" filename ":" (.getMessage e))
-                       m))))
+                     (catch Exception e (println "Error reading file" filename ":" (.getMessage e)) m))))
       {}
       files)))
 
@@ -27,8 +25,6 @@
   (into {}
         (for [[k v] kits]
           (into {}
-                (for [[kk vv] (get v :packages)]
-                  {kk (merge (merge (dissoc v :packages) {:kit-name kk :package-name k}) vv)})))))
+                (for [[kk vv] (get v :packages)] {kk (merge (merge (dissoc v :packages) {:kit-name kk :package-name k}) vv)})))))
 
-(def settings
-  (try (read-string (slurp "./config.edn")) (catch Exception e {:error (str e) :debug-level 1})))
+(def settings (try (read-string (slurp "./config.edn")) (catch Exception e {:error (str e) :debug-level 1})))

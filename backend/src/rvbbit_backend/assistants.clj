@@ -20,50 +20,57 @@
   [req]
   (try
     (let [{:keys [url headers query-params method body file] :or {method :get}} req
-          http-method (case method
-                        :get     client/get
-                        :post    client/post
-                        :put     client/put
-                        :delete  client/delete
-                        :head    client/head
-                        :options client/options
-                        :patch   client/patch
-                        :GET     client/get
-                        :POST    client/post
-                        :PUT     client/put
-                        :DELETE  client/delete
-                        :HEAD    client/head
-                        :OPTIONS client/options
-                        :PATCH   client/patch
-                        (throw (IllegalArgumentException. {:error (str "Unknown http method: "
-                                                                       method)})))
-          headers (merge {"Authorization" (str "Bearer " openapi-key)
-                          "Content-Type"  "application/json"
-                          "OpenAI-Beta"   "assistants=v1"}
-                         (if (not (nil? openapi-org-id)) {"OpenAI-Organization" openapi-org-id} {})
-                         headers)
-          body2 (if (nil? body)
-                  {:query-params query-params}
-                  (if (nil? file)
-                    {:body (json/generate-string body)}
-                    {:multipart [{:name     "file"
-                                  :content  (slurp file)
-                                  :filename (last (clojure.string/split file #"/"))}
-                                 {:name "purpose" :content "assistants"}]}))
-          response (try (http-method url (merge {:as :json :headers headers :debug false} body2))
-                        (catch Exception e
-                          {:error {:message (.getMessage e)
-                                   :msg     (str e)
-                                   :class   (str (type e))}}))]
-      (if (:error response)
-        (do (ut/pp [:error response :body-sent body2]) response)
-        (get response :body)))
-    (catch Exception e
-      {:error-outer {:message (.getMessage e) :msg (str e) :class (str (type e))}})))
+          http-method                                                           (case method
+                                                                                  :get     client/get
+                                                                                  :post    client/post
+                                                                                  :put     client/put
+                                                                                  :delete  client/delete
+                                                                                  :head    client/head
+                                                                                  :options client/options
+                                                                                  :patch   client/patch
+                                                                                  :GET     client/get
+                                                                                  :POST    client/post
+                                                                                  :PUT     client/put
+                                                                                  :DELETE  client/delete
+                                                                                  :HEAD    client/head
+                                                                                  :OPTIONS client/options
+                                                                                  :PATCH   client/patch
+                                                                                  (throw (IllegalArgumentException.
+                                                                                           {:error (str "Unknown http method: "
+                                                                                                        method)})))
+          headers                                                               (merge {"Authorization" (str "Bearer "
+                                                                                                             openapi-key)
+                                                                                        "Content-Type"  "application/json"
+                                                                                        "OpenAI-Beta"   "assistants=v1"}
+                                                                                       (if (not (nil? openapi-org-id))
+                                                                                         {"OpenAI-Organization" openapi-org-id}
+                                                                                         {})
+                                                                                       headers)
+          body2                                                                 (if (nil? body)
+                                                                                  {:query-params query-params}
+                                                                                  (if (nil? file)
+                                                                                    {:body (json/generate-string body)}
+                                                                                    {:multipart [{:name "file"
+                                                                                                  :content (slurp file)
+                                                                                                  :filename
+                                                                                                    (last (clojure.string/split
+                                                                                                            file
+                                                                                                            #"/"))}
+                                                                                                 {:name    "purpose"
+                                                                                                  :content "assistants"}]}))
+          response                                                              (try (http-method url
+                                                                                                  (merge {:as      :json
+                                                                                                          :headers headers
+                                                                                                          :debug   false}
+                                                                                                         body2))
+                                                                                     (catch Exception e
+                                                                                       {:error {:message (.getMessage e)
+                                                                                                :msg     (str e)
+                                                                                                :class   (str (type e))}}))]
+      (if (:error response) (do (ut/pp [:error response :body-sent body2]) response) (get response :body)))
+    (catch Exception e {:error-outer {:message (.getMessage e) :msg (str e) :class (str (type e))}})))
 
-(defn list-assistants
-  []
-  (oai-call {:url "https://api.openai.com/v1/assistants" :method :get :query-params {:limit 20}}))
+(defn list-assistants [] (oai-call {:url "https://api.openai.com/v1/assistants" :method :get :query-params {:limit 20}}))
 
 (defn create-assistant
   []
@@ -95,9 +102,7 @@
         :tools [{:type "retrieval"}]}}))
 
 
-(defn upload-file
-  [file]
-  (api/create-file {:purpose "assistants" :file (java.io.File. file)} {:api-key openapi-key}))
+(defn upload-file [file] (api/create-file {:purpose "assistants" :file (java.io.File. file)} {:api-key openapi-key}))
 
 (defn chat-lame
   [convo]
@@ -109,43 +114,35 @@
 (defn chat
   [convo]
   (oai-call {:url    "https://api.openai.com/v1/chat/completions"
-             :body   {:messages (vec (for [{:keys [role content]} convo]
-                                       {:role role :content content}))
-                      :model    "gpt-4"}
+             :body   {:messages (vec (for [{:keys [role content]} convo] {:role role :content content})) :model "gpt-4"}
              :method :post}))
 
 (defn one-shot-chat
   [message system-msg]
   (oai-call {:url    "https://api.openai.com/v1/chat/completions"
-             :body   {:messages [{:role "system" :content system-msg}
-                                 {:role "user" :content message}]
+             :body   {:messages [{:role "system" :content system-msg} {:role "user" :content message}]
                       :model    "gpt-4-1106-preview"}
              :method :post}))
 
 (defn buffy
   [query-name]
-  (let [base-folder "/home/ryanr/rvbbit-backend/kit-rowsets/"
+  (let [base-folder    "/home/ryanr/rvbbit-backend/kit-rowsets/"
         _ (println query-name)
-        table-name (keyword (str "table" (rand-int 12345)))
+        table-name     (keyword (str "table" (rand-int 12345)))
         data-file-path (str base-folder (ut/unkeyword query-name) ".edn")
-        gdata (take 100 (edn/read-string (slurp data-file-path))) ;(durable-atom "./datom.edn")
-        story
-          (one-shot-chat
-            (str "read this data, analyze it, and tell me a short story about it please."
-                 "it is in EDN format, very similar to JSON. Here it is: ``` "
-                 (pr-str gdata)
-                 " ```")
-            "You are a helpful assistant - an upbeat valley girl who loves reading tabular data.")
+        gdata          (take 100 (edn/read-string (slurp data-file-path))) ;(durable-atom "./datom.edn")
+        story          (one-shot-chat (str "read this data, analyze it, and tell me a short story about it please."
+                                           "it is in EDN format, very similar to JSON. Here it is: ``` "
+                                           (pr-str gdata)
+                                           " ```")
+                                      "You are a helpful assistant - an upbeat valley girl who loves reading tabular data.")
         _ (ut/pp story)]
     {:storytime {:data [{:ask-mutates       {}
                          :content           (vec (for [line (vec (remove empty?
-                                                                   (cstr/split-lines
-                                                                     (get-in story
-                                                                             [:choices 0 :message
-                                                                              :content]))))]
-                                                   [:box :padding "10px" :width "500px" :size "auto"
-                                                    :style {:font-size "17px"} :child
-                                                    [:speak-click (str line)]]))
+                                                                   (cstr/split-lines (get-in story
+                                                                                             [:choices 0 :message :content]))))]
+                                                   [:box :padding "10px" :width "500px" :size "auto" :style {:font-size "17px"}
+                                                    :child [:speak-click (str line)]]))
                          :highlight-columns {}
                          :name              "Well, you asked for it."
                          :order             0

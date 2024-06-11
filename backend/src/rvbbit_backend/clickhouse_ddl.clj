@@ -1,7 +1,7 @@
 (ns rvbbit-backend.clickhouse-ddl
   (:require
-   [rvbbit-backend.util :as ut]
-   [clojure.string :as cstr]))
+    [clojure.string      :as cstr]
+    [rvbbit-backend.util :as ut]))
 
 (def create-reco-vw
   " CREATE or replace VIEW viz_recos_vw AS
@@ -419,25 +419,30 @@ ORDER BY (db_type, connection_id, table_name, field_name)
 ;;                                :rowset rowset]))))
 
 
-(defn create-attribute-sample [sample-table-name-str rowset]
-  (try
-    (let [field-types (cstr/join ""
-                                 (for [[k v] (first rowset)]
-                                   (let [type (cond (string? v) "String"
-                                                    (integer? v) "Int32"
-                                                    (float? v) "Float64"
-                                                    (cstr/includes? (str (type v)) "DateTime") "DateTime"
-                                                    (cstr/includes? (str (type v)) "Date") "Date"
-                                                    :else "String")
-                                         kk (ut/unkeyword k)]
-                                     (str kk " " type " ,"))))
-          ddl (str "-- DROP TABLE IF EXISTS " sample-table-name-str "; \n
-                         CREATE TABLE IF NOT EXISTS " sample-table-name-str "
-                (" (cstr/join "" (drop-last field-types)) ") ENGINE =  Memory;")]
-      ;(ut/pp [:debug field-types (keys (first rowset)) ddl])
-      ddl)
-    (catch Exception e (ut/pp [:error-creating-ddl-for-sample-based-on-rowset sample-table-name-str
-                               :error (str e)
-                               :rowset rowset]))))
+(defn create-attribute-sample
+  [sample-table-name-str rowset]
+  (try (let [field-types (cstr/join ""
+                                    (for [[k v] (first rowset)]
+                                      (let [type (cond (string? v)                                "String"
+                                                       (integer? v)                               "Int32"
+                                                       (float? v)                                 "Float64"
+                                                       (cstr/includes? (str (type v)) "DateTime") "DateTime"
+                                                       (cstr/includes? (str (type v)) "Date")     "Date"
+                                                       :else                                      "String")
+                                            kk   (ut/unkeyword k)]
+                                        (str kk " " type " ,"))))
+             ddl         (str "-- DROP TABLE IF EXISTS "
+                              sample-table-name-str
+                              "; \n
+                         CREATE TABLE IF NOT EXISTS "
+                              sample-table-name-str
+                              "
+                ("
+                              (cstr/join "" (drop-last field-types))
+                              ") ENGINE =  Memory;")]
+         ;(ut/pp [:debug field-types (keys (first rowset)) ddl])
+         ddl)
+       (catch Exception e
+         (ut/pp [:error-creating-ddl-for-sample-based-on-rowset sample-table-name-str :error (str e) :rowset rowset]))))
 
 (defn insert-attributes [])

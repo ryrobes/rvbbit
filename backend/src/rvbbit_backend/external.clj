@@ -10,8 +10,7 @@
 
 (defn pretty-spit
   [file-name collection]
-  (spit (java.io.File. file-name)
-        (with-out-str (clojure.pprint/write collection :dispatch clojure.pprint/code-dispatch))))
+  (spit (java.io.File. file-name) (with-out-str (clojure.pprint/write collection :dispatch clojure.pprint/code-dispatch))))
 
 
 (def client-pushes (atom {}))
@@ -62,16 +61,9 @@
         repacked (into {}
                        (for [file  files
                              :let  [relative-path (cstr/replace file dir "")
-                                    keyname       (keyword (cstr/replace (str (last (cstr/split
-                                                                                      relative-path
-                                                                                      #"/")))
-                                                                         ".edn"
-                                                                         ""))
-                                    file-data     (try (when (.exists (io/file file))
-                                                         (read-string (slurp file)))
-                                                       (catch Exception e
-                                                         (do (ut/pp [:cannot-read-existing file e])
-                                                             {})))]
+                                    keyname       (keyword (cstr/replace (str (last (cstr/split relative-path #"/"))) ".edn" ""))
+                                    file-data     (try (when (.exists (io/file file)) (read-string (slurp file)))
+                                                       (catch Exception e (do (ut/pp [:cannot-read-existing file e]) {})))]
                              :when file-data]
                          [keyname file-data]))]
     repacked))
@@ -82,8 +74,7 @@
         block-dir     (str client-dir "/" tab "/" block-name "/")
         files         (get-all-paths block-dir)
         root-file     (str "./live/" (fixstr client-name) ".edn")
-        original-name (get-in (try (read-string (slurp root-file))
-                                   (catch Exception e {:invalid-edn! (str e)}))
+        original-name (get-in (try (read-string (slurp root-file)) (catch Exception e {:invalid-edn! (str e)}))
                               [panel-key :name]
                               block-name)
         q             (atom {})
@@ -91,26 +82,15 @@
         repack        (into {}
                             (for [file  files
                                   :let  [relative-path (cstr/replace file block-dir "")
-                                         keyname       (keyword (cstr/replace (str (last
-                                                                                     (cstr/split
-                                                                                       relative-path
-                                                                                       #"/")))
-                                                                              ".edn"
-                                                                              ""))
-                                         subkey        (cond (cstr/includes? (str relative-path)
-                                                                             "/queries/")
-                                                               q
-                                                             (cstr/includes? (str relative-path)
-                                                                             "/views/")
-                                                               v
-                                                             :else nil)
-                                         file-data     (try (when (.exists (io/file file))
-                                                              (read-string (slurp file)))
+                                         keyname       (keyword
+                                                         (cstr/replace (str (last (cstr/split relative-path #"/"))) ".edn" ""))
+                                         subkey        (cond (cstr/includes? (str relative-path) "/queries/") q
+                                                             (cstr/includes? (str relative-path) "/views/")   v
+                                                             :else                                            nil)
+                                         file-data     (try (when (.exists (io/file file)) (read-string (slurp file)))
                                                             (catch Exception _ nil))]
                                   :when file-data]
-                              (if subkey
-                                (do (swap! subkey merge {keyname file-data}) {})
-                                {keyname file-data})))
+                              (if subkey (do (swap! subkey merge {keyname file-data}) {}) {keyname file-data})))
         repack        (-> repack
                           (assoc :queries @q)
                           (assoc :views @v))
@@ -140,27 +120,24 @@
     (doseq [[k v] panels ;; for each panel
             :when (map? v)
             :let  [;_ (ut/pp [:working-on k v])
-                   board-name (get v :tab)
-                   block-dir (str client-dir "/" board-name "/" (get name-mapping k) "/")
-                   block-file-base (str block-dir (fixstr k) ".edn")
+                   board-name                (get v :tab)
+                   block-dir                 (str client-dir "/" board-name "/" (get name-mapping k) "/")
+                   block-file-base           (str block-dir (fixstr k) ".edn")
                    naked-incoming-block-data (-> v
                                                  (dissoc :views)
                                                  (dissoc :tab)
                                                  (dissoc :name)
                                                  (dissoc :queries))
-                   naked-incoming-views (get v :views {})
-                   naked-incoming-queries (get v :queries {})
-                   existing-file-data (try (when (.exists (io/file block-file-base))
-                                             (read-string (slurp block-file-base)))
-                                           (catch Exception e
-                                             (do (ut/pp [:cannot-read-existing block-file-base e])
-                                                 {})))
-                   existing-file-data-base (-> existing-file-data
-                                               (dissoc :views)
-                                               (dissoc :tab)
-                                               (dissoc :queries))
-                   base-exists? (and (.exists (io/file block-file-base))
-                                     (= naked-incoming-block-data existing-file-data-base))]]
+                   naked-incoming-views      (get v :views {})
+                   naked-incoming-queries    (get v :queries {})
+                   existing-file-data        (try (when (.exists (io/file block-file-base)) (read-string (slurp block-file-base)))
+                                                  (catch Exception e (do (ut/pp [:cannot-read-existing block-file-base e]) {})))
+                   existing-file-data-base   (-> existing-file-data
+                                                 (dissoc :views)
+                                                 (dissoc :tab)
+                                                 (dissoc :queries))
+                   base-exists?              (and (.exists (io/file block-file-base))
+                                                  (= naked-incoming-block-data existing-file-data-base))]]
       (swap! path-history conj block-file-base)
       (if (not base-exists?)
         (do ;(ut/pp [:file-unpacker! k :base client-name
@@ -170,14 +147,9 @@
         (doseq [[kk vv] naked-incoming-views
                 :let    [view-base          (str block-dir "/views/")
                          view-file-base     (str view-base (fixstr kk) ".edn")
-                         existing-file-data (try (when (.exists (io/file view-file-base))
-                                                   (read-string (slurp view-file-base)))
-                                                 (catch Exception e
-                                                   (do (ut/pp [:cannot-read-existing view-file-base
-                                                               e])
-                                                       {})))
-                         base-exists?       (and (.exists (io/file view-file-base))
-                                                 (= vv existing-file-data))]]
+                         existing-file-data (try (when (.exists (io/file view-file-base)) (read-string (slurp view-file-base)))
+                                                 (catch Exception e (do (ut/pp [:cannot-read-existing view-file-base e]) {})))
+                         base-exists?       (and (.exists (io/file view-file-base)) (= vv existing-file-data))]]
           (swap! path-history conj view-file-base)
           (if (not base-exists?)
             (do ;(ut/pp [:file-unpacker! k kk :views client-name
@@ -187,14 +159,9 @@
         (doseq [[kk vv] naked-incoming-queries
                 :let    [query-base         (str block-dir "/queries/")
                          query-file-base    (str query-base (fixstr kk) ".edn")
-                         existing-file-data (try (when (.exists (io/file query-file-base))
-                                                   (read-string (slurp query-file-base)))
-                                                 (catch Exception e
-                                                   (do (ut/pp [:cannot-read-existing query-file-base
-                                                               e])
-                                                       {})))
-                         base-exists?       (and (.exists (io/file query-file-base))
-                                                 (= vv existing-file-data))]]
+                         existing-file-data (try (when (.exists (io/file query-file-base)) (read-string (slurp query-file-base)))
+                                                 (catch Exception e (do (ut/pp [:cannot-read-existing query-file-base e]) {})))
+                         base-exists?       (and (.exists (io/file query-file-base)) (= vv existing-file-data))]]
           (swap! path-history conj query-file-base)
           (if (not base-exists?)
             (do ;(ut/pp [:file-unpacker! k kk :queries client-name

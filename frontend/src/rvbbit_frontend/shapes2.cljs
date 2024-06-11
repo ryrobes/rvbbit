@@ -3,9 +3,8 @@
     ["react-drag-and-drop"   :as rdnd]
     [clojure.string          :as cstr]
     [garden.color            :as    c
-                             :refer [analogous color? complement hex->hsl hex? hsl hsl->hex hsla
-                                     invert mix rgb->hex rgb->hsl shades split-complement tetrad
-                                     triad]]
+                             :refer [analogous color? complement hex->hsl hex? hsl hsl->hex hsla invert mix rgb->hex rgb->hsl
+                                     shades split-complement tetrad triad]]
     [re-com.core             :as    re-com
                              :refer [at]]
     [re-com.util             :refer [px]]
@@ -22,21 +21,16 @@
         function?      (or (fn? s) (try (fn? s) (catch :default _ false)))]
     (cond (hex-color? s)                           [re-com/h-box :gap "3px" :children
                                                     [[re-com/box :child (str s)]
-                                                     [re-com/box :child " " :width "13px" :height
-                                                      "13px" :style
-                                                      {:background-color (str s)
-                                                       :border-radius    "2px"}]]]
+                                                     [re-com/box :child " " :width "13px" :height "13px" :style
+                                                      {:background-color (str s) :border-radius "2px"}]]]
           (or function? (= k-val-type "function")) (str (.-name s) "!") ;; temp
-          (string? s)                              [re-com/box :size "auto" :align :end :justify
-                                                    :end :style {:word-break "break-all"} :child
-                                                    (str "\"" s "\"")]
+          (string? s)                              [re-com/box :size "auto" :align :end :justify :end :style
+                                                    {:word-break "break-all"} :child (str "\"" s "\"")]
           :else                                    (ut/replacer (str s) #"clojure.core/" ""))))
 
 (defn draggable-pill [_ _ element] element) ;; stub
 
-(defn sql-explanations-kp
-  []
-  {[:from 0 0] "table-name" [:from 0 1] "table-alias" [:from] "the table we are selecting from"})
+(defn sql-explanations-kp [] {[:from 0 0] "table-name" [:from 0 1] "table-alias" [:from] "the table we are selecting from"})
 
 
 (defn map-boxes2
@@ -75,30 +69,31 @@
                ^{:key (str block-id keypath kki kk)}
                [re-com/box :child
                 (cond
-                  (= k-val-type "map")
-                    ^{:key (str block-id keypath kki kk k-val-type)}
-                    [re-com/h-box :children
-                     [[draggable-pill
-                       {:from      block-id
-                        :new-block [:artifacts "text"]
-                        :idx       0 ;idx
-                        :keypath   [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]}
-                       block-id ;; (when (not (= block-id :inline-render)) block-id)
-                       ^{:key (str block-id keypath kki kk k-val-type 1)}
-                       [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
-                        :style {:cursor (when draggable? "grab")} :children
-                        [^{:key (str block-id keypath kki kk k-val-type 124)}
-                         [re-com/box :child (str kk)]
-                         ^{:key (str block-id keypath kki kk k-val-type 134)}
-                         [re-com/box :child (str k-val-type) :style
-                          {:opacity     0.3
-                           :font-size   font-size ; "9px"
-                           :padding-top "7px"}]
-                         (when (> (count k-val) 1)
-                           ^{:key (str block-id keypath kki kk k-val-type 156)}
-                           [re-com/box :style {:opacity 0.3} :child (str "(" (count k-val) ")")])]
-                        :padding "8px"]] (map-boxes2 k-val block-id flow-name keypath-in kk nil)]
-                     :style keystyle]
+                  (= k-val-type "map") ^{:key (str block-id keypath kki kk k-val-type)}
+                                       [re-com/h-box :children
+                                        [[draggable-pill
+                                          {:from      block-id
+                                           :new-block [:artifacts "text"]
+                                           :idx       0 ;idx
+                                           :keypath   [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]} block-id ;; (when
+                                                                                                                          ;; (not
+                                                                                                                          ;; (=
+                                                                                                                          ;; block-id
+                                                                                                                          ;; :inline-render))
+                                                                                                                          ;; block-id)
+                                          ^{:key (str block-id keypath kki kk k-val-type 1)}
+                                          [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
+                                           :style {:cursor (when draggable? "grab")} :children
+                                           [^{:key (str block-id keypath kki kk k-val-type 124)} [re-com/box :child (str kk)]
+                                            ^{:key (str block-id keypath kki kk k-val-type 134)}
+                                            [re-com/box :child (str k-val-type) :style
+                                             {:opacity     0.3
+                                              :font-size   font-size ; "9px"
+                                              :padding-top "7px"}]
+                                            (when (> (count k-val) 1)
+                                              ^{:key (str block-id keypath kki kk k-val-type 156)}
+                                              [re-com/box :style {:opacity 0.3} :child (str "(" (count k-val) ")")])] :padding
+                                           "8px"]] (map-boxes2 k-val block-id flow-name keypath-in kk nil)] :style keystyle]
                   (or (= k-val-type "vector")
                       (= k-val-type "list") ; (= k-val-type "function")
                       (= k-val-type "rowset")
@@ -110,8 +105,7 @@
                        {:from      block-id
                         :new-block [:artifacts "text"]
                         :idx       0 ;idx
-                        :keypath   [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]}
-                       block-id
+                        :keypath   [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]} block-id
                        ^{:key (str block-id keypath kki kk k-val-type 3)}
                        [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
                         :style
@@ -142,12 +136,10 @@
                              ^{:key (str block-id keypath kki kk k-val-type 827)}
                              [re-com/box :style {:opacity 0.3} :child (str "(" (count k-val) ")")])]
                           [(when true ;(not (get sql-explanations keypath ""))
-                             ^{:key (str block-id keypath kki kk k-val-type 7)}
-                             [re-com/box :child (str kk)])
+                             ^{:key (str block-id keypath kki kk k-val-type 7)} [re-com/box :child (str kk)])
                            (when true ; (not (get sql-explanations keypath ""))
                              ^{:key (str block-id keypath kki kk k-val-type 8)}
-                             [re-com/box :child (str (when (= (count k-val) 0) "empty ") k-val-type)
-                              :style
+                             [re-com/box :child (str (when (= (count k-val) 0) "empty ") k-val-type) :style
                               {:opacity     0.3
                                :font-size   font-size ; "9px"
                                :padding-top "7px"}])
@@ -155,46 +147,36 @@
                              ^{:key (str block-id keypath kki kk k-val-type 82)}
                              [re-com/md-icon-button :md-icon-name "zmdi-info" :tooltip
                               (str "FOOO" (get sql-explanations keypath "")) :style
-                              {:font-size  "16px"
-                               :cursor     "pointer"
-                               :opacity    0.5
-                               :padding    "0px"
-                               :margin-top "-1px"}])]) :padding "8px"]]
+                              {:font-size "16px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}])]) :padding
+                        "8px"]]
                       [map-boxes2
-                       (if (= k-val-type "rowset")
-                         (zipmap (iterate inc 0) (take 10 k-val))
-                         (zipmap (iterate inc 0) k-val)) block-id flow-name keypath-in kk nil]]
-                     :style keystyle]
-                  :else
-                    ^{:key (str block-id keypath kki kk k-val-type 9)}
-                    [re-com/h-box :children
-                     [^{:key (str block-id keypath kki kk k-val-type 10)}
-                      [re-com/h-box :gap "6px" :children
-                       [[draggable-pill
-                         {:from      block-id
-                          :new-block [:artifacts "text"]
-                          :idx       0 ;idx
-                          :keypath   [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]}
-                         block-id
-                         ^{:key (str block-id keypath kki kk k-val-type 11)}
-                         [re-com/box :child (str kk) :style {:cursor (when draggable? "grab")}]]
-                        (when true ;(not (get sql-explanations (vec (conj keypath kk)) ""))
-                          ^{:key (str block-id keypath kki kk k-val-type 12)}
-                          [re-com/box :child (str k-val-type) :style
-                           {:opacity    0.3
-                            :font-size  font-size ;"9px"
-                            :font-style (if (= k-val-type "function") "italic" "normal")}])
-                        (when (get sql-explanations (vec (conj keypath kk)) "")
-                          ^{:key (str block-id keypath kki kk k-val-type 822)}
-                          [re-com/box :style {:opacity 0.3} :child
-                           (str (get sql-explanations (vec (conj keypath kk)) ""))])]]
-                      ^{:key (str block-id keypath kki kk k-val-type 13)}
-                      [re-com/box :size "auto" :align :end :justify :end :child
-                       [map-value-box k-val] :style
-                       {;:font-weight 500
-                        :line-height  "1.2em"
-                        :padding-left "5px"}]] :justify :between :padding "5px" :style
-                     valstyle])]))]]
+                       (if (= k-val-type "rowset") (zipmap (iterate inc 0) (take 10 k-val)) (zipmap (iterate inc 0) k-val))
+                       block-id flow-name keypath-in kk nil]] :style keystyle]
+                  :else ^{:key (str block-id keypath kki kk k-val-type 9)}
+                        [re-com/h-box :children
+                         [^{:key (str block-id keypath kki kk k-val-type 10)}
+                          [re-com/h-box :gap "6px" :children
+                           [[draggable-pill
+                             {:from      block-id
+                              :new-block [:artifacts "text"]
+                              :idx       0 ;idx
+                              :keypath   [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]} block-id
+                             ^{:key (str block-id keypath kki kk k-val-type 11)}
+                             [re-com/box :child (str kk) :style {:cursor (when draggable? "grab")}]]
+                            (when true ;(not (get sql-explanations (vec (conj keypath kk)) ""))
+                              ^{:key (str block-id keypath kki kk k-val-type 12)}
+                              [re-com/box :child (str k-val-type) :style
+                               {:opacity    0.3
+                                :font-size  font-size ;"9px"
+                                :font-style (if (= k-val-type "function") "italic" "normal")}])
+                            (when (get sql-explanations (vec (conj keypath kk)) "")
+                              ^{:key (str block-id keypath kki kk k-val-type 822)}
+                              [re-com/box :style {:opacity 0.3} :child (str (get sql-explanations (vec (conj keypath kk)) ""))])]]
+                          ^{:key (str block-id keypath kki kk k-val-type 13)}
+                          [re-com/box :size "auto" :align :end :justify :end :child [map-value-box k-val] :style
+                           {;:font-weight 500
+                            :line-height  "1.2em"
+                            :padding-left "5px"}]] :justify :between :padding "5px" :style valstyle])]))]]
     (if (= keypath [])
       (let [k-val-type (ut/data-typer data)
             val-color  (get @(ut/tracked-subscribe [::conn/data-colors]) k-val-type)]

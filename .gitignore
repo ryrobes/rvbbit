@@ -41,5 +41,5 @@ flow-logs/
 *.code-workspace
 .directory
 screen-snaps/
-
+transit-data/
 

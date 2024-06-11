@@ -84,8 +84,7 @@
 
 (defn print-ansi-art
   [filename]
-  (with-open [reader (clojure.java.io/reader filename)]
-    (doseq [line (line-seq reader)] (println line))))
+  (with-open [reader (clojure.java.io/reader filename)] (doseq [line (line-seq reader)] (println line))))
 
 (defn index-of [coll item] (first (keep-indexed #(when (= %2 item) %1) coll)))
 
@@ -93,39 +92,36 @@
 
 (defn current-datetime-parts
   []
-  (try
-    (let [now               (java.time.ZonedDateTime/now)
-          day-of-week       (.getDayOfWeek now)
-          month             (.getMonth now)
-          day               (.getDayOfMonth now)
-          nth               (case (mod day 10)
-                              1 (if (= day 11) "th" "st")
-                              2 (if (= day 12) "th" "nd")
-                              3 (if (= day 13) "th" "rd")
-                              "th")
-          formatter         (java.time.format.DateTimeFormatter/ofPattern
-                              (str "EEEE, MMMM d'" nth "' h:mma")
-                              java.util.Locale/US)
-          formatter-seconds (java.time.format.DateTimeFormatter/ofPattern
-                              (str "EEEE, MMMM d'" nth "' h:mm:ssa")
-                              java.util.Locale/US)
-          now-str           (.format formatter now)
-          now-seconds-str   (.format formatter-seconds now)]
-      {:year            (.getYear now)
-       :month           (.getMonthValue now)
-       :month-name      (.name month)
-       :day             day
-       :day-of-week-int (.getValue day-of-week)
-       :day-of-week     (.name day-of-week)
-       :hour            (.getHour now)
-       :minute          (.getMinute now)
-       :second          (.getSecond now)
-       :quarter         (inc (quot (.getMonthValue now) 4))
-       :am-pm           (if (< (.getHour now) 12) "AM" "PM")
-       :now             now-str
-       :now-seconds     now-seconds-str
-       :nth             nth})
-    (catch Throwable e {:time-atom-error (str "Error! " e)})))
+  (try (let [now               (java.time.ZonedDateTime/now)
+             day-of-week       (.getDayOfWeek now)
+             month             (.getMonth now)
+             day               (.getDayOfMonth now)
+             nth               (case (mod day 10)
+                                 1 (if (= day 11) "th" "st")
+                                 2 (if (= day 12) "th" "nd")
+                                 3 (if (= day 13) "th" "rd")
+                                 "th")
+             formatter         (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "' h:mma")
+                                                                             java.util.Locale/US)
+             formatter-seconds (java.time.format.DateTimeFormatter/ofPattern (str "EEEE, MMMM d'" nth "' h:mm:ssa")
+                                                                             java.util.Locale/US)
+             now-str           (.format formatter now)
+             now-seconds-str   (.format formatter-seconds now)]
+         {:year            (.getYear now)
+          :month           (.getMonthValue now)
+          :month-name      (.name month)
+          :day             day
+          :day-of-week-int (.getValue day-of-week)
+          :day-of-week     (.name day-of-week)
+          :hour            (.getHour now)
+          :minute          (.getMinute now)
+          :second          (.getSecond now)
+          :quarter         (inc (quot (.getMonthValue now) 4))
+          :am-pm           (if (< (.getHour now) 12) "AM" "PM")
+          :now             now-str
+          :now-seconds     now-seconds-str
+          :nth             nth})
+       (catch Throwable e {:time-atom-error (str "Error! " e)})))
 
 
 
@@ -135,9 +131,7 @@
         (some #{:and :or} (take 1 clause)) (cons clause (mapcat break-out-parts (rest clause)))
         :else                              (cons clause (mapcat break-out-parts (rest clause)))))
 
-(defn where-dissect
-  [clause]
-  (let [parts (break-out-parts clause)] (cons clause (remove #(= clause %) parts))))
+(defn where-dissect [clause] (let [parts (break-out-parts clause)] (cons clause (remove #(= clause %) parts))))
 
 (defn thaw-atom
   "Thaws an atom from disk or creates a new one if the file doesn't exist."
@@ -155,8 +149,7 @@
 
 (defn serializable?
   [value]
-  (and (not (clojure.string/includes? (pr-str value) "#object"))
-       (not (clojure.string/includes? (pr-str value) "#error"))))
+  (and (not (clojure.string/includes? (pr-str value) "#object")) (not (clojure.string/includes? (pr-str value) "#error"))))
 
 
 
@@ -178,8 +171,7 @@
                        (clojure.pprint/pprint @a)
                        (prn @a)))
                    (finally (.close wtr))))
-            (let [size-in-bytes      (java.nio.file.Files/size
-                                       (java.nio.file.Paths/get file-path (into-array String [])))
+            (let [size-in-bytes      (java.nio.file.Files/size (java.nio.file.Paths/get file-path (into-array String [])))
                   size-in-mb         (/ size-in-bytes 1048576.0)
                   size-in-mb-rounded (/ (Math/round (* size-in-mb 100.0)) 100.0)]
               (pp ["  " :freezing-atom file-path size-in-mb-rounded :mb])))
@@ -189,8 +181,7 @@
 (defn freeze-atom
   "Freezes a single atom to disk."
   [file-path]
-  (let [a (get @managed-atoms file-path)]
-    (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
+  (let [a (get @managed-atoms file-path)] (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
 
 (def terminal (TerminalFactory/get))
 
@@ -204,8 +195,7 @@
 
 (defn get-system-load-average
   []
-  (let [os-bean (java.lang.management.ManagementFactory/getOperatingSystemMXBean)]
-    (.getSystemLoadAverage os-bean)))
+  (let [os-bean (java.lang.management.ManagementFactory/getOperatingSystemMXBean)] (.getSystemLoadAverage os-bean)))
 
 (def debug-level (get config/settings :debug-level 0))
 
@@ -266,9 +256,7 @@
         hue   (* 60 (if (< h 0) (+ h 6) h))]
     [(mod hue 360) (* 100 s) (* 100 l)]))
 
-(defn hex-to-rgb
-  [hex]
-  (map #(Integer/parseInt % 16) [(subs hex 1 3) (subs hex 3 5) (subs hex 5 7)]))
+(defn hex-to-rgb [hex] (map #(Integer/parseInt % 16) [(subs hex 1 3) (subs hex 3 5) (subs hex 5 7)]))
 
 (defn rgb-to-xyz
   [r g b]
@@ -281,30 +269,20 @@
     [(+ (* r 0.4124) (* g 0.3576) (* b 0.1805)) (+ (* r 0.2126) (* g 0.7152) (* b 0.0722))
      (+ (* r 0.0193) (* g 0.1192) (* b 0.9505))]))
 
-(defn xyz-to-cie
-  [x y z]
-  (let [total (+ x y z)] [(if (zero? total) 0 (/ x total)) (if (zero? total) 0 (/ y total))]))
+(defn xyz-to-cie [x y z] (let [total (+ x y z)] [(if (zero? total) 0 (/ x total)) (if (zero? total) 0 (/ y total))]))
 
 (defn hex-to-cie
   [hex]
-  (let [[r g b] (hex-to-rgb hex)
-        [x y z] (rgb-to-xyz (/ r 255.0) (/ g 255.0) (/ b 255.0))]
-    (xyz-to-cie x y z)))
+  (let [[r g b] (hex-to-rgb hex) [x y z] (rgb-to-xyz (/ r 255.0) (/ g 255.0) (/ b 255.0))] (xyz-to-cie x y z)))
 
-(defn cie-to-xyz
-  [x y brightness]
-  (let [Y brightness X (/ (* Y x) y) Z (/ (* Y (- 1 x y)) y)] [X Y Z]))
+(defn cie-to-xyz [x y brightness] (let [Y brightness X (/ (* Y x) y) Z (/ (* Y (- 1 x y)) y)] [X Y Z]))
 
 (defn xyz-to-rgb
   [X Y Z]
   (let [r (/ (+ (* X 3.2406) (* Y -1.5372) (* Z -0.4986)) 100)
         g (/ (+ (* X -0.9689) (* Y 1.8758) (* Z 0.0415)) 100)
         b (/ (+ (* X 0.0557) (* Y -0.2040) (* Z 1.0570)) 100)]
-    (mapv #(max 0
-                (min 255
-                     (Math/round
-                       (* 255 (if (> % 0.0031308) (Math/pow (* % 1.055) (/ 1 2.4)) (* % 12.92))))))
-      [r g b])))
+    (mapv #(max 0 (min 255 (Math/round (* 255 (if (> % 0.0031308) (Math/pow (* % 1.055) (/ 1 2.4)) (* % 12.92)))))) [r g b])))
 
 (defn rgb-to-hex2 [r g b] (format "#%02x%02x%02x" r g b))
 
@@ -332,11 +310,7 @@
 
 (defn rgb-to-hex2 [r g b] (format "#%02x%02x%02x" r g b))
 
-(defn hue-to-hex
-  [hue]
-  (let [[r g b] (hue-to-rgb2 hue)
-        out     (rgb-to-hex2 r g b)]
-    (if (= out "#nullnullnull") "#00000000" out)))
+(defn hue-to-hex [hue] (let [[r g b] (hue-to-rgb2 hue) out (rgb-to-hex2 r g b)] (if (= out "#nullnullnull") "#00000000" out)))
 
 
 (defn hex-to-hue-sat
@@ -347,9 +321,7 @@
     [(int hue-scaled) 254])) ; Scale saturation to [0, 254]
 
 
-(defn bytes-to-mb
-  [bytes]
-  (let [mb (/ bytes 1048576.0) formatted-mb0 (format "%.0f" mb)] (str formatted-mb0 "MB")))
+(defn bytes-to-mb [bytes] (let [mb (/ bytes 1048576.0) formatted-mb0 (format "%.0f" mb)] (str formatted-mb0 "MB")))
 
 
 (defn interpolate-hsl [hsl1 hsl2 factor] (map (fn [v1 v2] (+ v1 (* (- v2 v1) factor))) hsl1 hsl2))
@@ -476,17 +448,14 @@
 
 (defn time-seq
   [v]
-  (let [{:keys [days minutes seconds hours weeks months at starts tz]
-         :or   {tz (ZoneId/systemDefault)}}
-          (apply hash-map v)
-        zone-id (if (instance? String tz) (ZoneId/of tz) tz)
-        starting-instant
-          (if starts
-            (-> (LocalDate/parse starts)
-                (.atTime (if at (LocalTime/of (quot at 100) (mod at 100)) (LocalTime/MIDNIGHT)))
-                (.atZone zone-id)
-                .toInstant)
-            (Instant/now))]
+  (let [{:keys [days minutes seconds hours weeks months at starts tz] :or {tz (ZoneId/systemDefault)}} (apply hash-map v)
+        zone-id          (if (instance? String tz) (ZoneId/of tz) tz)
+        starting-instant (if starts
+                           (-> (LocalDate/parse starts)
+                               (.atTime (if at (LocalTime/of (quot at 100) (mod at 100)) (LocalTime/MIDNIGHT)))
+                               (.atZone zone-id)
+                               .toInstant)
+                           (Instant/now))]
     (cond days    (if at
                     (chime/periodic-seq (-> starting-instant
                                             (.plus (Period/ofDays days)))
@@ -517,9 +486,7 @@
                     (chime/periodic-seq starting-instant (Period/ofWeeks weeks)))
           months  (if at
                     (chime/periodic-seq (-> (LocalDate/parse starts)
-                                            (.atTime (if at
-                                                       (LocalTime/of (quot at 100) (mod at 100))
-                                                       (LocalTime/MIDNIGHT)))
+                                            (.atTime (if at (LocalTime/of (quot at 100) (mod at 100)) (LocalTime/MIDNIGHT)))
                                             (.atZone zone-id)
                                             (.plus (Period/ofMonths months))
                                             .toInstant)
@@ -535,21 +502,13 @@
 
 (defn unix-to-date [timestamp] (java.util.Date. timestamp))
 
-(defn today-yyyymmdd
-  []
-  (let [cal (Calendar/getInstance)
-        fmt (SimpleDateFormat. "yyyy-MM-dd")]
-    (.format fmt (.getTime cal))))
+(defn today-yyyymmdd [] (let [cal (Calendar/getInstance) fmt (SimpleDateFormat. "yyyy-MM-dd")] (.format fmt (.getTime cal))))
 
 (defn today-yyyymmdd-hhmm
   []
-  (let [cal (Calendar/getInstance)
-        fmt (SimpleDateFormat. "yyyy-MM-dd HH:mm")]
-    (.format fmt (.getTime cal))))
+  (let [cal (Calendar/getInstance) fmt (SimpleDateFormat. "yyyy-MM-dd HH:mm")] (.format fmt (.getTime cal))))
 
-(defn date-str-to-unix
-  [date-str]
-  (let [fmt (SimpleDateFormat. "yyyy-MM-dd") date (.parse fmt date-str)] (.getTime date)))
+(defn date-str-to-unix [date-str] (let [fmt (SimpleDateFormat. "yyyy-MM-dd") date (.parse fmt date-str)] (.getTime date)))
 
 (defn date-to-ymd
   [date] ;; blargh
@@ -580,17 +539,15 @@
 
 (defn accumulate-unique-runs
   [data]
-  (let [merge-runs
-          (fn [runs run]
-            (let [run-start (:start run)
-                  run-end   (:end run)]
-              (cond (some #(and (= (:start %) run-start) (= (:end %) run-end)) runs) runs
-                    (some #(and (= (:start %) run-start) (nil? (:end %)) run-end) runs)
-                      (conj (vec (remove #(and (= (:start %) run-start) (nil? (:end %))) runs)) run)
-                    :else (conj runs run))))]
+  (let [merge-runs (fn [runs run]
+                     (let [run-start (:start run)
+                           run-end   (:end run)]
+                       (cond (some #(and (= (:start %) run-start) (= (:end %) run-end)) runs) runs
+                             (some #(and (= (:start %) run-start) (nil? (:end %)) run-end) runs)
+                               (conj (vec (remove #(and (= (:start %) run-start) (nil? (:end %))) runs)) run)
+                             :else (conj runs run))))]
     (reduce (fn [acc entry]
-              (reduce (fn [inner-acc [block-id run]]
-                        (update inner-acc block-id (fn [runs] (merge-runs (or runs []) run))))
+              (reduce (fn [inner-acc [block-id run]] (update inner-acc block-id (fn [runs] (merge-runs (or runs []) run))))
                 acc
                 (into [] entry)))
       {}
@@ -635,9 +592,7 @@
          end#    (System/currentTimeMillis)]
      {:result result# :fn-start start# :fn-end end# :elapsed-ms (- end# start#)}))
 
-(defn dissoc-in
-  [map-in keypath]
-  (let [base-kp (pop keypath) last-kp (last keypath)] (update-in map-in base-kp dissoc last-kp)))
+(defn dissoc-in [map-in keypath] (let [base-kp (pop keypath) last-kp (last keypath)] (update-in map-in base-kp dissoc last-kp)))
 
 (defn ppln [x] (puget/with-options {:width 330} (puget/cprint x)))
 
@@ -657,9 +612,7 @@
 
 (defn ms-to-iso8601
   [ms]
-  (let [instant   (Instant/ofEpochMilli ms)
-        formatter (DateTimeFormatter/ISO_INSTANT)]
-    (.format formatter instant)))
+  (let [instant (Instant/ofEpochMilli ms) formatter (DateTimeFormatter/ISO_INSTANT)] (.format formatter instant)))
 
 (defn is-hiccup? [x] (cstr/includes? (str x) ":div")) ;; TODO, no need anymore?
 
@@ -670,8 +623,7 @@
   (try (let [aa (some true?
                       (vec (if (and (or (list? x) (vector? x)) (not (empty? x)) (coll-of-maps? x))
                              (if (map? (first x))
-                               (for [k (keys (first x))]
-                                 (or (map? (get (first x) k)) (vector? (get (first x) k))))
+                               (for [k (keys (first x))] (or (map? (get (first x) k)) (vector? (get (first x) k))))
                                false)
                              false)))]
          (if aa true false))
@@ -694,9 +646,8 @@
         (boolean? x) "boolean"
         (coll-of-maps? x) "rowset" ;;; TODO, revisit. convoluted logic
         (vector? x) "vector"
-        (or
-          (and (map? x) (contains? x :classname) (contains? x :subprotocol) (contains? x :subname))
-          (and (map? x) (contains? x :dbtype) (contains? x :dbname) (contains? x :user)))
+        (or (and (map? x) (contains? x :classname) (contains? x :subprotocol) (contains? x :subname))
+            (and (map? x) (contains? x :dbtype) (contains? x :dbname) (contains? x :user)))
           "jdbc-conn"
         (map? x) "map"
         (list? x) "list"
@@ -727,13 +678,10 @@
           (let [[from-x from-y] (@placed-blocks from)
                 to-x            (+ from-x step-x)
                 to-y            (if (= from-x to-x) (+ from-y step-y) from-y)]
-            (do (swap! placed-blocks assoc to [to-x to-y])
-                (when (> to-y @max-y) (swap! max-y #(+ % step-y))))))))
+            (do (swap! placed-blocks assoc to [to-x to-y]) (when (> to-y @max-y) (swap! max-y #(+ % step-y))))))))
     (mapv (fn [[block [x y]]] [block x y]) @placed-blocks)))
 
-(defn coords-map
-  [connections]
-  (into {} (for [[bid x y] (gen-coords connections)] {bid {:x x :y y}})))
+(defn coords-map [connections] (into {} (for [[bid x y] (gen-coords connections)] {bid {:x x :y y}})))
 
 
 (def nspc ['flowmaps.core 'clojure.set])
@@ -759,8 +707,7 @@
       (->> specs
            (map (fn [[k v]]
                   (let [args-spec (:args (s/spec v))]
-                    [(str (namespace k) "/" (name k))
-                     (not= (s/conform args-spec args) :clojure.spec.alpha/invalid)])))
+                    [(str (namespace k) "/" (name k)) (not= (s/conform args-spec args) :clojure.spec.alpha/invalid)])))
            (into (sorted-map))))
     (println "The provided arguments should be a vector.")))
 
@@ -772,8 +719,7 @@
 
 (defn write-json
   [data filename]
-  (let [json-str (json/generate-string data)]
-    (with-open [writer (io/writer filename)] (.write writer json-str))))
+  (let [json-str (json/generate-string data)] (with-open [writer (io/writer filename)] (.write writer json-str))))
 
 (defn map-vals [m f] (into {} (for [[k v] m] [k (f v)])))
 
@@ -792,17 +738,13 @@
         (coll? x) (mapv lists-to-vectors x)
         :else     x))
 
-(defn dissoc-in
-  [map-in keypath]
-  (let [base-kp (pop keypath) last-kp (last keypath)] (update-in map-in base-kp dissoc last-kp)))
+(defn dissoc-in [map-in keypath] (let [base-kp (pop keypath) last-kp (last keypath)] (update-in map-in base-kp dissoc last-kp)))
 
 
 
 (defn millis-to-date-string
   [millis]
-  (let [date   (java.util.Date. millis)
-        format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss")]
-    (.format format date)))
+  (let [date (java.util.Date. millis) format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss")] (.format format date)))
 
 (defn deep-flatten [x] (if (coll? x) (mapcat deep-flatten x) [x]))
 
@@ -817,15 +759,12 @@
 
 (defn unique-block-id
   [proposed existing-keys reserved-names]
-  (let [all-names (set (concat existing-keys reserved-names))]
-    (unique-block-id-helper proposed 0 all-names)))
+  (let [all-names (set (concat existing-keys reserved-names))] (unique-block-id-helper proposed 0 all-names)))
 
 (defn generate-unique-names
   [name-map]
-  (let [update-map-with-unique-name (fn [acc [k v]]
-                                      (let [unique-name
-                                              (unique-block-id-helper v 0 (set (vals acc)))]
-                                        (assoc acc k unique-name)))]
+  (let [update-map-with-unique-name
+          (fn [acc [k v]] (let [unique-name (unique-block-id-helper v 0 (set (vals acc)))] (assoc acc k unique-name)))]
     (reduce update-map-with-unique-name {} name-map)))
 
 (defn reverse-map [m] (reduce (fn [acc [k v]] (assoc acc v k)) {} m))
@@ -839,9 +778,7 @@
         (coll? item) (map deep-remove-nil-values item)
         :else        item))
 
-(defn remove-empty-key
-  [arg-map key-name]
-  (if (empty? (get arg-map key-name)) (dissoc arg-map key-name) arg-map))
+(defn remove-empty-key [arg-map key-name] (if (empty? (get arg-map key-name)) (dissoc arg-map key-name) arg-map))
 
 (defn remove-empty-sub-keys
   [arg-map]
@@ -851,9 +788,7 @@
 
 (defn remove-namespaced-keys
   [m]
-  (walk/postwalk
-    (fn [x] (if (map? x) (into {} (remove (fn [[k v]] (and (keyword? k) (namespace k))) x)) x))
-    m))
+  (walk/postwalk (fn [x] (if (map? x) (into {} (remove (fn [[k v]] (and (keyword? k) (namespace k))) x)) x)) m))
 
 (defn pool-create
   [jdbc-body name]
@@ -887,9 +822,7 @@
   (let [key-remove-set (set keys-to-remove)]
     (cond (map? data)    (->> data
                               (reduce-kv (fn [acc k v]
-                                           (if (or (key-remove-set k)
-                                                   (and (keyword? k)
-                                                        (cstr/starts-with? (name k) "_")))
+                                           (if (or (key-remove-set k) (and (keyword? k) (cstr/starts-with? (name k) "_")))
                                              acc
                                              (assoc acc k (deep-remove-keys v keys-to-remove))))
                                          {})
@@ -900,8 +833,8 @@
 (defn clean-sql-from-ui-keys
   [query]
   (let [res (deep-remove-keys query
-                              [:cache? :col-widths :row-height :render-all? :refresh-every :page
-                               :connection-id :deep-meta? :clicked-row-height :style-rules])]
+                              [:cache? :col-widths :row-height :render-all? :refresh-every :page :connection-id :deep-meta?
+                               :clicked-row-height :style-rules])]
     res))
 
 (defn deep-remove-keys2
@@ -909,9 +842,7 @@
   (let [key-remove-set (set keys-to-remove)]
     (cond (map? data)    (->> data
                               (reduce-kv (fn [acc k v]
-                                           (if (key-remove-set k)
-                                             acc
-                                             (assoc acc k (deep-remove-keys v keys-to-remove))))
+                                           (if (key-remove-set k) acc (assoc acc k (deep-remove-keys v keys-to-remove))))
                                          {})
                               (into (empty data)))
           (vector? data) (mapv (fn [elem] (deep-remove-keys elem keys-to-remove)) data)
@@ -921,15 +852,12 @@
   [s]
   (if (and (string? s) (> (count s) 3000))
     (let [substring (subs s 0 3000)]
-      (boolean (re-matches #"^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
-                           substring)))
+      (boolean (re-matches #"^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$" substring)))
     false))
 
 (defn replace-large-base64
   [data]
-  (cond (string? data) (if (and (is-base64? data) (> (count data) 3000))
-                         "**huge base64 string**"
-                         data)
+  (cond (string? data) (if (and (is-base64? data) (> (count data) 3000)) "**huge base64 string**" data)
         (map? data)    (into {} (map (fn [[k v]] [k (replace-large-base64 v)]) data))
         (vector? data) (mapv replace-large-base64 data)
         (list? data)   (doall (map replace-large-base64 data)) ;; use doall to realize the lazy
@@ -939,11 +867,14 @@
   [x & [flow-limit]]
   (let [flow-limit (if (nil? flow-limit) 50 flow-limit)]
     (letfn [(limited-helper [x]
-              (cond (map? x) (into (empty x) (map (fn [[k v]] [k (limited-helper v)])) x)
-                    (coll? x) (into (empty x) (take flow-limit (map limited-helper x)))
-                    (and (not (string? x)) (not (keyword? x)) (not (number? x)))
-                      (try (doall (take flow-limit x)) (catch Exception _ x))
-                    :else x))]
+              (cond (map? x)                                                     (into (empty x)
+                                                                                       (map (fn [[k v]] [k (limited-helper v)]))
+                                                                                       x)
+                    (coll? x)                                                    (into (empty x)
+                                                                                       (take flow-limit (map limited-helper x)))
+                    (and (not (string? x)) (not (keyword? x)) (not (number? x))) (try (doall (take flow-limit x))
+                                                                                      (catch Exception _ x))
+                    :else                                                        x))]
       (limited-helper x))))
 
 (defn greeting
@@ -968,9 +899,7 @@
 
 (def console-lock (Object.))
 
-(defn safe-cprint
-  [x]
-  (locking console-lock (puget/with-options {:width (get-terminal-width)} (puget/cprint x))))
+(defn safe-cprint [x] (locking console-lock (puget/with-options {:width (get-terminal-width)} (puget/cprint x))))
 
 
 
@@ -1022,13 +951,9 @@
   [file-name collection & [width]]
   (let [width (or width 85)]
     (spit (java.io.File. file-name)
-          (with-out-str (clojure.pprint/write collection
-                                              :dispatch     clojure.pprint/code-dispatch
-                                              :right-margin width)))))
+          (with-out-str (clojure.pprint/write collection :dispatch clojure.pprint/code-dispatch :right-margin width)))))
 
-(defn copy-file
-  [src dest]
-  (with-open [in-file (io/reader src) out-file (io/writer dest)] (io/copy in-file out-file)))
+(defn copy-file [src dest] (with-open [in-file (io/reader src) out-file (io/writer dest)] (io/copy in-file out-file)))
 
 (defn get-file-vectors-simple
   "returns a vector of filenames/folders in the X folder relative to the jar (packaged by default)
@@ -1037,8 +962,7 @@
   (let [is-ext?    (if (= file-ext "directory")
                      #(and (.isDirectory %) (not (cstr/includes? (str %) "/."))) ; remove hidden
                      #(cstr/ends-with? (str %) file-ext)) ; remove anythint not with this .ext
-        file-seq   (into []
-                         (for [f (filter is-ext? (.listFiles (io/file relative-folder)))] (str f)))
+        file-seq   (into [] (for [f (filter is-ext? (.listFiles (io/file relative-folder)))] (str f)))
         files-only (into [] (for [f file-seq] (cstr/replace (str f) relative-folder "")))]
     files-only))
 
@@ -1047,14 +971,11 @@
   (let [is-ext?              (if (= file-ext "directory")
                                #(and (.isDirectory %) (not (cstr/includes? (str %) "/."))) ; remove
                                #(cstr/ends-with? (str %) file-ext)) ; remove anything not with
-        file-seq             (into []
-                                   (for [f (filter is-ext? (.listFiles (io/file relative-folder)))]
-                                     [f (.lastModified f)]))
+        file-seq             (into [] (for [f (filter is-ext? (.listFiles (io/file relative-folder)))] [f (.lastModified f)]))
         files-with-time-diff (into []
                                    (for [[f time] file-seq
                                          :let     [tt (- (System/currentTimeMillis) time)]]
-                                     [(cstr/replace (str f) relative-folder "")
-                                      (format-duration-seconds (/ tt 1000)) tt]))]
+                                     [(cstr/replace (str f) relative-folder "") (format-duration-seconds (/ tt 1000)) tt]))]
     files-with-time-diff))
 
 (defn ne? [x] (if (seqable? x) (boolean (seq x)) true))
@@ -1113,17 +1034,13 @@
 (defn extract-patterns
   [data kw num]
   (let [matches (atom [])]
-    (walk/prewalk (fn [item] (when (matches-pattern? item kw num) (swap! matches conj item)) item)
-                  data)
+    (walk/prewalk (fn [item] (when (matches-pattern? item kw num) (swap! matches conj item)) item) data)
     @matches))
 
 (defn kvpaths
   ([m] (kvpaths [] m ()))
   ([prev m result]
-   (reduce-kv (fn [res k v]
-                (if (associative? v)
-                  (let [kp (conj prev k)] (kvpaths kp v (conj res kp)))
-                  (conj res (conj prev k))))
+   (reduce-kv (fn [res k v] (if (associative? v) (let [kp (conj prev k)] (kvpaths kp v (conj res kp))) (conj res (conj prev k))))
               result
               m)))
 
@@ -1159,10 +1076,7 @@
 (defn kvpaths
   ([m] (kvpaths [] m ()))
   ([prev m result]
-   (reduce-kv (fn [res k v]
-                (if (associative? v)
-                  (let [kp (conj prev k)] (kvpaths kp v (conj res kp)))
-                  (conj res (conj prev k))))
+   (reduce-kv (fn [res k v] (if (associative? v) (let [kp (conj prev k)] (kvpaths kp v (conj res kp))) (conj res (conj prev k))))
               result
               m)))
 
@@ -1179,14 +1093,8 @@
 (defn keypaths
   ([m] (keypaths [] m ()))
   ([prev m result]
-   (reduce-kv (fn [res k v]
-                (if (associative? v) (keypaths (conj prev k) v res) (conj res (conj prev k))))
-              result
-              m)))
+   (reduce-kv (fn [res k v] (if (associative? v) (keypaths (conj prev k) v res) (conj res (conj prev k)))) result m)))
 
 (defn keypaths2
   ([m] (keypaths [] m ()))
-  ([prev m result]
-   (reduce-kv (fn [res k v] (if (map? v) (keypaths (conj prev k) v res) (conj res (conj prev k))))
-              result
-              m)))
+  ([prev m result] (reduce-kv (fn [res k v] (if (map? v) (keypaths (conj prev k) v res) (conj res (conj prev k)))) result m)))

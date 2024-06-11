@@ -29,9 +29,9 @@
 (defonce autocomplete-keywords (atom []))
 
 (def param-code-hover (atom nil))
- 
-(def solver-fn-runs (atom {}))       
-(def solver-fn-lookup (atom {}))          
+
+(def solver-fn-runs (atom {}))
+(def solver-fn-lookup (atom {}))
 
 (def running-blocks (reagent/atom {}))
 (def real-running-blocks (reagent/atom {}))
@@ -163,9 +163,7 @@
                                                     :titleColor "#ffffff99"
                                                     :stroke     "#ffffff99"
                                                     :titleFont  "Lato"}
-                                           :header {:labelFont  "Lato"
-                                                    :titleFont  "Lato"
-                                                    :titleColor "#ffffff99"}
+                                           :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
                                            :mark   {:font "Lato"}
                                            :title  {:font         "Lato"
                                                     :subtitleFont "Lato"
@@ -197,17 +195,14 @@
                                                       :titleColor "#ffffff99"
                                                       :stroke     "#ffffff99"
                                                       :titleFont  "Lato"}
-                                             :header {:labelFont  "Lato"
-                                                      :titleFont  "Lato"
-                                                      :titleColor "#ffffff99"}
+                                             :header {:labelFont "Lato" :titleFont "Lato" :titleColor "#ffffff99"}
                                              :mark   {:font "Lato"}
                                              :title  {:font         "Lato"
                                                       :subtitleFont "Lato"
                                                       :labelFont    "Lato"
                                                       :titleFont    "Lato"
                                                       :titleColor   "#ffffff99"}}
-     :grid-selected-column-css              {:background-color "#00000088"
-                                             :filter           "brightness(200%)"}
+     :grid-selected-column-css              {:background-color "#00000088" :filter "brightness(200%)"}
      :base-block-color-selected             "#0b031b"
      :block-title-font-color                "#ffffff"
      :base-block-color                      "#0b1122"
@@ -223,30 +218,22 @@
                                                                   :font-size   "16px"
                                                                   :font-family :theme/base-font
                                                                   :font-weight 700}}
-                                             :tooltip     {:container
-                                                             {:background "#000"
-                                                              :color "#ffffff"
-                                                              :text {:fill "#eeeeee"}
-                                                              :fontSize "18px"
-                                                              :borderRadius "4px"
-                                                              :boxShadow
-                                                                "0 1px 2px rgba(0, 0, 0, 0.55)"
-                                                              :padding "5px 9px"}
-                                                           :basic {:whiteSpace "pre"
-                                                                   :display    "flex"
-                                                                   :alignItems "center"}
+                                             :tooltip     {:container {:background   "#000"
+                                                                       :color        "#ffffff"
+                                                                       :text         {:fill "#eeeeee"}
+                                                                       :fontSize     "18px"
+                                                                       :borderRadius "4px"
+                                                                       :boxShadow    "0 1px 2px rgba(0, 0, 0, 0.55)"
+                                                                       :padding      "5px 9px"}
+                                                           :basic     {:whiteSpace "pre" :display "flex" :alignItems "center"}
                                                            :tableCell {:padding "3px 5px"}}
-                                             :axis        {:legend {:text {:fill "#ffffff"
-                                                                           :font-size "14px"
-                                                                           :font-family
-                                                                             :theme/base-font
+                                             :axis        {:legend {:text {:fill        "#ffffff"
+                                                                           :font-size   "14px"
+                                                                           :font-family :theme/base-font
                                                                            :font-weight 700}}
                                                            :ticks  {:line {:stroke "#ffffff60"}
-                                                                    :text {:fill        "#ffffff60"
-                                                                           :font-weight 700}}}
-                                             :grid        {:line {:stroke          "#ffffff"
-                                                                  :strokeWidth     0
-                                                                  :strokeDasharray "0 0"}}}
+                                                                    :text {:fill "#ffffff60" :font-weight 700}}}
+                                             :grid        {:line {:stroke "#ffffff" :strokeWidth 0 :strokeDasharray "0 0"}}}
      :editor-outer-rim-color                "#33ffb7"
      :grid-selected-font-color              "#ffffff"
      :block-title-selected-font-color       "#ffffff"

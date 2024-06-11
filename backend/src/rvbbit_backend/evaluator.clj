@@ -36,35 +36,33 @@
       (let [nrepl?           true ;(cstr/includes? s ":::use-nrepl")
             ext-nrepl?       (cstr/includes? s ":::ext-nrepl") ;; from rabbit.edn
             custom-nrepl?    (cstr/includes? s ":::custom-nrepl")
-            custom-nrepl-map (cond ext-nrepl? {:host ext-repl-host ;; hardcoded instead of
-                                               :port ext-repl-port}
-                                   (and (not (nil? repl-host)) (not (nil? repl-port)))
-                                     {:host repl-host ;; override repl
-                                      :port repl-port}
-                                   custom-nrepl?
-                                     (first (remove nil?
-                                              (for [l (cstr/split s #"\n")]
-                                                (when (cstr/includes? l ":::custom-nrepl")
-                                                  (edn/read-string
-                                                    (last (cstr/split l #":::custom-nrepl")))))))
-                                   :else {:host "127.0.0.1" :port 8181})
+            custom-nrepl-map (cond ext-nrepl?                                          {:host ext-repl-host ;; hardcoded
+                                                                                                            ;; instead of
+                                                                                        :port ext-repl-port}
+                                   (and (not (nil? repl-host)) (not (nil? repl-port))) {:host repl-host ;; override repl
+                                                                                        :port repl-port}
+                                   custom-nrepl?                                       (first
+                                                                                         (remove nil?
+                                                                                           (for [l (cstr/split s #"\n")]
+                                                                                             (when (cstr/includes?
+                                                                                                     l
+                                                                                                     ":::custom-nrepl")
+                                                                                               (edn/read-string
+                                                                                                 (last (cstr/split
+                                                                                                         l
+                                                                                                         #":::custom-nrepl")))))))
+                                   :else                                               {:host "127.0.0.1" :port 8181})
             nrepl-port       (get custom-nrepl-map :port)
             nrepl-host       (get custom-nrepl-map :host)]
         (if (not nrepl?) ;; never going to happen here TODO: remove if
-          (let [eval-output  (try
-                               (if (string? code) (load-string s) (eval code))
-                               (catch Exception e
-                                 {:server-eval-error [] :error (ex-message e) :data (ex-data e)}))
+          (let [eval-output  (try (if (string? code) (load-string s) (eval code))
+                                  (catch Exception e {:server-eval-error [] :error (ex-message e) :data (ex-data e)}))
                 output-type  (type eval-output)
-                eval-output0 (cond (or (cstr/starts-with? (str output-type)
-                                                          "class tech.v3.dataset.impl")
-                                       (cstr/starts-with? (str output-type)
-                                                          "class clojure.lang.Var"))
+                eval-output0 (cond (or (cstr/starts-with? (str output-type) "class tech.v3.dataset.impl")
+                                       (cstr/starts-with? (str output-type) "class clojure.lang.Var"))
                                      [:pre (str eval-output)]
                                    :else eval-output)]
-            (do (when debug?
-                  (println ["   !**NOT REPL**!   " (newline) (str output-type) (newline)
-                            eval-output]))
+            (do (when debug? (println ["   !**NOT REPL**!   " (newline) (str output-type) (newline) eval-output]))
                 {:evald-result eval-output0}))
           (let
             [e (try
@@ -73,8 +71,7 @@
                          s             (str user-fn-str "\n" s)
                          skt           (nrepl/client conn 60000)
                          msg           (nrepl/message skt {:op "eval" :code s})
-                         rsp-read      (vec (remove #(or (nil? %)
-                                                         (cstr/starts-with? (str %) "(var")) ;; no
+                         rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var")) ;; no
                                               (nrepl/response-values msg)))
                          rsp           (nrepl/combine-responses msg)
                          msg-out       (vec (remove nil? (for [m msg] (get m :out))))
@@ -82,9 +79,7 @@
                      {:evald-result (-> rsp
                                         (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
                                         (assoc :value merged-values) ;; ?
-                                        (assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join
-                                                                                         msg-out))
-                                                                     #"\n")))
+                                        (assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join msg-out)) #"\n")))
                                         (dissoc :id)
                                         (dissoc :session))}))
                  (catch Exception ee
@@ -102,8 +97,7 @@
                                             :cause      (str (ex-cause ee))
                                             :err-data   (str (ex-data ee))
                                             :error      (ex-message ee)}
-                                           (if (not (nil? added-errors))
-                                             {:rabbit-added added-errors}))})))]
+                                           (if (not (nil? added-errors)) {:rabbit-added added-errors}))})))]
             (do ;(println "cache miss" cache-hash (keys @eval-cache))
               (swap! eval-cache assoc cache-hash e)
               e) ;; nrepl://127.0.0.1:44865
