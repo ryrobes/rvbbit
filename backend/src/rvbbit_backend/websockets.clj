@@ -752,6 +752,7 @@
                ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed)
                extra           [ddl-str columns-vec-arg table-name table-name-str]]
            ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
+           (swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
            (write-transit-data rowset-fixed keypath client-name table-name-str)
            (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
            (sql-exec db-conn ddl-str extra)
@@ -781,6 +782,7 @@
                extra          [ddl-str table-name table-name-str]
                same-schema?   (= ddl-str (get @snap-pushes table-name))]
           ;;  (enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
+           (swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
            (write-transit-data rowset-fixed keypath client-name table-name-str)
            (when (not same-schema?)
              (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
@@ -2018,22 +2020,24 @@
 
 (declare run-solver)
 
+;; TODO, these 3 can all be combined into one "smarter" version base don args, but I'm still iterating, so it's fine
 (defmethod wl/handle-request :run-solver
   [{:keys [solver-name client-name override-map]}]
   (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
   (swap! last-solvers-atom-meta assoc-in
     [solver-name :output]
-    [:warning! {:running-manually-via client-name :with-override-map override-map}])
+    [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
+  ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
   (run-solver solver-name client-name override-map))
 
 (defmethod wl/handle-push :run-solver-custom
-  [{:keys [solver-name temp-solver-name client-name input-map]}]
+  [{:keys [solver-name temp-solver-name client-name override-map input-map]}]
   (ut/pp [:custom-solver-run! solver-name :from client-name :input-map input-map])
   (swap! last-solvers-atom-meta assoc-in
     [temp-solver-name :output]
-    [:warning! {:running-custom-inputs-via client-name :with-input-map input-map}])
+    [:warning! {:solver-running-custom-inputs-via client-name :with-input-map input-map :override-map? override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
-  (run-solver solver-name client-name nil input-map temp-solver-name)
+  (run-solver solver-name client-name override-map input-map temp-solver-name)
   temp-solver-name)
 
 (defn flow-kill!
@@ -2790,7 +2794,7 @@
                 new-history                 (vec (conj runs timestamp-str))]
             (ut/pp [:running-sql-solver solver-name :data-key data-key])
             (swap! last-solvers-atom assoc solver-name test-query-sql)
-            (swap! last-solvers-data-atom assoc solver-name output) ;; full data can be clover
+            ;(swap! last-solvers-data-atom assoc solver-name output) ;; full data can be clover
             (swap! last-solvers-atom-meta assoc
               solver-name
               (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
@@ -2799,6 +2803,7 @@
           (catch Throwable e
             (do (ut/pp [:SOLVER-SQL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
                 (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+      
       (= runner-type :nrepl)
         (try (let [repl-host                   (get-in runner-map [:runner :host])
                    repl-port                   (get-in runner-map [:runner :port])
@@ -2831,6 +2836,7 @@
              (catch Throwable e
                (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
                    (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+      
       (= runner-type :flow) ;; no runner def needed for anon flow pulls
         (try (let [client-name                 :rvbbit-solver
                    flowmap                     (get vdata :flowmap)

@@ -5,21 +5,33 @@
  :openapi-org-id nil
  :default "./screens/looking-glass-redux.edn"
  :harvest-on-boot? true
- :runners {:clover {:default [:box :child "hey"] 
-                    ;:type :built-in
-                    :icon "images/rvbbit-clover.png"}
-           :clover-query {:default {:select [[1 :one]]} 
-                          ;:type :built-in
-                          :runner {}
-                          :icon "images/rvbbit-clover.png"}
+ :runners {;:clover {:default [:box :child "hey"] 
+           ;         ;:type :built-in
+           ;         :icon "images/rvbbit-clover.png"}
+           ;:clover-query {:default {:select [[1 :one]]} 
+           ;               ;:type :built-in
+           ;               :runner {}
+           ;               :icon "images/rvbbit-clover.png"}
            :clojure {:type :nrepl 
                      :runner {:port 8181 :host "127.0.0.1"}
-                     :default (+ 1 2 3)
+                     :default (str "Hi!" (+ 1 2 3))
+                     :editor :clover
+                     :clover-fn [:run-solver
+                                 {:signal false
+                                  :type :clojure
+                                  :input-map {}
+                                  :data :clover-body}]
                      :default-view [:box :child [:string :*query-id]]
                      :icon "images/clj.png"}
            :clojure2 {:type :nrepl
                       :runner {:port 37851 :host "127.0.0.1"}
-                      :default (+ 1 2 3)
+                      :default (str "Hi!" (+ 1 2 3))
+                      :editor :clover
+                      :clover-fn  [:run-solver
+                                   {:signal false
+                                    :type :clojure2
+                                    :input-map {}
+                                    :data :clover-body}]
                       :default-view [:box :child [:string :*query-id]]
                       :icon "images/clj.png"}
            ;;:ext-repl {:port 8181 :host "127.0.0.1"}
@@ -29,14 +41,19 @@
                              :overrides {:code :selected-view} 
                              :opts? {:instanced? true}}
                     :type :flow-based
+                    :editor :text
+                    :clover-fn [:data-viewer [:run-solver
+                                              [:get-my-colors
+                                               {:input-image-path
+                                                "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-48163-50841.png"}]] ]
                     :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene."
                     :default-view [:box :child [:img {:src :*query-id}]]
                     :icon "images/dalle.png"}
            :python3 {:runner {:flow-id :run-python3
-                              :overrides {:code :selected-view} 
+                              :overrides {:code :string-body}
                               :opts? {:instanced? true}}
                      :type :flow-based
-                     ;:default "import foo\nprint(foo.bar())"
+                     :editor :text
                      :default-view [:box :child [:string :*query-id]]
                      :icon "images/python3.png"}}
  :eleven-labs-api-key nil

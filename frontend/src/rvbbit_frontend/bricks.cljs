@@ -1063,7 +1063,9 @@
 (re-frame/reg-event-db ::add-new
                        (undoable)
                        (fn [db [_ panel-key type body]]
-                         (let [name (if (= type :queries) "new-query" "new-view")
+                         (let [name (cond (= type :queries) "new-query"
+                                          (= type :views) "new-view"
+                                          :else (str "new-" (cstr/replace (str type) ":" "")))
                                name (ut/safe-key (keyword name))]
                            (ut/tapp>> [:adding-new type :to panel-key])
                            (assoc-in db [:panels panel-key type name] body))))
@@ -2198,7 +2200,7 @@
                            (when (or (= token-string ":") (and token-end (can-be-autocompleted? token-string)))
                              (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
        :options        {:mode              (if sql-hint? "sql" "clojure")
-                        :hintOptions       {:hint custom-hint-simple-fn}
+                        :hintOptions       {:hint custom-hint-simple-fn :completeSingle false}
                         :lineWrapping      true
                         :lineNumbers       true
                         :matchBrackets     true
@@ -7711,14 +7713,24 @@
 
 
 
-(def clover-templates {:color-theft {:args [:*input]
-                                     :body [:data-viewer
-                                            [:run-solver
-                                             [:get-my-colors
-                                              {:input-image-path
-                                               :*input}]]]}
-                       :cheese-burger {:args [:x]
-                                       :body [:box :style {:color "yellow" :font-size "23px"} :child [:string3 :x "CHEESEBURGER!"]]}})
+(def clover-templates {:color-theft   {:args [:*input]
+                                       :body [:data-viewer
+                                              [:run-solver
+                                               [:get-my-colors
+                                                {:input-image-path
+                                                 :*input}]]]}
+                       :clj            {:args [:code] :body  [:run-solver
+                                                              {:signal false
+                                                               :type :clojure
+                                                               :input-map {}
+                                                               :data :code}]}
+                       :clj2            {:args [:code] :body  [:run-solver
+                                                              {:signal false
+                                                               :type :clojure2
+                                                               :input-map {}
+                                                               :data :code}]}
+                       :cheese-burger  {:args [:x]
+                                        :body [:box :style {:color "yellow" :font-size "23px"} :child [:string3 :x "CHEESEBURGER!"]]}})
 
 (re-frame/reg-sub
  ::valid-clover-template-keys
@@ -8017,68 +8029,35 @@
                               {}
                               (for [v kps]
                                 (let [[_ & this]                v
-                                      [[solver-name input-map]] this
-                                      unresolved-req-hash       (hash [solver-name input-map client-name])
-                                      resolved-input-map        (resolver/logic-and-params input-map panel-key) ;; and we need
-                                                                                                                ;; to
-                                                                                                                ;; 'pre-resolve'
-                                                                                                                ;; it's inputs
-                                                                                                                ;; i n
-                                                                                                                ;; case
-                                                                                                                ;; they
-                                                                                                                ;; are
-                                                                                                                ;; client
-                                                                                                                ;; local
+                                      override?                 (try (map? (first this)) (catch :default _ false)) ;; not a vec input call, completely new solver map
+                                      [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
+                                      unresolved-req-hash       (hash (if override? this [solver-name input-map client-name]))
+                                      resolved-input-map        (resolver/logic-and-params input-map panel-key)
+                                      resolved-full-map         (when override? (resolver/logic-and-params (first this) panel-key))
+                                      unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
                                       new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
                                       sub-param                 (keyword (str "solver/" new-solver-name))
-                                      req-map                   {:kind             :run-solver-custom ;; solver-name
-                                                                                                      ;; temp-solver-name
-                                                                                                      ;; client-name
-                                                                                                      ;; input-map
-                                                                 :solver-name      solver-name
-                                                                 :temp-solver-name (keyword new-solver-name)
-                                                                 :input-map        resolved-input-map
-                                                                 :client-name      client-name}
+                                      req-map                   (merge
+                                                                 {:kind             :run-solver-custom
+                                                                  :solver-name      solver-name
+                                                                  :temp-solver-name (keyword new-solver-name)
+                                                                  :input-map        resolved-input-map
+                                                                  :client-name      client-name}
+                                                                 (when override? {:override-map resolved-full-map}))
                                       websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                       online?                   (true? (= websocket-status :connected))
                                       run?                      (= (get-in @db/solver-fn-runs [panel-key sub-param])
-                                                                   resolved-input-map)
+                                                                   unique-resolved-map)
                                       lets-go?                  (and online? (not run?))
-                                      ;; _ (when lets-go?
-                                      ;;     (ut/tapp>> [:run-solver-req-map-bricks! (str (first this)) lets-go? (not run?) req-map
-                                      ;;                 @db/solver-fn-runs]))
+                                      _ (when lets-go?
+                                          (ut/tapp>> [:run-solver-req-map-bricks! override? (str (first this)) lets-go? (not run?) req-map
+                                                      @db/solver-fn-runs]))
                                       _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                       _ (when lets-go?
-                                          ;;  (swap! db/solver-fn-runs ut/dissoc-in [panel-key])
-                                          ;(swap! db/solver-fn-lookup assoc (ut/lists-to-vectors (first kps))
-                                          ;sub-param)
                                           (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
-                                          (swap! db/solver-fn-runs assoc-in [panel-key sub-param] resolved-input-map))]
+                                          (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map))]
                                   {v sub-param})))]
               (walk/postwalk-replace logic-kps obody)))
-        ;; solver-clover-fn-walk-map {:run-solver (fn [[solver-name input-map]]
-        ;;                                          (let [unresolved-req-hash (hash [solver-name input-map
-        ;;                                          client-name])
-        ;;                                                input-map (resolver/logic-and-params input-map nil) ;; and we need
-        ;;                                                to 'pre-resolve' it's inputs i n case they are client local
-        ;;                                                new-solver-name (str (ut/replacer (str solver-name) ":"
-        ;;                                                "") unresolved-req-hash)
-        ;;                                                sub-param (str "solver/" new-solver-name) ;(keyword (str
-        ;;                                                "solver/" new-solver-name))
-        ;;                                                req-map {:kind        :run-solver-custom ;; solver-name
-        ;;                                                temp-solver-name client-name input-map
-        ;;                                                         :solver-name solver-name
-        ;;                                                         :temp-solver-name  (keyword new-solver-name)
-        ;;                                                         :input-map  input-map
-        ;;                                                         :client-name client-name}]
-        ;;                                            (ut/tapp>> [:run-solver-req-map req-map])
-        ;;                                            (ut/tracked-dispatch
-        ;;                                             [::wfx/request :default
-        ;;                                              {:message     req-map
-        ;;                                                 ;:on-response [::http/socket-response]
-        ;;                                                 ;:on-timeout  [::http/timeout-response :run-flow-clover]
-        ;;                                               :timeout     50000000}])
-        ;;                                            sub-param))}
         obody-key-set (ut/body-set body)
         has-fn? (fn [k] (contains? obody-key-set k)) ;; faster than some on a set since it will
         has-drops? (boolean (some obody-key-set all-drops)) ;; faster?

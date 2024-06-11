@@ -886,6 +886,8 @@
 
 (re-frame/reg-sub ::search-results (fn [db _] (get db :search-results)))
 
+(re-frame/reg-sub ::block-runners (fn [db _] (get-in db [:server :settings :runners])))
+
 (defn search-panel-left
   [single-width single-height]
   (let [client-name @(ut/tracked-subscribe [::bricks/client-name])
@@ -927,6 +929,7 @@
         system-panel?       (or (= selected-block "none!") (nil? selected-block))
         first-data-key      (first (keys sql-calls))
         first-view-key      (first (keys views))
+        block-runners-map   @(ut/tracked-subscribe [::block-runners])
         data-key            (if (get @db/data-browser-query selected-block)
                               (get @db/data-browser-query selected-block)
                               first-data-key)
@@ -1377,26 +1380,49 @@
                               {:on-click #(do (swap! db/data-browser-query assoc selected-block k))} :style
                               {:cursor "pointer" :font-size "13px" :padding-left "5px" :padding-right "5px"} :child
                               (str k)]]]))])]]
-                  [re-com/h-box :gap "7px" :padding "5px" :style {:font-weight 700 :color "#dddddd66" :margin-top "3px"} :children
-                   [[re-com/box :attr
+                  
+                  [re-com/h-box :gap "7px" :padding "5px"
+                   :style {:font-weight 700 
+                           :color "#dddddd66" 
+                           :margin-top "3px"}
+
+                   :children
+
+                   (into 
+                    
+                    
+                    
+                    [[re-com/box :attr
                      {:on-click #(ut/tracked-dispatch [::bricks/add-new selected-block :queries
                                                        {:select [["heya, friendo" :greetings] [(rand-int 123) :count_stuff]]}])}
                      :style {:cursor "pointer"} :child "+query"]
                     [re-com/box :attr
                      {:on-click
-                        #(ut/tracked-dispatch
-                           [::bricks/add-new selected-block :queries
-                            {:select [:*]
-                             :from
-                               [{:data '(vec
-                                         (for
-                                          [i (range 45)]
-                                          {:row_id i :type (rand-nth ["cat" "dog" "pizza"]) :name (str "row " i)}))}]}])} :style
+                      #(ut/tracked-dispatch
+                        [::bricks/add-new selected-block :queries
+                         {:select [:*]
+                          :from
+                          [{:data '(vec
+                                    (for
+                                     [i (range 45)]
+                                      {:row_id i :type (rand-nth ["cat" "dog" "pizza"]) :name (str "row " i)}))}]}])} :style
                      {:cursor "pointer"} :child "+code"]
                     [re-com/box :attr
                      {:on-click #(ut/tracked-dispatch [::bricks/add-new selected-block :views
                                                        [:box :child "heya" :align :center :justify :center :size "auto" :style
-                                                        {:font-size "22px"}]])} :style {:cursor "pointer"} :child "+view"]]]]]
+                                                        {:font-size "22px"}]])} :style {:cursor "pointer"} :child "+view"]]
+                    
+                    (vec (for [[k v] block-runners-map
+                               :when (not (cstr/includes? (str k) "clover"))]
+                           [re-com/box :attr
+                            {:on-click #(ut/tracked-dispatch [::bricks/add-new selected-block k ;:queries
+                                                              (get v :default)])}
+                            :style {:cursor "pointer" :opacity 0.5}
+                            :child (str "+" (cstr/replace (str k) ":" ""))]))
+                    
+                    
+                    )
+                   ]]]
                 (if @db/bad-form?
                   [re-com/v-box :padding "12px" :style
                    {:color            (theme-pull :theme/editor-font-color nil)

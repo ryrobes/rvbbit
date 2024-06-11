@@ -48,7 +48,7 @@ find "$DIRECTORY" -type f \( -name "*.clj" -o -name "*.cljs" -o -name "*.cljc" \
 
   # zprint formatting
   echo "zprint formatting $file"  ##  :respect-nl :respect-bl preseves lots of formatting, be prevents lots of formatting changes... mixed bag
-  if ! zprint '{:style [:sort-require :ns-justify :justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 130 :map {:comma? false :sort? false}}' < "$file.nocomments" > "$file.tmp"; then
+  if ! zprint '{:style [:sort-require :ns-justify :justified-original] :parse-string? true :comment {:count? nil :wrap? nil} :width 90 :map {:comma? false :sort? false}}' < "$file.nocomments" > "$file.tmp"; then
     echo "zprint failed for $file, skipping..."
     rm -f "$file.nocomments" "$file.tmp"
     continue
@@ -62,6 +62,5 @@ find "$DIRECTORY" -type f \( -name "*.clj" -o -name "*.cljs" -o -name "*.cljc" \
 done
 
 echo "Formatting complete."
-
 
 

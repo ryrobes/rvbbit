@@ -1,0 +1,18 @@
+{:color-theft   {:args [:*input]
+                 :body [:data-viewer
+                        [:run-solver
+                         [:get-my-colors
+                          {:input-image-path
+                           :*input}]]]}
+ :clj            {:args [:code] :body  [:run-solver
+                                        {:signal false
+                                         :type :clojure
+                                         :input-map {}
+                                         :data :code}]}
+ :clj2            {:args [:code] :body  [:run-solver
+                                         {:signal false
+                                          :type :clojure2
+                                          :input-map {}
+                                          :data :code}]}
+ :cheese-burger  {:args [:x]
+                  :body [:box :style {:color "yellow" :font-size "23px"} :child [:string3 :x "CHEESEBURGER!"]]}}
