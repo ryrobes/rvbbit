@@ -116,14 +116,16 @@
           obody-key-set          (ut/body-set block-map)
 
           client-name            @(ut/tracked-sub ::client-name {})
+
           solver-clover-walk (fn [obody]
                                (let [kps       (ut/extract-patterns obody :run-solver 2)
                                      logic-kps (into {}
                                                      (for [v kps]
                                                        (let [[_ & this]                   v
                                                              [[solver-name input-map]] this
+                                                             panel-key :resolver
                                                              unresolved-req-hash (hash [solver-name input-map client-name])
-                                                             resolved-input-map (logic-and-params-fn input-map nil) ;; and we need to 'pre-resolve' it's inputs i n case they are client local
+                                                             resolved-input-map (logic-and-params-fn input-map panel-key) ;; and we need to 'pre-resolve' it's inputs i n case they are client local
                                                              new-solver-name (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
                                                              sub-param (keyword (str "solver/" new-solver-name))
                                                              req-map {:kind        :run-solver-custom ;; solver-name temp-solver-name client-name input-map
@@ -133,11 +135,10 @@
                                                                       :client-name client-name}
                                                              websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                                              online? (true? (= websocket-status :connected))
-                                                             ;;run? (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
                                                              run? (= (get-in @db/solver-fn-runs [panel-key sub-param]) resolved-input-map)
                                                              lets-go? (and online? (not run?))
-                                                              ;; _ (when lets-go?
-                                                              ;;     (ut/tapp>> [:run-solver-req-map! (not run?) req-map @db/solver-fn-runs]))
+                                                              _ (when lets-go?
+                                                                  (ut/tapp>> [:run-solver-req-map-resolver! (str (first this)) lets-go? (not run?) req-map @db/solver-fn-runs]))
                                                              _ (when lets-go?
                                                                  (ut/tracked-dispatch
                                                                   [::wfx/push :default req-map]))

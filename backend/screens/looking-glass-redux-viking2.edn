@@ -1,108 +1,8 @@
-{:orders
- {:jvm_stats
-  [:used_memory_mb
-   :thread_count
-   :messages
-   :unix_ms
-   :messages_per_second
-   :recent_messages
-   :recent_messages_per_second
-   :recent_queries_run
-   :recent_queries_per_second
-   :queries_per_second
-   :sql_cache_size
-   :ws_peers
-   :subscriptions
-   :open_flow_channels
-   :uptime_seconds
-   :seconds_since_last_update
-   :queries_run
-   :internal_queries_run
-   :sniffs_run
-   :sys_load
-   :ts],
-  :solvers_sql_snapshot_solver_1 (:query_error),
-  :extract (:query_error),
-  :flow-fn-sys
-  [:name :description :full_map :inputs :icon :input_types :output_types :category],
-  :flows-sys [:flow_id :file_path :last_modified],
-  :flow-fn-categories-sys [:category],
-  :flow-fn-all-sys [:name]},
+{:orders {},
  :reco-preview nil,
- :flow? false,
- :sql-source
- {:jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
-  :solvers_sql_snapshot_solver_1
-  {:select [:*],
-   :connection-id "system-db",
-   :from [:solvers_sql_snapshot_solver_1],
-   :limit 111},
-  :extract
-  {:select [:*], :connection-id "system-db", :from [:extract], :limit 111}},
+ :sql-source {},
  :meta
- {:flow-fn-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 130,
-     :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
-     :cardinality 100},
-    :description
-    {:data-type "string",
-     :distinct 33,
-     :group-by? true,
-     :commons
-     {"" 96, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
-     :cardinality 25},
-    :full_map
-    {:data-type "string",
-     :distinct 130,
-     :group-by? true,
-     :commons
-     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
-      1},
-     :cardinality 100},
-    :inputs
-    {:data-type "string",
-     :distinct 69,
-     :group-by? true,
-     :commons
-     {"[:open-input-1 :open-input]" 10,
-      "[:value1 :value2]" 7,
-      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
-     :cardinality 53},
-    :icon
-    {:data-type "string",
-     :distinct 21,
-     :group-by? true,
-     :commons {"zmdi-puzzle-piece" 96, "zmdi-pizza" 3, "zmdi-file-text" 3},
-     :cardinality 16},
-    :input_types
-    {:data-type "string",
-     :distinct 58,
-     :group-by? true,
-     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
-     :cardinality 44},
-    :output_types
-    {:data-type "string",
-     :distinct 14,
-     :group-by? true,
-     :commons {":any" 67, "" 17, ":string" 13},
-     :cardinality 10},
-    :category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 96, ":rabbit-base" 18, ":clojure-base" 16},
-     :cardinality 2}},
-   :rowcount 130},
-  :gen-viz-1132
+ {:gen-viz-1132
   {:fields
    {:rows
     {:data-type "integer",
@@ -117,18 +17,6 @@
      :commons {"unknown" 1, "string" 1, "integer" 1},
      :cardinality 100}},
    :rowcount 7},
-  :solvers_sql_snapshot_solver_1
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: solvers_sql_snapshot_solver_1)"
-      1},
-     :cardinality 100}},
-   :rowcount 2},
   :client-items-drag-item-key-5
   {:fields
    {:item_type
@@ -395,161 +283,6 @@
      :commons {1 269, 0 149, 2 51},
      :cardinality 1}},
    :rowcount 500},
-  :flows-sys
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 95,
-     :group-by? true,
-     :commons {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "map-pull-test2" 1},
-     :cardinality 96},
-    :file_path
-    {:data-type "string",
-     :distinct 98,
-     :group-by? true,
-     :commons
-     {"./flows/generated-flow-map.edn" 1,
-      "./flows/stitches-math.edn" 1,
-      "./flows/openai-image-gen-ladder3.edn" 1},
-     :cardinality 100},
-    :last_modified
-    {:data-type "string",
-     :distinct 32,
-     :group-by? true,
-     :commons
-     {"2024-03-12 02:37:43" 67, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
-     :cardinality 32}},
-   :rowcount 98},
-  :jvm_stats
-  {:fields
-   {:queries_run
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {84 1, 212 1, 183 1},
-     :cardinality 100},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 59,
-     :group-by? true,
-     :commons {20.87 8, 22.2 8, 23.67 5},
-     :cardinality 53},
-    :uptime_seconds
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {1259 1, 1364 1, 1004 1},
-     :cardinality 100},
-    :queries_per_second
-    {:data-type "float",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :sql_cache_size
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :ts
-    {:data-type "string",
-     :distinct 111,
-     :group-by? true,
-     :commons
-     {"2024-06-07 16:44:11" 1, "2024-06-07 16:55:26" 1, "2024-06-07 16:39:26" 1},
-     :cardinality 100},
-    :subscriptions
-    {:data-type "integer",
-     :distinct 4,
-     :group-by? true,
-     :commons {160 101, 144 7, 17 2},
-     :cardinality 3},
-    :messages_per_second
-    {:data-type "float",
-     :distinct 70,
-     :group-by? true,
-     :commons {21.76 7, 21.59 5, 21.89 5},
-     :cardinality 63},
-    :messages
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {19739 1, 7055 1, 692 1},
-     :cardinality 100},
-    :sniffs_run
-    {:data-type "integer",
-     :distinct 95,
-     :group-by? true,
-     :commons {37 2, 83 2, 5 2},
-     :cardinality 85},
-    :sys_load
-    {:data-type "float",
-     :distinct 101,
-     :group-by? true,
-     :commons {5.54 2, 4.33 2, 5.74 2},
-     :cardinality 90},
-    :unix_ms
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {1717793276834 1, 1717793531833 1, 1717792856832 1},
-     :cardinality 100},
-    :used_memory_mb
-    {:data-type "integer",
-     :distinct 108,
-     :group-by? true,
-     :commons {1294 2, 1113 2, 1455 2},
-     :cardinality 97},
-    :recent_queries_run
-    {:data-type "integer",
-     :distinct 8,
-     :group-by? true,
-     :commons {3 51, 2 24, 4 19},
-     :cardinality 7},
-    :thread_count
-    {:data-type "integer",
-     :distinct 23,
-     :group-by? true,
-     :commons {118 13, 117 13, 119 13},
-     :cardinality 20},
-    :internal_queries_run
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :open_flow_channels
-    {:data-type "integer",
-     :distinct 6,
-     :group-by? true,
-     :commons {11 62, 0 43, 93 3},
-     :cardinality 5},
-    :ws_peers
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {6 110, 0 1},
-     :cardinality 1},
-    :recent_messages
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {19739 1, 7055 1, 692 1},
-     :cardinality 100},
-    :recent_queries_per_second
-    {:data-type "float",
-     :distinct 8,
-     :group-by? true,
-     :commons {0.2 51, 0.13 24, 0.27 19},
-     :cardinality 7},
-    :seconds_since_last_update
-    {:data-type "integer",
-     :distinct 3,
-     :group-by? true,
-     :commons {15 68, 14 42, -1 1},
-     :cardinality 2}},
-   :rowcount 111},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -659,26 +392,6 @@
      :commons {"1022244779" 42, "388025726" 27, "-1623928394" 24},
      :cardinality 8}},
    :rowcount 500},
-  :extract
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: extract)" 1},
-     :cardinality 100}},
-   :rowcount 2},
-  :flow-fn-categories-sys
-  {:fields
-   {:category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
-     :cardinality 100}},
-   :rowcount 3},
   :city-drag-26-1
   {:fields
    {:city
@@ -894,44 +607,7 @@
      :group-by? false,
      :commons {1 5, 199 1, 1092 1},
      :cardinality 86}},
-   :rowcount 29},
-  :flow-fn-all-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 130,
-     :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
-     :cardinality 100}},
-   :rowcount 130}},
- :default-col-widths
- {:virtual-panel
-  {:kick--901124283 102,
-   :kick-2069665480 102,
-   :kick-370867603 102,
-   :kick--1119642575 102,
-   :kick-1110050738 102,
-   :kick--880886288 102,
-   :kick-2032982605 102,
-   :kick--507872807 102,
-   :kick-193841235 102,
-   :kick--1764769189 152,
-   :kick-1882474277 102,
-   :kick-16634386 102,
-   :kick-585243654 102,
-   :kick--697986870 102,
-   :kick-1921167268 102,
-   :kick-299248616 102,
-   :kick-981261776 102,
-   :kick--80423385 102,
-   :kick-1187229317 102,
-   :kick--1086507122 102,
-   :kick--253879321 102,
-   :kick--618116215 102,
-   :kick-2037089813 102,
-   :kick--485712612 102,
-   :kick--1486263916 102,
-   :kick-468215201 102}},
+   :rowcount 29}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -1004,6 +680,8 @@
     "aaaah-wednesday-the-day"
     "alarm-clock1"
     "alarm-clock2"
+    "alarm-clock22"
+    "alarm-clock23"
     "alice-puzzle-1"
     "asdasdasdasd"
     "autumn-theme"
@@ -1166,7 +844,7 @@
    :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [806931633 732799557 4294705152],
+ :memory [579015656 384378008 4294705152],
  :flow-subs
  [:flow/flow-forever>*running?
   :flow/openai-image-gen-ladder>:output-revised-prompt
@@ -1180,15 +858,14 @@
   :time/second
   :flow/flow-forever>:final-math
   :flow/openai-image-gen-ladder3>:output-revised-prompt],
- :client-name :thrilling-elliptic-yak-35,
- :alt-key-held? false,
+ :client-name :beautiful-thin-raccoon-35,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 3158, :h 1690},
- :post-meta {:jvm_stats {:* {:rowcount 111}}, :solvers_sql_snapshot_solver_1 {}},
+ :window {:w 2556, :h 1663},
+ :post-meta {},
  :flow-estimates
  {"openai-image-gen-ladder3"
-  {:times 42, :run-id "3b10886d-bd50-42b9-8492-6e5cdc6e22cd"}},
+  {:times 48, :run-id "f945eca7-9850-4a6f-a2d0-b63fe3b624fe"}},
  :status
  {:heartbeat
   {:kick
@@ -1207,7 +884,6 @@
   :alert1 {:alerts :alert2}},
  :screen-name "looking-glass-redux-viking2",
  :recos-page2 0,
- :selected-warren-item :sql-snapshot-solver-1,
  :selected-tab "fat zebra",
  :col-names nil,
  :snapshots nil,
@@ -1220,8 +896,8 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   47486
-   -1247625457]],
+   1208
+   1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap
  {"openai-image-gen-ladder3"
@@ -1235,14 +911,10 @@
    "Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.\n\nA highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise.",
    :prompt-5
    "Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.\n\nA highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise."}},
- :base-sniff-queries
- {:jvm_stats 1498154063,
-  :solvers_sql_snapshot_solver_1 -356095096,
-  :extract 1536005692},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 861998026,
+ :user-params-hash 301351007,
  :grid-recos? true,
- :session-hash -1511940793,
+ :session-hash 543789228,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -1722,7 +1394,7 @@
   :block-1585
   {:h 4,
    :w 5,
-   :root [56 26],
+   :root [40 6],
    :tab "fat zebra",
    :selected-view :hi,
    :name "block-1585",
@@ -1746,7 +1418,7 @@
        ["openai-image-gen-ladder3"
         "run-ss5!"
         {:prompt
-         "Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:\n\nCraft in high definition, a stylized 16:9highly stylized & exaggerated pinup style cyberpunk illustration of a scene drawn from the traditional myths from a wintery Cape Cod, which embraces an other-worldly charm in a majestic environment. \n\nPosition at the heart of this landscape, a late 20s buxom Caucasian woman with beautifully flowing hair. Identify her with full, pouty lips and a nose that gently upturns. Her visage can be seen as a blend of delight and enchantment, while the sight of intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and busty overflowing physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, buxom, burlesque, augmenting the glow of her skin. Her dark makeup a contrast to her pale skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, providing the observer with an alluringly playful glance. Buxom pinup glowing."}]]
+         "Use this prompt exactly as is with no modifications at all please. Craft in high definition, a stylized 16:9highly stylized & exaggerated pinup style cyberpunk illustration of a scene drawn from the traditional myths from a wintery Cape Cod, which embraces an other-worldly charm in a majestic environment. \n\nPosition at the heart of this landscape, a late 20s buxom Caucasian woman with beautifully flowing hair. Identify her with full, pouty lips and a nose that gently upturns. Her visage can be seen as a blend of delight and enchantment, while the sight of intricate Celtic-styled tattoos of rabbits and wilderness adorn her neck, collarbone, and shoulders. She possesses a magical and busty overflowing physique. Bask her in the mysterious, abstract glows of blue and pink that enhance her robust and curvaceous symmetry, buxom, burlesque, augmenting the glow of her skin. Her dark makeup a contrast to her pale skin. Complete her attire with a choker ribbon and an extended necklace as she leans against a wall, providing the observer with an alluringly playful glance. Buxom pinup glowing."}]]
       [:img {:src "./images/gen/b64-image3-18154-71605.png", :width "90%"}]]]},
    :queries {}},
   :block-7416
@@ -1865,7 +1537,7 @@
   :block-4393
   {:h 4,
    :w 5,
-   :root [30 30],
+   :root [61 26],
    :tab "fat zebra",
    :selected-view :hi,
    :name "block-4393",
@@ -1893,10 +1565,10 @@
       [:img {:src "", :width "90%"}]]]},
    :queries {}},
   :block-5738
-  {:h 3,
-   :w 8,
+  {:h 4,
+   :w 6,
    :tab "fat zebra",
-   :root [40 23],
+   :root [40 22],
    :name "block-5738",
    :views
    {:param-val
@@ -1941,6 +1613,36 @@
      :child
      [:string :time/second]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-4703
+  {:h 4,
+   :w 5,
+   :root [40 2],
+   :tab "fat zebra",
+   :selected-view :hi,
+   :name "block-4703",
+   :views
+   {:hi
+    [:v-box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-weight 700,
+      :font-size "25px",
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :children
+     [[:run-flow
+       ["openai-image-gen-ladder3"
+        "yo!"
+        {:prompt
+         "Use this prompt exactly as is with no modifications at all please. Create an image of a full-figured Irish-Scot woman in her late twenties standing in a dystopian forest located in New England, North America. The setting merges cyberpunk and vaporwave styles, revealing the captivating beauty of a night sky lit with neon hues of pinks, purples, and light blues. The woman has long cascading hair and complex tattoos reaching up to her neck, which include matching rabbit motifs with her necklace, contributing to her enigmatic aura. Her full lips are slightly pursed, adding to her voluptuous appeal. Include elements that reflect pin-up art style in her portrayal."}]]
+      [:img {:src "./images/gen/b64-image3-79719-1045.png", :width "90%"}]]]},
+   :queries {}},
   :block-3166
   {:h 7,
    :w 30,
@@ -2208,7 +1910,7 @@
   :block-3308
   {:h 4,
    :w 5,
-   :root [46 30],
+   :root [46 26],
    :tab "fat zebra",
    :selected-view :hi,
    :name "block-3308",
@@ -2238,7 +1940,7 @@
   :block-8368
   {:h 4,
    :w 5,
-   :root [16 30],
+   :root [40 10],
    :tab "fat zebra",
    :selected-view :hi,
    :name "block-8368",
@@ -2262,7 +1964,7 @@
        ["openai-image-gen-ladder3"
         "vwall1!"
         {:prompt
-         "Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:  Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:\n\nCreate a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork is inspired by the pinup noir femme fatale and cyberpunk aesthetics, having a strong burlesque influence."}]]
+         "Use this prompt exactly as is with no modifications at all please.  Create a fantasy-inspired, high-definition, 16:9 ratio illustration with a heavy emphasis on exaggerated stylistic elements. The scene takes place in an otherworldly, yet traditionally Scottish location. A woman in her late 20s of Caucasian descent, with a buxom, robust and hyper curvaceous physique, exudes a sultry yet pleased expression. She has long brunette hair, full pouty lips with the bottom one being more prominent, and a slightly upturned nose. Her body is adorned with intricate Celtic-style tattoos of rabbits and wilderness, which cover her neck, collarbone, and shoulders. Mysterious blue and pink lights from the forest radiate off her voluptuous figure. She accessorizes with a choker ribbon and a long necklace, expressing a confident, flirty aura as she leans against a wall, casting a coy glance at the viewer. This artwork is inspired by the pinup noir femme fatale and cyberpunk aesthetics, having a strong burlesque influence."}]]
       [:img {:src "./images/gen/b64-image3-77379-7669.png", :width "90%"}]]]},
    :queries {}},
   :block-10802
@@ -2512,20 +2214,21 @@
    :root [47 19],
    :tab "violet ferret"},
   :block-12188
-  {:drag-meta {:type :open-input},
+  {:name "created very interesting whimsy",
    :w 6,
    :selected-view :wholesome-baby-blue-magpie,
+   :root [40 11],
    :h 12,
+   :tab "fat zebra",
+   :drag-meta {:type :open-input},
+   :minimized? true,
    :views
    {:wholesome-baby-blue-magpie
     [:open-input
      {:kp [:param :wholesome-baby-blue-magpie],
       :width-int :panel-width+100,
       :height-int :panel-height+80,
-      :syntax "text"}]},
-   :tab "fat zebra",
-   :root [40 11],
-   :name "created very interesting whimsy"},
+      :syntax "text"}]}},
   :block-7319
   {:h 5,
    :w 8,
@@ -2583,7 +2286,7 @@
   :block-9213
   {:h 4,
    :w 5,
-   :root [11 30],
+   :root [56 26],
    :tab "fat zebra",
    :selected-view :hi,
    :name "block-9213",
@@ -2722,20 +2425,21 @@
    :root [17 8],
    :tab "sapphire ape"},
   :block-1322
-  {:drag-meta {:type :open-input},
+  {:name "block-1322",
    :w 6,
    :selected-view :reliable-coral-moose,
+   :root [40 1],
    :h 10,
+   :tab "fat zebra",
+   :drag-meta {:type :open-input},
+   :minimized? true,
    :views
    {:reliable-coral-moose
     [:open-input
      {:kp [:param :reliable-coral-moose],
       :width-int :panel-width+100,
       :height-int :panel-height+80,
-      :syntax "text"}]},
-   :tab "fat zebra",
-   :root [40 1],
-   :name "block-1322"},
+      :syntax "text"}]}},
   :block-1784
   {:drag-meta {:type :open-input},
    :w 7,
@@ -2852,7 +2556,7 @@
        "freeze-ladder!"
        {:prompt
         [:string3
-         " Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.  "
+         " Use this prompt exactly as it is with no modifications at all please.  "
          :flow/openai-image-gen-ladder3>:output-revised-prompt]}]]]},
    :queries {}},
   :block-11886
@@ -3097,7 +2801,7 @@
   :block-532
   {:h 4,
    :w 5,
-   :root [46 26],
+   :root [40 18],
    :tab "fat zebra",
    :selected-view :hi,
    :name "block-532",
@@ -3121,7 +2825,7 @@
        ["openai-image-gen-ladder3"
         "bcod!"
         {:prompt
-         "Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:  Create an intricately detailed, hyperrealistic digitally-rendered representation of a frosty morning in a typical New England setting, demonstrating a unique blend of old-world charm and advanced, cyberpunk features. The charming locale is covered in a fresh layer of pristine snow amidst a snowfall, adding a touch of roughness to the atmosphere. The buildings emit a warm, inviting glow, tinted in shades of delicate pink and neon light blue. On the left side of the frame, a stunningly gorgeous Irish woman in her early 30s is highlighted. She possesses a curvaceous build, full pouty lips with a significantly larger lower one, an upturned nose, and an expression that expertly melds contentment with a hint of enticing sophistication. Her long, slightly wet hair flows down her neck and shoulders due to the snowfall. Her neck, collarbone, and shoulders are adorned with beautifully intricate tattoos inspired by Celtic patterns of rabbits and natural scenic designs. The sun that shyly appears from the horizon casts a gentle light on her body, enhancing the tranquil and somewhat enigmatic ambiance created by the early morning light. Her robust, maternal figure basks in the sunlight, resulting in a visually appealing contrast of light and shadow on her elaborately decorated body"}]]
+         "Use this prompt exactly as is with no modifications at all please.  Create an intricately detailed, hyperrealistic digitally-rendered representation of a frosty morning in a typical New England setting, demonstrating a unique blend of old-world charm and advanced, cyberpunk features. The charming locale is covered in a fresh layer of pristine snow amidst a snowfall, adding a touch of roughness to the atmosphere. The buildings emit a warm, inviting glow, tinted in shades of delicate pink and neon light blue. On the left side of the frame, a stunningly gorgeous Irish woman in her early 30s is highlighted. She possesses a curvaceous build, full pouty lips with a significantly larger lower one, an upturned nose, and an expression that expertly melds contentment with a hint of enticing sophistication. Her long, slightly wet hair flows down her neck and shoulders due to the snowfall. Her neck, collarbone, and shoulders are adorned with beautifully intricate tattoos inspired by Celtic patterns of rabbits and natural scenic designs. The sun that shyly appears from the horizon casts a gentle light on her body, enhancing the tranquil and somewhat enigmatic ambiance created by the early morning light. Her robust, maternal figure basks in the sunlight, resulting in a visually appealing contrast of light and shadow on her elaborately decorated body"}]]
       [:img {:src "./images/gen/b64-image3-92038-97586.png", :width "90%"}]]]},
    :queries {}},
   :block-409
@@ -3154,7 +2858,7 @@
    :root [39 19],
    :tab "violet ferret"},
   :block-12201
-  {:h 4,
+  {:h 3,
    :w 5,
    :root [1 26],
    :tab "fat zebra",
@@ -3262,7 +2966,7 @@
   :block-8993
   {:h 4,
    :w 5,
-   :root [35 30],
+   :root [40 14],
    :tab "fat zebra",
    :selected-view :hi,
    :name "block-8993",
@@ -3286,7 +2990,7 @@
        ["openai-image-gen-ladder3"
         "yope!"
         {:prompt
-         "Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please:  A highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise"}]]
+         "Use this prompt exactly as is with no modifications at all please  A highly detailed, exaggerated pinup style illustration, featuring a young, powerful, and robust Scandinavian woman in her early 30s. She sports a full-face and long, thick Viking braids, buxom pinup build. The setting is in the picturesque wilderness of Northeast America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark eye makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise"}]]
       [:img {:src "./images/gen/b64-image3-270-9299.png", :width "90%"}]]]},
    :queries {}},
   :block-7870
@@ -3405,7 +3109,7 @@
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version nil,
-   :openai-image-gen-ladder3>dominant-color "#30323e",
+   :openai-image-gen-ladder3>dominant-color "#7388ae",
    :counting-loop>open-fn-2 44,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt nil,
@@ -3437,7 +3141,7 @@
    :counting-loop>*running? false,
    :counting-loop>open-fn-3 45,
    :openai-image-gen-ladder3>relative-url-path-for-png-version
-   "./images/gen/b64-image3-92038-97586.png",
+   "./images/gen/b64-image3-16229-99058.png",
    :flow-forever>*running? false,
    :openai-image-gen-ladder2>*running? false,
    :openai-image-gen-ladder>execute-shell-command
@@ -3447,7 +3151,7 @@
     :command
     "convert /home/ryanr/rvbbit-out/b64-image-55359-30122.webp /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image-55359-30122.png"},
    :openai-image-gen-ladder3>output-revised-prompt
-   "Create an intricately detailed, hyperrealistic digitally-rendered representation of a frosty morning in a typical New England setting, demonstrating a unique blend of old-world charm and advanced, cyberpunk features. The charming locale is covered in a fresh layer of pristine snow amidst a snowfall, adding a touch of roughness to the atmosphere. The buildings emit a warm, inviting glow, tinted in shades of delicate pink and neon light blue. On the left side of the frame, a stunningly gorgeous Irish woman in her early 30s is highlighted. She possesses a curvaceous build, full pouty lips with a significantly larger lower one, an upturned nose, and an expression that expertly melds contentment with a hint of enticing sophistication. Her long, slightly wet hair flows down her neck and shoulders due to the snowfall. Her neck, collarbone, and shoulders are adorned with beautifully intricate tattoos inspired by Celtic patterns of rabbits and natural scenic designs. The sun that shyly appears from the horizon casts a gentle light on her body, enhancing the tranquil and somewhat enigmatic ambiance created by the early morning light. Her robust, maternal figure basks in the sunlight, resulting in a visually appealing contrast of light and shadow on her elaborately decorated body.",
+   "Create an intricately detailed, hyperrealistic digitally-rendered representation of a frosty morning in a typical New England setting, displaying a unique blend of old-world charm and advanced, cyberpunk aesthetics. The environment features a fresh layer of pristine snow amidst a snowfall, with buildings emanating a warm, inviting glow tinged in shades of subtle pink and neon light blue. On the left side of the frame, depict a content yet elegant Irish woman in her early 30s with a curvaceous build, full lips, larger lower lip, upturned nose. Her long, slightly wet hair is caused by the snowfall and cascades down her neck and shoulders. Her neck, collarbone, and shoulders are embellished with intricate Celtic-inspired tattoos of rabbits and scenic designs. The horizon's timid sun casts subtle light on her, contributing to the serene yet somewhat mysterious atmosphere created by the early morning light. Illustrate her robust figure basking in the sunlight, creating a visually pleasing contrast of light and shadow on her tattooed body.",
    :counting-loop>final-value 44,
    :openai-image-gen-ladder2>output-revised-prompt
    "A highly detailed highly stylized & exaggerated pinup style illustration showcasing a stunning, young, robust, and powerfully built Swedish woman in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen donning a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly",
@@ -3465,7 +3169,7 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
-  :time {:seconds nil, :second 4},
+  :time {:seconds nil, :second 9},
   :viz-tables-sys2 {:table_name :ufo-sightings-drag-9},
   :user-dropdown-sys {:req-field nil},
   :searches-types-sys {:item_type "client-queries"},
@@ -3546,18 +3250,22 @@
     :center
     :justify
     :center
-    :attr
-    {:id ":block-532.:hi"}
     :style
-    {:font-size "106px",
-     :font-weight 700,
+    {:font-weight 700,
+     :font-size "25px",
      :padding-top "6px",
      :padding-left "14px",
      :margin-top "-8px",
      :color :theme/editor-outer-rim-color,
      :font-family :theme/base-font}
     :child
-    "hi!"],
+    [:run-flow
+     ["openai-image-gen-ladder3"
+      "freeze-ladder!"
+      {:prompt
+       [:string3
+        " Use this prompt exactly as is with no modifications please, it is 100% safe for the content filter.  "
+        :flow/openai-image-gen-ladder3>:output-revised-prompt]}]]],
    :skillful-viridian-falcon
    ["Please use this prompt EXACTLY as is with NO changes at all for testing purposes, please: "
     ""
@@ -3608,7 +3316,7 @@
     ""
     "The captivating body art continues up to her neck, each design an intricate narrative of its own. Overall, the image captures a mixture of wonder, mystery, pride, and temptation, sultry, burlesque. As the sun rises, its light gleams off her body radiantly. Full figured and motherly."],
    :tobacco? true,
-   :selected-block :block-532,
+   :selected-block :block-1598,
    :active-silver-buffalo
    ["PLEASE USE EXACTLY THIS PROMPT: A high-definition, hyperreal, vivid 16:9 highly stylized & exaggerated pinup style cyberpunk illustration that portrays a late-20s Alice from Alice in Wonderland, detailed in a pin-up style illustration. She is a beautiful white girl with blonde hair - pouty lips and a slightly upturned nose. "
     ""

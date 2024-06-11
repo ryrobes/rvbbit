@@ -1,17 +1,52 @@
 {:orders
- {:gen-viz-516 (:mb :mem_used :messages_per_second :ts),
-  :fields-sys [:field_name :field_type :data_type],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :connections-sys [:database_name :connection_id]},
+ {:flow-fn-sys
+  [:name :description :full_map :inputs :icon :input_types :output_types :category],
+  :solvers_sql_snapshot_solver_1 (:query_error),
+  :flows-sys [:flow_id :file_path :last_modified],
+  :jvm_stats
+  [:used_memory_mb
+   :thread_count
+   :messages
+   :unix_ms
+   :messages_per_second
+   :recent_messages
+   :recent_messages_per_second
+   :recent_queries_run
+   :recent_queries_per_second
+   :queries_per_second
+   :sql_cache_size
+   :ws_peers
+   :subscriptions
+   :open_flow_channels
+   :uptime_seconds
+   :seconds_since_last_update
+   :queries_run
+   :internal_queries_run
+   :sniffs_run
+   :sys_load
+   :ts],
+  :kick-99725321 [:mb :mem_used :messages_per_second :ts :snapshot_ds],
+  :extract (:query_error),
+  :flow-fn-categories-sys [:category],
+  :gen-viz-516 (:mb :mem_used :messages_per_second :ts),
+  :flow-fn-all-sys [:name]},
  :reco-preview nil,
+ :flow? false,
  :sql-source
- {:gen-viz-516
+ {:jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
+  :solvers_sql_snapshot_solver_1
+  {:select [:*],
+   :connection-id "system-db",
+   :from [:solvers_sql_snapshot_solver_1],
+   :limit 111},
+  :extract {:select [:*], :connection-id "system-db", :from [:extract], :limit 111},
+  :gen-viz-516
   {:cache? false,
    :where [:= :client_name :*client-name-str],
-   :limit 77,
+   :limit 123,
    :group-by [:ts],
-   :_last-run "17:48:07",
+   :_last-run "19:05:33",
    :refresh-every 20,
    :from
    [{:select
@@ -35,10 +70,87 @@
    (fn [x]
      (vec
        (reverse
-         (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))}},
+         (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))},
+  :kick-99725321
+  {:select [:*],
+   :connection-id "cache.db",
+   :_cached-at "Monday, June 10th 7:05PM",
+   :_cache-query ":data/sql-snapshot-solver-1",
+   :from [[:solvers_sql_snapshot_solver_1 :extract]]}},
  :meta
- {:fields-sys {:fields {}, :rowcount 0},
-  :tables-sys {:fields {}, :rowcount 0},
+ {:flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 130,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100},
+    :description
+    {:data-type "string",
+     :distinct 33,
+     :group-by? true,
+     :commons
+     {"" 96, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 25},
+    :full_map
+    {:data-type "string",
+     :distinct 130,
+     :group-by? true,
+     :commons
+     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
+      1},
+     :cardinality 100},
+    :inputs
+    {:data-type "string",
+     :distinct 69,
+     :group-by? true,
+     :commons
+     {"[:open-input-1 :open-input]" 10,
+      "[:value1 :value2]" 7,
+      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
+     :cardinality 53},
+    :icon
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"zmdi-puzzle-piece" 96, "zmdi-pizza" 3, "zmdi-file-text" 3},
+     :cardinality 16},
+    :input_types
+    {:data-type "string",
+     :distinct 58,
+     :group-by? true,
+     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
+     :cardinality 44},
+    :output_types
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {":any" 67, "" 17, ":string" 13},
+     :cardinality 10},
+    :category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 96, ":rabbit-base" 18, ":clojure-base" 16},
+     :cardinality 2}},
+   :rowcount 130},
+  :solvers_sql_snapshot_solver_1
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: solvers_sql_snapshot_solver_1)"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
   :gen-viz-797
   {:fields
    {:rows
@@ -54,6 +166,31 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 95,
+     :group-by? true,
+     :commons {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "map-pull-test2" 1},
+     :cardinality 96},
+    :file_path
+    {:data-type "string",
+     :distinct 98,
+     :group-by? true,
+     :commons
+     {"./flows/generated-flow-map.edn" 1,
+      "./flows/stitches-math.edn" 1,
+      "./flows/openai-image-gen-ladder3.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 32,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 67, "2024-06-08 18:41:08" 1, "2024-03-14 07:50:09" 1},
+     :cardinality 32}},
+   :rowcount 98},
   :gen-viz-94
   {:fields
    {:diff
@@ -63,6 +200,136 @@
      :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
+  :jvm_stats
+  {:fields
+   {:queries_run
+    {:data-type "integer",
+     :distinct 27,
+     :group-by? true,
+     :commons {8 1, 30 1, 87 1},
+     :cardinality 100},
+    :recent_messages_per_second
+    {:data-type "float",
+     :distinct 18,
+     :group-by? true,
+     :commons {17.07 4, 17.2 4, 17.66 2},
+     :cardinality 66},
+    :uptime_seconds
+    {:data-type "integer",
+     :distinct 27,
+     :group-by? true,
+     :commons {209 1, 194 1, 14 1},
+     :cardinality 100},
+    :queries_per_second
+    {:data-type "float",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 27},
+     :cardinality 3},
+    :sql_cache_size
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 27},
+     :cardinality 3},
+    :ts
+    {:data-type "string",
+     :distinct 27,
+     :group-by? true,
+     :commons
+     {"2024-06-08 18:52:16" 1, "2024-06-08 18:55:31" 1, "2024-06-08 18:56:01" 1},
+     :cardinality 100},
+    :subscriptions
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {92 23, 109 2, 51 1},
+     :cardinality 14},
+    :messages_per_second
+    {:data-type "float",
+     :distinct 23,
+     :group-by? true,
+     :commons {16.97 3, 17.2 3, 16.34 1},
+     :cardinality 85},
+    :messages
+    {:data-type "integer",
+     :distinct 27,
+     :group-by? true,
+     :commons {8 1, 1434 1, 3265 1},
+     :cardinality 100},
+    :sniffs_run
+    {:data-type "integer",
+     :distinct 6,
+     :group-by? true,
+     :commons {10 9, 12 6, 5 6},
+     :cardinality 22},
+    :sys_load
+    {:data-type "float",
+     :distinct 26,
+     :group-by? true,
+     :commons {5.31 2, 3.48 1, 6.71 1},
+     :cardinality 96},
+    :unix_ms
+    {:data-type "integer",
+     :distinct 27,
+     :group-by? true,
+     :commons {1717887211938 1, 1717887331938 1, 1717887031943 1},
+     :cardinality 100},
+    :used_memory_mb
+    {:data-type "integer",
+     :distinct 27,
+     :group-by? true,
+     :commons {2922 1, 754 1, 3175 1},
+     :cardinality 100},
+    :recent_queries_run
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? true,
+     :commons {2 11, 3 7, 1 3},
+     :cardinality 33},
+    :thread_count
+    {:data-type "integer",
+     :distinct 20,
+     :group-by? true,
+     :commons {413 3, 423 2, 414 2},
+     :cardinality 74},
+    :internal_queries_run
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 15, 7 12},
+     :cardinality 7},
+    :open_flow_channels
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {11 17, 104 9, 22 1},
+     :cardinality 11},
+    :ws_peers
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {5 24, 6 2, 0 1},
+     :cardinality 11},
+    :recent_messages
+    {:data-type "integer",
+     :distinct 27,
+     :group-by? true,
+     :commons {8 1, 1434 1, 3265 1},
+     :cardinality 100},
+    :recent_queries_per_second
+    {:data-type "float",
+     :distinct 9,
+     :group-by? true,
+     :commons {0.13 11, 0.2 7, 0.07 3},
+     :cardinality 33},
+    :seconds_since_last_update
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {14 21, 15 5, -1 1},
+     :cardinality 11}},
+   :rowcount 27},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -72,6 +339,41 @@
      :commons {80332 1},
      :cardinality 100}},
    :rowcount 1},
+  :kick-99725321
+  {:fields
+   {:mb
+    {:data-type "integer",
+     :distinct 138,
+     :group-by? true,
+     :commons {587 11, 590 9, 3633 8},
+     :cardinality 27},
+    :mem_used
+    {:data-type "integer",
+     :distinct 148,
+     :group-by? true,
+     :commons {1209630207 6, 596211103 6, 4525279763 6},
+     :cardinality 29},
+    :messages_per_second
+    {:data-type "string",
+     :distinct 93,
+     :group-by? true,
+     :commons {"2.27" 68, "8.48" 18, "2.13" 17},
+     :cardinality 18},
+    :ts
+    {:data-type "string",
+     :distinct 148,
+     :group-by? true,
+     :commons
+     {"2024-06-09 19:29:47" 6, "2024-06-09 19:29:48" 6, "2024-06-09 19:29:17" 6},
+     :cardinality 29},
+    :snapshot_ds
+    {:data-type "string",
+     :distinct 6,
+     :group-by? true,
+     :commons
+     {"2024-06-09 19:50" 148, "2024-06-09 19:55" 122, "2024-06-09 19:45" 112},
+     :cardinality 1}},
+   :rowcount 500},
   :gen-viz-828
   {:fields
    {:agg
@@ -87,6 +389,26 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :extract
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: extract)" 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
+     :cardinality 100}},
+   :rowcount 3},
   :gen-viz-84
   {:fields
    {:rows
@@ -102,21 +424,6 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -239,30 +546,30 @@
   {:fields
    {:mb
     {:data-type "integer",
-     :distinct 57,
+     :distinct 107,
      :group-by? true,
-     :commons {494 3, 445 3, 459 3},
-     :cardinality 74},
+     :commons {1786 4, 1719 3, 1886 2},
+     :cardinality 86},
     :mem_used
     {:data-type "integer",
-     :distinct 77,
+     :distinct 123,
      :group-by? true,
-     :commons {496599205 1, 503455105 1, 500905699 1},
+     :commons {1873680105 1, 1715508794 1, 1770545199 1},
      :cardinality 100},
     :messages_per_second
     {:data-type "float",
-     :distinct 13,
+     :distinct 15,
      :group-by? true,
-     :commons {3.27 35, 3.13 15, 3.4 11},
-     :cardinality 16},
+     :commons {2.47 34, 2.53 24, 2.67 18},
+     :cardinality 12},
     :ts
     {:data-type "string",
-     :distinct 77,
+     :distinct 123,
      :group-by? true,
      :commons
-     {"2024-06-10 17:29:32" 1, "2024-06-10 17:44:47" 1, "2024-06-10 17:32:32" 1},
+     {"2024-06-10 18:51:20" 1, "2024-06-10 18:36:50" 1, "2024-06-10 18:48:50" 1},
      :cardinality 100}},
-   :rowcount 77},
+   :rowcount 123},
   :shape-drag-7
   {:fields
    {:shape
@@ -277,11 +584,593 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30}},
+   :rowcount 30},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 130,
+     :group-by? true,
+     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :cardinality 100}},
+   :rowcount 130}},
  :default-col-widths
- {:system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys ##Inf},
-  :system-fields-list* {:fields-sys ##Inf}},
+ {:virtual-panel
+  {:kick--2111308704 102,
+   :kick--1366141264 102,
+   :kick-1802817678 102,
+   :kick-1216047081 102,
+   :kick-119009662 102,
+   :kick--1819319728 102,
+   :kick--1051320310 102,
+   :kick--968910070 102,
+   :kick--83439191 102,
+   :kick-217170754 102,
+   :kick-1998853012 102,
+   :kick-1264524995 102,
+   :kick-316297241 102,
+   :kick-1235283377 102,
+   :kick--740540476 102,
+   :kick-1997500819 102,
+   :kick-1040686180 102,
+   :kick--1885453964 102,
+   :kick--1698570412 102,
+   :kick-1863374390 102,
+   :kick--319575496 102,
+   :kick-454774288 102,
+   :kick-521492626 102,
+   :kick--769989215 102,
+   :kick--1460123672 102,
+   :kick-1102417168 102,
+   :kick-90972209 102,
+   :kick-931179027 102,
+   :kick--639114816 102,
+   :kick--2093825769 102,
+   :kick--784617323 102,
+   :kick-336371138 102,
+   :kick--1123601560 102,
+   :kick-623577164 102,
+   :kick-1579506031 102,
+   :kick--830128815 102,
+   :kick-1809283437 102,
+   :kick--763867135 102,
+   :kick-311736531 102,
+   :kick-135468397 102,
+   :kick--1092559896 102,
+   :kick--802065338 102,
+   :kick--1022594534 102,
+   :kick-82930938 102,
+   :kick--194743534 102,
+   :kick--1063418159 102,
+   :kick--1493381732 102,
+   :kick--1751234294 102,
+   :kick--1694831227 102,
+   :kick--473455511 102,
+   :kick--1379167778 102,
+   :kick-437673535 102,
+   :kick-1354858674 102,
+   :kick--684229623 102,
+   :kick--1554787945 102,
+   :kick-1984514563 102,
+   :kick-75628259 102,
+   :kick--784992760 102,
+   :kick-1597509426 102,
+   :kick-1391801754 102,
+   :kick-1110834287 102,
+   :kick--1289312580 102,
+   :kick--1850049511 102,
+   :kick--625262423 102,
+   :kick-541270873 102,
+   :kick-2055063915 102,
+   :kick-478511015 102,
+   :kick-1734980653 102,
+   :kick-1433730461 102,
+   :kick-1438489402 102,
+   :kick-683314241 102,
+   :kick-417411556 102,
+   :kick-768873436 102,
+   :kick-250355038 102,
+   :kick-1168653194 102,
+   :kick--235242595 102,
+   :kick-408417919 102,
+   :kick--439644501 102,
+   :kick--392222035 102,
+   :kick-399368335 102,
+   :kick--38991459 102,
+   :kick-1388301611 102,
+   :kick--1036368978 102,
+   :kick-37767551 102,
+   :kick-300842835 102,
+   :kick-943618287 102,
+   :kick-1427356238 102,
+   :kick--958361517 102,
+   :kick-458137321 102,
+   :kick--292600051 102,
+   :kick--919997108 102,
+   :kick--636906874 102,
+   :kick--1774521086 102,
+   :kick-824105666 102,
+   :kick-57217426 511,
+   :kick-995713118 102,
+   :kick--1874588618 102,
+   :kick-2012660120 ##Inf,
+   :kick-1339367879 102,
+   :kick-187520832 102,
+   :kick-1686445186 102,
+   :kick--404581311 102,
+   :kick-1416711075 102,
+   :kick-781530717 102,
+   :kick--631240972 102,
+   :kick--1340602288 102,
+   :kick--794046775 102,
+   :kick-1021820388 102,
+   :kick--1696210049 102,
+   :kick--93335227 102,
+   :kick-18609235 102,
+   :kick--906105149 102,
+   :kick--1631199382 102,
+   :kick-1585260591 102,
+   :kick-1062979287 102,
+   :kick--1543457640 102,
+   :kick-1986382663 102,
+   :kick-1848299668 102,
+   :kick--639687946 102,
+   :kick-1858570948 102,
+   :kick--1991823411 102,
+   :kick--1262225133 102,
+   :kick--1955266527 102,
+   :kick--1229372972 102,
+   :kick-1665312400 102,
+   :kick--1414696764 102,
+   :kick--1861139527 102,
+   :kick-562832962 102,
+   :kick--233143119 102,
+   :kick--945590943 102,
+   :kick-1604595301 102,
+   :kick-429490065 102,
+   :kick-1713511929 102,
+   :kick--469231631 102,
+   :kick--1407734464 102,
+   :kick--981837828 102,
+   :kick--702915808 102,
+   :kick--804452699 102,
+   :kick-54440885 102,
+   :kick-513280695 102,
+   :kick-448819977 102,
+   :kick-460681673 102,
+   :kick--1034643822 102,
+   :kick--1820497719 102,
+   :kick--628580207 102,
+   :kick-1371528302 102,
+   :kick-12397902 102,
+   :kick--1240765600 102,
+   :kick-1736482071 102,
+   :kick-1856409428 102,
+   :kick-467980342 102,
+   :kick-883333163 102,
+   :kick--419019118 102,
+   :kick-1449917989 102,
+   :kick-1146318633 102,
+   :kick-1131199777 102,
+   :kick-876232588 102,
+   :kick--812176706 102,
+   :kick-223523423 102,
+   :kick--878572291 102,
+   :kick--690603448 102,
+   :kick-972953939 102,
+   :kick-486170960 102,
+   :kick--989138614 102,
+   :kick--1802221393 102,
+   :kick-912579790 102,
+   :kick--1179168557 102,
+   :kick-20476943 ##Inf,
+   :kick--1541767948 102,
+   :kick-499046464 102,
+   :kick--1059191925 102,
+   :kick-245644912 102,
+   :kick--233830952 102,
+   :kick--147691833 102,
+   :kick--679836663 102,
+   :kick-505057226 102,
+   :kick--1197598581 102,
+   :kick--668558460 102,
+   :kick--473453039 102,
+   :kick--207757312 102,
+   :kick--261550718 102,
+   :kick--1584142126 102,
+   :kick--266455396 102,
+   :kick--410032769 102,
+   :kick--1654326545 102,
+   :kick--1764769189 152,
+   :kick--754533435 102,
+   :kick--91374387 102,
+   :kick-509555875 102,
+   :kick-52268674 102,
+   :kick-668891867 102,
+   :kick--1576310944 102,
+   :kick-1497153002 102,
+   :kick--1865040163 102,
+   :kick--463373471 102,
+   :kick-1544826432 102,
+   :kick-1282586534 102,
+   :kick--685503385 102,
+   :kick-1419251057 102,
+   :kick--1169393925 102,
+   :kick-564783201 102,
+   :kick--436309061 102,
+   :kick-748702475 102,
+   :kick-661906206 102,
+   :kick-57423376 102,
+   :kick--1431716361 102,
+   :kick--1180878231 102,
+   :kick--741890179 ##Inf,
+   :kick--620821381 102,
+   :kick--1215380871 102,
+   :kick--811630682 102,
+   :kick-1595048990 102,
+   :kick-1173109006 102,
+   :kick--1043112301 102,
+   :kick--1223153752 102,
+   :kick--431643680 102,
+   :kick-1730461116 102,
+   :kick--492686510 102,
+   :kick--1786216265 102,
+   :kick-1317187776 102,
+   :kick--1206604069 102,
+   :kick--854796309 102,
+   :kick--1927816983 102,
+   :kick--1845423091 102,
+   :kick-2014394306 102,
+   :kick--314382872 102,
+   :kick-10310595 102,
+   :kick--749761941 102,
+   :kick--1161888240 102,
+   :kick-1629927120 102,
+   :kick--1173017374 102,
+   :kick--1252512957 102,
+   :kick--1843010760 102,
+   :kick--304974416 102,
+   :kick--1271296763 102,
+   :kick--1311043050 102,
+   :kick--1726018195 102,
+   :kick--439650629 102,
+   :kick--717466692 102,
+   :kick-940285381 102,
+   :kick-177577851 102,
+   :kick-2144232210 102,
+   :kick--1876287622 102,
+   :kick--411095210 102,
+   :kick-1325855671 102,
+   :kick--818684105 102,
+   :kick-137055698 102,
+   :kick-2141520194 102,
+   :kick-1945729636 102,
+   :kick-1304213150 102,
+   :kick-652629366 102,
+   :kick-1551122829 ##Inf,
+   :kick--2027333149 102,
+   :kick--826908707 102,
+   :kick-452400459 102,
+   :kick-1818665173 102,
+   :kick-1183392602 102,
+   :kick-2083565945 102,
+   :kick-1183710979 102,
+   :kick--1586515974 102,
+   :kick-944995219 102,
+   :kick--624019267 102,
+   :kick-486042854 102,
+   :kick-496114703 102,
+   :kick-1378497731 102,
+   :kick-882004873 102,
+   :kick-813859136 102,
+   :kick--2123721147 102,
+   :kick-1811571266 102,
+   :kick-1244767542 ##Inf,
+   :kick--1653659075 102,
+   :kick--894688957 102,
+   :kick-11504879 102,
+   :kick-1739101698 102,
+   :kick--334549012 102,
+   :kick--519413246 102,
+   :kick--1832355068 102,
+   :kick--1433423272 102,
+   :kick-1209294021 102,
+   :kick-1469805322 102,
+   :kick--1923022419 102,
+   :kick--861137847 102,
+   :kick-2009407520 102,
+   :kick-1922680796 102,
+   :kick-1478482084 102,
+   :kick-2044032465 102,
+   :kick-1671562162 102,
+   :kick--1867018179 102,
+   :kick--372281942 102,
+   :kick-1180609878 102,
+   :kick-1028215343 102,
+   :kick-50832139 102,
+   :kick--1205647916 102,
+   :kick-530915204 102,
+   :kick--89337738 102,
+   :kick-508420482 102,
+   :kick--705077916 102,
+   :kick--986694426 102,
+   :kick-476148006 102,
+   :kick--1641934002 102,
+   :kick--968282092 102,
+   :kick-2035968523 102,
+   :kick-665847504 102,
+   :kick-1509519712 102,
+   :kick--1774393274 102,
+   :kick--6093218 102,
+   :kick--1937960542 102,
+   :kick--682699180 102,
+   :kick--1253133311 102,
+   :kick--160604149 102,
+   :kick-430070695 102,
+   :kick--2003805492 102,
+   :kick-2141524378 102,
+   :kick--1755934044 102,
+   :kick-1263786058 102,
+   :kick-1076309157 102,
+   :kick--1674965036 102,
+   :kick--1998576370 102,
+   :kick-1529731445 102,
+   :kick-938902114 102,
+   :kick--128108392 102,
+   :kick--1880230636 102,
+   :kick-944535750 102,
+   :kick-282746005 102,
+   :kick-1174728203 102,
+   :kick--546130711 102,
+   :kick--532471406 102,
+   :kick--1235427449 102,
+   :kick--782781786 102,
+   :kick-1818420301 102,
+   :kick--634654317 102,
+   :kick-1409136227 102,
+   :kick-1842914567 102,
+   :kick-1498239922 102,
+   :kick-1599874656 102,
+   :kick-1191327893 102,
+   :kick-1145864495 102,
+   :kick--1890434219 102,
+   :kick-1966982812 102,
+   :kick-311880000 102,
+   :kick--1616717126 102,
+   :kick--1552487040 102,
+   :kick-1877528300 102,
+   :kick-1627408599 102,
+   :kick--288338335 102,
+   :kick--1555682410 102,
+   :kick-2097790340 102,
+   :kick-782717217 102,
+   :kick-629943648 102,
+   :kick--367188909 102,
+   :kick--2006172516 102,
+   :kick-1445304026 102,
+   :kick-99725321 102,
+   :kick--1528946898 102,
+   :kick--1113980933 102,
+   :kick--1742244601 ##Inf,
+   :kick--560727156 102,
+   :kick-616420557 102,
+   :kick-1000639971 102,
+   :kick--1854362588 102,
+   :kick--232637678 102,
+   :kick-816431774 102,
+   :kick--1166241526 102,
+   :kick-1947719523 102,
+   :kick--774960722 102,
+   :kick-815987097 102,
+   :kick-1412880790 102,
+   :kick-604605725 102,
+   :kick-1557430993 102,
+   :kick-800645406 102,
+   :kick--1007839547 102,
+   :kick-890889926 102,
+   :kick-615321092 102,
+   :kick--1279189767 102,
+   :kick-915193413 102,
+   :kick-350367717 102,
+   :kick--2067445276 102,
+   :kick-885412643 102,
+   :kick--1687793529 102,
+   :kick--1807411203 102,
+   :kick-727808061 102,
+   :kick-1639684708 102,
+   :kick-1907872610 102,
+   :kick-117285072 102,
+   :kick--350353382 102,
+   :kick--1156189314 102,
+   :kick--1474679731 102,
+   :kick-1672728783 102,
+   :kick-1025861472 102,
+   :kick-1892818650 102,
+   :kick--471106849 511,
+   :kick--1812035665 102,
+   :kick-2106306493 102,
+   :kick--135284166 102,
+   :kick-129564465 102,
+   :kick--1306990358 102,
+   :kick--1588527860 102,
+   :kick--1780230705 102,
+   :kick--1627336015 102,
+   :kick--2084730320 102,
+   :kick-1515063559 102,
+   :kick-2074241478 102,
+   :kick-1988773118 102,
+   :kick--20483141 102,
+   :kick-1126992299 102,
+   :kick--1499716855 102,
+   :kick--966172206 102,
+   :kick-91768830 102,
+   :kick--1336120284 102,
+   :kick-649492164 102,
+   :kick--1045266533 102,
+   :kick--1960920952 102,
+   :kick-1822183944 102,
+   :kick-803213050 102,
+   :kick--887259355 102,
+   :kick-1337042157 102,
+   :kick-1713673219 102,
+   :kick-2079598965 102,
+   :kick-250070858 102,
+   :kick-1048313795 102,
+   :kick-38470923 102,
+   :kick--1941260473 102,
+   :kick-1266374008 102,
+   :kick--1367203478 102,
+   :kick--608252190 102,
+   :kick--981804815 511,
+   :kick--1536726392 102,
+   :kick--1949772076 102,
+   :kick-1496695196 102,
+   :kick-1246703196 102,
+   :kick--260986364 102,
+   :kick-984223628 102,
+   :kick--607005745 102,
+   :kick--690793915 102,
+   :kick-913967034 102,
+   :kick--259222706 102,
+   :kick--727957022 102,
+   :kick-1505438779 102,
+   :kick-2061829287 102,
+   :kick-997922517 102,
+   :kick--1245960609 102,
+   :kick-1109999035 102,
+   :kick--1276737154 102,
+   :kick-1651480428 102,
+   :kick--450119159 102,
+   :kick-955098931 102,
+   :kick--1202809803 102,
+   :kick-2038164187 102,
+   :kick--849461000 102,
+   :kick-762064217 102,
+   :kick-1547789405 102,
+   :kick-1707649077 102,
+   :kick-1691451090 102,
+   :kick--1566251997 102,
+   :kick-1109939103 102,
+   :kick--228867099 102,
+   :kick-2035298705 102,
+   :kick-365563421 102,
+   :kick-852200274 102,
+   :kick-145941382 102,
+   :kick--379089106 102,
+   :kick-651522943 102,
+   :kick-2099506843 102,
+   :kick--7320398 102,
+   :kick--1109760534 102,
+   :kick--1072982658 102,
+   :kick-1706704742 102,
+   :kick--1120785948 102,
+   :kick-492464673 102,
+   :kick-1025229145 102,
+   :kick--221486836 102,
+   :kick-491578940 102,
+   :kick-1472938080 102,
+   :kick--925576235 102,
+   :kick--1768414176 102,
+   :kick-1572555615 102,
+   :kick-1966109746 102,
+   :kick--1569950832 102,
+   :kick-1413807762 102,
+   :kick--1386820978 102,
+   :kick--791575084 102,
+   :kick-111697227 102,
+   :kick-412408273 102,
+   :kick--232855714 102,
+   :kick-1912695709 102,
+   :kick--167640515 102,
+   :kick--1354273566 102,
+   :kick-1518843021 102,
+   :kick--1273982739 102,
+   :kick--1084048202 102,
+   :kick-1776659862 102,
+   :kick--1640189883 102,
+   :kick-1558015529 102,
+   :kick--633672987 102,
+   :kick-1315491131 102,
+   :kick-516552678 102,
+   :kick--2127266568 102,
+   :kick--1225204172 102,
+   :kick-1854281788 102,
+   :kick--899043773 102,
+   :kick--1412933362 102,
+   :kick-1228520923 102,
+   :kick-1301347836 102,
+   :kick--80434568 102,
+   :kick--1729273573 102,
+   :kick--1928226305 ##Inf,
+   :kick--2133693415 102,
+   :kick-1648472719 102,
+   :kick--2052937584 102,
+   :kick--1337044660 102,
+   :kick-1310226486 102,
+   :kick-1637131936 102,
+   :kick-105168083 102,
+   :kick--794464461 102,
+   :kick--1726685438 102,
+   :kick-1698893596 102,
+   :kick-2062807963 102,
+   :kick-852331767 102,
+   :kick--901377219 102,
+   :kick-1371303248 102,
+   :kick-1450015648 102,
+   :kick-1011539966 102,
+   :kick-407359126 102,
+   :kick-1997553565 102,
+   :kick--1047460637 102,
+   :kick-235176699 102,
+   :kick--939687449 ##Inf,
+   :kick--1596611463 102,
+   :kick--1971830358 102,
+   :kick-1509773739 102,
+   :kick-1496511115 102,
+   :kick--647801785 102,
+   :kick-1619912375 102,
+   :kick-1841354829 102,
+   :kick--1765766793 102,
+   :kick--303127769 102,
+   :kick-875999821 102,
+   :kick--1264644573 102,
+   :kick--1539177922 102,
+   :kick-1006665102 102,
+   :kick-592750987 102,
+   :kick-1702109046 102,
+   :kick--1127945037 102,
+   :kick--1647561724 102,
+   :kick--759460573 102,
+   :kick-784077662 102,
+   :kick--1323081836 102,
+   :kick--871580678 102,
+   :kick--709330682 102,
+   :kick--1708942851 102,
+   :kick-570698004 102,
+   :kick-1862431373 102,
+   :kick-960019103 102,
+   :kick-530978078 102,
+   :kick--758197438 102,
+   :kick-882693587 102,
+   :kick-2124316706 102,
+   :kick--938753014 102,
+   :kick--1064149913 102,
+   :kick--982628248 102,
+   :kick-1576183721 102,
+   :kick--616159511 102,
+   :kick--199920405 102,
+   :kick-1665470575 102,
+   :kick-897842789 102,
+   :kick-414165388 102,
+   :kick-623697813 102,
+   :kick-52012495 102,
+   :kick-1797101845 102,
+   :kick-1359159584 102,
+   :kick-198713599 102,
+   :kick-568821847 511,
+   :kick-428903393 102,
+   :kick--1439964668 102},
+  :block-4284 {:gen-viz-516 127}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -507,70 +1396,94 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [503252219 457412719 4294705152],
- :sched {:gen-viz-516 3732},
+ :memory [2151547508 2114528280 4294705152],
+ :sched {:gen-viz-516 171979},
  :flow-subs
- [:solver/get-my-colors-1565651097
+ [:flow/flow-forever>*running?
+  :flow/live-scratch-flow>*running?
   :time/now-seconds
   :client/*client-name*>stats>memory
-  :flow/flow-forever>*running?
-  :solver/solver-fn-test1-1603499423
-  :solver/solver-fn-test1-1030515200
-  :solver/solver-fn-test11463441873
   :time/minute
   :time/hour
   :solver/colors-of-the-moment>data-colors
   :solver/colors-of-the-moment>colors>2
   :solver/colors-of-the-moment>colors>1
-  :solver/solver-fn-test11098864634
-  :solver/get-my-colors-1614005760
   :solver/colors-of-the-moment>brightest
-  :flow/live-scratch-flow>*running?
   :solver/colors-of-the-moment
   :solver/wallpaper-of-the-moment
-  :solver/get-my-colors-704551049
   :solver/colors-of-the-moment>colors>0
   :time/second
   :flow/flow-forever>:final-math
   :solver/colors-of-the-moment>second-brightest
-  :solver/solver-fn-test1-537318747
   :solver/colors-of-the-moment>darkest],
- :client-name :truthful-cylindrical-boar-28,
+ :client-name :keen-blush-weasel-28,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2620, :h 1662},
- :post-meta {:gen-viz-516 {:* {:rowcount 77}}},
+ :window {:w 3507, :h 1418},
+ :post-meta
+ {:jvm_stats {:* {:rowcount 27}},
+  :solvers_sql_snapshot_solver_1 {},
+  :extract {},
+  :gen-viz-516 {:* {:rowcount 123}},
+  :kick-99725321 {:* {:rowcount 1511341}}},
  :status
  {:heartbeat
   {:kick
-   [:solver/get-my-colors-1565651097
-    :time/now-seconds
+   [:time/now-seconds
+    :signal/every-5-minutes
+    :solver-meta/wallpaper-of-the-moment>extra
+    :signal/changed-wallpaper-8k?
     :client/*client-name*>stats>memory
+    :solver-meta/dazzling-gnu-solver>extra
+    :solver-meta/colors-of-the-moment>extra
+    :signal/nice-coyote-signal
     :flow/flow-forever>*running?
-    :solver/solver-fn-test1-1603499423
-    :solver/solver-fn-test1-1030515200
-    :solver/solver-fn-test11463441873
+    :signal/glowing-bat-signal
+    :signal/exciting-cheetah-signal
+    :signal/brave-ape-signal
+    :solver-meta/wallpaper-of-the-moment-8k>extra
+    :signal/cool-raccoon-signal-yo
+    :solver-meta/count-sql-solver-1>extra
+    :signal/worthy-fish-signal
+    :signal/dragging-to-potential-cross-breed?
+    :solver-meta/png-wallpaper?>extra
+    :solver-meta/sql-snapshot-solver-1>extra
+    :solver-meta/static-data>extra
+    :signal/every-minute
     :time/minute
+    :signal/part-sql-snapshot-solver-1-0
     :time/hour
+    :solver-meta/sql-solver-1>extra
+    :signal/changed-wallpaper?
     :solver/colors-of-the-moment>data-colors
     :solver/colors-of-the-moment>colors>2
     :solver/colors-of-the-moment>colors>1
-    :solver/solver-fn-test11098864634
-    :solver/get-my-colors-1614005760
+    :solver-meta/sql-snapshot-solver-1>error
+    :signal/special-lion-signal
+    :signal/optimistic-sheep-signal
+    :solver-meta/sql-snapshot-solver-1>output
     :solver/colors-of-the-moment>brightest
     :flow/live-scratch-flow>*running?
     :solver/colors-of-the-moment
+    :solver-meta/vibrant-antelope-solver>extra
     :solver/wallpaper-of-the-moment
-    :solver/get-my-colors-704551049
+    :signal/elegant-grasshopper-signal
     :solver/colors-of-the-moment>colors>0
+    :solver-meta/sql-snapshot-solver-1>history
+    :signal/fun-gorilla
     :time/second
     :flow/flow-forever>:final-math
+    :signal/genius-gnat-signal
+    :solver/sql-snapshot-solver-1
     :solver/colors-of-the-moment>second-brightest
-    :solver/solver-fn-test1-537318747
+    :signal/hourly?
+    :solver-meta/colors-of-the-moment-8k>extra
+    :signal/fair-armadillo-signal
     :solver/colors-of-the-moment>darkest]},
   :alert1 {:alerts :alert2}},
- :screen-name "alarm-clock22",
+ :screen-name "alarm-clock23",
  :recos-page2 0,
+ :selected-warren-item :sql-snapshot-solver-1,
  :selected-tab "star-shaped wallaby",
  :col-names nil,
  :snapshots nil,
@@ -583,12 +1496,16 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   3736
-   1100038046]],
+   171994
+   -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
+ :base-sniff-queries
+ {:jvm_stats 1498154063,
+  :solvers_sql_snapshot_solver_1 -356095096,
+  :extract 1536005692},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 75358783,
+ :user-params-hash -1508037152,
  :grid-recos? true,
  :resolved-queries
  {:gen-viz-797
@@ -766,9 +1683,9 @@
   :gen-viz-516
   {:cache? false,
    :where [:= :client_name :*client-name-str],
-   :limit 77,
+   :limit 123,
    :group-by [:ts],
-   :_last-run "17:48:07",
+   :_last-run "19:05:33",
    :refresh-every 20,
    :from
    [{:select
@@ -939,35 +1856,6 @@
      :child
      [:string :time/now-seconds]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
-  :block-2133
-  {:h 3,
-   :w 7,
-   :root [34 5],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-2133",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-2133.:hi"}
-     :style
-     {:font-size "44px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:string3
-      [:run-solver
-       [:solver-fn-test1 {:some-number :time/minute, :some-string "Huge!"}]]]]},
-   :queries {}},
   :block-7416
   {:h 5,
    :w 4,
@@ -1001,101 +1889,6 @@
    :name "flow-play-from-runstreams",
    :root [5 18],
    :tab "through the rabbit hole and out the other side"},
-  :block-1944
-  {:h 3,
-   :w 5,
-   :root [23 19],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-1944",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-1944.:hi"}
-     :style
-     {:font-size "44px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:string3 :param/huger]]},
-   :queries {}},
-  :block-11067
-  {:h 3,
-   :w 10,
-   :tab "star-shaped wallaby",
-   :root [30 27],
-   :name "block-11067",
-   :views
-   {:param-val
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :padding
-     "13px"
-     :style
-     {:font-size "45px"}
-     :child
-     [:string :param/huger22]]},
-   :queries {}},
-  :block-2593
-  {:h 4,
-   :w 5,
-   :root [32 22],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-2593",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-2593.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:string3 :param/my-mpa>mm>pp>zz]]},
-   :queries {}},
-  :block-6003
-  {:h 3,
-   :w 6,
-   :root [33 18],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-6003",
-   :views
-   {:hi
-    [:box
-     :size
-     "auto"
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size [:auto-size-px [:get-in [:param/color-pal [:colors 0]]]]}
-     :child
-     [:string [:get-in [:param/color-pal [:colors 3]]]]]},
-   :queries {}},
   :block-1194
   {:h 10,
    :w 11,
@@ -1123,55 +1916,6 @@
      :child
      [:left-pad [:time/second 2]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}},
-  :block-744
-  {:h 2,
-   :w 5,
-   :root [46 19],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-744",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-2133.:hi"}
-     :style
-     {:font-size "33px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:string3
-      [:run-solver
-       [:solver-fn-test1 {:some-number :time/second, :some-string "HHHuge!"}]]]]},
-   :queries {}},
-  :block-1544
-  {:h 10,
-   :w 18,
-   :tab "star-shaped wallaby",
-   :root [12 22],
-   :name "block-1544",
-   :views
-   {:param-val
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :padding
-     "13px"
-     :style
-     {:font-size "45px"}
-     :child
-     [:img {:src :param/queen-local, :width "90%"}]]},
    :queries {}},
   :block-204
   {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
@@ -1344,26 +2088,6 @@
      [:left-pad [:time/minute 2]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
-  :block-12305
-  {:h 3,
-   :w 30,
-   :tab "star-shaped wallaby",
-   :root [30 30],
-   :name "block-12305",
-   :views
-   {:param-val
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :padding
-     "13px"
-     :style
-     {:font-size "45px"}
-     :child
-     [:string :param/new-dawn]]},
-   :queries {}},
   :block-2536
   {:h 2,
    :w 16,
@@ -1407,7 +2131,7 @@
    :style {:backdrop-filter "blur(4px) brightness(70%)"},
    :selected-view :hi,
    :root [0 1],
-   :h 24,
+   :h 18,
    :queries {},
    :tab "star-shaped wallaby",
    :minimized? false,
@@ -1518,39 +2242,6 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
-  :block-8156
-  {:h 4,
-   :w 6,
-   :tab "star-shaped wallaby",
-   :root [12 4],
-   :name "block-8156",
-   :views
-   {:pulled-val
-    [:box
-     :size
-     "auto"
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size
-      [:auto-size-px
-       [:get-in
-        [[:run-solver
-          [:get-my-colors
-           {:input-image-path
-            "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-91930-52309.png"}]]
-         [:colors 0]]]]}
-     :child
-     [:string
-      [:get-in
-       [[:run-solver
-         [:get-my-colors
-          {:input-image-path
-           "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-91930-52309.png"}]]
-        [:colors 0]]]]]},
-   :queries {}},
   :block-2194
   {:name "block-2194",
    :w 5,
@@ -1620,37 +2311,6 @@
    :name "clone-hi29",
    :root [1 43],
    :tab "star-shaped wallaby"},
-  :block-8619
-  {:h 8,
-   :w 10,
-   :root [40 9],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-8619",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-2133.:hi"}
-     :style
-     {:font-size "14px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:data-viewer
-      [:run-solver
-       [:get-my-colors
-        {:input-image-path
-         "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-25269-5344.png"}]]]]},
-   :queries {}},
   :block-7319
   {:h 5,
    :w 8,
@@ -1687,37 +2347,6 @@
      [:speak-click
       "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}},
-  :block-5447
-  {:h 9,
-   :w 9,
-   :root [18 3],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-5447",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-5447.:hi"}
-     :style
-     {:font-size "12px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:data-viewer
-      [:run-solver
-       [:get-my-colors
-        {:input-image-path
-         "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-48163-50841.png"}]]]]},
    :queries {}},
   :block-2589
   {:name "block-2589",
@@ -1789,17 +2418,17 @@
    :style {:border-radius "0px 0px 0px 30px"},
    :block-key ":block-12050",
    :selected-view :every-45-seconds,
-   :root [1 13],
-   :h 6,
+   :root [0 19],
+   :h 8,
    :file-path "./screens/blackberries3-narrow.edn",
    :connection-id "system-db",
    :queries
    {:gen-viz-516
     {:cache? false,
      :where [:= :client_name :*client-name-str],
-     :limit 77,
+     :limit 123,
      :group-by [:ts],
-     :_last-run "17:48:07",
+     :_last-run "19:05:33",
      :refresh-every 20,
      :from
      [{:select
@@ -1883,26 +2512,6 @@
         :fill "#00000000",
         :stroke-width 4,
         :stroke :solver/colors-of-the-moment>colors>1}]]]}},
-  :block-5317
-  {:h 3,
-   :w 6,
-   :tab "star-shaped wallaby",
-   :root [16 19],
-   :name "block-5317",
-   :views
-   {:param-val
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :padding
-     "13px"
-     :style
-     {:font-size "45px"}
-     :child
-     [:string :param/huger]]},
-   :queries {}},
   :block-6121
   {:h 2,
    :w 16,
@@ -1926,33 +2535,6 @@
      [:speak-click
       "Here you can see that while running the flow interactively, we get the dialog push, as well as the ability to manipulate the options on the flow directly."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}},
-  :block-99
-  {:h 4,
-   :w 13,
-   :root [27 9],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-99",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-99.:hi"}
-     :style
-     {:font-size "44px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:string3 :param/color-pal>second-darkest " " :param/color-pal>colors>3]]},
    :queries {}},
   :block-1449
   {:h 7,
@@ -1978,39 +2560,6 @@
    :root [1 1],
    :tab "sapphire ape",
    :selected-view :ufo-sightings-drag-9},
-  :block-3329
-  {:h 4,
-   :w 6,
-   :tab "star-shaped wallaby",
-   :root [39 18],
-   :name "block-3329",
-   :views
-   {:pulled-val
-    [:box
-     :size
-     "auto"
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {:font-size
-      [:auto-size-px
-       [:get-in
-        [[:run-solver
-          [:get-my-colors
-           {:input-image-path
-            "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-91930-52309.png"}]]
-         [:second-darkest]]]]}
-     :child
-     [:string
-      [:get-in
-       [[:run-solver
-         [:get-my-colors
-          {:input-image-path
-           "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-91930-52309.png"}]]
-        [:second-darkest]]]]]},
-   :queries {}},
   :block-3487
   {:name "get-in test",
    :w 7,
@@ -2034,21 +2583,21 @@
       :color [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]}
      :child
      [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]]}}},
- :selected-block "none!",
+ :selected-block :block-4284,
  :theme-colors-hashmap
- {"float" "#c29df9",
-  "boolean" "#58a2e2",
-  "map" "#61e653",
-  "list" "#7e206d",
+ {"float" "#efb6af",
+  "boolean" "#6edef5",
+  "map" "#b5c686",
+  "list" "#654d85",
   "string" "#ffffff",
-  "any" "#8e4587",
-  "vector" "#d364bd",
-  "keyword" "#f2e3c1",
-  "rabbit-code" "#227ac1",
-  "datetime" "#4d1884",
-  "integer" "#c2a9b9",
-  "unknown" "#401519",
-  "date" "#262e11"},
+  "any" "#8731a9",
+  "vector" "#034aff",
+  "keyword" "#e8cfc6",
+  "rabbit-code" "#305eb6",
+  "datetime" "#7e3e76",
+  "integer" "#e4bc94",
+  "unknown" "#502321",
+  "date" "#0f422d"},
  :click-param
  {:blocks-sys
   {:block_key ":block-12050",
@@ -2074,60 +2623,55 @@
   :time
   {:month-name "MAY",
    :day 4,
-   :hour 17,
+   :hour 19,
    :now "Saturday, May 25th 3:05AM",
-   :second 27,
+   :second 58,
    :now-second nil,
-   :now-seconds "Monday, June 10th 5:48:27PM",
+   :now-seconds "Monday, June 10th 7:05:58PM",
    :nth "th",
    :month 4,
-   :minute 48},
+   :minute 5},
   :client
   {:engaging-teal-duck-15>stats>memory 268,
-   :*client-name*>stats>memory 436,
+   :*client-name*>stats>memory 1902,
    :grin-bulbous-turtle-14>stats>memory 1419,
    :fit-star-shaped-ape-9>stats>memory nil,
-   :electrifying-jungle-green-yak-27>stats>memory nil,
-   :fetching-ivory-hornet-15>stats>memory 611,
-   :principled-gray-grasshopper-35>stats>memory nil,
-   :truthful-cylindrical-boar-28>stats>memory nil},
+   :keen-blush-weasel-28>stats>memory nil},
   :param
-  {:color-pal
-   [:run-solver
-    [:get-my-colors
-     {:input-image-path
-      "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-25269-5344.png"}]],
-   :huger
-   [:run-solver
-    [:solver-fn-test1 {:some-number :time/minute, :some-string "Huge!"}]],
-   :new-dawn
-   "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-48163-50841.png",
-   :my-mpa {:mm {:pp {:zz 123}}},
-   :new-dawn-pal
-   [:run-solver
-    [:get-my-colors
-     {:input-image-path
-      "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-48163-50841.png"}]],
+  {:selected-view [:queries :gen-viz-516],
    :selected-view-data
-   [:box
-    :align
-    :center
-    :justify
-    :center
-    :padding
-    "13px"
-    :style
-    {:font-size "45px"}
-    :child
-    [:string :param/queen-local]],
-   :selected-view [:views :param-val],
-   :queen-local "images/gen/b64-image3-48163-50841.png",
+   {:cache? false,
+    :where [:= :client_name :*client-name-str],
+    :limit 77,
+    :group-by [:ts],
+    :_last-run "18:56:56",
+    :refresh-every 20,
+    :from
+    [{:select
+      [:client_name
+       :recent_messages_per_second
+       :messages_per_second
+       :mem_used
+       :batches
+       :packets
+       :ts],
+      :where [:= :client_name :*client-name-str],
+      :from [[:client_memory :ee183]],
+      :order-by [[:mem_time :desc]]}],
+    :order-by [[:ts :desc]],
+    :connection-id "system-db",
+    :select
+    [[[[:sum :mem_used]] :mem_used]
+     [[:sum :recent_messages_per_second] :messages_per_second]
+     :ts],
+    :post-process-fn
+    (fn [x]
+      (vec
+        (reverse
+          (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))},
    :testme :solver/colors-of-the-moment>colors>1,
-   :selected-block :block-1544,
-   :test [:get-in [:solver/colors-of-the-moment [:colors 2]]],
-   :huger22
-   [:run-solver
-    [:solver-fn-test1 {:some-number :time/minute, :some-string "Huge!!!!v!!!!"}]]},
+   :test [:string [:get-in [:solver/colors-of-the-moment [:colors 2]]]],
+   :selected-block :block-4284},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -2279,6 +2823,27 @@
     "2024-05-27 03:42:20 889 (18ms)"
     "2024-05-27 03:42:10 906 (18ms)"
     "2024-05-27 03:41:45 893 (20ms)"],
+   :colors-of-the-moment>history
+   ["2024-05-28 00:35:01 067 (7597ms)"
+    "2024-05-28 00:30:01 155 (5885ms)"
+    "2024-05-28 00:25:01 182 (8894ms)"
+    "2024-05-28 00:20:01 232 (7919ms)"
+    "2024-05-28 00:15:01 089 (4560ms)"
+    "2024-05-28 00:10:01 007 (3986ms)"
+    "2024-05-28 00:05:01 082 (4631ms)"
+    "2024-05-28 00:00:01 399 (6450ms)"
+    "2024-05-27 23:55:01 246 (4839ms)"
+    "2024-05-27 23:50:01 075 (2145ms)"
+    "2024-05-27 23:45:01 062 (3885ms)"
+    "2024-05-27 23:40:01 050 (17504ms)"
+    "2024-05-27 23:35:01 003 (1969ms)"
+    "2024-05-27 23:30:01 078 (3527ms)"
+    "2024-05-27 23:25:01 040 (4233ms)"
+    "2024-05-27 23:20:01 048 (16681ms)"
+    "2024-05-27 23:15:01 078 (3790ms)"
+    "2024-05-27 23:10:01 028 (1778ms)"
+    "2024-05-27 23:05:01 078 (17140ms)"
+    "2024-05-27 23:00:01 071 (3861ms)"],
    :colors-of-the-moment-8k>history
    ["2024-05-27 05:06:00 907 (3329ms)"
     "2024-05-27 05:00:01 043 (11960ms)"
@@ -2302,205 +2867,71 @@
     "2024-05-27 03:30:01 069 (4614ms)"]},
   :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3},
   :signal
-  {:fun-gorilla false,
-   :cool-raccoon-signal-yo false,
-   :part-optimistic-sheep-signal-1 false,
-   :worthy-fish-signal false,
-   :hourly? true,
+  {:part-optimistic-sheep-signal-1 false,
    :part-every-5-minutes-9 false,
    :part-every-5-minutes-10 false,
-   :fair-armadillo-signal false,
    :part-every-5-minutes-3 false,
    :part-every-5-minutes-2 false,
-   :nice-coyote-signal false,
    :part-every-5-minutes-8 false,
    :part-every-5-minutes-12 false,
-   :elegant-grasshopper-signal false,
-   :brave-ape-signal false,
-   :exciting-cheetah-signal false,
    :part-optimistic-sheep-signal-4 false,
    :part-every-5-minutes-7 false,
-   :genius-gnat-signal false,
-   :dragging-to-potential-cross-breed? false,
    :part-every-5-minutes-5 false,
-   :every-minute true,
+   :part-colors-of-the-moment-0 nil,
    :part-optimistic-sheep-signal-0 false,
    :part-every-5-minutes-6 false,
-   :changed-wallpaper-8k? false,
    :part-every-5-minutes-1 false,
-   :changed-wallpaper? false,
    :part-every-minute-0 true,
    :part-optimistic-sheep-signal-3 true,
    :part-optimistic-sheep-signal-2 false,
-   :special-lion-signal false,
    :part-every-5-minutes-4 false,
-   :optimistic-sheep-signal false,
    :part-every-5-minutes-0 false,
-   :part-every-5-minutes-11 false,
-   :glowing-bat-signal false},
+   :part-every-5-minutes-11 false},
   :solver
-  {:get-my-colors-636324254
-   {:second-darkest "#17344a",
-    :highest-saturation "#0e6a83",
-    :most-contrasting "#a12e5b",
-    :darkest "#0f1a34",
-    :contrast-with-dominant "#29d5bc",
+  {:colors-of-the-moment
+   {:second-darkest "#2f1d3b",
+    :highest-saturation "#0f7db8",
+    :most-contrasting "#efcdaf",
+    :darkest "#210f30",
+    :contrast-with-dominant "#efcdaf",
     :colors
-    ["#c9a1a7"
-     "#29d5bc"
-     "#0f1a34"
-     "#1a9a95"
-     "#37a0c2"
-     "#0e6a83"
-     "#654652"
-     "#176065"
-     "#a12e5b"
-     "#996d4a"
-     "#17344a"],
-    :most-frequent "#176065",
+    ["#c85a5a"
+     "#33b9df"
+     "#0f7db8"
+     "#210f30"
+     "#2e5e84"
+     "#7b2e47"
+     "#efcdaf"
+     "#3f6063"
+     "#343b5d"
+     "#c586c6"
+     "#2f1d3b"],
+    :most-frequent "#c85a5a",
     :data-colors
-    {"float" "#5ceee3",
-     "boolean" "#c066b4",
-     "map" "#d2d636",
-     "list" "#5902b9",
-     "string" "#ecf1e4",
-     "any" "#5f5687",
-     "vector" "#35d529",
-     "keyword" "#c9c5a1",
-     "rabbit-code" "#1177d8",
-     "datetime" "#85138d",
-     "integer" "#8463e0",
-     "unknown" "#662617",
-     "date" "#0e4810"},
-    :dominant "#17344a",
-    :most-contrasting-dark "#a12e5b",
-    :second-brightest "#c9a1a7",
-    :brightest "#29d5bc",
-    :most-contrasting-light "#29d5bc"},
-   :colors-of-the-moment
-   {:second-darkest "#131c2f",
-    :highest-saturation "#53bae6",
-    :most-contrasting "#b040af",
-    :darkest "#0f1622",
-    :contrast-with-dominant "#c1d2f2",
-    :colors
-    ["#c1d2f2"
-     "#0f1622"
-     "#3275c0"
-     "#254c8b"
-     "#53bae6"
-     "#b040af"
-     "#1a315f"
-     "#5a1f5b"
-     "#3a5f69"
-     "#7c9c9c"
-     "#131c2f"],
-    :most-frequent "#5a1f5b",
-    :data-colors
-    {"float" "#c29df9",
-     "boolean" "#58a2e2",
-     "map" "#61e653",
-     "list" "#7e206d",
+    {"float" "#efb6af",
+     "boolean" "#6edef5",
+     "map" "#b5c686",
+     "list" "#654d85",
      "string" "#ffffff",
-     "any" "#8e4587",
-     "vector" "#d364bd",
-     "keyword" "#f2e3c1",
-     "rabbit-code" "#227ac1",
-     "datetime" "#4d1884",
-     "integer" "#c2a9b9",
-     "unknown" "#401519",
-     "date" "#262e11"},
-    :dominant "#131c2f",
-    :most-contrasting-dark "#b040af",
-    :second-brightest "#53bae6",
-    :brightest "#c1d2f2",
-    :most-contrasting-light "#c1d2f2"},
-   :solver-fn-test11098864634 "Huge!!!!v!!!!171",
+     "any" "#8731a9",
+     "vector" "#034aff",
+     "keyword" "#e8cfc6",
+     "rabbit-code" "#305eb6",
+     "datetime" "#7e3e76",
+     "integer" "#e4bc94",
+     "unknown" "#502321",
+     "date" "#0f422d"},
+    :dominant "#2f1d3b",
+    :most-contrasting-dark "#210f30",
+    :second-brightest "#c586c6",
+    :brightest "#efcdaf",
+    :most-contrasting-light "#efcdaf"},
    :colors-of-the-moment>most-contrasting-light "#66b6c6",
-   :colors-of-the-moment>colors>0 "#c1d2f2",
+   :colors-of-the-moment>colors>0 "#c85a5a",
    :colors-of-the-moment>contrast-with-dominant "#cd5a51",
-   :solver-fn-test1-1728349450 "Huge!1433446",
-   :solver-fn-test11085976455 "HHHuge!147",
-   :colors-of-the-moment>brightest "#c1d2f2",
-   :get-my-colors-1614005760
-   {:second-darkest "#244a66",
-    :highest-saturation "#62d9ae",
-    :most-contrasting "#62d9ae",
-    :darkest "#0a0d1f",
-    :contrast-with-dominant "#c44c4c",
-    :colors
-    ["#df9b9c"
-     "#62d9ae"
-     "#244a66"
-     "#0a0d1f"
-     "#449696"
-     "#7f5c7d"
-     "#c2396b"
-     "#527795"
-     "#81a9bc"
-     "#c44c4c"
-     "#325a71"],
-    :most-frequent "#325a71",
-    :data-colors
-    {"float" "#a7f1b8",
-     "boolean" "#e081e0",
-     "map" "#dfa666",
-     "list" "#5a91c0",
-     "string" "#effbf1",
-     "any" "#7885a3",
-     "vector" "#bdd962",
-     "keyword" "#e0bcd6",
-     "rabbit-code" "#b371ba",
-     "datetime" "#9b5938",
-     "integer" "#b6df9b",
-     "unknown" "#268d4d",
-     "date" "#0a2b14"},
-    :dominant "#325a71",
-    :most-contrasting-dark "#c2396b",
-    :second-brightest "#df9b9c",
-    :brightest "#62d9ae",
-    :most-contrasting-light "#62d9ae"},
-   :colors-of-the-moment>second-brightest "#53bae6",
-   :get-my-colors-1565651097
-   {:second-darkest "#17344a",
-    :highest-saturation "#0e6a83",
-    :most-contrasting "#a12e5b",
-    :darkest "#0f1a34",
-    :contrast-with-dominant "#29d5bc",
-    :colors
-    ["#c9a1a7"
-     "#29d5bc"
-     "#0f1a34"
-     "#1a9a95"
-     "#37a0c2"
-     "#0e6a83"
-     "#654652"
-     "#176065"
-     "#a12e5b"
-     "#996d4a"
-     "#17344a"],
-    :most-frequent "#176065",
-    :data-colors
-    {"float" "#5ceee3",
-     "boolean" "#c066b4",
-     "map" "#d2d636",
-     "list" "#5902b9",
-     "string" "#ecf1e4",
-     "any" "#5f5687",
-     "vector" "#35d529",
-     "keyword" "#c9c5a1",
-     "rabbit-code" "#1177d8",
-     "datetime" "#85138d",
-     "integer" "#8463e0",
-     "unknown" "#662617",
-     "date" "#0e4810"},
-    :dominant "#17344a",
-    :most-contrasting-dark "#a12e5b",
-    :second-brightest "#c9a1a7",
-    :brightest "#29d5bc",
-    :most-contrasting-light "#29d5bc"},
+   :colors-of-the-moment>brightest "#efcdaf",
+   :colors-of-the-moment>second-brightest "#c586c6",
    :colors-of-the-moment>0 nil,
-   :solver-fn-test1-537318747 "HHHuge!149",
    :colors-of-the-moment-8k
    {:second-darkest "#474c5d",
     :highest-saturation "#ce7446",
@@ -2552,190 +2983,28 @@
     "#13537b"
     "#243c77"],
    :vibrant-antelope-solver 193,
-   :colors-of-the-moment>darkest "#0f1622",
-   :solver-fn-test1222038074 "Huge!168",
-   :get-my-colors-1805775471
-   {:second-darkest "#244a66",
-    :highest-saturation "#62d9ae",
-    :most-contrasting "#62d9ae",
-    :darkest "#0a0d1f",
-    :contrast-with-dominant "#c44c4c",
-    :colors
-    ["#df9b9c"
-     "#62d9ae"
-     "#244a66"
-     "#0a0d1f"
-     "#449696"
-     "#7f5c7d"
-     "#c2396b"
-     "#527795"
-     "#81a9bc"
-     "#c44c4c"
-     "#325a71"],
-    :most-frequent "#325a71",
-    :data-colors
-    {"float" "#a7f1b8",
-     "boolean" "#e081e0",
-     "map" "#dfa666",
-     "list" "#5a91c0",
-     "string" "#effbf1",
-     "any" "#7885a3",
-     "vector" "#bdd962",
-     "keyword" "#e0bcd6",
-     "rabbit-code" "#b371ba",
-     "datetime" "#9b5938",
-     "integer" "#b6df9b",
-     "unknown" "#268d4d",
-     "date" "#0a2b14"},
-    :dominant "#325a71",
-    :most-contrasting-dark "#c2396b",
-    :second-brightest "#df9b9c",
-    :brightest "#62d9ae",
-    :most-contrasting-light "#62d9ae"},
-   :get-my-colors137816905
-   {:second-darkest "#17344a",
-    :highest-saturation "#0e6a83",
-    :most-contrasting "#a12e5b",
-    :darkest "#0f1a34",
-    :contrast-with-dominant "#29d5bc",
-    :colors
-    ["#c9a1a7"
-     "#29d5bc"
-     "#0f1a34"
-     "#1a9a95"
-     "#37a0c2"
-     "#0e6a83"
-     "#654652"
-     "#176065"
-     "#a12e5b"
-     "#996d4a"
-     "#17344a"],
-    :most-frequent "#176065",
-    :data-colors
-    {"float" "#5ceee3",
-     "boolean" "#c066b4",
-     "map" "#d2d636",
-     "list" "#5902b9",
-     "string" "#ecf1e4",
-     "any" "#5f5687",
-     "vector" "#35d529",
-     "keyword" "#c9c5a1",
-     "rabbit-code" "#1177d8",
-     "datetime" "#85138d",
-     "integer" "#8463e0",
-     "unknown" "#662617",
-     "date" "#0e4810"},
-    :dominant "#17344a",
-    :most-contrasting-dark "#a12e5b",
-    :second-brightest "#c9a1a7",
-    :brightest "#29d5bc",
-    :most-contrasting-light "#29d5bc"},
-   :solver-fn-test1794743035 "Huge!141",
-   :get-my-colors-704551049
-   {:second-darkest "#352161",
-    :highest-saturation "#ba192c",
-    :most-contrasting "#ba192c",
-    :darkest "#1b0718",
-    :contrast-with-dominant "#ba192c",
-    :colors
-    ["#dd6aad"
-     "#352161"
-     "#4ab4dd"
-     "#1b0718"
-     "#8f4193"
-     "#3f6d98"
-     "#f7c9c9"
-     "#6a76c5"
-     "#60339a"
-     "#ba192c"
-     "#483376"],
-    :most-frequent "#ba192c",
-    :data-colors
-    {"float" "#b4f4f0",
-     "boolean" "#8bcbf3",
-     "map" "#5add4a",
-     "list" "#ce663b",
-     "string" "#ffffff",
-     "any" "#1df5b7",
-     "vector" "#6b52c4",
-     "keyword" "#f7c9c9",
-     "rabbit-code" "#5d53c0",
-     "datetime" "#a27b39",
-     "integer" "#e3a6cc",
-     "unknown" "#22862a",
-     "date" "#062513"},
-    :dominant "#483376",
-    :most-contrasting-dark "#ba192c",
-    :second-brightest "#4ab4dd",
-    :brightest "#f7c9c9",
-    :most-contrasting-light "#f7c9c9"},
-   :solver-fn-test1603802830 "booobs143446",
-   :solver-fn-test1-1603499423 "Huge!!!!!!!!129",
-   :solver-fn-test1771509803 "Huge!143446",
-   :solver-fn-test1-1030515200 "Huge!171",
-   :get-my-colors-1416867304
-   {:second-darkest "#244a66",
-    :highest-saturation "#62d9ae",
-    :most-contrasting "#62d9ae",
-    :darkest "#0a0d1f",
-    :contrast-with-dominant "#c44c4c",
-    :colors
-    ["#df9b9c"
-     "#62d9ae"
-     "#244a66"
-     "#0a0d1f"
-     "#449696"
-     "#7f5c7d"
-     "#c2396b"
-     "#527795"
-     "#81a9bc"
-     "#c44c4c"
-     "#325a71"],
-    :most-frequent "#325a71",
-    :data-colors
-    {"float" "#a7f1b8",
-     "boolean" "#e081e0",
-     "map" "#dfa666",
-     "list" "#5a91c0",
-     "string" "#effbf1",
-     "any" "#7885a3",
-     "vector" "#bdd962",
-     "keyword" "#e0bcd6",
-     "rabbit-code" "#b371ba",
-     "datetime" "#9b5938",
-     "integer" "#b6df9b",
-     "unknown" "#268d4d",
-     "date" "#0a2b14"},
-    :dominant "#325a71",
-    :most-contrasting-dark "#c2396b",
-    :second-brightest "#df9b9c",
-    :brightest "#62d9ae",
-    :most-contrasting-light "#62d9ae"},
+   :colors-of-the-moment>darkest "#210f30",
    :colors-of-the-moment>colors>3 "#2e1b24",
    :colors-of-the-moment>highest-saturation "#0c66a1",
    :colors-of-the-moment>most-contrasting "#a1543e",
    :colors-of-the-moment>2 nil,
-   :solver-fn-test11722011302 "huge!143446",
-   :solver-fn-test11463441873 "Huge!!!!128",
-   :solver-fn-test1421530310 "HHHuge!138",
-   :wallpaper-of-the-moment "./images/large/vap9.png",
-   :solver-fn-test1-1218464503 "booobs14446",
-   :colors-of-the-moment>colors>2 "#3275c0",
+   :wallpaper-of-the-moment "./images/large/b64-image-29058-65870-4k.webp",
+   :colors-of-the-moment>colors>2 "#0f7db8",
    :dazzling-gnu-solver 11214,
-   :colors-of-the-moment>colors>1 "#0f1622",
+   :colors-of-the-moment>colors>1 "#33b9df",
    :colors-of-the-moment>data-colors
-   {"float" "#c29df9",
-    "boolean" "#58a2e2",
-    "map" "#61e653",
-    "list" "#7e206d",
+   {"float" "#efb6af",
+    "boolean" "#6edef5",
+    "map" "#b5c686",
+    "list" "#654d85",
     "string" "#ffffff",
-    "any" "#8e4587",
-    "vector" "#d364bd",
-    "keyword" "#f2e3c1",
-    "rabbit-code" "#227ac1",
-    "datetime" "#4d1884",
-    "integer" "#c2a9b9",
-    "unknown" "#401519",
-    "date" "#262e11"}}},
+    "any" "#8731a9",
+    "vector" "#034aff",
+    "keyword" "#e8cfc6",
+    "rabbit-code" "#305eb6",
+    "datetime" "#7e3e76",
+    "integer" "#e4bc94",
+    "unknown" "#502321",
+    "date" "#0f422d"}}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

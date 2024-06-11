@@ -333,10 +333,11 @@
 
 (defn set-desired-workers [num-workers] (reset! desired-workers num-workers))
 
+
+
 (def task-queues-slot (atom {})) ; Holds the queues for each keyword
 (def running-slot (atom true))
 (def workers-slot (atom {})) ; Holds the futures of the worker threads for each keyword
-
 
 (defn worker-loop-slot
   [keyword]

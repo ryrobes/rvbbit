@@ -355,8 +355,9 @@
                                                      (for [v kps]
                                                        (let [[_ & this]                   v
                                                              [[solver-name input-map]] this
+                                                             panel-key  :conn
                                                              unresolved-req-hash (hash [solver-name input-map client-name])
-                                                             resolved-input-map (logic-and-params-fn input-map nil) ;; and we need to 'pre-resolve' it's inputs i n case they are client local
+                                                             resolved-input-map (logic-and-params-fn input-map panel-key) ;; and we need to 'pre-resolve' it's inputs i n case they are client local
                                                              new-solver-name (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
                                                              sub-param (keyword (str "solver/" new-solver-name))
                                                              req-map {:kind        :run-solver-custom ;; solver-name temp-solver-name client-name input-map
@@ -366,11 +367,10 @@
                                                                       :client-name client-name}
                                                              websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                                              online? (true? (= websocket-status :connected))
-                                                             ;;run? (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
                                                              run? (= (get-in @db/solver-fn-runs [panel-key sub-param]) resolved-input-map)
                                                              lets-go? (and online? (not run?))
-                                                            ;;  _ (when lets-go?
-                                                            ;;      (ut/tapp>> [:run-solver-req-map! (not run?) req-map @db/solver-fn-runs]))
+                                                             _ (when lets-go?
+                                                                 (ut/tapp>> [:run-solver-req-map-conns! (str (first this)) lets-go? (not run?) req-map @db/solver-fn-runs]))
                                                              _ (when lets-go?
                                                                  (ut/tracked-dispatch
                                                                   [::wfx/push :default req-map]))
@@ -626,7 +626,7 @@
                         (if kp-encoded-param?
                           (vec (cons kkey (break-up-flow-key vkey)))
                           [kkey vkey]))
-          ;; _ (when (= (first keypath) :param/huger)
+          ;; _ (when (= (first keypath) :param/huger22)
           ;;     (ut/tapp>> [:param (first keypath)  kp-encoded-param? param-has-fn?  (get-in db full-kp)  
           ;;                 @db/solver-fn-runs  @db/solver-fn-lookup (get @db/solver-fn-lookup (str (get-in db full-kp)))
           ;;                 ;; @(ut/tracked-sub ::clicked-parameter-key-alpha
@@ -641,14 +641,16 @@
                                                       {:keypath [(keyword (ut/replacer (first (cstr/split (str (first keypath))  #">"))  ":" ""))]})
                                      (vec (rest (break-up-flow-key vkey))))
                              param-has-fn?
-                            (try
-                              (get-in db (vec (cons :click-param (map keyword 
-                                                                      (map #(cstr/replace (str %) ":" "") 
-                                                                                   (cstr/split (get @db/solver-fn-lookup (str (get-in db full-kp))) #"/"))))))
-                              (catch :default _  nil)) ;; get the sub ref and return that data
+                             (try
+                               (get-in db (vec (cons :click-param (map keyword
+                                                                       (map #(cstr/replace (str %) ":" "")
+                                                                            (cstr/split (get @db/solver-fn-lookup (str (get-in db full-kp))) #"/"))))))
+                               (catch :default _  nil)) ;; get the sub ref and return that data
                              :else
                              (get-in db full-kp))
-          ;; _ (when (= (first keypath) :param/huger) (ut/tapp>> [val0]))
+          val0                (if (and param-has-fn? (nil? val0)) ;; hasn't run yet - should check atom as well...
+                                (get-in db full-kp) val0) ;; we need the solver code below to trigger it if need be.
+          ;;_ (when (= (first keypath) :param/huger22) (ut/tapp>> [val0]))
           ;; _ (when kp-encoded-param? (ut/tapp>> [:clicked-parameter-key-alpha-w-ext-kp keypath kp-encoded-param? param-has-fn?
           ;;                                       (vec (rest (break-up-flow-key vkey)))
           ;;                                       @(ut/tracked-sub ::clicked-parameter-key-alpha
@@ -714,11 +716,16 @@
                                     (not (cstr/includes? (str val) " ")))
                              (edn/read-string val) ;; temp hacky param work around (since we
                              val)
+          ;sub-param (get @db/solver-fn-lookup (str (get-in db full-kp)))
+          ;fn-changed?  (if param-has-fn? (nil? (get-in @db/solver-fn-runs [:conn sub-param])) false)
           contains-params? (contains-namespaced-keyword? val)
-          contains-solver-fn? (some #(= % :run-solver) (ut/deep-flatten val))]
+          contains-solver-fn? (some #(= % :run-solver) (ut/deep-flatten [val (get-in db full-kp)]))]
       (if (or contains-solver-fn? 
+              ;fn-changed?
               contains-params?) ;; (and contains-params? (not contains-sql-alias?))
-        (logic-and-params-fn val nil) ;; process again, no recursion here for now... we want to
+        (logic-and-params-fn 
+         (if contains-solver-fn? (get-in db full-kp) val) ;;val
+         nil) ;; process again, no recursion here for now... we want to
         val))))
 
 

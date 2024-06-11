@@ -9429,7 +9429,7 @@
                                                      (let [[_ & this]                   v
                                                            [[solver-name input-map]] this
                                                            unresolved-req-hash (hash [solver-name input-map client-name])
-                                                           resolved-input-map (resolver/logic-and-params input-map nil) ;; and we need to 'pre-resolve' it's inputs i n case they are client local
+                                                           resolved-input-map (resolver/logic-and-params input-map panel-key) ;; and we need to 'pre-resolve' it's inputs i n case they are client local
                                                            new-solver-name (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
                                                            sub-param (keyword (str "solver/" new-solver-name))
                                                            req-map {:kind        :run-solver-custom ;; solver-name temp-solver-name client-name input-map
@@ -9441,8 +9441,8 @@
                                                            online? (true? (= websocket-status :connected))
                                                            run? (= (get-in @db/solver-fn-runs [panel-key sub-param]) resolved-input-map)
                                                            lets-go? (and online? (not run?))
-                                                            ;; _ (when true ;;lets-go?
-                                                            ;;     (ut/tapp>> [:run-solver-req-map-bricks! lets-go? (not run?) req-map @db/solver-fn-runs]))
+                                                            _ (when lets-go?
+                                                                (ut/tapp>> [:run-solver-req-map-bricks! (str (first this)) lets-go? (not run?) req-map @db/solver-fn-runs]))
                                                            _ (when lets-go?
                                                                (ut/tracked-dispatch
                                                                 [::wfx/push :default req-map]))

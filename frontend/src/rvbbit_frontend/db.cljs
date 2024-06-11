@@ -30,8 +30,8 @@
 
 (def param-code-hover (atom nil))
  
-(def solver-fn-runs (atom {}))     
-(def solver-fn-lookup (atom {}))        
+(def solver-fn-runs (atom {}))       
+(def solver-fn-lookup (atom {}))          
 
 (def running-blocks (reagent/atom {}))
 (def real-running-blocks (reagent/atom {}))
