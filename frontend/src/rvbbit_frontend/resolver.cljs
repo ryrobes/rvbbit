@@ -132,14 +132,18 @@
           ;;     (walk/postwalk-replace logic-kps obody)))
           solver-clover-walk
           (fn [obody]
-            (let [kps       (ut/extract-patterns obody :run-solver 2)
+            (let [;kps       (ut/extract-patterns obody :run-solver 2)
+                  kps        (ut/extract-patterns-with-keypath obody :run-solver 2)
                   logic-kps (into
                              {}
-                             (for [v kps]
+                             (for [[fkp v] kps]
                                (let [[_ & this]                v
+                                     fkp                       (vec (into [:resolver panel-key] fkp))
                                      override?                 (try (map? (first this)) (catch :default _ false)) ;; not a vec input call, completely new solver map
                                      [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
-                                     unresolved-req-hash       (hash (if override? this [solver-name input-map client-name]))
+                                     unresolved-req-hash       (hash (if override?
+                                                                       fkp ;this 
+                                                                       [solver-name fkp client-name]))
                                      resolved-input-map        (logic-and-params input-map panel-key)
                                      resolved-full-map         (when override? (logic-and-params (first this) panel-key))
                                      unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers

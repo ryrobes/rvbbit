@@ -2032,7 +2032,7 @@
 
 (defmethod wl/handle-push :run-solver-custom
   [{:keys [solver-name temp-solver-name client-name override-map input-map]}]
-  (ut/pp [:custom-solver-run! solver-name :from client-name :input-map input-map])
+  (ut/pp [:custom-solver-run! temp-solver-name :from client-name :input-map input-map])
   (swap! last-solvers-atom-meta assoc-in
     [temp-solver-name :output]
     [:warning! {:solver-running-custom-inputs-via client-name :with-input-map input-map :override-map? override-map}])
@@ -2753,11 +2753,13 @@
                        meta-extra           {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms 0}}
                        timestamp-str        (str timestamp-str " (cache hit)")
                        new-history          (vec (conj (get @last-solvers-history-atom solver-name []) timestamp-str))] ;; regardless
+                   (ut/pp [:cached-solver-hit! solver-name])
                    (swap! last-solvers-atom assoc solver-name output)
                    (swap! last-solvers-atom-meta assoc
                      solver-name
                      (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
                    (swap! last-solvers-history-atom assoc solver-name new-history))
+      
       (= runner-type :sql)
         (try
           (let [snapshot?                   (true? (get solver-map :snapshot? false))
@@ -3570,7 +3572,7 @@
                                                                            ;; js memory read-string
                                                                            ;; issues (distinct or
                                                                            ;; rowcount is
-         (ut/pp [:running-meta-cnts ui-keypath client-name cnts])
+        ;;  (ut/pp [:running-meta-cnts ui-keypath client-name cnts])
          (push-to-client ui-keypath [:cnts-meta (first ui-keypath)] client-name 1 :cnts cnts))
        (catch Exception e (ut/pp [:error-w-sql-meta-cnts! e]))))
 

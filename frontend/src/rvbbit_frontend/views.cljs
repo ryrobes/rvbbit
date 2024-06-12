@@ -886,7 +886,7 @@
 
 (re-frame/reg-sub ::search-results (fn [db _] (get db :search-results)))
 
-(re-frame/reg-sub ::block-runners (fn [db _] (get-in db [:server :settings :runners])))
+
 
 (defn search-panel-left
   [single-width single-height]
@@ -920,16 +920,20 @@
   [re-com/box :child "search" :size "auto" :width (px single-width) :height (px single-height) :style
    {:border "2px solid yellow"}])
 
+(def view-title-edit-idx (reagent/atom nil))
+
 (defn editor-panel
   [bricks-wide bricks-tall]
   (let [selected-panel-map  @(ut/tracked-subscribe [::bricks/selected-block-map])
         selected-block      @(ut/tracked-subscribe [::bricks/selected-block])
         sql-calls           @(rfa/sub ::bricks/panel-sql-calls {:panel-key selected-block})
         views               @(rfa/sub ::bricks/panel-views {:panel-key selected-block})
+        runners             @(rfa/sub ::bricks/panel-runners {:panel-key selected-block})
         system-panel?       (or (= selected-block "none!") (nil? selected-block))
         first-data-key      (first (keys sql-calls))
         first-view-key      (first (keys views))
-        block-runners-map   @(ut/tracked-subscribe [::block-runners])
+        block-runners-map   @(ut/tracked-subscribe [::bricks/block-runners])
+        runners?            (ut/ne? runners)
         data-key            (if (get @db/data-browser-query selected-block)
                               (get @db/data-browser-query selected-block)
                               first-data-key)
@@ -949,7 +953,8 @@
         single-width-bricks (js/Math.floor (/ bricks-wide panel-count))
         single-width        (* single-width-bricks bricks/brick-size)
         single-width-px     (px single-width)
-        hh1                 [@db/mad-libs-waiting-room @db/data-browser-query-con @db/item-browser-mode @db/scrubbers
+        hh1                 [@db/mad-libs-waiting-room @db/data-browser-query-con 
+                             @db/item-browser-mode @db/scrubbers
                              @db/value-spy] ;; reactivity hack! React!
         single-height       ttl-height
         single-height-px    ttl-height-px
@@ -1257,6 +1262,7 @@
                                                                            selected-kp (if (nil? (first selected-kp))
                                                                                          nil
                                                                                          selected-kp)] ;; if viz-gen or
+                                                                       ;;(ut/tapp>> [:sel-keypath (str selected-kp) (get @db/data-browser-query selected-block)])
                                                                        (if ;(and ;view-selected?
                                                                          (get-in @db/scrubbers [selected-block data-key] false)
                                                                          [re-com/box :size "none" :width (px single-width) :height
@@ -1281,11 +1287,29 @@
               :padding-left "8px"}])]] :height single-height-px :width
         (if (and (= @db/editor-mode :vvv) system-panel?) (px (* 2 single-width)) single-width-px) :style {:overflow "hidden"}]
        (cond
-         (or views? queries?) ; data-key
+         (or views? queries? runners?) ; data-key
            (let []
              [re-com/box :size "none" :child
               [re-com/v-box :size "1" :children
-               [[re-com/box :padding "4px" :child (str "queries & views") :style
+               [[re-com/h-box :padding "4px" 
+                 :justify :between :align :center 
+                 :children [[re-com/box :child (str "queries & views")]
+                            [re-com/h-box 
+                             :style {:padding-right "10px"}
+                             :gap "4px"
+                             :children (for [mode ["clover" "text" "pretty" "rowset" "map-boxes"]
+                                             :let [bkgrd (str (theme-pull :theme/editor-rim-color nil))
+                                                   bkgrd (if (> (count bkgrd) 7) (subs bkgrd 0 7)  bkgrd)]]
+                                         [re-com/box :child (str mode)
+                                          :style {:background-color (str bkgrd 45)
+                                                  :color "black"
+                                                  :padding-left "3px"
+                                                  :padding-right "3px"
+                                                  :margin-top "2px"
+                                                  :border-radius "7px"
+                                                  :font-size "13px"
+                                                  }])]] 
+                 :style
                  {:font-weight 500
                   :color       (theme-pull :theme/editor-font-color nil)
                   :background  (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")}]
@@ -1322,6 +1346,7 @@
                        [[re-com/box :padding "3px" :attr {:on-click #(do (swap! db/data-browser-query assoc selected-block :*))}
                          :style {:cursor "pointer" :font-size "13px" :padding-left "5px" :padding-right "5px"} :child
                          (str :*)]]]]]
+                    
                     (when queries?
                       [re-com/h-box :gap "7px" :padding "5px" :style {:font-weight 700 :color "#dddddd"} :children
                        (for [k (keys sql-calls)]
@@ -1362,6 +1387,7 @@
                                 {:color         dyn-color
                                  :border-bottom (if (get @db/data-browser-query-con k) (str "4px solid " dyn-color) "inherit")
                                  :font-size     "15px"}])]]))])
+                    
                     (when views?
                       [re-com/h-box :gap "7px" :padding "5px" :style {:font-weight 700 :color "#dddddd"} :children
                        (for [k (keys views)]
@@ -1379,50 +1405,97 @@
                             [[re-com/box :padding "3px" :attr
                               {:on-click #(do (swap! db/data-browser-query assoc selected-block k))} :style
                               {:cursor "pointer" :font-size "13px" :padding-left "5px" :padding-right "5px"} :child
-                              (str k)]]]))])]]
+                              ;(str "🍀" " " k)
+                              (str k)]]]))])
+                    
+                    (when runners?
+                      [re-com/h-box :gap "7px" :padding "5px" :style {:font-weight 700 :color "#dddddd"} :children
+                       (let [runners-kps (vec (apply concat (for [[k v] runners] (for [vv (keys v)] [k vv]))))]
+                         (for [k runners-kps]
+                           (let [runner-icon (get-in runners (vec (conj k :icon)) "") ;; todo? as long as they match the theme..
+                                 runner-color (get-in runners (vec (conj k :icon)) "cyan") ]
+                             [re-com/h-box :style
+                              {:margin-left      "-5px"
+                               :border-top       "1px solid #80008045"
+                               :border-left      "1px solid #80008080"
+                               :color            (if (= (last k) data-key)
+                                                   (theme-pull :theme/editor-background-color nil) ;;"#000000"
+                                                   (theme-pull :theme/editor-font-color nil))
+                               :background-color (if (= (last k) data-key) "#9973e0" "inherit")
+                               :padding-right    "5px"
+                               :padding-left     "5px"} :gap "4px" :children
+                              [[re-com/box :padding "3px" :attr
+                                {:on-click #(do (swap! db/data-browser-query assoc selected-block (last k)))} :style
+                                {:cursor "pointer" :font-size "13px" :padding-left "5px" :padding-right "5px"} :child
+                                (str (last k))]]])))])
+                    
+                    ]]
                   
-                  [re-com/h-box :gap "7px" :padding "5px"
-                   :style {:font-weight 700 
-                           :color "#dddddd66" 
-                           :margin-top "3px"}
+                  (let [combo-items {:view {:base-key :views
+                                            :default [:box :child "heya" :align :center :justify :center :size "auto" :style
+                                                      {:font-size "22px"}]}
+                                     :query {:base-key :queries
+                                             :default {:select [["heya, friendo" :greetings] [(rand-int 123) :count_stuff]]}}
+                                     :code-query {:base-key :queries
+                                                  :default {:select [:*]
+                                                            :from
+                                                            [{:data '(vec
+                                                                      (for
+                                                                       [i (range 45)]
+                                                                        {:row_id i :type (rand-nth ["cat" "dog" "pizza"]) :name (str "row " i)}))}]}}}
+                        runners-items (into {} (for [[k v] block-runners-map] {k {:base-key k  :default (get v :default)}}))
+                        ;;_ (ut/tapp>> [:runners-items  runners runners-items combo-items])
+                        combo-items (merge combo-items runners-items)]
+                    
+                    [re-com/single-dropdown 
+                     :choices (vec (for [c (keys combo-items)] {:id c :label (str c)}))
+                     :max-height "320px" 
+                     :placeholder "add new slice" 
+                     :style {:font-size "13px"} 
+                     :model nil ;(get sql-params :user-dropdown-sys/req-field) 
+                     :on-change #(ut/tracked-dispatch [::bricks/add-new selected-block (get-in combo-items [% :base-key])  (get-in combo-items [% :default])]) 
+                     :width "125px"
+                     ])
+                  
+                  ;; [re-com/h-box :gap "7px" :padding "5px"
+                  ;;  :style {:font-weight 700
+                  ;;          :color "#dddddd66"
+                  ;;          :margin-top "3px"}
 
-                   :children
+                  ;;  :children
+                  ;;  (into
+                  ;;   [[re-com/box :attr
+                  ;;     {:on-click #(ut/tracked-dispatch [::bricks/add-new selected-block :queries
+                  ;;                                       {:select [["heya, friendo" :greetings] [(rand-int 123) :count_stuff]]}])}
+                  ;;     :style {:cursor "pointer"} :child "+query"]
+                     
+                  ;;    [re-com/box :attr
+                  ;;     {:on-click
+                  ;;      #(ut/tracked-dispatch
+                  ;;        [::bricks/add-new selected-block :queries
+                  ;;         {:select [:*]
+                  ;;          :from
+                  ;;          [{:data '(vec
+                  ;;                    (for
+                  ;;                     [i (range 45)]
+                  ;;                      {:row_id i :type (rand-nth ["cat" "dog" "pizza"]) :name (str "row " i)}))}]}])} :style
+                  ;;     {:cursor "pointer"} :child "+code"]
+                     
+                  ;;    [re-com/box :attr
+                  ;;     {:on-click #(ut/tracked-dispatch [::bricks/add-new selected-block :views
+                  ;;                                       [:box :child "heya" :align :center :justify :center :size "auto" :style
+                  ;;                                        {:font-size "22px"}]])} :style {:cursor "pointer"} :child "+view"]
+                  ;;    ]
 
-                   (into 
-                    
-                    
-                    
-                    [[re-com/box :attr
-                     {:on-click #(ut/tracked-dispatch [::bricks/add-new selected-block :queries
-                                                       {:select [["heya, friendo" :greetings] [(rand-int 123) :count_stuff]]}])}
-                     :style {:cursor "pointer"} :child "+query"]
-                    [re-com/box :attr
-                     {:on-click
-                      #(ut/tracked-dispatch
-                        [::bricks/add-new selected-block :queries
-                         {:select [:*]
-                          :from
-                          [{:data '(vec
-                                    (for
-                                     [i (range 45)]
-                                      {:row_id i :type (rand-nth ["cat" "dog" "pizza"]) :name (str "row " i)}))}]}])} :style
-                     {:cursor "pointer"} :child "+code"]
-                    [re-com/box :attr
-                     {:on-click #(ut/tracked-dispatch [::bricks/add-new selected-block :views
-                                                       [:box :child "heya" :align :center :justify :center :size "auto" :style
-                                                        {:font-size "22px"}]])} :style {:cursor "pointer"} :child "+view"]]
-                    
-                    (vec (for [[k v] block-runners-map
-                               :when (not (cstr/includes? (str k) "clover"))]
-                           [re-com/box :attr
-                            {:on-click #(ut/tracked-dispatch [::bricks/add-new selected-block k ;:queries
-                                                              (get v :default)])}
-                            :style {:cursor "pointer" :opacity 0.5}
-                            :child (str "+" (cstr/replace (str k) ":" ""))]))
-                    
-                    
-                    )
-                   ]]]
+                  ;;   (vec (for [[k v] block-runners-map
+                  ;;              :when (not (cstr/includes? (str k) "clover"))]
+                  ;;          [re-com/box :attr
+                  ;;           {:on-click #(ut/tracked-dispatch [::bricks/add-new selected-block k ;:queries
+                  ;;                                             (get v :default)])}
+                  ;;           :style {:cursor "pointer" :opacity 0.5}
+                  ;;           :child (str "+" (cstr/replace (str k) ":" ""))])))]
+                   
+                   ]]
                 (if @db/bad-form?
                   [re-com/v-box :padding "12px" :style
                    {:color            (theme-pull :theme/editor-font-color nil)
@@ -1441,7 +1514,12 @@
                      "(Block cannot be saved until corrected)"]]]
                   (let [query-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys sql-calls))
                                        (some #(= % data-key) (keys sql-calls)))
-                        is-layout? @(ut/tracked-subscribe [::bricks/is-layout? selected-block data-key])
+                        runners-items (into {} (for [[k v] runners] {(first (first v)) {:base-key k}}))
+                        ;runners-items (into {} (for [[k [kk vv]]  runners]  {kk {:base-key k}}))
+                        ;; _ (ut/tapp>> [:runners-items runners  (keys runners-items) (get @db/data-browser-query selected-block) ])
+                        runner-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys runners-items))
+                                        (some #(= % data-key) (keys runners-items)))
+                       ; is-layout? @(ut/tracked-subscribe [::bricks/is-layout? selected-block data-key])
                         viz-gen?   (= :viz-gen (get @db/data-browser-query selected-block))]
                     [re-com/v-box :children
                      [(cond query-box? [re-com/v-box :justify :between :children
@@ -1452,9 +1530,9 @@
                                              [re-com/v-box :padding "9px" :size "none" :height (px (- single-height 107)) :style
                                               {;:border "1px solid pink"
                                                :overflow "auto"} :children
-                                              [(when (not (empty? console))
+                                              [(when (ut/ne? console)
                                                  [re-com/box :child "console output (limited to 50 items)"])
-                                               (when (not (empty? console))
+                                               (when (ut/ne? console)
                                                  [re-com/v-box :children (for [r console] [re-com/box :child (str r)])])
                                                [shape/map-boxes2 (dissoc repl-output :out) "no-block" "no-flow" [] "no-block"
                                                 "map"]]])]
@@ -1462,6 +1540,11 @@
                                                                    single-width-bricks 6.05])
                                            (when (not @bricks/dragging?)
                                              [bricks/read-only-sql-box single-width (/ single-height 3.2) (str sql-string)])])]
+                            ;; runner-box? [re-com/box :size "none" :style {:transform "translate(0)"}
+                            ;;              :height (px (- single-height 100))
+                            ;;              :child (str "render-loop for" data-key  " runner."  
+                            ;;                          (get runners-items data-key) 
+                            ;;                          (get block-runners-map [(get-in runners-items [data-key :base-key]) data-key]))]
                             viz-gen? ;[re-com/box :child (str (count mad-libs-combos) " rows. ")]
                               (let [;default-combo-view @(ut/tracked-subscribe
                                     src-table-id-str   (last (get selected-panel-map :mad-libs-combo-hash))
@@ -1471,22 +1554,15 @@
                                     shape-name         (get opts :shape_name)
                                     viz-shape          @(ut/tracked-subscribe [::bricks/get-viz-shape shape-name])
                                     default-shape-view (get viz-shape :selected_view)
-                                    default-shape-view (try (when (not (empty? default-shape-view))
+                                    default-shape-view (try (when (ut/ne? default-shape-view)
                                                               (keyword (ut/replacer default-shape-view #":" "")))
                                                             (catch :default _ nil))]
                                 (ut/tapp>> [:def-sel default-shape-view viz-shape])
-                                [re-com/box :size "none" :style {:transform "translate(0)"} ;; a known
-                                                                                            ;; CSS hack
-                                                                                            ;; for fixed
+                                [re-com/box :size "none" :style {:transform "translate(0)"} 
                                  :height (px (- single-height 100)) :child
                                  [bricks/honeycomb selected-block (or default-shape-view :oz)]])
-                            :else      [re-com/box :size "none" :style {:transform "translate(0)"} ;; a
-                                                                                                   ;; known
-                                                                                                   ;; CSS
-                                                                                                   ;; hack
-                                                                                                   ;; for
-                                                                                                   ;; fixed
-                                        :height (px (- single-height 100))                         ;; (get
+                            :else      [re-com/box :size "none" :style {:transform "translate(0)"}
+                                        :height (px (- single-height 100))                       
                                         :child [bricks/honeycomb selected-block data-key]])
                       (if viz-gen? ;; dont show scrubber boolean if on viz-gen mode
                         [re-com/box :style {:font-size "10px" :margin-left "8px"} :child
@@ -1991,7 +2067,7 @@
           running?     @(ut/tracked-subscribe [::conn/clicked-parameter-key [running-key]])
           runstreamed? (= overrides :runstream-overrides)
           overrides    (if runstreamed? @(ut/tracked-subscribe [::bricks/runstream-overrides flow-id]) overrides)
-          overrides?   (not (empty? overrides))]
+          overrides?   (ut/ne? overrides)]
       (when (not running?) ;(not (some (fn [x] (= x text)) @db/speech-log))
         (let [fstr (str "changed! running flow " flow-id (when overrides? " (with overrides)"))
               w    (/ (count fstr) 4.1)]
@@ -2416,7 +2492,8 @@
          (let [mem @(ut/tracked-subscribe [::bricks/memory])]
            [re-com/box :size "none" :style {:position "fixed" :left 2 :bottom 20 :font-weight 700 :color "#ffffff99"} :child
             (str (ut/bytes-to-mb (get mem 1)) (str " (lazy-grid? " (not (or @bricks/param-hover @bricks/query-hover)) ")"))])
-         [bricks/reecatch [task-bar]] [bricks/reecatch [flows/alert-box]]
+         [bricks/reecatch [task-bar]] 
+         [bricks/reecatch [flows/alert-box]]
          [re-com/box :child
           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-labels" :tooltip "toggle display mode" :on-click
            #(ut/tracked-dispatch [::bricks/toggle-no-ui]) :style

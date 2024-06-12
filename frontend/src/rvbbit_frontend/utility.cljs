@@ -46,7 +46,7 @@
   (js/console.info (clj->js (stringify-keywords data))))
 
 
-
+(def t> tapp>>)
 
 
 
@@ -157,7 +157,7 @@
 
 
 
-(def clover-walk-singles-map (atom {}))
+(def clover-walk-singles-map (atom {}))  
 
 (defonce process-key-cache (atom {}))
 (defonce process-key-tracker (atom {}))
@@ -285,6 +285,37 @@
 
 (defn lists-to-vectors [data] (walk/postwalk (fn [x] (if (list? x) (vec x) x)) data))
 
+
+
+
+
+
+
+
+;; (defn extract-patterns2-orig
+;;   [data kw num] ;; raw
+;;   (let [matches (atom [])]
+;;     (walk/prewalk (fn [item] (when (matches-pattern2-orig? item kw num) (swap! matches conj item)) item) data)
+;;     @matches))
+
+(defonce extract-patterns2-cache (atom {}))
+
+(defn matches-pattern2-orig? [item kw num] (and (vector? item) (= (count item) num) (= (first item) kw)))
+
+(defn extract-patterns-with-keypath ;; used for solvers and making stable unique keys. important.
+  [data kw num]
+  (let [cache (get @extract-patterns2-cache (pr-str [data kw num]))]
+    (if cache cache 
+    (let [rr (letfn [(walk [data path]
+                       (cond
+                         (matches-pattern2-orig? data kw num) [[path data]]
+                         (map? data) (mapcat (fn [[k v]] (walk v (conj path k))) data)
+                         (sequential? data) (mapcat (fn [v] (walk v path)) data)
+                         :else []))]
+               (walk data []))]
+      (swap! extract-patterns2-cache assoc (pr-str [data kw num]) rr)
+      rr
+      ))))
 
 
 

@@ -5713,8 +5713,9 @@
 (re-frame/reg-sub ::view (fn [db [_ panel-key view-key]] (get-in db [:panels panel-key :views view-key])))
 
 (re-frame/reg-sub ::views
-                  (fn [db {:keys [panel-key]}]
-                    (let [views      (get-in db [:panels panel-key :views] {})
+                  (fn [db {:keys [panel-key ttype]}]
+                    (let [ttype      (or ttype :views)
+                          views      (get-in db [:panels panel-key ttype] {})
                           oz-layers  (vec (remove empty?
                                             (remove nil?
                                               (for [[_ v] views]
@@ -5740,6 +5741,24 @@
 (re-frame/reg-sub ::panel-views
                   (fn [db {:keys [panel-key]}] (let [v (get-in db [:panels panel-key :views])] (if (vector? v) {:base v} v))))
 
+(re-frame/reg-sub ::block-runners (fn [db _] (get-in db [:server :settings :runners])))
+
+(re-frame/reg-sub
+ ::panel-runners
+ (fn [db {:keys [panel-key]}]
+   (let [br (keys (get-in db [:server :settings :runners]))
+         v (select-keys (get-in db [:panels panel-key]) br)] 
+     v)))
+
+(re-frame/reg-sub
+ ::panel-runners-rev
+ (fn [db {:keys [panel-key]}]
+   (let [br (vec (keys (get-in db [:server :settings :runners])))
+         v (select-keys (get-in db [:panels panel-key]) br)
+         ;;v (vec (apply concat (for [[k v] v] (for [vv v] vv))))
+         ]
+     v)))
+
 (re-frame/reg-sub ::panel-view-keys (fn [db {:keys [panel-key]}] (let [v (get-in db [:panels panel-key :views])] (vec (keys v)))))
 
 (re-frame/reg-sub ::selected-view
@@ -5747,7 +5766,9 @@
                     (let [body    (get-in db [:panels panel-key :views])
                           queries (get-in db [:panels panel-key :queries])
                           view    (get-in db [:panels panel-key :selected-view])
-                          vq      (conj (conj (into (keys body) (keys queries)) :layered-viz) :dyn-tab)] ;; pseudo
+                          runners (keys (get-in db [:server :settings :runners]))
+                          runners2 (vec (apply merge (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))))
+                          vq      (conj (conj (into runners2 (into (keys body) (keys queries))) :layered-viz) :dyn-tab)] ;; pseudo
                       (cond (and view (some #(= % view) vq)) view
                             (map? body)                      (nth (keys body) 0)
                             :else                            nil))))                                      ;(first queries))
@@ -5756,11 +5777,17 @@
                   (fn [db {:keys [panel-key]}]
                     (let [body    (get-in db [:panels panel-key :views])
                           queries (get-in db [:panels panel-key :queries])
+                          runners (keys (get-in db [:server :settings :runners]))
+                          runners2 (vec (apply merge (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))))
+                          ;;_ (ut/tapp>> [:runners runners2])
                           view    (get-in db [:panels panel-key :selected-view])
-                          vq      (conj (conj (into (keys body) (keys queries)) :layered-viz) :dyn-tab)] ;; pseudo
-                      (cond (and view (some #(= % view) vq)) view
-                            (map? body)                      (nth (keys body) 0)
-                            :else                            nil))))
+                          vq      (conj (conj (into runners2 (into (keys body) (keys queries))) :layered-viz) :dyn-tab)
+                          v  (cond (and view (some #(= % view) vq)) view
+                                   (map? body)                      (nth (keys body) 0)
+                                   :else                            nil)
+                          ;;_ (when (ut/ne? runners2) (ut/tapp>> [:vq vq v]))
+                          ]
+                      v)))
 
 
 (re-frame/reg-sub ::selected-view-w-queries
@@ -5772,20 +5799,67 @@
                             (map? body) (nth (keys body) 0)
                             :else       (first queries)))))
 
+;; (re-frame/reg-sub ::editor-panel-selected-view ;; this whole sub is bonkers. kek
+;;                   (fn [db _] ;; todo, this is so weird. old code. fix lmao
+;;                     (let [selected-block (get db :selected-block)
+;;                           ;;_ (ut/tapp>>  [:key2])
+;;                           sql-calls      @(rfa/sub ::panel-sql-calls {:panel-key selected-block})
+;;                           views          @(rfa/sub ::panel-views {:panel-key selected-block})
+;;                           ;runners-rev    @(rfa/sub ::panel-runners {:panel-key selected-block})
+;;                           ;;_ (ut/tapp>> [:runners runners-rev])
+;;                           ;runners        (into {} (for [[k v] runners-rev] {(first (first v)) {:base-key k}}))
+;;                           ;runners        (vec (apply concat (for [[k v] runners] (for [vv v] [k vv]))))
+;;                           first-data-key (first (keys sql-calls))
+;;                           first-view-key (first (keys views))
+;;                           ;first-runner-key (first (second runners))
+;;                           data-key       (if (get @db/data-browser-query selected-block)
+;;                                            (get @db/data-browser-query selected-block)
+;;                                            first-data-key)  ;; lol
+;;                           data-key       (if (nil? data-key) first-view-key data-key) ;; lol 
+;;                           ;data-key       (if (nil? data-key) first-runner-key data-key) ;; lol
+;;                           what           (or (when (some #(= % data-key) (keys sql-calls)) :queries) ;; lol wut
+;;                                              (when (some #(= % data-key) (keys views)) :views)
+;;                                              ;(when (some #(= % data-key) (vec (map second runners))) (get-in runners [data-key :base-key]))
+;;                                              ;(first (filter #(= (last %) data-key) runners))
+;;                                              )]
+                      
+;;                       [what data-key]
+;;                       ;[data-key  nil] ;(first (filter #(= (last %) data-key) runners))
+;;                       )))
+
 (re-frame/reg-sub ::editor-panel-selected-view
-                  (fn [db _]
+                  (fn [db _] 
                     (let [selected-block (get db :selected-block)
-                          sql-calls      @(rfa/sub ::panel-sql-calls {:panel-key selected-block})
-                          views          @(rfa/sub ::panel-views {:panel-key selected-block})
-                          first-data-key (first (keys sql-calls))
-                          first-view-key (first (keys views))
-                          data-key       (if (get @db/data-browser-query selected-block)
-                                           (get @db/data-browser-query selected-block)
-                                           first-data-key)
-                          data-key       (if (nil? data-key) first-view-key data-key)
-                          what           (or (when (some #(= % data-key) (keys sql-calls)) :queries)
-                                             (when (some #(= % data-key) (keys views)) :views))]
-                      [what data-key])))
+                          panel (get-in db [:panels selected-block])
+                          ;;_ (ut/tapp>> [:kkeeyy panel])
+                          panel-pairs (apply concat (for [[k v] panel
+                                                          :when (map? v)]
+                                                      (for [vv (keys v)] [k vv])))
+                          chosen (try
+                                   (first (filter #(= (second %) (get @db/data-browser-query selected-block)) panel-pairs)) (catch :default _ nil))
+                          chosen (cond
+                                   (= (get @db/data-browser-query selected-block) :*) [nil nil]
+                                   (nil? chosen) (first panel-pairs)
+                                   :else chosen)]
+                      chosen)))
+
+
+(re-frame/reg-sub ::view-type
+                  (fn [db {:keys [panel-key view]}]
+                    (let [selected-block panel-key
+                          panel (get-in db [:panels selected-block])
+                          panel-pairs (apply concat (for [[k v] panel
+                                                          :when (map? v)]
+                                                      (for [vv (keys v)] [k vv])))
+                          chosen (try
+                                   (first (filter #(= (second %) view) panel-pairs)) (catch :default _ nil))
+                          chosen (cond
+                                   ;(= (get @db/data-browser-query selected-block) :*) [nil nil]
+                                   (nil? chosen) (first panel-pairs)
+                                   :else chosen)]
+                      (first chosen))))
+
+;;(ut/tapp>> [:ed  (str @(ut/tracked-sub ::editor-panel-selected-view2 {}))])
 
 (re-frame/reg-event-db ::select-view (fn [db [_ panel-key view-key]] (assoc-in db [:panels panel-key :selected-view] view-key)))
 
@@ -7346,7 +7420,10 @@
                :theme             (theme-pull :theme/codemirror-theme nil)}}]]) ;"ayu-mirage" ;"hopscotch"
 
 
-
+(re-frame/reg-sub
+ ::app-db-clover
+ (fn [db {:keys [keypath]}]
+   (get-in db keypath)))
 
 
 (defonce progress-bars (reagent.core/atom {}))
@@ -7595,6 +7672,8 @@
                                                           :autoPlay true
                                                           :playsInline true
                                                           :ref (fn [x] (reset! video-ref x))}]])}))
+                 ;;:app-db (fn [kp] @(ut/tracked-sub ::app-db-clover {:keypath kp}))
+                 ;;:app-db-keys (fn [kp] (vec (keys @(ut/tracked-sub ::app-db-clover {:keypath kp}))))
                  :execute (fn [pp]
                             (when (map? pp)
                               (let [mods (count (keys pp))]
@@ -7721,11 +7800,13 @@
                                                  :*input}]]]}
                        :clj            {:args [:code] :body  [:run-solver
                                                               {:signal false
+                                                               :cache? true
                                                                :type :clojure
                                                                :input-map {}
                                                                :data :code}]}
                        :clj2            {:args [:code] :body  [:run-solver
                                                               {:signal false
+                                                               :cache? true
                                                                :type :clojure2
                                                                :input-map {}
                                                                :data :code}]}
@@ -7795,6 +7876,10 @@
 ;;   "./images/gen/b64-image3-61714-61215.png"]]
 
 
+;; ::view-type
+;; (fn [db {:keys [panel-key view]}]
+
+
 (defn honeycomb
   [panel-key & [override-view fh fw replacement-view replacement-query]] ;; can sub lots of this
   (let [;block-map panel-map ;@(ut/tracked-subscribe [::panel-map panel-key]) ;(get workspace
@@ -7803,13 +7888,16 @@
         sql-calls @(rfa/sub ::panel-sql-calls {:panel-key panel-key})
         replacement-all? (and (not (nil? replacement-query)) (not (nil? replacement-view)))
         sql-calls (if replacement-query (merge {} replacement-query) sql-calls)
+        ;;_ (ut/tapp>> [::tt @(ut/tracked-sub ::panel-runners-rev {:panel-key panel-key})])
         all-keys (vec (into (vec (sort (into (vec (keys sql-calls)) all-view-keys))) [:virtual-view]))
         selected-view @(ut/tracked-sub ::selected-view-alpha {:panel-key panel-key}) ;(or  :view)
-        override-view (cond (= override-view :*)                                                        selected-view ;; default
-                                                                                                                      ;; editor
-                                                                                                                      ;; "everything"
-                            (and (not (nil? override-view)) (some #(= % override-view) all-keys))       override-view
-                            (and (not (nil? override-view)) (not (some #(= % override-view) all-keys))) (first all-keys)
+        override-view (cond (= override-view :*)                                                        selected-view
+                            (and (not (nil? override-view))
+                                 ;(some #(= % override-view) all-keys)
+                                 )override-view
+                            (and (not (nil? override-view))
+                                 ;(not (some #(= % override-view) all-keys))
+                                 )(first all-keys)
                             :else                                                                       nil)
         w (if (not (nil? override-view)) 11 @(ut/tracked-subscribe [::panel-width panel-key]))
         h (if (not (nil? override-view)) 8.7 @(ut/tracked-subscribe [::panel-height panel-key]))
@@ -7821,6 +7909,11 @@
         px-width-int (- ww 100)
         px-height-int (- hh 105)
         selected-view (if override-view override-view selected-view)
+        selected-view-type @(ut/tracked-sub ::view-type {:panel-key panel-key :view selected-view})
+        selected-view-type (if (and (not= selected-view-type :views)
+                                    (not= selected-view-type :queries)) selected-view-type :views)
+        ;;_ (ut/tapp>>  [:selected-view-type selected-view selected-view-type])
+
         all-drops @(ut/tracked-sub ::all-drops-of-alpha {:ttype :*})
         drop-walks (into {}
                          (for [d all-drops]
@@ -7828,11 +7921,33 @@
                                 [:box :child [:string x "hey"] :style {:color "red"}])}))
         walk-map (clover-walk-singles panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view)
         connection-id @(ut/tracked-subscribe [::panel-connection-id panel-key]) ;(get block-map
-        body @(rfa/sub ::views {:panel-key panel-key})
+
+        body @(rfa/sub ::views {:panel-key panel-key :ttype selected-view-type})
+
+
+
+
         body (if replacement-view
                replacement-view ;{selected-view replacement-view}
                body)
         ;;orig-body body
+
+        body (if (and (not= selected-view-type :views)
+                      (not= selected-view-type :queries))
+               ;;{(first body) [:box :child [:string3 (last body)]]}
+               (let [br @(ut/tracked-sub ::block-runners {})
+                     wrapper (get-in br [selected-view-type :clover-fn])
+                     ;wrapper (ut/postwalker {:clover-body body} wrapper)
+                     ]
+                 (into {} (for [[k v]  body] {k [:box 
+                                                 :align :center :justify :center :size "auto"
+                                                 :style {:font-size "14px" :color (theme-pull :theme/editor-outer-rim-color nil)}
+                                                 :child [:data-viewer (ut/postwalk-replacer {:clover-body v} wrapper)]]})))
+               body)
+
+        ;; _ (when (not= selected-view-type :views)
+        ;;     (ut/tapp>> [:body body selected-view-type]))
+
 
         valid-clover-template-keys (vec (filter keyword? (ut/deep-flatten body)))
         clover-templates-map (select-keys clover-templates valid-clover-template-keys)
@@ -7863,12 +7978,12 @@
         selected-view-is-sql? (contains? sql-calls selected-view)
         override-view-is-sql? (contains? sql-calls override-view)
         valid-body-params (ut/deep-flatten (merge ;;@(ut/tracked-subscribe [::valid-body-params
-                                             @(rfa/sub ::valid-body-params {:panel-key panel-key})
-                                             @(rfa/sub ::valid-body-params-all-condis)
-                                             (keys (get @db/solver-fn-runs panel-key {}))
+                                            @(rfa/sub ::valid-body-params {:panel-key panel-key})
+                                            @(rfa/sub ::valid-body-params-all-condis)
+                                            (keys (get @db/solver-fn-runs panel-key {}))
                                              ;;(for [[_ v] @db/solver-fn-runs] (vals v))
-                                             @(rfa/sub ::valid-body-params-in {:body body})
-                                             @(rfa/sub ::valid-body-params-in {:body vsql-calls})))
+                                            @(rfa/sub ::valid-body-params-in {:body body})
+                                            @(rfa/sub ::valid-body-params-in {:body vsql-calls})))
         possible-datasets-used (set (for [e valid-body-params] (keyword (nth (ut/splitter (ut/safe-name e) #"/") 0))))
         used-datasets (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys)))
         used-datasets (if replacement-all? (into used-datasets (keys replacement-query)) used-datasets)
@@ -7893,8 +8008,8 @@
         condi-walks (into {}
                           (for [k condi-walks-targets]
                             {k ;;@(ut/tracked-subscribe [::conn/condi-value (keyword (last
-                               @(ut/tracked-sub ::conn/condi-value
-                                                {:condi-key (keyword (last (ut/splitter (ut/safe-name k) "/")))})}))
+                             @(ut/tracked-sub ::conn/condi-value
+                                              {:condi-key (keyword (last (ut/splitter (ut/safe-name k) "/")))})}))
         into-walk-map2 (fn [obody]
                          (let [;obody (walk/postwalk-replace condi-walks orig-body)
                                kps       (ut/extract-patterns obody :into 3) ;(kv-map-fn obody)
@@ -7927,7 +8042,7 @@
                                                     (let [[_ pkey pval] v
                                                           raw-param-key (get-in vsql-calls
                                                                                 (conj (vec (first (filter #(= (last %) :on-click)
-                                                                                                    (ut/kvpaths vsql-calls))))
+                                                                                                          (ut/kvpaths vsql-calls))))
                                                                                       1)
                                                                                 pkey)]
                                                       {v (fn []
@@ -7940,12 +8055,12 @@
                                               (for [v kps]
                                                 (let [[_ that this] v]
                                                   {v ;(resolver/logic-and-params
-                                                     (resolver/logic-and-params (if (vector? this)
-                                                                                  (vec (for [r this] (last (get r that))))
-                                                                                  (vec (for [r @(rfa/sub ::conn/sql-data-alpha
-                                                                                                         {:keypath [this]})]
-                                                                                         (last (get r that)))))
-                                                                                panel-key)})))]
+                                                   (resolver/logic-and-params (if (vector? this)
+                                                                                (vec (for [r this] (last (get r that))))
+                                                                                (vec (for [r @(rfa/sub ::conn/sql-data-alpha
+                                                                                                       {:keypath [this]})]
+                                                                                       (last (get r that)))))
+                                                                              panel-key)})))]
                           (walk/postwalk-replace logic-kps obody)))
         string-walk (fn [num obody]
                       (let [kps       (ut/extract-patterns obody :string3 num)
@@ -7971,6 +8086,18 @@
                       (let [kps       (ut/extract-patterns obody :get-in 2)
                             logic-kps (into {} (for [v kps] (let [[_ [data kp]] v] {v (get-in data kp)})))]
                         (walk/postwalk-replace logic-kps obody)))
+        get-in-app-db (fn [obody]
+                        (let [kps       (ut/extract-patterns obody :app-db 2)
+                              logic-kps (into {} (for [v kps]
+                                                   (let [[_ keypath] v]
+                                                     {v @(ut/tracked-sub  ::app-db-clover {:keypath keypath})})))]
+                          (walk/postwalk-replace logic-kps obody)))
+        get-in-app-db-keys (fn [obody]
+                             (let [kps       (ut/extract-patterns obody :app-db-keys 2)
+                                   logic-kps (into {} (for [v kps]
+                                                        (let [[_ keypath] v]
+                                                          {v (vec (keys @(ut/tracked-sub  ::app-db-clover {:keypath keypath})))})))]
+                               (walk/postwalk-replace logic-kps obody)))
         run-rs-flow (fn [flow-id flow-id-inst panel-key override-merge-map]
                       (let [client-name @(ut/tracked-subscribe [::client-name])
                             base-opts   {:increment-id? false :instance-id flow-id-inst}
@@ -8020,77 +8147,83 @@
                                       (let [kps       (ut/extract-patterns body keyname 2)
                                             logic-kps (into {} (for [v kps] (let [[_ val] v] {v (run-drop v val)})))]
                                         (walk/postwalk-replace logic-kps body)))
-                              obody
-                              keynames))
+                                    obody
+                                    keynames))
         solver-clover-walk
-          (fn [obody]
-            (let [kps       (ut/extract-patterns obody :run-solver 2)
-                  logic-kps (into
-                              {}
-                              (for [v kps]
-                                (let [[_ & this]                v
-                                      override?                 (try (map? (first this)) (catch :default _ false)) ;; not a vec input call, completely new solver map
-                                      [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
-                                      unresolved-req-hash       (hash (if override? this [solver-name input-map client-name]))
-                                      resolved-input-map        (resolver/logic-and-params input-map panel-key)
-                                      resolved-full-map         (when override? (resolver/logic-and-params (first this) panel-key))
-                                      unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
-                                      new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
-                                      sub-param                 (keyword (str "solver/" new-solver-name))
-                                      req-map                   (merge
-                                                                 {:kind             :run-solver-custom
-                                                                  :solver-name      solver-name
-                                                                  :temp-solver-name (keyword new-solver-name)
-                                                                  :input-map        resolved-input-map
-                                                                  :client-name      client-name}
-                                                                 (when override? {:override-map resolved-full-map}))
-                                      websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
-                                      online?                   (true? (= websocket-status :connected))
-                                      run?                      (= (get-in @db/solver-fn-runs [panel-key sub-param])
-                                                                   unique-resolved-map)
-                                      lets-go?                  (and online? (not run?))
-                                      _ (when lets-go?
-                                          (ut/tapp>> [:run-solver-req-map-bricks! override? (str (first this)) lets-go? (not run?) req-map
-                                                      @db/solver-fn-runs]))
-                                      _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
-                                      _ (when lets-go?
-                                          (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
-                                          (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map))]
-                                  {v sub-param})))]
-              (walk/postwalk-replace logic-kps obody)))
+        (fn [obody]
+          (let [;kps       (ut/extract-patterns obody :run-solver 2)
+                kps        (ut/extract-patterns-with-keypath obody :run-solver 2)
+                logic-kps (into
+                           {}
+                           (for [[fkp v] kps]
+                             (let [[_ & this]                v
+                                   fkp                       (vec (into [:panels panel-key] fkp))
+                                   override?                 (try (map? (first this)) (catch :default _ false)) ;; not a vec input call, completely new solver map
+                                   [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
+                                   unresolved-req-hash       (hash (if override?
+                                                                     fkp ;this 
+                                                                     [solver-name fkp client-name]))
+                                   resolved-input-map        (resolver/logic-and-params input-map panel-key)
+                                   resolved-full-map         (when override? (resolver/logic-and-params (first this) panel-key))
+                                   unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
+                                   new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
+                                   sub-param                 (keyword (str "solver/" new-solver-name))
+                                   req-map                   (merge
+                                                              {:kind             :run-solver-custom
+                                                               :solver-name      solver-name
+                                                               :temp-solver-name (keyword new-solver-name)
+                                                               :input-map        resolved-input-map
+                                                               :client-name      client-name}
+                                                              (when override? {:override-map resolved-full-map}))
+                                   websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
+                                   online?                   (true? (= websocket-status :connected))
+                                   run?                      (= (get-in @db/solver-fn-runs [panel-key sub-param])
+                                                                unique-resolved-map)
+                                   lets-go?                  (and online? (not run?))
+                                  ;;  _ (when lets-go?
+                                  ;;      (ut/tapp>> [:run-solver-req-map-bricks! override? (str (first this)) lets-go? (not run?) req-map
+                                  ;;                  @db/solver-fn-runs]))
+                                   _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
+                                   _ (when lets-go?
+                                       (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
+                                       (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map))]
+                               {v sub-param})))]
+            (walk/postwalk-replace logic-kps obody)))
         obody-key-set (ut/body-set body)
         has-fn? (fn [k] (contains? obody-key-set k)) ;; faster than some on a set since it will
         has-drops? (boolean (some obody-key-set all-drops)) ;; faster?
         body ;;(ut/timed
-          (cond->> body
-            true                      (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
-            (has-fn? :*this-block*)   (ut/postwalk-replacer {:*this-block* panel-key})
+        (cond->> body
+          true                      (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
+          (has-fn? :*this-block*)   (ut/postwalk-replacer {:*this-block* panel-key})
             ;;(has-fn? :run-solver)     (ut/postwalk-replacer solver-clover-fn-walk-map) ;; has to run first since
             ;;it'll contain a clover sub param
-            (has-fn? :run-solver)     solver-clover-walk ;;(conn/solver-clover-walk client-name panel-key)
-            (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
-            (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
-            (ut/ne? data-walks)       (ut/postwalk-replacer data-walks)
-            (ut/ne? vsql-replace-map) (ut/postwalk-replacer vsql-replace-map) ;;(walk/postwalk-replace
-            (has-fn? :map)            map-walk-map2
-            (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
-            (has-fn? :get-in)         get-in-walk
-            (has-fn? :=)              =-walk-map2 ;; test, needs to be first - "and" after...
-            (has-fn? :if)             if-walk-map2 ;; ifs needs special treatment - must
-            (has-fn? :when)           when-walk-map2 ;; test!
-            (has-fn? :set-parameter)  onclick-walk-map2 ;; test!
-            (has-fn? :into)           into-walk-map2
-            (has-fn? :auto-size-px)   auto-size-walk-map2
-            (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these extra string
-            (has-fn? :string3)        (string-walk 3)
-            (has-fn? :string3)        (string-walk 4)
-            (has-fn? :string3)        (string-walk 5)
-            (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS FUCKERY - we
-            (has-fn? :push>)          push-walk
-            (has-fn? :push>>)         push-walk-fn
-            has-drops?                (drop-walk-replace (vec (keys drop-walks))))
+          (has-fn? :run-solver)     solver-clover-walk ;;(conn/solver-clover-walk client-name panel-key)
+          (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
+          (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
+          (ut/ne? data-walks)       (ut/postwalk-replacer data-walks)
+          (ut/ne? vsql-replace-map) (ut/postwalk-replacer vsql-replace-map) ;;(walk/postwalk-replace
+          (has-fn? :map)            map-walk-map2
+          (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
+          (has-fn? :app-db)         get-in-app-db
+          (has-fn? :app-db-keys)    get-in-app-db-keys
+          (has-fn? :get-in)         get-in-walk
+          (has-fn? :=)              =-walk-map2 ;; test, needs to be first - "and" after...
+          (has-fn? :if)             if-walk-map2 ;; ifs needs special treatment - must
+          (has-fn? :when)           when-walk-map2 ;; test!
+          (has-fn? :set-parameter)  onclick-walk-map2 ;; test!
+          (has-fn? :into)           into-walk-map2
+          (has-fn? :auto-size-px)   auto-size-walk-map2
+          (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these extra string
+          (has-fn? :string3)        (string-walk 3)
+          (has-fn? :string3)        (string-walk 4)
+          (has-fn? :string3)        (string-walk 5)
+          (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS FUCKERY - we
+          (has-fn? :push>)          push-walk
+          (has-fn? :push>>)         push-walk-fn
+          has-drops?                (drop-walk-replace (vec (keys drop-walks))))
         body ;;(ut/timed
-          (ut/postwalk-replacer walk-map body)
+        (ut/postwalk-replacer walk-map body)
         dbody-type (get-in @dragging-body [:drag-meta :type])
         relevant-for-dyn-drop? (or (and is-layout? (or (= :query dbody-type) (= :view dbody-type)))
                                    (and (not (contains? @dragging-body :cloned-from))
@@ -8101,16 +8234,16 @@
                                         (not (= :meta-blocks dbody-type)))) ;; temp
         overlay? (and @dragging? relevant-for-dyn-drop?)
         base-tables (vec (filter #(and (not (ut/is-sql-sql-alias? %)) (keyword? %))
-                           (remove nil?
-                             (flatten (for [[_ v] sql-calls]
-                                        (when (not (cstr/includes? (str (get v :from)) ":query/")) (get-in v [:from 0])))))))
+                                 (remove nil?
+                                         (flatten (for [[_ v] sql-calls]
+                                                    (when (not (cstr/includes? (str (get v :from)) ":query/")) (get-in v [:from 0])))))))
         base-table-sniffs
-          (into {}
-                (for [t base-tables]
-                  {t {:select        [:*]
-                      :connection-id (if (some #(= t %) ["channel_history" "fn_history" "flows_history"]) "flows-db" "system-db")
-                      :from          [t]
-                      :limit         111}}))
+        (into {}
+              (for [t base-tables]
+                {t {:select        [:*]
+                    :connection-id (if (some #(= t %) ["channel_history" "fn_history" "flows_history"]) "flows-db" "system-db")
+                    :from          [t]
+                    :limit         111}}))
         templated-strings-vals (ut/deep-template-find body)
         templates? (ut/ne? templated-strings-vals)
         templated-strings-walk (if templates?

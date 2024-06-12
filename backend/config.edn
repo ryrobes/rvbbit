@@ -15,7 +15,7 @@
            :clojure {:type :nrepl 
                      :runner {:port 8181 :host "127.0.0.1"}
                      :default (str "Hi!" (+ 1 2 3))
-                     :editor :clover
+                     :syntax "clojure"
                      :clover-fn [:run-solver
                                  {:signal false
                                   :type :clojure
@@ -26,7 +26,7 @@
            :clojure2 {:type :nrepl
                       :runner {:port 37851 :host "127.0.0.1"}
                       :default (str "Hi!" (+ 1 2 3))
-                      :editor :clover
+                      :syntax "clojure"
                       :clover-fn  [:run-solver
                                    {:signal false
                                     :type :clojure2
@@ -40,8 +40,8 @@
            :dalle3 {:runner {:flow-id :run-dalle3
                              :overrides {:code :selected-view} 
                              :opts? {:instanced? true}}
-                    :type :flow-based
-                    :editor :text
+                    :type :flow
+                    :syntax "text"
                     :clover-fn [:data-viewer [:run-solver
                                               [:get-my-colors
                                                {:input-image-path
@@ -52,8 +52,8 @@
            :python3 {:runner {:flow-id :run-python3
                               :overrides {:code :string-body}
                               :opts? {:instanced? true}}
-                     :type :flow-based
-                     :editor :text
+                     :type :flow
+                     :syntax "python"
                      :default-view [:box :child [:string :*query-id]]
                      :icon "images/python3.png"}}
  :eleven-labs-api-key nil

@@ -341,14 +341,18 @@
           ;;     (walk/postwalk-replace logic-kps obody)))
           solver-clover-walk
           (fn [obody]
-            (let [kps       (ut/extract-patterns obody :run-solver 2)
+            (let [;kps       (ut/extract-patterns obody :run-solver 2)
+                  kps        (ut/extract-patterns-with-keypath obody :run-solver 2)
                   logic-kps (into
                              {}
-                             (for [v kps]
+                             (for [[fkp v] kps]
                                (let [[_ & this]                v
+                                     fkp                       (vec (into [:conns panel-key] fkp))
                                      override?                 (try (map? (first this)) (catch :default _ false)) ;; not a vec input call, completely new solver map
                                      [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
-                                     unresolved-req-hash       (hash (if override? this [solver-name input-map client-name]))
+                                     unresolved-req-hash       (hash (if override?
+                                                                       fkp ;this 
+                                                                       [solver-name fkp client-name]))
                                      resolved-input-map        (logic-and-params input-map panel-key)
                                      resolved-full-map         (when override? (logic-and-params (first this) panel-key))
                                      unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
@@ -652,12 +656,11 @@
           ;sub-param (get @db/solver-fn-lookup (str (get-in db full-kp)))
           ;fn-changed?  (if param-has-fn? (nil? (get-in @db/solver-fn-runs [:conn sub-param])) false)
           contains-params?    (contains-namespaced-keyword? val)
-          contains-solver-fn? (some #(= % :run-solver) (ut/deep-flatten [val (get-in db full-kp)]))]
+          contains-solver-fn? (some #(= % :run-solver) (ut/deep-flatten [val (get-in db full-kp)]))]  
       (if (or contains-solver-fn?
-              ;fn-changed?
               contains-params?) ;; (and contains-params? (not contains-sql-alias?))
         (logic-and-params-fn (if contains-solver-fn? (get-in db full-kp) val) ;;val
-                             nil) ;; process again, no recursion here for now... we want to
+                             keypath) ;; process again, no recursion here for now... we want to
         val))))
 
 
