@@ -986,7 +986,7 @@
          [[re-com/box :padding "4px" :child
            [re-com/h-box :gap "6px" :children
             [[re-com/md-icon-button :src (at) :md-icon-name "zmdi-arrows" :style
-              {:background-color (theme-pull :theme/editor-rim-color "#a3a3a3") ;"#00000000"
+              {;:background-color (theme-pull :theme/editor-rim-color "#a3a3a3") ;"#00000000"
                :color            (theme-pull :theme/editor-font-color nil)
                :cursor           "grab"
                :height           "15px"
@@ -1443,7 +1443,8 @@
                                                                       (for
                                                                        [i (range 45)]
                                                                         {:row_id i :type (rand-nth ["cat" "dog" "pizza"]) :name (str "row " i)}))}]}}}
-                        runners-items (into {} (for [[k v] block-runners-map] {k {:base-key k  :default (get v :default)}}))
+                        runners-items (into {} (for [[k v] (-> block-runners-map (dissoc :views) (dissoc :queries))] 
+                                                 {k {:base-key k  :default (get v :default)}}))
                         ;;_ (ut/tapp>> [:runners-items  runners runners-items combo-items])
                         combo-items (merge combo-items runners-items)]
                     
@@ -1514,11 +1515,11 @@
                      "(Block cannot be saved until corrected)"]]]
                   (let [query-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys sql-calls))
                                        (some #(= % data-key) (keys sql-calls)))
-                        runners-items (into {} (for [[k v] runners] {(first (first v)) {:base-key k}}))
+                        ;;runners-items (into {} (for [[k v] runners] {(first (first v)) {:base-key k}}))
                         ;runners-items (into {} (for [[k [kk vv]]  runners]  {kk {:base-key k}}))
                         ;; _ (ut/tapp>> [:runners-items runners  (keys runners-items) (get @db/data-browser-query selected-block) ])
-                        runner-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys runners-items))
-                                        (some #(= % data-key) (keys runners-items)))
+                        ;; runner-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys runners-items))
+                        ;;                 (some #(= % data-key) (keys runners-items)))
                        ; is-layout? @(ut/tracked-subscribe [::bricks/is-layout? selected-block data-key])
                         viz-gen?   (= :viz-gen (get @db/data-browser-query selected-block))]
                     [re-com/v-box :children
@@ -1630,7 +1631,7 @@
             [[re-com/box :style
               {:font-weight      500
                :color            (theme-pull :theme/editor-font-color nil)
-               :background-color (theme-pull :theme/editor-rim-color "#a3a3a3")
+               ;:background-color (theme-pull :theme/editor-rim-color "#a3a3a3")
                :padding-top      "4px"
                :padding-bottom   "4px" ;:margin-left "2px"
               } :child "reco preview"]
@@ -1670,15 +1671,30 @@
                  :border-radius  "0px 11px 0px 0px"
                  :padding-top    "4px"
                  :padding-bottom "4px"
-                 :margin-left    "-21px"} :children
-                [[re-com/h-box :gap "12px" :width (px (- (* single-width 0.405) 18)) :children
-                  (for [b    ["queries" "blocks"]
+                 ;:margin-left    "-21px"
+                 } 
+                
+                :children
+                [[re-com/h-box :gap "8px" 
+                  :width (px (- (* single-width 0.405) 18)) 
+                  :justify :end
+                  :align :center ;:size "auto"
+                  ;:style {:padding-right "8px"}
+                  :children
+                  (conj 
+                   (vec (for [b    ["queries" "blocks"]
                         :let [selected? (= (keyword b) @db/item-browser-mode)]]
-                    [re-com/box :attr {:on-click #(reset! db/item-browser-mode (keyword b))} :style
-                     (if selected? {:user-select "none" :opacity 1.0} {:cursor "pointer" :user-select "none" :opacity 0.3}) :child
-                     (str b)])]
-                 [re-com/md-icon-button :md-icon-name "zmdi-window-minimize" :on-click
-                  #(ut/tracked-dispatch [::bricks/toggle-editor]) :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}]]]
+                    [re-com/box :attr {:on-click #(reset! db/item-browser-mode (keyword b))} 
+                     :style
+                     (if selected?
+                       {:user-select "none" :opacity 1.0}
+                       {:cursor "pointer" :user-select "none" :opacity 0.3}) :child
+                     (str b)]))
+                   [re-com/md-icon-button :md-icon-name "zmdi-window-minimize" :on-click
+                    #(ut/tracked-dispatch [::bricks/toggle-editor]) :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}]
+                   )]
+                 ;[re-com/gap :size "12px"]
+                 ]]
                [re-com/box :style {:padding-right "3px"} :child
                 (cond (= @db/item-browser-mode :queries) [bricks/screen-query-browser (* single-width 0.379)
                                                           (- single-height 1.3)]
@@ -1731,7 +1747,7 @@
        :z-index          100
        :border           (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil)) ; #b7e27c"
        :filter           "drop-shadow(0.35rem 0.35rem 0.4rem rgba(0, 0, 0, 0.8))"
-       :background-color (str (theme-pull :theme/editor-background-color nil) 99) ; "#000000"
+       :background-color (str (theme-pull :theme/editor-background-color nil) 77) ; "#000000"
        :backdrop-filter  "blur(5px)"}]]))
 
 (dnd2/subscribe! (js/document.querySelector "div")

@@ -1,0 +1,90 @@
+;;
+;;   ____ _  _ ___  ___  _ ___    ___  ____ ____ ____    ____ ____ _  _ ____ _ ____
+;;   |__/ |  | |__] |__] |  |     |__] |__| [__  |___    |    |  | |\ | |___ | | __
+;;   |  \  \/  |__] |__] |  |     |__] |  | ___] |___    |___ |__| | \| |    | |__]
+;;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+;;
+;; docs coming soon, doc!
+
+{:debug-level 1 ;; for console output. somewhat deprecated.
+ :openapi-key "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"
+ :openapi-org-id nil
+ :default "./screens/looking-glass-redux.edn"
+ ;; ^^ if no screen given in URL, load this one. "start page" essentially.
+ :harvest-on-boot? true
+ ;; see clover-templates.edn, for the full clover defs mentioned here
+ :runner-view-modes {:text [:code-box :*data]
+                     :data [:data-viewer :*data]
+                     :pretty [:pretty-box :*data]
+                     :clover [:box :child :*data]}
+ :runners {:queries {:default {}
+                     ;:icon "images/sql.png"
+                     } ;; basic clover-sql query runner
+           :views   {:default []
+                     ;:icon "images/clover.png"
+                     } ;; basic clover render
+           :sandwiches {:type :clojure}
+           :hoagies {}
+           ;; ^ these 2 are built in a required and mostly not configurable for now
+           :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
+                     :runner {:port 8181 :host "127.0.0.1"}
+                     :default (let [clojure-version (clojure-version)
+                                    jvm-version (System/getProperty
+                                                 "java.version")]
+                                (str
+                                 "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+                                 clojure-version
+                                 " on " jvm-version " JVM tech"
+                                 " 🥕🐇"))
+                     :syntax "clojure"
+                     :clover-fn [:run-solver
+                                 {:signal false
+                                  :type :clojure
+                                  :input-map {}
+                                  :data :clover-body}]
+                     :default-view [:box :child [:string :*query-id]]
+                     :icon "images/clj.png"}
+           :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
+                      :runner {:port 37851 :host "127.0.0.1"}
+                      :default (let [clojure-version (clojure-version)
+                                     jvm-version (System/getProperty
+                                                  "java.version")]
+                                 (str
+                                  "👻 Whoa. Spooky external nREPL! 👀 Clojure "
+                                  clojure-version
+                                  " on " jvm-version " JVM tech"
+                                  " 👻"))
+                      :syntax "clojure"
+                      :clover-fn  [:run-solver
+                                   {:signal false
+                                    :type :clojure2
+                                    :input-map {}
+                                    :data :clover-body}]
+                      :default-view [:box :child [:string :*query-id]]
+                      :icon "images/clj.png"}
+           :create-image {:runner {:flow-id :run-dalle3
+                                   :overrides {:code :selected-view}
+                                   :opts? {:instanced? true}}
+                          :type :flow
+                          :syntax "text"
+                          :clover-fn [:data-viewer [:run-solver
+                                                    [:get-my-colors
+                                                     {:input-image-path
+                                                      "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-48163-50841.png"}]]]
+                          :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene."
+                          :default-view [:box :child [:img {:src :*query-id}]]
+                          :icon "images/dalle.png"
+                          }
+           :python3 {:runner {:flow-id :run-python3
+                              :overrides {:code :string-body}
+                              :opts? {:instanced? true}}
+                     :type :flow
+                     :syntax "python"
+                     :default-view [:box :child [:string :*query-id]]
+                     ;:icon "images/python3.png"
+                     }}
+ :eleven-labs-api-key nil
+ :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive" ;;  "Alicia Speaks-Unique and Pleasant"  ;; "Sofia-AI-frye" ;; "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
+ }
+

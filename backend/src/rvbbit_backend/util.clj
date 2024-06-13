@@ -197,7 +197,7 @@
   []
   (let [os-bean (java.lang.management.ManagementFactory/getOperatingSystemMXBean)] (.getSystemLoadAverage os-bean)))
 
-(def debug-level (get config/settings :debug-level 0))
+(def debug-level (get (config/settings) :debug-level 0))
 
 
 (defn replace-multiple [s replacements] (reduce (fn [s [k v]] (cstr/replace s k v)) s replacements))
@@ -746,7 +746,18 @@
   [millis]
   (let [date (java.util.Date. millis) format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss")] (.format format date)))
 
-(defn deep-flatten [x] (if (coll? x) (mapcat deep-flatten x) [x]))
+;;(defn deep-flatten [x] (if (coll? x) (mapcat deep-flatten x) [x]))
+
+;; (defn deep-flatten [x] (if (coll? x) (into #{} (mapcat deep-flatten x)) #{x}))
+
+(def df-cache (atom {}))
+
+(defn deep-flatten [x]
+  (if-let [cached-result (@df-cache (pr-str x))]
+    cached-result
+    (let [result (vec (filter keyword? (if (coll? x) (into #{} (mapcat deep-flatten x)) #{x})))]
+      (swap! df-cache assoc (pr-str x) result)
+      result)))
 
 (def boot-timestamp
   (str (-> (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss")

@@ -196,12 +196,12 @@
   (undo/undo-config! {:harvest-fn   (fn [ratom] (select-keys @ratom [:panels :signals-map :flows]))
                       :reinstate-fn (fn [ratom value] (swap! ratom merge value))})
   (track-mouse-activity)
-  (let [press-fn   (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event
-                     (when (and (= (.-keyCode event) 71) (not @g-key-down?))
-                       (do (reset! g-key-down? true) (reset! flows/drop-toggle? (not @flows/drop-toggle?)))))
-        release-fn (fn [event] (when (= (.-keyCode event) 71) (do (reset! g-key-down? false) (reset! flows/drop-toggle? false))))]
-    (.addEventListener js/window "keydown" press-fn)
-    (.addEventListener js/window "keyup" release-fn))
+  ;; (let [press-fn   (fn [event] ;; test, keeping out of re-pressed / app-db due to causing event
+  ;;                    (when (and (= (.-keyCode event) 71) (not @g-key-down?))
+  ;;                      (do (reset! g-key-down? true) (reset! flows/drop-toggle? (not @flows/drop-toggle?)))))
+  ;;       release-fn (fn [event] (when (= (.-keyCode event) 71) (do (reset! g-key-down? false) (reset! flows/drop-toggle? false))))]
+  ;;   (.addEventListener js/window "keydown" press-fn)
+  ;;   (.addEventListener js/window "keyup" release-fn))
   (ut/tracked-dispatch
     [::wfx/request :default
      {:message {:kind :session-snaps :client-name client-name} :on-response [::bricks/save-sessions] :timeout 15000}])

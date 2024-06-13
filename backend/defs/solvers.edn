@@ -102,6 +102,7 @@
  :solver-fn-test1
  {:signal false,
   :type :clojure,
+  :cache? true,
   :input-map {:some-string "HEYa!", :some-number 123},
   :data (str :some-string (+ 123 :some-number))},
  :sql-solver-1

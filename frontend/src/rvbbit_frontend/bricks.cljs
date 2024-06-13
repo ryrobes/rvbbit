@@ -36,7 +36,7 @@
     [goog.events :as gevents]
     [goog.i18n.NumberFormat.Format]
     [oz.core :as oz]
-    [re-catch.core :as rc]
+    ;[re-catch.core :as rc]
     [re-com.core :as    re-com
                  :refer [at]]
     [re-com.util :refer [px]]
@@ -155,42 +155,85 @@
 
 ;;(def reecatch rc/catch)
 
+;; (defn reecatch
+;;   [] ;;; fork of re-catch, will push to own forked credited lib before release
+;;   (let [error-state (reagent/atom nil)
+;;         info-state  (reagent/atom nil)
+;;         retry-timer (reagent/atom nil)
+;;         websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
+;;         online?                   (true? (= websocket-status :connected))
+;;         retry-count (reagent/atom 0)] ; Add a retry count
+;;     (reagent/create-class
+;;       {:component-did-catch    (fn re-catch-block [this error info]
+;;                                  (reset! error-state (str error))
+;;                                  (reset! info-state (some->> info
+;;                                                              .-componentStack
+;;                                                              (cstr/split-lines)
+;;                                                              (remove cstr/blank?)
+;;                                                              (drop-while #(re-find #"re_catch" %))
+;;                                                              (drop-while #(re-find #"reecatch" %))
+;;                                                              (take 4)
+;;                                                              (cstr/join "\n")))
+;;                                  ;; Schedule a re-render after 5 seconds
+;;                                  (reset! retry-timer (js/setTimeout #(swap! retry-count inc) 3000))) ; Increment the retry
+;;                                                                                                      ; count
+;;        :component-will-unmount (fn []
+;;                                  ;; Clear the retry timer when the component unmounts
+;;                                  (when @retry-timer (js/clearTimeout @retry-timer) (reset! retry-timer nil)))
+;;        :reagent-render         (fn [& body]
+;;                                  (if @error-state
+;;                                    (do
+;;                                      ;; Reset the error state if the retry count has changed
+;;                                      (when (pos? @retry-count) (reset! error-state nil) (reset! retry-count 0))
+;;                                      [*render-error* {:error @error-state :info @info-state}])
+;;                                    (when-not (->> body
+;;                                                   (remove nil?)
+;;                                                   empty?)
+;;                                      (into [:<>] body))))})))
+
 (defn reecatch
-  [] ;;; fork of re-catch, will push to own forked credited lib before release
+  []
   (let [error-state (reagent/atom nil)
         info-state  (reagent/atom nil)
         retry-timer (reagent/atom nil)
-        websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
-        online?                   (true? (= websocket-status :connected))
-        retry-count (reagent/atom 0)] ; Add a retry count
+        grace-period-timer (reagent/atom nil)
+        ;websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
+        ;online? (true? (= websocket-status :connected))
+        retry-count (reagent/atom 0)]
     (reagent/create-class
-      {:component-did-catch    (fn re-catch-block [this error info]
-                                 (reset! error-state (str error))
-                                 (reset! info-state (some->> info
-                                                             .-componentStack
-                                                             (cstr/split-lines)
-                                                             (remove cstr/blank?)
-                                                             (drop-while #(re-find #"re_catch" %))
-                                                             (drop-while #(re-find #"reecatch" %))
-                                                             (take 4)
-                                                             (cstr/join "\n")))
-                                 ;; Schedule a re-render after 5 seconds
-                                 (reset! retry-timer (js/setTimeout #(swap! retry-count inc) 3000))) ; Increment the retry
-                                                                                                     ; count
-       :component-will-unmount (fn []
-                                 ;; Clear the retry timer when the component unmounts
-                                 (when @retry-timer (js/clearTimeout @retry-timer) (reset! retry-timer nil)))
-       :reagent-render         (fn [& body]
-                                 (if @error-state
-                                   (do
-                                     ;; Reset the error state if the retry count has changed
-                                     (when (pos? @retry-count) (reset! error-state nil) (reset! retry-count 0))
-                                     [*render-error* {:error @error-state :info @info-state}])
-                                   (when-not (->> body
-                                                  (remove nil?)
-                                                  empty?)
-                                     (into [:<>] body))))})))
+     {:component-did-catch (fn re-catch-block [this error info]
+                              ;; Start the grace period timer
+                             (reset! grace-period-timer
+                                     (js/setTimeout #(do
+                                                       (reset! error-state (str error))
+                                                       (reset! info-state (some->> info
+                                                                                   .-componentStack
+                                                                                   (cstr/split-lines)
+                                                                                   (remove cstr/blank?)
+                                                                                   (drop-while (fn [x] (re-find #"re_catch" x)))
+                                                                                   (drop-while (fn [x] (re-find #"reecatch" x)))
+                                                                                   (take 14)
+                                                                                   (cstr/join "\n"))))
+                                                    5000)) ; 4 seconds grace period
+                              ;; Schedule a re-render after 3 seconds
+                             (reset! retry-timer (js/setTimeout #(swap! retry-count inc) 3000))) ; Increment the retry count
+      :component-will-unmount (fn []
+                                 ;; Clear the retry timer and the grace period timer when the component unmounts
+                                (when @retry-timer (js/clearTimeout @retry-timer) (reset! retry-timer nil))
+                                (when @grace-period-timer (js/clearTimeout @grace-period-timer) (reset! grace-period-timer nil)))
+      :reagent-render (fn [& body]
+                        (if @error-state
+                          (do
+                             ;; Reset the error state if the retry count has changed
+                            (when (pos? @retry-count) (reset! error-state nil) (reset! retry-count 0))
+                            [*render-error* {:error @error-state :info @info-state}])
+                          (when-not (->> body
+                                         (remove nil?)
+                                         empty?)
+                            (into [:<>] body))))
 
+      
+      })))
 
 
 (re-frame/reg-event-fx ::ship-atom
@@ -2566,17 +2609,27 @@
             (let [filtered-params (into {}
                                         (filter
                                           #(and ;; filter out from the top bar toggle first....
-                                             (not (= (str (first %)) ":/")) ;; sometimes a garbo
+                                            (not (= (str (first %)) ":/")) ;; sometimes a garbo
                                                                             ;; param sneaks
-                                             (not (cstr/starts-with? (str (first %)) ":conn-list/"))
-                                             (not (cstr/starts-with? (str (first %)) (if (get pf :theme) ":theme/***" ":theme/")))
-                                             (not (cstr/starts-with? (str (first %)) (if (get pf :user) ":param/***" ":param/")))
-                                             (not (cstr/starts-with? (str (first %))
-                                                                     (if (get pf :condis) ":condi/***" ":condi/")))
-                                             (if (get pf :this-tab? true)
-                                               (some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) current-tab-queries)
-                                               true)
-                                             (not (cstr/includes? (str (first %)) "-sys/")))
+                                            (not (cstr/starts-with? (str (first %)) ":solver-meta/"))
+                                            (not (cstr/starts-with? (str (first %)) ":signal/"))
+                                            (not (and (cstr/starts-with? (str (first %)) ":solver/")
+                                                 (re-matches #".*\d" (str (first %)))))
+                                            (not (cstr/ends-with? (str (first %)) "*running?"))
+                                            (not (cstr/ends-with? (str (first %)) "/selected-view"))
+                                            (not (cstr/ends-with? (str (first %)) "/selected-view-data"))
+                                            (not (cstr/starts-with? (str (first %)) ":conn-list/"))
+                                            (not (cstr/starts-with? (str (first %)) ":time/"))
+                                            (not (cstr/starts-with? (str (first %)) ":sys/"))
+                                            (not (cstr/starts-with? (str (first %)) ":client/"))
+                                            (not (cstr/starts-with? (str (first %)) (if (get pf :theme) ":theme/***" ":theme/")))
+                                            (not (cstr/starts-with? (str (first %)) (if (get pf :user) ":param/***" ":param/")))
+                                            (not (cstr/starts-with? (str (first %))
+                                                                    (if (get pf :condis) ":condi/***" ":condi/")))
+                                            (if (get pf :this-tab? true)
+                                              (some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) current-tab-queries)
+                                              true)
+                                            (not (cstr/includes? (str (first %)) "-sys/")))
                                           grp))
                   filter-keys     (vec (filter-search @searcher-atom (keys filtered-params)))
                   filtered-params (select-keys filtered-params filter-keys)
@@ -5746,14 +5799,14 @@
 (re-frame/reg-sub
  ::panel-runners
  (fn [db {:keys [panel-key]}]
-   (let [br (keys (get-in db [:server :settings :runners]))
+   (let [br (keys (-> (get-in db [:server :settings :runners]) (dissoc :views) (dissoc :queries)))
          v (select-keys (get-in db [:panels panel-key]) br)] 
      v)))
 
 (re-frame/reg-sub
  ::panel-runners-rev
  (fn [db {:keys [panel-key]}]
-   (let [br (vec (keys (get-in db [:server :settings :runners])))
+   (let [br (vec (keys (-> (get-in db [:server :settings :runners]) (dissoc :views) (dissoc :queries))))
          v (select-keys (get-in db [:panels panel-key]) br)
          ;;v (vec (apply concat (for [[k v] v] (for [vv v] vv))))
          ]
@@ -5766,7 +5819,7 @@
                     (let [body    (get-in db [:panels panel-key :views])
                           queries (get-in db [:panels panel-key :queries])
                           view    (get-in db [:panels panel-key :selected-view])
-                          runners (keys (get-in db [:server :settings :runners]))
+                          runners (keys (-> (get-in db [:server :settings :runners]) (dissoc :views) (dissoc :queries)))
                           runners2 (vec (apply merge (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))))
                           vq      (conj (conj (into runners2 (into (keys body) (keys queries))) :layered-viz) :dyn-tab)] ;; pseudo
                       (cond (and view (some #(= % view) vq)) view
@@ -5777,9 +5830,10 @@
                   (fn [db {:keys [panel-key]}]
                     (let [body    (get-in db [:panels panel-key :views])
                           queries (get-in db [:panels panel-key :queries])
-                          runners (keys (get-in db [:server :settings :runners]))
+                          runners (keys (-> (get-in db [:server :settings :runners]) (dissoc :views) (dissoc :queries)))
                           runners2 (vec (apply merge (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))))
-                          ;;_ (ut/tapp>> [:runners runners2])
+                          ;;conj on a map takes map entries or seqables of map entries
+                          ;;_ (ut/tapp>> [:run runners runners2 (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))])
                           view    (get-in db [:panels panel-key :selected-view])
                           vq      (conj (conj (into runners2 (into (keys body) (keys queries))) :layered-viz) :dyn-tab)
                           v  (cond (and view (some #(= % view) vq)) view
@@ -6330,7 +6384,7 @@
 (re-frame/reg-event-db ::clear-cache-atoms
                        (fn [db _]
                          (ut/tapp>> [:clearing-cache-atoms! (get db :client-name)])
-                         (doseq [a [ut/replacer-data ut/replacer-cache ut/deep-flatten-data ut/deep-flatten-cache
+                         (doseq [a [ut/replacer-data ut/replacer-cache ut/deep-flatten-data ut/deep-flatten-cache ut/map-boxes-cache
                                     ut/clover-walk-singles-map ut/process-key-cache ut/process-key-tracker ut/compound-keys-cache
                                     ut/compound-keys-tracker ut/upstream-cache ut/upstream-cache-tracker ut/downstream-cache
                                     ut/downstream-cache-tracker ut/split-cache ut/split-cache-data ut/extract-patterns-data
@@ -6375,6 +6429,7 @@
                :db/solver-fn-runs              db/solver-fn-runs
                :ut/is-large-base64-atom        ut/is-large-base64-atom
                :ut/safe-name-cache             ut/safe-name-cache
+               :ut/map-boxes-cache             ut/map-boxes-cache
                :re-frame.db/app-db             re-frame.db/app-db
                :ut/clean-sql-atom              ut/clean-sql-atom
                :ut/format-map-atom             ut/format-map-atom
@@ -6724,6 +6779,7 @@
 
 (defn map-value-box
   [s k-val-type] ;; dupe of a fn inside flows, but w/o dragging - TODO refactor to single fn -
+  ;(ut/tapp>> [s k-val-type]) 
   (let [render-values? true
         function?      (or (fn? s) (try (fn? s) (catch :default _ false)))]
     (cond (ut/hex-color? s)                        [re-com/h-box :gap "3px" :children
@@ -6737,7 +6793,10 @@
                                                            " MB")]
                                                      [re-com/box :size "auto" :child
                                                       [:img {:src (str "data:image/png;base64," s)}]]]]
-          (or function? (= k-val-type "function")) (str (.-name s) "!") ;; temp
+          (or function? (= k-val-type "function"))    [re-com/box :size "auto" :align :end :justify :end :style  {:font-weight 700}
+                                                       :child (str (.-name s))] ;; temp
+          ;; [re-com/box :size "auto" :align :end :justify :end :style
+          ;;  {:word-break "break-all"} :child (str "\"" (.-name s) "\"")]
           (string? s)                              [re-com/box :size "auto" :align :end :justify :end :style
                                                     {:word-break "break-all"} :child (str "\"" s "\"")]
           :else                                    (ut/replacer (str s) #"clojure.core/" ""))))
@@ -6750,7 +6809,21 @@
                   (fn [db {:keys [block-id selected-view]}]
                     (let [view (get-in db [:panels block-id :views selected-view])] (data-viewer-source view))))
 
-(defn map-boxes2
+(declare map-boxes2*)
+
+(defn map-boxes2 [data block-id selected-view keypath kki init-data-type & [draggable?]]
+  (let [cache-key (pr-str [data block-id selected-view keypath kki init-data-type draggable?])
+        cache (get @ut/map-boxes-cache cache-key)]
+    (swap! ut/map-boxes-cache-hits update cache-key (fnil inc 0))
+    (if cache cache
+        (let [res (map-boxes2* data block-id selected-view keypath kki init-data-type draggable?)]
+          (swap! ut/map-boxes-cache assoc cache-key res)
+          res))))
+
+;;(ut/tapp>> [:map-boxes-cache-hits @ut/map-boxes-cache-hits])
+;;(ut/tapp>> [:map-boxes-cache-hits2 (ut/distribution ut/map-boxes-cache-hits 0.33)]) 
+
+(defn map-boxes2*
   [data block-id selected-view keypath kki init-data-type & [draggable?]] ;; dupe of a fn inside
   (let [sql-explanations (sql-explanations-kp)
         flow-name (ut/data-typer data)
@@ -6776,7 +6849,7 @@
                    in-body?   true ;(ut/contains-data? only-body k-val)
                    hovered?   false ;(ut/contains-data? mat-hovered-input k-val)
                    border-ind (if in-body? "solid" "dashed")
-                   val-color  (get dcolors k-val-type)
+                   val-color  (get dcolors k-val-type (theme-pull :theme/editor-outer-rim-color nil))
                    keypath-in (conj keypath kk)
                    keystyle   {:background-color (if hovered? (str val-color 66) "#00000000")
                                :color            val-color
@@ -6808,7 +6881,8 @@
                                            :style
                                            {;:cursor (when draggable? "grab")
                                            } :children
-                                           [^{:key (str block-id keypath kki kk k-val-type 124)} [re-com/box :child (str kk)]
+                                           [^{:key (str block-id keypath kki kk k-val-type 124)} 
+                                            [re-com/box :child (str kk)]
                                             ^{:key (str block-id keypath kki kk k-val-type 134)}
                                             [re-com/box :child (str k-val-type) :style
                                              {:opacity     0.45
@@ -6817,10 +6891,11 @@
                                             (when (> (count k-val) 1)
                                               ^{:key (str block-id keypath kki kk k-val-type 156)}
                                               [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])] :padding
-                                           "8px"]] (map-boxes2 k-val block-id selected-view keypath-in kk nil draggable?)] :style
+                                           "8px"]] [map-boxes2 k-val block-id selected-view keypath-in kk nil draggable?]] :style
                                         keystyle]
                   (or (= k-val-type "vector")
-                      (= k-val-type "list") ; (= k-val-type "function")
+                      (= k-val-type "list")
+                      ;(= k-val-type "function")
                       (= k-val-type "rowset")
                       (= k-val-type "jdbc-conn")
                       (= k-val-type "render-object"))
@@ -6843,8 +6918,8 @@
                         } :children
                         (if (and (= k-val-type "list") (= (ut/data-typer (first k-val)) "function"))
                           [^{:key (str block-id keypath kki kk k-val-type 4)}
-                           [re-com/h-box :style {:margin-top "4px"} :gap "1px" :children
-                            [;[re-com/box :child (str kk) :style {:opacity 0.25}]
+                           [re-com/h-box :style {:margin-top "4px"} :gap "5px" :children
+                            [[re-com/box :child (str kk) :style {:opacity 0.25}]
                              [re-com/box :child "(" :style
                               {;:opacity 0.5
                                :color       "orange"
@@ -6865,11 +6940,13 @@
                            (when (> (count k-val) 1)
                              ^{:key (str block-id keypath kki kk k-val-type 827)}
                              [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])]
+                          
                           [(when true ;(not (get sql-explanations keypath ""))
                              ^{:key (str block-id keypath kki kk k-val-type 7)} [re-com/box :child (str kk)])
                            (when true ; (not (get sql-explanations keypath ""))
                              ^{:key (str block-id keypath kki kk k-val-type 8)}
-                             [re-com/box :child (str (when (= (count k-val) 0) "empty ") k-val-type) :style
+                             [re-com/box :child (str (when (= (count k-val) 0) "empty ") k-val-type) 
+                              :style
                               {:opacity     0.45
                                :font-size   font-size ; "9px"
                                :padding-top "7px"}])
@@ -6880,7 +6957,9 @@
                               {:font-size "16px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}])]) :padding
                         "8px"]]
                       [map-boxes2
-                       (if (= k-val-type "rowset") (zipmap (iterate inc 0) (take 10 k-val)) (zipmap (iterate inc 0) k-val))
+                       (if (= k-val-type "rowset")
+                         (zipmap (iterate inc 0) (take 10 k-val))
+                         (zipmap (iterate inc 0) k-val))
                        block-id selected-view keypath-in kk nil draggable?]] :style keystyle]
                   :else
                     ^{:key (str block-id keypath kki kk k-val-type 9)}
@@ -6912,7 +6991,7 @@
                           ^{:key (str block-id keypath kki kk k-val-type 822)}
                           [re-com/box :style {:opacity 0.45} :child (str (get sql-explanations (vec (conj keypath kk)) ""))])]]
                       ^{:key (str block-id keypath kki kk k-val-type 13)}
-                      [re-com/box :size "auto" :align :end :justify :end :child [map-value-box k-val] :style
+                      [re-com/box :size "auto" :align :end :justify :end :child [map-value-box k-val k-val-type] :style
                        {;:font-weight 500
                         :line-height  "1.2em"
                         :padding-left "5px"}]] :justify :between :padding "5px" :style valstyle])]))]]
@@ -7520,8 +7599,9 @@
                            (if (vector? args)
                              (cstr/join "" args) ;;(apply str args))
                              (str args)))
-                 :data-viewer (fn [x] [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
-                                       :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]])
+                 :data-viewer (fn [x] (let [x (walk/postwalk-replace {:box :_box :icon :_icon :v-box :_v-box  :h-box :_h-box} x)]
+                                        [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
+                                         :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]]))
                  :progress-bar
                    (fn [[ww seconds uid]]
                      (let [progress            (or (get @progress-bars uid) (reagent.core/atom 0))
@@ -7910,8 +7990,11 @@
         px-height-int (- hh 105)
         selected-view (if override-view override-view selected-view)
         selected-view-type @(ut/tracked-sub ::view-type {:panel-key panel-key :view selected-view})
-        selected-view-type (if (and (not= selected-view-type :views)
-                                    (not= selected-view-type :queries)) selected-view-type :views)
+        selected-view-type (cond (nil? selected-view-type) :views
+                                 (and (not= selected-view-type :views)
+                                      (not= selected-view-type :queries))
+                                 selected-view-type
+                                 :else :views)
         ;;_ (ut/tapp>>  [:selected-view-type selected-view selected-view-type])
 
         all-drops @(ut/tracked-sub ::all-drops-of-alpha {:ttype :*})
@@ -7939,7 +8022,7 @@
                      wrapper (get-in br [selected-view-type :clover-fn])
                      ;wrapper (ut/postwalker {:clover-body body} wrapper)
                      ]
-                 (into {} (for [[k v]  body] {k [:box 
+                 (into {} (for [[k v]  body] {k [:box
                                                  :align :center :justify :center :size "auto"
                                                  :style {:font-size "14px" :color (theme-pull :theme/editor-outer-rim-color nil)}
                                                  :child [:data-viewer (ut/postwalk-replacer {:clover-body v} wrapper)]]})))
@@ -8192,6 +8275,7 @@
         obody-key-set (ut/body-set body)
         has-fn? (fn [k] (contains? obody-key-set k)) ;; faster than some on a set since it will
         has-drops? (boolean (some obody-key-set all-drops)) ;; faster?
+        ;data-viewer? (=  (get (val body) 0)  :data-viewer) ;; (has-fn? :data-viewer)
         body ;;(ut/timed
         (cond->> body
           true                      (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
@@ -8221,9 +8305,22 @@
           (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS FUCKERY - we
           (has-fn? :push>)          push-walk
           (has-fn? :push>>)         push-walk-fn
+          ;data-viewer?              (walk/postwalk-replace {:data-viewer (fn [x] [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
+          ;                                                                         :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]])}) 
+          (has-fn? :data-viewer)  (ut/postwalk-replacer
+                                    {:data-viewer (fn [x] (let [x (walk/postwalk-replace {:box :_box 
+                                                                                          :icon :_icon 
+                                                                                          :v-box :_v-box  
+                                                                                          :h-box :_h-box} x)]
+                                                            [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
+                                                             :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]]))} )
           has-drops?                (drop-walk-replace (vec (keys drop-walks))))
-        body ;;(ut/timed
-        (ut/postwalk-replacer walk-map body)
+        ;; body (if data-viewer? ;; else they will try to render shit inside the vectors... 
+        ;;        (ut/postwalk-replacer 
+        ;;         (->  walk-map (dissoc :box :icon :h-box :v-box)) 
+        ;;                              body)
+        ;;        (ut/postwalk-replacer walk-map body))
+        body (ut/postwalk-replacer walk-map body)
         dbody-type (get-in @dragging-body [:drag-meta :type])
         relevant-for-dyn-drop? (or (and is-layout? (or (= :query dbody-type) (= :view dbody-type)))
                                    (and (not (contains? @dragging-body :cloned-from))

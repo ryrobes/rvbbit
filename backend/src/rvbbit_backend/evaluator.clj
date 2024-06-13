@@ -10,7 +10,7 @@
 (defn run [code] (eval code))
 
 (defonce eval-cache (atom {}))
-(def rabbit-config config/settings) ;; legacy
+(def rabbit-config (config/settings)) ;; legacy
 (def debug? true)
 
 (def repl-server (atom nil))

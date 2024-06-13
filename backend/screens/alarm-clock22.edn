@@ -28,7 +28,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 77,
    :group-by [:ts],
-   :_last-run "16:55:06",
+   :_last-run "20:52:02",
    :refresh-every 20,
    :from
    [{:select
@@ -110,17 +110,17 @@
   {:fields
    {:snapshot_ds
     {:data-type "string",
-     :distinct 81,
+     :distinct 104,
      :group-by? true,
-     :commons {"2024-06-12 09:40" 1, "2024-06-12 11:35" 1, "2024-06-12 10:20" 1},
+     :commons {"2024-06-12 09:40" 1, "2024-06-12 16:40" 1, "2024-06-12 16:05" 1},
      :cardinality 100},
     :rowcnt
     {:data-type "integer",
-     :distinct 81,
+     :distinct 104,
      :group-by? false,
-     :commons {212 1, 861 1, 2503 1},
+     :commons {2981 1, 212 1, 3443 1},
      :cardinality 100}},
-   :rowcount 81},
+   :rowcount 104},
   :solvers-sql-snapshot-solver-1-drag-30
   {:fields
    {:mb
@@ -317,28 +317,28 @@
   {:fields
    {:mb
     {:data-type "integer",
-     :distinct 58,
+     :distinct 71,
      :group-by? true,
-     :commons {325 4, 270 3, 337 3},
-     :cardinality 75},
+     :commons {957 3, 1069 2, 978 2},
+     :cardinality 92},
     :mem_used
     {:data-type "integer",
      :distinct 77,
      :group-by? true,
-     :commons {404396344 1, 356413530 1, 266391876 1},
+     :commons {1126668835 1, 1083219565 1, 1011748264 1},
      :cardinality 100},
     :messages_per_second
     {:data-type "float",
-     :distinct 13,
+     :distinct 28,
      :group-by? true,
-     :commons {2.13 48, 2.33 11, 2.14 4},
-     :cardinality 16},
+     :commons {4.73 7, 4.47 7, 4.93 6},
+     :cardinality 36},
     :ts
     {:data-type "string",
      :distinct 77,
      :group-by? true,
      :commons
-     {"2024-06-12 16:49:24" 1, "2024-06-12 16:52:24" 1, "2024-06-12 16:50:09" 1},
+     {"2024-06-12 20:34:15" 1, "2024-06-12 20:40:58" 1, "2024-06-12 20:48:05" 1},
      :cardinality 100}},
    :rowcount 77},
   :shape-drag-7
@@ -357,7 +357,9 @@
      :cardinality 83}},
    :rowcount 30}},
  :default-col-widths
- {:block-8027 {:solvers-sql-snapshot-solver-1-drag-30 102},
+ {:block-11262 {:new-query 153},
+  :block-4167 {:query-11824 211},
+  :block-8027 {:solvers-sql-snapshot-solver-1-drag-30 102},
   :block-2952 {:snapshot-ds-drag-10 180},
   :block-12005 {:new-query 255}},
  :runstream-drops nil,
@@ -587,93 +589,90 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? true,
  :buffy? false,
- :memory [523286083 445346011 4294705152],
- :sched {},
+ :memory [1112368668 1005490332 4294705152],
+ :sched {:gen-viz-516 7356},
  :flow-subs
  [:time/now-seconds
-  :solver/solver-fn-test11975938697
-  :solver/get-my-colors423837796
-  :solver/get-my-colors1540646499
-  :solver/get-my-colors-334349423
-  :solver/solver-fn-test1701812984
+  :solver/get-my-colors-32492723
+  :solver/wallpaper-of-the-moment-8k-2041063498
   :flow/flow-forever>*running?
-  :solver/get-my-colors-418152992
-  :solver/get-my-colors902336142
+  :solver/solver-fn-test11358977488
+  :solver/get-my-colors-723959505
+  :solver/get-my-colors-1768779535
+  :solver/get-my-colors-1862013147
+  :solver/solver-fn-test1-1998797508
   :time/minute
-  :solver/solver-fn-test11569008714
   :time/hour
-  :solver/get-my-colors1570995018
   :solver/raw-custom-override437660285
   :solver/colors-of-the-moment>data-colors
-  :solver/get-my-colors1961113147
   :solver/colors-of-the-moment>colors>2
+  :solver/get-my-colors778252583
   :solver/colors-of-the-moment>colors>1
   :solver/raw-custom-override-55990886
+  :solver/get-my-colors-636982395
   :solver/colors-of-the-moment>brightest
   :flow/live-scratch-flow>*running?
   :solver/colors-of-the-moment
+  :solver/solver-fn-test1-120091311
   :client/*client-name*>stats>memory
-  :solver/wallpaper-of-the-moment-8k-1510103615
   :solver/wallpaper-of-the-moment
-  :solver/get-my-colors-1530760203
-  :solver/get-my-colors593059893
   :solver/colors-of-the-moment>colors>0
   :time/second
   :flow/flow-forever>:final-math
-  :solver/solver-fn-test1-370691334
+  :solver/get-my-colors-738897960
   :solver/colors-of-the-moment>second-brightest
-  :solver/get-my-colors462714984
-  :solver/get-my-colors-859994723
+  :solver/get-my-colors393774094
+  :solver/solver-fn-test11606518307
+  :solver/get-my-colors495809413
   :solver/colors-of-the-moment>darkest],
- :client-name :instantaneous-lilac-hornet-32,
+ :client-name :spiritual-short-falcon-23,
  :flow-editor? true,
  :openai-api-key "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",
  :window {:w 2559, :h 1665},
  :post-meta
- {:snapshot-ds-drag-10 {:* {:rowcount 81}}, :gen-viz-516 {:* {:rowcount 77}}},
+ {:solvers-sql-snapshot-solver-1-drag-30 {:* {:rowcount 177537}},
+  :snapshot-ds-drag-10 {:* {:rowcount 104}},
+  :gen-viz-516 {:* {:rowcount 77}}},
  :status
  {:heartbeat
   {:kick
    [:time/now-seconds
-    :solver/solver-fn-test11975938697
-    :solver/get-my-colors423837796
-    :solver/get-my-colors1540646499
-    :solver/get-my-colors-334349423
-    :solver/solver-fn-test1701812984
+    :solver/get-my-colors-32492723
+    :solver/wallpaper-of-the-moment-8k-2041063498
     :flow/flow-forever>*running?
-    :solver/get-my-colors-418152992
-    :solver/get-my-colors902336142
+    :solver/solver-fn-test11358977488
+    :solver/get-my-colors-723959505
+    :solver/get-my-colors-1768779535
+    :solver/get-my-colors-1862013147
+    :solver/solver-fn-test1-1998797508
     :time/minute
-    :solver/solver-fn-test11569008714
     :time/hour
-    :solver/get-my-colors1570995018
     :solver/raw-custom-override437660285
     :solver/colors-of-the-moment>data-colors
-    :solver/get-my-colors1961113147
     :solver/colors-of-the-moment>colors>2
+    :solver/get-my-colors778252583
     :solver/colors-of-the-moment>colors>1
     :solver/raw-custom-override-55990886
+    :solver/get-my-colors-636982395
     :solver/colors-of-the-moment>brightest
     :flow/live-scratch-flow>*running?
     :solver/colors-of-the-moment
+    :solver/solver-fn-test1-120091311
     :client/*client-name*>stats>memory
-    :solver/wallpaper-of-the-moment-8k-1510103615
     :solver/wallpaper-of-the-moment
-    :solver/get-my-colors-1530760203
-    :solver/get-my-colors593059893
     :solver/colors-of-the-moment>colors>0
     :time/second
     :flow/flow-forever>:final-math
-    :solver/solver-fn-test1-370691334
+    :solver/get-my-colors-738897960
     :solver/colors-of-the-moment>second-brightest
-    :solver/get-my-colors462714984
-    :solver/get-my-colors-859994723
+    :solver/get-my-colors393774094
+    :solver/solver-fn-test11606518307
+    :solver/get-my-colors495809413
     :solver/colors-of-the-moment>darkest]},
   :alert1 {:alerts :alert2}},
  :screen-name "alarm-clock22",
  :recos-page2 0,
- :selected-tab "champion tiger",
- :col-names nil,
+ :selected-tab "star-shaped wallaby",
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
@@ -684,14 +683,15 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   4623
+   7349
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :base-sniff-queries {:solvers_sql_snapshot_solver_1 -356095096},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1494368498,
+ :user-params-hash 1678272792,
  :grid-recos? true,
+ :session-hash 581883139,
  :resolved-queries
  {:new-query {:select [["heya, friendo" :greetings] [67 :count_stuff]]},
   :gen-viz-797
@@ -882,7 +882,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 77,
    :group-by [:ts],
-   :_last-run "16:55:39",
+   :_last-run "20:52:02",
    :refresh-every 20,
    :from
    [{:select
@@ -2083,7 +2083,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 77,
      :group-by [:ts],
-     :_last-run "16:55:39",
+     :_last-run "20:52:02",
      :refresh-every 20,
      :from
      [{:select
@@ -2239,7 +2239,7 @@
      [:string3 :param/color-pal>second-darkest " " :param/color-pal>colors>3]]},
    :queries {}},
   :block-12005
-  {:clojure {:new-clojure (str "Hi!" (+ 1 2 3))},
+  {:clojure {:new-clojure (str "Hi!" (+ 1 2 3 5))},
    :name "block-12005",
    :w 5,
    :selected-view :hi,
@@ -2395,21 +2395,21 @@
       :color [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]}
      :child
      [:string3 [:get-in [:solver/colors-of-the-moment [:colors 2]]]]]}}},
- :selected-block :block-12005,
+ :selected-block :block-3197,
  :theme-colors-hashmap
- {"float" "#9cdabc",
-  "boolean" "#d26cc2",
-  "map" "#babb66",
-  "list" "#594d94",
-  "string" "#f1f9f1",
-  "any" "#4658ad",
-  "vector" "#5bea2f",
-  "keyword" "#d4d3a6",
-  "rabbit-code" "#4c8bab",
-  "datetime" "#693873",
-  "integer" "#9bbac7",
-  "unknown" "#50373c",
-  "date" "#3f3927"},
+ {"float" "#cec9c9",
+  "boolean" "#acca9e",
+  "map" "#8c7ec6",
+  "list" "#424982",
+  "string" "#ffffff",
+  "any" "#3fa465",
+  "vector" "#bf81c0",
+  "keyword" "#ffffff",
+  "rabbit-code" "#c180bc",
+  "datetime" "#7b2c72",
+  "integer" "#ccc4c3",
+  "unknown" "#2f196d",
+  "date" "#08220e"},
  :click-param
  {:blocks-sys
   {:block_key ":block-12050",
@@ -2440,23 +2440,20 @@
    :queries 4,
    :ts "2024-05-27 02:04:18"},
   :time
-  {:month-name "MAY",
-   :day 4,
-   :hour 17,
-   :now "Saturday, May 25th 3:05AM",
-   :second 30,
-   :now-seconds "Wednesday, June 12th 5:19:30PM",
-   :nth "th",
+  {:hour 20,
+   :second 12,
+   :now-seconds "Wednesday, June 12th 8:52:12PM",
    :month 4,
-   :minute 19},
+   :minute 52},
   :client
-  {:fetching-ivory-hornet-15>stats>memory 611,
+  {:spiritual-short-falcon-23>stats>memory nil,
+   :fetching-ivory-hornet-15>stats>memory 611,
    :electrifying-jungle-green-yak-27>stats>memory nil,
    :favorable-desert-parrot-40>stats>memory 658,
    :principled-gray-grasshopper-35>stats>memory nil,
    :enthusiastic-triangular-swallow-40>stats>memory nil,
    :fit-star-shaped-ape-9>stats>memory nil,
-   :*client-name*>stats>memory 463,
+   :*client-name*>stats>memory 1033,
    :grin-bulbous-turtle-14>stats>memory 1419,
    :truthful-cylindrical-boar-28>stats>memory nil,
    :engaging-teal-duck-15>stats>memory 268,
@@ -2481,20 +2478,36 @@
       "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-48163-50841.png"}]],
    :selected-view-data
    [:box
-    :child
-    "heya"
     :align
     :center
     :justify
     :center
-    :size
-    "auto"
+    :attr
+    {:id ":block-3197.:hi"}
     :style
-    {:font-size "22px"}],
-   :selected-view [:views :new-view],
+    {:font-size "28px",
+     :font-weight 700,
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family :theme/base-font}
+    :child
+    [:string3
+     [:clj
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (str
+          "🐇🥕 Hello there! This is Clojure version "
+          clojure-version
+          " on JVM  "
+          jvm-version
+          " 🥕🐇 "
+          :time/now-seconds))]]],
+   :selected-view [:views :hi],
    :queen-local "images/gen/b64-image3-48163-50841.png",
    :testme :solver/colors-of-the-moment>colors>1,
-   :selected-block :block-12005,
+   :selected-block :block-3197,
    :test [:get-in [:solver/colors-of-the-moment [:colors 2]]],
    :huger22
    [:run-solver
@@ -2672,7 +2685,7 @@
     "2024-05-27 03:40:00 984 (14958ms)"
     "2024-05-27 03:35:01 153 (10006ms)"
     "2024-05-27 03:30:01 069 (4614ms)"]},
-  :sys {:selected-tab "champion tiger", :selected-tab-idx 4},
+  :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3},
   :signal
   {:part-optimistic-sheep-signal-1 false,
    :part-every-5-minutes-9 false,
@@ -2735,43 +2748,43 @@
    :get-my-colors-702287705
    "java.lang.Exception: JSON error (unexpected character): F",
    :colors-of-the-moment
-   {:second-darkest "#302c3c",
-    :highest-saturation "#b72260",
-    :most-contrasting "#b72260",
-    :darkest "#25202f",
-    :contrast-with-dominant "#b72260",
+   {:second-darkest "#192e4f",
+    :highest-saturation "#192e4f",
+    :most-contrasting "#080c19",
+    :darkest "#080c19",
+    :contrast-with-dominant "#080c19",
     :colors
-    ["#25202f"
-     "#d4a6bc"
-     "#66b8bb"
-     "#7e415a"
-     "#6d81a4"
-     "#3d717f"
-     "#404c6e"
-     "#552f3d"
-     "#b72260"
-     "#b26c44"
-     "#302c3c"],
-    :most-frequent "#404c6e",
+    ["#cecbc9"
+     "#6ea6a7"
+     "#375b78"
+     "#080c19"
+     "#a55585"
+     "#60374b"
+     "#192e4f"
+     "#59799f"
+     "#27555a"
+     "#a06e58"
+     "#ccc3c5"],
+    :most-frequent "#192e4f",
     :data-colors
-    {"float" "#9cdabc",
-     "boolean" "#d26cc2",
-     "map" "#babb66",
-     "list" "#594d94",
-     "string" "#f1f9f1",
-     "any" "#4658ad",
-     "vector" "#5bea2f",
-     "keyword" "#d4d3a6",
-     "rabbit-code" "#4c8bab",
-     "datetime" "#693873",
-     "integer" "#9bbac7",
-     "unknown" "#50373c",
-     "date" "#3f3927"},
-    :dominant "#302c3c",
-    :most-contrasting-dark "#b72260",
-    :second-brightest "#66b8bb",
-    :brightest "#d4a6bc",
-    :most-contrasting-light "#66b8bb"},
+    {"float" "#cec9c9",
+     "boolean" "#acca9e",
+     "map" "#8c7ec6",
+     "list" "#424982",
+     "string" "#ffffff",
+     "any" "#3fa465",
+     "vector" "#bf81c0",
+     "keyword" "#ffffff",
+     "rabbit-code" "#c180bc",
+     "datetime" "#7b2c72",
+     "integer" "#ccc4c3",
+     "unknown" "#2f196d",
+     "date" "#08220e"},
+    :dominant "#ccc3c5",
+    :most-contrasting-dark "#080c19",
+    :second-brightest "#ccc3c5",
+    :brightest "#cecbc9",
+    :most-contrasting-light "#cecbc9"},
    :solver-fn-test11098864634 "Huge!!!!v!!!!178",
    :colors-of-the-moment>most-contrasting-light "#66b6c6",
    :get-my-colors-1530760203
@@ -2851,6 +2864,44 @@
     :second-brightest "#c9a1a7",
     :brightest "#29d5bc",
     :most-contrasting-light "#29d5bc"},
+   :get-my-colors495809413
+   {:second-darkest "#153767",
+    :highest-saturation "#2bc3ed",
+    :most-contrasting "#2bc3ed",
+    :darkest "#072723",
+    :contrast-with-dominant "#072723",
+    :colors
+    ["#d15edd"
+     "#072723"
+     "#4b61c1"
+     "#35418e"
+     "#2bc3ed"
+     "#dddbf8"
+     "#153767"
+     "#5c2566"
+     "#316b66"
+     "#952366"
+     "#d167de"],
+    :most-frequent "#072723",
+    :data-colors
+    {"float" "#c0f5b1",
+     "boolean" "#f76dff",
+     "map" "#7ec4dd",
+     "list" "#923883",
+     "string" "#ffffff",
+     "any" "#85d01e",
+     "vector" "#2bed81",
+     "keyword" "#f8e8db",
+     "rabbit-code" "#3993c4",
+     "datetime" "#8d2775",
+     "integer" "#a5f4ef",
+     "unknown" "#641090",
+     "date" "#243604"},
+    :dominant "#d167de",
+    :most-contrasting-dark "#072723",
+    :second-brightest "#2bc3ed",
+    :brightest "#dddbf8",
+    :most-contrasting-light "#2bc3ed"},
    :get-my-colors1961113147
    {:second-darkest "#244a66",
     :highest-saturation "#62d9ae",
@@ -2934,16 +2985,54 @@
    :wallpaper-of-the-moment-8k-1774690003
    "./images/large/b64-image-94158-17185-8k.webp",
    :solver-fn-test11518013396 "Huge!!!!v!!!!130",
-   :colors-of-the-moment>colors>0 "#25202f",
+   :colors-of-the-moment>colors>0 "#cecbc9",
    :colors-of-the-moment>contrast-with-dominant "#cd5a51",
    :solver-fn-test1-1728349450 "Huge!1433446",
    :raw-custom-override-1731159434 nil,
    :raw-custom-override-1249063786 "come with me168",
+   :get-my-colors-1768779535
+   {:second-darkest "#244a66",
+    :highest-saturation "#62d9ae",
+    :most-contrasting "#62d9ae",
+    :darkest "#0a0d1f",
+    :contrast-with-dominant "#c44c4c",
+    :colors
+    ["#df9b9c"
+     "#62d9ae"
+     "#244a66"
+     "#0a0d1f"
+     "#449696"
+     "#7f5c7d"
+     "#c2396b"
+     "#527795"
+     "#81a9bc"
+     "#c44c4c"
+     "#325a71"],
+    :most-frequent "#325a71",
+    :data-colors
+    {"float" "#a7f1b8",
+     "boolean" "#e081e0",
+     "map" "#dfa666",
+     "list" "#5a91c0",
+     "string" "#effbf1",
+     "any" "#7885a3",
+     "vector" "#bdd962",
+     "keyword" "#e0bcd6",
+     "rabbit-code" "#b371ba",
+     "datetime" "#9b5938",
+     "integer" "#b6df9b",
+     "unknown" "#268d4d",
+     "date" "#0a2b14"},
+    :dominant "#325a71",
+    :most-contrasting-dark "#c2396b",
+    :second-brightest "#df9b9c",
+    :brightest "#62d9ae",
+    :most-contrasting-light "#62d9ae"},
    :wallpaper-of-the-moment-8k376088674
    "./images/large/b64-image-56911-44759-8k.webp",
    :raw-custom-override727608925 nil,
    :solver-fn-test11085976455 "HHHuge!147",
-   :colors-of-the-moment>brightest "#d4a6bc",
+   :colors-of-the-moment>brightest "#cecbc9",
    :get-my-colors-1614005760
    {:second-darkest "#244a66",
     :highest-saturation "#62d9ae",
@@ -2983,11 +3072,49 @@
     :brightest "#62d9ae",
     :most-contrasting-light "#62d9ae"},
    :raw-custom-override-946854442 "come with me 368",
-   :colors-of-the-moment>second-brightest "#66b8bb",
+   :colors-of-the-moment>second-brightest "#ccc3c5",
    :raw-custom-override227227535 nil,
    :raw-custom-override-706315641
    "🐇🥕 Hello there! This is Clojure version 1.11.1 on JVM  17.0.11 🥕🐇 Wednesday, June 12th 3:16:52PM",
    :get-my-colors-859994723
+   {:second-darkest "#17344a",
+    :highest-saturation "#0e6a83",
+    :most-contrasting "#a12e5b",
+    :darkest "#0f1a34",
+    :contrast-with-dominant "#29d5bc",
+    :colors
+    ["#c9a1a7"
+     "#29d5bc"
+     "#0f1a34"
+     "#1a9a95"
+     "#37a0c2"
+     "#0e6a83"
+     "#654652"
+     "#176065"
+     "#a12e5b"
+     "#996d4a"
+     "#17344a"],
+    :most-frequent "#176065",
+    :data-colors
+    {"float" "#5ceee3",
+     "boolean" "#c066b4",
+     "map" "#d2d636",
+     "list" "#5902b9",
+     "string" "#ecf1e4",
+     "any" "#5f5687",
+     "vector" "#35d529",
+     "keyword" "#c9c5a1",
+     "rabbit-code" "#1177d8",
+     "datetime" "#85138d",
+     "integer" "#8463e0",
+     "unknown" "#662617",
+     "date" "#0e4810"},
+    :dominant "#17344a",
+    :most-contrasting-dark "#a12e5b",
+    :second-brightest "#c9a1a7",
+    :brightest "#29d5bc",
+    :most-contrasting-light "#29d5bc"},
+   :get-my-colors-723959505
    {:second-darkest "#17344a",
     :highest-saturation "#0e6a83",
     :most-contrasting "#a12e5b",
@@ -3065,6 +3192,45 @@
     :second-brightest "#df9b9c",
     :brightest "#62d9ae",
     :most-contrasting-light "#62d9ae"},
+   :solver-fn-test11606518307 "Huge!175",
+   :get-my-colors393774094
+   {:second-darkest "#352161",
+    :highest-saturation "#ba192c",
+    :most-contrasting "#ba192c",
+    :darkest "#1b0718",
+    :contrast-with-dominant "#ba192c",
+    :colors
+    ["#dd6aad"
+     "#352161"
+     "#4ab4dd"
+     "#1b0718"
+     "#8f4193"
+     "#3f6d98"
+     "#f7c9c9"
+     "#6a76c5"
+     "#60339a"
+     "#ba192c"
+     "#483376"],
+    :most-frequent "#ba192c",
+    :data-colors
+    {"float" "#b4f4f0",
+     "boolean" "#8bcbf3",
+     "map" "#5add4a",
+     "list" "#ce663b",
+     "string" "#ffffff",
+     "any" "#1df5b7",
+     "vector" "#6b52c4",
+     "keyword" "#f7c9c9",
+     "rabbit-code" "#5d53c0",
+     "datetime" "#a27b39",
+     "integer" "#e3a6cc",
+     "unknown" "#22862a",
+     "date" "#062513"},
+    :dominant "#483376",
+    :most-contrasting-dark "#ba192c",
+    :second-brightest "#4ab4dd",
+    :brightest "#f7c9c9",
+    :most-contrasting-light "#f7c9c9"},
    :get-my-colors684438348
    {:second-darkest "#153767",
     :highest-saturation "#2bc3ed",
@@ -3223,6 +3389,44 @@
     :second-brightest "#95c3bc",
     :brightest "#d9c2a3",
     :most-contrasting-light "#ce7446"},
+   :get-my-colors778252583
+   {:second-darkest "#17344a",
+    :highest-saturation "#0e6a83",
+    :most-contrasting "#a12e5b",
+    :darkest "#0f1a34",
+    :contrast-with-dominant "#29d5bc",
+    :colors
+    ["#c9a1a7"
+     "#29d5bc"
+     "#0f1a34"
+     "#1a9a95"
+     "#37a0c2"
+     "#0e6a83"
+     "#654652"
+     "#176065"
+     "#a12e5b"
+     "#996d4a"
+     "#17344a"],
+    :most-frequent "#176065",
+    :data-colors
+    {"float" "#5ceee3",
+     "boolean" "#c066b4",
+     "map" "#d2d636",
+     "list" "#5902b9",
+     "string" "#ecf1e4",
+     "any" "#5f5687",
+     "vector" "#35d529",
+     "keyword" "#c9c5a1",
+     "rabbit-code" "#1177d8",
+     "datetime" "#85138d",
+     "integer" "#8463e0",
+     "unknown" "#662617",
+     "date" "#0e4810"},
+    :dominant "#17344a",
+    :most-contrasting-dark "#a12e5b",
+    :second-brightest "#c9a1a7",
+    :brightest "#29d5bc",
+    :most-contrasting-light "#29d5bc"},
    :raw-custom-override49486509 15,
    :colors-of-the-moment>colors
    ["#ceced7"
@@ -3277,7 +3481,7 @@
     :most-contrasting-light "#f7c9c9"},
    :vibrant-antelope-solver 193,
    :raw-custom-override-829246165 nil,
-   :colors-of-the-moment>darkest "#25202f",
+   :colors-of-the-moment>darkest "#080c19",
    :get-my-colors423837796
    {:second-darkest "#17344a",
     :highest-saturation "#0e6a83",
@@ -3317,7 +3521,7 @@
     :brightest "#29d5bc",
     :most-contrasting-light "#29d5bc"},
    :raw-custom-override-55990886
-   "🐇🥕 Hello there! This is Clojure version 1.11.1 on JVM  17.0.11 🥕🐇 Wednesday, June 12th 4:55:17PM",
+   "🐇🥕 Hello there! This is Clojure version 1.11.1 on JVM  17.0.11 🥕🐇 Wednesday, June 12th 8:52:04PM",
    :solver-fn-test1-805110668 "HHHuge!175",
    :solver-fn-test1222038074 "Huge!168",
    :get-my-colors-1431581326 nil,
@@ -3438,6 +3642,46 @@
    :raw-custom-override297460384 145,
    :raw-custom-override2035510269
    "🐇🥕 Hello there! This is Clojure version 1.10.1 on JVM  17.0.11 🥕🐇 ",
+   :get-my-colors-32492723
+   {:second-darkest "#17344a",
+    :highest-saturation "#0e6a83",
+    :most-contrasting "#a12e5b",
+    :darkest "#0f1a34",
+    :contrast-with-dominant "#29d5bc",
+    :colors
+    ["#c9a1a7"
+     "#29d5bc"
+     "#0f1a34"
+     "#1a9a95"
+     "#37a0c2"
+     "#0e6a83"
+     "#654652"
+     "#176065"
+     "#a12e5b"
+     "#996d4a"
+     "#17344a"],
+    :most-frequent "#176065",
+    :data-colors
+    {"float" "#5ceee3",
+     "boolean" "#c066b4",
+     "map" "#d2d636",
+     "list" "#5902b9",
+     "string" "#ecf1e4",
+     "any" "#5f5687",
+     "vector" "#35d529",
+     "keyword" "#c9c5a1",
+     "rabbit-code" "#1177d8",
+     "datetime" "#85138d",
+     "integer" "#8463e0",
+     "unknown" "#662617",
+     "date" "#0e4810"},
+    :dominant "#17344a",
+    :most-contrasting-dark "#a12e5b",
+    :second-brightest "#c9a1a7",
+    :brightest "#29d5bc",
+    :most-contrasting-light "#29d5bc"},
+   :wallpaper-of-the-moment-8k-2041063498
+   "./images/large/b64-image-71976-43017-8k.webp",
    :solver-fn-test1794743035 "Huge!141",
    :get-my-colors1570995018
    {:second-darkest "#153767",
@@ -3517,6 +3761,45 @@
     :most-contrasting-light "#f7c9c9"},
    :get-my-colors806459624
    "java.lang.Exception: JSON error (unexpected character): F",
+   :get-my-colors-1862013147
+   {:second-darkest "#17344a",
+    :highest-saturation "#0e6a83",
+    :most-contrasting "#a12e5b",
+    :darkest "#0f1a34",
+    :contrast-with-dominant "#29d5bc",
+    :colors
+    ["#c9a1a7"
+     "#29d5bc"
+     "#0f1a34"
+     "#1a9a95"
+     "#37a0c2"
+     "#0e6a83"
+     "#654652"
+     "#176065"
+     "#a12e5b"
+     "#996d4a"
+     "#17344a"],
+    :most-frequent "#176065",
+    :data-colors
+    {"float" "#5ceee3",
+     "boolean" "#c066b4",
+     "map" "#d2d636",
+     "list" "#5902b9",
+     "string" "#ecf1e4",
+     "any" "#5f5687",
+     "vector" "#35d529",
+     "keyword" "#c9c5a1",
+     "rabbit-code" "#1177d8",
+     "datetime" "#85138d",
+     "integer" "#8463e0",
+     "unknown" "#662617",
+     "date" "#0e4810"},
+    :dominant "#17344a",
+    :most-contrasting-dark "#a12e5b",
+    :second-brightest "#c9a1a7",
+    :brightest "#29d5bc",
+    :most-contrasting-light "#29d5bc"},
+   :solver-fn-test1-1998797508 "Huge!175",
    :raw-custom-override768890526
    "🐇🥕 Hello there! This is Clojure version 1.10.1 on JVM  17.0.11 🥕🐇",
    :get-my-colors-418152992
@@ -3557,7 +3840,46 @@
     :second-brightest "#c9a1a7",
     :brightest "#29d5bc",
     :most-contrasting-light "#29d5bc"},
+   :solver-fn-test11358977488 "HHHuge!127",
    :solver-fn-test11245701670 "HHHuge!151",
+   :get-my-colors-738897960
+   {:second-darkest "#244a66",
+    :highest-saturation "#62d9ae",
+    :most-contrasting "#62d9ae",
+    :darkest "#0a0d1f",
+    :contrast-with-dominant "#c44c4c",
+    :colors
+    ["#df9b9c"
+     "#62d9ae"
+     "#244a66"
+     "#0a0d1f"
+     "#449696"
+     "#7f5c7d"
+     "#c2396b"
+     "#527795"
+     "#81a9bc"
+     "#c44c4c"
+     "#325a71"],
+    :most-frequent "#325a71",
+    :data-colors
+    {"float" "#a7f1b8",
+     "boolean" "#e081e0",
+     "map" "#dfa666",
+     "list" "#5a91c0",
+     "string" "#effbf1",
+     "any" "#7885a3",
+     "vector" "#bdd962",
+     "keyword" "#e0bcd6",
+     "rabbit-code" "#b371ba",
+     "datetime" "#9b5938",
+     "integer" "#b6df9b",
+     "unknown" "#268d4d",
+     "date" "#0a2b14"},
+    :dominant "#325a71",
+    :most-contrasting-dark "#c2396b",
+    :second-brightest "#df9b9c",
+    :brightest "#62d9ae",
+    :most-contrasting-light "#62d9ae"},
    :get-my-colors-704551049
    {:second-darkest "#352161",
     :highest-saturation "#ba192c",
@@ -3725,13 +4047,52 @@
    :colors-of-the-moment>2 nil,
    :solver-fn-test11722011302 "huge!143446",
    :solver-fn-test1421530310 "HHHuge!138",
-   :wallpaper-of-the-moment "./images/large/b64-image-14352-17164-4k.webp",
+   :wallpaper-of-the-moment "./images/large/b64-image-75717-47155-4k.webp",
    :get-my-colors2059407280
    "java.lang.Exception: JSON error (unexpected character): F",
    :raw-custom-override2131813992
    "🐇🥕 Hello there! This is Clojure version 1.11.1 on JVM  17.0.11 🥕🐇",
-   :raw-custom-override437660285 57.5,
+   :raw-custom-override437660285 25,
    :solver-fn-test1-1218464503 "booobs14446",
+   :solver-fn-test1-120091311 "Huge!!!!v!!!!175",
+   :get-my-colors-636982395
+   {:second-darkest "#352161",
+    :highest-saturation "#ba192c",
+    :most-contrasting "#ba192c",
+    :darkest "#1b0718",
+    :contrast-with-dominant "#ba192c",
+    :colors
+    ["#dd6aad"
+     "#352161"
+     "#4ab4dd"
+     "#1b0718"
+     "#8f4193"
+     "#3f6d98"
+     "#f7c9c9"
+     "#6a76c5"
+     "#60339a"
+     "#ba192c"
+     "#483376"],
+    :most-frequent "#ba192c",
+    :data-colors
+    {"float" "#b4f4f0",
+     "boolean" "#8bcbf3",
+     "map" "#5add4a",
+     "list" "#ce663b",
+     "string" "#ffffff",
+     "any" "#1df5b7",
+     "vector" "#6b52c4",
+     "keyword" "#f7c9c9",
+     "rabbit-code" "#5d53c0",
+     "datetime" "#a27b39",
+     "integer" "#e3a6cc",
+     "unknown" "#22862a",
+     "date" "#062513"},
+    :dominant "#483376",
+    :most-contrasting-dark "#ba192c",
+    :second-brightest "#4ab4dd",
+    :brightest "#f7c9c9",
+    :most-contrasting-light "#f7c9c9"},
    :get-my-colors-1921446326
    {:second-darkest "#17344a",
     :highest-saturation "#0e6a83",
@@ -3770,23 +4131,23 @@
     :second-brightest "#c9a1a7",
     :brightest "#29d5bc",
     :most-contrasting-light "#29d5bc"},
-   :colors-of-the-moment>colors>2 "#66b8bb",
+   :colors-of-the-moment>colors>2 "#375b78",
    :dazzling-gnu-solver 11214,
-   :colors-of-the-moment>colors>1 "#d4a6bc",
+   :colors-of-the-moment>colors>1 "#6ea6a7",
    :colors-of-the-moment>data-colors
-   {"float" "#9cdabc",
-    "boolean" "#d26cc2",
-    "map" "#babb66",
-    "list" "#594d94",
-    "string" "#f1f9f1",
-    "any" "#4658ad",
-    "vector" "#5bea2f",
-    "keyword" "#d4d3a6",
-    "rabbit-code" "#4c8bab",
-    "datetime" "#693873",
-    "integer" "#9bbac7",
-    "unknown" "#50373c",
-    "date" "#3f3927"},
+   {"float" "#cec9c9",
+    "boolean" "#acca9e",
+    "map" "#8c7ec6",
+    "list" "#424982",
+    "string" "#ffffff",
+    "any" "#3fa465",
+    "vector" "#bf81c0",
+    "keyword" "#ffffff",
+    "rabbit-code" "#c180bc",
+    "datetime" "#7b2c72",
+    "integer" "#ccc4c3",
+    "unknown" "#2f196d",
+    "date" "#08220e"},
    :get-my-colors1540646499
    {:second-darkest "#352161",
     :highest-saturation "#ba192c",
@@ -3827,4 +4188,5 @@
     :most-contrasting-light "#f7c9c9"},
    :solver-fn-test11569008714 "Huge!!!!v!!!!142"}},
  :selected-flow "live-scratch-flow",
+ :current-url "#/alarm-clock22",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

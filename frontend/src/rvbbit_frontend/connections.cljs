@@ -370,9 +370,9 @@
                                      run?                      (= (get-in @db/solver-fn-runs [panel-key sub-param])
                                                                   unique-resolved-map)
                                      lets-go?                  (and online? (not run?))
-                                     _ (when lets-go?
-                                         (ut/tapp>> [:run-solver-req-map-conns! override? (str (first this)) lets-go? (not run?) req-map
-                                                     @db/solver-fn-runs]))
+                                    ;;  _ (when lets-go?
+                                    ;;      (ut/tapp>> [:run-solver-req-map-conns! override? (str (first this)) lets-go? (not run?) req-map
+                                    ;;                  @db/solver-fn-runs]))
                                      _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                      _ (when lets-go?
                                          (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)

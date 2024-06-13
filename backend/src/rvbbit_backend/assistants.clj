@@ -11,8 +11,8 @@
     [rvbbit-backend.util     :as ut]
     [wkok.openai-clojure.api :as api]))
 
-(def openapi-key (get config/settings :openapi-key))
-(def openapi-org-id (get config/settings :openapi-org-id))
+(def openapi-key (get (config/settings) :openapi-key))
+(def openapi-org-id (get (config/settings) :openapi-org-id))
 
 
 

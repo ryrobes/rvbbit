@@ -1181,17 +1181,21 @@
           (ring-resp/content-type "audio/mpeg"))
       (ring-resp/not-found "File not found"))))
 
+(defn package-settings-for-client []
+  (merge (config/settings)
+         {:clover-templates (edn/read-string (slurp "./defs/clover-templates.edn"))
+          :kits    {} ;;config/kit-fns
+          :screens (vec (map :screen_name
+                             (sql-query system-db
+                                        (to-sql {:select   [:screen_name]
+                                                 :from     [[:screens :jj24a7a]]
+                                                 :group-by [:screen_name]
+                                                 :order-by [[1 :asc]]}))))}))
+
 (defmethod wl/handle-request :get-settings
   [{:keys [client-name]}]
   (ut/pp [:client client-name :just-booted])
-  (merge config/settings
-         {:kits    config/kit-fns
-          :screens (vec (map :screen_name
-                          (sql-query system-db
-                                     (to-sql {:select   [:screen_name]
-                                              :from     [[:screens :jj24a7a]]
-                                              :group-by [:screen_name]
-                                              :order-by [[1 :asc]]}))))}))
+  (package-settings-for-client))
 
 (def times-atom (ut/thaw-atom {} "./data/atoms/times-atom.edn"))
 (def params-atom (ut/thaw-atom {} "./data/atoms/params-atom.edn"))
@@ -2717,9 +2721,7 @@
         input-map             (get solver-map :input-map {})
         input-map             (if (ut/ne? override-input) (merge input-map override-input) input-map)
         use-cache?            (true? (get solver-map :cache? false))
-        vdata                 (walk/postwalk-replace input-map (get solver-map :data)) ;; if we have input maps or
-                                                                                       ;; overrides, do that first
-                                                                                       ;; so it's part of vdata now
+        vdata                 (walk/postwalk-replace input-map (get solver-map :data)) 
         vdata-clover-kps      (vec (filter #(and (keyword? %) ;; get any resolvable keys in the struct before we operate on
                                                               ;; it
                                                  (cstr/includes? (str %) "/")
@@ -2737,7 +2739,7 @@
                                                  (str "clover-param-lookup-error " kp)))}))
         vdata                 (if (ut/ne? vdata-clover-walk-map) (walk/postwalk-replace vdata-clover-walk-map vdata) vdata) 
         runner-name           (get solver-map :type :clojure)
-        runner-map            (get-in config/settings [:runners runner-name] {})
+        runner-map            (get-in (config/settings) [:runners runner-name] {})
         runner-type           (get runner-map :type runner-name)
         timestamp             (System/currentTimeMillis)
         cache-key             [vdata runner-name] ;; since we could have 2 connections with the
@@ -5008,7 +5010,7 @@
   {:port                 websocket-port
    :join?                false
    :async?               true
-   :min-threads          300
+   ;:min-threads          300
    :max-threads          1000 ;; Increased max threads
    :idle-timeout         1000000 ;; Increased idle timeout
    :max-idle-time        6000000 ;; Increased max idle time
@@ -5065,7 +5067,7 @@
    ::http/allowed-origins   {:creds false :allowed-origins (constantly true)}
    ::http/secure-headers    {:content-security-policy-settings {:object-src "none"}}
    ::http/resource-path     "/public"
-   :max-threads             150
+   :max-threads             300
    ::http/type              :jetty
    ::http/host              "0.0.0.0"
    ::http/port              web-server-port

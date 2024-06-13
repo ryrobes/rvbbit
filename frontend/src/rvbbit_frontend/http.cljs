@@ -303,30 +303,36 @@
               flow-runner-sub?            (and kick? (= (get-in result [:task-id 0]) :flow-runner) (not heartbeat?)) ;; server
                                                                                                                      ;; mutate
                                                                                                                      ;; only for
+              settings-update?            (and kick? (= (get-in result [:task-id 0]) :settings) (not heartbeat?))
               flow-runner-tracker-blocks? (and kick? (= (get-in result [:task-id 0]) :tracker-blocks) (not heartbeat?))
               flow-runner-acc-tracker?    (and kick? (= (get-in result [:task-id 0]) :acc-tracker) (not heartbeat?))
               condi-tracker?              (and kick? (= (get-in result [:task-id 0]) :condis) (not heartbeat?))
               estimate?                   (and kick? (= (get-in result [:task-id 0]) :estimate) (not heartbeat?))]
+
+          (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
+
           (swap! packets-received inc)
+
           (if heartbeat? ;; test
             (ut/tracked-dispatch
-              [::wfx/request :default
-               {:message {:kind        :ack
-                          :memory      (let [mem     (when (exists? js/window.performance.memory)
-                                                       [(.-totalJSHeapSize js/window.performance.memory)
-                                                        (.-usedJSHeapSize js/window.performance.memory)
-                                                        (.-jsHeapSizeLimit js/window.performance.memory)])
-                                             mem-row {:mem_time    (str (.toISOString (js/Date.)))
-                                                      :mem_total   (first mem)
-                                                      :packets     @packets-received
-                                                      :batches     @batches-received
-                                                      :mem_used    (second mem)
-                                                      :client-name (str client-name)
-                                                      :mem_limit   (last mem)}]
-                                         mem-row)
-                          :flow-subs   (get db :flow-subs)
-                          :client-name (get db :client-name)}
-                :timeout 50000}]))
+             [::wfx/request :default
+              {:message {:kind        :ack
+                         :memory      (let [mem     (when (exists? js/window.performance.memory)
+                                                      [(.-totalJSHeapSize js/window.performance.memory)
+                                                       (.-usedJSHeapSize js/window.performance.memory)
+                                                       (.-jsHeapSizeLimit js/window.performance.memory)])
+                                            mem-row {:mem_time    (str (.toISOString (js/Date.)))
+                                                     :mem_total   (first mem)
+                                                     :packets     @packets-received
+                                                     :batches     @batches-received
+                                                     :mem_used    (second mem)
+                                                     :client-name (str client-name)
+                                                     :mem_limit   (last mem)}]
+                                        mem-row)
+                         :flow-subs   (get db :flow-subs)
+                         :client-name (get db :client-name)}
+               :timeout 50000}]))
+
           (when alert? ;(and alert? not-sys-stats?) ; (and alert? (string? (first (get result
             (let [cnt      (get-in result [:data 0 0])
                   fstr     (str cnt)
@@ -334,56 +340,62 @@
                   h        (get-in result [:data 0 2] 1)
                   duration (get-in result [:data 0 3] 6)]
               (ut/dispatch-delay 400 [::insert-alert [:h-box :children [cnt]] w h duration])))
+
           (when (or (= task-id :reco) (= task-id :outliers)) ;; kinda deprecated, won't need
             (update-context-boxes result task-id ms reco-count))
-          (cond counts? (let [;emeta-map (get-in db [:meta ui-keypath])
-                              ss              (get result :status)
-                              post-meta-shape (into {} (for [[k v] ss] {k {(if (= k :*) :rowcount :distinct) v}}))]
-                          (-> db
-                              (assoc-in [:post-meta ui-keypath] post-meta-shape)))
-                (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
-                  (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
-                server-sub? (assoc-in db (vec (cons :click-param task-id)) (get result :status))
-                condi-tracker? (assoc-in db [:flow-results :condis (get-in result [:task-id 1])] (get result :status))
-                flow-runner-tracker-blocks? (let [block-keys      (keys (get-in db [:flows (get db :selected-flow) :map]))
-                                                  flow-id         (get-in result [:task-id 1])
-                                                  filtered-blocks (into {}
-                                                                        (for [[k v] (get result :status)]
-                                                                          {k (vec (cset/intersection (set block-keys)
-                                                                                                     (set v)))}))]
-                                              (assoc-in db [:flow-results :tracker-blocks flow-id] filtered-blocks))
-                flow-runner-acc-tracker? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
-                                               flow-id    (get-in result [:task-id 1])
-                                               trackers   (select-keys (get result :status) block-keys)]
-                                           (-> db
-                                               (ut/dissoc-in (if (or (empty? trackers) (= (count (keys trackers)) 1)) ;; TODO
+
+          (cond
+
+            settings-update? (assoc-in db [:server :settings] (get result :status))
+
+            counts? (let [;emeta-map (get-in db [:meta ui-keypath])
+                          ss              (get result :status)
+                          post-meta-shape (into {} (for [[k v] ss] {k {(if (= k :*) :rowcount :distinct) v}}))]
+                      (-> db
+                          (assoc-in [:post-meta ui-keypath] post-meta-shape)))
+            (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
+            (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
+            server-sub? (assoc-in db (vec (cons :click-param task-id)) (get result :status))
+            condi-tracker? (assoc-in db [:flow-results :condis (get-in result [:task-id 1])] (get result :status))
+            flow-runner-tracker-blocks? (let [block-keys      (keys (get-in db [:flows (get db :selected-flow) :map]))
+                                              flow-id         (get-in result [:task-id 1])
+                                              filtered-blocks (into {}
+                                                                    (for [[k v] (get result :status)]
+                                                                      {k (vec (cset/intersection (set block-keys)
+                                                                                                 (set v)))}))]
+                                          (assoc-in db [:flow-results :tracker-blocks flow-id] filtered-blocks))
+            flow-runner-acc-tracker? (let [block-keys (keys (get-in db [:flows (get db :selected-flow) :map]))
+                                           flow-id    (get-in result [:task-id 1])
+                                           trackers   (select-keys (get result :status) block-keys)]
+                                       (-> db
+                                           (ut/dissoc-in (if (or (empty? trackers) (= (count (keys trackers)) 1)) ;; TODO
                                                                                                                       ;; this
-                                                               [:flow-results :return-maps flow-id]
-                                                               [:skip-me :yo :yo]))
-                                               (assoc-in [:flow-results :tracker flow-id] trackers)))
-                estimate? (assoc db :flow-estimates (merge (get db :flow-estimates) (get result :status)))
-                flow-runner-sub? (let [rtn         (get result :status)
-                                       mps-key     (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
-                                       return-maps (get-in db [:flow-results :return-maps] {})]
-                                   (if (= rtn :started)
-                                     (assoc-in db task-id rtn)
-                                     (-> db
-                                         (assoc-in [:flow-results :return-maps] ;; (vec (into [:flow-results]
-                                                   (assoc-in return-maps (vec (drop 1 mps-key)) rtn)) ;; keeping
-                                         (assoc-in task-id rtn))))
-                heartbeat? (-> db
-                               (assoc-in [:status task-id ui-keypath] (get result :status))
-                               (assoc-in [:status-data task-id ui-keypath]
-                                         {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
-                               (assoc :flow-subs (get result :status)))
-                :else (-> db
-                          (assoc-in [:status task-id ui-keypath] (get result :status))
-                          (assoc-in [:status-data task-id ui-keypath]
-                                    {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
-                          (ut/dissoc-in [:query-history :recos-sys])
-                          (ut/dissoc-in [:query-history :viz-shapes-sys])
-                          (ut/dissoc-in [:query-history :viz-shapes0-sys])
-                          (ut/dissoc-in [:query-history :viz-tables-sys]))))
+                                                           [:flow-results :return-maps flow-id]
+                                                           [:skip-me :yo :yo]))
+                                           (assoc-in [:flow-results :tracker flow-id] trackers)))
+            estimate? (assoc db :flow-estimates (merge (get db :flow-estimates) (get result :status)))
+            flow-runner-sub? (let [rtn         (get result :status)
+                                   mps-key     (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
+                                   return-maps (get-in db [:flow-results :return-maps] {})]
+                               (if (= rtn :started)
+                                 (assoc-in db task-id rtn)
+                                 (-> db
+                                     (assoc-in [:flow-results :return-maps] ;; (vec (into [:flow-results]
+                                               (assoc-in return-maps (vec (drop 1 mps-key)) rtn)) ;; keeping
+                                     (assoc-in task-id rtn))))
+            heartbeat? (-> db
+                           (assoc-in [:status task-id ui-keypath] (get result :status))
+                           (assoc-in [:status-data task-id ui-keypath]
+                                     {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
+                           (assoc :flow-subs (get result :status)))
+            :else (-> db
+                      (assoc-in [:status task-id ui-keypath] (get result :status))
+                      (assoc-in [:status-data task-id ui-keypath]
+                                {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
+                      (ut/dissoc-in [:query-history :recos-sys])
+                      (ut/dissoc-in [:query-history :viz-shapes-sys])
+                      (ut/dissoc-in [:query-history :viz-shapes0-sys])
+                      (ut/dissoc-in [:query-history :viz-tables-sys]))))
         (catch :default e (do (ut/tapp>> [:simple-response-error! (str e)]) db))))))
 
 (re-frame/reg-event-db ::status-response
@@ -508,6 +520,14 @@
           client-name (get db :client-name)
           p0          (cset/difference (set pl) (set pp))
           base-keys   (filter (comp not namespace) (keys db))
+          ;; temp-sub-click-params (filter 
+          ;;                        #(or
+          ;;                          (not (cstr/starts-with? (str %) ":solver-meta/"))
+          ;;                          (not (cstr/starts-with? (str %) ":signal/"))
+          ;;                          (and (not (cstr/starts-with? (str %) ":solver/"))
+          ;;                               (re-matches #".*\d" (str %)))
+          ;;                          (not (cstr/ends-with? (str %) "*running?")))
+          ;;                        (keys (get db :click-params)))
           image       (if (= save-type :skinny)
                         (-> db ;; dehydrated... as it were
                             (select-keys base-keys)
@@ -524,6 +544,8 @@
                             (dissoc :signals-map)
                             (dissoc :repl-output)
                             (ut/dissoc-in [:click-param :signal-history])
+                            (ut/dissoc-in [:click-param :solver-meta])
+                            (ut/dissoc-in [:click-param :signal])
                             (dissoc :data)
                             (dissoc :flows) ;;; mostly ephemeral with the UI....
                             (dissoc :http-reqs)

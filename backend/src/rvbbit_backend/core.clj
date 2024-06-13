@@ -54,7 +54,7 @@
     java.time.format.DateTimeFormatter
     java.time.ZoneId))
 
-(def harvest-on-boot? (get config/settings :harvest-on-boot? true))
+(def harvest-on-boot? (get (config/settings) :harvest-on-boot? true))
 
 
 
@@ -269,6 +269,26 @@
                                                             (wss/process-csv {} f-path)))
       file-path)))
 
+
+(defn watch-config-files
+  []
+  (let [file-path "./defs/"]
+    (beholder/watch #(when (or (cstr/ends-with? (str (get % :path)) "config.edn")
+                               (cstr/ends-with? (str (get % :path)) "clover-templates.edn"))
+                       (let [destinations (vec (keys @wss/client-queues))]
+                         (doseq [d destinations]
+                           (wss/alert! d
+                                       [:v-box :justify :center :style {:opacity 0.7} :children
+                                        [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                          :child (str "Note: Server config has been updated & received")]
+                                         [:box :child (str (get % :path))]]]
+                                       13 2
+                                       5)
+                           (wss/kick d [:settings] (wss/package-settings-for-client) 1 :none (str "file updated " (get % :path)))
+                           )))
+                    file-path)))
+
+
 (defn thaw-flow-results
   []
   (ut/pp [:thawing-flow-results-atom...])
@@ -313,6 +333,9 @@
   (defonce start-screen-watcher (watch-screens-folder))
   #_{:clj-kondo/ignore [:inline-def]}
   (defonce start-flow-watcher (watch-flows-folder))
+  #_{:clj-kondo/ignore [:inline-def]}
+  (defonce start-settings-watcher (watch-config-files))
+
   (shutdown/add-hook! ::heads-up-msg #(ut/ppa "Shutting down now, commander!"))
   (sql-exec system-db "drop table if exists jvm_stats;")
   (sql-exec system-db "drop table if exists errors;")
@@ -425,15 +448,15 @@
     (ut/pp [:warren-flow? conns]))
   (shutdown/add-hook! ::the-pool-is-now-closing
                       #(do (reset! wss/shutting-down? true)
-                           ;;  (let [destinations (vec (keys @wss/client-queues))]
-                           ;;    (doseq [d destinations]
-                           ;;      (wss/alert! d
-                           ;;                  [:v-box :justify :center :style {:opacity 0.7} :children
-                           ;;                   [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
-                           ;;                     :child
-                           ;;                     [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]]
-                           ;;                  10 1
-                           ;;                  5)))
+                            (let [destinations (vec (keys @wss/client-queues))]
+                              (doseq [d destinations]
+                                (wss/alert! d
+                                            [:v-box :justify :center :style {:opacity 0.7} :children
+                                             [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                               :child
+                                               [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]]
+                                            10 1
+                                            5)))
                            ;;  (Thread/sleep 2000)
                            (wss/destroy-websocket-server!)
                            (tt/stop!)
@@ -604,7 +627,7 @@
         (log-tracker kks)
         (update-stat-atom kks))))
   (add-watch flow-db/tracker :tracker-watch tracker-changed2)
-  (ut/pp {:settings config/settings})
+  ;;(ut/pp {:settings config/settings})
   (defn heartbeat
     [dest]
     {:components

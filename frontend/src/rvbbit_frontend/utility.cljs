@@ -48,7 +48,8 @@
 
 (def t> tapp>>)
 
-
+(defonce map-boxes-cache (atom {}))
+(defonce map-boxes-cache-hits (atom {}))
 
 
 (defn distribution
@@ -94,20 +95,26 @@
 
 
 
-(defonce pre-leaf-clover (atom {}))
-(defonce deep-flatten-data (atom {}))
-(defonce deep-flatten-cache (atom {}))
+(def deep-flatten-data (atom {}))
+(def deep-flatten-cache (atom {}))
 
+;; (defn deep-flatten-real [x] (if (coll? x) (into #{} (mapcat deep-flatten-real x)) #{x}))
 
+;;(defn deep-flatten-real [x] (if (coll? x) (into #{} (filter keyword? (mapcat deep-flatten-real x))) #{x}))
 
-(defn deep-flatten-real [x] (if (coll? x) (into #{} (mapcat deep-flatten-real x)) #{x}))
+(defn deep-flatten-real [x] ;; only keywords, not sure why i'd need the rest of the shit for my use cases - 6/13/24
+  (if (coll? x)
+    (into #{} (filter keyword? (mapcat deep-flatten-real x)))
+    (if (keyword? x) #{x} #{})))
 
 (defn deep-flatten*
   [x]
   (let [hx (pr-str x)] ;; switching from hash keys to pr-str due to collisions... 6/2/24
     (swap! deep-flatten-cache update hx (fnil inc 0))
     (or (@deep-flatten-data hx)
-        (let [deep (deep-flatten-real x)]
+        (let [deep (deep-flatten-real x)
+              ;deep (set (filter keyword? (deep-flatten-real x)))
+              ]
           (swap! deep-flatten-data assoc hx deep)
           deep))))
 
@@ -157,8 +164,8 @@
 
 
 
-(def clover-walk-singles-map (atom {}))  
-
+(def clover-walk-singles-map (atom {}))       
+ 
 (defonce process-key-cache (atom {}))
 (defonce process-key-tracker (atom {}))
 
@@ -304,8 +311,8 @@
 
 (defn extract-patterns-with-keypath ;; used for solvers and making stable unique keys. important.
   [data kw num]
-  (let [cache (get @extract-patterns2-cache (pr-str [data kw num]))]
-    (if cache cache 
+  ;(let [] ;; [cache (get @extract-patterns2-cache (pr-str [data kw num]))]
+    ;(if false [] cache ;; cache 
     (let [rr (letfn [(walk [data path]
                        (cond
                          (matches-pattern2-orig? data kw num) [[path data]]
@@ -313,9 +320,9 @@
                          (sequential? data) (mapcat (fn [v] (walk v path)) data)
                          :else []))]
                (walk data []))]
-      (swap! extract-patterns2-cache assoc (pr-str [data kw num]) rr)
+      ;(swap! extract-patterns2-cache assoc (pr-str [data kw num]) rr)
       rr
-      ))))
+      )););)
 
 
 

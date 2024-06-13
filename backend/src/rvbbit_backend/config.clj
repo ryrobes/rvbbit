@@ -27,4 +27,4 @@
           (into {}
                 (for [[kk vv] (get v :packages)] {kk (merge (merge (dissoc v :packages) {:kit-name kk :package-name k}) vv)})))))
 
-(def settings (try (read-string (slurp "./config.edn")) (catch Exception e {:error (str e) :debug-level 1})))
+(defn settings [] (try (read-string (slurp "./defs/config.edn")) (catch Exception e {:error (str e) :debug-level 1})))
