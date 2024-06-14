@@ -27,12 +27,14 @@
  :clj            {:args [:code]
                   :body  [:run-solver
                           {:signal false
+                           :cache? false
                            :type :clojure
                            :input-map {}
                            :data :code}]}
  :clj2            {:args [:code]
                    :body  [:run-solver
                            {:signal false
+                            :cache? false
                             :type :clojure2
                             :input-map {}
                             :data :code}]}

@@ -610,17 +610,13 @@
                                                                                             {:success true
                                                                                              :status  (get response :status)}))
                                                                  rr   (recursive-clean resp)
-                                                                 rrs  (pr-str rr) ;; i hate
-                                                                                  ;; everyone, why
-                                                                                  ;; does
-                                                                                  ;; client-http
-                                                                                  ;; keywording
+                                                                 rrs  (pr-str rr)
                                                                  tts  (cstr/replace rrs #":/" ":")
                                                                  ttsr (edn/read-string tts)]
                                                              ttsr))))
     (catch Exception e ;{:error (str e)
       {;:error (str e)
-       :error (parse-error-body e)
+       :error [(parse-error-body e) (str e)]
        :class (str (type e))})))
 
 
@@ -914,9 +910,9 @@
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 300))] ;; was 100, was (async/sliding-buffer
+  (let [results (async/chan (async/sliding-buffer 100))] ;; was 100, was (async/sliding-buffer
     (try (async/go-loop []
-           (async/<! (async/timeout 450)) ;; was 70 ?
+           (async/<! (async/timeout 850)) ;; was 70 ?
            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
              (let [items            (loop [res []]
                                       (if-let [item (ut/dequeue! queue-atom)]
@@ -943,32 +939,32 @@
 (defn push-to-client
   [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
   (enqueue-task-slot
-    client-name
-    (fn []
-      (try
-        (let [rr                0 ;(rand-int 3)
-              cq                (get client-queue-atoms rr)
-              _ (swap! queue-distributions assoc client-name (vec (conj (get @queue-distributions client-name []) rr)))
-              client-queue-atom (get @cq client-name)]
-          (swap! queue-status assoc-in [client-name task-id ui-keypath] status)
-          (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
-          (if client-queue-atom
-            (do (inc-score! client-name :push)
-                (inc-score! client-name :last-push true)
-                (swap! client-queue-atom conj
-                  {:ui-keypath  ui-keypath
-                   :status      status
-                   :elapsed-ms  elapsed-ms
-                   :reco-count  reco-count
-                   :queue-id    queue-id
-                   :task-id     task-id
-                   :data        [data ;; data is likely needed for :payload and :payload-kp that
-                                 (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
-                   :client-name client-name}))
-            (let [] ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
-              (new-client client-name)
-              (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms)))) ;)
-        (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))))));)
+   client-name
+   (fn []
+     (try
+       (let [rr                0 ;(rand-int 3)
+             cq                (get client-queue-atoms rr)
+             _ (swap! queue-distributions assoc client-name (vec (conj (get @queue-distributions client-name []) rr)))
+             client-queue-atom (get @cq client-name)]
+         (swap! queue-status assoc-in [client-name task-id ui-keypath] status)
+         (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
+         (if client-queue-atom
+           (do (inc-score! client-name :push)
+               (inc-score! client-name :last-push true)
+               (swap! client-queue-atom conj
+                      {:ui-keypath  ui-keypath
+                       :status      status
+                       :elapsed-ms  elapsed-ms
+                       :reco-count  reco-count
+                       :queue-id    queue-id
+                       :task-id     task-id
+                       :data        [data ;; data is likely needed for :payload and :payload-kp that
+                                     (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
+                       :client-name client-name}))
+           (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
+             (new-client client-name)
+             (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
+       (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))))))
 
 
 

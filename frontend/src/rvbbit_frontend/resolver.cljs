@@ -78,6 +78,10 @@
                       (let [kps       (ut/extract-patterns obody :case 2)
                             logic-kps (into {} (for [v kps] (let [[_ l] v] {v (ut/vectorized-case l)})))]
                         (ut/postwalk-replacer logic-kps obody)))
+          get-in-walk (fn [obody]
+                        (let [kps       (ut/extract-patterns obody :get-in 2)
+                              logic-kps (into {} (for [v kps] (let [[_ [data kp]] v] {v (get-in data kp)})))]
+                          (walk/postwalk-replace logic-kps obody)))
           singles {:text   str
                    :>>     (fn [[x y]] (true? (> x y)))
                    :<<     (fn [[x y]] (true? (< x y)))
@@ -166,7 +170,10 @@
                                     ;;                  @db/solver-fn-runs]))
                                      _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                      _ (when lets-go?
-                                         (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
+                                         (swap! db/solver-fn-lookup assoc
+                                                ;(str (first kps))
+                                                fkp
+                                                sub-param)
                                          (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map))]
                                  {v sub-param})))]
               (walk/postwalk-replace logic-kps obody)))
@@ -184,6 +191,7 @@
                           (has-fn? :string3)        (string-walk 4)
                           (has-fn? :string3)        (string-walk 5)
                           (has-fn? :string3)        (string-walk 6) ;; TODO REMOVE ALL THIS
+                          (has-fn? :get-in)         get-in-walk
                           (has-fn? :=)              =-walk-map2
                           (has-fn? :if)             if-walk-map2
                           (has-fn? :when)           when-walk-map2

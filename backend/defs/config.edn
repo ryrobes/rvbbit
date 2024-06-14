@@ -24,8 +24,8 @@
            :views   {:default []
                      ;:icon "images/clover.png"
                      } ;; basic clover render
-           :sandwiches {:type :clojure}
-           :hoagies {}
+           ;:sandwiches {:type :clojure}
+           ;:hoagies {}
            ;; ^ these 2 are built in a required and mostly not configurable for now
            :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
                      :runner {:port 8181 :host "127.0.0.1"}

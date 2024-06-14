@@ -278,14 +278,46 @@
   ::simple-response
   (fn [db [_ result & [batched?]]]
     (if (vector? result)
-      (do ;; (ut/tapp>> [:batch-of-messages (count result) (vec (for [r result] (get r
+      ;; (let [grouped-results (group-by #(let [ui-keypath                  (first (get % :ui-keypath))
+      ;;                                        kick?                       (= ui-keypath :kick)
+      ;;                                        task-id                     (get % :task-id)
+      ;;                                        heartbeat?                  (= task-id :heartbeat)]
+      ;;                                    (and kick?
+      ;;                                         (contains? valid-task-ids (get-in % [:task-id 0]))
+      ;;                                         (not heartbeat?))) result)
+      ;;       result-subs (get grouped-results true)
+      ;;       result (get grouped-results false)]
+      ;;   (ut/tapp>> [:batch-of-messages (count result)
+      ;;               (vec (for [r result] (str (get r :task-id))))])
+      ;;   (swap! batches-received inc)
+      ;;   (doseq [res result] (re-frame/dispatch [::simple-response res true])) ;; process the other batches 
+      ;;   db) ;; 
+
+      ;; take all the server subs and apply them all at once instead of feeding them through one by one..
+      (let [grouped-results (group-by #(let [ui-keypath                  (first (get % :ui-keypath))
+                                             kick?                       (= ui-keypath :kick)
+                                             task-id                     (get % :task-id)
+                                             heartbeat?                  (= task-id :heartbeat)]
+                                         (and kick?
+                                              (contains? valid-task-ids (get-in % [:task-id 0]))
+                                              (not heartbeat?))) result)
+            result-subs (get grouped-results true)
+            result (get grouped-results false)
+            updates (reduce (fn [acc res]
+                              (let [task-id (get res :task-id)]
+                                (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
+                            {} result-subs)]
+        ;; (ut/tapp>> [:batch-of-messages (count result) :grouped-update (count result-subs)
+        ;;             (vec (for [r result] (str (get r :task-id))))
+        ;;             (vec (for [r result-subs] (str (get r :task-id))))])
         (swap! batches-received inc)
-        (doseq [res result] (re-frame/dispatch [::simple-response res true]))
-        db)
+        (doseq [res result] (re-frame/dispatch [::simple-response res true])) ;; process the other batches as a side-effect
+        (reduce-kv (fn [db k v] (update db k #(merge-with merge % v))) db updates)) ;; update db with updates
+
       (try
         (let [ui-keypath                  (first (get result :ui-keypath))
               client-name                 (get db :client-name)
-              ms                          (try (js/Math.ceil (/ (get result :elapsed-ms) 1000)) (catch :default _ nil))
+              ms                          -1 ;(try (js/Math.ceil (/ (get result :elapsed-ms) 1000)) (catch :default _ nil))
               file-push?                  (= ui-keypath :file-changed)
               external-enabled?           (get db :external? false)
               task-id                     (get result :task-id)
@@ -296,7 +328,7 @@
               heartbeat?                  (= task-id :heartbeat)
               alert?                      (= task-id :alert1)
               server-sub?                 (and kick?
-                                               (contains? valid-task-ids (get-in result [:task-id 0])) ;; should
+                                               (contains? valid-task-ids (get-in result [:task-id 0]))
                                                (not heartbeat?))                                                     ;; server
                                                                                                                      ;; mutate
                                                                                                                      ;; only for
@@ -311,9 +343,12 @@
 
           (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
 
+          ;; (when (not batched?) 
+          ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id))]))
+
           (swap! packets-received inc)
 
-          (if heartbeat? ;; test
+          (when heartbeat? ;; test
             (ut/tracked-dispatch
              [::wfx/request :default
               {:message {:kind        :ack
@@ -346,6 +381,8 @@
 
           (cond
 
+            server-sub? (assoc-in db (vec (cons :click-param task-id)) (get result :status))
+
             settings-update? (assoc-in db [:server :settings] (get result :status))
 
             counts? (let [;emeta-map (get-in db [:meta ui-keypath])
@@ -353,9 +390,10 @@
                           post-meta-shape (into {} (for [[k v] ss] {k {(if (= k :*) :rowcount :distinct) v}}))]
                       (-> db
                           (assoc-in [:post-meta ui-keypath] post-meta-shape)))
+
             (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
             (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
-            server-sub? (assoc-in db (vec (cons :click-param task-id)) (get result :status))
+
             condi-tracker? (assoc-in db [:flow-results :condis (get-in result [:task-id 1])] (get result :status))
             flow-runner-tracker-blocks? (let [block-keys      (keys (get-in db [:flows (get db :selected-flow) :map]))
                                               flow-id         (get-in result [:task-id 1])
@@ -374,6 +412,7 @@
                                                            [:skip-me :yo :yo]))
                                            (assoc-in [:flow-results :tracker flow-id] trackers)))
             estimate? (assoc db :flow-estimates (merge (get db :flow-estimates) (get result :status)))
+
             flow-runner-sub? (let [rtn         (get result :status)
                                    mps-key     (vec (ut/postwalk-replacer {:flow-runner :return-maps} task-id))
                                    return-maps (get-in db [:flow-results :return-maps] {})]
@@ -383,6 +422,7 @@
                                      (assoc-in [:flow-results :return-maps] ;; (vec (into [:flow-results]
                                                (assoc-in return-maps (vec (drop 1 mps-key)) rtn)) ;; keeping
                                      (assoc-in task-id rtn))))
+
             heartbeat? (-> db
                            (assoc-in [:status task-id ui-keypath] (get result :status))
                            (assoc-in [:status-data task-id ui-keypath]

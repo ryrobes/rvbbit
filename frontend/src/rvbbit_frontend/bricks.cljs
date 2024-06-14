@@ -8264,11 +8264,16 @@
                                                                 unique-resolved-map)
                                    lets-go?                  (and online? (not run?))
                                   ;;  _ (when lets-go?
-                                  ;;      (ut/tapp>> [:run-solver-req-map-bricks! override? (str (first this)) lets-go? (not run?) req-map
-                                  ;;                  @db/solver-fn-runs]))
+                                  ;;      (ut/tapp>> [:run-solver-req-map-bricks! (str fkp) sub-param override? (str (first this)) lets-go? (not run?) ;req-map
+                                  ;;                  ;@db/solver-fn-runs
+                                  ;;                  @db/solver-fn-lookup
+                                  ;;                  ]))
                                    _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                    _ (when lets-go?
-                                       (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
+                                       (swap! db/solver-fn-lookup assoc 
+                                              ;(str (first kps))
+                                              fkp
+                                              sub-param)
                                        (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map))]
                                {v sub-param})))]
             (walk/postwalk-replace logic-kps obody)))
@@ -8307,13 +8312,13 @@
           (has-fn? :push>>)         push-walk-fn
           ;data-viewer?              (walk/postwalk-replace {:data-viewer (fn [x] [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
           ;                                                                         :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]])}) 
-          (has-fn? :data-viewer)  (ut/postwalk-replacer
-                                    {:data-viewer (fn [x] (let [x (walk/postwalk-replace {:box :_box 
-                                                                                          :icon :_icon 
-                                                                                          :v-box :_v-box  
-                                                                                          :h-box :_h-box} x)]
-                                                            [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
-                                                             :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]]))} )
+          ;; (has-fn? :data-viewer)  (ut/postwalk-replacer
+          ;;                           {:data-viewer (fn [x] (let [x (walk/postwalk-replace {:box :_box 
+          ;;                                                                                 :icon :_icon 
+          ;;                                                                                 :v-box :_v-box  
+          ;;                                                                                 :h-box :_h-box} x)]
+          ;;                                                   [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
+          ;;                                                    :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]]))} )
           has-drops?                (drop-walk-replace (vec (keys drop-walks))))
         ;; body (if data-viewer? ;; else they will try to render shit inside the vectors... 
         ;;        (ut/postwalk-replacer 
