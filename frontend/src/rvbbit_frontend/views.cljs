@@ -1288,7 +1288,14 @@
         (if (and (= @db/editor-mode :vvv) system-panel?) (px (* 2 single-width)) single-width-px) :style {:overflow "hidden"}]
        (cond
          (or views? queries? runners?) ; data-key
-           (let []
+           (let [data-key-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
+                 view-type-map @(ut/tracked-sub ::bricks/view-type-map {:view-type data-key-type})
+                 modes (get view-type-map :modes)
+                 current-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key selected-block :data-key data-key})
+                 ;;_ (ut/tapp>> [selected-block data-key data-key-type view-type-map])
+                 ;data-key-type (if (nil? data-key-type) :* data-key-type)
+                 ;selected-block (if (nil? (get @db/data-browser-query selected-block)) first-data-key data-key)
+                 ]
              [re-com/box :size "none" :child
               [re-com/v-box :size "1" :children
                [[re-com/h-box :padding "4px" 
@@ -1297,12 +1304,16 @@
                             [re-com/h-box 
                              :style {:padding-right "10px"}
                              :gap "4px"
-                             :children (for [mode ["clover" "text" "pretty" "rowset" "map-boxes"]
-                                             :let [bkgrd (str (theme-pull :theme/editor-rim-color nil))
+                             :children (for [mode modes ;["clover" "text" "pretty" "rowset" "map-boxes"]
+                                             :let [bkgrd (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                   selected? (= mode current-view-mode)
                                                    bkgrd (if (> (count bkgrd) 7) (subs bkgrd 0 7)  bkgrd)]]
                                          [re-com/box :child (str mode)
-                                          :style {:background-color (str bkgrd 45)
+                                          :attr (when (not selected?)
+                                                  {:on-click #(ut/tracked-dispatch [::bricks/set-view-mode selected-block data-key mode])})
+                                          :style {:background-color (str bkgrd (if selected? "" 45))
                                                   :color "black"
+                                                  :cursor (when (not selected?) "pointer")
                                                   :padding-left "3px"
                                                   :padding-right "3px"
                                                   :margin-top "2px"
@@ -2363,7 +2374,10 @@
                                            (when (get custom-map :background-size) ", ")
                                            (get custom-map :background-size))}))) :children
         [[bricks/reecatch [tab-menu]] [bricks/reecatch [snapshot-menu]] (when session? [session-modal])
-         (when (and editor? (not @bricks/mouse-dragging-panel?)) [bricks/reecatch [editor-panel 33 10]])
+         (when (and editor? (not @bricks/mouse-dragging-panel?)) 
+           [bricks/reecatch [editor-panel 33 10]]
+           ;;[bricks/reecatch [editor-panel 50 22]]
+           )
          (when (or (and @bricks/dragging? (not @bricks/on-block?) (not @bricks/over-flow?)) @bricks/swap-layers?)
            [re-com/box :child " " :style
             {:background-color (str (theme-pull :theme/editor-background-color nil) 22) ;; "#00000022"

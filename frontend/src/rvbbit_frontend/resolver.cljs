@@ -24,8 +24,9 @@
 (defn logic-and-params-fn
   [block-map panel-key]
   (if (try (and (ut/ne? block-map) (or (map? block-map) (vector? block-map) (keyword? block-map))) (catch :default _ false))
-    (let [;;;valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %)
+    (let [;;valid-body-params      (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/"))))
           valid-body-params (vec (ut/get-compound-keys block-map))
+          ;; _ (ut/tapp>> [:valid-body-params panel-key block-map valid-body-params])
           workspace-params (into {}
                                  (for [k valid-body-params] ;; deref here?
                                    {k @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
@@ -89,51 +90,6 @@
                    :string (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))}
           obody-key-set (ut/body-set block-map)
           client-name @(ut/tracked-sub ::client-name {})
-          ;; solver-clover-walk
-          ;; (fn [obody]
-          ;;   (let [kps       (ut/extract-patterns obody :run-solver 2)
-          ;;         logic-kps (into
-          ;;                    {}
-          ;;                    (for [v kps]
-          ;;                      (let [[_ & this]                v
-          ;;                            [[solver-name input-map]] this
-          ;;                            panel-key                 :resolver
-          ;;                            unresolved-req-hash       (hash [solver-name input-map client-name])
-          ;;                            resolved-input-map        (logic-and-params-fn input-map panel-key) ;; and we need
-          ;;                                                                                                   ;; to
-          ;;                                                                                                   ;; 'pre-resolve'
-          ;;                                                                                                   ;; it's inputs
-          ;;                                                                                                   ;; i n case
-          ;;                                                                                                   ;; they are
-          ;;                                                                                                   ;; client
-          ;;                                                                                                   ;; local
-          ;;                            new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
-          ;;                            sub-param                 (keyword (str "solver/" new-solver-name))
-          ;;                            req-map                   {:kind             :run-solver-custom ;; solver-name
-          ;;                                                                                               ;; temp-solver-name
-          ;;                                                                                               ;; client-name
-          ;;                                                                                               ;; input-map
-          ;;                                                       :solver-name      solver-name
-          ;;                                                       :temp-solver-name (keyword new-solver-name)
-          ;;                                                       :input-map        resolved-input-map
-          ;;                                                       :client-name      client-name}
-          ;;                            websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
-          ;;                            online?                   (true? (= websocket-status :connected))
-          ;;                            run?                      (= (get-in @db/solver-fn-runs [panel-key sub-param])
-          ;;                                                         resolved-input-map)
-          ;;                            lets-go?                  (and online? (not run?))
-          ;;                               ;; _ (when lets-go?
-          ;;                               ;;     (ut/tapp>> [:run-solver-req-map-resolver! (str (first this)) lets-go? (not run?)
-          ;;                               ;;                 req-map @db/solver-fn-runs]))
-          ;;                            _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
-          ;;                            _ (when lets-go?
-          ;;                                   ;(swap! db/solver-fn-runs ut/dissoc-in [panel-key])
-          ;;                                   ;(swap! db/solver-fn-runs assoc-in [panel-key (hash resolved-input-map)]
-          ;;                                   ;sub-param)
-          ;;                                (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
-          ;;                                (swap! db/solver-fn-runs assoc-in [panel-key sub-param] resolved-input-map))]
-          ;;                        {v sub-param})))]
-          ;;     (walk/postwalk-replace logic-kps obody)))
           solver-clover-walk
           (fn [obody]
             (let [;kps       (ut/extract-patterns obody :run-solver 2)
@@ -181,8 +137,7 @@
           out-block-map (cond->> block-map
                           true                      (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" ""))
                           true                      (ut/postwalk-replacer {:*this-block* panel-key})
-                          (has-fn? :run-solver)     solver-clover-walk ;;(conn/solver-clover-walk client-name
-                                                                       ;;panel-key)
+                          (has-fn? :run-solver)     solver-clover-walk
                           (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
                           (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
                           (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)

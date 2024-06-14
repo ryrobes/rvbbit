@@ -655,7 +655,7 @@
 (defn sort-map-by-key [m] (sort-by first (into [] m)))
 
 (re-frame/reg-sub ::safe-key
-                  (fn [db [_ proposed & [locals]]]
+                  (fn [db {:keys [proposed locals]}]
                     (let [block-names       (keys (get db :panels))
                           locals            (or locals [])
                           incoming-keyword? (keyword? proposed)
@@ -664,15 +664,22 @@
                           user-param-names  (keys (get-in db [:click-param :param]))
                           view-names        (distinct (mapcat (fn [[_ v]] (keys (get v :views))) (get db :panels)))
                           query-names       (mapcat (fn [[_ v]] (keys (get v :queries))) (get db :panels)) ;; faster
+                          runner-keys       (keys (get-in db [:server :settings :runners] {}))
+                          all-runners       (apply concat
+                                                   (for [r runner-keys]
+                                                     (mapcat (fn [[_ v]] (keys (get v r))) (get db :panels))))
+                     ;;      _ (tapp>>  [:prop runner-keys all-runners])
                           all-keys          (vec (apply concat
-                                                   [block-names user-param-names locals view-names snapshot-names tab-names
-                                                    query-names]))
+                                                   [block-names user-param-names locals 
+                                                    view-names snapshot-names tab-names
+                                                    query-names all-runners]))
                           reco              (unique-block-id proposed all-keys [])]
                       (cond (and incoming-keyword? (keyword? reco))       reco
                             (and incoming-keyword? (not (keyword? reco))) (keyword (replacer (str reco) #":" ""))
                             :else                                         reco))))
 
-(defn safe-key [proposed & [locals]] @(tracked-subscribe [::safe-key proposed locals]))
+(defn safe-key [proposed & [locals]]
+  @(tracked-sub ::safe-key {:proposed proposed :locals locals}))
 
 (defn get-time-format-str [] (cstr/join " " (drop 4 (drop-last 4 (splitter (str (js/Date.)) #" ")))))
 

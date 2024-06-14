@@ -553,6 +553,30 @@
         (logic-and-params-fn val nil) ;; process again, no recursion here for now... we want to
         val))))
 
+(re-frame/reg-sub
+ ::runner-crosswalk-map
+ (fn [_ _] 
+   (let [;; runner-keys       (keys (get-in db [:server :settings :runners] {}))
+        ;;  all-runners       (apply concat
+        ;;                           (for [r runner-keys]
+        ;;                             (mapcat (fn [[_ v]] (keys (get v r))) (get db :panels))))
+         modded-map (into {} (for [[k v] @db/solver-fn-lookup
+                                   :let [base-k (last k)
+                                         base-k (if (vector? base-k) (last base-k) base-k)]] ;; bit of a hack, since our keys are not fully congruent
+                               {base-k v}))
+         modded-map (into {} (for [[k v] modded-map]
+                               (if (cstr/includes? (str k) "/")
+                                 {k v}
+                                 {k v ;; add the server compat alias just in case
+                                  (keyword (str "data/" (cstr/replace (str k) ":" ""))) v})))
+         ;;_ (ut/tapp>> [:modded-map modded-map])
+         ]
+     modded-map)))
+
+;;(ut/tapp>> [:modded-map @(ut/tracked-sub ::runner-crosswalk-map {})]) 
+
+
+
 (defn break-up-flow-key
   [key]
   (let [ff  (cstr/split (-> (str key)
@@ -567,6 +591,7 @@
   ::clicked-parameter-key-alpha ;;; important, common, and likely more expensive than need be.
   (fn [db {:keys [keypath]}]
     (let [cmp                 (ut/splitter (ut/safe-name (nth keypath 0)) "/")
+          runner-crosswalk-map     @(ut/tracked-sub ::runner-crosswalk-map {})
           kkey                (keyword (ut/replacer (nth cmp 0) "-parameter" ""))
           vkey                (keyword (peek cmp))
           kp-encoded-param?   (and (or (= kkey :theme)
@@ -574,7 +599,7 @@
           ;; param-has-fn? (when kp-encoded-param? ;;(= kkey :param) ;;kp-encoded-param?
           ;;                 (some #(= % :run-solver) (ut/deep-flatten (get-in db (vec (cons :click-param [kkey
           ;;                 (split-back vkey)]))))))
-          param-has-fn?       (when (= kkey :param)
+          param-has-fn?       (when (or (= kkey :param) (= kkey :theme))
                                 (= (get-in db (vec (cons :click-param [kkey (split-back vkey) 0]))) :run-solver))
           full-kp             (cons :click-param (if kp-encoded-param? (vec (cons kkey (break-up-flow-key vkey))) [kkey vkey]))
           ;; _ (when (= (first keypath) :param/huger22)
@@ -588,7 +613,12 @@
           ;;                   (cstr/split (get @db/solver-fn-lookup (str (get-in db full-kp))) #"/"))))))
           ;;                      (catch :default _  nil))
           ;;                 ]))
-          val0                (cond (and param-has-fn? kp-encoded-param?) ;; we need to render the value in order to
+          val0                (cond 
+                                
+                                (get runner-crosswalk-map (nth keypath 0))  ;; more sketchy recursion... beware!
+                                @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [(get runner-crosswalk-map (nth keypath 0))]})
+                                
+                                (and param-has-fn? kp-encoded-param?) ;; we need to render the value in order to
                                                                           ;; fake the natural kp
                                       (get-in @(ut/tracked-sub
                                                  ::clicked-parameter-key-alpha
@@ -608,6 +638,11 @@
                                                                                                   #"/")))))))
                                                                                (catch :default _ nil)) ;; get the sub ref and
                                                                                                        ;; return that data
+                                    (let [vv (get-in db full-kp)]  ;; if we get back a clover keyword, try and resolve it. CAREFUL, this could stackoverflow us easy...
+                                      (and (keyword? vv) (cstr/includes? (str vv) "/")))
+
+                                         @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [(get-in db full-kp)]})
+                                      
                                     :else                                 (get-in db full-kp))
           val0                (if (and param-has-fn? (nil? val0)) ;; hasn't run yet - should check atom as well...
                                 (get-in db full-kp)
@@ -665,7 +700,8 @@
           ;sub-param (get @db/solver-fn-lookup (str (get-in db full-kp)))
           ;fn-changed?  (if param-has-fn? (nil? (get-in @db/solver-fn-runs [:conn sub-param])) false)
           contains-params?    (contains-namespaced-keyword? val)
-          contains-solver-fn? (some #(= % :run-solver) (ut/deep-flatten [val (get-in db full-kp)]))]  
+          contains-solver-fn? (some #(= % :run-solver) (ut/deep-flatten [val (get-in db full-kp)]))] 
+      ;;(ut/tapp>> [:kk (str keypath) val])
       (if (or contains-solver-fn?
               contains-params?) ;; (and contains-params? (not contains-sql-alias?))
         (logic-and-params-fn (if contains-solver-fn? (get-in db full-kp) val) ;;val

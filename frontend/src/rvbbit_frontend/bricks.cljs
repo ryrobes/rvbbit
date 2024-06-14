@@ -55,7 +55,7 @@
     [rvbbit-frontend.select-transform :as st]
     [rvbbit-frontend.shapes :as shape]
     [rvbbit-frontend.subs :as subs]
-    [rvbbit-frontend.utility :as ut]
+    [rvbbit-frontend.utility :as ut :refer [tapp>>]]
     [websocket-fx.core :as wfx])
   (:import
     [goog.i18n              NumberFormat]
@@ -340,7 +340,7 @@
         base-theme-keys     (keys resolved-base-theme)
         theme-key?          (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
         fallback0           (if theme-key? (get resolved-base-theme t2) fallback)
-        rs                  (fn [edn] (resolver/logic-and-params edn nil))]
+        rs                  (fn [edn] (resolver/logic-and-params edn :theme-pull))]
     (rs (if (not (nil? v)) v fallback0))))
 
 
@@ -1062,6 +1062,25 @@
 
 (re-frame/reg-sub ::screen-name (fn [db] (get db :screen-name (ut/safe-name (get db :client-name)))))
 
+(re-frame/reg-sub
+ ::current-view-mode
+ (fn [db {:keys [panel-key data-key]}]
+   (let [view-type @(ut/tracked-sub ::view-type {:panel-key panel-key :view data-key})
+         modes (get-in db [:server :settings :runners view-type :modes])]
+     (get-in db [:panels panel-key :selected-mode data-key] (first modes)))))
+
+(re-frame/reg-sub
+ ::current-view-mode-clover-fn 
+ (fn [db {:keys [panel-key data-key]}] 
+   (let [curr @(ut/tracked-sub ::current-view-mode {:panel-key panel-key :data-key data-key})
+         clover-fn (get-in db [:server :settings :modes curr])]
+     clover-fn 
+     )))
+
+(re-frame/reg-event-db
+ ::set-view-mode
+ (fn [db [_ panel-key data-key mode]] 
+   (assoc-in db [:panels panel-key :selected-mode data-key] mode)))
 
 (re-frame/reg-event-db ::dispatch-keepalive
                        (fn [db [_]]
@@ -1110,7 +1129,7 @@
                                           (= type :views) "new-view"
                                           :else (str "new-" (cstr/replace (str type) ":" "")))
                                name (ut/safe-key (keyword name))]
-                           (ut/tapp>> [:adding-new type :to panel-key])
+                           (ut/tapp>> [:adding-new type :to panel-key :as name])
                            (assoc-in db [:panels panel-key type name] body))))
 
 (re-frame/reg-event-db ::update-workspace-noundo (fn [db [_ keypath value]] (assoc-in db (cons :panels keypath) value)))
@@ -1596,12 +1615,8 @@
                                                                              [(get-in (first body) [:drag-meta :param-table])
                                                                               (get-in (first body) [:drag-meta :param-field])])))]})
                           (catch :default _ nil))
-          ;v             (str (or param-value v))
-          ;meta          @(ut/tracked-sub ::meta-from-param-name {:param-name k})
-          ;dtype         (if param-has-fn? (ut/data-typer param-value) (get meta :data-type))
-          ;dtype         (try (if (and (= dtype "vector") (every? string? v)) "string" dtype)
-          ;                   (catch :default _ dtype)) ;; since stringified code is
-          ;dcolor        (get @(ut/tracked-sub ::conn/data-colors {}) dtype)
+          dtype         (ut/data-typer param-value)
+          is-map?        (= dtype "map")
           is-image?      (and (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".png")
                                   (cstr/ends-with? (cstr/lower-case (str param-value)) ".webp")
                                   (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpg")
@@ -1614,6 +1629,7 @@
                                (cstr/starts-with? (cstr/lower-case (str param-value)) "./images")))
           is-video?      (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".mp4")
                              (cstr/ends-with? (cstr/lower-case (str param-value)) ".mov"))
+          
           param-key      (get-in (first body) [:drag-meta :param-full])
           is-view?       (and (cstr/ends-with? (str param-key) "-vw") (cstr/starts-with? (str param-key) ":flow"))
           multi-param?   (true? (cstr/includes? (str param-key) ".*/"))
@@ -1623,14 +1639,17 @@
                                   :w       (get-in (first body) [:w])
                                   :tab     tab
                                   :root    root
-                                  :name    new-key
+                                  :name    (str param-key) ;;new-key
                                   :views   (if multi-param?
                                              {:multi-param-vals [:box :align :center :justify :center :padding "13px" :style
                                                                  {:font-size "30px"} :child
                                                                  [:h-box :gap "9px" :children param-key]]}
                                              {:param-val [:box :align :center :justify :center :padding "13px" :style
-                                                          {:font-size "45px"} :child
+                                                          {:font-size (cond is-map? "12px"
+                                                                            :else "45px")} 
+                                                          :child
                                                           (cond is-view?  [:honeycomb param-key] ;; TODO, we
+                                                                is-map?   [:data-viewer  param-key]
                                                                 is-image? [:img {:src param-key :width "100%"}]
                                                                 is-video? [:iframe ;; :video ? html5 shit
                                                                            {:src   :movies_deets/_1080p_video
@@ -2659,6 +2678,7 @@
                          dcolor        (get @(ut/tracked-sub ::conn/data-colors {}) dtype)
                          param-value   (str param-value) ;; since the rest expects it
                          ;;  _ (ut/tapp>> [[table field]  param-value])
+                         is-map?       (= dtype "map")
                          is-image?     (and (or (cstr/ends-with? (cstr/lower-case (str param-value)) ".png")
                                                 (cstr/ends-with? (cstr/lower-case (str param-value)) ".webp")
                                                 (cstr/ends-with? (cstr/lower-case (str param-value)) ".jpg")
@@ -2685,9 +2705,11 @@
                      (draggable ;(sql-spawner-filter :param [k table field])
                        {:h         (cond is-image? 6
                                          is-video? 9
+                                         is-map? 9
                                          :else     (+ 2 pheight))
                         :w         (cond is-image? 6
                                          is-video? 13
+                                         is-map? 9
                                          :else     pwidth)
                         :root      [0 0]
                         :drag-meta {:type :param :param-full k :param-type dtype :param-table table :param-field field}}
@@ -5804,6 +5826,13 @@
      v)))
 
 (re-frame/reg-sub
+ ::panel-runners-only
+ (fn [db {:keys [panel-key]}]
+   (let [br (keys (-> (get-in db [:server :settings :runners]) (dissoc :views) (dissoc :queries)))
+         v (select-keys (get-in db [:panels panel-key]) br)]
+     (into {} (for [[k vv] v] vv)))))
+
+(re-frame/reg-sub
  ::panel-runners-rev
  (fn [db {:keys [panel-key]}]
    (let [br (vec (keys (-> (get-in db [:server :settings :runners]) (dissoc :views) (dissoc :queries))))
@@ -5912,6 +5941,11 @@
                                    (nil? chosen) (first panel-pairs)
                                    :else chosen)]
                       (first chosen))))
+
+(re-frame/reg-sub
+ ::view-type-map
+ (fn [db {:keys [view-type]}]
+   (get-in db [:server :settings :runners view-type])))  
 
 ;;(ut/tapp>> [:ed  (str @(ut/tracked-sub ::editor-panel-selected-view2 {}))])
 
@@ -6815,7 +6849,7 @@
   (let [cache-key (pr-str [data block-id selected-view keypath kki init-data-type draggable?])
         cache (get @ut/map-boxes-cache cache-key)]
     (swap! ut/map-boxes-cache-hits update cache-key (fnil inc 0))
-    (if cache cache
+    (if false cache
         (let [res (map-boxes2* data block-id selected-view keypath kki init-data-type draggable?)]
           (swap! ut/map-boxes-cache assoc cache-key res)
           res))))
@@ -6831,6 +6865,8 @@
         base-type-vec? (or (vector? data) (list? data))
         iter (if base-type-vec? (range (count data)) (keys data))
         source @(ut/tracked-sub ::data-viewer-source {:block-id block-id :selected-view selected-view})
+        source-clover-key? (and (keyword? source) (cstr/includes? (str source) "/"))
+        ;;_ (ut/tapp>> [:data-viewer-source source source-clover-key?])
         font-size "inherit" ;;"11px"
         draggable? false ;; override bs TODO
         dcolors @(ut/tracked-sub ::conn/data-colors {})
@@ -6851,6 +6887,9 @@
                    border-ind (if in-body? "solid" "dashed")
                    val-color  (get dcolors k-val-type (theme-pull :theme/editor-outer-rim-color nil))
                    keypath-in (conj keypath kk)
+                   clover-kp  (when source-clover-key? 
+                                (edn/read-string (str source ">" (cstr/replace (cstr/join ">" keypath-in) ":" ""))))
+                  ;;  _ (ut/tapp>> [:clover-kp clover-kp (str keypath-in)])
                    keystyle   {:background-color (if hovered? (str val-color 66) "#00000000")
                                :color            val-color
                                :border-radius    "12px"
@@ -6870,7 +6909,11 @@
                                            :root      [0 0]
                                            :drag-meta {:type        :viewer-pull
                                                        :param-full  [:box :style {:font-size "17px"} :child
-                                                                     [:data-viewer [:get-in [source keypath-in]]]]
+                                                                     [:data-viewer 
+                                                                      (if source-clover-key? 
+                                                                        clover-kp
+                                                                        [:get-in [source keypath-in]])
+                                                                      ]]
                                                        :param-type  k-val-type
                                                        :param-table :what
                                                        :param-field :what}} "meta-menu"         ;block-id ;; (when (not
@@ -6906,8 +6949,11 @@
                         :w         6
                         :root      [0 0]
                         :drag-meta {:type        :viewer-pull
-                                    :param-full  [:box :style {:font-size "17px"} :child
-                                                  [:data-viewer [:get-in [source keypath-in]]]]
+                                    :param-full  [:box :style {:font-size "17px"} 
+                                                  :child
+                                                  [:data-viewer (if source-clover-key?
+                                                                  clover-kp
+                                                                  [:get-in [source keypath-in]])]]
                                     :param-type  k-val-type
                                     :param-table :what
                                     :param-field :what}} "meta-menu"         ;block-id
@@ -6972,8 +7018,13 @@
                           :root      [0 0]
                           :drag-meta {:type        :viewer-pull
                                       :param-full  [:box :size "auto" :align :center :justify :center :style
-                                                    {:font-size [:auto-size-px [:get-in [source keypath-in]]]} :child
-                                                    [:string [:get-in [source keypath-in]]]]
+                                                    {:font-size [:auto-size-px (if source-clover-key?
+                                                                                 clover-kp
+                                                                                 [:get-in [source keypath-in]])]}
+                                                    :child
+                                                    [:string (if source-clover-key?
+                                                               clover-kp
+                                                               [:get-in [source keypath-in]])]]
                                       :param-type  k-val-type
                                       :param-table :what
                                       :param-field :what}} "meta-menu" ;block-id
@@ -7960,6 +8011,16 @@
 ;; (fn [db {:keys [panel-key view]}]
 
 
+
+(re-frame/reg-sub
+ ::get-clover-runner-fn
+ (fn [db {:keys [view-type]}]
+   (get-in db [:server :settings :runners view-type :clover-fn] 
+           [:box 
+            :style {:color "red" :background-color "black"}
+            :child [:string3 "no clover-fn found" :clover-body]])))
+
+
 (defn honeycomb
   [panel-key & [override-view fh fw replacement-view replacement-query]] ;; can sub lots of this
   (let [;block-map panel-map ;@(ut/tracked-subscribe [::panel-map panel-key]) ;(get workspace
@@ -8018,14 +8079,20 @@
         body (if (and (not= selected-view-type :views)
                       (not= selected-view-type :queries))
                ;;{(first body) [:box :child [:string3 (last body)]]}
-               (let [br @(ut/tracked-sub ::block-runners {})
-                     wrapper (get-in br [selected-view-type :clover-fn])
-                     ;wrapper (ut/postwalker {:clover-body body} wrapper)
+               (let [;br @(ut/tracked-sub ::block-runners {})
+                     wrapper @(ut/tracked-sub ::get-clover-runner-fn {:view-type selected-view-type}) ;;(get-in br [selected-view-type :clover-fn])
+                     clover-fn @(ut/tracked-sub ::current-view-mode-clover-fn {:panel-key panel-key :data-key selected-view})
+                     ;;wrapper (ut/postwalker {:clover-body body} wrapper)
                      ]
-                 (into {} (for [[k v]  body] {k [:box
-                                                 :align :center :justify :center :size "auto"
-                                                 :style {:font-size "14px" :color (theme-pull :theme/editor-outer-rim-color nil)}
-                                                 :child [:data-viewer (ut/postwalk-replacer {:clover-body v} wrapper)]]})))
+                ;;  (into {} (for [[k v] body] {k [:box
+                ;;                                  :align :center :justify :center :size "auto"
+                ;;                                  :style {:font-size "14px" :color (theme-pull :theme/editor-outer-rim-color nil)}
+                ;;                                  :child [:data-viewer (ut/postwalk-replacer {:clover-body v} wrapper)]]}))
+                 (into {} (for [[k v] body]
+                            {k (let [v (ut/postwalk-replacer {:clover-body v} wrapper)] ;; adds the functionality
+                                 (ut/postwalk-replacer {:*data v} clover-fn)
+                                 
+                                 )}))) ;; adds the render wrapper
                body)
 
         ;; _ (when (not= selected-view-type :views)
@@ -8240,7 +8307,8 @@
                            {}
                            (for [[fkp v] kps]
                              (let [[_ & this]                v
-                                   fkp                       (vec (into [:panels panel-key] fkp))
+                                   ;fkp                       (vec (into [:panels panel-key] fkp))
+                                   fkp                        (vec (into [:panels panel-key] [(first fkp)])) ;; only want view name as last key, not clover wrapper strucuts that change
                                    override?                 (try (map? (first this)) (catch :default _ false)) ;; not a vec input call, completely new solver map
                                    [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
                                    unresolved-req-hash       (hash (if override?
@@ -8839,6 +8907,7 @@
         audio-playing? @(ut/tracked-sub ::audio/audio-playing? {})
         top-start      (* start-y brick-size) ;-100 ;; if shifted some bricks away...
         left-start     (* start-x brick-size)]
+    
     (when false ;;(not @on-scrubber?) ;true ; external? UPDATE-PANELS-HASH DISABLED TMP!! WHEN
       (when (not (= panels-hash2 panels-hash1)) ;; core update for blind backend updating /
         (ut/tracked-dispatch [::update-panels-hash])))
@@ -8847,6 +8916,7 @@
                   (vec (reverse (sort-by val (frequencies @ut/simple-dispatch-counts))))])
       (ut/tapp>> [:sub-peek! @(rfa/sub ::client-name)
                   (vec (reverse (sort-by val (frequencies @ut/simple-subscription-counts))))]))
+    
     ^{:key (str "base-brick-grid")}
     [re-com/h-box :children
      [((maybedoall)
@@ -8938,15 +9008,18 @@
                 col-selected?                                @(ut/tracked-subscribe [::column-selected-any-field? brick-vec-key
                                                                                      selected-view])
                 views                                        @(rfa/sub ::views {:panel-key brick-vec-key})
+                runners                                      @(rfa/sub ::panel-runners-only {:panel-key brick-vec-key})
                 all-views                                    (if single-view? [] (vec (keys views)))
                 base-view-name                               :view ;; basically a default for single views
                 mouse-down?                                  (atom false)
                 tab-offset                                   (if tab @(ut/tracked-subscribe [::tab-offset2 tab]) [0 0])
                 click-delay                                  100
-                mixed-keys ;;(try
-                  (cond (and single-view? (seq sql-keys)) (conj sql-keys base-view-name)
-                        (and no-view? (seq sql-keys))     sql-keys
-                        :else                             (into all-views sql-keys))
+                ;; mixed-keys ;;(try
+                ;;   (cond (and single-view? (seq sql-keys)) (conj sql-keys base-view-name)
+                ;;         (and no-view? (seq sql-keys))     sql-keys
+                ;;         :else                             (into (into all-views sql-keys) (keys runners)))
+                mixed-keys                                   (vec (into (into all-views sql-keys) (keys runners)))
+                ;; _ (tapp>> [:prunners brick-vec-key mixed-keys (keys runners)])
                 zz                                           (if (or selected? hover-q?) (+ z 50) (+ z 10))
                 theme-base-block-style                       (theme-pull :theme/base-block-style {})
                 theme-base-block-style-map                   (when (map? theme-base-block-style) theme-base-block-style)]
@@ -8980,11 +9053,7 @@
                 ^{:key (str "brick-" brick-vec-key)}
                 [re-com/box :width (px block-width) :height (px block-height) :attr ;(merge
                  {;:on-mouse-enter  #(do (reset! over-block? true)
-                  :on-mouse-over  #(when (not @over-block?) (reset! over-block brick-vec-key) (reset! over-block? true)) ;; took
-                                                                                                                         ;; out
-                                                                                                                         ;; enter
-                                                                                                                         ;; for
-                                                                                                                         ;; watched
+                  :on-mouse-over  #(when (not @over-block?) (reset! over-block brick-vec-key) (reset! over-block? true)) 
                   :on-mouse-leave #(do (reset! over-block? false) (reset! over-block nil))} :style
                  (merge
                    {:position "fixed" ;"absolute" ;"fixed"
@@ -9158,8 +9227,7 @@
                                          query-running?   single-wait?
                                          flow-running?    @(ut/tracked-subscribe [::has-a-running-flow-view? brick-vec-key s])
                                          param-keyword    [(keyword (str "param/" (ut/safe-name s)))]
-                                         is-param? ;@(ut/tracked-subscribe
-                                           @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath param-keyword})
+                                         is-param?  @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath param-keyword})
                                          param-dtype      (when is-param? (ut/data-typer is-param?))
                                          param-dtype      (try (if (and (= param-dtype "vector") (every? string? is-param?))
                                                                  "string"
