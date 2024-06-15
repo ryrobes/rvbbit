@@ -7,7 +7,7 @@
     [clojure.string          :as cstr]
     [clojure.walk            :as walk]
     [goog.events             :as gevents]
-    [re-catch.core           :as rc]
+    ;[re-catch.core           :as rc]
     [re-com.core             :as    re-com
                              :refer [at]]
     [re-com.util             :refer [px]]
@@ -23,6 +23,7 @@
     [rvbbit-frontend.flows   :as flows]
     [rvbbit-frontend.http    :as http]
     [rvbbit-frontend.shapes  :as shape]
+    [rvbbit-frontend.resolver    :as resolver]
     [rvbbit-frontend.subs    :as subs]
     [rvbbit-frontend.utility :as ut]
     [talltale.core           :as tales]
@@ -2015,13 +2016,15 @@
 (defonce temp-atom (atom {}))
 
 (defn create-clover-keys-from-data
-  [data prefix] ;; prefix as in "theme/"
-  (vec (distinct (flatten (for [[k v] data]
-                            (if (or (map? v) (vector? v))
-                              (conj (for [ee (ut/kvpaths v)]
-                                      (str (keyword (ut/replacer (str prefix k ">" (cstr/join ">" ee)) ":" ""))))
-                                    (str (keyword (str prefix (ut/unkeyword k)))))
-                              (str (keyword (str prefix (ut/unkeyword k))))))))))
+  [data prefix] ;; prefix as in "theme/"  etc.
+  (let [kw-tag (keyword (str (ut/replacer prefix "/" "") "-autocomplete-gen"))
+        resolved-data (resolver/logic-and-params data kw-tag)] ;; if it was a fn, we need the result kp, not the request kp...
+    (vec (distinct (flatten (for [[k v] resolved-data]
+                              (if (or (map? v) (vector? v))
+                                (conj (for [ee (ut/kvpaths v)]
+                                        (str (keyword (ut/replacer (str prefix k ">" (cstr/join ">" ee)) ":" ""))))
+                                      (str (keyword (str prefix (ut/unkeyword k)))))
+                                (str (keyword (str prefix (ut/unkeyword k)))))))))))
 
 (re-frame/reg-event-db ::update-user-params-hash
                        (fn [db _]
@@ -2037,6 +2040,7 @@
                                                             (create-clover-keys-from-data (get pp-without-fs :theme) "theme/")))
                                new-h             (hash pp-without-fs)
                                client-name       (get db :client-name)]
+                           ;; (ut/tapp>>  [:update-user-params-hash-event (count new-autocompletes) new-autocompletes])
                            (reset! db/autocomplete-keywords (set (into new-autocompletes @db/autocomplete-keywords))) ;; dont
                            (ut/tracked-dispatch [::wfx/request :default ;; just a push, no response handling
                                                  {:message {:kind        :sync-client-params

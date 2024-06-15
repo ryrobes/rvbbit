@@ -18,7 +18,7 @@
     [clojure.walk            :as walk]
     [day8.re-frame.undo      :as    undo
                              :refer [undoable]]
-    [re-catch.core           :as rc]
+    ;[re-catch.core           :as rc]
     [re-com.core             :as    re-com
                              :refer [at]]
     [re-com.util             :refer [px]]

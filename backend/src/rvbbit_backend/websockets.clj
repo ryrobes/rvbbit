@@ -2023,7 +2023,7 @@
 ;; TODO, these 3 can all be combined into one "smarter" version base don args, but I'm still iterating, so it's fine
 (defmethod wl/handle-request :run-solver
   [{:keys [solver-name client-name override-map]}]
-  (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
+  ;; (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
   (swap! last-solvers-atom-meta assoc-in
     [solver-name :output]
     [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
@@ -2032,7 +2032,7 @@
 
 (defmethod wl/handle-push :run-solver-custom
   [{:keys [solver-name temp-solver-name client-name override-map input-map]}]
-  (ut/pp [:custom-solver-run! temp-solver-name :from client-name :input-map input-map])
+  ;; (ut/pp [:custom-solver-run! temp-solver-name :from client-name :input-map input-map])
   (swap! last-solvers-atom-meta assoc-in
     [temp-solver-name :output]
     [:warning! {:solver-running-custom-inputs-via client-name :with-input-map input-map :override-map? override-map}])
@@ -2738,7 +2738,7 @@
         runner-map            (get-in (config/settings) [:runners runner-name] {})
         runner-type           (get runner-map :type runner-name)
         timestamp             (System/currentTimeMillis)
-        cache-key             [vdata runner-name] ;; since we could have 2 connections with the
+        cache-key             (pr-str [solver-name vdata runner-name]) ;; since we could have 2 connections with the
         cache-val             (get @solvers-cache-atom cache-key)
         cache-hit?            (and (and use-cache? (ut/ne? cache-val)) (not= runner-type :sql))
         err?                  (fn [s]
@@ -2751,7 +2751,7 @@
                        meta-extra           {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms 0}}
                        timestamp-str        (str timestamp-str " (cache hit)")
                        new-history          (vec (conj (get @last-solvers-history-atom solver-name []) timestamp-str))] ;; regardless
-                   (ut/pp [:cached-solver-hit! solver-name])
+                   ;(ut/pp [:cached-solver-hit! solver-name])
                    (swap! last-solvers-atom assoc solver-name output)
                    (swap! last-solvers-atom-meta assoc
                      solver-name

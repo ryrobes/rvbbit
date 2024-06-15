@@ -27,7 +27,7 @@
                           split-complement tetrad triad]]
     [goog.dom :as gdom]
     [goog.events :as gevents]
-    [re-catch.core :as rc]
+    ;[re-catch.core :as rc]
     [re-com.core :as    re-com
                  :refer [at]]
     [re-com.util :refer [px]]

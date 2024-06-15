@@ -1982,8 +1982,7 @@
                                                          (ut/hiccup-css-to-string
                                                            (merge css
                                                                   (when (= (str code) (str @db/param-code-hover))
-                                                                    {;:transform "scale(1.2)"
-                                                                     :box-shadow (str "0 0 10px 5px "
+                                                                    {:box-shadow (str "0 0 10px 5px "
                                                                                       (ut/invert-hex-color
                                                                                         (theme-pull :theme/editor-outer-rim-color
                                                                                                     nil)))}))))
@@ -2085,19 +2084,19 @@
 
 
 
-(re-frame/reg-sub ::parameters-available
-                  (fn [db _]
-                    (let [;;codes [:theme/base-font :font-family :height]
-                          server-params (get-in db [:autocomplete :clover-params] [])
-                          view-codes    (get-in db [:autocomplete :view-keywords] [])
-                          flow-subs     (get db :flow-subs)
-                          click-params  (vec (for [e (keys (get-in db [:click-param :param]))]
-                                               (keyword (str "param/" (ut/replacer (str e) ":" "")))))
-                          themes        (vec (for [e (keys (get-in db [:click-param :theme]))]
-                                               (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
-                          codes         (vec (apply concat [server-params view-codes themes flow-subs click-params])) ;; not
-                         ]
-                      codes)))
+;; (re-frame/reg-sub ::parameters-available ;;; old logic
+;;                   (fn [db _]
+;;                     (let [;;codes [:theme/base-font :font-family :height]
+;;                           server-params (get-in db [:autocomplete :clover-params] [])
+;;                           view-codes    (get-in db [:autocomplete :view-keywords] [])
+;;                           flow-subs     (get db :flow-subs)
+;;                           click-params  (vec (for [e (keys (get-in db [:click-param :param]))]
+;;                                                (keyword (str "param/" (ut/replacer (str e) ":" "")))))
+;;                           themes        (vec (for [e (keys (get-in db [:click-param :theme]))]
+;;                                                (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
+;;                           codes         (vec (apply concat [server-params view-codes themes flow-subs click-params])) ;; not
+;;                          ]
+;;                       codes)))
 
 (defn get-surrounding-tokens
   [cm cursor token]
@@ -2170,7 +2169,8 @@
                   (fn [db _]
                     (let [editor?            (get db :editor? false)
                           part-kp            @(ut/tracked-sub ::editor-panel-selected-view {})
-                          view-code-hash     (hash [(get-in db [:panels (get db :selected-block)]) part-kp])
+                          v-spy              (get @db/value-spy (get db :selected-block))
+                          view-code-hash     (hash [(get-in db [:panels (get db :selected-block) v-spy]) part-kp])
                           old-view-code-hash @last-view-highlighted-hash]
                       (and editor? (not= view-code-hash old-view-code-hash)))))
 
@@ -2210,7 +2210,7 @@
 
 (defn can-be-autocompleted?
   [token-string]
-  (let [list @db/autocomplete-keywords ;;(vec (map str @(rfa/sub ::parameters-available {})))
+  (let [list @db/autocomplete-keywords
         can? (ut/ne? (filter #(clojure.string/starts-with? % token-string) list))
         _ (ut/tapp>> [:can-be-autocompleted? can? token-string])]
     can?))
@@ -2313,15 +2313,25 @@
 (re-frame/reg-event-db
   ::highlight-panel-code
   (fn [db _]
-    (let [flow-subs      (get db :flow-subs)
+    (let [;flow-subs      (get db :flow-subs)
           [_ data-key]   @(ut/tracked-sub ::editor-panel-selected-view {})
           selected-block (get db :selected-block)
           value-spy?     (get-in @db/value-spy [selected-block data-key] false)
-          click-params   (vec (for [e (keys (get-in db [:click-param :param]))]
-                                (keyword (str "param/" (ut/replacer (str e) ":" "")))))
-          themes         (vec (for [e (keys (get-in db [:click-param :theme]))]
-                                (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
-          codes          (vec (into themes (into flow-subs click-params)))
+
+          ;; click-params   (vec (for [e (keys (get-in db [:click-param :param]))]
+          ;;                       (keyword (str "param/" (ut/replacer (str e) ":" "")))))
+          ;; themes         (vec (for [e (keys (get-in db [:click-param :theme]))]
+          ;;                       (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
+
+          ;; instead of looking for all the possible things, why not just look at what is here and if it applies?
+          selected-view-type @(ut/tracked-sub ::view-type {:panel-key selected-block :view data-key})
+          clover-kpw     (filter #(and (keyword? %) (cstr/includes? (str %) "/" )) 
+                                 (ut/deep-flatten (get-in db [:panels selected-block selected-view-type data-key])))
+          clover-kpw-set (set (map str clover-kpw))
+          interspace (cset/intersection clover-kpw-set (set @db/autocomplete-keywords))
+          ;_ (tapp>> [:insersec (map edn/read-string interspace)])
+
+          codes          (vec interspace)  ;; (vec (into themes (into flow-subs click-params)))
           part-kp        @(ut/tracked-sub ::editor-panel-selected-view {})
           view-code-hash (hash [(get-in db [:panels (get db :selected-block)]) part-kp])]
       (reset! last-view-highlighted-hash view-code-hash)
@@ -2335,7 +2345,9 @@
         (highlight-codes-values (into {}
                                       (for [c codes]
                                         {c @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                            {:keypath [(try (edn/read-string c) (catch :default _ c))]})}))
+                                                            {:keypath [c
+                                                                       ;(try (edn/read-string c) (catch :default _ c))
+                                                                       ]})}))
                                 {;:color "white"
                                  :background-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
                                  :filter           "invert(1.2)"
@@ -2404,7 +2416,8 @@
 
 (defn panel-param-box
   [type-key key width-int height-int value]
-  (let [sql-hint? (cstr/includes? (str value) ":::sql-string")]
+  (let [hidden-params-map (select-keys value [:selected-view :selected-view-data :selected-block])
+        value (dissoc value :selected-view :selected-view-data :selected-block)]
     [re-com/box :size "none" :width (px (- width-int 24)) :height (px (- height-int 24)) :style
      {:font-family   (theme-pull :theme/monospaced-font nil) ;"Fira Code" ; "Chivo Mono" ;"Fira
       :font-size     "13px"
@@ -2413,8 +2426,10 @@
       :font-weight   700} :child
      [(reagent/adapt-react-class cm/UnControlled)
       {:value   (ut/format-map (- width-int 24) (str (if (nil? key) value (get value key))))
-       :onBlur  #(ut/tracked-dispatch [::set-user-parameters type-key (read-string (cstr/join " " (ut/cm-deep-values %)))])
-       :options {:mode              (if sql-hint? "sql" "clojure")
+       :onBlur  #(ut/tracked-dispatch [::set-user-parameters type-key (merge 
+                                                                       (read-string (cstr/join " " (ut/cm-deep-values %)))
+                                                                       hidden-params-map)])
+       :options {:mode              "clojure"
                  :lineWrapping      true
                  :lineNumbers       true
                  :matchBrackets     true
@@ -6419,7 +6434,7 @@
 (re-frame/reg-event-db ::clear-cache-atoms
                        (fn [db _]
                          (ut/tapp>> [:clearing-cache-atoms! (get db :client-name)])
-                         (doseq [a [ut/replacer-data ut/replacer-cache ut/deep-flatten-data ut/deep-flatten-cache ut/map-boxes-cache
+                         (doseq [a [ut/replacer-data ut/replacer-cache ut/deep-flatten-data ut/deep-flatten-cache ut/map-boxes-cache ut/map-boxes-cache-hits
                                     ut/clover-walk-singles-map ut/process-key-cache ut/process-key-tracker ut/compound-keys-cache
                                     ut/compound-keys-tracker ut/upstream-cache ut/upstream-cache-tracker ut/downstream-cache
                                     ut/downstream-cache-tracker ut/split-cache ut/split-cache-data ut/extract-patterns-data
@@ -6815,7 +6830,7 @@
 (defn map-value-box
   [s k-val-type] ;; dupe of a fn inside flows, but w/o dragging - TODO refactor to single fn -
   ;(ut/tapp>> [s k-val-type]) 
-  (let [render-values? true
+  (let [;render-values? true
         function?      (or (fn? s) (try (fn? s) (catch :default _ false)))]
     (cond (ut/hex-color? s)                        [re-com/h-box :gap "3px" :children
                                                     [[re-com/box :child (str s)]
