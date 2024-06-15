@@ -2636,6 +2636,7 @@
                                                  (re-matches #".*\d" (str (first %)))))
                                             (not (cstr/ends-with? (str (first %)) "*running?"))
                                             (not (cstr/ends-with? (str (first %)) "/selected-view"))
+                                            (not (cstr/ends-with? (str (first %)) "/selected-block"))
                                             (not (cstr/ends-with? (str (first %)) "/selected-view-data"))
                                             (not (cstr/starts-with? (str (first %)) ":conn-list/"))
                                             (not (cstr/starts-with? (str (first %)) ":time/"))
@@ -6849,7 +6850,7 @@
   (let [cache-key (pr-str [data block-id selected-view keypath kki init-data-type draggable?])
         cache (get @ut/map-boxes-cache cache-key)]
     (swap! ut/map-boxes-cache-hits update cache-key (fnil inc 0))
-    (if false cache
+    (if cache cache
         (let [res (map-boxes2* data block-id selected-view keypath kki init-data-type draggable?)]
           (swap! ut/map-boxes-cache assoc cache-key res)
           res))))
