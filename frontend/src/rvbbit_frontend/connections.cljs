@@ -201,43 +201,35 @@
     (when (not no-select?) (ut/tracked-dispatch [::select-block bid]))
     (ut/tracked-dispatch [::update-flowmap-key2 bid nil body])))
 
-;; (declare logic-and-params)
 
-;; (defn solver-clover-walk
-;;   [client-name panel-key obody]
-;;   (let [kps       (ut/extract-patterns obody :run-solver 2)
-;;         logic-kps (into
-;;                     {}
-;;                     (for [v kps]
-;;                       (let [[_ & this]                v
-;;                             [[solver-name input-map]] this
-;;                             unresolved-req-hash       (hash [solver-name input-map client-name])
-;;                             resolved-input-map        (logic-and-params input-map nil) ;; and we need to 'pre-resolve' it's
-;;                                                                                        ;; inputs
-;;                                                                                        ;; i n case they are client
-;;                                                                                        ;; local
-;;                             new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
-;;                             sub-param                 (keyword (str "solver/" new-solver-name))
-;;                             req-map                   {:kind             :run-solver-custom ;; solver-name
-;;                                                                                             ;; temp-solver-name
-;;                                                                                             ;; client-name input-map
-;;                                                        :solver-name      solver-name
-;;                                                        :temp-solver-name (keyword new-solver-name)
-;;                                                        :input-map        resolved-input-map
-;;                                                        :client-name      client-name}
-;;                             websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
-;;                             online?                   (true? (= websocket-status :connected))
-;;                             run?                      (get-in @db/solver-fn-runs [panel-key (hash resolved-input-map)])
-;;                             lets-go?                  (and online? (not run?))
-;;                             ;; _ (when true ;;lets-go?
-;;                             ;;     (ut/tapp>> [:run-solver-req-map-bricks! lets-go? (not run?) req-map
-;;                             ;;     @db/solver-fn-runs]))
-;;                             _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
-;;                             _ (when lets-go?
-;;                                 (swap! db/solver-fn-runs ut/dissoc-in [panel-key])
-;;                                 (swap! db/solver-fn-runs assoc-in [panel-key (hash resolved-input-map)] sub-param))]
-;;                         {v sub-param})))]
-;;     (walk/postwalk-replace logic-kps obody)))
+
+(re-frame/reg-event-db
+ ::update-solver-fn-runs
+ (fn [db [_ keypath value]]
+   (assoc-in db (into [:solver-fn :runs] keypath) value)))
+
+(re-frame/reg-sub
+ ::solver-fn-runs
+ (fn [db {:keys [keypath]}]
+   (get-in db (into [:solver-fn :runs] keypath))))
+
+(re-frame/reg-sub
+ ::solver-fn-runs-keys
+ (fn [db {:keys [keypath]}]
+   (vec (keys (get-in db (into [:solver-fn :runs] keypath))))))
+
+
+(re-frame/reg-event-db
+ ::update-solver-fn-lookup
+ (fn [db [_ keypath value]] ;;; not *really* a keypath, used as an assoc with a compound key
+   (assoc-in db [:solver-fn :lookup keypath] value)))
+
+(re-frame/reg-sub
+ ::solver-fn-lookup
+ (fn [db {:keys [keypath]}] ;;; not *really* a keypath, used as an assoc with a compound key
+   (get-in db [:solver-fn :lookup keypath])))
+
+
 
 (declare logic-and-params-fn)
 
@@ -311,38 +303,6 @@
                    :<<     (fn [[x y]] (true? (< x y)))
                    :str    (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
                    :string (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))}
-          ;; solver-clover-walk
-          ;; (fn [obody]
-          ;;   (let [kps       (ut/extract-patterns obody :run-solver 2)
-          ;;         logic-kps (into
-          ;;                    {}
-          ;;                    (for [v kps]
-          ;;                      (let [[_ & this]                v
-          ;;                            [[solver-name input-map]] this
-          ;;                            panel-key                 :conn
-          ;;                            unresolved-req-hash       (hash [solver-name input-map client-name])
-          ;;                            resolved-input-map        (logic-and-params-fn input-map panel-key)
-          ;;                            new-solver-name           (str (ut/replacer (str solver-name) ":" "") unresolved-req-hash)
-          ;;                            sub-param                 (keyword (str "solver/" new-solver-name))
-          ;;                            req-map                   {:kind             :run-solver-custom 
-          ;;                                                       :solver-name      solver-name
-          ;;                                                       :temp-solver-name (keyword new-solver-name)
-          ;;                                                       :input-map        resolved-input-map
-          ;;                                                       :client-name      client-name}
-          ;;                            websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
-          ;;                            online?                   (true? (= websocket-status :connected))
-          ;;                            run?                      (= (get-in @db/solver-fn-runs [panel-key sub-param])
-          ;;                                                         resolved-input-map)
-          ;;                            lets-go?                  (and online? (not run?))
-          ;;                               ;; _ (when lets-go?
-          ;;                               ;;     (ut/tapp>> [:run-solver-req-map-conns! (str (first this)) lets-go? (not run?) req-map
-          ;;                               ;;                 @db/solver-fn-runs]))
-          ;;                            _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
-          ;;                            _ (when lets-go?
-          ;;                                (swap! db/solver-fn-lookup assoc (str (first kps)) sub-param)
-          ;;                                (swap! db/solver-fn-runs assoc-in [panel-key sub-param] resolved-input-map))]
-          ;;                        {v sub-param})))]
-          ;;     (walk/postwalk-replace logic-kps obody)))
           solver-clover-walk
           (fn [obody]
             (let [;kps       (ut/extract-patterns obody :run-solver 2)
@@ -371,7 +331,9 @@
                                                                 (when override? {:override-map resolved-full-map}))
                                      websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                      online?                   (true? (= websocket-status :connected))
-                                     run?                      (= (get-in @db/solver-fn-runs [panel-key sub-param])
+                                     run?                      (= 
+                                                                (get-in @db/solver-fn-runs [panel-key sub-param])
+                                                                ;@(ut/tracked-sub ::solver-fn-runs-keys {:keypath [panel-key sub-param]})
                                                                   unique-resolved-map)
                                      lets-go?                  (and online? (not run?))
                                     ;;  _ (when lets-go?
@@ -379,11 +341,11 @@
                                     ;;                  @db/solver-fn-runs]))
                                      _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                      _ (when lets-go?
-                                         (swap! db/solver-fn-lookup assoc
-                                                ;(str (first kps))
-                                                fkp
-                                                sub-param)
-                                         (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map))]
+                                         (swap! db/solver-fn-lookup assoc fkp sub-param)
+                                         ;(ut/tracked-dispatch [::update-solver-fn-lookup fkp sub-param])
+                                         (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)
+                                         ;(ut/tracked-dispatch [::update-solver-fn-runs [panel-key sub-param] unique-resolved-map])
+                                         )]
                                  {v sub-param})))]
               (walk/postwalk-replace logic-kps obody)))
           obody-key-set (ut/body-set block-map)
@@ -555,12 +517,14 @@
 
 (re-frame/reg-sub
  ::runner-crosswalk-map
- (fn [_ _] 
+ (fn [db _] 
    (let [;; runner-keys       (keys (get-in db [:server :settings :runners] {}))
         ;;  all-runners       (apply concat
         ;;                           (for [r runner-keys]
         ;;                             (mapcat (fn [[_ v]] (keys (get v r))) (get db :panels))))
-         modded-map (into {} (for [[k v] @db/solver-fn-lookup
+         modded-map (into {} (for [[k v] 
+                                   @db/solver-fn-lookup
+                                   ;(get-in db [:solver-fn :lookup])
                                    :let [base-k (last k)
                                          base-k (if (vector? base-k) (last base-k) base-k)]] ;; bit of a hack, since our keys are not fully congruent
                                {base-k v}))
@@ -602,17 +566,6 @@
           param-has-fn?       (when (or (= kkey :param) (= kkey :theme))
                                 (= (get-in db (vec (cons :click-param [kkey (split-back vkey) 0]))) :run-solver))
           full-kp             (cons :click-param (if kp-encoded-param? (vec (cons kkey (break-up-flow-key vkey))) [kkey vkey]))
-          ;; _ (when (= (first keypath) :param/huger22)
-          ;;     (ut/tapp>> [:param (first keypath)  kp-encoded-param? param-has-fn?  (get-in db full-kp)
-          ;;                 @db/solver-fn-runs  @db/solver-fn-lookup (get @db/solver-fn-lookup (str (get-in db
-          ;;                 full-kp)))
-          ;;                 ;; @(ut/tracked-sub ::clicked-parameter-key-alpha
-          ;;                 ;;                  {:keypath [(get @db/solver-fn-lookup (str (get-in db full-kp)))]})
-          ;;                 (try
-          ;;                   (get-in db (vec (cons :click-param (map keyword (map #(cstr/replace (str %) ":" "")
-          ;;                   (cstr/split (get @db/solver-fn-lookup (str (get-in db full-kp))) #"/"))))))
-          ;;                      (catch :default _  nil))
-          ;;                 ]))
           val0                (cond 
                                 
                                 (get runner-crosswalk-map (nth keypath 0))  ;; more sketchy recursion... beware!
@@ -626,16 +579,15 @@
                                                                                   ":"
                                                                                   ""))]})
                                               (vec (rest (break-up-flow-key vkey))))
-                                    param-has-fn?                         (try (let [] 
-                                                                                 ;;(ut/tapp>> [:alpha-loop (get-in db full-kp) keypath  @db/solver-fn-lookup (get @db/solver-fn-lookup [:conns keypath])])
-                                                                                 (get-in
-                                                                                 db
-                                                                                 (vec (cons :click-param
-                                                                                            (map keyword
-                                                                                              (map #(cstr/replace (str %) ":" "")
-                                                                                                (cstr/split
-                                                                                                  (get @db/solver-fn-lookup [:conns keypath])
-                                                                                                  #"/")))))))
+                                    param-has-fn?                         (try (get-in
+                                                                                db
+                                                                                (vec (cons :click-param
+                                                                                           (map keyword
+                                                                                                (map #(cstr/replace (str %) ":" "")
+                                                                                                     (cstr/split
+                                                                                                      (get @db/solver-fn-lookup [:conns keypath])
+                                                                                                      ;@(ut/tracked-sub ::solver-fn-lookup {:keypath [:conns keypath]})
+                                                                                                      #"/"))))))
                                                                                (catch :default _ nil)) ;; get the sub ref and
                                                                                                        ;; return that data
                                     (let [vv (get-in db full-kp)]  ;; if we get back a clover keyword, try and resolve it. CAREFUL, this could stackoverflow us easy...
@@ -697,8 +649,6 @@
           val                 (if (and (string? val) (cstr/starts-with? (str val) ":") (not (cstr/includes? (str val) " ")))
                                 (edn/read-string val) ;; temp hacky param work around (since we
                                 val)
-          ;sub-param (get @db/solver-fn-lookup (str (get-in db full-kp)))
-          ;fn-changed?  (if param-has-fn? (nil? (get-in @db/solver-fn-runs [:conn sub-param])) false)
           contains-params?    (contains-namespaced-keyword? val)
           contains-solver-fn? (some #(= % :run-solver) (ut/deep-flatten [val (get-in db full-kp)]))] 
       ;;(ut/tapp>> [:kk (str keypath) val])

@@ -2739,8 +2739,8 @@
         runner-type           (get runner-map :type runner-name)
         timestamp             (System/currentTimeMillis)
         cache-key             (pr-str [solver-name vdata runner-name]) ;; since we could have 2 connections with the
-        cache-val             (get @solvers-cache-atom cache-key)
-        cache-hit?            (and (and use-cache? (ut/ne? cache-val)) (not= runner-type :sql))
+        cache-val             (when use-cache? (get @solvers-cache-atom cache-key))
+        cache-hit?            (and (and use-cache? (ut/ne? cache-val)) (not= runner-type :sql) (not= runner-type :nrepl))
         err?                  (fn [s]
                                 (let [s (str s)]
                                   (or (cstr/includes? s "Exception") (cstr/includes? s ":err") (cstr/includes? s ":error"))))
@@ -2799,7 +2799,8 @@
               solver-name
               (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
             (swap! last-solvers-history-atom assoc solver-name new-history)
-            (swap! solvers-cache-atom assoc cache-key [output output-full]))
+            ;;;(swap! solvers-cache-atom assoc cache-key [output output-full])
+            )
           (catch Throwable e
             (do (ut/pp [:SOLVER-SQL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
                 (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
@@ -2832,7 +2833,8 @@
                  solver-name
                  (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
                (swap! last-solvers-history-atom assoc solver-name new-history)
-               (swap! solvers-cache-atom assoc cache-key [output output-full]))
+               ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
+               )
              (catch Throwable e
                (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
                    (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
@@ -2873,7 +2875,8 @@
                  solver-name
                  (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
                (swap! last-solvers-history-atom assoc solver-name new-history)
-               (swap! solvers-cache-atom assoc cache-key [output-val output-full])
+               (when use-cache? 
+                 (swap! solvers-cache-atom assoc cache-key [output-val output-full]))
                (swap! flow-db/results-atom dissoc flow-id)) ;; <-- clear out the flow atom right
              (catch Throwable e
                (do (ut/pp [:SOLVER-FLOW-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])

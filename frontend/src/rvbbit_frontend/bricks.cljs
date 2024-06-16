@@ -468,10 +468,10 @@
                                                            (into (ut/deep-flatten panels)
                                                                  (ut/deep-flatten (get-all-values (get db :click-param))))))
                                                        current-flow-open)))
-          clover-solvers          (vec (apply concat (for [[_ v] @db/solver-fn-runs] (keys v))))
-          ;; (swap! db/solver-fn-runs assoc-in [panel-key sub-param] resolved-input-map)
-          ;; _ (ut/tapp>> [:clover-solverss clover-solvers @db/solver-fn-runs])
-          ;;clover-solvers          (vec (for [[k v] @db/solver-fn-runs])
+          clover-solvers          (vec (apply concat (for [[_ v] 
+                                                           @db/solver-fn-runs
+                                                           ;(get-in db [:solver-fn :runs])
+                                                           ] (keys v))))
           warren-item             (get db :selected-warren-item)
           solver-open?            (and (= (get @db/flow-editor-system-mode 0) "signals") (get db :flow?))
           solver                  (if (and (get-in db [:solvers-map warren-item :data]) solver-open?)
@@ -2211,14 +2211,10 @@
 (defn can-be-autocompleted?
   [token-string]
   (let [list @db/autocomplete-keywords
-        can? (ut/ne? (filter #(clojure.string/starts-with? % token-string) list))
-        _ (ut/tapp>> [:can-be-autocompleted? can? token-string])]
+        fff (filter #(clojure.string/starts-with? % token-string) list)
+        can? (and (> (count fff) 1) (ut/ne? fff))
+        _ (ut/tapp>> [:can-be-autocompleted? can? (count fff) token-string])]
     can?))
-
-
-
-
-
 
 (defn panel-code-box
   [_ _ width-int height-int value]
@@ -2254,13 +2250,45 @@
                                   (ut/tracked-dispatch-sync [::update-selected parse])
                                   (ut/tracked-dispatch-sync [::update-selected-key-cons key parse]))
                                 (ut/dispatch-delay [::highlight-panel-code] 200))))
-       :onInputRead    (fn [cm]
-                         (let [cursor       (.getCursor cm)
-                               token        (.getTokenAt cm cursor)
-                               token-string (.-string token)
-                               token-end    (= (.-ch cursor) (.-end token))]
-                           (when (or (= token-string ":") (and token-end (can-be-autocompleted? token-string)))
-                             (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
+      ;;  :onInputRead    (fn [cm]
+      ;;                    (let [cursor       (.getCursor cm)
+      ;;                          token        (.getTokenAt cm cursor)
+      ;;                          token-string (.-string token)
+      ;;                          token-end    (= (.-ch cursor) (.-end token))]
+      ;;                      (when (or (= token-string ":")
+      ;;                                ;;(= token-string ">") ;; this didnt work
+      ;;                                (and token-end (can-be-autocompleted? token-string)))
+      ;;                        (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
+      ;;  :onCursorActivity (fn [cm]
+      ;;                      (let [cursor       (.getCursor cm)
+      ;;                            line         (.-line cursor)
+      ;;                            ch           (.-ch cursor)
+      ;;                            token        (.getTokenAt cm (clj->js {:line line :ch (dec ch)}))
+      ;;                            token-string (.-string token)
+      ;;                            token-end    (= ch (.-end token))]
+      ;;                        (when (or (= token-string ":")
+      ;;                                  (and token-end (can-be-autocompleted? token-string)))
+      ;;                          (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
+       :onCursorActivity (fn [cm]
+                           (let [cursor       (.getCursor cm)
+                                 line         (.-line cursor)
+                                 ch           (.-ch cursor)
+                                 token        (.getTokenAt cm (clj->js {:line line :ch (dec ch)}))
+                                 token-string (.-string token)
+                                 token-end    (= ch (.-end token))]
+                             (when (and token-end 
+                                        (cstr/starts-with? token-string ":")
+                                        (can-be-autocompleted? token-string))
+                               (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
+      ;;  :onCursorActivity    (fn [cm]
+      ;;                         (let [cursor       (.getCursor cm)
+      ;;                               token        (.getTokenAt cm cursor)
+      ;;                               token-string (.-string token)
+      ;;                               token-end    (= (.-ch cursor) (.-end token))]
+      ;;                           (when (or (= token-string ":")
+      ;;                                ;;(= token-string ">") ;; this didnt work
+      ;;                                     (and token-end (can-be-autocompleted? token-string)))
+      ;;                             (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
        :options        {:mode              (if sql-hint? "sql" "clojure")
                         :hintOptions       {:hint custom-hint-simple-fn :completeSingle false}
                         :lineWrapping      true
@@ -2272,35 +2300,35 @@
                         :detach            true
                         :readOnly          false
                         :extraKeys         (clj->js
-                                             {"Ctrl-Right"       (fn [^js cm]
-                                                                   (let [cursor (.getCursor cm)
-                                                                         match  (.findMatchingBracket cm cursor true)]
-                                                                     (if (and match (.-match match))
-                                                                       (.setCursor cm
-                                                                                   (clj->js {:line (.-line (.-to match))
-                                                                                             :ch   (+ (.-ch (.-to match)) 1)}))
-                                                                       (.execCommand cm "goGroupRight"))))
-                                              "Shift-Ctrl-Right" (fn [^js cm]
-                                                                   (let [cursor (.getCursor cm)
-                                                                         match  (.findMatchingBracket cm cursor true)]
-                                                                     (if (and match (.-match match))
-                                                                       (.setSelection cm
-                                                                                      cursor
-                                                                                      (clj->js {:line (.-line (.-to match))
-                                                                                                :ch   (+ (.-ch (.-to match)) 1)}))
-                                                                       (.execCommand cm "goGroupRight"))))
-                                              "Ctrl-Left"        (fn [^js cm]
-                                                                   (let [cursor (.getCursor cm)
-                                                                         match  (.findMatchingBracket cm cursor true)]
-                                                                     (if (and match (.-match match))
-                                                                       (.setCursor cm (.-to match))
-                                                                       (.execCommand cm "goGroupLeft"))))
-                                              "Shift-Ctrl-Left"  (fn [^js cm]
-                                                                   (let [cursor (.getCursor cm)
-                                                                         match  (.findMatchingBracket cm cursor true)]
-                                                                     (if (and match (.-match match))
-                                                                       (.setSelection cm cursor (.-to match))
-                                                                       (.execCommand cm "goGroupLeft"))))})
+                                            {"Ctrl-Right"       (fn [^js cm]
+                                                                  (let [cursor (.getCursor cm)
+                                                                        match  (.findMatchingBracket cm cursor true)]
+                                                                    (if (and match (.-match match))
+                                                                      (.setCursor cm
+                                                                                  (clj->js {:line (.-line (.-to match))
+                                                                                            :ch   (+ (.-ch (.-to match)) 1)}))
+                                                                      (.execCommand cm "goGroupRight"))))
+                                             "Shift-Ctrl-Right" (fn [^js cm]
+                                                                  (let [cursor (.getCursor cm)
+                                                                        match  (.findMatchingBracket cm cursor true)]
+                                                                    (if (and match (.-match match))
+                                                                      (.setSelection cm
+                                                                                     cursor
+                                                                                     (clj->js {:line (.-line (.-to match))
+                                                                                               :ch   (+ (.-ch (.-to match)) 1)}))
+                                                                      (.execCommand cm "goGroupRight"))))
+                                             "Ctrl-Left"        (fn [^js cm]
+                                                                  (let [cursor (.getCursor cm)
+                                                                        match  (.findMatchingBracket cm cursor true)]
+                                                                    (if (and match (.-match match))
+                                                                      (.setCursor cm (.-to match))
+                                                                      (.execCommand cm "goGroupLeft"))))
+                                             "Shift-Ctrl-Left"  (fn [^js cm]
+                                                                  (let [cursor (.getCursor cm)
+                                                                        match  (.findMatchingBracket cm cursor true)]
+                                                                    (if (and match (.-match match))
+                                                                      (.setSelection cm cursor (.-to match))
+                                                                      (.execCommand cm "goGroupLeft"))))})
                         :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
 
 
@@ -6518,7 +6546,6 @@
           keepers (vec (filter #(not (cstr/starts-with? (str %) ":query-preview")) ks))
           run-it? (or (and (nil? @mad-libs-view) (not (= @db/editor-mode :vvv)) (not (= (count ks-all) (count ks))))
                       (and (get db :flow?) (get db :flow-editor?)))]
-      ;;(reset! db/solver-fn-runs {})
       (if run-it?
         (-> db
             (ut/dissoc-in [:panels nil]) ;; garbage keys created by external edit with bad
@@ -6861,34 +6888,39 @@
 
 (declare map-boxes2*)
 
-(defn map-boxes2 [data block-id selected-view keypath kki init-data-type & [draggable?]]
-  (let [cache-key (pr-str [data block-id selected-view keypath kki init-data-type draggable?])
+(defn map-boxes2 [data block-id selected-view keypath kki init-data-type & [draggable? key-depth]]
+  (let [cache-key (pr-str [data block-id selected-view keypath kki init-data-type draggable? key-depth])
         cache (get @ut/map-boxes-cache cache-key)]
     (swap! ut/map-boxes-cache-hits update cache-key (fnil inc 0))
     (if cache cache
-        (let [res (map-boxes2* data block-id selected-view keypath kki init-data-type draggable?)]
+        (let [res (map-boxes2* data block-id selected-view keypath kki init-data-type draggable? key-depth)]
           (swap! ut/map-boxes-cache assoc cache-key res)
           res))))
 
 ;;(ut/tapp>> [:map-boxes-cache-hits @ut/map-boxes-cache-hits])
 ;;(ut/tapp>> [:map-boxes-cache-hits2 (ut/distribution ut/map-boxes-cache-hits 0.33)]) 
 
+;;; [map-boxes2 x panel-key selected-view [] :output nil ]
+
 (defn map-boxes2*
-  [data block-id selected-view keypath kki init-data-type & [draggable?]] ;; dupe of a fn inside
-  (let [sql-explanations (sql-explanations-kp)
-        flow-name (ut/data-typer data)
-        data (if (or (string? data) (number? data) (boolean? data)) [data] data)
-        base-type-vec? (or (vector? data) (list? data))
-        iter (if base-type-vec? (range (count data)) (keys data))
-        source @(ut/tracked-sub ::data-viewer-source {:block-id block-id :selected-view selected-view})
-        source-clover-key? (and (keyword? source) (cstr/includes? (str source) "/"))
-        ;;_ (ut/tapp>> [:data-viewer-source source source-clover-key?])
-        font-size "inherit" ;;"11px"
-        draggable? false ;; override bs TODO
-        dcolors @(ut/tracked-sub ::conn/data-colors {})
-        non-canvas? (nil? block-id)
-        dggbl (if non-canvas? draggable-stub draggable)
-        main-boxes
+  [data block-id selected-view keypath kki init-data-type & [draggable? key-depth]] ;; dupe of a fn inside
+  (if (<= (count keypath) (or key-depth 10))
+    (let [sql-explanations (sql-explanations-kp) ;; turn into general key annotations as some point with KP lookups?
+          flow-name (ut/data-typer data)
+          ;;;_ (tapp>>  [:kki (str keypath) kki])
+          data (if (or (string? data) (number? data) (boolean? data)) [data] data)
+          base-type-vec? (or (vector? data) (list? data))
+          iter (if base-type-vec? (range (count data)) (keys data))
+          source @(ut/tracked-sub ::data-viewer-source {:block-id block-id :selected-view selected-view})
+          source-clover-key? (and (keyword? source) (cstr/includes? (str source) "/"))
+          source-app-db? (try (= (first source) :app-db) (catch :default _ false))
+          ;;_ (ut/tapp>> [:data-viewer-source (str source) source-clover-key? source-app-db?])
+          font-size "inherit" ;;"11px"
+          draggable? false ;; override bs TODO
+          dcolors @(ut/tracked-sub ::conn/data-colors {})
+          non-canvas? (nil? block-id)
+          dggbl (if non-canvas? draggable-stub draggable)
+          main-boxes
           [re-com/v-box ;(if cells? re-com/h-box re-com/v-box)
            :size "auto" :padding "5px" :gap "2px" :style
            {:color       "black"
@@ -6903,7 +6935,7 @@
                    border-ind (if in-body? "solid" "dashed")
                    val-color  (get dcolors k-val-type (theme-pull :theme/editor-outer-rim-color nil))
                    keypath-in (conj keypath kk)
-                   clover-kp  (when source-clover-key? 
+                   clover-kp  (when source-clover-key?
                                 (edn/read-string (str source ">" (cstr/replace (cstr/join ">" keypath-in) ":" ""))))
                   ;;  _ (ut/tapp>> [:clover-kp clover-kp (str keypath-in)])
                    keystyle   {:background-color (if hovered? (str val-color 66) "#00000000")
@@ -6918,170 +6950,181 @@
                [re-com/box :child
                 (cond
                   (= k-val-type "map") ^{:key (str block-id keypath kki kk k-val-type)}
-                                       [re-com/h-box :children
-                                        [[dggbl ;;draggable
-                                          {:h         4
-                                           :w         6
-                                           :root      [0 0]
-                                           :drag-meta {:type        :viewer-pull
-                                                       :param-full  [:box :style {:font-size "17px"} :child
-                                                                     [:data-viewer 
-                                                                      (if source-clover-key? 
-                                                                        clover-kp
-                                                                        [:get-in [source keypath-in]])
-                                                                      ]]
-                                                       :param-type  k-val-type
-                                                       :param-table :what
-                                                       :param-field :what}} "meta-menu"         ;block-id ;; (when (not
+                  [re-com/h-box :children
+                   [[dggbl ;;draggable
+                     {:h         4
+                      :w         6
+                      :root      [0 0]
+                      :drag-meta {:type        :viewer-pull
+                                  :param-full  [:box :style {:font-size "17px"} :child
+                                                [:data-viewer
+                                                 (cond source-clover-key? clover-kp
+                                                       source-app-db? [:app-db keypath-in]
+                                                   :else [:get-in [source keypath-in]])]]
+                                  :param-type  k-val-type
+                                  :param-table :what
+                                  :param-field :what}} "meta-menu"         ;block-id ;; (when (not
                                                                                                 ;(= block-id
                                                                                                 ;:inline-render))
-                                          ^{:key (str block-id keypath kki kk k-val-type 1)}
-                                          [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
-                                           :style
-                                           {;:cursor (when draggable? "grab")
-                                           } :children
-                                           [^{:key (str block-id keypath kki kk k-val-type 124)} 
-                                            [re-com/box :child (str kk)]
-                                            ^{:key (str block-id keypath kki kk k-val-type 134)}
-                                            [re-com/box :child (str k-val-type) :style
-                                             {:opacity     0.45
-                                              :font-size   font-size ; "9px"
-                                              :padding-top "7px"}]
-                                            (when (> (count k-val) 1)
-                                              ^{:key (str block-id keypath kki kk k-val-type 156)}
-                                              [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])] :padding
-                                           "8px"]] [map-boxes2 k-val block-id selected-view keypath-in kk nil draggable?]] :style
-                                        keystyle]
+                     ^{:key (str block-id keypath kki kk k-val-type 1)}
+                     [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
+                      :style
+                      {;:cursor (when draggable? "grab")
+                       }:children
+                      [^{:key (str block-id keypath kki kk k-val-type 124)}
+                       [re-com/box :child (str kk)]
+                       ^{:key (str block-id keypath kki kk k-val-type 134)}
+                       [re-com/box :child (str k-val-type) :style
+                        {:opacity     0.45
+                         :font-size   font-size ; "9px"
+                         :padding-top "7px"}]
+                       (when (> (count k-val) 1)
+                         ^{:key (str block-id keypath kki kk k-val-type 156)}
+                         [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])] :padding
+                      "8px"]] [map-boxes2 k-val block-id selected-view keypath-in kk nil draggable?  key-depth]] :style
+                   keystyle]
                   (or (= k-val-type "vector")
                       (= k-val-type "list")
                       ;(= k-val-type "function")
                       (= k-val-type "rowset")
                       (= k-val-type "jdbc-conn")
                       (= k-val-type "render-object"))
-                    ^{:key (str block-id keypath kki kk k-val-type 2)}
-                    [re-com/h-box :style {:border-radius "12px" :border "3px solid black"} :children
+                  ^{:key (str block-id keypath kki kk k-val-type 2)}
+                  [re-com/h-box :style {:border-radius "12px" :border "3px solid black"} :children
+                   [[dggbl ;;draggable
+                     {:h         4
+                      :w         6
+                      :root      [0 0]
+                      :drag-meta {:type        :viewer-pull
+                                  :param-full  [:box :style {:font-size "17px"}
+                                                :child
+                                                [:data-viewer 
+                                                 (cond source-clover-key? clover-kp
+                                                       source-app-db? [:app-db keypath-in]
+                                                       :else [:get-in [source keypath-in]])]]
+                                  :param-type  k-val-type
+                                  :param-table :what
+                                  :param-field :what}} "meta-menu"         ;block-id
+                     ^{:key (str block-id keypath kki kk k-val-type 3)}
+                     [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
+                      :style
+                      {;:cursor (when draggable? "grab") ;;; skeptical, ryan 5/24/33
+                       }:children
+                      (if (and (= k-val-type "list") (= (ut/data-typer (first k-val)) "function"))
+                        [^{:key (str block-id keypath kki kk k-val-type 4)}
+                         [re-com/h-box :style {:margin-top "4px"} :gap "5px" :children
+                          [[re-com/box :child (str kk) :style {:opacity 0.25}]
+                           [re-com/box :child "(" :style
+                            {;:opacity 0.5
+                             :color       "orange"
+                             :margin-top  "-2px"
+                             :font-size   "14px"
+                             :font-weight 700}]
+                           ^{:key (str block-id keypath kki kk k-val-type 5)}
+                           [re-com/box :child (str (first k-val)) ; (str  "(")
+                            :style
+                            {:color     "#ffffff"
+                             :font-size font-size ;"17px"
+                             }]]]
+                         ^{:key (str block-id keypath kki kk k-val-type 6)}
+                         [re-com/box :child (str k-val-type) :style
+                          {:opacity     0.45
+                           :font-size   font-size ; "9px"
+                           :padding-top "16px"}]
+                         (when (> (count k-val) 1)
+                           ^{:key (str block-id keypath kki kk k-val-type 827)}
+                           [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])]
+
+                        [(when true ;(not (get sql-explanations keypath ""))
+                           ^{:key (str block-id keypath kki kk k-val-type 7)} [re-com/box :child (str kk)])
+                         (when true ; (not (get sql-explanations keypath ""))
+                           ^{:key (str block-id keypath kki kk k-val-type 8)}
+                           [re-com/box :child (str (when (= (count k-val) 0) "empty ") k-val-type)
+                            :style
+                            {:opacity     0.45
+                             :font-size   font-size ; "9px"
+                             :padding-top "7px"}])
+                         (when (ut/ne? (get sql-explanations keypath ""))
+                           ^{:key (str block-id keypath kki kk k-val-type 82)}
+                           [re-com/md-icon-button :md-icon-name "zmdi-info" :tooltip
+                            (str "FOOO" (get sql-explanations keypath "")) :style
+                            {:font-size "16px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}])]) :padding
+                      "8px"]]
+                    [map-boxes2
+                     (if (= k-val-type "rowset")
+                       (zipmap (iterate inc 0) (take 10 k-val))
+                       (zipmap (iterate inc 0) k-val))
+                     block-id selected-view keypath-in kk nil draggable? key-depth]] :style keystyle]
+                  :else
+                  ^{:key (str block-id keypath kki kk k-val-type 9)}
+                  [re-com/h-box :children
+                   [^{:key (str block-id keypath kki kk k-val-type 10)}
+                    [re-com/h-box :gap "6px" :children
                      [[dggbl ;;draggable
                        {:h         4
                         :w         6
                         :root      [0 0]
                         :drag-meta {:type        :viewer-pull
-                                    :param-full  [:box :style {:font-size "17px"} 
+                                    :param-full  [:box :size "auto" :align :center :justify :center :style
+                                                  {:font-size [:auto-size-px 
+                                                               (cond source-clover-key? clover-kp
+                                                                     source-app-db? [:app-db keypath-in]
+                                                                     :else [:get-in [source keypath-in]])]}
                                                   :child
-                                                  [:data-viewer (if source-clover-key?
-                                                                  clover-kp
-                                                                  [:get-in [source keypath-in]])]]
+                                                  [:string (cond source-clover-key? clover-kp
+                                                                 source-app-db? [:app-db keypath-in]
+                                                                 :else [:get-in [source keypath-in]])]]
                                     :param-type  k-val-type
                                     :param-table :what
-                                    :param-field :what}} "meta-menu"         ;block-id
-                       ^{:key (str block-id keypath kki kk k-val-type 3)}
-                       [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
-                        :style
-                        {;:cursor (when draggable? "grab") ;;; skeptical, ryan 5/24/33
-                        } :children
-                        (if (and (= k-val-type "list") (= (ut/data-typer (first k-val)) "function"))
-                          [^{:key (str block-id keypath kki kk k-val-type 4)}
-                           [re-com/h-box :style {:margin-top "4px"} :gap "5px" :children
-                            [[re-com/box :child (str kk) :style {:opacity 0.25}]
-                             [re-com/box :child "(" :style
-                              {;:opacity 0.5
-                               :color       "orange"
-                               :margin-top  "-2px"
-                               :font-size   "14px"
-                               :font-weight 700}]
-                             ^{:key (str block-id keypath kki kk k-val-type 5)}
-                             [re-com/box :child (str (first k-val)) ; (str  "(")
-                              :style
-                              {:color     "#ffffff"
-                               :font-size font-size ;"17px"
-                              }]]]
-                           ^{:key (str block-id keypath kki kk k-val-type 6)}
-                           [re-com/box :child (str k-val-type) :style
-                            {:opacity     0.45
-                             :font-size   font-size ; "9px"
-                             :padding-top "16px"}]
-                           (when (> (count k-val) 1)
-                             ^{:key (str block-id keypath kki kk k-val-type 827)}
-                             [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])]
-                          
-                          [(when true ;(not (get sql-explanations keypath ""))
-                             ^{:key (str block-id keypath kki kk k-val-type 7)} [re-com/box :child (str kk)])
-                           (when true ; (not (get sql-explanations keypath ""))
-                             ^{:key (str block-id keypath kki kk k-val-type 8)}
-                             [re-com/box :child (str (when (= (count k-val) 0) "empty ") k-val-type) 
-                              :style
-                              {:opacity     0.45
-                               :font-size   font-size ; "9px"
-                               :padding-top "7px"}])
-                           (when (ut/ne? (get sql-explanations keypath ""))
-                             ^{:key (str block-id keypath kki kk k-val-type 82)}
-                             [re-com/md-icon-button :md-icon-name "zmdi-info" :tooltip
-                              (str "FOOO" (get sql-explanations keypath "")) :style
-                              {:font-size "16px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}])]) :padding
-                        "8px"]]
-                      [map-boxes2
-                       (if (= k-val-type "rowset")
-                         (zipmap (iterate inc 0) (take 10 k-val))
-                         (zipmap (iterate inc 0) k-val))
-                       block-id selected-view keypath-in kk nil draggable?]] :style keystyle]
-                  :else
-                    ^{:key (str block-id keypath kki kk k-val-type 9)}
-                    [re-com/h-box :children
-                     [^{:key (str block-id keypath kki kk k-val-type 10)}
-                      [re-com/h-box :gap "6px" :children
-                       [[dggbl ;;draggable
-                         {:h         4
-                          :w         6
-                          :root      [0 0]
-                          :drag-meta {:type        :viewer-pull
-                                      :param-full  [:box :size "auto" :align :center :justify :center :style
-                                                    {:font-size [:auto-size-px (if source-clover-key?
-                                                                                 clover-kp
-                                                                                 [:get-in [source keypath-in]])]}
-                                                    :child
-                                                    [:string (if source-clover-key?
-                                                               clover-kp
-                                                               [:get-in [source keypath-in]])]]
-                                      :param-type  k-val-type
-                                      :param-table :what
-                                      :param-field :what}} "meta-menu" ;block-id
-                         ^{:key (str block-id keypath kki kk k-val-type 11)}
-                         [re-com/box :child (str kk) :style
-                          {;:cursor (when draggable? "grab")
-                          }]]
-                        (when true ;(not (get sql-explanations (vec (conj keypath kk)) ""))
-                          ^{:key (str block-id keypath kki kk k-val-type 12)}
-                          [re-com/box :child (str k-val-type) :style
-                           {:opacity    0.45
-                            :font-size  font-size ;"9px"
-                            :font-style (if (= k-val-type "function") "italic" "normal")}])
-                        (when (get sql-explanations (vec (conj keypath kk)) "")
-                          ^{:key (str block-id keypath kki kk k-val-type 822)}
-                          [re-com/box :style {:opacity 0.45} :child (str (get sql-explanations (vec (conj keypath kk)) ""))])]]
-                      ^{:key (str block-id keypath kki kk k-val-type 13)}
-                      [re-com/box :size "auto" :align :end :justify :end :child [map-value-box k-val k-val-type] :style
-                       {;:font-weight 500
-                        :line-height  "1.2em"
-                        :padding-left "5px"}]] :justify :between :padding "5px" :style valstyle])]))]]
-    (if (= keypath [])
-      (let [k-val-type (ut/data-typer data)
-            nin?       (not (= block-id :inline-render))
-            val-color  (get dcolors k-val-type)]
-        [re-com/v-box :children
-         [[re-com/v-box :style {:word-wrap "break-word" :overflow-wrap "break-word"} :children
-           [(when nin?
-              [re-com/v-box :padding "6px" :children
-               [^{:key (str block-id keypath kki 00 k-val-type 00002)}
-                [re-com/box :child (str flow-name) ;(str k-val-type)
-                 :align :end :style
-                 {:opacity       0.45
-                  :font-size     font-size ;"9px"
-                  :margin-top    "-7px"
-                  :margin-bottom "-5px"}]]]) main-boxes] :padding "0px"]] :style
-         {:font-family   (theme-pull :theme/base-font nil)
-          :color         val-color
-          :margin-top    (if nin? "0px" "-10px")
-          :border-radius "12px"}])
-      main-boxes)))
+                                    :param-field :what}} "meta-menu" ;block-id
+                       ^{:key (str block-id keypath kki kk k-val-type 11)}
+                       [re-com/box :child (str kk) :style
+                        {;:cursor (when draggable? "grab")
+                         }]]
+                      (when true ;(not (get sql-explanations (vec (conj keypath kk)) ""))
+                        ^{:key (str block-id keypath kki kk k-val-type 12)}
+                        [re-com/box :child (str k-val-type) :style
+                         {:opacity    0.45
+                          :font-size  font-size ;"9px"
+                          :font-style (if (= k-val-type "function") "italic" "normal")}])
+                      (when (get sql-explanations (vec (conj keypath kk)) "")
+                        ^{:key (str block-id keypath kki kk k-val-type 822)}
+                        [re-com/box :style {:opacity 0.45} :child (str (get sql-explanations (vec (conj keypath kk)) ""))])]]
+                    ^{:key (str block-id keypath kki kk k-val-type 13)}
+                    [re-com/box :size "auto" :align :end :justify :end :child [map-value-box k-val k-val-type] :style
+                     {;:font-weight 500
+                      :line-height  "1.2em"
+                      :padding-left "5px"}]] :justify :between :padding "5px" :style valstyle])]))]]
+      (if (= keypath [])
+        (let [k-val-type (ut/data-typer data)
+              nin?       (not (= block-id :inline-render))
+              val-color  (get dcolors k-val-type)]
+          [re-com/v-box :children
+           [[re-com/v-box :style {:word-wrap "break-word" :overflow-wrap "break-word"} :children
+             [(when nin?
+                [re-com/v-box :padding "6px" :children
+                 [^{:key (str block-id keypath kki 00 k-val-type 00002)}
+                  [re-com/box :child (str flow-name) ;(str k-val-type)
+                   :align :end :style
+                   {:opacity       0.45
+                    :font-size     font-size ;"9px"
+                    :margin-top    "-7px"
+                    :margin-bottom "-5px"}]]]) main-boxes] :padding "0px"]] :style
+           {:font-family   (theme-pull :theme/base-font nil)
+            :color         val-color
+            :margin-top    (if nin? "0px" "-10px")
+            :border-radius "12px"}])
+        main-boxes))
+        [re-com/v-box 
+         :size "auto"  :align :center :justify :center 
+         :margin "5px"
+         :style {:border (str  "2px dashed " (theme-pull :theme/editor-outer-rim-color nil))
+                 :color (theme-pull :theme/editor-outer-rim-color nil)
+                 :font-size "10px"  :font-weight 700
+                 :border-radius "14px"}
+         :children [[re-com/box :child (str "key depth reached")]
+                    [re-com/box :child (str "*drag a key out to extend*")]]]
+        ))
 
 
 (defn transform-nested ;; do this on the server?
@@ -7668,7 +7711,12 @@
                              (str args)))
                  :data-viewer (fn [x] (let [x (walk/postwalk-replace {:box :_box :icon :_icon :v-box :_v-box  :h-box :_h-box} x)]
                                         [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
-                                         :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]]))
+                                         :style {:overflow "auto"} :child 
+                                         [map-boxes2 x panel-key selected-view [] :output nil]]))
+                 :data-viewer-limit (fn [[x l]] (let [x (walk/postwalk-replace {:box :_box :icon :_icon :v-box :_v-box  :h-box :_h-box} x)]
+                                        [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
+                                         :style {:overflow "auto"} :child
+                                         [map-boxes2 x panel-key selected-view [] :output nil nil l]]))
                  :progress-bar
                    (fn [[ww seconds uid]]
                      (let [progress            (or (get @progress-bars uid) (reagent.core/atom 0))
@@ -8146,8 +8194,10 @@
         valid-body-params (ut/deep-flatten (merge ;;@(ut/tracked-subscribe [::valid-body-params
                                             @(rfa/sub ::valid-body-params {:panel-key panel-key})
                                             @(rfa/sub ::valid-body-params-all-condis)
-                                            (keys (get @db/solver-fn-runs panel-key {}))
-                                             ;;(for [[_ v] @db/solver-fn-runs] (vals v))
+                                            (keys 
+                                             (get @db/solver-fn-runs panel-key {})
+                                            ; @(ut/tracked-sub ::conn/solver-fn-runs-keys {:keypath [panel-key]})
+                                             )
                                             @(rfa/sub ::valid-body-params-in {:body body})
                                             @(rfa/sub ::valid-body-params-in {:body vsql-calls})))
         possible-datasets-used (set (for [e valid-body-params] (keyword (nth (ut/splitter (ut/safe-name e) #"/") 0))))
@@ -8344,21 +8394,21 @@
                                                               (when override? {:override-map resolved-full-map}))
                                    websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                    online?                   (true? (= websocket-status :connected))
-                                   run?                      (= (get-in @db/solver-fn-runs [panel-key sub-param])
+                                   run?                      (= 
+                                                              (get-in @db/solver-fn-runs [panel-key sub-param])
+                                                              ;;@(ut/tracked-sub ::conn/solver-fn-runs {:keypath [panel-key sub-param]})
                                                                 unique-resolved-map)
                                    lets-go?                  (and online? (not run?))
                                   ;;  _ (when lets-go?
                                   ;;      (ut/tapp>> [:run-solver-req-map-bricks! (str fkp) sub-param override? (str (first this)) lets-go? (not run?) ;req-map
-                                  ;;                  ;@db/solver-fn-runs
-                                  ;;                  @db/solver-fn-lookup
                                   ;;                  ]))
                                    _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                    _ (when lets-go?
-                                       (swap! db/solver-fn-lookup assoc 
-                                              ;(str (first kps))
-                                              fkp
-                                              sub-param)
-                                       (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map))]
+                                       (swap! db/solver-fn-lookup assoc fkp sub-param)
+                                       ;(ut/tracked-dispatch [::conn/update-solver-fn-lookup fkp sub-param])
+                                       (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)
+                                       ;(ut/tracked-dispatch [::conn/update-solver-fn-runs [panel-key sub-param] unique-resolved-map])
+                                       )]
                                {v sub-param})))]
             (walk/postwalk-replace logic-kps obody)))
         obody-key-set (ut/body-set body)
@@ -9029,7 +9079,7 @@
                 base-view-name                               :view ;; basically a default for single views
                 mouse-down?                                  (atom false)
                 tab-offset                                   (if tab @(ut/tracked-subscribe [::tab-offset2 tab]) [0 0])
-                click-delay                                  100
+                click-delay                                  1100
                 ;; mixed-keys ;;(try
                 ;;   (cond (and single-view? (seq sql-keys)) (conj sql-keys base-view-name)
                 ;;         (and no-view? (seq sql-keys))     sql-keys

@@ -583,6 +583,8 @@
                             (dissoc :flow-statuses)
                             (dissoc :signals-map)
                             (dissoc :repl-output)
+                            (dissoc :solver-fn)
+                            ;(ut/dissoc-in [:solver-fn :runs])
                             (ut/dissoc-in [:click-param :signal-history])
                             (ut/dissoc-in [:click-param :solver-meta])
                             (ut/dissoc-in [:click-param :signal])

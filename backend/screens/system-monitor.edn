@@ -1,5 +1,7 @@
 {:orders
- {:jvm_stats
+ {:kke192 (:query_error),
+  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb),
+  :jvm_stats
   [:used_memory_mb
    :thread_count
    :messages
@@ -20,15 +22,10 @@
    :internal_queries_run
    :sniffs_run
    :sys_load
-   :ts],
-  :kke192 (:query_error),
-  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb)},
+   :ts]},
  :reco-preview nil,
  :sql-source
- {:jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
-  :kke192 {:select [:*], :connection-id "system-db", :from [:kke192], :limit 111},
-  :new-query
+ {:new-query
   {:cache? false,
    :limit 100,
    :_last-run "14:46:56",
@@ -38,7 +35,10 @@
    :connection-id "system-db",
    :select
    [:thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :sys_load :used_memory_mb],
-   :post-process-fn reverse}},
+   :post-process-fn reverse},
+  :jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
+  :kke192 {:select [:*], :connection-id "system-db", :from [:kke192], :limit 111}},
  :meta
  {:kke192
   {:fields
@@ -55,35 +55,35 @@
   {:fields
    {:thread_count
     {:data-type "integer",
-     :distinct 33,
+     :distinct 28,
      :group-by? true,
-     :commons {263 7, 255 5, 261 5},
-     :cardinality 33},
+     :commons {209 14, 210 10, 208 9},
+     :cardinality 28},
     :ts1
     {:data-type "string",
      :distinct 100,
      :group-by? true,
      :commons
-     {"2024-06-15 14:26:49" 1, "2024-06-15 14:33:34" 1, "2024-06-15 14:32:19" 1},
+     {"2024-06-15 18:48:32" 1, "2024-06-15 19:08:17" 1, "2024-06-15 18:51:02" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
-     :distinct 3,
+     :distinct 4,
      :group-by? true,
-     :commons {"2024-06-15 14:3" 40, "2024-06-15 14:2" 34, "2024-06-15 14:4" 26},
-     :cardinality 2},
+     :commons {"2024-06-15 19:0" 40, "2024-06-15 18:5" 40, "2024-06-15 18:4" 17},
+     :cardinality 3},
     :sys_load
     {:data-type "float",
-     :distinct 95,
+     :distinct 84,
      :group-by? true,
-     :commons {9.51 2, 8.84 2, 6.61 2},
-     :cardinality 94},
+     :commons {4.25 5, 5.38 2, 4.87 2},
+     :cardinality 83},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 100,
+     :distinct 99,
      :group-by? true,
-     :commons {21392 1, 19218 1, 22522 1},
-     :cardinality 100}},
+     :commons {10122 2, 4731 1, 8602 1},
+     :cardinality 99}},
    :rowcount 100},
   :gen-viz-797
   {:fields
@@ -113,21 +113,21 @@
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 105,
+     :distinct 111,
      :group-by? true,
-     :commons {383 2, 250 2, 226 2},
-     :cardinality 94},
+     :commons {8 1, 183 1, 80 1},
+     :cardinality 100},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 102,
+     :distinct 99,
      :group-by? true,
-     :commons {69.8 4, 73.33 2, 71.67 2},
-     :cardinality 91},
+     :commons {74.14 3, 71.8 3, 71.11 2},
+     :cardinality 89},
     :uptime_seconds
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {1259 1, 1364 1, 1004 1},
+     :commons {1259 1, 1004 1, 764 1},
      :cardinality 100},
     :queries_per_second
     {:data-type "float",
@@ -146,91 +146,91 @@
      :distinct 111,
      :group-by? true,
      :commons
-     {"2024-06-14 16:28:04" 1, "2024-06-14 16:24:34" 1, "2024-06-14 16:27:49" 1},
+     {"2024-06-15 15:40:02" 1, "2024-06-15 15:52:47" 1, "2024-06-15 15:55:02" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
-     :distinct 8,
+     :distinct 4,
      :group-by? true,
-     :commons {261 74, 249 19, 280 10},
-     :cardinality 7},
+     :commons {230 107, 183 2, 92 1},
+     :cardinality 3},
     :messages_per_second
     {:data-type "float",
-     :distinct 94,
+     :distinct 96,
      :group-by? true,
-     :commons {70.14 4, 70.28 3, 70.09 3},
-     :cardinality 84},
+     :commons {72.3 4, 71.58 2, 71.92 2},
+     :cardinality 86},
     :messages
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {41628 1, 24324 1, 30759 1},
+     :commons {14950 1, 8 1, 96523 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 98,
+     :distinct 107,
      :group-by? true,
-     :commons {252 7, 138 2, 245 2},
-     :cardinality 88},
+     :commons {16 2, 45 2, 22 2},
+     :cardinality 96},
     :sys_load
     {:data-type "float",
-     :distinct 97,
+     :distinct 101,
      :group-by? true,
-     :commons {6.2 3, 3.75 3, 5.83 2},
-     :cardinality 87},
+     :commons {3.98 2, 4.54 2, 5.84 2},
+     :cardinality 90},
     :unix_ms
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {1718396704710 1, 1718396149712 1, 1718397229709 1},
+     :commons {1718480987407 1, 1718480252405 1, 1718480882406 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 110,
+     :distinct 109,
      :group-by? true,
-     :commons {3187 2, 3404 1, 3778 1},
-     :cardinality 99},
+     :commons {2411 2, 1224 2, 2361 1},
+     :cardinality 98},
     :recent_queries_run
     {:data-type "integer",
      :distinct 16,
      :group-by? true,
-     :commons {3 17, 4 17, 1 17},
+     :commons {5 21, 6 18, 3 17},
      :cardinality 14},
     :thread_count
     {:data-type "integer",
-     :distinct 33,
+     :distinct 30,
      :group-by? true,
-     :commons {179 13, 178 12, 180 8},
-     :cardinality 29},
+     :commons {205 10, 199 9, 204 9},
+     :cardinality 27},
     :internal_queries_run
     {:data-type "integer",
-     :distinct 1,
+     :distinct 2,
      :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
+     :commons {0 75, 6 36},
+     :cardinality 1},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 6,
+     :distinct 8,
      :group-by? true,
-     :commons {11 65, 0 26, 104 15},
-     :cardinality 5},
+     :commons {11 65, 0 22, 104 16},
+     :cardinality 7},
     :ws_peers
     {:data-type "integer",
-     :distinct 3,
+     :distinct 2,
      :group-by? true,
-     :commons {11 108, 10 2, 0 1},
-     :cardinality 2},
+     :commons {10 110, 0 1},
+     :cardinality 1},
     :recent_messages
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {100690 1, 41628 1, 24324 1},
+     :commons {14950 1, 108517 1, 8 1},
      :cardinality 100},
     :recent_queries_per_second
     {:data-type "float",
      :distinct 16,
      :group-by? true,
-     :commons {0.07 17, 0.27 17, 0.2 17},
+     :commons {0.33 21, 0.4 18, 0.27 17},
      :cardinality 14},
     :seconds_since_last_update
     {:data-type "integer",
@@ -411,15 +411,13 @@
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
    :rowcount 30}},
- :default-col-widths {:block-8594 {:new-query 102}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"],
- :auto-run? true,
- :selected-cols nil,
+ :selected-cols {},
  :server
  {:settings
   {:harvest-on-boot? true,
@@ -649,52 +647,33 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [283568634 236855554 4294705152],
- :sched {:new-query 9144},
+ :memory [840325906 813063498 4294705152],
+ :sched {:new-query 10},
  :flow-subs
  [:solver/raw-custom-override1085406457
   :solver/raw-custom-override-398966624
   :time/now-seconds
-  :solver/get-my-colors720628555
+  :client/*client-name*>stats>memory
   :flow/flow-forever>*running?
   :solver/raw-custom-override-569051388
-  :client/*client-name*>stats>memory
   :data/new-clojure-2
   :flow/live-scratch-flow>*running?
+  :solver/get-my-colors-1242203353
   :solver/raw-custom-override-916986421
   :solver/raw-custom-override-1471694664
   :flow/flow-forever>:final-math
   :solver/raw-custom-override-452322060
   :solver/raw-custom-override9026012
   :solver/colors-of-the-moment>darkest],
- :client-name :brave-prismatic-camel-31,
+ :client-name :fit-azure-hamster-14,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 1894, :h 1426},
- :post-meta {:new-query {:* {:rowcount 100}}},
- :status
- {:alert1 {:alerts :alert2},
-  :heartbeat
-  {:kick
-   [:solver/raw-custom-override1085406457
-    :solver/raw-custom-override-398966624
-    :time/now-seconds
-    :solver/get-my-colors720628555
-    :flow/flow-forever>*running?
-    :solver/raw-custom-override-569051388
-    :client/*client-name*>stats>memory
-    :data/new-clojure-2
-    :flow/live-scratch-flow>*running?
-    :solver/raw-custom-override-916986421
-    :solver/raw-custom-override-1471694664
-    :flow/flow-forever>:final-math
-    :solver/raw-custom-override-452322060
-    :solver/raw-custom-override9026012
-    :solver/colors-of-the-moment>darkest]}},
+ :window {:w 1861, :h 1467},
+ :post-meta {:jvm_stats {:* {:rowcount 111}}, :c345-up-or-down? {:* {:rowcount 1}}},
+ :status {:heartbeat {:kick []}},
  :screen-name "system-monitor",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
- :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
@@ -705,16 +684,14 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   9145
+   16
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :base-sniff-queries {:jvm_stats 1498154063, :kke192 -995149087},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1233833412,
+ :user-params-hash -502177442,
  :grid-recos? true,
- :session-hash -520419874,
- :no-ui? false,
  :resolved-queries
  {:new-query
   {:cache? false,
@@ -1200,7 +1177,7 @@
         clojure-version
         " on "
         jvm-version
-        " JVM "
+        " .jvm. "
         " 🥕🐇"))},
    :name "block-5533",
    :w 10,
@@ -1808,19 +1785,21 @@
    :minimized? true}},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#b5f4f0",
-  "boolean" "#8bcbf2",
-  "map" "#5bdc4a",
-  "list" "#cb5f41",
-  "string" "#ffffff",
-  "any" "#5758bc",
-  "vector" "#2ced94",
-  "keyword" "#f3f7c9",
-  "rabbit-code" "#6855c3",
-  "datetime" "#9f753b",
-  "integer" "#e39cc0",
-  "unknown" "#248428",
-  "date" "#062512"},
+ {"float" "#2c728e",
+  "boolean" "#f386bf",
+  "map" "#00FFFF",
+  "list" "#c32148",
+  "string" "#5dc963",
+  "any" "#ffffff",
+  "vector" "#008080",
+  "keyword" "#add8e6",
+  "rabbit-code" "#FC0FC0",
+  "datetime" "#472d7b",
+  "integer" "#d6e367",
+  "unknown" "#c7005d",
+  "date" "#3b528b",
+  "rabbitsql" "#FC0FC0",
+  "nil" "#ff2147"},
  :click-param
  {:flow
   {:crow-flow-201a>*running? false,
@@ -1828,24 +1807,24 @@
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false,
    :flow-forever>final-math nil},
-  :time {:second 4, :now-seconds "Saturday, June 15th 2:46:36PM", :month 4},
+  :time {:second 4, :now-seconds "Saturday, June 15th 7:07:22PM", :month 4},
   :client
   {:accepted-diamond-zebra-40>stats>memory nil,
-   :*client-name*>stats>memory 213,
-   :brave-prismatic-camel-31>stats>memory nil},
+   :*client-name*>stats>memory 283,
+   :brave-prismatic-camel-31>stats>memory nil,
+   :elegant-icosahedral-rhinoceros-30>stats>memory nil},
   :param
-  {:selected-view [:queries :new-query],
+  {:selected-view [:clojure :new-clojure-2],
    :selected-view-data
-   {:cache? false,
-    :limit 100,
-    :_last-run "13:18:34",
-    :refresh-every 10,
-    :from [[:jvm_stats :kke192]],
-    :order-by [[3 :desc]],
-    :connection-id "system-db",
-    :select
-    [:thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :sys_load :used_memory_mb],
-    :post-process-fn reverse},
+   (let [clojure-version (clojure-version)
+         jvm-version (System/getProperty "java.version")]
+     (str
+       "🐇🥕 nREPL. Clojure "
+       clojure-version
+       " on "
+       jvm-version
+       " JVM "
+       " 🥕🐇")),
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",
@@ -1992,7 +1971,7 @@
     :brightest "#f7c9cc",
     :most-contrasting-light "#f7c9cc"},
    :raw-custom-override-452322060
-   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n12  0      0 19982656 1645560 41618460    0    0    63    64    1    1 28  3 68  0  0\n\n",
+   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 6  0      0 60693136 1602656 16802380    0    0    76    96  173  206 30  4 67  0  0\n\n",
    :raw-custom-override1085406457 nil,
    :get-my-colors720628555
    {:second-darkest "#352260",
@@ -2032,15 +2011,53 @@
     :second-brightest "#4ab3dc",
     :brightest "#f7c9cc",
     :most-contrasting-light "#f7c9cc"},
-   :colors-of-the-moment>darkest "#060710",
+   :colors-of-the-moment>darkest "#070c11",
    :raw-custom-override-1471694664
-   "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 JVM  🥕🐇",
+   "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
    :raw-custom-override9026012
-   "top - 14:46:36 up 8 days,  1:06,  8 users,  load average: 8.94, 9.84, 8.04\nTasks: 432 total,   3 running, 429 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 12.1 us,  3.7 sy,  0.0 ni, 84.2 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,  19516.0 free,  66870.7 used,  42250.0 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  59585.3 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n  12382 ryanr     20   0   33.3g 929156 317196 S  93.3   0.7   2565:45 chrome\n1176063 ryanr     20   0 1132.1g 547096 222444 R  40.0   0.4   1632:42 chrome\n   1555 ryanr     20   0 4978180   2.4g 129692 S  13.3   1.9   1484:31 kwin_x11\n1937575 ryanr     20   0   18684  12288   3584 S  13.3   0.0  31:19.73 htop\n1937591 ryanr     20   0   18740  12288   3584 S  13.3   0.0  31:21.43 htop\n   1068 root      20   0   24.9g 714204 337396 S   6.7   0.5 561:51.98 Xorg\n1173371 ryanr     20   0 1132.0g   1.0g 159280 R   6.7   0.8   1882:59 chrome\n      1 root      20   0  168056  11992   7256 S   0.0   0.0   0:06.70 systemd\n      2 root      20   0       0      0      0 S   0.0   0.0   0:00.34 kthreadd\n      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp\n      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+\n      5 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 slub_fl+\n      6 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 netns\n\n------------------------[ saturday, june 15th 2:46:35pm ]-------------------------",
+   "top - 19:07:22 up  3:59,  6 users,  load average: 7.69, 6.09, 5.56\nTasks: 372 total,   3 running, 369 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 27.8 us,  2.6 sy,  0.0 ni, 69.6 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,  59270.2 free,  51403.9 used,  17962.7 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  75495.3 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n 195041 ryanr     20   0 1132.3g 618628 152560 S  93.8   0.5  11:20.47 chrome\n  17534 ryanr     20   0 1132.4g   1.0g 272172 S  62.5   0.8  98:12.24 chrome\n   5440 ryanr     20   0 1137.7g 965824 107340 S  37.5   0.7  58:05.56 code\n  39640 ryanr     20   0   43.3g  23.3g 298180 S  37.5  18.6 150:10.53 java\n  36194 ryanr     20   0 1134.1g 633036 166588 S  25.0   0.5  93:15.40 chrome\n  70482 ryanr     20   0 1130.9g 213592  98176 S  18.8   0.2   7:12.40 chainner\n   1610 ryanr     20   0 3333996   1.2g 143372 R  12.5   1.0  25:58.08 kwin_x11\n   2383 ryanr     20   0   33.2g 766720 338084 S  12.5   0.6  82:28.22 chrome\n   5410 ryanr     20   0   32.9g 553548 148720 S  12.5   0.4  17:10.82 code\n   5914 ryanr     20   0 1132.2g 998.6m 152720 S  12.5   0.8  77:29.61 chrome\n    854 root     -51   0       0      0      0 S   6.2   0.0   6:47.68 irq/189+\n      1 root      20   0  166596  11108   8036 S   0.0   0.0   0:00.81 systemd\n      2 root      20   0       0      0      0 S   0.0   0.0   0:00.00 kthreadd\n\n------------------------[ saturday, june 15th 7:07:21pm ]-------------------------",
+   :get-my-colors-1331789415
+   {:second-darkest "#352260",
+    :highest-saturation "#f7c9cc",
+    :most-contrasting "#b9202f",
+    :darkest "#1b0719",
+    :contrast-with-dominant "#b9202f",
+    :colors
+    ["#dd6bab"
+     "#352260"
+     "#4ab3dc"
+     "#1b0719"
+     "#8f4490"
+     "#416d97"
+     "#f7c9cc"
+     "#617ac6"
+     "#603699"
+     "#b9202f"
+     "#483474"],
+    :most-frequent "#352260",
+    :data-colors
+    {"float" "#b5f4f0",
+     "boolean" "#8bcbf2",
+     "map" "#5bdc4a",
+     "list" "#cb5f41",
+     "string" "#ffffff",
+     "any" "#5758bc",
+     "vector" "#2ced94",
+     "keyword" "#f3f7c9",
+     "rabbit-code" "#6855c3",
+     "datetime" "#9f753b",
+     "integer" "#e39cc0",
+     "unknown" "#248428",
+     "date" "#062512"},
+    :dominant "#483474",
+    :most-contrasting-dark "#b9202f",
+    :second-brightest "#4ab3dc",
+    :brightest "#f7c9cc",
+    :most-contrasting-light "#f7c9cc"},
    :raw-custom-override-916986421
    "🐇🥕 Sup! BIIIIGS. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override-569051388
-   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        65Gi        19Gi       954Mi        41Gi        58Gi\nSwap:             0B          0B          0B\n\n"},
+   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        50Gi        57Gi       553Mi        17Gi        73Gi\nSwap:             0B          0B          0B\n\n"},
   :data {:new-clojure-2 nil}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

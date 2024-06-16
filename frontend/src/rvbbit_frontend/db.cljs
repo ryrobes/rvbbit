@@ -32,7 +32,7 @@
 
 (def solver-fn-runs (atom {}))  
 (def solver-fn-lookup (atom {}))           
-(def solver-fn-lookup-vec (atom {}))
+;(def solver-fn-lookup-vec (atom {}))
 
 (def running-blocks (reagent/atom {}))
 (def real-running-blocks (reagent/atom {}))

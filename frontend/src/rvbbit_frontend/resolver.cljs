@@ -118,7 +118,9 @@
                                                                 (when override? {:override-map resolved-full-map}))
                                      websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                      online?                   (true? (= websocket-status :connected))
-                                     run?                      (= (get-in @db/solver-fn-runs [panel-key sub-param])
+                                     run?                      (= 
+                                                                (get-in @db/solver-fn-runs [panel-key sub-param])
+                                                                ;;@(ut/tracked-sub ::solver-fn-runs-keys {:keypath [panel-key sub-param]})
                                                                   unique-resolved-map)
                                      lets-go?                  (and online? (not run?))
                                     ;;  _ (when lets-go?
@@ -126,11 +128,11 @@
                                     ;;                  @db/solver-fn-runs]))
                                      _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                      _ (when lets-go?
-                                         (swap! db/solver-fn-lookup assoc
-                                                ;(str (first kps))
-                                                fkp
-                                                sub-param)
-                                         (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map))]
+                                         (swap! db/solver-fn-lookup assoc fkp sub-param)
+                                         ;(ut/tracked-dispatch [::conn/update-solver-fn-lookup fkp sub-param])
+                                         (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)
+                                         ;(ut/tracked-dispatch [::conn/update-solver-fn-runs [panel-key sub-param] unique-resolved-map])
+                                         )]
                                  {v sub-param})))]
               (walk/postwalk-replace logic-kps obody)))
           has-fn? (fn [k] (some #(= % k) obody-key-set))
