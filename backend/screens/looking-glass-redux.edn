@@ -1,55 +1,13 @@
 {:orders
- {:new-query [:row_id :type :name],
-  :query-11824 [:rowcnt],
-  :reco-counts [:table_name :cnt]},
+ {:fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :connections-sys [:database_name :connection_id]},
  :reco-preview nil,
- :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
- :sql-source
- {:new-query
-  {:select [:*],
-   :from
-   [{:data
-     (vec
-       (for
-         [i (range 4435)]
-         {:row_id i,
-          :type (rand-nth ["cat" "dog" "pizza"]),
-          :name (str "row " i)}))}]},
-  :query-11824
-  {:select [[[:count 1] :rowcnt]],
-   :from
-   [[{:select [:*],
-      :from
-      [{:data
-        (vec
-          (for
-            [i (range 4435)]
-            {:row_id i,
-             :type (rand-nth ["cat" "dog" "pizza"]),
-             :name (str "row " i)}))}]}
-     :gg801]]}},
+ :sql-source {},
  :meta
- {:new-query
-  {:fields
-   {:row_id
-    {:data-type "integer",
-     :distinct 500,
-     :group-by? true,
-     :commons {84 1, 390 1, 49 1},
-     :cardinality 100},
-    :type
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"pizza" 173, "dog" 167, "cat" 160},
-     :cardinality 0},
-    :name
-    {:data-type "string",
-     :distinct 500,
-     :group-by? true,
-     :commons {"row 272" 1, "row 443" 1, "row 277" 1},
-     :cardinality 100}},
-   :rowcount 500},
+ {:fields-sys {:fields {}, :rowcount 0},
+  :tables-sys {:fields {}, :rowcount 0},
   :gen-viz-797
   {:fields
    {:rows
@@ -113,6 +71,21 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -216,15 +189,6 @@
      :cardinality 23}},
    :rowcount 500},
   :reco-counts {:fields {}, :rowcount 0},
-  :query-11824
-  {:fields
-   {:rowcnt
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {4435 1},
-     :cardinality 100}},
-   :rowcount 1},
   :state-drag-3
   {:fields
    {:state
@@ -256,100 +220,79 @@
      :cardinality 83}},
    :rowcount 30}},
  :default-col-widths
- {:block-11262 {:new-query 153}, :block-4167 {:query-11824 211}},
+ {:block-11262 {:new-query 153},
+  :block-4167 {:query-11824 211},
+  :system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys ##Inf},
+  :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
- :data-hash -1155159440,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"],
- :selected-cols {},
+ :selected-cols nil,
  :server
  {:settings
   {:harvest-on-boot? true,
    :default "./screens/looking-glass-redux.edn",
    :eleven-labs-api-key nil,
-   :kits
-   {:outliers
-    {:description
-     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
-     :image-url "images/outliers-image.png",
-     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
-     :name "Outliers",
-     :icon "zmdi-functions",
-     :author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :run-on :queries,
-     :repl {:host "127.0.0.1", :port 42999},
-     :kit-name :outliers,
-     :package-name :query-basics-1},
-    :forecast
-    {:description "WIP: basic timeseries forecasting based on previous values",
-     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
-     :name "Forecasting",
-     :icon "zmdi-brightness-7",
-     :author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :run-on :queries,
-     :repl {:host "127.0.0.1", :port 42999},
-     :kit-name :forecast,
-     :package-name :query-basics-1},
-    :buffy
-    {:author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :kit-name :buffy,
-     :package-name :grab-bag,
-     :fn (rvbbit-backend.assistants/buffy :query-name),
-     :name "Ask Buffy!",
-     :icon "zmdi-cocktail",
-     :run-on :queries,
-     :description "What does Buffy think about this data? Who knows!"}},
-   :graphite-host "127.0.0.1",
+   :modes
+   {:text
+    [:pre
+     {:style
+      {:color :theme/editor-outer-rim-color,
+       :background-color "#00000000",
+       :border "none",
+       :text-shadow "4px 4px 4px #00000088",
+       :font-size "17px",
+       :font-family :theme/monospaced-font}}
+     :*data],
+    :data [:data-viewer :*data],
+    :pretty [:pretty-box :*data],
+    :rowset [:rowset :*data],
+    :clover [:box :child :*data]},
+   :kits {},
+   :clover-templates
+   {:color-theft
+    {:args [:*input],
+     :body
+     [:data-viewer [:run-solver [:get-my-colors {:input-image-path :*input}]]]},
+    :pretty-box
+    {:args [:*input],
+     :body
+     [:box
+      :size
+      "auto"
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:color :theme/editor-outer-rim-color,
+       :font-size [:auto-size-px [:string3 :*input]]}
+      :child
+      [:string3 :*input]]},
+    :clj
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure, :input-map {}, :data :code}]},
+    :clj2
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure2, :input-map {}, :data :code}]},
+    :cheese-burger
+    {:args [:x],
+     :body
+     [:box
+      :style
+      {:color "yellow", :font-size "23px"}
+      :child
+      [:string3 :x "CHEESEBURGER!"]]}},
+   :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive",
    :openapi-org-id nil,
-   :runners
-   {:clover
-    {:default [:box :child "hey"],
-     :type :built-in,
-     :icon "images/rvbbit-clover.png"},
-    :clover-query
-    {:default {:select [[1 :one]]},
-     :type :built-in,
-     :runner {},
-     :icon "images/rvbbit-clover.png"},
-    :clojure
-    {:type :built-in,
-     :runner {:port 8181, :host "127.0.0.1"},
-     :default (+ 1 2 3),
-     :default-view [:box :child [:string :*query-id]],
-     :icon "images/clj.png"},
-    :dalle3
-    {:runner
-     {:flow-id :run-dalle3,
-      :overrides {:code :selected-view},
-      :opts? {:instanced? true}},
-     :type :flow-based,
-     :default
-     "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene.",
-     :default-view [:box :child [:img {:src :*query-id}]],
-     :icon "images/dalle.png"},
-    :python3
-    {:runner
-     {:flow-id :run-python3,
-      :overrides {:code :selected-view},
-      :opts? {:instanced? true}},
-     :type :flow-based,
-     :default-view [:box :child [:string :*query-id]],
-     :icon "images/python3.png"}},
    :debug-level 1,
    :screens
    ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
@@ -360,6 +303,9 @@
     "aaaaah-wednesday-the-day"
     "aaaah-wednesday-the-day"
     "alarm-clock1"
+    "alarm-clock2"
+    "alarm-clock22"
+    "alarm-clock23"
     "alice-puzzle-1"
     "asdasdasdasd"
     "autumn-theme"
@@ -372,6 +318,7 @@
     "blackberries3"
     "blackberries3-narrow"
     "blackberries3-narrow2"
+    "blank-blue"
     "blank-sizzle"
     "blank-sizzle2"
     "blue-pines"
@@ -426,11 +373,13 @@
     "looking-glass-redux"
     "looking-glass-redux-conway2"
     "looking-glass-redux-mix5"
+    "looking-glass-redux-test"
     "looking-glass-redux-viking"
     "looking-glass-redux-viking2"
     "looking-glass-redux2"
     "looking-glass-redux23a"
     "looking-glass-redux23abb"
+    "looking-glass-redux23b"
     "looking-glass-redux2a"
     "looking-glass-redux2aa"
     "looking-glass-redux45"
@@ -467,12 +416,16 @@
     "retro-machines"
     "riffle-test"
     "server-stats"
+    "server-stats2"
     "sick-of-your-shit"
     "sizzle-board-1"
     "sneaky-swamp-creatures1"
+    "solver-test"
     "stop-drawing-dead-dashboards"
     "swamp-nightgown"
     "swamp-reacher"
+    "system-monitor"
+    "system-monitor2"
     "tallica-param-test2"
     "tangerine-dreams"
     "technicolor-shanny"
@@ -509,141 +462,57 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [265423836 245909120 4294705152],
+ :memory [188700431 167356323 4294705152],
  :flow-subs
- [:time/nth
+ [:solver/raw-custom-override-2070279978
+  :solver/raw-custom-override778576215
   :flow/flow-forever>*running?
-  :time/now
-  :time/minute
-  :time/hour
-  :time/month-name
-  :time/day
+  :solver/raw-custom-override-1375974037
+  :solver/raw-custom-override1413822180
   :flow/live-scratch-flow>*running?
-  :time/second
+  :solver/raw-custom-override418119901
   :flow/flow-forever>:final-math],
- :client-name :enthusiastic-icosahedral-cheetah-9,
+ :client-name :constant-ovoid-turkey-31,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 1741, :h 1459},
- :post-meta
- {:new-query {:* {:rowcount 4435}},
-  :gen-viz-797 {:* {:rowcount 317}},
-  :gen-viz-94 {:* {:rowcount 1}},
-  :rowcnt-drag-2 {:* {:rowcount 1}},
-  :gen-viz-828 {:* {:rowcount 317}},
-  :gen-viz-84 {:* {:rowcount 6}},
-  :ufo-sightings-drag-9 {:* {:rowcount 80332}},
-  :duration-hours-drag-43 {:* {:rowcount 8349}},
-  :city-drag-26 {:* {:rowcount 19899}},
-  :query-11824 {:* {:rowcount 1}},
-  :state-drag-3 {:* {:rowcount 68}},
-  :shape-drag-7 {:* {:rowcount 30}}},
+ :window {:w 2193, :h 1361},
+ :post-meta {},
+ :status
+ {:heartbeat
+  {:kick
+   [:solver/raw-custom-override-2070279978
+    :solver/raw-custom-override778576215
+    :flow/flow-forever>*running?
+    :solver/raw-custom-override-1375974037
+    :solver/raw-custom-override1413822180
+    :flow/live-scratch-flow>*running?
+    :solver/raw-custom-override418119901
+    :flow/flow-forever>:final-math]},
+  :alert1 {:alerts :alert2}},
  :screen-name "looking-glass-redux",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
+ :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
- :alerts [],
+ :alerts
+ [[[:box
+    :child
+    "sent screen save request to server... Please wait."
+    :style
+    {:font-size "12px", :opacity 0.66}]
+   11
+   0.5
+   1381
+   -1247625457]],
  :recos-page 0,
- :repl-output
- {:new-query
-  {:ns "rabbit-board.user",
-   :value
-   [[{:row_id 0, :type "cat", :name "row 0"}
-     {:row_id 1, :type "cat", :name "row 1"}
-     {:row_id 2, :type "cat", :name "row 2"}
-     {:row_id 3, :type "pizza", :name "row 3"}
-     {:row_id 4, :type "cat", :name "row 4"}
-     {:row_id 5, :type "pizza", :name "row 5"}
-     {:row_id 6, :type "cat", :name "row 6"}
-     {:row_id 7, :type "cat", :name "row 7"}
-     {:row_id 8, :type "cat", :name "row 8"}
-     {:row_id 9, :type "cat", :name "row 9"}
-     {:row_id 10, :type "pizza", :name "row 10"}
-     {:row_id 11, :type "pizza", :name "row 11"}
-     {:row_id 12, :type "pizza", :name "row 12"}
-     {:row_id 13, :type "cat", :name "row 13"}
-     {:row_id 14, :type "cat", :name "row 14"}
-     {:row_id 15, :type "pizza", :name "row 15"}
-     {:row_id 16, :type "cat", :name "row 16"}
-     {:row_id 17, :type "pizza", :name "row 17"}
-     {:row_id 18, :type "pizza", :name "row 18"}
-     {:row_id 19, :type "pizza", :name "row 19"}
-     {:row_id 20, :type "cat", :name "row 20"}
-     {:row_id 21, :type "cat", :name "row 21"}
-     {:row_id 22, :type "pizza", :name "row 22"}
-     {:row_id 23, :type "dog", :name "row 23"}
-     {:row_id 24, :type "dog", :name "row 24"}
-     {:row_id 25, :type "dog", :name "row 25"}
-     {:row_id 26, :type "cat", :name "row 26"}
-     {:row_id 27, :type "pizza", :name "row 27"}
-     {:row_id 28, :type "cat", :name "row 28"}
-     {:row_id 29, :type "pizza", :name "row 29"}
-     {:row_id 30, :type "pizza", :name "row 30"}
-     {:row_id 31, :type "pizza", :name "row 31"}
-     {:row_id 32, :type "cat", :name "row 32"}
-     {:row_id 33, :type "dog", :name "row 33"}
-     {:row_id 34, :type "cat", :name "row 34"}
-     {:row_id 35, :type "pizza", :name "row 35"}
-     {:row_id 36, :type "dog", :name "row 36"}
-     {:row_id 37, :type "dog", :name "row 37"}
-     {:row_id 38, :type "dog", :name "row 38"}
-     {:row_id 39, :type "cat", :name "row 39"}
-     {:row_id 40, :type "pizza", :name "row 40"}
-     {:row_id 41, :type "dog", :name "row 41"}
-     {:row_id 42, :type "dog", :name "row 42"}
-     {:row_id 43, :type "dog", :name "row 43"}
-     {:row_id 44, :type "pizza", :name "row 44"}
-     {:row_id 45, :type "dog", :name "row 45"}
-     {:row_id 46, :type "dog", :name "row 46"}
-     {:row_id 47, :type "dog", :name "row 47"}
-     {:row_id 48, :type "cat", :name "row 48"}
-     {:row_id 49, :type "dog", :name "row 49"}]],
-   :status #{"done"},
-   :meta {:nrepl-conn {:host "127.0.0.1", :port 8181}},
-   :out [""],
-   :output-lines 0,
-   :values 4435}},
  :rs-overrides-hashmap {"flow-forever" nil},
- :panels-hash -122659831,
- :sessions
- (["unwavering-cylindrical-seastar-17.edn"
-   "1003 hours, 1 minute, 16 seconds"
-   3610876730]
-   ["electrifying-scarlet-raven-39.edn"
-    "1003 hours, 1 minute, 23 seconds"
-    3610883030]
-   ["gorgeous-maroon-elephant-29.edn"
-    "1008 hours, 10 minutes, 28 seconds"
-    3629428646]
-   ["fantastic-ovoid-lark-16.edn" "1008 hours, 18 minutes, 48 seconds" 3629928259]
-   ["virtuous-taupe-penguin-42.edn" "1008 hours, 26 minutes, 53 seconds" 3630413924]
-   ["lucid-amaranth-leopard-hailing-from-endorheic-basin.edn"
-    "1008 hours, 27 minutes, 18 seconds"
-    3630438116]
-   ["upbeat-red-goose-of-submarine-canyon.edn"
-    "1008 hours, 40 minutes, 19 seconds"
-    3631219793]
-   ["impressive-rose-nightingale-23.edn"
-    "1009 hours, 20 minutes, 11 seconds"
-    3633611007]
-   ["keen-elliptic-goat-32.edn" "1012 hours, 15 minutes, 50 seconds" 3644150760]),
- :solvers-map {:vibrant-antelope-solver {:signal nil, :body nil}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1887818613,
+ :user-params-hash -980885202,
  :grid-recos? true,
+ :session-hash 730069359,
  :resolved-queries
- {:new-query
-  {:select [:*],
-   :from
-   [{:data
-     (vec
-       (for
-         [i (range 4435)]
-         {:row_id i,
-          :type (rand-nth ["cat" "dog" "pizza"]),
-          :name (str "row " i)}))}]},
-  :gen-viz-797
+ {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
    :from
    [{:select
@@ -795,19 +664,6 @@
      :ff571]],
    :group-by [:city],
    :order-by [[:rowcnt :desc]]},
-  :query-11824
-  {:select [[[:count 1] :rowcnt]],
-   :from
-   [[{:select [:*],
-      :from
-      [{:data
-        (vec
-          (for
-            [i (range 4435)]
-            {:row_id i,
-             :type (rand-nth ["cat" "dog" "pizza"]),
-             :name (str "row " i)}))}]}
-     :gg801]]},
   :state-drag-3
   {:select [:state [[:count 1] :rowcnt]],
    :from
@@ -849,35 +705,7 @@
    :group-by [:shape],
    :order-by [[:rowcnt :desc]]}},
  :panels
- {:block-11586
-  {:h 5,
-   :w 20,
-   :root [26 1],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-11586",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-11586.:hi"}
-     :style
-     {:font-size "167px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:string [:time/month-name " " :time/day :time/nth]]],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}},
-  :block-414
+ {:block-414
   {:mad-libs-combo-hash ["572062609" "ufo_sightings_drag_9"],
    :name "basic_timeseries - \"date_posted, rows\" - 769",
    :w 9,
@@ -919,44 +747,6 @@
       :padding 4,
       :background "transparent"}
      {:actions false}]}},
-  :block-11262
-  {:h 6,
-   :w 10,
-   :root [5 5],
-   :tab "star-shaped wallaby",
-   :selected-view :new-query,
-   :name "block-11262",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-11262.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     "hi!"],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries
-   {:new-query
-    {:select [:*],
-     :from
-     [{:data
-       (vec
-         (for
-           [i (range 4435)]
-           {:row_id i,
-            :type (rand-nth ["cat" "dog" "pizza"]),
-            :name (str "row " i)}))}]}}},
   :block-11251
   {:name "block-11251",
    :w 6,
@@ -999,34 +789,6 @@
      :order-by [[:rowcnt :desc]]}},
    :root [1 8],
    :tab "sapphire ape"},
-  :block-3341
-  {:h 3,
-   :w 21,
-   :root [1 17],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-3341",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-3341.:hi"}
-     :style
-     {:font-size "66px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:string :time/now]],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}},
   :block-7416
   {:h 5,
    :w 4,
@@ -1060,34 +822,6 @@
    :name "flow-play-from-runstreams",
    :root [5 18],
    :tab "through the rabbit hole and out the other side"},
-  :block-1194
-  {:h 10,
-   :w 11,
-   :root [27 21],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-1194",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-1194.:hi"}
-     :style
-     {:font-size "303px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:left-pad [:time/second 2]]],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}},
   :block-204
   {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
    :name "compound_trend_1 - \"date_posted, rows\" - 1141",
@@ -1231,34 +965,6 @@
        {:padding-top "133px", :font-size "20px"}
        :child
        [:string [:date_posted " vs " :rows]]]]]}},
-  :block-11814
-  {:h 10,
-   :w 12,
-   :root [14 21],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-11814",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-11814.:hi"}
-     :style
-     {:font-size "303px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:left-pad [:time/minute 2]]],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}},
   :block-2536
   {:h 2,
    :w 16,
@@ -1382,31 +1088,21 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
-  :block-1827
-  {:h 10,
-   :w 12,
+  :block-7328
+  {:drag-meta {:type :open-input},
+   :w 14,
+   :selected-view :well-cerise-kangaroo,
+   :h 8,
    :views
-   {:view-clone
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-11814.:hi"}
-     :style
-     {:font-size "303px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
-     :child
-     [:left-pad [:time/hour 2]]]},
-   :name "clone-hi29",
-   :root [1 21],
-   :tab "star-shaped wallaby"},
+   {:well-cerise-kangaroo
+    [:open-input
+     {:kp [:param :well-cerise-kangaroo],
+      :width-int :panel-width+100,
+      :height-int :panel-height+80,
+      :syntax "clojure"}]},
+   :tab "star-shaped wallaby",
+   :root [0 1],
+   :name "block-7328"},
   :block-7319
   {:h 5,
    :w 8,
@@ -1477,37 +1173,34 @@
      :order-by [[:rowcnt :desc]]}},
    :root [17 8],
    :tab "sapphire ape"},
-  :block-4167
-  {:name "block-4167",
-   :w 5,
-   :selected-view :query-11824,
-   :root [16 5],
-   :h 4,
-   :connection-id nil,
-   :queries
-   {:query-11824
-    {:select [[[:count 1] :rowcnt]], :from [[:query/new-query :gg801]]}},
+  :block-8532
+  {:name "block-8532",
+   :w 17,
+   :selected-mode {:new-create-image :text},
+   :selected-view :hi,
+   :root [29 0],
+   :h 10,
+   :queries {},
    :tab "star-shaped wallaby",
+   :create-image
+   {:new-create-image
+    "Create a hyperrealistic image of a beautiful young full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style."},
    :views
    {:hi
     [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-4167.:hi"}
-     :style
-     {:font-size "106px",
-      :font-weight 700,
-      :padding-top "6px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/editor-outer-rim-color,
-      :font-family :theme/base-font}
      :child
-     "hi!"],
-    :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+     [:run-solver
+      {:signal false,
+       :cache? false,
+       :type :flow,
+       :data
+       {:flowmap "openai-image-gen-ladder3",
+        :opts
+        {:timeout 120000,
+         :overrides
+         {:prompt
+          "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. It is raining. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity."}},
+        :return :hiccup-image-box-w-png}}]]}},
   :block-6121
   {:h 2,
    :w 16,
@@ -1555,50 +1248,18 @@
      :order-by [[:city :asc]]}},
    :root [1 1],
    :tab "sapphire ape",
-   :selected-view :ufo-sightings-drag-9}},
+   :selected-view :ufo-sightings-drag-9},
+  :block-6565
+  {:name "block-6565",
+   :w 10,
+   :selected-view :hi,
+   :root [2 2],
+   :h 12,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :minimized? true,
+   :views {:hi [:data-viewer :param/image-data]}}},
  :selected-block "none!",
- :signals-map
- {:fun-gorilla
-  {:signal
-   [:and
-    [:= :client/cute-prismatic-human-7>click-param>param>jessica "jessica"]
-    [:changed? :time/second]
-    [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
-    [:or [:= 2 1] [:< 9 4]]
-    [:signal/worthy-fish-signal]]},
-  :cool-raccoon-signal-yo
-  {:signal
-   [:or
-    [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
-    [:and
-     [:or [:> :time/hour 12] [:< :time/hour 6]]
-     [:or
-      [:= :time/second 10]
-      [:= :time/second 20]
-      [:= :time/second 45]
-      [:= :time/second 25]]]]},
-  :worthy-fish-signal {:signal [:or [:= :time/hour 16] [:= 221 22]]},
-  :hourly? {:signal [:or [:changed? :time/hour] [:<> :time/minute -1]]},
-  :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
-  :elegant-grasshopper-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :exciting-cheetah-signal
-  {:signal [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
-  :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
-  :dragging-to-potential-cross-breed?
-  {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
-  :special-lion-signal
-  {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
-  :optimistic-sheep-signal
-  {:signal
-   [:and
-    [:= :time/day 1]
-    [:= :time/hour 9]
-    [:changed? :time/minute]
-    [:changed? :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]]},
-  :glowing-bat-signal
-  {:signal [:and [:= :time/day 1] [:changed? :time/second] [:= :time/hour 9]]}},
  :theme-colors-hashmap
  {"float" "#ff2050",
   "boolean" "#8EA2A8",
@@ -1618,22 +1279,38 @@
  {:flow
   {:crow-flow-201a>*running? false,
    :counting-loop>*running? false,
-   :flow-forever>final-math 663.5,
+   :flow-forever>final-math nil,
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
   :param
-  {:selected-view [:queries :new-query],
+  {:image-data
+   [:run-solver
+    {:signal false,
+     :cache? false,
+     :type :flow,
+     :data
+     {:flowmap "openai-image-gen-ladder3",
+      :opts {:timeout 130000, :overrides {:prompt :param/well-cerise-kangaroo}},
+      :return :hiccup-image-box-w-png}}],
+   :well-cerise-kangaroo
+   "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity.",
+   :selected-view [:views :hi],
    :selected-view-data
-   {:select [:*],
-    :from
-    [{:data
-      (vec
-        (for
-          [i (range 45)]
-          {:row_id i,
-           :type (rand-nth ["cat" "dog" "pizza"]),
-           :name (str "row " i)}))}]},
-   :selected-block :block-11262},
+   [:box
+    :child
+    [:run-solver
+     {:signal false,
+      :cache? false,
+      :type :flow,
+      :data
+      {:flowmap "openai-image-gen-ladder3",
+       :opts
+       {:timeout 120000,
+        :overrides
+        {:prompt
+         "Create a hyperrealistic image of a beautiful young full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style."}},
+       :return :hiccup-image-box-w-png}}]],
+   :selected-block :block-8532},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -1729,7 +1406,7 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image "url(images/large/b64-image-98275-59630-4k.webp)",
+   {:background-image [:string3 "url(" :param/image-data>10>0>2 ")"],
     :transition "all 0.8s ease-in-out",
     :background-size "cover",
     :background-color "#424f57"},
@@ -1753,16 +1430,100 @@
    :datetime "1956-10-10 21:00:00.000000",
    :latitude "28.9783333",
    :country "us"},
-  :time
-  {:month-name "MAY",
-   :day 20,
-   :hour 23,
-   :now "Monday, May 20th 11:36PM",
-   :second 55,
-   :now-seconds "Wednesday, April 24 1:43:57PM",
-   :nth "th",
-   :month 4,
-   :minute 36},
-  nil {nil nil}},
+  :time {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :month 4},
+  :solver
+  {:raw-custom-override418119901 nil,
+   :raw-custom-override-1375974037
+   [:v-box
+    :padding
+    "10px"
+    :gap
+    "8px"
+    :width
+    :width-px
+    :style
+    {:background-color "#d37cc7",
+     :border-radius "20px",
+     :font-size "12px",
+     :font-weight 700,
+     :color "#d265be"}
+    :children
+    [[:box :child "./images/gen/b64-image3-19711-90807.png"]
+     [:box
+      :size
+      "auto"
+      :child
+      [:img
+       {:src "./images/gen/b64-image3-19711-90807.png",
+        :style {:border-radius "30px"}}]]]],
+   :raw-custom-override-2070279978
+   [:v-box
+    :padding
+    "10px"
+    :gap
+    "8px"
+    :width
+    :width-px
+    :style
+    {:background-color "#1d2b2d",
+     :border-radius "20px",
+     :font-size "12px",
+     :font-weight 700,
+     :color "#bbbec4"}
+    :children
+    [[:box :child "./images/gen/b64-image3-92888-58274.png"]
+     [:box
+      :size
+      "auto"
+      :child
+      [:img
+       {:src "./images/gen/b64-image3-92888-58274.png",
+        :style {:border-radius "30px"}}]]]],
+   :raw-custom-override778576215
+   [:v-box
+    :padding
+    "10px"
+    :gap
+    "8px"
+    :width
+    :width-px
+    :style
+    {:background-color "#243135",
+     :border-radius "20px",
+     :font-size "12px",
+     :font-weight 700,
+     :color "#1e2421"}
+    :children
+    [[:box :child "./images/gen/b64-image3-66695-84437.png"]
+     [:box
+      :size
+      "auto"
+      :child
+      [:img
+       {:src "./images/gen/b64-image3-66695-84437.png",
+        :style {:border-radius "30px"}}]]]],
+   :raw-custom-override1413822180
+   [:v-box
+    :padding
+    "10px"
+    :gap
+    "8px"
+    :width
+    :width-px
+    :style
+    {:background-color "#34253b",
+     :border-radius "20px",
+     :font-size "12px",
+     :font-weight 700,
+     :color "#c667a5"}
+    :children
+    [[:box :child "./images/gen/b64-image3-18614-44249.png"]
+     [:box
+      :size
+      "auto"
+      :child
+      [:img
+       {:src "./images/gen/b64-image3-18614-44249.png",
+        :style {:border-radius "30px"}}]]]]}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

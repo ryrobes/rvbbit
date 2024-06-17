@@ -48,8 +48,8 @@
 
 (def t> tapp>>)
 
-(defonce map-boxes-cache (atom {}))
-(defonce map-boxes-cache-hits (atom {}))
+(def map-boxes-cache (atom {}))
+(def map-boxes-cache-hits (atom {}))    
 
 
 (defn distribution
@@ -164,7 +164,7 @@
 
 
 
-(def clover-walk-singles-map (atom {}))       
+(def clover-walk-singles-map (atom {}))          
  
 (defonce process-key-cache (atom {}))
 (defonce process-key-tracker (atom {}))

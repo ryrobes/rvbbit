@@ -373,9 +373,9 @@
                      (swap! wss/panel-child-atoms assoc key new-child-atom)
                      (swap! new-child-atom assoc key (get new-state key)))))))
   (add-watch
-    wss/signals-atom
-    :master-signal-def-watcher ;; watcher signals defs
-    (fn [_ _ old-state new-state] (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....]) (wss/reload-signals-subs)))
+   wss/signals-atom
+   :master-signal-def-watcher ;; watcher signals defs
+   (fn [_ _ old-state new-state] (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....]) (wss/reload-signals-subs)))
   (add-watch wss/rules-atom :master-rule-def-watcher (fn [_ _ old-state new-state] (ut/pp [:rules-defs-changed :reloading....])))
   (add-watch wss/solvers-atom
              :master-solver-def-watcher
@@ -383,39 +383,39 @@
   (update-all-screen-meta)
   (update-all-flow-meta)
   (cruiser/insert-current-rules!
-    system-db
-    "system-db"
-    0
-    cruiser/default-sniff-tests
-    cruiser/default-field-attributes
-    cruiser/default-derived-fields
-    cruiser/default-viz-shapes
-    (merge cruiser/default-flow-functions {:custom @wss/custom-flow-blocks} {:sub-flows @wss/sub-flow-blocks}))
+   system-db
+   "system-db"
+   0
+   cruiser/default-sniff-tests
+   cruiser/default-field-attributes
+   cruiser/default-derived-fields
+   cruiser/default-viz-shapes
+   (merge cruiser/default-flow-functions {:custom @wss/custom-flow-blocks} {:sub-flows @wss/sub-flow-blocks}))
   (when harvest-on-boot? (update-all-conn-meta))
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force system-db as a conn, takes a sec
-    "system-db"
-    system-db
-    system-db
-    cruiser/default-sniff-tests
-    cruiser/default-field-attributes
-    cruiser/default-derived-fields
-    cruiser/default-viz-shapes)
+   "system-db"
+   system-db
+   system-db
+   cruiser/default-sniff-tests
+   cruiser/default-field-attributes
+   cruiser/default-derived-fields
+   cruiser/default-viz-shapes)
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force flows-db as a conn, takes a sec
-    "flows-db"
-    flows-db
-    system-db
-    cruiser/default-sniff-tests
-    cruiser/default-field-attributes
-    cruiser/default-derived-fields
-    cruiser/default-viz-shapes)
+   "flows-db"
+   flows-db
+   system-db
+   cruiser/default-sniff-tests
+   cruiser/default-field-attributes
+   cruiser/default-derived-fields
+   cruiser/default-viz-shapes)
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force cache-db as a conn, takes a sec
-    "cache.db"
-    wss/cache-db
-    system-db
-    cruiser/default-sniff-tests
-    cruiser/default-field-attributes
-    cruiser/default-derived-fields
-    cruiser/default-viz-shapes)
+   "cache.db"
+   wss/cache-db
+   system-db
+   cruiser/default-sniff-tests
+   cruiser/default-field-attributes
+   cruiser/default-derived-fields
+   cruiser/default-viz-shapes)
   (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
   (tt/start!)
   (def mon (tt/every! 15 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30
@@ -431,14 +431,17 @@
   (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too
   (def purge (tt/every! wss/jvm-stats-every 2 (bound-fn [] (wss/purge-dead-client-watchers))))
   (def timekeeper (tt/every! 1 3 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
+
+  (def solver-statuses (tt/every! 1 3 (bound-fn [] (swap! wss/last-solvers-atom-meta assoc :running-map @wss/solvers-running)))) ;; TODO, this more smart. grug grug
+ 
   (def last-look (atom {}))
   (def saved-uids (atom []))
   (let [signals  (vec (keys @wss/signals-atom))
         signalsv (vec (apply concat
-                        (for [[k v] @wss/signals-atom]
-                          (for [e (filter #(and (keyword? %) (or (some (fn [x] (= x %)) signals) (cstr/includes? (str %) "/")))
-                                    (ut/deep-flatten (get v :signal)))]
-                            [e (keyword (str "signal/" (cstr/replace (str k) ":" "")))]))))
+                             (for [[k v] @wss/signals-atom]
+                               (for [e (filter #(and (keyword? %) (or (some (fn [x] (= x %)) signals) (cstr/includes? (str %) "/")))
+                                               (ut/deep-flatten (get v :signal)))]
+                                 [e (keyword (str "signal/" (cstr/replace (str k) ":" "")))]))))
         solvers  (vec (for [[k v] @wss/solvers-atom
                             :when (keyword? (get v :signal))]
                         [(get v :signal) (keyword (str "solver/" (cstr/replace (str k) ":" "")))]))
@@ -448,15 +451,15 @@
     (ut/pp [:warren-flow? conns]))
   (shutdown/add-hook! ::the-pool-is-now-closing
                       #(do (reset! wss/shutting-down? true)
-                            (let [destinations (vec (keys @wss/client-queues))]
-                              (doseq [d destinations]
-                                (wss/alert! d
-                                            [:v-box :justify :center :style {:opacity 0.7} :children
-                                             [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
-                                               :child
-                                               [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]]
-                                            10 1
-                                            5)))
+                           (let [destinations (vec (keys @wss/client-queues))]
+                             (doseq [d destinations]
+                               (wss/alert! d
+                                           [:v-box :justify :center :style {:opacity 0.7} :children
+                                            [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                              :child
+                                              [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]]
+                                           10 1
+                                           5)))
                            ;;  (Thread/sleep 2000)
                            (wss/destroy-websocket-server!)
                            (tt/stop!)
@@ -498,92 +501,92 @@
   (defn update-stat-atom
     [kks]
     (let [;flows (if (or (nil? flows) (empty? flows))
-         ]
+          ]
       (swap! wss/flow-status merge
-        (into
-          {}
-          (for [k     kks ;(keys @flow-db/results-atom)
-                :when (not (= k "client-keepalive"))] ;; dont want to track heartbeats
-            (let [;; _ (ut/pp [:flow-status-atom-all! k (get @flow-db/results-atom k)
-                  cc              (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf?
-                  blocks          (get-in @flow-db/working-data [k :components-list])
-                  running-blocks  (vec (for [[k v] (get @flow-db/tracker k) :when (nil? (get v :end))] k))
-                  done-blocks     (vec (for [[k v] (get @flow-db/tracker k) :when (not (nil? (get v :end)))] k))
-                  not-started-yet (vec (cset/difference (set blocks) (set (into running-blocks done-blocks))))
-                  running-blocks  (vec (cset/difference (set blocks) (set (into done-blocks not-started-yet))))
-                  res             (get-in @flow-db/results-atom [k :done] :nope)
-                  running?        (or (= res :nope) (ut/chan? res) (= res :skip))
-                  done?           (not (= res :nope))
-                  error?          (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
-                  _ (when error? (swap! wss/temp-error-blocks assoc k not-started-yet))
-                  start           (try (apply min (or (for [[_ v] (get @flow-db/tracker k)] (get v :start)) [-1]))
-                                       (catch Exception _ (System/currentTimeMillis)))
-                  start-ts        (ut/millis-to-date-string start)
-                  end             (try (apply max (or (remove nil? (for [[_ v] (get @flow-db/tracker k)] (get v :end))) [-1]))
-                                       (catch Exception e
-                                         (do ;(ut/pp [:exception-in-getting-time-duration!! k
-                                           (System/currentTimeMillis))))
-                  start           (if error? (get-in @wss/last-times [k :start]) start)
-                  end             (if error? (System/currentTimeMillis) end)
-                  elapsed         (try (- end start)
-                                       (catch Throwable e (do (ut/pp [:elapsed-error?? k e :start start :end end]) 0)))
-                  _ (swap! wss/last-times assoc-in [k :end] (System/currentTimeMillis))
-                  human-elapsed   (ut/format-duration start end)
-                  run-id          (str (get-in @flow-db/results-atom [k :run-id]))
-                  parent-run-id   (str (get-in @flow-db/results-atom [k :parent-run-id]))
-                  overrides       (get-in @flow-db/subflow-overrides [k run-id])
-                  cname           (get-in @flow-db/results-atom
-                                          [k :opts-map :client-name]
-                                          (get @wss/orig-caller k :rvbbit-scheduler))
-                  client-name     (str cname)
-                  run-sql?        (and done? (not (some #(= % run-id) @saved-uids)))
-                  _ (when (and done? (not error?))
-                      (swap! wss/times-atom assoc k (conj (get @wss/times-atom k []) (int (/ elapsed 1000)))))
-                  _ (when run-sql?
-                      (try (let [row        {:client_name     client-name
-                                             :flow_id         (str k)
-                                             :started         start ;(get-in @flow-db/results-atom
-                                             :start_ts        start-ts
-                                             :ended           end ;(get-in @flow-db/results-atom
-                                             :run_id          run-id
-                                             :parent-run_id   parent-run-id
-                                             :elapsed         elapsed
-                                             :overrides       (pr-str overrides)
-                                             :elapsed_seconds (float (/ elapsed 1000))
-                                             :in_error        (cstr/includes? (str res) ":error")
-                                             :human_elapsed   (str human-elapsed)}
-                                 insert-sql {:insert-into [:flow_history] :values [row]}]
+             (into
+              {}
+              (for [k     kks ;(keys @flow-db/results-atom)
+                    :when (not (= k "client-keepalive"))] ;; dont want to track heartbeats
+                (let [;; _ (ut/pp [:flow-status-atom-all! k (get @flow-db/results-atom k)
+                      cc              (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf?
+                      blocks          (get-in @flow-db/working-data [k :components-list])
+                      running-blocks  (vec (for [[k v] (get @flow-db/tracker k) :when (nil? (get v :end))] k))
+                      done-blocks     (vec (for [[k v] (get @flow-db/tracker k) :when (not (nil? (get v :end)))] k))
+                      not-started-yet (vec (cset/difference (set blocks) (set (into running-blocks done-blocks))))
+                      running-blocks  (vec (cset/difference (set blocks) (set (into done-blocks not-started-yet))))
+                      res             (get-in @flow-db/results-atom [k :done] :nope)
+                      running?        (or (= res :nope) (ut/chan? res) (= res :skip))
+                      done?           (not (= res :nope))
+                      error?          (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
+                      _ (when error? (swap! wss/temp-error-blocks assoc k not-started-yet))
+                      start           (try (apply min (or (for [[_ v] (get @flow-db/tracker k)] (get v :start)) [-1]))
+                                           (catch Exception _ (System/currentTimeMillis)))
+                      start-ts        (ut/millis-to-date-string start)
+                      end             (try (apply max (or (remove nil? (for [[_ v] (get @flow-db/tracker k)] (get v :end))) [-1]))
+                                           (catch Exception e
+                                             (do ;(ut/pp [:exception-in-getting-time-duration!! k
+                                               (System/currentTimeMillis))))
+                      start           (if error? (get-in @wss/last-times [k :start]) start)
+                      end             (if error? (System/currentTimeMillis) end)
+                      elapsed         (try (- end start)
+                                           (catch Throwable e (do (ut/pp [:elapsed-error?? k e :start start :end end]) 0)))
+                      _ (swap! wss/last-times assoc-in [k :end] (System/currentTimeMillis))
+                      human-elapsed   (ut/format-duration start end)
+                      run-id          (str (get-in @flow-db/results-atom [k :run-id]))
+                      parent-run-id   (str (get-in @flow-db/results-atom [k :parent-run-id]))
+                      overrides       (get-in @flow-db/subflow-overrides [k run-id])
+                      cname           (get-in @flow-db/results-atom
+                                              [k :opts-map :client-name]
+                                              (get @wss/orig-caller k :rvbbit-scheduler))
+                      client-name     (str cname)
+                      run-sql?        (and done? (not (some #(= % run-id) @saved-uids)))
+                      _ (when (and done? (not error?))
+                          (swap! wss/times-atom assoc k (conj (get @wss/times-atom k []) (int (/ elapsed 1000)))))
+                      _ (when run-sql?
+                          (try (let [row        {:client_name     client-name
+                                                 :flow_id         (str k)
+                                                 :started         start ;(get-in @flow-db/results-atom
+                                                 :start_ts        start-ts
+                                                 :ended           end ;(get-in @flow-db/results-atom
+                                                 :run_id          run-id
+                                                 :parent-run_id   parent-run-id
+                                                 :elapsed         elapsed
+                                                 :overrides       (pr-str overrides)
+                                                 :elapsed_seconds (float (/ elapsed 1000))
+                                                 :in_error        (cstr/includes? (str res) ":error")
+                                                 :human_elapsed   (str human-elapsed)}
+                                     insert-sql {:insert-into [:flow_history] :values [row]}]
                              ;(wss/enqueue-task3 ;; temp remove to test some shit 3/9/24
                              ;  (fn []
-                             (sql-exec flows-db (to-sql insert-sql)) ;; sql-exec has its own queue now
+                                 (sql-exec flows-db (to-sql insert-sql)) ;; sql-exec has its own queue now
                              ;    ))
-                           )
-                           (catch Exception e (ut/pp [:flow-history-insert-error k (str e)]))))
-                  _ (swap! last-look assoc k done?)
-                  _ (when run-sql? (swap! saved-uids conj run-id))
-                  chans-open      (count (doall (map (fn [[_ ch]]
-                                                       (let [vv (try (not (ut/channel-open? ch)) (catch Throwable e (str e)))]
-                                                         (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
-                                                  (get @flow-db/channels-atom k))))
-                  channels-open?  (true? (> chans-open 0))]
-              {k {:*done?          done? ;(true? (not (nil? res)))
-                  :*started-by     cname
-                  :*channels-open? channels-open?
-                  :*channels-open  chans-open
-                  :running-blocks  running-blocks
-                  :done-blocks     done-blocks
-                  :waiting-blocks  not-started-yet
-                  :error-blocks    (get @wss/temp-error-blocks k [])
-                  :overrides       overrides
-                  :started         start
-                  :*finished       (count done-blocks)
-                  :*running        running-blocks
-                  :*done           done-blocks
-                  :*ms-elapsed     elapsed
-                  :*time-running   (str human-elapsed)
-                  :*not-started    not-started-yet
-                  :*open-channels  (get cc k)
-                  :*running?       running?}}))))))
+                                 )
+                               (catch Exception e (ut/pp [:flow-history-insert-error k (str e)]))))
+                      _ (swap! last-look assoc k done?)
+                      _ (when run-sql? (swap! saved-uids conj run-id))
+                      chans-open      (count (doall (map (fn [[_ ch]]
+                                                           (let [vv (try (not (ut/channel-open? ch)) (catch Throwable e (str e)))]
+                                                             (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
+                                                         (get @flow-db/channels-atom k))))
+                      channels-open?  (true? (> chans-open 0))]
+                  {k {:*done?          done? ;(true? (not (nil? res)))
+                      :*started-by     cname
+                      :*channels-open? channels-open?
+                      :*channels-open  chans-open
+                      :running-blocks  running-blocks
+                      :done-blocks     done-blocks
+                      :waiting-blocks  not-started-yet
+                      :error-blocks    (get @wss/temp-error-blocks k [])
+                      :overrides       overrides
+                      :started         start
+                      :*finished       (count done-blocks)
+                      :*running        running-blocks
+                      :*done           done-blocks
+                      :*ms-elapsed     elapsed
+                      :*time-running   (str human-elapsed)
+                      :*not-started    not-started-yet
+                      :*open-channels  (get cc k)
+                      :*running?       running?}}))))))
   (defn tracker-changed
     [key ref old-state new-state]
     (let [[_ b _] (data/diff old-state new-state)
@@ -599,7 +602,7 @@
                                      :when (not (get v :in-chan?))]
                                  {k v}))]
         (swap! wss/tracker-history assoc flow-id (vec (conj (get @wss/tracker-history flow-id []) tracker))) ;; for
-      )))
+        )))
   (defn tracker-changed2
     [key ref old-state new-state]
     (let [[_ b _] (data/diff old-state new-state)
@@ -607,7 +610,7 @@
       (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
         (async/thread ;; really expensive logging below. temp
           (let [;kks-string (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/"
-               ]
+                ]
             (ext/create-dirs "./flow-logs/")
             (doseq [flow-id kks
                     :let    [run-id     (str (get-in @flow-db/results-atom [flow-id :run-id]))
@@ -631,29 +634,29 @@
   (defn heartbeat
     [dest]
     {:components
-       {:kick-1            {:inputs [:destination :name :sub-task :thread-id :thread-desc :message-name]
-                            :fn     '(fn
-                                      [destination name sub-task thread-id thread-desc message-name & args]
-                                      (rvbbit-backend.websockets/kick
-                                       destination
-                                       name
-                                       sub-task
-                                       thread-id
-                                       thread-desc
-                                       message-name
-                                       args))
-                            :raw-fn '(fn
-                                      [destination name sub-task thread-id thread-desc message-name & args]
-                                      (rvbbit-backend.websockets/kick
-                                       destination
-                                       name
-                                       sub-task
-                                       thread-id
-                                       thread-desc
-                                       message-name
-                                       args))}
-        :open-input        :heartbeat
-        :kick-1destination dest}
+     {:kick-1            {:inputs [:destination :name :sub-task :thread-id :thread-desc :message-name]
+                          :fn     '(fn
+                                     [destination name sub-task thread-id thread-desc message-name & args]
+                                     (rvbbit-backend.websockets/kick
+                                      destination
+                                      name
+                                      sub-task
+                                      thread-id
+                                      thread-desc
+                                      message-name
+                                      args))
+                          :raw-fn '(fn
+                                     [destination name sub-task thread-id thread-desc message-name & args]
+                                     (rvbbit-backend.websockets/kick
+                                      destination
+                                      name
+                                      sub-task
+                                      thread-id
+                                      thread-desc
+                                      message-name
+                                      args))}
+      :open-input        :heartbeat
+      :kick-1destination dest}
      :connections [[:kick-1 :done] [:open-input :kick-1/name] [:open-input :kick-1/sub-task] [:open-input :kick-1/thread-id]
                    [:open-input :kick-1/thread-desc] [:open-input :kick-1/message-name]
                    [:kick-1destination :kick-1/destination]]})

@@ -2,61 +2,67 @@
   (:require-macros
     [cljs.core.async.macros :refer [go]])
   (:require
-    ["@nivo/bar" :as nivo-bar]
-    ["@nivo/calendar" :as nivo-calendar]
-    ["@nivo/line" :as nivo-line]
-    ["@nivo/pie" :as nivo-pie]
-    ["@nivo/scatterplot" :as nivo-scatterplot]
-    ["@nivo/swarmplot" :as nivo-swarmplot]
-    ["@nivo/treemap" :as nivo-treemap]
-    ["@nivo/waffle" :as nivo-waffle]
-    ["codemirror/addon/edit/closebrackets.js"]
-    ["codemirror/addon/edit/matchbrackets.js"]
-    ["codemirror/addon/hint/show-hint.js"]
-    ["codemirror/mode/clojure/clojure.js"]
-    ["codemirror/mode/julia/julia.js"]
-    ["codemirror/mode/markdown/markdown.js"]
-    ["codemirror/mode/python/python.js"]
-    ["codemirror/mode/r/r.js"]
-    ["codemirror/mode/sql/sql.js"]
-    ["html2canvas" :as html2canvas]
-    ["react-codemirror2" :as cm]
-    ["react-drag-and-drop" :as rdnd]
-    ["react-map-gl" :default Map
-                    :refer   [Layer Marker Source]]
-    [cljs.core.async :as    async
-                     :refer [<! >! chan]]
-    [cljs.tools.reader :refer [read-string]]
-    [clojure.edn :as edn]
-    [clojure.set :as cset]
-    [clojure.string :as cstr]
-    [clojure.walk :as walk]
-    [day8.re-frame.undo :as    undo
-                        :refer [undoable]]
-    [goog.events :as gevents]
-    [goog.i18n.NumberFormat.Format]
-    [oz.core :as oz]
+   ["@nivo/bar" :as nivo-bar]
+   ["@nivo/calendar" :as nivo-calendar]
+   ["@nivo/line" :as nivo-line]
+   ["@nivo/pie" :as nivo-pie]
+   ["@nivo/scatterplot" :as nivo-scatterplot]
+   ["@nivo/swarmplot" :as nivo-swarmplot]
+   ["@nivo/treemap" :as nivo-treemap]
+   ["@nivo/waffle" :as nivo-waffle]
+   ["codemirror/addon/edit/closebrackets.js"]
+   ["codemirror/addon/edit/matchbrackets.js"]
+   ["codemirror/addon/hint/show-hint.js"]
+   ["codemirror/mode/clojure/clojure.js"]
+   ["codemirror/mode/julia/julia.js"]
+   ["codemirror/mode/markdown/markdown.js"]
+   ["codemirror/mode/python/python.js"]
+   ["codemirror/mode/r/r.js"]
+   ["codemirror/mode/sql/sql.js"]
+   ["html2canvas" :as html2canvas]
+   ["react-codemirror2" :as cm]
+   ["react-drag-and-drop" :as rdnd]
+   ["react-map-gl" :default Map
+    :refer   [Layer Marker Source]]
+
+
+
+["react-virtualized" :refer [List AutoSizer]]
+
+
+   [cljs.core.async :as    async
+    :refer [<! >! chan]]
+   [cljs.tools.reader :refer [read-string]]
+   [clojure.edn :as edn]
+   [clojure.set :as cset]
+   [clojure.string :as cstr]
+   [clojure.walk :as walk]
+   [day8.re-frame.undo :as    undo
+    :refer [undoable]]
+   [goog.events :as gevents]
+   [goog.i18n.NumberFormat.Format]
+   [oz.core :as oz]
     ;[re-catch.core :as rc]
-    [re-com.core :as    re-com
-                 :refer [at]]
-    [re-com.util :refer [px]]
-    [re-frame.alpha :as rfa]
-    [re-frame.core :as re-frame]
-    [reagent.core :as reagent]
+   [re-com.core :as    re-com
+    :refer [at]]
+   [re-com.util :refer [px]]
+   [re-frame.alpha :as rfa]
+   [re-frame.core :as re-frame]
+   [reagent.core :as reagent]
     ;[reagent.dom :as rdom]
-    [rvbbit-frontend.audio :as audio]
-    [rvbbit-frontend.connections :as conn]
-    [rvbbit-frontend.db :as db]
-    [rvbbit-frontend.http :as http]
-    [rvbbit-frontend.layout :as lay]
-    [rvbbit-frontend.recharts :as reech]
-    [rvbbit-frontend.resolver :as resolver]
-    [rvbbit-frontend.scrubbers :as scrub]
-    [rvbbit-frontend.select-transform :as st]
-    [rvbbit-frontend.shapes :as shape]
-    [rvbbit-frontend.subs :as subs]
-    [rvbbit-frontend.utility :as ut :refer [tapp>>]]
-    [websocket-fx.core :as wfx])
+   [rvbbit-frontend.audio :as audio]
+   [rvbbit-frontend.connections :as conn]
+   [rvbbit-frontend.db :as db]
+   [rvbbit-frontend.http :as http]
+   [rvbbit-frontend.layout :as lay]
+   [rvbbit-frontend.recharts :as reech]
+   [rvbbit-frontend.resolver :as resolver]
+   [rvbbit-frontend.scrubbers :as scrub]
+   [rvbbit-frontend.select-transform :as st]
+   [rvbbit-frontend.shapes :as shape]
+   [rvbbit-frontend.subs :as subs]
+   [rvbbit-frontend.utility :as ut :refer [tapp>>]]
+   [websocket-fx.core :as wfx])
   (:import
     [goog.i18n              NumberFormat]
     [goog.i18n.NumberFormat Format]
@@ -155,85 +161,85 @@
 
 ;;(def reecatch rc/catch)
 
-;; (defn reecatch
-;;   [] ;;; fork of re-catch, will push to own forked credited lib before release
-;;   (let [error-state (reagent/atom nil)
-;;         info-state  (reagent/atom nil)
-;;         retry-timer (reagent/atom nil)
-;;         websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
-;;         online?                   (true? (= websocket-status :connected))
-;;         retry-count (reagent/atom 0)] ; Add a retry count
-;;     (reagent/create-class
-;;       {:component-did-catch    (fn re-catch-block [this error info]
-;;                                  (reset! error-state (str error))
-;;                                  (reset! info-state (some->> info
-;;                                                              .-componentStack
-;;                                                              (cstr/split-lines)
-;;                                                              (remove cstr/blank?)
-;;                                                              (drop-while #(re-find #"re_catch" %))
-;;                                                              (drop-while #(re-find #"reecatch" %))
-;;                                                              (take 4)
-;;                                                              (cstr/join "\n")))
-;;                                  ;; Schedule a re-render after 5 seconds
-;;                                  (reset! retry-timer (js/setTimeout #(swap! retry-count inc) 3000))) ; Increment the retry
-;;                                                                                                      ; count
-;;        :component-will-unmount (fn []
-;;                                  ;; Clear the retry timer when the component unmounts
-;;                                  (when @retry-timer (js/clearTimeout @retry-timer) (reset! retry-timer nil)))
-;;        :reagent-render         (fn [& body]
-;;                                  (if @error-state
-;;                                    (do
-;;                                      ;; Reset the error state if the retry count has changed
-;;                                      (when (pos? @retry-count) (reset! error-state nil) (reset! retry-count 0))
-;;                                      [*render-error* {:error @error-state :info @info-state}])
-;;                                    (when-not (->> body
-;;                                                   (remove nil?)
-;;                                                   empty?)
-;;                                      (into [:<>] body))))})))
-
 (defn reecatch
-  []
+  [] ;;; fork of re-catch, will push to own forked credited lib before release
   (let [error-state (reagent/atom nil)
         info-state  (reagent/atom nil)
         retry-timer (reagent/atom nil)
-        grace-period-timer (reagent/atom nil)
-        ;websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
-        ;online? (true? (= websocket-status :connected))
-        retry-count (reagent/atom 0)]
+        websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
+        online?                   (true? (= websocket-status :connected))
+        retry-count (reagent/atom 0)] ; Add a retry count
     (reagent/create-class
-     {:component-did-catch (fn re-catch-block [this error info]
-                              ;; Start the grace period timer
-                             (reset! grace-period-timer
-                                     (js/setTimeout #(do
-                                                       (reset! error-state (str error))
-                                                       (reset! info-state (some->> info
-                                                                                   .-componentStack
-                                                                                   (cstr/split-lines)
-                                                                                   (remove cstr/blank?)
-                                                                                   (drop-while (fn [x] (re-find #"re_catch" x)))
-                                                                                   (drop-while (fn [x] (re-find #"reecatch" x)))
-                                                                                   (take 14)
-                                                                                   (cstr/join "\n"))))
-                                                    5000)) ; 4 seconds grace period
-                              ;; Schedule a re-render after 3 seconds
-                             (reset! retry-timer (js/setTimeout #(swap! retry-count inc) 3000))) ; Increment the retry count
-      :component-will-unmount (fn []
-                                 ;; Clear the retry timer and the grace period timer when the component unmounts
-                                (when @retry-timer (js/clearTimeout @retry-timer) (reset! retry-timer nil))
-                                (when @grace-period-timer (js/clearTimeout @grace-period-timer) (reset! grace-period-timer nil)))
-      :reagent-render (fn [& body]
-                        (if @error-state
-                          (do
-                             ;; Reset the error state if the retry count has changed
-                            (when (pos? @retry-count) (reset! error-state nil) (reset! retry-count 0))
-                            [*render-error* {:error @error-state :info @info-state}])
-                          (when-not (->> body
-                                         (remove nil?)
-                                         empty?)
-                            (into [:<>] body))))
+      {:component-did-catch    (fn re-catch-block [this error info]
+                                 (reset! error-state (str error))
+                                 (reset! info-state (some->> info
+                                                             .-componentStack
+                                                             (cstr/split-lines)
+                                                             (remove cstr/blank?)
+                                                             (drop-while #(re-find #"re_catch" %))
+                                                             (drop-while #(re-find #"reecatch" %))
+                                                             (take 4)
+                                                             (cstr/join "\n")))
+                                 ;; Schedule a re-render after 5 seconds
+                                 (reset! retry-timer (js/setTimeout #(swap! retry-count inc) 5000))) ; Increment the retry
+                                                                                                     ; count
+       :component-will-unmount (fn []
+                                 ;; Clear the retry timer when the component unmounts
+                                 (when @retry-timer (js/clearTimeout @retry-timer) (reset! retry-timer nil)))
+       :reagent-render         (fn [& body]
+                                 (if @error-state
+                                   (do
+                                     ;; Reset the error state if the retry count has changed
+                                     (when (pos? @retry-count) (reset! error-state nil) (reset! retry-count 0))
+                                     [*render-error* {:error @error-state :info @info-state}])
+                                   (when-not (->> body
+                                                  (remove nil?)
+                                                  empty?)
+                                     (into [:<>] body))))})))
+
+;; (defn reecatch
+;;   []
+;;   (let [error-state (reagent/atom nil)
+;;         info-state  (reagent/atom nil)
+;;         retry-timer (reagent/atom nil)
+;;         grace-period-timer (reagent/atom nil)
+;;         ;websocket-status (get @(ut/tracked-sub ::http/websocket-status {}) :status)
+;;         ;online? (true? (= websocket-status :connected))
+;;         retry-count (reagent/atom 0)]
+;;     (reagent/create-class
+;;      {:component-did-catch (fn re-catch-block [this error info]
+;;                               ;; Start the grace period timer
+;;                              (reset! grace-period-timer
+;;                                      (js/setTimeout #(do
+;;                                                        (reset! error-state (str error))
+;;                                                        (reset! info-state (some->> info
+;;                                                                                    .-componentStack
+;;                                                                                    (cstr/split-lines)
+;;                                                                                    (remove cstr/blank?)
+;;                                                                                    (drop-while (fn [x] (re-find #"re_catch" x)))
+;;                                                                                    (drop-while (fn [x] (re-find #"reecatch" x)))
+;;                                                                                    (take 14)
+;;                                                                                    (cstr/join "\n"))))
+;;                                                     5000)) ; 4 seconds grace period
+;;                               ;; Schedule a re-render after 3 seconds
+;;                              (reset! retry-timer (js/setTimeout #(swap! retry-count inc) 3000))) ; Increment the retry count
+;;       :component-will-unmount (fn []
+;;                                  ;; Clear the retry timer and the grace period timer when the component unmounts
+;;                                 (when @retry-timer (js/clearTimeout @retry-timer) (reset! retry-timer nil))
+;;                                 (when @grace-period-timer (js/clearTimeout @grace-period-timer) (reset! grace-period-timer nil)))
+;;       :reagent-render (fn [& body]
+;;                         (if @error-state
+;;                           (do
+;;                              ;; Reset the error state if the retry count has changed
+;;                             (when (pos? @retry-count) (reset! error-state nil) (reset! retry-count 0))
+;;                             [*render-error* {:error @error-state :info @info-state}])
+;;                           (when-not (->> body
+;;                                          (remove nil?)
+;;                                          empty?)
+;;                             (into [:<>] body))))
 
       
-      })))
+;;       })))
 
 
 (re-frame/reg-event-fx ::ship-atom
@@ -6888,11 +6894,17 @@
 
 (declare map-boxes2*)
 
+(defonce opened-boxes (reagent/atom {}))
+(defonce opened-boxes-code (reagent/atom {}))
+
 (defn map-boxes2 [data block-id selected-view keypath kki init-data-type & [draggable? key-depth]]
-  (let [cache-key (pr-str [data block-id selected-view keypath kki init-data-type draggable? key-depth])
+  (let [keypath-in (conj keypath kki)
+        open? (get @opened-boxes (pr-str [block-id keypath-in kki]))
+        cache-key (pr-str [data block-id selected-view keypath kki init-data-type draggable? key-depth open?])
+        react! [@opened-boxes @opened-boxes-code]
         cache (get @ut/map-boxes-cache cache-key)]
     (swap! ut/map-boxes-cache-hits update cache-key (fnil inc 0))
-    (if cache cache
+    (if false cache
         (let [res (map-boxes2* data block-id selected-view keypath kki init-data-type draggable? key-depth)]
           (swap! ut/map-boxes-cache assoc cache-key res)
           res))))
@@ -6902,15 +6914,20 @@
 
 ;;; [map-boxes2 x panel-key selected-view [] :output nil ]
 
+(declare code-box)
+(declare edn-code-box)
+
 (defn map-boxes2*
   [data block-id selected-view keypath kki init-data-type & [draggable? key-depth]] ;; dupe of a fn inside
-  (if (<= (count keypath) (or key-depth 10))
+  (if (<= (count keypath) (or key-depth 5))
     (let [sql-explanations (sql-explanations-kp) ;; turn into general key annotations as some point with KP lookups?
           flow-name (ut/data-typer data)
+          react! [@opened-boxes]
           ;;;_ (tapp>>  [:kki (str keypath) kki])
           data (if (or (string? data) (number? data) (boolean? data)) [data] data)
           base-type-vec? (or (vector? data) (list? data))
           iter (if base-type-vec? (range (count data)) (keys data))
+          ;iter (vec (take 4 iter))
           source @(ut/tracked-sub ::data-viewer-source {:block-id block-id :selected-view selected-view})
           source-clover-key? (and (keyword? source) (cstr/includes? (str source) "/"))
           source-app-db? (try (= (first source) :app-db) (catch :default _ false))
@@ -6929,7 +6946,7 @@
             :font-weight 500} :children
            (for [kk iter] ;; (keys data)
              (let [k-val      (get-in data [kk])
-                   k-val-type (ut/data-typer k-val)
+                   k-val-type (or init-data-type (ut/data-typer k-val))
                    in-body?   true ;(ut/contains-data? only-body k-val)
                    hovered?   false ;(ut/contains-data? mat-hovered-input k-val)
                    border-ind (if in-body? "solid" "dashed")
@@ -6949,44 +6966,228 @@
                ^{:key (str block-id keypath kki kk)}
                [re-com/box :child
                 (cond
-                  (= k-val-type "map") ^{:key (str block-id keypath kki kk k-val-type)}
-                  [re-com/h-box :children
-                   [[dggbl ;;draggable
-                     {:h         4
-                      :w         6
-                      :root      [0 0]
-                      :drag-meta {:type        :viewer-pull
-                                  :param-full  [:box :style {:font-size "17px"} :child
-                                                [:data-viewer
-                                                 (cond source-clover-key? clover-kp
-                                                       source-app-db? [:app-db keypath-in]
-                                                   :else [:get-in [source keypath-in]])]]
-                                  :param-type  k-val-type
-                                  :param-table :what
-                                  :param-field :what}} "meta-menu"         ;block-id ;; (when (not
-                                                                                                ;(= block-id
-                                                                                                ;:inline-render))
-                     ^{:key (str block-id keypath kki kk k-val-type 1)}
-                     [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
-                      :style
-                      {;:cursor (when draggable? "grab")
-                       }:children
-                      [^{:key (str block-id keypath kki kk k-val-type 124)}
-                       [re-com/box :child (str kk)]
-                       ^{:key (str block-id keypath kki kk k-val-type 134)}
-                       [re-com/box :child (str k-val-type) :style
-                        {:opacity     0.45
-                         :font-size   font-size ; "9px"
-                         :padding-top "7px"}]
-                       (when (> (count k-val) 1)
-                         ^{:key (str block-id keypath kki kk k-val-type 156)}
-                         [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])] :padding
-                      "8px"]] [map-boxes2 k-val block-id selected-view keypath-in kk nil draggable?  key-depth]] :style
-                   keystyle]
-                  (or (= k-val-type "vector")
+                  (or (= k-val-type "map") 
                       (= k-val-type "list")
-                      ;(= k-val-type "function")
+                      (= k-val-type "set")
                       (= k-val-type "rowset")
+                      (= k-val-type "vector")) 
+                  ^{:key (str block-id keypath kki kk k-val-type)}
+
+                  (let [open? (or (get @opened-boxes (pr-str [block-id keypath-in kki]) false) (= (count k-val) 1))
+                        symbol-str (cond (= k-val-type "map") "{}"
+                                         (= k-val-type "vector") "[]"
+                                         (= k-val-type "list") "()"
+                                         (= k-val-type "set") "#{}"
+                                         :else "[]")
+                        code? (get @opened-boxes-code (pr-str [block-id keypath-in kki]) false)]
+                    
+                    (cond (and open? (not code?))
+                          [re-com/h-box :children
+                           [[dggbl ;;draggable
+                             {:h         4
+                              :w         6
+                              :root      [0 0]
+                              :drag-meta {:type        :viewer-pull
+                                          :param-full  [:box :style {:font-size "17px"} :child
+                                                        [:data-viewer
+                                                         (cond source-clover-key? clover-kp
+                                                               source-app-db? [:app-db keypath-in]
+                                                               :else [:get-in [source keypath-in]])]]
+                                          :param-type  k-val-type
+                                          :param-table :what
+                                          :param-field :what}} "meta-menu"
+                             ^{:key (str block-id keypath kki kk k-val-type 1)}
+                             [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
+                              :children
+                              [^{:key (str block-id keypath kki kk k-val-type 124)}
+                               [re-com/box :child (str kk)]
+                               ^{:key (str block-id keypath kki kk k-val-type 134)}
+                               [re-com/h-box 
+                                :gap "6px"
+                                :children [[re-com/box :child (str k-val-type)]
+                                                        (when (> (count k-val) 1)
+                                                          ^{:key (str block-id keypath kki kk k-val-type 156)}
+                                                          [re-com/box :style {:opacity 0.6} :child (str "(" (count k-val) ")")])
+                                                        ] 
+                                :style
+                                {:opacity     0.45
+                                 :font-size   font-size ; "9px"
+                                 :padding-top "7px"}]
+                               
+
+                               [re-com/h-box 
+                                ;:align :end :justify :end 
+                                :children [(when (not (= (count k-val) 1))
+                                             [re-com/box :child symbol-str
+                                              :padding "2px 8px 2px 8px"
+                                                                         ;:width "30px"
+                                              :attr {:on-click #(swap! opened-boxes-code assoc (pr-str [block-id keypath-in kki]) (not code?))}
+                                              :style
+                                              {:opacity     0.45
+                                               :font-family (theme-pull :theme/monospaced-font nil)
+                                               :font-weight 700
+                                               :border-radius "12px" ;:padding "3px"
+                                               :background-color (when code? (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55))
+                                               :cursor "pointer"
+                                               :font-size   font-size ; "9px"
+                                                                              ;:padding-top "7px"
+                                               }])
+
+                                           (when (not (= (count k-val) 1))
+                                             [re-com/box :child (str "   - ")
+                                              :padding "2px 8px 2px 8px"
+                                              :width "20px"
+                                              :attr {:on-click #(swap! opened-boxes assoc (pr-str [block-id keypath-in kki]) false)}
+                                              :style
+                                              {:opacity     0.45
+                             ;:padding-left "2px"
+                                               :border-radius "12px" ;:padding "3px"
+                                               :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                               :cursor "pointer"
+                                               :font-size   font-size ; "9px"
+                                   ;:padding-top "7px"
+                                               }])]]
+                               
+                               ] :padding
+                              "8px"]] [map-boxes2 
+                                       (if (= k-val-type "list")
+                                         (ut/lists-to-vectors k-val)
+                                         k-val)
+                                       
+                                       block-id selected-view keypath-in kk nil draggable? key-depth]] :style
+                           keystyle]
+
+
+                          (and open? code?)
+                          [re-com/h-box
+                           :style keystyle
+                           :children [^{:key (str block-id keypath kki kk k-val-type 1)}
+                                      [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
+                                       :children
+                                       [^{:key (str block-id keypath kki kk k-val-type 124)}
+                                        [re-com/box :child (str kk)]
+                                        ^{:key (str block-id keypath kki kk k-val-type 134)}
+
+                                        [re-com/h-box
+                                         :gap "6px"
+                                         :children [[re-com/box :child (str k-val-type)]
+                                                    (when (> (count k-val) 1)
+                                                      ^{:key (str block-id keypath kki kk k-val-type 156)}
+                                                      [re-com/box :style {:opacity 0.6} :child (str "(" (count k-val) ")")])]
+                                         :style
+                                         {:opacity     0.45
+                                          :font-size   font-size ; "9px"
+                                          :padding-top "7px"}]
+
+                                        ;; [re-com/box :child (str k-val-type) :style
+                                        ;;  {:opacity     0.45
+                                        ;;   :font-size   font-size ; "9px"
+                                        ;;   :padding-top "7px"}]
+                                        ;; (when (> (count k-val) 1)
+                                        ;;   ^{:key (str block-id keypath kki kk k-val-type 156)}
+                                        ;;   [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])
+
+                                        [re-com/h-box
+                                         ;:align :end :justify :end
+                                         :children [(when (not (= (count k-val) 1))
+                                                      [re-com/box :child symbol-str
+                                                       :padding "2px 8px 2px 8px"
+                                                    ;:width "30px"
+                                                       :attr {:on-click #(swap! opened-boxes-code assoc (pr-str [block-id keypath-in kki]) (not code?))}
+                                                       :style
+                                                       {:opacity     0.45
+                                                        :font-family (theme-pull :theme/monospaced-font nil)
+                                                        :font-weight 700
+                                                     ;:border-radius "12px" :padding "3px"
+                                                     ;:background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                                        :cursor "pointer"
+                                                        :font-size   font-size ; "9px"
+                                            ;:padding-top "7px"
+                                                        }])
+
+                                                    (when (not (= (count k-val) 1))
+                                                      [re-com/box :child (str "   - ")
+                                                       :padding "2px 8px 2px 8px"
+                                                       :width "20px"
+                                                       :attr {:on-click #(swap! opened-boxes assoc (pr-str [block-id keypath-in kki]) false)}
+                                                       :style
+                                                       {:opacity     0.45
+                                                   ;:padding-left "2px"
+                                                        :border-radius "12px" ;:padding "3px"
+                                                        :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                                        :cursor "pointer"
+                                                        :font-size   font-size ; "9px"
+                                            ;:padding-top "7px"
+                                                        }])]]] :padding
+                                       "8px"]
+
+                                      [re-com/v-box :children [;[re-com/box :child "x"
+                                                               ; :attr {:on-click #(swap! opened-boxes-code assoc (pr-str [block-id keypath-in kki]) false)}]
+                                                               ;[re-com/box :child (pr-str k-val)]
+                                                               [edn-code-box 330 nil (str k-val)] 
+                                                               
+                                                               ]]]]
+
+
+
+
+                          :else
+                          [re-com/v-box
+                           :style keystyle
+                           :min-width (px (* (count (str kk)) 11)) ;"110px"
+                           :children
+                           [^{:key (str block-id keypath kki kk k-val-type 124)}
+                            [dggbl ;;draggable
+                             {:h         4
+                              :w         6
+                              :root      [0 0]
+                              :drag-meta {:type        :viewer-pull
+                                          :param-full  [:box :style {:font-size "17px"} :child
+                                                        [:data-viewer
+                                                         (cond source-clover-key? clover-kp
+                                                               source-app-db? [:app-db keypath-in]
+                                                               :else [:get-in [source keypath-in]])]]
+                                          :param-type  k-val-type
+                                          :param-table :what
+                                          :param-field :what}} "meta-menu"
+                             [re-com/box :child (str kk)]]
+                            ^{:key (str block-id keypath kki kk k-val-type 134)}
+                            [re-com/h-box
+                             :justify :between
+                             :children
+                             [[re-com/box :child (str k-val-type) :style
+                               {:opacity     0.45
+                                :font-size   font-size ; "9px"
+                                :padding-top "7px"}]
+                              [re-com/h-box
+                               :justify :between :align :center :gap "4px"
+                               :children (if (> (count k-val) 1)
+                                           [[re-com/box :child (str (subs (str k-val) 0 30) (when (> (count (str k-val)) 30) "... ")) :style {:font-size "12px" :overflow "hidden"}]
+                                            [re-com/box :child (str (count k-val) " items +")
+                                             :attr {:on-click #(swap! opened-boxes assoc (pr-str [block-id keypath-in kki]) true)}
+                                             :padding "2px 8px 2px 8px"
+                                             :style
+                                             {:opacity     0.45
+                                              :border-radius "12px"
+                                              :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                              :cursor "pointer"
+                                              :font-size   font-size ; "9px"
+                                              :padding-top "7px"}]]
+                                           [[re-com/box :child "empty"
+                                             :padding "2px 8px 2px 8px"
+                                             :style
+                                             {:opacity     0.45
+                                              :border-radius "12px"
+                                              :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                              :cursor "pointer"
+                                              :font-size   font-size ; "9px"
+                                              :padding-top "7px"}]])]]]] :padding
+                           "8px"]))
+                  
+                  (or ;(= k-val-type "vector")
+                      ;(= k-val-type "list")
+                      ;(= k-val-type "function")
+                      ;(= k-val-type "rowset")
                       (= k-val-type "jdbc-conn")
                       (= k-val-type "render-object"))
                   ^{:key (str block-id keypath kki kk k-val-type 2)}
@@ -6998,7 +7199,7 @@
                       :drag-meta {:type        :viewer-pull
                                   :param-full  [:box :style {:font-size "17px"}
                                                 :child
-                                                [:data-viewer 
+                                                [:data-viewer
                                                  (cond source-clover-key? clover-kp
                                                        source-app-db? [:app-db keypath-in]
                                                        :else [:get-in [source keypath-in]])]]
@@ -7066,7 +7267,7 @@
                         :root      [0 0]
                         :drag-meta {:type        :viewer-pull
                                     :param-full  [:box :size "auto" :align :center :justify :center :style
-                                                  {:font-size [:auto-size-px 
+                                                  {:font-size [:auto-size-px
                                                                (cond source-clover-key? clover-kp
                                                                      source-app-db? [:app-db keypath-in]
                                                                      :else [:get-in [source keypath-in]])]}
@@ -7115,16 +7316,25 @@
             :margin-top    (if nin? "0px" "-10px")
             :border-radius "12px"}])
         main-boxes))
-        [re-com/v-box 
-         :size "auto"  :align :center :justify :center 
-         :margin "5px"
-         :style {:border (str  "2px dashed " (theme-pull :theme/editor-outer-rim-color nil))
-                 :color (theme-pull :theme/editor-outer-rim-color nil)
-                 :font-size "10px"  :font-weight 700
-                 :border-radius "14px"}
-         :children [[re-com/box :child (str "key depth reached")]
-                    [re-com/box :child (str "*drag a key out to extend*")]]]
-        ))
+    [re-com/v-box
+     :size "auto"  :align :center :justify :center
+     :margin "5px"
+     :style {:border (str  "2px dashed " (theme-pull :theme/editor-outer-rim-color nil))
+             :color (theme-pull :theme/editor-outer-rim-color nil)
+             :font-size "10px"  :font-weight 700
+             :border-radius "14px"}
+     :children [[re-com/box :child (str "key depth reached")]
+                [re-com/box :child (str "*drag a key out to extend*")]]]))
+
+;; dcolors @(ut/tracked-sub ::conn/data-colors {})
+
+
+
+
+
+
+
+
 
 
 (defn transform-nested ;; do this on the server?
@@ -7626,6 +7836,8 @@
 
 (declare grid)
 
+
+
 (defn clover-walk-singles
   [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view]
   (let [kk (pr-str [panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view])
@@ -7636,6 +7848,7 @@
               (merge
                 {;:re-com/box re-com/box ;; basics
                  :box re-com/box
+                 ;:tree render-as-tree
                  :layout (fn [x] [layout panel-key (or override-view selected-view) x w h])
                  :px re-com.util/px
                  :icon re-com/md-icon-button
@@ -8085,6 +8298,7 @@
             :child [:string3 "no clover-fn found" :clover-body]])))
 
 
+
 (defn honeycomb
   [panel-key & [override-view fh fw replacement-view replacement-query]] ;; can sub lots of this
   (let [;block-map panel-map ;@(ut/tracked-subscribe [::panel-map panel-key]) ;(get workspace
@@ -8399,9 +8613,9 @@
                                                               ;;@(ut/tracked-sub ::conn/solver-fn-runs {:keypath [panel-key sub-param]})
                                                                 unique-resolved-map)
                                    lets-go?                  (and online? (not run?))
-                                  ;;  _ (when lets-go?
-                                  ;;      (ut/tapp>> [:run-solver-req-map-bricks! (str fkp) sub-param override? (str (first this)) lets-go? (not run?) ;req-map
-                                  ;;                  ]))
+                                   _ (when lets-go?
+                                       (ut/tapp>> [:run-solver-req-map-bricks! (str fkp) sub-param override? (str (first this)) lets-go? (not run?) ;req-map
+                                                   ]))
                                    _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                    _ (when lets-go?
                                        (swap! db/solver-fn-lookup assoc fkp sub-param)

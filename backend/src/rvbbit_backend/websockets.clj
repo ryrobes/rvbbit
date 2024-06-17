@@ -2023,7 +2023,7 @@
 ;; TODO, these 3 can all be combined into one "smarter" version base don args, but I'm still iterating, so it's fine
 (defmethod wl/handle-request :run-solver
   [{:keys [solver-name client-name override-map]}]
-  ;; (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
+  (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
   (swap! last-solvers-atom-meta assoc-in
     [solver-name :output]
     [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
@@ -2710,6 +2710,7 @@
                      false
                      snapshot?)))
 
+(defonce solvers-running (atom {}))
 
 (defn run-solver
   [solver-name client-name & [override-map override-input temp-solver-name]]
@@ -2745,7 +2746,9 @@
                                 (let [s (str s)]
                                   (or (cstr/includes? s "Exception") (cstr/includes? s ":err") (cstr/includes? s ":error"))))
         timestamp-str         (cstr/trim (str (when use-cache? "^") (when cache-hit? "*") " " (millis-to-date timestamp)))]
+    (swap! solvers-running assoc-in [client-name solver-name] true)
     ;; (when override-input (ut/pp [:SOLVER-INPUT-OVERRIDE! temp-solver-name :wants input-map]))
+    ;;(when override-map (ut/pp [:SOLVER-MAP-OVERRIDE! temp-solver-name :wants input-map]))
     (cond
       cache-hit? (let [[output output-full] cache-val
                        meta-extra           {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms 0}}
@@ -2756,7 +2759,8 @@
                    (swap! last-solvers-atom-meta assoc
                      solver-name
                      (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
-                   (swap! last-solvers-history-atom assoc solver-name new-history))
+                   (swap! last-solvers-history-atom assoc solver-name new-history)
+                   (swap! solvers-running assoc-in [client-name solver-name] false))
       
       (= runner-type :sql)
         (try
@@ -2800,9 +2804,11 @@
               (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
             (swap! last-solvers-history-atom assoc solver-name new-history)
             ;;;(swap! solvers-cache-atom assoc cache-key [output output-full])
+            (swap! solvers-running assoc-in [client-name solver-name] false)
             )
           (catch Throwable e
             (do (ut/pp [:SOLVER-SQL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
+                (swap! solvers-running assoc-in [client-name solver-name] false)
                 (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
       
       (= runner-type :nrepl)
@@ -2834,9 +2840,11 @@
                  (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
                (swap! last-solvers-history-atom assoc solver-name new-history)
                ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
+               (swap! solvers-running assoc-in [client-name solver-name] false)
                )
              (catch Throwable e
                (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
+                   (swap! solvers-running assoc-in [client-name solver-name] false)
                    (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
       
       (= runner-type :flow) ;; no runner def needed for anon flow pulls
@@ -2846,13 +2854,16 @@
                                                       (get vdata :opts {}))
                    return                      (get vdata :return) ;; alternate block-id to fetch
                    flow-id                     (str (cstr/replace (str solver-name) ":" "") "-solver-flow-")
+                   ;;_ (ut/pp [:solver-flow-start solver-name flow-id opts])
                    {:keys [result elapsed-ms]} (ut/timed-exec (flow! client-name flowmap nil flow-id opts))
+                   ;;_ (ut/pp [:solver-flow-finsihed solver-name flow-id])
                    output                      result
                    output                      (ut/remove-namespaced-keys (ut/replace-large-base64 output))
                    output-val                  (get-in output [:return-val])
                    output-val                  (if return ;;(keyword? return)
                                                  (get-in output [:return-maps flow-id return] output-val)
                                                  output-val)
+                   ;;_ (ut/pp [:solver-flow-return-val solver-name flow-id output-val])
                    output-full                 {:req        vdata
                                                 :value      (-> (assoc output :return-maps
                                                                        (select-keys (get output :return-maps) [flow-id]))
@@ -2877,10 +2888,14 @@
                (swap! last-solvers-history-atom assoc solver-name new-history)
                (when use-cache? 
                  (swap! solvers-cache-atom assoc cache-key [output-val output-full]))
-               (swap! flow-db/results-atom dissoc flow-id)) ;; <-- clear out the flow atom right
+               (swap! flow-db/results-atom dissoc flow-id)
+               (swap! solvers-running assoc-in [client-name solver-name] false)
+               ) ;; <-- clear out the flow atom right
              (catch Throwable e
                (do (ut/pp [:SOLVER-FLOW-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
+                   (swap! solvers-running assoc-in [client-name solver-name] false)
                    (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+      
       :else ;; else we assume it's just data and keep it as is
         (let [output-full   {:static-data vdata}
               runs          (get @last-solvers-history-atom solver-name [])
@@ -2893,7 +2908,12 @@
             solver-name
             (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
           (swap! last-solvers-history-atom assoc solver-name new-history)
-          vdata))))
+          (swap! solvers-running assoc-in [client-name solver-name] false)
+          vdata)
+      
+      )
+      (swap! solvers-running assoc-in [client-name solver-name] false)
+      ))
 
 (defonce last-signals-history-atom-temp (atom {}))
 
@@ -4846,29 +4866,29 @@
                                         :when (not= (get v :last-seen-seconds) -1)]
                                     {k (ut/deselect-keys v [:booted :last-ack :last-push])}))
             cli-rows
-              (vec
-                (for [[k v] ack-scoreboardv
-                      :let  [booted                     (get v :booted-ts)
-                             now                        (System/currentTimeMillis)
-                             pushed                     (get v :push)
-                             [last-now last-pushed]     (get @mps-helper k)
-                             _ (swap! mps-helper assoc k [now pushed])
-                             recent-messages-per-second (try (Double/parseDouble (format "%.2f"
-                                                                                         (/ (- pushed last-pushed)
-                                                                                            (/ (- now last-now) 1000.0))))
-                                                             (catch Exception _ -1))
-                             uptime-seconds             (try (/ (- now booted) 1000.0) (catch Exception _ -1))
-                             msg-per-second             (try (Double/parseDouble (format "%.2f" (/ pushed uptime-seconds)))
-                                                             (catch Exception _ -1))
-                             uptime-str                 (ut/format-duration-seconds uptime-seconds)
-                             _ (swap! ack-scoreboard assoc-in [k :uptime] uptime-str) ;; bad
-                             _ (swap! ack-scoreboard assoc-in [k :messages-per-second] msg-per-second) ;; ^^ this.
-                             _ (swap! ack-scoreboard assoc-in [k :recent-messages-per-second] recent-messages-per-second) ;; ^^
+            (vec
+             (for [[k v] ack-scoreboardv
+                   :let  [booted                     (get v :booted-ts)
+                          now                        (System/currentTimeMillis)
+                          pushed                     (get v :push)
+                          [last-now last-pushed]     (get @mps-helper k)
+                          _ (swap! mps-helper assoc k [now pushed])
+                          recent-messages-per-second (try (Double/parseDouble (format "%.2f"
+                                                                                      (/ (- pushed last-pushed)
+                                                                                         (/ (- now last-now) 1000.0))))
+                                                          (catch Exception _ -1))
+                          uptime-seconds             (try (/ (- now booted) 1000.0) (catch Exception _ -1))
+                          msg-per-second             (try (Double/parseDouble (format "%.2f" (/ pushed uptime-seconds)))
+                                                          (catch Exception _ -1))
+                          uptime-str                 (ut/format-duration-seconds uptime-seconds)
+                          _ (swap! ack-scoreboard assoc-in [k :uptime] uptime-str) ;; bad
+                          _ (swap! ack-scoreboard assoc-in [k :messages-per-second] msg-per-second) ;; ^^ this.
+                          _ (swap! ack-scoreboard assoc-in [k :recent-messages-per-second] recent-messages-per-second) ;; ^^
                                                                                                                           ;; this.
-                             queue-distro               (get v :queue-distro)]]
-                  (merge
-                    {:client-name (str k) :uptime-seconds uptime-seconds :messages-per-second msg-per-second :uptime uptime-str}
-                    (assoc v :queue-distro (pr-str queue-distro)))))
+                          queue-distro               (get v :queue-distro)]]
+               (merge
+                {:client-name (str k) :uptime-seconds uptime-seconds :messages-per-second msg-per-second :uptime uptime-str}
+                (assoc v :queue-distro (pr-str queue-distro)))))
             _ (doseq [cli-row cli-rows]
                 (swap! params-atom assoc-in [(edn/read-string (get cli-row :client-name)) :stats] cli-row))
             insert-cli {:insert-into [:client_stats] :values cli-rows}
@@ -4879,27 +4899,27 @@
                                   (+ (get @last-stats-row :queries_run 0) (get @last-stats-row :internal_queries_run 0)))
             as-double (fn [x] (Double/parseDouble (clojure.pprint/cl-format nil "~,2f" x)))
             jvm-stats-vals
-              {:used_memory_mb             mm
-               :messages                   @all-pushes
-               :unix_ms                    (System/currentTimeMillis)
-               :uptime_seconds             seconds-since-boot
-               :seconds_since_last_update  seconds-since-last
-               :messages_per_second        (as-double (try (/ @all-pushes seconds-since-boot) (catch Exception _ -1)))
-               :recent_messages_per_second (as-double (try (/ last-messages seconds-since-last) (catch Exception _ -1)))
-               :recent_queries_run         queries-since-last
-               :recent_messages            (- @all-pushes last-messages)
-               :recent_queries_per_second  (as-double (try (/ queries-since-last seconds-since-last) (catch Exception _ -1)))
-               :queries_per_second         (try (/ (+ @q-calls @q-calls2) seconds-since-boot) (catch Exception _ -1))
-               :thread_count               thread-count
-               :sql_cache_size             (count @sql-cache)
-               :ws_peers                   (count @wl/sockets)
-               :subscriptions              ttl
-               :open_flow_channels         (apply + (for [[_ v] (flow-statuses)] (get v :channels-open)))
-               :queries_run                @q-calls
-               :internal_queries_run       @q-calls2
-               :sniffs_run                 @cruiser/sniffs
-               :sys_load                   (as-double sys-load) ;;sys-load to 2 decimal places
-              }
+            {:used_memory_mb             mm
+             :messages                   @all-pushes
+             :unix_ms                    (System/currentTimeMillis)
+             :uptime_seconds             seconds-since-boot
+             :seconds_since_last_update  seconds-since-last
+             :messages_per_second        (as-double (try (/ @all-pushes seconds-since-boot) (catch Exception _ -1)))
+             :recent_messages_per_second (as-double (try (/ last-messages seconds-since-last) (catch Exception _ -1)))
+             :recent_queries_run         queries-since-last
+             :recent_messages            (- @all-pushes last-messages)
+             :recent_queries_per_second  (as-double (try (/ queries-since-last seconds-since-last) (catch Exception _ -1)))
+             :queries_per_second         (try (/ (+ @q-calls @q-calls2) seconds-since-boot) (catch Exception _ -1))
+             :thread_count               thread-count
+             :sql_cache_size             (count @sql-cache)
+             :ws_peers                   (count @wl/sockets)
+             :subscriptions              ttl
+             :open_flow_channels         (apply + (for [[_ v] (flow-statuses)] (get v :channels-open)))
+             :queries_run                @q-calls
+             :internal_queries_run       @q-calls2
+             :sniffs_run                 @cruiser/sniffs
+             :sys_load                   (as-double sys-load) ;;sys-load to 2 decimal places
+             }
             _ (reset! last-stats-row jvm-stats-vals)
             insert-sql {:insert-into [:jvm_stats] :values [jvm-stats-vals]}
             _ (swap! server-atom assoc :uptime (ut/format-duration-seconds seconds-since-boot))]
@@ -4919,6 +4939,9 @@
                 {:ttl     (count @sql/errors)
                  :freq    (frequencies (mapv first @sql/errors))
                  :freq-db (frequencies (mapv second @sql/errors))}])
+
+        (ut/pp [:solvers-running? @solvers-running])
+
         (try (let [peers       (count @wl/sockets)
                    uptime-str  (ut/format-duration-seconds (ut/uptime-seconds))
                    server-subs ttl]

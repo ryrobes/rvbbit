@@ -34,7 +34,7 @@
                      :icon "images/clover.png"} ;; basic clover render
            ;; ^ these 2 are built in a required and mostly not configurable for now
            :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
-                     :runner {:port 8181 :host "127.0.0.1"}
+                     :runner {:port 37851 :host "127.0.0.1"} ;; from 8181 default for test overnight
                      :modes [:clover :text :data :rowset]
                      :default (let [clojure-version (clojure-version)
                                     jvm-version (System/getProperty
@@ -71,17 +71,23 @@
                                     :data :clover-body}]
                       ;:default-view [:box :child [:string :*query-id]]
                       :icon "images/clj.png"}
-           :create-image {:runner {:flow-id :run-dalle3
-                                   :overrides {:code :selected-view}
-                                   :opts? {:instanced? true}}
+           :create-image {:runner {}
                           :modes [:clover :data :text]
                           :type :flow
                           :syntax "text"
-                          :clover-fn [:data-viewer [:run-solver
-                                                    [:get-my-colors
-                                                     {:input-image-path
-                                                      "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-48163-50841.png"}]]]
-                          :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene."
+                          :clover-fn [:run-solver
+                                      {:signal false
+                                       :cache? false
+                                       :type :flow
+                                       :data
+                                       {:flowmap "openai-image-gen-ladder3"
+                                        :opts
+                                        {:timeout 120000
+                                         :overrides
+                                         {:prompt
+                                          :clover-body}}
+                                        :return :hiccup-image-box-w-png}}]
+                          :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene. There is a beautiful full-figured woman standing in the field, she looks upon you with kind eyes and beckons you closer."
                           ;:default-view [:box :child [:img {:src :*query-id}]]
                           :icon "images/dalle.png"}
            :python3 {:runner {:flow-id :run-python3
