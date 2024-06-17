@@ -1,8 +1,8 @@
 {:orders
- {:fields-sys [:field_name :field_type :data_type],
+ {:connections-sys [:database_name :connection_id],
+  :fields-sys [:field_name :field_type :data_type],
   :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :connections-sys [:database_name :connection_id]},
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
  :reco-preview nil,
  :sql-source {},
  :meta
@@ -220,9 +220,7 @@
      :cardinality 83}},
    :rowcount 30}},
  :default-col-widths
- {:block-11262 {:new-query 153},
-  :block-4167 {:query-11824 211},
-  :system-connections-list* {:connections-sys 111},
+ {:system-connections-list* {:connections-sys 111},
   :system-tables-list* {:tables-sys ##Inf},
   :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
@@ -460,39 +458,35 @@
     "wow-board"],
    :openapi-key "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"}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [188700431 167356323 4294705152],
+ :memory [205180323 173243387 4294705152],
  :flow-subs
- [:solver/raw-custom-override-2070279978
-  :solver/raw-custom-override778576215
-  :flow/flow-forever>*running?
-  :solver/raw-custom-override-1375974037
-  :solver/raw-custom-override1413822180
+ [:solver/raw-custom-override-1375974037
   :flow/live-scratch-flow>*running?
-  :solver/raw-custom-override418119901
-  :flow/flow-forever>:final-math],
- :client-name :constant-ovoid-turkey-31,
+  :flow/flow-forever>*running?
+  :flow/flow-forever>:final-math
+  :solver/raw-custom-override-2070279978
+  :solver/raw-custom-override778576215
+  :solver-status/*client-name*],
+ :client-name :lucid-pyramidal-gnat-14,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2193, :h 1361},
+ :window {:w 2969, :h 1520},
  :post-meta {},
  :status
  {:heartbeat
   {:kick
-   [:solver/raw-custom-override-2070279978
-    :solver/raw-custom-override778576215
-    :flow/flow-forever>*running?
-    :solver/raw-custom-override-1375974037
-    :solver/raw-custom-override1413822180
+   [:solver/raw-custom-override-1375974037
     :flow/live-scratch-flow>*running?
-    :solver/raw-custom-override418119901
-    :flow/flow-forever>:final-math]},
-  :alert1 {:alerts :alert2}},
+    :flow/flow-forever>*running?
+    :flow/flow-forever>:final-math
+    :solver/raw-custom-override-2070279978
+    :solver/raw-custom-override778576215
+    :solver-status/*client-name*]}},
  :screen-name "looking-glass-redux",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
- :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
@@ -503,14 +497,13 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   1381
+   931
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -980885202,
+ :user-params-hash -1983712745,
  :grid-recos? true,
- :session-hash 730069359,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1002,6 +995,33 @@
      :order-by [[:rowcnt :desc]]}},
    :root [25 8],
    :tab "sapphire ape"},
+  :block-8502
+  {:h 4,
+   :w 8,
+   :root [15 3],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-8502",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-8502.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/universal-pop,
+      :font-family :theme/base-font}
+     :child
+     :theme/universal-pop]},
+   :queries {}},
   :block-94
   {:mad-libs-combo-hash ["1561519308" "ufo_sightings_drag_9"],
    :name "basic_v_bar - \"country, rows\" - 559",
@@ -1140,6 +1160,33 @@
       "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-3476
+  {:h 4,
+   :w 11,
+   :root [10 10],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-3476",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3476.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "7px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color [:invert-hex-color :theme/editor-outer-rim-color],
+      :font-family :theme/base-font}
+     :child
+     :theme/universal-pop-color]},
+   :queries {}},
   :block-7215
   {:h 4,
    :w 9,
@@ -1197,9 +1244,11 @@
        {:flowmap "openai-image-gen-ladder3",
         :opts
         {:timeout 120000,
+         :retry-on-error? true,
+         :retries 20,
          :overrides
          {:prompt
-          "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. It is raining. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity."}},
+          "Create a   hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. It is raining. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity."}},
         :return :hiccup-image-box-w-png}}]]}},
   :block-6121
   {:h 2,
@@ -1249,6 +1298,15 @@
    :root [1 1],
    :tab "sapphire ape",
    :selected-view :ufo-sightings-drag-9},
+  :block-3158
+  {:h 19,
+   :w 13,
+   :root [46 1],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-3158",
+   :views {:hi [:data-viewer :solver-status/*client-name*]},
+   :queries {}},
   :block-6565
   {:name "block-6565",
    :w 10,
@@ -1282,6 +1340,7 @@
    :flow-forever>final-math nil,
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
+  :time {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :month 4},
   :param
   {:image-data
    [:run-solver
@@ -1290,27 +1349,17 @@
      :type :flow,
      :data
      {:flowmap "openai-image-gen-ladder3",
-      :opts {:timeout 130000, :overrides {:prompt :param/well-cerise-kangaroo}},
+      :opts
+      {:timeout 130000,
+       :retry-on-error? true,
+       :retries 20,
+       :overrides {:prompt :param/well-cerise-kangaroo}},
       :return :hiccup-image-box-w-png}}],
    :well-cerise-kangaroo
-   "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity.",
-   :selected-view [:views :hi],
-   :selected-view-data
-   [:box
-    :child
-    [:run-solver
-     {:signal false,
-      :cache? false,
-      :type :flow,
-      :data
-      {:flowmap "openai-image-gen-ladder3",
-       :opts
-       {:timeout 120000,
-        :overrides
-        {:prompt
-         "Create a hyperrealistic image of a beautiful young full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style."}},
-       :return :hiccup-image-box-w-png}}]],
-   :selected-block :block-8532},
+   "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity. ",
+   :selected-view nil,
+   :selected-view-data nil,
+   :selected-block :block-4263},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -1348,6 +1397,7 @@
    {:background-color "#00000088", :filter "brightness(200%)"},
    :base-block-color-selected "#00030a",
    :block-title-font-color "#ffffff",
+   :universal-pop-color [:invert-hex-color :theme/editor-outer-rim-color],
    :base-block-color "#04041e82",
    :editor-rim-color "#379fb5",
    :base-block-filter-selected
@@ -1405,6 +1455,7 @@
    :block-title-selected-font-color "#ffffff",
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
+   :universal-pop [:invert-hex-color :theme/editor-outer-rim-color],
    :canvas-background-css
    {:background-image [:string3 "url(" :param/image-data>10>0>2 ")"],
     :transition "all 0.8s ease-in-out",
@@ -1430,10 +1481,8 @@
    :datetime "1956-10-10 21:00:00.000000",
    :latitude "28.9783333",
    :country "us"},
-  :time {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :month 4},
   :solver
-  {:raw-custom-override418119901 nil,
-   :raw-custom-override-1375974037
+  {:raw-custom-override-1375974037
    [:v-box
     :padding
     "10px"
@@ -1442,19 +1491,19 @@
     :width
     :width-px
     :style
-    {:background-color "#d37cc7",
+    {:background-color "#283235",
      :border-radius "20px",
      :font-size "12px",
      :font-weight 700,
-     :color "#d265be"}
+     :color "#c2abc7"}
     :children
-    [[:box :child "./images/gen/b64-image3-19711-90807.png"]
+    [[:box :child "./images/gen/b64-image3-82235-63107.png"]
      [:box
       :size
       "auto"
       :child
       [:img
-       {:src "./images/gen/b64-image3-19711-90807.png",
+       {:src "./images/gen/b64-image3-82235-63107.png",
         :style {:border-radius "30px"}}]]]],
    :raw-custom-override-2070279978
    [:v-box
@@ -1465,65 +1514,25 @@
     :width
     :width-px
     :style
-    {:background-color "#1d2b2d",
+    {:background-color "#363f4a",
      :border-radius "20px",
      :font-size "12px",
      :font-weight 700,
-     :color "#bbbec4"}
+     :color "#2a2d31"}
     :children
-    [[:box :child "./images/gen/b64-image3-92888-58274.png"]
+    [[:box :child "./images/gen/b64-image3-54002-72405.png"]
      [:box
       :size
       "auto"
       :child
       [:img
-       {:src "./images/gen/b64-image3-92888-58274.png",
+       {:src "./images/gen/b64-image3-54002-72405.png",
         :style {:border-radius "30px"}}]]]],
    :raw-custom-override778576215
-   [:v-box
-    :padding
-    "10px"
-    :gap
-    "8px"
-    :width
-    :width-px
-    :style
-    {:background-color "#243135",
-     :border-radius "20px",
-     :font-size "12px",
-     :font-weight 700,
-     :color "#1e2421"}
-    :children
-    [[:box :child "./images/gen/b64-image3-66695-84437.png"]
-     [:box
-      :size
-      "auto"
-      :child
-      [:img
-       {:src "./images/gen/b64-image3-66695-84437.png",
-        :style {:border-radius "30px"}}]]]],
-   :raw-custom-override1413822180
-   [:v-box
-    :padding
-    "10px"
-    :gap
-    "8px"
-    :width
-    :width-px
-    :style
-    {:background-color "#34253b",
-     :border-radius "20px",
-     :font-size "12px",
-     :font-weight 700,
-     :color "#c667a5"}
-    :children
-    [[:box :child "./images/gen/b64-image3-18614-44249.png"]
-     [:box
-      :size
-      "auto"
-      :child
-      [:img
-       {:src "./images/gen/b64-image3-18614-44249.png",
-        :style {:border-radius "30px"}}]]]]}},
+   {:error
+    {:error
+     "Your request was rejected as a result of our safety system. Image descriptions generated from your prompt may contain text that is not allowed by our safety system. If you believe this was done in error, your request may succeed if retried, or by adjusting your prompt.",
+     :class "class clojure.lang.ExceptionInfo"},
+    :class "class clojure.lang.ExceptionInfo"}}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

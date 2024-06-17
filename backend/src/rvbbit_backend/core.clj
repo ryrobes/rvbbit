@@ -391,7 +391,9 @@
    cruiser/default-derived-fields
    cruiser/default-viz-shapes
    (merge cruiser/default-flow-functions {:custom @wss/custom-flow-blocks} {:sub-flows @wss/sub-flow-blocks}))
+
   (when harvest-on-boot? (update-all-conn-meta))
+
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force system-db as a conn, takes a sec
    "system-db"
    system-db
@@ -400,6 +402,7 @@
    cruiser/default-field-attributes
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
+  
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force flows-db as a conn, takes a sec
    "flows-db"
    flows-db
@@ -408,6 +411,7 @@
    cruiser/default-field-attributes
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
+  
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force cache-db as a conn, takes a sec
    "cache.db"
    wss/cache-db
@@ -416,9 +420,13 @@
    cruiser/default-field-attributes
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
+  
   (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
+
   (tt/start!)
+
   (def mon (tt/every! 15 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30
+  
   (wss/recycle-worker) ;; single blocking
   (wss/recycle-worker2) ;; single blocking
   (wss/recycle-worker3) ;; single blocking
@@ -432,7 +440,13 @@
   (def purge (tt/every! wss/jvm-stats-every 2 (bound-fn [] (wss/purge-dead-client-watchers))))
   (def timekeeper (tt/every! 1 3 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
 
-  (def solver-statuses (tt/every! 1 3 (bound-fn [] (swap! wss/last-solvers-atom-meta assoc :running-map @wss/solvers-running)))) ;; TODO, this more smart. grug grug
+  ;;;(def solver-statuses (tt/every! 1 3 (bound-fn [] (swap! wss/last-solvers-atom-meta assoc :running-map @wss/solvers-running)))) ;; TODO, this more smart. grug grug
+  (def solver-statuses (tt/every! 1 3 (bound-fn []
+                                         (doseq [[client-name solvers] @wss/solver-status]
+                                           (doseq [[solver-name v] solvers
+                                                   :when (get v :running?)]
+                                             ;;(ut/pp [:solver-status-loops client-name solver-name v])
+                                             (swap! wss/solver-status assoc-in [client-name solver-name :time-running] (ut/format-duration (get v :started) (System/currentTimeMillis))))))))
  
   (def last-look (atom {}))
   (def saved-uids (atom []))

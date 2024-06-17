@@ -272,7 +272,7 @@
 (defonce batches-received (atom 0))
 
 
-(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-meta :signal-history :panel :client})
+(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :signal-history :panel :client})
 
 (re-frame/reg-event-db
   ::simple-response
@@ -587,6 +587,7 @@
                             ;(ut/dissoc-in [:solver-fn :runs])
                             (ut/dissoc-in [:click-param :signal-history])
                             (ut/dissoc-in [:click-param :solver-meta])
+                            (ut/dissoc-in [:click-param :solver-status])
                             (ut/dissoc-in [:click-param :signal])
                             (dissoc :data)
                             (dissoc :flows) ;;; mostly ephemeral with the UI....

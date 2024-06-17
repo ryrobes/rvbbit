@@ -30,7 +30,7 @@
   (let [s           (str code) ;; ? why convert. TODO: remove
         eval-cache? false ;true ; (cstr/includes? s ";:::cache-me")
         cache-hash  (hash (cstr/trim (cstr/trim-newline (cstr/trim s))))]
-    (if (and (not (nil? (get @eval-cache cache-hash))) eval-cache?)
+    (if false ;(and (not (nil? (get @eval-cache cache-hash))) eval-cache?)
       (do ;(println "cache-hit" cache-hash)
         (get @eval-cache cache-hash))
       (let [nrepl?           true ;(cstr/includes? s ":::use-nrepl")
@@ -99,6 +99,6 @@
                                             :error      (ex-message ee)}
                                            (if (not (nil? added-errors)) {:rabbit-added added-errors}))})))]
             (do ;(println "cache miss" cache-hash (keys @eval-cache))
-              (swap! eval-cache assoc cache-hash e)
+              ;(swap! eval-cache assoc cache-hash e)
               e) ;; nrepl://127.0.0.1:44865
           ))))))

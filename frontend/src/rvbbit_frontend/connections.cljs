@@ -298,6 +298,10 @@
                         (let [kps       (ut/extract-patterns obody :get-in 2)
                               logic-kps (into {} (for [v kps] (let [[_ [data kp]] v] {v (get-in data kp)})))]
                           (walk/postwalk-replace logic-kps obody)))
+          invert-hex-color-walk (fn [obody]
+                                  (let [kps       (ut/extract-patterns obody :invert-hex-color 2)
+                                        logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/invert-hex-color hhex)})))]
+                                    (walk/postwalk-replace logic-kps obody)))
           singles {:text   str
                    :>>     (fn [[x y]] (true? (> x y)))
                    :<<     (fn [[x y]] (true? (< x y)))
@@ -331,10 +335,10 @@
                                                                 (when override? {:override-map resolved-full-map}))
                                      websocket-status          (get @(ut/tracked-sub ::http/websocket-status {}) :status)
                                      online?                   (true? (= websocket-status :connected))
-                                     run?                      (= 
+                                     run?                      (=
                                                                 (get-in @db/solver-fn-runs [panel-key sub-param])
                                                                 ;@(ut/tracked-sub ::solver-fn-runs-keys {:keypath [panel-key sub-param]})
-                                                                  unique-resolved-map)
+                                                                unique-resolved-map)
                                      lets-go?                  (and online? (not run?))
                                     ;;  _ (when lets-go?
                                     ;;      (ut/tapp>> [:run-solver-req-map-conns! override? (str (first this)) lets-go? (not run?) req-map
@@ -367,6 +371,7 @@
                           (has-fn? :if)             if-walk-map2
                           (has-fn? :when)           when-walk-map2
                           (has-fn? :into)           into-walk-map2
+                          (has-fn? :invert-hex-color) invert-hex-color-walk
                           (ut/ne? singles)          (ut/postwalk-replacer singles)
                           (has-fn? :case)           case-walk)
           templated-strings-vals (vec (filter #(cstr/includes? (str %) "/") (ut/deep-template-find out-block-map))) ;; ignore

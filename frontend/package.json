@@ -31,8 +31,7 @@
 		"react-dom": "17.0.2",
 		"react-drag-and-drop": "^3.0.0",
 		"react-map-gl": "^7.1.6",
-		"react-virtualized": "^9.22.5",
-		"react-virtualized-tree": "^3.4.1",
+ 
 		"react-zoom-pan-pinch": "^3.0.8",
 		"recharts": "^2.9.0",
 		"vega": "^5.22.1",

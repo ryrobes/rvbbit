@@ -324,7 +324,10 @@
                              :color            (if sel?
                                                  (theme-pull :theme/editor-background-color nil) ;;"#000000"
                                                  (str (theme-pull :theme/editor-font-color nil) 77))
-                             :background-color (if sel? "#9973e0" (theme-pull :theme/editor-background-color nil))
+                             :background-color (if sel?
+                                                 ;;"#9973e0"
+                                                 (theme-pull :theme/universal-pop-color "#9973e0" )
+                                                 (theme-pull :theme/editor-background-color nil))
                              :padding-left     "5px"
                              :padding-right    "5px"} :child (str table_name " (" recos ")")])
         combo-singles (vec (distinct (flatten (doall (for [{:keys [combo_edn recos]} combo-list]
@@ -462,7 +465,9 @@
                 [re-com/h-box :size "auto" :children
                  [[preview-container preview-maps preview-keys 3] [preview-container preview-maps preview-keys 4]
                   [preview-container preview-maps preview-keys 5]]]]]
-              [re-com/v-box :size "auto" :height "380px" :style {:border-top "1px solid #9973e066" :overflow "hidden"} :children
+              [re-com/v-box :size "auto" :height "380px" 
+               :style {:border-top (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")
+                       :overflow "hidden"} :children
                (let []
                  (for [c (range pages)]
                    [re-com/box :child (str c) :height "19px" :align :end :justify :center :attr
@@ -474,10 +479,11 @@
                                          (theme-pull :theme/editor-background-color nil) ;;"#000000"
                                          (theme-pull :theme/editor-font-color nil))
                      :background-color (if (= c recos-page)
-                                         "#9973e0" ;"darkcyan"
+                                         ;;"#9973e0" ;"darkcyan"
+                                         (theme-pull :theme/universal-pop-color "#9973e0")
                                          "inherit")
-                     :border-bottom    "1px solid #9973e066"
-                     :border-right     "1px solid #9973e066"}])) :width "30px"]]]))]]]]))
+                     :border-bottom    (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")
+                     :border-right     (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")}])) :width "30px"]]]))]]]]))
 
 (defn editor-panel-viz
   []
@@ -1338,7 +1344,10 @@
                              :color            (if (= k data-key)
                                                  (theme-pull :theme/editor-background-color nil)
                                                  (str (theme-pull :theme/editor-font-color nil) 77))
-                             :background-color (if (= k data-key) "#9973e0" "inherit")
+                             :background-color (if (= k data-key)
+                                                 ;"#9973e0"
+                                                 (theme-pull :theme/universal-pop-color "#9973e0")
+                                                 "inherit")
                              :padding-right    "5px"
                              :padding-left     "5px"} :gap "4px" :children
                             [[re-com/box :padding "3px" :attr
@@ -1352,7 +1361,10 @@
                         :color            (if (= :* data-key)
                                             (theme-pull :theme/editor-background-color nil) ;;"#000000"
                                             (theme-pull :theme/editor-font-color nil))
-                        :background-color (if (= :* data-key) "#9973e0" "inherit")
+                        :background-color (if (= :* data-key) 
+                                            ;"#9973e0" 
+                                            (theme-pull :theme/universal-pop-color "#9973e0")
+                                            "inherit")
                         :padding-right    "5px"
                         :padding-left     "5px"} :gap "4px" :children
                        [[re-com/box :padding "3px" :attr {:on-click #(do (swap! db/data-browser-query assoc selected-block :*))}
@@ -1372,7 +1384,10 @@
                              :border-top       "1px solid #80008045"
                              :border-left      "1px solid #80008080"
                              :color            dyn-color
-                             :background-color (if (= k data-key) "#9973e0" "inherit")
+                             :background-color (if (= k data-key) 
+                                                 ;"#9973e0" 
+                                                 (theme-pull :theme/universal-pop-color "#9973e0")
+                                                 "inherit")
                              :padding-right    "5px"
                              :padding-left     "5px"} :gap "4px" :children
                             [[re-com/box :padding "3px" :height "24px" :attr
@@ -1411,7 +1426,10 @@
                              :color            (if (= k data-key)
                                                  (theme-pull :theme/editor-background-color nil) ;;"#000000"
                                                  (theme-pull :theme/editor-font-color nil))
-                             :background-color (if (= k data-key) "#9973e0" "inherit")
+                             :background-color (if (= k data-key) 
+                                                 ;"#9973e0" 
+                                                 (theme-pull :theme/universal-pop-color "#9973e0")
+                                                 "inherit")
                              :padding-right    "5px"
                              :padding-left     "5px"} :gap "4px" :children
                             [[re-com/box :padding "3px" :attr
@@ -1433,7 +1451,10 @@
                                :color            (if (= (last k) data-key)
                                                    (theme-pull :theme/editor-background-color nil) ;;"#000000"
                                                    (theme-pull :theme/editor-font-color nil))
-                               :background-color (if (= (last k) data-key) "#9973e0" "inherit")
+                               :background-color (if (= (last k) data-key) 
+                                                   ;"#9973e0" 
+                                                   (theme-pull :theme/universal-pop-color "#9973e0")
+                                                   "inherit")
                                :padding-right    "5px"
                                :padding-left     "5px"} :gap "4px" :children
                               [[re-com/box :padding "3px" :attr
@@ -1590,27 +1611,34 @@
                               (get (first mad-libs-combos) :combo_hash)
                               ")")]
                         (let [view-scrubbers? (get-in @db/scrubbers [selected-block data-key] false)
-                              value-spy?      (get-in @db/value-spy [selected-block data-key] false)]
-                          [re-com/h-box :gap "10px" :children
-                           [[re-com/box :size "none" :width "90px" :child (if view-scrubbers? "scrubber on" "scrubber off") :attr
-                             {:on-click #(swap! db/scrubbers assoc-in [selected-block data-key] (not view-scrubbers?))} :style
-                             {:color       (if view-scrubbers? "yellow" "grey")
-                              :z-index     100
-                              :user-select "none"
-                              :margin-top  (if query-box? "9px" "inherit")
-                              :cursor      "pointer"
-                              :font-size   "11px"
-                              :font-weight 700}]
-                            [re-com/box :size "none" :width "90px" :child "value spy" :attr
-                             {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))} :style
-                             {:color           (if value-spy? "yellow" "grey")
-                              :z-index         100
-                              :user-select     "none"
-                              :text-decoration (when (not value-spy?) "strikethrough")
-                              :margin-top      (if query-box? "9px" "inherit")
-                              :cursor          "pointer"
-                              :font-size       "11px"
-                              :font-weight     700}]]]))]]))]] :height (px (- ttl-height 24)) :width single-width-px :style
+                              value-spy?      (get-in @db/value-spy [selected-block data-key] false)
+                              are-solver (get @db/solver-fn-lookup [:panels selected-block data-key])]
+                          [re-com/h-box
+                           :style {:font-size   "11px"
+                                   :padding-right "14px"
+                                   :font-weight 700}
+                           :justify :between
+                           :children [[re-com/h-box :gap "10px" :children
+                                       [[re-com/box :size "none" :width "90px" :child (if view-scrubbers? "scrubber on" "scrubber off") :attr
+                                         {:on-click #(swap! db/scrubbers assoc-in [selected-block data-key] (not view-scrubbers?))} :style
+                                         {:color       (if view-scrubbers? "yellow" "grey")
+                                          :z-index     100
+                                          :user-select "none"
+                                          :margin-top  (if query-box? "9px" "inherit")
+                                          :cursor      "pointer"}]
+                                        [re-com/box :size "none" :width "90px" :child "value spy" :attr
+                                         {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))} :style
+                                         {:color           (if value-spy? "yellow" "grey")
+                                          :z-index         100
+                                          :user-select     "none"
+                                          :text-decoration (when (not value-spy?) "strikethrough")
+                                          :margin-top      (if query-box? "9px" "inherit")
+                                          :cursor          "pointer"}]]]
+
+                                      (when are-solver 
+                                        [re-com/box :child (str are-solver)]
+                                        )]]
+                            ))]]))]] :height (px (- ttl-height 24)) :width single-width-px :style
               {:overflow "hidden"}])
          system-panel?        [re-com/box :size "none" :child
                                [re-com/v-box :size "1" :children
@@ -2302,7 +2330,9 @@
                                                  (if peek? (+ x2 (* dest-w 0.15)) x2) y2 ;(if peek? (* y2
                                                                                          ;0.7) y2)
                                                  involved?
-                                                 (cond (= dd selected-block) "#9973e0"
+                                                 (cond (= dd selected-block) 
+                                                       ;;"#9973e0"
+                                                       (theme-pull :theme/universal-pop-color "#9973e0")
                                                        (some #(= % dd) subq-blocks) "#e6ed21" ;; parent-of-selected
                                                        (some #(= % dd) (ut/cached-upstream-search subq-mapping selected-block))
                                                          "#7be073" ;; upstream?

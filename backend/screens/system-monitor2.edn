@@ -1,23 +1,5 @@
 {:orders
- {:flow-fn-sys
-  [:name :description :full_map :inputs :icon :input_types :output_types :category],
-  :fields-sys [:field_name :field_type :data_type],
-  :kke192 (:query_error),
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :grid-menu-sys* [:flow_id :runs],
-  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb),
-  :flows-sys [:flow_id :file_path :last_modified],
-  :grid1-sys*
-  [:flow_id
-   :run_id
-   :start_ts
-   :seconds
-   :human_elapsed
-   :overrides
-   :result
-   :styler_highlight_8369aaa1],
-  :jvm_stats
+ {:jvm_stats
   [:used_memory_mb
    :thread_count
    :messages
@@ -39,22 +21,13 @@
    :sniffs_run
    :sys_load
    :ts],
-  :tmp--1092321308-hist-sys
-  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
-  :flow_history (:query_error),
-  :gen-viz-812aaa-dropdown1-sys* [:id :label],
-  :flow-fn-categories-sys [:category],
-  :connections-sys [:database_name :connection_id],
-  :flow-history-calendar-sys*-viz1-sys* [:value :day],
-  :flow-fn-all-sys [:name]},
+  :kke192 (:query_error),
+  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb)},
  :reco-preview nil,
- :flow? false,
  :sql-source
  {:jvm_stats
   {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
   :kke192 {:select [:*], :connection-id "system-db", :from [:kke192], :limit 111},
-  :flow_history
-  {:select [:*], :connection-id "system-db", :from [:flow_history], :limit 111},
   :new-query
   {:cache? false,
    :limit 100,
@@ -65,137 +38,9 @@
    :connection-id "system-db",
    :select
    [:thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :sys_load :used_memory_mb],
-   :post-process-fn reverse},
-  :grid-menu-sys*
-  {:select [:flow_id [[:count [:distinct :run_id]] :runs]],
-   :connection-id "flows-db",
-   :col-widths {:runs 45, :flow_id 220},
-   :group-by [1],
-   :where [:and [:= 1 1] [:= 1 1] [:= 1 1]],
-   :order-by [[1 :asc]],
-   :from [[:flow_history :tt336aa]]},
-  :grid1-sys*
-  {:select
-   [:flow_id
-    :run_id
-    :start_ts
-    [:elapsed_seconds :seconds]
-    :human_elapsed
-    [[:case [:= "nil" :overrides] "No" :else "Yes"] :overrides]
-    [[:case [:= :in_error 1] "error" :else "success"] :result]],
-   :connection-id "flows-db",
-   :group-by [1 2],
-   :style-rules
-   {[:* :highlight-8369aaa1]
-    {:logic [:= :in_error 1], :style {:opacity 0.4, :font-style "italic"}}},
-   :col-widths
-   {:flow_id 280,
-    :seconds 80,
-    :overrides 70,
-    :run_id 70,
-    :human_elapsed 140,
-    :result 65,
-    :start_ts 145},
-   :where [:and [:= 1 1] [:= 1 1] [:= 1 1] [:= 1 1]],
-   :order-by [[:start_ts :desc]],
-   :from [[:flow_history :tt336a]]},
-  :gen-viz-812aaa-dropdown1-sys*
-  {:select [[:client_name :id] [:client_name :label]],
-   :connection-id "flows-db",
-   :from [{:select [:client_name], :from [[:flow_history :uu9]], :group-by [1]}],
-   :group-by [:client_name],
-   :order-by [:client_name]},
-  :flow-history-calendar-sys*-viz1-sys*
-  {:select
-   [[[[:count [:distinct :run_id]]] :value] [[:substr :start_ts 0 11] :day]],
-   :connection-id "flows-db",
-   :from [[:flow_history :cc393]],
-   :where [:and [:= 1 1] [:= 1 1]],
-   :group-by [[:substr :start_ts 0 11]]}},
+   :post-process-fn reverse}},
  :meta
- {:flow-fn-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 130,
-     :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
-     :cardinality 100},
-    :description
-    {:data-type "string",
-     :distinct 33,
-     :group-by? true,
-     :commons
-     {"" 96, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
-     :cardinality 25},
-    :full_map
-    {:data-type "string",
-     :distinct 130,
-     :group-by? true,
-     :commons
-     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
-      1},
-     :cardinality 100},
-    :inputs
-    {:data-type "string",
-     :distinct 69,
-     :group-by? true,
-     :commons
-     {"[:open-input-1 :open-input]" 10,
-      "[:value1 :value2]" 7,
-      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
-     :cardinality 53},
-    :icon
-    {:data-type "string",
-     :distinct 21,
-     :group-by? true,
-     :commons {"zmdi-puzzle-piece" 96, "zmdi-pizza" 3, "zmdi-file-text" 3},
-     :cardinality 16},
-    :input_types
-    {:data-type "string",
-     :distinct 58,
-     :group-by? true,
-     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
-     :cardinality 44},
-    :output_types
-    {:data-type "string",
-     :distinct 14,
-     :group-by? true,
-     :commons {":any" 67, "" 16, ":string" 14},
-     :cardinality 10},
-    :category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 96, ":rabbit-base" 18, ":clojure-base" 16},
-     :cardinality 2}},
-   :rowcount 130},
-  :fields-sys
-  {:fields
-   {:field_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"updated" 1, "data" 1, "client_name" 1},
-     :cardinality 100},
-    :field_type
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"TEXT" 2, "TIMESTAMP" 1},
-     :cardinality 66},
-    :data_type
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"string" 2, "datetime" 1},
-     :cardinality 66}},
-   :rowcount 3},
-  :kke192
+ {:kke192
   {:fields
    {:query_error
     {:data-type "string",
@@ -206,97 +51,40 @@
       "[SQLITE_ERROR] SQL error or missing database (no such table: kke192)" 1},
      :cardinality 100}},
    :rowcount 2},
-  :tables-sys
-  {:fields
-   {:db_schema
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"none" 26},
-     :cardinality 3},
-    :db_catalog
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? true,
-     :commons {nil 26},
-     :cardinality 3},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"system-db" 26},
-     :cardinality 3},
-    :schema_cat
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? false,
-     :commons {nil 26},
-     :cardinality 3},
-    :table_name
-    {:data-type "string",
-     :distinct 26,
-     :group-by? true,
-     :commons {"connections" 1, "board_history" 1, "client_items" 1},
-     :cardinality 100},
-    :fields
-    {:data-type "integer",
-     :distinct 15,
-     :group-by? false,
-     :commons {6 4, 5 3, 15 3},
-     :cardinality 57}},
-   :rowcount 26},
-  :grid-menu-sys*
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 500,
-     :group-by? true,
-     :commons
-     {"color-theft-solver-flow-1716588600266-0" 1,
-      "color-theft-solver-flow-1716589500283-0" 1,
-      "color-theft-solver-flow-1716590100267-0" 1},
-     :cardinality 100},
-    :runs
-    {:data-type "integer",
-     :distinct 7,
-     :group-by? false,
-     :commons {1 492, 2 3, 4769 1},
-     :cardinality 1}},
-   :rowcount 500},
   :new-query
   {:fields
    {:thread_count
     {:data-type "integer",
-     :distinct 33,
+     :distinct 5,
      :group-by? true,
-     :commons {220 8, 235 6, 226 6},
-     :cardinality 33},
+     :commons {283 2, 240 1, 258 1},
+     :cardinality 83},
     :ts1
     {:data-type "string",
-     :distinct 100,
+     :distinct 6,
      :group-by? true,
      :commons
-     {"2024-06-16 19:21:20" 1, "2024-06-16 19:10:50" 1, "2024-06-16 19:22:05" 1},
+     {"2024-06-17 17:50:49" 1, "2024-06-17 17:50:34" 1, "2024-06-17 17:50:19" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
-     :distinct 3,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-06-16 19:1" 40, "2024-06-16 19:0" 32, "2024-06-16 19:2" 28},
-     :cardinality 2},
+     :commons {"2024-06-17 17:5" 4, "2024-06-17 17:4" 2},
+     :cardinality 33},
     :sys_load
     {:data-type "float",
-     :distinct 88,
+     :distinct 5,
      :group-by? true,
-     :commons {7.45 3, 6.29 2, 7.63 2},
-     :cardinality 87},
+     :commons {4.87 2, 4.38 1, 4.93 1},
+     :cardinality 83},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 99,
+     :distinct 6,
      :group-by? true,
-     :commons {2103 2, 1923 1, 2728 1},
-     :cardinality 99}},
-   :rowcount 100},
+     :commons {2396 1, 3144 1, 1936 1},
+     :cardinality 100}},
+   :rowcount 6},
   :gen-viz-797
   {:fields
    {:rows
@@ -312,31 +100,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :flows-sys
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 95,
-     :group-by? true,
-     :commons {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "map-pull-test2" 1},
-     :cardinality 96},
-    :file_path
-    {:data-type "string",
-     :distinct 98,
-     :group-by? true,
-     :commons
-     {"./flows/generated-flow-map.edn" 1,
-      "./flows/stitches-math.edn" 1,
-      "./flows/openai-image-gen-ladder3.edn" 1},
-     :cardinality 100},
-    :last_modified
-    {:data-type "string",
-     :distinct 32,
-     :group-by? true,
-     :commons
-     {"2024-03-12 02:37:43" 67, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
-     :cardinality 32}},
-   :rowcount 98},
   :gen-viz-94
   {:fields
    {:diff
@@ -346,228 +109,136 @@
      :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
-  :grid1-sys*
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 20,
-     :group-by? true,
-     :commons
-     {"openai-image-gen-ladder3" 107,
-      "colors-of-the-moment-solver-flow-" 82,
-      "get-my-colors-2054962529-solver-flow-" 79},
-     :cardinality 3},
-    :run_id
-    {:data-type "string",
-     :distinct 500,
-     :group-by? true,
-     :commons
-     {"4a9cf6de-12cf-4a4b-bbc5-f0e7c496074f" 1,
-      "d81c73d1-35d9-4d7f-9ab3-ae64d7f366d7" 1,
-      "eada14c8-a20f-4abc-ace6-6773add0cc4d" 1},
-     :cardinality 100},
-    :start_ts
-    {:data-type "string",
-     :distinct 416,
-     :group-by? false,
-     :commons
-     {"2024-06-16 19:32:01" 3, "2024-06-16 19:07:54" 3, "2024-06-16 19:42:27" 3},
-     :cardinality 83},
-    :seconds
-    {:data-type "float",
-     :distinct 452,
-     :group-by? false,
-     :commons {0.003 7, 0 7, -0.001 4},
-     :cardinality 90},
-    :human_elapsed
-    {:data-type "string",
-     :distinct 42,
-     :group-by? false,
-     :commons {"1 second" 192, "less than a second" 77, "4 seconds" 50},
-     :cardinality 8},
-    :overrides
-    {:data-type "string",
-     :distinct 2,
-     :group-by? false,
-     :commons {"Yes" 484, "No" 16},
-     :cardinality 0},
-    :result
-    {:data-type "string",
-     :distinct 2,
-     :group-by? false,
-     :commons {"success" 459, "error" 41},
-     :cardinality 0},
-    :styler_highlight_8369aaa1
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? false,
-     :commons {0 459, 1 41},
-     :cardinality 0}},
-   :rowcount 500},
   :jvm_stats
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 111,
+     :distinct 5,
      :group-by? true,
-     :commons {190 1, 677 1, 406 1},
-     :cardinality 100},
+     :commons {0 2, 28 1, 26 1},
+     :cardinality 83},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 107,
+     :distinct 6,
      :group-by? true,
-     :commons {113.36 2, 119.58 2, 113.07 2},
-     :cardinality 96},
+     :commons {94.93 1, 96.52 1, 101.89 1},
+     :cardinality 100},
     :uptime_seconds
     {:data-type "integer",
-     :distinct 111,
+     :distinct 6,
      :group-by? true,
-     :commons {1259 1, 1364 1, 1004 1},
+     :commons {74 1, 59 1, 44 1},
      :cardinality 100},
     :queries_per_second
     {:data-type "float",
      :distinct 1,
      :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
+     :commons {0 6},
+     :cardinality 16},
     :sql_cache_size
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
+     :commons {0 6},
+     :cardinality 16},
     :ts
     {:data-type "string",
-     :distinct 111,
+     :distinct 6,
      :group-by? true,
      :commons
-     {"2024-06-16 18:55:50" 1, "2024-06-16 19:10:50" 1, "2024-06-16 19:09:05" 1},
+     {"2024-06-17 17:50:49" 1, "2024-06-17 17:50:34" 1, "2024-06-17 17:50:19" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
-     :distinct 4,
+     :distinct 3,
      :group-by? true,
-     :commons {240 68, 241 41, 97 1},
-     :cardinality 3},
+     :commons {271 4, 72 1, 0 1},
+     :cardinality 50},
     :messages_per_second
     {:data-type "float",
-     :distinct 90,
+     :distinct 6,
      :group-by? true,
-     :commons {113.43 5, 113.39 3, 113.38 3},
-     :cardinality 81},
+     :commons {77.29 1, 72.87 1, 64.99 1},
+     :cardinality 100},
     :messages
     {:data-type "integer",
-     :distinct 111,
+     :distinct 6,
      :group-by? true,
-     :commons {92134 1, 8 1, 37589 1},
+     :commons {5796 1, 4372 1, 2924 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 111,
+     :distinct 3,
      :group-by? true,
-     :commons {84 1, 49 1, 190 1},
-     :cardinality 100},
+     :commons {11 3, 0 2, 10 1},
+     :cardinality 50},
     :sys_load
     {:data-type "float",
-     :distinct 92,
+     :distinct 5,
      :group-by? true,
-     :commons {7.45 3, 6.62 2, 5.83 2},
-     :cardinality 82},
+     :commons {4.87 2, 4.38 1, 4.93 1},
+     :cardinality 83},
     :unix_ms
     {:data-type "integer",
-     :distinct 111,
+     :distinct 6,
      :group-by? true,
-     :commons {1718578865372 1, 1718578355368 1, 1718578550369 1},
+     :commons {1718661049286 1, 1718661034286 1, 1718661019284 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 110,
+     :distinct 6,
      :group-by? true,
-     :commons {3537 2, 3592 1, 1923 1},
-     :cardinality 99},
+     :commons {2396 1, 3144 1, 1936 1},
+     :cardinality 100},
     :recent_queries_run
     {:data-type "integer",
-     :distinct 9,
+     :distinct 5,
      :group-by? true,
-     :commons {6 34, 4 23, 5 17},
-     :cardinality 8},
+     :commons {0 2, 2 1, 8 1},
+     :cardinality 83},
     :thread_count
     {:data-type "integer",
-     :distinct 38,
+     :distinct 5,
      :group-by? true,
-     :commons {220 10, 219 7, 222 6},
-     :cardinality 34},
+     :commons {283 2, 240 1, 258 1},
+     :cardinality 83},
     :internal_queries_run
     {:data-type "integer",
-     :distinct 2,
+     :distinct 1,
      :group-by? true,
-     :commons {0 72, 6 39},
-     :cardinality 1},
+     :commons {0 6},
+     :cardinality 16},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 8,
+     :distinct 3,
      :group-by? true,
-     :commons {11 61, 104 21, 0 12},
-     :cardinality 7},
+     :commons {11 4, 46 1, 22 1},
+     :cardinality 50},
     :ws_peers
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {11 110, 0 1},
-     :cardinality 1},
+     :commons {12 5, 0 1},
+     :cardinality 33},
     :recent_messages
     {:data-type "integer",
-     :distinct 111,
+     :distinct 6,
      :group-by? true,
-     :commons {92134 1, 146283 1, 136111 1},
+     :commons {4372 1, 2924 1, 1396 1},
      :cardinality 100},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 9,
+     :distinct 5,
      :group-by? true,
-     :commons {0.4 34, 0.27 23, 0.33 17},
-     :cardinality 8},
+     :commons {0 2, 0.13 1, 0.53 1},
+     :cardinality 83},
     :seconds_since_last_update
     {:data-type "integer",
      :distinct 3,
      :group-by? true,
-     :commons {15 61, 14 49, -1 1},
-     :cardinality 2}},
-   :rowcount 111},
-  :tmp--1092321308-hist-sys {:fields {}, :rowcount 0},
-  :flow_history
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: flow_history)"
-      1},
-     :cardinality 100}},
-   :rowcount 2},
-  :gen-viz-812aaa-dropdown1-sys*
-  {:fields
-   {:id
-    {:data-type "string",
-     :distinct 210,
-     :group-by? false,
-     :commons
-     {":agreeable-silver-sand-dollar-27" 1,
-      ":beneficial-short-serval-32" 1,
-      ":effective-cerise-dove-42" 1},
-     :cardinality 100},
-    :label
-    {:data-type "string",
-     :distinct 210,
-     :group-by? false,
-     :commons
-     {":agreeable-silver-sand-dollar-27" 1,
-      ":beneficial-short-serval-32" 1,
-      ":effective-cerise-dove-42" 1},
-     :cardinality 100}},
-   :rowcount 210},
+     :commons {15 4, 14 1, -1 1},
+     :cardinality 50}},
+   :rowcount 6},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -592,15 +263,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :flow-fn-categories-sys
-  {:fields
-   {:category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
-     :cardinality 100}},
-   :rowcount 3},
   :gen-viz-84
   {:fields
    {:rows
@@ -616,21 +278,6 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -703,21 +350,6 @@
      :commons {"us" 288, nil 113, "au" 37},
      :cardinality 1}},
    :rowcount 500},
-  :flow-history-calendar-sys*-viz1-sys*
-  {:fields
-   {:value
-    {:data-type "integer",
-     :distinct 65,
-     :group-by? false,
-     :commons {382 2, 693 2, 872 2},
-     :cardinality 95},
-    :day
-    {:data-type "string",
-     :distinct 68,
-     :group-by? true,
-     :commons {"2024-06-05" 1, "2024-05-09" 1, "2024-05-22" 1},
-     :cardinality 100}},
-   :rowcount 68},
   :duration-hours-drag-43
   {:fields
    {:duration_hours
@@ -778,21 +410,8 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30},
-  :flow-fn-all-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 130,
-     :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
-     :cardinality 100}},
-   :rowcount 130}},
- :default-col-widths
- {:virtual-panel {:kick--1764769189 152, :grid-menu-sys* 130, :grid1-sys* 123},
-  :system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys 137},
-  :system-fields-list* {:fields-sys 170}},
+   :rowcount 30}},
+ :default-col-widths {:block-8594 {:new-query 102}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -1028,71 +647,64 @@
     "wow-board"],
    :openapi-key "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"}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [668586531 532343883 4294705152],
+ :memory [654119728 467345692 4294705152],
  :sched {:new-query 10},
  :flow-subs
  [:solver/raw-custom-override1085406457
-  :solver/raw-custom-override-1061429786
   :solver/raw-custom-override-398966624
   :time/now-seconds
   :flow/openai-image-gen-ladder3>relative-url-path-for-png-version
-  :solver/get-my-colors-2050389472
+  :solver/get-my-colors346368138
+  :solver/get-my-colors-322374943
   :flow/flow-forever>*running?
-  :flow/openai-image-gen-ladder3>*running?
   :solver/raw-custom-override-1328601774
+  :solver-status/*client-name*
   :solver/raw-custom-override-569051388
   :solver/raw-custom-override1413822180
   :data/new-clojure-2
-  :client/*client-name*>stats>memory
-  :solver/get-my-colors-273843172
+  :flow/live-scratch-flow>*running?
   :solver/raw-custom-override-916986421
   :solver/raw-custom-override-1471694664
   :flow/flow-forever>:final-math
   :solver/raw-custom-override-452322060
+  :client/*client-name*>stats>memory
   :solver/raw-custom-override9026012
   :solver/colors-of-the-moment>darkest],
- :client-name :quiet-cubic-beaver-23,
+ :client-name :honest-copper-cockroach-0,
  :alt-key-held? false,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2248, :h 1467},
- :post-meta
- {:jvm_stats {:* {:rowcount 111}},
-  :flow_history {},
-  :grid1-sys* {:* {:rowcount 46597}},
-  :gen-viz-812aaa-dropdown1-sys* {:* {:rowcount 210}},
-  :flow-history-calendar-sys*-viz1-sys* {:* {:rowcount 68}}},
+ :window {:w 2236, :h 1530},
+ :post-meta {:kke192 {}},
  :status
  {:heartbeat
   {:kick
    [:solver/raw-custom-override1085406457
-    :solver/raw-custom-override-1061429786
     :solver/raw-custom-override-398966624
     :time/now-seconds
     :flow/openai-image-gen-ladder3>relative-url-path-for-png-version
-    :solver/get-my-colors-2050389472
+    :solver/get-my-colors346368138
+    :solver/get-my-colors-322374943
     :flow/flow-forever>*running?
-    :flow/openai-image-gen-ladder3>*running?
     :solver/raw-custom-override-1328601774
+    :solver-status/*client-name*
     :solver/raw-custom-override-569051388
     :solver/raw-custom-override1413822180
     :data/new-clojure-2
-    :client/*client-name*>stats>memory
-    :solver/get-my-colors-273843172
+    :flow/live-scratch-flow>*running?
     :solver/raw-custom-override-916986421
     :solver/raw-custom-override-1471694664
     :flow/flow-forever>:final-math
     :solver/raw-custom-override-452322060
+    :client/*client-name*>stats>memory
     :solver/raw-custom-override9026012
     :solver/colors-of-the-moment>darkest]},
   :alert1 {:alerts :alert2}},
  :screen-name "system-monitor2",
  :recos-page2 0,
- :selected-warren-item :colors-of-the-moment-8k,
  :selected-tab "star-shaped wallaby",
- :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
@@ -1103,15 +715,15 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   7245
+   2150
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :base-sniff-queries
- {:jvm_stats 1498154063, :kke192 -995149087, :flow_history -1964522657},
+ :base-sniff-queries {:jvm_stats 1498154063, :kke192 -995149087},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1139179507,
+ :user-params-hash 460611026,
  :grid-recos? true,
+ :session-hash 1026943671,
  :resolved-queries
  {:new-query
   {:cache? false,
@@ -1572,8 +1184,8 @@
    :w 16,
    :selected-mode {:new-create-image :data},
    :selected-view :hi,
-   :root [28 6],
-   :h 11,
+   :root [30 4],
+   :h 10,
    :queries {},
    :tab "star-shaped wallaby",
    :views
@@ -1662,6 +1274,15 @@
       :font-family :theme/base-font}
      :child
      "hi!"]}},
+  :block-548
+  {:h 23,
+   :w 11,
+   :root [18 3],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-548",
+   :views {:hi [:data-viewer :solver-status/*client-name*]},
+   :queries {}},
   :block-2810
   {:clojure
    {:new-clojure
@@ -1975,7 +1596,7 @@
    :w 18,
    :style :param/glass-fish-style,
    :selected-view :hi,
-   :root [19 25],
+   :root [1 27],
    :h 2,
    :queries {},
    :tab "star-shaped wallaby",
@@ -2174,7 +1795,7 @@
    :w 5,
    :style :param/glass-fish-style,
    :selected-view :hi,
-   :root [32 4],
+   :root [38 1],
    :h 3,
    :queries {},
    :tab "star-shaped wallaby",
@@ -2228,21 +1849,21 @@
      [:data-viewer :param/generated-colors]]},
    :queries {},
    :minimized? true}},
- :selected-block "none!",
+ :selected-block :block-8236,
  :theme-colors-hashmap
- {"float" "#c3d4e8",
-  "boolean" "#cfda83",
-  "map" "#97e072",
-  "list" "#9b54a2",
-  "string" "#f7fcf4",
-  "any" "#bd86a4",
-  "vector" "#8d89bd",
-  "keyword" "#d0f5e7",
-  "rabbit-code" "#9f84c1",
-  "datetime" "#966058",
-  "integer" "#d5dda1",
-  "unknown" "#587b3f",
-  "date" "#0a2c16"},
+ {"float" "#d1c5b7",
+  "boolean" "#90abce",
+  "map" "#cad080",
+  "list" "#7f4c6b",
+  "string" "#fefefe",
+  "any" "#3c27b0",
+  "vector" "#d29b78",
+  "keyword" "#c6eec9",
+  "rabbit-code" "#6ca198",
+  "datetime" "#362c75",
+  "integer" "#b687d8",
+  "unknown" "#4c2329",
+  "date" "#252b20"},
  :click-param
  {:tables-sys
   {:db_schema "none",
@@ -2257,9 +1878,10 @@
    :flow-forever>*running? false,
    :flow-forever>final-math nil,
    :openai-image-gen-ladder3>relative-url-path-for-png-version
-   "./images/gen/b64-image3-7366-32394.png",
-   :openai-image-gen-ladder3>*running? false},
-  :time {:now-seconds "Sunday, June 16th 9:27:49PM", :month 4},
+   "./images/gen/b64-image3-23847-72185.png",
+   :openai-image-gen-ladder3>*running? false,
+   :live-scratch-flow>*running? false},
+  :time {:now-seconds "Monday, June 17th 6:27:11PM", :month 4},
   :grid1-sys*
   {:flow_id "raw-custom-override-1328601774-solver-flow-",
    :run_id "6f4ef084-2c43-4da7-aa97-db9e1c36f377",
@@ -2271,35 +1893,39 @@
    :styler_highlight_8369aaa1 0},
   :client
   {:accepted-diamond-zebra-40>stats>memory nil,
-   :*client-name*>stats>memory 503,
+   :*client-name*>stats>memory 505,
    :brave-prismatic-camel-31>stats>memory nil,
    :elegant-icosahedral-rhinoceros-30>stats>memory nil,
-   :quiet-cubic-beaver-23>stats>memory nil},
+   :quiet-cubic-beaver-23>stats>memory nil,
+   :honest-copper-cockroach-0>stats>memory nil},
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :rel-image-path2 "images/large/b64-image3-48163-50841-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   [:box
-    :child
-    [:run-solver
-     {:signal false,
-      :cache? false,
-      :type :flow,
-      :data
-      {:flowmap "openai-image-gen-ladder3",
-       :opts
-       {:timeout 120000,
-        :overrides
-        {:prompt
-         "Create an image of a beautiful young full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style."}},
-       :return :hiccup-image-box-w-png}}]],
-   :selected-view [:views :hi],
+   (let [process (.exec
+                   (Runtime/getRuntime)
+                   (into-array String ["bash" "-c" "top -b -n 1 | head -n 20"]))
+         reader (java.io.BufferedReader.
+                  (java.io.InputStreamReader. (.getInputStream process)))
+         output (StringBuilder.)]
+     (loop [line (.readLine reader)]
+       (when line
+         (.append output line)
+         (.append output "\n")
+         (recur (.readLine reader))))
+     (str
+       output
+       "\n"
+       "------------------------[ "
+       (clojure.string/lower-case :time/now-seconds)
+       " ]-------------------------")),
+   :selected-view [:clojure :new-clojure-3],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :miraculous-orange-hedgehog "new parameter value!",
    :rel-image-path :flow/openai-image-gen-ladder3>relative-url-path-for-png-version,
-   :selected-block :block-1247,
+   :selected-block :block-8236,
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",
@@ -2463,30 +2089,12 @@
     :brightest "#f7c9cc",
     :most-contrasting-light "#f7c9cc"},
    :raw-custom-override-1328601774
-   [:v-box
-    :padding
-    "10px"
-    :gap
-    "8px"
-    :width
-    :width-px
-    :style
-    {:background-color "#333541",
-     :border-radius "20px",
-     :font-size "12px",
-     :font-weight 700,
-     :color "#bbaead"}
-    :children
-    [[:box :child "./images/gen/b64-image3-47107-8858.png"]
-     [:box
-      :size
-      "auto"
-      :child
-      [:img
-       {:src "./images/gen/b64-image3-47107-8858.png",
-        :style {:border-radius "30px"}}]]]],
+   {:error
+    {:error "This request has been blocked by our content filters.",
+     :class "class clojure.lang.ExceptionInfo"},
+    :class "class clojure.lang.ExceptionInfo"},
    :raw-custom-override-452322060
-   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n13  0      0 32910344 1758632 54858388    0    0    51    67   11   27 32  3 64  0  0\n\n",
+   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 3  0      0 91562728 1334196 13850092    0    0   312   135  668  217 33  4 62  0  0\n\n",
    :get-my-colors2147070240
    {:second-darkest "#392f5e",
     :highest-saturation "#b1baf1",
@@ -2603,13 +2211,13 @@
     :brightest "#f7c9cc",
     :most-contrasting-light "#f7c9cc"},
    :solver-fn-test11311036473 "HHHuge!180",
-   :colors-of-the-moment>darkest "#050b17",
+   :colors-of-the-moment>darkest "#040b43",
    :raw-custom-override-1471694664
    "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
    :raw-custom-override-55990886
    "🐇🥕 Hello there! This is Clojure version 1.11.1 on JVM  17.0.11 🥕🐇 Saturday, June 15th 11:56:29PM",
    :raw-custom-override9026012
-   "top - 21:27:49 up 1 day,  6:19,  7 users,  load average: 5.43, 5.82, 5.89\nTasks: 408 total,   2 running, 406 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 15.2 us,  1.1 sy,  0.0 ni, 83.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,  32138.6 free,  41208.1 used,  55290.1 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  85696.7 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n2236961 ryanr     20   0   37.2g   4.4g 286536 S 120.0   3.5   4:18.36 java\n  38069 ryanr     20   0 1132.3g 690616 166820 S  53.3   0.5 109:25.28 chrome\n   2383 ryanr     20   0   33.2g 659640 296932 S  20.0   0.5 771:18.69 chrome\n   1610 ryanr     20   0 3862416   1.7g 134484 R  13.3   1.4 241:22.88 kwin_x11\n    854 root     -51   0       0      0      0 S   6.7   0.0  59:51.88 irq/189+\n   1044 root      20   0   24.6g 462344 211640 S   6.7   0.4  99:00.92 Xorg\n   2385 ryanr     20   0   32.4g 147552 109636 S   6.7   0.1   7:47.58 chrome\n  17534 ryanr     20   0 1132.3g   1.1g 164760 S   6.7   0.9 961:40.30 chrome\n2194600 ryanr     20   0 1132.3g 519920 175952 S   6.7   0.4   7:12.38 chrome\n      1 root      20   0  166596  11108   8036 S   0.0   0.0   0:01.55 systemd\n      2 root      20   0       0      0      0 S   0.0   0.0   0:00.02 kthreadd\n      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp\n      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+\n\n------------------------[ sunday, june 16th 9:27:48pm ]-------------------------",
+   "top - 18:27:11 up 52 min,  5 users,  load average: 5.09, 5.53, 5.69\nTasks: 378 total,   2 running, 376 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 17.4 us,  3.7 sy, 10.0 ni, 68.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,  89414.9 free,  24393.2 used,  14828.7 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used. 102668.5 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n    867 ryanr     31  11 1853972 421608  19328 S 140.0   0.3   2:47.13 syncthi+\n   5755 ryanr     20   0 1132.2g 810824 124720 R  86.7   0.6  26:41.41 chrome\n   6565 ryanr     20   0 1132.2g 571160 121180 S  53.3   0.4  21:05.02 chrome\n   4051 ryanr     20   0 1132.3g 476036 160192 S  46.7   0.4  15:41.36 chrome\n   2206 ryanr     20   0   33.2g 635532 287944 S  20.0   0.5  18:37.15 chrome\n   1579 ryanr     20   0 3466140   1.2g 141768 S  13.3   1.0   6:05.38 kwin_x11\n    854 root     -51   0       0      0      0 S   6.7   0.0   1:23.26 irq/189+\n   9250 ryanr     20   0 1132.3g 978384 166644 S   6.7   0.7  29:58.16 chrome\n      1 root      20   0  166660  11364   8164 S   0.0   0.0   0:00.71 systemd\n      2 root      20   0       0      0      0 S   0.0   0.0   0:00.00 kthreadd\n      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp\n      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+\n      5 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 slub_fl+\n\n------------------------[ monday, june 17th 6:27:11pm ]-------------------------",
    :get-my-colors-1331789415
    {:second-darkest "#352260",
     :highest-saturation "#f7c9cc",
@@ -2697,19 +2305,19 @@
     :width
     :width-px
     :style
-    {:background-color "#34253b",
+    {:background-color "#192d32",
      :border-radius "20px",
      :font-size "12px",
      :font-weight 700,
-     :color "#c667a5"}
+     :color "#122627"}
     :children
-    [[:box :child "./images/gen/b64-image3-18614-44249.png"]
+    [[:box :child "./images/gen/b64-image3-38509-95808.png"]
      [:box
       :size
       "auto"
       :child
       [:img
-       {:src "./images/gen/b64-image3-18614-44249.png",
+       {:src "./images/gen/b64-image3-38509-95808.png",
         :style {:border-radius "30px"}}]]]],
    :get-my-colors-2050389472
    {:second-darkest "#35395b",
@@ -2749,10 +2357,86 @@
     :second-brightest "#83c1da",
     :brightest "#d0a1dd",
     :most-contrasting-light "#c540b7"},
+   :get-my-colors-322374943
+   {:second-darkest "#1e2c38",
+    :highest-saturation "#27607f",
+    :most-contrasting "#bb6954",
+    :darkest "#1a1b21",
+    :contrast-with-dominant "#d1b7c5",
+    :colors
+    ["#d1b7c5"
+     "#80aed0"
+     "#1a1b21"
+     "#7b5566"
+     "#608aae"
+     "#27607f"
+     "#274156"
+     "#b44a64"
+     "#bb6954"
+     "#3e5e5f"
+     "#1e2c38"],
+    :most-frequent "#7b5566",
+    :data-colors
+    {"float" "#d1c5b7",
+     "boolean" "#90abce",
+     "map" "#cad080",
+     "list" "#7f4c6b",
+     "string" "#fefefe",
+     "any" "#3c27b0",
+     "vector" "#d29b78",
+     "keyword" "#c6eec9",
+     "rabbit-code" "#6ca198",
+     "datetime" "#362c75",
+     "integer" "#b687d8",
+     "unknown" "#4c2329",
+     "date" "#252b20"},
+    :dominant "#1e2c38",
+    :most-contrasting-dark "#b44a64",
+    :second-brightest "#80aed0",
+    :brightest "#d1b7c5",
+    :most-contrasting-light "#bb6954"},
+   :get-my-colors346368138
+   {:second-darkest "#1e2c38",
+    :highest-saturation "#27607f",
+    :most-contrasting "#bb6954",
+    :darkest "#1a1b21",
+    :contrast-with-dominant "#d1b7c5",
+    :colors
+    ["#d1b7c5"
+     "#80aed0"
+     "#1a1b21"
+     "#7b5566"
+     "#608aae"
+     "#27607f"
+     "#274156"
+     "#b44a64"
+     "#bb6954"
+     "#3e5e5f"
+     "#1e2c38"],
+    :most-frequent "#7b5566",
+    :data-colors
+    {"float" "#d1c5b7",
+     "boolean" "#90abce",
+     "map" "#cad080",
+     "list" "#7f4c6b",
+     "string" "#fefefe",
+     "any" "#3c27b0",
+     "vector" "#d29b78",
+     "keyword" "#c6eec9",
+     "rabbit-code" "#6ca198",
+     "datetime" "#362c75",
+     "integer" "#b687d8",
+     "unknown" "#4c2329",
+     "date" "#252b20"},
+    :dominant "#1e2c38",
+    :most-contrasting-dark "#b44a64",
+    :second-brightest "#80aed0",
+    :brightest "#d1b7c5",
+    :most-contrasting-light "#bb6954"},
    :solver-fn-test1-2135935405 "Huge!159",
    :raw-custom-override-569051388
-   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        40Gi        31Gi       537Mi        53Gi        83Gi\nSwap:             0B          0B          0B\n\n",
+   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        23Gi        87Gi       380Mi        14Gi       100Gi\nSwap:             0B          0B          0B\n\n",
    :raw-custom-override437660285 87.5},
   :data {:new-clojure-2 nil}},
- :selected-flow "openai-image-gen-ladder3",
+ :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

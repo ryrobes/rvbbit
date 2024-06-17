@@ -178,6 +178,7 @@
     {:theme-name                            "who ya gonna call?"
      :codemirror-theme                      "ayu-mirage"
      :editor-param-background-color         "#0b1122"
+     :universal-pop-color                   "#9973e0"
      :vega-defaults                         {:view   {:stroke "transparent"}
                                              :axis   {:domainColor "#ffffff22"
                                                       :grid        true
