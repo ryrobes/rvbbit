@@ -1049,15 +1049,17 @@
 
 (defn invert-hex-color
   [hex]
-  (let [rgb        (js/parseInt (subs hex 1) 16)
-        r          (bit-and (bit-shift-right rgb 16) 255)
-        g          (bit-and (bit-shift-right rgb 8) 255)
-        b          (bit-and rgb 255)
-        inverted-r (js/Number.prototype.toString.call (- 255 r) 16)
-        inverted-g (js/Number.prototype.toString.call (- 255 g) 16)
-        inverted-b (js/Number.prototype.toString.call (- 255 b) 16)
-        pad        (fn [s] (if (< (count s) 2) (str "0" s) s))]
-    (str "#" (pad inverted-r) (pad inverted-g) (pad inverted-b))))
+  (if (string? hex)
+    (let [rgb        (js/parseInt (subs hex 1) 16)
+          r          (bit-and (bit-shift-right rgb 16) 255)
+          g          (bit-and (bit-shift-right rgb 8) 255)
+          b          (bit-and rgb 255)
+          inverted-r (js/Number.prototype.toString.call (- 255 r) 16)
+          inverted-g (js/Number.prototype.toString.call (- 255 g) 16)
+          inverted-b (js/Number.prototype.toString.call (- 255 b) 16)
+          pad        (fn [s] (if (< (count s) 2) (str "0" s) s))]
+      (str "#" (pad inverted-r) (pad inverted-g) (pad inverted-b)))
+    "#FF06B5")) ;; ELSE cyberpunk secret shocking pink color ARG
 
 
 

@@ -21,6 +21,7 @@
 (defonce cm-focused? (reagent/atom false))
 
 (defonce value-spy (reagent/atom {}))
+(defonce solver-meta-spy (reagent/atom {}))
 (defonce signal-history-ticker? (reagent/atom true))
 
 (defonce cm-instance-panel-code-box (atom nil)) ;; for highlighting
@@ -30,7 +31,7 @@
 
 (def param-code-hover (atom nil))
 
-(def solver-fn-runs (atom {}))  
+(def solver-fn-runs (atom {}))    
 (def solver-fn-lookup (atom {}))           
 ;(def solver-fn-lookup-vec (atom {}))
 

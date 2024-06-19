@@ -86,7 +86,8 @@
 
 (defn update-screen-meta
   [f-path]
-  (let [;file-path "./screens/"
+  (try 
+    (let [;file-path "./screens/"
         screen-data      (read-screen f-path)
         screen-name      (get screen-data :screen-name "unnamed-screen!")
         resolved-queries (get screen-data :resolved-queries)
@@ -140,7 +141,9 @@
                                    (cond theme? (str theme-map)
                                          board? (pr-str {:panels (get board-map b) :click-param {:param (get params :param)}})
                                          :else  (str (get-in screen-data [:panels b])))
-                                   (str (get-in screen-data [:panels b :tab]))]))}))))
+                                   (str (get-in screen-data [:panels b :tab]))]))})))
+                                   (catch Throwable e (ut/pp [:update-screen-meta-error! f-path e]))
+                                   ))
 
 (defn update-all-screen-meta
   []
@@ -426,7 +429,7 @@
   (tt/start!)
 
   (def mon (tt/every! 15 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30
-  
+
   (wss/recycle-worker) ;; single blocking
   (wss/recycle-worker2) ;; single blocking
   (wss/recycle-worker3) ;; single blocking

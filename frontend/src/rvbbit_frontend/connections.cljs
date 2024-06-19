@@ -318,7 +318,7 @@
                                      fkp                       (vec (into [:conns panel-key] fkp))
                                      override?                 (try (map? (first this)) (catch :default _ false)) ;; not a vec input call, completely new solver map
                                      [[solver-name input-map]] (if override? [[:raw-custom-override {}]] this)
-                                     unresolved-req-hash       (hash (if override?
+                                     unresolved-req-hash       (hash (if false ;override?
                                                                        fkp ;this 
                                                                        [solver-name fkp client-name]))
                                      resolved-input-map        (logic-and-params input-map panel-key)

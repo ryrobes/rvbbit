@@ -961,7 +961,7 @@
         single-width        (* single-width-bricks bricks/brick-size)
         single-width-px     (px single-width)
         hh1                 [@db/mad-libs-waiting-room @db/data-browser-query-con 
-                             @db/item-browser-mode @db/scrubbers
+                             @db/item-browser-mode @db/scrubbers @db/solver-meta-spy
                              @db/value-spy] ;; reactivity hack! React!
         single-height       ttl-height
         single-height-px    ttl-height-px
@@ -1548,8 +1548,9 @@
                      "(Block cannot be saved until corrected)"]]]
                   (let [query-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys sql-calls))
                                        (some #(= % data-key) (keys sql-calls)))
-                        ;;runners-items (into {} (for [[k v] runners] {(first (first v)) {:base-key k}}))
-                        ;runners-items (into {} (for [[k [kk vv]]  runners]  {kk {:base-key k}}))
+                        solver-meta-spy?      (get-in @db/solver-meta-spy [selected-block data-key] false)
+                        ;; runners-items (into {} (for [[k v] runners] {(first (first v)) {:base-key k}}))
+                        ;;runners-items (into {} (for [[k [kk vv]]  runners]  {kk {:base-key k}}))
                         ;; _ (ut/tapp>> [:runners-items runners  (keys runners-items) (get @db/data-browser-query selected-block) ])
                         ;; runner-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys runners-items))
                         ;;                 (some #(= % data-key) (keys runners-items)))
@@ -1559,7 +1560,7 @@
                      [(cond query-box? [re-com/v-box :justify :between :children
                                         (if (get @db/data-browser-query-con data-key)
                                           [(let [repl-output (dissoc @(ut/tracked-subscribe [::bricks/repl-output data-key])
-                                                               :status)
+                                                                     :status)
                                                  console     (vec (remove empty? (get repl-output :out [])))]
                                              [re-com/v-box :padding "9px" :size "none" :height (px (- single-height 107)) :style
                                               {;:border "1px solid pink"
@@ -1574,29 +1575,46 @@
                                                                    single-width-bricks 6.05])
                                            (when (not @bricks/dragging?)
                                              [bricks/read-only-sql-box single-width (/ single-height 3.2) (str sql-string)])])]
+                            solver-meta-spy? (let [are-solver        (get @db/solver-fn-lookup [:panels selected-block data-key])
+                                                   meta-data          (when are-solver
+                                                                        @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                                         {:keypath [(keyword (str (ut/replacer are-solver
+                                                                                                                               ":solver/" "solver-meta/")))]}))
+                                                   running-status    (when are-solver
+                                                                       @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                                        {:keypath [(keyword (str (ut/replacer are-solver
+                                                                                                                              ":solver/" "solver-status/*client-name*>")))]}))]
+                                               [re-com/box :size "none" :style {:transform "translate(0)"}
+                                                :height (px (- single-height 100))
+                                                :style {:overflow "auto" :font-size "13px"}
+                                                :child [re-com/v-box
+                                                        :gap  "10px"
+                                                        :children [[bricks/map-boxes2 {:meta meta-data} selected-block data-key [] :output nil]
+                                                                   [bricks/map-boxes2 {:status running-status} selected-block data-key [] :output nil]]
+                                                        ]])
                             ;; runner-box? [re-com/box :size "none" :style {:transform "translate(0)"}
                             ;;              :height (px (- single-height 100))
                             ;;              :child (str "render-loop for" data-key  " runner."  
                             ;;                          (get runners-items data-key) 
                             ;;                          (get block-runners-map [(get-in runners-items [data-key :base-key]) data-key]))]
                             viz-gen? ;[re-com/box :child (str (count mad-libs-combos) " rows. ")]
-                              (let [;default-combo-view @(ut/tracked-subscribe
-                                    src-table-id-str   (last (get selected-panel-map :mad-libs-combo-hash))
-                                    combo-hash         (first (get selected-panel-map :mad-libs-combo-hash))
-                                    opts               @(ut/tracked-subscribe [::bricks/get-mad-libs-options selected-block
-                                                                               src-table-id-str combo-hash])
-                                    shape-name         (get opts :shape_name)
-                                    viz-shape          @(ut/tracked-subscribe [::bricks/get-viz-shape shape-name])
-                                    default-shape-view (get viz-shape :selected_view)
-                                    default-shape-view (try (when (ut/ne? default-shape-view)
-                                                              (keyword (ut/replacer default-shape-view #":" "")))
-                                                            (catch :default _ nil))]
-                                (ut/tapp>> [:def-sel default-shape-view viz-shape])
-                                [re-com/box :size "none" :style {:transform "translate(0)"} 
-                                 :height (px (- single-height 100)) :child
-                                 [bricks/honeycomb selected-block (or default-shape-view :oz)]])
+                            (let [;default-combo-view @(ut/tracked-subscribe
+                                  src-table-id-str   (last (get selected-panel-map :mad-libs-combo-hash))
+                                  combo-hash         (first (get selected-panel-map :mad-libs-combo-hash))
+                                  opts               @(ut/tracked-subscribe [::bricks/get-mad-libs-options selected-block
+                                                                             src-table-id-str combo-hash])
+                                  shape-name         (get opts :shape_name)
+                                  viz-shape          @(ut/tracked-subscribe [::bricks/get-viz-shape shape-name])
+                                  default-shape-view (get viz-shape :selected_view)
+                                  default-shape-view (try (when (ut/ne? default-shape-view)
+                                                            (keyword (ut/replacer default-shape-view #":" "")))
+                                                          (catch :default _ nil))]
+                              (ut/tapp>> [:def-sel default-shape-view viz-shape])
+                              [re-com/box :size "none" :style {:transform "translate(0)"}
+                               :height (px (- single-height 100)) :child
+                               [bricks/honeycomb selected-block (or default-shape-view :oz)]])
                             :else      [re-com/box :size "none" :style {:transform "translate(0)"}
-                                        :height (px (- single-height 100))                       
+                                        :height (px (- single-height 100))
                                         :child [bricks/honeycomb selected-block data-key]])
                       (if viz-gen? ;; dont show scrubber boolean if on viz-gen mode
                         [re-com/box :style {:font-size "10px" :margin-left "8px"} :child
@@ -1610,11 +1628,21 @@
                               " combo-hash: "
                               (get (first mad-libs-combos) :combo_hash)
                               ")")]
-                        (let [view-scrubbers? (get-in @db/scrubbers [selected-block data-key] false)
-                              value-spy?      (get-in @db/value-spy [selected-block data-key] false)
-                              are-solver (get @db/solver-fn-lookup [:panels selected-block data-key])]
+                        (let [view-scrubbers?       (get-in @db/scrubbers [selected-block data-key] false)
+                              value-spy?            (get-in @db/value-spy [selected-block data-key] false)
+                              solver-meta-spy?      (get-in @db/solver-meta-spy [selected-block data-key] false)
+                              are-solver            (get @db/solver-fn-lookup [:panels selected-block data-key])
+                              solver-running?       (when are-solver
+                                                      @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                       {:keypath [(keyword (str (ut/replacer are-solver 
+                                                                                                             ":solver/" "solver-status/*client-name*>")  ">running?"))]}))]
+                          ;; (ut/tapp>> [:solver-running? solver-running? are-solver (keyword (str (ut/replacer are-solver
+                          ;;                                                                                    ":solver/" "solver-status/*client-name*>")  ">running?"))])
+                          ;;;(ut/tapp>> [:dd @db/solver-fn-lookup])
+
                           [re-com/h-box
                            :style {:font-size   "11px"
+                                   ;:z-index 29788
                                    :padding-right "14px"
                                    :font-weight 700}
                            :justify :between
@@ -1633,10 +1661,27 @@
                                           :user-select     "none"
                                           :text-decoration (when (not value-spy?) "strikethrough")
                                           :margin-top      (if query-box? "9px" "inherit")
-                                          :cursor          "pointer"}]]]
+                                          :cursor          "pointer"}]
+                                        (when are-solver
+                                          [re-com/box :size "none" :width "90px" :child "solver meta" :attr
+                                           {:on-click #(swap! db/solver-meta-spy assoc-in [selected-block data-key] (not solver-meta-spy?))} :style
+                                           {:color           (if solver-meta-spy? "yellow" "grey")
+                                            :z-index         100
+                                            :user-select     "none"
+                                            :text-decoration (when (not solver-meta-spy?) "strikethrough")
+                                            :margin-top      (if query-box? "9px" "inherit")
+                                            :cursor          "pointer"}])]]
 
                                       (when are-solver 
-                                        [re-com/box :child (str are-solver)]
+                                        [re-com/h-box 
+                                         :gap  "6px"
+                                         :children 
+                                         [(when solver-running?
+                                            [re-com/md-icon-button :md-icon-name "zmdi-refresh" :class "rotate linear infinite"
+                                             :style
+                                             {:font-size "15px" :transform-origin "7.5px 12px"
+                                              :margin-top "-4px"}])
+                                          [re-com/box :child (str are-solver)]]]
                                         )]]
                             ))]]))]] :height (px (- ttl-height 24)) :width single-width-px :style
               {:overflow "hidden"}])

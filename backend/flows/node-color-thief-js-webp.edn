@@ -481,7 +481,7 @@
   {:y 900,
    :fn (fn [x] x),
    :w 150,
-   :raw-fn (fn [x] (str "/tmp/img" (hash x) ".png")),
+   :raw-fn (fn [x] (str "/tmp/img" (hash x) "-" (rand-int 9999) ".png")),
    :right-click? true,
    :icon "zmdi-functions",
    :types nil,
@@ -502,7 +502,7 @@
      :inputs [:x],
      :expandable? true,
      :drag-meta {:type :open-fn}}}}},
- :zoom [-1342.64 -2618.11 1.591],
+ :zoom [-637.51 -756.69 1.191],
  :opts {:close-on-done? true, :retry-on-error? false, :timeout 800000, :retries 0},
  :flow-id "node-color-thief-js-webp",
  :flowmaps-connections
