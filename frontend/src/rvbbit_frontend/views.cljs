@@ -1649,14 +1649,14 @@
                            :children [[re-com/h-box :gap "10px" :children
                                        [[re-com/box :size "none" :width "90px" :child (if view-scrubbers? "scrubber on" "scrubber off") :attr
                                          {:on-click #(swap! db/scrubbers assoc-in [selected-block data-key] (not view-scrubbers?))} :style
-                                         {:color       (if view-scrubbers? "yellow" "grey")
+                                         {:color       (if view-scrubbers? (theme-pull :theme/universal-pop-color nil) "grey")
                                           :z-index     100
                                           :user-select "none"
                                           :margin-top  (if query-box? "9px" "inherit")
                                           :cursor      "pointer"}]
                                         [re-com/box :size "none" :width "90px" :child "value spy" :attr
                                          {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))} :style
-                                         {:color           (if value-spy? "yellow" "grey")
+                                         {:color           (if value-spy? (theme-pull :theme/universal-pop-color nil) "grey")
                                           :z-index         100
                                           :user-select     "none"
                                           :text-decoration (when (not value-spy?) "strikethrough")
@@ -1665,7 +1665,7 @@
                                         (when are-solver
                                           [re-com/box :size "none" :width "90px" :child "solver meta" :attr
                                            {:on-click #(swap! db/solver-meta-spy assoc-in [selected-block data-key] (not solver-meta-spy?))} :style
-                                           {:color           (if solver-meta-spy? "yellow" "grey")
+                                           {:color           (if solver-meta-spy? (theme-pull :theme/universal-pop-color nil) "grey")
                                             :z-index         100
                                             :user-select     "none"
                                             :text-decoration (when (not solver-meta-spy?) "strikethrough")
@@ -1675,6 +1675,7 @@
                                       (when are-solver 
                                         [re-com/h-box 
                                          :gap  "6px"
+                                         :style {:color (if solver-running? (theme-pull :theme/universal-pop-color nil) "grey")}
                                          :children 
                                          [(when solver-running?
                                             [re-com/md-icon-button :md-icon-name "zmdi-refresh" :class "rotate linear infinite"

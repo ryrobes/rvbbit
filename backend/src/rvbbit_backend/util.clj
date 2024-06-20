@@ -899,9 +899,98 @@
          " "        name
          ", it is " (.format now formatter))))
 
+(defn calculate-atom-size
+  [name a]
+  (try (let [size-bytes (-> @a
+                            pr-str
+                            .-length)
+             size-mb    (-> size-bytes
+                            (/ 1048576.0)
+                            (* 1e6)
+                            Math/round
+                            (/ 1e6))]
+         {name {;:bytes size-bytes
+                :mb   size-mb
+                :keys (try (count (keys @a)) (catch Exception _ -1))}})
+       (catch Exception e {name [:error (str e)]})))
+
+(defn cache-distribution
+  [tracker-atom percent]
+  (let [values                      (vals @tracker-atom)
+        sorted-values               (if (every? number? values) (sort values) [])
+        total                       (count sorted-values)
+        top-10-percent-threshold    (if (not-empty sorted-values) (nth sorted-values (int (* total 0.9))) 0)
+        bottom-10-percent-threshold (if (not-empty sorted-values) (nth sorted-values (int (* total 0.1))) 0)
+        counts                      (group-by #(cond (< % bottom-10-percent-threshold) :bottom-10-percent
+                                                     (> % top-10-percent-threshold)    :top-10-percent
+                                                     :else                             :middle-80-percent)
+                                              sorted-values)
+        frequency-buckets           (group-by #(cond (and (>= % 1) (< % 5))     "1 - 4"
+                                                     (and (>= % 5) (< % 20))    "5 - 19"
+                                                     (and (>= % 20) (< % 100))  "20 - 99"
+                                                     (and (>= % 100) (< % 500)) "100 - 499"
+                                                     (>= % 500)                 "500+")
+                                              sorted-values)
+        dd                          (distinct values)
+        total-hit-count             (reduce + (vals @tracker-atom))
+        cutoff-hit-count            (* total-hit-count percent)
+        sorted-cache                (->> @tracker-atom
+                                         (sort-by val)
+                                         reverse)
+        accumulated-hits            (reductions + (map second sorted-cache))
+        cutoff-index                (->> accumulated-hits
+                                         (map-indexed vector)
+                                         (drop-while (fn [[idx acc]] (< acc cutoff-hit-count)))
+                                         ffirst)
+        keys-to-keep                (set (map first (take (inc cutoff-index) sorted-cache)))
+        cutoff-frequency            (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0)
+        above-threshold             (count keys-to-keep)
+        below-threshold             (- (count sorted-cache) above-threshold)]
+    {:culling             {:cutoff-frequency cutoff-frequency :above-threshold above-threshold :below-threshold below-threshold}
+     :total-entries       total
+     :top-10-freq-vals    (vec (take 10 (reverse (sort dd))))
+     :bottom-10-freq-vals (vec (take 10 (sort dd)))
+     :top-10-percent      (count (get counts :top-10-percent))
+     :middle-80-percent   (count (get counts :middle-80-percent))
+     :bottom-10-percent   (count (get counts :bottom-10-percent))
+     :frequency-buckets   (into {} (map (fn [[k v]] [k (count v)]) frequency-buckets))}))
+
+(defn purge-cache
+  [name percent tracker-atom data-atom & [hard-limit]]
+  (let [total-hit-count  (reduce + (vals @tracker-atom))
+        cutoff-hit-count (* total-hit-count percent)
+        sorted-cache     (->> @tracker-atom
+                              (sort-by val)
+                              reverse)
+        accumulated-hits (reductions + (map second sorted-cache))
+        cutoff-index     (->> accumulated-hits
+                              (map-indexed vector)
+                              (drop-while (fn [[idx acc]] (< acc cutoff-hit-count)))
+                              ffirst)
+        cutoff-frequency (if hard-limit hard-limit (if (seq sorted-cache) (val (nth sorted-cache cutoff-index)) 0))
+        keys-to-keep     (if hard-limit
+                           (set (map first (filter (fn [[k v]] (>= v hard-limit)) sorted-cache)))
+                           (set (map first (take (inc cutoff-index) sorted-cache))))
+        above-threshold  (count keys-to-keep)
+        below-threshold  (- (count sorted-cache) above-threshold)
+        distro           (cache-distribution tracker-atom percent)
+        pre-mb           (get-in (calculate-atom-size :temp data-atom) [:temp :mb])]
+    (swap! data-atom (fn [old-cache] (into {} (filter (fn [[k _]] (keys-to-keep k)) old-cache))))
+    (reset! tracker-atom {})
+    (let [post-mb (get-in (calculate-atom-size :temp data-atom) [:temp :mb])]
+      (pp [:cache-atom-culling! name (str pre-mb "mb") "->" (str post-mb "mb")
+               {:top-pct          percent
+                :hard-limit       hard-limit
+                :cutoff-frequency cutoff-frequency
+                :pre-mb           pre-mb
+                :distribution     distro
+                :post-mb          post-mb
+                :keeping          above-threshold
+                :purging          below-threshold}]))))
 
 
-
+(defn hash-group [key num-groups]
+  (mod (hash key) num-groups))
 
 
 (defn delay-execution [ms f] (future (do (Thread/sleep ms) (f))))

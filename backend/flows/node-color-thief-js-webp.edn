@@ -79,7 +79,7 @@
      (let [x (if (clojure.string/starts-with? (str x) "./images/")
                (clojure.string/replace (str x) "./images/" "/home/ryanr/rvbbit/frontend/resources/public/images/")
                x)]
-       (str "convert " x " " y))),
+       (str "convert " x " -resize 400x -filter Lanczos -colors 32 -dither FloydSteinberg " y))),
    :right-click? true,
    :icon "zmdi-functions",
    :types nil,
@@ -502,7 +502,7 @@
      :inputs [:x],
      :expandable? true,
      :drag-meta {:type :open-fn}}}}},
- :zoom [-637.51 -756.69 1.191],
+ :zoom [-3.68 -547 0.791],
  :opts {:close-on-done? true, :retry-on-error? false, :timeout 800000, :retries 0},
  :flow-id "node-color-thief-js-webp",
  :flowmaps-connections

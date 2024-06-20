@@ -1,6 +1,6 @@
 {:colors-of-the-moment
  {:signal :signal/changed-wallpaper?,
-  :cache? true,
+  :cache? false,
   :type :flow,
   :data
   {:flowmap "node-color-thief-js-webp",
@@ -49,6 +49,28 @@
  {:signal :solver/sql-solver-1,
   :type :clojure,
   :data (count :data/sql-solver-1)},
+ :send-to-upscaler-3
+ {:signal false,
+  :type :clojure,
+  :cache? false,
+  :input-map
+  {:rating 3,
+   :source-path
+   :flow/openai-image-gen-ladder3>:save-base64-to-webp-file},
+  :data
+  (let
+   [source-path
+    :source-path
+    file-name
+    (.getName (clojure.java.io/file source-path))
+    dest-path
+    (str "/home/ryanr/to-upscale/" :rating "/" file-name)]
+   (with-open
+    [in-file
+     (clojure.java.io/input-stream source-path)
+     out-file
+     (clojure.java.io/output-stream dest-path)]
+    (clojure.java.io/copy in-file out-file)))},
  :colors-of-the-moment-8k
  {:signal :signal/changed-wallpaper-8k?,
   :cache? true,
@@ -64,6 +86,28 @@
   :data
   {:flowmap "node-color-thief-js-webp",
    :opts {:overrides {:image-path :input-image-path}}}},
+ :send-to-upscaler-1
+ {:signal false,
+  :type :clojure,
+  :cache? false,
+  :input-map
+  {:rating 1,
+   :source-path
+   :flow/openai-image-gen-ladder3>:save-base64-to-webp-file},
+  :data
+  (let
+   [source-path
+    :source-path
+    file-name
+    (.getName (clojure.java.io/file source-path))
+    dest-path
+    (str "/home/ryanr/to-upscale/" :rating "/" file-name)]
+   (with-open
+    [in-file
+     (clojure.java.io/input-stream source-path)
+     out-file
+     (clojure.java.io/output-stream dest-path)]
+    (clojure.java.io/copy in-file out-file)))},
  :vibrant-antelope-solver
  {:signal :signal/cool-raccoon-signal-yo,
   :type :clojure2,
@@ -105,6 +149,28 @@
   :cache? true,
   :input-map {:some-string "HEYa!", :some-number 123},
   :data (str :some-string (+ 123 :some-number))},
+ :send-to-upscaler-4
+ {:signal false,
+  :type :clojure,
+  :cache? false,
+  :input-map
+  {:rating 4,
+   :source-path
+   :flow/openai-image-gen-ladder3>:save-base64-to-webp-file},
+  :data
+  (let
+   [source-path
+    :source-path
+    file-name
+    (.getName (clojure.java.io/file source-path))
+    dest-path
+    (str "/home/ryanr/to-upscale/" :rating "/" file-name)]
+   (with-open
+    [in-file
+     (clojure.java.io/input-stream source-path)
+     out-file
+     (clojure.java.io/output-stream dest-path)]
+    (clojure.java.io/copy in-file out-file)))},
  :sql-solver-1
  {:signal :signal/every-5-minutes,
   :type :sql,
@@ -147,6 +213,28 @@
    (clojure.string/ends-with?
     :solver/wallpaper-of-the-moment
     ".png"))},
+ :send-to-upscaler-2
+ {:signal false,
+  :type :clojure,
+  :cache? false,
+  :input-map
+  {:rating 2,
+   :source-path
+   :flow/openai-image-gen-ladder3>:save-base64-to-webp-file},
+  :data
+  (let
+   [source-path
+    :source-path
+    file-name
+    (.getName (clojure.java.io/file source-path))
+    dest-path
+    (str "/home/ryanr/to-upscale/" :rating "/" file-name)]
+   (with-open
+    [in-file
+     (clojure.java.io/input-stream source-path)
+     out-file
+     (clojure.java.io/output-stream dest-path)]
+    (clojure.java.io/copy in-file out-file)))},
  :wallpaper-of-the-moment
  {:signal :signal/every-5-minutes,
   :type :clojure,

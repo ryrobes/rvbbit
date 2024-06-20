@@ -346,43 +346,115 @@
   (sql-exec system-db "drop view  if exists viz_recos_vw2;")
   (sql-exec system-db "drop view  if exists user_subs_vw;")
   (sql-exec system-db "drop view  if exists latest_status;")
+
   (cruiser/create-sqlite-sys-tables-if-needed! system-db)
   (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
+
   (add-watch wss/screens-atom
              :master-screen-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               (doseq [key (keys new-state)]
+               (future 
+                 (doseq [key (keys new-state)]
                  (if-let [child-atom (get @wss/screen-child-atoms key)]
                    (swap! child-atom assoc key (get new-state key))
                    (let [new-child-atom (atom {})]
                      (swap! wss/screen-child-atoms assoc key new-child-atom)
-                     (swap! new-child-atom assoc key (get new-state key)))))))
+                     (swap! new-child-atom assoc key (get new-state key))))))))
+
   (add-watch wss/params-atom
              :master-params-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               (doseq [key (keys new-state)]
-                 (if-let [child-atom (get @wss/param-child-atoms key)]
-                   (swap! child-atom assoc key (get new-state key))
-                   (let [new-child-atom (atom {})]
-                     (swap! wss/param-child-atoms assoc key new-child-atom)
-                     (swap! new-child-atom assoc key (get new-state key)))))))
+               (future
+                 (doseq [key (keys new-state)]
+                   (if-let [child-atom (get @wss/param-child-atoms key)]
+                     (swap! child-atom assoc key (get new-state key))
+                     (let [new-child-atom (atom {})]
+                       (swap! wss/param-child-atoms assoc key new-child-atom)
+                       (swap! new-child-atom assoc key (get new-state key))))))))
+
   (add-watch wss/panels-atom
              :master-panels-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               (doseq [key (keys new-state)]
-                 (if-let [child-atom (get @wss/panel-child-atoms key)]
-                   (swap! child-atom assoc key (get new-state key))
-                   (let [new-child-atom (atom {})]
-                     (swap! wss/panel-child-atoms assoc key new-child-atom)
-                     (swap! new-child-atom assoc key (get new-state key)))))))
-  (add-watch
-   wss/signals-atom
-   :master-signal-def-watcher ;; watcher signals defs
-   (fn [_ _ old-state new-state] (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....]) (wss/reload-signals-subs)))
-  (add-watch wss/rules-atom :master-rule-def-watcher (fn [_ _ old-state new-state] (ut/pp [:rules-defs-changed :reloading....])))
+               (future
+                 (doseq [key (keys new-state)]
+                   (if-let [child-atom (get @wss/panel-child-atoms key)]
+                     (swap! child-atom assoc key (get new-state key))
+                     (let [new-child-atom (atom {})]
+                       (swap! wss/panel-child-atoms assoc key new-child-atom)
+                       (swap! new-child-atom assoc key (get new-state key))))))))
+
+  ;; (add-watch wss/last-solvers-atom
+  ;;            :master-solver-watcher ;; watcher splitter
+  ;;            (fn [_ _ old-state new-state]
+  ;;              (doseq [key (keys new-state)]
+  ;;                (if-let [child-atom (get @wss/solver-child-atoms key)]
+  ;;                  (swap! child-atom assoc key (get new-state key))
+  ;;                  (let [new-child-atom (atom {})]
+  ;;                    (swap! wss/solver-child-atoms assoc key new-child-atom)
+  ;;                    (swap! new-child-atom assoc key (get new-state key)))))))
+
+  ;; (defn hash-group [key num-groups]
+  ;;   (mod (hash key) num-groups))
+
+  ;; (def num-groups 20)
+
+  ;; (add-watch wss/last-solvers-atom
+  ;;            :master-solver-watcher ;; watcher splitter
+  ;;            (fn [_ _ old-state new-state]
+  ;;              (doseq [key (keys new-state)]
+  ;;                (let [group (hash-group key num-groups)]
+  ;;                  (if-let [child-atom (get @wss/solver-child-atoms group)]
+  ;;                    (swap! child-atom assoc key (get new-state key))
+  ;;                    (let [new-child-atom (atom {})]
+  ;;                      (swap! wss/solver-child-atoms assoc group new-child-atom)
+  ;;                      (swap! new-child-atom assoc key (get new-state key))))))))
+
+  
+
+  
+  
+  
+  (add-watch wss/last-solvers-atom
+             :master-solver-watcher ;; watcher splitter
+             (fn [_ _ old-state new-state]
+               (future
+                 (doseq [key (keys new-state)]
+                   (let [group (ut/hash-group key wss/num-groups)]
+                     (if-let [child-atom (get @wss/solver-child-atoms group)]
+                       (swap! child-atom assoc key (get new-state key))
+                       (let [new-child-atom (atom {})]
+                         (swap! wss/solver-child-atoms assoc group new-child-atom)
+                         (swap! new-child-atom assoc key (get new-state key)))))))))
+
+
+  (add-watch wss/solver-status
+             :master-solver-status-watcher ;; watcher splitter
+             (fn [_ _ old-state new-state]
+               (future ;; non blocking since atom watchers share threads with the reader/writers
+                 (doseq [key (keys new-state)]
+                   (if-let [child-atom (get @wss/solver-status-child-atoms key)]
+                     (swap! child-atom assoc key (get new-state key))
+                     (let [new-child-atom (atom {})]
+                       (swap! wss/solver-status-child-atoms assoc key new-child-atom)
+                       (swap! new-child-atom assoc key (get new-state key))))))))
+
+  (add-watch wss/signals-atom
+             :master-signal-def-watcher ;; watcher signals defs
+             (fn [_ _ old-state new-state]
+               (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....])
+               (wss/reload-signals-subs)))
+
+  (add-watch wss/rules-atom
+             :master-rule-def-watcher
+             (fn [_ _ old-state new-state]
+               (ut/pp [:rules-defs-changed :reloading....])))
+
   (add-watch wss/solvers-atom
              :master-solver-def-watcher
-             (fn [_ _ old-state new-state] (ut/pp [:solvers-defs-changed :reloading....]) (wss/reload-solver-subs)))
+             (fn [_ _ old-state new-state]
+               (ut/pp [:solvers-defs-changed :reloading....])
+               (wss/reload-solver-subs)))
+
   (update-all-screen-meta)
   (update-all-flow-meta)
   (cruiser/insert-current-rules!
@@ -405,7 +477,7 @@
    cruiser/default-field-attributes
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
-  
+
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force flows-db as a conn, takes a sec
    "flows-db"
    flows-db
@@ -414,7 +486,7 @@
    cruiser/default-field-attributes
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
-  
+
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force cache-db as a conn, takes a sec
    "cache.db"
    wss/cache-db
@@ -423,7 +495,7 @@
    cruiser/default-field-attributes
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
-  
+
   (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
 
   (tt/start!)
@@ -443,14 +515,17 @@
   (def purge (tt/every! wss/jvm-stats-every 2 (bound-fn [] (wss/purge-dead-client-watchers))))
   (def timekeeper (tt/every! 1 3 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
 
+  (def purge-solver-cache (tt/every! 600 600 (bound-fn [] (ut/purge-cache 0.5 wss/solvers-cache-hits-atom wss/solvers-cache-atom))))
+  ;;purge-cache [name percent tracker-atom data-atom & [hard-limit]]
+
   ;;;(def solver-statuses (tt/every! 1 3 (bound-fn [] (swap! wss/last-solvers-atom-meta assoc :running-map @wss/solvers-running)))) ;; TODO, this more smart. grug grug
   (def solver-statuses (tt/every! 1 3 (bound-fn []
-                                         (doseq [[client-name solvers] @wss/solver-status]
-                                           (doseq [[solver-name v] solvers
-                                                   :when (get v :running?)]
+                                        (doseq [[client-name solvers] @wss/solver-status]
+                                          (doseq [[solver-name v] solvers
+                                                  :when (get v :running?)]
                                              ;;(ut/pp [:solver-status-loops client-name solver-name v])
-                                             (swap! wss/solver-status assoc-in [client-name solver-name :time-running] (ut/format-duration (get v :started) (System/currentTimeMillis))))))))
- 
+                                            (swap! wss/solver-status assoc-in [client-name solver-name :time-running] (ut/format-duration (get v :started) (System/currentTimeMillis))))))))
+
   (def last-look (atom {}))
   (def saved-uids (atom []))
   (let [signals  (vec (keys @wss/signals-atom))

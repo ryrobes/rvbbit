@@ -1,21 +1,24 @@
 (ns rvbbit-frontend.utility
   (:require
-    [cljs.core.async   :as    async
-                       :refer [<! timeout]]
-    [cljs.tools.reader :refer [read-string]]
-    [clojure.string    :as cstr]
-    [clojure.walk      :as walk]
-    [goog.crypt.Hash   :as Hash]
-    [goog.crypt.Sha256 :as Sha256]
-    [goog.crypt.base64 :as base64]
-    [re-com.util       :refer [px]]
-    [re-com.validate   :refer [alert-type? string-or-hiccup? vector-of-maps?]]
-    [re-frame.alpha    :as rfa]
-    [re-frame.core     :as re-frame]
-    [reagent.core      :as reagent]
-    [talltale.core     :as tales]
-    [talltale.core     :as tales]
-    [zprint.core       :as zp])
+   [cljs.core.async   :as    async
+    :refer [<! timeout]]
+   [cljs.tools.reader :refer [read-string]]
+   [clojure.string    :as cstr]
+   [clojure.walk      :as walk]
+   [goog.crypt.Hash   :as Hash]
+   [goog.crypt.Sha256 :as Sha256]
+   [goog.crypt.base64 :as base64]
+   [re-com.util       :refer [px]]
+   [re-com.validate   :refer [alert-type? string-or-hiccup? vector-of-maps?]]
+   [garden.color :as    c
+    :refer [analogous color? complement hex->hsl hex? hsl hsl->hex hsla invert mix rgb->hex rgb->hsl shades
+            split-complement tetrad triad]]
+   [re-frame.alpha    :as rfa]
+   [re-frame.core     :as re-frame]
+   [reagent.core      :as reagent]
+   [talltale.core     :as tales]
+   [talltale.core     :as tales]
+   [zprint.core       :as zp])
   (:import
     [goog.i18n              NumberFormat]
     [goog.i18n.NumberFormat Format]
@@ -1062,6 +1065,25 @@
     "#FF06B5")) ;; ELSE cyberpunk secret shocking pink color ARG
 
 
+(defn tetrads [hex]
+  (try (vec (for [s (tetrad hex)]
+              (hsl->hex s)))
+       (catch :default _ ["#ffffff"])))
+
+(defn complements [hex]
+  (try (vec (for [s (complement hex)]
+              (hsl->hex s)))
+       (catch :default _ ["#ffffff"])))
+
+(defn split-complements [hex]
+  (try (vec (for [s (split-complement hex)]
+              (hsl->hex s)))
+       (catch :default _ ["#ffffff"])))
+
+(defn triads [hex]
+  (try (vec (for [s (triad hex)]
+              (hsl->hex s)))
+       (catch :default _ ["#ffffff"])))
 
 
 

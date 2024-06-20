@@ -87,6 +87,22 @@
                                   (let [kps       (ut/extract-patterns obody :invert-hex-color 2)
                                         logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/invert-hex-color hhex)})))]
                                     (walk/postwalk-replace logic-kps obody)))
+          tetrads-walk (fn [obody]
+                         (let [kps       (ut/extract-patterns obody :tetrads 2)
+                               logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/tetrads hhex)})))]
+                           (walk/postwalk-replace logic-kps obody)))
+          complements-walk (fn [obody]
+                             (let [kps       (ut/extract-patterns obody :complements 2)
+                                   logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/complements hhex)})))]
+                               (walk/postwalk-replace logic-kps obody)))
+          split-complements-walk (fn [obody]
+                                   (let [kps       (ut/extract-patterns obody :split-complements 2)
+                                         logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/split-complements hhex)})))]
+                                     (walk/postwalk-replace logic-kps obody)))
+          triads-walk (fn [obody]
+                        (let [kps       (ut/extract-patterns obody :triads 2)
+                              logic-kps (into {} (for [v kps] (let [[_ hhex] v] {v (ut/triads hhex)})))]
+                          (walk/postwalk-replace logic-kps obody)))
           singles {:text   str
                    :>>     (fn [[x y]] (true? (> x y)))
                    :<<     (fn [[x y]] (true? (< x y)))
@@ -158,6 +174,10 @@
                           (has-fn? :when)           when-walk-map2
                           (has-fn? :into)           into-walk-map2
                           (has-fn? :invert-hex-color) invert-hex-color-walk
+                          (has-fn? :tetrads)        tetrads-walk
+                          (has-fn? :complements)    complements-walk
+                          (has-fn? :split-complements)    split-complements-walk
+                          (has-fn? :triads)          triads-walk
                           (ut/ne? singles)          (ut/postwalk-replacer singles)
                           (has-fn? :case)           case-walk)
           templated-strings-vals (vec (filter #(cstr/includes? (str %) "/") (ut/deep-template-find out-block-map))) ;; ignore

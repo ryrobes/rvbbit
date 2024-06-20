@@ -60,6 +60,7 @@
     [java.io                                BufferedReader InputStreamReader]))
 
 (defonce flow-status (atom {}))
+(def num-groups 20)
 
 (def stats-cnt (atom 0))
 (def restart-map (atom {}))
@@ -953,9 +954,9 @@
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 100))] ;; was 100, was (async/sliding-buffer
+  (let [results (async/chan (async/sliding-buffer 500))] ;; was 100, was (async/sliding-buffer
     (try (async/go-loop []
-           (async/<! (async/timeout 850)) ;; was 70 ?
+           (async/<! (async/timeout 1000)) ;; was 70 ?
            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
              (let [items            (loop [res []]
                                       (if-let [item (ut/dequeue! queue-atom)]
@@ -1245,7 +1246,7 @@
 
 (defmethod wl/handle-request :autocomplete
   [{:keys [client-name surrounding panel-key view]}]
-  (ut/pp [:get-smart-autocomplete-vector client-name panel-key view {:context surrounding}])
+  ;;(ut/pp [:get-smart-autocomplete-vector client-name panel-key view {:context surrounding}])
   {:clover-params (conj @autocomplete-clover-param-atom :*) :view-keywords (conj @autocomplete-view-atom :*)})
 
 
@@ -1302,15 +1303,18 @@
                 human-elapsed       (if *running? (ut/format-duration started (System/currentTimeMillis)) *time-running)
                 last-update         (get @last-block-written k)
                 _ (when (and (> last-update-seconds 120) (empty? running-blocks) (not (nil? last-update)) *running?)
-                    (ut/pp [(str "ATTN: flow " k " killed by rabbit watchdog for going idle 2 mins")])
+                    (ut/pp [(str "ATTN: flow " k " killed by rabbit watchdog for going idle 2+ mins")])
                     ;;(stop-solver k)
                     (doseq [[client-name solvers] @solver-status]
                       (doseq [[sk _] solvers
-                              :when (= sk k)]
-                        (swap! solver-status assoc-in [client-name sk :running?] false)))
+                              :let [sk-mod (str (cstr/replace (str sk) ":" "") "-solver-flow-")] ;; solver flow name is a keyword?
+                              :when (= sk-mod k)]
+                        (ut/pp [:killswitch-on client-name sk k sk-mod])
+                        (swap! solver-status assoc-in [client-name sk :running?] false)
+                        (swap! solver-status assoc-in [client-name sk :stopped] (System/currentTimeMillis))))
                     (alert! *started-by
                             [:box :style {:color "red"} :child
-                             (str "ATTN: flow " k " killed by rabbit watchdog for going idle 2 mins")]
+                             (str "ATTN: flow " k " killed by rabbit watchdog for going idle 2+ mins")]
                             15
                             1
                             60)
@@ -2416,6 +2420,8 @@
 (defonce param-child-atoms (atom {}))
 (defonce panel-child-atoms (atom {}))
 (defonce flow-child-atoms (atom {})) ;; flows
+(defonce solver-child-atoms (atom {}))
+(defonce solver-status-child-atoms (atom {}))
 
 (defn get-atom-splitter
   [key ttype child-atom parent-atom]
@@ -2486,10 +2492,10 @@
         server?         (= base-type :server)]
     (cond status?         flow-status
           tracker?        flow-db/tracker
-          signal?         last-signals-atom ;; no need to split for now, will keep an eye on it
-          solver?         last-solvers-atom ;; no need to split for now, will keep an eye on it -
+          signal?         last-signals-atom ;; no need to split for now, will keep an eye on it (ut/hash-group (keyword (second sub-path)) num-groups)
+          solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom) ;; last-solvers-atom
           solver-meta?    last-solvers-atom-meta
-          solver-status?  solver-status
+          solver-status?  (get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status)  ;;solver-status
           data?           last-solvers-data-atom
           signal-history? last-signals-history-atom
           server?         server-atom ;; no need to split for now, will keep an eye on it - don't
@@ -2538,10 +2544,10 @@
                           status?         flow-status
                           tracker?        flow-db/tracker
                           signal?         last-signals-atom ;; no need to split for now, will keep an eye on
-                          solver?         last-solvers-atom ;; no need to split for now, will keep an eye on
+                          solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom)  ;;last-solvers-atom
                           data?           last-solvers-data-atom
                           solver-meta?    last-solvers-atom-meta
-                          solver-status?  solver-status
+                          solver-status?  (get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status) ;;solver-status
                           signal-history? last-signals-history-atom
                           server?         server-atom ;; no need to split for now, will keep an eye on it - I
                           time?           time-atom ;; zero need to split ever. lol, its like 6 keys
@@ -2607,12 +2613,11 @@
                           tracker?        flow-db/tracker
                           signal?         last-signals-atom ;; no need to split for now,
                                                             ;; will keep an eye
-                          solver?         last-solvers-atom ;; no need to split for now,
-                                                            ;; will keep an eye
+                          solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom) ;;last-solvers-atom 
                           data?           last-solvers-data-atom ;; ^^ same as above -
                                                                  ;; take a hint, choom.
                           solver-meta?    last-solvers-atom-meta
-                          solver-status?  solver-status
+                          solver-status?  (get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status) ;;solver-status
                           signal-history? last-signals-history-atom
                           server?         server-atom ;; no need to split for now, will keep an eye on it -
                           time?           time-atom ;; zero need to split ever. lol, its like 6 keys
@@ -2875,17 +2880,16 @@
           runner-name           (get solver-map :type :clojure)
           runner-map            (get-in (config/settings) [:runners runner-name] {})
           runner-type           (get runner-map :type runner-name)
-
           ;;cache-key             (pr-str [solver-name vdata runner-name])
           cache-key             (hash [solver-map input-map])
           cache-val             (when use-cache? (get @solvers-cache-atom cache-key))
-          cache-hit?            (true?  (and (and use-cache? 
-                                          (ut/ne? cache-val)
+          cache-hit?            (true?  (and (and use-cache?
+                                                  (ut/ne? cache-val)
                                           ;;(lookup-scache-exists? cache-key)
-                                          ) 
-                                     (not= runner-type :sql) 
+                                                  )
+                                             (not= runner-type :sql)
                                      ;(not= runner-type :nrepl)
-                                     ))
+                                             ))
           err?                  (fn [s]
                                   (let [s (str s)]
                                     (or (cstr/includes? s "Exception") (cstr/includes? s ":err") (cstr/includes? s ":error"))))
@@ -2893,12 +2897,14 @@
           vdata-ref             (if (> (count (str vdata)) 60)
                                   (subs (str vdata) 0 60)
                                   (str vdata))]
+
       (swap! solver-status assoc-in [client-name solver-name]
              {:started timestamp
               :stopped nil
               :running? true
               :time-running ""
               :ref vdata-ref})
+
       ;; (ut/pp [:*running!!! use-cache? cache-hit? client-name :for temp-solver-name vdata-ref])
     ;; (when override-input (ut/pp [:SOLVER-INPUT-OVERRIDE! temp-solver-name :wants input-map]))
     ;;(when override-map (ut/pp [:SOLVER-MAP-OVERRIDE! temp-solver-name :wants input-map]))
@@ -2915,15 +2921,10 @@
                      (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
                     ;;  (ut/pp [:*cacheddd!!! client-name :for temp-solver-name vdata-ref])
                      (swap! solvers-cache-hits-atom update cache-key (fnil inc 0))
-                     (swap! solver-status update-in [client-name solver-name]
-                            (fn [solver]
-                              (-> solver
-                                  (assoc :stopped (System/currentTimeMillis))
-                                  (assoc :running? false)
-                                  (assoc :cache-served? true)
-                                  (assoc :time-running (ut/format-duration
-                                                        (:started solver)
-                                                        (System/currentTimeMillis)))))))
+                     (swap! solver-status assoc-in [client-name solver-name :running?] false)
+                     (swap! solver-status assoc-in [client-name solver-name :cache-served?] true)
+                     (swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
+                     output)
 
         (= runner-type :sql)
         (try
@@ -2970,14 +2971,10 @@
               (swap! solvers-cache-atom assoc cache-key [output output-full]))
             ;;;(swap! solvers-cache-atom assoc cache-key [output output-full])
             ;(swap! solvers-running assoc-in [client-name solver-name] false)
-            (swap! solver-status update-in [client-name solver-name]
-                   (fn [solver]
-                     (-> solver
-                         (assoc :stopped (System/currentTimeMillis))
-                         (assoc :running? false)
-                         (assoc :time-running (ut/format-duration
-                                               (:started solver)
-                                               (System/currentTimeMillis)))))))
+            (swap! solver-status assoc-in [client-name solver-name :running?] false)
+            (swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
+            rows)
+          
           (catch Throwable e
             (do (ut/pp [:SOLVER-SQL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
                 ;(swap! solvers-running assoc-in [client-name solver-name] false)
@@ -2991,6 +2988,8 @@
                                                    (:started solver)
                                                    (System/currentTimeMillis))))))
                 (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+
+
 
         (= runner-type :nrepl)
         (try (let [repl-host                   (get-in runner-map [:runner :host])
@@ -3023,15 +3022,10 @@
                ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
                (when use-cache?
                  (swap! solvers-cache-atom assoc cache-key [output output-full]))
-               (swap! solver-status update-in [client-name solver-name]
-                      (fn [solver]
-                        (-> solver
-                            (assoc :stopped (System/currentTimeMillis))
-                            (assoc :running? false)
-                            (assoc :time-running (ut/format-duration
-                                                  (:started solver)
-                                                  (System/currentTimeMillis))))))
+               (swap! solver-status assoc-in [client-name solver-name :running?] false)
+               (swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
                ;(swap! solvers-running assoc-in [client-name solver-name] false)
+               output
                )
              (catch Throwable e
                (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
@@ -3048,72 +3042,74 @@
                    (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
 
         (= runner-type :flow) ;; no runner def needed for anon flow pulls
-        (try (let [client-name                 :rvbbit-solver
-                   flowmap                     (get vdata :flowmap)
-                   opts                        (merge {:close-on-done? true :increment-id? false :timeout 10000}
-                                                      (get vdata :opts {}))
-                   return                      (get vdata :return) ;; alternate block-id to fetch
-                   flow-id                     (str (cstr/replace (str solver-name) ":" "") "-solver-flow-")
+        (try
+          (let [client-name                 :rvbbit-solver
+                flowmap                     (get vdata :flowmap)
+                opts                        (merge {:close-on-done? true :increment-id? false :timeout 10000}
+                                                   (get vdata :opts {}))
+                return                      (get vdata :return) ;; alternate block-id to fetch
+                flow-id                     (str (cstr/replace (str solver-name) ":" "") "-solver-flow-")
                    ;;_ (ut/pp [:solver-flow-start solver-name flow-id opts])
-                   {:keys [result elapsed-ms]} (ut/timed-exec (flow! client-name flowmap nil flow-id opts))
+                {:keys [result elapsed-ms]} (ut/timed-exec (flow! client-name flowmap nil flow-id opts))
                    ;;_ (ut/pp [:solver-flow-finsihed solver-name flow-id])
-                   output                      result
-                   output                      (ut/remove-namespaced-keys (ut/replace-large-base64 output))
-                   output-val                  (get-in output [:return-val])
-                   output-val                  (if return ;;(keyword? return)
-                                                 (get-in output [:return-maps flow-id return] output-val)
-                                                 output-val)
+                output                      result
+                output                      (ut/remove-namespaced-keys (ut/replace-large-base64 output))
+                output-val                  (get-in output [:return-val])
+                output-val                  (if return ;;(keyword? return)
+                                              (get-in output [:return-maps flow-id return] output-val)
+                                              output-val)
                    ;;_ (ut/pp [:solver-flow-return-val solver-name flow-id output-val])
-                   output-full                 {:req        vdata
-                                                :value      (-> (assoc output :return-maps
-                                                                       (select-keys (get output :return-maps) [flow-id]))
-                                                                (dissoc :tracker)
-                                                                (dissoc :tracker-history))
-                                                :output-val output-val
-                                                :flow-id    flow-id
-                                                :return     return}
-                   error?                      (err? output-full)
-                   runs                        (get @last-solvers-history-atom solver-name [])
-                   meta-extra                  {:extra {:last-processed timestamp-str
-                                                        :cache-hit?     cache-hit?
-                                                        :elapsed-ms     elapsed-ms
-                                                        :runs           (count runs)
-                                                        :error?         error?}}
-                   timestamp-str               (str timestamp-str " (" elapsed-ms "ms)")
-                   new-history                 (conj runs timestamp-str)]
-               (swap! last-solvers-atom assoc solver-name output-val)
-               (swap! last-solvers-atom-meta assoc
-                      solver-name
-                      (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
-               (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
+                output-full                 {:req        vdata
+                                             :value      (-> (assoc output :return-maps
+                                                                    (select-keys (get output :return-maps) [flow-id]))
+                                                             (dissoc :tracker)
+                                                             (dissoc :tracker-history))
+                                             :output-val output-val
+                                             :flow-id    flow-id
+                                             :return     return}
+                error?                      (err? output-full)
+                runs                        (get @last-solvers-history-atom solver-name [])
+                meta-extra                  {:extra {:last-processed timestamp-str
+                                                     :cache-hit?     cache-hit?
+                                                     :elapsed-ms     elapsed-ms
+                                                     :runs           (count runs)
+                                                     :error?         error?}}
+                timestamp-str               (str timestamp-str " (" elapsed-ms "ms)")
+                new-history                 (conj runs timestamp-str)]
+            (do
+              (swap! last-solvers-atom assoc solver-name output-val)
+              (swap! last-solvers-atom-meta assoc
+                     solver-name
+                     (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
+              (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
+
                (when use-cache?
                  (swap! solvers-cache-atom assoc cache-key [output-val output-full]))
-               
-               (swap! flow-db/results-atom dissoc flow-id)  ;; <-- clear out the flow atom
-               ;(swap! solvers-running assoc-in [client-name solver-name] false)
-               (swap! solver-status update-in [client-name solver-name]
-                      (fn [solver]
-                        (-> solver
-                            (assoc :stopped (System/currentTimeMillis))
-                            (assoc :running? false)
-                            (assoc :time-running (ut/format-duration
-                                                  (:started solver)
-                                                  (System/currentTimeMillis)))))))
-             (catch Exception e
-               (do (ut/pp [:SOLVER-FLOW-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
-                   ;(swap! solvers-running assoc-in [client-name solver-name] false)
-                   (swap! solver-status update-in [client-name solver-name]
-                          (fn [solver]
-                            (-> solver
-                                (assoc :stopped (System/currentTimeMillis))
-                                (assoc :running? false)
-                                (assoc :error? true)
-                                (assoc :time-running (ut/format-duration
-                                                      (:started solver)
-                                                      (System/currentTimeMillis))))))
-                   (swap! last-solvers-atom-meta assoc solver-name
-                          {:error (str e)}))))
 
+              (swap! flow-db/results-atom dissoc flow-id)  ;; <-- clear out the flow atom
+               ;(swap! solvers-running assoc-in [client-name solver-name] false)
+              (swap! solver-status assoc-in [client-name solver-name :running?] false)
+              (swap! solver-status assoc-in [client-name solver-name :mid?] true)
+              (swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis)))
+              ;;  (swap! solver-status update-in [client-name solver-name]
+              ;;         (fn [solver]
+              ;;           (-> solver
+              ;;               (assoc :stopped (System/currentTimeMillis))
+              ;;               (assoc :running? false)
+              ;;               (assoc :time-running (ut/format-duration
+              ;;                                     (:started solver)
+              ;;                                     (System/currentTimeMillis))))))
+            output-val
+            )
+          (catch Exception e
+            (do (ut/pp [:SOLVER-FLOW-ERROR!!! (str e) e :tried vdata :for solver-name :runner-type runner-type])
+                   ;(swap! solvers-running assoc-in [client-name solver-name] false)
+                (swap! solver-status assoc-in [client-name solver-name :running?] false)
+                (swap! solver-status assoc-in [client-name solver-name :error?] true)
+                (swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
+                (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+
+        
         :else ;; else we assume it's just data and keep it as is
         (let [output-full   {:static-data vdata}
               runs          (get @last-solvers-history-atom solver-name [])
@@ -3127,15 +3123,14 @@
                  (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
           (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
           ;(swap! solvers-running assoc-in [client-name solver-name] false)
-          (swap! solver-status update-in [client-name solver-name]
-                 (fn [solver]
-                   (-> solver
-                       (assoc :stopped (System/currentTimeMillis))
-                       (assoc :running? false)
-                       (assoc :time-running (ut/format-duration
-                                             (:started solver)
-                                             (System/currentTimeMillis))))))
+          (swap! solver-status assoc-in [client-name solver-name :running?] false)
+          (swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
           vdata))
+
+      ;; just in case?
+      (swap! solver-status assoc-in [client-name solver-name :running?] false)
+      (swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
+      
       ;(swap! solvers-running assoc-in [client-name solver-name] false)
       ;; (swap! solver-status update-in [client-name solver-name]
       ;;        (fn [solver]
@@ -5156,7 +5151,10 @@
              }
             _ (reset! last-stats-row jvm-stats-vals)
             insert-sql {:insert-into [:jvm_stats] :values [jvm-stats-vals]}
-            _ (swap! server-atom assoc :uptime (ut/format-duration-seconds seconds-since-boot))]
+            _ (swap! server-atom assoc :uptime (ut/format-duration-seconds seconds-since-boot))
+            flow-status-map (flow-statuses) ;; <--- important, has side effects, TODO refactor into timed instead of hitched to jvm console stats output
+            ]
+        
         (swap! stats-cnt inc)
         (sql-exec system-db (to-sql {:delete-from [:client_stats]}))
         (sql-exec system-db (to-sql insert-cli))
@@ -5167,7 +5165,9 @@
           (ut/print-ansi-art "nname.ans")
           (ut/pp [:version 0 :june 2024 "Hi."])
           (println " "))
-        (let [fss (flow-statuses) fssk (vec (keys fss))] (ut/pp [:flow-status (select-keys fss fssk)]))
+        
+        ;;(let [fss (flow-statuses) fssk (vec (keys fss))] (ut/pp [:flow-status (select-keys fss fssk)]))
+
         ;;(ut/pp [:date-map @time-atom])
         (ut/pp [:sql-errors!
                 {:ttl     (count @sql/errors)
@@ -5176,8 +5176,17 @@
 
         ;;(ut/pp [:solvers-running? @solver-status])
 
+        (ut/pp [:solver-cache-distro (ut/cache-distribution solvers-cache-hits-atom 0.5)])
+
         (try (let [peers       (count @wl/sockets)
                    uptime-str  (ut/format-duration-seconds (ut/uptime-seconds))
+                   sub-types (try
+                               (frequencies (flatten (apply concat (for [[_ v] @atoms-and-watchers]
+                                                                     (for [k (keys v)]
+                                                                       (edn/read-string (first (cstr/split (str k) #"/"))))))))
+                               (catch Exception e {:error-getting-sub-types (str e)}))
+                   sub-types (select-keys sub-types (filter #(not (cstr/includes? (str %) "||")) (keys sub-types))) 
+                   ;; ^^ flow tracker subs have messy keypath parents and are generally one-offs. noise.
                    server-subs ttl]
                (swap! server-atom assoc :uptime uptime-str :clients peers :threads thread-count :memory mm)
                (ut/pp ["     " :jvm-stats
@@ -5188,6 +5197,7 @@
                         :sys-load                     sys-load
                         :cwidth                       (ut/get-terminal-width)
                         :uptime                       uptime-str
+                        :sub-types                    sub-types
                         :server-subs                  server-subs
                         :*jvm-memory-used             [(ut/nf mm) :mb]
                         :*current-threads             thread-count}]))
@@ -5267,11 +5277,12 @@
    :join?                false
    :async?               true
    ;:min-threads          300
-   :max-threads          1000 ;; Increased max threads
-   :idle-timeout         500000 ;; Reduced idle timeout
-   :max-idle-time        3000000 ;; Reduced max idle time
-   :input-buffer-size    131072 ;;32768  ;; Increased buffer sizes
-   :output-buffer-size   131072 ;;32768
+   ;:max-threads          1000 ;; Increased max threads
+   ;:idle-timeout         500000 ;; Reduced idle timeout
+   ;:max-idle-time        3000000 ;; Reduced max idle time
+   :max-idle-time         15000
+   ;:input-buffer-size    131072 ;;32768  ;; Increased buffer sizes
+   ;:output-buffer-size   131072 ;;32768
    :max-message-size     6291456 ;;2097152  ;; Increased max message size
    :websockets           ws-endpoints
    :allow-null-path-info true})

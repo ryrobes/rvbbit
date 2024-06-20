@@ -407,7 +407,7 @@
       [re-com/v-box :padding "6px" :style
        {;:border "1px solid red"
         :overflow "auto"} :gap "6px" :size "none" :children
-       (for [[name {:keys [signal]}] signals
+       (for [[name {:keys [signal]}] (sort signals)
              :let                    [selected? (= name selected-warren-item)
                                       sigkw     (keyword (str "signal/" (ut/replacer (str name) ":" "")))
                                       vv        (when signal? (get results name))
@@ -433,8 +433,21 @@
                (if solver? (ut/nf (get ext-map :runs)) (str (if (nil? vv) "" vv))) :style
                {:font-weight 700 :font-size "15px" :opacity (if (true? vv) 1.0 0.2)}]]]
             (when solver?
-              [re-com/h-box :padding "6px" :justify :between :style {:font-size "13px" :opacity 0.56} :children
-               [[re-com/box :child (str (get ext-map :last-processed))]
+              [re-com/h-box :padding "6px" :justify :between :style {:font-size "13px" :opacity 0.56}
+               :children
+               [
+                (when (cstr/includes? (str name) "upscaler")
+                  [re-com/md-icon-button :src (at) :md-icon-name "zmdi-play" :on-click
+                   #(ut/tracked-dispatch [::wfx/request :default
+                                          {:message {:kind         :run-solver
+                                                     :solver-name  name
+                                                   ;:override-map (get @(ut/tracked-sub ::solvers-map {})
+                                                   ;                   selected-warren-item)
+                                                     :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                                           :timeout 15000000}]) :style
+                   {:font-size "17px" :cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}])
+                
+                [re-com/box :child (str (get ext-map :last-processed))]
                 [re-com/box :child (str (get ext-map :elapsed-ms) "ms")]]])]] :operator sigkw])]]]))
 
 
