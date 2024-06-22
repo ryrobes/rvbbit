@@ -8416,6 +8416,13 @@
             :child [:string3 "no clover-fn found" :clover-body]])))
 
 
+(re-frame/reg-event-db
+ ::add-placeholder-value 
+ (fn [db [_ solver-name]]
+   (assoc-in db [:click-param :solver solver-name] 
+             [:box :child "running..."])))
+
+
 
 (defn honeycomb
   [panel-key & [override-view fh fw replacement-view replacement-query]] ;; can sub lots of this
@@ -8432,10 +8439,9 @@
         override-view (cond (= override-view :*)                                                        selected-view
                             (and (not (nil? override-view))
                                  ;(some #(= % override-view) all-keys)
-                                 ) override-view
+                                 )override-view
                             (and (not (nil? override-view))
-                                 (not (some #(= % override-view) all-keys))
-                                 ) (first all-keys)
+                                 (not (some #(= % override-view) all-keys))) (first all-keys)
                             :else                                                                       nil)
         w (if (not (nil? override-view)) 11 @(ut/tracked-subscribe [::panel-width panel-key]))
         h (if (not (nil? override-view)) 8.7 @(ut/tracked-subscribe [::panel-height panel-key]))
@@ -8453,6 +8459,7 @@
                                       (not= selected-view-type :queries))
                                  selected-view-type
                                  :else :views)
+        br @(ut/tracked-sub ::block-runners {})
         ;;_ (ut/tapp>>  [:selected-view-type selected-view selected-view-type])
 
         all-drops @(ut/tracked-sub ::all-drops-of-alpha {:ttype :*})
@@ -8462,6 +8469,7 @@
                                 [:box :child [:string x "hey"] :style {:color "red"}])}))
         walk-map (clover-walk-singles panel-key client-name px-width-int px-height-int ww hh w h selected-view override-view)
         connection-id @(ut/tracked-subscribe [::panel-connection-id panel-key]) ;(get block-map
+
 
         body @(rfa/sub ::views {:panel-key panel-key :ttype selected-view-type})
 
@@ -8474,30 +8482,44 @@
         body (if (and (not= selected-view-type :views)
                       (not= selected-view-type :queries))
                ;;{(first body) [:box :child [:string3 (last body)]]}
-               (let [br @(ut/tracked-sub ::block-runners {})
+               (let [
                      wrapper @(ut/tracked-sub ::get-clover-runner-fn {:view-type selected-view-type}) ;;(get-in br [selected-view-type :clover-fn])
                      clover-fn @(ut/tracked-sub ::current-view-mode-clover-fn {:panel-key panel-key :data-key selected-view})
-                     ;;wrapper (ut/postwalker {:clover-body body} wrapper)
+                     ;;sub-param (first (map last (filter (fn [[k _]] (cstr/includes? (str k) (str panel-key " " selected-view))) @db/solver-fn-lookup)))
+                     ;;sub-param-root (try (last (cstr/split (str sub-param) #"/")) (catch :default _ ""))
+                     ;;curr-val @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sub-param]})
+                     
+                     placeholder-clover (get-in br [selected-view-type :placeholder-clover] ;; inject placeholder if we have no data for this
+                                                [:box
+                                                 :child [:img {:src "images/running.gif"}]
+                                                 :size "auto"
+                                                 :style {:color :theme/universal-pop-color
+                                                         :font-size "14px"}
+                                                 :height :panel-height+50-px
+                                                 :align :center :justify :center])
+                     ;;placeholder-clover (edn/read-string (cstr/replace (pr-str placeholder-clover) "*solver-name*" sub-param-root)) ;; ugly, but cheaper than parse and postwalk here
+                     ;;_ (tapp>> [:ss sub-param sub-param-root  (str placeholder-clover)])
+                     
+                     ;;wrapper (ut/postwalker {:clover-body body} wrapper) 
                      ;;_ (tapp>> [:body (str body)])
-                     ]
+                     solver-body (into {} (for [[k v] body]
+                                            {k (let [syntax (get-in br [selected-view-type :syntax] "clojure")
+                                                     text?  (not= syntax "clojure")
+                                                     v (if text?
+                                                         (if (string? v) (str v) (try (str (cstr/join "\n" v)) (catch :default _ (str v))))
+                                                         ;; might be saved as a literal string if first in - but after being saved, it will be a vector of strings per newline
+                                                         v)
+                                                     v (ut/postwalk-replacer {:clover-body v} wrapper)]
+                                                 (if (not (nil? v))
+                                                   (ut/postwalk-replacer {:*data v} clover-fn) v))}))]
+                 (assoc solver-body :waiter placeholder-clover)
+                        
+
                 ;;  (into {} (for [[k v] body] {k [:box
                 ;;                                  :align :center :justify :center :size "auto"
                 ;;                                  :style {:font-size "14px" :color (theme-pull :theme/editor-outer-rim-color nil)}
                 ;;                                  :child [:data-viewer (ut/postwalk-replacer {:clover-body v} wrapper)]]}))
-                 (into {} (for [[k v] body]
-                            {k (let [syntax (get-in br [selected-view-type :syntax] "clojure")
-                                     text?  (not= syntax "clojure")
-                                     v (if text?
-                                         (if (string? v) (str v) (try (str (cstr/join "\n" v)) (catch :default _ (str v))))
-                                         ;; might be saved as a literal string if first in - but after being saved, it will be a vector of strings per newline
-                                         v)
-                                     v (ut/postwalk-replacer {:clover-body v} wrapper)
-                                     ;_ (tapp>> [:v (str v)])
-                                     ] ;; adds the functionality
-                                 
-                                 (if (not (nil? v))
-                                   (ut/postwalk-replacer {:*data v} clover-fn) v)
-                                 )}))) ;; adds the render wrapper
+                 ) ;; adds the render wrapper
                body)
 
         ;; _ (when (not= selected-view-type :views)
@@ -8766,6 +8788,7 @@
                                   ;;                  ]))
                                    _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                    _ (when lets-go?
+                                       ;;(ut/tracked-dispatch [::add-placeholder-value new-solver-name])
                                        (swap! db/solver-fn-lookup assoc fkp sub-param)
                                        ;(ut/tracked-dispatch [::conn/update-solver-fn-lookup fkp sub-param])
                                        (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)
@@ -8830,7 +8853,8 @@
         ;;        (ut/postwalk-replacer walk-map body))
         body (ut/postwalk-replacer walk-map body)
 
-        _ (when (= panel-key :block-1800) (tapp>> [:data-viewer-only? panel-key data-viewer-only? selected-view override-view (str body)]))
+        ;;_ (when (= panel-key :block-1800) (tapp>> [:data-viewer-only? panel-key data-viewer-only? selected-view override-view (str body)]))
+
         body (if (not data-viewer-only?)
                (ut/postwalk-replacer {:box re-com/box
                                       :layout (fn [x] [layout panel-key (or override-view selected-view) x w h])
@@ -8869,7 +8893,23 @@
                                                              (for [k templated-strings-vals]
                                                                {k @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})})))
                                  {})
-        body (if templates? (ut/deep-template-replace templated-strings-walk body) body)]
+        body (if templates? (ut/deep-template-replace templated-strings-walk body) body)
+
+        sub-param (first (map last (filter (fn [[k _]] (cstr/includes? (str k) (str panel-key " " selected-view))) @db/solver-fn-lookup)))
+
+        body (if (ut/ne? sub-param)
+               (let [curr-val @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sub-param]})
+                     sub-param-root (try (last (cstr/split (str sub-param) #"/")) (catch :default _ ""))
+                     placeholder-on-running? (get-in br [selected-view-type :placeholder-on-running?])
+                     running? (when placeholder-on-running? 
+                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(str "solver-status/*client-name*>" sub-param-root ">running?")]}))]
+                 (if (or (nil? curr-val) running?)
+                   (assoc body selected-view 
+                          ;;[re-com/box :child "waiting..."]
+                          (get body :waiter)
+                          ) ;; use user-space clover placeholder?
+                   body)) body) ;; we have to replace it down here so the solver gets started above even though we don't render it yet...
+  ]
     
     (doseq [[k v] (merge sql-calls base-table-sniffs)] ;; base-table-sniffs allow us to get
       (let [query          (sql-alias-replace-sub v)
@@ -9729,7 +9769,7 @@
                               (doall
                                (for [s mixed-keys]
                                  (let [selected?        (= (if (= s base-view-name) nil s) selected-view)
-                                       _ (tapp>> [:selected-view selected-view])
+                                       ;;;_ (tapp>> [:selected-view selected-view])
                                        not-view?        (not (some #(= % s) (keys views)))
                                        reco-count       (when not-view? @(ut/tracked-subscribe [::reco-count s :reco]))
                                        [_ single-wait?] (if not-view? @(ut/tracked-subscribe [::query-waitings s]) [0 0])

@@ -1322,12 +1322,12 @@
                  :justify :between :align :center 
                  :children [[re-com/box :child (str "queries & views")]
                             [re-com/box :child (str "runner: " data-key-type) 
-                             :style {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))
+                             :style {;:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))
                                      :color (str (theme-pull :theme/editor-outer-rim-color nil))
                                      ;:font-weight 700
                                      :padding-left "3px"
                                      :padding-right "3px"
-                                     :margin-top "2px"
+                                     ;:margin-top "2px"
                                      :border-radius "7px"
                                      :font-size "13px"}
                              ]

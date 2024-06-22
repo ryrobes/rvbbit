@@ -43,6 +43,20 @@
                                  " on " jvm-version " JVM tech"
                                  " 🥕🐇"))
                      :syntax "clojure"
+                     :placeholder-clover [:v-box 
+                                          :children [;[:box :child [:string3 :*solver-name* " running..."]]
+                                                     [:img {:src "images/running.gif" 
+                                                            ;:width "70px" 
+                                                            ;:height "70px"
+                                                            }]
+                                                     ] 
+                                          :size "auto"
+                                          :style {:color :theme/universal-pop-color
+                                                  ;:border "1px solid white"
+                                                  :font-size "14px"} 
+                                          ;:width  :panel-width-px
+                                          :height :panel-height+50-px 
+                                          :align :center :justify :center]
                      :clover-fn [:run-solver
                                  {:signal false
                                   :type :clojure
@@ -73,6 +87,7 @@
                           :modes [:clover :data :text]
                           :type :flow
                           :syntax "text"
+                          :placeholder-on-running? true
                           :clover-fn [:run-solver
                                       {:signal false
                                        :cache? false
