@@ -50,7 +50,7 @@
                        [io.pedestal/pedestal.service "0.6.4"]
                        [io.pedestal/pedestal.jetty "0.6.4"]]
   :jvm-opts           ["--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED" ;; suppresses warnings
-                       "-Xmx64g" ;; testing with 64g on my main dev machine
+                       "-Xmx16g"  ;; "-Xmx64g" ;; testing with 64g on my main dev machine
                        "-Xss2048k" ;; testing with double the stack space to root out some flow-runner intermittent StackOverflow issue...
                        "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"] ;; datalevin specific
   :cljfmt             {}

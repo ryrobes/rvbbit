@@ -511,7 +511,7 @@
           in-editor-solvers0      (vec (map last (filter (fn [[k _]] (cstr/includes? (str k) (str selected-block))) @db/solver-fn-lookup)))
           in-editor-solvers       (if editor? 
                                     (vec (distinct 
-                                          (apply flatten (for [s in-editor-solvers0]
+                                          (flatten (for [s in-editor-solvers0]
                                             [(keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")))
                                              (keyword (str (ut/replacer s ":solver/" "solver-meta/")))]))
                                           )) [])
@@ -521,7 +521,9 @@
           signal-subs             (if signals-mode? (vec (into signal-hist (into signal-ui-refs signal-ui-part-refs))) [])
           theme-refs              (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
                                                          (filter keyword? (ut/deep-flatten (get-in db [:click-param :theme]))))))]
-      ;; (tapp>> [:clover-solvers (str in-editor-solvers )
+      ;; (tapp>> [:clover-solvers
+      ;;          @db/solver-fn-lookup
+      ;;          (str in-editor-solvers0) (str in-editor-solvers )
       ;;          ;clover-solvers clover-solvers-running
       ;;          ])
       (filterv #(not (cstr/includes? (str %) "||")) ;; live running subs ignore
@@ -1099,7 +1101,8 @@
 
 (re-frame/reg-event-db
  ::set-view-mode
- (fn [db [_ panel-key data-key mode]] 
+ (fn [db [_ panel-key data-key mode]]
+   (tapp>> [:set-view-mode panel-key data-key mode])
    (assoc-in db [:panels panel-key :selected-mode data-key] mode)))
 
 (re-frame/reg-event-db ::dispatch-keepalive
@@ -2237,6 +2240,53 @@
         _ (ut/tapp>> [:can-be-autocompleted? can? (count fff) token-string])]
     can?))
 
+
+(defn panel-string-box
+  [_ width-int height-int value syntax]
+  (let [syntax     (or (if (= syntax "raw (clojure)") "clojure" syntax) "clojure")
+        stringify? true ;;(not (= syntax "clojure"))
+        ;selected-kp @(ut/tracked-sub ::editor-panel-selected-view {})
+        ;selected-kp (if (nil? (first selected-kp)) nil selected-kp)
+        ]
+    [re-com/box
+     :size "auto"
+     :padding "8px"
+     ;:width (px (- width-int 24))
+     ;:height (px (- height-int 24))
+     :style {:font-family      (if (= syntax "text") 
+                                 (theme-pull :theme/base-font nil)
+                                 (theme-pull :theme/monospaced-font nil))
+             ;;:color           (theme-pull :theme/editor-outer-rim-color nil)
+             :font-size        "16px"
+             :overflow         "auto"
+             :background-color "#00000000"
+             :font-weight      700}
+     :child [(reagent/adapt-react-class cm/UnControlled)
+             {;; :value   (ut/format-map (- width-int 24)
+              ;; :value   (if stringify?
+              ;;            (try (str (cstr/join "\n" value)) (catch :default _ (str value)))
+              ;;            (ut/format-map (- width-int 24) (str value)))
+              :value (if (string? value) (str value) (try (str (cstr/join "\n" value)) (catch :default _ (str value))))
+              :onBlur  #(let [rr  (ut/cm-deep-values %)
+                              rrd (try (read-string (cstr/join " " rr)) (catch :default _ (pr-str (cstr/join "\n" rr))))
+                              selected-kp  @(ut/tracked-subscribe [::editor-panel-selected-view])
+                              selected-kp  (if (nil? (first selected-kp)) nil selected-kp)]
+                          (ut/tapp>> [:string-input stringify? selected-kp  rr rrd value])
+                          (when (not= value rr)
+                            (ut/tracked-dispatch-sync [::update-selected-key-cons selected-kp rr])))
+              :onFocus        (fn [_] (reset! db/cm-focused? true))
+              :options {:mode              syntax
+                        :lineWrapping      true
+                        :lineNumbers       false ;true
+                        :matchBrackets     true
+                        :autoCloseBrackets true
+                        :autofocus         false
+                        :autoScroll        false
+                        :detach            true
+                        :readOnly          false ;true
+                        :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
+
+
 (defn panel-code-box
   [_ _ width-int height-int value]
   (let [sql-hint?   (cstr/includes? (str value) ":::sql-string")
@@ -2409,35 +2459,44 @@
 
 (defn open-input-code-box
   [kp width-int height-int value syntax & [style]]
-  (let [;sql-hint? (cstr/includes? (str value) ":::sql-string")
-        syntax     (or (if (= syntax "raw (clojure)") "clojure" syntax) "clojure")
+  (let [syntax     (or (if (= syntax "raw (clojure)") "clojure" syntax) "clojure")
         stringify? (not (= syntax "clojure"))]
-    [re-com/box :size "auto" :width (px (- width-int 24)) :height (px (- height-int 24)) :style
-     (merge {:font-family      (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
-             :font-size        "16px"
-             :overflow         "auto"
-             :background-color "#00000000"
-             :font-weight      700}
-            style) :child
-     [(reagent/adapt-react-class cm/UnControlled)
-      {;; :value   (ut/format-map (- width-int 24)
-       :value   (if stringify? (str (cstr/join "\n" value)) (ut/format-map (- width-int 24) (str value)))
-       :onBlur  #(let [rr  (ut/cm-deep-values %)
-                       rrd (try (read-string (cstr/join " " rr)) (catch :default _ (pr-str (cstr/join "\n" rr))))]
-                   (ut/tapp>> [:open-input stringify? kp rr rrd value])
-                   (if stringify?
-                     (when (not= value rr) (ut/tracked-dispatch [::conn/click-parameter kp rr]))
-                     (ut/tracked-dispatch [::conn/click-parameter kp rrd])))
-       :options {:mode              syntax
-                 :lineWrapping      true
-                 :lineNumbers       false ;true
-                 :matchBrackets     true
-                 :autoCloseBrackets true
-                 :autofocus         false
-                 :autoScroll        false
-                 :detach            true
-                 :readOnly          false ;true
-                 :theme             (theme-pull :theme/codemirror-theme nil)}}]])) ;"ayu-mirage" ;"hopscotch"
+    [re-com/box :size "auto" 
+     :width (px (- width-int 24)) 
+     :height (px (- height-int 24))
+     :style (merge {:font-family      (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
+                    :font-size        "16px"
+                    :overflow         "auto"
+                    :background-color "#00000000"
+                    :font-weight      700}
+                   style)
+     :child [(reagent/adapt-react-class cm/UnControlled)
+             {;; :value   (ut/format-map (- width-int 24)
+              :value   (if stringify?
+                         (try (str (cstr/join "\n" value)) 
+                              (catch :default _ (str value)))
+                         (ut/format-map (- width-int 24) (str value)))
+              :onBlur  #(let [rr  (ut/cm-deep-values %)
+                              rrd (try (read-string (cstr/join " " rr)) 
+                                       (catch :default _ (pr-str (cstr/join "\n" rr))))]
+                          (ut/tapp>> [:open-input stringify? kp rr rrd value])
+                          (if stringify?
+                            (when (not= value rr) (ut/tracked-dispatch [::conn/click-parameter kp rr]))
+                            (ut/tracked-dispatch [::conn/click-parameter kp rrd])))
+              :options {:mode              syntax
+                        :lineWrapping      true
+                        :lineNumbers       false ;true
+                        :matchBrackets     true
+                        :autoCloseBrackets true
+                        :autofocus         false
+                        :autoScroll        false
+                        :detach            true
+                        :readOnly          false ;true
+                        :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
+
+
+
+
 
 
 (defn field-code-box
@@ -5890,7 +5949,10 @@
 (re-frame/reg-sub ::panel-views
                   (fn [db {:keys [panel-key]}] (let [v (get-in db [:panels panel-key :views])] (if (vector? v) {:base v} v))))
 
-(re-frame/reg-sub ::block-runners (fn [db _] (get-in db [:server :settings :runners])))
+(re-frame/reg-sub
+ ::block-runners
+ (fn [db _]
+   (get-in db [:server :settings :runners])))
 
 (re-frame/reg-sub
  ::panel-runners
@@ -5923,7 +5985,7 @@
                           queries (get-in db [:panels panel-key :queries])
                           view    (get-in db [:panels panel-key :selected-view])
                           runners (keys (-> (get-in db [:server :settings :runners]) (dissoc :views) (dissoc :queries)))
-                          runners2 (vec (apply merge (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))))
+                          runners2 (vec (flatten (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))))
                           vq      (conj (conj (into runners2 (into (keys body) (keys queries))) :layered-viz) :dyn-tab)] ;; pseudo
                       (cond (and view (some #(= % view) vq)) view
                             (map? body)                      (nth (keys body) 0)
@@ -5934,11 +5996,12 @@
                     (let [body    (get-in db [:panels panel-key :views])
                           queries (get-in db [:panels panel-key :queries])
                           runners (keys (-> (get-in db [:server :settings :runners]) (dissoc :views) (dissoc :queries)))
-                          runners2 (vec (apply merge (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))))
+                          runners2 (vec (flatten (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))))
                           ;;conj on a map takes map entries or seqables of map entries
                           ;;_ (ut/tapp>> [:run runners runners2 (for [[_ v] (select-keys (get-in db [:panels panel-key]) runners)] (keys v))])
                           view    (get-in db [:panels panel-key :selected-view])
                           vq      (conj (conj (into runners2 (into (keys body) (keys queries))) :layered-viz) :dyn-tab)
+                          ;;_ (tapp>> [:vq (str vq (str runners2))])
                           v  (cond (and view (some #(= % view) vq)) view
                                    (map? body)                      (nth (keys body) 0)
                                    :else                            nil)
@@ -5987,8 +6050,7 @@
 (re-frame/reg-sub ::editor-panel-selected-view
                   (fn [db _] 
                     (let [selected-block (get db :selected-block)
-                          panel (get-in db [:panels selected-block])
-                          ;;_ (ut/tapp>> [:kkeeyy panel])
+                          panel (dissoc (get-in db [:panels selected-block]) :selected-mode :selected-view)
                           panel-pairs (apply concat (for [[k v] panel
                                                           :when (map? v)]
                                                       (for [vv (keys v)] [k vv])))
@@ -6004,7 +6066,7 @@
 (re-frame/reg-sub ::view-type
                   (fn [db {:keys [panel-key view]}]
                     (let [selected-block panel-key
-                          panel (get-in db [:panels selected-block])
+                          panel (dissoc (get-in db [:panels selected-block]) :selected-mode :selected-view)
                           panel-pairs (apply concat (for [[k v] panel
                                                           :when (map? v)]
                                                       (for [vv (keys v)] [k vv])))
@@ -6023,7 +6085,10 @@
 
 ;;(ut/tapp>> [:ed  (str @(ut/tracked-sub ::editor-panel-selected-view2 {}))])
 
-(re-frame/reg-event-db ::select-view (fn [db [_ panel-key view-key]] (assoc-in db [:panels panel-key :selected-view] view-key)))
+(re-frame/reg-event-db 
+ ::select-view 
+ (fn [db [_ panel-key view-key]] 
+   (assoc-in db [:panels panel-key :selected-view] view-key)))
 
 (re-frame/reg-sub ::panel-map (fn [db [_ panel-key]] (get-in db [:panels panel-key])))
 
@@ -6914,7 +6979,8 @@
 
 (re-frame/reg-sub ::data-viewer-source
                   (fn [db {:keys [block-id selected-view]}]
-                    (let [view (get-in db [:panels block-id :views selected-view])] (data-viewer-source view))))
+                    (let [view (get-in db [:panels block-id :views selected-view])] 
+                      (data-viewer-source view))))
 
 (declare map-boxes2*)
 
@@ -6955,14 +7021,6 @@
 ;(def start 0)  ; the start index of the page
 (def limit 20)  ; the number of items per page
 
-;; (defn get-page [iter start limit]
-;;   (subvec iter start (min (+ start limit) (count iter))))
-
-(defn get-page2 [iter start limit]
-  (if (= start "*")
-    iter
-    (subvec iter start (min (+ start limit) (count iter)))))
-
 (defn get-page [iter page limit]
   (if (= page "*")
     iter
@@ -6992,6 +7050,8 @@
           ;current-page (/ start limit)
           ;iter (vec (take 4 iter))
           source @(ut/tracked-sub ::data-viewer-source {:block-id block-id :selected-view selected-view})
+          source-kp (when (vector? source) (last source))
+          ;;_ (tapp>>  [:dv-source source (str source-kp)])
           source-clover-key? (and (keyword? source) (cstr/includes? (str source) "/"))
           source-app-db? (try (= (first source) :app-db) (catch :default _ false))
           ;;_ (ut/tapp>> [:data-viewer-source (str source) source-clover-key? source-app-db?])
@@ -7001,7 +7061,7 @@
           non-canvas? (nil? block-id)
           dggbl (if non-canvas? draggable-stub draggable)
           main-boxes
-          [re-com/v-box ;(if cells? re-com/h-box re-com/v-box)
+          [re-com/v-box ;(if cells? re-com/h-box re-com/v-box)   
            :size "auto" :padding "5px" :gap "2px" :style
            {:color       "black"
             :font-family (theme-pull :theme/base-font nil)
@@ -7029,7 +7089,7 @@
                                :border-radius    "12px"
                                :border           (str "3px " border-ind " " val-color 40)}
                    kp-clover (cond source-clover-key? clover-kp
-                                   source-app-db? [:app-db keypath-in]
+                                   source-app-db? [:app-db (vec  (into source-kp keypath-in))]
                                    :else [:get-in [source keypath-in]])]
                ^{:key (str block-id keypath kki kk)}
                [re-com/box :child
@@ -8349,6 +8409,7 @@
 (re-frame/reg-sub
  ::get-clover-runner-fn
  (fn [db {:keys [view-type]}]
+  ;;  (tapp>>  [:get-clover-runner-fn view-type (str (get-in db [:server :settings :runners view-type]))])
    (get-in db [:server :settings :runners view-type :clover-fn] 
            [:box 
             :style {:color "red" :background-color "black"}
@@ -8370,9 +8431,11 @@
         selected-view @(ut/tracked-sub ::selected-view-alpha {:panel-key panel-key}) ;(or  :view)
         override-view (cond (= override-view :*)                                                        selected-view
                             (and (not (nil? override-view))
-                                 (some #(= % override-view) all-keys)) override-view
+                                 ;(some #(= % override-view) all-keys)
+                                 ) override-view
                             (and (not (nil? override-view))
-                                 (not (some #(= % override-view) all-keys))) (first all-keys)
+                                 (not (some #(= % override-view) all-keys))
+                                 ) (first all-keys)
                             :else                                                                       nil)
         w (if (not (nil? override-view)) 11 @(ut/tracked-subscribe [::panel-width panel-key]))
         h (if (not (nil? override-view)) 8.7 @(ut/tracked-subscribe [::panel-height panel-key]))
@@ -8411,18 +8474,30 @@
         body (if (and (not= selected-view-type :views)
                       (not= selected-view-type :queries))
                ;;{(first body) [:box :child [:string3 (last body)]]}
-               (let [;br @(ut/tracked-sub ::block-runners {})
+               (let [br @(ut/tracked-sub ::block-runners {})
                      wrapper @(ut/tracked-sub ::get-clover-runner-fn {:view-type selected-view-type}) ;;(get-in br [selected-view-type :clover-fn])
                      clover-fn @(ut/tracked-sub ::current-view-mode-clover-fn {:panel-key panel-key :data-key selected-view})
                      ;;wrapper (ut/postwalker {:clover-body body} wrapper)
+                     ;;_ (tapp>> [:body (str body)])
                      ]
                 ;;  (into {} (for [[k v] body] {k [:box
                 ;;                                  :align :center :justify :center :size "auto"
                 ;;                                  :style {:font-size "14px" :color (theme-pull :theme/editor-outer-rim-color nil)}
                 ;;                                  :child [:data-viewer (ut/postwalk-replacer {:clover-body v} wrapper)]]}))
                  (into {} (for [[k v] body]
-                            {k (let [v (ut/postwalk-replacer {:clover-body v} wrapper)] ;; adds the functionality
-                                 (ut/postwalk-replacer {:*data v} clover-fn))}))) ;; adds the render wrapper
+                            {k (let [syntax (get-in br [selected-view-type :syntax] "clojure")
+                                     text?  (not= syntax "clojure")
+                                     v (if text?
+                                         (if (string? v) (str v) (try (str (cstr/join "\n" v)) (catch :default _ (str v))))
+                                         ;; might be saved as a literal string if first in - but after being saved, it will be a vector of strings per newline
+                                         v)
+                                     v (ut/postwalk-replacer {:clover-body v} wrapper)
+                                     ;_ (tapp>> [:v (str v)])
+                                     ] ;; adds the functionality
+                                 
+                                 (if (not (nil? v))
+                                   (ut/postwalk-replacer {:*data v} clover-fn) v)
+                                 )}))) ;; adds the render wrapper
                body)
 
         ;; _ (when (not= selected-view-type :views)
@@ -8593,13 +8668,13 @@
                         (let [kps       (ut/extract-patterns obody :app-db 2)
                               logic-kps (into {} (for [v kps]
                                                    (let [[_ keypath] v]
-                                                     {v @(ut/tracked-sub  ::app-db-clover {:keypath keypath})})))]
+                                                     {v @(ut/tracked-sub ::app-db-clover {:keypath keypath})})))]
                           (walk/postwalk-replace logic-kps obody)))
         get-in-app-db-keys (fn [obody]
                              (let [kps       (ut/extract-patterns obody :app-db-keys 2)
                                    logic-kps (into {} (for [v kps]
                                                         (let [[_ keypath] v]
-                                                          {v (vec (keys @(ut/tracked-sub  ::app-db-clover {:keypath keypath})))})))]
+                                                          {v (vec (keys @(ut/tracked-sub ::app-db-clover {:keypath keypath})))})))]
                                (walk/postwalk-replace logic-kps obody)))
         run-rs-flow (fn [flow-id flow-id-inst panel-key override-merge-map]
                       (let [client-name @(ut/tracked-subscribe [::client-name])
@@ -8813,6 +8888,7 @@
               (conn/sql-data [k] query connection-id))
             (when srcnew? ;;; no need to dispatch to update the same shit over and over...
               (ut/tracked-dispatch [::insert-sql-source k query]))))))
+    
     (cond ;;replacement-all? [reecatch [re-com/box :child (get body selected-view)]]
       (seq body)
         (cond
@@ -8824,18 +8900,29 @@
                                (number? bv) (str bv)
                                (nil? bv) "nil!"
                                :else bv)]
-                  [re-com/box ;:size "auto"
-                   :style {:filter (if overlay? "blur(3px) opacity(60%)" "none")} :child bv])
+                  [reecatch 
+                   [re-com/box ;:size "auto"
+                    :src  (at)
+                    :style {:filter (if overlay? "blur(3px) opacity(60%)" "none")}
+                    :child bv]])
+                
                 (if override-view-is-sql?
                   [reecatch [magic-table panel-key [override-view]]]
+
                   (let [bv (get body override-view)
                         bv (cond (map? bv) [map-boxes2 bv nil "" [] nil nil]
                                  (number? bv) (str bv)
+                                 (nil? bv) (str "nil!")
+                                 (keyword? bv) (str bv)
                                  :else bv)]
+                    ;;(tapp>> [:editor (str bv)])
                     [reecatch
-                     [re-com/box :width (px ww) :size "none" :style {:filter (if overlay? "blur(3px) opacity(60%)" "none")}
-                      :child
-                      bv]]))))
+                     [re-com/box
+                      :src  (at)
+                      :width (px ww)
+                      :size "none"
+                      :style {:filter (if overlay? "blur(3px) opacity(60%)" "none")}
+                      :child bv]]))))
           
           selected-view-is-sql?      [reecatch [magic-table panel-key [selected-view]]] ;; magic-table
                                                                                         ;; [panel-key
@@ -8843,36 +8930,44 @@
                                       (let [bv body
                                             bv (cond (map? bv) [map-boxes2 bv nil "" [] nil nil]
                                                      (number? bv) (str bv)
+                                                     (keyword? bv) (str bv)
                                                      (nil? bv) "nil!"
                                                      :else bv)]
                                         [re-com/v-box :children
                                          [(when overlay?
                                             @(ut/tracked-subscribe [::dynamic-drop-targets nil @dragging-body panel-key nil ww hh]))
-                                          [re-com/box :style {:filter (if overlay? "blur(3px) opacity(60%)" "none")}
+                                          [re-com/box 
+                                           :src  (at)
+                                           :style {:filter (if overlay? "blur(3px) opacity(60%)" "none")}
                                            :child bv]]])]
           
           :else                      [reecatch
                                       (let [bv (get body selected-view)
                                             bv (cond (map? bv) [map-boxes2 bv nil "" [] nil nil]
                                                      (number? bv) (str bv)
+                                                     (keyword? bv) (str bv)
                                                      (nil? bv) "nil!"
                                                      :else bv)]
                                         [re-com/v-box :children
                                          [(when overlay?
                                             @(ut/tracked-subscribe [::dynamic-drop-targets nil @dragging-body panel-key nil ww hh]))
                                           [re-com/box
+                                           :src  (at)
                                            :style {:filter      (if overlay? "blur(3px) opacity(60%)" "none")
                                                    :margin-top  (if (and overlay? is-layout?) "-25px" "inherit") ;; not sure why the
                                                                                                         ;; pos gets fucked up
                                                                                                         ;; on
                                                    :margin-left (if (and overlay? is-layout?) "-3px" "inherit")}
                                            :child bv]]])]) ;)
+      
       (and no-view? selected-view-is-sql?) (if (and fw fh) ;(js/alert (str selected-view))
                                              [reecatch [magic-table panel-key [selected-view] fw fh]]
                                              [reecatch [magic-table panel-key [selected-view]]]) ;; block-sizes
                                                                                                  ;; block-width
-      (and no-view? (nil? selected-view) (seq sql-calls)) [reecatch [magic-table panel-key [(first (keys sql-calls))]]]
-      :else [re-com/box :child "nothing here to do."])))
+      (and no-view? (nil? selected-view) (seq sql-calls))  [reecatch [magic-table panel-key [(first (keys sql-calls))]]]
+
+      :else [re-com/box 
+             :child "nothing here to do."])))
 
 
 
@@ -9312,7 +9407,7 @@
     
     ^{:key (str "base-brick-grid")}
     [re-com/h-box :children
-     [((maybedoall)
+     [(doall ;; (maybedoall)
         (for [[bw bh brick-vec-key] brick-roots] ;diff-grid1] ;(if @dragging? current-grid
           (let [bricksw                                      (* bw brick-size)
                 bricksh                                      (* bh brick-size)
@@ -9392,9 +9487,9 @@
                 single-view?                                 @(ut/tracked-subscribe [::is-single-view? brick-vec-key])
                 no-view?                                     @(ut/tracked-subscribe [::has-no-view? brick-vec-key])
                 selected-view                                @(ut/tracked-sub ::selected-view-alpha {:panel-key brick-vec-key})
+                ;;_ (tapp>> [:pre-selected-view selected-view])
                 selected-view                                (cond viz-reco? reco-selected
-                                                                   (and (nil? selected-view) no-view? (seq sql-keys)) (first
-                                                                                                                        sql-keys)
+                                                                   (and (nil? selected-view) no-view? (seq sql-keys)) (first sql-keys)
                                                                    :else selected-view)
                 is-grid?                                     @(ut/tracked-subscribe [::is-grid? brick-vec-key selected-view])
                 is-pinned?                                   @(ut/tracked-subscribe [::is-pinned? brick-vec-key])
@@ -9634,6 +9729,7 @@
                               (doall
                                (for [s mixed-keys]
                                  (let [selected?        (= (if (= s base-view-name) nil s) selected-view)
+                                       _ (tapp>> [:selected-view selected-view])
                                        not-view?        (not (some #(= % s) (keys views)))
                                        reco-count       (when not-view? @(ut/tracked-subscribe [::reco-count s :reco]))
                                        [_ single-wait?] (if not-view? @(ut/tracked-subscribe [::query-waitings s]) [0 0])
@@ -9699,18 +9795,19 @@
                                        :attr
                                        {:on-click #(do (reset! mad-libs-view nil)
                                                        (clear-preview2-recos)
+                                                       (tapp>> [:clicked-on brick-vec-key s])
                                                        (ut/tracked-dispatch [::select-view brick-vec-key
-                                                                             (if (= s base-view-name) nil s)]))} :style
-                                       {:font-size        "12px"
-                                        :cursor           (if selected? "inherit" "pointer")
-                                        :font-weight      (cond ;single-tab? 500
-                                                            selected? 700
-                                                            :else     500)
-                                        :background-color bcolor
-                                        :color            fcolor
-                                        :margin-top       "-1px" ;(if is-param? "-3px"
-                                        :padding-left     "4px"
-                                        :padding-right    "4px"} :height "18px"]
+                                                                             (if (= s base-view-name) nil s)]))}
+                                       :style {:font-size        "12px"
+                                               :cursor           (if selected? "inherit" "pointer")
+                                               :font-weight      (cond ;single-tab? 500
+                                                                   selected? 700
+                                                                   :else     500)
+                                               :background-color bcolor
+                                               :color            fcolor
+                                               :margin-top       "-1px" ;(if is-param? "-3px"
+                                               :padding-left     "4px"
+                                               :padding-right    "4px"} :height "18px"]
                                       (when (or flow-running? 
                                                 runner-running?
                                                 (and (not selected?) query-running? not-view?))

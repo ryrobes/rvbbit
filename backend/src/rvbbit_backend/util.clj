@@ -20,25 +20,27 @@
     [rvbbit-backend.config   :as config]
     [talltale.core           :as tales])
   (:import
-    [java.lang.management ManagementFactory]
-    java.time.Instant
-    java.time.LocalTime
-    java.time.LocalDate
-    java.time.ZoneId
-    java.time.format.DateTimeFormatter
-    [java.time            LocalTime Duration Instant ZonedDateTime ZoneId Period DayOfWeek]
-    [java.text            SimpleDateFormat]
-    [java.util            Date TimeZone Calendar]
-    [java.awt.image       BufferedImage]
-    [javax.imageio        ImageIO]
-    [java.io              File]
-    [java.awt             Color]
-    [jline                TerminalFactory]
-    [java.time.format     TextStyle]
-    [java.util            Locale]
-    [java.security        MessageDigest]
-    [java.util            Base64]
-    java.time.format.DateTimeFormatter))
+   [java.lang.management ManagementFactory]
+   java.time.Instant
+   java.time.LocalTime
+   java.time.LocalDate
+   java.time.ZoneId
+   java.time.format.DateTimeFormatter
+   [java.time            LocalTime Duration Instant ZonedDateTime ZoneId Period DayOfWeek]
+   [java.text            SimpleDateFormat]
+   [java.util            Date TimeZone Calendar]
+   [java.awt.image       BufferedImage]
+   [javax.imageio        ImageIO]
+   [java.io              File]
+   [java.awt             Color]
+   [jline                TerminalFactory]
+   [java.time.format     TextStyle]
+   [java.util            Locale]
+   [java.security        MessageDigest]
+   [java.util            Base64]
+   [com.sun.management OperatingSystemMXBean]
+   [java.lang.management RuntimeMXBean]
+   java.time.format.DateTimeFormatter))
 
 (def rvbbit
   "
@@ -197,8 +199,34 @@
   []
   (let [os-bean (java.lang.management.ManagementFactory/getOperatingSystemMXBean)] (.getSystemLoadAverage os-bean)))
 
-(def debug-level (get (config/settings) :debug-level 0))
+;; (defn get-jvm-cpu-usage []
+;;   (let [os-mxbean (ManagementFactory/getOperatingSystemMXBean)
+;;         runtime-mxbean (ManagementFactory/getRuntimeMXBean)
+;;         uptime (.getUptime runtime-mxbean)
+;;         cpu-time (if (instance? OperatingSystemMXBean os-mxbean)
+;;                    (let [os-mxbean-ext ^OperatingSystemMXBean os-mxbean]
+;;                      (.getProcessCpuTime os-mxbean-ext))
+;;                    (throw (UnsupportedOperationException. "CPU time not supported on this JVM")))]
+;;     (if (> uptime 0)
+;;       (let [cpu-usage (/ (* cpu-time 100.0) (* uptime 1000000.0))]
+;;         cpu-usage)
+;;       0.0)))
 
+(defn get-jvm-cpu-usage []
+  (let [os-mxbean (ManagementFactory/getOperatingSystemMXBean)
+        runtime-mxbean (ManagementFactory/getRuntimeMXBean)
+        uptime (.getUptime runtime-mxbean)
+        available-processors (.getAvailableProcessors os-mxbean)
+        cpu-time (if (instance? OperatingSystemMXBean os-mxbean)
+                   (let [os-mxbean-ext ^OperatingSystemMXBean os-mxbean]
+                     (.getProcessCpuTime os-mxbean-ext))
+                   (throw (UnsupportedOperationException. "CPU time not supported on this JVM")))]
+    (if (> uptime 0)
+      (let [cpu-usage (/ (* cpu-time 100.0) (* uptime 1000000.0 available-processors))]
+        cpu-usage)
+      0.0)))
+
+(def debug-level (get (config/settings) :debug-level 0))
 
 (defn replace-multiple [s replacements] (reduce (fn [s [k v]] (cstr/replace s k v)) s replacements))
 
@@ -903,7 +931,7 @@
   [name a]
   (try (let [size-bytes (-> @a
                             pr-str
-                            .-length)
+                            .length) ; use .length as a method
              size-mb    (-> size-bytes
                             (/ 1048576.0)
                             (* 1e6)

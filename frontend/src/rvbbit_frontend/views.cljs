@@ -1264,14 +1264,15 @@
                                            (let []
                                              (ut/tracked-dispatch [::bricks/get-combo-hash selected-block src-table-id-str
                                                                    shape-name new-curr-axe])))}])]]]]])]]])
-            :else                                                    (let [selected-kp @(ut/tracked-subscribe
-                                                                                          [::bricks/editor-panel-selected-view])
+            
+            :else                                                    (let [selected-kp @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
                                                                            selected-kp (if (nil? (first selected-kp))
                                                                                          nil
                                                                                          selected-kp)] ;; if viz-gen or
                                                                        ;;(ut/tapp>> [:sel-keypath (str selected-kp) (get @db/data-browser-query selected-block)])
                                                                        (if ;(and ;view-selected?
                                                                          (get-in @db/scrubbers [selected-block data-key] false)
+
                                                                          [re-com/box :size "none" :width (px single-width) :height
                                                                           (px (- single-height 40)) :child
                                                                           [bricks/scrubber-panel view-selected?
@@ -1281,11 +1282,23 @@
                                                                              @(ut/tracked-subscribe [::bricks/keypaths-in-query
                                                                                                      selected-block data-key]))
                                                                            data-key nil {:fm true}] :style {:overflow "auto"}]
-                                                                         [bricks/panel-code-box selected-block selected-kp
-                                                                          (+ 17 single-width) (- single-height 20)
-                                                                          (if (nil? selected-kp)
-                                                                            selected-panel-map
-                                                                            (get-in selected-panel-map selected-kp))])))
+                                                                         
+                                                                         (let [selected-view-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
+                                                                               syntax (get-in block-runners-map [selected-view-type :syntax])] 
+                                                                           ;;(ut/tapp>> [selected-view-type  syntax])
+                                                                           (if (or (nil? syntax) (= syntax "clojure"))
+                                                                             [bricks/panel-code-box selected-block selected-kp
+                                                                              (+ 17 single-width) (- single-height 20)
+                                                                              (if (nil? selected-kp)
+                                                                                selected-panel-map
+                                                                                (get-in selected-panel-map selected-kp))]
+                                                                             [bricks/panel-string-box selected-kp (+ 17 single-width) (- single-height 20)
+                                                                              (if (nil? selected-kp)
+                                                                                selected-panel-map
+                                                                                (get-in selected-panel-map selected-kp))
+                                                                              syntax
+                                                                              ]
+                                                                             )))))
           (when (and system-panel? (= @db/editor-mode :status))
             [re-com/box :child (str websocket-status) :style
              {:color        (str (theme-pull :theme/editor-font-color nil) 77) ;; "#ffffff44"
@@ -1308,6 +1321,16 @@
                [[re-com/h-box :padding "4px" 
                  :justify :between :align :center 
                  :children [[re-com/box :child (str "queries & views")]
+                            [re-com/box :child (str "runner: " data-key-type) 
+                             :style {:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))
+                                     :color (str (theme-pull :theme/editor-outer-rim-color nil))
+                                     ;:font-weight 700
+                                     :padding-left "3px"
+                                     :padding-right "3px"
+                                     :margin-top "2px"
+                                     :border-radius "7px"
+                                     :font-size "13px"}
+                             ]
                             [re-com/h-box 
                              :style {:padding-right "10px"}
                              :gap "4px"
@@ -2601,7 +2624,9 @@
                                                :timeout 50000}]))]]])])]]
          (let [mem @(ut/tracked-subscribe [::bricks/memory])]
            [re-com/box :size "none" :style {:position "fixed" :left 2 :bottom 20 :font-weight 700 :color "#ffffff99"} :child
-            (str (ut/bytes-to-mb (get mem 1)) (str " (lazy-grid? " (not (or @bricks/param-hover @bricks/query-hover)) ")"))])
+            (str (ut/bytes-to-mb (get mem 1)) 
+                 ;;(str " (lazy-grid? " (not (or @bricks/param-hover @bricks/query-hover)) ")")
+                 )])
          [bricks/reecatch [task-bar]] 
          [bricks/reecatch [flows/alert-box]]
          [re-com/box :child

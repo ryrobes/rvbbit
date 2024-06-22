@@ -1,5 +1,26 @@
 {:orders
- {:jvm_stats
+ {:recos-sys
+  [:context_hash
+   :combo_hash
+   :connection_id
+   :shape_name
+   :query_map
+   :query_map_str
+   :viz_map
+   :combo_edn
+   :selected_view
+   :table_name
+   :condis
+   :h
+   :w
+   :score],
+  :fields-sys [:field_name :field_type :data_type],
+  :kke192 (:query_error),
+  :viz-shapes-sys [:combo_edn :recos],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb),
+  :jvm_stats
   [:used_memory_mb
    :thread_count
    :messages
@@ -21,14 +42,39 @@
    :sniffs_run
    :sys_load
    :ts],
-  :kke192 (:query_error),
-  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb),
-  :flows-sys [:flow_id :file_path :last_modified]},
+  :searches-types-sys [:item_type],
+  :searches-rows-sys
+  [:item_sub_type
+   :item_type
+   :item_key
+   :display_name
+   :sample
+   :value
+   :is_live
+   :block_meta],
+  :viz-tables-sys [:table_name :recos],
+  :shows-drag-6 [:location :show_name :title :tour_name],
+  :shows (:query_error),
+  :viz-shapes0-sys [:shape :recos],
+  :connections-sys [:database_name :connection_id],
+  :searches-sub-types-sys [:item_key :is_live :items :styler_highlight_4018a],
+  :gen-viz-243 [:rows :tour_name]},
  :reco-preview nil,
  :sql-source
  {:jvm_stats
   {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
   :kke192 {:select [:*], :connection-id "system-db", :from [:kke192], :limit 111},
+  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
+  :gen-viz-243
+  {:select [[[:count 1] :rows] :tour_name],
+   :from
+   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+   :group-by [:tour_name],
+   :order-by [[:rows :desc]]},
+  :shows-drag-6
+  {:select [:location :show_name :title :tour_name],
+   :from [[:shows :dd235]],
+   :_last-run "19:23:37"},
   :new-query
   {:cache? false,
    :limit 100,
@@ -39,9 +85,160 @@
    :connection-id "system-db",
    :select
    [:thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :sys_load :used_memory_mb],
-   :post-process-fn reverse}},
+   :post-process-fn reverse},
+  :searches-types-sys
+  {:select [:item_type],
+   :where
+   [:and
+    [:not [:like :item_sub_type "%preview%"]]
+    [:not [:= :item_type "saved-block"]]],
+   :from [:client_items],
+   :group-by [1]},
+  :searches-sub-types-sys
+  {:select [:item_key :is_live [[:count 1] :items]],
+   :where
+   [:and
+    [:not [:= :item_key "upbeat-globular-gnu-4"]]
+    [:not [:like :item_sub_type "%preview%"]]
+    [:not [:= :item_type "saved-block"]]
+    [:= :item_type "client-params"]],
+   :style-rules
+   {[:* :highlight-4018a]
+    {:logic [:= :is_live 1],
+     :style {:background-color "#9c346434", :color "#9c3464"}}},
+   :from [:client_items],
+   :group-by [1 2]}},
  :meta
- {:kke192
+ {:recos-sys
+  {:fields
+   {:query_map
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"[{:select [[[[:sum :rows]] :rows] :tour_name], :from [\"query/shows_drag_6\"], :group-by [:tour_name]}]"
+      6,
+      "[{:select [[:tour_name :id] [:tour_name :label]], :from [\"query/shows_drag_6\"], :group-by [:tour_name], :order-by [:tour_name]}]"
+      1,
+      "[{:select [[[[:sum :rows]] :rows] [[:substr :title 0 11] :day_sqlite_title] :tour_name], :from [\"query/shows_drag_6\"], :group-by [[:substr :title 0 11] :tour_name]}]"
+      1},
+     :cardinality 50},
+    :shape_name
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"basic_timeseries_color" 2, "basic_h_bar_nivo" 1, "recharts_line" 1},
+     :cardinality 89},
+    :w
+    {:data-type "unknown",
+     :distinct 3,
+     :group-by? true,
+     :commons {nil 7, 9 2, 6 1},
+     :cardinality 30},
+    :combo_edn
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"\"rows, tour_name\"" 7,
+      "\"tour_name\"" 1,
+      "\"day_sqlite_title*, rows, tour_name\"" 1},
+     :cardinality 40},
+    :query_map_str
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"\nSELECT (SUM(rows)) AS rows, tour_name\nFROM 'query/shows_drag_6'\nGROUP BY tour_name\n"
+      6,
+      "\nSELECT tour_name AS id, tour_name AS label\nFROM 'query/shows_drag_6'\nGROUP BY tour_name\nORDER BY tour_name ASC\n"
+      1,
+      "\nSELECT (SUM(rows)) AS rows, SUBSTR(title, 0, 11) AS day_sqlite_title, tour_name\nFROM 'query/shows_drag_6'\nGROUP BY SUBSTR(title, 0, 11), tour_name\n"
+      1},
+     :cardinality 50},
+    :selected_view
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"" 7, ":reech" 3},
+     :cardinality 20},
+    :combo_hash
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"419046331" 1, "-500156998" 1, "2048926143" 1},
+     :cardinality 100},
+    :h
+    {:data-type "unknown",
+     :distinct 4,
+     :group-by? true,
+     :commons {nil 7, 2 1, 9 1},
+     :cardinality 40},
+    :condis
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"" 10},
+     :cardinality 10},
+    :score
+    {:data-type "float",
+     :distinct 2,
+     :group-by? true,
+     :commons {48.39999999999999 9, 0 1},
+     :cardinality 20},
+    :table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"shows_drag_6" 10},
+     :cardinality 10},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"cache.db" 10},
+     :cardinality 10},
+    :context_hash
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"-281537579" 10},
+     :cardinality 10},
+    :viz_map
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons
+     {"{:reech [:> :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:> :BarChart {:data :query-preview, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:> :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0.33}] [:> :Tooltip] [:> :XAxis {:dataKey :tour_name}] [:> :Bar {:dataKey :rows, :stroke \"#8884d8\", :fill \"#8884d8\"}]]]}"
+      1,
+      "[:nivo-bar-chart {:labelTextColor \"#423939\", :axisLeft {:tickRotation 0, :legendPosition \"middle\", :legendOffset -65}, :indexBy :tour_name, :layout \"vertical\", :enableLabel false, :axisBottom {:tickRotation 0, :legendPosition \"middle\", :legendOffset 40}, :inner-padding 0, :width :panel-width+70, :colors :theme/vega-default-color-scheme, :theme :theme/nivo-defaults, :colorBy \"id\", :click {:x :tour_name, :y :rows}, :groupMode \"stacked\", :keys [:rows], :padding 0.1, :enableGridX true, :border-radius 2, :enableGridY true, :height :panel-height+50, :margin {:top 5, :right 5, :bottom 50, :left 45}, :data :query-preview}]"
+      1,
+      "[:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :theme :theme/nivo-defaults, :arcLinkLabelsSkipAngle 10, :click {:c :tour_name, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :query-preview, :arcLinkLabelsTextColor \"#ffffff\"}]"
+      1},
+     :cardinality 100}},
+   :rowcount 10},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"ts" 1, "tour_name" 1, "title" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"TEXT" 6, "TIMESTAMP" 1},
+     :cardinality 28},
+    :data_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"string" 6, "datetime" 1},
+     :cardinality 28}},
+   :rowcount 7},
+  :kke192
   {:fields
    {:query_error
     {:data-type "string",
@@ -52,39 +249,94 @@
       "[SQLITE_ERROR] SQL error or missing database (no such table: kke192)" 1},
      :cardinality 100}},
    :rowcount 2},
+  :viz-shapes-sys
+  {:fields
+   {:combo_edn
+    {:data-type "string",
+     :distinct 4,
+     :group-by? true,
+     :commons
+     {"\"tour_name\"" 1, "\"rows, tour_name\"" 1, "\"rows, title, tour_name\"" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {1 3, 7 1},
+     :cardinality 50}},
+   :rowcount 4},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 7},
+     :cardinality 14},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 7},
+     :cardinality 14},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"met-on-tour" 7},
+     :cardinality 14},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 7},
+     :cardinality 14},
+    :table_name
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"tracks" 1, "shows" 1, "setlists" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 5,
+     :group-by? false,
+     :commons {8 2, 5 2, 12 1},
+     :cardinality 71}},
+   :rowcount 7},
   :new-query
   {:fields
    {:thread_count
     {:data-type "integer",
-     :distinct 37,
+     :distinct 18,
      :group-by? true,
-     :commons {270 7, 261 7, 243 7},
-     :cardinality 37},
+     :commons {365 11, 369 10, 362 9},
+     :cardinality 18},
     :ts1
     {:data-type "string",
      :distinct 100,
      :group-by? true,
      :commons
-     {"2024-06-18 22:39:09" 1, "2024-06-18 22:27:39" 1, "2024-06-18 22:29:54" 1},
+     {"2024-06-20 19:17:33" 1, "2024-06-20 19:13:03" 1, "2024-06-20 19:06:18" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
      :distinct 4,
      :group-by? true,
-     :commons {"2024-06-18 22:3" 40, "2024-06-18 22:2" 40, "2024-06-18 22:1" 13},
+     :commons {"2024-06-20 19:1" 40, "2024-06-20 19:0" 40, "2024-06-20 18:5" 19},
      :cardinality 3},
     :sys_load
     {:data-type "float",
-     :distinct 89,
+     :distinct 87,
      :group-by? true,
-     :commons {4.87 3, 6.06 3, 6.13 2},
-     :cardinality 88},
+     :commons {8.53 3, 8.69 3, 7.79 2},
+     :cardinality 87},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 96,
+     :distinct 100,
      :group-by? true,
-     :commons {2628 2, 5030 2, 2811 2},
-     :cardinality 95}},
+     :commons {16678 1, 28504 1, 32470 1},
+     :cardinality 100}},
    :rowcount 100},
   :gen-viz-797
   {:fields
@@ -101,31 +353,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :flows-sys
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 95,
-     :group-by? true,
-     :commons {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "map-pull-test2" 1},
-     :cardinality 96},
-    :file_path
-    {:data-type "string",
-     :distinct 98,
-     :group-by? true,
-     :commons
-     {"./flows/generated-flow-map.edn" 1,
-      "./flows/stitches-math.edn" 1,
-      "./flows/openai-image-gen-ladder3.edn" 1},
-     :cardinality 100},
-    :last_modified
-    {:data-type "string",
-     :distinct 32,
-     :group-by? true,
-     :commons
-     {"2024-03-12 02:37:43" 67, "2024-03-14 07:50:09" 1, "2024-03-13 13:00:03" 1},
-     :cardinality 32}},
-   :rowcount 98},
   :gen-viz-94
   {:fields
    {:diff
@@ -139,21 +366,21 @@
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 110,
+     :distinct 111,
      :group-by? true,
-     :commons {0 2, 84 1, 936 1},
-     :cardinality 99},
+     :commons {84 1, 820 1, 692 1},
+     :cardinality 100},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 106,
+     :distinct 110,
      :group-by? true,
-     :commons {197.03 2, 196.13 2, 194.68 2},
-     :cardinality 95},
+     :commons {427.9 2, 421.69 1, 459.44 1},
+     :cardinality 99},
     :uptime_seconds
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {1259 1, 1364 1, 1004 1},
+     :commons {1259 1, 1320 1, 1364 1},
      :cardinality 100},
     :queries_per_second
     {:data-type "float",
@@ -172,62 +399,62 @@
      :distinct 111,
      :group-by? true,
      :commons
-     {"2024-06-18 21:52:24" 1, "2024-06-18 21:34:54" 1, "2024-06-18 21:49:54" 1},
+     {"2024-06-19 19:58:47" 1, "2024-06-19 19:51:02" 1, "2024-06-19 19:51:32" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
-     :distinct 6,
+     :distinct 8,
      :group-by? true,
-     :commons {444 104, 383 3, 407 1},
-     :cardinality 5},
+     :commons {454 80, 471 23, 414 3},
+     :cardinality 7},
     :messages_per_second
     {:data-type "float",
-     :distinct 80,
+     :distinct 111,
      :group-by? true,
-     :commons {192.94 6, 192.97 4, 192.82 4},
-     :cardinality 72},
+     :commons {389.44 1, 391.19 1, 366.94 1},
+     :cardinality 100},
     :messages
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {237077 1, 242907 1, 8 1},
+     :commons {604900 1, 266552 1, 8 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 105,
+     :distinct 111,
      :group-by? true,
-     :commons {124 2, 140 2, 134 2},
-     :cardinality 94},
+     :commons {84 1, 177 1, 246 1},
+     :cardinality 100},
     :sys_load
     {:data-type "float",
-     :distinct 91,
+     :distinct 106,
      :group-by? true,
-     :commons {6.67 3, 7.26 3, 7.14 3},
-     :cardinality 81},
+     :commons {16.34 2, 11.37 2, 6.47 2},
+     :cardinality 95},
     :unix_ms
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {1718761044265 1, 1718761299266 1, 1718761404267 1},
+     :commons {1718842517863 1, 1718841047844 1, 1718841842852 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
      :distinct 110,
      :group-by? true,
-     :commons {1779 2, 1609 1, 2288 1},
+     :commons {2881 2, 7749 1, 7958 1},
      :cardinality 99},
     :recent_queries_run
     {:data-type "integer",
-     :distinct 14,
+     :distinct 11,
      :group-by? true,
-     :commons {9 20, 11 19, 12 15},
-     :cardinality 12},
+     :commons {7 36, 8 25, 6 21},
+     :cardinality 9},
     :thread_count
     {:data-type "integer",
-     :distinct 39,
+     :distinct 33,
      :group-by? true,
-     :commons {254 9, 255 8, 248 8},
-     :cardinality 35},
+     :commons {292 12, 295 11, 290 7},
+     :cardinality 29},
     :internal_queries_run
     {:data-type "integer",
      :distinct 1,
@@ -236,35 +463,170 @@
      :cardinality 0},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 10,
+     :distinct 6,
      :group-by? true,
-     :commons {104 41, 11 34, 0 13},
-     :cardinality 9},
+     :commons {11 67, 0 21, 104 17},
+     :cardinality 5},
     :ws_peers
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {16 110, 0 1},
+     :commons {17 110, 0 1},
      :cardinality 1},
     :recent_messages
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {237077 1, 242907 1, 199658 1},
+     :commons {370006 1, 46874 1, 552505 1},
      :cardinality 100},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 14,
+     :distinct 11,
      :group-by? true,
-     :commons {0.6 20, 0.73 19, 0.8 15},
-     :cardinality 12},
+     :commons {0.47 36, 0.53 25, 0.4 21},
+     :cardinality 9},
     :seconds_since_last_update
     {:data-type "integer",
      :distinct 3,
      :group-by? true,
-     :commons {15 58, 14 52, -1 1},
+     :commons {14 57, 15 53, -1 1},
      :cardinality 2}},
    :rowcount 111},
+  :searches-types-sys
+  {:fields
+   {:item_type
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons {"solvers" 1, "signals" 1, "saved-views" 1},
+     :cardinality 100}},
+   :rowcount 8},
+  :searches-rows-sys
+  {:fields
+   {:item_sub_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"stats" 16, "param" 9},
+     :cardinality 7},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"client-params" 25},
+     :cardinality 3},
+    :item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"amazing-oval-nightingale-11" 25},
+     :cardinality 3},
+    :display_name
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons
+     {":selected-block" 1, ":client-subs" 1, ":recent-messages-per-second" 1},
+     :cardinality 100},
+    :sample
+    {:data-type "string",
+     :distinct 23,
+     :group-by? true,
+     :commons {"19" 2, "" 2, "5772" 1},
+     :cardinality 92},
+    :value
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons
+     {":client/amazing-oval-nightingale-11>param>selected-view-data" 1,
+      ":client/amazing-oval-nightingale-11>stats>queue-size" 1,
+      ":client/amazing-oval-nightingale-11>stats>server-subs" 1},
+     :cardinality 100},
+    :is_live
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1 25},
+     :cardinality 3},
+    :block_meta
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 25},
+     :cardinality 3}},
+   :rowcount 25},
+  :viz-tables-sys
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"shows_drag_6" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {31 1},
+     :cardinality 100}},
+   :rowcount 1},
+  :shows-drag-6
+  {:fields
+   {:location
+    {:data-type "string",
+     :distinct 274,
+     :group-by? true,
+     :commons {"San Francisco, CA" 15, "Seattle, WA" 7, "Dallas, TX" 7},
+     :cardinality 54},
+    :show_name
+    {:data-type "string",
+     :distinct 406,
+     :group-by? true,
+     :commons {"Sonisphere" 7, "Lollapalooza" 6, "Monsters of Rock" 6},
+     :cardinality 81},
+    :title
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"2010-09-22 Christchurch, New Zealand" 1,
+      "1991-10-30 Madison, WI" 1,
+      "2012-06-09 Castle Donington, England" 1},
+     :cardinality 100},
+    :tour_name
+    {:data-type "string",
+     :distinct 31,
+     :group-by? true,
+     :commons {nil 103, "Damaged Justice" 55, "Wherever We May Roam" 54},
+     :cardinality 6}},
+   :rowcount 500},
+  :shows
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: shows)" 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :viz-shapes0-sys
+  {:fields
+   {:shape
+    {:data-type "string",
+     :distinct 9,
+     :group-by? false,
+     :commons {"basic_h_bar_nivo" 1, "recharts_line" 1, "recharts_area" 1},
+     :cardinality 100},
+    :recos
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {1 8, 2 1},
+     :cardinality 22}},
+   :rowcount 9},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -304,6 +666,21 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -376,6 +753,36 @@
      :commons {"us" 288, nil 113, "au" 37},
      :cardinality 1}},
    :rowcount 500},
+  :searches-sub-types-sys
+  {:fields
+   {:item_key
+    {:data-type "string",
+     :distinct 238,
+     :group-by? true,
+     :commons
+     {"poised-star-shaped-rat-38" 1,
+      "unreal-olive-squirrel-14" 1,
+      "affirmative-byzantium-buffalo-31" 1},
+     :cardinality 100},
+    :is_live
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 205, 1 33},
+     :cardinality 0},
+    :items
+    {:data-type "integer",
+     :distinct 26,
+     :group-by? false,
+     :commons {96 33, 61 29, 26 25},
+     :cardinality 10},
+    :styler_highlight_4018a
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {0 205, 1 33},
+     :cardinality 0}},
+   :rowcount 238},
   :duration-hours-drag-43
   {:fields
    {:duration_hours
@@ -422,6 +829,24 @@
      :commons {183 1, 968 1, 633 1},
      :cardinality 100}},
    :rowcount 68},
+  :gen-viz-243
+  {:fields
+   {:rows
+    {:data-type "integer",
+     :distinct 27,
+     :group-by? false,
+     :commons {20 4, 26 2, 12 2},
+     :cardinality 84},
+    :tour_name
+    {:data-type "string",
+     :distinct 32,
+     :group-by? true,
+     :commons
+     {"Kill 'Em All for One" 1,
+      "Guns N’ Roses/Metallica Stadium Tour" 1,
+      "Nowhere Else to Roam" 1},
+     :cardinality 100}},
+   :rowcount 32},
   :shape-drag-7
   {:fields
    {:shape
@@ -438,15 +863,23 @@
      :cardinality 83}},
    :rowcount 30}},
  :default-col-widths
- {:system-connections-list* {:connections-sys 111},
+ {:viz-shapes0-list* {:viz-shapes0-sys 155},
+  :block-110 {:gen-viz-243 230},
+  :block-7716 {:shows-drag-location-6 205},
+  :searches-sub-types-sys-list* {:searches-sub-types-sys 205},
+  :system-connections-list* {:connections-sys 111},
+  :system-fields-list* {:fields-sys 170},
+  :block-3567 {:shows-drag-6 252},
   :system-tables-list* {:tables-sys 137},
-  :system-fields-list* {:fields-sys 170}},
+  :searches-types-list* {:searches-types-sys 111},
+  :searches-rows-sys-list* {:searches-rows-sys 170}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
-  "star-shaped wallaby"],
+  "star-shaped wallaby"
+  "sunny fox"],
  :selected-cols nil,
  :server
  {:settings
@@ -678,186 +1111,79 @@
     "wow-board"],
    :openapi-key "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"}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [354156062 284033138 4294705152],
- :sched {:new-query 585},
+ :memory [194533502 160805318 4294705152],
+ :preview-keys
+ ["784550338" "1901218831" "-500156998" "2051572034" "-522810259" "419046331"],
+ :sched {:new-query 10},
  :flow-subs
- [:solver-status/*client-name*>get-my-colors-1921023464>running?
+ [:solver-status/*client-name*>raw-custom-override-1657692765>running?
   :time/now-seconds
-  :solver-status/*client-name*>raw-custom-override2014913233>running?
-  :solver/raw-custom-override-552760583
-  :solver/raw-custom-override-971514787
+  :solver-status/*client-name*>raw-custom-override-1561961887>running?
+  :data/new-clojure-1
+  :solver/raw-custom-override1686200581
+  :flow/openai-image-gen-ladder3>hiccup-image-box-w-png-vw
+  :solver/raw-custom-override-1561961887
   :flow/flow-forever>*running?
-  :solver-status/*client-name*>get-my-colors-1724972061>running?
-  :solver/raw-custom-override2014913233
-  :solver-status/*client-name*>raw-custom-override1563408633>running?
-  :solver-status/*client-name*>raw-custom-override-552760583>running?
-  :solver-status/*client-name*>raw-custom-override1857002409>running?
-  :solver/raw-custom-override1790254665
-  :solver-status/*client-name*>raw-custom-override1509245178>running?
-  :solver-status/*client-name*>raw-custom-override1668161178>running?
-  :solver/get-my-colors-1724972061
-  :solver/raw-custom-override1668161178
-  :solver/get-my-colors-1921023464
-  :client/*client-name*>stats>memory
-  :solver-status/*client-name*>raw-custom-override296905666>running?
-  :solver-status/*client-name*>raw-custom-override-971514787>running?
-  :flow/live-scratch-flow>*running?
-  :solver/raw-custom-override1563408633
-  :solver-status/*client-name*>raw-custom-override1790254665>running?
-  :solver-status/*client-name*>raw-custom-override-1198745239>running?
-  :flow/flow-forever>:final-math
-  :solver/raw-custom-override1509245178
-  :solver/raw-custom-override1857002409
-  :solver/raw-custom-override296905666
+  :client/amazing-oval-nightingale-11>stats>memory
   :solver-status/*client-name*
-  :solver/raw-custom-override-1198745239
+  :solver/raw-custom-override-970575260
+  :solver-status/*client-name*>raw-custom-override-970575260>running?
+  :solver-status/*client-name*>get-my-colors-916110573>running?
+  :solver/raw-custom-override-1280155551
+  :flow/live-scratch-flow>*running?
+  :solver/get-my-colors-87522178
+  :client/*client-name*>stats>memory
+  :solver-status/*client-name*>raw-custom-override-1280155551>running?
+  :time/second
+  :flow/flow-forever>:final-math
+  :solver/get-my-colors-916110573
+  :solver/raw-custom-override-1657692765
+  :solver-status/*client-name*>get-my-colors-87522178>running?
+  :solver-status/*client-name*>raw-custom-override1686200581>running?
   :solver/colors-of-the-moment>darkest],
- :client-name :favorable-prismatic-sheep-42,
- :runstreams-lookups
- {"flow-forever"
-  {:open-inputs
-   {:dialog-width {:user-input 10, :defaults {}, :type {:out :integer}},
-    :duration-to-show {:user-input 600, :defaults {}, :type :integer},
-    :some-input-int {:user-input 333, :defaults {}, :type {:out :integer}},
-    :another-input-int {:user-input 234.5, :defaults {}, :type {:out :float}},
-    :dialog-height {:user-input 3, :defaults {}, :type :integer}},
-   :blocks
-   {:dialog-ui-box
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :dialog-width
-    {:type {:out {:out :integer}},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :final-math
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :render-the-answer
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? true,
-     :defaults {},
-     :sample "no sample data"},
-    :user-value-in
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :dialog-pushed
-    {:type {:out :any},
-     :ttype :alert!,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :render-the-choice
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :more-math
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :duration-to-show
-    {:type {:out :integer},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :some-math
-    {:type {:out :any},
-     :ttype :open-fn,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :some-input-int
-    {:type {:out {:out :integer}},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :another-input-int
-    {:type {:out {:out :float}},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"},
-    :dialog-height
-    {:type {:out :integer},
-     :ttype :open-block,
-     :meta nil,
-     :last? false,
-     :defaults {},
-     :sample "no sample data"}}}},
+ :client-name :upbeat-globular-gnu-4,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2097, :h 1389},
+ :window {:w 2317, :h 1229},
  :post-meta
- {:jvm_stats {:* {:rowcount 111}}, :kke192 {}, :flows-sys {:* {:rowcount 98}}},
+ {:gen-viz-243 {:* {:rowcount 32}},
+  :shows-drag-6 {:* {:rowcount 2214}},
+  :new-query {:* {:rowcount 100}}},
  :status
  {:heartbeat
   {:kick
-   [:solver-status/*client-name*>get-my-colors-1921023464>running?
+   [:solver-status/*client-name*>raw-custom-override-1657692765>running?
     :time/now-seconds
-    :solver-status/*client-name*>raw-custom-override2014913233>running?
-    :solver/raw-custom-override-552760583
-    :solver/raw-custom-override-971514787
+    :solver-status/*client-name*>raw-custom-override-1561961887>running?
+    :data/new-clojure-1
+    :solver/raw-custom-override1686200581
+    :flow/openai-image-gen-ladder3>hiccup-image-box-w-png-vw
+    :solver/raw-custom-override-1561961887
     :flow/flow-forever>*running?
-    :solver-status/*client-name*>get-my-colors-1724972061>running?
-    :solver/raw-custom-override2014913233
-    :solver-status/*client-name*>raw-custom-override1563408633>running?
-    :solver-status/*client-name*>raw-custom-override-552760583>running?
-    :solver-status/*client-name*>raw-custom-override1857002409>running?
-    :solver/raw-custom-override1790254665
-    :solver-status/*client-name*>raw-custom-override1509245178>running?
-    :solver-status/*client-name*>raw-custom-override1668161178>running?
-    :solver/get-my-colors-1724972061
-    :solver/raw-custom-override1668161178
-    :solver/get-my-colors-1921023464
-    :client/*client-name*>stats>memory
-    :solver-status/*client-name*>raw-custom-override296905666>running?
-    :solver-status/*client-name*>raw-custom-override-971514787>running?
-    :flow/live-scratch-flow>*running?
-    :solver/raw-custom-override1563408633
-    :solver-status/*client-name*>raw-custom-override1790254665>running?
-    :solver-status/*client-name*>raw-custom-override-1198745239>running?
-    :flow/flow-forever>:final-math
-    :solver/raw-custom-override1509245178
-    :solver/raw-custom-override1857002409
-    :solver/raw-custom-override296905666
+    :client/amazing-oval-nightingale-11>stats>memory
     :solver-status/*client-name*
-    :solver/raw-custom-override-1198745239
+    :solver/raw-custom-override-970575260
+    :solver-status/*client-name*>raw-custom-override-970575260>running?
+    :solver-status/*client-name*>get-my-colors-916110573>running?
+    :solver/raw-custom-override-1280155551
+    :flow/live-scratch-flow>*running?
+    :solver/get-my-colors-87522178
+    :client/*client-name*>stats>memory
+    :solver-status/*client-name*>raw-custom-override-1280155551>running?
+    :time/second
+    :flow/flow-forever>:final-math
+    :solver/get-my-colors-916110573
+    :solver/raw-custom-override-1657692765
+    :solver-status/*client-name*>get-my-colors-87522178>running?
+    :solver-status/*client-name*>raw-custom-override1686200581>running?
     :solver/colors-of-the-moment>darkest]},
+  :reco {:shows-drag-location-6 :done, :shows-drag-6 :done},
   :alert1 {:alerts :alert2}},
  :screen-name "pomp-girl2",
  :recos-page2 0,
- :selected-tab "star-shaped wallaby",
+ :selected-tab "sunny fox",
  :col-names nil,
  :snapshots
  {:params
@@ -2671,18 +2997,23 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   2134
+   7439
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :base-sniff-queries {:jvm_stats 1498154063, :kke192 -995149087},
+ :base-sniff-queries {:jvm_stats 1498154063, :kke192 -995149087, :shows 89957543},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -545578363,
+ :user-params-hash -311264312,
  :grid-recos? true,
  :preview-keys2 [],
- :session-hash 509191698,
+ :session-hash 1723491999,
  :resolved-queries
- {:new-query
+ {:query-preview784550338
+  {:select [[[:count 1] :value] [:tour_name :id]],
+   :from
+   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+   :group-by [:tour_name]},
+  :new-query
   {:cache? false,
    :limit 100,
    :_last-run "22:23:22",
@@ -2730,6 +3061,25 @@
       :state],
      :from [[:ufo_sightings :jj584]],
      :order-by [[:city :asc]]}]},
+  :query-preview1901218831
+  {:select [[[:count 1] :rows] :tour_name],
+   :from
+   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+   :group-by [:tour_name]},
+  :query-preview419046331
+  {:select [[[[:count 1]] :rows] :tour_name],
+   :from
+   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+   :group-by [:tour_name]},
+  :query-preview-500156998
+  {:select [[[:count 1] :rows] :title :tour_name],
+   :from
+   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+   :group-by [:title :tour_name]},
+  :shows-drag-6
+  {:select [:location :show_name :title :tour_name],
+   :from [[:shows :dd235]],
+   :_last-run "19:23:37"},
   :rowcnt-drag-2
   {:select [[[:sum :rowcnt] :rowcnt_sum]],
    :from
@@ -2772,6 +3122,11 @@
      :order-by [[:city :asc]]}],
    :order-by [[:date_posted :desc]],
    :group-by [:date_posted]},
+  :query-preview-522810259
+  {:select [[[:count 1] :rows] :tour_name],
+   :from
+   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+   :group-by [:tour_name]},
   :gen-viz-84
   {:select [[[:count 1] :rows] :country],
    :from
@@ -2805,6 +3160,12 @@
     :state],
    :from [[:ufo_sightings :jj584]],
    :order-by [[:city :asc]]},
+  :query-preview2051572034
+  {:select
+   [[[:count 1] :rows] [[:substr :title 0 11] :day_sqlite_title] :tour_name],
+   :from
+   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+   :group-by [[:substr :title 0 11] :tour_name]},
   :duration-hours-drag-43
   {:select [:duration_hours [[:count 1] :rowcnt]],
    :from
@@ -2865,6 +3226,12 @@
      :uu58]],
    :group-by [:state],
    :order-by [[:rowcnt :desc]]},
+  :gen-viz-243
+  {:select [[[:count 1] :rows] :tour_name],
+   :from
+   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+   :group-by [:tour_name],
+   :order-by [[:rows :desc]]},
   :shape-drag-7
   {:select [:shape [[:count 1] :rowcnt]],
    :from
@@ -3014,6 +3381,71 @@
      :order-by [[:rowcnt :desc]]}},
    :root [1 8],
    :tab "sapphire ape"},
+  :block-110
+  {:clojure
+   {:new-clojure-1
+    (let [clojure-version (clojure-version)
+          jvm-version (System/getProperty "java.version")]
+      (str
+        "Clojure "
+        clojure-version
+        " on JVM "
+        jvm-version
+        " @ "
+        :time/second
+        " seconds! "))},
+   :name "Metallica Tours / Shows Played",
+   :w 10,
+   :selected-mode {:new-clojure-1 :text},
+   :style :param/glass-fish-style,
+   :selected-view :gen-viz-243,
+   :root [4 3],
+   :h 8,
+   :connection-id "met-on-tour",
+   :queries
+   {:gen-viz-243
+    {:select [[[:count 1] :rows] :tour_name],
+     :from
+     [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+     :group-by [:tour_name],
+     :order-by [[:rows :desc]]}},
+   :tab "sunny fox",
+   :views
+   {:oz
+    [:vega-lite
+     {:layer
+      [{:encoding
+        {:y
+         {:field :tour_name,
+          :axis {:title :data/new-clojure-1},
+          :sort "-x",
+          :type "ordinal"},
+         :x
+         {:aggregate "sum",
+          :field :rows,
+          :axis {:title "Shows Played"},
+          :type "quantitative"}},
+        :mark
+        {:type "bar", :color [:invert-hex-color :theme/editor-outer-rim-color]}}],
+      :data {:values :gen-viz-243},
+      :config :theme/vega-defaults,
+      :width "container",
+      :height :panel-height,
+      :padding 4,
+      :background "transparent"}
+     {:actions false}],
+    :new-view
+    [:box
+     :child
+     :flow/openai-image-gen-ladder3>hiccup-image-box-w-png-vw
+     :align
+     :center
+     :justify
+     :center
+     :size
+     "auto"
+     :style
+     {:font-size "22px"}]}},
   :block-3341
   {:name "block-3341",
    :w 18,
@@ -3113,6 +3545,21 @@
       :font-family :theme/base-font}
      :child
      "hi!"]}},
+  :block-1795
+  {:h 5,
+   :w 7,
+   :views
+   {:sub-37
+    [:box
+     :size
+     "auto"
+     :style
+     {:font-size "66px", :color "cyan"}
+     :child
+     [:string :client/amazing-oval-nightingale-11>stats>memory]]},
+   :name "subscription amazing-oval-nightingale-11:memory37",
+   :root [35 13],
+   :tab "sunny fox"},
   :block-11530
   {:h 2,
    :w 9,
@@ -3147,6 +3594,33 @@
    :tab "star-shaped wallaby",
    :minimized? true,
    :views {:hi [:data-viewer :solver-status/*client-name*]}},
+  :block-4749
+  {:h 4,
+   :w 5,
+   :root [21 16],
+   :tab "sunny fox",
+   :selected-view :hi,
+   :name "block-4749",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-4749.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
   :block-2810
   {:clojure
    {:new-clojure
@@ -3189,6 +3663,33 @@
       :font-family :theme/base-font}
      :child
      "hi!"]}},
+  :block-1012
+  {:h 4,
+   :w 5,
+   :root [20 15],
+   :tab "sunny fox",
+   :selected-view :hi,
+   :name "block-1012",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-1012.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
   :block-204
   {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
    :name "compound_trend_1 - \"date_posted, rows\" - 1141",
@@ -3455,6 +3956,126 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-10904
+  {:h 4,
+   :w 5,
+   :root [20 16],
+   :tab "sunny fox",
+   :selected-view :hi,
+   :name "block-10904",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-10904.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
+  :block-3234
+  {:h 4,
+   :w 5,
+   :root [20 16],
+   :tab "sunny fox",
+   :selected-view :hi,
+   :name "block-3234",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3234.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
+  :block-3717
+  {:h 8,
+   :w 8,
+   :root [15 3],
+   :tab "sunny fox",
+   :selected-view :cell-drop-9405,
+   :name "block-3717",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3717.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"],
+    :cell-drop-9405
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "77px", :font-weight 700, :color :theme/universal-pop-color}
+     :child
+     [:string :gen-viz-243/tour_name.1]]},
+   :queries {}},
+  :block-7536
+  {:h 4,
+   :w 5,
+   :root [20 15],
+   :tab "sunny fox",
+   :selected-view :hi,
+   :name "block-7536",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-7536.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
   :block-7319
   {:h 5,
    :w 8,
@@ -3549,6 +4170,33 @@
       "Here you can see that while running the flow interactively, we get the dialog push, as well as the ability to manipulate the options on the flow directly."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-10405
+  {:h 4,
+   :w 5,
+   :root [20 16],
+   :tab "sunny fox",
+   :selected-view :hi,
+   :name "block-10405",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-10405.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
   :block-1449
   {:h 7,
    :w 32,
@@ -3573,6 +4221,45 @@
    :root [1 1],
    :tab "sapphire ape",
    :selected-view :ufo-sightings-drag-9},
+  :block-3567
+  {:h 8,
+   :w 21,
+   :connection-id "met-on-tour",
+   :name "select-all-shows",
+   :queries
+   {:shows-drag-6
+    {:select [:location :show_name :title :tour_name],
+     :from [[:shows :dd235]],
+     :_last-run "19:23:37"}},
+   :root [24 3],
+   :tab "sunny fox"},
+  :block-11
+  {:h 4,
+   :w 5,
+   :root [20 16],
+   :tab "sunny fox",
+   :selected-view :hi,
+   :name "block-11",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
   :block-8594
   {:name "block-8594",
    :w 17,
@@ -3685,75 +4372,140 @@
      :child
      [:data-viewer :param/generated-colors]]},
    :queries {},
-   :minimized? true}},
- :selected-block "none!",
+   :minimized? true},
+  :block-6825
+  {:h 4,
+   :w 5,
+   :root [20 16],
+   :tab "sunny fox",
+   :selected-view :hi,
+   :name "block-6825",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-6825.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}}},
+ :selected-block :block-1795,
  :theme-colors-hashmap
- {"float" "#e8bdb7",
-  "boolean" "#91c1c7",
-  "map" "#92cf7d",
-  "list" "#7a4c69",
-  "string" "#ffffff",
-  "any" "#548da1",
-  "vector" "#ae7acd",
-  "keyword" "#c2edcc",
-  "rabbit-code" "#5da077",
-  "datetime" "#533966",
-  "integer" "#a8b5d0",
-  "unknown" "#452429",
-  "date" "#2b3219"},
+ {"float" "#a6c681",
+  "boolean" "#80b5b7",
+  "map" "#cfac3f",
+  "list" "#36375b",
+  "string" "#c2e7c1",
+  "any" "#468d54",
+  "vector" "#847674",
+  "keyword" "#87c286",
+  "rabbit-code" "#498b85",
+  "datetime" "#432227",
+  "integer" "#a899a6",
+  "unknown" "#29203b",
+  "date" "#0f241f"},
  :click-param
- {:tables-sys
+ {:fields-sys {:field_name "location", :field_type "TEXT", :data_type "string"},
+  :viz-shapes-sys {:combo_edn nil},
+  :tables-sys
   {:db_schema "none",
    :db_catalog nil,
-   :connection_id "system-db",
+   :connection_id "met-on-tour",
    :schema_cat nil,
-   :table_name "board_history",
-   :fields 4},
+   :table_name "shows",
+   :fields 8},
   :flow
   {:crow-flow-201a>*running? false,
    :counting-loop>*running? false,
    :flow-forever>*running? false,
    :flow-forever>final-math nil,
    :openai-image-gen-ladder3>*running? false,
-   :live-scratch-flow>*running? false},
-  :time {:now-seconds "Tuesday, June 18th 11:07:52PM", :month 4},
-  :grid1-sys*
-  {:flow_id "raw-custom-override-1328601774-solver-flow-",
-   :run_id "6f4ef084-2c43-4da7-aa97-db9e1c36f377",
-   :start_ts "2024-06-16 19:54:21",
-   :seconds 0,
-   :human_elapsed "less than a second",
-   :overrides "Yes",
-   :result "success",
-   :styler_highlight_8369aaa1 0},
+   :live-scratch-flow>*running? false,
+   :openai-image-gen-ladder3>hiccup-image-box-w-png-vw
+   [:v-box
+    :padding
+    "10px"
+    :gap
+    "8px"
+    :width
+    :width-px
+    :style
+    {:background-color "#1a2534",
+     :border-radius "20px",
+     :font-size "12px",
+     :font-weight 700,
+     :color "#bcb0a3"}
+    :children
+    [[:box :child "./images/gen/b64-image3-59624-86275.png"]
+     [:box
+      :size
+      "auto"
+      :child
+      [:img
+       {:src "./images/gen/b64-image3-59624-86275.png",
+        :style {:border-radius "30px"}}]]]]},
+  :time {:now-seconds "Thursday, June 20th 9:24:25PM", :month 4, :second 25},
+  :grid1-sys* {},
+  :user-dropdown-sys {:req-field "tour_name"},
+  :searches-types-sys {:item_type "client-params"},
   :client
-  {:accepted-diamond-zebra-40>stats>memory nil,
-   :*client-name*>stats>memory 257,
-   :brave-prismatic-camel-31>stats>memory nil,
+  {:favorable-prismatic-sheep-42>stats>memory nil,
    :elegant-icosahedral-rhinoceros-30>stats>memory nil,
    :quiet-cubic-beaver-23>stats>memory nil,
    :honest-copper-cockroach-0>stats>memory nil,
+   :*client-name*>stats>memory 151,
+   :accepted-diamond-zebra-40>stats>memory nil,
+   :brave-prismatic-camel-31>stats>memory nil,
    :distinguished-hexagonal-badger-16>stats>memory nil,
-   :favorable-prismatic-sheep-42>stats>memory nil},
+   :amazing-oval-nightingale-11>stats>memory 620},
+  :searches-rows-sys
+  {:item_sub_type "stats",
+   :item_type "client-params",
+   :item_key "amazing-oval-nightingale-11",
+   :display_name ":memory",
+   :sample "590",
+   :value ":client/amazing-oval-nightingale-11>stats>memory",
+   :is_live 1,
+   :block_meta nil},
+  :viz-tables-sys {:table_name "shows_drag_6"},
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data nil,
-   :selected-view nil,
+   :selected-view-data
+   [:box
+    :size
+    "auto"
+    :style
+    {:font-size "66px", :color "cyan"}
+    :child
+    [:string :client/amazing-oval-nightingale-11>stats>memory]],
+   :selected-view [:views :sub-37],
    :generated-colors
    [:run-solver
     [:get-my-colors
      {:input-image-path
-      "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-76876-55342.png"}]],
+      " /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-76876-55342.png"}]],
    :miraculous-orange-hedgehog "new parameter value!",
-   :rel-image-path "images/large/b64-image3-68345-76954-4k.webp",
-   :selected-block :block-10928,
+   :rel-image-path "images/large/b64-image3-76876-55342-4k.webp",
+   :selected-block :block-1795,
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",
     :box-shadow "10px 5px 5px #00000034",
     :backdrop-filter "blur(4px) brightness(60%)",
     :filter nil}},
+  :viz-shapes0-sys {:shape nil},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -3845,10 +4597,19 @@
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
-  :connections-sys {:database_name "*cache-db*", :connection_id "system-db"},
-  :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3},
+  :connections-sys {:database_name "SQLite", :connection_id "met-on-tour"},
+  :sys {:selected-tab "sunny fox", :selected-tab-idx 4},
+  :searches-sub-types-sys
+  {:item_key "amazing-oval-nightingale-11",
+   :is_live 1,
+   :items 25,
+   :styler_highlight_4018a 1},
+  :gen-viz-243.* {:tour_name ["Damage, Inc." "Madly In Anger With The World"]},
+  :gen-viz-243 {:rows 181, :tour_name "World Magnetic"},
   :solver
-  {:raw-custom-override-1061429786
+  {:raw-custom-override-1280155551
+   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        58Gi       8.8Gi       470Mi        58Gi        65Gi\nSwap:             0B          0B          0B\n\n",
+   :raw-custom-override-1061429786
    [:v-box
     :padding
     "10px"
@@ -3873,8 +4634,85 @@
         :style {:border-radius "30px"}}]]]],
    :raw-custom-override-398966624
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :get-my-colors-87522178
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
+   :raw-custom-override-970575260 "Clojure 1.11.1 on JVM 17.0.11 @ 42 seconds! ",
    :raw-custom-override1563408633
-   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        41Gi        31Gi       769Mi        52Gi        82Gi\nSwap:             0B          0B          0B\n\n",
+   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        41Gi        31Gi       803Mi        52Gi        82Gi\nSwap:             0B          0B          0B\n\n",
+   :get-my-colors-916110573
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
    :get-my-colors-1838023526
    {:second-darkest "#352260",
     :highest-saturation "#f7c9cc",
@@ -4142,13 +4980,13 @@
     :brightest "#f7c9cc",
     :most-contrasting-light "#f7c9cc"},
    :solver-fn-test11311036473 "HHHuge!180",
-   :colors-of-the-moment>darkest "#1f2137",
+   :colors-of-the-moment>darkest "#32313f",
    :raw-custom-override-1471694664
    "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
    :raw-custom-override-55990886
    "🐇🥕 Hello there! This is Clojure version 1.11.1 on JVM  17.0.11 🥕🐇 Saturday, June 15th 11:56:29PM",
    :raw-custom-override1509245178
-   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 5  0      0 32890112 2397108 53108612    0    0    24    67   14    4 35  3 62  0  0\n\n",
+   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n11  0      0 32755028 2396868 53070548    0    0    24    67   13    1 35  3 62  0  0\n\n",
    :raw-custom-override9026012
    "top - 22:22:57 up  4:48,  5 users,  load average: 4.65, 4.62, 4.45\nTasks: 385 total,   4 running, 381 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 35.8 us,  1.1 sy,  0.0 ni, 63.1 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,  78419.3 free,  27941.7 used,  22275.8 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  99052.3 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n 364579 ryanr     20   0   75.7g   9.1g 286848 S 125.0   7.2  27:33.79 java\n   6565 ryanr     20   0 1132.2g 651460 120176 R 100.0   0.5 115:46.81 chrome\n   9250 ryanr     20   0 1132.4g   1.7g 276804 R 100.0   1.3 145:26.67 chrome\n   5755 ryanr     20   0 1132.2g 870736 124712 R  62.5   0.7 159:37.06 chrome\n   1579 ryanr     20   0 3584016   1.3g 143224 S  12.5   1.1  23:31.93 kwin_x11\n  24122 ryanr     20   0 1130.9g 238032  97036 S  12.5   0.2  15:56.65 chainner\n  57916 ryanr     20   0   32.9g 345820 157232 S   6.2   0.3   5:18.76 code\n      1 root      20   0  166660  11364   8164 S   0.0   0.0   0:00.80 systemd\n      2 root      20   0       0      0      0 S   0.0   0.0   0:00.00 kthreadd\n      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp\n      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+\n      5 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 slub_fl+\n      6 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 netns\n\n------------------------[ monday, june 17th 10:22:56pm ]-------------------------",
    :get-my-colors-1331789415
@@ -4189,6 +5027,8 @@
     :second-brightest "#4ab3dc",
     :brightest "#f7c9cc",
     :most-contrasting-light "#f7c9cc"},
+   :raw-custom-override-1657692765
+   "top - 19:20:18 up 3 days,  1:45,  6 users,  load average: 9.37, 8.75, 8.20\nTasks: 373 total,   2 running, 371 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 32.3 us,  2.1 sy,  7.7 ni, 57.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,   8975.8 free,  60165.5 used,  59495.5 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  66776.4 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n2774667 ryanr     20   0   81.3g  48.1g 292784 S 256.2  38.3   2963:58 java\n    867 ryanr     31  11 2187020 393656  19328 S  93.8   0.3 265:49.05 syncthi+\n2802883 ryanr     20   0 1132.2g   1.1g 122860 S  62.5   0.9 633:56.13 chrome\n   2206 ryanr     20   0   33.2g 737336 300724 S  50.0   0.6   1827:03 chrome\n   5755 ryanr     20   0 1132.3g 662396 192488 R  12.5   0.5   2614:53 chrome\n   1579 ryanr     20   0 3639932   1.4g 143744 S   6.2   1.1 307:08.23 kwin_x11\n   2208 ryanr     20   0   32.4g 139112 105400 S   6.2   0.1  18:53.04 chrome\n2913639 ryanr     20   0 1132.3g 588508 185172 S   6.2   0.4 328:02.38 chrome\n3870695 ryanr     20   0   13344   4352   3456 R   6.2   0.0   0:00.01 top\n      1 root      20   0  168124  12772   8164 S   0.0   0.0   0:03.00 systemd\n      2 root      20   0       0      0      0 S   0.0   0.0   0:00.19 kthreadd\n      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp\n      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+\n\n------------------------[ thursday, june 20th 7:20:17pm ]-------------------------",
    :raw-custom-override-916986421
    "🐇🥕 Sup! BIIIIGS. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :get-my-colors-273843172
@@ -4392,7 +5232,7 @@
     :brightest "#c7a9d2",
     :most-contrasting-light "#af6958"},
    :raw-custom-override-971514787
-   "top - 23:07:52 up 1 day,  5:33,  6 users,  load average: 4.49, 6.09, 6.49\nTasks: 403 total,   6 running, 397 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 46.8 us,  9.5 sy,  0.0 ni, 43.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,  32091.9 free,  42340.1 used,  54204.8 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  84333.0 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n   9250 ryanr     20   0 1132.3g   2.0g 180532 R 112.5   1.6   1139:14 chrome\n   5755 ryanr     20   0 1132.3g   1.0g 165108 R 106.2   0.8   1056:40 chrome\n1752975 ryanr     20   0 1132.3g 871544 224336 R 106.2   0.7  18:11.64 chrome\n1401249 ryanr     20   0 1132.2g   1.9g 151648 S 100.0   1.5 301:16.36 chrome\n1569006 ryanr     20   0 1132.2g 738408 140620 R 100.0   0.6 148:39.43 chrome\n1783260 ryanr     20   0       4      0      0 R  56.2   0.0   0:00.09 sync-di+\n  58373 ryanr     20   0   32.1g  11.0g  70784 S  43.8   8.8  70:28.53 clojure+\n   2206 ryanr     20   0   33.4g 985.3m 500884 S  12.5   0.8 751:57.30 chrome\n  52873 ryanr     20   0 1132.2g   2.4g 116128 S  12.5   1.9 225:40.04 chrome\n  24040 ryanr     20   0 1123.0g 179184 124056 S   6.2   0.1   6:16.36 chainner\n      1 root      20   0  166660  11364   8164 S   0.0   0.0   0:01.44 systemd\n      2 root      20   0       0      0      0 S   0.0   0.0   0:00.05 kthreadd\n      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp\n\n------------------------[ tuesday, june 18th 11:07:51pm ]-------------------------",
+   "top - 23:05:31 up 1 day,  5:30,  6 users,  load average: 7.12, 6.77, 6.73\nTasks: 396 total,   7 running, 389 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 68.4 us,  9.7 sy,  0.0 ni, 21.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,  32018.0 free,  42450.5 used,  54168.3 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  84187.2 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n1766875 ryanr     20   0   75.7g   6.4g 290944 S 220.0   5.1  12:21.24 java\n   9250 ryanr     20   0 1132.3g   2.0g 180532 R 113.3   1.6   1137:51 chrome\n1401249 ryanr     20   0 1132.2g   1.9g 151648 R 113.3   1.5 299:50.75 chrome\n   5755 ryanr     20   0 1132.3g   1.0g 165108 R 106.7   0.8   1055:23 chrome\n  24170 ryanr     20   0   24.9g   1.9g 491016 S 106.7   1.5 111:51.69 python3+\n1752975 ryanr     20   0 1132.3g 868568 224028 S  80.0   0.7  16:51.46 chrome\n   6565 ryanr     20   0 1132.3g   1.1g 185672 R  60.0   0.9 793:52.48 chrome\n1569006 ryanr     20   0 1132.2g 994492 140620 R  60.0   0.8 147:05.95 chrome\n  24122 ryanr     20   0 1130.9g 439420 112652 S  26.7   0.3  89:20.56 chainner\n  52873 ryanr     20   0 1132.2g   2.4g 116608 S  26.7   1.9 225:28.82 chrome\n   2206 ryanr     20   0   33.4g 993.3m 501320 S  20.0   0.8 751:28.09 chrome\n   1033 root      20   0   24.5g 369364 182188 S  13.3   0.3  72:23.51 Xorg\n1566580 ryanr     20   0  161112   7148   5120 S  13.3   0.0   2:00.21 btop\n\n------------------------[ tuesday, june 18th 11:05:30pm ]-------------------------",
    :get-my-colors346368138
    {:second-darkest "#2a2c45",
     :highest-saturation "#aa394e",
@@ -4431,13 +5271,14 @@
     :second-brightest "#c28c9a",
     :brightest "#79b1aa",
     :most-contrasting-light "#79b1aa"},
+   :raw-custom-override-1561961887
+   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 7  0      0 9191420 1459884 59463492    0    0    13    60    6   11 40  3 57  0  0\n\n",
    :solver-fn-test1-2135935405 "Huge!159",
    :raw-custom-override-569051388
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        27Gi        76Gi       448Mi        21Gi        96Gi\nSwap:             0B          0B          0B\n\n",
    :raw-custom-override1790254665
    "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
    :raw-custom-override437660285 87.5},
-  :data {}},
+  :data {:new-clojure-1 nil}},
  :selected-flow "live-scratch-flow",
- :current-url "#/pomp-girl2",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

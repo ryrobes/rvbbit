@@ -60,7 +60,9 @@
     [java.io                                BufferedReader InputStreamReader]))
 
 (defonce flow-status (atom {}))
-(def num-groups 20)
+
+(def num-groups 8) ;; atom segments to split solvers master atom into
+;; 20 seems fine, testing with 8... impacts thread count mostly. not good isolated perf testing yet.
 
 (def stats-cnt (atom 0))
 (def restart-map (atom {}))
@@ -389,7 +391,7 @@
                   (do (swap! task-queues-slot-pool assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
                       (@task-queues-slot-pool keyword)))]
     (.put queue task)
-    (when (not (@workers-slot-pool keyword)) (start-workers-slot-pool keyword 4))))
+    (when (not (@workers-slot-pool keyword)) (start-workers-slot-pool keyword 4)))) ;;; parallel pool size for each client/slot 
 
 (defn stop-workers-slot-pool
   [keyword]
@@ -403,6 +405,9 @@
       (Thread/sleep 60))))
 
 (defn recycle-workers-slot-pool [keyword num-workers] (stop-workers-slot-pool keyword) (start-workers-slot-pool keyword num-workers))
+
+(defn get-slot-pool-queue-sizes []
+  (into {} (map (fn [[k v]] [k (.size v)]) @task-queues-slot-pool)))
 
 
 
@@ -946,7 +951,7 @@
   (doseq [cq client-queue-atoms]
     (let [new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)] (swap! cq assoc client-name new-queue-atom))))
 
-
+(def client-batches (atom {}))
 
 (def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :tracker :alert1})
 
@@ -954,9 +959,9 @@
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 500))] ;; was 100, was (async/sliding-buffer
+  (let [results (async/chan (async/sliding-buffer 100))] ;; was 100, was (async/sliding-buffer
     (try (async/go-loop []
-           (async/<! (async/timeout 1000)) ;; was 70 ?
+           (async/<! (async/timeout 700)) ;; was 70 ?
            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
              (let [items            (loop [res []]
                                       (if-let [item (ut/dequeue! queue-atom)]
@@ -966,7 +971,8 @@
                    latest-items     (mapv (fn [group] (if (contains? valid-groups (first group)) group (last group)))
                                       (vals items-by-task-id))]
                (if (not-empty latest-items)
-                 (let [message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
+                 (let [_ (swap! client-batches update client-name (fnil inc 0))
+                       message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
                    (when (async/>! results message) (recur)))
                  (recur)))
              (recur)))
@@ -978,13 +984,13 @@
   [{:keys [kind client-name] :as data}]
   (sub-push-loop client-name data client-queues kind))
 
-
+;; 8 mins - 180 threads, 30 mps, 1200mb 
 
 (defn push-to-client
   [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
-  (enqueue-task-slot
-   client-name
-   (fn []
+  ;(enqueue-task-slot
+  ; client-name
+  ; (fn []
      (try
        (let [rr                0 ;(rand-int 3)
              cq                (get client-queue-atoms rr)
@@ -1008,7 +1014,7 @@
            (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
              (new-client client-name)
              (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
-       (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))))))
+       (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))));))
 
 
 
@@ -4236,7 +4242,7 @@
                                               (to-sql honey-sql)
                                               (to-sql (assoc honey-sql :limit 500))))
                             honey-sql-str2 (first honey-sql-str)
-                            _ (async/thread (get-clover-sql-training clover-sql honey-sql-str2)) ;; ONLY
+                            ;;;_ (async/thread (get-clover-sql-training clover-sql honey-sql-str2)) ;; ONLY
                             honey-result (timed-expr (if literal-data?
                                                        honey-sql ;; which in this case IS the
                                                        (sql-query target-db honey-sql-str ui-keypath)))
@@ -5045,12 +5051,13 @@
             free-memory (.freeMemory runtime)
             used-memory (/ (- total-memory free-memory) (* 1024 1024))
             mm (int (Math/floor used-memory))
-            sys-load (ut/get-system-load-average)
+            sys-load (ut/get-jvm-cpu-usage)  ;; (ut/get-system-load-average)
             thread-mx-bean (java.lang.management.ManagementFactory/getThreadMXBean)
             thread-count (.getThreadCount thread-mx-bean)
             booted? (= @stats-cnt 0)
             ttl (try (apply + (for [[_ v] @atoms-and-watchers] (count (keys v)))) (catch Exception _ -1))
             _ (swap! stats-shadow conj {:mem mm :tick (count @stats-shadow) :threads thread-count :subs ttl :load sys-load})
+
             chart-view (fn [data]
                          (let [max-key (find-max-key data)]
                            [:> :ResponsiveContainer {:width "100%" :height :panel-height+50}
@@ -5090,6 +5097,7 @@
                                :stroke            :theme/block-tab-selected-font-color
                                :fill              :theme/block-tab-selected-font-color
                                :strokeDasharray   "5 5"}]]]))
+            
             ack-scoreboardv (into {}
                                   (for [[k v] (client-statuses)
                                         :when (not= (get v :last-seen-seconds) -1)]
@@ -5121,15 +5129,21 @@
             _ (doseq [cli-row cli-rows]
                 (swap! params-atom assoc-in [(edn/read-string (get cli-row :client-name)) :stats] cli-row))
             insert-cli {:insert-into [:client_stats] :values cli-rows}
+            all-batches (apply + (vals @client-batches))
             seconds-since-last (try (/ (- (System/currentTimeMillis) (get @last-stats-row :unix_ms)) 1000) (catch Exception _ -1))
             seconds-since-boot (try (/ (- (System/currentTimeMillis) @booted) 1000) (catch Exception _ -1))
             last-messages (- @all-pushes (get @last-stats-row :messages 0))
+            last-batches  (- all-batches (get @last-stats-row :batches 0))
             queries-since-last (- (+ @q-calls @q-calls2)
                                   (+ (get @last-stats-row :queries_run 0) (get @last-stats-row :internal_queries_run 0)))
             as-double (fn [x] (Double/parseDouble (clojure.pprint/cl-format nil "~,2f" x)))
             jvm-stats-vals
             {:used_memory_mb             mm
              :messages                   @all-pushes
+             :batches                    all-batches
+             :batches_per_second         (as-double (try (/ all-batches seconds-since-boot) (catch Exception _ -1)))
+             :recent_batches_per_second  (as-double (try (/ last-batches seconds-since-last) (catch Exception _ -1)))
+             :recent_batches             (- all-batches last-batches)
              :unix_ms                    (System/currentTimeMillis)
              :uptime_seconds             seconds-since-boot
              :seconds_since_last_update  seconds-since-last
@@ -5178,6 +5192,8 @@
 
         (ut/pp [:solver-cache-distro (ut/cache-distribution solvers-cache-hits-atom 0.5)])
 
+        (ut/pp [:solver-runner-pool-stats (get-slot-pool-queue-sizes)])
+
         (try (let [peers       (count @wl/sockets)
                    uptime-str  (ut/format-duration-seconds (ut/uptime-seconds))
                    sub-types (try
@@ -5189,10 +5205,11 @@
                    ;; ^^ flow tracker subs have messy keypath parents and are generally one-offs. noise.
                    server-subs ttl]
                (swap! server-atom assoc :uptime uptime-str :clients peers :threads thread-count :memory mm)
-               (ut/pp ["     " :jvm-stats
+               (ut/pp [(get @time-atom :now-seconds)
+                       :jvm-stats
                        {:*cached-queries              (count @sql-cache)
-                        :clover-sql-training-queries  (count (keys @clover-sql-training-atom))
-                        :clover-sql-training-enriched (count (keys @clover-sql-enriched-training-atom))
+                        ;:clover-sql-training-queries  (count (keys @clover-sql-training-atom))
+                        ;:clover-sql-training-enriched (count (keys @clover-sql-enriched-training-atom))
                         :ws-peers                     peers
                         :sys-load                     sys-load
                         :cwidth                       (ut/get-terminal-width)
@@ -5202,38 +5219,41 @@
                         :*jvm-memory-used             [(ut/nf mm) :mb]
                         :*current-threads             thread-count}]))
              (catch Throwable e (ut/pp [:printing-shit-error? (str e)])))
-        (when (or booted? (zero? (mod @stats-cnt 100)))
-          (doseq [[client-name v] @atoms-and-watchers]
-            (let [clients (count @wl/sockets)]
-              (alert! client-name
-                      [:v-box :justify :center :style
-                       {;:margin-top "-6px"
-                        :opacity 0.7} ;:color (if error? "red" "inherit")}
-                       :children
-                       [[:box :style {:font-weight 700 :font-size "18px"} :child (str "[sys-stats] " client-name)]
-                        [:box :style {:font-weight 700 :font-size "11px" :opacity 0.6} :child
-                         (str thread-count
-                              " threads,  "
-                              (ut/nf mm)
-                              " MB used on server, "
-                              (ut/nf ttl)
-                              " active client subs, "
-                              clients
-                              " client"
-                              (when (> clients 1) "s")
-                              " connected")]
-                        [:box :style {:font-weight 700 :font-size "11px" :opacity 0.6} :child
-                         (str "uptime: " (ut/format-duration-seconds (ut/uptime-seconds)))]
-                        [:box :style {:font-weight 700 :font-size "11px" :opacity 0.6} :child
-                         (str "you have " (count (keys v)) " (server) watcher subs")]
-                        (when booted?
-                          [:box :style {:color :theme/editor-outer-rim-color :font-weight 700} :child
-                           [:speak-always (str "Hello. data rabbit system is now online.")]])]]
-                      10
-                      (if booted? 2.2 1.7)
-                      6)
-              (alert! client-name (chart-view (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
-              (alert! client-name (chart-view (last-x-items @stats-shadow 50)) 10 4 5)))))
+        
+        ;; (when (or booted? (zero? (mod @stats-cnt 100)))
+        ;;   (doseq [[client-name v] @atoms-and-watchers]
+        ;;     (let [clients (count @wl/sockets)]
+        ;;       (alert! client-name
+        ;;               [:v-box :justify :center :style
+        ;;                {;:margin-top "-6px"
+        ;;                 :opacity 0.7} ;:color (if error? "red" "inherit")}
+        ;;                :children
+        ;;                [[:box :style {:font-weight 700 :font-size "18px"} :child (str "[sys-stats] " client-name)]
+        ;;                 [:box :style {:font-weight 700 :font-size "11px" :opacity 0.6} :child
+        ;;                  (str thread-count
+        ;;                       " threads,  "
+        ;;                       (ut/nf mm)
+        ;;                       " MB used on server, "
+        ;;                       (ut/nf ttl)
+        ;;                       " active client subs, "
+        ;;                       clients
+        ;;                       " client"
+        ;;                       (when (> clients 1) "s")
+        ;;                       " connected")]
+        ;;                 [:box :style {:font-weight 700 :font-size "11px" :opacity 0.6} :child
+        ;;                  (str "uptime: " (ut/format-duration-seconds (ut/uptime-seconds)))]
+        ;;                 [:box :style {:font-weight 700 :font-size "11px" :opacity 0.6} :child
+        ;;                  (str "you have " (count (keys v)) " (server) watcher subs")]
+        ;;                 (when booted?
+        ;;                   [:box :style {:color :theme/editor-outer-rim-color :font-weight 700} :child
+        ;;                    [:speak-always (str "Hello. data rabbit system is now online.")]])]]
+        ;;               10
+        ;;               (if booted? 2.2 1.7)
+        ;;               6)
+        ;;       (alert! client-name (chart-view (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
+        ;;       (alert! client-name (chart-view (last-x-items @stats-shadow 50)) 10 4 5))))
+
+              )
       (catch Exception e (ut/pp [:jvm-stats (str e)])))))
 
 

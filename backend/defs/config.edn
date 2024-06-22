@@ -8,8 +8,6 @@
 ;; docs coming soon, doc!
 
 {:debug-level 1 ;; for console output. somewhat deprecated.
- :openapi-key "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"
- :openapi-org-id nil
  :default "./screens/looking-glass-redux.edn"
  ;; ^^ if no screen given in URL, load this one. "start page" essentially.
  :harvest-on-boot? true
@@ -21,7 +19,7 @@
                          :text-shadow "4px 4px 4px #00000088"
                          :font-size "17px"
                          :font-family :theme/monospaced-font}}
-                :*data]
+                [:string3 :*data]]
          :data [:data-viewer :*data]
          :pretty [:pretty-box :*data]
          :rowset [:rowset :*data]
@@ -54,7 +52,7 @@
                      :icon "images/clj.png"}
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
-                      :modes [:text :data :rowset :clover]
+                      :modes [:clover :text :data :rowset]
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
                                                   "java.version")]
@@ -90,12 +88,44 @@
                           :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene. There is a beautiful full-figured woman standing in the field, she looks upon you with kind eyes and beckons you closer."
                           ;:default-view [:box :child [:img {:src :*query-id}]]
                           :icon "images/dalle.png"}
-           :python3 {:runner {:flow-id :run-python3
-                              :overrides {:code :string-body}
-                              :opts? {:instanced? true}}
-                     :modes [:text :data :rowset :clover]
+           :python3 {:runner {}
+                     :modes [:text] ; :data :rowset :clover]
                      :type :flow
                      :syntax "python"
+                     :clover-fn [:run-solver
+                                 {:signal false
+                                  :cache? false
+                                  :type :flow
+                                  :data
+                                  {:flowmap "python-test-1"
+                                   :opts
+                                   {:timeout 120000
+                                    :overrides
+                                    {:open-input-1
+                                     :clover-body}}
+                                   :return :open-fn-5}}]
+                     :default ["import platform"
+                               ""
+                               "def main():"
+                               "    # Print Hello, World!"
+                               "    print(\"Hello, World!\")"
+                               "    "
+                               "    # Print Python version"
+                               "    print(f\"Python version: {platform.python_version()}\")"
+                               "    "
+                               "    # Print detailed Python version info"
+                               "    print(f\"Python version info: {platform.python_version_tuple()}\")"
+                               "    "
+                               "    # Print system information"
+                               "    print(f\"System: {platform.system()}\")"
+                               "    print(f\"Node: {platform.node()}\")"
+                               "    print(f\"Release: {platform.release()}\")"
+                               "    print(f\"Version: {platform.version()}\")"
+                               "    print(f\"Machine: {platform.machine()}\")"
+                               "    print(f\"Processor: {platform.processor()}\")"
+                               ""
+                               "if __name__ == \"__main__\":"
+                               "    main()"]
                      ;:default-view [:box :child [:string :*query-id]]
                      :icon "images/python3.png"}}
  :eleven-labs-api-key nil
