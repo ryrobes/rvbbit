@@ -60,6 +60,9 @@
     [java.io                                BufferedReader InputStreamReader]))
 
 (defonce flow-status (atom {}))
+(defonce cpu-usage (atom []))
+(defonce push-usage (atom []))
+(defonce peer-usage (atom []))
 
 (def num-groups 8) ;; atom segments to split solvers master atom into
 ;; 20 seems fine, testing with 8... impacts thread count mostly. not good isolated perf testing yet.
@@ -5067,6 +5070,205 @@
 (def booted (atom nil))
 (def clients-alive (atom nil))
 
+
+;; (defn draw-bar-graph [cpu-usage]
+;;   (let [max-values 60
+;;         rows 5
+;;         width (min (count cpu-usage) max-values)
+;;         truncated (take max-values cpu-usage)
+;;         max-cpu (apply max truncated)
+;;         normalized (map #(int (/ (* % (* rows 8)) max-cpu)) truncated)
+;;         bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
+;;         get-bar-char (fn [height row]
+;;                        (let [row-height (- height (* row 8))]
+;;                          (cond
+;;                            (<= height (* row 8)) " "
+;;                            (> row-height 8) "█"
+;;                            :else (nth bar-chars row-height))))
+;;         border-line (apply str (repeat (+ width 2) "─"))
+;;         border-top (str "╭" border-line "╮")
+;;         border-bottom (str "╰" border-line "╯")
+;;         label "CPU Usage (Last 60 seconds)"
+;;         padding (apply str (repeat (- (+ width 3) (count label) 2) " "))
+;;         label-row (str "│ " label padding "│")]
+;;     (println border-top)
+;;     (println label-row)
+;;     (println (str "│ " (apply str (repeat width "🐰")) " │"))
+;;     (doseq [row (range (dec rows) -1 -1)]
+;;       (println (str "│ " (apply str (map #(get-bar-char % row) normalized)) " │")))
+;;     (println (str "│ " (apply str (repeat width "🐰")) " │"))
+;;     (println border-bottom)))
+
+;; (defn draw-bar-graph [cpu-usage]
+;;   (let [console-width (- (ut/get-terminal-width) 10)
+;;         rows 5
+;;         border-width 2
+;;         label-padding 4
+;;         time-marker-interval 30
+;;         values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
+;;         max-values (- console-width border-width label-padding)
+;;         num-markers (quot max-values values-per-marker)
+;;         actual-width (- max-values num-markers)
+;;         truncated (take actual-width cpu-usage)
+;;         max-cpu (apply max truncated)
+;;         normalized (map #(int (/ (* % (* rows 8)) max-cpu)) truncated)
+;;         bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
+;;         get-bar-char (fn [height row]
+;;                        (let [row-height (- height (* row 8))]
+;;                          (cond
+;;                            (<= height (* row 8)) " "
+;;                            (> row-height 8) "█"
+;;                            :else (nth bar-chars row-height))))
+;;         border-line (apply str (repeat (- console-width 2) "─"))
+;;         border-top (str "╭" border-line "╮")
+;;         border-bottom (str "╰" border-line "╯")
+;;         time-span (quot (count truncated) 60)
+;;         minutes (quot time-span 60)
+;;         seconds (rem time-span 60)
+;;         label (format "CPU Usage (Last %d min %d sec)" minutes seconds)
+;;         padding (apply str (repeat (- console-width (count label) 4) " "))
+;;         label-row (str "│ " label padding "│")
+;;         draw-row (fn [row-data]
+;;                    (str "│ " (apply str
+;;                                     (map-indexed
+;;                                      (fn [idx ch]
+;;                                        (if (and (pos? idx)
+;;                                                 (zero? (rem idx (inc values-per-marker))))
+;;                                          (str "│" ch)
+;;                                          ch))
+;;                                      row-data))
+;;                         (apply str (repeat (- console-width (count row-data) 3) " ")) " │"))]
+;;     (println border-top)
+;;     (println label-row)
+;;     (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+;;     (doseq [row (range (dec rows) -1 -1)]
+;;       (println (draw-row (map #(get-bar-char % row) normalized))))
+;;     (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+;;     (println border-bottom)))
+
+;; (defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color] :or {color :default}}]
+;;   (let [console-width (- (ut/get-terminal-width) 10)
+;;         rows 5
+;;         border-width 2
+;;         label-padding 4
+;;         time-marker-interval 30
+;;         values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
+;;         max-values (- console-width border-width label-padding)
+;;         num-markers (quot max-values values-per-marker)
+;;         actual-width (- max-values num-markers)
+;;         truncated (take-last actual-width cpu-usage)
+;;         max-cpu (apply max truncated)
+;;         normalized (map #(int (/ (* % (* rows 8)) max-cpu)) truncated)
+;;         bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
+;;         color-code (case color
+;;                      :red "\u001B[31m"
+;;                      :green "\u001B[32m"
+;;                      :yellow "\u001B[33m"
+;;                      :blue "\u001B[34m"
+;;                      :magenta "\u001B[35m"
+;;                      :cyan "\u001B[36m"
+;;                      :white "\u001B[37m"
+;;                      "")
+;;         reset-code "\u001B[0m"
+;;         colorize (fn [s] (str color-code s reset-code))
+;;         get-bar-char (fn [height row]
+;;                        (let [row-height (- height (* row 8))]
+;;                          (cond
+;;                            (and (zero? height) (not= row 0)) " "
+;;                            (and (zero? height) (zero? row)) "▁"
+;;                            (<= height (* row 8)) " "
+;;                            (> row-height 8) "█"
+;;                            :else (nth bar-chars row-height))))
+;;         border-line (apply str (repeat (- console-width 2) "─"))
+;;         border-top (str "╭" border-line "╮")
+;;         border-bottom (str "╰" border-line "╯")
+;;         time-span (count truncated)
+;;         minutes (quot time-span 60)
+;;         seconds (rem time-span 60)
+;;         label (str label-str (format " (last %d min %d sec)" minutes seconds) " | max " symbol-str ": " (format "%.2f" (apply max truncated)) " avg " symbol-str ": " (format "%.2f" (ut/avgf truncated)) " ")
+;;         padding (apply str (repeat (- console-width (count label) 4) " "))
+;;         label-row (str "│ " (colorize label) padding "│")
+;;         draw-row (fn [row-data]
+;;                    (let [graph-data (apply str
+;;                                            (map-indexed
+;;                                             (fn [idx ch]
+;;                                               (if (and (pos? idx)
+;;                                                        (zero? (rem idx (inc values-per-marker))))
+;;                                                 (str "│" (colorize ch))
+;;                                                 (colorize ch)))
+;;                                             row-data))
+;;                          padding (apply str (repeat (- console-width (count (clojure.string/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
+;;                      (str "│ " graph-data padding "│")))]
+;;     (println border-top)
+;;     (println label-row)
+;;     (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+;;     (doseq [row (range (dec rows) -1 -1)]
+;;       (println (draw-row (map #(get-bar-char % row) normalized))))
+;;     (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+;;     (println border-bottom)) "")
+
+(defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color] :or {color :default}}]
+  (let [console-width (- (ut/get-terminal-width) 10)
+        rows 5
+        border-width 2
+        label-padding 4
+        time-marker-interval 30
+        values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
+        max-values (- console-width border-width label-padding)
+        num-markers (quot max-values values-per-marker)
+        actual-width (- max-values num-markers)
+        truncated (take-last actual-width cpu-usage)
+        max-cpu (apply max truncated)
+        normalized (map #(int (/ (* % (* rows 8)) max-cpu)) truncated)
+        bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
+        color-code (case color
+                     :red "\u001B[31m"
+                     :green "\u001B[32m"
+                     :yellow "\u001B[33m"
+                     :blue "\u001B[34m"
+                     :magenta "\u001B[35m"
+                     :cyan "\u001B[36m"
+                     :white "\u001B[37m"
+                     "")
+        reset-code "\u001B[0m"
+        colorize (fn [s] (str color-code s reset-code))
+        get-bar-char (fn [height row]
+                       (let [row-height (- height (* row 8))]
+                         (cond
+                           (and (zero? height) (not= row 0)) " "
+                           (and (zero? height) (zero? row)) "▁"
+                           (<= height (* row 8)) " "
+                           (> row-height 8) "█"
+                           :else (nth bar-chars row-height))))
+        border-line (apply str (repeat (- console-width 2) "─"))
+        border-top (str "╭" border-line "╮")
+        border-bottom (str "╰" border-line "╯")
+        time-span (count truncated)
+        minutes (quot time-span 60)
+        seconds (rem time-span 60)
+        label (str label-str (format " (last %d min %d sec)" minutes seconds) " | max " symbol-str ": " (format "%.2f" (apply max truncated)) " avg " symbol-str ": " (format "%.2f" (ut/avgf truncated)))
+        padding (apply str (repeat (- console-width (count label) 4) " "))
+        label-row (str "│ " (colorize label) padding "│")
+        draw-row (fn [row-data]
+                   (let [graph-data (apply str
+                                           (map-indexed
+                                            (fn [idx ch]
+                                              (if (and (pos? idx)
+                                                       (zero? (rem idx (inc values-per-marker))))
+                                                (str " " (colorize ch)) ; Space instead of vertical line
+                                                (colorize ch)))
+                                            row-data))
+                         padding (apply str (repeat (- console-width (count (clojure.string/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
+                     (str "│ " graph-data padding "│")))]
+    (println border-top)
+    (println label-row)
+    (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+    (doseq [row (range (dec rows) -1 -1)]
+      (println (draw-row (map #(get-bar-char % row) normalized))))
+    (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+    (println border-bottom)
+    "")) ; Return an empty string instead of nil
+
 (defn jvm-stats
   []
   (when (not @shutting-down?)
@@ -5076,7 +5278,7 @@
             free-memory (.freeMemory runtime)
             used-memory (/ (- total-memory free-memory) (* 1024 1024))
             mm (int (Math/floor used-memory))
-            sys-load (ut/get-jvm-cpu-usage)  ;; (ut/get-system-load-average)
+            sys-load (ut/avgf (take-last 15 @cpu-usage)) ;;(ut/get-jvm-cpu-usage)  ;; (ut/get-system-load-average)
             thread-mx-bean (java.lang.management.ManagementFactory/getThreadMXBean)
             thread-count (.getThreadCount thread-mx-bean)
             booted? (= @stats-cnt 0)
@@ -5215,7 +5417,7 @@
 
         ;;(ut/pp [:solvers-running? @solver-status])
 
-        (ut/pp [:solver-cache-distro (ut/cache-distribution solvers-cache-hits-atom 0.5)])
+        (ut/pp [:solver-cache (ut/calculate-atom-size :solver-cache solvers-cache-atom )])
 
         (ut/pp [:solver-runner-pool-stats (get-slot-pool-queue-sizes)])
 
@@ -5235,8 +5437,13 @@
                        {:*cached-queries              (count @sql-cache)
                         ;:clover-sql-training-queries  (count (keys @clover-sql-training-atom))
                         ;:clover-sql-training-enriched (count (keys @clover-sql-enriched-training-atom))
-                        :ws-peers                     peers
+                        :ws-peers                     (do (reset! peer-usage (vec (take-last 600 @peer-usage)))
+                                                          peers)
                         :sys-load                     sys-load
+                        :sys-load-avg                 (do (reset! cpu-usage (vec (take-last 600 @cpu-usage)))
+                                                          (ut/avgf @cpu-usage))
+                        :pushes-avg                   (do (reset! push-usage (vec (take-last 600 @push-usage)))
+                                                          (ut/avgf (ut/cumulative-to-delta @push-usage)))
                         :cwidth                       (ut/get-terminal-width)
                         :uptime                       uptime-str
                         :sub-types                    sub-types
@@ -5244,6 +5451,12 @@
                         :*jvm-memory-used             [(ut/nf mm) :mb]
                         :*current-threads             thread-count}]))
              (catch Throwable e (ut/pp [:printing-shit-error? (str e)])))
+              
+              (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :yellow))
+              (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs" "client pushes" :color :magenta))
+              (ut/pp (draw-bar-graph @peer-usage "clients" "peers" :color :green))
+
+              ;;(draw-bar-graph @cpu-usage)
         
         ;; (when (or booted? (zero? (mod @stats-cnt 100)))
         ;;   (doseq [[client-name v] @atoms-and-watchers]

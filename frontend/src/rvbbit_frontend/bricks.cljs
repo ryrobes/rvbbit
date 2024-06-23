@@ -8338,7 +8338,7 @@
                                        overrides?   (ut/ne? overrides)
                                        input-map?   (ut/ne? input-map)]
                                    [re-com/h-box :size "auto" :children
-                                    [[re-com/box :child (str tt)]
+                                    [[re-com/box :child (if (not (vector? tt)) (str tt) tt)]
                                      [re-com/h-box :size "auto" :height "10px" :children
                                       [;(str running?)
                                        [re-com/md-icon-button :md-icon-name (if running? "zmdi-refresh" "zmdi-play") :class

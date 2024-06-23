@@ -83,6 +83,9 @@
  {:signal false,
   :cache? true,
   :type :flow,
+  :input-map
+  {:input-image-path
+   "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-3490-16567.png"},
   :data
   {:flowmap "node-color-thief-js-webp",
    :opts {:overrides {:image-path :input-image-path}}}},

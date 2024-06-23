@@ -43,6 +43,7 @@
     [rvbbit-backend.websockets :as wss]
     [shutdown.core :as shutdown]
     [taskpool.taskpool :as tp]
+    [websocket-layer.core      :as wl]
     [tea-time.core :as tt]
     [websocket-layer.network :as net]) ;; enables joda jdbc time returns
   (:import
@@ -508,6 +509,18 @@
   (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too
   (def purge (tt/every! wss/jvm-stats-every 2 (bound-fn [] (wss/purge-dead-client-watchers))))
   (def timekeeper (tt/every! 1 3 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
+  (def cpukeeper (tt/every! 1 3 (bound-fn [] (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))))
+  (def pushkeeper (tt/every! 1 3 (bound-fn [] (swap! wss/push-usage conj @wss/all-pushes))))
+  (def peerkeeper (tt/every! 1 3 (bound-fn [] (swap! wss/peer-usage conj (count @wl/sockets))))) 
+
+  
+  ;; (def cpukeeper (tt/every! 1 3 (bound-fn []
+  ;;                                 (swap! wss/cpu-usage
+  ;;                                        (fn [current-values]
+  ;;                                          (->> (conj current-values (ut/get-jvm-cpu-usage))
+  ;;                                               (take-last 600)))))))
+
+  ;; get-jvm-cpu-usage
 
   ;(def purge-solver-cache (tt/every! 600 600 (bound-fn [] (ut/purge-cache 0.5 wss/solvers-cache-hits-atom wss/solvers-cache-atom))))
   (def purge-solver-cache (tt/every! 600 600 (bound-fn [] (do (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
@@ -524,6 +537,7 @@
 
   (def last-look (atom {}))
   (def saved-uids (atom []))
+
   (let [signals  (vec (keys @wss/signals-atom))
         signalsv (vec (apply concat
                              (for [[k v] @wss/signals-atom]
@@ -537,6 +551,7 @@
         fmap     (wss/warren-flow-map conns)]
     (ut/pretty-spit "./flows/generated-flow-map.edn" fmap)
     (ut/pp [:warren-flow? conns]))
+  
   (shutdown/add-hook! ::the-pool-is-now-closing
                       #(do (reset! wss/shutting-down? true)
                            (let [destinations (vec (keys @wss/client-queues))]

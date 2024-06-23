@@ -197,6 +197,10 @@
 
 (defn avg [nums] (when (seq nums) (Math/round (/ (reduce + nums) (double (count nums))))))
 
+(defn avgf [nums]
+  (when (seq nums)
+    (Double/parseDouble (format "%.2f" (/ (reduce + nums) (double (count nums)))))))
+
 (defn get-system-load-average
   []
   (let [os-bean (java.lang.management.ManagementFactory/getOperatingSystemMXBean)] (.getSystemLoadAverage os-bean)))
@@ -254,7 +258,35 @@
       (finally
         (.close reader)))))
 
-(defn get-jvm-cpu-usage [] (get-cpu-usage-unix (get-pid)))
+;; "java.util.IllegalFormatConversionException: f != java.lang.Long"
+;; (defn cumulative-to-delta [cumulative-values]
+;;   (vec
+;;    (cons 0  ; First value has no previous value to subtract from
+;;          (map -
+;;               (rest cumulative-values)
+;;               cumulative-values))))
+
+(defn cumulative-to-delta [cumulative-values]
+  (if (empty? cumulative-values)
+    []
+    (vec
+     (cons 0.0
+           (map (fn [a b]
+                  (if (and (number? a) (number? b))
+                    (float (- a b))
+                    (throw (IllegalArgumentException. "Non-numeric value in input"))))
+                (rest cumulative-values)
+                cumulative-values)))))
+
+(defn normalize-cpu-usage [cpu-usage num-cores]
+  (let [max-theoretical-usage (* 100 num-cores)]
+    (/ (max 0 (min cpu-usage max-theoretical-usage)) num-cores)))
+
+(defn get-jvm-cpu-usage [] (let [num-cores (.. Runtime getRuntime availableProcessors)
+                                 raw-usage (get-cpu-usage-unix (get-pid))
+                                 ;;normalized-usage (/ raw-usage num-cores)
+                                 normalized-usage (normalize-cpu-usage raw-usage num-cores)]
+                             normalized-usage))
 
 (def debug-level (get (config/settings) :debug-level 0))
 
