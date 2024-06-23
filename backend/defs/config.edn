@@ -22,7 +22,7 @@
                 [:string3 :*data]]
          :data [:data-viewer :*data]
          :pretty [:pretty-box :*data]
-         :rowset [:rowset :*data]
+         :rowset [:honeycomb {:select [:*] :from {:data :*data}} 11 9]
          :clover [:box :child :*data]}
  :runners {:queries {:default {}
                      :modes [:rowset]
@@ -104,21 +104,23 @@
                           ;:default-view [:box :child [:img {:src :*query-id}]]
                           :icon "images/dalle.png"}
            :python3 {:runner {}
-                     :modes [:text] ; :data :rowset :clover]
+                     :modes [:text :data :rowset :clover]
                      :type :flow
                      :syntax "python"
+                     :placeholder-on-running? true
                      :clover-fn [:run-solver
                                  {:signal false
                                   :cache? false
                                   :type :flow
                                   :data
-                                  {:flowmap "python-test-1"
+                                  {:flowmap "simple-python-exec" ;; "python-test-1"
                                    :opts
                                    {:timeout 120000
                                     :overrides
-                                    {:open-input-1
+                                    {:python-code-string ;;:open-input-1
                                      :clover-body}}
-                                   :return :open-fn-5}}]
+                                   :return :output-only
+                                   }}]
                      :default ["import platform"
                                ""
                                "def main():"

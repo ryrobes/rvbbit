@@ -24,6 +24,8 @@
    java.time.Instant
    java.time.LocalTime
    java.time.LocalDate
+   [java.lang.management ManagementFactory]
+   [java.io BufferedReader InputStreamReader]
    java.time.ZoneId
    java.time.format.DateTimeFormatter
    [java.time            LocalTime Duration Instant ZonedDateTime ZoneId Period DayOfWeek]
@@ -212,19 +214,47 @@
 ;;         cpu-usage)
 ;;       0.0)))
 
-(defn get-jvm-cpu-usage []
-  (let [os-mxbean (ManagementFactory/getOperatingSystemMXBean)
-        runtime-mxbean (ManagementFactory/getRuntimeMXBean)
-        uptime (.getUptime runtime-mxbean)
-        available-processors (.getAvailableProcessors os-mxbean)
-        cpu-time (if (instance? OperatingSystemMXBean os-mxbean)
-                   (let [os-mxbean-ext ^OperatingSystemMXBean os-mxbean]
-                     (.getProcessCpuTime os-mxbean-ext))
-                   (throw (UnsupportedOperationException. "CPU time not supported on this JVM")))]
-    (if (> uptime 0)
-      (let [cpu-usage (/ (* cpu-time 100.0) (* uptime 1000000.0 available-processors))]
-        cpu-usage)
-      0.0)))
+;; (defn get-jvm-cpu-usage []
+;;   (let [os-mxbean (ManagementFactory/getOperatingSystemMXBean)
+;;         runtime-mxbean (ManagementFactory/getRuntimeMXBean)
+;;         uptime (.getUptime runtime-mxbean)
+;;         available-processors (.getAvailableProcessors os-mxbean)
+;;         cpu-time (if (instance? OperatingSystemMXBean os-mxbean)
+;;                    (let [os-mxbean-ext ^OperatingSystemMXBean os-mxbean]
+;;                      (.getProcessCpuTime os-mxbean-ext))
+;;                    (throw (UnsupportedOperationException. "CPU time not supported on this JVM")))]
+;;     (if (> uptime 0)
+;;       (let [cpu-usage (/ (* cpu-time 100.0) (* uptime 1000000.0 available-processors))]
+;;         cpu-usage)
+;;       0.0)))
+
+(defn get-pid []
+  (let [runtime-mxbean (ManagementFactory/getRuntimeMXBean)
+        jvm-name (.getName runtime-mxbean)]
+    (first (clojure.string/split jvm-name #"@"))))
+
+(defn get-cpu-usage-unix [pid]
+  (let [process-builder (ProcessBuilder. ["sh" "-c" (str "top -b -n 1 | grep " pid)])
+        process (.start process-builder)
+        reader (BufferedReader. (InputStreamReader. (.getInputStream process)))]
+    (try
+      (let [output (reduce str (line-seq reader))]
+        (if (clojure.string/blank? output)
+          (throw (Exception. "CPU usage not found"))
+          ;; Assuming a more generic parsing strategy that doesn't rely on fixed positions
+          (let [parts (clojure.string/split output #"\s+")
+                cpu-usage-index (->> parts
+                                     (map-indexed vector)
+                                     (filter #(re-matches #"\d+\.\d+" (second %)))
+                                     (first)
+                                     (first))]
+            (if cpu-usage-index
+              (Float/parseFloat (nth parts cpu-usage-index))
+              (throw (Exception. "CPU usage not found"))))))
+      (finally
+        (.close reader)))))
+
+(defn get-jvm-cpu-usage [] (get-cpu-usage-unix (get-pid)))
 
 (def debug-level (get (config/settings) :debug-level 0))
 

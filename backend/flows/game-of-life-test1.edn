@@ -117,7 +117,7 @@
                                      :border (str "3px solid " ccolor),
                                      :border-radius radi-str,
                                      :height "50px"}}]))])]]))]
-       (println "Initial grid:" (deref grid))
+       
        (defn game-of-life [rows cols delay-ms iterations]
          (let [done (java.util.concurrent.CountDownLatch. 1)]
            (.start

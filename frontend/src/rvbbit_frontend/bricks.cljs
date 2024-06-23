@@ -472,6 +472,11 @@
                                                                        (into (ut/deep-flatten panels)
                                                                              (ut/deep-flatten (get-all-values (get db :click-param))))))
                                                        current-flow-open)))
+          ;; flow-runners            (when (and (get db :flow?) 
+          ;;                                    (ut/ne? sflow)) 
+          ;;                           (vec (for [e (keys (get-in db [:flows sflow :map]))] (keyword (str "flow/" sflow ">" e)))))
+          flow-runners            []
+          ;;_ (tapp>> [:flow-runners flow-runners])
           clover-solvers          (vec (apply concat (for [[_ v]
                                                            @db/solver-fn-runs
                                                            ;(get-in db [:solver-fn :runs])
@@ -526,29 +531,40 @@
       ;;          (str in-editor-solvers0) (str in-editor-solvers )
       ;;          ;clover-solvers clover-solvers-running
       ;;          ])
-      (filterv #(not (cstr/includes? (str %) "||")) ;; live running subs ignore
+      ;(filterv #(not (cstr/includes? (str %) "||")) ;; live running subs ignore
         (vec (distinct
-               (concat signal-subs clover-solvers clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs)))))))
+               (concat flow-runners signal-subs clover-solvers clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs)))
+      ;         )
+      )))
 
 
 (re-frame/reg-sub ::stale-flow-subs?
                   (fn [db _]
                     (let [;;new @(ut/tracked-subscribe [::get-flow-subs])
+                          flow-open (get db :selected-flow)
+                          flow-open? (and (ut/ne? flow-open) (not= flow-open "live-scratch-flow") (get db :flow?))
                           new   @(rfa/sub ::get-flow-subs {})
                           old   (get db :flow-subs [])
                           deads (vec (cset/difference (set old) (set new)))
-                          deads (filterv #(not (cstr/includes? (str %) "||")) deads)] ;; dont mess with
-                      (ut/ne? deads))))
+                          deads (filterv #(not (cstr/includes? (str %) "||")) deads)
+                          stale? (if flow-open?
+                                   false
+                                   (ut/ne? deads))]
+                      ;;(tapp>>  [:stale? stale? flow-open?])
+                      stale?)))
 
 (re-frame/reg-event-db ::unsub-to-flows
                        (fn [db _]
                          (let [;;new @(ut/tracked-subscribe [::get-flow-subs])
                                new   @(rfa/sub ::get-flow-subs {})
                                old   (get db :flow-subs [])
-                               old   (filterv #(not (cstr/includes? (str %) "||")) old)
+                               flow-open? (get db :flow?)
+                               old   (filterv #(and 
+                                                (if flow-open? (not (cstr/includes? (str %) (str (get db :selected-flow)))) true)
+                                                (not (cstr/includes? (str %) "||"))) old)
                                deads (vec (cset/difference (set old) (set new)))
                                deads (filterv #(not (cstr/includes? (str %) "||")) deads) ;; dont mess with
-                               _ (ut/tapp>> [:flow-unsub-change! (get db :client-name) {:old old :new new :removing deads}])]
+                               _ (ut/tapp>> [:flow-unsub-change!  flow-open? (get db :client-name) {:old old :new new :removing deads}])]
                            (doall (doseq [n deads]
                                     (ut/tracked-dispatch [::http/unsub-to-flow-value n])
                                     (ut/tracked-dispatch [::conn/declick-parameter
@@ -8512,6 +8528,7 @@
                                                      v (ut/postwalk-replacer {:clover-body v} wrapper)]
                                                  (if (not (nil? v))
                                                    (ut/postwalk-replacer {:*data v} clover-fn) v))}))]
+                 
                  (assoc solver-body :waiter placeholder-clover)
                         
 

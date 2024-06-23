@@ -499,6 +499,11 @@
 (re-frame/reg-event-db ::add-live-flow-subs
                        (fn [db [_ running-subs]] (assoc db :flow-subs (vec (into running-subs (get db :flow-subs))))))
 
+;; (re-frame/reg-event-db
+;;  ::add-live-flow-subs
+;;  (fn [db [_ running-subs]] 
+;;    (assoc-in db [:click-param ])))
+
 (re-frame/reg-event-db
   ::run-current-flowmap
   (fn [db _]
@@ -534,7 +539,7 @@
             [::wfx/request :default
              {:message     {:kind        :run-flow
                             :flow-id     flow-id
-                            :no-return?  true ;;false ; true ;false ;true  ;; if we arent
+                            :no-return?  false ;true  ;false ;true ;;false ; true ;false ;true  ;; if we arent
                             :file-image  {:flowmaps             @(ut/tracked-subscribe [::flowmap-raw])
                                           :opts                 @(ut/tracked-subscribe [::opts-map])
                                           :zoom                 @db/pan-zoom-offsets
@@ -566,7 +571,10 @@
         server-running? (or (if only? false chans-open?)
                             @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]]))
         rrblocks        (get @db/real-running-blocks flow-id [])]
-    (if (= bid :*) server-running? (and (some #(= bid %) rrblocks) server-running?))))
+    
+    (if (= bid :*) server-running? (and (some #(= bid %) rrblocks) server-running?))
+    ;true
+    ))
 
 
 
@@ -579,7 +587,9 @@
                                                                 [(keyword (str "flow/" flow-id ">*running?"))]])
                           running       (get-in db [:flow-results :tracker-blocks flow-id :running-blocks])]
                       (cond (= bid :*) flow-running?
-                            :else      (true? (and flow-running? (some #(= bid %) running)))))))
+                            :else      (true? (and flow-running? (some #(= bid %) running))))
+                      ;true
+                      )))
 
 (re-frame/reg-sub ::is-waiting?
                   (fn [db [_ bid flow-id]]
@@ -710,12 +720,7 @@
                                            :idx        0 ;idx
                                            :keypath-in keypath-in
                                            :flow-id    flow-name
-                                           :keypath    [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]} block-id ;; (when
-                                                                                                                           ;; (not
-                                                                                                                           ;; (=
-                                                                                                                           ;; block-id
-                                                                                                                           ;; :inline-render))
-                                                                                                                           ;; block-id)
+                                           :keypath    [:map (if add-kp? (vec (cons :v keypath-in)) keypath-in)]} block-id 
                                           ^{:key (str block-id keypath kki kk k-val-type 1)}
                                           [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
                                            :style {:cursor (when draggable? "grab")} :children
@@ -4964,8 +4969,10 @@
                                     (if sub-flow-exec?
                                       (ut/tracked-dispatch [::http/load-flow-w-alias file-path v])
                                       (ut/tracked-dispatch [::set-selected-flow (str v)])))} :child (str v)]
-                     [re-com/md-icon-button :src (at) :md-icon-name "zmdi-close" :on-click
-                      #(ut/tracked-dispatch [::unload-flow (str v)]) :style
+                     [re-com/md-icon-button :src (at) :md-icon-name "zmdi-close"
+                      :on-click
+                      #(ut/tracked-dispatch [::unload-flow (str v)])
+                      :style
                       {;:color bcolor
                        :cursor    "pointer"
                        :height    "12px"
@@ -5251,7 +5258,8 @@
                  :color       (str (theme-pull :theme/editor-outer-rim-color nil))
                  :font-size   "29px"} :gap "10px" :children
                 [[edit-flow-title flow-id 1450]
-                 [re-com/md-icon-button :src (at) :md-icon-name (if watched? "zmdi-eye" "zmdi-eye-off") :on-click
+                 [re-com/md-icon-button :src (at) :md-icon-name (if watched? "zmdi-eye" "zmdi-eye-off") 
+                  :on-click
                   #(if watched?
                      (ut/tracked-dispatch [::wfx/request :default
                                            {:message {:kind        :remove-flow-watcher
@@ -5273,7 +5281,8 @@
                                                         :flow-keys   running-subs
                                                         :flow-id     flow-id
                                                         :client-name client-name}
-                                              :timeout 15000000}]))) :style
+                                              :timeout 15000000}]))) 
+                                              :style
                   {:cursor "pointer" :margin-top "8px" :font-size "30px"}]]]
                (when has-override?
                  [re-com/h-box :align :center :justify :center :gap "5px" :style

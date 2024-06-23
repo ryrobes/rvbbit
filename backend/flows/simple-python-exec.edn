@@ -1,18 +1,20 @@
 {:flowmaps
  {:python-code-string
-  {:w 200,
-   :h 85,
-   :data
-   {:drag-meta {:type :open-block},
-    :flow-item {:expandable? true, :inputs [:value-0]},
-    :user-input ["print('boobs!')"],
-    :syntax "python",
-    :width 350,
-    :view-output? false},
+  {:y 1225,
+   :w 200,
+   :types nil,
    :z 0,
    :ports {:out {:out :any}, :in {}},
+   :inputs nil,
+   :h 85,
    :x 2325,
-   :y 1225},
+   :data
+   {:drag-meta {:type :open-block},
+    :flow-item {:expandable? true, :inputs []},
+    :user-input ["print('{:bvoo 123}')"],
+    :syntax "python",
+    :width 350,
+    :view-output? false}},
   :shell-command-1
   {:w 300,
    :h 150,
@@ -21,12 +23,9 @@
    :z 0,
    :data
    {:flow-item
-    {:description
-     "Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs",
+    {:description "Execute shell command. WARNING: only use if you know what you're doing / have controlled inputs",
      :category ":rabbit-base",
-     :fn
-     (fn [command]
-       (rvbbit-backend.websockets/run-shell-command command)),
+     :fn (fn [command] (rvbbit-backend.websockets/run-shell-command command)),
      :name ":shell-command",
      :icon "zmdi-washing-machine",
      :defaults {:command "ls -la"},
@@ -46,15 +45,7 @@
     :connection-id nil,
     :queries
     {:name-drag-14
-     {:select
-      [:name
-       :full_map
-       :description
-       :inputs
-       :icon
-       :input_types
-       :output_types
-       :category],
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
       :from [[:query/flow-fn-sys :cc526]],
       :where [:= :name ":shell-command"]}},
     :drag-meta
@@ -70,21 +61,11 @@
      :target :name,
      :row-num 4}},
    :icon "zmdi-washing-machine",
-   :ports
-   {:in {:command :string},
-    :out
-    {:output :list,
-     :exception :vector,
-     :seconds :list,
-     :command :string,
-     :* :map}}},
+   :ports {:in {:command :string}, :out {:output :list, :exception :vector, :seconds :list, :command :string, :* :map}}},
   :py-executable
   {:w 175,
    :h 85,
-   :data
-   {:drag-meta {:type :open-block},
-    :flow-item {:expandable? true},
-    :user-input "python3"},
+   :data {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input "python3"},
    :z 0,
    :ports {:out {:out :string}},
    :x 2450,
@@ -97,14 +78,9 @@
    :z 0,
    :data
    {:flow-item
-    {:description
-     "Write file content to the server. Useful in chaining together operations.",
+    {:description "Write file content to the server. Useful in chaining together operations.",
      :category ":rabbit-base",
-     :fn
-     (fn [full-path file-data]
-       (rvbbit-backend.websockets/write-local-file
-         full-path
-         file-data)),
+     :fn (fn [full-path file-data] (rvbbit-backend.websockets/write-local-file full-path file-data)),
      :name ":write-file",
      :icon "zmdi-file-text",
      :types {:full-path :string, :file-data :string, :out :string},
@@ -122,15 +98,7 @@
     :view-output? true,
     :queries
     {:name-drag-11
-     {:select
-      [:name
-       :full_map
-       :description
-       :inputs
-       :icon
-       :input_types
-       :output_types
-       :category],
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
       :from [[:query/flow-fn-sys :hh964]],
       :where [:= :name ":write-file"]}},
     :drag-meta
@@ -146,32 +114,29 @@
      :target :name,
      :row-num 3}},
    :icon "zmdi-file-text",
-   :ports
-   {:in {:full-path :string, :file-data :string},
-    :out {:status :keyword, :file-path :string, :* :map}}},
+   :ports {:in {:full-path :string, :file-data :string}, :out {:status :keyword, :file-path :string, :* :map}}},
   :tmp-file-path
   {:w 125,
    :h 85,
    :data
-   {:drag-meta {:type :open-block},
-    :flow-item {:expandable? true},
-    :user-input "/tmp/scratch.py",
-    :view-output? false},
+   {:drag-meta {:type :open-block}, :flow-item {:expandable? true}, :user-input "/tmp/scratch.py", :view-output? false},
    :z 0,
    :ports {:out {:out :string}},
    :x 2150,
    :y 1225},
   :output-only
-  {:y 1800,
+  {:y 1825,
    :fn (fn [x] x),
    :w 200,
-   :raw-fn (fn [x] x),
+   :raw-fn (fn [x] (try (clojure.edn/read-string (first x)) (catch Exception _ x))),
    :right-click? true,
    :icon "zmdi-functions",
+   :types nil,
    :z 0,
-   :ports {:in {:value :any}, :out {:out :list}},
+   :ports {:in {:x :any}, :out {:out :list}},
+   :inputs nil,
    :h 100,
-   :x 2350,
+   :x 2425,
    :data
    {:flow-item
     {:description "Write you own Clojure function! Godspeed!",
@@ -196,15 +161,7 @@
     :view-output? false,
     :queries
     {:name-drag-25
-     {:select
-      [:name
-       :full_map
-       :description
-       :inputs
-       :icon
-       :input_types
-       :output_types
-       :category],
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
       :from [[:query/flow-fn-sys :ii11]],
       :where [:= :name ":open-fn"]}},
     :drag-meta
@@ -249,15 +206,7 @@
     :connection-id nil,
     :queries
     {:name-drag-35
-     {:select
-      [:name
-       :full_map
-       :description
-       :inputs
-       :icon
-       :input_types
-       :output_types
-       :category],
+     {:select [:name :full_map :description :inputs :icon :input_types :output_types :category],
       :from [[:query/flow-fn-sys :bb736]],
       :where [:= :name ":clojure-string-join"]}},
     :drag-meta
@@ -273,16 +222,15 @@
      :target :name,
      :row-num 22}},
    :icon "zmdi-group",
-   :ports
-   {:in {:delimiter :string, :value-1 :any, :value-2 :any},
-    :out {:out :string}}}},
- :zoom [-2131.18 -1602.6 1.355],
+   :ports {:in {:delimiter :string, :value-1 :any, :value-2 :any}, :out {:out :string}}}},
+ :zoom [-2661.32 -1972.97 1.725],
+ :opts nil,
  :flow-id "simple-python-exec",
  :flowmaps-connections
  [[:tmp-file-path :write-file-1/full-path]
   [:python-code-string :write-file-1/file-data]
   [:py-executable :clojure-string-join-1/value-1]
   [:write-file-1/file-path :clojure-string-join-1/value-2]
-  [:shell-command-1/output :output-only/value]
   [:clojure-string-join-1 :shell-command-1/command]
-  [:output-only :done]]}
+  [:output-only :done]
+  [:shell-command-1/output :output-only/x]]}

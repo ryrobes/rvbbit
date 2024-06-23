@@ -959,7 +959,7 @@
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 100))] ;; was 100, was (async/sliding-buffer
+  (let [results (async/chan (async/sliding-buffer 400))] ;; was 100, was (async/sliding-buffer
     (try (async/go-loop []
            (async/<! (async/timeout 700)) ;; was 70 ?
            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
@@ -968,8 +968,13 @@
                                         (recur (conj res item))
                                         res))
                    items-by-task-id (group-by :task-id items)
-                   latest-items     (mapv (fn [group] (if (contains? valid-groups (first group)) group (last group)))
-                                      (vals items-by-task-id))]
+                   ;;_ (when (= client-name :electrifying-red-wren-26)  (ut/pp [:push client-name items-by-task-id]))
+                   latest-items     (mapv (fn [group] (if 
+                                                       (contains? valid-groups (first group)) ;;(or (contains? valid-groups (first group)) (cstr/includes? (str group) "running?"))
+                                                        group (last group)))
+                                      (vals items-by-task-id))
+                   ;;_ (when (= client-name :electrifying-red-wren-26)  (ut/pp [:push-latest client-name latest-items]))
+                   ]
                (if (not-empty latest-items)
                  (let [_ (swap! client-batches update client-name (fnil inc 0))
                        message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
@@ -3254,7 +3259,10 @@
                                              :when   (or (= (get sv :signal) kk)
                                                          (= (get sv :signal)
                                                             (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
-                                       (enqueue-task4 (fn [] (run-solver sk client-name)))))
+                                       ;(enqueue-task4 (fn [] 
+                                                        (run-solver sk client-name)
+                                       ;                 ))
+                                       ))
                                  _ (swap! last-signals-history-atom assoc kk (get @last-signals-history-atom-temp kk)) ;; one
                                                                                                                        ;; write,
                                                                                                                        ;; to

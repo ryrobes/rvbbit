@@ -1,223 +1,228 @@
 {:orders
- {:recos-sys
-  [:context_hash
-   :combo_hash
-   :connection_id
-   :shape_name
-   :query_map
-   :query_map_str
-   :viz_map
-   :combo_edn
-   :selected_view
-   :table_name
-   :condis
-   :h
-   :w
-   :score],
-  :fields-sys [:field_name :field_type :data_type],
-  :kke192 (:query_error),
-  :viz-shapes-sys [:combo_edn :recos],
+ {:kick-868154760
+  [:Age
+   :Fare
+   :PassengerId
+   :SibSp
+   :Parch
+   :Predicted
+   :Sex
+   :Survived
+   :Embarked
+   :Pclass],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb),
-  :jvm_stats
-  [:used_memory_mb
-   :thread_count
-   :messages
-   :unix_ms
-   :messages_per_second
-   :recent_messages
-   :recent_messages_per_second
-   :recent_queries_run
-   :recent_queries_per_second
-   :queries_per_second
-   :sql_cache_size
-   :ws_peers
-   :subscriptions
-   :open_flow_channels
-   :uptime_seconds
-   :seconds_since_last_update
-   :queries_run
-   :internal_queries_run
-   :sniffs_run
-   :sys_load
-   :ts],
-  :searches-types-sys [:item_type],
-  :searches-rows-sys
-  [:item_sub_type
-   :item_type
-   :item_key
-   :display_name
-   :sample
-   :value
-   :is_live
-   :block_meta],
-  :viz-tables-sys [:table_name :recos],
-  :shows-drag-6 [:location :show_name :title :tour_name],
-  :shows (:query_error),
-  :viz-shapes0-sys [:shape :recos],
-  :connections-sys [:database_name :connection_id],
-  :searches-sub-types-sys [:item_key :is_live :items :styler_highlight_4018a],
-  :gen-viz-243 [:rows :tour_name]},
+  :fields-sys [:field_name :field_type :data_type],
+  :connections-sys [:database_name :connection_id]},
  :reco-preview nil,
  :sql-source
- {:jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
-  :kke192 {:select [:*], :connection-id "system-db", :from [:kke192], :limit 111},
-  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
-  :gen-viz-243
-  {:select [[[:count 1] :rows] :tour_name],
+ {:kick-868154760
+  {:select [:*],
    :from
-   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
-   :group-by [:tour_name],
-   :order-by [[:rows :desc]]},
-  :shows-drag-6
-  {:select [:location :show_name :title :tour_name],
-   :from [[:shows :dd235]],
-   :_last-run "19:23:37"},
-  :new-query
-  {:cache? false,
-   :limit 100,
-   :_last-run "22:23:22",
-   :refresh-every 10,
-   :from [[:jvm_stats :kke192]],
-   :order-by [[2 :desc]],
-   :connection-id "system-db",
-   :select
-   [:thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :sys_load :used_memory_mb],
-   :post-process-fn reverse},
-  :searches-types-sys
-  {:select [:item_type],
-   :where
-   [:and
-    [:not [:like :item_sub_type "%preview%"]]
-    [:not [:= :item_type "saved-block"]]],
-   :from [:client_items],
-   :group-by [1]},
-  :searches-sub-types-sys
-  {:select [:item_key :is_live [[:count 1] :items]],
-   :where
-   [:and
-    [:not [:= :item_key "upbeat-globular-gnu-4"]]
-    [:not [:like :item_sub_type "%preview%"]]
-    [:not [:= :item_type "saved-block"]]
-    [:= :item_type "client-params"]],
-   :style-rules
-   {[:* :highlight-4018a]
-    {:logic [:= :is_live 1],
-     :style {:background-color "#9c346434", :color "#9c3464"}}},
-   :from [:client_items],
-   :group-by [1 2]}},
+   {:data
+    [{"Age" 22,
+      "Fare" 7.25,
+      "PassengerId" 1,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 38,
+      "Fare" 71.2833,
+      "PassengerId" 2,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 1}
+     {"Age" 26,
+      "Fare" 7.925,
+      "PassengerId" 3,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 35,
+      "Fare" 53.1,
+      "PassengerId" 4,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 35,
+      "Fare" 8.05,
+      "PassengerId" 5,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 8.4583,
+      "PassengerId" 6,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 1,
+      "Pclass" 3}
+     {"Age" 54,
+      "Fare" 51.8625,
+      "PassengerId" 7,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 2,
+      "Fare" 21.075,
+      "PassengerId" 8,
+      "SibSp" 3,
+      "Parch" 1,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 27,
+      "Fare" 11.1333,
+      "PassengerId" 9,
+      "SibSp" 0,
+      "Parch" 2,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 14,
+      "Fare" 30.0708,
+      "PassengerId" 10,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 2}
+     {"Age" 4,
+      "Fare" 16.7,
+      "PassengerId" 11,
+      "SibSp" 1,
+      "Parch" 1,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 58,
+      "Fare" 26.55,
+      "PassengerId" 12,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 20,
+      "Fare" 8.05,
+      "PassengerId" 13,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 39,
+      "Fare" 31.275,
+      "PassengerId" 14,
+      "SibSp" 1,
+      "Parch" 5,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 14,
+      "Fare" 7.8542,
+      "PassengerId" 15,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 0,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 55,
+      "Fare" 16,
+      "PassengerId" 16,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 2}
+     {"Age" 2,
+      "Fare" 29.125,
+      "PassengerId" 17,
+      "SibSp" 4,
+      "Parch" 1,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 1,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 13,
+      "PassengerId" 18,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 1,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 2}
+     {"Age" 31,
+      "Fare" 18,
+      "PassengerId" 19,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 0,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 7.225,
+      "PassengerId" 20,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 3}]}},
+  :Fare-drag-33 {:select [[[:sum :Fare] :Fare_sum]], :from [[nil :vv768]]}},
  :meta
- {:recos-sys
-  {:fields
-   {:query_map
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"[{:select [[[[:sum :rows]] :rows] :tour_name], :from [\"query/shows_drag_6\"], :group-by [:tour_name]}]"
-      6,
-      "[{:select [[:tour_name :id] [:tour_name :label]], :from [\"query/shows_drag_6\"], :group-by [:tour_name], :order-by [:tour_name]}]"
-      1,
-      "[{:select [[[[:sum :rows]] :rows] [[:substr :title 0 11] :day_sqlite_title] :tour_name], :from [\"query/shows_drag_6\"], :group-by [[:substr :title 0 11] :tour_name]}]"
-      1},
-     :cardinality 50},
-    :shape_name
-    {:data-type "string",
-     :distinct 9,
-     :group-by? true,
-     :commons {"basic_timeseries_color" 2, "basic_h_bar_nivo" 1, "recharts_line" 1},
-     :cardinality 89},
-    :w
-    {:data-type "unknown",
-     :distinct 3,
-     :group-by? true,
-     :commons {nil 7, 9 2, 6 1},
-     :cardinality 30},
-    :combo_edn
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"\"rows, tour_name\"" 7,
-      "\"tour_name\"" 1,
-      "\"day_sqlite_title*, rows, tour_name\"" 1},
-     :cardinality 40},
-    :query_map_str
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"\nSELECT (SUM(rows)) AS rows, tour_name\nFROM 'query/shows_drag_6'\nGROUP BY tour_name\n"
-      6,
-      "\nSELECT tour_name AS id, tour_name AS label\nFROM 'query/shows_drag_6'\nGROUP BY tour_name\nORDER BY tour_name ASC\n"
-      1,
-      "\nSELECT (SUM(rows)) AS rows, SUBSTR(title, 0, 11) AS day_sqlite_title, tour_name\nFROM 'query/shows_drag_6'\nGROUP BY SUBSTR(title, 0, 11), tour_name\n"
-      1},
-     :cardinality 50},
-    :selected_view
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"" 7, ":reech" 3},
-     :cardinality 20},
-    :combo_hash
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"419046331" 1, "-500156998" 1, "2048926143" 1},
-     :cardinality 100},
-    :h
-    {:data-type "unknown",
-     :distinct 4,
-     :group-by? true,
-     :commons {nil 7, 2 1, 9 1},
-     :cardinality 40},
-    :condis
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"" 10},
-     :cardinality 10},
-    :score
-    {:data-type "float",
-     :distinct 2,
-     :group-by? true,
-     :commons {48.39999999999999 9, 0 1},
-     :cardinality 20},
-    :table_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"shows_drag_6" 10},
-     :cardinality 10},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"cache.db" 10},
-     :cardinality 10},
-    :context_hash
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"-281537579" 10},
-     :cardinality 10},
-    :viz_map
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons
-     {"{:reech [:> :ResponsiveContainer {:width \"100%\", :height :panel-height+50} [:> :BarChart {:data :query-preview, :margin {:top 5, :bottom 5, :right 30, :left 20}} [:> :CartesianGrid {:strokeDasharray \"1 4\", :opacity 0.33}] [:> :Tooltip] [:> :XAxis {:dataKey :tour_name}] [:> :Bar {:dataKey :rows, :stroke \"#8884d8\", :fill \"#8884d8\"}]]]}"
-      1,
-      "[:nivo-bar-chart {:labelTextColor \"#423939\", :axisLeft {:tickRotation 0, :legendPosition \"middle\", :legendOffset -65}, :indexBy :tour_name, :layout \"vertical\", :enableLabel false, :axisBottom {:tickRotation 0, :legendPosition \"middle\", :legendOffset 40}, :inner-padding 0, :width :panel-width+70, :colors :theme/vega-default-color-scheme, :theme :theme/nivo-defaults, :colorBy \"id\", :click {:x :tour_name, :y :rows}, :groupMode \"stacked\", :keys [:rows], :padding 0.1, :enableGridX true, :border-radius 2, :enableGridY true, :height :panel-height+50, :margin {:top 5, :right 5, :bottom 50, :left 45}, :data :query-preview}]"
-      1,
-      "[:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :theme :theme/nivo-defaults, :arcLinkLabelsSkipAngle 10, :click {:c :tour_name, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :query-preview, :arcLinkLabelsTextColor \"#ffffff\"}]"
-      1},
-     :cardinality 100}},
-   :rowcount 10},
-  :fields-sys
+ {:fields-sys
   {:fields
    {:field_name
     {:data-type "string",
@@ -238,33 +243,6 @@
      :commons {"string" 6, "datetime" 1},
      :cardinality 28}},
    :rowcount 7},
-  :kke192
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: kke192)" 1},
-     :cardinality 100}},
-   :rowcount 2},
-  :viz-shapes-sys
-  {:fields
-   {:combo_edn
-    {:data-type "string",
-     :distinct 4,
-     :group-by? true,
-     :commons
-     {"\"tour_name\"" 1, "\"rows, tour_name\"" 1, "\"rows, title, tour_name\"" 1},
-     :cardinality 100},
-    :recos
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? false,
-     :commons {1 3, 7 1},
-     :cardinality 50}},
-   :rowcount 4},
   :tables-sys
   {:fields
    {:db_schema
@@ -304,6 +282,69 @@
      :commons {8 2, 5 2, 12 1},
      :cardinality 71}},
    :rowcount 7},
+  :kick-868154760
+  {:fields
+   {:SibSp
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {0 11, 1 7, 4 1},
+     :cardinality 20},
+    :Predicted
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {1 10, 0 10},
+     :cardinality 10},
+    :Fare
+    {:data-type "float",
+     :distinct 19,
+     :group-by? true,
+     :commons {8.05 2, 71.2833 1, 8.4583 1},
+     :cardinality 94},
+    :Embarked
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {2 15, 0 3, 1 2},
+     :cardinality 15},
+    :Sex
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 11, 1 9},
+     :cardinality 10},
+    :PassengerId
+    {:data-type "integer",
+     :distinct 20,
+     :group-by? true,
+     :commons {8 1, 18 1, 10 1},
+     :cardinality 100},
+    :Survived
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {1 10, 0 10},
+     :cardinality 10},
+    :Parch
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {0 15, 1 3, 5 1},
+     :cardinality 20},
+    :Pclass
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {3 13, 1 4, 2 3},
+     :cardinality 15},
+    :Age
+    {:data-type "integer",
+     :distinct 15,
+     :group-by? true,
+     :commons {28 3, 14 2, 35 2},
+     :cardinality 75}},
+   :rowcount 20},
   :new-query
   {:fields
    {:thread_count
@@ -362,215 +403,6 @@
      :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
-  :jvm_stats
-  {:fields
-   {:queries_run
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {84 1, 820 1, 692 1},
-     :cardinality 100},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 110,
-     :group-by? true,
-     :commons {427.9 2, 421.69 1, 459.44 1},
-     :cardinality 99},
-    :uptime_seconds
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {1259 1, 1320 1, 1364 1},
-     :cardinality 100},
-    :queries_per_second
-    {:data-type "float",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :sql_cache_size
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :ts
-    {:data-type "string",
-     :distinct 111,
-     :group-by? true,
-     :commons
-     {"2024-06-19 19:58:47" 1, "2024-06-19 19:51:02" 1, "2024-06-19 19:51:32" 1},
-     :cardinality 100},
-    :subscriptions
-    {:data-type "integer",
-     :distinct 8,
-     :group-by? true,
-     :commons {454 80, 471 23, 414 3},
-     :cardinality 7},
-    :messages_per_second
-    {:data-type "float",
-     :distinct 111,
-     :group-by? true,
-     :commons {389.44 1, 391.19 1, 366.94 1},
-     :cardinality 100},
-    :messages
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {604900 1, 266552 1, 8 1},
-     :cardinality 100},
-    :sniffs_run
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {84 1, 177 1, 246 1},
-     :cardinality 100},
-    :sys_load
-    {:data-type "float",
-     :distinct 106,
-     :group-by? true,
-     :commons {16.34 2, 11.37 2, 6.47 2},
-     :cardinality 95},
-    :unix_ms
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {1718842517863 1, 1718841047844 1, 1718841842852 1},
-     :cardinality 100},
-    :used_memory_mb
-    {:data-type "integer",
-     :distinct 110,
-     :group-by? true,
-     :commons {2881 2, 7749 1, 7958 1},
-     :cardinality 99},
-    :recent_queries_run
-    {:data-type "integer",
-     :distinct 11,
-     :group-by? true,
-     :commons {7 36, 8 25, 6 21},
-     :cardinality 9},
-    :thread_count
-    {:data-type "integer",
-     :distinct 33,
-     :group-by? true,
-     :commons {292 12, 295 11, 290 7},
-     :cardinality 29},
-    :internal_queries_run
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :open_flow_channels
-    {:data-type "integer",
-     :distinct 6,
-     :group-by? true,
-     :commons {11 67, 0 21, 104 17},
-     :cardinality 5},
-    :ws_peers
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {17 110, 0 1},
-     :cardinality 1},
-    :recent_messages
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {370006 1, 46874 1, 552505 1},
-     :cardinality 100},
-    :recent_queries_per_second
-    {:data-type "float",
-     :distinct 11,
-     :group-by? true,
-     :commons {0.47 36, 0.53 25, 0.4 21},
-     :cardinality 9},
-    :seconds_since_last_update
-    {:data-type "integer",
-     :distinct 3,
-     :group-by? true,
-     :commons {14 57, 15 53, -1 1},
-     :cardinality 2}},
-   :rowcount 111},
-  :searches-types-sys
-  {:fields
-   {:item_type
-    {:data-type "string",
-     :distinct 8,
-     :group-by? true,
-     :commons {"solvers" 1, "signals" 1, "saved-views" 1},
-     :cardinality 100}},
-   :rowcount 8},
-  :searches-rows-sys
-  {:fields
-   {:item_sub_type
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"stats" 16, "param" 9},
-     :cardinality 7},
-    :item_type
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"client-params" 25},
-     :cardinality 3},
-    :item_key
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"amazing-oval-nightingale-11" 25},
-     :cardinality 3},
-    :display_name
-    {:data-type "string",
-     :distinct 25,
-     :group-by? true,
-     :commons
-     {":selected-block" 1, ":client-subs" 1, ":recent-messages-per-second" 1},
-     :cardinality 100},
-    :sample
-    {:data-type "string",
-     :distinct 23,
-     :group-by? true,
-     :commons {"19" 2, "" 2, "5772" 1},
-     :cardinality 92},
-    :value
-    {:data-type "string",
-     :distinct 25,
-     :group-by? true,
-     :commons
-     {":client/amazing-oval-nightingale-11>param>selected-view-data" 1,
-      ":client/amazing-oval-nightingale-11>stats>queue-size" 1,
-      ":client/amazing-oval-nightingale-11>stats>server-subs" 1},
-     :cardinality 100},
-    :is_live
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {1 25},
-     :cardinality 3},
-    :block_meta
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? true,
-     :commons {nil 25},
-     :cardinality 3}},
-   :rowcount 25},
-  :viz-tables-sys
-  {:fields
-   {:table_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"shows_drag_6" 1},
-     :cardinality 100},
-    :recos
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {31 1},
-     :cardinality 100}},
-   :rowcount 1},
   :shows-drag-6
   {:fields
    {:location
@@ -601,32 +433,6 @@
      :commons {nil 103, "Damaged Justice" 55, "Wherever We May Roam" 54},
      :cardinality 6}},
    :rowcount 500},
-  :shows
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: shows)" 1},
-     :cardinality 100}},
-   :rowcount 2},
-  :viz-shapes0-sys
-  {:fields
-   {:shape
-    {:data-type "string",
-     :distinct 9,
-     :group-by? false,
-     :commons {"basic_h_bar_nivo" 1, "recharts_line" 1, "recharts_area" 1},
-     :cardinality 100},
-    :recos
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? false,
-     :commons {1 8, 2 1},
-     :cardinality 22}},
-   :rowcount 9},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -753,36 +559,6 @@
      :commons {"us" 288, nil 113, "au" 37},
      :cardinality 1}},
    :rowcount 500},
-  :searches-sub-types-sys
-  {:fields
-   {:item_key
-    {:data-type "string",
-     :distinct 238,
-     :group-by? true,
-     :commons
-     {"poised-star-shaped-rat-38" 1,
-      "unreal-olive-squirrel-14" 1,
-      "affirmative-byzantium-buffalo-31" 1},
-     :cardinality 100},
-    :is_live
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {0 205, 1 33},
-     :cardinality 0},
-    :items
-    {:data-type "integer",
-     :distinct 26,
-     :group-by? false,
-     :commons {96 33, 61 29, 26 25},
-     :cardinality 10},
-    :styler_highlight_4018a
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? false,
-     :commons {0 205, 1 33},
-     :cardinality 0}},
-   :rowcount 238},
   :duration-hours-drag-43
   {:fields
    {:duration_hours
@@ -863,23 +639,21 @@
      :cardinality 83}},
    :rowcount 30}},
  :default-col-widths
- {:viz-shapes0-list* {:viz-shapes0-sys 155},
-  :block-110 {:gen-viz-243 230},
-  :block-7716 {:shows-drag-location-6 205},
-  :searches-sub-types-sys-list* {:searches-sub-types-sys 205},
+ {:block-10643 {:new-query-1-py3 100},
+  :virtual-panel {:kick-868154760 100},
   :system-connections-list* {:connections-sys 111},
-  :system-fields-list* {:fields-sys 170},
-  :block-3567 {:shows-drag-6 252},
   :system-tables-list* {:tables-sys 137},
-  :searches-types-list* {:searches-types-sys 111},
-  :searches-rows-sys-list* {:searches-rows-sys 170}},
+  :system-fields-list* {:fields-sys 170},
+  :block-5001 {:Fare-drag-33 ##Inf}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"
-  "sunny fox"],
+  "sunny fox"
+  "prismatic serval"
+  "willing owl"],
  :selected-cols nil,
  :server
  {:settings
@@ -896,10 +670,10 @@
        :text-shadow "4px 4px 4px #00000088",
        :font-size "17px",
        :font-family :theme/monospaced-font}}
-     :*data],
+     [:string3 :*data]],
     :data [:data-viewer :*data],
     :pretty [:pretty-box :*data],
-    :rowset [:rowset :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
     :clover [:box :child :*data]},
    :kits {},
    :clover-templates
@@ -941,7 +715,6 @@
       :child
       [:string3 :x "CHEESEBURGER!"]]}},
    :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive",
-   :openapi-org-id nil,
    :debug-level 1,
    :screens
    ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
@@ -1108,83 +881,58 @@
     "winter-twin-peaks"
     "witchy425"
     "wonderland-horror-interface"
-    "wow-board"],
-   :openapi-key "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"}},
+    "wow-board"]}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? true,
  :buffy? false,
- :memory [194533502 160805318 4294705152],
- :preview-keys
- ["784550338" "1901218831" "-500156998" "2051572034" "-522810259" "419046331"],
- :sched {:new-query 10},
+ :memory [1061249403 1039866795 4294705152],
  :flow-subs
- [:solver-status/*client-name*>raw-custom-override-1657692765>running?
-  :time/now-seconds
-  :solver-status/*client-name*>raw-custom-override-1561961887>running?
+ [:time/now-seconds
   :data/new-clojure-1
-  :solver/raw-custom-override1686200581
   :flow/openai-image-gen-ladder3>hiccup-image-box-w-png-vw
-  :solver/raw-custom-override-1561961887
   :flow/flow-forever>*running?
+  :solver-status/*client-name*>get-my-colors308020694>running?
   :client/amazing-oval-nightingale-11>stats>memory
-  :solver-status/*client-name*
-  :solver/raw-custom-override-970575260
-  :solver-status/*client-name*>raw-custom-override-970575260>running?
-  :solver-status/*client-name*>get-my-colors-916110573>running?
-  :solver/raw-custom-override-1280155551
-  :flow/live-scratch-flow>*running?
-  :solver/get-my-colors-87522178
   :client/*client-name*>stats>memory
-  :solver-status/*client-name*>raw-custom-override-1280155551>running?
+  :solver-status/*client-name*
+  :solver/get-my-colors308020694
+  :solver/raw-custom-override1116852110
+  :solver/get-my-colors345208371
+  :flow/live-scratch-flow>*running?
   :time/second
   :flow/flow-forever>:final-math
-  :solver/get-my-colors-916110573
-  :solver/raw-custom-override-1657692765
-  :solver-status/*client-name*>get-my-colors-87522178>running?
-  :solver-status/*client-name*>raw-custom-override1686200581>running?
+  :solver-status/*client-name*>get-my-colors345208371>running?
+  :solver-status/*client-name*>raw-custom-override1116852110>running?
   :solver/colors-of-the-moment>darkest],
- :client-name :upbeat-globular-gnu-4,
+ :client-name :plentiful-octohedral-llama-33,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2317, :h 1229},
- :post-meta
- {:gen-viz-243 {:* {:rowcount 32}},
-  :shows-drag-6 {:* {:rowcount 2214}},
-  :new-query {:* {:rowcount 100}}},
+ :window {:w 3563, :h 1824},
+ :post-meta {:kick-868154760 {:* {:rowcount 20}}},
  :status
  {:heartbeat
   {:kick
-   [:solver-status/*client-name*>raw-custom-override-1657692765>running?
-    :time/now-seconds
-    :solver-status/*client-name*>raw-custom-override-1561961887>running?
+   [:time/now-seconds
     :data/new-clojure-1
-    :solver/raw-custom-override1686200581
     :flow/openai-image-gen-ladder3>hiccup-image-box-w-png-vw
-    :solver/raw-custom-override-1561961887
     :flow/flow-forever>*running?
+    :solver-status/*client-name*>get-my-colors308020694>running?
     :client/amazing-oval-nightingale-11>stats>memory
-    :solver-status/*client-name*
-    :solver/raw-custom-override-970575260
-    :solver-status/*client-name*>raw-custom-override-970575260>running?
-    :solver-status/*client-name*>get-my-colors-916110573>running?
-    :solver/raw-custom-override-1280155551
-    :flow/live-scratch-flow>*running?
-    :solver/get-my-colors-87522178
     :client/*client-name*>stats>memory
-    :solver-status/*client-name*>raw-custom-override-1280155551>running?
+    :solver-status/*client-name*
+    :solver/get-my-colors308020694
+    :solver/raw-custom-override1116852110
+    :solver/get-my-colors345208371
+    :flow/live-scratch-flow>*running?
     :time/second
     :flow/flow-forever>:final-math
-    :solver/get-my-colors-916110573
-    :solver/raw-custom-override-1657692765
-    :solver-status/*client-name*>get-my-colors-87522178>running?
-    :solver-status/*client-name*>raw-custom-override1686200581>running?
+    :solver-status/*client-name*>get-my-colors345208371>running?
+    :solver-status/*client-name*>raw-custom-override1116852110>running?
     :solver/colors-of-the-moment>darkest]},
-  :reco {:shows-drag-location-6 :done, :shows-drag-6 :done},
   :alert1 {:alerts :alert2}},
  :screen-name "pomp-girl2",
  :recos-page2 0,
- :selected-tab "sunny fox",
- :col-names nil,
+ :selected-tab "prismatic serval",
  :snapshots
  {:params
   {"betty"
@@ -2997,23 +2745,16 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   7439
+   220
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :base-sniff-queries {:jvm_stats 1498154063, :kke192 -995149087, :shows 89957543},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -311264312,
+ :user-params-hash 1195116061,
  :grid-recos? true,
- :preview-keys2 [],
- :session-hash 1723491999,
+ :session-hash -1245826186,
  :resolved-queries
- {:query-preview784550338
-  {:select [[[:count 1] :value] [:tour_name :id]],
-   :from
-   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
-   :group-by [:tour_name]},
-  :new-query
+ {:new-query
   {:cache? false,
    :limit 100,
    :_last-run "22:23:22",
@@ -3061,21 +2802,6 @@
       :state],
      :from [[:ufo_sightings :jj584]],
      :order-by [[:city :asc]]}]},
-  :query-preview1901218831
-  {:select [[[:count 1] :rows] :tour_name],
-   :from
-   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
-   :group-by [:tour_name]},
-  :query-preview419046331
-  {:select [[[[:count 1]] :rows] :tour_name],
-   :from
-   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
-   :group-by [:tour_name]},
-  :query-preview-500156998
-  {:select [[[:count 1] :rows] :title :tour_name],
-   :from
-   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
-   :group-by [:title :tour_name]},
   :shows-drag-6
   {:select [:location :show_name :title :tour_name],
    :from [[:shows :dd235]],
@@ -3122,11 +2848,6 @@
      :order-by [[:city :asc]]}],
    :order-by [[:date_posted :desc]],
    :group-by [:date_posted]},
-  :query-preview-522810259
-  {:select [[[:count 1] :rows] :tour_name],
-   :from
-   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
-   :group-by [:tour_name]},
   :gen-viz-84
   {:select [[[:count 1] :rows] :country],
    :from
@@ -3160,12 +2881,6 @@
     :state],
    :from [[:ufo_sightings :jj584]],
    :order-by [[:city :asc]]},
-  :query-preview2051572034
-  {:select
-   [[[:count 1] :rows] [[:substr :title 0 11] :day_sqlite_title] :tour_name],
-   :from
-   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
-   :group-by [[:substr :title 0 11] :tour_name]},
   :duration-hours-drag-43
   {:select [:duration_hours [[:count 1] :rowcnt]],
    :from
@@ -3621,6 +3336,85 @@
      :child
      "hi!"]},
    :queries {}},
+  :block-10740
+  {:name "block-10740",
+   :w 12,
+   :selected-mode {:new-python3 :rowset},
+   :selected-view :new-python3,
+   :root [5 10],
+   :h 9,
+   :queries {},
+   :tab "prismatic serval",
+   :minimized? false,
+   :python3
+   {:new-python3
+    ["import pandas as pd"
+     "from sklearn.model_selection import train_test_split"
+     "from sklearn.tree import DecisionTreeClassifier"
+     "from sklearn.preprocessing import LabelEncoder"
+     "import edn_format"
+     ""
+     "# Load the Titanic dataset from a local "
+     "file_path = '/home/ryanr/titanic.csv'"
+     "df = pd.read_csv(file_path) "
+     ""
+     "# Check if the necessary columns are present "
+     "required_columns = ['Name', 'Ticket', 'Cabin']"
+     "missing_columns = [col for col in required_columns if col not in df.columns]"
+     "if missing_columns:"
+     "    print(f\"Missing columns in dataset: {missing_columns}\")"
+     "else:"
+     "    # Drop columns that won't be used"
+     "    df = df.drop(['Name', 'Ticket', 'Cabin'], axis=1)"
+     ""
+     "# Fill missing values"
+     "df['Age'] = df['Age'].fillna(df['Age'].median())"
+     "df['Embarked'] = df['Embarked'].fillna(df['Embarked'].mode()[0])"
+     ""
+     "# Convert categorical features to numeric"
+     "label_encoder = LabelEncoder()"
+     "df['Sex'] = label_encoder.fit_transform(df['Sex'])"
+     "df['Embarked'] = label_encoder.fit_transform(df['Embarked'])"
+     ""
+     "# Split the dataset into features and target variable"
+     "X = df.drop(['Survived'], axis=1)"
+     "y = df['Survived']"
+     ""
+     "# Split the dataset into training and testing sets"
+     "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)"
+     ""
+     "# Train a decision tree classifier  "
+     "clf = DecisionTreeClassifier()"
+     "clf.fit(X_train, y_train)"
+     ""
+     "# Make predictions"
+     "df['Predicted'] = clf.predict(X)"
+     ""
+     "# Convert DataFrame to list of dicts"
+     "data_list = df.to_dict(orient='records')"
+     ""
+     "print(edn_format.dumps(data_list))"
+     ""
+     ""]},
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-10740.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]}},
   :block-2810
   {:clojure
    {:new-clojure
@@ -4400,7 +4194,7 @@
      :child
      "hi!"]},
    :queries {}}},
- :selected-block :block-1795,
+ :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#a6c681",
   "boolean" "#80b5b7",
@@ -4416,7 +4210,8 @@
   "unknown" "#29203b",
   "date" "#0f241f"},
  :click-param
- {:fields-sys {:field_name "location", :field_type "TEXT", :data_type "string"},
+ {nil {nil nil},
+  :fields-sys {:field_name "location", :field_type "TEXT", :data_type "string"},
   :viz-shapes-sys {:combo_edn nil},
   :tables-sys
   {:db_schema "none",
@@ -4431,7 +4226,6 @@
    :flow-forever>*running? false,
    :flow-forever>final-math nil,
    :openai-image-gen-ladder3>*running? false,
-   :live-scratch-flow>*running? false,
    :openai-image-gen-ladder3>hiccup-image-box-w-png-vw
    [:v-box
     :padding
@@ -4441,34 +4235,45 @@
     :width
     :width-px
     :style
-    {:background-color "#1a2534",
+    {:background-color "#3c3043",
      :border-radius "20px",
      :font-size "12px",
      :font-weight 700,
-     :color "#bcb0a3"}
+     :color "#322833"}
     :children
-    [[:box :child "./images/gen/b64-image3-59624-86275.png"]
+    [[:box :child "./images/gen/b64-image3-80884-15266.png"]
      [:box
       :size
       "auto"
       :child
       [:img
-       {:src "./images/gen/b64-image3-59624-86275.png",
-        :style {:border-radius "30px"}}]]]]},
-  :time {:now-seconds "Thursday, June 20th 9:24:25PM", :month 4, :second 25},
+       {:src "./images/gen/b64-image3-80884-15266.png",
+        :style {:border-radius "30px"}}]]]],
+   :simple-python-exec>*running? false,
+   :live-scratch-flow>*running? false},
+  :flows-sys
+  {:flow_id "simple-python-exec",
+   :file_path "./flows/simple-python-exec.edn",
+   :last_modified "2024-03-12 02:37:43"},
+  :time {:now-seconds "Saturday, June 22nd 9:38:40PM", :month 4, :second 40},
   :grid1-sys* {},
+  :viz-tables-sys2 {:table_name :new-query-1},
   :user-dropdown-sys {:req-field "tour_name"},
   :searches-types-sys {:item_type "client-params"},
   :client
   {:favorable-prismatic-sheep-42>stats>memory nil,
+   :plentiful-octohedral-llama-33>stats>memory nil,
    :elegant-icosahedral-rhinoceros-30>stats>memory nil,
+   :simple-narrow-camel-5>stats>memory 184,
+   :quick-thin-serval-37>stats>memory nil,
    :quiet-cubic-beaver-23>stats>memory nil,
    :honest-copper-cockroach-0>stats>memory nil,
-   :*client-name*>stats>memory 151,
+   :*client-name*>stats>memory 978,
    :accepted-diamond-zebra-40>stats>memory nil,
    :brave-prismatic-camel-31>stats>memory nil,
    :distinguished-hexagonal-badger-16>stats>memory nil,
-   :amazing-oval-nightingale-11>stats>memory 620},
+   :amazing-oval-nightingale-11>stats>memory 504,
+   :seemly-diamond-pigeon-4>stats>memory nil},
   :searches-rows-sys
   {:item_sub_type "stats",
    :item_type "client-params",
@@ -4482,15 +4287,8 @@
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data
-   [:box
-    :size
-    "auto"
-    :style
-    {:font-size "66px", :color "cyan"}
-    :child
-    [:string :client/amazing-oval-nightingale-11>stats>memory]],
-   :selected-view [:views :sub-37],
+   :selected-view-data nil,
+   :selected-view nil,
    :generated-colors
    [:run-solver
     [:get-my-colors
@@ -4498,7 +4296,7 @@
       " /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-76876-55342.png"}]],
    :miraculous-orange-hedgehog "new parameter value!",
    :rel-image-path "images/large/b64-image3-76876-55342-4k.webp",
-   :selected-block :block-1795,
+   :selected-block :block-5001,
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",
@@ -4598,7 +4396,7 @@
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
   :connections-sys {:database_name "SQLite", :connection_id "met-on-tour"},
-  :sys {:selected-tab "sunny fox", :selected-tab-idx 4},
+  :sys {:selected-tab "prismatic serval", :selected-tab-idx 5},
   :searches-sub-types-sys
   {:item_key "amazing-oval-nightingale-11",
    :is_live 1,
@@ -4634,6 +4432,208 @@
         :style {:border-radius "30px"}}]]]],
    :raw-custom-override-398966624
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override540354845
+   {:rowset
+    [{"Age" 22,
+      "Fare" 7.25,
+      "PassengerId" 1,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 38,
+      "Fare" 71.2833,
+      "PassengerId" 2,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 1}
+     {"Age" 26,
+      "Fare" 7.925,
+      "PassengerId" 3,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 35,
+      "Fare" 53.1,
+      "PassengerId" 4,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 35,
+      "Fare" 8.05,
+      "PassengerId" 5,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 8.4583,
+      "PassengerId" 6,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 1,
+      "Pclass" 3}
+     {"Age" 54,
+      "Fare" 51.8625,
+      "PassengerId" 7,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 2,
+      "Fare" 21.075,
+      "PassengerId" 8,
+      "SibSp" 3,
+      "Parch" 1,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 27,
+      "Fare" 11.1333,
+      "PassengerId" 9,
+      "SibSp" 0,
+      "Parch" 2,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 14,
+      "Fare" 30.0708,
+      "PassengerId" 10,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 2}
+     {"Age" 4,
+      "Fare" 16.7,
+      "PassengerId" 11,
+      "SibSp" 1,
+      "Parch" 1,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 58,
+      "Fare" 26.55,
+      "PassengerId" 12,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 20,
+      "Fare" 8.05,
+      "PassengerId" 13,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 39,
+      "Fare" 31.275,
+      "PassengerId" 14,
+      "SibSp" 1,
+      "Parch" 5,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 14,
+      "Fare" 7.8542,
+      "PassengerId" 15,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 0,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 55,
+      "Fare" 16,
+      "PassengerId" 16,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 2}
+     {"Age" 2,
+      "Fare" 29.125,
+      "PassengerId" 17,
+      "SibSp" 4,
+      "Parch" 1,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 1,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 13,
+      "PassengerId" 18,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 1,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 2}
+     {"Age" 31,
+      "Fare" 18,
+      "PassengerId" 19,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 0,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 7.225,
+      "PassengerId" 20,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 3}]},
    :get-my-colors-87522178
    {:second-darkest "#221d32",
     :highest-saturation "#9c3464",
@@ -4980,7 +4980,45 @@
     :brightest "#f7c9cc",
     :most-contrasting-light "#f7c9cc"},
    :solver-fn-test11311036473 "HHHuge!180",
-   :colors-of-the-moment>darkest "#32313f",
+   :get-my-colors473984375
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
+   :colors-of-the-moment>darkest "#051c16",
    :raw-custom-override-1471694664
    "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
    :raw-custom-override-55990886
@@ -5193,6 +5231,82 @@
     :second-brightest "#37c3c0",
     :brightest "#bde6cb",
     :most-contrasting-light "#bde6cb"},
+   :get-my-colors308020694
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
+   :get-my-colors-2073856859
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
    :get-my-colors-322374943
    {:second-darkest "#1e3238",
     :highest-saturation "#7bbff0",
@@ -5273,12 +5387,806 @@
     :most-contrasting-light "#79b1aa"},
    :raw-custom-override-1561961887
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 7  0      0 9191420 1459884 59463492    0    0    13    60    6   11 40  3 57  0  0\n\n",
+   :get-my-colors768651776
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
+   :get-my-colors-611541511
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
    :solver-fn-test1-2135935405 "Huge!159",
+   :get-my-colors-696004512
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
    :raw-custom-override-569051388
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        27Gi        76Gi       448Mi        21Gi        96Gi\nSwap:             0B          0B          0B\n\n",
    :raw-custom-override1790254665
    "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
-   :raw-custom-override437660285 87.5},
+   :get-my-colors345208371
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
+   :raw-custom-override437660285 87.5,
+   :raw-custom-override-1533153823
+   {:rowset
+    [{"Age" 22,
+      "Fare" 7.25,
+      "PassengerId" 1,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 38,
+      "Fare" 71.2833,
+      "PassengerId" 2,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 1}
+     {"Age" 26,
+      "Fare" 7.925,
+      "PassengerId" 3,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 35,
+      "Fare" 53.1,
+      "PassengerId" 4,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 35,
+      "Fare" 8.05,
+      "PassengerId" 5,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 8.4583,
+      "PassengerId" 6,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 1,
+      "Pclass" 3}
+     {"Age" 54,
+      "Fare" 51.8625,
+      "PassengerId" 7,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 2,
+      "Fare" 21.075,
+      "PassengerId" 8,
+      "SibSp" 3,
+      "Parch" 1,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 27,
+      "Fare" 11.1333,
+      "PassengerId" 9,
+      "SibSp" 0,
+      "Parch" 2,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 14,
+      "Fare" 30.0708,
+      "PassengerId" 10,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 2}
+     {"Age" 4,
+      "Fare" 16.7,
+      "PassengerId" 11,
+      "SibSp" 1,
+      "Parch" 1,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 58,
+      "Fare" 26.55,
+      "PassengerId" 12,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 20,
+      "Fare" 8.05,
+      "PassengerId" 13,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 39,
+      "Fare" 31.275,
+      "PassengerId" 14,
+      "SibSp" 1,
+      "Parch" 5,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 14,
+      "Fare" 7.8542,
+      "PassengerId" 15,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 0,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 55,
+      "Fare" 16,
+      "PassengerId" 16,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 2}
+     {"Age" 2,
+      "Fare" 29.125,
+      "PassengerId" 17,
+      "SibSp" 4,
+      "Parch" 1,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 1,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 13,
+      "PassengerId" 18,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 1,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 2}
+     {"Age" 31,
+      "Fare" 18,
+      "PassengerId" 19,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 0,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 7.225,
+      "PassengerId" 20,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 3}]},
+   :raw-custom-override1116852110
+   [{"Age" 22,
+     "Fare" 7.25,
+     "PassengerId" 1,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 38,
+     "Fare" 71.2833,
+     "PassengerId" 2,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 1}
+    {"Age" 26,
+     "Fare" 7.925,
+     "PassengerId" 3,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 35,
+     "Fare" 53.1,
+     "PassengerId" 4,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 35,
+     "Fare" 8.05,
+     "PassengerId" 5,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 8.4583,
+     "PassengerId" 6,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 1,
+     "Pclass" 3}
+    {"Age" 54,
+     "Fare" 51.8625,
+     "PassengerId" 7,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 2,
+     "Fare" 21.075,
+     "PassengerId" 8,
+     "SibSp" 3,
+     "Parch" 1,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 27,
+     "Fare" 11.1333,
+     "PassengerId" 9,
+     "SibSp" 0,
+     "Parch" 2,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 14,
+     "Fare" 30.0708,
+     "PassengerId" 10,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 2}
+    {"Age" 4,
+     "Fare" 16.7,
+     "PassengerId" 11,
+     "SibSp" 1,
+     "Parch" 1,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 58,
+     "Fare" 26.55,
+     "PassengerId" 12,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 20,
+     "Fare" 8.05,
+     "PassengerId" 13,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 39,
+     "Fare" 31.275,
+     "PassengerId" 14,
+     "SibSp" 1,
+     "Parch" 5,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 14,
+     "Fare" 7.8542,
+     "PassengerId" 15,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 0,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 55,
+     "Fare" 16,
+     "PassengerId" 16,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 2}
+    {"Age" 2,
+     "Fare" 29.125,
+     "PassengerId" 17,
+     "SibSp" 4,
+     "Parch" 1,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 1,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 13,
+     "PassengerId" 18,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 1,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 2}
+    {"Age" 31,
+     "Fare" 18,
+     "PassengerId" 19,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 0,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 7.225,
+     "PassengerId" 20,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 3}],
+   :raw-custom-override1025564379
+   [{"Age" 22,
+     "Fare" 7.25,
+     "PassengerId" 1,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 38,
+     "Fare" 71.2833,
+     "PassengerId" 2,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 1}
+    {"Age" 26,
+     "Fare" 7.925,
+     "PassengerId" 3,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 35,
+     "Fare" 53.1,
+     "PassengerId" 4,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 35,
+     "Fare" 8.05,
+     "PassengerId" 5,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 8.4583,
+     "PassengerId" 6,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 1,
+     "Pclass" 3}
+    {"Age" 54,
+     "Fare" 51.8625,
+     "PassengerId" 7,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 2,
+     "Fare" 21.075,
+     "PassengerId" 8,
+     "SibSp" 3,
+     "Parch" 1,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 27,
+     "Fare" 11.1333,
+     "PassengerId" 9,
+     "SibSp" 0,
+     "Parch" 2,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 14,
+     "Fare" 30.0708,
+     "PassengerId" 10,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 2}
+    {"Age" 4,
+     "Fare" 16.7,
+     "PassengerId" 11,
+     "SibSp" 1,
+     "Parch" 1,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 58,
+     "Fare" 26.55,
+     "PassengerId" 12,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 20,
+     "Fare" 8.05,
+     "PassengerId" 13,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 39,
+     "Fare" 31.275,
+     "PassengerId" 14,
+     "SibSp" 1,
+     "Parch" 5,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 14,
+     "Fare" 7.8542,
+     "PassengerId" 15,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 0,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 55,
+     "Fare" 16,
+     "PassengerId" 16,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 2}
+    {"Age" 2,
+     "Fare" 29.125,
+     "PassengerId" 17,
+     "SibSp" 4,
+     "Parch" 1,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 1,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 13,
+     "PassengerId" 18,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 1,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 2}
+    {"Age" 31,
+     "Fare" 18,
+     "PassengerId" 19,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 0,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 7.225,
+     "PassengerId" 20,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 3}],
+   :get-my-colors773783877
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"}},
   :data {:new-clojure-1 nil}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}
