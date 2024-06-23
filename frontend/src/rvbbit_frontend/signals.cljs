@@ -369,12 +369,27 @@
                :readOnly          true ;true
                :theme             (theme-pull :theme/codemirror-theme nil)}}]]) ;"ayu-mirage" ;"hopscotch"
 
+(re-frame/reg-sub
+ ::solver-no-signal?
+ (fn [db {:keys [solver-name]}]
+   (let [solvers-map (get db :solvers-map {})]
+     (if (get solvers-map solver-name)
+       (let [signal (get-in solvers-map [solver-name :signal])
+             signal? (if (or (false? signal)
+                             (nil? signal)) true false)]
+         ;;(ut/tapp>> [:ss solver-name (get solvers-map solver-name) (get-in solvers-map [solver-name :signal])])
+         signal?
+         )
+       false))))
+
+
 
 (defn items-list
   [ph signals selected-warren-item warren-type-string]
   (let [;signals @(ut/tracked-subscribe [::signals-map])
         solver?          (= warren-type-string "solvers")
         signal?          (= warren-type-string "signals")
+        
         warren-item-type @(ut/tracked-sub ::warren-item-type {})
         ssr              (ut/replacer (str @(ut/tracked-sub ::warren-item-type {})) ":" "")
         selected-type    (str ssr "s")
@@ -411,6 +426,7 @@
              :let                    [selected? (= name selected-warren-item)
                                       sigkw     (keyword (str "signal/" (ut/replacer (str name) ":" "")))
                                       vv        (when signal? (get results name))
+                                      solver-no-signal? (when solver? @(ut/tracked-sub ::solver-no-signal? {:solver-name name}))
                                       ext-map   (when solver?
                                                   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                    {:keypath [(keyword (str "solver-meta/"
@@ -436,7 +452,7 @@
               [re-com/h-box :padding "6px" :justify :between :style {:font-size "13px" :opacity 0.56}
                :children
                [
-                (when (cstr/includes? (str name) "upscaler")
+                (when solver-no-signal?  ;; (cstr/includes? (str name) "upscaler")
                   [re-com/md-icon-button :src (at) :md-icon-name "zmdi-play" :on-click
                    #(ut/tracked-dispatch [::wfx/request :default
                                           {:message {:kind         :run-solver
@@ -726,6 +742,54 @@
 
 (defn history-mouse-leave [] (unhighlight-code) (reset! hover-tools-atom nil))
 
+(defn draggable-play
+  [element solver-name]
+  [(reagent/adapt-react-class rdnd/Draggable)
+   (let [data {:h         2
+               :w         7
+               :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
+               :views     {:solver-player [:box :align :center :justify :center :style
+                                         {:font-size    "25px"
+                                          :font-weight  700
+                                          :padding-top  "6px"
+                                          :padding-left "14px"
+                                          :margin-top   "-8px"
+                                          :color        :theme/editor-outer-rim-color
+                                          :font-family  :theme/base-font}
+                                         :child  [:click-solver [solver-name (str "run " (ut/replacer (str solver-name) ":" ""))]]]}
+               :name      (str (ut/replacer solver-name ":" "") "-player")}]
+     {:type          "meta-menu" ;:play-port
+      :on-drag-end   #(do (reset! bricks/dragging? false))
+      :on-drag-start #(do (reset! bricks/dragging? true)
+                          (reset! bricks/dragging-size [(get data :w) (get data :h)])
+                          (reset! bricks/dragging-body data))
+      :data          (pr-str data)}) ;[bid pid]
+   [re-com/box
+    :size "none"
+    :child element
+    :style {:cursor "grab"}]])
+
+(defn draggable-viewer
+  [element solver? solver-name]
+  [(reagent/adapt-react-class rdnd/Draggable)
+   (let [data {:h         (if solver? 8 3)
+               :w         6
+               :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
+               :views     {(if solver? 
+                             :solver-viewer
+                             :signal-viewer) [:data-viewer (keyword (str (if solver? "solver/" "signal/") (ut/replacer (str solver-name) ":" "")))]}
+               :name      (str (ut/replacer solver-name ":" "") "-viewer")}]
+     {:type          "meta-menu" ;;:play-port
+      :on-drag-end   #(do (reset! bricks/dragging? false))
+      :on-drag-start #(do (reset! bricks/dragging? true)
+                          (reset! bricks/dragging-size [(get data :w) (get data :h)])
+                          (reset! bricks/dragging-body data))
+      :data          (pr-str data)}) ;[bid pid]
+   [re-com/box
+    :size "none"
+    :child element
+    :style {:cursor "grab"}]])
+
 
 (defn right-col
   [ph]
@@ -763,7 +827,10 @@
          } :height (px (* ph 0.7)) :padding "6px" :children
          [(let [ww (* (- (last @db/flow-editor-system-mode) 70) 0.65)]
             [re-com/h-box :justify :between :align :center :children
-             [[edit-item-name selected-warren-item warren-item-type (* ww 0.9)]
+             [[draggable-viewer 
+               [edit-item-name selected-warren-item warren-item-type (* ww 0.9)]
+               solver?
+               selected-warren-item]
               (cond signal? [re-com/box :align :center :justify :center :style
                              {;:border "1px solid yellow"
                               :font-size   "22px"
@@ -771,17 +838,19 @@
                              (str @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                    {:keypath [(keyword (str "signal/"
                                                                             (ut/replacer (str selected-warren-item) ":" "")))]}))]
-                    solver? [re-com/md-icon-button :src (at) :md-icon-name "zmdi-play" :on-click
-                             #(ut/tracked-dispatch [::wfx/request :default
-                                                    {:message {:kind         :run-solver
-                                                               :solver-name  selected-warren-item
-                                                               :override-map (get @(ut/tracked-sub ::solvers-map {})
-                                                                                  selected-warren-item)
-                                                               :client-name  @(ut/tracked-sub ::bricks/client-name {})}
-                                                     :timeout 15000000}]) :style
-                             {:font-size "17px" :cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}]
+                    solver? [draggable-play
+                             [re-com/md-icon-button :src (at) :md-icon-name "zmdi-play" :on-click
+                              #(ut/tracked-dispatch [::wfx/request :default
+                                                     {:message {:kind         :run-solver
+                                                                :solver-name  selected-warren-item
+                                                                :override-map (get @(ut/tracked-sub ::solvers-map {})
+                                                                                   selected-warren-item)
+                                                                :client-name  @(ut/tracked-sub ::bricks/client-name {})}
+                                                      :timeout 15000000}]) :style
+                              {:font-size "17px" :cursor "pointer" :color (theme-pull :theme/editor-outer-rim-color nil)}]
+                             selected-warren-item]
                     :else   [re-com/gap :size "10px"] ;; placeholder
-              )]])
+                    )]])
           [re-com/box :style {:border (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) 45) :border-radius "4px"}
            :height (if signal? (px (- (* (* ph 0.7) 0.25) 12)) (px (- (* (* ph 0.7) 0.55) 12))) :padding "6px" :child
            [code-box nil ;(* (- (last @db/flow-editor-system-mode) 14) 0.65) ;; width

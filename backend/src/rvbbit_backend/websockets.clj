@@ -102,6 +102,7 @@
 (def last-solvers-data-atom (ut/thaw-atom {} "./data/atoms/last-solvers-data-atom.edn"))
 (def last-solvers-atom-meta (ut/thaw-atom {} "./data/atoms/last-solvers-atom-meta.edn"))
 (def last-solvers-history-atom (ut/thaw-atom {} "./data/atoms/last-solvers-history-atom.edn"))
+(def last-solvers-history-counts-atom (ut/thaw-atom {} "./data/atoms/last-solvers-history-counts-atom.edn"))
 
 (def autocomplete-view-atom (ut/thaw-atom [] "./data/atoms/autocomplete-view-atom.edn"))
 (def autocomplete-clover-param-atom (ut/thaw-atom [] "./data/atoms/autocomplete-clover-param-atom.edn"))
@@ -2101,18 +2102,26 @@
   [{:keys [solver-name client-name override-map]}]
   (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
   (swap! last-solvers-atom-meta assoc-in
-    [solver-name :output]
-    [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
+         [solver-name :output]
+         [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
-  (enqueue-task-slot-pool client-name (fn [] (run-solver solver-name client-name override-map)))
-  )
+  (enqueue-task-slot-pool client-name (fn [] (run-solver solver-name client-name override-map))))
+
+(defmethod wl/handle-push :run-solver
+  [{:keys [solver-name client-name override-map]}]
+  (ut/pp [:manual-solver-run! solver-name :from client-name :override override-map])
+  (swap! last-solvers-atom-meta assoc-in
+         [solver-name :output]
+         [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
+  ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
+  (enqueue-task-slot-pool client-name (fn [] (run-solver solver-name client-name override-map))))
 
 (defmethod wl/handle-push :run-solver-custom
   [{:keys [solver-name temp-solver-name client-name override-map input-map]}]
   ;; (ut/pp [:custom-solver-run! temp-solver-name :from client-name :input-map input-map])
   (swap! last-solvers-atom-meta assoc-in
-    [temp-solver-name :output]
-    [:warning! {:solver-running-custom-inputs-via client-name :with-input-map input-map :override-map? override-map}])
+         [temp-solver-name :output]
+         [:warning! {:solver-running-custom-inputs-via client-name :with-input-map input-map :override-map? override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
 ;;  (run-solver solver-name client-name override-map input-map temp-solver-name)
   (enqueue-task-slot-pool client-name (fn [] (run-solver solver-name client-name override-map input-map temp-solver-name)))
@@ -2930,6 +2939,7 @@
                             solver-name
                             (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
                      (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
+                     (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
                     ;;  (ut/pp [:*cacheddd!!! client-name :for temp-solver-name vdata-ref])
                      (swap! solvers-cache-hits-atom update cache-key (fnil inc 0))
                      (swap! solver-status assoc-in [client-name solver-name :running?] false)
@@ -2967,7 +2977,7 @@
                 meta-extra                  {:extra {:last-processed timestamp-str
                                                      :cache-hit?     cache-hit?
                                                      :elapsed-ms     elapsed-ms
-                                                     :runs           (count runs)
+                                                     :runs           (get @last-solvers-history-counts-atom solver-name) ;; (count runs)
                                                      :error?         error?}}
                 timestamp-str               (str timestamp-str " (" elapsed-ms "ms, " rows " rows)")
                 new-history                 (vec (conj runs timestamp-str))]
@@ -2978,6 +2988,7 @@
                    solver-name
                    (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
             (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
+            (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
             (when use-cache?
               (swap! solvers-cache-atom assoc cache-key [output output-full]))
             ;;;(swap! solvers-cache-atom assoc cache-key [output output-full])
@@ -3021,7 +3032,7 @@
                    meta-extra                  {:extra {:last-processed timestamp-str
                                                         :cache-hit?     cache-hit?
                                                         :elapsed-ms     elapsed-ms
-                                                        :runs           (count runs)
+                                                        :runs           (get @last-solvers-history-counts-atom solver-name) ;; (count runs)
                                                         :error?         error?}}
                    timestamp-str               (str timestamp-str " (" elapsed-ms "ms)")
                    new-history                 (vec (conj runs timestamp-str))]
@@ -3030,6 +3041,7 @@
                       solver-name
                       (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
                (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
+               (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
                ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
                (when use-cache?
                  (swap! solvers-cache-atom assoc cache-key [output output-full]))
@@ -3083,7 +3095,7 @@
                 meta-extra                  {:extra {:last-processed timestamp-str
                                                      :cache-hit?     cache-hit?
                                                      :elapsed-ms     elapsed-ms
-                                                     :runs           (count runs)
+                                                     :runs           (get @last-solvers-history-counts-atom solver-name) ;; (count runs)
                                                      :error?         error?}}
                 timestamp-str               (str timestamp-str " (" elapsed-ms "ms)")
                 new-history                 (conj runs timestamp-str)]
@@ -3093,6 +3105,7 @@
                      solver-name
                      (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
               (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
+              (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
 
                (when use-cache?
                  (swap! solvers-cache-atom assoc cache-key [output-val output-full]))
@@ -3124,7 +3137,10 @@
         :else ;; else we assume it's just data and keep it as is
         (let [output-full   {:static-data vdata}
               runs          (get @last-solvers-history-atom solver-name [])
-              meta-extra    {:extra {:last-processed timestamp-str :cache-hit? cache-hit? :elapsed-ms -1 runs (count runs)}}
+              meta-extra    {:extra {:last-processed timestamp-str
+                                     :cache-hit? cache-hit?
+                                     :elapsed-ms -1
+                                     :runs (get @last-solvers-history-counts-atom solver-name)}}
               timestamp-str (str timestamp-str " (static)")
               new-history   (conj runs timestamp-str)]
           (ut/pp [:solver-static solver-name vdata])
@@ -3133,6 +3149,7 @@
                  solver-name
                  (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
           (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
+          (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
           ;(swap! solvers-running assoc-in [client-name solver-name] false)
           (swap! solver-status assoc-in [client-name solver-name :running?] false)
           (swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))

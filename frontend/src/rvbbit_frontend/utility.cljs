@@ -98,8 +98,8 @@
 
 
 
-(def deep-flatten-data (atom {}))
-(def deep-flatten-cache (atom {}))
+(def deep-flatten-data (atom {}))   
+(def deep-flatten-cache (atom {}))    
 
 ;; (defn deep-flatten-real [x] (if (coll? x) (into #{} (mapcat deep-flatten-real x)) #{x}))
 
@@ -167,7 +167,7 @@
 
 
 
-(def clover-walk-singles-map (atom {}))   ;;;  
+(def clover-walk-singles-map (atom {}))     
 (defonce process-key-cache (atom {}))
 (defonce process-key-tracker (atom {}))
 

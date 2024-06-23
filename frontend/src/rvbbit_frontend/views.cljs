@@ -2411,7 +2411,7 @@
                    lmap)
                  [])]
     (bricks/droppable
-      (if @rvbbit-frontend.flows/dragging-port? ["meta-menu" :flow-port] ["meta-menu"]) ;; eyes
+      (if @rvbbit-frontend.flows/dragging-port? ["meta-menu" :flow-port] ["meta-menu" ]) ;; eyes
       [(js/Math.floor (/ (ifnil (first @db/context-modal-pos) 0) bricks/brick-size))
        (js/Math.floor (/ (ifnil (last @db/context-modal-pos) 0) bricks/brick-size))]
       [re-com/box :style {:background-color "black"} :attr
