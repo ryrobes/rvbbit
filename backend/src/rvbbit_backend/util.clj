@@ -266,6 +266,14 @@
 ;;               (rest cumulative-values)
 ;;               cumulative-values))))
 
+(defn memory-used []
+  (int (Math/floor (/ (float (/ (- (-> (java.lang.Runtime/getRuntime)
+                                       (.totalMemory))
+                                   (-> (java.lang.Runtime/getRuntime)
+                                       (.freeMemory)))
+                                1024))
+                      1024))))
+
 (defn cumulative-to-delta [cumulative-values]
   (if (empty? cumulative-values)
     []
@@ -1261,7 +1269,13 @@
          repeat)
     (rest csv-data)))
 
-(defn nf [num] (cstr/trim (str (format "%,12d" num))))
+;;(defn nf [num] (cstr/trim (str (format "%,12d" num))))
+
+(defn nf [num]
+  (cstr/trim
+   (if (float? num)
+     (str (format "%,12.2f" num))
+     (str (format "%,12d" num)))))
 
 (defn kvpaths
   ([m] (kvpaths [] m ()))

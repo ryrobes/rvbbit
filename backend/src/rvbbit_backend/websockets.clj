@@ -44,7 +44,7 @@
     [rvbbit-backend.ddl        :as ddl]
     [rvbbit-backend.ddl        :as sqlite-ddl] ;; needed for hardcoded rowset filter fn
     [rvbbit-backend.cruiser    :as cruiser]
-    [tea-time.core             :as tt]
+    ;;[tea-time.core             :as tt]
     [com.climate.claypoole     :as cp]
     [clj-http.client           :as client]
     [clojure.data.json         :as json2]
@@ -63,6 +63,7 @@
 (defonce cpu-usage (atom []))
 (defonce push-usage (atom []))
 (defonce peer-usage (atom []))
+(defonce mem-usage (atom []))
 
 (def num-groups 8) ;; atom segments to split solvers master atom into
 ;; 20 seems fine, testing with 8... impacts thread count mostly. not good isolated perf testing yet.
@@ -912,7 +913,7 @@
 
 (declare client-statuses)
 
-(defmethod wl/handle-request :ack
+(defmethod wl/handle-push :ack
   [{:keys [client-name memory flow-subs]}]
   (inc-score! client-name :ack)
   (swap! client-latency assoc
@@ -947,6 +948,44 @@
 (defonce client-queue-atoms [client-queues]) ;; [client-queues client-queues-2 client-queues-3 ])
 
 (defonce queue-distributions (atom {}))
+(defonce dynamic-timeouts (atom {}))
+
+(defn get-adaptive-timeout
+  "Calculate an adaptive timeout based on the client's recent average latency.
+   Returns a lower timeout value in milliseconds."
+  [client-name]
+  (try
+    (let [latency-data (get @client-latency client-name [])
+          ;; _ (when (empty? latency-data)
+          ;;     (ut/pp [:warning-no-latency-data client-name]))
+          avg-latency (if (seq latency-data)
+                        (ut/avg (take-last 20 latency-data))
+                        1000) ; Default to 1000ms if no data
+          adapted-timeout
+          (cond
+            (<= avg-latency 200) 250    ; Very fast clients
+            (<= avg-latency 400) 400    ; Fast clients
+            (<= avg-latency 600) 550    ; Good performance clients
+            (<= avg-latency 800) 700    ; Above average clients
+            (<= avg-latency 1000) 850   ; Average clients
+            (<= avg-latency 1500) 1100  ; Below average clients
+            (<= avg-latency 2000) 1350  ; Slow clients
+            (<= avg-latency 2500) 1600  ; Very slow clients
+            (<= avg-latency 3000) 1850  ; Extremely slow clients
+            :else 2100)]               ; Worst case scenario
+      (swap! dynamic-timeouts assoc client-name [avg-latency adapted-timeout])
+      adapted-timeout)
+    (catch Exception e
+      (ut/pp [:error-in-get-adaptive-timeout client-name (.getMessage e)])
+      1000))) ; Default timeout in case of any error
+
+;; Helper function to safely get the current timeout for a client
+(defn safe-get-timeout [client-name]
+  (try
+    (get-adaptive-timeout client-name)
+    (catch Exception e
+      (ut/pp [:error-getting-timeout client-name (.getMessage e)])
+      1000))) ; Default timeout if anything goes wrong
 
 (defn new-client
   [client-name]
@@ -957,28 +996,25 @@
 
 (def client-batches (atom {}))
 
-(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :tracker :alert1})
+(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :tracker :alert1}) ;; to not skip old dupes
 
 (defn sub-push-loop
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 400))] ;; was 100, was (async/sliding-buffer
+  (let [results (async/chan (async/sliding-buffer 500))] ;; was 100, was (async/sliding-buffer
     (try (async/go-loop []
-           (async/<! (async/timeout 700)) ;; was 70 ?
+           (async/<! (async/timeout (safe-get-timeout client-name))) ;; was 1100 ?
            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
              (let [items            (loop [res []]
                                       (if-let [item (ut/dequeue! queue-atom)]
                                         (recur (conj res item))
                                         res))
                    items-by-task-id (group-by :task-id items)
-                   ;;_ (when (= client-name :electrifying-red-wren-26)  (ut/pp [:push client-name items-by-task-id]))
-                   latest-items     (mapv (fn [group] (if 
-                                                       (contains? valid-groups (first group)) ;;(or (contains? valid-groups (first group)) (cstr/includes? (str group) "running?"))
+                   latest-items     (mapv (fn [group] (if
+                                                       (contains? valid-groups (first group))
                                                         group (last group)))
-                                      (vals items-by-task-id))
-                   ;;_ (when (= client-name :electrifying-red-wren-26)  (ut/pp [:push-latest client-name latest-items]))
-                   ]
+                                          (vals items-by-task-id))]
                (if (not-empty latest-items)
                  (let [_ (swap! client-batches update client-name (fnil inc 0))
                        message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
@@ -997,9 +1033,9 @@
 
 (defn push-to-client
   [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
-  ;(enqueue-task-slot
-  ; client-name
-  ; (fn []
+  (enqueue-task-slot
+   client-name
+   (fn []
      (try
        (let [rr                0 ;(rand-int 3)
              cq                (get client-queue-atoms rr)
@@ -1023,7 +1059,7 @@
            (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
              (new-client client-name)
              (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
-       (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))));))
+       (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))))))
 
 
 
@@ -2108,7 +2144,10 @@
          [solver-name :output]
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
-  (enqueue-task-slot-pool client-name (fn [] (run-solver solver-name client-name override-map))))
+  ;(enqueue-task-slot-pool client-name (fn [] 
+                                        (run-solver solver-name client-name override-map)
+  ;                                      ))
+  )
 
 (defmethod wl/handle-push :run-solver
   [{:keys [solver-name client-name override-map]}]
@@ -2117,7 +2156,10 @@
          [solver-name :output]
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
-  (enqueue-task-slot-pool client-name (fn [] (run-solver solver-name client-name override-map))))
+  ;(enqueue-task-slot-pool client-name (fn [] 
+                                        (run-solver solver-name client-name override-map)
+  ;                                      ))
+  )
 
 (defmethod wl/handle-push :run-solver-custom
   [{:keys [solver-name temp-solver-name client-name override-map input-map]}]
@@ -2127,7 +2169,9 @@
          [:warning! {:solver-running-custom-inputs-via client-name :with-input-map input-map :override-map? override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
 ;;  (run-solver solver-name client-name override-map input-map temp-solver-name)
-  (enqueue-task-slot-pool client-name (fn [] (run-solver solver-name client-name override-map input-map temp-solver-name)))
+ ; (enqueue-task-slot-pool client-name (fn [] 
+                                        (run-solver solver-name client-name override-map input-map temp-solver-name)
+;                                        ))
   temp-solver-name)
 
 (defn flow-kill!
@@ -2339,7 +2383,7 @@
   (let [bm {name block-map}] (ut/pp [:saving-new-custom-block bm])))
 
 
-(defmethod wl/handle-request :sync-client-params
+(defmethod wl/handle-push :sync-client-params
   [{:keys [client-name params-map]}]
   (let [params     (or (dissoc params-map nil) {})
         kps        (ut/kvpaths params)
@@ -4824,12 +4868,7 @@
 
 (defn jvm-memory-used
   []
-  (let [mm (int (Math/floor (/ (float (/ (- (-> (java.lang.Runtime/getRuntime)
-                                                (.totalMemory))
-                                            (-> (java.lang.Runtime/getRuntime)
-                                                (.freeMemory)))
-                                         1024))
-                               1024)))]
+  (let [mm (ut/memory-used)]
     (ut/pp ["     " :jvm-stats :*cached-queries (ut/nf (count @sql-cache)) :*jvm-memory-used (ut/nf mm) :mb])))
 
 
@@ -5207,67 +5246,85 @@
 ;;     (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
 ;;     (println border-bottom)) "")
 
-(defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color] :or {color :default}}]
-  (let [console-width (- (ut/get-terminal-width) 10)
-        rows 5
-        border-width 2
-        label-padding 4
-        time-marker-interval 30
-        values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
-        max-values (- console-width border-width label-padding)
-        num-markers (quot max-values values-per-marker)
-        actual-width (- max-values num-markers)
-        truncated (take-last actual-width cpu-usage)
-        max-cpu (apply max truncated)
-        normalized (map #(int (/ (* % (* rows 8)) max-cpu)) truncated)
-        bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
-        color-code (case color
-                     :red "\u001B[31m"
-                     :green "\u001B[32m"
-                     :yellow "\u001B[33m"
-                     :blue "\u001B[34m"
-                     :magenta "\u001B[35m"
-                     :cyan "\u001B[36m"
-                     :white "\u001B[37m"
-                     "")
-        reset-code "\u001B[0m"
-        colorize (fn [s] (str color-code s reset-code))
-        get-bar-char (fn [height row]
-                       (let [row-height (- height (* row 8))]
-                         (cond
-                           (and (zero? height) (not= row 0)) " "
-                           (and (zero? height) (zero? row)) "▁"
-                           (<= height (* row 8)) " "
-                           (> row-height 8) "█"
-                           :else (nth bar-chars row-height))))
-        border-line (apply str (repeat (- console-width 2) "─"))
-        border-top (str "╭" border-line "╮")
-        border-bottom (str "╰" border-line "╯")
-        time-span (count truncated)
-        minutes (quot time-span 60)
-        seconds (rem time-span 60)
-        label (str label-str (format " (last %d min %d sec)" minutes seconds) " | max " symbol-str ": " (format "%.2f" (apply max truncated)) " avg " symbol-str ": " (format "%.2f" (ut/avgf truncated)))
-        padding (apply str (repeat (- console-width (count label) 4) " "))
-        label-row (str "│ " (colorize label) padding "│")
-        draw-row (fn [row-data]
-                   (let [graph-data (apply str
-                                           (map-indexed
-                                            (fn [idx ch]
-                                              (if (and (pos? idx)
-                                                       (zero? (rem idx (inc values-per-marker))))
-                                                (str " " (colorize ch)) ; Space instead of vertical line
-                                                (colorize ch)))
-                                            row-data))
-                         padding (apply str (repeat (- console-width (count (clojure.string/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
-                     (str "│ " graph-data padding "│")))]
-    (println border-top)
-    (println label-row)
-    (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
-    (doseq [row (range (dec rows) -1 -1)]
-      (println (draw-row (map #(get-bar-char % row) normalized))))
-    (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
-    (println border-bottom)
-    "")) ; Return an empty string instead of nil
+(defn average-in-chunks [data chunk-size]
+  (vec (->> data
+       (partition-all chunk-size) ;; vector into chunks
+       (map (fn [chunk] (/ (apply + chunk) (count chunk))))))) ;; average for each chunk.
+
+
+(defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color freq] :or {color :default freq 1}}]
+  (try
+    (let [console-width (- (ut/get-terminal-width) 10)
+          rows 5
+          border-width 2
+          label-padding 4
+          time-marker-interval 30
+          values-per-marker (/ time-marker-interval 1) ; Assuming 1 value per second
+          max-values (- console-width border-width label-padding)
+          num-markers (quot max-values values-per-marker)
+          actual-width (- max-values num-markers)
+          truncated (take-last actual-width cpu-usage)
+          max-cpu (apply max truncated)
+          normalized (map #(int (/ (* % (* rows 8)) max-cpu)) truncated)
+          bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
+          color-code (case color
+                       :red "\u001B[31m"
+                       :green "\u001B[32m"
+                       :yellow "\u001B[33m"
+                       :blue "\u001B[34m"
+                       :magenta "\u001B[35m"
+                       :cyan "\u001B[36m"
+                       :white "\u001B[37m"
+                       "")
+          reset-code "\u001B[0m"
+          colorize (fn [s] (str color-code s reset-code))
+          get-bar-char (fn [height row]
+                         (let [row-height (- height (* row 8))]
+                           (cond
+                             (and (zero? height) (not= row 0)) " "
+                             (and (zero? height) (zero? row)) "▁"
+                             (<= height (* row 8)) " "
+                             (> row-height 8) "█"
+                             :else (nth bar-chars row-height))))
+          border-line (apply str (repeat (- console-width 2) "─"))
+          border-top (str "╭" border-line "╮")
+          border-bottom (str "╰" border-line "╯")
+          time-span (count truncated)
+          ;minutes (quot time-span 60)
+          seconds (rem time-span 60)
+          label (str label-str
+                     (str " (last " (ut/format-duration-seconds (* seconds freq))  ")")
+                     " | max " symbol-str ": "
+                     ;(format "%.2f" (float (apply max truncated)))
+                     (ut/nf (float (apply max truncated)))
+                     " avg " symbol-str ": "
+                     ;(format "%.2f" (float (ut/avgf truncated)))
+                     (ut/nf (float (ut/avgf truncated))))
+          padding (str (apply str (repeat (- console-width (count label) 4) " ")) " ")
+          ;;label-row (str "│ " (colorize label) padding "│")
+          label-row (str "│ " (str "\u001B[1m" (colorize label) "\u001B[0m") padding "│")
+          draw-row (fn [row-data]
+                     (let [graph-data (apply str
+                                             (map-indexed
+                                              (fn [idx ch]
+                                                (if (and (pos? idx)
+                                                         (zero? (rem idx (inc values-per-marker))))
+                                                  (str " " (colorize ch)) ; Space instead of vertical line
+                                                  (colorize ch)))
+                                              row-data))
+                           padding (apply str (repeat (- console-width (count (clojure.string/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
+                       (str "│ " graph-data padding "│")))
+          legned (str "(each segment is " (ut/format-duration-seconds (* 15 freq)) ", each tick is " (ut/format-duration-seconds freq) (when (> freq 1) " **averaged") ")")]
+      (println border-top)
+      (println label-row)
+      (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+      (doseq [row (range (dec rows) -1 -1)]
+        (println (draw-row (map #(get-bar-char % row) normalized))))
+      (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
+      (println border-bottom)
+      (println (str "\u001B[1m" (colorize legned) "\u001B[0m")))
+    (catch Throwable e
+      (ut/pp [:bar-graph-error! (str e) label-str (count cpu-usage) :vals :passed cpu-usage]))))
 
 (defn jvm-stats
   []
@@ -5324,7 +5381,7 @@
                                :stroke            :theme/block-tab-selected-font-color
                                :fill              :theme/block-tab-selected-font-color
                                :strokeDasharray   "5 5"}]]]))
-            
+
             ack-scoreboardv (into {}
                                   (for [[k v] (client-statuses)
                                         :when (not= (get v :last-seen-seconds) -1)]
@@ -5395,7 +5452,7 @@
             _ (swap! server-atom assoc :uptime (ut/format-duration-seconds seconds-since-boot))
             flow-status-map (flow-statuses) ;; <--- important, has side effects, TODO refactor into timed instead of hitched to jvm console stats output
             ]
-        
+
         (swap! stats-cnt inc)
         (sql-exec system-db (to-sql {:delete-from [:client_stats]}))
         (sql-exec system-db (to-sql insert-cli))
@@ -5406,7 +5463,7 @@
           (ut/print-ansi-art "nname.ans")
           (ut/pp [:version 0 :june 2024 "Hi."])
           (println " "))
-        
+
         ;;(let [fss (flow-statuses) fssk (vec (keys fss))] (ut/pp [:flow-status (select-keys fss fssk)]))
 
         ;;(ut/pp [:date-map @time-atom])
@@ -5417,7 +5474,7 @@
 
         ;;(ut/pp [:solvers-running? @solver-status])
 
-        (ut/pp [:solver-cache (ut/calculate-atom-size :solver-cache solvers-cache-atom )])
+        (ut/pp [:solver-cache (ut/calculate-atom-size :solver-cache solvers-cache-atom)])
 
         (ut/pp [:solver-runner-pool-stats (get-slot-pool-queue-sizes)])
 
@@ -5428,7 +5485,7 @@
                                                                      (for [k (keys v)]
                                                                        (edn/read-string (first (cstr/split (str k) #"/"))))))))
                                (catch Exception e {:error-getting-sub-types (str e)}))
-                   sub-types (select-keys sub-types (filter #(not (cstr/includes? (str %) "||")) (keys sub-types))) 
+                   sub-types (select-keys sub-types (filter #(not (cstr/includes? (str %) "||")) (keys sub-types)))
                    ;; ^^ flow tracker subs have messy keypath parents and are generally one-offs. noise.
                    server-subs ttl]
                (swap! server-atom assoc :uptime uptime-str :clients peers :threads thread-count :memory mm)
@@ -5437,11 +5494,15 @@
                        {:*cached-queries              (count @sql-cache)
                         ;:clover-sql-training-queries  (count (keys @clover-sql-training-atom))
                         ;:clover-sql-training-enriched (count (keys @clover-sql-enriched-training-atom))
-                        :ws-peers                     (do (reset! peer-usage (vec (take-last 600 @peer-usage)))
+                        :ws-peers                     (do ;(reset! peer-usage (vec (take-last 600 @peer-usage)))
                                                           peers)
                         :sys-load                     sys-load
-                        :sys-load-avg                 (do (reset! cpu-usage (vec (take-last 600 @cpu-usage)))
+                        :sys-load-avg                 (do ;(reset! cpu-usage (vec (take-last 600 @cpu-usage)))
                                                           (ut/avgf @cpu-usage))
+                        :avg-memory                 (do ;(reset! mem-usage (vec (take-last 600 @mem-usage)))
+                                                        (ut/avgf @mem-usage)
+                                                        ;@mem-usage
+                                                        )
                         :pushes-avg                   (do (reset! push-usage (vec (take-last 600 @push-usage)))
                                                           (ut/avgf (ut/cumulative-to-delta @push-usage)))
                         :cwidth                       (ut/get-terminal-width)
@@ -5451,13 +5512,22 @@
                         :*jvm-memory-used             [(ut/nf mm) :mb]
                         :*current-threads             thread-count}]))
              (catch Throwable e (ut/pp [:printing-shit-error? (str e)])))
-              
-              (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :yellow))
-              (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs" "client pushes" :color :magenta))
-              (ut/pp (draw-bar-graph @peer-usage "clients" "peers" :color :green))
+
+        (ut/pp [:latency-adaptations @dynamic-timeouts])
+
+        (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
+        (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
+
+        (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes" :color :magenta))
+        (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 15) "msgs/sec" "client pushes" :color :magenta :freq 15))
+
+        (ut/pp (draw-bar-graph @mem-usage "memory usage" "mb" :color :yellow))
+        (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 15) "memory usage" "mb" :color :yellow :freq 15))
+
+              ;(ut/pp (draw-bar-graph @peer-usage "clients" "peers" :color :green))
 
               ;;(draw-bar-graph @cpu-usage)
-        
+
         ;; (when (or booted? (zero? (mod @stats-cnt 100)))
         ;;   (doseq [[client-name v] @atoms-and-watchers]
         ;;     (let [clients (count @wl/sockets)]
@@ -5490,8 +5560,7 @@
         ;;               6)
         ;;       (alert! client-name (chart-view (last-x-items (average-chunks @stats-shadow) 10)) 10 4 5)
         ;;       (alert! client-name (chart-view (last-x-items @stats-shadow 50)) 10 4 5))))
-
-              )
+        )
       (catch Exception e (ut/pp [:jvm-stats (str e)])))))
 
 
@@ -5535,10 +5604,10 @@
    :join?                false
    :async?               true
    ;:min-threads          300
-   ;:max-threads          1000 ;; Increased max threads
-   ;:idle-timeout         500000 ;; Reduced idle timeout
-   ;:max-idle-time        3000000 ;; Reduced max idle time
-   :max-idle-time         15000
+   :max-threads          1000 ;; Increased max threads
+   :idle-timeout         500000 ;; Reduced idle timeout
+   :max-idle-time        3000000 ;; Reduced max idle time
+   ;:max-idle-time         15000
    ;:input-buffer-size    131072 ;;32768  ;; Increased buffer sizes
    ;:output-buffer-size   131072 ;;32768
    :max-message-size     6291456 ;;2097152  ;; Increased max message size

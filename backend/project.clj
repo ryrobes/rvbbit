@@ -12,7 +12,7 @@
                        [philoskim/debux "0.8.3"]
                        [org.clojure/java.jdbc "0.7.12"]
                        [clj-taskpool "0.1.0"] ;; https://github.com/WickedShell/clj-taskpool
-                       [tea-time "1.0.1"] ;; https://github.com/aphyr/tea-time - task scheduler
+                       ;;;[tea-time "1.0.1"] ;; https://github.com/aphyr/tea-time - task scheduler
                        [mvxcvi/puget "1.3.2"] ;; https://github.com/greglook/puget
                        [clojure.java-time "1.1.0"] ;; https://github.com/dm3/clojure.java-time
                        [com.nextjournal/beholder "1.0.0"]
@@ -50,7 +50,8 @@
                        [io.pedestal/pedestal.service "0.6.4"]
                        [io.pedestal/pedestal.jetty "0.6.4"]]
   :jvm-opts           ["--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED" ;; suppresses warnings
-                       "-Xmx16g"  ;; "-Xmx64g" ;; testing with 64g on my main dev machine
+                       "-Xmx32g"  ;; "-Xmx64g" ;; testing with 64g on my main dev machine
+                       "-Xms16g" ;; testing
                        "-Xss2048k" ;; testing with double the stack space to root out some flow-runner intermittent StackOverflow issue...
                        "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"] ;; datalevin specific
   :cljfmt             {}

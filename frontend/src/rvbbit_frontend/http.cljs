@@ -349,23 +349,22 @@
           (when heartbeat? ;; test
             ;;(ut/tapp>> [:heart-beat (get db :flow-subs)])
             (ut/tracked-dispatch
-             [::wfx/request :default
-              {:message {:kind        :ack
-                         :memory      (let [mem     (when (exists? js/window.performance.memory)
-                                                      [(.-totalJSHeapSize js/window.performance.memory)
-                                                       (.-usedJSHeapSize js/window.performance.memory)
-                                                       (.-jsHeapSizeLimit js/window.performance.memory)])
-                                            mem-row {:mem_time    (str (.toISOString (js/Date.)))
-                                                     :mem_total   (first mem)
-                                                     :packets     @packets-received
-                                                     :batches     @batches-received
-                                                     :mem_used    (second mem)
-                                                     :client-name (str client-name)
-                                                     :mem_limit   (last mem)}]
-                                        mem-row)
-                         :flow-subs   (get db :flow-subs)
-                         :client-name (get db :client-name)}
-               :timeout 50000}]))
+             [::wfx/push :default
+              {:kind        :ack
+               :memory      (let [mem     (when (exists? js/window.performance.memory)
+                                            [(.-totalJSHeapSize js/window.performance.memory)
+                                             (.-usedJSHeapSize js/window.performance.memory)
+                                             (.-jsHeapSizeLimit js/window.performance.memory)])
+                                  mem-row {:mem_time    (str (.toISOString (js/Date.)))
+                                           :mem_total   (first mem)
+                                           :packets     @packets-received
+                                           :batches     @batches-received
+                                           :mem_used    (second mem)
+                                           :client-name (str client-name)
+                                           :mem_limit   (last mem)}]
+                              mem-row)
+               :flow-subs   (get db :flow-subs)
+               :client-name (get db :client-name)}]))
 
           (when alert? ;(and alert? not-sys-stats?) ; (and alert? (string? (first (get result
             (let [cnt      (get-in result [:data 0 0])
@@ -379,6 +378,8 @@
             (update-context-boxes result task-id ms reco-count))
 
           (cond
+            
+            server-sub? (assoc-in db (vec (cons :click-param task-id)) (get result :status))
 
             settings-update? (assoc-in db [:server :settings] (get result :status))
 
@@ -427,7 +428,7 @@
                                      {:data (get result :data) :elapsed-ms elapsed-ms :reco-count reco-count})
                            (assoc :flow-subs (get result :status)))
             
-            server-sub? (assoc-in db (vec (cons :click-param task-id)) (get result :status))
+            
 
             :else (-> db
                       (assoc-in [:status task-id ui-keypath] (get result :status))

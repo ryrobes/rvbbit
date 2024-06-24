@@ -1570,10 +1570,6 @@
                            (let [tt (cset/intersection (set (get db :tabs)) (set kks))]
                              (vec (into (get v :root) [(get v :w) (get v :h) tt k])))))))
 
-(re-frame/reg-sub ::is-grid?222
-                  (fn [db [_ panel-key view]]
-                    (true? (some #(= % :grid) (ut/deep-flatten (get-in db [:panels panel-key :views view]))))))
-
 (defn round-to-nearest-quarter [num] (* 0.25 (js/Math.round (/ num 0.25))))
 
 (defn mouse-move-handler
@@ -8589,6 +8585,7 @@
         valid-clover-template-keys (vec (filter keyword? (ut/deep-flatten body)))
         clover-templates @(ut/tracked-sub ::clover-templates {})
         clover-templates-map (select-keys clover-templates valid-clover-template-keys)
+
         ;; _ (when (ut/ne? clover-templates-map) (ut/tapp>> [:clover-templates-map clover-templates-map]))
         body (if (ut/ne? clover-templates-map) ;; clover templates early pass so rest of clover can be evaluated
                (replace-templates (select-keys clover-templates valid-clover-template-keys) body)
@@ -8599,23 +8596,23 @@
         is-layout? @(ut/tracked-subscribe [::is-layout? panel-key selected-view])
         body (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") body) ;; eyes
         sql-aliases-used @(ut/tracked-sub ::panel-sql-aliases-in-views-body {:panel-key panel-key :body body})
-        vsql-calls (if is-layout?
-                     @(ut/tracked-subscribe [::all-vsql-calls]) ;; get all just in case they
-                     @(ut/tracked-subscribe [::panel-vsql-calls panel-key]))
-        vsql-calls (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") vsql-calls)
-        vsql-replace-map (into {}
-                               (for [[k v] vsql-calls]
-                                 (let [look-for-datasets   (cset/intersection (set (ut/deep-flatten v)) (set all-sql-call-keys))
-                                       data-subbed-rep-map (into {}
-                                                                 (for [ds look-for-datasets]
-                                                                   {ds @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]})}))
-                                       data-subbed-src     (ut/postwalk-replacer data-subbed-rep-map v)]
-                                   {k (vsql-map data-subbed-src)})))
+        ;; vsql-calls (if is-layout?
+        ;;              @(ut/tracked-subscribe [::all-vsql-calls]) ;; get all just in case they
+        ;;              @(ut/tracked-subscribe [::panel-vsql-calls panel-key]))
+        ;; vsql-calls (ut/namespaced-swapper "this-block" (ut/replacer (str panel-key) #":" "") vsql-calls)
+        ;; vsql-replace-map (into {}
+        ;;                        (for [[k v] vsql-calls]
+        ;;                          (let [look-for-datasets   (cset/intersection (set (ut/deep-flatten v)) (set all-sql-call-keys))
+        ;;                                data-subbed-rep-map (into {}
+        ;;                                                          (for [ds look-for-datasets]
+        ;;                                                            {ds @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]})}))
+        ;;                                data-subbed-src     (ut/postwalk-replacer data-subbed-rep-map v)]
+        ;;                            {k (vsql-map data-subbed-src)})))
         ;; selected-view-is-sql? (true? (some #(= selected-view %) (keys sql-calls)))
         ;; override-view-is-sql? (true? (some #(= override-view %) (keys sql-calls)))
         selected-view-is-sql? (contains? sql-calls selected-view)
         override-view-is-sql? (contains? sql-calls override-view)
-        valid-body-params (ut/deep-flatten (merge ;;@(ut/tracked-subscribe [::valid-body-params
+        valid-body-params (ut/deep-flatten [;(merge ;;@(ut/tracked-subscribe [::valid-body-params
                                             @(rfa/sub ::valid-body-params {:panel-key panel-key})
                                             @(rfa/sub ::valid-body-params-all-condis)
                                             (keys
@@ -8623,7 +8620,9 @@
                                             ; @(ut/tracked-sub ::conn/solver-fn-runs-keys {:keypath [panel-key]})
                                              )
                                             @(rfa/sub ::valid-body-params-in {:body body})
-                                            @(rfa/sub ::valid-body-params-in {:body vsql-calls})))
+                                            ;;@(rfa/sub ::valid-body-params-in {:body vsql-calls})
+                                            ;)
+  ])
         possible-datasets-used (set (for [e valid-body-params] (keyword (nth (ut/splitter (ut/safe-name e) #"/") 0))))
         used-datasets (cset/union (set sql-aliases-used) (cset/intersection possible-datasets-used (set all-sql-call-keys)))
         used-datasets (if replacement-all? (into used-datasets (keys replacement-query)) used-datasets)
@@ -8675,20 +8674,20 @@
                               (let [kps       (ut/extract-patterns obody :auto-size-px 2)
                                     logic-kps (into {} (for [v kps] (let [[_ l] v] {v (ut/auto-font-size-px l h w)})))] ;(=
                                 (walk/postwalk-replace logic-kps obody)))
-        onclick-walk-map2 (fn [obody]
-                            (let [kps       (ut/extract-patterns obody :set-parameter 3)
-                                  logic-kps (into {}
-                                                  (for [v kps]
-                                                    (let [[_ pkey pval] v
-                                                          raw-param-key (get-in vsql-calls
-                                                                                (conj (vec (first (filter #(= (last %) :on-click)
-                                                                                                          (ut/kvpaths vsql-calls))))
-                                                                                      1)
-                                                                                pkey)]
-                                                      {v (fn []
-                                                           (ut/tracked-dispatch [::conn/click-parameter [panel-key]
-                                                                                 {raw-param-key pval}]))})))]
-                              (walk/postwalk-replace logic-kps obody)))
+        ;; onclick-walk-map2 (fn [obody]
+        ;;                     (let [kps       (ut/extract-patterns obody :set-parameter 3)
+        ;;                           logic-kps (into {}
+        ;;                                           (for [v kps]
+        ;;                                             (let [[_ pkey pval] v
+        ;;                                                   raw-param-key (get-in vsql-calls
+        ;;                                                                         (conj (vec (first (filter #(= (last %) :on-click)
+        ;;                                                                                                   (ut/kvpaths vsql-calls))))
+        ;;                                                                               1)
+        ;;                                                                         pkey)]
+        ;;                                               {v (fn []
+        ;;                                                    (ut/tracked-dispatch [::conn/click-parameter [panel-key]
+        ;;                                                                          {raw-param-key pval}]))})))]
+        ;;                       (walk/postwalk-replace logic-kps obody)))
         map-walk-map2 (fn [obody]
                         (let [kps       (ut/extract-patterns obody :map 3)
                               logic-kps (into {}
@@ -8859,7 +8858,7 @@
           (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
           (ut/ne? condi-walks)      (ut/postwalk-replacer condi-walks)
           (ut/ne? data-walks)       (ut/postwalk-replacer data-walks)
-          (ut/ne? vsql-replace-map) (ut/postwalk-replacer vsql-replace-map) ;;(walk/postwalk-replace
+          ;(ut/ne? vsql-replace-map) (ut/postwalk-replacer vsql-replace-map) ;;(walk/postwalk-replace
           (has-fn? :map)            map-walk-map2
           (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params)
           (has-fn? :app-db)         get-in-app-db
@@ -8868,7 +8867,7 @@
           (has-fn? :=)              =-walk-map2 ;; test, needs to be first - "and" after...
           (has-fn? :if)             if-walk-map2 ;; ifs needs special treatment - must
           (has-fn? :when)           when-walk-map2 ;; test!
-          (has-fn? :set-parameter)  onclick-walk-map2 ;; test!
+          ;;(has-fn? :set-parameter)  onclick-walk-map2 ;; test!
           (has-fn? :into)           into-walk-map2
           (has-fn? :auto-size-px)   auto-size-walk-map2
           (has-fn? :string3)        (string-walk 2) ;; TODO, remove all these extra string
@@ -8943,7 +8942,7 @@
                                  {})
         body (if templates? (ut/deep-template-replace templated-strings-walk body) body)
 
-        sub-param (first (map last (filter (fn [[k _]] (cstr/includes? (str k) (str panel-key " " selected-view))) @db/solver-fn-lookup)))
+        sub-param (when (has-fn? :run-solver) (first (map last (filter (fn [[k _]] (cstr/includes? (str k) (str panel-key " " selected-view))) @db/solver-fn-lookup))))
 
         body (if (ut/ne? sub-param)
                (let [curr-val @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sub-param]})
@@ -9095,14 +9094,10 @@
                                          (get db :panels)))]
                            (vec (conj (get v :root) k))))))
 
-
 (re-frame/reg-sub ::all-roots-tab
                   (fn [db {:keys [tab]}]
                     (vec (for [[k v] (into {} (filter #(= tab (get (val %) :tab "")) (get db :panels)))]
                            (vec (conj (get v :root) k))))))
-
-
-
 
 (re-frame/reg-sub ::all-roots-tab-sizes
                   (fn [db {:keys [tab]}]
@@ -9297,16 +9292,77 @@
                        (undoable)
                        (fn [db [_ panel-id]] (assoc-in db [:panels panel-id :tab] (get db :selected-tab))))
 
+
+
+;; (defn canvas-size [rects] (reduce (fn [[max-x max-y] [x y h w]] [(max max-x (+ x w)) (max max-y (+ y h))]) [0 0] rects))
+
+;; (defn min-at-least-pos
+;;   [coords]
+;;   (reduce (fn [acc coord]
+;;             (if (or (< (first coord) (first acc)) (and (= (first coord) (first acc)) (< (second coord) (second acc)))) coord acc))
+;;           coords))
+
+;; (re-frame/reg-sub ::tab-recenter-alpha
+;;                   (fn [db {:keys [tab]}]
+;;                     (let [coords  (vec (for [[x y _] 
+;;                                              @(rfa/sub ::all-roots-tab {:tab tab})] [x y]))
+;;                           coords+ @(rfa/sub ::all-roots-tab-sizes {:tab tab})
+                          
+;;                           icons?  (ut/not-empty?
+;;                                     (for [[k v] (get db :panels) 
+;;                                           :when (and (= (get v :tab "") tab) 
+;;                                                      (get v :iconized? false))] k)) 
+;;                           corner  (if icons? [] (try (min-at-least-pos coords) (catch :default _ [0 0])))
+;;                           corner  (if (empty? corner) [0 0] corner)
+;;                           [hh ww] (canvas-size coords+)
+;;                           corner  [(* -1 (first corner)) (* -1 (last corner))]
+;;                           [hh ww] [(+ hh (first corner))
+;;                                    (+ ww (last corner))]
+;;                           _ (tapp>> (str [tab :coords coords :coords+ coords+ :corner corner :early-corner (ut/min-at-least-pos coords) (ut/canvas-size coords+) hh ww]))
+;;                           ]
+;;                       (vec (into corner [hh ww])))))
+
+
+
+(defn canvas-size [rects]
+  (reduce (fn [[min-x min-y max-x max-y] [x y h w]]
+            [(min min-x x)
+             (min min-y y)
+             (max max-x (+ x w))
+             (max max-y (+ y h))])
+          [##Inf ##Inf ##-Inf ##-Inf]
+          rects))
+
+(re-frame/reg-sub ::tab-recenter-alpha
+                  (fn [db {:keys [tab]}]
+                    (let [coords+ @(rfa/sub ::all-roots-tab-sizes {:tab tab})
+          ; Filter out any coordinates with negative x or y
+                          filtered-coords+ (filter (fn [[x y _ _]] (and (>= x 0) (>= y 0))) coords+)
+                          [min-x min-y max-x max-y] (canvas-size filtered-coords+)
+                          offset-x (- min-x)
+                          offset-y (- min-y)
+                          width (- max-x min-x)
+                          height (- max-y min-y)
+
+                          _ (tapp>> (str [tab :coords+ coords+
+                                          :filtered-coords+ filtered-coords+
+                                          :calculated [offset-x offset-y width height]
+                                          :bounds [min-x min-y max-x max-y]]))]
+                      [offset-x offset-y width height])))
+
+
+
+
+
 (re-frame/reg-sub ::tab-recenter
                   (fn [db [_ tab]]
-                    (let [coords  (vec (for [[x y _] @(rfa/sub ::all-roots-tab {:tab tab})] [x y]))
+                    (let [coords  (vec (for [[x y _]
+                                             @(rfa/sub ::all-roots-tab {:tab tab})] [x y]))
                           coords+ @(rfa/sub ::all-roots-tab-sizes {:tab tab})
                           icons?  (ut/not-empty?
-                                    (for [[k v] (get db :panels) :when (and (= (get v :tab "") tab) (get v :iconized? false))] k)) ;; if
-                                                                                                                                   ;; icons,
-                                                                                                                                   ;; do
-                                                                                                                                   ;; not
-                                                                                                                                   ;; recenter
+                                   (for [[k v] (get db :panels)
+                                         :when (and (= (get v :tab "") tab)
+                                                    (get v :iconized? false))] k))
                           corner  (if icons? [] (try (ut/min-at-least-pos coords) (catch :default _ [0 0])))
                           corner  (if (empty? corner) [0 0] corner)
                           [hh ww] (ut/canvas-size coords+)
@@ -9316,15 +9372,19 @@
 
 (re-frame/reg-sub ::tab-offset
                   (fn [_ [_ tab]]
-                    (let [coords (vec (for [[x y _] @(rfa/sub ::all-roots-tab {:tab tab})] [x y]))
-                          corner (try (ut/min-at-least-pos coords) (catch :default _ [0 0]))]
+                    (let [coords (vec (for [[x y _] 
+                                            @(rfa/sub ::all-roots-tab {:tab tab})] [x y]))
+                          corner (try (ut/min-at-least-pos coords) (catch :default _ [0 0]))
+                          ;_ (tapp>> (str [:offset tab :coords coords :corner corner]))
+                          ]
                       corner)))
 
 (re-frame/reg-sub ::tab-offset2 ;; parent offset
                   (fn [db [_ tab]]
                     (let [stab (get db :selected-tab)]
                       (first (for [[_ v] (get db :panels)
-                                   :when (and (= (get v :tab) stab) (some #(= % tab) (ut/deep-flatten (get v :views))))]
+                                   :when (and (= (get v :tab) stab) 
+                                              (some #(= % tab) (ut/deep-flatten (get v :views))))]
                                (get v :root))))))
 
 (re-frame/reg-sub ::is-grid?
@@ -9335,7 +9395,7 @@
 
 (defn render-icon
   [icon num]
-  (if (and (not (empty? icon)) (not (nil? icon)))
+  (if (and (ut/ne? icon) (not (nil? icon)))
     (if (cstr/includes? icon "zmdi")
       [re-com/md-icon-button :src (at) :md-icon-name icon :style
        {;:color bcolor :cursor "grab"
@@ -9470,7 +9530,13 @@
   (let [;reaction-hack! @hover-square ;; seems less expensive than doall-for ? Reaction-hack2!
         panels-hash1   @(ut/tracked-sub ::panels-hash {})
         panels-hash2   (hash (ut/remove-underscored @(ut/tracked-sub ::panels {})))
-        [tab-x tab-y]  (if tab (let [tt @(ut/tracked-subscribe [::tab-recenter tab])] [(get tt 0 0) (get tt 1 0)]) [0 0])
+        [tab-x tab-y]  (if tab 
+                         (let [tt @(ut/tracked-sub ::tab-recenter-alpha {:tab tab})] 
+                              ;[tt @(ut/tracked-subscribe [::tab-recenter tab])]
+                           ;(tapp>> [:tabs-tt tab (str tt)])
+                           [(get tt 0 0)
+                            (get tt 1 0)])
+                         [0 0])
         start-y        (if tab tab-y 0)
         start-x        (if tab tab-x 0)
         bricks-high    (+ (js/Math.floor (/ @(ut/tracked-subscribe [::subs/h]) brick-size)) 1)
@@ -9479,7 +9545,9 @@
         lines?         @(ut/tracked-sub ::lines? {})
         peek?          @(ut/tracked-sub ::peek? {})
         full-no-ui?    @(ut/tracked-sub ::full-no-ui? {})
-        brick-roots    (if tab @(rfa/sub ::all-roots-tab {:tab tab}) @(rfa/sub ::all-roots {}))
+        brick-roots    (if tab
+                         @(rfa/sub ::all-roots-tab {:tab tab})
+                         @(rfa/sub ::all-roots {}))
         audio-playing? @(ut/tracked-sub ::audio/audio-playing? {})
         top-start      (* start-y brick-size) ;-100 ;; if shifted some bricks away...
         left-start     (* start-x brick-size)]
@@ -9495,7 +9563,7 @@
     
     ^{:key (str "base-brick-grid")}
     [re-com/h-box :children
-     [(doall ;; (maybedoall)
+     [(doall ;(maybedoall)
         (for [[bw bh brick-vec-key] brick-roots] ;diff-grid1] ;(if @dragging? current-grid
           (let [bricksw                                      (* bw brick-size)
                 bricksh                                      (* bh brick-size)
@@ -9603,16 +9671,20 @@
               (let [icon-h (get iconization :h 1)
                     icon-w (get iconization :w 1)
                     vv     (get iconization :view [:box :child "icon?"])]
-                [re-com/box :size "auto" :width (px (* brick-size icon-w)) :height (px (* brick-size icon-h)) :align :center
-                 :justify :center :attr
-                 {;:on-click #(js/alert (if tab "in container" "not in container"))
-                  :on-context-menu #(when (not tab) (ut/tracked-dispatch [::toggle-icon-block brick-vec-key]))
+                [re-com/box
+                 :size "auto"
+                 :width (px (* brick-size icon-w))
+                 :height (px (* brick-size icon-h))
+                 :align :center
+                 :justify :center
+                 :attr {;:on-click #(js/alert (if tab "in container" "not in container"))
+                        :on-context-menu #(when (not tab) (ut/tracked-dispatch [::toggle-icon-block brick-vec-key]))
                   ;;:on-mouse-down   #(mouse-down-handler % brick-vec-key tab-offset true)
-                  :on-mouse-over   #(when (and (not @over-block?) (not (= brick-vec-key @over-block)))
-                                      (reset! over-block brick-vec-key)
-                                      (reset! over-block? true)) ;; took out enter for watched
-                  :on-mouse-leave  #(do (reset! over-block? false) (reset! over-block nil))
-                  :on-double-click #(do (tag-screen-position %) (ut/tracked-dispatch [::launch-clone brick-vec-key]))} :style
+                        :on-mouse-over   #(when (and (not @over-block?) (not (= brick-vec-key @over-block)))
+                                            (reset! over-block brick-vec-key)
+                                            (reset! over-block? true)) ;; took out enter for watched
+                        :on-mouse-leave  #(do (reset! over-block? false) (reset! over-block nil))
+                        :on-double-click #(do (tag-screen-position %) (ut/tracked-dispatch [::launch-clone brick-vec-key]))} :style
                  (merge {:position         "fixed"
                          :user-select      "none"
                          :border           (cond selected? (str "2px solid " (theme-pull :theme/universal-pop-color "#9973e0"))
@@ -9625,9 +9697,13 @@
                          :left             (px left)}
                         theme-base-block-style-map ;; just in case
                         panel-style) :child [honeycomb-fragments vv icon-w icon-h]])
-              (when (not (cstr/starts-with? (str brick-vec-key) ":query-preview"))
+              (when (and (<= (/ left brick-size) bricks-wide) ;;; ??? problem wiht reacting with things offscreen?
+                         (<= (/ top brick-size) bricks-high)
+                     (not (cstr/starts-with? (str brick-vec-key) ":query-preview")))
                 ^{:key (str "brick-" brick-vec-key)}
-                [re-com/box :width (px block-width) :height (px block-height)
+                [re-com/box 
+                 :width (px block-width) 
+                 :height (px block-height)
                  :attr ;(merge
                  {;:on-mouse-enter  #(do (reset! over-block? true)
                   :on-mouse-over  #(when (not @over-block?) (reset! over-block brick-vec-key) (reset! over-block? true))

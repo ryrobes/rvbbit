@@ -1950,7 +1950,7 @@
                                                                  (str "1px solid "
                                                                       (theme-pull :theme/block-tab-selected-font-color nil))))}]]]
                        (if (not selected?)
-                         (bricks/draggable (let [[_ _ w h] @(ut/tracked-subscribe [::bricks/tab-recenter t])]
+                         (bricks/draggable (let [[_ _ w h] @(ut/tracked-sub ::bricks/tab-recenter-alpha {:tab t})]
                                              {:w w :selected-view :vv :name (str t) :h h :ghosted? false :views {:vv [:grid t]}})
                                            "meta-menu"
                                            tab-box)
@@ -2131,7 +2131,7 @@
                                pp                (get db :click-param)
                                pp-without-fs     (ut/remove-keys pp
                                                                  (into (map first fs)
-                                                                       [:flow :time :server :flows-sys :client :solver
+                                                                       [:flow :time :server :flows-sys :client :solver :solver-status :data 
                                                                         :signal-history :solver-meta nil]))
                                new-autocompletes (vec (into (create-clover-keys-from-data (get pp-without-fs :param) "param/")
                                                             (create-clover-keys-from-data (get pp-without-fs :theme) "theme/")))
@@ -2139,11 +2139,10 @@
                                client-name       (get db :client-name)]
                            ;; (ut/tapp>>  [:update-user-params-hash-event (count new-autocompletes) new-autocompletes])
                            (reset! db/autocomplete-keywords (set (into new-autocompletes @db/autocomplete-keywords))) ;; dont
-                           (ut/tracked-dispatch [::wfx/request :default ;; just a push, no response handling
-                                                 {:message {:kind        :sync-client-params
-                                                            :params-map  pp-without-fs ;; pp ;; why send things we
-                                                            :client-name client-name}
-                                                  :timeout 10000}])
+                           (ut/tracked-dispatch [::wfx/push    :default ;; just a push, no response handling
+                                                 {:kind        :sync-client-params
+                                                  :params-map  pp-without-fs ;; pp ;; why send things we
+                                                  :client-name client-name}])
                            (reset! temp-atom pp-without-fs)
                            (assoc db :user-params-hash new-h))))
 
@@ -2155,8 +2154,7 @@
                           pp            (get db :click-param)
                           pp-without-fs (ut/remove-keys pp
                                                         (into (map first fs)
-                                                              [:flow :time :server :flows-sys :client :solver :signal-history
-                                                               :solver-meta nil]))]
+                                                              [:flow :time :server :flows-sys :client :solver :signal-history :data :solver-status :solver-meta nil]))]
                       (hash pp-without-fs)))) ;; was :param
 
 (re-frame/reg-sub ::user-params-hash (fn [db] (get db :user-params-hash)))

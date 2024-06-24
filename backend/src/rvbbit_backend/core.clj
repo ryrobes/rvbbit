@@ -44,7 +44,7 @@
     [shutdown.core :as shutdown]
     [taskpool.taskpool :as tp]
     [websocket-layer.core      :as wl]
-    [tea-time.core :as tt]
+    ;;[tea-time.core :as tt]
     [websocket-layer.network :as net]) ;; enables joda jdbc time returns
   (:import
     [java.util Date]
@@ -354,35 +354,35 @@
   (add-watch wss/screens-atom
              :master-screen-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
-                 (doseq [key (keys new-state)]
+               (future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               (doseq [key (keys new-state)]
                  (if-let [child-atom (get @wss/screen-child-atoms key)]
                    (swap! child-atom assoc key (get new-state key))
                    (let [new-child-atom (atom {})]
                      (swap! wss/screen-child-atoms assoc key new-child-atom)
-                     (swap! new-child-atom assoc key (get new-state key)))))));)
+                     (swap! new-child-atom assoc key (get new-state key))))))))
 
   (add-watch wss/params-atom
              :master-params-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
-                 (doseq [key (keys new-state)]
-                   (if-let [child-atom (get @wss/param-child-atoms key)]
-                     (swap! child-atom assoc key (get new-state key))
-                     (let [new-child-atom (atom {})]
-                       (swap! wss/param-child-atoms assoc key new-child-atom)
-                       (swap! new-child-atom assoc key (get new-state key)))))));)
+               (future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               (doseq [key (keys new-state)]
+                 (if-let [child-atom (get @wss/param-child-atoms key)]
+                   (swap! child-atom assoc key (get new-state key))
+                   (let [new-child-atom (atom {})]
+                     (swap! wss/param-child-atoms assoc key new-child-atom)
+                     (swap! new-child-atom assoc key (get new-state key))))))))
 
   (add-watch wss/panels-atom
              :master-panels-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
-                 (doseq [key (keys new-state)]
-                   (if-let [child-atom (get @wss/panel-child-atoms key)]
-                     (swap! child-atom assoc key (get new-state key))
-                     (let [new-child-atom (atom {})]
-                       (swap! wss/panel-child-atoms assoc key new-child-atom)
-                       (swap! new-child-atom assoc key (get new-state key)))))));)
+               (future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               (doseq [key (keys new-state)]
+                 (if-let [child-atom (get @wss/panel-child-atoms key)]
+                   (swap! child-atom assoc key (get new-state key))
+                   (let [new-child-atom (atom {})]
+                     (swap! wss/panel-child-atoms assoc key new-child-atom)
+                     (swap! new-child-atom assoc key (get new-state key))))))))
 
   ;; (add-watch wss/last-solvers-atom
   ;;            :master-solver-watcher ;; watcher splitter
@@ -409,29 +409,29 @@
   ;;                    (let [new-child-atom (atom {})]
   ;;                      (swap! wss/solver-child-atoms assoc group new-child-atom)
   ;;                      (swap! new-child-atom assoc key (get new-state key))))))))
-  
+
   (add-watch wss/last-solvers-atom
              :master-solver-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
-                 (doseq [key (keys new-state)]
-                   (let [group (ut/hash-group key wss/num-groups)]
-                     (if-let [child-atom (get @wss/solver-child-atoms group)]
-                       (swap! child-atom assoc key (get new-state key))
-                       (let [new-child-atom (atom {})]
-                         (swap! wss/solver-child-atoms assoc group new-child-atom)
-                         (swap! new-child-atom assoc key (get new-state key))))))));)
+               (future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               (doseq [key (keys new-state)]
+                 (let [group (ut/hash-group key wss/num-groups)]
+                   (if-let [child-atom (get @wss/solver-child-atoms group)]
+                     (swap! child-atom assoc key (get new-state key))
+                     (let [new-child-atom (atom {})]
+                       (swap! wss/solver-child-atoms assoc group new-child-atom)
+                       (swap! new-child-atom assoc key (get new-state key)))))))))
 
   (add-watch wss/solver-status
              :master-solver-status-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               ;(future  ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
-                 (doseq [key (keys new-state)]
-                   (if-let [child-atom (get @wss/solver-status-child-atoms key)]
-                     (swap! child-atom assoc key (get new-state key))
-                     (let [new-child-atom (atom {})]
-                       (swap! wss/solver-status-child-atoms assoc key new-child-atom)
-                       (swap! new-child-atom assoc key (get new-state key)))))));)
+               (future  ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               (doseq [key (keys new-state)]
+                 (if-let [child-atom (get @wss/solver-status-child-atoms key)]
+                   (swap! child-atom assoc key (get new-state key))
+                   (let [new-child-atom (atom {})]
+                     (swap! wss/solver-status-child-atoms assoc key new-child-atom)
+                     (swap! new-child-atom assoc key (get new-state key))))))))
 
   (add-watch wss/signals-atom
              :master-signal-def-watcher ;; watcher signals defs
@@ -493,9 +493,9 @@
 
   (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
 
-  (tt/start!)
+  ;;(tt/start!)
 
-  (def mon (tt/every! 15 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 30
+
 
   (wss/recycle-worker) ;; single blocking
   (wss/recycle-worker2) ;; single blocking
@@ -505,55 +505,132 @@
                            ;; blocking queue setup)
   (wss/recycle-workers5d 2) ;; for writing transit files
 
-  (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))
-  (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too
-  (def purge (tt/every! wss/jvm-stats-every 2 (bound-fn [] (wss/purge-dead-client-watchers))))
-  (def timekeeper (tt/every! 1 3 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
-  (def cpukeeper (tt/every! 1 3 (bound-fn [] (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))))
-  (def pushkeeper (tt/every! 1 3 (bound-fn [] (swap! wss/push-usage conj @wss/all-pushes))))
-  (def peerkeeper (tt/every! 1 3 (bound-fn [] (swap! wss/peer-usage conj (count @wl/sockets))))) 
+  ;; (def mon (tt/every! 15 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 15
+  ;; (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))
+  ;; (def refresh-flow-tables (tt/every! 5 2 (bound-fn [] (wss/flow-atoms>sql)))) ;; was 30. 5 too
+  ;; (def purge (tt/every! wss/jvm-stats-every 2 (bound-fn [] (wss/purge-dead-client-watchers))))
+  ;; (def timekeeper (tt/every! 1 3 (bound-fn [] (reset! wss/time-atom (ut/current-datetime-parts)))))
+  ;; (def cpukeeper  (tt/every! 1 3 (bound-fn [] (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))))
+  ;; (def pushkeeper (tt/every! 1 3 (bound-fn [] (swap! wss/push-usage conj @wss/all-pushes))))
+  ;; (def peerkeeper (tt/every! 1 3 (bound-fn [] (swap! wss/peer-usage conj (count @wl/sockets)))))
+  ;; (def purge-solver-cache (tt/every! 600 600 (bound-fn [] (do (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
+  ;;                                                             (reset! wss/solvers-cache-hits-atom {})
+  ;;                                                             (reset! wss/solvers-cache-atom {})))))
 
-  
-  ;; (def cpukeeper (tt/every! 1 3 (bound-fn []
-  ;;                                 (swap! wss/cpu-usage
-  ;;                                        (fn [current-values]
-  ;;                                          (->> (conj current-values (ut/get-jvm-cpu-usage))
-  ;;                                               (take-last 600)))))))
+  ;; (def solver-statuses (tt/every! 1 3 (bound-fn [] ;; update "time runnning" in solver status atom
+  ;;                                       (doseq [[client-name solvers] @wss/solver-status]
+  ;;                                         (doseq [[solver-name v] solvers
+  ;;                                                 :when (get v :running?)]
+  ;;                                           (swap! wss/solver-status assoc-in [client-name solver-name :time-running] (ut/format-duration (get v :started) (System/currentTimeMillis))))))))
 
-  ;; get-jvm-cpu-usage
+  (defn start-scheduler [interval f task-name]
+    (let [stop-ch (async/chan)]
+      (ut/pp [:starting-async-job-scheduler! task-name [:every interval :ms]])
+      (async/go-loop []
+        (let [[_ ch] (async/alts! [(async/timeout interval) stop-ch])]
+          (when-not (= ch stop-ch)
+            (try
+              (f)
+              (catch Throwable e
+                (ut/pp [:core.scheduler-error! task-name e])))
+            (recur))))
+      stop-ch))
 
-  ;(def purge-solver-cache (tt/every! 600 600 (bound-fn [] (ut/purge-cache 0.5 wss/solvers-cache-hits-atom wss/solvers-cache-atom))))
-  (def purge-solver-cache (tt/every! 600 600 (bound-fn [] (do (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
-                                                              (reset! wss/solvers-cache-hits-atom {})
-                                                              (reset! wss/solvers-cache-atom {})))))
-  
+  ;; Define all schedulers
+  (def mon
+    (start-scheduler 15000
+                     wss/jvm-stats
+                     "JVM Stats"))
 
-  ;;;(def solver-statuses (tt/every! 1 3 (bound-fn [] (swap! wss/last-solvers-atom-meta assoc :running-map @wss/solvers-running)))) ;; TODO, this more smart. grug grug
-  (def solver-statuses (tt/every! 1 3 (bound-fn [] ;; update "time runnning" in solver status atom
-                                        (doseq [[client-name solvers] @wss/solver-status]
-                                          (doseq [[solver-name v] solvers
-                                                  :when (get v :running?)]
-                                            (swap! wss/solver-status assoc-in [client-name solver-name :time-running] (ut/format-duration (get v :started) (System/currentTimeMillis))))))))
+  (def param-sync
+    (start-scheduler 30000
+                     wss/param-sql-sync
+                     "Parameter Sync"))
+
+  (def refresh-flow-tables
+    (start-scheduler 5000
+                     wss/flow-atoms>sql
+                     "Refresh Flow Tables"))
+
+  (def purge
+    (start-scheduler 600
+                     wss/purge-dead-client-watchers
+                     "Purge Dead Clients"))
+
+  (def timekeeper
+    (start-scheduler 1000
+                     #(reset! wss/time-atom (ut/current-datetime-parts))
+                     "Timekeeper"))
+
+  (def cpukeeper
+    (start-scheduler 1000
+                     #(swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage))
+                     "CPU Keeper"))
+
+  (def memkeeper
+    (start-scheduler 1000
+                     #(swap! wss/mem-usage conj (ut/memory-used))
+                     "Memory Keeper"))
+
+  (def pushkeeper
+    (start-scheduler 1000
+                     #(swap! wss/push-usage conj @wss/all-pushes)
+                     "Push Keeper"))
+
+  (def peerkeeper
+    (start-scheduler 1000
+                     #(swap! wss/peer-usage conj (count @wl/sockets))
+                     "Peer Keeper"))
+
+  (def purge-solver-cache
+    (start-scheduler 600000
+                     #(do
+                        (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
+                        (reset! wss/solvers-cache-hits-atom {})
+                        (reset! wss/solvers-cache-atom {}))
+                     "Purge Solver Cache"))
+
+  (def solver-statuses
+    (start-scheduler 1000
+                     #(doseq [[client-name solvers] @wss/solver-status]
+                        (doseq [[solver-name v] solvers
+                                :when (get v :running?)]
+                          (swap! wss/solver-status assoc-in
+                                 [client-name solver-name :time-running]
+                                 (ut/format-duration (get v :started) (System/currentTimeMillis)))))
+                     "Update Solver Statuses"))
+
+  (defn stop-all-schedulers []
+    (doseq [scheduler [mon param-sync refresh-flow-tables purge timekeeper
+                       cpukeeper pushkeeper peerkeeper
+                       purge-solver-cache solver-statuses]]
+      (ut/pp [:stopping-async-job-scheduler! (str scheduler)])
+      (async/close! scheduler)))
+
 
   (def last-look (atom {}))
   (def saved-uids (atom []))
 
-  (let [signals  (vec (keys @wss/signals-atom))
-        signalsv (vec (apply concat
-                             (for [[k v] @wss/signals-atom]
-                               (for [e (filter #(and (keyword? %) (or (some (fn [x] (= x %)) signals) (cstr/includes? (str %) "/")))
-                                               (ut/deep-flatten (get v :signal)))]
-                                 [e (keyword (str "signal/" (cstr/replace (str k) ":" "")))]))))
-        solvers  (vec (for [[k v] @wss/solvers-atom
-                            :when (keyword? (get v :signal))]
-                        [(get v :signal) (keyword (str "solver/" (cstr/replace (str k) ":" "")))]))
-        conns    (vec (distinct (into signalsv solvers)))
-        fmap     (wss/warren-flow-map conns)]
-    (ut/pretty-spit "./flows/generated-flow-map.edn" fmap)
-    (ut/pp [:warren-flow? conns]))
-  
+  ;; create a flow of all the signals and solvers relations (or an attempt to) - just a fun little experiment for now
+  (future
+    (let [signals  (vec (keys @wss/signals-atom))
+          signalsv (vec (apply concat
+                               (for [[k v] @wss/signals-atom]
+                                 (for [e (filter #(and (keyword? %) (or (some (fn [x] (= x %)) signals) (cstr/includes? (str %) "/")))
+                                                 (ut/deep-flatten (get v :signal)))]
+                                   [e (keyword (str "signal/" (cstr/replace (str k) ":" "")))]))))
+          solvers  (vec (for [[k v] @wss/solvers-atom
+                              :when (keyword? (get v :signal))]
+                          [(get v :signal) (keyword (str "solver/" (cstr/replace (str k) ":" "")))]))
+          conns    (vec (distinct (into signalsv solvers)))
+          fmap     (wss/warren-flow-map conns)]
+      (ut/pretty-spit "./flows/generated-flow-map.edn" fmap)
+    ;;(ut/pp [:warren-flow? conns])
+      ))
+
   (shutdown/add-hook! ::the-pool-is-now-closing
                       #(do (reset! wss/shutting-down? true)
+                           (stop-all-schedulers)
                            (let [destinations (vec (keys @wss/client-queues))]
                              (doseq [d destinations]
                                (wss/alert! d
@@ -565,7 +642,7 @@
                                            5)))
                            ;;  (Thread/sleep 2000)
                            (wss/destroy-websocket-server!)
-                           (tt/stop!)
+                           ;;(tt/stop!)
                            (wss/stop-worker)
                            (wss/stop-worker2)
                            (wss/stop-worker3)
