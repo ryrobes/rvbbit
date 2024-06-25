@@ -354,35 +354,35 @@
   (add-watch wss/screens-atom
              :master-screen-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               (future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
                (doseq [key (keys new-state)]
                  (if-let [child-atom (get @wss/screen-child-atoms key)]
                    (swap! child-atom assoc key (get new-state key))
                    (let [new-child-atom (atom {})]
                      (swap! wss/screen-child-atoms assoc key new-child-atom)
-                     (swap! new-child-atom assoc key (get new-state key))))))))
+                     (swap! new-child-atom assoc key (get new-state key)))))));)
 
   (add-watch wss/params-atom
              :master-params-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               (future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
                (doseq [key (keys new-state)]
                  (if-let [child-atom (get @wss/param-child-atoms key)]
                    (swap! child-atom assoc key (get new-state key))
                    (let [new-child-atom (atom {})]
                      (swap! wss/param-child-atoms assoc key new-child-atom)
-                     (swap! new-child-atom assoc key (get new-state key))))))))
+                     (swap! new-child-atom assoc key (get new-state key)))))));)
 
   (add-watch wss/panels-atom
              :master-panels-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               (future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
                (doseq [key (keys new-state)]
                  (if-let [child-atom (get @wss/panel-child-atoms key)]
                    (swap! child-atom assoc key (get new-state key))
                    (let [new-child-atom (atom {})]
                      (swap! wss/panel-child-atoms assoc key new-child-atom)
-                     (swap! new-child-atom assoc key (get new-state key))))))))
+                     (swap! new-child-atom assoc key (get new-state key)))))));)
 
   ;; (add-watch wss/last-solvers-atom
   ;;            :master-solver-watcher ;; watcher splitter
@@ -413,25 +413,25 @@
   (add-watch wss/last-solvers-atom
              :master-solver-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               (future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
                (doseq [key (keys new-state)]
                  (let [group (ut/hash-group key wss/num-groups)]
                    (if-let [child-atom (get @wss/solver-child-atoms group)]
                      (swap! child-atom assoc key (get new-state key))
                      (let [new-child-atom (atom {})]
                        (swap! wss/solver-child-atoms assoc group new-child-atom)
-                       (swap! new-child-atom assoc key (get new-state key)))))))))
+                       (swap! new-child-atom assoc key (get new-state key))))))));)
 
   (add-watch wss/solver-status
              :master-solver-status-watcher ;; watcher splitter
              (fn [_ _ old-state new-state]
-               (future  ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               ;(future  ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
                (doseq [key (keys new-state)]
                  (if-let [child-atom (get @wss/solver-status-child-atoms key)]
                    (swap! child-atom assoc key (get new-state key))
                    (let [new-child-atom (atom {})]
                      (swap! wss/solver-status-child-atoms assoc key new-child-atom)
-                     (swap! new-child-atom assoc key (get new-state key))))))))
+                     (swap! new-child-atom assoc key (get new-state key)))))));)
 
   (add-watch wss/signals-atom
              :master-signal-def-watcher ;; watcher signals defs
@@ -449,6 +449,28 @@
              (fn [_ _ old-state new-state]
                (ut/pp [:solvers-defs-changed :reloading....])
                (wss/reload-solver-subs)))
+
+  (defonce fake-time (atom {})) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
+
+  ;; (add-watch fake-time
+  ;;            :fake-time-pusher
+  ;;            (fn [_ _ old-state new-state]
+  ;;              (let [ttt (ut/current-datetime-parts)]
+  ;;                (reset! wss/time-atom ttt)
+  ;;                (reset! wss/time-atom-1 ttt)
+  ;;                (reset! wss/time-atom-2 ttt)
+  ;;                (reset! wss/time-atom-3 ttt)
+  ;;                (reset! wss/time-atom-4 ttt)
+  ;;                (reset! wss/time-atom-5 ttt))))
+  
+(defn update-time-atom [atom new-time]
+  (reset! atom new-time))
+
+  (add-watch fake-time
+             :fake-time-pusher
+             (fn [_ _ old-state new-state]
+               (let [ttt (ut/current-datetime-parts)]
+                 (doall (pmap #(update-time-atom % ttt) wss/time-atoms)))))
 
   (update-all-screen-meta)
   (update-all-flow-meta)
@@ -523,18 +545,71 @@
   ;;                                                 :when (get v :running?)]
   ;;                                           (swap! wss/solver-status assoc-in [client-name solver-name :time-running] (ut/format-duration (get v :started) (System/currentTimeMillis))))))))
 
-  (defn start-scheduler [interval f task-name]
-    (let [stop-ch (async/chan)]
-      (ut/pp [:starting-async-job-scheduler! task-name [:every interval :ms]])
-      (async/go-loop []
-        (let [[_ ch] (async/alts! [(async/timeout interval) stop-ch])]
-          (when-not (= ch stop-ch)
+  (defn logger [name edn]
+    (let [dir         (str "./logs/" (str (java.time.LocalDate/now)) "/")
+          _           (ext/create-dirs dir)
+          fp          (str dir name ".log.edn")
+          mst         (System/currentTimeMillis)
+          data        [(ut/millis-to-date-string mst) edn]
+          pretty-data (with-out-str (ppt/pprint data))]
+      (spit fp (str pretty-data "\n") :append true)))
+
+  ;; (defn start-scheduler [interval f task-name]
+  ;;   (let [stop-ch (async/chan)]
+  ;;     (ut/pp [:starting-async-job-scheduler! task-name [:every interval :ms]])
+  ;;     (async/go-loop []
+  ;;       (let [[_ ch] (async/alts! [(async/timeout interval) stop-ch])]
+  ;;         (when-not (= ch stop-ch)
+  ;;           (try
+  ;;             (do
+  ;;               (swap! wss/scheduler-atom assoc task-name 
+  ;;                      (ut/millis-to-date-string (System/currentTimeMillis)))
+  ;;               (f))
+  ;;             (catch Throwable e
+  ;;               (ut/pp [:core.scheduler-error! task-name e])))
+  ;;           (recur))))
+  ;;     stop-ch))
+
+  ;; (defn start-scheduler [interval f task-name]
+  ;;   (let [running (atom true)]
+  ;;     (future
+  ;;       (while @running
+  ;;         (try
+  ;;           (Thread/sleep interval)
+  ;;           (swap! wss/scheduler-atom assoc task-name
+  ;;                  (ut/millis-to-date-string (System/currentTimeMillis)))
+  ;;           (f)
+  ;;           (catch Throwable e
+  ;;             (ut/pp [:core.scheduler-error! task-name e])))))
+  ;;     (fn [] (reset! running false))))
+
+(defn start-scheduler [interval f task-name]
+  (let [stop-ch (async/chan)
+        error-ch (async/chan (async/sliding-buffer 10))]
+
+    ;; Error logging go-block
+    (async/go-loop []
+      (when-let [error (<! error-ch)]
+        (println "Error in task" task-name ":" (pr-str error))
+        (recur)))
+
+    ;; Main scheduler go-block
+    (async/go-loop [last-run (System/currentTimeMillis)]
+      (let [now (System/currentTimeMillis)
+            wait-time (max 0 (- interval (- now last-run)))
+            [_ ch] (async/alts! [(async/timeout wait-time) stop-ch])]
+        (if (= ch stop-ch)
+          (println "Scheduler" task-name "stopped.")
+          (do
             (try
               (f)
               (catch Throwable e
-                (ut/pp [:core.scheduler-error! task-name e])))
-            (recur))))
-      stop-ch))
+                (async/>! error-ch (str e))))
+            (recur (System/currentTimeMillis))))))
+
+    ;; Return a function to stop the scheduler
+    #(async/close! stop-ch)))
+
 
   ;; Define all schedulers
   (def mon
@@ -559,8 +634,11 @@
 
   (def timekeeper
     (start-scheduler 1000
-                     #(reset! wss/time-atom (ut/current-datetime-parts))
-                     "Timekeeper"))
+                     #(let [ddate (ut/current-datetime-parts)]
+                        (logger "timekeeper" {:new ddate :old @wss/time-atom})
+                        ;(reset! wss/time-atom ddate)
+                        (reset! fake-time ddate))
+                     "Timekeeper")) ;; 5:35:00 am stops? - 9:45:00 pm stopped also
 
   (def cpukeeper
     (start-scheduler 1000
@@ -605,7 +683,9 @@
                        cpukeeper pushkeeper peerkeeper
                        purge-solver-cache solver-statuses]]
       (ut/pp [:stopping-async-job-scheduler! (str scheduler)])
-      (async/close! scheduler)))
+      ;;(async/close! scheduler)
+      scheduler
+      ))
 
 
   (def last-look (atom {}))

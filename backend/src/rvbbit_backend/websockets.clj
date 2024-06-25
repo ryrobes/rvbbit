@@ -64,6 +64,7 @@
 (defonce push-usage (atom []))
 (defonce peer-usage (atom []))
 (defonce mem-usage (atom []))
+(defonce scheduler-atom (atom {}))
 
 (def num-groups 8) ;; atom segments to split solvers master atom into
 ;; 20 seems fine, testing with 8... impacts thread count mostly. not good isolated perf testing yet.
@@ -112,6 +113,20 @@
 (def autocomplete-clover-param-atom (ut/thaw-atom [] "./data/atoms/autocomplete-clover-param-atom.edn"))
 
 (def time-atom (ut/thaw-atom {} "./data/atoms/time-atom.edn"))
+
+(def time-atom-1 (atom {}))
+(def time-atom-2 (atom {}))
+(def time-atom-3 (atom {}))
+(def time-atom-4 (atom {}))
+(def time-atom-5 (atom {}))
+(def time-atom-6 (atom {}))
+(def time-atom-7 (atom {}))
+(def time-atom-8 (atom {}))
+(def time-atom-9 (atom {}))
+(def time-atom-10 (atom {}))
+
+(def time-atoms [time-atom-1 time-atom-2 time-atom-3 time-atom-4 time-atom-5
+                 time-atom-6 time-atom-7 time-atom-8 time-atom-9 time-atom-10])
 
 (def clover-sql-training-atom (ut/thaw-atom {} "./data/training/clover-sql-training-atom.edn"))
 (def clover-sql-enriched-training-atom (ut/thaw-atom {} "./data/training/clover-sql-enriched-training-atom.edn"))
@@ -2573,6 +2588,13 @@
           screen?         (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
           :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))))
 
+(defn get-time-atom-for-client
+  [client-name]
+  (let [client-str (name client-name)  ; Convert keyword to string
+        hash-value (Math/abs (hash client-str))  ; Get positive hash value
+        index (mod hash-value (count time-atoms))]  ; Mod by number of atoms
+    (nth time-atoms index)))
+
 (defn add-watcher
   [keypath client-name fn flow-key sub-type & [flow-id]] ;; flow id optional is for unsub stuff
   (let [;;client-name :all ;; test
@@ -2617,7 +2639,7 @@
                           solver-status?  (get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status) ;;solver-status
                           signal-history? last-signals-history-atom
                           server?         server-atom ;; no need to split for now, will keep an eye on it - I
-                          time?           time-atom ;; zero need to split ever. lol, its like 6 keys
+                          time?           (get-time-atom-for-client  client-name) ;; time-atom ;; zero need to split ever. lol, its like 6 keys
                           panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                           client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
                           flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -2687,7 +2709,7 @@
                           solver-status?  (get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status) ;;solver-status
                           signal-history? last-signals-history-atom
                           server?         server-atom ;; no need to split for now, will keep an eye on it -
-                          time?           time-atom ;; zero need to split ever. lol, its like 6 keys
+                          time?           (get-time-atom-for-client  client-name) ;; time-atom ;; zero need to split ever. lol, its like 6 keys
                           panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                           client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
                           flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -5297,7 +5319,7 @@
                      " | max " symbol-str ": "
                      ;(format "%.2f" (float (apply max truncated)))
                      (ut/nf (float (apply max truncated)))
-                     " avg " symbol-str ": "
+                     ", avg " symbol-str ": "
                      ;(format "%.2f" (float (ut/avgf truncated)))
                      (ut/nf (float (ut/avgf truncated))))
           padding (str (apply str (repeat (- console-width (count label) 4) " ")) " ")
@@ -5494,6 +5516,7 @@
                        {:*cached-queries              (count @sql-cache)
                         ;:clover-sql-training-queries  (count (keys @clover-sql-training-atom))
                         ;:clover-sql-training-enriched (count (keys @clover-sql-enriched-training-atom))
+                        :schedulers-last-run          @scheduler-atom
                         :ws-peers                     (do ;(reset! peer-usage (vec (take-last 600 @peer-usage)))
                                                           peers)
                         :sys-load                     sys-load
@@ -5503,7 +5526,7 @@
                                                         (ut/avgf @mem-usage)
                                                         ;@mem-usage
                                                         )
-                        :pushes-avg                   (do (reset! push-usage (vec (take-last 600 @push-usage)))
+                        :pushes-avg                   (do ;(reset! push-usage (vec (take-last 600 @push-usage)))
                                                           (ut/avgf (ut/cumulative-to-delta @push-usage)))
                         :cwidth                       (ut/get-terminal-width)
                         :uptime                       uptime-str
@@ -5517,12 +5540,15 @@
 
         (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
         (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
+        (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
 
         (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes" :color :magenta))
         (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 15) "msgs/sec" "client pushes" :color :magenta :freq 15))
+        (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
 
         (ut/pp (draw-bar-graph @mem-usage "memory usage" "mb" :color :yellow))
         (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 15) "memory usage" "mb" :color :yellow :freq 15))
+        (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
 
               ;(ut/pp (draw-bar-graph @peer-usage "clients" "peers" :color :green))
 

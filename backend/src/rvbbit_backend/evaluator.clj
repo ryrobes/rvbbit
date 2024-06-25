@@ -18,6 +18,52 @@
 (def ext-repl-host (get-in rabbit-config [:ext-nrepl :host] "127.0.0.1"))
 (def repl-port (get rabbit-config :nrepl-port 8181))
 
+(defn introspect-namespace [conn]
+  (let [introspection-code "
+    (let [ns-obj *ns*
+          vars (ns-interns ns-obj)
+          interesting-vars (filter (fn [[_ v]]
+                                     (or (instance? clojure.lang.Atom @v)
+                                         (instance? clojure.lang.Ref @v)
+                                         (vector? @v)
+                                         (map? @v)
+                                         (seq? @v)
+                                         (number? @v)
+                                         (string? @v)))
+                                   vars)]
+      (into {}
+            (map (fn [[k v]]
+                   [(str k) {:name (str k)
+                             :type (cond
+                                     (instance? clojure.lang.Atom @v) :atom
+                                     (instance? clojure.lang.Ref @v) :ref
+                                     (vector? @v) :vector
+                                     (map? @v) :map
+                                     (seq? @v) :seq
+                                     (number? @v) :number
+                                     (string? @v) :string
+                                     :else (type @v))
+                             :value (pr-str @v)}])
+                 interesting-vars)))
+    "]
+    (let [skt (nrepl/client conn 60000)
+          result (-> (nrepl/message skt {:op "eval" :code introspection-code})
+                     nrepl/combine-responses
+                     :value
+                     read-string)]
+      result)))
+
+(def namespace-state (atom {}))
+
+(defn update-namespace-state-async [host port]
+  (future
+    (try
+      (with-open [conn (nrepl/connect :host host :port port)]
+        (let [introspection (introspect-namespace conn)]
+          (swap! namespace-state assoc [host port] introspection)))
+      (catch Exception e
+        (println "Error during async introspection:" (ex-message e))))))
+
 (defn create-nrepl-server!
   []
   (ut/pp [:starting-local-nrepl :port repl-port])
@@ -36,21 +82,20 @@
       (let [nrepl?           true ;(cstr/includes? s ":::use-nrepl")
             ext-nrepl?       (cstr/includes? s ":::ext-nrepl") ;; from rabbit.edn
             custom-nrepl?    (cstr/includes? s ":::custom-nrepl")
-            custom-nrepl-map (cond ext-nrepl?                                          {:host ext-repl-host ;; hardcoded
-                                                                                                            ;; instead of
+            custom-nrepl-map (cond ext-nrepl?                                          {:host ext-repl-host
                                                                                         :port ext-repl-port}
                                    (and (not (nil? repl-host)) (not (nil? repl-port))) {:host repl-host ;; override repl
                                                                                         :port repl-port}
                                    custom-nrepl?                                       (first
-                                                                                         (remove nil?
-                                                                                           (for [l (cstr/split s #"\n")]
-                                                                                             (when (cstr/includes?
-                                                                                                     l
-                                                                                                     ":::custom-nrepl")
-                                                                                               (edn/read-string
-                                                                                                 (last (cstr/split
+                                                                                        (remove nil?
+                                                                                                (for [l (cstr/split s #"\n")]
+                                                                                                  (when (cstr/includes?
                                                                                                          l
-                                                                                                         #":::custom-nrepl")))))))
+                                                                                                         ":::custom-nrepl")
+                                                                                                    (edn/read-string
+                                                                                                     (last (cstr/split
+                                                                                                            l
+                                                                                                            #":::custom-nrepl")))))))
                                    :else                                               {:host "127.0.0.1" :port 8181})
             nrepl-port       (get custom-nrepl-map :port)
             nrepl-host       (get custom-nrepl-map :host)]
@@ -76,6 +121,9 @@
                          rsp           (nrepl/combine-responses msg)
                          msg-out       (vec (remove nil? (for [m msg] (get m :out))))
                          merged-values rsp-read]
+                     
+                     ;(update-namespace-state-async nrepl-host nrepl-port)
+
                      {:evald-result (-> rsp
                                         (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
                                         (assoc :value merged-values) ;; ?

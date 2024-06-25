@@ -92,8 +92,6 @@
 
 (defn index-of [coll item] (first (keep-indexed #(when (= %2 item) %1) coll)))
 
-
-
 (defn current-datetime-parts
   []
   (try (let [now               (java.time.ZonedDateTime/now)
