@@ -450,27 +450,34 @@
                (ut/pp [:solvers-defs-changed :reloading....])
                (wss/reload-solver-subs)))
 
-  (defonce fake-time (atom {})) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
+  (defonce father-time (atom {})) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
 
-  ;; (add-watch fake-time
-  ;;            :fake-time-pusher
-  ;;            (fn [_ _ old-state new-state]
-  ;;              (let [ttt (ut/current-datetime-parts)]
-  ;;                (reset! wss/time-atom ttt)
-  ;;                (reset! wss/time-atom-1 ttt)
-  ;;                (reset! wss/time-atom-2 ttt)
-  ;;                (reset! wss/time-atom-3 ttt)
-  ;;                (reset! wss/time-atom-4 ttt)
-  ;;                (reset! wss/time-atom-5 ttt))))
-  
-(defn update-time-atom [atom new-time]
-  (reset! atom new-time))
-
-  (add-watch fake-time
+  (add-watch father-time
              :fake-time-pusher
              (fn [_ _ old-state new-state]
-               (let [ttt (ut/current-datetime-parts)]
-                 (doall (pmap #(update-time-atom % ttt) wss/time-atoms)))))
+               (try
+                 (let [ttt (ut/current-datetime-parts)]
+                   (reset! wss/time-atom ttt)  ;; the OG
+                   (reset! wss/time-atom-1 ttt)
+                   (reset! wss/time-atom-2 ttt)
+                   (reset! wss/time-atom-3 ttt)
+                   (reset! wss/time-atom-4 ttt)
+                   (reset! wss/time-atom-5 ttt)
+                   (reset! wss/time-atom-6 ttt)
+                   (reset! wss/time-atom-7 ttt)
+                   (reset! wss/time-atom-8 ttt)
+                   (reset! wss/time-atom-9 ttt)
+                   (reset! wss/time-atom-10 ttt)) 
+                 (catch Throwable e (ut/pp [:father-time-error e])))))
+
+;; (defn update-time-atom [atom new-time]
+;;   (reset! atom new-time))
+
+;;   (add-watch fake-time
+;;              :fake-time-pusher
+;;              (fn [_ _ old-state new-state]
+;;                (let [ttt (ut/current-datetime-parts)]
+;;                  (doall (pmap #(update-time-atom % ttt) wss/time-atoms)))))
 
   (update-all-screen-meta)
   (update-all-flow-meta)
@@ -583,32 +590,36 @@
   ;;             (ut/pp [:core.scheduler-error! task-name e])))))
   ;;     (fn [] (reset! running false))))
 
-(defn start-scheduler [interval f task-name]
-  (let [stop-ch (async/chan)
-        error-ch (async/chan (async/sliding-buffer 10))]
+  (defn start-scheduler [interval f task-name]
+    (let [stop-ch (async/chan)
+          error-ch (async/chan (async/sliding-buffer 10))]
+
+      (ut/pp [:starting-async-job-scheduler! task-name [:every interval :ms]])
 
     ;; Error logging go-block
-    (async/go-loop []
-      (when-let [error (<! error-ch)]
-        (println "Error in task" task-name ":" (pr-str error))
-        (recur)))
+      (async/go-loop []
+        (when-let [error (<! error-ch)]
+          (ut/pp [:core.scheduler-error! task-name error])
+          (recur)))
 
     ;; Main scheduler go-block
-    (async/go-loop [last-run (System/currentTimeMillis)]
-      (let [now (System/currentTimeMillis)
-            wait-time (max 0 (- interval (- now last-run)))
-            [_ ch] (async/alts! [(async/timeout wait-time) stop-ch])]
-        (if (= ch stop-ch)
-          (println "Scheduler" task-name "stopped.")
-          (do
-            (try
-              (f)
-              (catch Throwable e
-                (async/>! error-ch (str e))))
-            (recur (System/currentTimeMillis))))))
+      (async/go-loop [last-run (System/currentTimeMillis)]
+        (let [now (System/currentTimeMillis)
+              wait-time (max 0 (- interval (- now last-run)))
+              [_ ch] (async/alts! [(async/timeout wait-time) stop-ch])]
+          (if (= ch stop-ch)
+            (ut/pp ["Scheduler" task-name "stopped."])
+            (do
+              (try
+                (swap! wss/scheduler-atom assoc task-name
+                       (ut/millis-to-date-string (System/currentTimeMillis)))
+                (f)
+                (catch Throwable e
+                  (async/>! error-ch (pr-str e))))
+              (recur (System/currentTimeMillis))))))
 
     ;; Return a function to stop the scheduler
-    #(async/close! stop-ch)))
+      #(async/close! stop-ch)))
 
 
   ;; Define all schedulers
@@ -637,7 +648,7 @@
                      #(let [ddate (ut/current-datetime-parts)]
                         (logger "timekeeper" {:new ddate :old @wss/time-atom})
                         ;(reset! wss/time-atom ddate)
-                        (reset! fake-time ddate))
+                        (reset! father-time ddate))
                      "Timekeeper")) ;; 5:35:00 am stops? - 9:45:00 pm stopped also
 
   (def cpukeeper
@@ -684,8 +695,7 @@
                        purge-solver-cache solver-statuses]]
       (ut/pp [:stopping-async-job-scheduler! (str scheduler)])
       ;;(async/close! scheduler)
-      scheduler
-      ))
+      scheduler))
 
 
   (def last-look (atom {}))

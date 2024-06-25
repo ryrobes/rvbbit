@@ -126,7 +126,8 @@
 (def time-atom-10 (atom {}))
 
 (def time-atoms [time-atom-1 time-atom-2 time-atom-3 time-atom-4 time-atom-5
-                 time-atom-6 time-atom-7 time-atom-8 time-atom-9 time-atom-10])
+                 time-atom-6 time-atom-7 time-atom-8 time-atom-9 time-atom-10
+                 ])
 
 (def clover-sql-training-atom (ut/thaw-atom {} "./data/training/clover-sql-training-atom.edn"))
 (def clover-sql-enriched-training-atom (ut/thaw-atom {} "./data/training/clover-sql-enriched-training-atom.edn"))
