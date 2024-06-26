@@ -59,6 +59,7 @@
                                           :align :center :justify :center]
                      :clover-fn [:run-solver
                                  {:signal false
+                                  :cache? false
                                   :type :clojure
                                   :input-map {}
                                   :data :clover-body}]

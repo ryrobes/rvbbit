@@ -1,6 +1,6 @@
-(ns rabbit-board.user
+(ns rvbbit-board.user
   (:require
     [clojure.string :as cstr]))
 
-(defn test-function [n] (str "Hello, " n ". How are ya?"))
+(defn boston-greeting [you] (str "hey, " you ". ow ahh ya?"))
 

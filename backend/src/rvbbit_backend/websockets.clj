@@ -113,6 +113,7 @@
 (def autocomplete-clover-param-atom (ut/thaw-atom [] "./data/atoms/autocomplete-clover-param-atom.edn"))
 
 (def time-atom (ut/thaw-atom {} "./data/atoms/time-atom.edn"))
+(def father-time (ut/thaw-atom {} "./data/atoms/father-time-atom.edn")) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
 
 (def time-atom-1 (atom {}))
 (def time-atom-2 (atom {}))
@@ -1337,7 +1338,7 @@
                    (assoc :last-seen-seconds (if never? -1 seconds-ago))
                    (dissoc :client-sub-list)
                    (assoc :last-seen (cond (< seconds-ago 0)       "not since boot"
-                                           (= k :rvbbit-scheduler) "n/a"
+                                           (= k :rvbbit) "n/a"
                                            :else                   (ut/format-duration-seconds seconds-ago)))))})));)
 
 (declare flow-kill!)
@@ -2044,7 +2045,7 @@
   [time-seq1 flowmap & [opts]]
   (let [;[opts chan-out override] args
         opts            (if (nil? opts) {} opts)
-        client-name     :rvbbit-scheduler
+        client-name     :rvbbit
         raw             (if (string? flowmap)
                           (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
                                (catch Exception _
@@ -2143,12 +2144,14 @@
 (defmethod wl/handle-request :run-flow
   [{:keys [client-name flowmap file-image flow-id opts no-return?]}]
   (ut/pp [:running-flow-map-from client-name])
-  (when (not (get-in (flow-statuses) [flow-id :*running?] false)) (flow! client-name flowmap file-image flow-id opts true)))
+  (when (not (get-in (flow-statuses) [flow-id :*running?] false)) 
+    (flow! client-name flowmap file-image flow-id opts no-return?)))
 
 (defmethod wl/handle-push :run-flow
   [{:keys [client-name flowmap file-image flow-id opts no-return?]}]
   (ut/pp [:running-flow-map-from client-name])
-  (when (not (get-in (flow-statuses) [flow-id :*running?] false)) (flow! client-name flowmap file-image flow-id opts true)))
+  (when (not (get-in (flow-statuses) [flow-id :*running?] false)) 
+    (flow! client-name flowmap file-image flow-id opts true)))
 
 (declare run-solver)
 
@@ -2160,9 +2163,9 @@
          [solver-name :output]
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
-  ;(enqueue-task-slot-pool client-name (fn [] 
+  (enqueue-task-slot-pool client-name (fn [] 
                                         (run-solver solver-name client-name override-map)
-  ;                                      ))
+                                        ))
   )
 
 (defmethod wl/handle-push :run-solver
@@ -2172,9 +2175,9 @@
          [solver-name :output]
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
-  ;(enqueue-task-slot-pool client-name (fn [] 
+  (enqueue-task-slot-pool client-name (fn [] 
                                         (run-solver solver-name client-name override-map)
-  ;                                      ))
+                                        ))
   )
 
 (defmethod wl/handle-push :run-solver-custom
@@ -2185,9 +2188,9 @@
          [:warning! {:solver-running-custom-inputs-via client-name :with-input-map input-map :override-map? override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
 ;;  (run-solver solver-name client-name override-map input-map temp-solver-name)
- ; (enqueue-task-slot-pool client-name (fn [] 
+  (enqueue-task-slot-pool client-name (fn [] 
                                         (run-solver solver-name client-name override-map input-map temp-solver-name)
-;                                        ))
+                                        ))
   temp-solver-name)
 
 (defn flow-kill!
@@ -2504,7 +2507,10 @@
 (defonce panel-child-atoms (atom {}))
 (defonce flow-child-atoms (atom {})) ;; flows
 (defonce solver-child-atoms (atom {}))
+(defonce time-child-atoms (atom {}))
 (defonce solver-status-child-atoms (atom {}))
+
+
 
 (defn get-atom-splitter
   [key ttype child-atom parent-atom]
@@ -2557,7 +2563,17 @@
           (swap! last-values-per assoc-in [client-name keypath] new-value)) ;; if a new client
       ))))
 
-(defn get-atom-from-keys
+;; (defn get-time-atom-for-client
+;;   [client-name]
+;;   (let [client-name (or client-name :rvbbit)
+;;         ;client-str (str client-name)  ; Convert keyword to string
+;;         ;hash-value (Math/abs (hash client-str))  ; Get positive hash value
+;;         ;index (mod hash-value (count time-atoms))
+;;         index (- (ut/hash-group client-name (count time-atoms)) 1)
+;;         ]  ; Mod by number of atoms
+;;     (nth time-atoms index)))
+
+(defn get-atom-from-keys ;; is always called internally by client :rvbbit
   [base-type sub-type sub-path keypath]
   (let [tracker?        (= sub-type :tracker)
         flow?           (= base-type :flow) ;; (cstr/starts-with? (str flow-key) ":flow/")
@@ -2570,6 +2586,7 @@
         solver?         (= base-type :solver)
         data?           (= base-type :data)
         solver-meta?    (= base-type :solver-meta)
+        repl-ns?        (= base-type :repl-ns)
         solver-status?  (= base-type :solver-status)
         signal-history? (= base-type :signal-history)
         server?         (= base-type :server)]
@@ -2578,23 +2595,20 @@
           signal?         last-signals-atom ;; no need to split for now, will keep an eye on it (ut/hash-group (keyword (second sub-path)) num-groups)
           solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom) ;; last-solvers-atom
           solver-meta?    last-solvers-atom-meta
+          repl-ns?        evl/repl-introspection-atom
           solver-status?  (get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status)  ;;solver-status
           data?           last-solvers-data-atom
           signal-history? last-signals-history-atom
           server?         server-atom ;; no need to split for now, will keep an eye on it - don't
-          time?           time-atom ;; zero need to split ever. lol, its like 6 keys
+          ;time?           time-atom ;;(get-time-atom-for-client :rvbbit) ;;  time-atom ;; zero need to split ever. lol, its like 6 keys
+          time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
           panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
           client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
           flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
           screen?         (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
           :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))))
 
-(defn get-time-atom-for-client
-  [client-name]
-  (let [client-str (name client-name)  ; Convert keyword to string
-        hash-value (Math/abs (hash client-str))  ; Get positive hash value
-        index (mod hash-value (count time-atoms))]  ; Mod by number of atoms
-    (nth time-atoms index)))
+
 
 (defn add-watcher
   [keypath client-name fn flow-key sub-type & [flow-id]] ;; flow id optional is for unsub stuff
@@ -2613,6 +2627,7 @@
         solver?         (= base-type :solver)
         data?           (= base-type :data)
         solver-meta?    (= base-type :solver-meta)
+        repl-ns?        (= base-type :repl-ns)
         solver-status?  (= base-type :solver-status)
         signal-history? (= base-type :signal-history)
         server?         (= base-type :server)
@@ -2621,6 +2636,7 @@
                           solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec
                           data?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                          repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                           signal-history? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec
                           time?           (vec (rest keypath))
@@ -2637,10 +2653,12 @@
                           solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom)  ;;last-solvers-atom
                           data?           last-solvers-data-atom
                           solver-meta?    last-solvers-atom-meta
+                          repl-ns?        evl/repl-introspection-atom
                           solver-status?  (get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status) ;;solver-status
                           signal-history? last-signals-history-atom
                           server?         server-atom ;; no need to split for now, will keep an eye on it - I
-                          time?           (get-time-atom-for-client  client-name) ;; time-atom ;; zero need to split ever. lol, its like 6 keys
+                          ;;time?           time-atom ;;(get-time-atom-for-client  client-name) ;; time-atom ;; zero need to split ever. lol, its like 6 keys
+                          time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
                           panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                           client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
                           flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -2682,6 +2700,7 @@
           solver? (= base-type :solver)
           data? (= base-type :data)
           solver-meta? (= base-type :solver-meta)
+          repl-ns?        (= base-type :repl-ns)
           solver-status?  (= base-type :solver-status)
           signal-history? (= base-type :signal-history)
           server? (= base-type :server)
@@ -2690,6 +2709,7 @@
                     data?           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-meta?    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                    repl-ns?        (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     solver-status?  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     signal-history? (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     time?           (vec (rest keypath))
@@ -2707,10 +2727,12 @@
                           data?           last-solvers-data-atom ;; ^^ same as above -
                                                                  ;; take a hint, choom.
                           solver-meta?    last-solvers-atom-meta
+                          repl-ns?        evl/repl-introspection-atom
                           solver-status?  (get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status) ;;solver-status
                           signal-history? last-signals-history-atom
                           server?         server-atom ;; no need to split for now, will keep an eye on it -
-                          time?           (get-time-atom-for-client  client-name) ;; time-atom ;; zero need to split ever. lol, its like 6 keys
+                          ;;time?           time-atom ;;(get-time-atom-for-client  client-name) ;; time-atom ;; zero need to split ever. lol, its like 6 keys
+                          time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
                           panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                           client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
                           flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -2803,7 +2825,7 @@
     (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath {:sub-path sub-path}])
     (cond
       (cstr/includes? (str flow-key) "*running?")  false
-      (= base-type :time)                         (get @time-atom client-param-path)
+      (= base-type :time)                         (get @father-time client-param-path)
       (= base-type :signal)                       (get @last-signals-atom client-param-path)
       (= base-type :data)                         (get-in @last-solvers-data-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -2814,6 +2836,9 @@
       (= base-type :solver-meta)                  (get-in @last-solvers-atom-meta
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
+      (= base-type :repl-ns)                      (get-in @evl/repl-introspection-atom
+                                                    (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+                                                    lv)      
       (= base-type :solver-status)                  (get-in @solver-status
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                                                           lv)
@@ -2857,7 +2882,7 @@
         flat           (ut/deep-flatten honey-sql)
         literal-data?  (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
         honey-modded   (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
-        client-name    :rvbbit-solver
+        client-name    :rvbbit
         honey-modded   (walk/postwalk-replace {:*client-name client-name :*client-name-str (pr-str client-name)} honey-modded)
         client-cache?  (if literal-data? (get honey-sql :cache? true) false)]
     (ut/pp [:solver-sql! solver-name orig-honey-sql honey-sql honey-modded connection-id client-name snapshot?])
@@ -2962,7 +2987,7 @@
                                   solver-name)
           vdata-clover-walk-map (into {}
                                       (for [kp vdata-clover-kps]
-                                        {kp (try (clover-lookup :rvbbit-solver kp)
+                                        {kp (try (clover-lookup :rvbbit kp)
                                                  (catch Exception e
                                                    (ut/pp [:clover-lookup-error kp e])
                                                    (str "clover-param-lookup-error " kp)))}))
@@ -3086,7 +3111,7 @@
         (= runner-type :nrepl)
         (try (let [repl-host                   (get-in runner-map [:runner :host])
                    repl-port                   (get-in runner-map [:runner :port])
-                   {:keys [result elapsed-ms]} (ut/timed-exec (evl/repl-eval vdata repl-host repl-port))
+                   {:keys [result elapsed-ms]} (ut/timed-exec (evl/repl-eval vdata repl-host repl-port client-name solver-name))
                    output-full                 result
                    output                      (last (get-in output-full [:evald-result :value]))
                    output-full                 (-> output-full
@@ -3136,7 +3161,7 @@
 
         (= runner-type :flow) ;; no runner def needed for anon flow pulls
         (try
-          (let [client-name                 :rvbbit-solver
+          (let [client-name                 :rvbbit
                 flowmap                     (get vdata :flowmap)
                 opts                        (merge {:close-on-done? true :increment-id? false :timeout 10000}
                                                    (get vdata :opts {}))
@@ -3265,7 +3290,7 @@
               {}
               (for [[k {:keys [signal]}] signals-map]
                 {k (let [cmpkeys (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten signal)))
-                         vvals   (select-keys (get-in @atoms-and-watchers [:rvbbit-signals]) cmpkeys)]
+                         vvals   (select-keys (get-in @atoms-and-watchers [:rvbbit]) cmpkeys)]
                      (into {}
                            (for [[k {:keys [base-type sub-type sub-path keypath]}] vvals
                                  :let                                              [;;_ (when (not= base-type :time)
@@ -3295,7 +3320,7 @@
                                                                                                                              ;; here,
                                                                                                                              ;; btw
                    )}))
-          client-name :rvbbit-solver
+          client-name :rvbbit
           nowah (System/currentTimeMillis) ;; want to have a consistent timestamp for this
           signals-resolved (into {}
                                  (for [[k v] signals-map]
@@ -3389,7 +3414,7 @@
         flow-client-param-path  (keyword (cstr/replace (str (first keypath) (last keypath)) #":" ">"))
         other-client-param-path (keyword (cstr/replace (cstr/join ">" keypath) ":" "")) ;;(keyword
         client-param-path       (if (= base-type :flow) flow-client-param-path other-client-param-path)
-        signal?                 (= client-name :rvbbit-signals)]
+        signal?                 (= client-name :rvbbit)]
     (if (not signal?)
       (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)
       (do ;;(ut/pp [:signal-or-solver base-type keypath client-name])
@@ -3407,7 +3432,7 @@
 
 (defn purge-dead-client-watchers
   []
-  (let [cc (dissoc (client-statuses) :rvbbit-scheduler)]
+  (let [cc (dissoc (client-statuses) :rvbbit)]
     (doseq [[k {:keys [last-seen-seconds]}] cc
             :let                            [subs (get @atoms-and-watchers k)]
             :when                           (> last-seen-seconds 6000)]
@@ -3481,6 +3506,7 @@
         (= base-type :signal)                       client-param-path
         (= base-type :solver)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
         (= base-type :solver-meta)                  (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
+        (= base-type :repl-ns)                      (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
         (= base-type :solver-status)                (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
         (= base-type :signal-history)               (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec
         (= base-type :server)                       client-param-path
@@ -3530,7 +3556,7 @@
       (kick client-name
             [base-type client-param-path]
             (cond (cstr/includes? (str flow-key) "running?")  false
-                  (= base-type :time)                         (get @time-atom client-param-path)
+                  (= base-type :time)                         (get @father-time client-param-path)
                   (= base-type :signal)                       (get @last-signals-atom client-param-path)
                   (= base-type :data)                         (get-in @last-solvers-data-atom
                                                                       (vec (into [(keyword (second sub-path))]
@@ -3542,6 +3568,10 @@
                                                                       lv)
                   (= base-type :solver-meta)                  (get-in @last-solvers-atom-meta
                                                                       (vec (into [(keyword (second sub-path))]
+                                                                                 (vec (rest (rest sub-path)))))
+                                                                      lv)
+                  (= base-type :repl-ns)                      (get-in @evl/repl-introspection-atom
+                                                                      (vec (into [(keyword (second sub-path))] 
                                                                                  (vec (rest (rest sub-path)))))
                                                                       lv)
                   ;; (= base-type :solver-status)                  (get-in @solver-status
@@ -3591,17 +3621,17 @@
                              [signal-name
                               (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) ;; get
                                      (ut/deep-flatten signal)))]))
-        curr-keyparts (vec (keys (get @atoms-and-watchers :rvbbit-signals)))
+        curr-keyparts (vec (keys (get @atoms-and-watchers :rvbbit)))
         all-keyparts  (vec (distinct (ut/deep-flatten (map last parts))))
         to-remove     (vec (cset/difference (set curr-keyparts) (set all-keyparts)))]
     (reset! signal-parts-atom parts) ;; faster than running it every time - since we need it
     (ut/pp [:reload-signals-subs! parts curr-keyparts all-keyparts {:remove! to-remove}])
     (doseq [rm to-remove] ;; clean up ones we dont need to watch anymore
-      (let [{:keys [sub-type keypath flow-key]} (get-in @atoms-and-watchers [:rvbbit-signals rm])]
-        (remove-watcher keypath :rvbbit-signals sub-type nil flow-key)))
+      (let [{:keys [sub-type keypath flow-key]} (get-in @atoms-and-watchers [:rvbbit rm])]
+        (remove-watcher keypath :rvbbit sub-type nil flow-key)))
     (doseq [kk all-keyparts] ;; re-add them all - TODO, only add new ones (however, they get
       (ut/pp [:signal-sub-to kk])
-      (sub-to-value :rvbbit-signals kk true))
+      (sub-to-value :rvbbit kk true))
     (reset! last-signals-atom (select-keys @last-signals-atom
                                            (vec (filter #(not (cstr/includes? (str %) "/part-")) (keys @last-signals-atom))))) ;; clear
                                                                                                                                ;; cache
@@ -3631,7 +3661,7 @@
             {}
             (for [[k {:keys [signal]}] signals-map]
               {k (let [cmpkeys (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) (ut/deep-flatten signal)))
-                       vvals   (select-keys (get-in @atoms-and-watchers [:rvbbit-signals]) cmpkeys)]
+                       vvals   (select-keys (get-in @atoms-and-watchers [:rvbbit]) cmpkeys)]
                    (into {}
                          (for [[k {:keys [base-type sub-type sub-path keypath]}] vvals
                                :let                                              [;;_ (when (not= base-type :time) (ut/pp
@@ -3712,14 +3742,14 @@
                              [solver-name
                               (vec (filter #(and (keyword? %) (cstr/includes? (str %) "/")) ;; get
                                      (ut/deep-flatten [signal])))])) ;; enclose in case its
-        curr-keyparts (vec (keys (get @atoms-and-watchers :rvbbit-signals)))
+        curr-keyparts (vec (keys (get @atoms-and-watchers :rvbbit)))
         all-keyparts  (vec (distinct (ut/deep-flatten (map last parts))))
         to-remove     (vec (filter #(cstr/starts-with? (str %) ":solver/")
                              (cset/difference (set curr-keyparts) (set all-keyparts))))]
     (ut/pp [:reload-solver-subs! {:parts parts :curr-keypaths curr-keyparts :all-keyparts all-keyparts :to-remove to-remove}])
     (doseq [kk all-keyparts]
       (ut/pp [:solver-sub-to kk])
-      (sub-to-value :rvbbit-signals kk true))
+      (sub-to-value :rvbbit kk true))
     (doseq [signal (keys @solvers-atom)] ;; (re)process everythiung since we just got updated
       (ut/pp [:re-processing-solver signal]) ;; as if it was brand new... like an initial sub
     )))
@@ -4278,7 +4308,7 @@
                                                                'http-call      'rvbbit-backend.websockets/http-call
                                                                'flatten-map    'rvbbit-backend.websockets/flatten-map}
                                                               literals)
-                                                output-full (evl/repl-eval literals repl-host repl-port)
+                                                output-full (evl/repl-eval literals repl-host repl-port client-name ui-keypath)
                                                 output      (last (get-in output-full [:evald-result :value]))
                                                 output-full (-> output-full
                                                                 (assoc-in [:evald-result :output-lines]
@@ -4654,7 +4684,7 @@
                   _ (when kit-name (ut/pp [:running-kit kit-name]))
                   repl-host    (get-in config/kit-fns [kit-name :repl :host])
                   repl-port    (get-in config/kit-fns [kit-name :repl :port])
-                  output-full  (timed-expr (evl/repl-eval repl-command repl-host repl-port))
+                  output-full  (timed-expr (evl/repl-eval repl-command repl-host repl-port client-name kit-name))
                   elapsed-ms   (get output-full :elapsed-ms)
                   output-full  (get output-full :result) ;; from timed map
                   output       (last (get-in output-full [:evald-result :value]))
@@ -5512,7 +5542,7 @@
                    ;; ^^ flow tracker subs have messy keypath parents and are generally one-offs. noise.
                    server-subs ttl]
                (swap! server-atom assoc :uptime uptime-str :clients peers :threads thread-count :memory mm)
-               (ut/pp [(get @time-atom :now-seconds)
+               (ut/pp [(get @father-time :now-seconds)
                        :jvm-stats
                        {:*cached-queries              (count @sql-cache)
                         ;:clover-sql-training-queries  (count (keys @clover-sql-training-atom))
@@ -5538,6 +5568,8 @@
              (catch Throwable e (ut/pp [:printing-shit-error? (str e)])))
 
         (ut/pp [:latency-adaptations @dynamic-timeouts])
+
+        (ut/pp [:repl-introspections @evl/repl-introspection-atom])
 
         (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
         (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
@@ -5630,13 +5662,15 @@
   {:port                 websocket-port
    :join?                false
    :async?               true
-   ;:min-threads          300
+   :min-threads          300
    :max-threads          1000 ;; Increased max threads
-   :idle-timeout         500000 ;; Reduced idle timeout
-   :max-idle-time        3000000 ;; Reduced max idle time
-   ;:max-idle-time         15000
-   ;:input-buffer-size    131072 ;;32768  ;; Increased buffer sizes
-   ;:output-buffer-size   131072 ;;32768
+   ;:idle-timeout         500000 ;; Reduced idle timeout
+   ;:max-idle-time        3000000 ;; Reduced max idle time
+   ;:max-idle-time        15000
+   ;:input-buffer-size    131072 ;; default is 8192
+   ;:output-buffer-size   131072 ;; default is 32768
+   ;:input-buffer-size    32768
+   ;:output-buffer-size   131072
    :max-message-size     6291456 ;;2097152  ;; Increased max message size
    :websockets           ws-endpoints
    :allow-null-path-info true})

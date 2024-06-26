@@ -1284,14 +1284,15 @@
                                                                            data-key nil {:fm true}] :style {:overflow "auto"}]
                                                                          
                                                                          (let [selected-view-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
+                                                                               repl? (true? (cstr/includes? (str selected-view-type) "clojure"))
                                                                                syntax (get-in block-runners-map [selected-view-type :syntax])] 
-                                                                           ;;(ut/tapp>> [selected-view-type  syntax])
+                                                                           ;;(ut/tapp>> [selected-view-type repl? syntax])
                                                                            (if (or (nil? syntax) (= syntax "clojure"))
                                                                              [bricks/panel-code-box selected-block selected-kp
                                                                               (+ 17 single-width) (- single-height 20)
                                                                               (if (nil? selected-kp)
                                                                                 selected-panel-map
-                                                                                (get-in selected-panel-map selected-kp))]
+                                                                                (get-in selected-panel-map selected-kp)) repl?]
                                                                              [bricks/panel-string-box selected-kp (+ 17 single-width) (- single-height 20)
                                                                               (if (nil? selected-kp)
                                                                                 selected-panel-map
@@ -2131,7 +2132,7 @@
                                pp                (get db :click-param)
                                pp-without-fs     (ut/remove-keys pp
                                                                  (into (map first fs)
-                                                                       [:flow :time :server :flows-sys :client :solver :solver-status :data 
+                                                                       [:flow :time :server :flows-sys :client :solver :solver-status :data :repl-ns
                                                                         :signal-history :solver-meta nil]))
                                new-autocompletes (vec (into (create-clover-keys-from-data (get pp-without-fs :param) "param/")
                                                             (create-clover-keys-from-data (get pp-without-fs :theme) "theme/")))
@@ -2154,7 +2155,7 @@
                           pp            (get db :click-param)
                           pp-without-fs (ut/remove-keys pp
                                                         (into (map first fs)
-                                                              [:flow :time :server :flows-sys :client :solver :signal-history :data :solver-status :solver-meta nil]))]
+                                                              [:flow :time :server :flows-sys :client :solver :signal-history :data :repl-ns :solver-status :solver-meta :repl-ns nil]))]
                       (hash pp-without-fs)))) ;; was :param
 
 (re-frame/reg-sub ::user-params-hash (fn [db] (get db :user-params-hash)))

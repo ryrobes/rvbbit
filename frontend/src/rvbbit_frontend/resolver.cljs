@@ -108,7 +108,7 @@
                    :<<     (fn [[x y]] (true? (< x y)))
                    :str    (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))
                    :string (fn [args] (if (vector? args) (cstr/join "" (apply str args)) (str args)))}
-          obody-key-set (ut/body-set block-map)
+          obody-key-set (ut/deep-flatten block-map)
           client-name @(ut/tracked-sub ::client-name {})
           solver-clover-walk
           (fn [obody]

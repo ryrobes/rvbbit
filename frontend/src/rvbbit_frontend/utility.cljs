@@ -467,10 +467,14 @@
 
 (defn tracked-sub
   [sub-key sub-map] ;;; lmao - hack to track subscriptions for debugging
+  ;(swap! simple-subscription-counts conj (first query))
+  (swap! subscription-counts-alpha update sub-key (fnil inc 0))
   (rfa/sub sub-key sub-map))
 
 (defn tracked-subscribe
   [query] ;;; lmao - hack to track subscriptions for debugging
+  ;(swap! simple-subscription-counts conj (first query))
+  (swap! subscription-counts update (first query) (fnil inc 0))
   (cond (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query)
           (do ;(tapp>> [:cpk! (last query)])
             (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))
@@ -1231,7 +1235,7 @@
                        :else                                          :justified)
             o    (zp/zprint-str s
                                 (js/Math.floor (/ w 9))
-                                {:parse-string? true ;; was :parse-string-all?
+                                {:parse-string-all? true ;; was :parse-string-all?
                                  :style         type ;:community ;[:binding-nl :extend-nl]
                                  :pair          {:force-nl? true}
                                  :pair-fn       {:hang? true}

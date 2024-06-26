@@ -450,25 +450,35 @@
                (ut/pp [:solvers-defs-changed :reloading....])
                (wss/reload-solver-subs)))
 
-  (defonce father-time (atom {})) ;; a hedge; since thread starvation has as times been an issue, cascading into the scheduler itself.
-
-  (add-watch father-time
-             :fake-time-pusher
+  ;; (add-watch wss/father-time
+  ;;            :fake-time-pusher
+  ;;            (fn [_ _ old-state new-state]
+  ;;              (try
+  ;;                (let [ttt (ut/current-datetime-parts)]
+  ;;                  (reset! wss/time-atom ttt)  ;; the OG
+  ;;                  (reset! wss/time-atom-1 ttt)
+  ;;                  (reset! wss/time-atom-2 ttt)
+  ;;                  (reset! wss/time-atom-3 ttt)
+  ;;                  (reset! wss/time-atom-4 ttt)
+  ;;                  (reset! wss/time-atom-5 ttt)
+  ;;                  (reset! wss/time-atom-6 ttt)
+  ;;                  (reset! wss/time-atom-7 ttt)
+  ;;                  (reset! wss/time-atom-8 ttt)
+  ;;                  (reset! wss/time-atom-9 ttt)
+  ;;                  (reset! wss/time-atom-10 ttt)) 
+  ;;                (catch Throwable e (ut/pp [:father-time-error e])))))
+  
+    (add-watch wss/father-time
+             :time-marches-on-or-does-it? ;; having issues with a single atom...
              (fn [_ _ old-state new-state]
-               (try
-                 (let [ttt (ut/current-datetime-parts)]
-                   (reset! wss/time-atom ttt)  ;; the OG
-                   (reset! wss/time-atom-1 ttt)
-                   (reset! wss/time-atom-2 ttt)
-                   (reset! wss/time-atom-3 ttt)
-                   (reset! wss/time-atom-4 ttt)
-                   (reset! wss/time-atom-5 ttt)
-                   (reset! wss/time-atom-6 ttt)
-                   (reset! wss/time-atom-7 ttt)
-                   (reset! wss/time-atom-8 ttt)
-                   (reset! wss/time-atom-9 ttt)
-                   (reset! wss/time-atom-10 ttt)) 
-                 (catch Throwable e (ut/pp [:father-time-error e])))))
+               ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
+               (doseq [key (keys new-state)]
+                 (let [group (ut/hash-group key wss/num-groups)]
+                   (if-let [child-atom (get @wss/time-child-atoms group)]
+                     (swap! child-atom assoc key (get new-state key))
+                     (let [new-child-atom (atom {})]
+                       (swap! wss/time-child-atoms assoc group new-child-atom)
+                       (swap! new-child-atom assoc key (get new-state key))))))));)
 
 ;; (defn update-time-atom [atom new-time]
 ;;   (reset! atom new-time))
@@ -645,10 +655,11 @@
 
   (def timekeeper
     (start-scheduler 1000
-                     #(let [ddate (ut/current-datetime-parts)]
-                        (logger "timekeeper" {:new ddate :old @wss/time-atom})
-                        ;(reset! wss/time-atom ddate)
-                        (reset! father-time ddate))
+                     #(try 
+                        (let [ddate (ut/current-datetime-parts)]
+                        ;(logger "timekeeper" {:new ddate :old @wss/time-atom})
+                        (reset! wss/father-time ddate))
+                        (catch Exception e (ut/pp [:time-has-thrown-an-error!! :EGADS! e])))
                      "Timekeeper")) ;; 5:35:00 am stops? - 9:45:00 pm stopped also
 
   (def cpukeeper
@@ -807,7 +818,7 @@
                       overrides       (get-in @flow-db/subflow-overrides [k run-id])
                       cname           (get-in @flow-db/results-atom
                                               [k :opts-map :client-name]
-                                              (get @wss/orig-caller k :rvbbit-scheduler))
+                                              (get @wss/orig-caller k :rvbbit))
                       client-name     (str cname)
                       run-sql?        (and done? (not (some #(= % run-id) @saved-uids)))
                       _ (when (and done? (not error?))

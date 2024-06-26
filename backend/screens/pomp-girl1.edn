@@ -1,32 +1,5 @@
 {:orders
- {:recos-sys
-  [:context_hash
-   :combo_hash
-   :connection_id
-   :shape_name
-   :query_map
-   :query_map_str
-   :viz_map
-   :combo_edn
-   :selected_view
-   :table_name
-   :condis
-   :h
-   :w
-   :score],
-  :fields-sys [:field_name :field_type :data_type],
-  :kke192 (:query_error),
-  :viz-shapes-sys [:combo_edn :recos],
-  :offenses-drag-DISTRICT-23 [:DISTRICT :rowcnt],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb),
-  :gen-viz-797 [:rows :date_posted],
-  :query-preview-821060284 [:rowcnt :DISTRICT],
-  :query-preview-329680758 [:rows :DISTRICT],
-  :gen-viz-94 [:diff],
-  :query-preview-2134749148 [:rows :rowcnt],
-  :jvm_stats
+ {:jvm_stats
   [:used_memory_mb
    :thread_count
    :messages
@@ -52,59 +25,20 @@
    :sniffs_run
    :sys_load
    :ts],
-  :query-preview-1245441669 [:value :id],
-  :query-preview-2117100418 [:rows :DISTRICT],
-  :viz-tables-sys [:table_name :recos],
-  :query-preview-1218651980 [:rows :DISTRICT],
-  :query-preview-118115176 [:rows :rowcnt],
-  :query-preview-799616270 [:rows :DISTRICT],
-  :query-preview-1186830505 [:rows :rowcnt],
-  :query-preview-1644793450 [:rows :rowcnt],
-  :viz-shapes0-sys [:shape :recos],
-  :query-preview-774076580 [:rows :DISTRICT],
-  :gen-viz-345 [:rowcnt :DISTRICT],
-  :rowcnt-drag-2 [:rowcnt_sum],
-  :query-preview1246412148 [:rowcnt :DISTRICT],
-  :gen-viz-828 [:agg :date_posted],
-  :ufo_sightings (:query_error),
-  :offenses (:query_error),
-  :query-preview60943014 [:value :id],
-  :gen-viz-84 [:rows :country],
+  :kke192 (:query_error),
+  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb),
   :connections-sys [:database_name :connection_id],
-  :ufo-sightings-drag-9
-  [:city
-   :country
-   :date_posted
-   :datetime
-   :duration_hours
-   :duration_seconds
-   :duration_seconds_int
-   :latitude
-   :longitude
-   :shape
-   :state],
-  :query-preview-1898346886 [:rows :DISTRICT],
-  :duration-hours-drag-43 [:duration_hours :rowcnt],
-  :city-drag-26 [:city :rowcnt],
-  :rowcnt-drag-35 [:rowcnt_sum],
-  :query-preview-340718103 [:rowcnt :DISTRICT],
-  :query-preview1591343325 [:value :id],
-  :query-preview-1077517692 [:rowcnt :DISTRICT],
-  :state-drag-3 [:state :rowcnt],
-  :shape-drag-7 [:shape :rowcnt],
-  :query-preview-533264495 [:rows :rowcnt]},
+  :fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
  :reco-preview nil,
  :sql-source
- {:kke192 {:select [:*], :connection-id "system-db", :from [:kke192], :limit 111},
-  :offenses-drag-DISTRICT-23
-  {:select [:DISTRICT [[:count 1] :rowcnt]],
-   :from [[:offenses :hh901]],
-   :group-by [:DISTRICT],
-   :order-by [[:rowcnt :desc]],
-   :_last-run "13:52:58"},
+ {:jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
+  :kke192 {:select [:*], :connection-id "system-db", :from [:kke192], :limit 111},
   :new-query
   {:cache? false,
-   :limit 100,
+   :limit 60,
    :_last-run "22:23:22",
    :refresh-every 10,
    :from [[:jvm_stats :kke192]],
@@ -112,473 +46,9 @@
    :connection-id "system-db",
    :select
    [:thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :sys_load :used_memory_mb],
-   :post-process-fn reverse},
-  :gen-viz-797
-  {:select [[[:count 1] :rows] :date_posted],
-   :from
-   [{:select
-     [:city
-      :country
-      :date_posted
-      :datetime
-      :duration_hours
-      :duration_seconds
-      :duration_seconds_int
-      :latitude
-      :longitude
-      :shape
-      :state],
-     :from [[:ufo_sightings :jj584]],
-     :order-by [[:city :asc]]}],
-   :group-by [:date_posted]},
-  :query-preview-821060284
-  {:select [[[[:avg :rowcnt]] :rowcnt] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :query-preview-329680758
-  {:select [[[[:count 1]] :rows] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :gen-viz-94
-  {:select
-   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
-     :diff]],
-   :from
-   [{:select
-     [:city
-      :country
-      :date_posted
-      :datetime
-      :duration_hours
-      :duration_seconds
-      :duration_seconds_int
-      :latitude
-      :longitude
-      :shape
-      :state],
-     :from [[:ufo_sightings :jj584]],
-     :order-by [[:city :asc]]}]},
-  :query-preview-2134749148
-  {:select [[[[:count 1]] :rows] :rowcnt],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:rowcnt]},
-  :jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
-  :query-preview-1245441669
-  {:select [[[:count 1] :value] [:rowcnt :id]],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:rowcnt]},
-  :query-preview-2117100418
-  {:select [[[[:count 1]] :rows] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :query-preview-1218651980
-  {:select [[[:count 1] :rows] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :query-preview-118115176
-  {:select [[[:count 1] :rows] :rowcnt],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:rowcnt]},
-  :query-preview-799616270
-  {:select [[[:count 1] :rows] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :query-preview-1186830505
-  {:select [[[[:count 1]] :rows] :rowcnt],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:rowcnt]},
-  :query-preview-1644793450
-  {:select [[[[:count 1]] :rows] :rowcnt],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:rowcnt]},
-  :query-preview-774076580
-  {:select [[[[:count 1]] :rows] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :gen-viz-345
-  {:select [[[[:avg :rowcnt]] :rowcnt] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :rowcnt-drag-2
-  {:select [[[:sum :rowcnt] :rowcnt_sum]],
-   :from
-   [[{:select [:city [[:count 1] :rowcnt]],
-      :from
-      [[{:select
-         [:city
-          :country
-          :date_posted
-          :datetime
-          :duration_hours
-          :duration_seconds
-          :duration_seconds_int
-          :latitude
-          :longitude
-          :shape
-          :state],
-         :from [[:ufo_sightings :jj584]],
-         :order-by [[:city :asc]]}
-        :ff571]],
-      :group-by [:city],
-      :order-by [[:rowcnt :desc]]}
-     :yy403]]},
-  :query-preview1246412148
-  {:select [[[[:sum :rowcnt]] :rowcnt] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :gen-viz-828
-  {:select [[[[:count 1]] :agg] :date_posted],
-   :from
-   [{:select
-     [:city
-      :country
-      :date_posted
-      :datetime
-      :duration_hours
-      :duration_seconds
-      :duration_seconds_int
-      :latitude
-      :longitude
-      :shape
-      :state],
-     :from [[:ufo_sightings :jj584]],
-     :order-by [[:city :asc]]}],
-   :order-by [[:date_posted :desc]],
-   :group-by [:date_posted]},
-  :ufo_sightings
-  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
-  :offenses
-  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111},
-  :query-preview60943014
-  {:select [[[:count 1] :value] [:DISTRICT :id]],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :gen-viz-84
-  {:select [[[:count 1] :rows] :country],
-   :from
-   [{:select
-     [:city
-      :country
-      :date_posted
-      :datetime
-      :duration_hours
-      :duration_seconds
-      :duration_seconds_int
-      :latitude
-      :longitude
-      :shape
-      :state],
-     :from [[:ufo_sightings :jj584]],
-     :order-by [[:city :asc]]}],
-   :group-by [:country]},
-  :ufo-sightings-drag-9
-  {:select
-   [:city
-    :country
-    :date_posted
-    :datetime
-    :duration_hours
-    :duration_seconds
-    :duration_seconds_int
-    :latitude
-    :longitude
-    :shape
-    :state],
-   :from [[:ufo_sightings :jj584]],
-   :order-by [[:city :asc]]},
-  :query-preview-1898346886
-  {:select [[[[:count 1]] :rows] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :duration-hours-drag-43
-  {:select [:duration_hours [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:city
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :jj584]],
-      :order-by [[:city :asc]]}
-     :cc350]],
-   :group-by [:duration_hours],
-   :order-by [[:rowcnt :desc]]},
-  :city-drag-26
-  {:select [:city [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:city
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :jj584]],
-      :order-by [[:city :asc]]}
-     :ff571]],
-   :group-by [:city],
-   :order-by [[:rowcnt :desc]]},
-  :rowcnt-drag-35
-  {:select [[[:sum :rowcnt] :rowcnt_sum]],
-   :from
-   [[{:select [:DISTRICT [[:count 1] :rowcnt]],
-      :from [[:offenses :hh901]],
-      :group-by [:DISTRICT],
-      :order-by [[:rowcnt :desc]]}
-     :ww876]]},
-  :query-preview-340718103
-  {:select [[[[:avg :rowcnt]] :rowcnt] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :query-preview1591343325
-  {:select [[[:sum :rowcnt] :value] [:DISTRICT :id]],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :query-preview-1077517692
-  {:select [[[[:sum :rowcnt]] :rowcnt] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :state-drag-3
-  {:select [:state [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:city
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :jj584]],
-      :order-by [[:city :asc]]}
-     :uu58]],
-   :group-by [:state],
-   :order-by [[:rowcnt :desc]]},
-  :shape-drag-7
-  {:select [:shape [[:count 1] :rowcnt]],
-   :from
-   [[{:select
-      [:city
-       :country
-       :date_posted
-       :datetime
-       :duration_hours
-       :duration_seconds
-       :duration_seconds_int
-       :latitude
-       :longitude
-       :shape
-       :state],
-      :from [[:ufo_sightings :jj584]],
-      :order-by [[:city :asc]]}
-     :hh354]],
-   :group-by [:shape],
-   :order-by [[:rowcnt :desc]]},
-  :query-preview-533264495
-  {:select [[[[:count 1]] :rows] :rowcnt],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:rowcnt]}},
+   :post-process-fn reverse}},
  :meta
- {:recos-sys
-  {:fields
-   {:query_map
-    {:data-type "string",
-     :distinct 11,
-     :group-by? true,
-     :commons
-     {"[{:select [[[[:sum :rows]] :rows] :DISTRICT], :from [\"query/offenses_drag_DISTRICT_23\"], :group-by [:DISTRICT]}]"
-      6,
-      "[{:select [[[[:sum :rowcnt]] :rowcnt] :DISTRICT], :from [\"query/offenses_drag_DISTRICT_23\"], :group-by [:DISTRICT]}]"
-      6,
-      "[{:select [[[[:sum :rows]] :rows] :rowcnt], :from [\"query/offenses_drag_DISTRICT_23\"], :group-by [:rowcnt]}]"
-      5},
-     :cardinality 42},
-    :shape_name
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"basic_h_bar_nivo" 3, "recharts_line" 3, "recharts_area" 3},
-     :cardinality 50},
-    :w
-    {:data-type "unknown",
-     :distinct 3,
-     :group-by? true,
-     :commons {nil 19, 9 6, 6 1},
-     :cardinality 11},
-    :combo_edn
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons
-     {"\"DISTRICT, rowcnt\"" 9, "\"DISTRICT, rows\"" 7, "\"rowcnt, rows\"" 6},
-     :cardinality 19},
-    :query_map_str
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons
-     {"\nSELECT (SUM(rows)) AS rows, DISTRICT\nFROM 'query/offenses_drag_DISTRICT_23'\nGROUP BY DISTRICT\n"
-      6,
-      "\nSELECT (SUM(rowcnt)) AS rowcnt, DISTRICT\nFROM 'query/offenses_drag_DISTRICT_23'\nGROUP BY DISTRICT\n"
-      6,
-      "\nSELECT (SUM(rows)) AS rows, rowcnt\nFROM 'query/offenses_drag_DISTRICT_23'\nGROUP BY rowcnt\n"
-      5},
-     :cardinality 38},
-    :selected_view
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"" 17, ":reech" 9},
-     :cardinality 7},
-    :combo_hash
-    {:data-type "string",
-     :distinct 26,
-     :group-by? true,
-     :commons {"-1218651980" 1, "-2134749148" 1, "-150945890" 1},
-     :cardinality 100},
-    :h
-    {:data-type "unknown",
-     :distinct 4,
-     :group-by? true,
-     :commons {nil 19, 9 3, 5 3},
-     :cardinality 15},
-    :condis
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"" 24, "{:true? [:= 1 1]}" 1, "{:testcc [:= 1 1]}" 1},
-     :cardinality 11},
-    :score
-    {:data-type "float",
-     :distinct 5,
-     :group-by? true,
-     :commons {2.1 9, 49.29999999999998 7, 48.84999999999999 6},
-     :cardinality 19},
-    :table_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"offenses_drag_DISTRICT_23" 26},
-     :cardinality 3},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"cache.db" 26},
-     :cardinality 3},
-    :context_hash
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"2104101274" 26},
-     :cardinality 3},
-    :viz_map
-    {:data-type "string",
-     :distinct 26,
-     :group-by? true,
-     :commons
-     {"[:h-box :size \"auto\" :align :center :justify :center :width :panel-width+80-px :gap \"10px\" :children :query-preview-2]"
-      1,
-      "[:nivo-pie-chart {:padAngle 0.7, :innerRadius 0.5, :width :panel-width+70, :arcLinkLabelsThickness 4, :borderWidth 2, :cornerRadius 3, :activeOuterRadiusOffset 8, :theme :theme/nivo-defaults, :arcLinkLabelsSkipAngle 10, :click {:c :rowcnt, :y :rows}, :arcLabelsSkipAngle 10, :height :panel-height+50, :margin {:top 50, :right 50, :bottom 50, :left 45}, :data :query-preview, :arcLinkLabelsTextColor \"#ffffff\"}]"
-      1,
-      "[:vega-lite {:layer [{:encoding {:y {:field :DISTRICT, :type \"ordinal\"}, :x {:aggregate \"avg\", :field :rowcnt, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values \"query/offenses_drag_DISTRICT_23\"}} {:actions false}]"
-      1},
-     :cardinality 100}},
-   :rowcount 26},
-  :fields-sys
+ {:fields-sys
   {:fields
    {:field_name
     {:data-type "string",
@@ -610,21 +80,6 @@
       "[SQLITE_ERROR] SQL error or missing database (no such table: kke192)" 1},
      :cardinality 100}},
    :rowcount 2},
-  :viz-shapes-sys
-  {:fields
-   {:combo_edn
-    {:data-type "string",
-     :distinct 5,
-     :group-by? true,
-     :commons {"\"rowcnt, rows\"" 1, "\"rowcnt\"" 1, "\"DISTRICT, rows\"" 1},
-     :cardinality 100},
-    :recos
-    {:data-type "integer",
-     :distinct 5,
-     :group-by? false,
-     :commons {6 1, 1 1, 7 1},
-     :cardinality 100}},
-   :rowcount 5},
   :offenses-drag-DISTRICT-23
   {:fields
    {:DISTRICT
@@ -683,36 +138,36 @@
   {:fields
    {:thread_count
     {:data-type "integer",
-     :distinct 24,
+     :distinct 13,
      :group-by? true,
-     :commons {190 10, 187 9, 192 9},
-     :cardinality 23},
+     :commons {480 19, 479 11, 478 7},
+     :cardinality 21},
     :ts1
     {:data-type "string",
-     :distinct 100,
+     :distinct 60,
      :group-by? true,
      :commons
-     {"2024-06-24 13:48:13" 1, "2024-06-24 13:29:47" 1, "2024-06-24 13:29:01" 1},
+     {"2024-06-25 20:21:33" 1, "2024-06-25 20:28:22" 1, "2024-06-25 20:28:52" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
-     :distinct 4,
+     :distinct 2,
      :group-by? true,
-     :commons {"2024-06-24 13:4" 40, "2024-06-24 13:3" 40, "2024-06-24 13:2" 17},
+     :commons {"2024-06-25 20:2" 40, "2024-06-25 20:3" 20},
      :cardinality 3},
     :sys_load
     {:data-type "float",
-     :distinct 90,
+     :distinct 55,
      :group-by? true,
-     :commons {4.25 3, 5.12 2, 4.17 2},
-     :cardinality 89},
+     :commons {7.08 2, 5.84 2, 5.41 2},
+     :cardinality 91},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 99,
+     :distinct 60,
      :group-by? true,
-     :commons {5212 2, 10314 1, 10550 1},
-     :cardinality 99}},
-   :rowcount 100},
+     :commons {6726 1, 8909 1, 10329 1},
+     :cardinality 100}},
+   :rowcount 60},
   :gen-viz-797
   {:fields
    {:rows
@@ -728,36 +183,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :query-preview-821060284
-  {:fields
-   {:rowcnt
-    {:data-type "float",
-     :distinct 13,
-     :group-by? false,
-     :commons {20127 1, 13239 1, 41915 1},
-     :cardinality 100},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :query-preview-329680758
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
   :gen-viz-94
   {:fields
    {:diff
@@ -767,40 +192,25 @@
      :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
-  :query-preview-2134749148
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :rowcnt
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? true,
-     :commons {35717 1, 1765 1, 23460 1},
-     :cardinality 100}},
-   :rowcount 13},
   :jvm_stats
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 111,
+     :distinct 81,
      :group-by? true,
-     :commons {246 1, 8 1, 94 1},
-     :cardinality 100},
+     :commons {84 2, 10 2, 87 2},
+     :cardinality 72},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 108,
+     :distinct 106,
      :group-by? true,
-     :commons {112.81 2, 110.48 2, 104.7 2},
-     :cardinality 97},
+     :commons {61.78 3, 60.32 2, 60.17 2},
+     :cardinality 95},
     :uptime_seconds
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {1288 1, 939 1, 1015 1},
+     :commons {764 1, 885 1, 1022 1},
      :cardinality 100},
     :queries_per_second
     {:data-type "float",
@@ -812,7 +222,7 @@
     {:data-type "integer",
      :distinct 110,
      :group-by? true,
-     :commons {0 2, 84 1, 11930 1},
+     :commons {0 2, 2291 1, 6847 1},
      :cardinality 99},
     :sql_cache_size
     {:data-type "integer",
@@ -825,74 +235,74 @@
      :distinct 111,
      :group-by? true,
      :commons
-     {"2024-06-24 13:29:47" 1, "2024-06-24 13:15:55" 1, "2024-06-24 13:16:25" 1},
+     {"2024-06-25 20:00:03" 1, "2024-06-25 19:53:00" 1, "2024-06-25 20:02:20" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
      :distinct 5,
      :group-by? true,
-     :commons {211 104, 176 4, 193 1},
+     :commons {134 97, 138 9, 132 3},
      :cardinality 4},
     :messages_per_second
     {:data-type "float",
-     :distinct 86,
+     :distinct 78,
      :group-by? true,
-     :commons {106.92 3, 107.16 3, 107.25 3},
-     :cardinality 77},
+     :commons {59.01 6, 59.07 5, 59.05 4},
+     :cardinality 70},
     :messages
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {92067 1, 140061 1, 66857 1},
+     :commons {90345 1, 25030 1, 82860 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 22,
+     :distinct 10,
      :group-by? true,
-     :commons {20 14, 23 11, 28 11},
-     :cardinality 19},
+     :commons {14 20, 11 20, 13 20},
+     :cardinality 9},
     :sys_load
     {:data-type "float",
-     :distinct 94,
+     :distinct 98,
      :group-by? true,
-     :commons {4.38 3, 2.83 3, 4.4 3},
-     :cardinality 84},
+     :commons {6.54 3, 4.17 3, 4.59 3},
+     :cardinality 88},
     :recent_batches_per_second
     {:data-type "float",
-     :distinct 78,
+     :distinct 86,
      :group-by? true,
-     :commons {10.51 4, 10.49 4, 11.09 3},
-     :cardinality 70},
+     :commons {6.71 3, 7.29 3, 7.16 3},
+     :cardinality 77},
     :batches
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {84 1, 11930 1, 16384 1},
+     :commons {2291 1, 6847 1, 9115 1},
      :cardinality 100},
     :unix_ms
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {1719249566440 1, 1719249294816 1, 1719248808255 1},
+     :commons {1719359580049 1, 1719360049349 1, 1719359487114 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 111,
+     :distinct 110,
      :group-by? true,
-     :commons {8960 1, 10597 1, 2187 1},
-     :cardinality 100},
+     :commons {5803 2, 2199 1, 8613 1},
+     :cardinality 99},
     :recent_queries_run
     {:data-type "integer",
-     :distinct 7,
+     :distinct 5,
      :group-by? true,
-     :commons {2 43, 3 38, 1 17},
-     :cardinality 6},
+     :commons {1 70, 0 31, 2 5},
+     :cardinality 4},
     :thread_count
     {:data-type "integer",
-     :distinct 33,
+     :distinct 19,
      :group-by? true,
-     :commons {190 9, 185 9, 187 9},
-     :cardinality 29},
+     :commons {481 16, 479 15, 480 12},
+     :cardinality 17},
     :internal_queries_run
     {:data-type "integer",
      :distinct 1,
@@ -901,34 +311,34 @@
      :cardinality 0},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 5,
+     :distinct 3,
      :group-by? true,
-     :commons {11 77, 0 25, 104 6},
-     :cardinality 4},
+     :commons {11 84, 0 26, 46 1},
+     :cardinality 2},
     :ws_peers
     {:data-type "integer",
      :distinct 2,
      :group-by? true,
-     :commons {9 110, 6 1},
+     :commons {6 110, 3 1},
      :cardinality 1},
     :recent_messages
     {:data-type "integer",
      :distinct 111,
      :group-by? true,
-     :commons {74613 1, 66857 1, 138395 1},
+     :commons {90345 1, 25030 1, 82860 1},
      :cardinality 100},
     :recent_queries_per_second
     {:data-type "float",
      :distinct 8,
      :group-by? true,
-     :commons {0.13 43, 0.2 38, 0.07 17},
+     :commons {0.07 60, 0 31, 0.06 10},
      :cardinality 7},
     :batches_per_second
     {:data-type "float",
-     :distinct 56,
+     :distinct 50,
      :group-by? true,
-     :commons {10.71 14, 10.7 10, 10.49 5},
-     :cardinality 50},
+     :commons {6.99 8, 7.24 6, 7.23 6},
+     :cardinality 45},
     :seconds_since_last_update
     {:data-type "integer",
      :distinct 2,
@@ -936,156 +346,6 @@
      :commons {15 110, -1 1},
      :cardinality 1}},
    :rowcount 111},
-  :query-preview-1245441669
-  {:fields
-   {:value
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :id
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? false,
-     :commons {35717 1, 1765 1, 23460 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :query-preview-2117100418
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :viz-tables-sys
-  {:fields
-   {:table_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"offenses_drag_DISTRICT_23" 1},
-     :cardinality 100},
-    :recos
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {26 1},
-     :cardinality 100}},
-   :rowcount 1},
-  :query-preview-1218651980
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :query-preview-118115176
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :rowcnt
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? true,
-     :commons {35717 1, 1765 1, 23460 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :query-preview-799616270
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :query-preview-1186830505
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :rowcnt
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? true,
-     :commons {35717 1, 1765 1, 23460 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :query-preview-1644793450
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :rowcnt
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? true,
-     :commons {35717 1, 1765 1, 23460 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :viz-shapes0-sys
-  {:fields
-   {:shape
-    {:data-type "string",
-     :distinct 13,
-     :group-by? false,
-     :commons {"basic_h_bar_nivo" 1, "recharts_line" 1, "recharts_area" 1},
-     :cardinality 100},
-    :recos
-    {:data-type "integer",
-     :distinct 3,
-     :group-by? false,
-     :commons {3 6, 1 6, 2 1},
-     :cardinality 23}},
-   :rowcount 13},
-  :query-preview-774076580
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
   :gen-viz-345
   {:fields
    {:rowcnt
@@ -1110,21 +370,6 @@
      :commons {80332 1},
      :cardinality 100}},
    :rowcount 1},
-  :query-preview1246412148
-  {:fields
-   {:rowcnt
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? false,
-     :commons {35717 1, 1765 1, 23460 1},
-     :cardinality 100},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
   :gen-viz-828
   {:fields
    {:agg
@@ -1140,44 +385,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :ufo_sightings
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings)"
-      1},
-     :cardinality 100}},
-   :rowcount 2},
-  :offenses
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: offenses)" 1},
-     :cardinality 100}},
-   :rowcount 2},
-  :query-preview60943014
-  {:fields
-   {:value
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :id
-    {:data-type "string",
-     :distinct 13,
-     :group-by? false,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
   :gen-viz-84
   {:fields
    {:rows
@@ -1280,21 +487,6 @@
      :commons {"us" 288, nil 113, "au" 37},
      :cardinality 1}},
    :rowcount 500},
-  :query-preview-1898346886
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
   :duration-hours-drag-43
   {:fields
    {:duration_hours
@@ -1335,51 +527,6 @@
      :commons {319073 1},
      :cardinality 100}},
    :rowcount 1},
-  :query-preview-340718103
-  {:fields
-   {:rowcnt
-    {:data-type "float",
-     :distinct 13,
-     :group-by? false,
-     :commons {20127 1, 13239 1, 41915 1},
-     :cardinality 100},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :query-preview1591343325
-  {:fields
-   {:value
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? false,
-     :commons {35717 1, 1765 1, 23460 1},
-     :cardinality 100},
-    :id
-    {:data-type "string",
-     :distinct 13,
-     :group-by? false,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
-  :query-preview-1077517692
-  {:fields
-   {:rowcnt
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? false,
-     :commons {35717 1, 1765 1, 23460 1},
-     :cardinality 100},
-    :DISTRICT
-    {:data-type "string",
-     :distinct 13,
-     :group-by? true,
-     :commons {"E5" 1, "B2" 1, "C6" 1},
-     :cardinality 100}},
-   :rowcount 13},
   :state-drag-3
   {:fields
    {:state
@@ -1409,42 +556,19 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30},
-  :query-preview-533264495
-  {:fields
-   {:rows
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {1 13},
-     :cardinality 7},
-    :rowcnt
-    {:data-type "integer",
-     :distinct 13,
-     :group-by? true,
-     :commons {35717 1, 1765 1, 23460 1},
-     :cardinality 100}},
-   :rowcount 13}},
+   :rowcount 30}},
  :default-col-widths
- {:viz-shapes0-list* {:viz-shapes0-sys 155},
-  :block-11609 {:city-drag-26 180},
-  :block-7416 {:rowcnt-drag-2 161},
-  :block-8805 {:duration-hours-drag-43 180},
-  :block-8137 {:offenses-drag-DISTRICT-23 105},
-  :system-connections-list* {:connections-sys 111},
-  :system-fields-list* {:fields-sys 170},
-  :block-7319 {:shape-drag-7 180},
-  :block-3777 {:state-drag-3 180},
-  :block-10895 {:rowcnt-drag-35 161},
-  :block-1449 {:ufo-sightings-drag-9 141},
-  :system-tables-list* {:tables-sys 137}},
+ {:system-connections-list* {:connections-sys 111},
+  :system-tables-list* {:tables-sys 137},
+  :system-fields-list* {:fields-sys 170}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
   "fat zebra"
   "star-shaped wallaby"
-  "essential snake"],
+  "essential snake"
+  "slate-gray pig"],
  :selected-cols nil,
  :server
  {:settings
@@ -1674,77 +798,85 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [324195937 274507853 4294705152],
- :preview-keys
- ["-1644793450" "1591343325" "1246412148" "-340718103" "-821060284" "-1077517692"],
- :sched {:new-query 10},
+ :memory [363774614 293987974 4294705152],
+ :sched {:new-query 13},
  :flow-subs
  [:time/now-seconds
-  :solver/raw-custom-override48304193
-  :solver-status/*client-name*>raw-custom-override698326850>running?
-  :flow/flow-forever>*running?
-  :solver-status/*client-name*>get-my-colors427814933>running?
-  :solver/get-my-colors-1210110133
-  :solver/raw-custom-override698326850
-  :solver-status/*client-name*>raw-custom-override48304193>running?
-  :solver/raw-custom-override-594565741
-  :flow/live-scratch-flow>*running?
-  :solver/raw-custom-override67394260
+  :solver/raw-custom-override-754422235
   :client/*client-name*>stats>memory
-  :solver-status/*client-name*>raw-custom-override67394260>running?
+  :solver/raw-custom-override1690693749
+  :flow/flow-forever>*running?
+  :solver-meta/raw-custom-override1333558267>output>evald-result
   :solver-status/*client-name*
+  :solver/raw-custom-override-601425185
+  :solver-status/*client-name*>get-my-colors1873060527>running?
+  :solver-meta/raw-custom-override-603185828
+  :solver-status/*client-name*>raw-custom-override-1572537168>running?
+  :time/minute
+  :solver-meta/raw-custom-override-754422235
+  :solver-status/*client-name*>raw-custom-override-601425185>running?
+  :solver-status/*client-name*>raw-custom-override-603185828
+  :solver-status/*client-name*>raw-custom-override-754422235>running?
+  :solver-status/*client-name*>raw-custom-override-754422235
+  :solver/raw-custom-override-1615694209
+  :solver-status/*client-name*>raw-custom-override-603185828>running?
+  :repl-ns/rvbbit-board>tester1
+  :flow/live-scratch-flow>*running?
+  :solver/raw-custom-override-1572537168
+  :solver/raw-custom-override-603185828
+  :solver-status/*client-name*>raw-custom-override1690693749>running?
   :flow/flow-forever>:final-math
-  :solver/get-my-colors427814933
-  :solver-status/*client-name*>get-my-colors-1210110133>running?
-  :solver-status/*client-name*>raw-custom-override-594565741>running?
+  :solver-meta/raw-custom-override1333558267
+  :solver-status/*client-name*>get-my-colors-498985028>running?
+  :solver/get-my-colors-498985028
+  :solver-status/*client-name*>raw-custom-override-1615694209>running?
+  :solver/get-my-colors1873060527
   :solver/colors-of-the-moment>darkest],
- :client-name :fit-ruby-parrot-29,
+ :client-name :knowledgeable-pyramidal-dolphin-22,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2123, :h 1498},
- :post-meta
- {:kke192 {},
-  :offenses-drag-DISTRICT-23 {:* {:rowcount 13}},
-  :query-preview-2134749148 {:* {:rowcount 13}},
-  :query-preview-2117100418 {:* {:rowcount 13}},
-  :query-preview-774076580 {:* {:rowcount 13}},
-  :gen-viz-345 {:* {:rowcount 13}},
-  :query-preview1246412148 {:* {:rowcount 13}},
-  :gen-viz-828 {:* {:rowcount 317}},
-  :offenses {},
-  :ufo-sightings-drag-9 {:* {:rowcount 80332}},
-  :rowcnt-drag-35 {:* {:rowcount 1}},
-  :query-preview1591343325 {:* {:rowcount 13}},
-  :shape-drag-7 {:* {:rowcount 30}},
-  :query-preview-533264495 {:* {:rowcount 13}}},
+ :window {:w 2642, :h 1632},
+ :post-meta {:jvm_stats {:* {:rowcount 111}}, :kke192 {}},
  :status
  {:heartbeat
   {:kick
    [:time/now-seconds
-    :solver/raw-custom-override48304193
-    :solver-status/*client-name*>raw-custom-override698326850>running?
-    :flow/flow-forever>*running?
-    :solver-status/*client-name*>get-my-colors427814933>running?
-    :solver/get-my-colors-1210110133
-    :solver/raw-custom-override698326850
-    :solver-status/*client-name*>raw-custom-override48304193>running?
-    :solver/raw-custom-override-594565741
-    :flow/live-scratch-flow>*running?
-    :solver/raw-custom-override67394260
+    :solver/raw-custom-override-754422235
     :client/*client-name*>stats>memory
-    :solver-status/*client-name*>raw-custom-override67394260>running?
+    :solver/raw-custom-override1690693749
+    :flow/flow-forever>*running?
+    :solver-meta/raw-custom-override1333558267>output>evald-result
     :solver-status/*client-name*
+    :solver/raw-custom-override-601425185
+    :solver-status/*client-name*>get-my-colors1873060527>running?
+    :solver-meta/raw-custom-override-603185828
+    :solver-status/*client-name*>raw-custom-override-1572537168>running?
+    :time/minute
+    :solver-meta/raw-custom-override-754422235
+    :solver-status/*client-name*>raw-custom-override-601425185>running?
+    :solver-status/*client-name*>raw-custom-override-603185828
+    :solver-status/*client-name*>raw-custom-override-754422235>running?
+    :solver-status/*client-name*>raw-custom-override-754422235
+    :solver/raw-custom-override-1615694209
+    :solver-status/*client-name*>raw-custom-override-603185828>running?
+    :repl-ns/rvbbit-board>tester1
+    :flow/live-scratch-flow>*running?
+    :solver/raw-custom-override-1572537168
+    :solver/raw-custom-override-603185828
+    :solver-status/*client-name*>raw-custom-override1690693749>running?
     :flow/flow-forever>:final-math
-    :solver/get-my-colors427814933
-    :solver-status/*client-name*>get-my-colors-1210110133>running?
-    :solver-status/*client-name*>raw-custom-override-594565741>running?
+    :solver-meta/raw-custom-override1333558267
+    :solver-status/*client-name*>get-my-colors-498985028>running?
+    :solver/get-my-colors-498985028
+    :solver-status/*client-name*>raw-custom-override-1615694209>running?
+    :solver/get-my-colors1873060527
     :solver/colors-of-the-moment>darkest]},
-  :reco {:offenses-drag-DISTRICT-23 :done}},
+  :alert1 {:alerts :alert2}},
  :screen-name "pomp-girl1",
  :recos-page2 0,
- :selected-tab "fat zebra",
+ :selected-tab "star-shaped wallaby",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -1756,18 +888,15 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   218
+   13232
    -1247625457]],
- :recos-page 2,
+ :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :base-sniff-queries
- {:jvm_stats 1498154063,
-  :kke192 -995149087,
-  :ufo_sightings 484893751,
-  :offenses -505802446},
+ :base-sniff-queries {:jvm_stats 1498154063, :kke192 -995149087},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1437585849,
+ :user-params-hash 793537917,
  :grid-recos? true,
+ :session-hash -462687852,
  :resolved-queries
  {:offenses-drag-DISTRICT-23
   {:select [:DISTRICT [[:count 1] :rowcnt]],
@@ -1777,7 +906,7 @@
    :_last-run "13:52:58"},
   :new-query
   {:cache? false,
-   :limit 100,
+   :limit 60,
    :_last-run "22:23:22",
    :refresh-every 10,
    :from [[:jvm_stats :kke192]],
@@ -1804,14 +933,6 @@
      :from [[:ufo_sightings :jj584]],
      :order-by [[:city :asc]]}],
    :group-by [:date_posted]},
-  :query-preview-821060284
-  {:select [[[[:avg :rowcnt]] :rowcnt] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
   :gen-viz-94
   {:select
    [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
@@ -1831,14 +952,6 @@
       :state],
      :from [[:ufo_sightings :jj584]],
      :order-by [[:city :asc]]}]},
-  :query-preview-1644793450
-  {:select [[[[:count 1]] :rows] :rowcnt],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:rowcnt]},
   :gen-viz-345
   {:select [[[[:avg :rowcnt]] :rowcnt] :DISTRICT],
    :from
@@ -1870,14 +983,6 @@
       :group-by [:city],
       :order-by [[:rowcnt :desc]]}
      :yy403]]},
-  :query-preview1246412148
-  {:select [[[[:sum :rowcnt]] :rowcnt] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
   :gen-viz-828
   {:select [[[[:count 1]] :agg] :date_posted],
    :from
@@ -1978,30 +1083,6 @@
       :group-by [:DISTRICT],
       :order-by [[:rowcnt :desc]]}
      :ww876]]},
-  :query-preview-340718103
-  {:select [[[[:avg :rowcnt]] :rowcnt] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :query-preview1591343325
-  {:select [[[:sum :rowcnt] :value] [:DISTRICT :id]],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
-  :query-preview-1077517692
-  {:select [[[[:sum :rowcnt]] :rowcnt] :DISTRICT],
-   :from
-   [{:select [:DISTRICT [[:count 1] :rowcnt]],
-     :from [[:offenses :hh901]],
-     :group-by [:DISTRICT],
-     :order-by [[:rowcnt :desc]]}],
-   :group-by [:DISTRICT]},
   :state-drag-3
   {:select [:state [[:count 1] :rowcnt]],
    :from
@@ -2085,6 +1166,33 @@
       :padding 4,
       :background "transparent"}
      {:actions false}]}},
+  :block-8412
+  {:h 9,
+   :w 10,
+   :root [21 11],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-8412",
+   :views {:hi [:data-viewer :repl-ns/rvbbit-board>tester1]},
+   :queries {}},
+  :block-1341
+  {:h 7,
+   :w 10,
+   :tab "star-shaped wallaby",
+   :root [21 4],
+   :name "block-1341",
+   :views {:pulled-val [:data-viewer :solver-meta/raw-custom-override1333558267]},
+   :queries {}},
+  :block-10372
+  {:h 5,
+   :w 8,
+   :tab "star-shaped wallaby",
+   :root [34 3],
+   :name "block-10372",
+   :views
+   {:pulled-val
+    [:data-viewer :solver-meta/raw-custom-override1333558267>output>evald-result]},
+   :queries {}},
   :block-11251
   {:name "block-11251",
    :w 6,
@@ -2691,6 +1799,15 @@
      :child
      "🐇"]},
    :queries {}},
+  :block-2897
+  {:h 11,
+   :w 11,
+   :root [42 16],
+   :tab "star-shaped wallaby",
+   :selected-view :hi,
+   :name "block-2897",
+   :views {:hi [:data-viewer [:app-db [:panels :block-166]]]},
+   :queries {}},
   :block-7319
   {:h 5,
    :w 8,
@@ -2728,6 +1845,65 @@
       "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-166
+  {:clojure
+   {:new-clojure-1
+    (do
+      (ns rvbbit-board.tester1)
+      (def tt 45)
+      [2 3 3 4 333 555]
+      "farts!"
+      (println "hi hib hi!")
+      (def test "stringy!")
+      (defonce test45 (atom {}))
+      (reset! test45 "FUCK!")
+      (def fart [(deref test45) test])
+      [:box
+       :align
+       :center
+       :justify
+       :center
+       :child
+       (str :time/minute " " (get fart 0))
+       :style
+       {:color "cyan", :font-weight 700, :font-size "99px"}]),
+    :new-clojure-2
+    (let [clojure-version (clojure-version)
+          jvm-version (System/getProperty "java.version")]
+      (str
+        "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+        clojure-version
+        " on "
+        jvm-version
+        " JVM tech"
+        " 🥕🐇"))},
+   :name "block-166",
+   :w 11,
+   :selected-mode {:new-clojure-1 :clover, :new-clojure-2 :text},
+   :selected-view :new-clojure-1,
+   :root [33 9],
+   :h 5,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-166.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]}},
   :block-7215
   {:h 4,
    :w 9,
@@ -2761,7 +1937,6 @@
      :order-by [[:rowcnt :desc]]}},
    :root [17 8],
    :tab "sapphire ape"},
-  "none!" {:h 4},
   :block-6121
   {:h 2,
    :w 16,
@@ -2832,7 +2007,7 @@
    :queries
    {:new-query
     {:cache? false,
-     :limit 100,
+     :limit 60,
      :_last-run "22:23:22",
      :refresh-every 10,
      :from [[:jvm_stats :kke192]],
@@ -2934,7 +2109,7 @@
      [:data-viewer :param/generated-colors]]},
    :queries {},
    :minimized? true}},
- :selected-block "none!",
+ :selected-block :block-166,
  :theme-colors-hashmap
  {"float" "#f9b2c9",
   "boolean" "#d0dab4",
@@ -2966,8 +2141,13 @@
    :flow-forever>*running? false,
    :flow-forever>final-math nil,
    :openai-image-gen-ladder3>*running? false,
-   :live-scratch-flow>*running? false},
-  :time {:now-seconds "Monday, June 24th 1:54:24PM", :month 4},
+   :live-scratch-flow>*running? false,
+   :simple-python-exec>*running? false},
+  :flows-sys
+  {:flow_id "simple-python-exec",
+   :file_path "./flows/simple-python-exec.edn",
+   :last_modified "2024-06-22 20:55:46"},
+  :time {:now-seconds "Wednesday, June 26th 12:17:46AM", :month 4, :minute 17},
   :grid1-sys*
   {:flow_id "raw-custom-override-1328601774-solver-flow-",
    :run_id "6f4ef084-2c43-4da7-aa97-db9e1c36f377",
@@ -2983,8 +2163,10 @@
    :elegant-icosahedral-rhinoceros-30>stats>memory nil,
    :fit-ruby-parrot-29>stats>memory nil,
    :quiet-cubic-beaver-23>stats>memory nil,
+   :spirited-aquamarine-hippopotamus-42>stats>memory 478,
    :honest-copper-cockroach-0>stats>memory nil,
-   :*client-name*>stats>memory 221,
+   :*client-name*>stats>memory 297,
+   :knowledgeable-pyramidal-dolphin-22>stats>memory 360,
    :accepted-diamond-zebra-40>stats>memory nil,
    :brave-prismatic-camel-31>stats>memory nil,
    :distinguished-hexagonal-badger-16>stats>memory nil},
@@ -2992,8 +2174,27 @@
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data {:h 4},
-   :selected-view nil,
+   :selected-view-data
+   (do
+     (ns rvbbit-board.tester1)
+     (def tt 45)
+     [2 3 3 4 333 555]
+     "farts!"
+     (println "hi hi hi!")
+     (def test "stringy!")
+     (defonce test45 (atom {}))
+     (reset! test45 "FUCK!")
+     (def fart [(deref test45) test])
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :child
+      (str :time/minute " " (get fart 0))
+      :style
+      {:color "cyan", :font-size "45px"}]),
+   :selected-view [:clojure :new-clojure-1],
    :generated-colors
    [:run-solver
     [:get-my-colors
@@ -3001,7 +2202,7 @@
       "/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-3490-16567.png"}]],
    :miraculous-orange-hedgehog "new parameter value!",
    :rel-image-path "images/large/b64-image3-3490-16567-4k.webp",
-   :selected-block :block-7731,
+   :selected-block :block-166,
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",
@@ -3101,7 +2302,7 @@
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
   :connections-sys {:database_name "SQLite", :connection_id "boston-crime"},
-  :sys {:selected-tab "fat zebra", :selected-tab-idx 2},
+  :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3},
   :solver
   {:raw-custom-override-1061429786
    [:v-box
@@ -3130,6 +2331,44 @@
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override1563408633
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        46Gi        26Gi       652Mi        52Gi        77Gi\nSwap:             0B          0B          0B\n\n",
+   :get-my-colors-1978003777
+   {:second-darkest "#1e1f3b",
+    :highest-saturation "#f49cb4",
+    :most-contrasting "#dfd3ae",
+    :darkest "#121327",
+    :contrast-with-dominant "#dfd3ae",
+    :colors
+    ["#7ca6b7"
+     "#7854ba"
+     "#121327"
+     "#dfd3ae"
+     "#f49cb4"
+     "#e663cd"
+     "#3b3f78"
+     "#4c546c"
+     "#8c6474"
+     "#4c2c3c"
+     "#1e1f3b"],
+    :most-frequent "#121327",
+    :data-colors
+    {"float" "#f9b2c9",
+     "boolean" "#d0dab4",
+     "map" "#dfb5ae",
+     "list" "#6e44a3",
+     "string" "#ffffff",
+     "any" "#765e90",
+     "vector" "#86d8c3",
+     "keyword" "#ffffff",
+     "rabbit-code" "#af88a0",
+     "datetime" "#663544",
+     "integer" "#9ef49c",
+     "unknown" "#502325",
+     "date" "#1a3514"},
+    :dominant "#1e1f3b",
+    :most-contrasting-dark "#7854ba",
+    :second-brightest "#f49cb4",
+    :brightest "#dfd3ae",
+    :most-contrasting-light "#dfd3ae"},
    :get-my-colors-1838023526
    {:second-darkest "#352260",
     :highest-saturation "#f7c9cc",
@@ -3211,6 +2450,18 @@
     {:error "This request has been blocked by our content filters.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override-1572537168
+   "top - 00:17:44 up 4 days, 10:06,  8 users,  load average: 13.69, 12.68, 11.97\nTasks: 413 total,   8 running, 405 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 67.6 us,  5.2 sy,  0.0 ni, 27.2 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,   7747.9 free,  47359.7 used,  73529.1 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  79174.0 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n  33436 ryanr     20   0 1132.3g   1.0g 169936 R 106.2   0.8   3193:53 chrome\n1018120 ryanr     20   0 1139.8g   2.8g 101976 S 100.0   2.2   1957:48 code\n3900400 ryanr     20   0 1132.3g 877580 164120 R 100.0   0.7 279:10.23 chrome\n   1933 ryanr     20   0   33.3g 872912 379456 R  93.8   0.7   2279:47 chrome\n  30950 ryanr     20   0 1132.3g 589404 168348 R  75.0   0.4 361:31.05 chrome\n4118200 ryanr     20   0 1134.1g 798844 142484 R  62.5   0.6  24:08.24 chrome\n  34090 ryanr     20   0 1132.3g 667652 204000 R  56.2   0.5   3882:40 chrome\n3788366 ryanr     20   0 1132.2g 754308 126072 R  56.2   0.6 233:19.04 chrome\n4171383 ryanr     20   0   42.2g  11.2g 285184 S  43.8   8.9   3:36.37 java\n3994247 ryanr     20   0 1132.2g   1.5g 117848 S  31.2   1.2  60:50.44 chrome\n   1530 ryanr     20   0 5396228   2.8g 144656 S  25.0   2.2 939:14.60 kwin_x11\n4140415 ryanr     20   0 1134.1g 381720 151856 S  18.8   0.3  10:49.70 chrome\n1018093 ryanr     20   0   32.9g   2.4g 145896 S  12.5   1.9 173:13.50 code\n\n------------------------[ wednesday, june 26th 12:17:44am ]-------------------------",
+   :raw-custom-override-603185828
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :child
+    "17 FUCK!"
+    :style
+    {:color "cyan", :font-weight 700, :font-size "99px"}],
    :raw-custom-override1668161178
    {:error
     {:error "This request has been blocked by our content filters.",
@@ -3258,6 +2509,8 @@
     :most-contrasting-light "#7fbad0"},
    :raw-custom-override67394260
    "top - 13:51:34 up 2 days, 23:40,  9 users,  load average: 4.14, 3.64, 3.74\nTasks: 411 total,   2 running, 409 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 36.4 us,  2.6 sy,  0.0 ni, 60.0 id,  1.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,  15444.2 free,  41086.2 used,  72106.3 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  85647.1 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n2314466 ryanr     20   0   42.0g  13.7g 307816 S 193.3  10.9  24:17.00 java\n2363232 ryanr     20   0 1132.2g 800484 152876 R 113.3   0.6   0:38.03 chrome\n  33436 ryanr     20   0 1132.3g   1.1g 168160 S  46.7   0.9   1876:19 chrome\n   1933 ryanr     20   0   33.2g 841392 335240 S  26.7   0.6   1545:20 chrome\n  34090 ryanr     20   0 1132.3g 899464 203584 S  20.0   0.7   2423:47 chrome\n   1530 ryanr     20   0 4525060   2.1g 140624 S  13.3   1.7 572:17.14 kwin_x11\n   3227 ryanr     20   0  721716 107792  87524 S  13.3   0.1  38:36.68 konsole\n   1037 root      20   0   24.8g 616444 295028 S   6.7   0.5 160:58.20 Xorg\n   1892 ryanr     20   0   32.9g 565244 257640 S   6.7   0.4  54:45.73 chrome\n   3243 ryanr     20   0   95984   7312   5120 S   6.7   0.0  33:17.60 btop\n1150740 ryanr     20   0 1141.4g 518492 179596 S   6.7   0.4 253:19.80 chrome\n2364470 ryanr     20   0   13356   4224   3328 R   6.7   0.0   0:00.01 top\n      1 root      20   0  166712  11328   8128 S   0.0   0.0   0:02.50 systemd\n\n------------------------[ monday, june 24th 1:51:34pm ]-------------------------",
+   :raw-custom-override-1615694209
+   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n12  0      0 7934384 1706940 73586608    0    0    27    55    6    1 29  3 68  0  0\n\n",
    :raw-custom-override1857002409
    [:v-box
     :padding
@@ -3283,6 +2536,44 @@
         :style {:border-radius "30px"}}]]]],
    :raw-custom-override296905666
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :get-my-colors1873060527
+   {:second-darkest "#1e1f3b",
+    :highest-saturation "#f49cb4",
+    :most-contrasting "#dfd3ae",
+    :darkest "#121327",
+    :contrast-with-dominant "#dfd3ae",
+    :colors
+    ["#7ca6b7"
+     "#7854ba"
+     "#121327"
+     "#dfd3ae"
+     "#f49cb4"
+     "#e663cd"
+     "#3b3f78"
+     "#4c546c"
+     "#8c6474"
+     "#4c2c3c"
+     "#1e1f3b"],
+    :most-frequent "#121327",
+    :data-colors
+    {"float" "#f9b2c9",
+     "boolean" "#d0dab4",
+     "map" "#dfb5ae",
+     "list" "#6e44a3",
+     "string" "#ffffff",
+     "any" "#765e90",
+     "vector" "#86d8c3",
+     "keyword" "#ffffff",
+     "rabbit-code" "#af88a0",
+     "datetime" "#663544",
+     "integer" "#9ef49c",
+     "unknown" "#502325",
+     "date" "#1a3514"},
+    :dominant "#1e1f3b",
+    :most-contrasting-dark "#7854ba",
+    :second-brightest "#f49cb4",
+    :brightest "#dfd3ae",
+    :most-contrasting-light "#dfd3ae"},
    :get-my-colors2147070240
    {:second-darkest "#392f5e",
     :highest-saturation "#b1baf1",
@@ -3359,7 +2650,47 @@
     :second-brightest "#6dd1e7",
     :brightest "#e5b5dc",
     :most-contrasting-light "#6cb567"},
+   :get-my-colors-1285255523
+   {:second-darkest "#1e1f3b",
+    :highest-saturation "#f49cb4",
+    :most-contrasting "#dfd3ae",
+    :darkest "#121327",
+    :contrast-with-dominant "#dfd3ae",
+    :colors
+    ["#7ca6b7"
+     "#7854ba"
+     "#121327"
+     "#dfd3ae"
+     "#f49cb4"
+     "#e663cd"
+     "#3b3f78"
+     "#4c546c"
+     "#8c6474"
+     "#4c2c3c"
+     "#1e1f3b"],
+    :most-frequent "#121327",
+    :data-colors
+    {"float" "#f9b2c9",
+     "boolean" "#d0dab4",
+     "map" "#dfb5ae",
+     "list" "#6e44a3",
+     "string" "#ffffff",
+     "any" "#765e90",
+     "vector" "#86d8c3",
+     "keyword" "#ffffff",
+     "rabbit-code" "#af88a0",
+     "datetime" "#663544",
+     "integer" "#9ef49c",
+     "unknown" "#502325",
+     "date" "#1a3514"},
+    :dominant "#1e1f3b",
+    :most-contrasting-dark "#7854ba",
+    :second-brightest "#f49cb4",
+    :brightest "#dfd3ae",
+    :most-contrasting-light "#dfd3ae"},
    :raw-custom-override1085406457 nil,
+   :raw-custom-override-257765162
+   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        50Gi       3.8Gi       806Mi        71Gi        73Gi\nSwap:             0B          0B          0B\n\n",
    :get-my-colors720628555
    {:second-darkest "#352260",
     :highest-saturation "#f7c9cc",
@@ -3400,13 +2731,55 @@
     :most-contrasting-light "#f7c9cc"},
    :solver-fn-test11311036473 "HHHuge!180",
    :raw-custom-override-594565741 nil,
+   :raw-custom-override-754422235
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override48304193
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 7  0      0 15817348 1722084 72114992    0    0    27    53    4   13 26  3 71  0  0\n\n",
-   :colors-of-the-moment>darkest "#130f26",
+   :colors-of-the-moment>darkest "#131326",
    :raw-custom-override-1471694664
    "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
    :raw-custom-override-55990886
    "🐇🥕 Hello there! This is Clojure version 1.11.1 on JVM  17.0.11 🥕🐇 Saturday, June 15th 11:56:29PM",
+   :get-my-colors-498985028
+   {:second-darkest "#1e1f3b",
+    :highest-saturation "#f49cb4",
+    :most-contrasting "#dfd3ae",
+    :darkest "#121327",
+    :contrast-with-dominant "#dfd3ae",
+    :colors
+    ["#7ca6b7"
+     "#7854ba"
+     "#121327"
+     "#dfd3ae"
+     "#f49cb4"
+     "#e663cd"
+     "#3b3f78"
+     "#4c546c"
+     "#8c6474"
+     "#4c2c3c"
+     "#1e1f3b"],
+    :most-frequent "#121327",
+    :data-colors
+    {"float" "#f9b2c9",
+     "boolean" "#d0dab4",
+     "map" "#dfb5ae",
+     "list" "#6e44a3",
+     "string" "#ffffff",
+     "any" "#765e90",
+     "vector" "#86d8c3",
+     "keyword" "#ffffff",
+     "rabbit-code" "#af88a0",
+     "datetime" "#663544",
+     "integer" "#9ef49c",
+     "unknown" "#502325",
+     "date" "#1a3514"},
+    :dominant "#1e1f3b",
+    :most-contrasting-dark "#7854ba",
+    :second-brightest "#f49cb4",
+    :brightest "#dfd3ae",
+    :most-contrasting-light "#dfd3ae"},
+   :raw-custom-override1204004910
+   "top - 20:34:38 up 4 days,  6:23,  9 users,  load average: 7.28, 9.17, 8.84\nTasks: 414 total,   4 running, 410 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 38.4 us,  1.5 sy,  0.0 ni, 60.1 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,   3894.6 free,  51668.2 used,  73073.9 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  74942.9 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n  34090 ryanr     20   0 1132.3g 663740 208024 R 106.2   0.5   3713:35 chrome\n  33436 ryanr     20   0 1132.3g 967636 169688 S  87.5   0.7   3034:48 chrome\n   1933 ryanr     20   0   33.2g 858212 327468 S  37.5   0.7   2113:49 chrome\n1018120 ryanr     20   0 1139.8g   2.6g 102292 S  37.5   2.1   1800:35 code\n3788366 ryanr     20   0 1132.2g 758132 125816 R  37.5   0.6 112:51.71 chrome\n3900400 ryanr     20   0 1132.2g   1.2g 126912 R  37.5   1.0  77:12.92 chrome\n3972571 ryanr     20   0   42.7g  14.2g 285056 S  25.0  11.3  34:18.52 java\n   1530 ryanr     20   0 5353068   2.8g 146984 S  18.8   2.2 886:49.97 kwin_x11\n2961106 ryanr     20   0 1134.1g 725544 165408 S  18.8   0.6  38:52.52 chrome\n3836670 ryanr     20   0 1150.5g 554264 142768 S  18.8   0.4  24:55.09 chrome\n   2246 ryanr     20   0 1132.3g 555188 143372 S  12.5   0.4 219:11.82 chrome\n   1588 ryanr     20   0 3746492   1.1g 288028 S   6.2   0.9  38:42.38 plasmas+\n 637739 ryanr     20   0   34.7g 203848  20340 S   6.2   0.2   2:39.17 java\n\n------------------------[ tuesday, june 25th 8:34:36pm ]-------------------------",
    :raw-custom-override1509245178
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n14  0      0 27798740 2393908 52603932    0    0    24    66    1    1 35  3 62  0  0\n\n",
    :raw-custom-override9026012
@@ -3613,6 +2986,7 @@
     :most-contrasting-light "#bde6cb"},
    :raw-custom-override698326850
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        40Gi        15Gi       685Mi        70Gi        83Gi\nSwap:             0B          0B          0B\n\n",
+   :raw-custom-override1333558267 [:box :child "FUCK!" :style {:color "cyan"}],
    :get-my-colors-322374943
    {:second-darkest "#1e3238",
     :highest-saturation "#7bbff0",
@@ -3691,6 +3065,11 @@
     :second-brightest "#c28c9a",
     :brightest "#79b1aa",
     :most-contrasting-light "#79b1aa"},
+   :raw-custom-override-601425185
+   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        46Gi       7.6Gi       884Mi        71Gi        77Gi\nSwap:             0B          0B          0B\n\n",
+   :raw-custom-override1690693749 nil,
+   :raw-custom-override-1691456360
+   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n13  0      0 3990540 1657236 73169192    0    0    28    54    9    0 28  3 69  0  0\n\n",
    :get-my-colors427814933
    {:second-darkest "#1e1f3b",
     :highest-saturation "#f49cb4",
@@ -3730,6 +3109,7 @@
     :brightest "#dfd3ae",
     :most-contrasting-light "#dfd3ae"},
    :solver-fn-test1-2135935405 "Huge!159",
+   :raw-custom-override1535169544 nil,
    :raw-custom-override-569051388
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        27Gi        76Gi       448Mi        21Gi        96Gi\nSwap:             0B          0B          0B\n\n",
    :raw-custom-override1790254665
@@ -3772,7 +3152,9 @@
     :most-contrasting-dark "#7854ba",
     :second-brightest "#f49cb4",
     :brightest "#dfd3ae",
-    :most-contrasting-light "#dfd3ae"}},
+    :most-contrasting-light "#dfd3ae"},
+   :raw-custom-override837793496
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇"},
   :data {}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

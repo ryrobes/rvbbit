@@ -18,11 +18,21 @@
         t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
         t1                  (keyword (first t0))
         t2                  (keyword (last t0))
-        self-ref-keys       (distinct (filter #(and (keyword? %) (namespace %)) (ut/deep-flatten db/base-theme)))
-        self-ref-pairs      (into {}
-                                  (for [k    self-ref-keys ;; todo add a reurziver version of
-                                        :let [bk (keyword (ut/replacer (str k) ":theme/" ""))]]
-                                    {k (get db/base-theme bk)}))
+        ;;self-ref-keys       (distinct (filter #(and (keyword? %) (namespace %)) (ut/deep-flatten db/base-theme)))
+        ;; new deep-flatten is already a set with only keywords
+        ;;self-ref-keys       (filter #(namespace %) (ut/deep-flatten db/base-theme))
+        self-ref-keys       (into #{} (filter namespace) (ut/deep-flatten db/base-theme))
+        ;; self-ref-pairs      (into {}
+        ;;                           (for [k    self-ref-keys ;; todo add a reurziver version of
+        ;;                                 :let [bk (keyword (ut/replacer (str k) ":theme/" ""))]]
+        ;;                             {k (get db/base-theme bk)}))
+        self-ref-pairs (reduce (fn [acc k]
+                                 (let [bk (keyword (cstr/replace (name k) "theme/" ""))]
+                                   (if-let [value (get db/base-theme bk)]
+                                     (assoc acc k value)
+                                     acc)))
+                               {}
+                               self-ref-keys)
         resolved-base-theme (ut/postwalk-replacer self-ref-pairs db/base-theme)
         base-theme-keys     (keys resolved-base-theme)
         theme-key?          (true? (and (= t1 :theme) (some #(= % t2) base-theme-keys)))
