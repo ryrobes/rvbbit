@@ -66,6 +66,8 @@
 (defonce mem-usage (atom []))
 (defonce scheduler-atom (atom {}))
 
+(defonce timekeeper-failovers (atom {}))
+
 (def num-groups 8) ;; atom segments to split solvers master atom into
 ;; 20 seems fine, testing with 8... impacts thread count mostly. not good isolated perf testing yet.
 
@@ -976,10 +978,11 @@
           ;; _ (when (empty? latency-data)
           ;;     (ut/pp [:warning-no-latency-data client-name]))
           avg-latency (if (seq latency-data)
-                        (ut/avg (take-last 20 latency-data))
+                        (ut/avg (take-last 10 latency-data))
                         1000) ; Default to 1000ms if no data
           adapted-timeout
           (cond
+            (= client-name :rvbbit) 200 ; internal
             (<= avg-latency 200) 250    ; Very fast clients
             (<= avg-latency 400) 400    ; Fast clients
             (<= avg-latency 600) 550    ; Good performance clients
@@ -1019,7 +1022,7 @@
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 500))] ;; was 100, was (async/sliding-buffer
+  (let [results (async/chan (async/sliding-buffer 100))] ;; was 100, was (async/sliding-buffer
     (try (async/go-loop []
            (async/<! (async/timeout (safe-get-timeout client-name))) ;; was 1100 ?
            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
@@ -1050,9 +1053,9 @@
 
 (defn push-to-client
   [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
-  (enqueue-task-slot
-   client-name
-   (fn []
+  ;(enqueue-task-slot
+  ; client-name
+  ; (fn []
      (try
        (let [rr                0 ;(rand-int 3)
              cq                (get client-queue-atoms rr)
@@ -1076,7 +1079,7 @@
            (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
              (new-client client-name)
              (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
-       (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))))))
+       (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))));))
 
 
 
@@ -2163,9 +2166,9 @@
          [solver-name :output]
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
-  (enqueue-task-slot-pool client-name (fn [] 
+  ;(enqueue-task-slot-pool client-name (fn [] 
                                         (run-solver solver-name client-name override-map)
-                                        ))
+  ;                                      ))
   )
 
 (defmethod wl/handle-push :run-solver
@@ -2175,9 +2178,9 @@
          [solver-name :output]
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
-  (enqueue-task-slot-pool client-name (fn [] 
+  ;(enqueue-task-slot-pool client-name (fn [] 
                                         (run-solver solver-name client-name override-map)
-                                        ))
+  ;                                      ))
   )
 
 (defmethod wl/handle-push :run-solver-custom
@@ -2188,9 +2191,9 @@
          [:warning! {:solver-running-custom-inputs-via client-name :with-input-map input-map :override-map? override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
 ;;  (run-solver solver-name client-name override-map input-map temp-solver-name)
-  (enqueue-task-slot-pool client-name (fn [] 
+  ;(enqueue-task-slot-pool client-name (fn [] 
                                         (run-solver solver-name client-name override-map input-map temp-solver-name)
-                                        ))
+   ;                                     ))
   temp-solver-name)
 
 (defn flow-kill!
@@ -2665,6 +2668,7 @@
                           screen?         (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
                           :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
     (remove-watch atom-to-watch watch-key)
+    ;;(swap! atoms-and-watchers ut/dissoc-in [client-name flow-key]) ;; pointless?
     (add-watch atom-to-watch watch-key watcher)
     (swap! atoms-and-watchers assoc-in
       [client-name flow-key]
@@ -3373,7 +3377,7 @@
                                                             (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
                                        ;(enqueue-task4 (fn [] 
                                                         (run-solver sk client-name)
-                                       ;                 ))
+                                        ;                ))
                                        ))
                                  _ (swap! last-signals-history-atom assoc kk (get @last-signals-history-atom-temp kk)) ;; one
                                                                                                                        ;; write,

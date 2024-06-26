@@ -466,15 +466,13 @@
 
 
 (defn tracked-sub
-  [sub-key sub-map] ;;; lmao - hack to track subscriptions for debugging
-  ;(swap! simple-subscription-counts conj (first query))
-  (swap! subscription-counts-alpha update sub-key (fnil inc 0))
+  [sub-key sub-map] ;;; hack to track subscriptions for debugging, easy freq
+  ;(swap! subscription-counts-alpha update sub-key (fnil inc 0))
   (rfa/sub sub-key sub-map))
 
 (defn tracked-subscribe
-  [query] ;;; lmao - hack to track subscriptions for debugging
-  ;(swap! simple-subscription-counts conj (first query))
-  (swap! subscription-counts update (first query) (fnil inc 0))
+  [query] ;;; hack to track subscriptions for debugging, easy freq
+  ;(swap! subscription-counts update (first query) (fnil inc 0))
   (cond (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query)
           (do ;(tapp>> [:cpk! (last query)])
             (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))

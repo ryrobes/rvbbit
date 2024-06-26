@@ -8576,13 +8576,11 @@
         body (if (and (not= selected-view-type :views)
                       (not= selected-view-type :queries))
                ;;{(first body) [:box :child [:string3 (last body)]]}
-               (let [
-                     wrapper @(ut/tracked-sub ::get-clover-runner-fn {:view-type selected-view-type}) ;;(get-in br [selected-view-type :clover-fn])
+               (let [wrapper @(ut/tracked-sub ::get-clover-runner-fn {:view-type selected-view-type}) ;;(get-in br [selected-view-type :clover-fn])
                      clover-fn @(ut/tracked-sub ::current-view-mode-clover-fn {:panel-key panel-key :data-key selected-view})
                      ;;sub-param (first (map last (filter (fn [[k _]] (cstr/includes? (str k) (str panel-key " " selected-view))) @db/solver-fn-lookup)))
                      ;;sub-param-root (try (last (cstr/split (str sub-param) #"/")) (catch :default _ ""))
                      ;;curr-val @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sub-param]})
-                     
                      placeholder-clover (get-in br [selected-view-type :placeholder-clover] ;; inject placeholder if we have no data for this
                                                 [:box
                                                  :child [:img {:src "images/running.gif"}]
