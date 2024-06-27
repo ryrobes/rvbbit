@@ -55,7 +55,8 @@
     [honey.sql                 :as honey])
   (:import ;(clojure.lang MultiFn)
     [com.github.vertical_blank.sqlformatter SqlFormatter]
-    [java.util.concurrent                   Executors TimeUnit TimeoutException]
+    [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException]
+    ;;[java.util.concurrent                   Executors TimeUnit TimeoutException]
     [java.lang                              ProcessBuilder]
     [java.io                                BufferedReader InputStreamReader]))
 
@@ -235,7 +236,7 @@
 
 (defn start-workers4
   [num-workers]
-  (ut/pp [:starting-sync-worker-thread-*pool 4])
+  (ut/pp [:starting-sync-worker-thread-*pool 2])
   (reset! running4 true)
   (reset! workers4 (doall (map (fn [_] (future (worker-loop4))) (range num-workers)))))
 
@@ -1990,8 +1991,8 @@
                             :return-val      (if no-return? nil return-val)}]
       (do
         (swap! restart-map assoc flow-id (inc (get @restart-map flow-id 0)))
-        (when (not (cstr/includes? flow-id "keepalive"))
-          (ut/pp [:flowmap-returned-val (ut/limited (ut/replace-large-base64 return-val)) :flowmap-returned-val]))
+        ;; (when (not (cstr/includes? flow-id "keepalive"))
+        ;;   (ut/pp [:flowmap-returned-val (ut/limited (ut/replace-large-base64 return-val)) :flowmap-returned-val]))
         (let [cnt         (count (str return-val))
               limit       160
               over?       (> cnt limit)
@@ -2526,15 +2527,7 @@
       (get @child-atom key))))
 
 
-(add-watch flow-db/results-atom
-           :master-watcher ;; flow watcher split of results-atom
-           (fn [_ _ old-state new-state]
-             (doseq [key (keys new-state)]
-               (if-let [child-atom (get @flow-child-atoms key)]
-                 (swap! child-atom assoc key (get new-state key))
-                 (let [new-child-atom (atom {})]
-                   (swap! flow-child-atoms assoc key new-child-atom)
-                   (swap! new-child-atom assoc key (get new-state key)))))))
+
 
 
 (defn break-up-flow-key-ext
@@ -2612,6 +2605,26 @@
           :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))))
 
 
+(defonce custom-watcher-thread-pool
+  (ThreadPoolExecutor. 10 1000 60 TimeUnit/SECONDS (SynchronousQueue.)))
+
+(defn execute-custom-watcher [f]
+  (.execute custom-watcher-thread-pool f))
+
+(defn wrap-custom-watcher [watcher-fn]
+  (fn [key ref old-state new-state]
+    (execute-custom-watcher
+     (fn []
+       (try
+         (watcher-fn key ref old-state new-state)
+         (catch Exception e
+           (println "Error in watcher:" (.getMessage e))
+           (throw e)))))))
+
+(defn add-watch+ [atom key watcher-fn]
+  (let [wrapped-watcher (wrap-custom-watcher watcher-fn)]
+    (add-watch atom key wrapped-watcher)))
+
 
 (defn add-watcher
   [keypath client-name fn flow-key sub-type & [flow-id]] ;; flow id optional is for unsub stuff
@@ -2669,7 +2682,7 @@
                           :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
     (remove-watch atom-to-watch watch-key)
     ;;(swap! atoms-and-watchers ut/dissoc-in [client-name flow-key]) ;; pointless?
-    (add-watch atom-to-watch watch-key watcher)
+    (add-watch+ atom-to-watch watch-key watcher)
     (swap! atoms-and-watchers assoc-in
       [client-name flow-key]
       {:created   (ut/get-current-timestamp)
@@ -2829,7 +2842,8 @@
     (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath {:sub-path sub-path}])
     (cond
       (cstr/includes? (str flow-key) "*running?")  false
-      (= base-type :time)                         (get @father-time client-param-path)
+      ;(= base-type :time)                         (get @father-time client-param-path)
+      (= base-type :time)                         (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
       (= base-type :signal)                       (get @last-signals-atom client-param-path)
       (= base-type :data)                         (get-in @last-solvers-data-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -2872,7 +2886,7 @@
 
 (defn solver-sql
   [solver-name honey-sql snapshot?] ;; basically same as front-end - convert the query to a
-  (ut/pp [:solver-sql [solver-name (str honey-sql) snapshot?]])
+  ;; (ut/pp [:solver-sql [solver-name (str honey-sql) snapshot?]])
   (let [style-rules    (get honey-sql :style-rules)
         orig-honey-sql honey-sql
         connection-id  (get honey-sql :connection-id)
@@ -2889,7 +2903,7 @@
         client-name    :rvbbit
         honey-modded   (walk/postwalk-replace {:*client-name client-name :*client-name-str (pr-str client-name)} honey-modded)
         client-cache?  (if literal-data? (get honey-sql :cache? true) false)]
-    (ut/pp [:solver-sql! solver-name orig-honey-sql honey-sql honey-modded connection-id client-name snapshot?])
+    ;; (ut/pp [:solver-sql! solver-name orig-honey-sql honey-sql honey-modded connection-id client-name snapshot?])
     (query-runstream :honey-xcall
                      [:solvers solver-name]
                      honey-modded
@@ -3375,9 +3389,9 @@
                                              :when   (or (= (get sv :signal) kk)
                                                          (= (get sv :signal)
                                                             (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
-                                       ;(enqueue-task4 (fn [] 
+                                       (enqueue-task4 (fn [] 
                                                         (run-solver sk client-name)
-                                        ;                ))
+                                                        ))
                                        ))
                                  _ (swap! last-signals-history-atom assoc kk (get @last-signals-history-atom-temp kk)) ;; one
                                                                                                                        ;; write,
@@ -3560,7 +3574,8 @@
       (kick client-name
             [base-type client-param-path]
             (cond (cstr/includes? (str flow-key) "running?")  false
-                  (= base-type :time)                         (get @father-time client-param-path)
+                  ;;(= base-type :time)                         (get @father-time client-param-path)
+                  (= base-type :time)                         (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
                   (= base-type :signal)                       (get @last-signals-atom client-param-path)
                   (= base-type :data)                         (get-in @last-solvers-data-atom
                                                                       (vec (into [(keyword (second sub-path))]
@@ -5371,7 +5386,7 @@
                                               row-data))
                            padding (apply str (repeat (- console-width (count (clojure.string/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
                        (str "│ " graph-data padding "│")))
-          legned (str "(each segment is " (ut/format-duration-seconds (* 15 freq)) ", each tick is " (ut/format-duration-seconds freq) (when (> freq 1) " **averaged") ")")]
+          legned (str "  (each segment is " (ut/format-duration-seconds (* 15 freq)) ", each tick is " (ut/format-duration-seconds freq) (when (> freq 1) " **averaged") ")")]
       (println border-top)
       (println label-row)
       (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
@@ -5573,19 +5588,22 @@
 
         (ut/pp [:latency-adaptations @dynamic-timeouts])
 
-        (ut/pp [:repl-introspections @evl/repl-introspection-atom])
+        ;(ut/pp [:repl-introspections @evl/repl-introspection-atom])
+
+        (ut/pp [:timekeeper-failovers? @timekeeper-failovers])
+        (ut/pp [:times {:atom (str @father-time) :real (str (ut/current-datetime-parts))}])
 
         (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
         (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
-        (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
+        ;(ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
 
         (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes" :color :magenta))
         (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 15) "msgs/sec" "client pushes" :color :magenta :freq 15))
-        (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
+        ;(ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
 
         (ut/pp (draw-bar-graph @mem-usage "memory usage" "mb" :color :yellow))
         (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 15) "memory usage" "mb" :color :yellow :freq 15))
-        (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
+        ;(ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
 
               ;(ut/pp (draw-bar-graph @peer-usage "clients" "peers" :color :green))
 
@@ -5644,8 +5662,63 @@
 
 
 
+;; (def ring-options-old
+;;   {:port websocket-port :join? false :async? true :max-idle-time 5000 :websockets ws-endpoints :allow-null-path-info true})
 
 
+;; (defn web-handler
+;;   [request]
+;;   {:status  200
+;;    :headers {"Content-Type" "text/html"}
+;;    :body    "<html><head></head><body>youre never going to see this, bro</body></html>"})
+
+;; (def websocket-port 3030)
+
+;; (def ws-endpoints {"/ws" (net/websocket-handler {:encoding :edn})})
+
+;; (def ring-options
+;;   {:port                 websocket-port
+;;    :join?                false
+;;    :async?               true
+;;    ;:min-threads          300
+;;    ;:max-threads          1000 ;; Increased max threads
+;;    ;:idle-timeout         500000 ;; Reduced idle timeout
+;;    ;:max-idle-time        3000000 ;; Reduced max idle time
+;;    ;:max-idle-time        15000
+;;    ;:input-buffer-size    131072 ;; default is 8192
+;;    ;:output-buffer-size   131072 ;; default is 32768
+;;    :input-buffer-size    32768
+;;    :output-buffer-size   131072
+;;    :max-message-size     6291456 ;;2097152  ;; Increased max message size
+;;    :websockets           ws-endpoints
+;;    :allow-null-path-info true})
+
+;; (defonce websocket-server (atom nil))
+
+;;;;;;;;;(reset! websocket-server (jetty/run-jetty #'web-handler ring-options))
+
+
+
+
+
+(defonce websocket-thread-pool (Executors/newFixedThreadPool 300)) ; Pool for WebSocket connections
+
+(defn execute-websocket-task [f]
+  (.execute websocket-thread-pool f))
+
+(defn wrap-websocket-handler [handler]
+  (fn [request]
+    (let [response-promise (promise)]
+      (execute-websocket-task
+       (fn []
+         (try
+           (let [response (handler request)]
+             (deliver response-promise response))
+           (catch Exception e
+             (deliver response-promise {:status 500
+                                        :headers {"Content-Type" "text/plain"}
+                                        :body "Internal Server Error"})))))
+      @response-promise)))
 
 (defn web-handler
   [request]
@@ -5655,34 +5728,30 @@
 
 (def websocket-port 3030)
 
-
 (def ws-endpoints {"/ws" (net/websocket-handler {:encoding :edn})})
-
-(def ring-options-old
-  {:port websocket-port :join? false :async? true :max-idle-time 5000 :websockets ws-endpoints :allow-null-path-info true})
-
 
 (def ring-options
   {:port                 websocket-port
    :join?                false
    :async?               true
-   :min-threads          300
-   :max-threads          1000 ;; Increased max threads
-   ;:idle-timeout         500000 ;; Reduced idle timeout
-   ;:max-idle-time        3000000 ;; Reduced max idle time
-   ;:max-idle-time        15000
-   ;:input-buffer-size    131072 ;; default is 8192
-   ;:output-buffer-size   131072 ;; default is 32768
-   ;:input-buffer-size    32768
-   ;:output-buffer-size   131072
-   :max-message-size     6291456 ;;2097152  ;; Increased max message size
-   :websockets           ws-endpoints
+   :min-threads          100
+   :max-threads          300 ;; from our dedicated pool
+   :input-buffer-size    32768
+   :output-buffer-size   131072
+   :max-message-size     6291456 ;; 6MB
+   :websockets           (into {} (for [[k v] ws-endpoints]
+                                    [k (wrap-websocket-handler v)]))
    :allow-null-path-info true})
 
-
-
-
 (defonce websocket-server (atom nil))
+
+;; (reset! websocket-server (jetty/run-jetty #'web-handler ring-options))
+
+(defn stop-websocket-server []
+  (when-let [server @websocket-server]
+    (.stop server)
+    (reset! websocket-server nil)))
+
 
 
 
@@ -5691,7 +5760,10 @@
 (defn destroy-websocket-server!
   []
   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
-  (try (do (when @websocket-server (.stop @websocket-server) @websocket-server (reset! websocket-server nil)) @websocket-server)
+  (try (do (when @websocket-server
+             (.stop @websocket-server)
+             @websocket-server
+             (reset! websocket-server nil)) @websocket-server)
        (catch Throwable _ nil)))
 
 

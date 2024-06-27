@@ -2,5 +2,5 @@
   (:require
     [clojure.string :as cstr]))
 
-(defn boston-greeting [you] (str "hey, " you ". ow ahh ya?"))
+;;(defn boston-greeting [you] (str "hey, " you ". ow ahh ya?"))
 
