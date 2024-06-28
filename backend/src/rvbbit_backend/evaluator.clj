@@ -92,7 +92,7 @@
           rsp-read      (vec ;(remove #(or (nil? %) (cstr/starts-with? (str %) "(var")) ;; no
                          (nrepl/response-values msg));)
           rsp           (nrepl/combine-responses msg)
-          msg-out       (vec (remove nil? (for [m msg] (get m :out))))
+          ;msg-out       (vec (remove nil? (for [m msg] (get m :out))))
           merged-values (first rsp-read)
           results (-> rsp
                       (assoc :values merged-values)

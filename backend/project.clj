@@ -55,8 +55,8 @@
                        "-Xms16g" ;; testing
                        "-XX:+UseG1GC"
                        "-XX:MaxGCPauseMillis=200"
-                       ;;"-Xss2048k" ;; testing with double the stack space to root out some flow-runner intermittent StackOverflow issue...
-                       "-Xss1536k"
+                       "-Xss2048k" ;; testing with double the stack space to root out some flow-runner intermittent StackOverflow issue...
+                       ;;"-Xss1536k"
                        "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED"] ;; datalevin specific
   :cljfmt             {}
   :source-paths       ["src" "../shared"]

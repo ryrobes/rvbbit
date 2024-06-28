@@ -48,7 +48,8 @@
    [websocket-layer.network :as net]) ;; enables joda jdbc time returns
   (:import
    [java.util Date]
-   [java.util.concurrent Executors TimeUnit]
+   ;;[java.util.concurrent Executors TimeUnit]
+   [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ThreadPoolExecutor$CallerRunsPolicy]
    java.nio.file.Files
    java.nio.file.Paths
    java.nio.file.attribute.FileTime
@@ -325,7 +326,9 @@
     thread))
 
 
-(defonce scheduler (Executors/newScheduledThreadPool 4))
+
+
+
 
 (defn log-and-update-atom []
   (try
@@ -339,7 +342,7 @@
 
 (defn start-time-scheduler []
   (ut/pp [:staring-time-scheduler])
-  (.scheduleAtFixedRate scheduler
+  (.scheduleAtFixedRate wss/time-scheduler
                         (reify Runnable
                           (run [_]
                             (log-and-update-atom)))
@@ -348,9 +351,8 @@
                         TimeUnit/SECONDS))
 
 (defn stop-time-scheduler []
-  (.shutdownNow scheduler))
+  (.shutdownNow wss/time-scheduler))
 
-;; Enhanced watcher with logging
 (defn time-marches-on-or-does-it? [key ref old-state new-state]
   (try
     (doseq [key (keys new-state)]
@@ -362,7 +364,7 @@
             (swap! new-child-atom assoc key (get new-state key))))))
     ;(println "Watcher updated child atoms successfully.")
     (catch Exception e
-      (println "Error in watcher:" (.getMessage e))
+      (println "Error in time-marches-on:" key ref (.getMessage e))
       (throw e))))
 
 (add-watch wss/father-time
@@ -371,6 +373,33 @@
 
 
 
+
+
+
+(defonce scheduled-tasks (atom {}))
+
+(defn start-scheduler [secs f name-str & [delay]]
+  (ut/pp ["Starting scheduler" name-str "every" secs "seconds"])
+  (let [delay (or delay 0)
+        task (.scheduleAtFixedRate wss/general-scheduler-thread-pool
+                                   (reify Runnable
+                                     (run [_]
+                                       (try
+                                         (f)
+                                         ;;(log/debug "Executed" name-str)
+                                         (catch Exception e
+                                           (ut/pp [e "Error in scheduler" name-str])))))
+                                   delay
+                                   secs
+                                   TimeUnit/SECONDS)]
+    (swap! scheduled-tasks assoc name-str task)))
+
+(defn stop-all-schedulers []
+  (ut/pp ["Stopping all schedulers"])
+  (doseq [[name task] @scheduled-tasks]
+    (ut/pp ["Stopping scheduler" name])
+    (.cancel task true))
+  (reset! scheduled-tasks {}))
 
 
 
@@ -402,10 +431,10 @@
   (cruiser/create-sqlite-sys-tables-if-needed! system-db)
   (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
 
-  (defonce custom-watcher-thread-master-pool (Executors/newFixedThreadPool 32))
+
 
   (defn execute-custom-watcher [f]
-    (.execute custom-watcher-thread-master-pool f))
+    (.execute wss/custom-watcher-thread-master-pool f))
 
   (defn wrap-custom-watcher [watcher-fn]
     (fn [key ref old-state new-state]
@@ -414,7 +443,7 @@
          (try
            (watcher-fn key ref old-state new-state)
            (catch Exception e
-             (println "Error in watcher:" (.getMessage e))
+             (println "Error in wrap-custom-watcher:" key ref (.getMessage e))
              (throw e)))))))
 
   (defn add-watch+ [atom key watcher-fn]
@@ -423,7 +452,6 @@
 
   (defn remove-watch+ [atom key]
     (remove-watch atom key))
-
 
   (add-watch+ wss/screens-atom
               :master-screen-watcher ;; watcher splitter
@@ -459,14 +487,14 @@
                       (swap! new-child-atom assoc key (get new-state key)))))));)
 
   (add-watch+ flow-db/results-atom
-             :master-watcher ;; flow watcher split of results-atom
-             (fn [_ _ old-state new-state]
-               (doseq [key (keys new-state)]
-                 (if-let [child-atom (get @wss/flow-child-atoms key)]
-                   (swap! child-atom assoc key (get new-state key))
-                   (let [new-child-atom (atom {})]
-                     (swap! wss/flow-child-atoms assoc key new-child-atom)
-                     (swap! new-child-atom assoc key (get new-state key)))))))
+              :master-watcher ;; flow watcher split of results-atom
+              (fn [_ _ old-state new-state]
+                (doseq [key (keys new-state)]
+                  (if-let [child-atom (get @wss/flow-child-atoms key)]
+                    (swap! child-atom assoc key (get new-state key))
+                    (let [new-child-atom (atom {})]
+                      (swap! wss/flow-child-atoms assoc key new-child-atom)
+                      (swap! new-child-atom assoc key (get new-state key)))))))
 
   ;; (add-watch wss/last-solvers-atom
   ;;            :master-solver-watcher ;; watcher splitter
@@ -646,30 +674,30 @@
   ;;                                                 :when (get v :running?)]
   ;;                                           (swap! wss/solver-status assoc-in [client-name solver-name :time-running] (ut/format-duration (get v :started) (System/currentTimeMillis))))))))
 
-  (defn logger [name edn]
-    (let [dir         (str "./logs/" (str (java.time.LocalDate/now)) "/")
-          _           (ext/create-dirs dir)
-          fp          (str dir name ".log.edn")
-          mst         (System/currentTimeMillis)
-          data        [(ut/millis-to-date-string mst) edn]
-          pretty-data (with-out-str (ppt/pprint data))]
-      (spit fp (str pretty-data "\n") :append true)))
+  ;; (defn logger [name edn]
+  ;;   (let [dir         (str "./logs/" (str (java.time.LocalDate/now)) "/")
+  ;;         _           (ext/create-dirs dir)
+  ;;         fp          (str dir name ".log.edn")
+  ;;         mst         (System/currentTimeMillis)
+  ;;         data        [(ut/millis-to-date-string mst) edn]
+  ;;         pretty-data (with-out-str (ppt/pprint data))]
+  ;;     (spit fp (str pretty-data "\n") :append true)))
 
-  (defn start-scheduler [interval f task-name]
-    (let [stop-ch (async/chan)]
-      (ut/pp [:starting-async-job-scheduler! task-name [:every interval :ms]])
-      (async/go-loop []
-        (let [[_ ch] (async/alts! [(async/timeout interval) stop-ch])]
-          (when-not (= ch stop-ch)
-            (try
-              (do
-                (swap! wss/scheduler-atom assoc task-name
-                       (ut/millis-to-date-string (System/currentTimeMillis)))
-                (f))
-              (catch Throwable e
-                (ut/pp [:core.scheduler-error! task-name e])))
-            (recur))))
-      stop-ch))
+  ;; (defn start-scheduler [interval f task-name]
+  ;;   (let [stop-ch (async/chan)]
+  ;;     (ut/pp [:starting-async-job-scheduler! task-name [:every interval :ms]])
+  ;;     (async/go-loop []
+  ;;       (let [[_ ch] (async/alts! [(async/timeout interval) stop-ch])]
+  ;;         (when-not (= ch stop-ch)
+  ;;           (try
+  ;;             (do
+  ;;               (swap! wss/scheduler-atom assoc task-name
+  ;;                      (ut/millis-to-date-string (System/currentTimeMillis)))
+  ;;               (f))
+  ;;             (catch Throwable e
+  ;;               (ut/pp [:core.scheduler-error! task-name e])))
+  ;;           (recur))))
+  ;;     stop-ch))
 
   ;; (defn start-scheduler [interval f task-name]
   ;;   (let [running (atom true)]
@@ -716,26 +744,28 @@
   ;;     #(async/close! stop-ch)))
 
 
-  ;; Define all schedulers
-  (def mon
-    (start-scheduler 15000
-                     wss/jvm-stats
-                     "JVM Stats"))
+  ;;  all schedulers
+  (start-scheduler 15
+                   wss/jvm-stats
+                   "JVM Stats" 15)
 
-  (def param-sync
-    (start-scheduler 30000
-                     wss/param-sql-sync
-                     "Parameter Sync"))
+  (start-scheduler 30
+                   wss/param-sql-sync
+                   "Parameter Sync" 120)
 
-  (def refresh-flow-tables
-    (start-scheduler 5000
-                     wss/flow-atoms>sql
-                     "Refresh Flow Tables"))
+  (start-scheduler 5
+                   wss/flow-atoms>sql
+                   "Refresh Flow Tables" 30)
 
-  (def purge
-    (start-scheduler 600
-                     wss/purge-dead-client-watchers
-                     "Purge Dead Clients"))
+  (start-scheduler 600
+                   wss/purge-dead-client-watchers
+                   "Purge Dead Clients" 600)
+
+  (start-scheduler 1
+                   #(let [pst (wss/query-pool-sizes)]
+                      (doseq [pp (keys pst)]
+                        (swap! wss/pool-stats-atom assoc pp (conj (get @wss/pool-stats-atom pp []) (get-in pst [pp 1])))))
+                   "Query Pool Sizes")
 
   ;; (def timekeeper
   ;;   (start-scheduler 1000
@@ -806,51 +836,45 @@
   ;;                           (catch Exception e (ut/pp [:timekeeper3-has-thrown-an-error!! :EGADS! e])))
   ;;                         "Timekeeper3"))
 
-  (def cpukeeper
-    (start-scheduler 1000
-                     #(swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage))
-                     "CPU Keeper"))
+  (start-scheduler 1
+                   #(swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage))
+                   "CPU Keeper")
 
-  (def memkeeper
-    (start-scheduler 1000
-                     #(swap! wss/mem-usage conj (ut/memory-used))
-                     "Memory Keeper"))
+  (start-scheduler 1
+                   #(swap! wss/mem-usage conj (ut/memory-used))
+                   "Memory Keeper")
 
-  (def pushkeeper
-    (start-scheduler 1000
-                     #(swap! wss/push-usage conj @wss/all-pushes)
-                     "Push Keeper"))
+  (start-scheduler 1
+                   #(swap! wss/push-usage conj @wss/all-pushes)
+                   "Push Keeper")
 
-  (def peerkeeper
-    (start-scheduler 1000
-                     #(swap! wss/peer-usage conj (count @wl/sockets))
-                     "Peer Keeper"))
+  (start-scheduler 1
+                   #(swap! wss/peer-usage conj (count @wl/sockets))
+                   "Peer Keeper")
 
-  (def purge-solver-cache
-    (start-scheduler 600000
-                     #(do
-                        (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
-                        (reset! wss/solvers-cache-hits-atom {})
-                        (reset! wss/solvers-cache-atom {}))
-                     "Purge Solver Cache"))
+  (start-scheduler 600
+                   #(do
+                      (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
+                      (reset! wss/solvers-cache-hits-atom {})
+                      (reset! wss/solvers-cache-atom {}))
+                   "Purge Solver Cache" 600)
 
-  (def solver-statuses
-    (start-scheduler 1000
-                     #(doseq [[client-name solvers] @wss/solver-status]
-                        (doseq [[solver-name v] solvers
-                                :when (get v :running?)]
-                          (swap! wss/solver-status assoc-in
-                                 [client-name solver-name :time-running]
-                                 (ut/format-duration (get v :started) (System/currentTimeMillis)))))
-                     "Update Solver Statuses"))
+  (start-scheduler 1
+                   #(doseq [[client-name solvers] @wss/solver-status]
+                      (doseq [[solver-name v] solvers
+                              :when (get v :running?)]
+                        (swap! wss/solver-status assoc-in
+                               [client-name solver-name :time-running]
+                               (ut/format-duration (get v :started) (System/currentTimeMillis)))))
+                   "Update Solver Statuses")
 
-  (defn stop-all-schedulers []
-    (doseq [scheduler [mon param-sync refresh-flow-tables purge ;timekeeper
-                       cpukeeper pushkeeper peerkeeper
-                       purge-solver-cache solver-statuses]]
-      (ut/pp [:stopping-async-job-scheduler! (str scheduler)])
-      ;;(async/close! scheduler)
-      scheduler))
+  ;; (defn stop-all-schedulers []
+  ;;   (doseq [scheduler [mon param-sync refresh-flow-tables purge ;timekeeper
+  ;;                      cpukeeper pushkeeper peerkeeper
+  ;;                      purge-solver-cache solver-statuses]]
+  ;;     (ut/pp [:stopping-async-job-scheduler! (str scheduler)])
+  ;;     ;;(async/close! scheduler)
+  ;;     scheduler))
 
 
   (def last-look (atom {}))
@@ -1013,12 +1037,15 @@
                       :*not-started    not-started-yet
                       :*open-channels  (get cc k)
                       :*running?       running?}}))))))
+
   (defn tracker-changed
     [key ref old-state new-state]
     (let [[_ b _] (data/diff old-state new-state)
           kks     (try (keys b) (catch Exception _ nil))]
       (when (> (count (remove #(= "client-keepalive" %) kks)) 0) (update-stat-atom kks))))
-  (add-watch flow-db/status :tracker-watch tracker-changed)
+  
+  (add-watch+ flow-db/status :tracker-watch tracker-changed)
+
   (defn log-tracker
     [kks]
     (doseq [flow-id kks]
@@ -1029,6 +1056,7 @@
                                  {k v}))]
         (swap! wss/tracker-history assoc flow-id (vec (conj (get @wss/tracker-history flow-id []) tracker))) ;; for
         )))
+
   (defn tracker-changed2
     [key ref old-state new-state]
     (let [[_ b _] (data/diff old-state new-state)
@@ -1055,7 +1083,9 @@
                 (spit fp (str pretty-data "\n") :append true)))))
         (log-tracker kks)
         (update-stat-atom kks))))
-  (add-watch flow-db/tracker :tracker-watch tracker-changed2)
+  
+  (add-watch+ flow-db/tracker :tracker-watch tracker-changed2)
+
   ;;(ut/pp {:settings config/settings})
   (defn heartbeat
     [dest]

@@ -534,10 +534,15 @@
           editor?                 (get db :editor?)
           in-editor-solvers0      (vec (map last (filter (fn [[k _]] (cstr/includes? (str k) (str selected-block))) @db/solver-fn-lookup)))
           in-editor-solvers       (if editor?
-                                    (vec (distinct
-                                          (flatten (for [s in-editor-solvers0]
-                                                     [(keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")))
-                                                      (keyword (str (ut/replacer s ":solver/" "solver-meta/")))])))) [])
+                                    (let []
+                                      (vec (distinct
+                                            (remove nil? 
+                                                    (flatten (for [s in-editor-solvers0
+                                                           :let [ns-key (keyword (str (ut/replacer s ":solver/" "solver-meta/")))
+                                                                 ns-key1 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [ns-key]})]]
+                                                       [(keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")))
+                                                        (when (ut/ne? ns-key1) (keyword (str "repl-ns/" (get-in ns-key1 [:output :evald-result :ns]))))
+                                                        ns-key])))))) [])
           clover-solvers-running  (vec (for [s clover-solvers] ;;(vec (remove (set in-editor-solvers0) clover-solvers))] 
                                          (keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")  ">running?"))))
           ;; clover-solvers-running  []
@@ -839,46 +844,102 @@
                           tabs          (vec (remove empty? (distinct (into explicit-tabs seen-tabs))))]
                       tabs)))
 
-(re-frame/reg-sub ::visible-tabs
-                  (fn [db]
-                    (let [;tabs @(ut/tracked-subscribe [::tabs])
-                          tabs        @(rfa/sub ::tabs {})
-                          hidden-tabs (get db :hidden-tabs [])]
-                      (vec (cset/difference (set tabs) (set hidden-tabs))))))
+(re-frame/reg-sub
+ ::block-layers
+ (fn [db]
+   (let [block-names       (keys (get db :panels))
+         snapshot-names    (keys (get-in db [:snapshots :params]))
+         tab-names         (get db :tabs)
+         user-param-names  (keys (get-in db [:click-param :param]))
+         view-names        (distinct (mapcat (fn [[_ v]] (keys (get v :views))) (get db :panels)))
+         query-names       (mapcat (fn [[_ v]] (keys (get v :queries))) (get db :panels)) ;; faster
+         runner-keys       (keys (get-in db [:server :settings :runners] {}))
+         all-runners       (apply concat
+                                  (for [r runner-keys]
+                                    (mapcat (fn [[_ v]] 
+                                              (keys (get v r))) 
+                                            (get db :panels))))
+         all-keys          (vec (apply concat
+                                       [block-names user-param-names
+                                        view-names snapshot-names tab-names
+                                        query-names all-runners]))]
+     all-keys)))
 
-(re-frame/reg-sub ::hidden-tabs (fn [db] (vec (get db :hidden-tabs []))))
+(re-frame/reg-sub
+ ::visible-tabs
+ (fn [db]
+   (let [;tabs @(ut/tracked-subscribe [::tabs])
+         tabs        @(rfa/sub ::tabs {})
+         hidden-tabs (get db :hidden-tabs [])]
+     (vec (cset/difference (set tabs) (set hidden-tabs))))))
 
-(re-frame/reg-event-db ::toggle-tab-visibility
-                       (undoable)
-                       (fn [db [_ tab-name]]
-                         (let [tabs    (get db :hidden-tabs []) ;@(ut/tracked-subscribe [::tabs])
-                               exists? (some #(= % tab-name) tabs)]
-                           (if exists?
-                             (assoc db :hidden-tabs (vec (remove #(= % tab-name) tabs)))
-                             (assoc db :hidden-tabs (vec (conj tabs tab-name)))))))
+(re-frame/reg-sub 
+ ::hidden-tabs 
+ (fn [db] (vec (get db :hidden-tabs []))))
 
-(re-frame/reg-sub ::panel-keys (fn [db] (vec (keys (get db :panels {})))))
+(re-frame/reg-event-db
+ ::toggle-tab-visibility
+ (undoable)
+ (fn [db [_ tab-name]]
+   (let [tabs    (get db :hidden-tabs []) ;@(ut/tracked-subscribe [::tabs])
+         exists? (some #(= % tab-name) tabs)]
+     (if exists?
+       (assoc db :hidden-tabs (vec (remove #(= % tab-name) tabs)))
+       (assoc db :hidden-tabs (vec (conj tabs tab-name)))))))
 
-(re-frame/reg-sub ::selected-tab (fn [db] (get db :selected-tab (first (get db :tabs)))))
+(re-frame/reg-sub
+ ::panel-keys 
+ (fn [db] (vec (keys (get db :panels {})))))
 
-(re-frame/reg-event-db ::delete-tab
-                       (undoable)
-                       (fn [db [_ tab-name]]
-                         (let [tabs     (get db :tabs)
-                               curr-idx (.indexOf tabs tab-name)
-                               new-tabs (vec (remove #(= % tab-name) (get db :tabs)))
-                               new-curr (nth (cycle new-tabs) curr-idx)]
-                           (ut/tapp>> [:boo curr-idx new-curr])
-                           (-> db
-                               (assoc :tabs (vec (remove #(= % tab-name) (get db :tabs))))
-                               (assoc :panels (into {} (filter #(not (= tab-name (get (val %) :tab))) (get db :panels))))))))
+(re-frame/reg-sub 
+ ::selected-tab 
+ (fn [db] (get db :selected-tab (first (get db :tabs)))))
 
-(re-frame/reg-event-db ::rename-tab
-                       (fn [db [_ old new]]
-                         (-> db
-                             (assoc :panels (ut/update-nested-tabs (get db :panels) old new))
-                             (assoc :tabs (vec (map (fn [item] (if (= item old) new item)) (get db :tabs))))
-                             (assoc :selected-tab new))))
+(re-frame/reg-event-db
+ ::delete-tab
+ (undoable)
+ (fn [db [_ tab-name]]
+   (let [tabs     (get db :tabs)
+         curr-idx (.indexOf tabs tab-name)
+         new-tabs (vec (remove #(= % tab-name) (get db :tabs)))
+         new-curr (nth (cycle new-tabs) curr-idx)]
+     (ut/tapp>> [:boo curr-idx new-curr])
+     (-> db
+         (assoc :tabs (vec (remove #(= % tab-name) (get db :tabs))))
+         (assoc :panels (into {} (filter #(not (= tab-name (get (val %) :tab))) (get db :panels))))))))
+
+(re-frame/reg-event-db
+ ::rename-tab
+ (fn [db [_ old new]]
+   (-> db
+       (assoc :panels (ut/update-nested-tabs (get db :panels) old new))
+       (assoc :tabs (vec (map (fn [item] (if (= item old) new item)) (get db :tabs))))
+       (assoc :selected-tab new))))
+
+(re-frame/reg-event-db
+ ::rename-block-layer
+ (fn [db [_ panel-key old new]]
+   (let [old (keyword (cstr/replace (str old) ":" ""))
+         new (keyword new)
+         new (ut/safe-key new)]
+     ;;(tapp>> [:change-block-layer? panel-key old new])
+     (swap! db/data-browser-query assoc panel-key new)  ;; to select it in the editor 
+     (assoc-in db [:panels panel-key] (walk/postwalk-replace
+                                    {old new}
+                                    (get-in db [:panels panel-key]))))))
+
+(re-frame/reg-event-db
+ ::delete-block-layer
+ (fn [db [_ panel-key data-key-type block-layer]]
+   (tapp>> [:delete-block-layer panel-key data-key-type block-layer])
+   (let [block-layer (if (string? block-layer)
+                       (try (edn/read-string block-layer)
+                            (catch :default _ (keyword (cstr/replace block-layer ":" "")))) block-layer)]
+     (swap! db/data-browser-query assoc panel-key nil)
+     (-> db
+         (ut/dissoc-in [:panels panel-key data-key-type block-layer])
+         (ut/dissoc-in [:data block-layer])))))
+
 
 (re-frame/reg-event-db ::select-tab
                        (fn [db [_ tab]]
@@ -1254,7 +1315,10 @@
                     (first (remove nil?
                              (for [[k v] (get db :panels)] (when (some #(= query-key %) (keys (get v :queries))) k))))))
 
-(re-frame/reg-sub ::repl-output (fn [db [_ query-key]] (get-in db [:repl-output query-key] nil)))
+(re-frame/reg-sub
+ ::repl-output
+ (fn [db [_ query-key]]
+   (get-in db [:repl-output query-key] nil)))
 
 (re-frame/reg-sub
   ::lookup-connection-id-by-query-key
@@ -3033,6 +3097,114 @@
 
 (re-frame/reg-sub ::panel-name-only (fn [db {:keys [panel-key]}] (get-in db [:panels panel-key :name] (str panel-key))))
 
+(defn nrepl-introspection-browser [selected-block data-key-type data-key width-int height-int]
+(let [;ph             @query-hover ;; reaction hack
+      ;selected-block @(ut/tracked-sub ::selected-block {})
+      ;blocks         (map keyword @(ut/tracked-sub ::current-tab-blocks {}))
+      are-solver        (get @db/solver-fn-lookup [:panels selected-block data-key])
+      meta-data          (when are-solver
+                           @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                            {:keypath [(keyword (str (ut/replacer are-solver
+                                                                                  ":solver/" "solver-meta/")))]}))
+      name-space        (get-in meta-data [:output :evald-result :ns])
+      ns-clover         (keyword (str "repl-ns/" name-space))
+      intro-map         (when are-solver 
+                          @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                         {:keypath [ns-clover]}))
+      intro-at (get intro-map :introspected)
+      intro-map (vec (apply concat (for [[k v] (dissoc intro-map :introspected)] 
+                  (for [[kk vv] v]
+                    ;;(merge {:type k} vv)
+                     
+                     (assoc {:item-value vv :item-name kk} :repl-type k)
+                     ;;vv
+                     ))))
+      ;; rdata             (when are-solver
+      ;;                     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+      ;;                                      {:keypath [(keyword (str (ut/replacer are-solver
+      ;;                                                                            ":" "")))]}))
+      ;; running-status    (when are-solver
+      ;;                     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+      ;;                                      {:keypath [(keyword (str (ut/replacer are-solver
+      ;;                                                                            ":solver/" "solver-status/*client-name*>")))]}))
+      ]
+  
+  (tapp>> [:intro-map intro-map ])   
+  
+  ;[re-com/box :child (str intro-map)]  
+
+  [re-com/box 
+   :size "none" 
+   :height (px (- height-int 70)) 
+   :style {:overflow-y "auto" 
+           :overflow-x "hidden" 
+           :margin-left "-22px"}
+   :child
+   [re-com/v-box
+    :style {:background-color (theme-pull :theme/editor-param-background-color nil) ;; "#0b1122"
+            :margin-top       "4px"
+            :padding-right    "2px"}
+    :children (for [k intro-map]
+                (let [
+                  {:keys [item-value item-name repl-type]} k
+                      ;meta @(ut/tracked-subscribe [::meta-from-query-name k])
+                      ;nname               @(ut/tracked-sub ::panel-name-only {:panel-key k})
+                      ;[rows fields]       @(ut/tracked-subscribe [::panel-counts k])
+                      ;query-panel         k ;@(ut/tracked-subscribe [::panel-from-query-name k])
+                      ;subq-blocks         @(ut/tracked-sub ::subq-panels-alpha {:panel-id selected-block})
+                      ;subq-mapping        @(ut/tracked-sub ::subq-mapping-alpha {})
+                      ;parent-of-selected? (some #(= % query-panel) subq-blocks)
+                      ;upstream?           (some #(= % query-panel) (ut/cached-upstream-search subq-mapping selected-block))
+                      ;downstream?         (some #(= % query-panel) (ut/cached-downstream-search subq-mapping selected-block))
+                      ;selected?           @(ut/tracked-subscribe [::has-query? selected-block k])
+                      dtype (ut/data-typer item-value)
+                      dcolor (get @(ut/tracked-sub ::conn/data-colors {}) dtype)
+                      ]
+                  [re-com/v-box :attr
+                   {;:on-mouse-enter #(reset! query-hover k)
+                    ;:on-mouse-leave #(reset! query-hover nil)
+                    ;:on-click       #(ut/tracked-dispatch [::select-block query-panel])
+                    } 
+                   :style
+                   {;:border           (cond (= selected-block query-panel) (str "2px solid " (theme-pull :theme/universal-pop-color "#9973e0"))
+                    ;                        parent-of-selected?            "2px solid #e6ed21"
+                    ;                        upstream?                      "2px solid #7be073"
+                    ;                        downstream?                    "2px dashed #05dfff"
+                    ;                        :else                          (str "1px solid "
+                    ;                                                            (theme-pull :theme/editor-font-color nil)
+                    ;                                                            33))
+                    :border          (str "1px solid " dcolor)
+                    :color dcolor
+                    ;:color            (if (or selected? (= k @query-hover))
+                    ;                    (theme-pull :theme/grid-selected-font-color nil)
+                    ;                    (str (theme-pull :theme/editor-font-color nil) 99))
+                    :cursor           "pointer"
+                    :background-color (str dcolor 55)
+                    ;:background-color (if (= k @query-hover)
+                    ;                    (str (theme-pull :theme/grid-selected-background-color nil) 55)
+                    ;                    (if selected? (theme-pull :theme/grid-selected-background-color nil) "inherit"))
+                    } 
+                   :children
+                   [[re-com/h-box 
+                     :justify :between 
+                     :size "auto"
+                     :width "100%"
+                     :children
+                     [[re-com/box :child (str item-name) :size "auto" :style
+                       {:font-weight 700 :font-size "13px" :padding-left "4px" :padding-right "4px"}]
+                      
+                      [re-com/box :child (str dtype) :size "auto" :style
+                       {:font-weight 700 :font-size "13px" :padding-left "4px" :padding-right "4px"}]
+                      
+                      ]]
+                    [re-com/h-box :justify :between :children
+                     [[re-com/box :child (str repl-type) :style
+                       {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px"} :align :end]
+                      [re-com/box :child (str item-value) :style
+                       {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px"} :align
+                       :end]]]]]))]]
+
+                       ))
 
 (defn screen-block-browser
   [width-int height-int]

@@ -1,351 +1,8 @@
-{:orders
- {:kick-868154760
-  [:Age
-   :Fare
-   :PassengerId
-   :SibSp
-   :Parch
-   :Predicted
-   :Sex
-   :Survived
-   :Embarked
-   :Pclass],
-  :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :fields-sys [:field_name :field_type :data_type],
-  :connections-sys [:database_name :connection_id]},
+{:orders {},
  :reco-preview nil,
- :sql-source
- {:kick-868154760
-  {:select [:*],
-   :from
-   {:data
-    [{"Age" 22,
-      "Fare" 7.25,
-      "PassengerId" 1,
-      "SibSp" 1,
-      "Parch" 0,
-      "Predicted" 0,
-      "Sex" 1,
-      "Survived" 0,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 38,
-      "Fare" 71.2833,
-      "PassengerId" 2,
-      "SibSp" 1,
-      "Parch" 0,
-      "Predicted" 1,
-      "Sex" 0,
-      "Survived" 1,
-      "Embarked" 0,
-      "Pclass" 1}
-     {"Age" 26,
-      "Fare" 7.925,
-      "PassengerId" 3,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 1,
-      "Sex" 0,
-      "Survived" 1,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 35,
-      "Fare" 53.1,
-      "PassengerId" 4,
-      "SibSp" 1,
-      "Parch" 0,
-      "Predicted" 1,
-      "Sex" 0,
-      "Survived" 1,
-      "Embarked" 2,
-      "Pclass" 1}
-     {"Age" 35,
-      "Fare" 8.05,
-      "PassengerId" 5,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 0,
-      "Sex" 1,
-      "Survived" 0,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 28,
-      "Fare" 8.4583,
-      "PassengerId" 6,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 0,
-      "Sex" 1,
-      "Survived" 0,
-      "Embarked" 1,
-      "Pclass" 3}
-     {"Age" 54,
-      "Fare" 51.8625,
-      "PassengerId" 7,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 0,
-      "Sex" 1,
-      "Survived" 0,
-      "Embarked" 2,
-      "Pclass" 1}
-     {"Age" 2,
-      "Fare" 21.075,
-      "PassengerId" 8,
-      "SibSp" 3,
-      "Parch" 1,
-      "Predicted" 0,
-      "Sex" 1,
-      "Survived" 0,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 27,
-      "Fare" 11.1333,
-      "PassengerId" 9,
-      "SibSp" 0,
-      "Parch" 2,
-      "Predicted" 1,
-      "Sex" 0,
-      "Survived" 1,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 14,
-      "Fare" 30.0708,
-      "PassengerId" 10,
-      "SibSp" 1,
-      "Parch" 0,
-      "Predicted" 1,
-      "Sex" 0,
-      "Survived" 1,
-      "Embarked" 0,
-      "Pclass" 2}
-     {"Age" 4,
-      "Fare" 16.7,
-      "PassengerId" 11,
-      "SibSp" 1,
-      "Parch" 1,
-      "Predicted" 1,
-      "Sex" 0,
-      "Survived" 1,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 58,
-      "Fare" 26.55,
-      "PassengerId" 12,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 1,
-      "Sex" 0,
-      "Survived" 1,
-      "Embarked" 2,
-      "Pclass" 1}
-     {"Age" 20,
-      "Fare" 8.05,
-      "PassengerId" 13,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 0,
-      "Sex" 1,
-      "Survived" 0,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 39,
-      "Fare" 31.275,
-      "PassengerId" 14,
-      "SibSp" 1,
-      "Parch" 5,
-      "Predicted" 0,
-      "Sex" 1,
-      "Survived" 0,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 14,
-      "Fare" 7.8542,
-      "PassengerId" 15,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 0,
-      "Sex" 0,
-      "Survived" 0,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 55,
-      "Fare" 16,
-      "PassengerId" 16,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 1,
-      "Sex" 0,
-      "Survived" 1,
-      "Embarked" 2,
-      "Pclass" 2}
-     {"Age" 2,
-      "Fare" 29.125,
-      "PassengerId" 17,
-      "SibSp" 4,
-      "Parch" 1,
-      "Predicted" 0,
-      "Sex" 1,
-      "Survived" 0,
-      "Embarked" 1,
-      "Pclass" 3}
-     {"Age" 28,
-      "Fare" 13,
-      "PassengerId" 18,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 1,
-      "Sex" 1,
-      "Survived" 1,
-      "Embarked" 2,
-      "Pclass" 2}
-     {"Age" 31,
-      "Fare" 18,
-      "PassengerId" 19,
-      "SibSp" 1,
-      "Parch" 0,
-      "Predicted" 0,
-      "Sex" 0,
-      "Survived" 0,
-      "Embarked" 2,
-      "Pclass" 3}
-     {"Age" 28,
-      "Fare" 7.225,
-      "PassengerId" 20,
-      "SibSp" 0,
-      "Parch" 0,
-      "Predicted" 1,
-      "Sex" 0,
-      "Survived" 1,
-      "Embarked" 0,
-      "Pclass" 3}]}},
-  :Fare-drag-33 {:select [[[:sum :Fare] :Fare_sum]], :from [[nil :vv768]]}},
+ :sql-source {},
  :meta
- {:fields-sys
-  {:fields
-   {:field_name
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons {"ts" 1, "tour_name" 1, "title" 1},
-     :cardinality 100},
-    :field_type
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"TEXT" 6, "TIMESTAMP" 1},
-     :cardinality 28},
-    :data_type
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"string" 6, "datetime" 1},
-     :cardinality 28}},
-   :rowcount 7},
-  :tables-sys
-  {:fields
-   {:db_schema
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"none" 7},
-     :cardinality 14},
-    :db_catalog
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? true,
-     :commons {nil 7},
-     :cardinality 14},
-    :connection_id
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"met-on-tour" 7},
-     :cardinality 14},
-    :schema_cat
-    {:data-type "unknown",
-     :distinct 1,
-     :group-by? false,
-     :commons {nil 7},
-     :cardinality 14},
-    :table_name
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons {"tracks" 1, "shows" 1, "setlists" 1},
-     :cardinality 100},
-    :fields
-    {:data-type "integer",
-     :distinct 5,
-     :group-by? false,
-     :commons {8 2, 5 2, 12 1},
-     :cardinality 71}},
-   :rowcount 7},
-  :kick-868154760
-  {:fields
-   {:SibSp
-    {:data-type "integer",
-     :distinct 4,
-     :group-by? true,
-     :commons {0 11, 1 7, 4 1},
-     :cardinality 20},
-    :Predicted
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {1 10, 0 10},
-     :cardinality 10},
-    :Fare
-    {:data-type "float",
-     :distinct 19,
-     :group-by? true,
-     :commons {8.05 2, 71.2833 1, 8.4583 1},
-     :cardinality 94},
-    :Embarked
-    {:data-type "integer",
-     :distinct 3,
-     :group-by? true,
-     :commons {2 15, 0 3, 1 2},
-     :cardinality 15},
-    :Sex
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {0 11, 1 9},
-     :cardinality 10},
-    :PassengerId
-    {:data-type "integer",
-     :distinct 20,
-     :group-by? true,
-     :commons {8 1, 18 1, 10 1},
-     :cardinality 100},
-    :Survived
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {1 10, 0 10},
-     :cardinality 10},
-    :Parch
-    {:data-type "integer",
-     :distinct 4,
-     :group-by? true,
-     :commons {0 15, 1 3, 5 1},
-     :cardinality 20},
-    :Pclass
-    {:data-type "integer",
-     :distinct 3,
-     :group-by? true,
-     :commons {3 13, 1 4, 2 3},
-     :cardinality 15},
-    :Age
-    {:data-type "integer",
-     :distinct 15,
-     :group-by? true,
-     :commons {28 3, 14 2, 35 2},
-     :cardinality 75}},
-   :rowcount 20},
-  :new-query
+ {:new-query
   {:fields
    {:thread_count
     {:data-type "integer",
@@ -472,21 +129,6 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
-  :connections-sys
-  {:fields
-   {:database_name
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
-     :cardinality 30},
-    :connection_id
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
-     :cardinality 100}},
-   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -638,13 +280,6 @@
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
    :rowcount 30}},
- :default-col-widths
- {:block-10643 {:new-query-1-py3 100},
-  :virtual-panel {:kick-868154760 100},
-  :system-connections-list* {:connections-sys 111},
-  :system-tables-list* {:tables-sys 137},
-  :system-fields-list* {:fields-sys 170},
-  :block-5001 {:Fare-drag-33 ##Inf}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -883,56 +518,56 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [1061249403 1039866795 4294705152],
+ :memory [379762147 353436123 4294705152],
  :flow-subs
  [:time/now-seconds
   :data/new-clojure-1
+  :solver-status/*client-name*
+  :solver-status/*client-name*>raw-custom-override685268485>running?
   :flow/openai-image-gen-ladder3>hiccup-image-box-w-png-vw
   :flow/flow-forever>*running?
-  :solver-status/*client-name*>get-my-colors308020694>running?
   :client/amazing-oval-nightingale-11>stats>memory
+  :solver/get-my-colors409689395
+  :solver-status/*client-name*>get-my-colors409689395>running?
   :client/*client-name*>stats>memory
-  :solver-status/*client-name*
-  :solver/get-my-colors308020694
-  :solver/raw-custom-override1116852110
-  :solver/get-my-colors345208371
   :flow/live-scratch-flow>*running?
+  :solver/get-my-colors-727185878
   :time/second
   :flow/flow-forever>:final-math
-  :solver-status/*client-name*>get-my-colors345208371>running?
-  :solver-status/*client-name*>raw-custom-override1116852110>running?
+  :solver/raw-custom-override685268485
+  :solver-status/*client-name*>get-my-colors-727185878>running?
   :solver/colors-of-the-moment>darkest],
- :client-name :plentiful-octohedral-llama-33,
+ :client-name :terrific-short-sheep-29,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 3563, :h 1824},
- :post-meta {:kick-868154760 {:* {:rowcount 20}}},
+ :window {:w 2508, :h 1636},
+ :post-meta {},
  :status
  {:heartbeat
   {:kick
    [:time/now-seconds
     :data/new-clojure-1
+    :solver-status/*client-name*
+    :solver-status/*client-name*>raw-custom-override685268485>running?
     :flow/openai-image-gen-ladder3>hiccup-image-box-w-png-vw
     :flow/flow-forever>*running?
-    :solver-status/*client-name*>get-my-colors308020694>running?
     :client/amazing-oval-nightingale-11>stats>memory
+    :solver/get-my-colors409689395
+    :solver-status/*client-name*>get-my-colors409689395>running?
     :client/*client-name*>stats>memory
-    :solver-status/*client-name*
-    :solver/get-my-colors308020694
-    :solver/raw-custom-override1116852110
-    :solver/get-my-colors345208371
     :flow/live-scratch-flow>*running?
+    :solver/get-my-colors-727185878
     :time/second
     :flow/flow-forever>:final-math
-    :solver-status/*client-name*>get-my-colors345208371>running?
-    :solver-status/*client-name*>raw-custom-override1116852110>running?
+    :solver/raw-custom-override685268485
+    :solver-status/*client-name*>get-my-colors-727185878>running?
     :solver/colors-of-the-moment>darkest]},
   :alert1 {:alerts :alert2}},
  :screen-name "pomp-girl2",
  :recos-page2 0,
- :selected-tab "prismatic serval",
+ :selected-tab "willing owl",
  :snapshots
  {:params
   {"betty"
@@ -2745,14 +2380,14 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   220
+   548
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1195116061,
+ :user-params-hash 1136239008,
  :grid-recos? true,
- :session-hash -1245826186,
+ :session-hash 2133895994,
  :resolved-queries
  {:new-query
   {:cache? false,
@@ -3415,6 +3050,15 @@
       :font-family :theme/base-font}
      :child
      "hi!"]}},
+  :block-7033
+  {:h 15,
+   :w 13,
+   :root [35 2],
+   :tab "willing owl",
+   :selected-view :hi,
+   :name "block-7033",
+   :views {:hi [:data-viewer [:app-db [:panels :block-9804]]]},
+   :queries {}},
   :block-2810
   {:clojure
    {:new-clojure
@@ -3870,6 +3514,7 @@
      :child
      "hi!"]},
    :queries {}},
+  :selected-view :new-clojjsdddddfdure-6dvv,
   :block-7319
   {:h 5,
    :w 8,
@@ -4108,6 +3753,50 @@
         :dataKey :sys_load,
         :stroke-width 3,
         :fill :param/generated-colors>colors>0}]]]}},
+  :block-9804
+  {:clojure
+   {:new-cdflojure1-2d-1
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (def poop [1 2 3])
+        (defonce fart ["string" "mnap"])
+        (println jvm-version)
+        (str
+          "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇")))},
+   :name "block-9804",
+   :w 14,
+   :selected-mode
+   {:new-clojjsdddddfdure-6dvv-1-1 :text, :new-cdflojure1-2d-1 :text},
+   :selected-view :new-cdflojure1-2d-1,
+   :root [6 15],
+   :h 4,
+   :queries {},
+   :tab "willing owl",
+   :views
+   {:hiiii
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-9804.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]}},
   :block-7922
   {:name "block-7922",
    :w 5,
@@ -4194,7 +3883,7 @@
      :child
      "hi!"]},
    :queries {}}},
- :selected-block "none!",
+ :selected-block :block-9804,
  :theme-colors-hashmap
  {"float" "#a6c681",
   "boolean" "#80b5b7",
@@ -4210,8 +3899,7 @@
   "unknown" "#29203b",
   "date" "#0f241f"},
  :click-param
- {nil {nil nil},
-  :fields-sys {:field_name "location", :field_type "TEXT", :data_type "string"},
+ {:fields-sys {:field_name "location", :field_type "TEXT", :data_type "string"},
   :viz-shapes-sys {:combo_edn nil},
   :tables-sys
   {:db_schema "none",
@@ -4235,19 +3923,19 @@
     :width
     :width-px
     :style
-    {:background-color "#3c3043",
+    {:background-color "#192530",
      :border-radius "20px",
      :font-size "12px",
      :font-weight 700,
-     :color "#322833"}
+     :color "#c9bab9"}
     :children
-    [[:box :child "./images/gen/b64-image3-80884-15266.png"]
+    [[:box :child "./images/gen/b64-image3-63006-33351.png"]
      [:box
       :size
       "auto"
       :child
       [:img
-       {:src "./images/gen/b64-image3-80884-15266.png",
+       {:src "./images/gen/b64-image3-63006-33351.png",
         :style {:border-radius "30px"}}]]]],
    :simple-python-exec>*running? false,
    :live-scratch-flow>*running? false},
@@ -4255,7 +3943,7 @@
   {:flow_id "simple-python-exec",
    :file_path "./flows/simple-python-exec.edn",
    :last_modified "2024-03-12 02:37:43"},
-  :time {:now-seconds "Saturday, June 22nd 9:38:40PM", :month 4, :second 40},
+  :time {:now-seconds "Friday, June 28th 12:40:58AM", :month 4, :second 58},
   :grid1-sys* {},
   :viz-tables-sys2 {:table_name :new-query-1},
   :user-dropdown-sys {:req-field "tour_name"},
@@ -4265,11 +3953,13 @@
    :plentiful-octohedral-llama-33>stats>memory nil,
    :elegant-icosahedral-rhinoceros-30>stats>memory nil,
    :simple-narrow-camel-5>stats>memory 184,
+   :prominent-octohedral-frog-2>stats>memory nil,
    :quick-thin-serval-37>stats>memory nil,
    :quiet-cubic-beaver-23>stats>memory nil,
    :honest-copper-cockroach-0>stats>memory nil,
-   :*client-name*>stats>memory 978,
+   :*client-name*>stats>memory 344,
    :accepted-diamond-zebra-40>stats>memory nil,
+   :terrific-short-sheep-29>stats>memory nil,
    :brave-prismatic-camel-31>stats>memory nil,
    :distinguished-hexagonal-badger-16>stats>memory nil,
    :amazing-oval-nightingale-11>stats>memory 504,
@@ -4287,8 +3977,18 @@
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data nil,
-   :selected-view nil,
+   :selected-view-data
+   (let [clojure-version (clojure-version)
+         jvm-version (System/getProperty "java.version")]
+     (println jvm-version)
+     (str
+       "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+       clojure-version
+       " on "
+       jvm-version
+       " JVM tech"
+       " 🥕🐇")),
+   :selected-view [:clojure :new-cdflojure1-2d-1],
    :generated-colors
    [:run-solver
     [:get-my-colors
@@ -4296,7 +3996,7 @@
       " /home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-76876-55342.png"}]],
    :miraculous-orange-hedgehog "new parameter value!",
    :rel-image-path "images/large/b64-image3-76876-55342-4k.webp",
-   :selected-block :block-5001,
+   :selected-block :block-9804,
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",
@@ -4396,7 +4096,7 @@
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
   :connections-sys {:database_name "SQLite", :connection_id "met-on-tour"},
-  :sys {:selected-tab "prismatic serval", :selected-tab-idx 5},
+  :sys {:selected-tab "willing owl", :selected-tab-idx 6},
   :searches-sub-types-sys
   {:item_key "amazing-oval-nightingale-11",
    :is_live 1,
@@ -4407,6 +4107,8 @@
   :solver
   {:raw-custom-override-1280155551
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        58Gi       8.8Gi       470Mi        58Gi        65Gi\nSwap:             0B          0B          0B\n\n",
+   :raw-custom-override524136702
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override-1061429786
    [:v-box
     :padding
@@ -4713,6 +4415,44 @@
     :second-brightest "#74847c",
     :brightest "#c681aa",
     :most-contrasting-light "#c681aa"},
+   :get-my-colors-727185878
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
    :get-my-colors-1838023526
    {:second-darkest "#352260",
     :highest-saturation "#f7c9cc",
@@ -4794,6 +4534,46 @@
     {:error "This request has been blocked by our content filters.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :get-my-colors-12582346
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
+   :raw-custom-override195045909
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override1668161178
    {:error
     {:error "This request has been blocked by our content filters.",
@@ -4839,6 +4619,209 @@
     :second-brightest "#7fbad0",
     :brightest "#cbafc9",
     :most-contrasting-light "#7fbad0"},
+   :raw-custom-override2082488441
+   [{"Age" 22,
+     "Fare" 7.25,
+     "PassengerId" 1,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 38,
+     "Fare" 71.2833,
+     "PassengerId" 2,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 1}
+    {"Age" 26,
+     "Fare" 7.925,
+     "PassengerId" 3,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 35,
+     "Fare" 53.1,
+     "PassengerId" 4,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 35,
+     "Fare" 8.05,
+     "PassengerId" 5,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 8.4583,
+     "PassengerId" 6,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 1,
+     "Pclass" 3}
+    {"Age" 54,
+     "Fare" 51.8625,
+     "PassengerId" 7,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 2,
+     "Fare" 21.075,
+     "PassengerId" 8,
+     "SibSp" 3,
+     "Parch" 1,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 27,
+     "Fare" 11.1333,
+     "PassengerId" 9,
+     "SibSp" 0,
+     "Parch" 2,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 14,
+     "Fare" 30.0708,
+     "PassengerId" 10,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 2}
+    {"Age" 4,
+     "Fare" 16.7,
+     "PassengerId" 11,
+     "SibSp" 1,
+     "Parch" 1,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 58,
+     "Fare" 26.55,
+     "PassengerId" 12,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 20,
+     "Fare" 8.05,
+     "PassengerId" 13,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 39,
+     "Fare" 31.275,
+     "PassengerId" 14,
+     "SibSp" 1,
+     "Parch" 5,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 14,
+     "Fare" 7.8542,
+     "PassengerId" 15,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 0,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 55,
+     "Fare" 16,
+     "PassengerId" 16,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 2}
+    {"Age" 2,
+     "Fare" 29.125,
+     "PassengerId" 17,
+     "SibSp" 4,
+     "Parch" 1,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 1,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 13,
+     "PassengerId" 18,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 1,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 2}
+    {"Age" 31,
+     "Fare" 18,
+     "PassengerId" 19,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 0,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 7.225,
+     "PassengerId" 20,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 3}],
+   :raw-custom-override2046742377
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override1857002409
    [:v-box
     :padding
@@ -4862,7 +4845,11 @@
       [:img
        {:src "./images/gen/b64-image3-58136-79911.png",
         :style {:border-radius "30px"}}]]]],
+   :raw-custom-override-181173015
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override296905666
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override1069018025
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :get-my-colors2147070240
    {:second-darkest "#392f5e",
@@ -4902,6 +4889,8 @@
     :second-brightest "#b1baf1",
     :brightest "#dfc5d0",
     :most-contrasting-light "#dfc5d0"},
+   :raw-custom-override-363268343
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :get-my-colors-1266998909
    {:second-darkest "#311756",
     :highest-saturation "#1a0429",
@@ -4940,6 +4929,8 @@
     :second-brightest "#6dd1e7",
     :brightest "#e5b5dc",
     :most-contrasting-light "#6cb567"},
+   :raw-custom-override-1225391870
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override1085406457 nil,
    :get-my-colors720628555
    {:second-darkest "#352260",
@@ -5018,7 +5009,9 @@
     :second-brightest "#74847c",
     :brightest "#c681aa",
     :most-contrasting-light "#c681aa"},
-   :colors-of-the-moment>darkest "#051c16",
+   :raw-custom-override685268485
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :colors-of-the-moment>darkest "#061631",
    :raw-custom-override-1471694664
    "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
    :raw-custom-override-55990886
@@ -5065,6 +5058,8 @@
     :second-brightest "#4ab3dc",
     :brightest "#f7c9cc",
     :most-contrasting-light "#f7c9cc"},
+   :raw-custom-override1891806685
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override-1657692765
    "top - 19:20:18 up 3 days,  1:45,  6 users,  load average: 9.37, 8.75, 8.20\nTasks: 373 total,   2 running, 371 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 32.3 us,  2.1 sy,  7.7 ni, 57.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,   8975.8 free,  60165.5 used,  59495.5 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  66776.4 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n2774667 ryanr     20   0   81.3g  48.1g 292784 S 256.2  38.3   2963:58 java\n    867 ryanr     31  11 2187020 393656  19328 S  93.8   0.3 265:49.05 syncthi+\n2802883 ryanr     20   0 1132.2g   1.1g 122860 S  62.5   0.9 633:56.13 chrome\n   2206 ryanr     20   0   33.2g 737336 300724 S  50.0   0.6   1827:03 chrome\n   5755 ryanr     20   0 1132.3g 662396 192488 R  12.5   0.5   2614:53 chrome\n   1579 ryanr     20   0 3639932   1.4g 143744 S   6.2   1.1 307:08.23 kwin_x11\n   2208 ryanr     20   0   32.4g 139112 105400 S   6.2   0.1  18:53.04 chrome\n2913639 ryanr     20   0 1132.3g 588508 185172 S   6.2   0.4 328:02.38 chrome\n3870695 ryanr     20   0   13344   4352   3456 R   6.2   0.0   0:00.01 top\n      1 root      20   0  168124  12772   8164 S   0.0   0.0   0:03.00 systemd\n      2 root      20   0       0      0      0 S   0.0   0.0   0:00.19 kthreadd\n      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp\n      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+\n\n------------------------[ thursday, june 20th 7:20:17pm ]-------------------------",
    :raw-custom-override-916986421
@@ -5193,6 +5188,10 @@
     :second-brightest "#83c1da",
     :brightest "#d0a1dd",
     :most-contrasting-light "#c540b7"},
+   :raw-custom-override-540258200
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override-2078623081
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :get-my-colors1860093772
    {:second-darkest "#384963",
     :highest-saturation "#37c3c0",
@@ -5231,6 +5230,10 @@
     :second-brightest "#37c3c0",
     :brightest "#bde6cb",
     :most-contrasting-light "#bde6cb"},
+   :raw-custom-override1685863455
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override257993920
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :get-my-colors308020694
    {:second-darkest "#221d32",
     :highest-saturation "#9c3464",
@@ -5345,6 +5348,8 @@
     :second-brightest "#7bbff0",
     :brightest "#c7a9d2",
     :most-contrasting-light "#af6958"},
+   :raw-custom-override-748653809
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override-971514787
    "top - 23:05:31 up 1 day,  5:30,  6 users,  load average: 7.12, 6.77, 6.73\nTasks: 396 total,   7 running, 389 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 68.4 us,  9.7 sy,  0.0 ni, 21.9 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,  32018.0 free,  42450.5 used,  54168.3 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  84187.2 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n1766875 ryanr     20   0   75.7g   6.4g 290944 S 220.0   5.1  12:21.24 java\n   9250 ryanr     20   0 1132.3g   2.0g 180532 R 113.3   1.6   1137:51 chrome\n1401249 ryanr     20   0 1132.2g   1.9g 151648 R 113.3   1.5 299:50.75 chrome\n   5755 ryanr     20   0 1132.3g   1.0g 165108 R 106.7   0.8   1055:23 chrome\n  24170 ryanr     20   0   24.9g   1.9g 491016 S 106.7   1.5 111:51.69 python3+\n1752975 ryanr     20   0 1132.3g 868568 224028 S  80.0   0.7  16:51.46 chrome\n   6565 ryanr     20   0 1132.3g   1.1g 185672 R  60.0   0.9 793:52.48 chrome\n1569006 ryanr     20   0 1132.2g 994492 140620 R  60.0   0.8 147:05.95 chrome\n  24122 ryanr     20   0 1130.9g 439420 112652 S  26.7   0.3  89:20.56 chainner\n  52873 ryanr     20   0 1132.2g   2.4g 116608 S  26.7   1.9 225:28.82 chrome\n   2206 ryanr     20   0   33.4g 993.3m 501320 S  20.0   0.8 751:28.09 chrome\n   1033 root      20   0   24.5g 369364 182188 S  13.3   0.3  72:23.51 Xorg\n1566580 ryanr     20   0  161112   7148   5120 S  13.3   0.0   2:00.21 btop\n\n------------------------[ tuesday, june 18th 11:05:30pm ]-------------------------",
    :get-my-colors346368138
@@ -5388,6 +5393,44 @@
    :raw-custom-override-1561961887
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 7  0      0 9191420 1459884 59463492    0    0    13    60    6   11 40  3 57  0  0\n\n",
    :get-my-colors768651776
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
+   :get-my-colors543308716
    {:second-darkest "#221d32",
     :highest-saturation "#9c3464",
     :most-contrasting "#c681aa",
@@ -5502,8 +5545,48 @@
     :second-brightest "#74847c",
     :brightest "#c681aa",
     :most-contrasting-light "#c681aa"},
+   :raw-custom-override1549578475
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override-569051388
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        27Gi        76Gi       448Mi        21Gi        96Gi\nSwap:             0B          0B          0B\n\n",
+   :get-my-colors409689395
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
    :raw-custom-override1790254665
    "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
    :get-my-colors345208371
@@ -5948,6 +6031,8 @@
      "Survived" 1,
      "Embarked" 0,
      "Pclass" 3}],
+   :raw-custom-override-1522422338
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override1025564379
    [{"Age" 22,
      "Fare" 7.25,
@@ -6149,6 +6234,8 @@
      "Survived" 1,
      "Embarked" 0,
      "Pclass" 3}],
+   :raw-custom-override794065810
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :get-my-colors773783877
    {:second-darkest "#221d32",
     :highest-saturation "#9c3464",
