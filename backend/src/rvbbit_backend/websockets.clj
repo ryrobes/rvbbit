@@ -144,40 +144,43 @@
 (def jvm-stats-every 30)
 
 (defonce general-scheduler-thread-pool
-  (Executors/newScheduledThreadPool 32))
+  (Executors/newScheduledThreadPool 16))
 ;; (defonce general-scheduler-thread-pool
 ;;   (ThreadPoolExecutor. 4 50 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
   ;; (defonce custom-watcher-thread-master-pool 
   ;;   (Executors/newFixedThreadPool 32))
 (defonce custom-watcher-thread-master-pool ;; master watchers
-  (ThreadPoolExecutor. 4 50 30 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+  (ThreadPoolExecutor. 10 50 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
   ;; (defonce custom-watcher-thread-master-pool
   ;;   (ThreadPoolExecutor. 4 50 60 TimeUnit/SECONDS (LinkedBlockingQueue.)))
 
 ;; (defonce custom-watcher-thread-pool
 ;;   (ThreadPoolExecutor. 10 1000 60 TimeUnit/SECONDS (SynchronousQueue.)))
 (defonce custom-watcher-thread-pool ;; if pool is 100% full, will fallback to parent callers thread pool instead of rejection
-  (ThreadPoolExecutor. 5 1500 10 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))  
+  (ThreadPoolExecutor. 10 1500 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))  
+
+
+
 
 ;; TODO put back in general queue once we are satisfied the bug is gone
-(defonce time-scheduler
-  (Executors/newScheduledThreadPool 4))
+;; (defonce time-scheduler
+;;   (Executors/newScheduledThreadPool 4))
 
 ;;(defonce websocket-thread-pool (Executors/newFixedThreadPool 300)) ; Pool for WebSocket connections
 ;; (defonce websocket-thread-pool (doto (Executors/newFixedThreadPool 300)
 ;;                                  (.prestartAllCoreThreads)))
 (defonce websocket-thread-pool ;; master watchers
-  (ThreadPoolExecutor. 10 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+  (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
 (defonce solver-thread-pool ;; master watchers
-  (ThreadPoolExecutor. 5 300 30 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+  (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
 (defn execute-solver-task [f]
   (.execute solver-thread-pool f))
 
 (defonce push-thread-pool ;; master watchers
-  (ThreadPoolExecutor. 5 300 30 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+  (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
 (defn execute-push-task [f]
   (.execute push-thread-pool f))
@@ -1048,9 +1051,28 @@
       (ut/pp [:error-getting-timeout client-name (.getMessage e)])
       1000))) ; Default timeout if anything goes wrong
 
+;; custom-watcher-thread-pool ;; websocket-thread-pool 
+(defn adjust-thread-pool-size [thread-pool new-core-size new-max-size]
+  (.setMaximumPoolSize thread-pool new-max-size)
+  (.setCorePoolSize thread-pool new-core-size))
+
+(defn client-sized-pools []
+  (let [client-count (max (count @wl/sockets) 1)
+          ;new-core-size (max 10 (min client-count 50))   ; Min core size of 10, max core size of 50
+          ;new-max-size  (max 20 (min (* 2 client-count) 100))
+        watcher-core (+ (* client-count 45) 50)
+        watcher-max (* client-count 120)
+        ws-core (+ (* client-count 2) 5)
+        ws-max  (* client-count 5)]
+    (ut/pp [:adjusting-pool-sizes-for client-count :clients
+            [[:websocket-pool ws-core ws-max] [:watcher-pool watcher-core watcher-max]]])
+    (adjust-thread-pool-size custom-watcher-thread-pool watcher-core watcher-max)
+    (adjust-thread-pool-size websocket-thread-pool ws-core ws-max)))
+
 (defn new-client
   [client-name]
   (ut/pp [:new-client-is-alive! client-name :opening (count client-queue-atoms) :queues])
+  ;(client-sized-pools)
   (swap! ack-scoreboard assoc-in [client-name :booted-ts] (System/currentTimeMillis))
   (doseq [cq client-queue-atoms]
     (let [new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)] (swap! cq assoc client-name new-queue-atom))))
@@ -3483,15 +3505,15 @@
     (ut/pp [:reaction-runner flow-id keypath client-name]) ;; (ut/replace-large-base64
     (kick client-name (vec (cons :flow-runner keypath)) new-value nil nil nil)))
 
-(defn purge-dead-client-watchers
-  []
+(defn purge-dead-client-watchers []
   (let [cc (dissoc (client-statuses) :rvbbit)]
     (doseq [[k {:keys [last-seen-seconds]}] cc
             :let                            [subs (get @atoms-and-watchers k)]
             :when                           (> last-seen-seconds 6000)]
       (ut/pp [:dead-client :cleaning-up k])
+      ;(client-sized-pools)
       (swap! atoms-and-watchers dissoc k) ;; remove client from watchers atom
-      (swap! ack-scoreboard dissoc k)     ;; remove client client board
+      (swap! ack-scoreboard dissoc k)     ;; remove client from client board
       )))
 
 (defn accumulate-unique-runs
@@ -5468,7 +5490,7 @@
 (def pools [[push-thread-pool "push-thread-pool"]
             [solver-thread-pool "solver-thread-pool"]
             [websocket-thread-pool "websocket-thread-pool"]
-            [time-scheduler "time-scheduler"]
+            ;[time-scheduler "time-scheduler"]
             [general-scheduler-thread-pool "general-scheduler-thread-pool"]
             [custom-watcher-thread-master-pool "custom-watcher-thread-master-pool"]
             [custom-watcher-thread-pool "custom-watcher-thread-pool"]])
@@ -5477,7 +5499,7 @@
   (into {} (for [[pool pname] pools]
              {pname (pool-monitor pool)})))
 
-(defn draw-pool-stats [& [kks]]
+(defn draw-pool-stats [& [kks freqs]]
   (doseq [pp (if kks
                kks
                (keys @pool-stats-atom))
@@ -5488,6 +5510,7 @@
                                     (average-in-chunks
                                      (mapv kkey (get @pool-stats-atom pp))  ff))
                                   (str kkey " : " pp) sym :color color :freq ff)))
+                freqs (if (nil? freqs) [1 15 60] freqs)
                 colors [:green :yellow :blue :magenta :cyan :white]
                 color-index (mod (hash pp) (count colors))
                 color (nth colors color-index)]]
@@ -5495,19 +5518,12 @@
     (ut/pp [:pool pp])
 
     (ut/pp [:current-pool-size])
-    (draw-it :current-pool-size "threads" 1 color)
-    (draw-it :current-pool-size "threads" 15 color)
-    (draw-it :current-pool-size "threads" 60 color)
-
+    (doseq [ff freqs] (draw-it :current-pool-size "threads" ff color))
     (ut/pp [:active-threads])
-    (draw-it :active-threads "threads" 1 color)
-    (draw-it :active-threads "threads" 15 color)
-    (draw-it :active-threads "threads" 60 color)
-
+    (doseq [ff freqs] (draw-it :active-threads "threads" ff color))
     (ut/pp [:percent-float])
-    (draw-it :percent-float "%" 1 color)
-    (draw-it :percent-float "%" 15 color)
-    (draw-it :percent-float "%" 60 color)))
+    (doseq [ff freqs] (draw-it :percent-float "%" ff color))))
+
 
 (defn draw-cpu-stats []
   (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))

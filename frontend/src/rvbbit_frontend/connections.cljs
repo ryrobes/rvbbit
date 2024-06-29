@@ -235,7 +235,7 @@
 
 (re-frame/reg-sub ::logic-and-params (fn [_ {:keys [m p]}] (logic-and-params-fn m p))) ;; cheeky sub hack under certain conditions?
 
-(defn logic-and-params [m p] @(rfa/sub ::logic-and-params {:m m :p p}))
+(defn logic-and-params [m p] @(ut/tracked-sub ::logic-and-params {:m m :p p}))
 
 (defn logic-and-params-fn
   [block-map panel-key]
@@ -245,7 +245,7 @@
           valid-body-params (vec (ut/get-compound-keys block-map))
           workspace-params (into {}
                                  (for [k valid-body-params] ;; deref here?
-                                   {k @(rfa/sub ::clicked-parameter-key-alpha {:keypath [k]})}))
+                                   {k @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [k]})}))
           value-walks-targets (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
           value-walks (into {}
                             (for [k value-walks-targets] ;all-sql-call-keys]
@@ -256,11 +256,11 @@
                                     field (keyword (first gs))]
                                 {k (if (not (integer? row))
                                      (str field)
-                                     (get-in @(rfa/sub ::sql-data-alpha {:keypath [ds]}) [row field]))})))
+                                     (get-in @(ut/tracked-sub ::sql-data-alpha {:keypath [ds]}) [row field]))})))
           condi-walks-targets (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
           condi-walks (into {}
                             (for [k condi-walks-targets]
-                              {k @(rfa/sub ::condi-value {:condi-key (keyword (last (ut/splitter (ut/safe-name k) "/")))})}))
+                              {k @(ut/tracked-sub ::condi-value {:condi-key (keyword (last (ut/splitter (ut/safe-name k) "/")))})}))
           into-walk-map2 (fn [obody]
                            (let [;obody (ut/postwalk-replacer condi-walks orig-body)
                                  kps       (ut/extract-patterns obody :into 3) ;(kv-map-fn
@@ -402,7 +402,7 @@
                                    (ut/postwalk-replacer {nil ""}
                                                          (into {}
                                                                (for [k templated-strings-vals]
-                                                                 {k @(rfa/sub ::clicked-parameter-key-alpha {:keypath [k]})})))
+                                                                 {k @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [k]})})))
                                    {})
           out-block-map (if templates? (ut/deep-template-replace templated-strings-walk out-block-map) out-block-map)]
       (if (ut/ne? (vec (ut/get-compound-keys out-block-map))) (logic-and-params-fn out-block-map panel-key) out-block-map))
@@ -509,7 +509,7 @@
                                                    (for [v kps]
                                                      (let [kws             (vec (filter #(cstr/includes? (str %) "/")
                                                                                   (ut/deep-flatten v)))
-                                                           wm              @(rfa/sub ::resolve-click-param {:long-keyword kws})
+                                                           wm              @(ut/tracked-sub ::resolve-click-param {:long-keyword kws})
                                                            v0              (ut/postwalk-replacer wm v)
                                                            [_ l this that] v0]
                                                        {v (if l this that)})))]
@@ -677,7 +677,7 @@
                                                       (for [v kps]
                                                         (let [kws             (vec (filter #(cstr/includes? (str %) "/")
                                                                                      (ut/deep-flatten v)))
-                                                              wm              @(rfa/sub ::resolve-click-param {:long-keyword kws})
+                                                              wm              @(ut/tracked-sub ::resolve-click-param {:long-keyword kws})
                                                               v0              (ut/postwalk-replacer wm v)
                                                               [_ l this that] v0]
                                                           {v (if l this that)})))]
@@ -860,7 +860,7 @@
 (re-frame/reg-event-db ::clear-query-history
                        (fn [db [_ query-id]]
                          (let [;panel @(ut/tracked-subscribe [::lookup-panel-key-by-query-key query-id])
-                               panel @(rfa/sub ::lookup-panel-key-by-query-key-alpha {:query-key query-id})]
+                               panel @(ut/tracked-sub ::lookup-panel-key-by-query-key-alpha {:query-key query-id})]
                            (-> db
                                (assoc-in [:panels panel :queries query-id :_last-run] (ut/get-time-format-str))
                                (ut/dissoc-in [:query-history query-id])
@@ -920,7 +920,7 @@
 (defn theme-pull
   [cmp-key fallback & test-fn]
   (let [;v                   @(ut/tracked-subscribe [::clicked-parameter-key [cmp-key]])
-        v                   @(rfa/sub ::clicked-parameter-key-alpha {:keypath [cmp-key]})
+        v                   @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [cmp-key]})
         t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
         t1                  (keyword (first t0))
         t2                  (keyword (last t0))
@@ -957,7 +957,7 @@
   (when (not (cstr/starts-with? (str (first keypath)) ":query-preview")) ;; lets not sniff rando
     (let [fields        (get @(ut/tracked-subscribe [::sql-metadata keypath]) :fields [])
           honey-sql     (if (empty? (ut/clean-sql-from-ui-keys honey-sql))
-                          @(rfa/sub ::sql-source {:kkey (first keypath)})
+                          @(ut/tracked-sub ::sql-source {:kkey (first keypath)})
                           honey-sql)
           connection-id (or (get honey-sql :connection-id) (if (nil? connection-id) "cache.db" connection-id))
           deep-meta?    (or deeps? (get honey-sql :deep-meta?))
@@ -975,7 +975,7 @@
                                        {}))]
         (when ;true
           (and (not (= keypath [:query-preview])) ;; no need to meta on browsing viz recos
-               @(rfa/sub ::sql-meta-not-run? {:keypath (conj (conj keypath f) name) :query hsql}))
+               @(ut/tracked-sub ::sql-meta-not-run? {:keypath (conj (conj keypath f) name) :query hsql}))
           (dorun (ut/tracked-dispatch [::wfx/request :default
                                        {:message     {:kind          :honey-xcall
                                                       :ui-keypath    (conj (conj keypath f) name)
@@ -1003,7 +1003,7 @@
     (doseq [[[f name] {:keys [style logic]}] style-rules]
       (let [kp   (conj (conj (conj keypath f) name) :styles)
             hsql {:select [[[:case logic 1 :else 0] :v]] :from [(ut/keypath-munger keypath)]}]
-        (when (and @(rfa/sub ::sql-style-not-run? {:keypath kp :query hsql :pquery honey-sql})
+        (when (and @(ut/tracked-sub ::sql-style-not-run? {:keypath kp :query hsql :pquery honey-sql})
                    (not @(ut/tracked-subscribe [::sql-query-not-run? keypath honey-sql])))
           (dorun (ut/tracked-dispatch [::wfx/request :default
                                        {:message     {:kind          :honey-xcall
@@ -1046,7 +1046,7 @@
               keypath ;(conj keypath name)
             hsql {:select [[[:case logic 1 :else 0] :v]]}]
         (when ;true
-          @(rfa/sub ::sql-condi-not-run? {:keypath kp :query hsql :pquery kk})
+          @(ut/tracked-sub ::sql-condi-not-run? {:keypath kp :query hsql :pquery kk})
           (dorun (ut/tracked-dispatch [::wfx/request :default
                                        {:message     {:kind          :honey-xcall
                                                       :ui-keypath    kp
@@ -1092,7 +1092,7 @@
          rules         (when has-rules?
                          (vec (for [[[col name] logic] style-rules]
                                 [[:case (:logic logic) 1 :else 0] (keyword (str "styler_" (ut/safe-name name)))])))
-         panel-key     @(rfa/sub ::lookup-panel-key-by-query-key-alpha {:query-key (first keypath)})
+         panel-key     @(ut/tracked-sub ::lookup-panel-key-by-query-key-alpha {:query-key (first keypath)})
          clover-sql    (assoc honey-sql :connection-id "system-db")
          honey-sql     (ut/clean-sql-from-ui-keys honey-sql)
          hselect       (get honey-sql :select)
@@ -1144,7 +1144,7 @@
            refresh-every (get honey-sql :refresh-every)
            cache?        (get honey-sql :cache? false)
            page          (get honey-sql :page)
-           panel-key     @(rfa/sub ::lookup-panel-key-by-query-key-alpha {:query-key (first keypath)})
+           panel-key     @(ut/tracked-sub ::lookup-panel-key-by-query-key-alpha {:query-key (first keypath)})
            honey-sql     (ut/clean-sql-from-ui-keys honey-sql)
            hselect       (get honey-sql :select)
            honey-modded  (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)

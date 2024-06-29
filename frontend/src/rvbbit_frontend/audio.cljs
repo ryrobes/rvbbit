@@ -142,7 +142,7 @@
                       (if (= src :param)
                         (let [vvv @(ut/tracked-sub ::resolver/logic-and-params
                                                    {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
-                              vv  (try (first vvv ;;@(rfa/sub ::resolver/logic-and-params {:m [(get-in db
+                              vv  (try (first vvv ;;@(ut/tracked-sub ::resolver/logic-and-params {:m [(get-in db
                                                   ;;[:runstreams
                                        )
                                        (catch :default e (do (ut/tapp>> [:rs-value-fuck-up-audio vvv flow-id kkey src e]) vvv)))]

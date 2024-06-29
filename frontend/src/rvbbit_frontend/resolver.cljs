@@ -29,7 +29,7 @@
           ;; _ (ut/tapp>> [:valid-body-params panel-key block-map valid-body-params])
           workspace-params (into {}
                                  (for [k valid-body-params] ;; deref here?
-                                   {k @(rfa/sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
+                                   {k @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
           value-walks-targets (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
           value-walks (into {}
                             (for [k value-walks-targets] ;all-sql-call-keys]
@@ -40,7 +40,7 @@
                                     field (keyword (first gs))]
                                 {k (if (not (integer? row))
                                      (str field)
-                                     (get-in @(rfa/sub ::conn/sql-data-alpha {:keypath [ds]}) [row field]))})))
+                                     (get-in @(ut/tracked-sub ::conn/sql-data-alpha {:keypath [ds]}) [row field]))})))
           condi-walks-targets (distinct (filter #(cstr/includes? (str %) "condi/") valid-body-params))
           condi-walks (into {}
                             (for [k condi-walks-targets]
@@ -188,7 +188,7 @@
                                    (ut/postwalk-replacer {nil ""}
                                                          (into {}
                                                                (for [k templated-strings-vals]
-                                                                 {k @(rfa/sub ::conn/clicked-parameter-key-alpha
+                                                                 {k @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                               {:keypath [k]})})))
                                    {})
           out-block-map (if templates? (ut/deep-template-replace templated-strings-walk out-block-map) out-block-map)]
@@ -198,4 +198,4 @@
 
 (re-frame/reg-sub ::logic-and-params (fn [_ {:keys [m p]}] (logic-and-params-fn m p)))
 
-(defn logic-and-params [m p] @(rfa/sub ::logic-and-params {:m m :p p}))
+(defn logic-and-params [m p] @(ut/tracked-sub ::logic-and-params {:m m :p p}))

@@ -145,7 +145,11 @@
                                           board? (pr-str {:panels (get board-map b) :click-param {:param (get params :param)}})
                                           :else  (str (get-in screen-data [:panels b])))
                                     (str (get-in screen-data [:panels b :tab]))]))})))
-    (catch Throwable e (ut/pp [:update-screen-meta-error! f-path e]))))
+    (catch Throwable e 
+      ;(ut/pp [:update-screen-meta-error! f-path e])
+      (println "Error in update-screen-meta:" (.getMessage e))
+      (.printStackTrace e)
+      )))
 
 (defn update-all-screen-meta
   []
@@ -330,46 +334,38 @@
 
 
 
-(defn log-and-update-atom []
-  (try
-    ;(println "Updating atom at" (System/currentTimeMillis))
-    (let [ddate (ut/current-datetime-parts)]
-      (reset! wss/father-time ddate))
-    ;(println "Atom updated:" @wss/father-time)
-    (catch Exception e
-      (println "Error updating atom:" (.getMessage e))
-      (throw e))))
 
-(defn start-time-scheduler []
-  (ut/pp [:staring-time-scheduler])
-  (.scheduleAtFixedRate wss/time-scheduler
-                        (reify Runnable
-                          (run [_]
-                            (log-and-update-atom)))
-                        0
-                        1
-                        TimeUnit/SECONDS))
 
-(defn stop-time-scheduler []
-  (.shutdownNow wss/time-scheduler))
+;; (defn start-time-scheduler []
+;;   (ut/pp [:staring-time-scheduler])
+;;   (.scheduleAtFixedRate wss/time-scheduler
+;;                         (reify Runnable
+;;                           (run [_]
+;;                             (log-and-update-atom)))
+;;                         0
+;;                         1
+;;                         TimeUnit/SECONDS))
 
-(defn time-marches-on-or-does-it? [key ref old-state new-state]
-  (try
-    (doseq [key (keys new-state)]
-      (let [group (ut/hash-group key wss/num-groups)]
-        (if-let [child-atom (get @wss/time-child-atoms group)]
-          (swap! child-atom assoc key (get new-state key))
-          (let [new-child-atom (atom {})]
-            (swap! wss/time-child-atoms assoc group new-child-atom)
-            (swap! new-child-atom assoc key (get new-state key))))))
-    ;(println "Watcher updated child atoms successfully.")
-    (catch Exception e
-      (println "Error in time-marches-on:" key ref (.getMessage e))
-      (throw e))))
+;; (defn stop-time-scheduler []
+;;   (.shutdownNow wss/time-scheduler))
 
-(add-watch wss/father-time
-           :time-marches-on-or-does-it?
-           time-marches-on-or-does-it?)
+;; (defn time-marches-on-or-does-it? [key ref old-state new-state]
+;;   (try
+;;     (doseq [key (keys new-state)]
+;;       (let [group (ut/hash-group key wss/num-groups)]
+;;         (if-let [child-atom (get @wss/time-child-atoms group)]
+;;           (swap! child-atom assoc key (get new-state key))
+;;           (let [new-child-atom (atom {})]
+;;             (swap! wss/time-child-atoms assoc group new-child-atom)
+;;             (swap! new-child-atom assoc key (get new-state key))))))
+;;     ;(println "Watcher updated child atoms successfully.")
+;;     (catch Exception e
+;;       (println "Error in time-marches-on:" key ref (.getMessage e))
+;;       (throw e))))
+
+;; (add-watch wss/father-time
+;;            :time-marches-on-or-does-it?
+;;            time-marches-on-or-does-it?)
 
 
 
@@ -418,8 +414,6 @@
   #_{:clj-kondo/ignore [:inline-def]}
   (defonce start-settings-watcher (watch-config-files))
 
-  (start-time-scheduler)
-
   (shutdown/add-hook! ::heads-up-msg #(ut/ppa "Shutting down now, commander!"))
   (sql-exec system-db "drop table if exists jvm_stats;")
   (sql-exec system-db "drop table if exists errors;")
@@ -430,8 +424,6 @@
 
   (cruiser/create-sqlite-sys-tables-if-needed! system-db)
   (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
-
-
 
   (defn execute-custom-watcher [f]
     (.execute wss/custom-watcher-thread-master-pool f))
@@ -452,6 +444,36 @@
 
   (defn remove-watch+ [atom key]
     (remove-watch atom key))
+
+  ;; (defn time-marches-on-or-does-it? [key ref old-state new-state]
+  ;;   (try
+  ;;     (doseq [key (keys new-state)]
+  ;;       (let [group (ut/hash-group key wss/num-groups)]
+  ;;         (if-let [child-atom (get @wss/time-child-atoms group)]
+  ;;           (swap! child-atom assoc key (get new-state key))
+  ;;           (let [new-child-atom (atom {})]
+  ;;             (swap! wss/time-child-atoms assoc group new-child-atom)
+  ;;             (swap! new-child-atom assoc key (get new-state key))))))
+  ;;     ;(println "Watcher updated child atoms successfully.")
+  ;;     (catch Exception e
+  ;;       (println "Error in time-marches-on:" key ref (.getMessage e))
+  ;;       (throw e))))
+
+  (add-watch+ wss/father-time
+              :time-marches-on-or-does-it?
+              (fn [_ _ old-state new-state]
+                (try
+                  (doseq [key (keys new-state)]
+                    (let [group (ut/hash-group key wss/num-groups)]
+                      (if-let [child-atom (get @wss/time-child-atoms group)]
+                        (swap! child-atom assoc key (get new-state key))
+                        (let [new-child-atom (atom {})]
+                          (swap! wss/time-child-atoms assoc group new-child-atom)
+                          (swap! new-child-atom assoc key (get new-state key))))))
+                   ;(println "Watcher updated child atoms successfully.")
+                  (catch Exception e
+                    (println "Error in time-marches-on:" (.getMessage e))
+                    (throw e)))))
 
   (add-watch+ wss/screens-atom
               :master-screen-watcher ;; watcher splitter
@@ -745,6 +767,18 @@
 
 
   ;;  all schedulers
+
+  (start-scheduler 1
+                   #(try
+                      ;(println "Updating atom at" (System/currentTimeMillis))
+                      (let [ddate (ut/current-datetime-parts)]
+                        (reset! wss/father-time ddate))
+                      ;(println "Atom updated:" @wss/father-time)
+                      (catch Exception e
+                        (println "Error updating atom:" (.getMessage e))
+                        (throw e)))
+                   "Father Time")
+
   (start-scheduler 15
                    wss/jvm-stats
                    "JVM Stats" 15)
@@ -899,7 +933,6 @@
 
   (shutdown/add-hook! ::the-pool-is-now-closing
                       #(do (reset! wss/shutting-down? true)
-                           (stop-time-scheduler)
                            (stop-all-schedulers)
                            (let [destinations (vec (keys @wss/client-queues))]
                              (doseq [d destinations]
@@ -1043,7 +1076,7 @@
     (let [[_ b _] (data/diff old-state new-state)
           kks     (try (keys b) (catch Exception _ nil))]
       (when (> (count (remove #(= "client-keepalive" %) kks)) 0) (update-stat-atom kks))))
-  
+
   (add-watch+ flow-db/status :tracker-watch tracker-changed)
 
   (defn log-tracker
@@ -1083,7 +1116,7 @@
                 (spit fp (str pretty-data "\n") :append true)))))
         (log-tracker kks)
         (update-stat-atom kks))))
-  
+
   (add-watch+ flow-db/tracker :tracker-watch tracker-changed2)
 
   ;;(ut/pp {:settings config/settings})
