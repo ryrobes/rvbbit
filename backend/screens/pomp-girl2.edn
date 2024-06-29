@@ -1,40 +1,776 @@
-{:orders {},
+{:orders
+ {:recos-sys
+  [:context_hash
+   :combo_hash
+   :connection_id
+   :shape_name
+   :query_map
+   :query_map_str
+   :viz_map
+   :combo_edn
+   :selected_view
+   :table_name
+   :condis
+   :h
+   :w
+   :score],
+  :blocks-sys
+  [:block_key :block_name :queries :views :block_data :view_names :query_names],
+  :fields-sys [:field_name :field_type :data_type],
+  :kke192 (:query_error),
+  :viz-shapes-sys [:combo_edn :recos],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :kick-868154760
+  [:Age
+   :Fare
+   :PassengerId
+   :SibSp
+   :Parch
+   :Predicted
+   :Sex
+   :Survived
+   :Embarked
+   :Pclass],
+  :new-query (:thread_count :ts1 :ts :sys_load :used_memory_mb),
+  :gen-viz-797 [:rows :date_posted],
+  :files-sys [:file_path :screen_name :blocks :queries :ts],
+  :gen-viz-94 [:diff],
+  :jvm_stats
+  [:used_memory_mb
+   :thread_count
+   :messages
+   :batches
+   :recent_batches
+   :recent_batches_per_second
+   :batches_per_second
+   :unix_ms
+   :messages_per_second
+   :recent_messages
+   :recent_messages_per_second
+   :recent_queries_run
+   :recent_queries_per_second
+   :queries_per_second
+   :sql_cache_size
+   :ws_peers
+   :subscriptions
+   :open_flow_channels
+   :uptime_seconds
+   :seconds_since_last_update
+   :queries_run
+   :internal_queries_run
+   :sniffs_run
+   :sys_load
+   :ts],
+  :searches-types-sys [:item_type],
+  :searches-rows-sys
+  [:item_sub_type
+   :item_type
+   :item_key
+   :display_name
+   :sample
+   :value
+   :is_live
+   :block_meta],
+  :viz-tables-sys [:table_name :recos],
+  :shows-drag-6 [:location :show_name :title :tour_name],
+  :shows (:query_error),
+  :viz-shapes0-sys [:shape :recos],
+  :rowcnt-drag-2 [:rowcnt_sum],
+  :gen-viz-828 [:agg :date_posted],
+  :ufo_sightings (:query_error),
+  :gen-viz-84 [:rows :country],
+  :connections-sys [:database_name :connection_id],
+  :ufo-sightings-drag-9
+  [:city
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :latitude
+   :longitude
+   :shape
+   :state],
+  :searches-sub-types-sys [:item_key :is_live :items :styler_highlight_4018a],
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :state-drag-3 [:state :rowcnt],
+  :gen-viz-243 [:rows :tour_name],
+  :shape-drag-7 [:shape :rowcnt]},
  :reco-preview nil,
- :sql-source {},
+ :sql-source
+ {:kke192 {:select [:*], :connection-id "system-db", :from [:kke192], :limit 111},
+  :kick-868154760
+  {:select [:*],
+   :from
+   {:data
+    [{"Age" 22,
+      "Fare" 7.25,
+      "PassengerId" 1,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 38,
+      "Fare" 71.2833,
+      "PassengerId" 2,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 1}
+     {"Age" 26,
+      "Fare" 7.925,
+      "PassengerId" 3,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 35,
+      "Fare" 53.1,
+      "PassengerId" 4,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 35,
+      "Fare" 8.05,
+      "PassengerId" 5,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 8.4583,
+      "PassengerId" 6,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 1,
+      "Pclass" 3}
+     {"Age" 54,
+      "Fare" 51.8625,
+      "PassengerId" 7,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 2,
+      "Fare" 21.075,
+      "PassengerId" 8,
+      "SibSp" 3,
+      "Parch" 1,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 27,
+      "Fare" 11.1333,
+      "PassengerId" 9,
+      "SibSp" 0,
+      "Parch" 2,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 14,
+      "Fare" 30.0708,
+      "PassengerId" 10,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 2}
+     {"Age" 4,
+      "Fare" 16.7,
+      "PassengerId" 11,
+      "SibSp" 1,
+      "Parch" 1,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 58,
+      "Fare" 26.55,
+      "PassengerId" 12,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 1}
+     {"Age" 20,
+      "Fare" 8.05,
+      "PassengerId" 13,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 39,
+      "Fare" 31.275,
+      "PassengerId" 14,
+      "SibSp" 1,
+      "Parch" 5,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 14,
+      "Fare" 7.8542,
+      "PassengerId" 15,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 0,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 55,
+      "Fare" 16,
+      "PassengerId" 16,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 2}
+     {"Age" 2,
+      "Fare" 29.125,
+      "PassengerId" 17,
+      "SibSp" 4,
+      "Parch" 1,
+      "Predicted" 0,
+      "Sex" 1,
+      "Survived" 0,
+      "Embarked" 1,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 13,
+      "PassengerId" 18,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 1,
+      "Survived" 1,
+      "Embarked" 2,
+      "Pclass" 2}
+     {"Age" 31,
+      "Fare" 18,
+      "PassengerId" 19,
+      "SibSp" 1,
+      "Parch" 0,
+      "Predicted" 0,
+      "Sex" 0,
+      "Survived" 0,
+      "Embarked" 2,
+      "Pclass" 3}
+     {"Age" 28,
+      "Fare" 7.225,
+      "PassengerId" 20,
+      "SibSp" 0,
+      "Parch" 0,
+      "Predicted" 1,
+      "Sex" 0,
+      "Survived" 1,
+      "Embarked" 0,
+      "Pclass" 3}]}},
+  :new-query
+  {:cache? false,
+   :limit 100,
+   :_last-run "22:10:36",
+   :refresh-every 10,
+   :from [[:jvm_stats :kke192]],
+   :order-by [[2 :desc]],
+   :connection-id "system-db",
+   :select
+   [:thread_count [:ts :ts1] [[:substr :ts 0 16] :ts] :sys_load :used_memory_mb],
+   :post-process-fn reverse},
+  :gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
+  :searches-types-sys
+  {:select [:item_type],
+   :where
+   [:and
+    [:not [:like :item_sub_type "%preview%"]]
+    [:not [:= :item_type "saved-block"]]],
+   :from [:client_items],
+   :group-by [1]},
+  :shows-drag-6
+  {:select [:location :show_name :title :tour_name],
+   :from [[:shows :dd235]],
+   :_last-run "19:23:37"},
+  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]]},
+  :searches-sub-types-sys
+  {:select [:item_key :is_live [[:count 1] :items]],
+   :where
+   [:and
+    [:not [:= :item_key "impressive-long-wolf-17"]]
+    [:not [:like :item_sub_type "%preview%"]]
+    [:not [:= :item_type "saved-block"]]
+    [:= :item_type "client-params"]],
+   :style-rules
+   {[:* :highlight-4018a]
+    {:logic [:= :is_live 1],
+     :style {:background-color "#9c346434", :color "#9c3464"}}},
+   :from [:client_items],
+   :group-by [1 2]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :gen-viz-243
+  {:select [[[:count 1] :rows] :tour_name],
+   :from
+   [{:select [:location :show_name :title :tour_name], :from [[:shows :dd235]]}],
+   :group-by [:tour_name],
+   :order-by [[:rows :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]}},
+ :audio-playing? false,
  :meta
- {:new-query
+ {:recos-sys {:fields {}, :rowcount 0},
+  :blocks-sys
+  {:fields
+   {:block_key
+    {:data-type "string",
+     :distinct 55,
+     :group-by? true,
+     :commons {":block-2133" 1, ":block-3777" 1, ":block-6003" 1},
+     :cardinality 100},
+    :block_name
+    {:data-type "string",
+     :distinct 52,
+     :group-by? true,
+     :commons
+     {"drag-from-select-all-ufo_sightings" 4,
+      "block-12050" 1,
+      "board: champion tiger" 1},
+     :cardinality 94},
+    :queries
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {0 42, 1 12, 2 1},
+     :cardinality 5},
+    :views
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {1 32, 0 12, 2 10},
+     :cardinality 7},
+    :block_data
+    {:data-type "string",
+     :distinct 55,
+     :group-by? true,
+     :commons
+     {"{:h 8, :w 10, :root [40 9], :tab \"star-shaped wallaby\", :selected-view :hi, :name \"block-8619\", :views {:hi [:box :align :center :justify :center :attr {:id \":block-2133.:hi\"} :style {:font-size \"14px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:data-viewer [:run-solver [:get-my-colors {:input-image-path \"/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-25269-5344.png\"}]]]]}, :queries {}}"
+      1,
+      "{:panels {:block-414 {:mad-libs-combo-hash [\"572062609\" \"ufo_sightings_drag_9\"], :name \"basic_timeseries - \\\"date_posted, rows\\\" - 769\", :w 9, :root [5 13], :h 5, :connection-id \"bigfoot-ufos\", :queries {:gen-viz-797 {:select [[[:count 1] :rows] :date_posted], :from [{:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]}], :group-by [:date_posted]}}, :tab \"sapphire ape\", :conditionals nil, :views {:oz [:vega-lite {:layer [{:encoding {:x {:field :date_posted, :type \"temporal\", :sort \"x\"}, :y {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :legend nil, :field nil, :type \"ordinal\"}}, :mark {:type \"area\", :interpolate \"monotone\", :point \"transparent\", :tooltip {:content \"encoding\"}}}], :data {:values :gen-viz-797}, :config :theme/vega-defaults, :width \"container\", :height :panel-height, :padding 4, :background \"transparent\"} {:actions false}]}}, :block-11609 {:h 5, :w 8, :connection-id \"bigfoot-ufos\", :name \"drag-from-select-all-ufo_sightings\", :queries {:city-drag-26 {:select [:city [[:count 1] :rowcnt]], :from [[{:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]} :ff571]], :group-by [:city], :order-by [[:rowcnt :desc]]}}, :root [1 8], :tab \"sapphire ape\"}, :block-7416 {:h 5, :w 4, :connection-id \"bigfoot-ufos\", :name \"drag-from-drag-from-select-all-ufo_sightings\", :queries {:rowcnt-drag-2 {:select [[[:sum :rowcnt] :rowcnt_sum]], :from [[{:select [:city [[:count 1] :rowcnt]], :from [[{:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]} :ff571]], :group-by [:city], :order-by [[:rowcnt :desc]]} :yy403]]}}, :root [1 13], :tab \"sapphire ape\"}, :block-204 {:mad-libs-combo-hash [\"-1610972762\" \"ufo_sightings_drag_9\"], :name \"compound_trend_1 - \\\"date_posted, rows\\\" - 1141\", :w 10, :root [23 13], :h 5, :connection-id \"bigfoot-ufos\", :queries {:gen-viz-828 {:select [[[[:count 1]] :agg] :date_posted], :from [{:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]}], :order-by [[:date_posted :desc]], :group-by [:date_posted]}, :gen-viz-94 {:select [[[:max [:round [:raw [\"(100 * ((\" nil \".0 - \" nil \".0) / \" nil \".0))\"]] 2]] :diff]], :from [{:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]}]}}, :tab \"sapphire ape\", :conditionals {:c345-up-or-down? [:reagent-gt :query-preview/agg.0 :query-preview/agg.1]}, :views {:oz [:v-box :size \"auto\" :height :half-panel-height-px :style {:padding-left \"8px\", :padding-right \"8px\"} :children [[:h-box :justify :between :children [[:box :padding \"16px\" :child [:number :query-preview/agg.0] :style {:font-size \"39px\", :color \"#ffffff\"}] [:h-box :padding \"13px\" :size \"auto\" :children [[:icon :md-icon-name [:if :condi/c345-up-or-down? \"zmdi-chevron-up\" \"zmdi-chevron-down\"] :style {:font-size \"55px\", :color [:if :condi/c345-up-or-down? \"#20f323\" \"#f36464\"], :opacity 0.5, :margin-top \"8px\"}] [:box :child [:percent :query-preview-2/diff.0] :style {:font-size \"25px\", :padding \"15px\"}]]]]] [:box :style {:margin-top \"-10px\"} :size \"auto\" :child [:vega-lite {:layer [{:encoding {:x {:field :date_posted, :type \"temporal\", :title nil, :sort \"x\"}, :y {:aggregate \"sum\", :field :agg, :title nil, :scale {:zero false}, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale {:scheme \"purples\"}, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"line\", :interpolate \"monotone\", :line true, :point true, :tooltip {:content \"encoding\"}}}], :data {:values :gen-viz-828}, :config {:view {:stroke \"transparent\"}, :line {:strokeWidth 3}, :axis {:domainColor \"#ffffff22\", :grid true, :font \"Lato\", :labelColor \"#afafaf\", :titleFont \"Lato\", :titleColor \"#282828\", :labelFont \"Lato\", :domain false, :gridColor \"#ffffff22\", :tickColor \"#ffffff22\", :axisFont \"Lato\"}, :legend {:labelFont \"Lato\", :legendFont \"Lato\", :labelColor \"#ffffff99\", :titleColor \"#ffffff99\", :stroke \"#ffffff99\", :titleFont \"Lato\"}, :header {:labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}, :mark {:font \"Lato\"}, :title {:font \"Lato\", :subtitleFont \"Lato\", :labelFont \"Lato\", :titleFont \"Lato\", :titleColor \"#ffffff99\"}}, :width :panel-width, :height :half-panel-height, :padding 4, :background \"transparent\"} {:actions false}]] [:box :align :center :justify :center :style {:padding-top \"133px\", :font-size \"20px\"} :child [:string [:date_posted \" vs \" :rows]]]]]}}, :block-8805 {:h 5, :w 8, :connection-id \"bigfoot-ufos\", :name \"drag-from-select-all-ufo_sightings\", :queries {:duration-hours-drag-43 {:select [:duration_hours [[:count 1] :rowcnt]], :from [[{:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]} :cc350]], :group-by [:duration_hours], :order-by [[:rowcnt :desc]]}}, :root [25 8], :tab \"sapphire ape\"}, :block-94 {:mad-libs-combo-hash [\"1561519308\" \"ufo_sightings_drag_9\"], :name \"basic_v_bar - \\\"country, rows\\\" - 559\", :w 9, :root [14 13], :h 5, :connection-id \"bigfoot-ufos\", :queries {:gen-viz-84 {:select [[[:count 1] :rows] :country], :from [{:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]}], :group-by [:country]}}, :tab \"sapphire ape\", :conditionals nil, :views {:oz [:vega-lite {:layer [{:encoding {:y {:field :country, :type \"ordinal\"}, :x {:aggregate \"sum\", :field :rows, :type \"quantitative\"}, :row {:field nil, :legend nil}, :size {:legend nil}, :shape {:legend nil}, :column {:field nil, :legend nil}, :color {:scale :theme/vega-default-color-scheme, :legend nil, :field 1, :type \"ordinal\"}}, :mark {:type \"bar\", :tooltip {:content \"encoding\"}}}], :data {:values :gen-viz-84}, :config :theme/vega-defaults, :width \"container\", :height :panel-height, :padding 4, :background \"transparent\"} {:actions false}]}}, :block-7319 {:h 5, :w 8, :connection-id \"bigfoot-ufos\", :name \"drag-from-select-all-ufo_sightings\", :queries {:shape-drag-7 {:select [:shape [[:count 1] :rowcnt]], :from [[{:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]} :hh354]], :group-by [:shape], :order-by [[:rowcnt :desc]]}}, :root [9 8], :tab \"sapphire ape\"}, :block-3777 {:h 5, :w 8, :connection-id \"bigfoot-ufos\", :name \"drag-from-select-all-ufo_sightings\", :queries {:state-drag-3 {:select [:state [[:count 1] :rowcnt]], :from [[{:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]} :uu58]], :group-by [:state], :order-by [[:rowcnt :desc]]}}, :root [17 8], :tab \"sapphire ape\"}, :block-1449 {:h 7, :w 32, :connection-id \"bigfoot-ufos\", :name \"select-all-ufo_sightings\", :queries {:ufo-sightings-drag-9 {:select [:city :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :latitude :longitude :shape :state], :from [[:ufo_sightings :jj584]], :order-by [[:city :asc]]}}, :root [1 1], :tab \"sapphire ape\", :selected-view :ufo-sightings-drag-9}}, :click-param {:param {:color-pal [:run-solver [:get-my-colors {:input-image-path \"/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-25269-5344.png\"}]], :huger [:run-solver [:solver-fn-test1 {:some-number :time/minute, :some-string \"Huge!\"}]], :new-dawn \"/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-48163-50841.png\", :my-mpa {:mm {:pp {:zz 123}}}, :wpa-8k [:run-solver [:wallpaper-of-the-moment-8k {}]], :new-dawn-pal [:run-solver [:get-my-colors {:input-image-path \"/home/ryanr/rvbbit/frontend/resources/public/images/gen/b64-image3-48163-50841.png\"}]], :selected-view-data [:box :align :center :justify :center :attr {:id \":block-3197.:hi\"} :style {:font-size \"28px\", :font-weight 700, :padding-top \"6px\", :padding-left \"14px\", :margin-top \"-8px\", :color :theme/editor-outer-rim-color, :font-family :theme/base-font} :child [:string3 [:clj (let [clojure-version (clojure-version) jvm-version (System/getProperty \"java.version\")] (str \"🐇🥕 Hello there! This is Clojure version \" clojure-version \" on JVM  \" jvm-version \" 🥕🐇 \" :time/now-seconds))]]], :selected-view [:views :hi], :queen-local \"images/gen/b64-image3-48163-50841.png\", :testme :solver/colors-of-the-moment>colors>1, :selected-block :block-3197, :test [:get-in [:solver/colors-of-the-moment [:colors 2]]], :huger22 [:run-solver [:solver-fn-test1 {:some-number :time/minute, :some-string \"Huge!!!!v!!!!\"}]]}}}"
+      1,
+      "{:h 10, :w 18, :tab \"star-shaped wallaby\", :root [12 22], :name \"block-1544\", :views {:param-val [:box :align :center :justify :center :padding \"13px\" :style {:font-size \"45px\"} :child [:img {:src :param/queen-local, :width \"90%\"}]]}, :queries {}}"
+      1},
+     :cardinality 100},
+    :view_names
+    {:data-type "string",
+     :distinct 11,
+     :group-by? true,
+     :commons {":hi" 18, "" 12, ":hi :stack" 9},
+     :cardinality 20},
+    :query_names
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {"" 42, ":city-drag-26" 1, ":state-drag-3" 1},
+     :cardinality 25}},
+   :rowcount 55},
+  :fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"ts" 1, "tour_name" 1, "title" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"TEXT" 6, "TIMESTAMP" 1},
+     :cardinality 28},
+    :data_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"string" 6, "datetime" 1},
+     :cardinality 28}},
+   :rowcount 7},
+  :kke192
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: kke192)" 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :viz-shapes-sys {:fields {}, :rowcount 0},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 7},
+     :cardinality 14},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 7},
+     :cardinality 14},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"met-on-tour" 7},
+     :cardinality 14},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 7},
+     :cardinality 14},
+    :table_name
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"tracks" 1, "shows" 1, "setlists" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 5,
+     :group-by? false,
+     :commons {8 2, 5 2, 12 1},
+     :cardinality 71}},
+   :rowcount 7},
+  :kick-868154760
+  {:fields
+   {:SibSp
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {0 11, 1 7, 4 1},
+     :cardinality 20},
+    :Predicted
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {1 10, 0 10},
+     :cardinality 10},
+    :Fare
+    {:data-type "float",
+     :distinct 19,
+     :group-by? true,
+     :commons {8.05 2, 71.2833 1, 8.4583 1},
+     :cardinality 94},
+    :Embarked
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {2 15, 0 3, 1 2},
+     :cardinality 15},
+    :Sex
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 11, 1 9},
+     :cardinality 10},
+    :PassengerId
+    {:data-type "integer",
+     :distinct 20,
+     :group-by? true,
+     :commons {8 1, 18 1, 10 1},
+     :cardinality 100},
+    :Survived
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {1 10, 0 10},
+     :cardinality 10},
+    :Parch
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {0 15, 1 3, 5 1},
+     :cardinality 20},
+    :Pclass
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {3 13, 1 4, 2 3},
+     :cardinality 15},
+    :Age
+    {:data-type "integer",
+     :distinct 15,
+     :group-by? true,
+     :commons {28 3, 14 2, 35 2},
+     :cardinality 75}},
+   :rowcount 20},
+  :new-query
   {:fields
    {:thread_count
     {:data-type "integer",
-     :distinct 18,
+     :distinct 63,
      :group-by? true,
-     :commons {365 11, 369 10, 362 9},
-     :cardinality 18},
+     :commons {917 4, 871 4, 885 3},
+     :cardinality 62},
     :ts1
     {:data-type "string",
      :distinct 100,
      :group-by? true,
      :commons
-     {"2024-06-20 19:17:33" 1, "2024-06-20 19:13:03" 1, "2024-06-20 19:06:18" 1},
+     {"2024-06-28 21:50:03" 1, "2024-06-28 22:02:33" 1, "2024-06-28 22:03:33" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
      :distinct 4,
      :group-by? true,
-     :commons {"2024-06-20 19:1" 40, "2024-06-20 19:0" 40, "2024-06-20 18:5" 19},
+     :commons {"2024-06-28 22:0" 40, "2024-06-28 21:5" 40, "2024-06-28 21:4" 17},
      :cardinality 3},
     :sys_load
     {:data-type "float",
-     :distinct 87,
+     :distinct 96,
      :group-by? true,
-     :commons {8.53 3, 8.69 3, 7.79 2},
-     :cardinality 87},
+     :commons {13.24 2, 13.27 2, 9.27 2},
+     :cardinality 95},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 100,
+     :distinct 99,
      :group-by? true,
-     :commons {16678 1, 28504 1, 32470 1},
-     :cardinality 100}},
+     :commons {12279 2, 10535 1, 11666 1},
+     :cardinality 99}},
    :rowcount 100},
   :gen-viz-797
   {:fields
@@ -51,6 +787,44 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :files-sys
+  {:fields
+   {:file_path
+    {:data-type "string",
+     :distinct 171,
+     :group-by? true,
+     :commons
+     {"./screens/weave-test122.edn" 1,
+      "./screens/nightcity-cape-cod.edn" 1,
+      "./screens/counting-lord-of-the-woods.edn" 1},
+     :cardinality 100},
+    :screen_name
+    {:data-type "string",
+     :distinct 164,
+     :group-by? true,
+     :commons
+     {"unnamed-screen!" 7, "tallica-param-test2" 2, "the-generated-lassff" 1},
+     :cardinality 95},
+    :blocks
+    {:data-type "integer",
+     :distinct 55,
+     :group-by? true,
+     :commons {3 45, 12 6, 6 6},
+     :cardinality 32},
+    :queries
+    {:data-type "integer",
+     :distinct 34,
+     :group-by? true,
+     :commons {0 53, 5 13, 11 13},
+     :cardinality 19},
+    :ts
+    {:data-type "string",
+     :distinct 12,
+     :group-by? true,
+     :commons
+     {"2024-06-28 19:55:26" 27, "2024-06-28 19:55:24" 24, "2024-06-28 19:55:25" 20},
+     :cardinality 7}},
+   :rowcount 171},
   :gen-viz-94
   {:fields
    {:diff
@@ -60,6 +834,225 @@
      :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
+  :jvm_stats
+  {:fields
+   {:queries_run
+    {:data-type "integer",
+     :distinct 62,
+     :group-by? true,
+     :commons {183 1, 199 1, 403 1},
+     :cardinality 100},
+    :recent_messages_per_second
+    {:data-type "float",
+     :distinct 62,
+     :group-by? true,
+     :commons {76.61 1, 78.61 1, 72.14 1},
+     :cardinality 100},
+    :uptime_seconds
+    {:data-type "integer",
+     :distinct 62,
+     :group-by? true,
+     :commons {764 1, 209 1, 194 1},
+     :cardinality 100},
+    :queries_per_second
+    {:data-type "float",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 62},
+     :cardinality 1},
+    :recent_batches
+    {:data-type "integer",
+     :distinct 61,
+     :group-by? true,
+     :commons {0 2, 2239 1, 725 1},
+     :cardinality 98},
+    :sql_cache_size
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 60, 2 2},
+     :cardinality 3},
+    :ts
+    {:data-type "string",
+     :distinct 62,
+     :group-by? true,
+     :commons
+     {"2024-06-28 19:59:48" 1, "2024-06-28 20:05:48" 1, "2024-06-28 20:08:33" 1},
+     :cardinality 100},
+    :subscriptions
+    {:data-type "integer",
+     :distinct 8,
+     :group-by? true,
+     :commons {212 28, 227 13, 185 8},
+     :cardinality 12},
+    :messages_per_second
+    {:data-type "float",
+     :distinct 62,
+     :group-by? true,
+     :commons {115.61 1, 71.61 1, 116.89 1},
+     :cardinality 100},
+    :messages
+    {:data-type "integer",
+     :distinct 62,
+     :group-by? true,
+     :commons {56182 1, 101475 1, 379 1},
+     :cardinality 100},
+    :sniffs_run
+    {:data-type "integer",
+     :distinct 62,
+     :group-by? true,
+     :commons {84 1, 177 1, 8 1},
+     :cardinality 100},
+    :sys_load
+    {:data-type "float",
+     :distinct 62,
+     :group-by? true,
+     :commons {6.96 1, 12.67 1, 3.23 1},
+     :cardinality 100},
+    :recent_batches_per_second
+    {:data-type "float",
+     :distinct 41,
+     :group-by? true,
+     :commons {9.8 4, 10.33 3, 9.87 3},
+     :cardinality 66},
+    :batches
+    {:data-type "integer",
+     :distinct 62,
+     :group-by? true,
+     :commons {2239 1, 725 1, 1640 1},
+     :cardinality 100},
+    :unix_ms
+    {:data-type "integer",
+     :distinct 62,
+     :group-by? true,
+     :commons {1719619503430 1, 1719619218429 1, 1719619173429 1},
+     :cardinality 100},
+    :used_memory_mb
+    {:data-type "integer",
+     :distinct 61,
+     :group-by? true,
+     :commons {6057 2, 2922 1, 10611 1},
+     :cardinality 98},
+    :recent_queries_run
+    {:data-type "integer",
+     :distinct 18,
+     :group-by? true,
+     :commons {4 11, 5 8, 3 8},
+     :cardinality 29},
+    :thread_count
+    {:data-type "integer",
+     :distinct 52,
+     :group-by? true,
+     :commons {733 3, 391 3, 729 2},
+     :cardinality 83},
+    :internal_queries_run
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 62},
+     :cardinality 1},
+    :open_flow_channels
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {11 48, 0 9, 104 5},
+     :cardinality 4},
+    :ws_peers
+    {:data-type "integer",
+     :distinct 4,
+     :group-by? true,
+     :commons {8 28, 7 18, 9 15},
+     :cardinality 6},
+    :recent_messages
+    {:data-type "integer",
+     :distinct 62,
+     :group-by? true,
+     :commons {3717 1, 29022 1, 107413 1},
+     :cardinality 100},
+    :recent_queries_per_second
+    {:data-type "float",
+     :distinct 18,
+     :group-by? true,
+     :commons {0.27 11, 0.33 8, 0.2 8},
+     :cardinality 29},
+    :batches_per_second
+    {:data-type "float",
+     :distinct 55,
+     :group-by? true,
+     :commons {9.51 3, 9.58 2, 8.34 2},
+     :cardinality 88},
+    :seconds_since_last_update
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {14 46, 15 15, -1 1},
+     :cardinality 4}},
+   :rowcount 62},
+  :searches-types-sys
+  {:fields
+   {:item_type
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons {"solvers" 1, "signals" 1, "saved-views" 1},
+     :cardinality 100}},
+   :rowcount 8},
+  :searches-rows-sys
+  {:fields
+   {:item_sub_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"stats" 16, "param" 9},
+     :cardinality 7},
+    :item_type
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"client-params" 25},
+     :cardinality 3},
+    :item_key
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"amazing-oval-nightingale-11" 25},
+     :cardinality 3},
+    :display_name
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons
+     {":selected-block" 1, ":client-subs" 1, ":recent-messages-per-second" 1},
+     :cardinality 100},
+    :sample
+    {:data-type "string",
+     :distinct 23,
+     :group-by? true,
+     :commons {"19" 2, "" 2, "/home/ryanr/rvbbit/frontend/resources/public/" 1},
+     :cardinality 92},
+    :value
+    {:data-type "string",
+     :distinct 25,
+     :group-by? true,
+     :commons
+     {":client/amazing-oval-nightingale-11>param>selected-view-data" 1,
+      ":client/amazing-oval-nightingale-11>stats>queue-size" 1,
+      ":client/amazing-oval-nightingale-11>stats>server-subs" 1},
+     :cardinality 100},
+    :is_live
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 25},
+     :cardinality 3},
+    :block_meta
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 25},
+     :cardinality 3}},
+   :rowcount 25},
+  :viz-tables-sys {:fields {}, :rowcount 0},
   :shows-drag-6
   {:fields
    {:location
@@ -90,6 +1083,18 @@
      :commons {nil 103, "Damaged Justice" 55, "Wherever We May Roam" 54},
      :cardinality 6}},
    :rowcount 500},
+  :shows
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: shows)" 1},
+     :cardinality 100}},
+   :rowcount 2},
+  :viz-shapes0-sys {:fields {}, :rowcount 0},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -114,6 +1119,18 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings)"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
   :gen-viz-84
   {:fields
    {:rows
@@ -129,6 +1146,21 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -201,6 +1233,36 @@
      :commons {"us" 288, nil 113, "au" 37},
      :cardinality 1}},
    :rowcount 500},
+  :searches-sub-types-sys
+  {:fields
+   {:item_key
+    {:data-type "string",
+     :distinct 356,
+     :group-by? true,
+     :commons
+     {"poised-star-shaped-rat-38" 1,
+      "lively-magenta-guinea-pig-6" 1,
+      "unreal-olive-squirrel-14" 1},
+     :cardinality 100},
+    :is_live
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 347, 1 9},
+     :cardinality 0},
+    :items
+    {:data-type "integer",
+     :distinct 32,
+     :group-by? false,
+     :commons {96 70, 26 39, 61 35},
+     :cardinality 8},
+    :styler_highlight_4018a
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? false,
+     :commons {0 347, 1 9},
+     :cardinality 0}},
+   :rowcount 356},
   :duration-hours-drag-43
   {:fields
    {:duration_hours
@@ -280,15 +1342,36 @@
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
    :rowcount 30}},
+ :default-col-widths
+ {:virtual-panel {:kick-868154760 100},
+  :viz-shapes0-list* {:viz-shapes0-sys ##Inf},
+  :block-11609 {:city-drag-26 180},
+  :block-110 {:gen-viz-243 230},
+  :block-7416 {:rowcnt-drag-2 161},
+  :searches-sub-types-sys-list* {:searches-sub-types-sys 261},
+  :block-8805 {:duration-hours-drag-43 180},
+  :system-connections-list* {:connections-sys 126},
+  :system-fields-list* {:fields-sys 170},
+  :block-7319 {:shape-drag-7 180},
+  :block-3777 {:state-drag-3 180},
+  :files-list* {:files-sys 237},
+  :blocks-list* {:blocks-sys 177},
+  :block-1449 {:ufo-sightings-drag-9 141},
+  :block-3567 {:shows-drag-6 177},
+  :system-tables-list* {:tables-sys 133},
+  :searches-types-list* {:searches-types-sys 148},
+  :searches-rows-sys-list* {:searches-rows-sys 170}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
-  "fat zebra"
+  "clovers"
   "star-shaped wallaby"
   "sunny fox"
   "prismatic serval"
-  "willing owl"],
+  "willing owl"
+  "circular armadillo"],
+ :auto-run? true,
  :selected-cols nil,
  :server
  {:settings
@@ -464,7 +1547,6 @@
     "pink-dusk-falls"
     "pinup-rabbit-fields"
     "pomp-girl1"
-    "pomp-girl2"
     "poor-touring-me"
     "pres-sql-test-1"
     "purple-dusk-old-town"
@@ -518,56 +1600,58 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [379762147 353436123 4294705152],
+ :memory [2154652942 1992617878 4294705152],
+ :preview-keys [],
+ :sched {},
  :flow-subs
- [:time/now-seconds
-  :data/new-clojure-1
-  :solver-status/*client-name*
-  :solver-status/*client-name*>raw-custom-override685268485>running?
-  :flow/openai-image-gen-ladder3>hiccup-image-box-w-png-vw
+ [:solver-status/*client-name*>get-my-colors-565250358>running?
+  :repl-ns/repl-impressive-long-wolf-17--raw-custom-override838101334
   :flow/flow-forever>*running?
-  :client/amazing-oval-nightingale-11>stats>memory
-  :solver/get-my-colors409689395
-  :solver-status/*client-name*>get-my-colors409689395>running?
-  :client/*client-name*>stats>memory
+  :solver-status/*client-name*>raw-custom-override838101334
+  :solver-status/*client-name*>get-my-colors-1462145537>running?
+  :repl-ns/repl-impressive-long-wolf-17--raw-custom-override513614713
+  :solver-meta/raw-custom-override513614713
+  :solver/get-my-colors-1462145537
   :flow/live-scratch-flow>*running?
-  :solver/get-my-colors-727185878
-  :time/second
-  :flow/flow-forever>:final-math
-  :solver/raw-custom-override685268485
-  :solver-status/*client-name*>get-my-colors-727185878>running?
-  :solver/colors-of-the-moment>darkest],
- :client-name :terrific-short-sheep-29,
+  :solver-status/*client-name*>raw-custom-override513614713
+  :solver/get-my-colors-565250358
+  :solver-meta/raw-custom-override838101334],
+ :client-name :impressive-long-wolf-17,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2508, :h 1636},
- :post-meta {},
+ :window {:w 2445, :h 1638},
+ :post-meta
+ {:kke192 {},
+  :kick-868154760 {:* {:rowcount 20}},
+  :new-query {:* {:rowcount 100}},
+  :gen-viz-797 {:* {:rowcount 317}},
+  :jvm_stats {:* {:rowcount 62}},
+  :shows-drag-6 {:* {:rowcount 2214}},
+  :shows {},
+  :ufo_sightings {},
+  :duration-hours-drag-43 {:* {:rowcount 8349}},
+  :shape-drag-7 {:* {:rowcount 30}}},
  :status
  {:heartbeat
   {:kick
-   [:time/now-seconds
-    :data/new-clojure-1
-    :solver-status/*client-name*
-    :solver-status/*client-name*>raw-custom-override685268485>running?
-    :flow/openai-image-gen-ladder3>hiccup-image-box-w-png-vw
+   [:solver-status/*client-name*>get-my-colors-565250358>running?
+    :repl-ns/repl-impressive-long-wolf-17--raw-custom-override838101334
     :flow/flow-forever>*running?
-    :client/amazing-oval-nightingale-11>stats>memory
-    :solver/get-my-colors409689395
-    :solver-status/*client-name*>get-my-colors409689395>running?
-    :client/*client-name*>stats>memory
+    :solver-status/*client-name*>raw-custom-override838101334
+    :solver-status/*client-name*>get-my-colors-1462145537>running?
+    :repl-ns/repl-impressive-long-wolf-17--raw-custom-override513614713
+    :solver-meta/raw-custom-override513614713
+    :solver/get-my-colors-1462145537
     :flow/live-scratch-flow>*running?
-    :solver/get-my-colors-727185878
-    :time/second
-    :flow/flow-forever>:final-math
-    :solver/raw-custom-override685268485
-    :solver-status/*client-name*>get-my-colors-727185878>running?
-    :solver/colors-of-the-moment>darkest]},
-  :alert1 {:alerts :alert2}},
+    :solver-status/*client-name*>raw-custom-override513614713
+    :solver/get-my-colors-565250358
+    :solver-meta/raw-custom-override838101334]}},
  :screen-name "pomp-girl2",
  :recos-page2 0,
- :selected-tab "willing owl",
+ :selected-tab "circular armadillo",
+ :col-names nil,
  :snapshots
  {:params
   {"betty"
@@ -2380,19 +3464,25 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   548
+   26514
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
+ :base-sniff-queries
+ {:shows 89957543,
+  :jvm_stats 1498154063,
+  :kke192 -995149087,
+  :ufo_sightings 484893751},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1136239008,
+ :user-params-hash -767281082,
  :grid-recos? true,
- :session-hash 2133895994,
+ :preview-keys2 [],
+ :session-hash 1926546547,
  :resolved-queries
  {:new-query
   {:cache? false,
    :limit 100,
-   :_last-run "22:23:22",
+   :_last-run "22:11:12",
    :refresh-every 10,
    :from [[:jvm_stats :kke192]],
    :order-by [[2 :desc]],
@@ -2933,6 +4023,33 @@
    :name "flow-play-from-runstreams",
    :root [5 18],
    :tab "through the rabbit hole and out the other side"},
+  :block-5254
+  {:h 4,
+   :w 5,
+   :root [2 7],
+   :tab "clovers",
+   :selected-view :hi,
+   :name "block-5254",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-5254.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "🍀"]},
+   :queries {}},
   :block-548
   {:name "block-548",
    :w 12,
@@ -3308,6 +4425,15 @@
      :order-by [[:rowcnt :desc]]}},
    :root [25 8],
    :tab "sapphire ape"},
+  :block-5214
+  {:w 37,
+   :selected-view :vv,
+   :name "sapphire ape",
+   :h 17,
+   :ghosted? false,
+   :views {:vv [:grid "sapphire ape"]},
+   :root [2 12],
+   :tab "willing owl"},
   :block-94
   {:mad-libs-combo-hash ["1561519308" "ufo_sightings_drag_9"],
    :name "basic_v_bar - \"country, rows\" - 559",
@@ -3514,6 +4640,60 @@
      :child
      "hi!"]},
    :queries {}},
+  :block-9721
+  {:h 4,
+   :w 5,
+   :root [33 13],
+   :tab "sapphire ape",
+   :selected-view :hi,
+   :name "block-9721",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-9721.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
+  :block-692
+  {:h 4,
+   :w 5,
+   :root [33 9],
+   :tab "sapphire ape",
+   :selected-view :hi,
+   :name "block-692",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-692.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
   :selected-view :new-clojjsdddddfdure-6dvv,
   :block-7319
   {:h 5,
@@ -3551,6 +4731,33 @@
      [:speak-click
       "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
+   :queries {}},
+  :block-3064
+  {:h 4,
+   :w 5,
+   :root [2 3],
+   :tab "clovers",
+   :selected-view :hi,
+   :name "block-3064",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3064.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "🍀"]},
    :queries {}},
   :block-7215
   {:h 4,
@@ -3625,6 +4832,33 @@
      :center
      :attr
      {:id ":block-10405.:hi"}
+     :style
+     {:font-size "106px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "hi!"]},
+   :queries {}},
+  :block-10352
+  {:h 4,
+   :w 5,
+   :root [25 3],
+   :tab "willing owl",
+   :selected-view :hi,
+   :name "block-10352",
+   :views
+   {:hi
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-10352.:hi"}
      :style
      {:font-size "106px",
       :font-weight 700,
@@ -3711,7 +4945,7 @@
    {:new-query
     {:cache? false,
      :limit 100,
-     :_last-run "22:23:22",
+     :_last-run "22:11:12",
      :refresh-every 10,
      :from [[:jvm_stats :kke192]],
      :order-by [[2 :desc]],
@@ -3756,26 +4990,43 @@
   :block-9804
   {:clojure
    {:new-cdflojure1-2d-1
+    (let [clojure-version (clojure-version)
+          jvm-version (System/getProperty "java.version")]
+      (def poop [1 2 3])
+      (defonce numbers 123456)
+      (def kk :keuwort234)
+      (def mm {:map34 45})
+      (defonce fart ["string" "mnap"])
+      (println jvm-version)
+      (str
+        "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+        clojure-version
+        " on "
+        jvm-version
+        " JVM tech"
+        " 🥕🐇")),
+    :new-clojure-2
     (do
       (let [clojure-version (clojure-version)
-            jvm-version (System/getProperty "java.version")]
-        (def poop [1 2 3])
-        (defonce fart ["string" "mnap"])
-        (println jvm-version)
+            jvm-version (System/getProperty "java.version")
+            seconds :time/second]
         (str
           "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
           clojure-version
-          " on "
+          " onn "
           jvm-version
           " JVM tech"
+          seconds
           " 🥕🐇")))},
    :name "block-9804",
-   :w 14,
+   :w 18,
    :selected-mode
-   {:new-clojjsdddddfdure-6dvv-1-1 :text, :new-cdflojure1-2d-1 :text},
-   :selected-view :new-cdflojure1-2d-1,
-   :root [6 15],
-   :h 4,
+   {:new-clojjsdddddfdure-6dvv-1-1 :text,
+    :new-cdflojure1-2d-1 :text,
+    :new-clojure-2 :text},
+   :selected-view :new-clojure-2,
+   :root [3 3],
+   :h 3,
    :queries {},
    :tab "willing owl",
    :views
@@ -3856,6 +5107,15 @@
      [:data-viewer :param/generated-colors]]},
    :queries {},
    :minimized? true},
+  :block-2692
+  {:w 5,
+   :selected-view :vv,
+   :name "clovers",
+   :h 8,
+   :ghosted? false,
+   :views {:vv [:grid "clovers"]},
+   :root [33 1],
+   :tab "sapphire ape"},
   :block-6825
   {:h 4,
    :w 5,
@@ -3912,8 +5172,9 @@
   {:crow-flow-201a>*running? false,
    :counting-loop>*running? false,
    :flow-forever>*running? false,
-   :flow-forever>final-math nil,
    :openai-image-gen-ladder3>*running? false,
+   :simple-python-exec>*running? false,
+   :live-scratch-flow>*running? false,
    :openai-image-gen-ladder3>hiccup-image-box-w-png-vw
    [:v-box
     :padding
@@ -3923,27 +5184,31 @@
     :width
     :width-px
     :style
-    {:background-color "#192530",
+    {:background-color "#52799c",
      :border-radius "20px",
      :font-size "12px",
      :font-weight 700,
-     :color "#c9bab9"}
+     :color "#cc9ccf"}
     :children
-    [[:box :child "./images/gen/b64-image3-63006-33351.png"]
+    [[:box :child "./images/gen/b64-image3-67747-25813.png"]
      [:box
       :size
       "auto"
       :child
       [:img
-       {:src "./images/gen/b64-image3-63006-33351.png",
-        :style {:border-radius "30px"}}]]]],
-   :simple-python-exec>*running? false,
-   :live-scratch-flow>*running? false},
+       {:src "./images/gen/b64-image3-67747-25813.png",
+        :style {:border-radius "30px"}}]]]]},
   :flows-sys
   {:flow_id "simple-python-exec",
    :file_path "./flows/simple-python-exec.edn",
    :last_modified "2024-03-12 02:37:43"},
-  :time {:now-seconds "Friday, June 28th 12:40:58AM", :month 4, :second 58},
+  :files-sys
+  {:file_path "./screens/alarm-clock22.edn",
+   :screen_name "alarm-clock22",
+   :blocks 55,
+   :queries 14,
+   :ts "2024-06-28 19:55:27"},
+  :time {:month 4, :second 24, :now-seconds "Friday, June 28th 10:11:01PM"},
   :grid1-sys* {},
   :viz-tables-sys2 {:table_name :new-query-1},
   :user-dropdown-sys {:req-field "tour_name"},
@@ -3953,11 +5218,12 @@
    :plentiful-octohedral-llama-33>stats>memory nil,
    :elegant-icosahedral-rhinoceros-30>stats>memory nil,
    :simple-narrow-camel-5>stats>memory 184,
+   :impressive-long-wolf-17>stats>memory 972,
    :prominent-octohedral-frog-2>stats>memory nil,
    :quick-thin-serval-37>stats>memory nil,
    :quiet-cubic-beaver-23>stats>memory nil,
    :honest-copper-cockroach-0>stats>memory nil,
-   :*client-name*>stats>memory 344,
+   :*client-name*>stats>memory 929,
    :accepted-diamond-zebra-40>stats>memory nil,
    :terrific-short-sheep-29>stats>memory nil,
    :brave-prismatic-camel-31>stats>memory nil,
@@ -3978,17 +5244,24 @@
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   (let [clojure-version (clojure-version)
-         jvm-version (System/getProperty "java.version")]
-     (println jvm-version)
-     (str
-       "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
-       clojure-version
-       " on "
-       jvm-version
-       " JVM tech"
-       " 🥕🐇")),
-   :selected-view [:clojure :new-cdflojure1-2d-1],
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :attr
+    {:id ":block-9804.:hi"}
+    :style
+    {:font-size "106px",
+     :font-weight 700,
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family :theme/base-font}
+    :child
+    "hi!"],
+   :selected-view [:views :hiiii],
    :generated-colors
    [:run-solver
     [:get-my-colors
@@ -4096,7 +5369,7 @@
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
   :connections-sys {:database_name "SQLite", :connection_id "met-on-tour"},
-  :sys {:selected-tab "willing owl", :selected-tab-idx 6},
+  :sys {:selected-tab "circular armadillo", :selected-tab-idx 7},
   :searches-sub-types-sys
   {:item_key "amazing-oval-nightingale-11",
    :is_live 1,
@@ -4105,7 +5378,8 @@
   :gen-viz-243.* {:tour_name ["Damage, Inc." "Madly In Anger With The World"]},
   :gen-viz-243 {:rows 181, :tour_name "World Magnetic"},
   :solver
-  {:raw-custom-override-1280155551
+  {:raw-custom-override-1238672541 nil,
+   :raw-custom-override-1280155551
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        58Gi       8.8Gi       470Mi        58Gi        65Gi\nSwap:             0B          0B          0B\n\n",
    :raw-custom-override524136702
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
@@ -4374,9 +5648,250 @@
     :second-brightest "#74847c",
     :brightest "#c681aa",
     :most-contrasting-light "#c681aa"},
+   :raw-custom-override-1516564627
+   "top - 22:10:38 up 2 days,  3:17,  6 users,  load average: 12.85, 11.22, 11.24\nTasks: 406 total,   6 running, 400 sleeping,   0 stopped,   0 zombie\n%Cpu(s): 75.8 us, 10.6 sy,  0.5 ni, 13.1 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem : 128636.8 total,   3985.9 free,  56238.8 used,  68412.0 buff/cache\nMiB Swap:      0.0 total,      0.0 free,      0.0 used.  70583.9 avail Mem \n\n    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n2522570 ryanr     20   0   78.3g  19.7g 388620 S 462.5  15.7 171:22.53 java\n  57296 ryanr     20   0 1132.3g   1.0g 196752 R 106.2   0.8   2147:39 chrome\n  26191 ryanr     20   0 1141.8g   1.6g 102232 S 100.0   1.2 445:51.87 code\n2532675 ryanr     20   0 1132.3g   1.5g 131480 R 100.0   1.2  93:32.62 chrome\n1623742 ryanr     20   0 1134.1g 619084 163992 S  50.0   0.5  46:13.90 chrome\n   3309 ryanr     20   0   33.2g 872188 316364 S  43.8   0.7   1565:19 chrome\n   4101 ryanr     20   0 1132.3g 943536 155992 R  43.8   0.7   2214:35 chrome\n   1546 ryanr     20   0 4604176   2.2g 143772 R  31.2   1.7 363:12.42 kwin_x11\n  65198 ryanr     20   0 1130.9g 479256  97500 S  25.0   0.4 152:53.72 chainner\n   1028 root      20   0   24.7g 557208 289320 S  12.5   0.4 126:44.37 Xorg\n  26161 ryanr     20   0   32.9g   1.2g 148800 R  12.5   1.0  69:33.91 code\n    854 root     -51   0       0      0      0 S   6.2   0.0  61:04.07 irq/189+\n    859 ryanr     31  11 2186892 304840  19328 S   6.2   0.2 198:35.28 syncthi+\n\n------------------------[ friday, june 28th 10:10:37pm ]-------------------------",
    :raw-custom-override-970575260 "Clojure 1.11.1 on JVM 17.0.11 @ 42 seconds! ",
+   :raw-custom-override-1936922615
+   [{"Age" 22,
+     "Fare" 7.25,
+     "PassengerId" 1,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 38,
+     "Fare" 71.2833,
+     "PassengerId" 2,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 1}
+    {"Age" 26,
+     "Fare" 7.925,
+     "PassengerId" 3,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 35,
+     "Fare" 53.1,
+     "PassengerId" 4,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 35,
+     "Fare" 8.05,
+     "PassengerId" 5,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 8.4583,
+     "PassengerId" 6,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 1,
+     "Pclass" 3}
+    {"Age" 54,
+     "Fare" 51.8625,
+     "PassengerId" 7,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 2,
+     "Fare" 21.075,
+     "PassengerId" 8,
+     "SibSp" 3,
+     "Parch" 1,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 27,
+     "Fare" 11.1333,
+     "PassengerId" 9,
+     "SibSp" 0,
+     "Parch" 2,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 14,
+     "Fare" 30.0708,
+     "PassengerId" 10,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 2}
+    {"Age" 4,
+     "Fare" 16.7,
+     "PassengerId" 11,
+     "SibSp" 1,
+     "Parch" 1,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 58,
+     "Fare" 26.55,
+     "PassengerId" 12,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 1}
+    {"Age" 20,
+     "Fare" 8.05,
+     "PassengerId" 13,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 39,
+     "Fare" 31.275,
+     "PassengerId" 14,
+     "SibSp" 1,
+     "Parch" 5,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 14,
+     "Fare" 7.8542,
+     "PassengerId" 15,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 0,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 55,
+     "Fare" 16,
+     "PassengerId" 16,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 2}
+    {"Age" 2,
+     "Fare" 29.125,
+     "PassengerId" 17,
+     "SibSp" 4,
+     "Parch" 1,
+     "Predicted" 0,
+     "Sex" 1,
+     "Survived" 0,
+     "Embarked" 1,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 13,
+     "PassengerId" 18,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 1,
+     "Survived" 1,
+     "Embarked" 2,
+     "Pclass" 2}
+    {"Age" 31,
+     "Fare" 18,
+     "PassengerId" 19,
+     "SibSp" 1,
+     "Parch" 0,
+     "Predicted" 0,
+     "Sex" 0,
+     "Survived" 0,
+     "Embarked" 2,
+     "Pclass" 3}
+    {"Age" 28,
+     "Fare" 7.225,
+     "PassengerId" 20,
+     "SibSp" 0,
+     "Parch" 0,
+     "Predicted" 1,
+     "Sex" 0,
+     "Survived" 1,
+     "Embarked" 0,
+     "Pclass" 3}],
    :raw-custom-override1563408633
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        41Gi        31Gi       803Mi        52Gi        82Gi\nSwap:             0B          0B          0B\n\n",
+   :get-my-colors-1462145537
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
    :get-my-colors-916110573
    {:second-darkest "#221d32",
     :highest-saturation "#9c3464",
@@ -4932,6 +6447,8 @@
    :raw-custom-override-1225391870
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override1085406457 nil,
+   :raw-custom-override513614713
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :get-my-colors720628555
    {:second-darkest "#352260",
     :highest-saturation "#f7c9cc",
@@ -4970,6 +6487,8 @@
     :second-brightest "#4ab3dc",
     :brightest "#f7c9cc",
     :most-contrasting-light "#f7c9cc"},
+   :raw-custom-override-341368218
+   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 9  0      0 4085112 1698752 68355136    0    0    67    60   17    6 49  6 45  0  0\n\n",
    :solver-fn-test11311036473 "HHHuge!180",
    :get-my-colors473984375
    {:second-darkest "#221d32",
@@ -5011,7 +6530,7 @@
     :most-contrasting-light "#c681aa"},
    :raw-custom-override685268485
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
-   :colors-of-the-moment>darkest "#061631",
+   :colors-of-the-moment>darkest "#1b255e",
    :raw-custom-override-1471694664
    "🐇🥕 nREPL. Clojure 1.11.1 on 17.0.11 .jvm.  🥕🐇",
    :raw-custom-override-55990886
@@ -5390,6 +6909,44 @@
     :second-brightest "#c28c9a",
     :brightest "#79b1aa",
     :most-contrasting-light "#79b1aa"},
+   :get-my-colors-565250358
+   {:second-darkest "#221d32",
+    :highest-saturation "#9c3464",
+    :most-contrasting "#c681aa",
+    :darkest "#100d1b",
+    :contrast-with-dominant "#c681aa",
+    :colors
+    ["#c681aa"
+     "#5c76a1"
+     "#3b3f68"
+     "#673d52"
+     "#100d1b"
+     "#94645c"
+     "#412c44"
+     "#2c1b2c"
+     "#9c3464"
+     "#74847c"
+     "#221d32"],
+    :most-frequent "#100d1b",
+    :data-colors
+    {"float" "#a6c681",
+     "boolean" "#80b5b7",
+     "map" "#cfac3f",
+     "list" "#36375b",
+     "string" "#c2e7c1",
+     "any" "#468d54",
+     "vector" "#847674",
+     "keyword" "#87c286",
+     "rabbit-code" "#498b85",
+     "datetime" "#432227",
+     "integer" "#a899a6",
+     "unknown" "#29203b",
+     "date" "#0f241f"},
+    :dominant "#221d32",
+    :most-contrasting-dark "#9c3464",
+    :second-brightest "#74847c",
+    :brightest "#c681aa",
+    :most-contrasting-light "#c681aa"},
    :raw-custom-override-1561961887
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 7  0      0 9191420 1459884 59463492    0    0    13    60    6   11 40  3 57  0  0\n\n",
    :get-my-colors768651776
@@ -5547,6 +7104,8 @@
     :most-contrasting-light "#c681aa"},
    :raw-custom-override1549578475
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override838101334
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 onn 17.0.11 JVM tech9 🥕🐇",
    :raw-custom-override-569051388
    "               total        used        free      shared  buff/cache   available\nMem:           125Gi        27Gi        76Gi       448Mi        21Gi        96Gi\nSwap:             0B          0B          0B\n\n",
    :get-my-colors409689395
@@ -6236,6 +7795,8 @@
      "Pclass" 3}],
    :raw-custom-override794065810
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override1481402121
+   "               total        used        free      shared  buff/cache   available\nMem:           125Gi        54Gi       3.9Gi       595Mi        66Gi        68Gi\nSwap:             0B          0B          0B\n\n",
    :get-my-colors773783877
    {:second-darkest "#221d32",
     :highest-saturation "#9c3464",

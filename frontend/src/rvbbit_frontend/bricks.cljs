@@ -1615,6 +1615,7 @@
  (fn [db [_]] ;; if col is selected, first unselect that and then on subsequent, unselect
    (reset! mad-libs-view nil)
    (reset! db/editor-mode :meta)
+   (reset! db/cm-focused? false)
    (cond (and (not (nil? (get db :selected-flow-block))) (get db :flow?)) (assoc db :selected-flow-block nil)
          (nil? (get db :selected-cols))                                   (-> db
                                                                               (assoc :selected-block "none!")
@@ -2438,6 +2439,7 @@
                               selected-kp  @(ut/tracked-subscribe [::editor-panel-selected-view])
                               selected-kp  (if (nil? (first selected-kp)) nil selected-kp)]
                           (ut/tapp>> [:string-input stringify? selected-kp  rr rrd value])
+                          (reset! db/cm-focused? false)
                           (when (not= value rr)
                             (ut/tracked-dispatch-sync [::update-selected-key-cons selected-kp rr])))
               :onFocus        (fn [_] (reset! db/cm-focused? true))
@@ -3194,7 +3196,7 @@
       ;;                                                                            ":solver/" "solver-status/*client-name*>")))]}))
         ]
 
-    (tapp>> [:intro-map intro-map])
+    ;; (tapp>> [:intro-map intro-map])
 
   ;[re-com/box :child (str intro-map)]  
 

@@ -1229,17 +1229,21 @@
       cache
       (let [;s (replacer s #"1.0" "\"ONE-POINT-ZERO\"")
             type (cond (cstr/includes? s "(")                         :community
-                       (cstr/starts-with? (cstr/trim-newline s) "[:") [:hiccup :justified]
+                       (cstr/starts-with? (cstr/trim-newline s) "[:") [:justified-original :hiccup] ;:community ;[:hiccup :justified-original]
                        :else                                          :justified)
             o    (zp/zprint-str s
                                 (js/Math.floor (/ w 9))
                                 {:parse-string-all? true ;; was :parse-string-all?
                                  :style         type ;:community ;[:binding-nl :extend-nl]
-                                 :pair          {:force-nl? true}
-                                 :pair-fn       {:hang? true}
+                                 :pair          {:force-nl? false}
+                                 ;:pair-fn       {:hang? true}
+                                 :map {:hang? true :comma? false :sort? false}
+                                 :pair-fn {:hang? true
+                                           ;:flow? true
+                                           }
                                  :binding       {:force-nl? true}
                                  :vector        {:respect-nl? true}
-                                 :map           {:comma? false :sort? false}
+                                 ;:map           {:comma? false :sort? false}
                                  :parse         {:interpose "\n\n"}})]
         (swap! format-map-atom assoc [w s] o)
         o))))
