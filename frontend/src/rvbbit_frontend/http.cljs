@@ -166,22 +166,35 @@
                                :timeout 15000000}]))
                          db))
 
+;; (re-frame/reg-event-db ::sub-to-flow-value
+;;                        (fn [db [_ key]]
+;;                          (let [client-name (get db :client-name)]
+;;                            (ut/tracked-dispatch
+;;                             [::wfx/request :default
+;;                              {:message     {:kind :sub-to-flow-value :flow-key key :client-name client-name}
+;;                               :on-response [::value-response-flow]
+;;                               :on-timeout  [::timeout-response :get-flow-value key]
+;;                               :timeout     15000000}]))
+;;                          db))
+
 (re-frame/reg-event-db ::sub-to-flow-value
                        (fn [db [_ key]]
                          (let [client-name (get db :client-name)]
-                           (ut/tracked-dispatch [::wfx/request :default
-                                                 {:message     {:kind :sub-to-flow-value :flow-key key :client-name client-name}
-                                                  :on-response [::value-response-flow]
-                                                  :on-timeout  [::timeout-response :get-flow-value key]
-                                                  :timeout     15000000}]))
+                           (ut/tracked-dispatch
+                            [::wfx/push :default
+                             {:kind :sub-to-flow-value 
+                              :flow-key key 
+                              :client-name client-name}]))
                          db))
 
 (re-frame/reg-event-db ::unsub-to-flow-value
                        (fn [db [_ key]]
                          (let [client-name (get db :client-name)]
-                           (ut/tracked-dispatch [::wfx/request :default
-                                                 {:message {:kind :unsub-to-flow-value :flow-key key :client-name client-name}
-                                                  :timeout 15000000}]))
+                           (ut/tracked-dispatch
+                            [::wfx/push :default
+                             {:kind :unsub-to-flow-value 
+                              :flow-key key 
+                              :client-name client-name}]))
                          db))
 
 

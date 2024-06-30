@@ -2909,7 +2909,7 @@
     (edn/read-string ;; should always be a keyword coming in
      (ut/replace-multiple (str flow-key) {"*client-name*" client-name-str}))))
 
-(defmethod wl/handle-request :unsub-to-flow-value
+(defmethod wl/handle-push :unsub-to-flow-value
   [{:keys [client-name flow-key]}]
   (let [;;orig-flow-key flow-key
         subbed-sub (get-in @param-var-crosswalk [client-name flow-key])
@@ -3753,15 +3753,19 @@
                                                                       (vec (into [(keyword (second sub-path))]
                                                                                  (vec (rest (rest sub-path)))))
                                                                       lv)
-                  :else                                       (get-in @flow-db/results-atom keypath lv) ;; assume
-                  )
+                  :else                                       (get-in @flow-db/results-atom keypath lv))
             nil
             nil
             nil))
     [:client-sub-request flow-id :step-id step-id :client-name client-name]))
 
 
-(defmethod wl/handle-request :sub-to-flow-value [{:keys [client-name flow-key]}] (doall (sub-to-value client-name flow-key)))
+(defmethod wl/handle-push :sub-to-flow-value [{:keys [client-name flow-key]}] 
+  (doall (sub-to-value client-name flow-key)))
+
+(defmethod wl/handle-request :sub-to-flow-value [{:keys [client-name flow-key]}]
+  (ut/pp [:why-is-client  client-name :still-requesting?])
+  (doall (sub-to-value client-name flow-key)))
 
 
 (defn remove-watchers-for-flow22

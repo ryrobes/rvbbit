@@ -524,10 +524,14 @@
                                                         (ut/deep-flatten (get db :runstreams)))))
          runstreams              (vec (for [{:keys [flow-id]} @(ut/tracked-sub ::runstreams {})]
                                         (keyword (str "flow/" flow-id ">*running?"))))
+         selected-block          (get db :selected-block)
+         editor?                 (get db :editor?)
          selected-tab            (get db :selected-tab)
          panels-map              (get db :panels)
          panels-map              (if all? panels-map
-                                   (only-relevant-tabs panels-map selected-tab))  ;; filter down to curent tab and embedded grid tabs 
+                                     (merge
+                                      (only-relevant-tabs panels-map selected-tab)
+                                      (when editor? (select-keys (get db :panels) [selected-block]))))
          panels                  [(create-runner-listeners panels-map)
                                   (create-solver-listeners panels-map)]
          drop-refs               (vec (distinct (vals @drop-last-tracker-refs)))
@@ -558,10 +562,10 @@
          flow-runners             []
           ;;_ (tapp>> [:flow-runners flow-runners])
          clover-solvers-all       (vec (apply concat (for [[_ v] ;; all things
-                                                          @db/solver-fn-runs] (keys v))))
+                                                           @db/solver-fn-runs] (keys v))))
          clover-solvers-tab       (vec (apply concat (for [[k v] @db/solver-fn-runs
-                                                          :when (if (cstr/starts-with? (str k) ":block")
-                                                                  (some #(= % k) (keys panels-map)) true)] (keys v))))
+                                                           :when (if (cstr/starts-with? (str k) ":block")
+                                                                   (some #(= % k) (keys panels-map)) true)] (keys v))))
          clover-solvers           (if all? clover-solvers-all clover-solvers-tab)
          ;;_ (tapp>> [:clover-solvers clover-solvers clover-solvers2 @db/solver-fn-runs])
          warren-item             (get db :selected-warren-item)
@@ -593,8 +597,7 @@
                                           signals-mode?)
                                    [(keyword (str "signal-history/" (ut/replacer (str warren-item) ":" "")))]
                                    [])
-         selected-block          (get db :selected-block)
-         editor?                 (get db :editor?)
+
          in-editor-solvers0      (vec (map last (filter (fn [[k _]] (cstr/includes? (str k) (str selected-block))) @db/solver-fn-lookup)))
          in-editor-solvers       (if editor?
                                    (let []
@@ -604,7 +607,7 @@
                                                                   :let [ns-key (keyword (str (ut/replacer s ":solver/" "solver-meta/")))
                                                                         ns-key1 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [ns-key]})]]
                                                               [(keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")))
-                                                               (when (and (ut/ne? ns-key1) (get-in ns-key1 [:output :evald-result :ns])) 
+                                                               (when (and (ut/ne? ns-key1) (get-in ns-key1 [:output :evald-result :ns]))
                                                                  (keyword (str "repl-ns/" (get-in ns-key1 [:output :evald-result :ns]))))
                                                                ns-key])))))) [])
          clover-solvers-running  (vec (for [s clover-solvers] ;;(vec (remove (set in-editor-solvers0) clover-solvers))] 
@@ -10258,9 +10261,14 @@
                                      (when (or flow-running?
                                                runner-running?
                                                (and (not selected?) query-running? not-view?))
-                                       [re-com/md-icon-button :md-icon-name "zmdi-refresh" :class "rotate linear infinite"
-                                        :style
-                                        {:font-size "20px" :transform-origin "10px 11px" :padding "0px" :margin-top "-5px"}])
+                                       [re-com/md-icon-button 
+                                        :md-icon-name "zmdi-refresh" 
+                                        :class "rotate linear infinite"
+                                        :style {:font-size "20px" 
+                                                :color (theme-pull :theme/universal-pop-color nil)
+                                                :transform-origin "10px 11px" 
+                                                :padding "0px" 
+                                                :margin-top "-5px"}])
                                      (when reco-ready?
                                        [re-com/box :style {:margin-top "-6px"} :child
                                         [re-com/md-icon-button :md-icon-name "zmdi-view-dashboard" :on-click
