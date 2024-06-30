@@ -1275,7 +1275,7 @@
           xmax    (+ (if (< xmax 10) 10 xmax) 0.3)
           ;xmax    (if (< xmax 30) 30 xmax)
           ymax    (if (< ymax 10) 10 ymax)]
-      (ut/tapp>> (str [:editor-size xmax ymax]))
+      ;(ut/tapp>> (str [:editor-size xmax ymax]))
       (reset! editor-size [xmax ymax]))))
 
 (defn resize-mouse-down-handler [e]
@@ -1876,14 +1876,16 @@
                                                                                                                                           ":solver/" "solver-status/*client-name*>")))]}))
                                                                console-output (get-in meta-data [:output :evald-result :out] [])]
                                                   ;;(ut/tapp>>  [:console-output console-output])
-                                                           [re-com/box :size "none"
+                                                           [re-com/box 
+                                                            :size "none"
                                                             :style {:transform "translate(0)"}
                                                             :height (px (- single-height 100))
-                                                            :width "98%"
+                                                            ;:width "98%"
                                                             :align :center
                                                             :style {:overflow "auto" :font-size "13px"}
                                                             :child [re-com/v-box
                                                                     :gap  "10px"
+                                                                    :width "98%"
                                                                     :children [(when (ut/ne? (remove empty? console-output))
                                                                                  [re-com/v-box
                                                                                   :style {:border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)

@@ -814,9 +814,9 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 600)
 
-  (start-scheduler 600
-                   qp/cleanup-unused-queues
-                   "Clean Dormant Queues" 600)
+  ;; (start-scheduler 600
+  ;;                  qp/cleanup-unused-queues
+  ;;                  "Clean Dormant Queues" 600)
 
   ;; (start-scheduler 1
   ;;                  #(let [pst (wss/query-pool-sizes)]

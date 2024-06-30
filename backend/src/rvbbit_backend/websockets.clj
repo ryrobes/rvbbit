@@ -5845,19 +5845,19 @@
 
           (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
           (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
-         ;(ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
+          (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
 
           (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes" :color :magenta))
           (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 15) "msgs/sec" "client pushes" :color :magenta :freq 15))
-         ;(ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
+          (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
 
           (ut/pp (draw-bar-graph @mem-usage "memory usage" "mb" :color :yellow))
           (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 15) "memory usage" "mb" :color :yellow :freq 15))
-         ;(ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
+          (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
 
           (ut/pp (draw-bar-graph @solver-usage "solvers running" "solvers" :color :red))
           (ut/pp (draw-bar-graph (average-in-chunks @solver-usage 15) "solvers running" "solvers" :color :red :freq 15))
-         ;(ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
+          (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
 
           ;(ut/pp [:watcher+-queues (count (keys @task-queues-slot))])
           ;(ut/pp [:push-queues (count (keys @task-queues-slot2))])

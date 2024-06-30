@@ -172,24 +172,6 @@
                              :workers (count (get @workers queue-type))}]))}))
      (catch Exception e (println "get-queue-stats-error" e)))))
 
-;; (defn get-queue-stats+
-;;   ([]
-;;    (get-queue-stats+ :default))
-;;   ([system-id]
-;;    (when-let [system (get @queue-systems system-id)]
-;;      (let [{:keys [task-queues workers]} system
-;;            by-type-map (into {}
-;;                              (for [[queue-type queues] @task-queues]
-;;                                [queue-type
-;;                                 {:queues (count queues)
-;;                                  :total-tasks (reduce + (map #(.size %) (vals queues)))
-;;                                  :workers (count (get @workers queue-type))}]))]
-;;        {:overall {:total-queue-types (count @task-queues)
-;;                   :total-queues (reduce + (map (comp count second) @task-queues))
-;;                   :total-tasks (apply + (for [[_ v] by-type-map] (get v :total-tasks)))
-;;                   :total-workers (reduce + (map (comp count second) @workers))}
-;;         :by-type by-type-map}))))
-
 (defn cleanup-unused-queues
   ([]
    (cleanup-unused-queues :default))
@@ -219,10 +201,6 @@
    (when-let [system (get @queue-systems system-id)]
      (swap! (:config system) merge config))))
 
-
-
-
-
 (defn get-queue-stats+
   ([]
    (get-queue-stats+ :default))
@@ -241,8 +219,6 @@
                           {:queues (count queues)
                            :total-tasks (reduce + (map safe-queue-size queues))
                            :workers (count (get @workers queue-type))}]))}))))
-
-
 
 (defn cleanup-unused-queues
   ([]
