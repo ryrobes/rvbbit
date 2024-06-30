@@ -31,6 +31,7 @@
    [io.pedestal.http.route    :as route]
    [hikari-cp.core            :as hik]
    [clojure.string            :as cstr]
+   [rvbbit-backend.queue-party  :as qp]
    [rvbbit-backend.transform  :as ts]
    [rvbbit-backend.pivot      :as pivot]
    [rvbbit-backend.sql        :as    sql
@@ -62,6 +63,7 @@
 
 (defonce flow-status (atom {}))
 (defonce cpu-usage (atom []))
+(defonce solver-usage (atom []))
 (defonce push-usage (atom []))
 (defonce peer-usage (atom []))
 (defonce mem-usage (atom []))
@@ -144,21 +146,22 @@
 (def jvm-stats-every 30)
 
 (defonce general-scheduler-thread-pool
-  (Executors/newScheduledThreadPool 16))
+  (Executors/newScheduledThreadPool 8))
+
 ;; (defonce general-scheduler-thread-pool
 ;;   (ThreadPoolExecutor. 4 50 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
   ;; (defonce custom-watcher-thread-master-pool 
   ;;   (Executors/newFixedThreadPool 32))
-(defonce custom-watcher-thread-master-pool ;; master watchers
-  (ThreadPoolExecutor. 10 50 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+;; (defonce custom-watcher-thread-master-pool ;; master watchers
+;;   (ThreadPoolExecutor. 10 50 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
   ;; (defonce custom-watcher-thread-master-pool
   ;;   (ThreadPoolExecutor. 4 50 60 TimeUnit/SECONDS (LinkedBlockingQueue.)))
 
 ;; (defonce custom-watcher-thread-pool
 ;;   (ThreadPoolExecutor. 10 1000 60 TimeUnit/SECONDS (SynchronousQueue.)))
-(defonce custom-watcher-thread-pool ;; if pool is 100% full, will fallback to parent callers thread pool instead of rejection
-  (ThreadPoolExecutor. 10 1500 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))  
+;; (defonce custom-watcher-thread-pool ;; if pool is 100% full, will fallback to parent callers thread pool instead of rejection
+;;   (ThreadPoolExecutor. 10 1500 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))  
 
 
 
@@ -173,309 +176,358 @@
 (defonce websocket-thread-pool ;; master watchers
   (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
-(defonce solver-thread-pool ;; master watchers
-  (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+;; (defonce solver-thread-pool ;; master watchers
+;;   (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
-(defn execute-solver-task [f]
-  (.execute solver-thread-pool f))
+;; (defn execute-solver-task [f]
+;;   (.execute solver-thread-pool f))
 
-(defonce push-thread-pool ;; master watchers
-  (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+;; (defonce push-thread-pool ;; master watchers
+;;   (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
-(defn execute-push-task [f]
-  (.execute push-thread-pool f))
+;; (defn execute-push-task [f]
+;;   (.execute push-thread-pool f))
 
-(def task-queue (java.util.concurrent.LinkedBlockingQueue.))
-(def running (atom true))
-(def worker (atom nil)) ; Holds the future of the worker thread
 
-(defn enqueue-task [task] (.put task-queue task))
 
-(defn worker-loop [] (loop [] (when @running (let [task (.take task-queue)] (task)))) (recur))
 
-(defn start-worker [] (ut/pp [:starting-sync-worker-thread 1]) (reset! running true) (reset! worker (future (worker-loop))))
 
-(defn stop-worker
-  []
-  (reset! running false)
-  (when-let [w @worker]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60))))
+;; (def task-queue (java.util.concurrent.LinkedBlockingQueue.))
+;; (def running (atom true))
+;; (def worker (atom nil)) ; Holds the future of the worker thread
 
-(defn recycle-worker [] (reset! stats-cnt 0) (stop-worker) (start-worker))
+;; (defn enqueue-task [task] (.put task-queue task))
 
-(def task-queue2 (java.util.concurrent.LinkedBlockingQueue.))
-(def running2 (atom true))
-(def worker2 (atom nil)) ; Holds the future of the worker thread
+;; (defn worker-loop [] (loop [] (when @running (let [task (.take task-queue)] (task)))) (recur))
 
-(defn enqueue-task2 [task] (.put task-queue2 task))
+;; (defn start-worker [] (ut/pp [:starting-sync-worker-thread 1]) (reset! running true) (reset! worker (future (worker-loop))))
 
-(defn worker-loop2 [] (loop [] (when @running2 (let [task (.take task-queue2)] (task)))) (recur))
+;; (defn stop-worker
+;;   []
+;;   (reset! running false)
+;;   (when-let [w @worker]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60))))
 
-(defn start-worker2 [] (ut/pp [:starting-sync-worker-thread 2]) (reset! running2 true) (reset! worker2 (future (worker-loop2))))
+;; (defn recycle-worker [] (reset! stats-cnt 0) (stop-worker) (start-worker))
 
-(defn stop-worker2
-  []
-  (reset! running2 false)
-  (when-let [w @worker2]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60))))
+;; (def task-queue2 (java.util.concurrent.LinkedBlockingQueue.))
+;; (def running2 (atom true))
+;; (def worker2 (atom nil)) ; Holds the future of the worker thread
 
-(defn recycle-worker2 [] (stop-worker2) (start-worker2))
+;; (defn enqueue-task2 [task] (.put task-queue2 task))
 
-(def task-queue3 (java.util.concurrent.LinkedBlockingQueue.))
-(def running3 (atom true))
-(def worker3 (atom nil)) ; Holds the future of the worker thread
+;; (defn worker-loop2 [] (loop [] (when @running2 (let [task (.take task-queue2)] (task)))) (recur))
 
-(defn enqueue-task3 [task] (.put task-queue3 task))
+;; (defn start-worker2 [] (ut/pp [:starting-sync-worker-thread 2]) (reset! running2 true) (reset! worker2 (future (worker-loop2))))
 
-(defn worker-loop3 [] (loop [] (when @running3 (let [task (.take task-queue3)] (task)))) (recur))
+;; (defn stop-worker2
+;;   []
+;;   (reset! running2 false)
+;;   (when-let [w @worker2]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60))))
 
-(defn start-worker3 [] (ut/pp [:starting-sync-worker-thread 3]) (reset! running3 true) (reset! worker3 (future (worker-loop3))))
+;; (defn recycle-worker2 [] (stop-worker2) (start-worker2))
 
-(defn stop-worker3
-  []
-  (reset! running3 false)
-  (when-let [w @worker3]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60))))
+;; (def task-queue3 (java.util.concurrent.LinkedBlockingQueue.))
+;; (def running3 (atom true))
+;; (def worker3 (atom nil)) ; Holds the future of the worker thread
 
-(defn recycle-worker3 [] (stop-worker3) (start-worker3))
+;; (defn enqueue-task3 [task] (.put task-queue3 task))
 
-(def task-queue3a (java.util.concurrent.LinkedBlockingQueue.))
-(def running3a (atom true))
-(def worker3a (atom nil)) ; Holds the future of the worker thread
+;; (defn worker-loop3 [] (loop [] (when @running3 (let [task (.take task-queue3)] (task)))) (recur))
 
-(defn enqueue-task3a [task] (.put task-queue3a task))
+;; (defn start-worker3 [] (ut/pp [:starting-sync-worker-thread 3]) (reset! running3 true) (reset! worker3 (future (worker-loop3))))
 
-(defn worker-loop3a [] (loop [] (when @running3a (let [task (.take task-queue3a)] (task)))) (recur))
+;; (defn stop-worker3
+;;   []
+;;   (reset! running3 false)
+;;   (when-let [w @worker3]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60))))
 
-(defn start-worker3a
-  []
-  (ut/pp [:starting-sync-worker-thread 3 :a])
-  (reset! running3a true)
-  (reset! worker3a (future (worker-loop3a))))
+;; (defn recycle-worker3 [] (stop-worker3) (start-worker3))
 
-(defn stop-worker3a
-  []
-  (reset! running3a false)
-  (when-let [w @worker3a]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60))))
+;; (def task-queue3a (java.util.concurrent.LinkedBlockingQueue.))
+;; (def running3a (atom true))
+;; (def worker3a (atom nil)) ; Holds the future of the worker thread
 
-(defn recycle-worker3a [] (stop-worker3a) (start-worker3a))
+;; (defn enqueue-task3a [task] (.put task-queue3a task))
 
-(def task-queue4 (java.util.concurrent.LinkedBlockingQueue.))
-(def running4 (atom true))
-(def workers4 (atom nil)) ; Holds the futures of the worker threads
+;; (defn worker-loop3a [] (loop [] (when @running3a (let [task (.take task-queue3a)] (task)))) (recur))
 
-(defn enqueue-task4 [task] (.put task-queue4 task))
+;; (defn start-worker3a
+;;   []
+;;   (ut/pp [:starting-sync-worker-thread 3 :a])
+;;   (reset! running3a true)
+;;   (reset! worker3a (future (worker-loop3a))))
 
-(defn worker-loop4 [] (loop [] (when @running4 (let [task (.take task-queue4)] (task)))) (recur))
+;; (defn stop-worker3a
+;;   []
+;;   (reset! running3a false)
+;;   (when-let [w @worker3a]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60))))
 
-(defn start-workers4
-  [num-workers]
-  (ut/pp [:starting-sync-worker-thread-*pool 2])
-  (reset! running4 true)
-  (reset! workers4 (doall (map (fn [_] (future (worker-loop4))) (range num-workers)))))
+;; (defn recycle-worker3a [] (stop-worker3a) (start-worker3a))
 
+;; (def task-queue4 (java.util.concurrent.LinkedBlockingQueue.))
+;; (def running4 (atom true))
+;; (def workers4 (atom nil)) ; Holds the futures of the worker threads
 
-(defn stop-workers4
-  []
-  (reset! running4 false)
-  (doseq [w @workers4]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60)))
-  (while (not (.isEmpty task-queue4)) ; Wait until the task queue is empty
-    (Thread/sleep 60)))
+;; (defn enqueue-task4 [task] (.put task-queue4 task))
 
-(defn recycle-workers4 [num-workers] (stop-workers4) (start-workers4 num-workers))
+;; (defn worker-loop4 [] (loop [] (when @running4 (let [task (.take task-queue4)] (task)))) (recur))
 
-(def task-queue-sql-meta (java.util.concurrent.LinkedBlockingQueue.))
-(def running-sql-meta (atom true))
-(def workers-sql-meta (atom nil)) ; Holds the futures of the worker threads
+;; (defn start-workers4
+;;   [num-workers]
+;;   (ut/pp [:starting-sync-worker-thread-*pool 2])
+;;   (reset! running4 true)
+;;   (reset! workers4 (doall (map (fn [_] (future (worker-loop4))) (range num-workers)))))
 
-(defn enqueue-task-sql-meta [task] (.put task-queue-sql-meta task))
 
-(defn worker-loop-sql-meta [] (loop [] (when @running-sql-meta (let [task (.take task-queue-sql-meta)] (task)))) (recur))
+;; (defn stop-workers4
+;;   []
+;;   (reset! running4 false)
+;;   (doseq [w @workers4]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (while (not (.isEmpty task-queue4)) ; Wait until the task queue is empty
+;;     (Thread/sleep 60)))
 
-(defn start-workers-sql-meta
-  [num-workers]
-  (ut/pp [:starting-sync-worker-thread-*pool :sql-meta])
-  (reset! running-sql-meta true)
-  (reset! workers-sql-meta (doall (map (fn [_] (future (worker-loop-sql-meta))) (range num-workers)))))
+;; (defn recycle-workers4 [num-workers] (stop-workers4) (start-workers4 num-workers))
 
+;; (def task-queue-sql-meta (java.util.concurrent.LinkedBlockingQueue.))
+;; (def running-sql-meta (atom true))
+;; (def workers-sql-meta (atom nil)) ; Holds the futures of the worker threads
 
-(defn stop-workers-sql-meta
-  []
-  (reset! running-sql-meta false)
-  (doseq [w @workers-sql-meta]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60)))
-  (while (not (.isEmpty task-queue-sql-meta)) ; Wait until the task queue is empty
-    (Thread/sleep 60)))
+;; (defn enqueue-task-sql-meta [task] (.put task-queue-sql-meta task))
 
-(defn recycle-workers-sql-meta [num-workers] (stop-workers-sql-meta) (start-workers-sql-meta num-workers))
+;; (defn worker-loop-sql-meta [] (loop [] (when @running-sql-meta (let [task (.take task-queue-sql-meta)] (task)))) (recur))
 
-(def task-queue5 (java.util.concurrent.LinkedBlockingQueue.))
-(def running5 (atom true))
-(def workers5 (atom nil)) ; Holds the futures of the worker threads
+;; (defn start-workers-sql-meta
+;;   [num-workers]
+;;   (ut/pp [:starting-sync-worker-thread-*pool :sql-meta])
+;;   (reset! running-sql-meta true)
+;;   (reset! workers-sql-meta (doall (map (fn [_] (future (worker-loop-sql-meta))) (range num-workers)))))
 
-(defn enqueue-task5 [task] (.put task-queue5 task))
 
-(defn worker-loop5 [] (loop [] (when @running5 (let [task (.take task-queue5)] (task)))) (recur))
+;; (defn stop-workers-sql-meta
+;;   []
+;;   (reset! running-sql-meta false)
+;;   (doseq [w @workers-sql-meta]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (while (not (.isEmpty task-queue-sql-meta)) ; Wait until the task queue is empty
+;;     (Thread/sleep 60)))
 
+;; (defn recycle-workers-sql-meta [num-workers] (stop-workers-sql-meta) (start-workers-sql-meta num-workers))
 
-(defn start-workers5
-  [num-workers]
-  (ut/pp [:starting-sync-worker-thread-*pool 5])
-  (reset! running5 true)
-  (reset! workers5 (doall (map (fn [_] (future (worker-loop5))) (range num-workers)))))
+;; (def task-queue5 (java.util.concurrent.LinkedBlockingQueue.))
+;; (def running5 (atom true))
+;; (def workers5 (atom nil)) ; Holds the futures of the worker threads
 
+;; (defn enqueue-task5 [task] (.put task-queue5 task))
 
-(defn stop-workers5
-  []
-  (reset! running5 false)
-  (doseq [w @workers5]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60)))
-  (while (not (.isEmpty task-queue5)) ; Wait until the task queue is empty
-    (Thread/sleep 60)))
+;; (defn worker-loop5 [] (loop [] (when @running5 (let [task (.take task-queue5)] (task)))) (recur))
 
-(defn recycle-workers5 [num-workers] (stop-workers5) (start-workers5 num-workers))
 
+;; (defn start-workers5
+;;   [num-workers]
+;;   (ut/pp [:starting-sync-worker-thread-*pool 5])
+;;   (reset! running5 true)
+;;   (reset! workers5 (doall (map (fn [_] (future (worker-loop5))) (range num-workers)))))
 
 
+;; (defn stop-workers5
+;;   []
+;;   (reset! running5 false)
+;;   (doseq [w @workers5]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (while (not (.isEmpty task-queue5)) ; Wait until the task queue is empty
+;;     (Thread/sleep 60)))
 
+;; (defn recycle-workers5 [num-workers] (stop-workers5) (start-workers5 num-workers))
 
 
-(def task-queue5d (java.util.concurrent.LinkedBlockingQueue.))
-(def running5d (atom true))
-(def workers5d (atom nil)) ; Holds the futures of the worker threads
-(defonce desired-workers (atom 0))
 
-(defn enqueue-task5d [task] (.put task-queue5d task))
 
-(defn worker-loop5d
-  []
-  (loop []
-    (when (and @running5d (pos? @desired-workers)) (let [task (.take task-queue5d)] (task)) (swap! desired-workers dec))
-    (recur)))
 
-(defn start-workers5d
-  [num-workers]
-  (ut/pp [:starting-sync-worker-thread-*pool 5 :dynamic])
-  (reset! running5d true)
-  (swap! desired-workers + num-workers)
-  (reset! workers5d (doall (map (fn [_] (future (worker-loop5d))) (range num-workers)))))
 
-(defn stop-workers5d
-  []
-  (reset! running5d false)
-  (doseq [w @workers5d]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60)))
-  (while (not (.isEmpty task-queue5d)) ; Wait until the task queue is empty
-    (Thread/sleep 60)))
+;; (def task-queue5d (java.util.concurrent.LinkedBlockingQueue.))
+;; (def running5d (atom true))
+;; (def workers5d (atom nil)) ; Holds the futures of the worker threads
+;; (defonce desired-workers (atom 0))
 
-(defn recycle-workers5d [num-workers] (stop-workers5d) (start-workers5d num-workers))
+;; (defn enqueue-task5d [task] (.put task-queue5d task))
 
-(defn set-desired-workers [num-workers] (reset! desired-workers num-workers))
+;; (defn worker-loop5d
+;;   []
+;;   (loop []
+;;     (when (and @running5d (pos? @desired-workers)) (let [task (.take task-queue5d)] (task)) (swap! desired-workers dec))
+;;     (recur)))
 
+;; (defn start-workers5d
+;;   [num-workers]
+;;   (ut/pp [:starting-sync-worker-thread-*pool 5 :dynamic])
+;;   (reset! running5d true)
+;;   (swap! desired-workers + num-workers)
+;;   (reset! workers5d (doall (map (fn [_] (future (worker-loop5d))) (range num-workers)))))
 
+;; (defn stop-workers5d
+;;   []
+;;   (reset! running5d false)
+;;   (doseq [w @workers5d]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (while (not (.isEmpty task-queue5d)) ; Wait until the task queue is empty
+;;     (Thread/sleep 60)))
 
+;; (defn recycle-workers5d [num-workers] (stop-workers5d) (start-workers5d num-workers))
 
+;; (defn set-desired-workers [num-workers] (reset! desired-workers num-workers))
 
 
-(def task-queues-slot (atom {})) ; Holds the queues for each keyword
-(def running-slot (atom true))
-(def workers-slot (atom {})) ; Holds the futures of the worker threads for each keyword
 
-(defn worker-loop-slot
-  [keyword]
-  (loop []
-    (when @running-slot (let [queue (@task-queues-slot keyword) task (when queue (.take queue))] (when task (task))))
-    (recur)))
 
-(defn start-workers-slot
-  [keyword num-workers]
-  (reset! running-slot true)
-  (swap! workers-slot assoc keyword (doall (map (fn [_] (future (worker-loop-slot keyword))) (range num-workers)))))
 
-(defn enqueue-task-slot
-  [keyword task]
-  (let [queue (or (@task-queues-slot keyword)
-                  (do (swap! task-queues-slot assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
-                      (@task-queues-slot keyword)))]
-    (.put queue task)
-    (when (not (@workers-slot keyword)) (start-workers-slot keyword 1))))
 
-(defn stop-workers-slot
-  [keyword]
-  (reset! running-slot false)
-  (doseq [w (@workers-slot keyword)]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60)))
-  (let [queue (@task-queues-slot keyword)]
-    (while (and queue (not (.isEmpty queue))) ; Wait until the task queue is empty
-      (Thread/sleep 60))))
+;; (def task-queues-slot (atom {})) ; Holds the queues for each keyword
+;; (def running-slot (atom true))
+;; (def workers-slot (atom {})) ; Holds the futures of the worker threads for each keyword
 
-(defn recycle-workers-slot [keyword num-workers] (stop-workers-slot keyword) (start-workers-slot keyword num-workers))
+;; (defn worker-loop-slot
+;;   [keyword]
+;;   (loop []
+;;     (when @running-slot (let [queue (@task-queues-slot keyword) task (when queue (.take queue))] (when task (task))))
+;;     (recur)))
 
+;; (defn start-workers-slot
+;;   [keyword num-workers]
+;;   (reset! running-slot true)
+;;   (swap! workers-slot assoc keyword (doall (map (fn [_] (future (worker-loop-slot keyword))) (range num-workers)))))
 
+;; (defn enqueue-task-slot
+;;   [keyword task]
+;;   (let [queue (or (@task-queues-slot keyword)
+;;                   (do (swap! task-queues-slot assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
+;;                       (@task-queues-slot keyword)))]
+;;     (.put queue task)
+;;     (when (not (@workers-slot keyword)) (start-workers-slot keyword 1))))
 
+;; (defn stop-workers-slot
+;;   [keyword]
+;;   (reset! running-slot false)
+;;   (doseq [w (@workers-slot keyword)]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (let [queue (@task-queues-slot keyword)]
+;;     (while (and queue (not (.isEmpty queue))) ; Wait until the task queue is empty
+;;       (Thread/sleep 60))))
 
+;; (defn recycle-workers-slot [keyword num-workers] (stop-workers-slot keyword) (start-workers-slot keyword num-workers))
 
 
 
 
-(def task-queues-slot-pool (atom {})) ; Holds the queues for each keyword
-(def running-slot-pool (atom true))
-(def workers-slot-pool (atom {})) ; Holds the futures of the worker threads for each keyword
 
-(defn worker-loop-slot-pool
-  [keyword]
-  (loop []
-    (when @running-slot-pool (let [queue (@task-queues-slot-pool keyword) task (when queue (.take queue))] (when task (task))))
-    (recur)))
 
-(defn start-workers-slot-pool
-  [keyword num-workers]
-  (reset! running-slot-pool true)
-  (swap! workers-slot-pool assoc keyword (doall (map (fn [_] (future (worker-loop-slot-pool keyword))) (range num-workers)))))
 
-(defn enqueue-task-slot-pool
-  [keyword task]
-  (let [queue (or (@task-queues-slot-pool keyword)
-                  (do (swap! task-queues-slot-pool assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
-                      (@task-queues-slot-pool keyword)))]
-    (.put queue task)
-    (when (not (@workers-slot-pool keyword)) (start-workers-slot-pool keyword 4)))) ;;; parallel pool size for each client/slot 
+;; (def task-queues-slot2 (atom {})) ; Holds the queues for each keyword
+;; (def running-slot2 (atom true))
+;; (def workers-slot2 (atom {})) ; Holds the futures of the worker threads for each keyword
 
-(defn stop-workers-slot-pool
-  [keyword]
-  (reset! running-slot-pool false)
-  (doseq [w (@workers-slot-pool keyword)]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60)))
-  (let [queue (@task-queues-slot-pool keyword)]
-    (while (and queue (not (.isEmpty queue))) ; Wait until the task queue is empty
-      (Thread/sleep 60))))
+;; (defn worker-loop-slot2
+;;   [keyword]
+;;   (loop []
+;;     (when @running-slot2 (let [queue (@task-queues-slot2 keyword) task (when queue (.take queue))] (when task (task))))
+;;     (recur)))
 
-(defn recycle-workers-slot-pool [keyword num-workers] (stop-workers-slot-pool keyword) (start-workers-slot-pool keyword num-workers))
+;; (defn start-workers-slot2
+;;   [keyword num-workers]
+;;   (reset! running-slot2 true)
+;;   (swap! workers-slot2 assoc keyword (doall (map (fn [_] (future (worker-loop-slot2 keyword))) (range num-workers)))))
 
-(defn get-slot-pool-queue-sizes []
-  (into {} (map (fn [[k v]] [k (.size v)]) @task-queues-slot-pool)))
+;; (defn enqueue-task-slot2
+;;   [keyword task]
+;;   (let [queue (or (@task-queues-slot2 keyword)
+;;                   (do (swap! task-queues-slot2 assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
+;;                       (@task-queues-slot2 keyword)))]
+;;     (.put queue task)
+;;     (when (not (@workers-slot2 keyword)) (start-workers-slot2 keyword 1)))) ;; one worker per slot (for now)
+
+;; (defn stop-workers-slot2
+;;   [keyword]
+;;   (reset! running-slot2 false)
+;;   (doseq [w (@workers-slot2 keyword)]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (let [queue (@task-queues-slot2 keyword)]
+;;     (while (and queue (not (.isEmpty queue))) ; Wait until the task queue is empty
+;;       (Thread/sleep 60))))
+
+;; (defn recycle-workers-slot2 [keyword num-workers] (stop-workers-slot2 keyword) (start-workers-slot2 keyword num-workers))
+
+
+
+
+
+
+
+
+
+
+
+;; (def task-queues-slot-pool (atom {})) ; Holds the queues for each keyword
+;; (def running-slot-pool (atom true))
+;; (def workers-slot-pool (atom {})) ; Holds the futures of the worker threads for each keyword
+
+;; (defn worker-loop-slot-pool
+;;   [keyword]
+;;   (loop []
+;;     (when @running-slot-pool (let [queue (@task-queues-slot-pool keyword) task (when queue (.take queue))] (when task (task))))
+;;     (recur)))
+
+;; (defn start-workers-slot-pool
+;;   [keyword num-workers]
+;;   (reset! running-slot-pool true)
+;;   (swap! workers-slot-pool assoc keyword (doall (map (fn [_] (future (worker-loop-slot-pool keyword))) (range num-workers)))))
+
+;; (defn enqueue-task-slot-pool
+;;   [keyword task]
+;;   (let [queue (or (@task-queues-slot-pool keyword)
+;;                   (do (swap! task-queues-slot-pool assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
+;;                       (@task-queues-slot-pool keyword)))]
+;;     (.put queue task)
+;;     (when (not (@workers-slot-pool keyword)) (start-workers-slot-pool keyword 4)))) ;;; parallel pool size for each client/slot 
+
+;; (defn stop-workers-slot-pool
+;;   [keyword]
+;;   (reset! running-slot-pool false)
+;;   (doseq [w (@workers-slot-pool keyword)]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (let [queue (@task-queues-slot-pool keyword)]
+;;     (while (and queue (not (.isEmpty queue))) ; Wait until the task queue is empty
+;;       (Thread/sleep 60))))
+
+;; (defn recycle-workers-slot-pool [keyword num-workers] (stop-workers-slot-pool keyword) (start-workers-slot-pool keyword num-workers))
+
+;; (defn get-slot-pool-queue-sizes []
+;;   (into {} (map (fn [[k v]] [k (.size v)]) @task-queues-slot-pool)))
 
 
 
@@ -905,7 +957,9 @@
                    :let  [values     (vec (for [r batch] (vals r)))
                           insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
              (sql-exec db-conn insert-sql extra))
-           (enqueue-task5 (fn [] ;; so our sniffer metadata picks up the new column
+           ;(enqueue-task5 
+            (qp/slot-queue :sql-meta client-name 
+            (fn [] ;; so our sniffer metadata picks up the new column
                             (cruiser/captured-sniff "cache.db"
                                                     db-conn
                                                     db-conn
@@ -1056,18 +1110,18 @@
   (.setMaximumPoolSize thread-pool new-max-size)
   (.setCorePoolSize thread-pool new-core-size))
 
-(defn client-sized-pools []
-  (let [client-count (max (count @wl/sockets) 1)
-          ;new-core-size (max 10 (min client-count 50))   ; Min core size of 10, max core size of 50
-          ;new-max-size  (max 20 (min (* 2 client-count) 100))
-        watcher-core (+ (* client-count 45) 50)
-        watcher-max (* client-count 120)
-        ws-core (+ (* client-count 2) 5)
-        ws-max  (* client-count 5)]
-    (ut/pp [:adjusting-pool-sizes-for client-count :clients
-            [[:websocket-pool ws-core ws-max] [:watcher-pool watcher-core watcher-max]]])
-    (adjust-thread-pool-size custom-watcher-thread-pool watcher-core watcher-max)
-    (adjust-thread-pool-size websocket-thread-pool ws-core ws-max)))
+;; (defn client-sized-pools []
+;;   (let [client-count (max (count @wl/sockets) 1)
+;;           ;new-core-size (max 10 (min client-count 50))   ; Min core size of 10, max core size of 50
+;;           ;new-max-size  (max 20 (min (* 2 client-count) 100))
+;;         watcher-core (+ (* client-count 45) 50)
+;;         watcher-max (* client-count 120)
+;;         ws-core (+ (* client-count 2) 5)
+;;         ws-max  (* client-count 5)]
+;;     (ut/pp [:adjusting-pool-sizes-for client-count :clients
+;;             [[:websocket-pool ws-core ws-max] [:watcher-pool watcher-core watcher-max]]])
+;;     (adjust-thread-pool-size custom-watcher-thread-pool watcher-core watcher-max)
+;;     (adjust-thread-pool-size websocket-thread-pool ws-core ws-max)))
 
 (defn new-client
   [client-name]
@@ -1116,34 +1170,35 @@
 
 (defn push-to-client
   [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
-  ;(enqueue-task-slot
-  (execute-push-task
+(qp/slot-queue :push-to-client client-name 
+  ;(enqueue-task-slot2 client-name 
+  ;(execute-push-task
   ; client-name
    (fn []
-  (try
-    (let [rr                0 ;(rand-int 3)
-          cq                (get client-queue-atoms rr)
-          _ (swap! queue-distributions assoc client-name (vec (conj (get @queue-distributions client-name []) rr)))
-          client-queue-atom (get @cq client-name)]
-      (swap! queue-status assoc-in [client-name task-id ui-keypath] status)
-      (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
-      (if client-queue-atom
-        (do (inc-score! client-name :push)
-            (inc-score! client-name :last-push true)
-            (swap! client-queue-atom conj
-                   {:ui-keypath  ui-keypath
-                    :status      status
-                    :elapsed-ms  elapsed-ms
-                    :reco-count  reco-count
-                    :queue-id    queue-id
-                    :task-id     task-id
-                    :data        [data ;; data is likely needed for :payload and :payload-kp that
-                                  (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
-                    :client-name client-name}))
-        (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
-          (new-client client-name)
-          (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
-    (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))))))
+     (try
+       (let [rr                0 ;(rand-int 3)
+             cq                (get client-queue-atoms rr)
+             _ (swap! queue-distributions assoc client-name (vec (conj (get @queue-distributions client-name []) rr)))
+             client-queue-atom (get @cq client-name)]
+         (swap! queue-status assoc-in [client-name task-id ui-keypath] status)
+         (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
+         (if client-queue-atom
+           (do (inc-score! client-name :push)
+               (inc-score! client-name :last-push true)
+               (swap! client-queue-atom conj
+                      {:ui-keypath  ui-keypath
+                       :status      status
+                       :elapsed-ms  elapsed-ms
+                       :reco-count  reco-count
+                       :queue-id    queue-id
+                       :task-id     task-id
+                       :data        [data ;; data is likely needed for :payload and :payload-kp that
+                                     (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
+                       :client-name client-name}))
+           (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
+             (new-client client-name)
+             (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
+       (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))))))
 
 
 
@@ -1523,16 +1578,14 @@
                            v)]]
             (walk/postwalk-replace
              {:block-id k :block-id-str (str k) :bid k :bids (str k)}
-             (cond (not (empty? (get v :raw-fn))) ;; user provided anon fn
+             (cond (ut/ne? (get v :raw-fn)) ;; user provided anon fn
                    (let [fn-raw (get v :raw-fn)]
                      {k (-> v
                             (assoc :fn fn-raw)
                             (dissoc :raw-fn))})
-                   (not (empty? (get v :components))) ;; unpacked subflow! (legacy saved flows
+                   (ut/ne? (get v :components)) ;; unpacked subflow! (legacy saved flows
                    {k (assoc (process-flowmaps v sub-map) :description [(get v :file-path nil) (get v :flow-id nil)])} ;; sneaky
-                   (and (not (empty? (get v :data))) (not (empty? (get v :inputs)))) ;; templated
-                                                                                          ;; input
-                                                                                          ;; "static"
+                   (and (ut/ne? (get v :data)) (ut/ne? (get v :inputs))) 
                    (let [vv         (get v :data)
                          str?       (string? vv)
                          inputs     (get v :inputs)
@@ -2231,8 +2284,10 @@
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
   ;(enqueue-task-slot-pool client-name (fn [] 
-  (execute-solver-task (fn []
-                         (run-solver solver-name client-name override-map))))
+  ;(execute-solver-task 
+   (qp/slot-queue :solvers-req client-name 
+   (fn []
+     (run-solver solver-name client-name override-map))))
 
 (defmethod wl/handle-push :run-solver
   [{:keys [solver-name client-name override-map]}]
@@ -2242,8 +2297,10 @@
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
   ;(enqueue-task-slot-pool client-name (fn [] 
-  (execute-solver-task (fn []
-                         (run-solver solver-name client-name override-map))))
+  ;(execute-solver-task 
+   (qp/slot-queue :solvers-push client-name 
+   (fn []
+     (run-solver solver-name client-name override-map))))
 
 (defmethod wl/handle-push :run-solver-custom
   [{:keys [solver-name temp-solver-name client-name override-map input-map]}]
@@ -2254,8 +2311,10 @@
   ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
 ;;  (run-solver solver-name client-name override-map input-map temp-solver-name)
   ;(enqueue-task-slot-pool client-name (fn [] 
-  (execute-solver-task (fn []
-                         (run-solver solver-name client-name override-map input-map temp-solver-name)))
+  ;(execute-solver-task
+   (qp/slot-queue :solvers-cust client-name 
+   (fn []
+     (run-solver solver-name client-name override-map input-map temp-solver-name)))
   temp-solver-name)
 
 (defn flow-kill!
@@ -2667,23 +2726,46 @@
 
 
 
+;;;;; huge sync pool version
+;; (defn execute-custom-watcher [f]
+;;   (.execute custom-watcher-thread-pool f))
 
-(defn execute-custom-watcher [f]
-  (.execute custom-watcher-thread-pool f))
+;; (defn wrap-custom-watcher [watcher-fn]
+;;   (fn [key ref old-state new-state]
+;;     (execute-custom-watcher
+;;      (fn []
+;;        (try
+;;          (watcher-fn key ref old-state new-state)
+;;          (catch Exception e
+;;            (println "Error in wrap-custom-watcher:"  key ref (.getMessage e))
+;;            (throw e)))))))
 
-(defn wrap-custom-watcher [watcher-fn]
+;; (defn add-watch+ [atom key watcher-fn]
+;;   (let [wrapped-watcher (wrap-custom-watcher watcher-fn)]
+;;     (add-watch atom key wrapped-watcher)))
+
+
+;;;;; slot per keypath version
+(defn wrap-custom-watcher [watcher-fn base-type]
   (fn [key ref old-state new-state]
-    (execute-custom-watcher
-     (fn []
-       (try
-         (watcher-fn key ref old-state new-state)
-         (catch Exception e
-           (println "Error in wrap-custom-watcher:"  key ref (.getMessage e))
-           (throw e)))))))
+    ;;(ut/pp [:watch+ :slot key])
+    ;(enqueue-task-slot key                    
+    (let [base-atom-key (keyword (str "sub-watcher/" (name base-type)))]
+      (qp/slot-queue base-atom-key key
+                     (fn []
+                       (try
+                         (watcher-fn key ref old-state new-state)
+                         (catch Exception e
+                           (ut/pp ["Error in wrap-custom-watcher:" key key (.getMessage e)])
+                           (throw e))))))))
 
-(defn add-watch+ [atom key watcher-fn]
-  (let [wrapped-watcher (wrap-custom-watcher watcher-fn)]
+(defn add-watch+ [atom key watcher-fn base-type]
+  (let [wrapped-watcher (wrap-custom-watcher watcher-fn base-type)]
     (add-watch atom key wrapped-watcher)))
+
+
+
+;;enqueue-task-slot [keyword task]
 
 
 (defn add-watcher
@@ -2742,7 +2824,7 @@
                           :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
     (remove-watch atom-to-watch watch-key)
     ;;(swap! atoms-and-watchers ut/dissoc-in [client-name flow-key]) ;; pointless?
-    (add-watch+ atom-to-watch watch-key watcher)
+    (add-watch+ atom-to-watch watch-key watcher base-type)
     (swap! atoms-and-watchers assoc-in
            [client-name flow-key]
            {:created   (ut/get-current-timestamp)
@@ -3448,8 +3530,10 @@
                                                       (= (get sv :signal)
                                                          (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
                                     ;(enqueue-task4 (fn []
-                                    (execute-solver-task (fn []
-                                                           (run-solver sk client-name)))))
+                                    ;(execute-solver-task
+                                     (qp/slot-queue :solvers-int sk ;;client-name 
+                                     (fn []
+                                       (run-solver sk client-name)))))
                               _ (swap! last-signals-history-atom assoc kk (get @last-signals-history-atom-temp kk)) ;; one
                                                                                                                        ;; write,
                                                                                                                        ;; to
@@ -4373,7 +4457,8 @@
                                                                                                ;(not
                                                                                                ;post-sniffed-literal-data?))
                           (do (if data-literal-code?
-                                (enqueue-task
+                                ;(enqueue-task
+                                 (qp/serial-slot-queue :general-serial :general 
                                  (fn []
                                    (let [;output (evl/run literals) ;; (and repl-host repl-port)
                                          literals    (walk/postwalk-replace
@@ -4408,7 +4493,9 @@
                                                 nil)))
                                      (async/>!! completion-channel true) ;; unblock
                                      )))
-                                (enqueue-task (fn []
+                                ;(enqueue-task 
+                                 (qp/serial-slot-queue :general-serial :general 
+                                 (fn []
                                                 (insert-rowset literals
                                                                cache-table
                                                                (first ui-keypath)
@@ -4567,12 +4654,15 @@
                                                   (keys fields)
                                                   (get @sql/map-orders honey-sql-str))}
                         result-hash (hash result)]
-                    (enqueue-task-sql-meta (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name deep-meta?)))
+                     ;(enqueue-task-sql-meta 
+                    (qp/slot-queue :sql-meta client-name
+                                   (fn [] (sniff-meta ui-keypath honey-sql fields target-db client-name deep-meta?)))
                     (if sniffable?
                       (doall
                        (do
                          (swap! deep-run-list conj filtered-req-hash) ;; mark this as run
-                         (enqueue-task
+                         ;(enqueue-task
+                         (qp/serial-slot-queue :general-serial :general  
                           (fn []
                             (ut/pp :kick-sniff)
                             (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :started)
@@ -4618,7 +4708,8 @@
                                                   (get run-it :elapsed-ms)))))) ;; vertica
                             ))))
                       (when sniff-worthy? ;; want details, but not yet the full expensive meta
-                        (enqueue-task
+                        ;(enqueue-task
+                         (qp/serial-slot-queue :general-serial :general 
                          (fn []
                            (swap! sql/query-history assoc
                                   cache-table-name
@@ -4677,7 +4768,8 @@
 
 (defn insert-kit-data
   [output query-hash ui-keypath ttype kit-name elapsed-ms & [client-name flow-id]]
-  (enqueue-task3 ;; blocking for inserts and deletes (while we are one sqlite, will be
+  ;(enqueue-task3 ;; blocking for inserts and deletes (while we are one sqlite, will be
+  (qp/serial-slot-queue :general-serial :general 
    (fn []
      (let [output-is-valid? (map? output) ;; basic spec checking
            kit-keys         (keys output)
@@ -4721,7 +4813,8 @@
   (swap! q-calls inc)
   (inc-score! client-name :push)
   (when (keyword? kit-name) ;;; all kit stuff. deprecated?
-    (enqueue-task2
+    ;(enqueue-task2
+     (qp/serial-slot-queue :general-serial :general 
      (fn []
        (try ;; save off the full thing... or try
          (let [;kit-name :outliers
@@ -5107,7 +5200,9 @@
                                                                         (mapv :value rows)))))
         delete-sql   {:delete-from [:client_items] :where [:= 1 1]} ;; (cons :or (vec (for [k
         ]
-    (enqueue-task3 (fn []
+    ;(enqueue-task3 
+     (qp/serial-slot-queue :general-serial :general 
+     (fn []
                      (sql-exec system-db (to-sql delete-sql))
                      (doseq [rr (partition-all 50 rows)]
                        (sql-exec system-db (to-sql {:insert-into [:client_items] :values rr})))))))
@@ -5487,13 +5582,14 @@
               :largest-pool-size (.getLargestPoolSize thread-pool)}]))
 
 
-(def pools [[push-thread-pool "push-thread-pool"]
-            [solver-thread-pool "solver-thread-pool"]
+(def pools [;[push-thread-pool "push-thread-pool"]
+            ;[solver-thread-pool "solver-thread-pool"]
             [websocket-thread-pool "websocket-thread-pool"]
             ;[time-scheduler "time-scheduler"]
             [general-scheduler-thread-pool "general-scheduler-thread-pool"]
-            [custom-watcher-thread-master-pool "custom-watcher-thread-master-pool"]
-            [custom-watcher-thread-pool "custom-watcher-thread-pool"]])
+            ;[custom-watcher-thread-master-pool "custom-watcher-thread-master-pool"]
+            ;[custom-watcher-thread-pool "custom-watcher-thread-pool"]
+            ])
 
 (defn query-pool-sizes []
   (into {} (for [[pool pname] pools]
@@ -5668,8 +5764,7 @@
               insert-sql {:insert-into [:jvm_stats] :values [jvm-stats-vals]}
               _ (swap! server-atom assoc :uptime (ut/format-duration-seconds seconds-since-boot))
               flow-status-map (flow-statuses) ;; <--- important, has side effects, TODO refactor into timed instead of hitched to jvm console stats output
-              pool-sizes (query-pool-sizes)
-              ]
+              pool-sizes (query-pool-sizes)]
 
           (swap! stats-cnt inc)
           (sql-exec system-db (to-sql {:delete-from [:client_stats]}))
@@ -5746,15 +5841,24 @@
 
           (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
           (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
-        ;(ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
+         ;(ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
 
           (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes" :color :magenta))
           (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 15) "msgs/sec" "client pushes" :color :magenta :freq 15))
-        ;(ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
+         ;(ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
 
           (ut/pp (draw-bar-graph @mem-usage "memory usage" "mb" :color :yellow))
           (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 15) "memory usage" "mb" :color :yellow :freq 15))
-        ;(ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
+         ;(ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
+
+          (ut/pp (draw-bar-graph @solver-usage "solvers running" "solvers" :color :red))
+          (ut/pp (draw-bar-graph (average-in-chunks @solver-usage 15) "solvers running" "solvers" :color :red :freq 15))
+         ;(ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
+
+          ;(ut/pp [:watcher+-queues (count (keys @task-queues-slot))])
+          ;(ut/pp [:push-queues (count (keys @task-queues-slot2))])
+          ;(ut/pp [:queue-party-stats (qp/get-queue-stats)])
+          (ut/pp [:queue-party-stats+ (qp/get-queue-stats+)])
 
           ;; (draw-cpu-stats)
           ;; (draw-mem-stats)

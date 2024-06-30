@@ -1,16 +1,17 @@
 (ns rvbbit-backend.sql
   (:require
-    [clj-time.coerce     :as tc]
-    [clj-time.core       :as time]
-    [clj-time.jdbc]
-    [clojure.edn         :as edn]
-    [clojure.java.jdbc   :as jdbc]
-    [clojure.string      :as cstr]
-    [clojure.walk        :as walk]
-    [hikari-cp.core      :as hik]
-    [honey.sql           :as honey]
-    [rvbbit-backend.util :as ut]
-    [taskpool.taskpool   :as tp]))  ;; enables joda time returns
+   [clj-time.coerce     :as tc]
+   [clj-time.core       :as time]
+   [clj-time.jdbc]
+   [clojure.edn         :as edn]
+   [clojure.java.jdbc   :as jdbc]
+   [clojure.string      :as cstr]
+   [clojure.walk        :as walk]
+   [hikari-cp.core      :as hik]
+   [honey.sql           :as honey]
+   [rvbbit-backend.util :as ut]
+   [rvbbit-backend.queue-party :as qp]
+   [taskpool.taskpool   :as tp]))
 
 
 
@@ -188,46 +189,48 @@
 
 
 
-(def task-queues-sql (atom {})) ; Holds the queues for each keyword
-(def running-sql (atom true))
-(def workers-sql (atom {})) ; Holds the futures of the worker threads for each keyword
+;; (def task-queues-sql (atom {})) ; Holds the queues for each keyword
+;; (def running-sql (atom true))
+;; (def workers-sql (atom {})) ; Holds the futures of the worker threads for each keyword
 
-(defn worker-loop-sql
-  [keyword]
-  (loop []
-    (when @running-sql (let [queue (@task-queues-sql keyword) task (when queue (.take queue))] (when task (task))))
-    (recur)))
+;; (defn worker-loop-sql
+;;   [keyword]
+;;   (loop []
+;;     (when @running-sql (let [queue (@task-queues-sql keyword) task (when queue (.take queue))] (when task (task))))
+;;     (recur)))
 
-(defn start-workers-sql
-  [keyword num-workers]
-  (reset! running-sql true)
-  (swap! workers-sql assoc keyword (doall (map (fn [_] (future (worker-loop-sql keyword))) (range num-workers)))))
+;; (defn start-workers-sql
+;;   [keyword num-workers]
+;;   (reset! running-sql true)
+;;   (swap! workers-sql assoc keyword (doall (map (fn [_] (future (worker-loop-sql keyword))) (range num-workers)))))
 
-(defn enqueue-task-sql
-  [keyword task]
-  (let [queue (or (@task-queues-sql keyword)
-                  (do (swap! task-queues-sql assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
-                      (@task-queues-sql keyword)))]
-    (.put queue task)
-    (when (not (@workers-sql keyword)) (start-workers-sql keyword 1))))
+;; (defn enqueue-task-sql
+;;   [keyword task]
+;;   (let [queue (or (@task-queues-sql keyword)
+;;                   (do (swap! task-queues-sql assoc keyword (java.util.concurrent.LinkedBlockingQueue.))
+;;                       (@task-queues-sql keyword)))]
+;;     (.put queue task)
+;;     (when (not (@workers-sql keyword)) (start-workers-sql keyword 1))))
+;; ;;; ^^ move over to queue party generic  blocking queue handling...
 
-(defn stop-workers-sql
-  [keyword]
-  (reset! running-sql false)
-  (doseq [w (@workers-sql keyword)]
-    (future-cancel w)
-    (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
-      (Thread/sleep 60)))
-  (let [queue (@task-queues-sql keyword)]
-    (while (and queue (not (.isEmpty queue))) ; Wait until the task queue is empty
-      (Thread/sleep 60))))
+;; (defn stop-workers-sql
+;;   [keyword]
+;;   (reset! running-sql false)
+;;   (doseq [w (@workers-sql keyword)]
+;;     (future-cancel w)
+;;     (while (not (.isDone w)) ; Ensure the future is cancelled before proceeding
+;;       (Thread/sleep 60)))
+;;   (let [queue (@task-queues-sql keyword)]
+;;     (while (and queue (not (.isEmpty queue))) ; Wait until the task queue is empty
+;;       (Thread/sleep 60))))
 
-(defn recycle-workers-sql [keyword num-workers] (stop-workers-sql keyword) (start-workers-sql keyword num-workers))
+;; (defn recycle-workers-sql [keyword num-workers] (stop-workers-sql keyword) (start-workers-sql keyword num-workers))
 
 
 (defn sql-exec
   [db-spec query & [extra]]
-  (enqueue-task-sql db-spec
+  ;(enqueue-task-sql db-spec
+  (qp/serial-slot-queue :sql-serial db-spec 
                     (fn []
                       (jdbc/with-db-connection [t-con db-spec]
                                                (try (jdbc/db-do-commands t-con query)

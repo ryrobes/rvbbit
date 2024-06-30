@@ -604,7 +604,8 @@
                                                                   :let [ns-key (keyword (str (ut/replacer s ":solver/" "solver-meta/")))
                                                                         ns-key1 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [ns-key]})]]
                                                               [(keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")))
-                                                               (when (ut/ne? ns-key1) (keyword (str "repl-ns/" (get-in ns-key1 [:output :evald-result :ns]))))
+                                                               (when (and (ut/ne? ns-key1) (get-in ns-key1 [:output :evald-result :ns])) 
+                                                                 (keyword (str "repl-ns/" (get-in ns-key1 [:output :evald-result :ns]))))
                                                                ns-key])))))) [])
          clover-solvers-running  (vec (for [s clover-solvers] ;;(vec (remove (set in-editor-solvers0) clover-solvers))] 
                                         (keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")  ">running?"))))

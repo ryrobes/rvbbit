@@ -938,7 +938,7 @@
    :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [236127942 218579218 4294705152],
+ :memory [155651715 128483835 4294705152],
  :flow-subs
  [:solver-meta/send-to-upscaler-1>extra>runs
   :flow/flow-forever>*running?
@@ -1009,7 +1009,7 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   251580
+   265933
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap
@@ -1027,7 +1027,7 @@
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
  :user-params-hash 1154393572,
  :grid-recos? true,
- :session-hash 659118531,
+ :session-hash -1939627820,
  :resolved-queries
  {:gen-viz-1132
   {:select [[[:count 1] :rows] :data_type],
@@ -4179,10 +4179,10 @@
    "./images/gen/b64-image-59678-4653.png",
    :flow-forever>open-fn-4 {:start 1708449913923, :end 1708449913926},
    :openai-image-gen-ladder3>save-base64-to-webp-file
-   "/home/ryanr/rvbbit-out/b64-image3-58703-1360.png",
+   "/home/ryanr/rvbbit-out/b64-image3-45635-87166.png",
    :crow-flow-201>*running? false,
    :openai-image-gen-ladder>relative-url-path-for-png-version nil,
-   :openai-image-gen-ladder3>dominant-color "#4f5877",
+   :openai-image-gen-ladder3>dominant-color "#464272",
    :counting-loop>open-fn-2 44,
    :crow-flow-201a>*running? false,
    :openai-image-gen-ladder>output-revised-prompt nil,
@@ -4214,7 +4214,7 @@
    :counting-loop>*running? false,
    :counting-loop>open-fn-3 45,
    :openai-image-gen-ladder3>relative-url-path-for-png-version
-   "./images/gen/b64-image3-58703-1360.png",
+   "./images/gen/b64-image3-45635-87166.png",
    :flow-forever>*running? false,
    :openai-image-gen-ladder2>*running? false,
    :openai-image-gen-ladder>execute-shell-command
@@ -4230,7 +4230,8 @@
    "A highly detailed highly stylized & exaggerated pinup style illustration showcasing a stunning, young, robust, and powerfully built Swedish woman in her early 30s, characterized by a full-face and long, thick Viking braids. She stands majestically in the heart of a Northeast American forest, the New England wilderness being particularly picturesque during dusk. She locks gaze with the camera, her confident and alluring look intensified by the dramatic Cyberpunk-Vaporwave aesthetic lighting and her dark eye makeup. A sly, playful smile dances on her lips, adding a mystical and alluring atmosphere. Her shoulders and collarbone are lavishly adorned with intricate and ornate tattoos. The captivating body art continues up to her neck, each design an intricate narrative of its own. The woman is also seen donning a necklace with a rabbit pendant, and similar rabbit motifs can be found delicately integrated into her tattoos. Overall, the image captures a mixture of wonder, mystery, and temptation. As the sun rises, its light gleams off her body radiantly",
    :openai-image-gen-ladder>dominant-color "#19374c",
    :openai-image-gen-ladder2>pop-color "#cbab97",
-   :flow-forever>final-math nil},
+   :flow-forever>final-math nil,
+   :openai-image-gen-ladder3>*running? false},
   :flows-sys
   {:flow_id "openai-image-gen-ladder",
    :file_path "./flows/openai-image-gen-ladder.edn",
@@ -4241,7 +4242,7 @@
    :blocks 12,
    :queries 9,
    :ts "2024-02-18 21:40:58"},
-  :time {:seconds nil, :second 16},
+  :time {:seconds nil, :second 28},
   :grid1-sys*
   {:flow_id "raw-custom-override-1328601774-solver-flow-",
    :run_id "7c6cbadb-3028-46fe-86ab-174d22a83ead",

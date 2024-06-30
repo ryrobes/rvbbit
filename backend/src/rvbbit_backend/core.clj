@@ -27,6 +27,7 @@
    [nextjournal.beholder :as beholder]
    [puget.printer :as puget]
    [ring.adapter.jetty9 :as jetty]
+   [rvbbit-backend.queue-party  :as qp]
    [rvbbit-backend.assistants :as ass]
    [rvbbit-backend.config :as config]
    [rvbbit-backend.cruiser :as cruiser]
@@ -98,7 +99,9 @@
                              (assoc screen-data
                                     :panels (into {}
                                                   (for [[k v] (get screen-data :panels)]
-                                                    {k (assoc v :queries (select-keys resolved-queries (keys (get v :queries))))})))
+                                                    (try
+                                                      {k (assoc v :queries (select-keys resolved-queries (keys (get v :queries))))}
+                                                      (catch Throwable e (ut/pp [:error-reading-screen-panels f-path e k v]) {}))))) ;; issue with pomp-girl2? TODO
                              screen-data)
           theme-map        (get-in screen-data [:click-param :theme])
           has-theme?       (and (not (nil? theme-map)) (ut/ne? theme-map))
@@ -187,7 +190,8 @@
 (defn refresh-flow-fn
   [flow-functions-map]
   (doseq [{:keys [category name description file-path inputs icon types]} (ut/flatten-map flow-functions-map)]
-    (wss/enqueue-task3 ;; since out base sqlite db hate concurrency, with a "real" db, this can
+    ;(wss/enqueue-task3 ;; since out base sqlite db hate concurrency, with a "real" db, this can
+    (qp/serial-slot-queue :general-serial :general 
      (fn []
        (let [connection_id "system-db"]
          (sql-exec system-db (to-sql {:delete-from [:flow_functions] :where [:and [:= :name name] [:= :category category]]}))
@@ -402,9 +406,10 @@
 (defn -main
   [& args]
   (ut/print-ansi-art "rrvbbit.ans")
+  (qp/create-slot-queue-system)
   (thaw-flow-results)
   ;(sql/start-worker-sql)
-  (wss/recycle-workers-sql-meta 5) ;; sql meta cnts
+  ;(wss/recycle-workers-sql-meta 5) ;; sql meta cnts
   #_{:clj-kondo/ignore [:inline-def]}
   (defonce start-conn-watcher (watch-connections-folder))
   #_{:clj-kondo/ignore [:inline-def]}
@@ -425,12 +430,16 @@
   (cruiser/create-sqlite-sys-tables-if-needed! system-db)
   (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
 
-  (defn execute-custom-watcher [f]
-    (.execute wss/custom-watcher-thread-master-pool f))
+
+
+  ;; (defn execute-custom-watcher [f]
+  ;;   (.execute wss/custom-watcher-thread-master-pool f))
 
   (defn wrap-custom-watcher [watcher-fn]
     (fn [key ref old-state new-state]
-      (execute-custom-watcher
+      ;(execute-custom-watcher
+      (qp/slot-queue
+       :master-watchers key
        (fn []
          (try
            (watcher-fn key ref old-state new-state)
@@ -442,8 +451,18 @@
     (let [wrapped-watcher (wrap-custom-watcher watcher-fn)]
       (add-watch atom key wrapped-watcher)))
 
-  (defn remove-watch+ [atom key]
-    (remove-watch atom key))
+
+
+
+
+
+
+
+
+
+
+  ;; (defn remove-watch+ [atom key]
+  ;;   (remove-watch atom key))
 
   ;; (defn time-marches-on-or-does-it? [key ref old-state new-state]
   ;;   (try
@@ -670,13 +689,13 @@
 
 
 
-  (wss/recycle-worker) ;; single blocking
-  (wss/recycle-worker2) ;; single blocking
-  (wss/recycle-worker3) ;; single blocking
-  (wss/recycle-workers4 45) ;; run-solver only
-  (wss/recycle-workers5 8) ;; push-to-client only (not used at the moment, we have a per-client
-                           ;; blocking queue setup)
-  (wss/recycle-workers5d 2) ;; for writing transit files
+  ;(wss/recycle-worker) ;; single blocking
+  ;(wss/recycle-worker2) ;; single blocking
+  ;(wss/recycle-worker3) ;; single blocking
+  ;(wss/recycle-workers4 45) ;; run-solver only
+  ;(wss/recycle-workers5 8) ;; push-to-client only (not used at the moment, we have a per-client
+  ;                         ;; blocking queue setup)
+  ;(wss/recycle-workers5d 2) ;; for writing transit files
 
   ;; (def mon (tt/every! 15 5 (bound-fn [] (wss/jvm-stats)))) ;; update stats table every 15
   ;; (def param-sync (tt/every! 30 2 (bound-fn [] (wss/param-sql-sync))))
@@ -795,11 +814,15 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 600)
 
-  (start-scheduler 1
-                   #(let [pst (wss/query-pool-sizes)]
-                      (doseq [pp (keys pst)]
-                        (swap! wss/pool-stats-atom assoc pp (conj (get @wss/pool-stats-atom pp []) (get-in pst [pp 1])))))
-                   "Query Pool Sizes")
+  (start-scheduler 600
+                   qp/cleanup-unused-queues
+                   "Clean Dormant Queues" 600)
+
+  ;; (start-scheduler 1
+  ;;                  #(let [pst (wss/query-pool-sizes)]
+  ;;                     (doseq [pp (keys pst)]
+  ;;                       (swap! wss/pool-stats-atom assoc pp (conj (get @wss/pool-stats-atom pp []) (get-in pst [pp 1])))))
+  ;;                  "Query Pool Sizes")
 
   ;; (def timekeeper
   ;;   (start-scheduler 1000
@@ -870,21 +893,29 @@
   ;;                           (catch Exception e (ut/pp [:timekeeper3-has-thrown-an-error!! :EGADS! e])))
   ;;                         "Timekeeper3"))
 
-  (start-scheduler 1
-                   #(swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage))
-                   "CPU Keeper")
+  ;; (start-scheduler 1
+  ;;                  #(swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage))
+  ;;                  "CPU Keeper")
 
-  (start-scheduler 1
-                   #(swap! wss/mem-usage conj (ut/memory-used))
-                   "Memory Keeper")
+  ;; (start-scheduler 1
+  ;;                  #(swap! wss/mem-usage conj (ut/memory-used))
+  ;;                  "Memory Keeper")
 
-  (start-scheduler 1
-                   #(swap! wss/push-usage conj @wss/all-pushes)
-                   "Push Keeper")
+  ;; (start-scheduler 1
+  ;;                  #(swap! wss/push-usage conj @wss/all-pushes)
+  ;;                  "Push Keeper")
 
-  (start-scheduler 1
-                   #(swap! wss/peer-usage conj (count @wl/sockets))
-                   "Peer Keeper")
+  ;; (start-scheduler 1
+  ;;                  #(swap! wss/peer-usage conj (count @wl/sockets))
+  ;;                  "Peer Keeper")
+  
+    (start-scheduler 1
+                   #(do (swap! wss/peer-usage conj (count @wl/sockets))
+                        (swap! wss/peer-usage conj (count @wl/sockets))
+                        (swap! wss/push-usage conj @wss/all-pushes)
+                        (swap! wss/mem-usage conj (ut/memory-used))
+                        (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
+                   "Stats Keeper")
 
   (start-scheduler 600
                    #(do
@@ -893,13 +924,32 @@
                       (reset! wss/solvers-cache-atom {}))
                    "Purge Solver Cache" 600)
 
-  (start-scheduler 1
-                   #(doseq [[client-name solvers] @wss/solver-status]
-                      (doseq [[solver-name v] solvers
-                              :when (get v :running?)]
-                        (swap! wss/solver-status assoc-in
-                               [client-name solver-name :time-running]
-                               (ut/format-duration (get v :started) (System/currentTimeMillis)))))
+  ;; (start-scheduler 1
+  ;;                  #(doseq [[client-name solvers] @wss/solver-status]
+  ;;                     (doseq [[solver-name v] solvers
+  ;;                             :when (get v :running?)]
+  ;;                       (swap! wss/solver-status assoc-in
+  ;;                              [client-name solver-name :time-running]
+  ;;                              (ut/format-duration (get v :started) (System/currentTimeMillis)))))
+  ;;                  "Update Solver Statuses")
+
+    (start-scheduler 1
+                   #(let [total-updated (reduce ;; run side effects, but return how many are active
+                                         (fn [acc [client-name solvers]]
+                                           (let [updated-count
+                                                 (reduce-kv (fn [inner-acc solver-name v]
+                                                              (if (get v :running?)
+                                                                (do (swap! wss/solver-status assoc-in
+                                                                           [client-name solver-name :time-running]
+                                                                           (ut/format-duration (get v :started) (System/currentTimeMillis)))
+                                                                    (inc inner-acc))
+                                                                inner-acc))
+                                                            0
+                                                            solvers)]
+                                             (+ acc updated-count)))
+                                         0
+                                         @wss/solver-status)]
+                      (swap! wss/solver-usage conj total-updated))
                    "Update Solver Statuses")
 
   ;; (defn stop-all-schedulers []
@@ -933,6 +983,7 @@
 
   (shutdown/add-hook! ::the-pool-is-now-closing
                       #(do (reset! wss/shutting-down? true)
+                           ;(qp/stop-slot-queue-system) ;; throws unhandeled exception  TODO
                            (stop-all-schedulers)
                            (let [destinations (vec (keys @wss/client-queues))]
                              (doseq [d destinations]
@@ -946,11 +997,11 @@
                            ;;  (Thread/sleep 2000)
                            (wss/destroy-websocket-server!)
                            ;;(tt/stop!)
-                           (wss/stop-worker)
-                           (wss/stop-worker2)
-                           (wss/stop-worker3)
-                           (wss/stop-workers4)
-                           (wss/stop-workers5)
+                           ;(wss/stop-worker)
+                           ;(wss/stop-worker2)
+                           ;(wss/stop-worker3)
+                           ;(wss/stop-workers4)
+                           ;(wss/stop-workers5)
                            (Thread/sleep 2000)
                            (wss/destroy-websocket-server!)))
   (shutdown/add-hook! ::the-pool-is-now-closed
@@ -961,9 +1012,9 @@
                       #(do (wss/destroy-websocket-server!)
                            (Thread/sleep 1000)
                            (wss/stop-web-server!)
-                           (wss/stop-worker)
-                           (wss/stop-worker2)
-                           (wss/stop-worker3)
+                           ;(wss/stop-worker)
+                           ;(wss/stop-worker2)
+                           ;(wss/stop-worker3)
                            (ut/ppa [:shutting-down-system-pools])
                            (hik/close-datasource (get system-db :datasource))
                            (wss/destroy-websocket-server!)))
