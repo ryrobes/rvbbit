@@ -386,7 +386,7 @@
                                      (run [_]
                                        (try
                                          (f)
-                                         ;;(log/debug "Executed" name-str)
+                                         (swap! wss/scheduler-atom assoc name-str (ut/get-current-timestamp))
                                          (catch Exception e
                                            (ut/pp [e "Error in scheduler" name-str])))))
                                    delay
@@ -983,7 +983,8 @@
 
   (shutdown/add-hook! ::the-pool-is-now-closing
                       #(do (reset! wss/shutting-down? true)
-                           ;(qp/stop-slot-queue-system) ;; throws unhandeled exception  TODO
+                           ;(wss/destroy-websocket-server!)
+                           (qp/stop-slot-queue-system)
                            (stop-all-schedulers)
                            (let [destinations (vec (keys @wss/client-queues))]
                              (doseq [d destinations]
@@ -1200,9 +1201,11 @@
      :connections [[:kick-1 :done] [:open-input :kick-1/name] [:open-input :kick-1/sub-task] [:open-input :kick-1/thread-id]
                    [:open-input :kick-1/thread-desc] [:open-input :kick-1/message-name]
                    [:kick-1destination :kick-1/destination]]})
+  
   (wss/schedule! [:seconds 15]
                  (heartbeat :all)
                  {:flow-id "client-keepalive" :increment-id? false :close-on-done? true :debug? false})
+  
   (wss/schedule! [:minutes 20]
                  "game-of-life-test1"
                  {:close-on-done? true
@@ -1210,7 +1213,9 @@
                   :flow-id        "game-of-life-test1"
                   :debug?         false
                   :overrides      {:iterations-max 1000 :tick-delay-ms 800}})
-  (wss/schedule! [:minutes 30] "counting-loop" {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
+  
+  ;; (wss/schedule! [:minutes 30] "counting-loop" {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
+
   (let [_ (ut/pp [:waiting-for-background-systems...])
         _ (Thread/sleep 13000) ;; 10 enough? want everything cranking before clients come
         _ (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options))] ;; wut?

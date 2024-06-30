@@ -86,9 +86,13 @@
 
 (defn deselect-keys [m ks] (apply dissoc m ks))
 
+(def console-lock (Object.))
+
+(defn safe-println [x] (locking console-lock (println x)))
+
 (defn print-ansi-art
   [filename]
-  (with-open [reader (clojure.java.io/reader filename)] (doseq [line (line-seq reader)] (println line))))
+  (with-open [reader (clojure.java.io/reader filename)] (doseq [line (line-seq reader)] (safe-println line))))
 
 (defn index-of [coll item] (first (keep-indexed #(when (= %2 item) %1) coll)))
 
@@ -1093,7 +1097,7 @@
 
 
 
-(def console-lock (Object.))
+
 
 (defn safe-cprint [x] (locking console-lock (puget/with-options {:width (get-terminal-width)} (puget/cprint x))))
 

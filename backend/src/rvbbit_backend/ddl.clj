@@ -388,6 +388,7 @@ group by 1, 2) tt on s.client_name = tt.client_name
    (connection_id text NULL,
     run_id integer NULL,
     category text NULL, 
+    sub_flow text NULL,
     name text NULL, 
     full_map text NULL,
     description text NULL,

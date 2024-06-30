@@ -36,6 +36,7 @@
                        [org.clojure/core.cache "1.0.207"]
                        [talltale "0.5.8"]
                        [clucie "0.4.2"]
+                       [zprint "1.2.3"]
                        [jline "2.14.6"] ;; to detect console width
                        [clj-commons/clj-ssh "0.5.15"]
                        [com.ryrobes/flowmaps "0.31-SNAPSHOT"]

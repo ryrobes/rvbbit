@@ -1125,7 +1125,7 @@
 
 (defn new-client
   [client-name]
-  (ut/pp [:new-client-is-alive! client-name :opening (count client-queue-atoms) :queues])
+  (ut/pp [:new-client-is-alive! client-name :opening (count client-queue-atoms) :websocket-queues])
   ;(client-sized-pools)
   (swap! ack-scoreboard assoc-in [client-name :booted-ts] (System/currentTimeMillis))
   (doseq [cq client-queue-atoms]
@@ -5774,6 +5774,7 @@
           (sql-exec system-db (to-sql {:delete-from [:client_stats]}))
           (sql-exec system-db (to-sql insert-cli))
           (sql-exec system-db (to-sql insert-sql))
+
           (when booted?
             (println " ")
             (reset! booted (System/currentTimeMillis))
@@ -5857,12 +5858,16 @@
 
           (ut/pp (draw-bar-graph @solver-usage "solvers running" "solvers" :color :red))
           (ut/pp (draw-bar-graph (average-in-chunks @solver-usage 15) "solvers running" "solvers" :color :red :freq 15))
-          (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
+          (ut/pp (draw-bar-graph (average-in-chunks @solver-usage 60) "solvers running" "solvers" :color :red :freq 60))
 
           ;(ut/pp [:watcher+-queues (count (keys @task-queues-slot))])
           ;(ut/pp [:push-queues (count (keys @task-queues-slot2))])
           ;(ut/pp [:queue-party-stats (qp/get-queue-stats)])
-          (ut/pp [:queue-party-stats+ (qp/get-queue-stats+)])
+
+          (let [ss (qp/get-queue-stats+)]
+            (ut/pp [:queue-party-stats+ ss])
+            ;;(ut/safe-println (qp/zp-stats ss))
+            )
 
           ;; (draw-cpu-stats)
           ;; (draw-mem-stats)
