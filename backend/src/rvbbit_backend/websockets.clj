@@ -66,7 +66,10 @@
 (defonce solver-usage (atom []))
 (defonce push-usage (atom []))
 (defonce peer-usage (atom []))
+(defonce sys-load (atom []))
 (defonce mem-usage (atom []))
+(defonce non-heap-mem-usage (atom []))
+(defonce time-usage (atom []))
 (defonce scheduler-atom (atom {}))
 
 (defonce timekeeper-failovers (atom {}))
@@ -5480,15 +5483,15 @@
 ;;             (map (fn [chunk] (/ (apply + chunk) (count chunk))))))) ;; average for each chunk.
 
 (defn average-in-chunks [data chunk-size]
-  (vec (->> data
-            (partition-all chunk-size) ;; vector into chunks
-            (map (fn [chunk]
-                   (let [sum (apply + chunk)
-                         count (count chunk)
-                         average (if (zero? sum)
-                                   0 ;(do (println "Chunk with sum zero encountered.") 0) ;; Log and return 0 for sum zero
-                                   (/ sum count))] ;; Calculate average normally
-                     average))))))
+  (->> data
+       (partition-all chunk-size) ;; vector into chunks
+       (map (fn [chunk]
+              (let [sum (apply + chunk)
+                    count (count chunk)
+                    average (if (zero? sum)
+                              0 ;(do (println "Chunk with sum zero encountered.") 0) ;; Log and return 0 for sum zero
+                              (/ sum count))] ;; Calculate average normally
+                average)))))
 
 
 (defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color freq] :or {color :default freq 1}}]
@@ -5517,6 +5520,13 @@
                        :magenta "\u001B[35m"
                        :cyan "\u001B[36m"
                        :white "\u001B[37m"
+                       :bright-red "\u001B[91m"
+                       :bright-green "\u001B[92m"
+                       :bright-yellow "\u001B[93m"
+                       :bright-blue "\u001B[94m"
+                       :bright-magenta "\u001B[95m"
+                       :bright-cyan "\u001B[96m"
+                       :bright-white "\u001B[97m"
                        "")
           reset-code "\u001B[0m"
           colorize (fn [s] (str color-code s reset-code))
@@ -5537,10 +5547,10 @@
           label (str label-str
                      (str " (last " (ut/format-duration-seconds seconds)  ")")
                      " | max " symbol-str ": "
-                     ;(format "%.2f" (float (apply max truncated)))
                      (ut/nf (float (apply max truncated)))
+                     ", min " symbol-str ": "
+                     (ut/nf (float (apply min truncated)))
                      ", avg " symbol-str ": "
-                     ;(format "%.2f" (float (ut/avgf truncated)))
                      (ut/nf (float (ut/avgf truncated))))
           padding (str (apply str (repeat (- console-width (count label) 4) " ")) " ")
           ;;label-row (str "│ " (colorize label) padding "│")
@@ -5625,23 +5635,90 @@
     (doseq [ff freqs] (draw-it :percent-float "%" ff color))))
 
 
-(defn draw-cpu-stats []
-  (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
-  (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
-  (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60)))
+;; (defn draw-cpu-stats []
+;;   (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
+;;   (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
+;;   (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
+;;   (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 600) "cpu usage" "%" :color :cyan :freq 600)))
 
-(defn draw-msg-stats []
-  (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes" :color :magenta))
-  (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 15) "msgs/sec" "client pushes" :color :magenta :freq 15))
-  (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60)))
+;; (defn draw-msg-stats []
+;;   (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes" :color :magenta))
+;;   (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 15) "msgs/sec" "client pushes" :color :magenta :freq 15))
+;;   (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
+;;   (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 600) "msgs/sec" "client pushes" :color :magenta :freq 600)))
 
-(defn draw-mem-stats []
-  (ut/pp (draw-bar-graph @mem-usage "memory usage" "mb" :color :yellow))
-  (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 15) "memory usage" "mb" :color :yellow :freq 15))
-  (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60)))
+;; (defn draw-mem-stats []
+;;   (ut/pp (draw-bar-graph @mem-usage "memory usage" "mb" :color :yellow))
+;;   (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 15) "memory usage" "mb" :color :yellow :freq 15))
+;;   (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
+;;   (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 600) "memory usage" "mb" :color :yellow :freq 600)))
 
+;; (defn draw-stats [kks & [freqs]]
+;;   (let [data-base (case kks
+;;                     :cpu [@cpu-usage "cpu usage" "%"]
+;;                     :mem [@mem-usage "msgs/sec" "client pushes"]
+;;                     :msgs [@push-usage "memory usage" "mb"]
+;;                     :queues [(get @qp/queue-stats-history :total-queues) "queues" "queues"]
+;;                     :workers [(get @qp/queue-stats-history :total-workers) "workers" "workers"]
+;;                     :tasks [(get @qp/queue-stats-history :total-tasks) "tasks" "tasks"])
+;;         draw-it (fn [ff color data]
+;;                   (let [[data-vec kkey sym] data]
+;;                     (ut/pp (draw-bar-graph
+;;                             (if (= ff 1)
+;;                               data-vec
+;;                               (average-in-chunks data-vec ff))
+;;                             (str kkey " : " kks) sym :color color :freq ff))))
+;;         freqs (if (nil? freqs) [1 15 60] freqs)
+;;         colors [:red :green :yellow
+;;                 :blue :magenta :cyan
+;;                 :white :bright-red :bright-green
+;;                 :bright-yellow :bright-blue :bright-magenta
+;;                 :bright-cyan :bright-white]
+;;         color-index (mod (hash kks) (count colors))
+;;         color (nth colors color-index)]
+;;     (doseq [ff freqs] (draw-it ff color data-base))))
 
+(defn stats-keywords []
+  {:cpu [@cpu-usage "cpu usage" "%"]
+   :mem [@mem-usage "heap memory usage" "mb"]
+   :non-heap-mem [@non-heap-mem-usage "non-heap memory usage" "mb"]
+   :msgs-cum [@push-usage "messages/sec" "client 'pushes'"]
+   :load [@sys-load "system load" "load"]
+   :clients [@peer-usage "clients" "clients"]
+   :solvers [@solver-usage "solvers running" "solvers"]
+   :msgs [(ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes"]
+   :websockets [(get-in @pool-stats-atom ["websocket-thread-pool" :current-pool-size]) "threads" "threads"]
+   :queues [(get @qp/queue-stats-history :total-queues) "queues" "queues"]
+   :workers [(get @qp/queue-stats-history :total-workers) "workers" "workers"]
+   :tasks [(get @qp/queue-stats-history :total-tasks) "tasks" "tasks"]})
 
+(defn draw-stats
+  ([]
+   (ut/pp [:draw-stats-needs-help 
+           (str "Hi. Draw what? " (clojure.string/join ", " (map str (keys (stats-keywords)))))]))
+  ([kks & [freqs]]
+   (let [data-base (get (stats-keywords) kks)
+         ;;_ (ut/pp data-base)
+         draw-it (fn [ff color data]
+                   (let [[data-vec kkey sym] data]
+                     (ut/pp (draw-bar-graph
+                             (if (= ff 1)
+                               data-vec
+                               (average-in-chunks data-vec ff))
+                             (str kkey " : " kks) sym :color color :freq ff))))
+         freqs (if (nil? freqs) [1 15 60] freqs)
+         colors [:red :green :yellow
+                 :blue :magenta :cyan
+                 :white :bright-red :bright-green
+                 :bright-yellow :bright-blue :bright-magenta
+                 :bright-cyan :bright-white]
+         color-index (mod (hash kks) (count colors))
+         color (nth colors color-index)]
+     (if data-base
+       (doseq [ff freqs] (draw-it ff color data-base))
+       (ut/pp [:draw-stats-needs-help 
+               (str kks "? Nope. Invalid data type, bro! Gimmie something: " (clojure.string/join ", " (map str (keys (stats-keywords)))))])))))
+  
 
   (defn jvm-stats
     []
@@ -5844,25 +5921,36 @@
           ;;         (apply + (for [[_ v] pool-sizes] (get v :max-pool-size)))]])
           ;; (ut/pp [:times {:atom (str @father-time) :real (str (ut/current-datetime-parts))}])
 
-          (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
-          (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
-          (ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
+          ;; (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))
+          ;; ;(ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 15) "cpu usage" "%" :color :cyan :freq 15))
+          ;; ;(ut/pp (draw-bar-graph (average-in-chunks @cpu-usage 60) "cpu usage" "%" :color :cyan :freq 60))
 
-          (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes" :color :magenta))
-          (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 15) "msgs/sec" "client pushes" :color :magenta :freq 15))
-          (ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
+          ;; (ut/pp (draw-bar-graph (ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes" :color :magenta))
+          ;; ;(ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 15) "msgs/sec" "client pushes" :color :magenta :freq 15))
+          ;; ;(ut/pp (draw-bar-graph (average-in-chunks (ut/cumulative-to-delta @push-usage) 60) "msgs/sec" "client pushes" :color :magenta :freq 60))
 
-          (ut/pp (draw-bar-graph @mem-usage "memory usage" "mb" :color :yellow))
-          (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 15) "memory usage" "mb" :color :yellow :freq 15))
-          (ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
+          ;; (ut/pp (draw-bar-graph @mem-usage "memory usage" "mb" :color :yellow))
+          ;; ;(ut/pp (draw-bar-graph (average-in-chunks @mem-usage 15) "memory usage" "mb" :color :yellow :freq 15))
+          ;; ;(ut/pp (draw-bar-graph (average-in-chunks @mem-usage 60) "memory usage" "mb" :color :yellow :freq 60))
 
-          (ut/pp (draw-bar-graph @solver-usage "solvers running" "solvers" :color :red))
-          (ut/pp (draw-bar-graph (average-in-chunks @solver-usage 15) "solvers running" "solvers" :color :red :freq 15))
-          (ut/pp (draw-bar-graph (average-in-chunks @solver-usage 60) "solvers running" "solvers" :color :red :freq 60))
+          ;; (ut/pp (draw-bar-graph @solver-usage "solvers running" "solvers" :color :red))
+          ;; ;(ut/pp (draw-bar-graph (average-in-chunks @solver-usage 15) "solvers running" "solvers" :color :red :freq 15))
+          ;; ;(ut/pp (draw-bar-graph (average-in-chunks @solver-usage 60) "solvers running" "solvers" :color :red :freq 60))
+
+          ;; (ut/pp (draw-bar-graph (get @qp/queue-stats-history :total-queues) "queues"  "queues" :color :cyan))
+          ;; (ut/pp (draw-bar-graph (get @qp/queue-stats-history :total-workers) "workers" "workers" :color :magenta))
+          ;; (ut/pp (draw-bar-graph (get @qp/queue-stats-history :total-tasks) "tasks"   "tasks" :color :cyan))
 
           ;(ut/pp [:watcher+-queues (count (keys @task-queues-slot))])
           ;(ut/pp [:push-queues (count (keys @task-queues-slot2))])
           ;(ut/pp [:queue-party-stats (qp/get-queue-stats)])
+
+          (draw-stats :cpu [1 15])
+          (draw-stats :load [1 15])
+          (draw-stats :mem [1 15])
+          (draw-stats :msgs [1 15])
+          (draw-stats :queues [1 15])
+          (draw-stats :workers [1 15])
 
           (let [ss (qp/get-queue-stats+)]
             (ut/pp [:queue-party-stats+ ss])

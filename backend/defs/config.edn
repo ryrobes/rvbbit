@@ -43,19 +43,18 @@
                                  " on " jvm-version " JVM tech"
                                  " 🥕🐇"))
                      :syntax "clojure"
-                     :placeholder-clover [:v-box 
+                     :placeholder-clover [:v-box
                                           :children [;[:box :child [:string3 :*solver-name* " running..."]]
-                                                     [:img {:src "images/running.gif" 
+                                                     [:img {:src "images/running.gif"
                                                             ;:width "70px" 
                                                             ;:height "70px"
-                                                            }]
-                                                     ] 
+                                                            }]]
                                           :size "auto"
                                           :style {:color :theme/universal-pop-color
                                                   ;:border "1px solid white"
-                                                  :font-size "14px"} 
+                                                  :font-size "14px"}
                                           ;:width  :panel-width-px
-                                          :height :panel-height+50-px 
+                                          :height :panel-height+50-px
                                           :align :center :justify :center]
                      :clover-fn [:run-solver
                                  {:signal false
@@ -65,6 +64,29 @@
                                   :data :clover-body}]
                      ;:default-view [:box :child [:string :*query-id]]
                      :icon "images/clj.png"}
+           :bash {:type :nrepl ;; this is the built-in REPL that starts by default
+                  :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
+                  :modes [:text :data]
+                  :default (let [process (.exec (Runtime/getRuntime)
+                                                :clover-body)
+                                 reader (java.io.BufferedReader.
+                                         (java.io.InputStreamReader.
+                                          (.getInputStream process)))
+                                 output (StringBuilder.)]
+                             (loop [line (.readLine reader)]
+                               (when line
+                                 (.append output line)
+                                 (.append output "\n")
+                                 (recur (.readLine reader))))
+                             (str output))
+                  :syntax "shell"
+                  :clover-fn [:run-solver
+                              {:signal false
+                               :cache? false
+                               :type :clojure
+                               :input-map {}
+                               :data :clover-body}]
+                  :icon "images/bash.png"}
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
                       :modes [:clover :text :data :rowset]
@@ -120,8 +142,7 @@
                                     :overrides
                                     {:python-code-string ;;:open-input-1
                                      :clover-body}}
-                                   :return :output-only
-                                   }}]
+                                   :return :output-only}}]
                      :default ["import platform"
                                ""
                                "def main():"

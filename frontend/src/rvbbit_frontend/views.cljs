@@ -1295,7 +1295,6 @@
 (defonce hide-panel-2? (reagent/atom false))
 (defonce hide-panel-3? (reagent/atom false))
 
-
 (defn editor-panel
   [bricks-wide bricks-tall]
   (let [selected-panel-map  @(ut/tracked-subscribe [::bricks/selected-block-map])
@@ -1320,12 +1319,15 @@
         views?              (ut/ne? views)
         view-selected?      (true? (or (and views? (some #(= % (get @db/data-browser-query selected-block)) (keys views)))
                                        (not queries?)))
-        no-room-for-3?      (and (not @hide-panel-2?) (<= bricks-wide 27))
-        no-room-for-2?      (and (not @hide-panel-3?) (<= bricks-wide 19))
+        vertical?           (> bricks-tall bricks-wide)
+
+        no-room-for-3?      (and (not @hide-panel-2?) (<= (if vertical? bricks-tall bricks-wide) 27))
+        no-room-for-2?      (and (not @hide-panel-3?) (<= (if vertical? bricks-tall bricks-wide) 19))
+        _ (ut/tapp>> [:no-room-for-2? no-room-for-2? :no-room-for-3? no-room-for-3?])
         panel-count         (if system-panel? 3
                                 (if
                                  (or views? queries? runners?)
-                                  (- 3 (count (filter #(= % true) [(or no-room-for-2? @hide-panel-2?) 
+                                  (- 3 (count (filter #(= % true) [(or no-room-for-2? @hide-panel-2?)
                                                                    (or no-room-for-3? @hide-panel-3?)])))
                                   2))
 
@@ -1333,20 +1335,34 @@
 
         ttl-width           (* bricks-wide bricks/brick-size)
         ttl-width-px        (px ttl-width)
+
+        single-height-bricks (if vertical? (js/Math.floor (/ bricks-tall panel-count)) bricks-tall)
+
         ttl-height          (* bricks-tall bricks/brick-size)
         ttl-height-px       (px (+ 10 ttl-height))
+
         x-px                (px (first @detached-coords)) ;(px (* x bricks/brick-size))
         y-px                (px (last @detached-coords)) ;(px (* y bricks/brick-size))
-        single-width-bricks (js/Math.floor (/ bricks-wide panel-count))
-        single-width        (* single-width-bricks bricks/brick-size)
+
+        single-width-bricks (if vertical? bricks-wide (js/Math.floor (/ bricks-wide panel-count)))
+        single-width        (if vertical? 
+                              (- (* single-width-bricks bricks/brick-size) 12)
+                              (* single-width-bricks bricks/brick-size))
         single-width-px     (px single-width)
+
         hh1                 [@db/mad-libs-waiting-room @db/data-browser-query-con @view-title-edit-idx
                              @db/item-browser-mode @db/scrubbers @db/solver-meta-spy @editor-size
                              @db/value-spy @bricks/dragging-editor? @hide-panel-2? @hide-panel-3?] ;; reactivity hack! React!
-        single-height       ttl-height
-        single-height-px    ttl-height-px
+
+        single-height       (if vertical? (* single-height-bricks bricks/brick-size) ttl-height)
+        single-height-px    (if vertical?
+                              ;(px (+ single-height 10)) 
+                              (px single-height)
+                              ttl-height-px)
+
         ;; {:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
         atom-map            {:single-width-bricks single-width-bricks
+                             :single-height-bricks single-height-bricks
                              :bricks-wide bricks-wide
                              :bricks-tall bricks-tall
                              :single-width single-width
@@ -1375,7 +1391,8 @@
     (when (and (not (= reco-selected reco-preview)) reco-selected?)
       (insert-hidden-reco-preview reco-selected reco-viz reco-query reco-condis reco-combo shape-name true))
     [bricks/reecatch
-     [re-com/h-box :size "none"
+     [(if vertical? re-com/v-box re-com/h-box)
+      :size "none"
       :children
       (if @bricks/dragging-editor?
 
@@ -1446,28 +1463,27 @@
                                                    :font-size     "19px"} :attr
                                                   {:on-click #(ut/tracked-dispatch [::bricks/refresh-meta-tables @db/editor-mode])}]]]
                                      (str selected-block "'s panel map"))]
-                                     
-                                     (let [style-map {:font-size "17px"
-                                                      :margin-top "-2px"
-                                                      :opacity 0.88}]
-                                       [re-com/h-box 
-                                        :gap "2px"
-                                        :children [[re-com/md-icon-button ;; zmdi-n-2-square
+
+                           (let [style-map {:font-size "17px"
+                                            :margin-top "-2px"
+                                            :opacity 0.88}]
+                             [re-com/h-box
+                              :gap "2px"
+                              :children [[re-com/md-icon-button ;; zmdi-n-2-square
                                                     ;:attr {:on-click #(reset! hide-panel-2? true)}
-                                                    :md-icon-name "zmdi-n-1-square"
-                                                    :style style-map]
-                                                   [re-com/md-icon-button
-                                                    :attr {:on-click #(reset! hide-panel-2? (not @hide-panel-2?))}
-                                                    :md-icon-name (if @hide-panel-2?   "zmdi-square-o" "zmdi-n-2-square")
-                                                    :style style-map]
-                                                   [re-com/md-icon-button
-                                                    :attr {:on-click #(reset! hide-panel-3? (not @hide-panel-3?))}
-                                                    :md-icon-name (if @hide-panel-3?   "zmdi-square-o" "zmdi-n-3-square")
-                                                    :style style-map]]])
-                                     ]]]]
+                                          :md-icon-name "zmdi-n-1-square"
+                                          :style style-map]
+                                         [re-com/md-icon-button
+                                          :attr {:on-click #(reset! hide-panel-2? (not @hide-panel-2?))}
+                                          :md-icon-name (if @hide-panel-2?   "zmdi-square-o" "zmdi-n-2-square")
+                                          :style style-map]
+                                         [re-com/md-icon-button
+                                          :attr {:on-click #(reset! hide-panel-3? (not @hide-panel-3?))}
+                                          :md-icon-name (if @hide-panel-3?   "zmdi-square-o" "zmdi-n-3-square")
+                                          :style style-map]]])]]]]
              :style {:font-weight   500
                      :color         (theme-pull :theme/editor-font-color nil)
-                     :border-radius "11px 0px 0px 0px"
+                     :border-radius (if vertical? "11px 11px 0px 0px" "11px 0px 0px 0px")
                      :background    (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
                      :user-select   "none"}]
 
@@ -1737,7 +1753,7 @@
                 :padding-left "8px"}])]]
           :height single-height-px
           :width (if (and (= @db/editor-mode :vvv) system-panel?) (px (* 2 single-width)) single-width-px) :style {:overflow "hidden"}]
-         
+
          (when (and (not @hide-panel-2?) (not no-room-for-2?))
            (cond
              (or views? queries? runners?) ; data-key
@@ -1749,13 +1765,17 @@
                  ;data-key-type (if (nil? data-key-type) :* data-key-type)
                  ;selected-block (if (nil? (get @db/data-browser-query selected-block)) first-data-key data-key)
                    ]
-               [re-com/box :size "none"
+               [re-com/box
+                :size "none"
+
                 :child
                 [re-com/v-box
                  :size "1"
+                 ;:height single-height-px
                  :children
                  [[re-com/h-box :padding "4px"
-                   :justify :between :align :center
+                   :justify :between
+                   :align :center
                    :children [;[re-com/box :child (str "queries & views")]
                               [re-com/h-box
                                :gap "1px"
@@ -1821,7 +1841,7 @@
                               [re-com/box :padding "8px" :size "auto" :child (str @db/bad-form-msg)]
                               [re-com/box :padding "8px" :style {:opacity 0.3} :size "auto" :child
                                "(Block cannot be saved until corrected)"]]]
-                            (let [{:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
+                            (let [;{:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
                                   query-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys sql-calls))
                                                  (some #(= % data-key) (keys sql-calls)))
                                   solver-meta-spy?      (get-in @db/solver-meta-spy [selected-block data-key] false)
@@ -1850,9 +1870,12 @@
                                                   (if (get @db/data-browser-query-con data-key)
                                                     [(let [repl-output (dissoc @(ut/tracked-subscribe [::bricks/repl-output data-key]) :status)
                                                            console     (vec (remove empty? (get repl-output :out [])))]
-                                                       [re-com/v-box :padding "9px" :size "none" :height (px (- single-height 107)) :style
-                                                        {;:border "1px solid pink"
-                                                         :overflow "auto"} :children
+                                                       [re-com/v-box
+                                                        :padding "9px"
+                                                        :size "none"
+                                                        :height (px (- single-height 107))
+                                                        :style {;:border "1px solid pink"
+                                                                :overflow "auto"} :children
                                                         [(when (ut/ne? console)
                                                            [re-com/box :child "console output (limited to 50 items)"])
                                                          (when (ut/ne? console)
@@ -1876,7 +1899,7 @@
                                                                                                                                           ":solver/" "solver-status/*client-name*>")))]}))
                                                                console-output (get-in meta-data [:output :evald-result :out] [])]
                                                   ;;(ut/tapp>>  [:console-output console-output])
-                                                           [re-com/box 
+                                                           [re-com/box
                                                             :size "none"
                                                             :style {:transform "translate(0)"}
                                                             :height (px (- single-height 100))
@@ -2043,8 +2066,11 @@
                                                        :style
                                                        {:font-size "15px" :transform-origin "7.5px 12px"
                                                         :margin-top "-4px"}])
-                                                    [re-com/box :child (str are-solver)]]])]]))]]))]]] :height (px (- ttl-height 24)) :width single-width-px :style
-                {:overflow "hidden"}])
+                                                    [re-com/box :child (str are-solver)]]])]]))]]))]]]
+                :height (px (- single-height 10)) ;; (px (- ttl-height 24))
+                :width single-width-px
+                :style {:overflow "hidden"}])
+
              system-panel?        [re-com/box :size "none" :child
                                    [re-com/v-box :size "1" :children
                                     [[re-com/box :padding "4px" :child (str "(fields, data-types)") :style
@@ -2064,24 +2090,31 @@
                                                                         ;;single-width
                                         :vvv    [re-com/box :size "none" :child " " :width "0px"]
                                         :status [editor-panel-metadata-status] ;[editor-panel-status]
-                                        ):height (px (- ttl-height 40))]]] :height single-height-px :width
+                                        )
+                                      :height (px (- single-height 40))
+                                      ;(px (- ttl-height 40))
+                                      ]]]
+                                   :height single-height-px
+                                   :width
                                    (if (= @db/editor-mode :vvv) "0px" single-width-px) :style
                                    {;:border "1px solid white" :background-color "#1f2430"
                                     :overflow "hidden"}]
              :else [re-com/box :child "missing something?!"]))
-         
+
          ;;; {:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
 
          (when (and (not @hide-panel-3?) (not no-room-for-3?))
            (let [{:keys [single-width-bricks bricks-wide]} @editor-dimensions
                  panels-open (if @hide-panel-2? 2 3)
-                 offset-last (* (- bricks-wide (* panels-open single-width-bricks)) bricks/brick-size)
+                 offset-last (if vertical? 0 (* (- bricks-wide (* panels-open single-width-bricks)) bricks/brick-size))
                  ;offset-last (if @hide-panel-2?)
                  single-width (+ single-width offset-last)
                  single-width-px (px single-width)] ;; when size is not cleanly mod/3 we need to add the extra offset
-             (ut/tapp>> [:panel-3 offset-last single-width single-width-px])
+             (ut/tapp>> [:panel-3 vertical? offset-last single-width single-height])
              [re-com/v-box
+              ;:margin (if vertical? "5px")
               ;:style {:border "1px solid white"}
+              ;:height (px single-height)
               :width (px single-width)
               :children [(if (and (or (= @db/editor-mode :viz) (= @db/editor-mode :vvv))
                                   reco-selected?
@@ -2093,7 +2126,7 @@
                             [[re-com/box :style
                               {:font-weight      500
                                :color            (theme-pull :theme/editor-font-color nil)
-               ;:background-color (theme-pull :theme/editor-rim-color "#a3a3a3")
+                              ;:background-color (theme-pull :theme/editor-rim-color "#a3a3a3")
                                :padding-top      "4px"
                                :padding-bottom   "4px" ;:margin-left "2px"
                                }:child "reco preview"]
@@ -2104,82 +2137,92 @@
                               [;[re-com/box :child (str reco-selected)]
                                [bricks/honeycomb :reco-preview :oz]]]]]
 
-                           [re-com/h-box :size "auto" :height (px (- single-height 20)) :children
-                            [[re-com/v-box :size "none" :width (px (* single-width 0.6)) :children
-                              [[re-com/box :style
-                                {:font-weight    500
-                                 :color          (theme-pull :theme/editor-font-color nil)
-                                 :background     (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
-                                 :padding-top    "4px"
-                                 :padding-bottom "4px" ;:margin-left "2px"
-                                 }:child
-                                [re-com/h-box :width (px (* single-width 0.538)) :justify :between :children
-                                 [[re-com/h-box
-                                   :gap "1px"
-                                   :children [[re-com/box :child "parameters"]
-                                              [re-com/md-icon-button
-                                               :attr {:on-click #(reset! hide-panel-3? true)}
-                                               :md-icon-name "zmdi-chevron-left"
-                                               :style {:font-size "17px"
-                                                       :margin-top "-2px"
-                                                       :opacity 0.88}]]]
-                                  [re-com/h-box :gap "3px" :style {:font-size "11px" :margin-top "3px"} :children
-                                   (vec (for [f (keys @db/param-filter)]
-                                          [re-com/box :child (ut/safe-name f) :attr
-                                           {:on-click #(swap! db/param-filter assoc f (not (get @db/param-filter f false)))} :style
-                                           {:text-decoration (if (get @db/param-filter f true) "none" "line-through")
-                                            :opacity         (if (get @db/param-filter f true) 1 0.4)
-                                            :cursor          "pointer"
-                                            :user-select     "none"
-                                            :padding-left    "4px"
-                                            :padding-right   "4px"}]))]]]]
-                               [bricks/click-param-browser click-params (* single-width 0.6) (- single-height 1.3)]]]
+                           [re-com/h-box
+                            :size "auto"
+                            ;:style {:border "1px solid green"}
+                            :height (px (- single-height 20))
+                            :children [[re-com/v-box
+                                        :size "none"
+                                        :width (px (* single-width 0.6))
+                                        :children [[re-com/box :style
+                                                    {:font-weight    500
+                                                     :color          (theme-pull :theme/editor-font-color nil)
+                                                     :background     (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
+                                                     :padding-top    "4px"
+                                                     :padding-bottom "4px"}
+                                                    :child [re-com/h-box 
+                                                            :width (px (* single-width 0.538)) 
+                                                            :justify :between :children
+                                                            [[re-com/h-box
+                                                              :gap "1px"
+                                                              :children [[re-com/box 
+                                                                          :style {:padding-left (when vertical? "5px")}
+                                                                          :child "parameters"]
+                                                                         [re-com/md-icon-button
+                                                                          :attr {:on-click #(reset! hide-panel-3? true)}
+                                                                          :md-icon-name "zmdi-chevron-left"
+                                                                          :style {:font-size "17px"
+                                                                                  :margin-top "-2px"
+                                                                                  :opacity 0.88}]]]
+                                                             [re-com/h-box :gap "3px" :style {:font-size "11px" :margin-top "3px"} :children
+                                                              (vec (for [f (keys @db/param-filter)]
+                                                                     [re-com/box :child (ut/safe-name f) :attr
+                                                                      {:on-click #(swap! db/param-filter assoc f (not (get @db/param-filter f false)))} :style
+                                                                      {:text-decoration (if (get @db/param-filter f true) "none" "line-through")
+                                                                       :opacity         (if (get @db/param-filter f true) 1 0.4)
+                                                                       :cursor          "pointer"
+                                                                       :user-select     "none"
+                                                                       :padding-left    "4px"
+                                                                       :padding-right   "4px"}]))]]]]
+                                                   [bricks/click-param-browser click-params (* single-width 0.6) (- single-height 1.3)]]]
 
-                             (let [data-key-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
-                                   view-type-map @(ut/tracked-sub ::bricks/view-type-map {:view-type data-key-type})
-                                   nrepl? (= (get view-type-map :type) :nrepl)]
-                               [re-com/v-box :size "none" :width (px (* single-width 0.379))
-                                :children
-                                [[re-com/h-box :style
-                                  {:font-weight    500
-                                   :color          (theme-pull :theme/editor-font-color nil)
-                                   :background     (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
-                                   :border-radius  "0px 11px 0px 0px"
-                                   :padding-top    "4px"
-                                   :padding-bottom "4px"}
+                                       (let [data-key-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
+                                             view-type-map @(ut/tracked-sub ::bricks/view-type-map {:view-type data-key-type})
+                                             nrepl? (= (get view-type-map :type) :nrepl)]
+                                         [re-com/v-box 
+                                          :size "none" 
+                                          :width (px (* single-width (if vertical? 0.4 0.379)))
+                                          :children
+                                          [[re-com/h-box :style
+                                            {:font-weight    500
+                                             :color          (theme-pull :theme/editor-font-color nil)
+                                             :background     (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
+                                             :border-radius  (when (not vertical?) "0px 11px 0px 0px")
+                                             :padding-top    "4px"
+                                             :padding-bottom "4px"}
 
-                                  :children
-                                  [[re-com/h-box :gap "8px"
-                                    :width (px (- (* single-width 0.405) 18))
-                                    :justify :end
-                                    :align :center
-                                    :children
-                                    (conj
-                                     (vec (for [b    (remove nil? [(when nrepl? "nrepl") "queries" "blocks"])
-                                                :let [selected? (= (keyword b) @db/item-browser-mode)]]
-                                            [re-com/box :attr {:on-click #(reset! db/item-browser-mode (keyword b))}
-                                             :style
-                                             (if selected?
-                                               {:user-select "none" :opacity 1.0}
-                                               {:cursor "pointer" :user-select "none" :opacity 0.3}) :child
-                                             (str b)]))
-                                     [re-com/md-icon-button :md-icon-name "zmdi-window-minimize" :on-click
-                                      #(ut/tracked-dispatch [::bricks/toggle-editor]) :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}])]
+                                            :children
+                                            [[re-com/h-box :gap "8px"
+                                              :width (px (- (* single-width 0.405) (if vertical? 8 18)))
+                                              :justify :end
+                                              :align :center
+                                              :children
+                                              (conj
+                                               (vec (for [b    (remove nil? [(when nrepl? "nrepl") "queries" "blocks"])
+                                                          :let [selected? (= (keyword b) @db/item-browser-mode)]]
+                                                      [re-com/box :attr {:on-click #(reset! db/item-browser-mode (keyword b))}
+                                                       :style
+                                                       (if selected?
+                                                         {:user-select "none" :opacity 1.0}
+                                                         {:cursor "pointer" :user-select "none" :opacity 0.3}) :child
+                                                       (str b)]))
+                                               [re-com/md-icon-button :md-icon-name "zmdi-window-minimize" :on-click
+                                                #(ut/tracked-dispatch [::bricks/toggle-editor]) :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}])]
                  ;[re-com/gap :size "12px"]
-                                   ]]
-                                 [re-com/box :style {:padding-right "3px"} :child
-                                  (cond (= @db/item-browser-mode :queries) [bricks/screen-query-browser
-                                                                            (* single-width 0.379)
-                                                                            (- single-height 1.3)]
-                                        (= @db/item-browser-mode :blocks)  [bricks/screen-block-browser
-                                                                            (* single-width 0.379)
-                                                                            (- single-height 1.3)]
-                                        (= @db/item-browser-mode :nrepl)  [bricks/nrepl-introspection-browser
-                                                                           selected-block data-key-type data-key
-                                                                           (* single-width 0.379)
-                                                                           (- single-height 1.3)]
+                                             ]]
+                                           [re-com/box :style {:padding-right "3px"} :child
+                                            (cond (= @db/item-browser-mode :queries) [bricks/screen-query-browser
+                                                                                      (* single-width 0.379)
+                                                                                      (- single-height 1.3)]
+                                                  (= @db/item-browser-mode :blocks)  [bricks/screen-block-browser
+                                                                                      (* single-width 0.379)
+                                                                                      (- single-height 1.3)]
+                                                  (= @db/item-browser-mode :nrepl)  [bricks/nrepl-introspection-browser
+                                                                                     selected-block data-key-type data-key
+                                                                                     (* single-width 0.379)
+                                                                                     (- single-height 1.3)]
 
-                                        :else                              [re-com/box :child "nothing selected above?"])]]])]
+                                                  :else                              [re-com/box :child "nothing selected above?"])]]])]
                             :height single-height-px
                             :width single-width-px
                             :style
@@ -2239,23 +2282,22 @@
                            :font-weight    500
                            :color          (theme-pull :theme/editor-background-color nil) ;; "#000000"
                            :background     (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")}]]]))
-                           
-                           [re-com/box :child " "
-                            :width "11px" :height "11px"
-                            :attr {:on-mouse-down resize-mouse-down-handler}
-                            :style {:background-color (theme-pull :theme/editor-outer-rim-color nil)
-                                    :position "fixed"
-                                    :z-index 99999
-                                    :right -1
-                                    :cursor "se-resize"
-                                    :border-radius "8px 0px 0px 0px"
-                                    :bottom -1}]
 
-                           ])
+         [re-com/box :child " "
+          :width "11px" :height "11px"
+          :attr {:on-mouse-down resize-mouse-down-handler}
+          :style {:background-color (theme-pull :theme/editor-outer-rim-color nil)
+                  :position "fixed"
+                  :z-index 99999
+                  :right -1
+                  :cursor "se-resize"
+                  :border-radius "8px 0px 0px 0px"
+                  :bottom -1}]])
       :width ttl-width-px
       :height ttl-height-px
       :margin "-2px"
       :style (merge
+              (when vertical? {:padding-left  "2px"})
               {:position         "fixed"
                :top              y-px
                :left             x-px

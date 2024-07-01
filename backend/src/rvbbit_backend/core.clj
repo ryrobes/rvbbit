@@ -800,7 +800,7 @@
 
   (start-scheduler 15
                    wss/jvm-stats
-                   "JVM Stats" 15)
+                   "JVM Stats" 30)
 
   (start-scheduler 30
                    wss/param-sql-sync
@@ -814,106 +814,18 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 600)
 
-  ;; (start-scheduler 600
-  ;;                  qp/cleanup-unused-queues
-  ;;                  "Clean Dormant Queues" 600)
+  (start-scheduler 600
+                   #(qp/cleanup-inactive-queues 600) ;; should all be 3600+ for production
+                   "Purge Idle Queues" 720)
 
-  ;; (start-scheduler 1
-  ;;                  #(let [pst (wss/query-pool-sizes)]
-  ;;                     (doseq [pp (keys pst)]
-  ;;                       (swap! wss/pool-stats-atom assoc pp (conj (get @wss/pool-stats-atom pp []) (get-in pst [pp 1])))))
-  ;;                  "Query Pool Sizes")
-
-  ;; (def timekeeper
-  ;;   (start-scheduler 1000
-  ;;                    #(try
-  ;;                       (let [ddate (ut/current-datetime-parts)]
-  ;;                       ;(logger "timekeeper" {:new ddate :old @wss/time-atom})
-  ;;                         (reset! wss/father-time ddate))
-  ;;                       (catch Exception e (ut/pp [:time-has-thrown-an-error!! :EGADS! e])))
-  ;;                    "Timekeeper")) ;; 5:35:00 am stops? - 9:45:00 pm stopped also
-
-  ;;   (def timekeeper0
-  ;;   (start-scheduler 10000
-  ;;                    #(try
-  ;;                       (let [ddate (ut/current-datetime-parts)
-  ;;                             old-min (get @wss/father-time :minute)
-  ;;                             new-min (get ddate :minute)]
-  ;;                         (when
-  ;;                          (> new-min old-min)
-  ;;                           (do (ut/pp [:RESTARTING-TIMEKEEPER-0! :ACHTUNG! {:new ddate :old @wss/father-time}])
-  ;;                               (swap! wss/timekeeper-failovers update "Timekeeper0" (fnil inc 0))
-  ;;                               ;timekeeper
-  ;;                               (start-scheduler 1000
-  ;;                                                (fn [] (try
-  ;;                                                         (let [ddate (ut/current-datetime-parts)]
-  ;;                                                           (reset! wss/father-time ddate))
-  ;;                                                         (catch Exception e (ut/pp [:time-has-thrown-an-error!! :EGADS! e]))))
-  ;;                                                "Timekeeper"))))
-  ;;                       (catch Exception e (ut/pp [:timekeeper2-has-thrown-an-error!! :EGADS! e])))
-  ;;                    "Timekeeper0"))
-
-  ;; (def timekeeper2
-  ;;   (start-scheduler 75000
-  ;;                    #(try
-  ;;                       (let [ddate (ut/current-datetime-parts)
-  ;;                             old-min (get @wss/father-time :minute)
-  ;;                             new-min (get ddate :minute)]
-  ;;                         (when
-  ;;                          (> new-min old-min)
-  ;;                           (do (ut/pp [:RESTARTING-TIMEKEEPER-2! :ACHTUNG! {:new ddate :old @wss/father-time}])
-  ;;                               (swap! wss/timekeeper-failovers update "Timekeeper2" (fnil inc 0))
-  ;;                               ;timekeeper
-  ;;                               (start-scheduler 1000
-  ;;                                                (fn [] (try
-  ;;                                                         (let [ddate (ut/current-datetime-parts)]
-  ;;                                                           (reset! wss/father-time ddate))
-  ;;                                                         (catch Exception e (ut/pp [:time-has-thrown-an-error!! :EGADS! e]))))
-  ;;                                                "Timekeeper"))))
-  ;;                         (catch Exception e (ut/pp [:timekeeper2-has-thrown-an-error!! :EGADS! e])))
-  ;;                       "Timekeeper2"))
-
-  ;;   (def timekeeper3
-  ;;     (start-scheduler 85000
-  ;;                      #(try
-  ;;                         (let [ddate (ut/current-datetime-parts)
-  ;;                               old-min (get @wss/father-time :minute)
-  ;;                               new-min (get ddate :minute)]
-  ;;                           (when
-  ;;                            (> new-min old-min)
-  ;;                             (do (ut/pp [:RESTARTING-TIMEKEEPER-3! :ACHTUNG! {:new ddate :old @wss/father-time}])
-  ;;                                 (swap! wss/timekeeper-failovers update "Timekeeper3" (fnil inc 0))
-  ;;                                 ;timekeeper
-  ;;                                 (start-scheduler 1000
-  ;;                                                  (fn [] (try
-  ;;                                                           (let [ddate (ut/current-datetime-parts)]
-  ;;                                                             (reset! wss/father-time ddate))
-  ;;                                                           (catch Exception e (ut/pp [:time-has-thrown-an-error!! :EGADS! e]))))
-  ;;                                                  "Timekeeper3"))))
-  ;;                           (catch Exception e (ut/pp [:timekeeper3-has-thrown-an-error!! :EGADS! e])))
-  ;;                         "Timekeeper3"))
-
-  ;; (start-scheduler 1
-  ;;                  #(swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage))
-  ;;                  "CPU Keeper")
-
-  ;; (start-scheduler 1
-  ;;                  #(swap! wss/mem-usage conj (ut/memory-used))
-  ;;                  "Memory Keeper")
-
-  ;; (start-scheduler 1
-  ;;                  #(swap! wss/push-usage conj @wss/all-pushes)
-  ;;                  "Push Keeper")
-
-  ;; (start-scheduler 1
-  ;;                  #(swap! wss/peer-usage conj (count @wl/sockets))
-  ;;                  "Peer Keeper")
-  
-    (start-scheduler 1
+  (start-scheduler 1
                    #(do (swap! wss/peer-usage conj (count @wl/sockets))
-                        (swap! wss/peer-usage conj (count @wl/sockets))
                         (swap! wss/push-usage conj @wss/all-pushes)
                         (swap! wss/mem-usage conj (ut/memory-used))
+                        (swap! wss/sys-load conj (ut/get-system-load-average))
+                        (swap! wss/non-heap-mem-usage conj (ut/get-non-heap-memory-usage))
+                        (swap! wss/time-usage conj (System/currentTimeMillis)) ;; in case we want to easily ref w/o generating
+                        (qp/update-queue-stats-history) ;; has it's own timestamp key
                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
                    "Stats Keeper")
 
@@ -933,7 +845,13 @@
   ;;                              (ut/format-duration (get v :started) (System/currentTimeMillis)))))
   ;;                  "Update Solver Statuses")
 
-    (start-scheduler 1
+  (start-scheduler 1
+                   #(let [pst (wss/query-pool-sizes)]
+                      (doseq [pp (keys pst)]
+                        (swap! wss/pool-stats-atom assoc pp (conj (get @wss/pool-stats-atom pp []) (get-in pst [pp 1])))))
+                   "Query Pool Sizes") ;; kinda deprecated by queue-party, but we still use 2 small ones...
+
+  (start-scheduler 1
                    #(let [total-updated (reduce ;; run side effects, but return how many are active
                                          (fn [acc [client-name solvers]]
                                            (let [updated-count
@@ -1201,11 +1119,11 @@
      :connections [[:kick-1 :done] [:open-input :kick-1/name] [:open-input :kick-1/sub-task] [:open-input :kick-1/thread-id]
                    [:open-input :kick-1/thread-desc] [:open-input :kick-1/message-name]
                    [:kick-1destination :kick-1/destination]]})
-  
+
   (wss/schedule! [:seconds 15]
                  (heartbeat :all)
                  {:flow-id "client-keepalive" :increment-id? false :close-on-done? true :debug? false})
-  
+
   (wss/schedule! [:minutes 20]
                  "game-of-life-test1"
                  {:close-on-done? true
@@ -1213,7 +1131,7 @@
                   :flow-id        "game-of-life-test1"
                   :debug?         false
                   :overrides      {:iterations-max 1000 :tick-delay-ms 800}})
-  
+
   ;; (wss/schedule! [:minutes 30] "counting-loop" {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
 
   (let [_ (ut/pp [:waiting-for-background-systems...])

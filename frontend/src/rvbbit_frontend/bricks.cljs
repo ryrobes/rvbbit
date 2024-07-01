@@ -14,6 +14,7 @@
    ["codemirror/addon/edit/matchbrackets.js"]
    ["codemirror/addon/hint/show-hint.js"]
    ["codemirror/mode/clojure/clojure.js"]
+   ["codemirror/mode/shell/shell.js"]
    ["codemirror/mode/julia/julia.js"]
    ["codemirror/mode/markdown/markdown.js"]
    ["codemirror/mode/python/python.js"]

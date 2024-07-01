@@ -13,6 +13,7 @@
     [clojure.spec.alpha      :as s]
     [clojure.spec.test.alpha :as stest]
     [clojure.string          :as cstr]
+   [zprint.core              :as zp]
     [clojure.walk            :as walk]
     [hikari-cp.core          :as hik]
     [honey.sql               :as honey]
@@ -27,6 +28,7 @@
    [java.lang.management ManagementFactory]
    [java.io BufferedReader InputStreamReader]
    java.time.ZoneId
+   java.nio.ByteBuffer
    java.time.format.DateTimeFormatter
    [java.time            LocalTime Duration Instant ZonedDateTime ZoneId Period DayOfWeek]
    [java.text            SimpleDateFormat]
@@ -42,6 +44,8 @@
    [java.util            Base64]
    [com.sun.management OperatingSystemMXBean]
    [java.lang.management RuntimeMXBean]
+   [java.lang.management ManagementFactory]
+   [javax.management MBeanServerInvocationHandler]
    java.time.format.DateTimeFormatter))
 
 (def rvbbit
@@ -190,10 +194,26 @@
   (let [a (get @managed-atoms file-path)] (when a (with-open [wtr (io/writer file-path)] (binding [*out* wtr] (prn @a))))))
 
 (def terminal (TerminalFactory/get))
-
 (defn get-terminal-width [] (try (.getWidth terminal) (catch Throwable _ 85)))
 
+;; (defn get-terminal-width []
+;;   (let [terminal (TerminalFactory/get)]
+;;     (try (.getWidth terminal) (catch Throwable _ 85))))
 
+(defn zp-stats [s]
+  (let [s (pr-str s)
+        o (zp/zprint-str s
+                         (get-terminal-width)
+                         {:parse-string-all? true ;; was :parse-string-all?
+                          ;:color?        true
+                          :style         [:justified-original] ;;type ;:community ;[:binding-nl :extend-nl]
+                          :pair          {:force-nl? false}
+                          :map {:hang? true :comma? false :sort? false}
+                          :pair-fn {:hang? true}
+                          :binding       {:force-nl? true}
+                          :vector        {:respect-nl? true}
+                          :parse         {:interpose "\n\n"}})]
+    o))
 
 (defn safe-name [x] (cstr/replace (str x) ":" ""))
 
@@ -297,6 +317,14 @@
                                  ;;normalized-usage (/ raw-usage num-cores)
                                  normalized-usage (normalize-cpu-usage raw-usage num-cores)]
                              normalized-usage))
+
+(defn bytes-to-mb [bytes]
+  (Math/round (/ bytes 1048576.0)))
+
+(defn get-non-heap-memory-usage []
+  (let [memory-mx-bean (ManagementFactory/getMemoryMXBean)
+        nonHeapUsage (.getNonHeapMemoryUsage memory-mx-bean)]
+    (bytes-to-mb (.getUsed nonHeapUsage))))
 
 (def debug-level (get (config/settings) :debug-level 0))
 
