@@ -432,25 +432,27 @@
 
 
 
-  ;; (defn execute-custom-watcher [f]
-  ;;   (.execute wss/custom-watcher-thread-master-pool f))
+  (defn execute-custom-watcher [f key]
+    (.execute (wss/get-or-create-queue key) f))
 
-  (defn wrap-custom-watcher [watcher-fn]
-    (fn [key ref old-state new-state]
-      ;(execute-custom-watcher
-      (qp/slot-queue
-       :master-watchers key
-       (fn []
-         (try
-           (watcher-fn key ref old-state new-state)
-           (catch Exception e
-             (println "Error in wrap-custom-watcher:" key ref (.getMessage e))
-             (throw e)))))))
+  ;; (defn wrap-custom-watcher [watcher-fn]
+  ;;   (fn [key ref old-state new-state]
+  ;;     ;(execute-custom-watcher
+  ;;     (qp/slot-queue
+  ;;      :master-watchers key
+  ;;      (fn []
+  ;;        (try
+  ;;          (watcher-fn key ref old-state new-state)
+  ;;          (catch Exception e
+  ;;            (println "Error in wrap-custom-watcher:" key ref (.getMessage e))
+  ;;            (throw e)))))))
 
   (defn add-watch+ [atom key watcher-fn]
-    (let [wrapped-watcher (wrap-custom-watcher watcher-fn)]
+    (let [wrapped-watcher (execute-custom-watcher watcher-fn key)]
       (add-watch atom key wrapped-watcher)))
 
+  ;; (defn add-watch+ [atom key watcher-fn]
+  ;;   (add-watch atom key watcher-fn))
 
 
 
@@ -478,7 +480,7 @@
   ;;       (println "Error in time-marches-on:" key ref (.getMessage e))
   ;;       (throw e))))
 
-  (add-watch+ wss/father-time
+  (wss/add-watch+ wss/father-time
               :time-marches-on-or-does-it?
               (fn [_ _ old-state new-state]
                 (try
@@ -492,9 +494,10 @@
                    ;(println "Watcher updated child atoms successfully.")
                   (catch Exception e
                     (println "Error in time-marches-on:" (.getMessage e))
-                    (throw e)))))
+                    (throw e)))) 
+                  :time-marches-on-or-does-it?)
 
-  (add-watch+ wss/screens-atom
+  (wss/add-watch+ wss/screens-atom
               :master-screen-watcher ;; watcher splitter
               (fn [_ _ old-state new-state]
                ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
@@ -503,9 +506,10 @@
                     (swap! child-atom assoc key (get new-state key))
                     (let [new-child-atom (atom {})]
                       (swap! wss/screen-child-atoms assoc key new-child-atom)
-                      (swap! new-child-atom assoc key (get new-state key)))))));)
+                      (swap! new-child-atom assoc key (get new-state key)))))) 
+                  :master-screen-watcher);)
 
-  (add-watch+ wss/params-atom
+  (wss/add-watch+ wss/params-atom
               :master-params-watcher ;; watcher splitter
               (fn [_ _ old-state new-state]
                ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
@@ -514,9 +518,10 @@
                     (swap! child-atom assoc key (get new-state key))
                     (let [new-child-atom (atom {})]
                       (swap! wss/param-child-atoms assoc key new-child-atom)
-                      (swap! new-child-atom assoc key (get new-state key)))))));)
+                      (swap! new-child-atom assoc key (get new-state key))))))
+                  :master-params-watcher );)
 
-  (add-watch+ wss/panels-atom
+  (wss/add-watch+ wss/panels-atom
               :master-panels-watcher ;; watcher splitter
               (fn [_ _ old-state new-state]
                ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
@@ -525,9 +530,10 @@
                     (swap! child-atom assoc key (get new-state key))
                     (let [new-child-atom (atom {})]
                       (swap! wss/panel-child-atoms assoc key new-child-atom)
-                      (swap! new-child-atom assoc key (get new-state key)))))));)
+                      (swap! new-child-atom assoc key (get new-state key))))))
+                  :master-panels-watcher);)
 
-  (add-watch+ flow-db/results-atom
+  (wss/add-watch+ flow-db/results-atom
               :master-watcher ;; flow watcher split of results-atom
               (fn [_ _ old-state new-state]
                 (doseq [key (keys new-state)]
@@ -535,7 +541,8 @@
                     (swap! child-atom assoc key (get new-state key))
                     (let [new-child-atom (atom {})]
                       (swap! wss/flow-child-atoms assoc key new-child-atom)
-                      (swap! new-child-atom assoc key (get new-state key)))))))
+                      (swap! new-child-atom assoc key (get new-state key))))))
+              :master-watcher)
 
   ;; (add-watch wss/last-solvers-atom
   ;;            :master-solver-watcher ;; watcher splitter
@@ -563,7 +570,7 @@
   ;;                      (swap! wss/solver-child-atoms assoc group new-child-atom)
   ;;                      (swap! new-child-atom assoc key (get new-state key))))))))
 
-  (add-watch+ wss/last-solvers-atom
+  (wss/add-watch+ wss/last-solvers-atom
               :master-solver-watcher ;; watcher splitter
               (fn [_ _ old-state new-state]
                ;(future ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
@@ -573,9 +580,10 @@
                       (swap! child-atom assoc key (get new-state key))
                       (let [new-child-atom (atom {})]
                         (swap! wss/solver-child-atoms assoc group new-child-atom)
-                        (swap! new-child-atom assoc key (get new-state key))))))));)
+                        (swap! new-child-atom assoc key (get new-state key)))))))
+                  :master-solver-watcher);)
 
-  (add-watch+ wss/solver-status
+  (wss/add-watch+ wss/solver-status
               :master-solver-status-watcher ;; watcher splitter
               (fn [_ _ old-state new-state]
                ;(future  ;; going back to blocking for now, since it add some back-pressure under heavy client load. experiment 
@@ -584,24 +592,28 @@
                     (swap! child-atom assoc key (get new-state key))
                     (let [new-child-atom (atom {})]
                       (swap! wss/solver-status-child-atoms assoc key new-child-atom)
-                      (swap! new-child-atom assoc key (get new-state key)))))));)
+                      (swap! new-child-atom assoc key (get new-state key))))))
+                  :master-solver-status-watcher);)
 
-  (add-watch+ wss/signals-atom
+  (wss/add-watch+ wss/signals-atom
               :master-signal-def-watcher ;; watcher signals defs
               (fn [_ _ old-state new-state]
                 (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....])
-                (wss/reload-signals-subs)))
+                (wss/reload-signals-subs))
+                  :master-signal-def-watcher)
 
-  (add-watch+ wss/rules-atom
+  (wss/add-watch+ wss/rules-atom
               :master-rule-def-watcher
               (fn [_ _ old-state new-state]
-                (ut/pp [:rules-defs-changed :reloading....])))
+                (ut/pp [:rules-defs-changed :reloading....]))
+                  :master-rule-def-watcher)
 
-  (add-watch+ wss/solvers-atom
+  (wss/add-watch+ wss/solvers-atom
               :master-solver-def-watcher
               (fn [_ _ old-state new-state]
                 (ut/pp [:solvers-defs-changed :reloading....])
-                (wss/reload-solver-subs)))
+                (wss/reload-solver-subs))
+                  :master-solver-def-watcher)
 
   ;; (add-watch wss/father-time
   ;;            :fake-time-pusher
@@ -815,7 +827,7 @@
                    "Purge Dead Clients" 600)
 
   (start-scheduler 600
-                   #(qp/cleanup-inactive-queues 600) ;; should all be 3600+ for production
+                   #(qp/cleanup-inactive-queues 10) ;; MINUTES
                    "Purge Idle Queues" 720)
 
   (start-scheduler 1
@@ -1047,7 +1059,7 @@
           kks     (try (keys b) (catch Exception _ nil))]
       (when (> (count (remove #(= "client-keepalive" %) kks)) 0) (update-stat-atom kks))))
 
-  (add-watch+ flow-db/status :tracker-watch tracker-changed)
+  (wss/add-watch+ flow-db/status :tracker-watch tracker-changed :tracker-watch)
 
   (defn log-tracker
     [kks]
@@ -1087,7 +1099,7 @@
         (log-tracker kks)
         (update-stat-atom kks))))
 
-  (add-watch+ flow-db/tracker :tracker-watch tracker-changed2)
+  (wss/add-watch+ flow-db/tracker :tracker-watch2 tracker-changed2 :tracker-watch2)
 
   ;;(ut/pp {:settings config/settings})
   (defn heartbeat

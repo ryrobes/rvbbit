@@ -26,6 +26,7 @@
    [io.pedestal.http          :as server]
    [taskpool.taskpool         :as tp]
    [clojure.edn               :as edn]
+   [clojure.core.memoize      :as memoize]
    [rvbbit-backend.util       :as    ut
     :refer [ne?]]
    [io.pedestal.http.route    :as route]
@@ -163,8 +164,27 @@
 
 ;; (defonce custom-watcher-thread-pool
 ;;   (ThreadPoolExecutor. 10 1000 60 TimeUnit/SECONDS (SynchronousQueue.)))
+
 ;; (defonce custom-watcher-thread-pool ;; if pool is 100% full, will fallback to parent callers thread pool instead of rejection
-;;   (ThreadPoolExecutor. 10 1500 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))  
+;;   (ThreadPoolExecutor. 10 2000 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))  
+
+
+
+
+(defonce dyn-pools (atom {}))
+
+(defn create-queue []
+  (ThreadPoolExecutor. 1 1000 45 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+
+(defn get-or-create-queue [name]
+  (if-let [queue (@dyn-pools name)]
+    queue
+    (let [new-queue (create-queue)]
+      (ut/pp [:*creating-thread-pool-for name])
+      (swap! dyn-pools assoc name new-queue)
+      new-queue)))
+
+(def get-or-create-queue-memoized (memoize/memo get-or-create-queue))
 
 
 
@@ -184,6 +204,9 @@
 
 ;; (defn execute-solver-task [f]
 ;;   (.execute solver-thread-pool f))
+
+(defn execute-solver-task [base-type f]
+  (.execute (get-or-create-queue base-type) f))
 
 ;; (defonce push-thread-pool ;; master watchers
 ;;   (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
@@ -1284,11 +1307,11 @@
                              :file-change
                              :done)))))))
 
-(defn subscribe-to-session-changes
-  []
-  (let [file-path0 (str "./live/")]
-    (do (ut/pp [:beholder-watching file-path0])
-        (beholder/watch #(send-off ext/file-work-agent (react-to-file-changes %)) file-path0))))
+;; (defn subscribe-to-session-changes
+;;   []
+;;   (let [file-path0 (str "./live/")]
+;;     (do (ut/pp [:beholder-watching file-path0])
+;;         (beholder/watch #(send-off ext/file-work-agent (react-to-file-changes %)) file-path0))))
 
 (defonce last-panels (atom {}))
 
@@ -2287,8 +2310,8 @@
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
   ;(enqueue-task-slot-pool client-name (fn [] 
-  ;(execute-solver-task 
-   (qp/slot-queue :solvers-req client-name 
+  (execute-solver-task client-name
+   ;(qp/slot-queue :solvers-req client-name 
    (fn []
      (run-solver solver-name client-name override-map))))
 
@@ -2300,8 +2323,8 @@
          [:warning! {:solver-running-manually-via client-name :with-override-map override-map}])
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
   ;(enqueue-task-slot-pool client-name (fn [] 
-  ;(execute-solver-task 
-   (qp/slot-queue :solvers-push client-name 
+  (execute-solver-task client-name
+   ;(qp/slot-queue :solvers-push client-name 
    (fn []
      (run-solver solver-name client-name override-map))))
 
@@ -2314,8 +2337,8 @@
   ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
 ;;  (run-solver solver-name client-name override-map input-map temp-solver-name)
   ;(enqueue-task-slot-pool client-name (fn [] 
-  ;(execute-solver-task
-   (qp/slot-queue :solvers-cust client-name 
+  (execute-solver-task client-name
+   ;(qp/slot-queue :solvers-cust client-name 
    (fn []
      (run-solver solver-name client-name override-map input-map temp-solver-name)))
   temp-solver-name)
@@ -2730,43 +2753,50 @@
 
 
 ;;;;; huge sync pool version
-;; (defn execute-custom-watcher [f]
-;;   (.execute custom-watcher-thread-pool f))
+(defn execute-custom-watcher [base-type f]
+  (.execute (get-or-create-queue base-type) f))
 
-;; (defn wrap-custom-watcher [watcher-fn]
-;;   (fn [key ref old-state new-state]
-;;     (execute-custom-watcher
-;;      (fn []
-;;        (try
-;;          (watcher-fn key ref old-state new-state)
-;;          (catch Exception e
-;;            (println "Error in wrap-custom-watcher:"  key ref (.getMessage e))
-;;            (throw e)))))))
-
-;; (defn add-watch+ [atom key watcher-fn]
-;;   (let [wrapped-watcher (wrap-custom-watcher watcher-fn)]
-;;     (add-watch atom key wrapped-watcher)))
-
-
-;;;;; slot per keypath version
-(defn wrap-custom-watcher [watcher-fn base-type]
+(defn wrap-custom-watcher-pool [watcher-fn base-type]
   (fn [key ref old-state new-state]
-    ;;(ut/pp [:watch+ :slot key])
-    ;(enqueue-task-slot key                    
-    (let [base-atom-key (keyword (str "sub-watcher/" (name base-type)))]
-      (qp/slot-queue base-atom-key key
-                     (fn []
-                       (try
-                         (watcher-fn key ref old-state new-state)
-                         (catch Exception e
-                           (ut/pp ["Error in wrap-custom-watcher:" key key (.getMessage e)])
-                           (throw e))))))))
+    (execute-custom-watcher base-type
+     (fn []
+       (try
+         (watcher-fn key ref old-state new-state)
+         (catch Exception e
+           (println "Error in wrap-custom-watcher:"  key ref (.getMessage e))
+           (throw e)))))))
 
-(defn add-watch+ [atom key watcher-fn base-type]
-  (let [wrapped-watcher (wrap-custom-watcher watcher-fn base-type)]
+(defn add-watch+ [atom key watcher-fn base-type & [client-name]]
+  (let [base-type (if (= base-type :solver-status)
+                    (keyword (str (cstr/replace (str base-type) ":" "") "/"
+                                  (cstr/replace (str client-name) ":" "")))
+                    base-type)
+        wrapped-watcher (wrap-custom-watcher-pool watcher-fn base-type)]
     (add-watch atom key wrapped-watcher)))
 
 
+;;;;; slot per keypath version
+;; (defn wrap-custom-watcher [watcher-fn base-type]
+;;   (fn [key ref old-state new-state]
+;;     ;;(ut/pp [:watch+ :slot key])
+;;     ;(enqueue-task-slot key                    
+;;     (let [base-atom-key (keyword (str "sub-watcher/" (name base-type) "-" (subs (str (hash key)) 0 2)))]
+;;       (qp/slot-queue base-atom-key key
+;;                      (fn []
+;;                        (try
+;;                          (watcher-fn key ref old-state new-state)
+;;                          (catch Exception e
+;;                            (ut/pp ["Error in wrap-custom-watcher:" key key (.getMessage e)])
+;;                            (throw e))))))))
+
+;; (defn add-watch+ [atom key watcher-fn base-type]
+;;   (if (= base-type :solver)
+;;     (add-watch atom key watcher-fn)
+;;     (let [wrapped-watcher (wrap-custom-watcher watcher-fn base-type)]
+;;       (add-watch atom key wrapped-watcher))))
+
+;; (defn add-watch+ [atom key watcher-fn]
+;;   (add-watch atom key watcher-fn))
 
 ;;enqueue-task-slot [keyword task]
 
@@ -2827,7 +2857,7 @@
                           :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
     (remove-watch atom-to-watch watch-key)
     ;;(swap! atoms-and-watchers ut/dissoc-in [client-name flow-key]) ;; pointless?
-    (add-watch+ atom-to-watch watch-key watcher base-type)
+    (add-watch+ atom-to-watch watch-key watcher base-type client-name)
     (swap! atoms-and-watchers assoc-in
            [client-name flow-key]
            {:created   (ut/get-current-timestamp)
@@ -3135,9 +3165,10 @@
     (let [solver-map            (if (ut/ne? override-map) override-map (get @solvers-atom solver-name))
           input-map             (get solver-map :input-map {})
           input-map             (if (ut/ne? override-input) (merge input-map override-input) input-map)
-          use-cache?            (true?
-                                 (or (true? (not (nil? temp-solver-name))) ;; temp test
-                                     (true? (get solver-map :cache? false))))
+          ;use-cache?            (true?
+          ;                       (or (true? (not (nil? temp-solver-name))) ;; temp test
+          ;                           (true? (get solver-map :cache? false))))
+          use-cache?            true
           vdata                 (walk/postwalk-replace input-map (get solver-map :data))
           vdata-clover-kps      (vec (filter #(and (keyword? %) ;; get any resolvable keys in the struct before we operate on
                                                               ;; it
@@ -3533,8 +3564,8 @@
                                                       (= (get sv :signal)
                                                          (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
                                     ;(enqueue-task4 (fn []
-                                    ;(execute-solver-task
-                                     (qp/slot-queue :solvers-int sk ;;client-name 
+                                    (execute-solver-task client-name 
+                                     ;(qp/slot-queue :solvers-int sk ;;client-name 
                                      (fn []
                                        (run-solver sk client-name)))))
                               _ (swap! last-signals-history-atom assoc kk (get @last-signals-history-atom-temp kk)) ;; one
@@ -5493,8 +5524,14 @@
                               (/ sum count))] ;; Calculate average normally
                 average)))))
 
+(defn sum-in-chunks [data chunk-size]
+  (->> data
+       (partition-all chunk-size) ;; vector into chunks
+       (map (fn [chunk]
+              (reduce + 0 chunk)))))
 
-(defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color freq] :or {color :default freq 1}}]
+
+(defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color freq agg] :or {color :default freq 1 agg "avg"}}]
   (try
     (let [console-width (- (ut/get-terminal-width) 10)
           rows 5
@@ -5566,7 +5603,7 @@
                                               row-data))
                            padding (apply str (repeat (- console-width (count (clojure.string/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
                        (str "│ " graph-data padding "│")))
-          legned (str "  (each segment is " (ut/format-duration-seconds (* 15 freq)) ", each tick is " (ut/format-duration-seconds freq) (when (> freq 1) " **averaged") ")")]
+          legned (str "  (each segment is " (ut/format-duration-seconds (* 15 freq)) ", each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str " **" agg)) ")")]
       (println border-top)
       (println label-row)
       (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
@@ -5596,17 +5633,22 @@
               :largest-pool-size (.getLargestPoolSize thread-pool)}]))
 
 
-(def pools [;[push-thread-pool "push-thread-pool"]
-            ;[solver-thread-pool "solver-thread-pool"]
-            [websocket-thread-pool "websocket-thread-pool"]
-            ;[time-scheduler "time-scheduler"]
-            [general-scheduler-thread-pool "general-scheduler-thread-pool"]
-            ;[custom-watcher-thread-master-pool "custom-watcher-thread-master-pool"]
-            ;[custom-watcher-thread-pool "custom-watcher-thread-pool"]
-            ])
+;; (def pools [;[push-thread-pool "push-thread-pool"]
+;;             ;[solver-thread-pool "solver-thread-pool"]
+;;             [websocket-thread-pool "websocket-thread-pool"]
+;;             ;[time-scheduler "time-scheduler"]
+;;             [general-scheduler-thread-pool "general-scheduler-thread-pool"]
+;;             ;[custom-watcher-thread-master-pool "custom-watcher-thread-master-pool"]
+;;             ;[custom-watcher-thread-pool "custom-watcher-thread-pool"]
+;;             ])
+
+(defn pools []
+  (vec (for [[k v] (merge {"websocket-thread-pool" websocket-thread-pool
+                           "general-scheduler-thread-pool" general-scheduler-thread-pool}
+                          @dyn-pools)] [v k])))
 
 (defn query-pool-sizes []
-  (into {} (for [[pool pname] pools]
+  (into {} (for [[pool pname] (pools)]
              {pname (pool-monitor pool)})))
 
 (defn draw-pool-stats [& [kks freqs]]
@@ -5620,19 +5662,27 @@
                                     (average-in-chunks
                                      (mapv kkey (get @pool-stats-atom pp))  ff))
                                   (str kkey " : " pp) sym :color color :freq ff)))
-                freqs (if (nil? freqs) [1 15 60] freqs)
-                colors [:green :yellow :blue :magenta :cyan :white]
+                freqs (if (nil? freqs) 
+                        ;[1 15]
+                        [15]
+                        freqs)
+                colors [:red :green :yellow
+                        :blue :magenta :cyan
+                        :white :bright-red :bright-green
+                        :bright-yellow :bright-blue :bright-magenta
+                        :bright-cyan :bright-white]
                 color-index (mod (hash pp) (count colors))
                 color (nth colors color-index)]]
 
-    (ut/pp [:pool pp])
+    ;(ut/pp [:pool pp])
 
-    (ut/pp [:current-pool-size])
+    ;(ut/pp [:current-pool-size])
     (doseq [ff freqs] (draw-it :current-pool-size "threads" ff color))
-    (ut/pp [:active-threads])
-    (doseq [ff freqs] (draw-it :active-threads "threads" ff color))
-    (ut/pp [:percent-float])
-    (doseq [ff freqs] (draw-it :percent-float "%" ff color))))
+    ;(ut/pp [:active-threads])
+    ;(doseq [ff freqs] (draw-it :active-threads "threads" ff color))
+    ;(ut/pp [:percent-float])
+    ;(doseq [ff freqs] (draw-it :percent-float "%" ff color))
+    ))
 
 
 ;; (defn draw-cpu-stats []
@@ -5685,27 +5735,33 @@
    :msgs-cum [@push-usage "messages/sec" "client 'pushes'"]
    :load [@sys-load "system load" "load"]
    :clients [@peer-usage "clients" "clients"]
-   :solvers [@solver-usage "solvers running" "solvers"]
+   :solvers [@solver-usage "solvers running" "solvers" true]
    :msgs [(ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes"]
    :websockets [(get-in @pool-stats-atom ["websocket-thread-pool" :current-pool-size]) "threads" "threads"]
    :queues [(get @qp/queue-stats-history :total-queues) "queues" "queues"]
+   :queued-avg [(get @qp/queue-stats-history :total-queued) "queued" "tasks queued"]
+   :queued-sum [(get @qp/queue-stats-history :total-queued) "queued" "tasks queued" true]
    :workers [(get @qp/queue-stats-history :total-workers) "workers" "workers"]
-   :tasks [(get @qp/queue-stats-history :total-tasks) "tasks" "tasks"]})
+   :tasks [(get @qp/queue-stats-history :total-tasks) "tasks" "tasks" true]})
 
 (defn draw-stats
   ([]
    (ut/pp [:draw-stats-needs-help 
            (str "Hi. Draw what? " (clojure.string/join ", " (map str (keys (stats-keywords)))))]))
   ([kks & [freqs]]
-   (let [data-base (get (stats-keywords) kks)
+   (let [kksv (if (vector? kks) kks [kks])]
+    (doseq [kks kksv]
+      (let [data-base (get (stats-keywords) kks)
          ;;_ (ut/pp data-base)
          draw-it (fn [ff color data]
-                   (let [[data-vec kkey sym] data]
+                   (let [[data-vec kkey sym sum?] data]
                      (ut/pp (draw-bar-graph
                              (if (= ff 1)
                                data-vec
-                               (average-in-chunks data-vec ff))
-                             (str kkey " : " kks) sym :color color :freq ff))))
+                               (if sum? 
+                                 (sum-in-chunks data-vec ff)
+                                 (average-in-chunks data-vec ff)))
+                             (str kkey " : " kks) sym :color color :freq ff :agg (if sum? "sum" "avg")))))
          freqs (if (nil? freqs) [1 15 60] freqs)
          colors [:red :green :yellow
                  :blue :magenta :cyan
@@ -5717,7 +5773,7 @@
      (if data-base
        (doseq [ff freqs] (draw-it ff color data-base))
        (ut/pp [:draw-stats-needs-help 
-               (str kks "? Nope. Invalid data type, bro! Gimmie something: " (clojure.string/join ", " (map str (keys (stats-keywords)))))])))))
+               (str kks "? Nope. Invalid data type, bro! Gimmie something: " (clojure.string/join ", " (map str (keys (stats-keywords)))))])))))))
   
 
   (defn jvm-stats
@@ -5946,11 +6002,13 @@
           ;(ut/pp [:queue-party-stats (qp/get-queue-stats)])
 
           (draw-stats :cpu [1 15])
-          (draw-stats :load [1 15])
+          ;(draw-stats :load [1 15])
           (draw-stats :mem [1 15])
-          (draw-stats :msgs [1 15])
-          (draw-stats :queues [1 15])
-          (draw-stats :workers [1 15])
+          ;(draw-stats :msgs [1 15])
+;          (draw-stats :queues [1 15])
+          ;(draw-stats :workers [1 15])
+          ;(draw-stats :queued-sum [1 15])
+          ;(draw-stats :queued-avg [1 15])
 
           (let [ss (qp/get-queue-stats+)]
             (ut/pp [:queue-party-stats+ ss])
@@ -5961,7 +6019,7 @@
           ;; (draw-mem-stats)
           ;; (draw-msg-stats)
 
-        ;;(draw-pool-stats)
+        (draw-pool-stats nil [1 15])
 
 
               ;(ut/pp (draw-bar-graph @peer-usage "clients" "peers" :color :green))

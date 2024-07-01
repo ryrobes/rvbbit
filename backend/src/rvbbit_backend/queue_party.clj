@@ -24,6 +24,7 @@
 
 (def queue-stats-history (atom {:timestamp []
                                 :total-queues []
+                                :total-queued []
                                 :total-workers []
                                 :total-tasks []
                                 :total-resizes []}))
@@ -39,11 +40,11 @@
    :last-scaled (atom {})
    :resize-counts (atom {})
    :config (atom {:min-workers 1
-                  :max-workers 10 ;5
+                  :max-workers 20
                   :adjust-interval 5000
                   :scale-up-factor 2.0
                   :scale-down-factor 0.5
-                  :cooldown-period 30000 ;; 45000
+                  :cooldown-period 20000 ;; 45000
                   :serial-queues {}})})
 
 ;; Helper functions for safe queue access
@@ -121,15 +122,16 @@
                    (> (- current-time last-scaled-time) cooldown-period))
           (cond
             (and (> total-tasks (* scale-up-factor current-workers)) (< current-workers max-workers))
-            (let [new-workers (min (inc current-workers) max-workers)]
-              (ut/pp [:*scaling-workers-up queue-type id-keyword current-workers :> new-workers])
+            (let [boost 0
+                  new-workers (min (+ boost (inc current-workers)) max-workers)]
+              ;(ut/pp [:*scaling-workers-up queue-type id-keyword current-workers :> new-workers])
               (start-workers system queue-type id-keyword (- new-workers current-workers))
               (swap! (:last-scaled system) assoc-in [queue-type id-keyword] current-time)
               (swap! resize-counts update-in [queue-type id-keyword] (fnil inc 0)))
 
             (and (< total-tasks (* scale-down-factor current-workers)) (> current-workers min-workers))
             (let [new-workers (max (dec current-workers) min-workers)]
-              (ut/pp [:*scaling-workers-down queue-type id-keyword current-workers :> new-workers])
+              ;(ut/pp [:*scaling-workers-down queue-type id-keyword current-workers :> new-workers])
               (let [workers-to-remove (- current-workers new-workers)]
                 (stop-workers system queue-type id-keyword workers-to-remove))
               (swap! (:last-scaled system) assoc-in [queue-type id-keyword] current-time)
@@ -216,7 +218,8 @@
            current-time (System/currentTimeMillis)
            total-queues (reduce + (map (comp count second) @task-queues))
            total-workers (reduce + (map (fn [[_ queues]] (reduce + (map count (vals queues)))) @workers))
-           total-tasks (+ (reduce + (map (fn [[_ queues]] (reduce + (map safe-queue-size (vals queues)))) @task-queues))
+           total-queued (reduce + (map (fn [[_ queues]] (reduce + (map safe-queue-size (vals queues)))) @task-queues))
+           total-tasks (+ total-queued
                           (reduce + (map (fn [[_ queues]] (reduce + (map second queues))) @active-tasks)))
            total-resizes (reduce + (map (fn [[_ queues]] (reduce + (vals queues))) @resize-counts))]
 
@@ -225,6 +228,7 @@
                 (-> history
                     (update :timestamp conj current-time)
                     (update :total-queues conj total-queues)
+                    (update :total-queued conj total-queued)
                     (update :total-workers conj total-workers)
                     (update :total-tasks conj total-tasks)
                     (update :total-resizes conj total-resizes))))))))
@@ -265,6 +269,51 @@
                   :diff (format "%+d" (- total-workers total-queues))
                   :total-resizes total-resizes}
         :by-type by-type}))))
+
+;; (defn cleanup-inactive-queues
+;;   ([minutes]
+;;    (cleanup-inactive-queues :default minutes))
+;;   ([system-id minutes]
+;;    (when-let [system (get @queue-systems system-id)]
+;;      (let [{:keys [task-queues workers active-tasks last-scaled]} system
+;;            current-time (System/currentTimeMillis)
+;;            inactive-threshold (* minutes 60 1000) ; Convert minutes to milliseconds
+;;            queues-to-remove (atom {})]
+
+;;        ;; Identify inactive queues
+;;        (doseq [[queue-type queues] @task-queues]
+;;          (doseq [[id-keyword [queue last-access-time]] queues]
+;;            (when (> (- current-time last-access-time) inactive-threshold)
+;;              (swap! queues-to-remove update queue-type (fnil conj #{}) id-keyword))))
+
+;;        ;; Remove inactive queues and associated resources
+;;        (doseq [[queue-type ids] @queues-to-remove]
+;;          (doseq [id ids]
+;;            (try
+;;              ;; Remove from task-queues
+;;              (swap! task-queues update queue-type dissoc id)
+
+;;              ;; Stop and remove workers
+;;              (when-let [queue-workers (get-in @workers [queue-type id])]
+;;                (doseq [worker queue-workers]
+;;                  (when (future? worker)
+;;                    (future-cancel worker)))
+;;                (swap! workers update queue-type dissoc id))
+
+;;              ;; Remove from active-tasks
+;;              (swap! active-tasks update queue-type dissoc id)
+
+;;              ;; Remove from last-scaled
+;;              (swap! last-scaled update queue-type dissoc id)
+
+;;              (catch Exception e
+;;                (println "Error cleaning up queue:" queue-type id)
+;;                (.printStackTrace e)))))
+
+;;        ;; Return the number of removed queues
+;;        (let [removed-count (reduce + (map count (vals @queues-to-remove)))]
+;;          (ut/pp [:queue-party-housekeeping :cleaned-up removed-count :inactive-queues])
+;;          removed-count)))))
 
 (defn cleanup-inactive-queues
   ([minutes]

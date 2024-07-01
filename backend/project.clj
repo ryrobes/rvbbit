@@ -53,7 +53,7 @@
   :jvm-opts           ["--add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED" ;; suppresses warnings
                        ;;"-Xmx32g"  ;; "-Xmx64g" ;; testing with 64g on my main dev machine
                        "-Xmx64g" ;; testing with 64g on my main dev machine
-                       "-Xms16g" ;; testing
+                       ;"-Xms32g" ;; testing
                        "-XX:+UseG1GC"
                        "-XX:MaxGCPauseMillis=200"
                        "-Xss2048k" ;; testing with double the stack space to root out some flow-runner intermittent StackOverflow issue...

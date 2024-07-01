@@ -1323,7 +1323,7 @@
 
         no-room-for-3?      (and (not @hide-panel-2?) (<= (if vertical? bricks-tall bricks-wide) 27))
         no-room-for-2?      (and (not @hide-panel-3?) (<= (if vertical? bricks-tall bricks-wide) 19))
-        _ (ut/tapp>> [:no-room-for-2? no-room-for-2? :no-room-for-3? no-room-for-3?])
+        ;;_ (ut/tapp>> [:no-room-for-2? no-room-for-2? :no-room-for-3? no-room-for-3?])
         panel-count         (if system-panel? 3
                                 (if
                                  (or views? queries? runners?)
@@ -2110,7 +2110,7 @@
                  ;offset-last (if @hide-panel-2?)
                  single-width (+ single-width offset-last)
                  single-width-px (px single-width)] ;; when size is not cleanly mod/3 we need to add the extra offset
-             (ut/tapp>> [:panel-3 vertical? offset-last single-width single-height])
+             ;(ut/tapp>> [:panel-3 vertical? offset-last single-width single-height])
              [re-com/v-box
               ;:margin (if vertical? "5px")
               ;:style {:border "1px solid white"}
