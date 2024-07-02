@@ -23,6 +23,7 @@
 (defn strip-ansi-codes [s] (cstr/replace s #"\u001B\[[0-9;]*m" ""))
 
 (def repl-introspection-atom (ut/thaw-atom {} "./data/atoms/repl-introspection-atom.edn"))
+(defonce repl-introspection-child-atoms (atom {}))
 
 (defn logger [name edn]
   (let [dir         (str "./logs/" (str (java.time.LocalDate/now)) "/")

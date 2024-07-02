@@ -9967,24 +9967,24 @@
                 :justify :center
                 :attr {;:on-click #(js/alert (if tab "in container" "not in container"))
                        :on-context-menu #(when (not tab) (ut/tracked-dispatch [::toggle-icon-block brick-vec-key]))
-                  ;;:on-mouse-down   #(mouse-down-handler % brick-vec-key tab-offset true)
+                       ;;:on-mouse-down   #(mouse-down-handler % brick-vec-key tab-offset true)
                        :on-mouse-over   #(when (and (not @over-block?) (not (= brick-vec-key @over-block)))
                                            (reset! over-block brick-vec-key)
                                            (reset! over-block? true)) ;; took out enter for watched
                        :on-mouse-leave  #(do (reset! over-block? false) (reset! over-block nil))
-                       :on-double-click #(do (tag-screen-position %) (ut/tracked-dispatch [::launch-clone brick-vec-key]))} :style
-                (merge {:position         "fixed"
-                        :user-select      "none"
-                        :border           (cond selected? (str "2px solid " (theme-pull :theme/universal-pop-color "#9973e0"))
-                                                :else     "2px solid #ffffff05")
-                        :color            (theme-pull :theme/block-title-font-color nil)
-                        :cursor           "pointer"
-                        :z-index          zz
-                        :background-color (theme-pull :theme/base-block-color nil)
-                        :top              (px top)
-                        :left             (px left)}
-                       theme-base-block-style-map ;; just in case
-                       panel-style) :child [honeycomb-fragments vv icon-w icon-h]])
+                       :on-double-click #(do (tag-screen-position %) (ut/tracked-dispatch [::launch-clone brick-vec-key]))}
+                :style (merge {:position         "fixed"
+                               :user-select      "none"
+                               :border           (cond selected? (str "2px solid " (theme-pull :theme/universal-pop-color "#9973e0"))
+                                                       :else     "2px solid #ffffff05")
+                               :color            (theme-pull :theme/block-title-font-color nil)
+                               :cursor           "pointer"
+                               :z-index          zz
+                               :background-color (theme-pull :theme/base-block-color nil)
+                               :top              (px top)
+                               :left             (px left)}
+                              theme-base-block-style-map ;; just in case
+                              panel-style) :child [honeycomb-fragments vv icon-w icon-h]])
              (when (and (<= (/ left brick-size) bricks-wide) ;;; ??? problem wiht reacting with things offscreen?
                         (<= (/ top brick-size) bricks-high)
                         (not (cstr/starts-with? (str brick-vec-key) ":query-preview")))
@@ -10121,7 +10121,8 @@
                                  :padding-left "6px"} :child (str trunc-name)]) ;(str brick-vec-key " "
                                                                           ;trunc-name) ;(str
                       ^{:key (str "brick-" brick-vec "-header5")}
-                      (let [hovered-on? (or selected? (= brick-vec-key @over-block))]
+                      (let [hovered-on? (and (not @dragging-editor?)
+                                             (or selected? (= brick-vec-key @over-block)))]
                         [re-com/h-box :gap "5px" :children
                          [;;  (when (not selected?)
                           (when col-selected?
@@ -10147,7 +10148,7 @@
                              #(do (ut/tracked-dispatch [::toggle-icon-block brick-vec-key])
                                   (when selected? (ut/tracked-dispatch [::select-block "none!"]))
                                   (do (reset! over-block? false))) :style {:font-size "15px" :opacity 0.33 :cursor "pointer"}])
-                          (when (or selected? (= brick-vec-key @over-block))
+                          (when hovered-on?
                             ^{:key (str "brick-" brick-vec "-header-close")}
                             [re-com/md-icon-button :md-icon-name "zmdi-close" :on-click
                              #(do (ut/tracked-dispatch [::delete-panel brick-vec-key]) (do (reset! over-block? false))) :style
@@ -10162,9 +10163,11 @@
                      ^{:key (str "brick-" brick-vec-key "-dragger")}
                      [re-com/box :child " " :style {:background-color "#58A27933"}]
                      ^{:key (str "brick-" brick-vec-key "-honeycomb-box")}
-                     (if @dragging-block ;; @dragging? ;; dragging-block
+                     (if @dragging-block ;(or @dragging-editor? @dragging-block) ;; @dragging? ;; dragging-block
                        [re-com/box :child " "]
-                       [reecatch (if viz-reco? [honeycomb brick-vec-key selected-view] [honeycomb brick-vec-key])]))]
+                       [reecatch (if viz-reco? 
+                                   [honeycomb brick-vec-key selected-view] 
+                                     [honeycomb brick-vec-key])]))]
                   (if (or (and (not ghosted?) (not no-ui?)) selected?)
                     (let [] ;;  single-view? @(ut/tracked-subscribe [::is-single-view?
                       ^{:key (str "brick-" brick-vec "-footer")}

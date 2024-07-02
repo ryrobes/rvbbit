@@ -875,6 +875,7 @@
     "aaaaah-esday-the-day"
     "aaaaah-wednesday-the-day"
     "aaaah-wednesday-the-day"
+    "alarm-clock-tv"
     "alarm-clock1"
     "alarm-clock2"
     "alarm-clock22"
@@ -1036,30 +1037,45 @@
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
  :editor? true,
  :buffy? false,
- :memory [242562325 215444629 4294705152],
+ :memory [498841672 448601644 4294705152],
  :preview-keys [],
  :flow-subs
- [:solver/raw-custom-override-2031317346
-  :solver/raw-custom-override-2099661531
+ [:solver/raw-custom-override-2099661531
+  :solver-status/*client-name*>raw-custom-override-210407138>running?
   :solver/raw-custom-override1572444761
+  :solver-meta/raw-custom-override-2099661531
+  :solver/raw-custom-override-2031317346
+  :solver-status/*client-name*>raw-custom-override596631388>running?
+  :flow/flow-forever>*running?
+  :solver-meta/raw-custom-override-210407138
+  :repl-ns/repl-intellectual-cubic-elephant-42--raw-custom-override596631388
+  :repl-ns/repl-intellectual-cubic-elephant-42--raw-custom-override-1043853740
+  :solver-status/*client-name*>raw-custom-override-1043853740
   :solver/raw-custom-override-1736866437
   :solver/raw-custom-override-579076168
   :solver-status/*client-name*>raw-custom-override-2031317346>running?
-  :solver-status/*client-name*>raw-custom-override-2099661531>running?
-  :solver-status/*client-name*>raw-custom-override1572444761>running?
+  :repl-ns/repl-intellectual-cubic-elephant-42--raw-custom-override-210407138
+  :solver-status/*client-name*
+  :solver-status/*client-name*>raw-custom-override596631388
+  :solver/raw-custom-override596631388
   :solver-status/*client-name*>raw-custom-override-1736866437>running?
-  :solver-status/*client-name*>raw-custom-override-579076168>running?
-  :solver-status/*client-name*>raw-custom-override-2099661531
-  :solver-meta/raw-custom-override-2099661531
+  :solver/raw-custom-override-210407138
+  :solver-status/*client-name*>raw-custom-override1572444761>running?
   :solver-status/*client-name*>raw-custom-override1572444761
-  :solver-meta/raw-custom-override1572444761
-  :flow/flow-forever>*running?
   :flow/live-scratch-flow>*running?
-  :solver-status/*client-name*],
+  :solver-meta/raw-custom-override-1043853740
+  :solver-status/*client-name*>raw-custom-override-2099661531
+  :solver/raw-custom-override-1043853740
+  :solver-status/*client-name*>raw-custom-override-579076168>running?
+  :solver-status/*client-name*>raw-custom-override-1043853740>running?
+  :solver-status/*client-name*>raw-custom-override-210407138
+  :solver-meta/raw-custom-override596631388
+  :solver-status/*client-name*>raw-custom-override-2099661531>running?
+  :solver-meta/raw-custom-override1572444761],
  :client-name :intellectual-cubic-elephant-42,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2123, :h 1464},
+ :window {:w 2622, :h 1465},
  :post-meta
  {:ufo_sightings {},
   :gen-viz-797 {:* {:rowcount 317}},
@@ -1073,19 +1089,35 @@
  {:heartbeat
   {:kick
    [:solver/raw-custom-override-2099661531
+    :solver-status/*client-name*>raw-custom-override-210407138>running?
     :solver/raw-custom-override1572444761
     :solver-meta/raw-custom-override-2099661531
     :solver/raw-custom-override-2031317346
+    :solver-status/*client-name*>raw-custom-override596631388>running?
     :flow/flow-forever>*running?
+    :solver-meta/raw-custom-override-210407138
+    :repl-ns/repl-intellectual-cubic-elephant-42--raw-custom-override596631388
+    :repl-ns/repl-intellectual-cubic-elephant-42--raw-custom-override-1043853740
+    :solver-status/*client-name*>raw-custom-override-1043853740
     :solver/raw-custom-override-1736866437
     :solver/raw-custom-override-579076168
     :solver-status/*client-name*>raw-custom-override-2031317346>running?
+    :repl-ns/repl-intellectual-cubic-elephant-42--raw-custom-override-210407138
+    :solver-status/*client-name*
+    :solver-status/*client-name*>raw-custom-override596631388
+    :solver/raw-custom-override596631388
     :solver-status/*client-name*>raw-custom-override-1736866437>running?
+    :solver/raw-custom-override-210407138
     :solver-status/*client-name*>raw-custom-override1572444761>running?
     :solver-status/*client-name*>raw-custom-override1572444761
     :flow/live-scratch-flow>*running?
+    :solver-meta/raw-custom-override-1043853740
     :solver-status/*client-name*>raw-custom-override-2099661531
+    :solver/raw-custom-override-1043853740
     :solver-status/*client-name*>raw-custom-override-579076168>running?
+    :solver-status/*client-name*>raw-custom-override-1043853740>running?
+    :solver-status/*client-name*>raw-custom-override-210407138
+    :solver-meta/raw-custom-override596631388
     :solver-status/*client-name*>raw-custom-override-2099661531>running?
     :solver-meta/raw-custom-override1572444761]},
   :alert1 {:alerts :alert2}},
@@ -1103,16 +1135,16 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   11068
+   184689
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :base-sniff-queries {:ufo_sightings 484893751, :offenses -505802446},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 868052203,
+ :user-params-hash 318600367,
  :grid-recos? true,
  :preview-keys2 [],
- :session-hash -2010756815,
+ :session-hash 1151435892,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1867,9 +1899,23 @@
    :views {:param-val [:data-viewer :param/image-data]},
    :queries {}},
   :block-8532
-  {:name "block-8532",
+  {:clojure {:new-clojure-1 (do (rvbbit-backend.websockets/draw-stats :cpu))},
+   :name "block-8532",
    :w 17,
    :selected-mode {:new-create-image :clover},
+   :bash
+   {:new-bash
+    (let [process (.exec (Runtime/getRuntime) :clover-body)
+          reader (java.io.BufferedReader.
+                   (java.io.InputStreamReader. (.getInputStream process)))
+          output (StringBuilder.)]
+      (loop [line (.readLine reader)]
+        (when line
+          (.append output line)
+          (.append output "\n")
+          (recur (.readLine reader))))
+      (str output)),
+    :new-bash-1 ["top ; uname -all " ""]},
    :selected-view :new-create-image,
    :root [29 0],
    :h 10,
@@ -1877,25 +1923,8 @@
    :tab "star-shaped wallaby",
    :create-image
    {:new-create-image
-    ["Create a hyperrealistic image of a beautiful young full-figured, buxom woman in her late 20s, of Irish descent,    standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world.    A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty,  adding to her voluptuous charm and  pinup style."]},
-   :views
-   {:hi
-    [:box
-     :child
-     [:run-solver
-      {:signal false,
-       :cache? false,
-       :type :flow,
-       :data
-       {:flowmap "openai-image-gen-ladder3",
-        :opts
-        {:timeout 120000,
-         :retry-on-error? true,
-         :retries 20,
-         :overrides
-         {:prompt
-          "Create a      hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. It is raining. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity."}},
-        :return :hiccup-image-box-w-png}}]]}},
+    ["A highly detailed, exaggerated pinup style illustration, featuring a young, powerful, full-figured Scandinavian woman in her early 30s. She sports a full-face and long, flowing dark hair, buxom pinup build. The setting is in the picturesque wilderness of Cape Code America, under the teal and pink hues of a Cyberpunk-Vaporwave dusk. She stares confidently at the viewer, her allure intensified by dramatic lighting and dark makeup. A sly, playful smile dances on her lips, contributing to a mystical and alluring aura. Intricate and ornate tattoos adorn her shoulders, collarbone, and gracefully ascend to her neck, each one representing a unique story. She is seen with a rabbit pendant around her neck, and similar rabbit motifs are subtly integrated within her tattoos. The image beautifully juxtaposes the elements of wonder, mystery, and temptation in a radiant sunrise....  .   "]},
+   :views {}},
   :block-8262
   {:clojure
    {:new-clojure
@@ -2093,7 +2122,7 @@
    "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently.   The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity. ",
    :selected-view [:create-image :new-create-image],
    :selected-view-data
-   ["Create a hyperrealistic image of a beautiful young full-figured, buxom woman in her late 20s, of Irish descent,    standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world.    A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty,  adding to her voluptuous charm and  pinup style."],
+   ["Create a hyperrealistic image of a beautiful young full-figured, buxom woman in her late 20s, of Irish descent,    standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently. The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world.        A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty,  adding to her voluptuous charm and  pinup style  ."],
    :selected-block :block-8532},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
@@ -2220,33 +2249,16 @@
   :sys {:selected-tab "star-shaped wallaby", :selected-tab-idx 3},
   :solver
   {:raw-custom-override1572444761
-   [:v-box
-    :padding
-    "10px"
-    :gap
-    "8px"
-    :width
-    :width-px
-    :style
-    {:background-color "#242d3b",
-     :border-radius "20px",
-     :font-size "12px",
-     :font-weight 700,
-     :color "#cc9ee3"}
-    :children
-    [[:box :child "./images/gen/b64-image3-89988-14658.png"]
-     [:box
-      :size
-      "auto"
-      :child
-      [:img
-       {:src "./images/gen/b64-image3-89988-14658.png",
-        :style {:border-radius "30px"}}]]]],
+   {:error
+    {:error "This request has been blocked by our content filters.",
+     :class "class clojure.lang.ExceptionInfo"},
+    :class "class clojure.lang.ExceptionInfo"},
    :raw-custom-override-2099661531
    {:error
     {:error "This request has been blocked by our content filters.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override-210407138 nil,
    :raw-custom-override-2070279978
    [:v-box
     :padding
@@ -2294,6 +2306,7 @@
      "Your request was rejected as a result of our safety system. Image descriptions generated from your prompt may contain text that is not allowed by our safety system. If you believe this was done in error, your request may succeed if retried, or by adjusting your prompt.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override-1043853740 "",
    :raw-custom-override-579076168
    {:error
     {:error "This request has been blocked by our content filters.",
@@ -2321,6 +2334,7 @@
       :child
       [:img
        {:src "./images/gen/b64-image3-82235-63107.png",
-        :style {:border-radius "30px"}}]]]]}},
+        :style {:border-radius "30px"}}]]]],
+   :raw-custom-override596631388 nil}},
  :selected-flow "live-scratch-flow",
  :post-condi {:c345-up-or-down? [{:v 0}]}}

@@ -8,7 +8,7 @@
    :return nil}},
  :wallpaper-of-the-moment-8k
  {:signal :signal/every-5-minutes,
-  :type :clojure2,
+  :type :clojure,
   :cache? false,
   :data
   (do
@@ -113,7 +113,7 @@
     (clojure.java.io/copy in-file out-file)))},
  :vibrant-antelope-solver
  {:signal :signal/cool-raccoon-signal-yo,
-  :type :clojure2,
+  :type :clojure,
   :data (+ 1 2 3 88 (rand-int 1234))},
  :sql-snapshot-solver-1
  {:signal :signal/every-5-minutes,

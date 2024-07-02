@@ -34,9 +34,10 @@
 
 
 
-
+(def active-edge (reagent/atom nil))
 (defonce editor-dimensions (reagent/atom {}))
 (defonce editor-size (reagent/atom [33 10]))
+(defonce last-sizes (atom nil))
 
 (defn debounce [f interval] (let [dbnc (Debouncer. f interval)] (fn [& args] (.apply (.-fire dbnc) dbnc (to-array args)))))
 
@@ -55,19 +56,53 @@
           start-y (.-clientY evt)
           off-x   (:x offset)
           off-y   (:y offset)
-          x       (- start-x off-x) ;
+          x       (- start-x off-x)
           y       (- start-y off-y)]
+      (ut/tapp>> (str @detached-coords))
       (reset! detached-coords [x y]))))
+
+(defn mutate-editor-as-edge [edge]
+  (let [hh @(ut/tracked-subscribe [::subs/h])
+        ww @(ut/tracked-subscribe [::subs/w])
+        bb bricks/brick-size]
+    (reset! last-sizes @editor-size) ;; save the old config
+    (case edge
+      :left (let [bw (Math/floor (* (/ ww bb) 0.3))
+                  bh (- (Math/floor (/ hh bb)) 2)] 
+              (reset! detached-coords [0 bb])
+                (reset! editor-size [bw bh])) 
+      :right (let [bw (Math/floor (* (/ ww bb) 0.3))
+                   bwpx (* bw bb)
+                   bh (- (Math/floor (/ hh bb)) 2)]
+               (reset! detached-coords [(- ww bwpx) bb])
+               (reset! editor-size [bw bh]))
+      :top (let [bw (- (Math/floor (/ ww bb)) 2)
+                 bh (* (Math/floor (/ hh bb)) 0.3)]
+             (reset! detached-coords [bb 32])
+             (reset! editor-size [bw bh]))
+      :bottom (let [bw (- (Math/floor (/ ww bb)) 2)
+                    bh (* (Math/floor (/ hh bb)) 0.3)]
+                (reset! detached-coords [bb (- (- hh 36) (* bh bb))])
+                (reset! editor-size [bw bh])))
+  ))
 
 (defn mouse-up-handler
   [on-move]
-  (fn me [evt] (reset! bricks/dragging-editor? false) (do (gevents/unlisten js/window EventType.MOUSEMOVE on-move))))
+  (fn me [evt] 
+    (reset! bricks/dragging-editor? false) 
+    (when @active-edge 
+      (do (mutate-editor-as-edge @active-edge)
+          (reset! active-edge nil)))
+    (do (gevents/unlisten js/window EventType.MOUSEMOVE on-move))))
 
 (defn mouse-down-handler
   [e]
   (let [{:keys [left top]} (bricks/get-client-rect e)
         offset             {:x (- (.-clientX e) left) :y (- (.-clientY e) top)}
         on-move            (mouse-move-handler offset)]
+    (when @last-sizes (do
+                        (reset! editor-size @last-sizes)
+                        (reset! last-sizes nil)))
     (reset! bricks/dragging-editor? true)
     (do (gevents/listen js/window EventType.MOUSEMOVE on-move))
     (gevents/listen js/window EventType.MOUSEUP (mouse-up-handler on-move))))
@@ -1295,6 +1330,181 @@
 (defonce hide-panel-2? (reagent/atom false))
 (defonce hide-panel-3? (reagent/atom false))
 
+;; (defn docker-edges [bricks-wide bricks-tall]
+;;   (let [cc (theme-pull :theme/editor-outer-rim-color nil)
+;;         ccc (count cc)
+;;         cc (str (if (> ccc 7) (subs cc 0 7) cc) 45)
+;;         [x y] @detached-coords
+;;         xb (Math/floor (/ x bricks/brick-size))
+;;         yb (Math/floor (/ y bricks/brick-size))
+;;         near? (<= xb 2)
+;;         inside? (and (= xb 0) (or (>= yb 1) (<= yb (- bricks-tall 2))))]
+;;     (when near?
+;;       [re-com/h-box
+;;        :children [[re-com/box
+;;                    :align :center :justify :center
+;;                    :child " " ;;(str xb " " yb)
+;;                    :style {:background-color (if inside?  "#ffffff88" "#00000085")
+;;                            :color "#ffffff"
+;;                            :backdrop-filter "blur(4px)"
+;;                            :border           (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
+;;                            :position "fixed"
+;;                            :box-shadow     "0px -5px 5px 0px #00000099"
+;;                            :z-index 9999999
+;;                            :background-image (str "linear-gradient(0deg, " cc " 2px, transparent 8px), linear-gradient(90deg, " cc " 2px, transparent 8px)")
+;;                            :background-size  (str "50px 50px, 50px 50px")
+;;                            :left 0
+;;                            :border-radius "0px 12px 12px 0px"
+;;                            :height (* (- bricks-tall 2) bricks/brick-size)
+;;                            :width bricks/brick-size
+;;                            :top bricks/brick-size}]]])))
+
+
+
+;; (defn edge-properties [edge bricks-wide bricks-tall]
+;;   (case edge
+;;     :left   {:width bricks/brick-size
+;;              :height (* (- bricks-tall 2) bricks/brick-size)
+;;              :top bricks/brick-size
+;;              :left 0
+;;              :border-radius "0px 12px 12px 0px"
+;;              :near? #(<= (first %) 2)
+;;              :inside? #(and (= (first %) 0) (or (>= (second %) 1) (<= (second %) (- bricks-tall 2))))}
+;;     :right  {:width bricks/brick-size
+;;              :height (* (- bricks-tall 2) bricks/brick-size)
+;;              :top bricks/brick-size
+;;              :right 0
+;;              :border-radius "12px 0px 0px 12px"
+;;              :near? #(>= (first %) (- bricks-wide 3))
+;;              :inside? #(and (= (first %) (dec bricks-wide)) (or (>= (second %) 1) (<= (second %) (- bricks-tall 2))))}
+;;     :top    {:width (* (- bricks-wide 2) bricks/brick-size)
+;;              :height bricks/brick-size
+;;              :top 0
+;;              :left bricks/brick-size
+;;              :border-radius "0px 0px 12px 12px"
+;;              :near? #(<= (second %) 2)
+;;              :inside? #(and (= (second %) 0) (or (>= (first %) 1) (<= (first %) (- bricks-wide 2))))}
+;;     :bottom {:width (* (- bricks-wide 2) bricks/brick-size)
+;;              :height bricks/brick-size
+;;              :bottom 0
+;;              :left bricks/brick-size
+;;              :border-radius "12px 12px 0px 0px"
+;;              :near? #(>= (second %) (- bricks-tall 3))
+;;              :inside? #(and (= (second %) (dec bricks-tall)) (or (>= (first %) 1) (<= (first %) (- bricks-wide 2))))}))
+
+;; (defn docker-edge [edge bricks-wide bricks-tall]
+;;   (let [cc (theme-pull :theme/editor-outer-rim-color nil)
+;;         ccc (count cc)
+;;         ccx (if (> ccc 7) (subs cc 0 7) cc)
+;;         cc (str ccx 45)
+;;         [x y] @detached-coords
+;;         xb (Math/floor (/ x bricks/brick-size))
+;;         yb (Math/floor (/ y bricks/brick-size))
+;;         props (edge-properties edge bricks-wide bricks-tall)
+;;         near? ((:near? props) [xb yb])
+;;         inside? ((:inside? props) [xb yb])]
+;;     (when near?
+;;       [re-com/box
+;;        :align :center :justify :center
+;;        :child " "
+;;        :style (merge
+;;                {:background-color (if inside? (str ccx 88) "#00000085")
+;;                 :color "#ffffff"
+;;                 :backdrop-filter "blur(4px)"
+;;                 :border (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
+;;                 :position "fixed"
+;;                 :box-shadow "0px -5px 5px 0px #00000099"
+;;                 :z-index 9999999
+;;                 :background-image (str "linear-gradient(0deg, " cc " 2px, transparent 8px), linear-gradient(90deg, " cc " 2px, transparent 8px)")
+;;                 :background-size (str "50px 50px, 50px 50px")
+;;                 :transition "all 0.3s ease-in-out"}
+;;                (select-keys props [:width :height :top :bottom :left :right :border-radius]))])))
+
+;;   (defn docker-edges [bricks-wide bricks-tall]
+;;     [re-com/h-box
+;;      :children [[docker-edge :left bricks-wide bricks-tall]
+;;                 [docker-edge :right bricks-wide bricks-tall]
+;;                 [docker-edge :top bricks-wide bricks-tall]
+;;                 [docker-edge :bottom bricks-wide bricks-tall]]])
+
+
+
+
+
+(defn edge-properties [edge bricks-wide bricks-tall]
+  (case edge
+    :left   {:width bricks/brick-size
+             :height (* (- bricks-tall 2) bricks/brick-size)
+             :top bricks/brick-size
+             :left 0
+             :border-radius "0px 12px 12px 0px"
+             :near? #(<= (first %) 2)
+             :inside? #(and (= (first %) 0) (or (>= (second %) 1) (<= (second %) (- bricks-tall 2))))}
+    :right  {:width bricks/brick-size
+             :height (* (- bricks-tall 2) bricks/brick-size)
+             :top bricks/brick-size
+             :right 0
+             :border-radius "12px 0px 0px 12px"
+             :near? #(>= (first %) (- bricks-wide 3))
+             :inside? #(and (= (first %) (dec bricks-wide)) (or (>= (second %) 1) (<= (second %) (- bricks-tall 2))))}
+    :top    {:width (* (- bricks-wide 2) bricks/brick-size)
+             :height bricks/brick-size
+             :top 0
+             :left bricks/brick-size
+             :border-radius "0px 0px 12px 12px"
+             :near? #(<= (second %) 2)
+             :inside? #(and (= (second %) 0) (or (>= (first %) 1) (<= (first %) (- bricks-wide 2))))}
+    :bottom {:width (* (- bricks-wide 2) bricks/brick-size)
+             :height bricks/brick-size
+             :bottom 0
+             :left bricks/brick-size
+             :border-radius "12px 12px 0px 0px"
+             :near? #(>= (second %) (- bricks-tall 3))
+             :inside? #(and (= (second %) (dec bricks-tall)) (or (>= (first %) 1) (<= (first %) (- bricks-wide 2))))}))
+
+(defn docker-edge [edge bricks-wide bricks-tall]
+  (let [cc (theme-pull :theme/editor-outer-rim-color nil)
+        ccc (count cc)
+        ccx (if (> ccc 7) (subs cc 0 7) cc)
+        cc (str ccx 45)
+        [x y] @detached-coords
+        xb (Math/floor (/ x bricks/brick-size))
+        yb (Math/floor (/ y bricks/brick-size))
+        props (edge-properties edge bricks-wide bricks-tall)
+        near? ((:near? props) [xb yb])
+        inside? ((:inside? props) [xb yb])]
+    ;; Update the active-edge atom based on inside? status
+    (when inside?
+      (reset! active-edge edge))
+    (when (and (not inside?) (= @active-edge edge))
+      (reset! active-edge nil))
+    (when near?
+      [re-com/box
+       :align :center :justify :center
+       :child " "
+       :style (merge
+               {:background-color (if inside? (str ccx 88) "#00000085")
+                :color "#ffffff"
+                :backdrop-filter "blur(4px)"
+                :border (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil))
+                :position "fixed"
+                :box-shadow "0px -5px 5px 0px #00000099"
+                :z-index 9999999
+                :background-image (str "linear-gradient(0deg, " cc " 2px, transparent 8px), linear-gradient(90deg, " cc " 2px, transparent 8px)")
+                :background-size (str "50px 50px, 50px 50px")
+                :transition "all 0.3s ease-in-out"}
+               (select-keys props [:width :height :top :bottom :left :right :border-radius]))])))
+
+(defn docker-edges [bricks-wide bricks-tall]
+  [re-com/h-box
+   :children [[docker-edge :left bricks-wide bricks-tall]
+              [docker-edge :right bricks-wide bricks-tall]
+              [docker-edge :top bricks-wide bricks-tall]
+              [docker-edge :bottom bricks-wide bricks-tall]]])
+
+ 
+
+
 (defn editor-panel
   [bricks-wide bricks-tall]
   (let [selected-panel-map  @(ut/tracked-subscribe [::bricks/selected-block-map])
@@ -1394,12 +1604,13 @@
      [(if vertical? re-com/v-box re-com/h-box)
       :size "none"
       :children
+
       (if @bricks/dragging-editor?
 
         [(let [coord-str (str (mapv Math/floor @editor-size))
                min? (= coord-str "[10 10]")]
            [re-com/box
-            :child (str coord-str (when min? " (minimum size)"))
+            :child (str coord-str @active-edge (when min? " (minimum size)"))
             :style {:user-select "none"
                     :font-size "33px"
                     :font-family (theme-pull :theme/base-font nil)}
@@ -2945,8 +3156,12 @@
                     :background-size  (str "50px 50px, 50px 50px"
                                            (when (get custom-map :background-size) ", ")
                                            (get custom-map :background-size))}))) :children
-        [[bricks/reecatch [tab-menu]] [bricks/reecatch [snapshot-menu]] (when session? [session-modal])
-         (when (and editor? (not @bricks/mouse-dragging-panel?)) 
+        [[bricks/reecatch [tab-menu]]
+         [bricks/reecatch [snapshot-menu]]
+         (when @bricks/dragging-editor? 
+           [bricks/reecatch [docker-edges (Math/floor (/ ww bricks/brick-size)) (Math/floor (/ hh bricks/brick-size))]])
+         (when session? [session-modal])
+         (when (and editor? (not @bricks/mouse-dragging-panel?))
            ;;[bricks/reecatch [editor-panel 33 10]]
            [bricks/reecatch [editor-panel (get @editor-size 0) (get @editor-size 1)]]
            ;;[bricks/reecatch [editor-panel 46 22]]
@@ -3094,10 +3309,10 @@
                                                :timeout 50000}]))]]])])]]
          (let [mem @(ut/tracked-subscribe [::bricks/memory])]
            [re-com/box :size "none" :style {:position "fixed" :left 2 :bottom 20 :font-weight 700 :color "#ffffff99"} :child
-            (str (ut/bytes-to-mb (get mem 1)) 
+            (str (ut/bytes-to-mb (get mem 1))
                  ;;(str " (lazy-grid? " (not (or @bricks/param-hover @bricks/query-hover)) ")")
                  )])
-         [bricks/reecatch [task-bar]] 
+         [bricks/reecatch [task-bar]]
          [bricks/reecatch [flows/alert-box]]
          [re-com/box :child
           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-labels" :tooltip "toggle display mode" :on-click

@@ -29,6 +29,8 @@
                                 :total-tasks []
                                 :total-resizes []}))
 
+(def queue-specific-stats-history (atom {}))
+
 (def ^:private queue-systems (atom {}))
 
 (defn create-queue-system []
@@ -232,6 +234,38 @@
                     (update :total-workers conj total-workers)
                     (update :total-tasks conj total-tasks)
                     (update :total-resizes conj total-resizes))))))))
+
+(defn update-specific-queue-stats-history
+  ([queue-names]
+   (update-specific-queue-stats-history :default queue-names))
+  ([system-id queue-names]
+   (when-let [system (get @queue-systems system-id)]
+     (let [{:keys [task-queues workers active-tasks resize-counts]} system
+           current-time (System/currentTimeMillis)]
+
+       (swap! queue-specific-stats-history
+              (fn [history]
+                (reduce (fn [acc queue-name]
+                          (let [queues (get @task-queues queue-name {})
+                                queue-workers (get @workers queue-name {})
+                                queue-active-tasks (get @active-tasks queue-name {})
+                                queue-resizes (get @resize-counts queue-name {})
+                                total-queues (count queues)
+                                total-workers (reduce + (map count (vals queue-workers)))
+                                total-queued (reduce + (map safe-queue-size (vals queues)))
+                                total-active (reduce + (map second queue-active-tasks))
+                                total-tasks (+ total-queued total-active)
+                                total-resizes (reduce + (vals queue-resizes))]
+
+                            (-> acc
+                                (update-in [queue-name :timestamp] (fnil conj []) current-time)
+                                (update-in [queue-name :total-queues] (fnil conj []) total-queues)
+                                (update-in [queue-name :total-queued] (fnil conj []) total-queued)
+                                (update-in [queue-name :total-workers] (fnil conj []) total-workers)
+                                (update-in [queue-name :total-tasks] (fnil conj []) total-tasks)
+                                (update-in [queue-name :total-resizes] (fnil conj []) total-resizes))))
+                        history
+                        queue-names)))))))
 
 (defn get-queue-stats+
   ([]
