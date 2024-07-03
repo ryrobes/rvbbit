@@ -6,6 +6,27 @@
   {:flowmap "node-color-thief-js-webp",
    :opts {:overrides {:image-path :solver/wallpaper-of-the-moment}},
    :return nil}},
+ :all-large-webp-files
+ {:signal false,
+  :type :clojure,
+  :cache? true,
+  :data
+  (let
+   [dir
+    "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+    rel-dir
+    "./images/large/"
+    files
+    (->>
+     (file-seq (clojure.java.io/file dir))
+     (filter (fn [x] (.isFile x)))
+     (filter
+      (fn
+       [x]
+       (not (clojure.string/includes? (str (.getName x)) "8k"))))
+     (map (fn [x] (.getName x))))]
+   (println (count files))
+   (vec (for [f files] {:filename (str f)})))},
  :wallpaper-of-the-moment-8k
  {:signal :signal/every-5-minutes,
   :type :clojure,

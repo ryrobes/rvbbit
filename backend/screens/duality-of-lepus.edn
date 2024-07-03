@@ -1,31 +1,389 @@
 {:orders
- {:setlists (:query_error),
-  :shows (:query_error),
+ {:fields-sys [:field_name :field_type :data_type],
   :setlists-drag-2 [:show_id :song_name :song_order :ts],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :gen-viz-797 [:rows :date_posted],
+  :gen-viz-94 [:diff],
+  :DISTRICT-drag-37 [:DISTRICT :rowcnt],
+  :large-bgss [:ffilename],
+  :shows (:query_error),
+  :offenses-drag-24
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Location
+   :Long
+   :MONTH
+   :OCCURRED_ON_DATE
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :SHOOTING
+   :STREET
+   :UCR_PART
+   :YEAR],
+  :rowcnt-drag-2 [:rowcnt_sum],
+  :offenses-drag-26
+  [:DAY_OF_WEEK
+   :DISTRICT
+   :HOUR
+   :INCIDENT_NUMBER
+   :Lat
+   :Location
+   :Long
+   :MONTH
+   :OCCURRED_ON_DATE
+   :OFFENSE_CODE
+   :OFFENSE_CODE_GROUP
+   :OFFENSE_DESCRIPTION
+   :REPORTING_AREA
+   :SHOOTING
+   :STREET
+   :UCR_PART
+   :YEAR],
+  :gen-viz-828 [:agg :date_posted],
+  :ufo_sightings (:query_error),
+  :offenses (:query_error),
   :shows-drag-22 [:location :show_date :show_id :show_name :title :tour_name :ts],
-  :song-name-drag-43 [:song_name :rowcnt]},
+  :gen-viz-84 [:rows :country],
+  :connections-sys [:database_name :connection_id],
+  :ufo-sightings-drag-9
+  [:city
+   :country
+   :date_posted
+   :datetime
+   :duration_hours
+   :duration_seconds
+   :duration_seconds_int
+   :latitude
+   :longitude
+   :shape
+   :state],
+  :duration-hours-drag-43 [:duration_hours :rowcnt],
+  :city-drag-26 [:city :rowcnt],
+  :state-drag-3 [:state :rowcnt],
+  :shape-drag-7 [:shape :rowcnt],
+  :setlists (:query_error)},
  :reco-preview nil,
  :sql-source
- {:setlists
-  {:select [:*], :connection-id "system-db", :from [:setlists], :limit 111},
-  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
-  :setlists-drag-2
+ {:setlists-drag-2
   {:select [:show_id :song_name :song_order :ts],
    :from [[:setlists :hh333]],
    :_last-run "21:30:41"},
+  :gen-viz-797
+  {:select [[[:count 1] :rows] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:date_posted]},
+  :gen-viz-94
+  {:select
+   [[[:max [:round [:raw ["(100 * ((" nil ".0 - " nil ".0) / " nil ".0))"]] 2]]
+     :diff]],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}]},
+  :DISTRICT-drag-37
+  {:select [:DISTRICT [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:DAY_OF_WEEK
+       :DISTRICT
+       :HOUR
+       :INCIDENT_NUMBER
+       :Lat
+       :Location
+       :Long
+       :MONTH
+       :OCCURRED_ON_DATE
+       :OFFENSE_CODE
+       :OFFENSE_CODE_GROUP
+       :OFFENSE_DESCRIPTION
+       :REPORTING_AREA
+       :SHOOTING
+       :STREET
+       :UCR_PART
+       :YEAR],
+      :from [[:offenses :ff277]]}
+     :cc125]],
+   :group-by [:DISTRICT],
+   :order-by [[:rowcnt :desc]]},
+  :large-bgss
+  {:select [:*],
+   :order-by [1],
+   :from
+   [{:data
+     (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+           rel-dir " ./images/large/"
+           files (->>
+                   (file-seq (clojure.java.io/file dir))
+                   (filter (fn [x] (.isFile x)))
+                   (filter
+                     (fn [x]
+                       (not (clojure.string/includes? (str (.getName x)) "8k"))))
+                   (map (fn [x] (.getName x))))]
+       (println (count files))
+       (vec (for [f files] {:ffilename (str f)})))}],
+   :page 3,
+   :_last-run "03:02:01"},
+  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
+  :offenses-drag-24
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Location
+    :Long
+    :MONTH
+    :OCCURRED_ON_DATE
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :SHOOTING
+    :STREET
+    :UCR_PART
+    :YEAR],
+   :from [[:offenses :dd484]]},
+  :rowcnt-drag-2
+  {:select [[[:sum :rowcnt] :rowcnt_sum]],
+   :from
+   [[{:select [:city [[:count 1] :rowcnt]],
+      :from
+      [[{:select
+         [:city
+          :country
+          :date_posted
+          :datetime
+          :duration_hours
+          :duration_seconds
+          :duration_seconds_int
+          :latitude
+          :longitude
+          :shape
+          :state],
+         :from [[:ufo_sightings :jj584]],
+         :order-by [[:city :asc]]}
+        :ff571]],
+      :group-by [:city],
+      :order-by [[:rowcnt :desc]]}
+     :yy403]]},
+  :offenses-drag-26
+  {:select
+   [:DAY_OF_WEEK
+    :DISTRICT
+    :HOUR
+    :INCIDENT_NUMBER
+    :Lat
+    :Location
+    :Long
+    :MONTH
+    :OCCURRED_ON_DATE
+    :OFFENSE_CODE
+    :OFFENSE_CODE_GROUP
+    :OFFENSE_DESCRIPTION
+    :REPORTING_AREA
+    :SHOOTING
+    :STREET
+    :UCR_PART
+    :YEAR],
+   :from [[:offenses :ff277]]},
+  :gen-viz-828
+  {:select [[[[:count 1]] :agg] :date_posted],
+   :from
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :order-by [[:date_posted :desc]],
+   :group-by [:date_posted]},
+  :ufo_sightings
+  {:select [:*], :connection-id "system-db", :from [:ufo_sightings], :limit 111},
+  :offenses
+  {:select [:*], :connection-id "system-db", :from [:offenses], :limit 111},
   :shows-drag-22
   {:select [:location :show_date :show_id :show_name :title :tour_name :ts],
    :from [[:shows :pp193]],
    :_last-run "21:30:26"},
-  :song-name-drag-43
-  {:select [:song_name [[:count 1] :rowcnt]],
+  :gen-viz-84
+  {:select [[[:count 1] :rows] :country],
    :from
-   [[{:select [:show_id :song_name :song_order :ts], :from [[:setlists :hh333]]}
-     :qq331]],
-   :group-by [:song_name],
-   :order-by [[:rowcnt :desc]]}},
+   [{:select
+     [:city
+      :country
+      :date_posted
+      :datetime
+      :duration_hours
+      :duration_seconds
+      :duration_seconds_int
+      :latitude
+      :longitude
+      :shape
+      :state],
+     :from [[:ufo_sightings :jj584]],
+     :order-by [[:city :asc]]}],
+   :group-by [:country]},
+  :ufo-sightings-drag-9
+  {:select
+   [:city
+    :country
+    :date_posted
+    :datetime
+    :duration_hours
+    :duration_seconds
+    :duration_seconds_int
+    :latitude
+    :longitude
+    :shape
+    :state],
+   :from [[:ufo_sightings :jj584]],
+   :order-by [[:city :asc]]},
+  :duration-hours-drag-43
+  {:select [:duration_hours [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :cc350]],
+   :group-by [:duration_hours],
+   :order-by [[:rowcnt :desc]]},
+  :city-drag-26
+  {:select [:city [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :ff571]],
+   :group-by [:city],
+   :order-by [[:rowcnt :desc]]},
+  :state-drag-3
+  {:select [:state [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :uu58]],
+   :group-by [:state],
+   :order-by [[:rowcnt :desc]]},
+  :shape-drag-7
+  {:select [:shape [[:count 1] :rowcnt]],
+   :from
+   [[{:select
+      [:city
+       :country
+       :date_posted
+       :datetime
+       :duration_hours
+       :duration_seconds
+       :duration_seconds_int
+       :latitude
+       :longitude
+       :shape
+       :state],
+      :from [[:ufo_sightings :jj584]],
+      :order-by [[:city :asc]]}
+     :hh354]],
+   :group-by [:shape],
+   :order-by [[:rowcnt :desc]]},
+  :setlists
+  {:select [:*], :connection-id "system-db", :from [:setlists], :limit 111}},
+ :audio-playing? false,
  :meta
- {:setlists-drag-2
+ {:fields-sys
+  {:fields
+   {:field_name
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"ts" 1, "tour_name" 1, "title" 1},
+     :cardinality 100},
+    :field_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"TEXT" 6, "TIMESTAMP" 1},
+     :cardinality 28},
+    :data_type
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"string" 6, "datetime" 1},
+     :cardinality 28}},
+   :rowcount 7},
+  :setlists-drag-2
   {:fields
    {:show_id
     {:data-type "string",
@@ -55,6 +413,45 @@
      :commons {"2023-09-24 19:19:12" 500},
      :cardinality 0}},
    :rowcount 500},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 7},
+     :cardinality 14},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 7},
+     :cardinality 14},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"met-on-tour" 7},
+     :cardinality 14},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 7},
+     :cardinality 14},
+    :table_name
+    {:data-type "string",
+     :distinct 7,
+     :group-by? true,
+     :commons {"tracks" 1, "shows" 1, "setlists" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 5,
+     :group-by? false,
+     :commons {8 2, 5 2, 12 1},
+     :cardinality 71}},
+   :rowcount 7},
   :gen-viz-797
   {:fields
    {:rows
@@ -94,6 +491,18 @@
      :commons {35717 1, 1765 1, 23460 1},
      :cardinality 100}},
    :rowcount 13},
+  :large-bgss
+  {:fields
+   {:ffilename
+    {:data-type "string",
+     :distinct 500,
+     :group-by? true,
+     :commons
+     {"b64-image-31549-41819-4k.webp" 1,
+      "b64-image-83886-74618-4k.webp" 1,
+      "b64-image-34647-16558-4k.webp" 1},
+     :cardinality 100}},
+   :rowcount 500},
   :shows
   {:fields
    {:query_error
@@ -359,6 +768,29 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :ufo_sightings
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: ufo_sightings)"
+      1},
+     :cardinality 100}},
+   :rowcount 2},
+  :offenses
+  {:fields
+   {:query_error
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons
+     {"(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: offenses)" 1},
+     :cardinality 100}},
+   :rowcount 2},
   :shows-drag-22
   {:fields
    {:location
@@ -425,6 +857,21 @@
      :commons {"us" 1, "gb" 1, "de" 1},
      :cardinality 100}},
    :rowcount 6},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 5, "SQLite" 4, "*csv-import-db*" 1},
+     :cardinality 30},
+    :connection_id
+    {:data-type "string",
+     :distinct 10,
+     :group-by? true,
+     :commons {"imported" 1, "bigfoot-ufos" 1, "snifftmp1" 1},
+     :cardinality 100}},
+   :rowcount 10},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -528,21 +975,6 @@
      :cardinality 23}},
    :rowcount 500},
   :reco-counts {:fields {}, :rowcount 0},
-  :song-name-drag-43
-  {:fields
-   {:song_name
-    {:data-type "string",
-     :distinct 194,
-     :group-by? true,
-     :commons {"The Mechanix" 1, "My Friend of Misery" 1, "The Small Hours" 1},
-     :cardinality 100},
-    :rowcnt
-    {:data-type "integer",
-     :distinct 103,
-     :group-by? false,
-     :commons {1 33, 2 19, 4 9},
-     :cardinality 53}},
-   :rowcount 194},
   :state-drag-3
   {:fields
    {:state
@@ -585,10 +1017,22 @@
      :cardinality 100}},
    :rowcount 2}},
  :default-col-widths
- {:block-198 {:setlists-drag-2 102},
+ {:block-11609 {:city-drag-26 180},
+  :block-7416 {:rowcnt-drag-2 161},
+  :block-198 {:setlists-drag-2 102},
+  :block-7138 {:DISTRICT-drag-37 180},
   :block-8963 {:shows-drag-22 108},
+  :block-8805 {:duration-hours-drag-43 180},
+  :system-connections-list* {:connections-sys 100},
+  :system-fields-list* {:fields-sys 170},
+  :block-7319 {:shape-drag-7 180},
   :block-10615 {:song-name-drag-43 105},
-  :virtual-panel {:kick-1651958766 511}},
+  :block-3777 {:state-drag-3 180},
+  :block-2361 {:large-bgs 122, :large-bgss 311},
+  :block-1449 {:ufo-sightings-drag-9 141},
+  :system-tables-list* {:tables-sys 100},
+  :block-3392 {:offenses-drag-26 100},
+  :block-4346 {:offenses-drag-24 100}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -596,7 +1040,8 @@
   "fat zebra"
   "star-shaped wallaby"
   "globular koala"
-  "azure oyster"],
+  "azure oyster"
+  "fat hawk"],
  :selected-cols nil,
  :server
  {:settings
@@ -657,7 +1102,7 @@
       {:color "yellow", :font-size "23px"}
       :child
       [:string3 :x "CHEESEBURGER!"]]}},
-   :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive",
+   :eleven-labs-default-voice-name "Not OG Buffy",
    :debug-level 1,
    :screens
    ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
@@ -830,38 +1275,47 @@
  :runstreams {},
  :editor? false,
  :buffy? false,
- :memory [96156186 68386630 4294705152],
+ :memory [257607156 236098820 4294705152],
  :flow-subs
- [:solver/get-my-colors1354396971
-  :solver-status/*client-name*>get-my-colors1564957144>running?
-  :solver-status/*client-name*>raw-custom-override1028154902>running?
-  :solver-status/*client-name*>get-my-colors1354396971>running?
-  :solver/get-my-colors1564957144
+ [:solver-status/*client-name*>raw-custom-override1436984793>running?
+  :solver-status/*client-name*>get-my-colors1218698772>running?
+  :solver/raw-custom-override1436984793
+  :solver/get-my-colors1218698772
   :flow/live-scratch-flow>*running?
-  :solver-status/*client-name*>raw-custom-override-743749041>running?
-  :solver/raw-custom-override-743749041
-  :solver/raw-custom-override1028154902],
- :client-name :adventurous-circular-owl-25,
+  :solver/get-my-colors-1599193491
+  :solver-status/*client-name*>get-my-colors-1599193491>running?],
+ :client-name :successful-orchid-weasel-7,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 1945, :h 1132},
- :post-meta {:shows-drag-22 {:* {:rowcount 2214}}},
+ :window {:w 2161, :h 1258},
+ :post-meta
+ {:gen-viz-797 {:* {:rowcount 317}},
+  :DISTRICT-drag-37 {:* {:rowcount 13}},
+  :large-bgss {:* {:rowcount 1030}},
+  :offenses-drag-24 {:* {:rowcount 319073}},
+  :rowcnt-drag-2 {:* {:rowcount 1}},
+  :offenses-drag-26 {:* {:rowcount 319073}},
+  :ufo_sightings {},
+  :gen-viz-84 {:* {:rowcount 6}},
+  :ufo-sightings-drag-9 {:* {:rowcount 80332}},
+  :duration-hours-drag-43 {:* {:rowcount 8349}},
+  :state-drag-3 {:* {:rowcount 68}},
+  :shape-drag-7 {:* {:rowcount 30}}},
  :status
  {:heartbeat
   {:kick
-   [:solver/get-my-colors1354396971
-    :solver-status/*client-name*>get-my-colors1564957144>running?
-    :solver-status/*client-name*>raw-custom-override1028154902>running?
-    :solver-status/*client-name*>get-my-colors1354396971>running?
-    :solver/get-my-colors1564957144
+   [:solver-status/*client-name*>raw-custom-override1436984793>running?
+    :solver-status/*client-name*>get-my-colors1218698772>running?
+    :solver/raw-custom-override1436984793
+    :solver/get-my-colors1218698772
     :flow/live-scratch-flow>*running?
-    :solver-status/*client-name*>raw-custom-override-743749041>running?
-    :solver/raw-custom-override-743749041
-    :solver/raw-custom-override1028154902]},
+    :solver/get-my-colors-1599193491
+    :solver-status/*client-name*>get-my-colors-1599193491>running?]},
   :alert1 {:alerts :alert2}},
  :screen-name "duality-of-lepus",
  :recos-page2 0,
  :selected-tab "azure oyster",
+ :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
@@ -872,15 +1326,20 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   401
+   785
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {},
- :base-sniff-queries {:setlists 1669794951, :shows 89957543},
+ :base-sniff-queries
+ {:setlists 1669794951,
+  :shows 89957543,
+  :ufo_sightings 484893751,
+  :offenses -505802446},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1491484374,
+ :user-params-hash -1609875825,
  :grid-recos? true,
- :session-hash -586065003,
+ :preview-keys2 [],
+ :session-hash -551746322,
  :resolved-queries
  {:setlists-drag-2
   {:select [:show_id :song_name :song_order :ts],
@@ -948,6 +1407,24 @@
      :cc125]],
    :group-by [:DISTRICT],
    :order-by [[:rowcnt :desc]]},
+  :large-bgss
+  {:select [:*],
+   :order-by [1],
+   :from
+   [{:data
+     (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+           rel-dir " ./images/large/"
+           files (->>
+                   (file-seq (clojure.java.io/file dir))
+                   (filter (fn [x] (.isFile x)))
+                   (filter
+                     (fn [x]
+                       (not (clojure.string/includes? (str (.getName x)) "8k"))))
+                   (map (fn [x] (.getName x))))]
+       (println (count files))
+       (vec (for [f files] {:ffilename (str f)})))}],
+   :page 3,
+   :_last-run "03:02:01"},
   :offenses-drag-24
   {:select
    [:DAY_OF_WEEK
@@ -1106,13 +1583,6 @@
       :order-by [[:city :asc]]}
      :ff571]],
    :group-by [:city],
-   :order-by [[:rowcnt :desc]]},
-  :song-name-drag-43
-  {:select [:song_name [[:count 1] :rowcnt]],
-   :from
-   [[{:select [:show_id :song_name :song_order :ts], :from [[:setlists :hh333]]}
-     :qq331]],
-   :group-by [:song_name],
    :order-by [[:rowcnt :desc]]},
   :state-drag-3
   {:select [:state [[:count 1] :rowcnt]],
@@ -1522,33 +1992,6 @@
      :order-by [[:rowcnt :desc]]}},
    :root [25 8],
    :tab "sapphire ape"},
-  :block-8502
-  {:h 2,
-   :w 6,
-   :root [36 24],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-8502",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-8502.:hi"}
-     :style
-     {:font-size "45px",
-      :font-weight 700,
-      :padding-top "7px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color :theme/universal-pop,
-      :font-family :theme/base-font}
-     :child
-     :theme/universal-pop]},
-   :queries {}},
   :block-94
   {:mad-libs-combo-hash ["1561519308" "ufo_sightings_drag_9"],
    :name "basic_v_bar - \"country, rows\" - 559",
@@ -1622,9 +2065,9 @@
    :tab "globular koala"},
   :block-5503
   {:name "block-5503",
-   :w 9,
+   :w 4,
    :selected-view :hare-vw,
-   :root [28 8],
+   :root [38 2],
    :h 4,
    :queries {},
    :tab "azure oyster",
@@ -1681,7 +2124,8 @@
       :color :theme/editor-outer-rim-color,
       :font-family :theme/base-font}
      :child
-     "It's a perfect day for planting seeds and planning adventures!"]}},
+     [:speak-click
+      "It's a perfect day for planting seeds and planning adventures!"]]}},
   :block-9369
   {:h 3,
    :w 16,
@@ -1706,21 +2150,6 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
-  :block-7328
-  {:drag-meta {:type :open-input},
-   :w 14,
-   :selected-view :well-cerise-kangaroo,
-   :h 8,
-   :views
-   {:well-cerise-kangaroo
-    [:open-input
-     {:kp [:param :well-cerise-kangaroo],
-      :width-int :panel-width+100,
-      :height-int :panel-height+80,
-      :syntax "clojure"}]},
-   :tab "star-shaped wallaby",
-   :root [0 1],
-   :name "block-7328"},
   :block-971
   {:h 9,
    :w 9,
@@ -1766,46 +2195,6 @@
       "We can also debug by forcing various values into any step in the flow in order to observe different reactions... Notice the flow doesn't re-start from scratch, it is actually still running and will react to new values that hit any of it's channels."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
-  :block-3476
-  {:h 2,
-   :w 6,
-   :root [36 21],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-3476",
-   :views
-   {:hi
-    [:box
-     :align
-     :center
-     :justify
-     :center
-     :attr
-     {:id ":block-3476.:hi"}
-     :style
-     {:font-size "45px",
-      :font-weight 700,
-      :padding-top "7px",
-      :padding-left "14px",
-      :margin-top "-8px",
-      :color [:invert-hex-color :theme/editor-outer-rim-color],
-      :font-family :theme/base-font}
-     :child
-     :theme/universal-pop-color]},
-   :queries {}},
-  :block-10615
-  {:h 7,
-   :w 5,
-   :connection-id "met-on-tour",
-   :name "drag-from-select-all-setlists",
-   :queries
-   {:song-name-drag-43
-    {:select [:song_name [[:count 1] :rowcnt]],
-     :from [[:query/setlists-drag-2 :qq331]],
-     :group-by [:song_name],
-     :order-by [[:rowcnt :desc]]}},
-   :root [32 14],
-   :tab "azure oyster"},
   :block-7215
   {:h 4,
    :w 9,
@@ -1839,6 +2228,14 @@
      :order-by [[:rowcnt :desc]]}},
    :root [17 8],
    :tab "sapphire ape"},
+  :block-6584
+  {:h 17,
+   :w 9,
+   :tab "fat hawk",
+   :root [32 1],
+   :name ":param/generated-colors",
+   :views {:param-val [:data-viewer :param/generated-colors]},
+   :queries {}},
   :block-35
   {:h 9,
    :w 9,
@@ -1918,6 +2315,26 @@
       :font-family :theme/base-font}
      :child
      "hi!"]}},
+  :block-11696
+  {:h 4,
+   :w 6,
+   :tab "fat hawk",
+   :root [17 2],
+   :name "block-11696",
+   :views
+   {:pulled-val
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size [:auto-size-px :param/generated-colors>second-darkest]}
+     :child
+     [:string :param/generated-colors>second-darkest]]},
+   :queries {}},
   :block-6121
   {:h 2,
    :w 16,
@@ -1942,6 +2359,33 @@
       "Here you can see that while running the flow interactively, we get the dialog push, as well as the ability to manipulate the options on the flow directly."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-2361
+  {:h 14,
+   :w 7,
+   :root [36 8],
+   :tab "azure oyster",
+   :selected-view :large-bgss,
+   :name "block-2361",
+   :views {},
+   :queries
+   {:large-bgss
+    {:select [:*],
+     :order-by [1],
+     :from
+     [{:data
+       (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+             rel-dir " ./images/large/"
+             files (->>
+                     (file-seq (clojure.java.io/file dir))
+                     (filter (fn [x] (.isFile x)))
+                     (filter
+                       (fn [x]
+                         (not (clojure.string/includes? (str (.getName x)) "8k"))))
+                     (map (fn [x] (.getName x))))]
+         (println (count files))
+         (vec (for [f files] {:ffilename (str f)})))}],
+     :page 3,
+     :_last-run "03:02:01"}}},
   :block-1449
   {:h 7,
    :w 32,
@@ -1974,6 +2418,14 @@
    :selected-view :hi,
    :name "block-3158",
    :views {:hi [:data-viewer :solver-status/*client-name*]},
+   :queries {}},
+  :block-6124
+  {:h 9,
+   :w 9,
+   :tab "fat hawk",
+   :root [32 18],
+   :name ":param/tetradss",
+   :views {:param-val [:data-viewer :param/tetradss]},
    :queries {}},
   :block-3392
   {:h 7,
@@ -2050,21 +2502,21 @@
      :from [[:offenses :dd484]]}},
    :root [25 20],
    :tab "globular koala"}},
- :selected-block :block-2769,
+ :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#fdfcfc",
-  "boolean" "#d3c2ba",
-  "map" "#d8b4b4",
-  "list" "#9e469b",
-  "string" "#ffffff",
-  "any" "#4f52ba",
-  "vector" "#9ad3a5",
-  "keyword" "#ffffff",
-  "rabbit-code" "#6bc8a6",
-  "datetime" "#448392",
-  "integer" "#e9acdf",
-  "unknown" "#72336e",
-  "date" "#2b2e48"},
+ {"float" "#aaaed8",
+  "boolean" "#c59f9d",
+  "map" "#b7d190",
+  "list" "#6b0fd0",
+  "string" "#ebf3e7",
+  "any" "#da3490",
+  "vector" "#b68b9c",
+  "keyword" "#eddee5",
+  "rabbit-code" "#85a795",
+  "datetime" "#0f9d2c",
+  "integer" "#cba6a2",
+  "unknown" "#66354d",
+  "date" "#161a40"},
  :click-param
  {:tables-sys
   {:db_schema "none",
@@ -2077,30 +2529,21 @@
   {:crow-flow-201a>*running? false,
    :counting-loop>*running? false,
    :live-scratch-flow>*running? false,
-   :flow-forever>*running? false},
+   :flow-forever>*running? false,
+   :flow-forever>final-math nil},
   :time {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :month 4},
+  :large-bgss {:ffilename "b64-image-3422-95858-4k.webp"},
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
+   :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data
-   (let [clojure-version (clojure-version)
-         jvm-version (System/getProperty "java.version")]
-     {:howdy-str
-      (str
-        "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
-        clojure-version
-        " on "
-        jvm-version
-        " JVM tech"
-        " 🥕🐇"),
-      :jvm-version jvm-version,
-      :clojure-version clojure-version}),
-   :selected-view [:clojure :new-clojure-2],
+   :selected-view-data nil,
+   :selected-view nil,
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
-   :rel-image-path "images/large/b64-image3-30849-74975-4k.webp",
+   :rel-image-path [:string3 "images/large/" :large-bgss/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-2769,
+   :selected-block :block-11696,
    :glass-fish-style
    {:background-color [:string3 :param/generated-colors>darkest 73],
     :border-radius "16px",
@@ -2322,6 +2765,50 @@
     "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
     :jvm-version "17.0.11",
     :clojure-version "1.11.1"},
+   :get-my-colors-1599193491
+   {:second-darkest "#2c2c4c",
+    :highest-saturation "#188f94",
+    :most-contrasting "#141a2f",
+    :darkest "#141a2f",
+    :contrast-with-dominant "#141a2f",
+    :colors
+    ["#5fb1a0"
+     "#154d70"
+     "#cbbda2"
+     "#646683"
+     "#b67494"
+     "#188f94"
+     "#141a2f"
+     "#2c9ca4"
+     "#94646c"
+     "#2c2c4c"
+     "#c5ac9d"],
+    :most-frequent "#141a2f",
+    :data-colors
+    {"float" "#aaaed8",
+     "boolean" "#c59f9d",
+     "map" "#b7d190",
+     "list" "#6b0fd0",
+     "string" "#ebf3e7",
+     "any" "#da3490",
+     "vector" "#b68b9c",
+     "keyword" "#eddee5",
+     "rabbit-code" "#85a795",
+     "datetime" "#0f9d2c",
+     "integer" "#cba6a2",
+     "unknown" "#66354d",
+     "date" "#161a40"},
+    :dominant "#c5ac9d",
+    :most-contrasting-dark "#141a2f",
+    :second-brightest "#c5ac9d",
+    :brightest "#cbbda2",
+    :most-contrasting-light "#cbbda2"},
+   :raw-custom-override1207873141
+   [:box
+    :style
+    {:font-size "44px", :color "#ffffff"}
+    :child
+    "🐇🥕 Sup! Internal RVBBIT nREPL!!. Clojure 1.11.1 on 17.0.11 JVM tech!!! 🥕🐇"],
    :raw-custom-override-2070279978
    [:v-box
     :padding
@@ -2467,6 +2954,44 @@
        :height "200px",
        :style {:border-radius "15px"},
        :alt "A cute bunny (actually a kitten)"}]]],
+   :get-my-colors2119560863
+   {:second-darkest "#2c3c54",
+    :highest-saturation "#6cc4cc",
+    :most-contrasting "#362335",
+    :darkest "#362335",
+    :contrast-with-dominant "#362335",
+    :colors
+    ["#b36780"
+     "#d8bab4"
+     "#4994a4"
+     "#bac7d3"
+     "#3a4f6c"
+     "#41748c"
+     "#362335"
+     "#6cc4cc"
+     "#2c3c54"
+     "#74443c"
+     "#bac4cb"],
+    :most-frequent "#6cc4cc",
+    :data-colors
+    {"float" "#fdfcfc",
+     "boolean" "#d3c2ba",
+     "map" "#d8b4b4",
+     "list" "#9e469b",
+     "string" "#ffffff",
+     "any" "#4f52ba",
+     "vector" "#9ad3a5",
+     "keyword" "#ffffff",
+     "rabbit-code" "#6bc8a6",
+     "datetime" "#448392",
+     "integer" "#e9acdf",
+     "unknown" "#72336e",
+     "date" "#2b2e48"},
+    :dominant "#bac4cb",
+    :most-contrasting-dark "#362335",
+    :second-brightest "#d8bab4",
+    :brightest "#bac7d3",
+    :most-contrasting-light "#b36780"},
    :get-my-colors-1273357247
    {:second-darkest "#2c3c54",
     :highest-saturation "#6cc4cc",
@@ -2549,6 +3074,11 @@
     :second-brightest "#d8bab4",
     :brightest "#bac7d3",
     :most-contrasting-light "#b36780"},
+   :raw-custom-override1519555409
+   {:error
+    {:error "This request has been blocked by our content filters.",
+     :class "class clojure.lang.ExceptionInfo"},
+    :class "class clojure.lang.ExceptionInfo"},
    :get-my-colors136717390
    {:second-darkest "#34275d",
     :highest-saturation "#0e3969",
@@ -2703,7 +3233,50 @@
     :second-brightest "#d8bab4",
     :brightest "#bac7d3",
     :most-contrasting-light "#b36780"},
+   :raw-custom-override1436984793
+   {:howdy-str
+    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+    :jvm-version "17.0.11",
+    :clojure-version "1.11.1"},
    :raw-custom-override-1043853740 "",
+   :get-my-colors-258967002
+   {:second-darkest "#2c3c54",
+    :highest-saturation "#6cc4cc",
+    :most-contrasting "#362335",
+    :darkest "#362335",
+    :contrast-with-dominant "#362335",
+    :colors
+    ["#b36780"
+     "#d8bab4"
+     "#4994a4"
+     "#bac7d3"
+     "#3a4f6c"
+     "#41748c"
+     "#362335"
+     "#6cc4cc"
+     "#2c3c54"
+     "#74443c"
+     "#bac4cb"],
+    :most-frequent "#6cc4cc",
+    :data-colors
+    {"float" "#fdfcfc",
+     "boolean" "#d3c2ba",
+     "map" "#d8b4b4",
+     "list" "#9e469b",
+     "string" "#ffffff",
+     "any" "#4f52ba",
+     "vector" "#9ad3a5",
+     "keyword" "#ffffff",
+     "rabbit-code" "#6bc8a6",
+     "datetime" "#448392",
+     "integer" "#e9acdf",
+     "unknown" "#72336e",
+     "date" "#2b2e48"},
+    :dominant "#bac4cb",
+    :most-contrasting-dark "#362335",
+    :second-brightest "#d8bab4",
+    :brightest "#bac7d3",
+    :most-contrasting-light "#b36780"},
    :raw-custom-override211745628
    {:howdy-str
     "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
@@ -2752,6 +3325,44 @@
     :second-brightest "#d8bab4",
     :brightest "#bac7d3",
     :most-contrasting-light "#b36780"},
+   :get-my-colors1218698772
+   {:second-darkest "#2c2c4c",
+    :highest-saturation "#188f94",
+    :most-contrasting "#141a2f",
+    :darkest "#141a2f",
+    :contrast-with-dominant "#141a2f",
+    :colors
+    ["#5fb1a0"
+     "#154d70"
+     "#cbbda2"
+     "#646683"
+     "#b67494"
+     "#188f94"
+     "#141a2f"
+     "#2c9ca4"
+     "#94646c"
+     "#2c2c4c"
+     "#c5ac9d"],
+    :most-frequent "#141a2f",
+    :data-colors
+    {"float" "#aaaed8",
+     "boolean" "#c59f9d",
+     "map" "#b7d190",
+     "list" "#6b0fd0",
+     "string" "#ebf3e7",
+     "any" "#da3490",
+     "vector" "#b68b9c",
+     "keyword" "#eddee5",
+     "rabbit-code" "#85a795",
+     "datetime" "#0f9d2c",
+     "integer" "#cba6a2",
+     "unknown" "#66354d",
+     "date" "#161a40"},
+    :dominant "#c5ac9d",
+    :most-contrasting-dark "#141a2f",
+    :second-brightest "#c5ac9d",
+    :brightest "#cbbda2",
+    :most-contrasting-light "#cbbda2"},
    :raw-custom-override-1375974037
    [:v-box
     :padding
@@ -2865,6 +3476,11 @@
     {:error "This request has been blocked by our content filters.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override-1949595743
+   {:howdy-str
+    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+    :jvm-version "17.0.11",
+    :clojure-version "1.11.1"},
    :raw-custom-override-1388419981
    [:v-box
     :size

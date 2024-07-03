@@ -498,7 +498,7 @@
   ;;                 :time-marches-on-or-does-it?)
 
   (wss/add-watch+ wss/father-time
-                  :time-marches-on-or-does-it?
+                  :master-time-watcher
                   (fn [_ _ old-state new-state]
                     (try
                       (let [changes (reduce-kv
@@ -520,7 +520,7 @@
                       (catch Exception e
                         (println "Error in time-marches-on:" (.getMessage e))
                         (throw e))))
-                  :time-marches-on-or-does-it?)
+                  :master-time-watcher)
 
   ;; (wss/add-watch+ wss/screens-atom
   ;;             :master-screen-watcher ;; watcher splitter
@@ -632,7 +632,7 @@
 
 
   (wss/add-watch+ flow-db/results-atom
-                  :master-watcher
+                  :master-flow-watcher
                   (fn [_ _ old-state new-state]
                     (let [changes (reduce-kv
                                    (fn [m k v]
@@ -649,7 +649,7 @@
                                        child-atoms)
                                    (let [new-child-atom (atom {k v})]
                                      (assoc child-atoms k new-child-atom))))))))
-                  :master-watcher)
+                  :master-flow-watcher)
 
 
   ;; (add-watch wss/last-solvers-atom
@@ -703,7 +703,7 @@
   ;;                     (swap! new-child-atom assoc key (get new-state key))))))
   ;;                 :master-solver-status-watcher)
 
-    (wss/add-watch+ evl/repl-introspection-atom
+  (wss/add-watch+ evl/repl-introspection-atom
                   :master-nrepl-instrospection-watcher
                   (fn [_ _ old-state new-state]
                     (let [changes (reduce-kv
@@ -742,101 +742,141 @@
   ;;                                  (let [new-child-atom (atom {k v})]
   ;;                                    (assoc child-atoms k new-child-atom))))))))
   ;;                 :master-solver-status-watcher)
-  
-(wss/add-watch+ wss/solver-status  ;; 2 keys deep partitioning
-                :master-solver-status-watcher
-                (fn [_ _ old-state new-state]
-                  (let [changes (reduce-kv
-                                 (fn [m parent-key parent-value]
-                                   (let [old-parent-value (get old-state parent-key)]
-                                     (if (not= parent-value old-parent-value)
-                                       (assoc m parent-key
-                                              (reduce-kv
-                                               (fn [child-m child-key child-value]
-                                                 (if (not= child-value (get old-parent-value child-key))
-                                                   (assoc child-m child-key child-value)
-                                                   child-m))
-                                               {}
-                                               parent-value))
-                                       m)))
-                                 {}
-                                 new-state)]
-                    (doseq [[parent-key parent-changes] changes]
-                      (doseq [[child-key child-value] parent-changes]
-                        (let [composite-key [parent-key child-key]]
-                          (swap! wss/solver-status-child-atoms
-                                 (fn [child-atoms]
-                                   (if-let [child-atom (get child-atoms composite-key)]
-                                     (do
-                                       (swap! child-atom update parent-key assoc child-key child-value)
-                                       child-atoms)
-                                     (let [new-child-atom (atom {parent-key {child-key child-value}})]
-                                       (assoc child-atoms composite-key new-child-atom))))))))))
-                :master-solver-status-watcher)    
-    
-(wss/add-watch+ wss/last-signals-atom
-                :master-signals-watcher
-                (fn [_ _ old-state new-state]
-                  (let [changes (reduce-kv
-                                 (fn [m k v]
-                                   (if (not= v (get old-state k))
-                                     (assoc m k v)
-                                     m))
-                                 {}
-                                 new-state)]
-                    (doseq [[k v] changes]
-                      (let [group (ut/hash-group k wss/num-groups)]
-                        (swap! wss/signal-child-atoms
-                               (fn [child-atoms]
-                                 (if-let [child-atom (get child-atoms group)]
-                                   (do (swap! child-atom assoc k v)
-                                       child-atoms)
-                                   (let [new-child-atom (atom {k v})]
-                                     (assoc child-atoms group new-child-atom)))))))))
-                :master-signals-watcher)
 
-(wss/add-watch+ wss/last-solvers-atom
-                :master-solver-watcher
-                (fn [_ _ old-state new-state]
-                  (let [changes (reduce-kv
-                                 (fn [m k v]
-                                   (if (not= v (get old-state k))
-                                     (assoc m k v)
-                                     m))
-                                 {}
-                                 new-state)]
-                    (doseq [[k v] changes]
-                      (let [group (ut/hash-group k wss/num-groups)]
+  (wss/add-watch+ wss/solver-status  ;; 2 keys deep partitioning
+                  :master-solver-status-watcher
+                  (fn [_ _ old-state new-state]
+                    (let [changes (reduce-kv
+                                   (fn [m parent-key parent-value]
+                                     (let [old-parent-value (get old-state parent-key)]
+                                       (if (not= parent-value old-parent-value)
+                                         (assoc m parent-key
+                                                (reduce-kv
+                                                 (fn [child-m child-key child-value]
+                                                   (if (not= child-value (get old-parent-value child-key))
+                                                     (assoc child-m child-key child-value)
+                                                     child-m))
+                                                 {}
+                                                 parent-value))
+                                         m)))
+                                   {}
+                                   new-state)]
+                      (doseq [[parent-key parent-changes] changes]
+                        (doseq [[child-key child-value] parent-changes]
+                          (let [composite-key [parent-key child-key]]
+                            (swap! wss/solver-status-child-atoms
+                                   (fn [child-atoms]
+                                     (if-let [child-atom (get child-atoms composite-key)]
+                                       (do
+                                         (swap! child-atom update parent-key assoc child-key child-value)
+                                         child-atoms)
+                                       (let [new-child-atom (atom {parent-key {child-key child-value}})]
+                                         (assoc child-atoms composite-key new-child-atom))))))))))
+                  :master-solver-status-watcher)
+
+  (wss/add-watch+ wss/last-signals-atom
+                  :master-signals-watcher
+                  (fn [_ _ old-state new-state]
+                    (let [changes (reduce-kv
+                                   (fn [m k v]
+                                     (if (not= v (get old-state k))
+                                       (assoc m k v)
+                                       m))
+                                   {}
+                                   new-state)]
+                      (doseq [[k v] changes]
+                        (let [group (ut/hash-group k wss/num-groups)]
+                          (swap! wss/signal-child-atoms
+                                 (fn [child-atoms]
+                                   (if-let [child-atom (get child-atoms group)]
+                                     (do (swap! child-atom assoc k v)
+                                         child-atoms)
+                                     (let [new-child-atom (atom {k v})]
+                                       (assoc child-atoms group new-child-atom)))))))))
+                  :master-signals-watcher)
+
+  ;; (wss/add-watch+ wss/last-solvers-atom
+  ;;                 :master-solver-watcher
+  ;;                 (fn [_ _ old-state new-state]
+  ;;                   (let [changes (reduce-kv
+  ;;                                  (fn [m k v]
+  ;;                                    (if (not= v (get old-state k))
+  ;;                                      (assoc m k v)
+  ;;                                      m))
+  ;;                                  {}
+  ;;                                  new-state)]
+  ;;                     (doseq [[k v] changes]
+  ;;                       (let [group (ut/hash-group k wss/num-groups)]
+  ;;                         (swap! wss/solver-child-atoms
+  ;;                                (fn [child-atoms]
+  ;;                                  (if-let [child-atom (get child-atoms group)]
+  ;;                                    (do (swap! child-atom assoc k v)
+  ;;                                        child-atoms)
+  ;;                                    (let [new-child-atom (atom {k v})]
+  ;;                                      (assoc child-atoms group new-child-atom)))))))))
+  ;;                 :master-solver-watcher)
+  
+    (wss/add-watch+ wss/last-solvers-atom
+                  :master-solver-watcher
+                  (fn [_ _ old-state new-state]
+                    (let [changes (reduce-kv
+                                   (fn [m k v]
+                                     (if (not= v (get old-state k))
+                                       (assoc m k v)
+                                       m))
+                                   {}
+                                   new-state)]
+                      (doseq [[k v] changes]
                         (swap! wss/solver-child-atoms
                                (fn [child-atoms]
-                                 (if-let [child-atom (get child-atoms group)]
+                                 (if-let [child-atom (get child-atoms k)]
                                    (do (swap! child-atom assoc k v)
                                        child-atoms)
                                    (let [new-child-atom (atom {k v})]
-                                     (assoc child-atoms group new-child-atom)))))))))
-                :master-solver-watcher)
+                                     (assoc child-atoms k new-child-atom))))))))
+                  :master-solver-watcher)
 
 
   (wss/add-watch+ wss/last-solvers-atom-meta
-                :master-solver-meta-watcher
-                (fn [_ _ old-state new-state]
-                  (let [changes (reduce-kv
-                                 (fn [m k v]
-                                   (if (not= v (get old-state k))
-                                     (assoc m k v)
-                                     m))
-                                 {}
-                                 new-state)]
-                    (doseq [[k v] changes]
-                      (swap! wss/solver-meta-child-atoms
-                             (fn [child-atoms]
-                               (if-let [child-atom (get child-atoms k)]
-                                 (do (swap! child-atom assoc k v)
-                                     child-atoms)
-                                 (let [new-child-atom (atom {k v})]
-                                   (assoc child-atoms k new-child-atom))))))))
-                :master-solver-meta-watcher)
+                  :master-solver-meta-watcher
+                  (fn [_ _ old-state new-state]
+                    (let [changes (reduce-kv
+                                   (fn [m k v]
+                                     (if (not= v (get old-state k))
+                                       (assoc m k v)
+                                       m))
+                                   {}
+                                   new-state)]
+                      (doseq [[k v] changes]
+                        (swap! wss/solver-meta-child-atoms
+                               (fn [child-atoms]
+                                 (if-let [child-atom (get child-atoms k)]
+                                   (do (swap! child-atom assoc k v)
+                                       child-atoms)
+                                   (let [new-child-atom (atom {k v})]
+                                     (assoc child-atoms k new-child-atom))))))))
+                  :master-solver-meta-watcher)
 
+
+  (wss/add-watch+ wss/flow-status
+                  :master-flow-status-watcher
+                  (fn [_ _ old-state new-state]
+                    (let [changes (reduce-kv
+                                   (fn [m k v]
+                                     (if (not= v (get old-state k))
+                                       (assoc m k v)
+                                       m))
+                                   {}
+                                   new-state)]
+                      (doseq [[k v] changes]
+                        (swap! wss/flow-status-child-atoms
+                               (fn [child-atoms]
+                                 (if-let [child-atom (get child-atoms k)]
+                                   (do (swap! child-atom assoc k v)
+                                       child-atoms)
+                                   (let [new-child-atom (atom {k v})]
+                                     (assoc child-atoms k new-child-atom))))))))
+                  :master-flow-status-watcher)
 
 
 
@@ -854,23 +894,23 @@
     ;;               :master-solver-status-watcher);)
 
   (wss/add-watch+ wss/signals-atom
-              :master-signal-def-watcher ;; watcher signals defs
-              (fn [_ _ old-state new-state]
-                (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....])
-                (wss/reload-signals-subs))
+                  :master-signal-def-watcher ;; watcher signals defs
+                  (fn [_ _ old-state new-state]
+                    (ut/pp [:signals-defs-changed :reloading-signals-sys-subs....])
+                    (wss/reload-signals-subs))
                   :master-signal-def-watcher)
 
   (wss/add-watch+ wss/rules-atom
-              :master-rule-def-watcher
-              (fn [_ _ old-state new-state]
-                (ut/pp [:rules-defs-changed :reloading....]))
+                  :master-rule-def-watcher
+                  (fn [_ _ old-state new-state]
+                    (ut/pp [:rules-defs-changed :reloading....]))
                   :master-rule-def-watcher)
 
   (wss/add-watch+ wss/solvers-atom
-              :master-solver-def-watcher
-              (fn [_ _ old-state new-state]
-                (ut/pp [:solvers-defs-changed :reloading....])
-                (wss/reload-solver-subs))
+                  :master-solver-def-watcher
+                  (fn [_ _ old-state new-state]
+                    (ut/pp [:solvers-defs-changed :reloading....])
+                    (wss/reload-solver-subs))
                   :master-solver-def-watcher)
 
   ;; (add-watch wss/father-time
@@ -913,7 +953,9 @@
 ;;                  (doall (pmap #(update-time-atom % ttt) wss/time-atoms)))))
 
   (update-all-screen-meta)
+
   (update-all-flow-meta)
+
   (cruiser/insert-current-rules!
    system-db
    "system-db"
@@ -924,7 +966,8 @@
    cruiser/default-viz-shapes
    (merge cruiser/default-flow-functions {:custom @wss/custom-flow-blocks} {:sub-flows @wss/sub-flow-blocks}))
 
-  (when harvest-on-boot? (update-all-conn-meta))
+  (when harvest-on-boot?
+    (update-all-conn-meta))
 
   (cruiser/lets-give-it-a-whirl-no-viz ;;; force system-db as a conn, takes a sec
    "system-db"
@@ -1322,7 +1365,7 @@
           kks     (try (keys b) (catch Exception _ nil))]
       (when (> (count (remove #(= "client-keepalive" %) kks)) 0) (update-stat-atom kks))))
 
-  (wss/add-watch+ flow-db/status :tracker-watch tracker-changed :tracker-watch)
+  (wss/add-watch+ flow-db/status :master-flow-db-status-watcher* tracker-changed :master-flow-db-status-watcher*)
 
   (defn log-tracker
     [kks]
@@ -1335,34 +1378,111 @@
         (swap! wss/tracker-history assoc flow-id (vec (conj (get @wss/tracker-history flow-id []) tracker))) ;; for
         )))
 
-  (defn tracker-changed2
-    [key ref old-state new-state]
-    (let [[_ b _] (data/diff old-state new-state)
-          kks     (try (keys b) (catch Exception _ nil))]
-      (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
-        (async/thread ;; really expensive logging below. temp
-          (let [;kks-string (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/"
-                ]
-            (ext/create-dirs "./flow-logs/")
-            (doseq [flow-id kks
-                    :let    [run-id     (str (get-in @flow-db/results-atom [flow-id :run-id]))
-                             fp         (str "./flow-logs/" (cstr/replace flow-id "/" "-CALLING-") "--" run-id ".edn")
-                             mst        (System/currentTimeMillis)
-                             _ (swap! wss/watchdog-atom assoc flow-id mst)
-                             _ (swap! wss/watchdog-atom assoc flow-id mst)
-                             diffy      (get (ut/replace-large-base64 b) flow-id)
-                             diffy-keys (into {} (for [[k v] diffy] {k (first (keys v))}))
-                             _ (swap! wss/last-block-written assoc flow-id diffy-keys)
-                             blocks     (keys (get (ut/replace-large-base64 b) flow-id))]]
-              (let [data        [[(ut/millis-to-date-string mst) blocks]
-                                 {:values (select-keys (ut/replace-large-base64 (get-in @flow-db/results-atom [flow-id])) blocks)
-                                  :diff   diffy}]
-                    pretty-data (with-out-str (ppt/pprint data))] ; Use clojure.pprint/pprint
-                (spit fp (str pretty-data "\n") :append true)))))
-        (log-tracker kks)
-        (update-stat-atom kks))))
+  ;; (defn tracker-changed2
+  ;;   [key ref old-state new-state]
+  ;;   (let [[_ b _] (data/diff old-state new-state)
+  ;;         kks     (try (keys b) (catch Exception _ nil))]
+  ;;     (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
+  ;;       ;(async/thread ;; really expensive logging below. temp
+  ;;       (wss/execute-in-thread-pools :flow-tracker-side-effects*  
+  ;;         (fn []
+  ;;           (let [;kks-string (-> (cstr/join "-" kks) (cstr/replace " " "_") (cstr/replace "/"
+  ;;                 ]
+  ;;             (ext/create-dirs "./flow-logs/")
+  ;;             (doseq [flow-id kks
+  ;;                     :let    [run-id     (str (get-in @flow-db/results-atom [flow-id :run-id]))
+  ;;                              fp         (str "./flow-logs/" (cstr/replace flow-id "/" "-CALLING-") "--" run-id ".edn")
+  ;;                              mst        (System/currentTimeMillis)
+  ;;                              _ (swap! wss/watchdog-atom assoc flow-id mst)
+  ;;                              _ (swap! wss/watchdog-atom assoc flow-id mst)
+  ;;                              diffy      (get (ut/replace-large-base64 b) flow-id)
+  ;;                              diffy-keys (into {} (for [[k v] diffy] {k (first (keys v))}))
+  ;;                              _ (swap! wss/last-block-written assoc flow-id diffy-keys)
+  ;;                              blocks     (keys (get (ut/replace-large-base64 b) flow-id))]]
+  ;;               (let [data        [[(ut/millis-to-date-string mst) blocks]
+  ;;                                  {:values (select-keys (ut/replace-large-base64 (get-in @flow-db/results-atom [flow-id])) blocks)
+  ;;                                   :diff   diffy}]
+  ;;                     pretty-data (with-out-str (ppt/pprint data))] ; Use clojure.pprint/pprint
+  ;;                 (spit fp (str pretty-data "\n") :append true))))))
+  ;;       (log-tracker kks)
+  ;;       (update-stat-atom kks))))
 
-  (wss/add-watch+ flow-db/tracker :tracker-watch2 tracker-changed2 :tracker-watch2)
+  ;; (wss/add-watch+ flow-db/tracker 
+  ;;                 :master-flow-db-tracker-watcher* ;; only side effects
+  ;;                 tracker-changed2 
+  ;;                 :master-flow-db-tracker-watcher*)
+
+  ;; (wss/add-watch+ flow-db/tracker
+  ;;                 :master-flow-db-tracker-watcher
+  ;;                 (fn [_ _ old-state new-state]
+  ;;                   (let [changes (reduce-kv
+  ;;                                  (fn [m k v]
+  ;;                                    (if (not= v (get old-state k))
+  ;;                                      (assoc m k v)
+  ;;                                      m))
+  ;;                                  {}
+  ;;                                  new-state)]
+  ;;                     (doseq [[k v] changes]
+  ;;                       (swap! wss/flow-tracker-child-atoms
+  ;;                              (fn [child-atoms]
+  ;;                                (if-let [child-atom (get child-atoms k)]
+  ;;                                  (do (swap! child-atom assoc k v)
+  ;;                                      child-atoms)
+  ;;                                  (let [new-child-atom (atom {k v})]
+  ;;                                    (assoc child-atoms k new-child-atom))))))))
+  ;;                 :master-flow-db-tracker-watcher)
+
+
+(defn combined-tracker-watcher
+  [key ref old-state new-state]
+  (when (not= new-state old-state)
+    (let [[_ b _] (data/diff old-state new-state)
+        kks     (try (keys b) (catch Exception _ nil))]
+    (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
+      ;; Side effects part (originally from tracker-changed2)
+      (wss/execute-in-thread-pools :flow-tracker-side-effects*
+                                   (fn []
+                                     (ext/create-dirs "./flow-logs/")
+                                     (doseq [flow-id kks
+                                             :let [run-id     (str (get-in @flow-db/results-atom [flow-id :run-id]))
+                                                   fp         (str "./flow-logs/" (cstr/replace flow-id "/" "-CALLING-") "--" run-id ".edn")
+                                                   mst        (System/currentTimeMillis)
+                                                   _          (swap! wss/watchdog-atom assoc flow-id mst)
+                                                   diffy      (get (ut/replace-large-base64 b) flow-id)
+                                                   diffy-keys (into {} (for [[k v] diffy] {k (first (keys v))}))
+                                                   _          (swap! wss/last-block-written assoc flow-id diffy-keys)
+                                                   blocks     (keys (get (ut/replace-large-base64 b) flow-id))]]
+                                       (let [data        [[(ut/millis-to-date-string mst) blocks]
+                                                          {:values (select-keys (ut/replace-large-base64 (get-in @flow-db/results-atom [flow-id])) blocks)
+                                                           :diff   diffy}]
+                                             pretty-data (with-out-str (ppt/pprint data))]
+                                         (spit fp (str pretty-data "\n") :append true)))))
+      (log-tracker kks)
+      (update-stat-atom kks))
+
+    ;; Child atom update part (originally from the second watcher)
+    (let [changes (reduce-kv
+                   (fn [m k v]
+                     (if (not= v (get old-state k))
+                       (assoc m k v)
+                       m))
+                   {}
+                   new-state)]
+      (doseq [[k v] changes]
+        (swap! wss/flow-tracker-child-atoms
+               (fn [child-atoms]
+                 (if-let [child-atom (get child-atoms k)]
+                   (do (reset! child-atom {k v})
+                       child-atoms)
+                   (let [new-child-atom (atom {k v})]
+                     (assoc child-atoms k new-child-atom))))))))))
+
+;; Add the combined watcher
+(wss/add-watch+ flow-db/tracker
+                :master-flow-db-tracker-combined-watcher
+                combined-tracker-watcher
+                :master-flow-db-tracker-combined-watcher)
+
 
   ;;(ut/pp {:settings config/settings})
   (defn heartbeat

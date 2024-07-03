@@ -138,6 +138,7 @@
 
 (defn repl-eval
   [code repl-host repl-port client-name id]
+
   (let [s           (str code) ;; ? why convert. TODO: remove
         eval-cache? false ;true ; (cstr/includes? s ";:::cache-me")
         cache-hash  (hash (cstr/trim (cstr/trim-newline (cstr/trim s))))]
@@ -173,17 +174,17 @@
                                        (cstr/starts-with? (str output-type) "class clojure.lang.Var"))
                                    [:pre (str eval-output)]
                                    :else eval-output)]
-            (do (when debug? 
+            (do (when debug?
                   (println ["   !**NOT REPL**!   " (newline) (str output-type) (newline) eval-output]))
                 {:evald-result eval-output0}))
           (let
            [e (try
                 (with-open [conn (nrepl/connect :host nrepl-host :port nrepl-port)]
                   (let [user-fn-str   (slurp "./user.clj")
-                        gen-ns        (str "repl-" (-> (ut/keypath-munger [client-name "." id]) 
+                        gen-ns        (str "repl-" (-> (ut/keypath-munger [client-name "." id])
                                                        (cstr/replace  "_" "-")
                                                        (cstr/replace  "--" "-")))
-                        user-fn-str (if (not (cstr/includes? (str s) "(ns ")) 
+                        user-fn-str (if (not (cstr/includes? (str s) "(ns "))
                                       (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
                         s             (str user-fn-str "\n" s)
                         skt           (nrepl/client conn 60000)

@@ -57,7 +57,7 @@
    [honey.sql                 :as honey])
   (:import ;(clojure.lang MultiFn)
    [com.github.vertical_blank.sqlformatter SqlFormatter]
-   [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ThreadPoolExecutor$CallerRunsPolicy]
+   [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ArrayBlockingQueue ThreadPoolExecutor$CallerRunsPolicy]
     ;;[java.util.concurrent                   Executors TimeUnit TimeoutException]
    [java.lang                              ProcessBuilder]
    [java.io                                BufferedReader InputStreamReader]))
@@ -130,19 +130,19 @@
 
 (def pool-stats-atom  (atom {})) ;; (ut/thaw-atom {} "./data/atoms/pool-stats-atom.edn"))
 
-(def time-atom-1 (atom {}))
-(def time-atom-2 (atom {}))
-(def time-atom-3 (atom {}))
-(def time-atom-4 (atom {}))
-(def time-atom-5 (atom {}))
-(def time-atom-6 (atom {}))
-(def time-atom-7 (atom {}))
-(def time-atom-8 (atom {}))
-(def time-atom-9 (atom {}))
-(def time-atom-10 (atom {}))
+;; (def time-atom-1 (atom {}))
+;; (def time-atom-2 (atom {}))
+;; (def time-atom-3 (atom {}))
+;; (def time-atom-4 (atom {}))
+;; (def time-atom-5 (atom {}))
+;; (def time-atom-6 (atom {}))
+;; (def time-atom-7 (atom {}))
+;; (def time-atom-8 (atom {}))
+;; (def time-atom-9 (atom {}))
+;; (def time-atom-10 (atom {}))
 
-(def time-atoms [time-atom-1 time-atom-2 time-atom-3 time-atom-4 time-atom-5
-                 time-atom-6 time-atom-7 time-atom-8 time-atom-9 time-atom-10])
+;; (def time-atoms [time-atom-1 time-atom-2 time-atom-3 time-atom-4 time-atom-5
+;;                  time-atom-6 time-atom-7 time-atom-8 time-atom-9 time-atom-10])
 
 (def clover-sql-training-atom (ut/thaw-atom {} "./data/training/clover-sql-training-atom.edn"))
 (def clover-sql-enriched-training-atom (ut/thaw-atom {} "./data/training/clover-sql-enriched-training-atom.edn"))
@@ -155,6 +155,9 @@
 
 (defonce general-scheduler-thread-pool
   (Executors/newScheduledThreadPool 8))
+
+(defonce websocket-thread-pool
+  (ThreadPoolExecutor. 100 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
 ;; (defonce general-scheduler-thread-pool
 ;;   (ThreadPoolExecutor. 4 50 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
@@ -180,13 +183,24 @@
 (defonce pool-exec-times (atom {}))
 (defonce thread-pool-timing? true)
 
-(defn create-cached-thread-pool []
-  (ThreadPoolExecutor. 1 1000 80 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+(defn create-cached-thread-pool [name]
+  (if (or (cstr/includes? (str name) "watchers/") 
+          (cstr/includes? (str name) "subscriptions/"))
+    (ThreadPoolExecutor. 10 300 60 TimeUnit/SECONDS  (ArrayBlockingQueue. 20) (ThreadPoolExecutor$CallerRunsPolicy.))
+    (ThreadPoolExecutor. 1 1000 120 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))))
+
+;; for later to test with:
+;; (defn create-adaptive-pool [] 
+;;   (Executors/newWorkStealingPool))
+
+;; (defn create-bounded-pool []
+;;   (ThreadPoolExecutor. 1 100 60 TimeUnit/SECONDS  (ArrayBlockingQueue. 1000) (ThreadPoolExecutor$CallerRunsPolicy.)))
+
 
 (defn get-or-create-cached-thread-pool [name]
   (if-let [queue (@dyn-pools name)]
     queue
-    (let [new-queue (create-cached-thread-pool)]
+    (let [new-queue (create-cached-thread-pool name)]
       (ut/pp [:*creating-thread-pool-for name])
       (swap! dyn-pools assoc name new-queue)
       new-queue)))
@@ -235,6 +249,31 @@
         (.execute (get-or-create-cached-thread-pool base-type) f)
         (catch Throwable e (ut/pp [:pool-execute-on base-type :failed (str e)])))))
 
+(defn execute-in-thread-pools-but-deliver [base-type f]
+  (let [p (promise)]
+    (if thread-pool-timing?
+      (let [start-time (System/nanoTime)]
+        (try
+          (.execute (get-or-create-cached-thread-pool base-type)
+                    (fn []
+                      (try
+                        (deliver p (f))
+                        (finally
+                          (let [end-time (System/nanoTime)
+                                exec-time (/ (- end-time start-time) 1e6)]
+                            (add-exec-time base-type exec-time))))))
+          (catch Throwable e
+            (ut/pp [:timed-pool-execute-on base-type :failed (str e)])
+            (deliver p (throw e)))))  ; Re-throw the exception if thread pool execution fails
+      (try
+        (.execute (get-or-create-cached-thread-pool base-type)
+                  #(deliver p (f)))
+        (catch Throwable e
+          (ut/pp [:pool-execute-on base-type :failed (str e)])
+          (deliver p (throw e)))))  ; Re-throw the exception if thread pool execution fails
+    @p))  ; Dereference the promise to return the result or propagate the exception
+
+
 (defn- compare-states [old-state new-state path-acc]
   (cond
     ; If states are equal, no changes
@@ -262,10 +301,11 @@
                 ;(when (ut/ne? (flatten changed-kp)) 
                 ;  (ut/pp [:w+ client-name base-type key flow-key (break-up-flow-key-ext flow-key) changed-kp]))
              (ut/ne? (flatten changed-kp)))
-       (execute-in-thread-pools (keyword (str "watchers/" (cstr/replace (str base-type) ":" "")
+       (execute-in-thread-pools (keyword (str (if client-name 
+                                                "subscriptions/"
+                                                "watchers/") (cstr/replace (str base-type) ":" "")
                                               ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
-                                              (when client-name ".*")
-                                              ))
+                                              (when client-name ".*")))
                                 (fn []
                                   (try
                                     (watcher-fn key ref old-state new-state)
@@ -302,6 +342,7 @@
         ;                          (cstr/replace (str client-name) ":" "")))
         ;            ;;(keyword (str "client/" (cstr/replace (str client-name) ":" ""))) ;client-name
         ;            base-type)
+        base-type (if (and (cstr/includes? (str flow-key) ">*") (= base-type :flow)) :flow-status base-type)
         wrapped-watcher (wrap-custom-watcher-pool watcher-fn base-type client-name flow-key)]
     (add-watch atom key wrapped-watcher)))
 
@@ -314,8 +355,7 @@
 ;;(defonce websocket-thread-pool (Executors/newFixedThreadPool 300)) ; Pool for WebSocket connections
 ;; (defonce websocket-thread-pool (doto (Executors/newFixedThreadPool 300)
 ;;                                  (.prestartAllCoreThreads)))
-(defonce websocket-thread-pool ;; master watchers
-  (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+
 
 ;; (defonce solver-thread-pool ;; master watchers
 ;;   (ThreadPoolExecutor. 20 300 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
@@ -1282,7 +1322,7 @@
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 100))] ;; was 100, was (async/sliding-buffer
+  (let [results (async/chan (async/sliding-buffer 1000))] ;; was 100, was (async/sliding-buffer
     (try (async/go-loop []
            (async/<! (async/timeout (safe-get-timeout client-name))) ;; was 1100 ?
            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
@@ -1313,10 +1353,10 @@
 
 (defn push-to-client
   [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
-  (qp/slot-queue :push-to-client client-name
+  ;(qp/slot-queue :push-to-client client-name
   ;(enqueue-task-slot2 client-name 
   ;(execute-in-thread-pools (keyword (str "client/push-to-client." (cstr/replace (str client-name) ":" "")))
-                 (fn []
+  ;               (fn []
                    (try
                      (let [rr                0 ;(rand-int 3)
                            cq                (get client-queue-atoms rr)
@@ -1340,7 +1380,7 @@
                          (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
                            (new-client client-name)
                            (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
-                     (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))))))
+                     (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))));))
 
 (defn react-to-file-changes
   [{:keys [path type]}]
@@ -2127,159 +2167,163 @@
 
 (defn flow!
   [client-name flowmap file-image flow-id opts & [no-return?]]
-  (try
-    (let [orig-flowmap     flowmap
-          from-string?     (true? (string? flowmap))
-          _ (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of
-          orig-opts        opts ;; contains overrides
-          oo-flowmap       (if (string? flowmap) ;; load from disk and run client sync post
-                             (let [fss         (str "./flows/" flowmap ".edn")
-                                   raw         (try (edn/read-string (slurp fss))
-                                                    (catch Exception _
-                                                      (do (ut/pp [:error-reading-flow-from-disk-oo-flowmap-flow! fss flow-id
-                                                                  client-name])
-                                                          {})))
-                                   flowmaps    (process-flow-map (get raw :flowmaps))
-                                   connections (get raw :flowmaps-connections)
-                                   fmap        (process-flowmap2 flowmaps connections flow-id)
-                                   fmap        (merge fmap {:opts (get raw :opts)})]
-                               fmap)
-                             flowmap)
-          file-image       (or file-image
-                               (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
-                                    (catch Exception _
-                                      (do (when (not= flow-id "client-keepalive") ;; since no
-                                            (ut/pp [:error-reading-flow-from-disk-file-image-flow! flow-id client-name]))
-                                          {}))))
-          user-opts        (get oo-flowmap :opts (get opts :opts))
-          opts             (assoc opts :opts user-opts) ;; kinda weird, but we need to account
-          walk-map         (into {}
-                                 (for [[k v] (get @params-atom client-name)]
-                                   {(keyword (str "param/" (cstr/replace (str k) ":" ""))) v}))
-          flowmap          (walk/postwalk-replace walk-map oo-flowmap)
-          uid              (get opts :instance-id (str flow-id)) ;(ut/generate-name)
-          post-id          (if (get opts :increment-id? false) ;; if auto increment idx, lets
-                             (str uid "-" (count (filter #(cstr/starts-with? % uid) (keys @flow-db/channel-history))))
-                             uid)
-          uuid             (str (java.util.UUID/randomUUID))
-          sub-map          {:flow-id uid :client-name client-name}
-          finished-flowmap (process-flowmaps flowmap sub-map)
-          finished-flowmap (walk/postwalk-replace (merge ;; need to do recursively eventually?
-                                                   {:client-name client-name
-                                                    :cid         client-name
-                                                    :flow-id     flow-id
-                                                    :fid         flow-id
-                                                    :client-id   client-name
-                                                    'save!       'rvbbit-backend.websockets/save!
-                                                    'tap>        'rvbbit-backend.websockets/ttap>}
-                                                   (ut/deselect-keys (get opts :opts) ;; TODO,
-                                                                     [:retries :retry-on-error? :close-on-done? :debug?
-                                                                      :timeout]))
-                                                  finished-flowmap)
-          opts             (merge opts (select-keys (get opts :opts {}) [:close-on-done? :debug? :timeout]))
-          opts             (merge {:client-name client-name} opts)
-          finished-flowmap (assoc finished-flowmap :opts opts)
-          _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter
-          _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
-          _ (swap! last-times assoc-in [flow-id :start] (System/currentTimeMillis))
-          _ (swap! tracker-client-only assoc flow-id {})
-          _ (swap! acc-trackers assoc flow-id [])
-          _ (swap! temp-error-blocks assoc flow-id [])
-          base-flow-id     (if (cstr/includes? (str flow-id) "-SHD-") (first (cstr/split flow-id #"-SHD-")) flow-id) ;; if
+  
+  (execute-in-thread-pools-but-deliver
+   (keyword (str "flow-runner/" (cstr/replace client-name ":" "")))
+   (fn []
+     (try
+       (let [orig-flowmap     flowmap
+             from-string?     (true? (string? flowmap))
+             _ (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of
+             orig-opts        opts ;; contains overrides
+             oo-flowmap       (if (string? flowmap) ;; load from disk and run client sync post
+                                (let [fss         (str "./flows/" flowmap ".edn")
+                                      raw         (try (edn/read-string (slurp fss))
+                                                       (catch Exception _
+                                                         (do (ut/pp [:error-reading-flow-from-disk-oo-flowmap-flow! fss flow-id
+                                                                     client-name])
+                                                             {})))
+                                      flowmaps    (process-flow-map (get raw :flowmaps))
+                                      connections (get raw :flowmaps-connections)
+                                      fmap        (process-flowmap2 flowmaps connections flow-id)
+                                      fmap        (merge fmap {:opts (get raw :opts)})]
+                                  fmap)
+                                flowmap)
+             file-image       (or file-image
+                                  (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
+                                       (catch Exception _
+                                         (do (when (not= flow-id "client-keepalive") ;; since no
+                                               (ut/pp [:error-reading-flow-from-disk-file-image-flow! flow-id client-name]))
+                                             {}))))
+             user-opts        (get oo-flowmap :opts (get opts :opts))
+             opts             (assoc opts :opts user-opts) ;; kinda weird, but we need to account
+             walk-map         (into {}
+                                    (for [[k v] (get @params-atom client-name)]
+                                      {(keyword (str "param/" (cstr/replace (str k) ":" ""))) v}))
+             flowmap          (walk/postwalk-replace walk-map oo-flowmap)
+             uid              (get opts :instance-id (str flow-id)) ;(ut/generate-name)
+             post-id          (if (get opts :increment-id? false) ;; if auto increment idx, lets
+                                (str uid "-" (count (filter #(cstr/starts-with? % uid) (keys @flow-db/channel-history))))
+                                uid)
+             uuid             (str (java.util.UUID/randomUUID))
+             sub-map          {:flow-id uid :client-name client-name}
+             finished-flowmap (process-flowmaps flowmap sub-map)
+             finished-flowmap (walk/postwalk-replace (merge ;; need to do recursively eventually?
+                                                      {:client-name client-name
+                                                       :cid         client-name
+                                                       :flow-id     flow-id
+                                                       :fid         flow-id
+                                                       :client-id   client-name
+                                                       'save!       'rvbbit-backend.websockets/save!
+                                                       'tap>        'rvbbit-backend.websockets/ttap>}
+                                                      (ut/deselect-keys (get opts :opts) ;; TODO,
+                                                                        [:retries :retry-on-error? :close-on-done? :debug?
+                                                                         :timeout]))
+                                                     finished-flowmap)
+             opts             (merge opts (select-keys (get opts :opts {}) [:close-on-done? :debug? :timeout]))
+             opts             (merge {:client-name client-name} opts)
+             finished-flowmap (assoc finished-flowmap :opts opts)
+             _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter
+             _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
+             _ (swap! last-times assoc-in [flow-id :start] (System/currentTimeMillis))
+             _ (swap! tracker-client-only assoc flow-id {})
+             _ (swap! acc-trackers assoc flow-id [])
+             _ (swap! temp-error-blocks assoc flow-id [])
+             base-flow-id     (if (cstr/includes? (str flow-id) "-SHD-") (first (cstr/split flow-id #"-SHD-")) flow-id) ;; if
                                                                                                                      ;; history
                                                                                                                      ;; run,
                                                                                                                      ;; only for
                                                                                                                      ;; estimates
                                                                                                                      ;; for now
-          prev-times       (get @times-atom base-flow-id [-1])
-          ship-est         (fn [client-name]
-                             (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
-                                               (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
-                                    (when (not (nil? times))
-                                      (kick client-name [:estimate] {flow-id {:times times :run-id uuid}} nil nil nil)))
-                                  (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
-          _ (ship-est client-name)
-          image-map        (assoc file-image :opts (merge (get file-image :opts) (select-keys orig-opts [:overrides])))
-          _ (do (ext/create-dirs "./flow-history") ;; just in case
-                (spit ;; a partial flow-history map so if someone wants to "jump into" a
-                 (str "./flow-history/" flow-id ".edn")
-                 {:image       image-map ;; a partial flow-history map so if someone wants to
-                  :source-map  finished-flowmap
-                  :client-name client-name
-                  :flow-id     flow-id}))
-          return-val       (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn
-          retry?           (get-in opts [:opts :retry-on-error?] false)
-          restarts         (if retry? (- (get-in opts [:opts :retries] 0) (get @restart-map flow-id 0)) 0)
-          restarts-left?   (> restarts 0)
-          relevant-keys    (vec (filter #(cstr/starts-with? (str %) (str post-id)) (keys @flow-db/results-atom)))
-          working-data-ref (into {} (for [[k v] (select-keys @flow-db/working-data relevant-keys)] {k (get v :description)}))
-          run-id           (get-in @flow-db/results-atom [flow-id :run-id] "no-run-id")
-          output           {:client-name     client-name
-                            :flow-id         flow-id
-                            :run-id          run-id
-                            :fn-history      {} ;(select-keys @flow-db/fn-history
-                            :run-refs        working-data-ref
-                            :tracker         (select-keys @flow-db/tracker relevant-keys) ;; generally
-                            :tracker-history (ut/accumulate-unique-runs (get @tracker-history flow-id []))
-                            :source-map      finished-flowmap ;(if no-return? {}
-                            :return-maps     (if no-return? {} (select-keys @flow-db/results-atom relevant-keys))
-                            :return-map      {} ;(get @flow-db/results-atom post-id)
-                            :return-val      (if no-return? nil return-val)}]
-      (do
-        (swap! restart-map assoc flow-id (inc (get @restart-map flow-id 0)))
+             prev-times       (get @times-atom base-flow-id [-1])
+             ship-est         (fn [client-name]
+                                (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
+                                                  (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
+                                       (when (not (nil? times))
+                                         (kick client-name [:estimate] {flow-id {:times times :run-id uuid}} nil nil nil)))
+                                     (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
+             _ (ship-est client-name)
+             image-map        (assoc file-image :opts (merge (get file-image :opts) (select-keys orig-opts [:overrides])))
+             _ (do (ext/create-dirs "./flow-history") ;; just in case
+                   (spit ;; a partial flow-history map so if someone wants to "jump into" a
+                    (str "./flow-history/" flow-id ".edn")
+                    {:image       image-map ;; a partial flow-history map so if someone wants to
+                     :source-map  finished-flowmap
+                     :client-name client-name
+                     :flow-id     flow-id}))
+             return-val       (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn
+             retry?           (get-in opts [:opts :retry-on-error?] false)
+             restarts         (if retry? (- (get-in opts [:opts :retries] 0) (get @restart-map flow-id 0)) 0)
+             restarts-left?   (> restarts 0)
+             relevant-keys    (vec (filter #(cstr/starts-with? (str %) (str post-id)) (keys @flow-db/results-atom)))
+             working-data-ref (into {} (for [[k v] (select-keys @flow-db/working-data relevant-keys)] {k (get v :description)}))
+             run-id           (get-in @flow-db/results-atom [flow-id :run-id] "no-run-id")
+             output           {:client-name     client-name
+                               :flow-id         flow-id
+                               :run-id          run-id
+                               :fn-history      {} ;(select-keys @flow-db/fn-history
+                               :run-refs        working-data-ref
+                               :tracker         (select-keys @flow-db/tracker relevant-keys) ;; generally
+                               :tracker-history (ut/accumulate-unique-runs (get @tracker-history flow-id []))
+                               :source-map      finished-flowmap ;(if no-return? {}
+                               :return-maps     (if no-return? {} (select-keys @flow-db/results-atom relevant-keys))
+                               :return-map      {} ;(get @flow-db/results-atom post-id)
+                               :return-val      (if no-return? nil return-val)}]
+         (do
+           (swap! restart-map assoc flow-id (inc (get @restart-map flow-id 0)))
         ;; (when (not (cstr/includes? flow-id "keepalive"))
         ;;   (ut/pp [:flowmap-returned-val (ut/limited (ut/replace-large-base64 return-val)) :flowmap-returned-val]))
-        (let [cnt         (count (str return-val))
-              limit       160
-              over?       (> cnt limit)
-              error?      (or (cstr/includes? (str return-val) ":error") (cstr/includes? (str return-val) ":timeout"))
-              sample      (str ; (str (get-in @flow-status [flow-id :*time-running]) " ")
-                           (if over? (str (subs (str return-val) 0 limit) "...") (str return-val)))
-              result-code (cond (cstr/includes? (str return-val) ":error")   "error"
-                                (cstr/includes? (str return-val) ":timeout") "timeout"
-                                :else                                        "success")
-              sample      (if error? (get-in return-val [:error :error] sample) sample)]
-          (alert! client-name
-                  [:v-box :justify :center :style {:margin-top "-6px" :color (if error? "red" "inherit")} :children
-                   [[:box :child (str "flow " flow-id " has finished" (when error? (str " in error")))]
-                    (when (and error? restarts-left?)
-                      [:box :style {:font-size "9px"} :child (str "  " restarts " attempts left, restarting in 10 seconds...")])
-                    (when (not error?)
-                      [:box :style {:font-weight 700 :font-size "10px" :opacity 0.7} :child
-                       (str (get-in @flow-status [flow-id :*time-running]) " ")])
-                    [:box :style {:font-weight 700 :font-size (if error? "13px" "10px") :opacity (if error? 1.0 0.7)} :child
-                     (if error? (str sample) (str "returns: " sample))]]]
-                  10
-                  (if (and error? restarts-left?) 1.5 1.35)
-                  (if error? 25 9))
-          (when (and error? restarts-left?)
-            (async/thread (do (Thread/sleep 10000) (flow! client-name orig-flowmap file-image flow-id opts))))
-          (when (not error?) (swap! restart-map dissoc flow-id)) ;; reset the counter on
-          (do (when (not (= flow-id "client-keepalive")) ;; no need to track heartbeats..
-                (swap! latest-run-id assoc flow-id run-id)
-                (ut/pp [:saving-flow-exec-for flow-id result-code run-id])
-                (do (ext/create-dirs "./flow-history") ;; just in case
-                    (spit ;; ut/pretty-spit
-                     (str "./flow-history/" run-id ".edn")
-                     (ut/replace-large-base64 (merge output
-                                                     {;;:image file-image ;; as unprocessed as we can w/o being a file path
-                                                      :image       image-map
-                                                      :return-maps (select-keys @flow-db/results-atom relevant-keys) ;; in
+           (let [cnt         (count (str return-val))
+                 limit       160
+                 over?       (> cnt limit)
+                 error?      (or (cstr/includes? (str return-val) ":error") (cstr/includes? (str return-val) ":timeout"))
+                 sample      (str ; (str (get-in @flow-status [flow-id :*time-running]) " ")
+                              (if over? (str (subs (str return-val) 0 limit) "...") (str return-val)))
+                 result-code (cond (cstr/includes? (str return-val) ":error")   "error"
+                                   (cstr/includes? (str return-val) ":timeout") "timeout"
+                                   :else                                        "success")
+                 sample      (if error? (get-in return-val [:error :error] sample) sample)]
+             (alert! client-name
+                     [:v-box :justify :center :style {:margin-top "-6px" :color (if error? "red" "inherit")} :children
+                      [[:box :child (str "flow " flow-id " has finished" (when error? (str " in error")))]
+                       (when (and error? restarts-left?)
+                         [:box :style {:font-size "9px"} :child (str "  " restarts " attempts left, restarting in 10 seconds...")])
+                       (when (not error?)
+                         [:box :style {:font-weight 700 :font-size "10px" :opacity 0.7} :child
+                          (str (get-in @flow-status [flow-id :*time-running]) " ")])
+                       [:box :style {:font-weight 700 :font-size (if error? "13px" "10px") :opacity (if error? 1.0 0.7)} :child
+                        (if error? (str sample) (str "returns: " sample))]]]
+                     10
+                     (if (and error? restarts-left?) 1.5 1.35)
+                     (if error? 25 9))
+             (when (and error? restarts-left?)
+               (async/thread (do (Thread/sleep 10000) (flow! client-name orig-flowmap file-image flow-id opts))))
+             (when (not error?) (swap! restart-map dissoc flow-id)) ;; reset the counter on
+             (do (when (not (= flow-id "client-keepalive")) ;; no need to track heartbeats..
+                   (swap! latest-run-id assoc flow-id run-id)
+                   (ut/pp [:saving-flow-exec-for flow-id result-code run-id])
+                   (do (ext/create-dirs "./flow-history") ;; just in case
+                       (spit ;; ut/pretty-spit
+                        (str "./flow-history/" run-id ".edn")
+                        (ut/replace-large-base64 (merge output
+                                                        {;;:image file-image ;; as unprocessed as we can w/o being a file path
+                                                         :image       image-map
+                                                         :return-maps (select-keys @flow-db/results-atom relevant-keys) ;; in
                                                                                                                       ;; case
-                                                      :return-val  return-val} ;; in case no-return? is true
+                                                         :return-val  return-val} ;; in case no-return? is true
 ))))) ;; just for the record
-              output))))
-    (catch Throwable e ;; mostly for mal-formed raw-fns, etc TODO make more informative
-      (let [error-map (Throwable->map e)]
-        (do (ut/pp [:error-in-flow-processing error-map])
-            (alert! client-name
-                    [:v-box :children
-                     [[:box :child (str flow-id ":error in flow processing!")] [:box :child (str (:phase error-map))]
-                      [:box :style {:font-size "11px"} :child (str (:cause error-map))]]]
-                    10
-                    2.1
-                    8)
-            {:error error-map})))))
+                 output))))
+       (catch Throwable e ;; mostly for mal-formed raw-fns, etc TODO make more informative
+         (let [error-map (Throwable->map e)]
+           (do (ut/pp [:error-in-flow-processing error-map])
+               (alert! client-name
+                       [:v-box :children
+                        [[:box :child (str flow-id ":error in flow processing!")] [:box :child (str (:phase error-map))]
+                         [:box :style {:font-size "11px"} :child (str (:cause error-map))]]]
+                       10
+                       2.1
+                       8)
+               {:error error-map})))))))
 
 (defn schedule!
   [time-seq1 flowmap & [opts]]
@@ -2391,9 +2435,11 @@
   [{:keys [client-name flowmap file-image flow-id opts no-return?]}]
   (ut/pp [:running-flow-map-from client-name])
   (when (not (get-in (flow-statuses) [flow-id :*running?] false))
-    (execute-in-thread-pools (keyword (str "client/flow-runner." (cstr/replace (str client-name) ":" ""))) ;;:flow-runner
-                         (fn []
-                           (flow! client-name flowmap file-image flow-id opts true)))))
+   ; (execute-in-thread-pools (keyword (str "client/flow-runner." (cstr/replace (str client-name) ":" ""))) ;;:flow-runner
+    ;                     (fn []
+                           (flow! client-name flowmap file-image flow-id opts true)
+     ;                      ))
+    ))
 
 (declare run-solver)
 
@@ -2755,6 +2801,8 @@
 (defonce solver-child-atoms (atom {}))
 (defonce signal-child-atoms (atom {}))
 (defonce solver-meta-child-atoms (atom {}))
+(defonce flow-status-child-atoms (atom {}))
+(defonce flow-tracker-child-atoms (atom {}))
 (defonce time-child-atoms (atom {}))
 (defonce solver-status-child-atoms (atom {}))
 
@@ -2762,6 +2810,8 @@
   (let [atoms {:screen-child-atoms screen-child-atoms
                :param-child-atoms param-child-atoms
                :panel-child-atoms panel-child-atoms
+               :flow-status-child-atoms flow-status-child-atoms
+               :flow-tracker-child-atoms flow-tracker-child-atoms
                :signal-child-atoms signal-child-atoms
                :flow-child-atoms flow-child-atoms
                :evl/repl-introspection-child-atoms evl/repl-introspection-child-atoms
@@ -2860,11 +2910,14 @@
         solver-status?  (= base-type :solver-status)
         signal-history? (= base-type :signal-history)
         server?         (= base-type :server)]
-    (cond status?         flow-status
-          tracker?        flow-db/tracker
+    (cond ;status?         flow-status
+          status?         (get-atom-splitter (first keypath) :flow flow-status-child-atoms flow-status)
+;          tracker?        flow-db/tracker
+          tracker?         (get-atom-splitter (first keypath) :flow flow-tracker-child-atoms flow-db/tracker)
           ;signal?         last-signals-atom ;; no need to split for now, will keep an eye on it (ut/hash-group (keyword (second sub-path)) num-groups)
           signal?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :signal signal-child-atoms last-signals-atom)
-          solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom) ;; last-solvers-atom
+          ;solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom) ;; last-solvers-atom
+          solver?         (get-atom-splitter (keyword (second sub-path)) :solver solver-child-atoms last-solvers-atom)
           ;solver-meta?    last-solvers-atom-meta
           solver-meta?    (get-atom-splitter (keyword (second sub-path)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
           ;repl-ns?        evl/repl-introspection-atom
@@ -2935,6 +2988,7 @@
         solver-status?  (= base-type :solver-status)
         signal-history? (= base-type :signal-history)
         server?         (= base-type :server)
+        ;base-type       (if status? :flow-status base-type)
         keypath         (cond ;flow? keypath
                           signal?         (vec (rest keypath))
                           solver?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path))))) ;;(vec
@@ -2951,11 +3005,14 @@
                           :else           keypath)
         watcher         (make-watcher keypath flow-key :all fn (= sub-type :tracker))
         atom-to-watch   (cond
-                          status?         flow-status
-                          tracker?        flow-db/tracker
+                          ;status?         flow-status
+                          status?         (get-atom-splitter (first keypath) :flow flow-status-child-atoms flow-status)
+                          ;tracker?        flow-db/tracker
+                          tracker?         (get-atom-splitter (first keypath) :flow flow-tracker-child-atoms flow-db/tracker)
                           ;signal?         last-signals-atom ;; no need to split for now, will keep an eye on
                           signal?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :signal signal-child-atoms last-signals-atom)
-                          solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom)  ;;last-solvers-atom
+                          ;solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom)  ;;last-solvers-atom
+                          solver?         (get-atom-splitter (keyword (second sub-path)) :solver solver-child-atoms last-solvers-atom)
                           data?           last-solvers-data-atom
                           ;solver-meta?    last-solvers-atom-meta
                           solver-meta?    (get-atom-splitter (keyword (second sub-path)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
@@ -2975,7 +3032,7 @@
                           :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))]
     (remove-watch atom-to-watch watch-key)
     ;;(swap! atoms-and-watchers ut/dissoc-in [client-name flow-key]) ;; pointless?
-    (add-watch+ atom-to-watch watch-key watcher base-type client-name flow-key)
+    (add-watch+ atom-to-watch watch-key watcher (if tracker? :tracker base-type) client-name flow-key)
     (swap! atoms-and-watchers assoc-in
            [client-name flow-key]
            {:created   (ut/get-current-timestamp)
@@ -3029,11 +3086,14 @@
                     client?         (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
                     :else           keypath)
           atom-to-watch (cond
-                          status?         flow-status
-                          tracker?        flow-db/tracker
+                          ;status?         flow-status
+                          status?         (get-atom-splitter (first keypath) :flow flow-status-child-atoms flow-status)
+                          ;tracker?        flow-db/tracker
+                          tracker?         (get-atom-splitter (first keypath) :flow flow-tracker-child-atoms flow-db/tracker)
                           ;signal?         last-signals-atom ;; no need to split for now,
                           signal?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :signal signal-child-atoms last-signals-atom)
-                          solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom) ;;last-solvers-atom 
+                          ;solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom)
+                          solver?         (get-atom-splitter (keyword (second sub-path)) :solver solver-child-atoms last-solvers-atom)
                           data?           last-solvers-data-atom ;; ^^ same as above -
                                                                  ;; take a hint, choom.
                           ;solver-meta?    last-solvers-atom-meta
@@ -3185,7 +3245,7 @@
 (declare query-runstream)
 
 (defn solver-sql
-  [solver-name honey-sql snapshot?] ;; basically same as front-end - convert the query to a
+  [solver-name honey-sql snapshot? & [client-name]] ;; basically same as front-end - convert the query to a
   ;; (ut/pp [:solver-sql [solver-name (str honey-sql) snapshot?]])
   (let [style-rules    (get honey-sql :style-rules)
         orig-honey-sql honey-sql
@@ -3200,8 +3260,9 @@
         flat           (ut/deep-flatten honey-sql)
         literal-data?  (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
         honey-modded   (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
-        client-name    :rvbbit
+        client-name    (or client-name :rvbbit)
         honey-modded   (walk/postwalk-replace {:*client-name client-name :*client-name-str (pr-str client-name)} honey-modded)
+        client-name    (keyword (str (cstr/replace (str client-name) ":" "") ".via-solver"))
         client-cache?  (if literal-data? (get honey-sql :cache? true) false)]
     ;; (ut/pp [:solver-sql! solver-name orig-honey-sql honey-sql honey-modded connection-id client-name snapshot?])
     (query-runstream :honey-xcall
@@ -3432,7 +3493,11 @@
         (= runner-type :nrepl)
         (try (let [repl-host                   (get-in runner-map [:runner :host])
                    repl-port                   (get-in runner-map [:runner :port])
-                   {:keys [result elapsed-ms]} (ut/timed-exec (evl/repl-eval vdata repl-host repl-port client-name solver-name))
+                   {:keys [result elapsed-ms]} (ut/timed-exec 
+                                                    (execute-in-thread-pools-but-deliver
+                                                     (keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
+                                                     (fn []
+                                                       (evl/repl-eval vdata repl-host repl-port client-name solver-name))))
                    output-full                 result
                    output                      (last (get-in output-full [:evald-result :value]))
                    output-full                 (-> output-full
@@ -3482,7 +3547,8 @@
 
         (= runner-type :flow) ;; no runner def needed for anon flow pulls
         (try
-          (let [client-name                 :rvbbit
+          (let [client-name                 (or client-name :rvbbit)
+                client-name                 (keyword (str (cstr/replace (str client-name) ":" "") ".via-solver"))
                 flowmap                     (get vdata :flowmap)
                 opts                        (merge {:close-on-done? true :increment-id? false :timeout 10000}
                                                    (get vdata :opts {}))
@@ -3697,7 +3763,7 @@
                                                       (= (get sv :signal)
                                                          (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
                                     ;(enqueue-task4 (fn []
-                                    (execute-in-thread-pools (keyword (str "client/process-signal." (cstr/replace (str client-name) ":" "")))
+                                    (execute-in-thread-pools (keyword (str "signal/run-solver." (cstr/replace (str client-name) ":" "")))
                                      ;(qp/slot-queue :solvers-int sk ;;client-name 
                                                          (fn []
                                                            (run-solver sk client-name)))))
@@ -5061,18 +5127,23 @@
                                     (<! result-chan)))] ; This returns a channel; This returns
         (do (println "inviz: Getting result from async operation...") (async/<!! async-result-chan)))) ; Blocking take from
                                                                                                          ; the channel
-     (query-runstream kind
-                      ui-keypath
-                      honey-sql
-                      client-cache?
-                      sniff?
-                      connection-id
-                      client-name
-                      page
-                      panel-key
-                      clover-sql
-                      deep-meta?
-                      false))))
+     
+     (execute-in-thread-pools-but-deliver
+      (keyword (str "query-runstream/" (cstr/replace client-name ":" "")))
+      (fn []
+        (query-runstream kind
+                         ui-keypath
+                         honey-sql
+                         client-cache?
+                         sniff?
+                         connection-id
+                         client-name
+                         page
+                         panel-key
+                         clover-sql
+                         deep-meta?
+                         false)))
+     )))
 
 (defn send-file-success
   [content filename]
@@ -6226,8 +6297,8 @@
   {:port                 websocket-port
    :join?                false
    :async?               true
-   :min-threads          50
-   :max-threads          300 ;; from our dedicated pool
+   ;:min-threads          50
+   ;:max-threads          300 ;; from our dedicated pool
    :input-buffer-size    32768
    :output-buffer-size   131072
    :max-message-size     6291456 ;; 6MB

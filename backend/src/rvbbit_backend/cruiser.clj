@@ -1383,14 +1383,7 @@
   (doall
     (try
       (let [connect-meta      (surveyor/jdbc-connect-meta target-db f-path)
-            orig-conn         (if (cstr/ends-with? (cstr/lower-case f-path) "edn") (edn/read-string (slurp f-path)) target-db) ;; in
-                                                                                                                               ;; order
-                                                                                                                               ;; to
-                                                                                                                               ;; not
-                                                                                                                               ;; disrupt
-                                                                                                                               ;; hardcoded
-                                                                                                                               ;; cache.db
-                                                                                                                               ;; and
+            orig-conn         (if (cstr/ends-with? (cstr/lower-case f-path) "edn") (edn/read-string (slurp f-path)) target-db) 
             connection_id     (get connect-meta :connection_id)
             this-run-id       (get-latest-run-id system-db connect-meta)
             field-vectors-all (create-target-field-vectors target-db connect-meta) ;; this is a
