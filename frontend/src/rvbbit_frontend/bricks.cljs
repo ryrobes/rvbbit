@@ -1869,16 +1869,20 @@
                             :w             width
                             :root          root
                             :tab           tab
-                            :selected-view :hi
+                            :selected-view :hare-vw
                             :name          new-key
-                            :views         {:hi [:box :align :center :justify :center :attr {:id (str new-keyw "." :hi)} :style
-                                                 {:font-size    "106px"
+                            :views         {:hare-vw [:box :align :center :justify :center :attr {:id (str new-keyw "." :hi)} :style
+                                                 {:font-size    "21px"
                                                   :font-weight  700
                                                   :padding-top  "6px"
                                                   :padding-left "14px"
                                                   :margin-top   "-8px"
                                                   :color        :theme/editor-outer-rim-color ;"#f9b9f9"
-                                                  :font-family  :theme/base-font} :child "hi!"]}
+                                                  :font-family  :theme/base-font} 
+                                                 :child 
+                                                 ;;["hi!"]
+                                                 "It's a perfect day for planting seeds and planning adventures!"
+                                                 ]}
                             :queries       {}})]
       (ut/tracked-dispatch [::update-workspace [new-keyw] base-map])
       (reset! hover-square nil))))

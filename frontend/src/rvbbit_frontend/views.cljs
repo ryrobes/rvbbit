@@ -58,7 +58,7 @@
           off-y   (:y offset)
           x       (- start-x off-x)
           y       (- start-y off-y)]
-      (ut/tapp>> (str @detached-coords))
+      ;;(ut/tapp>> (str @detached-coords))
       (reset! detached-coords [x y]))))
 
 (defn mutate-editor-as-edge [edge]
@@ -76,7 +76,7 @@
                    bh (- (Math/floor (/ hh bb)) 2)]
                (reset! detached-coords [(- ww bwpx) bb])
                (reset! editor-size [bw bh]))
-      :top (let [bw (- (Math/floor (/ ww bb)) 2)
+      :top (let [bw (- (Math/floor (/ ww bb)) 2) 
                  bh (* (Math/floor (/ hh bb)) 0.3)]
              (reset! detached-coords [bb 32])
              (reset! editor-size [bw bh]))
@@ -86,6 +86,18 @@
                 (reset! editor-size [bw bh])))
   ))
 
+(defn clear-selection []
+  (when (.-empty js/window.getSelection)
+    (.empty js/window.getSelection))
+  (when (.-removeAllRanges js/window.getSelection)
+    (.removeAllRanges js/window.getSelection)))
+
+(defn prevent-selection [e]
+  (.preventDefault e))
+
+;; Call this function when dragging ends
+
+
 (defn mouse-up-handler
   [on-move]
   (fn me [evt] 
@@ -93,7 +105,8 @@
     (when @active-edge 
       (do (mutate-editor-as-edge @active-edge)
           (reset! active-edge nil)))
-    (do (gevents/unlisten js/window EventType.MOUSEMOVE on-move))))
+    (do ;;(clear-selection)  
+      (gevents/unlisten js/window EventType.MOUSEMOVE on-move))))
 
 (defn mouse-down-handler
   [e]
@@ -110,6 +123,7 @@
 (defonce view-browser-query (reagent/atom {}))
 
 (defonce data-browser-mode (reagent/atom :data))
+
 (defonce data-browser-system-mode (reagent/atom :data))
 
 (defn editor-panel-metadata
@@ -1319,10 +1333,11 @@
         height              (* (get @editor-size 1) bricks/brick-size)
         offset             {:x (+ -10 (- (.-clientX e) width))
                             :y (+ -30 (- (.-clientY e) height))}
-        
+
         on-move            (resize-mouse-move-handler offset)]
     (do
       (reset! bricks/dragging-editor? true)
+      ;; (when @bricks/dragging-editor? (.addEventListener js/document "mousedown" prevent-selection))
       (gevents/listen js/window EventType.MOUSEMOVE on-move))
     (gevents/listen js/window EventType.MOUSEUP
                     (mouse-up-handler on-move))))
@@ -1531,8 +1546,8 @@
                                        (not queries?)))
         vertical?           (> bricks-tall bricks-wide)
 
-        no-room-for-3?      (and (not @hide-panel-2?) (<= (if vertical? bricks-tall bricks-wide) 27))
-        no-room-for-2?      (and (not @hide-panel-3?) (<= (if vertical? bricks-tall bricks-wide) 19))
+        no-room-for-3?      (and (not @hide-panel-2?) (<= (if vertical? bricks-tall bricks-wide) 24))
+        no-room-for-2?      (and (not @hide-panel-3?) (<= (if vertical? bricks-tall bricks-wide) 16))
         ;;_ (ut/tapp>> [:no-room-for-2? no-room-for-2? :no-room-for-3? no-room-for-3?])
         panel-count         (if system-panel? 3
                                 (if
@@ -1547,6 +1562,21 @@
         ttl-width-px        (px ttl-width)
 
         single-height-bricks (if vertical? (js/Math.floor (/ bricks-tall panel-count)) bricks-tall)
+        single-width-bricks (if vertical? bricks-wide (js/Math.floor (/ bricks-wide panel-count)))
+
+        pdiff (if vertical?
+                (- (Math/floor bricks-tall) (* single-height-bricks panel-count))
+                (- (Math/floor bricks-wide) (* single-width-bricks panel-count)))
+        
+        single-height-bricks (if (and (> pdiff 0) vertical?) 
+                               (+ single-height-bricks (/ pdiff panel-count) 0.15)
+                               single-height-bricks)
+        
+        single-width-bricks (if (and (> pdiff 0) (not vertical?))
+                               (+ single-width-bricks (/ pdiff panel-count) 0.05)
+                               single-width-bricks)
+                               
+
 
         ttl-height          (* bricks-tall bricks/brick-size)
         ttl-height-px       (px (+ 10 ttl-height))
@@ -1554,8 +1584,10 @@
         x-px                (px (first @detached-coords)) ;(px (* x bricks/brick-size))
         y-px                (px (last @detached-coords)) ;(px (* y bricks/brick-size))
 
-        single-width-bricks (if vertical? bricks-wide (js/Math.floor (/ bricks-wide panel-count)))
-        single-width        (if vertical? 
+
+
+        ;single-width-bricks 
+        single-width        (if vertical?
                               (- (* single-width-bricks bricks/brick-size) 12)
                               (* single-width-bricks bricks/brick-size))
         single-width-px     (px single-width)
@@ -1569,6 +1601,11 @@
                               ;(px (+ single-height 10)) 
                               (px single-height)
                               ttl-height-px)
+
+
+        ;hdiff (- (* single-height-bricks panel-count) (Math/floor bricks-tall))
+        ;_  (ut/tapp>> [:ssw (* single-width-bricks panel-count) (Math/floor bricks-wide) vertical? pdiff])
+        ;_  (ut/tapp>> [:ssh (* single-height-bricks panel-count) (Math/floor bricks-tall) vertical? pdiff])
 
         ;; {:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
         atom-map            {:single-width-bricks single-width-bricks
@@ -1612,6 +1649,7 @@
            [re-com/box
             :child (str coord-str @active-edge (when min? " (minimum size)"))
             :style {:user-select "none"
+                    ;:pointer-events "none"
                     :font-size "33px"
                     :font-family (theme-pull :theme/base-font nil)}
             :size "1" :align :center :justify :center])]
@@ -1696,13 +1734,16 @@
                      :color         (theme-pull :theme/editor-font-color nil)
                      :border-radius (if vertical? "11px 11px 0px 0px" "11px 0px 0px 0px")
                      :background    (str "linear-gradient(" (theme-pull :theme/editor-rim-color nil) ", transparent)")
+                     ;:pointer-events "none"
                      :user-select   "none"}]
 
 
 
 
             [re-com/box
-             :style {:user-select      (when @bricks/dragging-editor? "none")}
+             :style (when @bricks/dragging-editor?
+                      {;:pointer-events "none"
+                       :user-select  "none"})
              :child (cond
                       system-panel?                                            (condp = @db/editor-mode ; @file-mode?
                                                                                  :files  [re-com/box :child [editor-panel-metadata-files]
@@ -2315,11 +2356,13 @@
          ;;; {:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
 
          (when (and (not @hide-panel-3?) (not no-room-for-3?))
-           (let [{:keys [single-width-bricks bricks-wide]} @editor-dimensions
+           (let [;{:keys [single-width-bricks bricks-wide]} @editor-dimensions
                  panels-open (if @hide-panel-2? 2 3)
-                 offset-last (if vertical? 0 (* (- bricks-wide (* panels-open single-width-bricks)) bricks/brick-size))
+                 offset-last (* bricks/brick-size (if (and vertical? (= panels-open 3)) -1 0)) ;(if vertical? 0 (* (- bricks-wide (* panels-open single-width-bricks)) bricks/brick-size))
                  ;offset-last (if @hide-panel-2?)
-                 single-width (+ single-width offset-last)
+                 single-height (+ single-height offset-last)
+                 single-height-px (px (- single-height 10))
+                 ;single-width (+ single-width offset-last)
                  single-width-px (px single-width)] ;; when size is not cleanly mod/3 we need to add the extra offset
              ;(ut/tapp>> [:panel-3 vertical? offset-last single-width single-height])
              [re-com/v-box
@@ -2406,15 +2449,20 @@
                                             [[re-com/h-box :gap "8px"
                                               :width (px (- (* single-width 0.405) (if vertical? 8 18)))
                                               :justify :end
+                                              :style {:font-size "12.5px" :margin-top "-2px"}
                                               :align :center
                                               :children
                                               (conj
-                                               (vec (for [b    (remove nil? [(when nrepl? "nrepl") "queries" "blocks"])
+                                               (vec (for [b    (remove nil? [(when nrepl? 
+                                                                               ;"nrepl"
+                                                                               "namespaces"
+                                                                               ) "queries" "blocks"])
                                                           :let [selected? (= (keyword b) @db/item-browser-mode)]]
                                                       [re-com/box :attr {:on-click #(reset! db/item-browser-mode (keyword b))}
                                                        :style
                                                        (if selected?
-                                                         {:user-select "none" :opacity 1.0}
+                                                         {:user-select "none" 
+                                                          :opacity 1.0}
                                                          {:cursor "pointer" :user-select "none" :opacity 0.3}) :child
                                                        (str b)]))
                                                [re-com/md-icon-button :md-icon-name "zmdi-window-minimize" :on-click
@@ -2441,10 +2489,10 @@
                              :overflow "hidden"}])
                          [re-com/h-box
                           :height "42px"
-                          :width (px (- (* single-width 0.98) 1))
+                          ;:width (px (- (* single-width 0.98) 1))
                           :size "none"
-                          :align :center
-                          :justify :between
+                          :align :end
+                          ;:justify :end
                           :gap "9px"
                           :children [(if (not (and (= @db/editor-mode :viz) reco-selected?))
                                        (let [cc (theme-pull :theme/editor-outer-rim-color nil)
@@ -2514,6 +2562,7 @@
                :left             x-px
                :border-radius    "16px"
                :user-select      (when @bricks/dragging-editor? "none")
+               ;:pointer-events    (when @bricks/dragging-editor? "none")
                :z-index          100
                :border           (str "6px solid " (theme-pull :theme/editor-outer-rim-color nil)) ; #b7e27c"
                :filter           "drop-shadow(0.35rem 0.35rem 0.4rem rgba(0, 0, 0, 0.8))"
@@ -2677,6 +2726,7 @@
               :left            0
               :z-index         999
               :backdrop-filter "blur(8px)"
+              ;:pointer-events "none"
               :user-select     "none"
               :transition_NOT  "all 0.2s ease-in-out"
               :transform-style "preserve-3d"}])]
@@ -2754,6 +2804,7 @@
         :right           0
         :z-index         999
         :backdrop-filter "blur(8px)"
+        ;:pointer-events "none"
         :user-select     "none"
         :transition_NOT  "all 0.2s ease-in-out"
         :transform-style "preserve-3d"}])))
@@ -3338,7 +3389,7 @@
            [:svg
             {:style {:width          (px ww) ;"6200px" ;; big ass render nothing gets cut off
                      :height         (px hh) ;"6200px"
-                     :pointer-events "none"
+                     ;:pointer-events "none"
                      :z-index        8}} (bricks/draw-lines coords)])]]])))
 
 

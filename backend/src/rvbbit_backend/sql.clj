@@ -40,7 +40,8 @@
         {:jdbc-url
            ;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=EXCLUSIVE"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=NORMAL"
-           "jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
+           ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
+           "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456" 
          :idle-timeout      600000
          :maximum-pool-size 20
          :max-lifetime      1800000

@@ -5,7 +5,7 @@
 (defonce search-box (reagent/atom nil))
 (defonce context-modal-pos (reagent/atom [0 0]))
 (defonce editor-mode (reagent/atom :meta))
-(defonce item-browser-mode (reagent/atom :queries))
+(defonce item-browser-mode (reagent/atom :blocks))
 (defonce auto-refresh? (reagent/atom false))
 (defonce param-filter
   (reagent/atom {;:clicked true

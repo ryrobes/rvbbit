@@ -31,6 +31,60 @@
                      :modes [:clover]
                      :icon "images/clover.png"} ;; basic clover render
            ;; ^ these 2 are built in a required and mostly not configurable for now
+           :clojure-intro {:type :nrepl ;; this is the built-in REPL that starts by default
+                           :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
+                           :modes [:clover :text :data :rowset]
+                           :default (do
+                                      (ns hoppy.chuck-norris
+                                        (:require [clojure.data.json :as json]
+                                                  [clojure.java.io :as io]))
+
+                                      (def url (java.net.URL. "https://api.chucknorris.io/jokes/random"))
+
+                                      (defn fetch-chuck-norris-joke []
+                                        (let [conn (.openConnection url)]
+                                          (with-open [reader (io/reader (.getInputStream conn))]
+                                            (json/read (java.io.PushbackReader. reader) :key-fn keyword))))
+
+                                      (defn joke-to-hiccup [joke]
+                                        [:v-box 
+                                         :size "auto" :align :center :justify :center 
+                                         :gap "4px"
+                                         :style {:color :theme/editor-outer-rim-color}
+                                         :children [[:h2 "Chuck's Wisdom of the Day"]
+                                         [:p (:value joke)]
+                                         [:img {:src "https://placekitten.com/200/200" 
+                                                :width "200px" :height "200px" :style {:border-radius "15px"}
+                                                :alt "A cute bunny (actually a kitten)"}]]])
+
+                                      (def joke (fetch-chuck-norris-joke))
+
+                                      (def hiccup (joke-to-hiccup joke))
+
+                                      (println "Console joke output:" (pr-str (get joke :value)))
+                                      hiccup)
+                           :syntax "clojure"
+                           :placeholder-clover [:v-box
+                                                :children [;[:box :child [:string3 :*solver-name* " running..."]]
+                                                           [:img {:src "images/running.gif"
+                                                                       ;:width "70px" 
+                                                                       ;:height "70px"
+                                                                  }]]
+                                                :size "auto"
+                                                :style {:color :theme/universal-pop-color
+                                                             ;:border "1px solid white"
+                                                        :font-size "14px"}
+                                                     ;:width  :panel-width-px
+                                                :height :panel-height+50-px
+                                                :align :center :justify :center]
+                           :clover-fn [:run-solver
+                                       {:signal false
+                                        :cache? false
+                                        :type :clojure
+                                        :input-map {}
+                                        :data :clover-body}]
+                                ;:default-view [:box :child [:string :*query-id]]
+                           :icon "images/clj.png"}
            :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
                      :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
                      :modes [:clover :text :data :rowset]
@@ -168,6 +222,9 @@
                      ;:default-view [:box :child [:string :*query-id]]
                      :icon "images/python3.png"}}
  :eleven-labs-api-key nil
- :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive" ;;  "Alicia Speaks-Unique and Pleasant"  ;; "Sofia-AI-frye" ;; "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
+ ;:eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive" ;;  "Alicia Speaks-Unique and Pleasant"  ;; "Sofia-AI-frye" ;; "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
+ ;:eleven-labs-default-voice-name "Alicia Speaks-Unique and Pleasant"
+ ;:eleven-labs-default-voice-name "Sofia-AI-frye"
+ :eleven-labs-default-voice-name "Not OG Buffy"
  }
 

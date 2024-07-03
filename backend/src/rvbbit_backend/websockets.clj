@@ -5785,13 +5785,16 @@
          ;;_ (ut/pp data-base)
              draw-it (fn [ff color data]
                        (let [[data-vec kkey sym sum?] data]
-                         (ut/pp (draw-bar-graph
+                        ; (ut/pp 
+                          (draw-bar-graph
                                  (if (= ff 1)
                                    data-vec
                                    (if sum?
                                      (sum-in-chunks data-vec ff)
                                      (average-in-chunks data-vec ff)))
-                                 (str kkey " : " kks) sym :color color :freq ff :agg (if sum? "sum" "avg")))))
+                                 (str kkey " : " kks) sym :color color :freq ff :agg (if sum? "sum" "avg"))
+                         ; )
+                         ))
              freqs (if (nil? freqs) [1 15 60] freqs)
              colors [:red :green :yellow
                      :blue :magenta :cyan
@@ -6032,9 +6035,9 @@
           ;(ut/pp [:push-queues (count (keys @task-queues-slot2))])
           ;(ut/pp [:queue-party-stats (qp/get-queue-stats)])
 
-        (draw-stats :cpu [1 15])
-        (draw-stats :threads [1 15])
-        (draw-stats :mem [1 15])
+        (draw-stats :cpu [3 15])
+        (draw-stats :threads [3 15])
+        (draw-stats :mem [3 15])
           ;(draw-stats :msgs [1 15])
 ;          (draw-stats :queues [1 15])
           ;(draw-stats :workers [1 15])
@@ -6047,7 +6050,7 @@
           ;; (draw-mem-stats)
           ;; (draw-msg-stats)
 
-        (draw-pool-stats nil [15])
+        ;(draw-pool-stats nil [15])
 
         (ut/pp [:pool-sizes
                 (let [pool-sizes (query-pool-sizes) 
