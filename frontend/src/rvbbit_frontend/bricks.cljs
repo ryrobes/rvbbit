@@ -1102,6 +1102,8 @@
 
 (re-frame/reg-event-db ::toggle-session-modal (fn [db [_]] (assoc db :session-modal? (not (get db :session-modal? false)))))
 
+(re-frame/reg-event-db ::toggle-quake-console (fn [db [_]] (assoc db :quake-console? (not (get db :quake-console? false)))))
+
 (re-frame/reg-event-db ::disable-session-modal (fn [db [_]] (assoc db :session-modal? false)))
 
 (re-frame/reg-sub ::session-modal? (fn [db] (get db :session-modal? false)))
@@ -1109,6 +1111,8 @@
 (re-frame/reg-event-db ::toggle-flow-gantt (fn [db [_]] (assoc-in db [:flow-gantt?] (not (get-in db [:flow-gantt?] false)))))
 
 (re-frame/reg-sub ::flow-gantt? (fn [db _] (get db :flow-gantt? false)))
+
+(re-frame/reg-sub ::quake-console? (fn [db _] (get db :quake-console? false)))
 
 (re-frame/reg-event-db ::toggle-editor
                        (fn [db [_]]

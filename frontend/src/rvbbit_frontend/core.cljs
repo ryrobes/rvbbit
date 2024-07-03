@@ -71,7 +71,8 @@
                              [[::bricks/panel-depth-up] [{:keyCode 82 :shiftKey true}]] ; shift-r
                              [[::bricks/panel-depth-down] [{:keyCode 70 :shiftKey true}]] ; shift-f
                              [[::flows/run-current-flowmap] [{:keyCode 70} {:keyCode 70}]] ; f f
-                             [[::bricks/toggle-session-modal] [{:keyCode 192}]] ; ` tilde
+                             ;[[::bricks/toggle-session-modal] [{:keyCode 192}]] ; ` tilde
+                             [[::bricks/toggle-quake-console] [{:keyCode 192}]] ; ` tilde
                              [[::bricks/save] [{:keyCode 83 :shiftKey false :ctrlKey true}]] ;; ctrl-s
                              [[::bricks/nudge-panel :up] [{:keyCode 87}]] ; w
                              [[::bricks/nudge-panel :down] [{:keyCode 83}]] ; s

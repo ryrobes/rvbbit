@@ -1,33 +1,44 @@
 (ns rvbbit-frontend.views
   (:require
-    [cljs-drag-n-drop.core   :as dnd2]
-    [cljs.tools.reader       :refer [read-string]]
-    [clojure.data            :as cdata]
-    [clojure.edn             :as edn]
-    [clojure.string          :as cstr]
-    [clojure.walk            :as walk]
-    [goog.events             :as gevents]
+   [cljs-drag-n-drop.core   :as dnd2]
+   [cljs.tools.reader       :refer [read-string]]
+   [clojure.data            :as cdata]
+   [clojure.edn             :as edn]
+   [clojure.string          :as cstr]
+   [clojure.walk            :as walk]
+   [goog.events             :as gevents]
     ;[re-catch.core           :as rc]
-    [re-com.core             :as    re-com
-                             :refer [at]]
-    [re-com.util             :refer [px]]
-    [re-frame.alpha          :as rfa]
-    [re-frame.core           :as re-frame]
-    [reagent.core            :as reagent]
-    [rvbbit-frontend.audio   :as audio]
-    [rvbbit-frontend.bricks  :as    bricks
-                             :refer [theme-pull]]
-    [rvbbit-frontend.buffy   :as buffy]
-    [rvbbit-frontend.connections :as conn]
-    [rvbbit-frontend.db      :as db]
-    [rvbbit-frontend.flows   :as flows]
-    [rvbbit-frontend.http    :as http]
-    [rvbbit-frontend.shapes  :as shape]
-    [rvbbit-frontend.resolver    :as resolver]
-    [rvbbit-frontend.subs    :as subs]
-    [rvbbit-frontend.utility :as ut]
-    [talltale.core           :as tales]
-    [websocket-fx.core       :as wfx])
+   ["codemirror/addon/edit/closebrackets.js"]
+   ["codemirror/addon/edit/matchbrackets.js"]
+   ["codemirror/addon/hint/show-hint.js"]
+   ["codemirror/mode/clojure/clojure.js"]
+   ["codemirror/mode/shell/shell.js"]
+   ["codemirror/mode/julia/julia.js"]
+   ["codemirror/mode/markdown/markdown.js"]
+   ["codemirror/mode/python/python.js"]
+   ["codemirror/mode/r/r.js"]
+   ["codemirror/mode/sql/sql.js"]
+   ["react-codemirror2" :as cm]
+   [re-com.core             :as    re-com
+    :refer [at]]
+   [re-com.util             :refer [px]]
+   [re-frame.alpha          :as rfa]
+   [re-frame.core           :as re-frame]
+   [reagent.core            :as reagent]
+   [rvbbit-frontend.audio   :as audio]
+   [rvbbit-frontend.bricks  :as    bricks
+    :refer [theme-pull]]
+   [rvbbit-frontend.buffy   :as buffy]
+   [rvbbit-frontend.connections :as conn]
+   [rvbbit-frontend.db      :as db]
+   [rvbbit-frontend.flows   :as flows]
+   [rvbbit-frontend.http    :as http]
+   [rvbbit-frontend.shapes  :as shape]
+   [rvbbit-frontend.resolver    :as resolver]
+   [rvbbit-frontend.subs    :as subs]
+   [rvbbit-frontend.utility :as ut]
+   [talltale.core           :as tales]
+   [websocket-fx.core       :as wfx])
   (:import
     [goog.events EventType]
     [goog.async  Debouncer]))
@@ -1517,8 +1528,225 @@
               [docker-edge :top bricks-wide bricks-tall]
               [docker-edge :bottom bricks-wide bricks-tall]]])
 
- 
+;; (defn console-text-box
+;;   [width-int height-int value]
+;;   [re-com/box :size "auto" :width (px (- width-int 24)) :max-height (px (- height-int 24)) :style
+;;    {;:background-color "#00000085"
+;;     :font-family   (theme-pull :theme/monospaced-font nil) ; "Fira Code" ;"Chivo Mono"
+;;     :margin-left   "9px"
+;;     :font-size     "20px"
+;;     :overflow      "hidden"
+;;     :border-radius "12px"
+;;     :font-weight   400} :child
+;;    [(reagent/adapt-react-class cm/UnControlled)
+;;     {:value   value
+;;      :options {:mode              "clojure"
+;;                :lineWrapping      true ;false
+;;                :lineNumbers       false
+;;                :matchBrackets     true
+;;                :autoCloseBrackets true
+;;                :autofocus         false
+;;                :autoScroll        false
+;;                :detach            true
+;;                :readOnly          false
+;;                :theme             (theme-pull :theme/codemirror-theme nil)}}]])
 
+
+(defonce cm-instance (reagent/atom nil))
+(defonce hide-responses? (reagent/atom false))
+(defonce console-responses (reagent/atom {})) 
+(defonce console-history (reagent/atom #{})) 
+
+(defn run-console-command [command]
+  (ut/tapp>> (str "Command entered: " command))
+  (reset! hide-responses? false)
+  (let [ee (str "fs dfsdf s" command " asdasdasd")]
+    (swap! console-responses assoc command ee)))
+
+(defn console-text-box
+  [width-int height-int value on-enter]
+  (let [history-index (reagent/atom -1)]
+    (fn [width-int height-int value on-enter]
+      [re-com/box
+       :size "auto"
+       :width (px (- width-int 24))
+       :height (px height-int)
+       :style
+       {:font-family   (theme-pull :theme/monospaced-font nil)
+        :margin-left   "9px"
+        :font-size     "20px"
+        :overflow      "hidden"
+        :border-radius "12px"
+        :font-weight   700}
+       :child
+       [(reagent/adapt-react-class cm/UnControlled)
+        {:value   (or value " ")
+         :onBeforeChange (fn [editor _ _] ;; data value]
+                           (reset! cm-instance editor))
+         ;:onBlur #(re-frame/dispatch [::bricks/toggle-quake-console]) ;; when not hovered over? to detect a click off into the canvas?
+         :options {:mode              "clojure"
+                   :lineWrapping      false
+                   :lineNumbers       false
+                   :matchBrackets     true
+                   :autoCloseBrackets true
+                   :autofocus         true
+                   :autoScroll        false
+                   :theme             (theme-pull :theme/codemirror-theme nil)
+                   :extraKeys         (clj->js
+                                       {"`" (fn [cm] (re-frame/dispatch [::bricks/toggle-quake-console]))
+                                        "Enter" (fn [cm]
+                                                  (let [command (first (ut/cm-deep-values cm))]
+                                                    (when (not-empty command)
+                                                      (swap! console-history conj command)
+                                                      (reset! history-index -1)
+                                                      ;(ut/tapp>> (str "Command entered: " command))
+                                                      (run-console-command command)
+                                                      (.setValue cm ""))))
+                                        "Down" (fn [cm]
+                                                 (when (seq @console-history)
+                                                   (let [new-index (if (>= @history-index (dec (count @console-history)))
+                                                                     0
+                                                                     (inc @history-index))]
+                                                     (reset! history-index new-index)
+                                                     (.setValue cm (nth (vec @console-history) new-index)))))
+                                        "Up" (fn [cm]
+                                               (when (seq @console-history)
+                                                 (let [new-index (if (<= @history-index 0)
+                                                                   (dec (count @console-history))
+                                                                   (dec @history-index))]
+                                                   (reset! history-index new-index)
+                                                   (.setValue cm (nth (vec @console-history) new-index)))))})}}]])))
+
+(def modes ["🍀" "🌞" "🌙" "🔥" [:img {:src "images/rabbit-console.png" :width "40px" :height "40px"}]])
+(defonce selected-mode (reagent/atom "🍀"))
+
+(defn cycle-mode [current-mode]
+  (let [current-index (.indexOf modes current-mode)
+        next-index (mod (inc current-index) (count modes))]
+    (get modes next-index)))
+
+(defn quake-console [ww]
+  (let [hh (* 2  bricks/brick-size)
+        reacts! [@console-responses @console-history @hide-responses?]
+        ww (Math/floor (* ww  0.8))]
+    [re-com/v-box
+     :size "none"
+     :style {:background-color "#00000099"
+             :backdrop-filter "blur(4px) brightness(33%)"
+             :box-shadow "0px -5px 5px 0px #00000099"
+             :position "fixed" :bottom 0 :left "50%" :z-index 999 :transform "translateX(-50%)"
+             :border-radius  "11px 11px 0px 0px"
+             :width (px ww)
+             :font-weight 700
+             :transition "all 0.6s ease-in-out"
+             :padding "8px"
+             :height (px hh)}
+     :children [[re-com/h-box
+                 :justify :between
+                 :children [[re-com/box
+                             :child (if (not @hide-responses?)
+                                      (str (get @console-responses (last @console-history) "")) "")]
+                            (when
+                             (and (not @hide-responses?)
+                                  (get @console-responses (last @console-history)))
+                              [re-com/md-icon-button :md-icon-name "zmdi-close"
+                               :on-click #(reset! hide-responses? true)
+                               :style {:font-size "16px"
+                                       :opacity 0.5}])]
+                 :height (if
+                          (and (not @hide-responses?)
+                               (get @console-responses (last @console-history))) "auto" "0px")
+                 :padding "9px"
+                 :style {:position "fixed"
+                         :bottom hh ;(if (get @console-responses (last @console-history)) hh (- hh 20))
+                         :transition "all 0.6s ease-in-out"
+                         :width (px (- ww 20))
+                         :color "white"
+                         :font-size "17px"
+                         :border-radius  "11px 11px 0px 0px"
+                         :background-color "#00000099"
+                         :backdrop-filter "blur(4px) brightness(33%)"
+                         :left "50%" :z-index 999 :transform "translateX(-50%)"}]
+                [re-com/h-box
+                 :size "none" :align :center :justify :center
+                 :height (px (- hh 20))
+                 :style {:border (str "3px dashed " (theme-pull :theme/universal-pop-color nil) 33)
+                         :font-family (theme-pull :theme/monospaced-font nil)
+                         :color (theme-pull :theme/universal-pop-color nil)
+                         :border-radius "11px"
+                         :padding-left "8px"
+                         :overflow "hidden"
+                         :font-size "22px"}
+                 :children [[re-com/box
+                             :child   @selected-mode
+                             :attr {:on-click #(do (swap! selected-mode cycle-mode)
+                                                   (when @cm-instance
+                                                     (.focus @cm-instance)))}
+                             :style {:font-size "31px"
+                                     :padding-left "5px" :margin-top "4px"
+                                     :user-select "none"
+                                     :cursor "pointer"
+                                     ;:border "1px solid white"
+                                     :font-weight 700}]
+                            [console-text-box nil nil " "]]]]]))
+
+;; (defn quake-console [ww]
+;;   (let [hh (* 2 bricks/brick-size)
+;;         reacts! [@console-responses @console-history @hide-responses?]
+;;         ww (Math/floor (* ww 0.8))]
+;;     ;(reagent/with-let [cm-instance (reagent/atom nil)]
+;;       (reagent/create-class
+;;        {:component-did-mount
+;;         (fn [this]
+;;           (let [node (reagent/dom-node this)
+;;                 cm (.querySelector node ".CodeMirror")]
+;;             (when cm
+;;               (reset! cm-instance (.getDoc cm)))))
+
+;;         :component-did-update
+;;         (fn [this]
+;;           (when @cm-instance
+;;             (.focus @cm-instance)))
+
+;;         :reagent-render
+;;         (fn [ww]
+;;           [re-com/v-box
+;;            :size "none"
+;;            :style {:background-color "#00000099"
+;;                    :backdrop-filter "blur(4px) brightness(33%)"
+;;                    :box-shadow "0px -5px 5px 0px #00000099"
+;;                    :position "fixed" :bottom 0 :left "50%" :z-index 999 :transform "translateX(-50%)"
+;;                    :border-radius  "11px 11px 0px 0px"
+;;                    :width (px ww)
+;;                    :font-weight 700
+;;                    :transition "all 0.6s ease-in-out"
+;;                    :padding "8px"
+;;                    :height (px hh)}
+;;            :children [[re-com/h-box
+;;                        ;; ... (rest of your existing code)
+;;                        ]
+;;                       [re-com/h-box
+;;                        :size "none" :align :center :justify :center
+;;                        :height (px (- hh 20))
+;;                        :style {:border (str "3px dashed " (theme-pull :theme/universal-pop-color nil) 33)
+;;                                :font-family (theme-pull :theme/monospaced-font nil)
+;;                                :color (theme-pull :theme/universal-pop-color nil)
+;;                                :border-radius "11px"
+;;                                :padding-left "8px"
+;;                                :overflow "hidden"
+;;                                :font-size "22px"}
+;;                        :children [[re-com/box
+;;                                    :child  (str @selected-mode)
+;;                                    :attr {:on-click (fn []
+;;                                                       (swap! selected-mode cycle-mode)
+;;                                                       (when @cm-instance
+;;                                                         (.focus @cm-instance)))}
+;;                                    :style {:font-size "31px"
+;;                                            :padding-left "5px" :margin-top "4px"
+;;                                            :user-select "none"
+;;                                            :cursor "pointer"
+;;                                            :font-weight 700}]
+;;                                   [console-text-box nil nil " "]]]]])})));)
 
 (defn editor-panel
   [bricks-wide bricks-tall]
@@ -3073,6 +3301,7 @@
   []
   (let [editor? (and @(ut/tracked-subscribe [::bricks/editor?]) (not @bricks/dragging?))
         buffy? @(ut/tracked-subscribe [::bricks/buffy?])
+        console? @(ut/tracked-subscribe [::bricks/quake-console?])
         flows? @(ut/tracked-subscribe [::bricks/flow?])
         external? @(ut/tracked-subscribe [::bricks/external?])
         session? @(ut/tracked-subscribe [::bricks/session-modal?])
@@ -3209,7 +3438,7 @@
                                            (get custom-map :background-size))}))) :children
         [[bricks/reecatch [tab-menu]]
          [bricks/reecatch [snapshot-menu]]
-         (when @bricks/dragging-editor? 
+         (when @bricks/dragging-editor?
            [bricks/reecatch [docker-edges (Math/floor (/ ww bricks/brick-size)) (Math/floor (/ hh bricks/brick-size))]])
          (when session? [session-modal])
          (when (and editor? (not @bricks/mouse-dragging-panel?))
@@ -3227,6 +3456,7 @@
             (px (* (get @bricks/dragging-body :w) bricks/brick-size)) :height
             (px (* (get @bricks/dragging-body :h) bricks/brick-size))])
          (when (and buffy? (not @bricks/mouse-dragging-panel?)) [bricks/reecatch [buffy/chat-panel]])
+         
          (when flows? ;(and flows? (not @bricks/mouse-dragging-panel?))
            [bricks/reecatch [flows/flow-panel]]) [bricks/reecatch [bricks/grid]]
          [re-com/box :child
@@ -3364,6 +3594,7 @@
                  ;;(str " (lazy-grid? " (not (or @bricks/param-hover @bricks/query-hover)) ")")
                  )])
          [bricks/reecatch [task-bar]]
+         (when console? [bricks/reecatch [quake-console ww]])
          [bricks/reecatch [flows/alert-box]]
          [re-com/box :child
           [re-com/md-icon-button :src (at) :md-icon-name "zmdi-labels" :tooltip "toggle display mode" :on-click
