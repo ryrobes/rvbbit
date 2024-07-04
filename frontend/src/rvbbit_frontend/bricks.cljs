@@ -45,6 +45,7 @@
    [re-frame.alpha :as rfa]
    [re-frame.core :as re-frame]
    [reagent.core :as reagent]
+   [garden.color :as    color]
     ;[reagent.dom :as rdom]
    [rvbbit-frontend.audio :as audio]
    [rvbbit-frontend.connections :as conn]
@@ -5017,12 +5018,45 @@
                                                                                                           ;; non-panel
                             {name (merge {:cols cols} logic-map)}))))
 
+
+(defn hex-to-rgb [hex]
+  (let [r (js/parseInt (subs hex 1 3) 16)
+        g (js/parseInt (subs hex 3 5) 16)
+        b (js/parseInt (subs hex 5 7) 16)]
+    [r g b]))
+
+(defn interpolate [start end factor]
+  (+ start (* (- end start) factor)))
+
+(defn generate-gradient [hex1 hex2 steps]
+  (let [rgb1 (hex-to-rgb hex1)
+        rgb2 (hex-to-rgb hex2)
+        step-factors (map #(/ % (dec steps)) (range steps))]
+    (mapv (fn [factor]
+            (mapv #(interpolate %1 %2 factor) rgb1 rgb2))
+          step-factors)))
+
+(defn rgb-to-css [rgb]
+  (str "rgb("  (cstr/join "," rgb) ")"))
+
+(defn gen-gradient [hex1 hex2 steps]
+  (mapv rgb-to-css (generate-gradient hex1 hex2 steps)))
+
+;;(tapp>> [:grad (str (gen-gradient "#ff0000" "#0000ff" 4))])
+
+;;    [:heatmap :PuRd :9 :asc]
+;; or [:heatmap ["#ffffff"  "#000000"] 9 :asc]
+
 (defn get-color-temp
   [weight scheme depth]
   (let [val1       (/ weight 100)
         hue        (* (- 1 val1) 120)
         temp       (str "hsl(" hue ",100%,50%)")
-        scheme     (get-in ut/colorbrewer [scheme depth] [])
+        custom?    (and (vector? scheme) (= (count scheme) 2))
+        ;;_ (tapp>> [:scheme :why scheme custom?] )
+        scheme     (if custom? 
+                     (gen-gradient (first scheme) (second scheme) 3) 
+                     (get-in ut/colorbrewer [scheme depth] []))
         num-scheme (count scheme)
         bins       (/ 100 num-scheme)
         wbin       (js/Math.ceil (/ weight bins))
@@ -5031,7 +5065,9 @@
 
 (re-frame/reg-sub ::heatmap-color-val
                   (fn [db [_ panel-key query-key field val styler-keys scheme depth direction]]
+                    ;(tapp>> [:fuk panel-key query-key field val styler-keys scheme depth direction])
                     (let [;other-vals (vec (distinct (for [r (get-in db [:data query-key])] (get r field))))
+                          ;;scheme ["#ffffff"  "#000000"]
                           styler-field (keyword (ut/replacer (str "styler_" (ut/safe-name styler-keys)) #"-" "_"))
                           local-vals   (remove nil?
                                                (for [r (get-in db [:data query-key])] (when (= (get r styler-field) 1) (get r field))))
@@ -5929,18 +5965,28 @@
                                                                     (try (some #(= id %) (get-in stylers [s :cols]))
                                                                          (catch :default e false))))
                                                        s))))
-                   heat-walk-map    (fn [obody]
-                                      (let [kps       (into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
-                                            logic-kps (into {}
-                                                            (for [[_ v] (into {}
-                                                                              (filter #(cstr/starts-with? (str (last %))
-                                                                                                          "[:heatmap")
-                                                                                      kps))]
-                                                              (let [[_ scheme depth direction] v]
-                                                                {v @(ut/tracked-subscribe [::heatmap-color-val panel-key query-key
-                                                                                           id (get row id) heatmap-styles scheme
-                                                                                           depth direction])})))]
-                                        (ut/postwalk-replacer logic-kps obody)))
+                  ;;  heat-walk-map    (fn [obody]
+                  ;;                     (let [kps       (into {} (for [p (ut/kvpaths obody)] {p (get-in obody p)}))
+                  ;;                           logic-kps (into {}
+                  ;;                                           (for [[_ v] (into {}
+                  ;;                                                             (filter #(cstr/starts-with? (str (last %))
+                  ;;                                                                                         "[:heatmap")
+                  ;;                                                                     kps))]
+                  ;;                                             (let [[_ scheme depth direction] v]
+                  ;;                                               ;(tapp>> [:ss scheme depth direction])
+                  ;;                                               {v @(ut/tracked-subscribe [::heatmap-color-val panel-key query-key
+                  ;;                                                                          id (get row id) heatmap-styles scheme
+                  ;;                                                                          depth direction])})))]
+                  ;;                       (ut/postwalk-replacer logic-kps obody)))
+
+                   heat-walk-map  (fn [obody]
+                                    (let [kps       (ut/extract-patterns obody :heatmap 4)
+                                          logic-kps (into {} (for [v kps] (let [[_ scheme depth direction] v]
+                                                                            {v @(ut/tracked-subscribe [::heatmap-color-val panel-key query-key
+                                                                                                       id (get row id) heatmap-styles scheme
+                                                                                                       depth direction])})))]
+                                      (walk/postwalk-replace logic-kps obody)))
+
                    styles           (apply merge
                                            (for [s styler-keys]
                                              (if (or (= (get-in stylers [s :cols]) id)
@@ -8506,7 +8552,7 @@
               :data-viewer (fn [x] (let [x (walk/postwalk-replace {:box :_box :icon :_icon :v-box :_v-box :h-box :_h-box
                                                                    :data-viewer :_data-viewer} x)
                                          solver-key (get @db/solver-fn-lookup [:panels panel-key selected-view])
-                                         _ (tapp>> [:dv solver-key panel-key selected-view @db/solver-fn-lookup])
+                                        ;; _ (tapp>> [:dv solver-key panel-key selected-view @db/solver-fn-lookup])
                                          ]
                                      [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
                                       :style {:overflow "auto"} :child

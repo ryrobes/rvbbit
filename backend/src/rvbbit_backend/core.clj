@@ -1151,7 +1151,9 @@
                    #(do
                       (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
                       (reset! wss/solvers-cache-hits-atom {})
-                      (reset! wss/solvers-cache-atom {}))
+                      (reset! wss/solvers-cache-atom {})
+                      (reset! sql/errors {}) ;; just for now
+                      (reset! ut/df-cache {})) ;; <--- big boy
                    "Purge Solver Cache" 600)
 
   ;; (start-scheduler 1

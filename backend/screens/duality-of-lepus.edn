@@ -1,21 +1,55 @@
 {:orders
- {:fields-sys [:field_name :field_type :data_type],
+ {:flow-fn-sys
+  [:name :description :full_map :inputs :icon :input_types :output_types :category],
+  :fields-sys [:field_name :field_type :data_type],
   :setlists-drag-2 [:show_id :song_name :song_order :ts],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :flows-sys [:flow_id :file_path :last_modified],
+  :jvm_stats
+  [:used_memory_mb
+   :thread_count
+   :messages
+   :batches
+   :recent_batches
+   :recent_batches_per_second
+   :batches_per_second
+   :unix_ms
+   :messages_per_second
+   :recent_messages
+   :recent_messages_per_second
+   :recent_queries_run
+   :recent_queries_per_second
+   :queries_per_second
+   :sql_cache_size
+   :ws_peers
+   :subscriptions
+   :open_flow_channels
+   :uptime_seconds
+   :seconds_since_last_update
+   :queries_run
+   :internal_queries_run
+   :sniffs_run
+   :sys_load
+   :ts],
   :large-bgss [:ffilename],
   :shows (:query_error),
   :tour-name-drag-11 [:tour_name :rowcnt],
+  :flow-fn-categories-sys [:category],
   :shows-drag-22 [:location :show_date :show_id :show_name :title :tour_name :ts],
   :gen-viz-342 [:rows :song_order],
   :connections-sys [:database_name :connection_id],
   :reco-counts [:table_name :cnt],
-  :setlists (:query_error)},
+  :setlists (:query_error),
+  :flow-fn-all-sys [:name]},
  :reco-preview "-1489866873",
+ :flow? false,
  :sql-source
  {:setlists
   {:select [:*], :connection-id "system-db", :from [:setlists], :limit 111},
   :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
+  :jvm_stats
+  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
   :setlists-drag-2
   {:select [:show_id :song_name :song_order :ts],
    :from [[:setlists :hh333]],
@@ -55,7 +89,68 @@
    :page 3,
    :_last-run "03:02:01"}},
  :meta
- {:fields-sys
+ {:flow-fn-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 131,
+     :group-by? true,
+     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
+     :cardinality 100},
+    :description
+    {:data-type "string",
+     :distinct 33,
+     :group-by? true,
+     :commons
+     {"" 97, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
+     :cardinality 25},
+    :full_map
+    {:data-type "string",
+     :distinct 131,
+     :group-by? true,
+     :commons
+     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
+      1,
+      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
+      1},
+     :cardinality 100},
+    :inputs
+    {:data-type "string",
+     :distinct 70,
+     :group-by? true,
+     :commons
+     {"[:open-input-1 :open-input]" 10,
+      "[:value1 :value2]" 7,
+      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
+     :cardinality 53},
+    :icon
+    {:data-type "string",
+     :distinct 21,
+     :group-by? true,
+     :commons {"zmdi-puzzle-piece" 97, "zmdi-pizza" 3, "zmdi-file-text" 3},
+     :cardinality 16},
+    :input_types
+    {:data-type "string",
+     :distinct 59,
+     :group-by? true,
+     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
+     :cardinality 45},
+    :output_types
+    {:data-type "string",
+     :distinct 14,
+     :group-by? true,
+     :commons {":any" 67, "" 17, ":string" 14},
+     :cardinality 10},
+    :category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 97, ":rabbit-base" 18, ":clojure-base" 16},
+     :cardinality 2}},
+   :rowcount 131},
+  :fields-sys
   {:fields
    {:field_name
     {:data-type "string",
@@ -160,6 +255,32 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :flows-sys
+  {:fields
+   {:flow_id
+    {:data-type "string",
+     :distinct 96,
+     :group-by? true,
+     :commons
+     {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "python3-runner-v1" 1},
+     :cardinality 96},
+    :file_path
+    {:data-type "string",
+     :distinct 99,
+     :group-by? true,
+     :commons
+     {"./flows/generated-flow-map.edn" 1,
+      "./flows/stitches-math.edn" 1,
+      "./flows/openai-image-gen-ladder3.edn" 1},
+     :cardinality 100},
+    :last_modified
+    {:data-type "string",
+     :distinct 34,
+     :group-by? true,
+     :commons
+     {"2024-03-12 02:37:43" 66, "2024-07-03 09:17:55" 1, "2024-06-22 18:16:16" 1},
+     :cardinality 34}},
+   :rowcount 99},
   :gen-viz-94
   {:fields
    {:diff
@@ -184,6 +305,160 @@
      :commons {35717 1, 1765 1, 23460 1},
      :cardinality 100}},
    :rowcount 13},
+  :jvm_stats
+  {:fields
+   {:queries_run
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {764 1, 579 1, 296 1},
+     :cardinality 100},
+    :recent_messages_per_second
+    {:data-type "float",
+     :distinct 109,
+     :group-by? true,
+     :commons {258.67 2, 252 2, 250.72 1},
+     :cardinality 98},
+    :uptime_seconds
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {390 1, 915 1, 1320 1},
+     :cardinality 100},
+    :queries_per_second
+    {:data-type "float",
+     :distinct 3,
+     :group-by? true,
+     :commons {0 109, 1 1, -16 1},
+     :cardinality 2},
+    :recent_batches
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {10120 1, 33830 1, 9768 1},
+     :cardinality 100},
+    :sql_cache_size
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {1 69, 0 42},
+     :cardinality 1},
+    :ts
+    {:data-type "string",
+     :distinct 111,
+     :group-by? true,
+     :commons
+     {"2024-07-03 09:43:45" 1, "2024-07-03 09:48:15" 1, "2024-07-03 09:38:45" 1},
+     :cardinality 100},
+    :subscriptions
+    {:data-type "integer",
+     :distinct 6,
+     :group-by? true,
+     :commons {757 102, 754 3, 741 2},
+     :cardinality 5},
+    :messages_per_second
+    {:data-type "float",
+     :distinct 96,
+     :group-by? true,
+     :commons {259.81 3, 259.64 3, 259.8 3},
+     :cardinality 86},
+    :messages
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {98065 1, 165030 1, 393167 1},
+     :cardinality 100},
+    :sniffs_run
+    {:data-type "integer",
+     :distinct 104,
+     :group-by? true,
+     :commons {161 2, 147 2, 220 2},
+     :cardinality 93},
+    :sys_load
+    {:data-type "float",
+     :distinct 105,
+     :group-by? true,
+     :commons {12.06 3, 13.74 2, 15.99 2},
+     :cardinality 94},
+    :recent_batches_per_second
+    {:data-type "float",
+     :distinct 94,
+     :group-by? true,
+     :commons {22.54 3, 22.81 3, 23.53 3},
+     :cardinality 84},
+    :batches
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {10120 1, 33830 1, 9768 1},
+     :cardinality 100},
+    :unix_ms
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {1720014120570 1, 1720014465548 1, 1720013970567 1},
+     :cardinality 100},
+    :used_memory_mb
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {3314 1, 5951 1, 2163 1},
+     :cardinality 100},
+    :recent_queries_run
+    {:data-type "integer",
+     :distinct 14,
+     :group-by? true,
+     :commons {3 20, 2 15, 10 12},
+     :cardinality 12},
+    :thread_count
+    {:data-type "integer",
+     :distinct 59,
+     :group-by? true,
+     :commons {599 5, 594 4, 619 4},
+     :cardinality 53},
+    :internal_queries_run
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {0 111},
+     :cardinality 0},
+    :open_flow_channels
+    {:data-type "integer",
+     :distinct 7,
+     :group-by? true,
+     :commons {11 51, 104 30, 0 17},
+     :cardinality 6},
+    :ws_peers
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {35 111},
+     :cardinality 0},
+    :recent_messages
+    {:data-type "integer",
+     :distinct 111,
+     :group-by? true,
+     :commons {98065 1, 327260 1, 105895 1},
+     :cardinality 100},
+    :recent_queries_per_second
+    {:data-type "float",
+     :distinct 19,
+     :group-by? true,
+     :commons {0.2 20, 0.13 15, 0.67 11},
+     :cardinality 17},
+    :batches_per_second
+    {:data-type "float",
+     :distinct 41,
+     :group-by? true,
+     :commons {23.25 20, 23.26 10, 23.22 9},
+     :cardinality 36},
+    :seconds_since_last_update
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {14 56, 15 54, -1 1},
+     :cardinality 2}},
+   :rowcount 111},
   :large-bgss
   {:fields
    {:ffilename
@@ -479,6 +754,15 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
+  :flow-fn-categories-sys
+  {:fields
+   {:category
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
+     :cardinality 100}},
+   :rowcount 3},
   :shows-drag-22
   {:fields
    {:location
@@ -732,7 +1016,16 @@
      {"(from database connection)" 1,
       "[SQLITE_ERROR] SQL error or missing database (no such table: setlists)" 1},
      :cardinality 100}},
-   :rowcount 2}},
+   :rowcount 2},
+  :flow-fn-all-sys
+  {:fields
+   {:name
+    {:data-type "string",
+     :distinct 131,
+     :group-by? true,
+     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
+     :cardinality 100}},
+   :rowcount 131}},
  :default-col-widths
  {:block-198 {:setlists-drag-2 102},
   :block-8963 {:shows-drag-22 108},
@@ -740,9 +1033,10 @@
   :block-2361 {:large-bgss 311},
   :system-connections-list* {:connections-sys 186},
   :system-tables-list* {:tables-sys 187},
-  :system-fields-list* {:fields-sys 237}},
+  :system-fields-list* {:fields-sys 237},
+  :virtual-panel {:kick--1764769189 152}},
  :runstream-drops nil,
- :data-hash -1333098758,
+ :data-hash 1632755138,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -984,7 +1278,7 @@
  :runstreams {},
  :editor? true,
  :buffy? false,
- :memory [459615529 403045973 4294705152],
+ :memory [514724025 437126757 4294705152],
  :flow-subs
  [:solver-status/*client-name*>raw-custom-override-1610584445>running?
   :solver/get-my-colors1359879335
@@ -992,7 +1286,6 @@
   :solver/raw-custom-override136934373>10>0>2
   :solver-status/*client-name*>get-my-colors1359879335>running?
   :solver-meta/raw-custom-override136934373
-  :solver/raw-custom-override-1610584445>jvm-version
   :solver/raw-custom-override-1610584445>howdy-str
   :solver/raw-custom-override-1610584445
   :solver/get-my-colors1128330406
@@ -1006,7 +1299,11 @@
  :openai-api-key "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",
  :window {:w 2647, :h 1451},
  :quake-console? false,
- :post-meta {:setlists {}, :gen-viz-342 {:* {:rowcount 25}}},
+ :post-meta
+ {:setlists {},
+  :jvm_stats {:* {:rowcount 111}},
+  :gen-viz-342 {:* {:rowcount 25}},
+  :flows-sys {:* {:rowcount 99}}},
  :status
  {:heartbeat
   {:kick
@@ -1016,7 +1313,6 @@
     :solver/raw-custom-override136934373>10>0>2
     :solver-status/*client-name*>get-my-colors1359879335>running?
     :solver-meta/raw-custom-override136934373
-    :solver/raw-custom-override-1610584445>jvm-version
     :solver/raw-custom-override-1610584445>howdy-str
     :solver/raw-custom-override-1610584445
     :solver/get-my-colors1128330406
@@ -1040,15 +1336,16 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   6157
+   7509
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {},
- :base-sniff-queries {:setlists 1669794951, :shows 89957543},
+ :base-sniff-queries {:setlists 1669794951, :shows 89957543, :jvm_stats 1498154063},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -2007486241,
+ :user-params-hash 1414508738,
  :grid-recos? true,
  :preview-keys2 [],
+ :session-hash 1056338460,
  :resolved-queries
  {:setlists-drag-2
   {:select [:show_id :song_name :song_order :ts],
@@ -2089,26 +2386,6 @@
       :font-family :theme/base-font}
      :child
      "It's a perfect day for planting seeds and planning adventures!"]}},
-  :block-317
-  {:h 4,
-   :w 6,
-   :tab "azure oyster",
-   :root [15 7],
-   :name "block-317",
-   :views
-   {:pulled-val
-    [:box
-     :size
-     "auto"
-     :align
-     :center
-     :justify
-     :center
-     :style
-     {}
-     :child
-     [:string :solver/raw-custom-override-1610584445>jvm-version]]},
-   :queries {}},
   :block-7215
   {:h 4,
    :w 9,
@@ -2150,6 +2427,25 @@
    :name ":param/generated-colors",
    :views {:param-val [:data-viewer :param/generated-colors]},
    :queries {}},
+  :block-1694
+  {:h 7,
+   :w 11,
+   :views
+   {:view-clone
+    [:box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {}
+     :child
+     [:img {:src "./images/gen/b64-image3-55488-51622.png", :width "100%"}]]},
+   :name "clone-pulled-val29",
+   :root [15 6],
+   :tab "azure oyster"},
   :block-3777-1
   {:h 7,
    :w 10,
@@ -2252,11 +2548,11 @@
   :block-12330
   {:h 3,
    :w 6,
-   :root [31 19],
+   :root [32 20],
    :tab "azure oyster",
    :selected-view :hare-vw,
    :name "block-12330",
-   :views {:hare-vw " [:markdown \"DAMN SON! \\n ## TJPSE TOTOTES!dd!!!\"]"},
+   :views {:hare-vw [:markdown "DAMN SON! \n ## TJPSE TOTOTES!dd!!!"]},
    :queries {}},
   :block-11696
   {:h 4,
@@ -2372,7 +2668,7 @@
    :tab "azure oyster",
    :create-image
    {:new-create-image-1
-    ["A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a snowstorm that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead. A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Her cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace. Her full lips are slightly parted, enhancing her allure. She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up."]},
+    ["A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a misty autumn morning that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead.   A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Her cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace.              Her full lips are slightly parted, enhancing her allure.   She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up.."]},
    :views
    {:hare-vw
     [:box
@@ -2435,7 +2731,7 @@
    {"console-out"
     [:console :solver-meta/raw-custom-override-1610584445>output>evald-result>out]},
    :name "console :solver/raw-custom-override-1610584445",
-   :root [23 4],
+   :root [22 2],
    :tab "azure oyster"},
   :block-284
   {:w 32,
@@ -2552,7 +2848,7 @@
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene. There is a beautiful full-figured woman standing in the field, she looks upon you with kind eyes and beckons you closer.",
+   ["A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a misty autumn morning that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead.   A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Her cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace.           Her full lips are slightly parted, enhancing her allure.   She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up.."],
    :selected-view [:create-image :new-create-image-1],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
@@ -3013,19 +3309,19 @@
     :width
     :width-px
     :style
-    {:background-color "#474d76",
+    {:background-color "#2e364c",
      :border-radius "20px",
      :font-size "12px",
      :font-weight 700,
-     :color "#313c64"}
+     :color "#7fc7ca"}
     :children
-    [[:box :child "./images/gen/b64-image3-55741-18134.png"]
+    [[:box :child "./images/gen/b64-image3-6386-23448.png"]
      [:box
       :size
       "auto"
       :child
       [:img
-       {:src "./images/gen/b64-image3-55741-18134.png",
+       {:src "./images/gen/b64-image3-6386-23448.png",
         :style {:border-radius "30px"}}]]]],
    :raw-custom-override1165054916
    [:div
@@ -3453,7 +3749,6 @@
     :second-brightest "#d8bab4",
     :brightest "#bac7d3",
     :most-contrasting-light "#b36780"},
-   :raw-custom-override-1610584445>jvm-version "17.0.11",
    :raw-custom-override1436984793
    {:howdy-str
     "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
@@ -3699,7 +3994,7 @@
     :second-brightest "#d8bab4",
     :brightest "#bac7d3",
     :most-contrasting-light "#b36780"},
-   :raw-custom-override136934373>10>0>2 "./images/gen/b64-image3-55741-18134.png",
+   :raw-custom-override136934373>10>0>2 "./images/gen/b64-image3-6386-23448.png",
    :raw-custom-override-1535991406
    {:error
     {:error "This request has been blocked by our content filters.",

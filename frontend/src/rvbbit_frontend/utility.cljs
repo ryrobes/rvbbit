@@ -125,7 +125,7 @@
 
 (defn deep-flatten
   [x] ;; param based
-  (if true ;;cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES
+  (if true ;cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES
     (deep-flatten* x)
     (deep-flatten-real x)))
 
@@ -1097,7 +1097,7 @@
 
 (defn clean-sql-from-ui-keys
   [x] ; <-- gets called hundreds of times
-  (if true ;;cache?
+  (if true  ;cache?
     (let [hx    (hash x)
           cache (get @clean-sql-atom hx)]
       (if cache
