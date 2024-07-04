@@ -125,37 +125,64 @@
        :event                    [::bricks/dispatch-auto-queries]
        :poll-when                [::bricks/auto-run-and-connected?]
        :dispatch-event-on-start? false}
+      
       {:interval                 5
        :event                    [::bricks/update-flow-statuses]
        :poll-when                [::bricks/update-flow-statuses?]
-       :dispatch-event-on-start? true} {:interval 120 :event [::bricks/clean-up-reco-previews] :dispatch-event-on-start? false}
-      {:interval 3 :event [::bricks/prune-alerts] :dispatch-event-on-start? false}
-      {:interval 5 :event [::bricks/get-memory-usage] :dispatch-event-on-start? false}
+       :dispatch-event-on-start? true} 
+      
+      {:interval 120 
+       :event [::bricks/clean-up-reco-previews] 
+       :dispatch-event-on-start? false}
+      
+      {:interval 3 
+       :event [::bricks/prune-alerts] 
+       :dispatch-event-on-start? false}
+
+      {:interval 5 
+       :event [::bricks/get-memory-usage] 
+       :dispatch-event-on-start? false}
+
       {:interval                 1 ;;; test
        :event                    [::bricks/highlight-panel-code]
        :poll-when                [::bricks/panel-code-up?]
        :dispatch-event-on-start? false}
+      
       {:interval                 2 ;; push sample data to runstream when running ?
        :event                    [::bricks/refresh-runstreams]
        :poll-when                [::bricks/runstream-running?]
        :dispatch-event-on-start? false}
+      
       {:interval                 1 ;; subscribe to server data from flows if we see it
        :event                    [::bricks/sub-to-flows]
        :poll-when                [::bricks/new-flow-subs?]
        :dispatch-event-on-start? false}
+    
       {:interval                 5 ;; subscribe to server data from flows if we see it
        :event                    [::bricks/unsub-to-flows]
        :poll-when                [::bricks/stale-flow-subs?]
        :dispatch-event-on-start? false}
+                                       
       {:interval                 600 ;; ten mins. less? more?
        :event                    [::bricks/purge-cache-atoms]
        :dispatch-event-on-start? false}
+      
       {:interval                 3600 ;; one hour. more?
        :event                    [::bricks/clear-cache-atoms]
        :dispatch-event-on-start? false}
+      
       {:interval                 3600 ;; hella expensive, testing
        :event                    [::http/get-autocomplete-values]
-       :dispatch-event-on-start? true} {:interval 1000 :event [::bricks/update-metadata-tabs] :dispatch-event-on-start? false}
+       :dispatch-event-on-start? true}
+
+      ;; {:interval 1000 
+      ;;  :event [::bricks/update-metadata-tabs] 
+      ;;  :dispatch-event-on-start? false}
+
+      {:interval 5 ;; too much when recos gets big? filter?
+       :event [::bricks/update-reco-previews]
+       :dispatch-event-on-start? false}
+
       {:interval 1 :event [::bricks/update-conditionals] :dispatch-event-on-start? false}
       {:interval                 4
        :event                    [::bricks/refresh-status]

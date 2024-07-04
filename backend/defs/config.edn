@@ -20,7 +20,7 @@
                          :font-size "17px"
                          :font-family :theme/monospaced-font}}
                 [:string3 :*data]]
-         :data [:data-viewer :*data]
+         :data  [:data-viewer :*data]
          :pretty [:pretty-box :*data]
          :rowset [:honeycomb {:select [:*] :from {:data :*data}} 11 9] ;; this is slow and funky. revisit?
          :clover [:box :child :*data]}

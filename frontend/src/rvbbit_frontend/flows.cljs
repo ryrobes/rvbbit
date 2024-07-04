@@ -3047,7 +3047,7 @@
         flowmaps            @(ut/tracked-subscribe [::flowmap-raw])
         dyn-width           (last @db/flow-editor-system-mode)
         panel-height        (* (.-innerHeight js/window) 0.50)
-        panel-height-bricks (/ panel-height bricks/brick-size)
+        panel-height-bricks (/ panel-height db/brick-size)
         read-only-flow?     (true? (cstr/includes? flow-id "/"))]
     (cond
       (= ttype :run-history)
@@ -4651,7 +4651,7 @@
          rs-running-list @(ut/tracked-subscribe [::bricks/runstreams-running-list])
          alerts          @(ut/tracked-subscribe [::bricks/alerts])
          estimates       @(ut/tracked-subscribe [::estimates])
-         max-w           (apply max (for [a alerts :let [width (* (get a 1) bricks/brick-size)]] width))
+         max-w           (apply max (for [a alerts :let [width (* (get a 1) db/brick-size)]] width))
          max-w           (if (or (nil? max-w) (< max-w 50))
                            300 ;420
                            max-w)
@@ -4681,7 +4681,7 @@
                            alerts)
          alerts-cnt      (try (count alerts) (catch :default _ 0))
          gap             1 ;11
-         all-h           (apply + (for [a alerts :let [h (* (get a 2) bricks/brick-size)]] h))
+         all-h           (apply + (for [a alerts :let [h (* (get a 2) db/brick-size)]] h))
          all-h           (if (> alerts-cnt 1) (+ all-h (* gap (dec alerts-cnt))) all-h)
          all-h           (if (or (nil? all-h) (< all-h 50)) 50 all-h)
          box-height      50
@@ -4709,8 +4709,8 @@
                :let [abody       (first a)
                      push-codes? (try (some #(or (= % :push) (= % :dialog-push)) (ut/deep-flatten abody))
                                       (catch :default _ false))
-                     width       (+ 60 (* (get a 1 0) bricks/brick-size))
-                     height      (* (get a 2 0) bricks/brick-size)
+                     width       (+ 60 (* (get a 1 0) db/brick-size))
+                     height      (* (get a 2 0) db/brick-size)
                      alert-id    (last a)]]
            [re-com/box :size "none" :attr
             (when (not push-codes?) (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])} {}))
@@ -5068,9 +5068,9 @@
                        :left             left-pos
                        :top              top-pos} :width
                       (px (* 5 ;(get @bricks/dragging-body :w)
-                             bricks/brick-size)) :height
+                             db/brick-size)) :height
                       (px (* 2 ;(get @bricks/dragging-body :h)
-                             bricks/brick-size))])))
+                             db/brick-size))])))
                (when (and (or (nil? @flow-hover) (not @flow-hover)) @lookup-modal?) [bricks/reecatch [lookup-modal]])
                [re-com/box :size "none" :style
                 {;:border "2px solid red"

@@ -148,6 +148,9 @@
                                     ;;                  @db/solver-fn-runs]))
                                      _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                      _ (when lets-go?
+                                         (ut/dispatch-delay 20 [::http/insert-alert [:v-box :children [[:box :child "resolver solver running"]
+                                                                                                       [:box :child (str fkp)
+                                                                                                        :style {:font-size "12px"}]]] 6 1.5 5])
                                          (swap! db/solver-fn-lookup assoc fkp sub-param)
                                          ;(ut/tracked-dispatch [::conn/update-solver-fn-lookup fkp sub-param])
                                          (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)

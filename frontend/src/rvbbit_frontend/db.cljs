@@ -2,6 +2,8 @@
   (:require ;[rvbbit-frontend.http :as http]
     [reagent.core :as reagent]))
 
+(def brick-size 50)
+
 (defonce search-box (reagent/atom nil))
 (defonce context-modal-pos (reagent/atom [0 0]))
 (defonce editor-mode (reagent/atom :meta))

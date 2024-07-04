@@ -1136,7 +1136,7 @@
              (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
              (sql-exec db-conn ddl-str extra))
            (swap! snap-pushes assoc table-name ddl-str)
-           (doseq [batch (partition-all 100 rowset-fixed)
+           (doseq [batch (partition-all 10 rowset-fixed)
                    :let  [values     (vec (for [r batch] (vals r)))
                           insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
              (sql-exec db-conn insert-sql extra))

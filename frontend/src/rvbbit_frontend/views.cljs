@@ -54,9 +54,9 @@
 
 (defonce detached-coords
   (reagent/atom (let [hh          (.-innerHeight js/window) ;; starting size set on load
-                      bricks-high (+ (js/Math.floor (/ hh bricks/brick-size)) 1)
-                      topper      (* (- bricks-high 12) bricks/brick-size) ;; size of editor
-                      lefty       (* 2 bricks/brick-size) ;; always 2 brick from the left...
+                      bricks-high (+ (js/Math.floor (/ hh db/brick-size)) 1)
+                      topper      (* (- bricks-high 12) db/brick-size) ;; size of editor
+                      lefty       (* 2 db/brick-size) ;; always 2 brick from the left...
                      ]
                   [lefty topper])))
 
@@ -75,7 +75,7 @@
 (defn mutate-editor-as-edge [edge]
   (let [hh @(ut/tracked-subscribe [::subs/h])
         ww @(ut/tracked-subscribe [::subs/w])
-        bb bricks/brick-size]
+        bb db/brick-size]
     (reset! last-sizes @editor-size) ;; save the old config
     (case edge
       :left (let [bw (Math/floor (* (/ ww bb) 0.3))
@@ -116,8 +116,10 @@
     (when @active-edge 
       (do (mutate-editor-as-edge @active-edge)
           (reset! active-edge nil)))
-    (do ;;(clear-selection)  
-      (gevents/unlisten js/window EventType.MOUSEMOVE on-move))))
+    (do ;(clear-selection)
+       ; (.removeAttribute js/document.body "style")
+        ;(js/setTimeout clear-selection 2000) ;;(clear-selection)  
+        (gevents/unlisten js/window EventType.MOUSEMOVE on-move))))
 
 (defn mouse-down-handler
   [e]
@@ -128,6 +130,8 @@
                         (reset! editor-size @last-sizes)
                         (reset! last-sizes nil)))
     (reset! bricks/dragging-editor? true)
+    ;(.setAttribute js/document.body "style" "user-select: none;")
+    (clear-selection)
     (do (gevents/listen js/window EventType.MOUSEMOVE on-move))
     (gevents/listen js/window EventType.MOUSEUP (mouse-up-handler on-move))))
 
@@ -219,7 +223,8 @@
 
 (defn search-panel-metadata-ext
   []
-  (let [sql-params         (into {}
+  (let [{:keys [single-width-bricks single-height-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
+        sql-params         (into {}
                                  (for [k [:searches-types-sys/item_type :searches-rows-sys/value
                                           :searches-sub-types-sys/item_key]]
                                    {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key
@@ -239,7 +244,9 @@
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
      [[re-com/v-box :size "auto" :children
        [[re-com/box :size "auto" :child
-         [bricks/magic-table :searches-rows-sys-list* [:searches-rows-sys] 11 (if selected-shortcode 8.5 10)
+         [bricks/magic-table :searches-rows-sys-list* [:searches-rows-sys] 
+          single-width-bricks ;;11 
+          (if selected-shortcode (- single-height-bricks 1.5) single-height-bricks)
           [:value :is_live :item_type :block_meta :item_key]]]
         (when selected-shortcode
           [re-com/box :child [bricks/shortcode-box 560 85 (str selected-shortcode " ;; rabbit-code parameter") "clojure"]])]]]]))
@@ -321,17 +328,20 @@
 
 (defn editor-panel-viz2
   []
-  (let [all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
+  (let [{:keys [single-width-bricks vertical? single-height-bricks single-width single-height bricks-wide bricks-tall panel-count]} @editor-dimensions
+        all-sql-call-keys @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
         grid-reco? @(ut/tracked-subscribe [::bricks/grid-reco?])
         recos-page @(ut/tracked-subscribe [::bricks/recos-page])
         all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/safe-name e) "-" "_"))
         sql-params (into {}
                          (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-tables-sys/table_name
-                                  :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn :user-dropdown-sys/req-field]]
+                                  :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn :user-dropdown-sys/req-field :user-dropdown-sys/shape]]
                            {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
-                              @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
+                            @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
         combo-picked? (not (nil? (get sql-params :viz-shapes-sys/combo_edn)))
-        shape-picked? (not (nil? (get sql-params :viz-shapes0-sys/shape)))
+        ;shape-picked? (not (nil? (get sql-params :viz-shapes0-sys/shape)))
+        shape-picked? (not (nil? (get sql-params :user-dropdown-sys/shape)))
+        react! [@editor-size]
         clear-filters-fn (fn []
                            (do (ut/tracked-dispatch [::conn/click-parameter [:viz-shapes0-sys :shape] nil])
                                (ut/tracked-dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] nil])
@@ -355,8 +365,8 @@
                    :viz-shapes-sys  {:select   [:combo_edn [[:count 1] :recos]]
                                      :from     [[:viz_recos_vw :vvt]]
                                      :where    [:and
-                                                (when (not (nil? (get sql-params :viz-shapes0-sys/shape)))
-                                                  [:= :shape_name :viz-shapes0-sys/shape])
+                                                (when (not (nil? (get sql-params :user-dropdown-sys/shape)))
+                                                  [:= :shape_name :user-dropdown-sys/shape])
                                                 (when req-field-picked?
                                                   [:like :combo_edn (str "%" (get sql-params :user-dropdown-sys/req-field) "%")])
                                                 [:= :table_name :viz-tables-sys/table_name]] ;; :viz-tables-sys/table_name-name
@@ -368,14 +378,17 @@
                                                 (when combo-picked? [:= :combo_edn :viz-shapes-sys/combo_edn])
                                                 (when req-field-picked?
                                                   [:like :combo_edn (str "%" (get sql-params :user-dropdown-sys/req-field) "%")])
-                                                (when shape-picked? [:= :shape_name :viz-shapes0-sys/shape])]}}
+                                                (when shape-picked? [:= :shape_name :user-dropdown-sys/shape])]}}
+
+        shape-list @(ut/tracked-subscribe [::conn/sql-data [:viz-shapes0-sys]])
         block-list @(ut/tracked-subscribe [::conn/sql-data [:viz-tables-sys]])
         combo-list @(ut/tracked-subscribe [::conn/sql-data [:viz-shapes-sys]])
         full-recos @(ut/tracked-subscribe [::conn/sql-data [:recos-sys]])
+
         current-tab-queries (try (map #(-> %
                                            ut/sql-keyword
                                            name)
-                                   @(ut/tracked-subscribe [::bricks/current-tab-queries]))
+                                      @(ut/tracked-subscribe [::bricks/current-tab-queries]))
                                  (catch :default _ []))
         block-list (vec (filter (fn [x] (some #(= % (get x :table_name)) current-tab-queries)) block-list)) ;; overwrite above
                                                                                                             ;; with curr tab
@@ -398,7 +411,7 @@
                                                  (str (theme-pull :theme/editor-font-color nil) 77))
                              :background-color (if sel?
                                                  ;;"#9973e0"
-                                                 (theme-pull :theme/universal-pop-color "#9973e0" )
+                                                 (theme-pull :theme/universal-pop-color "#9973e0")
                                                  (theme-pull :theme/editor-background-color nil))
                              :padding-left     "5px"
                              :padding-right    "5px"} :child (str table_name " (" recos ")")])
@@ -419,69 +432,114 @@
                                                                          :combo_edn     combo_edn}}))
         reco-selected (keyword (str "reco-preview"
                                     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [:recos-sys/combo_hash]})))
+        ;www (+ (if (= panel-count 3)
+        ;         (* single-width 1)
+        ;         (* single-width 2)) 300)
+        www (if vertical?
+              single-width
+              (- (min (* 2 single-width) (* panel-count single-width)) 40))
+        hhh (-
+             (if vertical?
+               (- (min (* 2 single-height)
+                       (* panel-count single-height)) 40)
+               single-height)
+             120)
+        w (Math/floor (/ www db/brick-size))
+        h (Math/floor (/ hhh db/brick-size))
+        charts-wide (js/Math.floor (/ w 7))
+        charts-high (js/Math.floor (/ h 4.5))
+        _ (ut/tapp>> [:ch w h charts-wide charts-high])
+        h-multi 2.2 ;; offsets for css zoom math fuckery
+        w-multi 2.3
+        hh (js/Math.floor (* (/ (/ hhh charts-high) db/brick-size) h-multi))
+        ww (js/Math.floor (* (/ (/ www charts-wide) db/brick-size) w-multi))
+        ;;recos-per-page 9
+        recos-per-page (* charts-wide charts-high)
         preview-container
-          (fn [preview-maps pk pnum]
-            (try
-              (let [panel-key     (nth pk pnum)
-                    ce            (get-in preview-maps [panel-key :combo_edn])
-                    query_map     (get-in preview-maps [panel-key :query_map])
-                    viz_map       (get-in preview-maps [panel-key :viz_map])
-                    w             (get-in preview-maps [panel-key :w] 9)
-                    h             (get-in preview-maps [panel-key :h] 9)
-                    selected-view (try (edn/read-string (get-in preview-maps [panel-key :selected_view] nil))
-                                       (catch :default _ nil))
-                    condis        (get-in preview-maps [panel-key :condis])
-                    combo_hash    (get-in preview-maps [panel-key :combo_hash])
-                    combo_edn     (try (when (not (nil? ce)) (ut/replacer ce #"\"" "")) (catch :default _ "")) ;; TODO, why
+        (fn [preview-maps pk pnum]
+          (try
+            (let [panel-key     (nth pk pnum)
+                  ce            (get-in preview-maps [panel-key :combo_edn])
+                  query_map     (get-in preview-maps [panel-key :query_map])
+                  viz_map       (get-in preview-maps [panel-key :viz_map])
+                    ;w             (get-in preview-maps [panel-key :w] 9)
+                    ;h             (get-in preview-maps [panel-key :h] 9)
+                  selected-view (try (edn/read-string (get-in preview-maps [panel-key :selected_view] nil))
+                                     (catch :default _ nil))
+                  condis        (get-in preview-maps [panel-key :condis])
+                  combo_hash    (get-in preview-maps [panel-key :combo_hash])
+                  combo_edn     (try (when (not (nil? ce)) (ut/replacer ce #"\"" "")) (catch :default _ "")) ;; TODO, why
                                                                                                                ;; bombing?
-                    shape_name    (get-in preview-maps [panel-key :shape_name])
-                    sel?          (= reco-selected panel-key)
-                    body          [re-com/v-box :size "none" :attr
-                                   {:on-click
-                                      #(do (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :combo_hash] combo_hash])
-                                           (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :combo_edn] combo_edn])
-                                           (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :shape_name] shape_name])
-                                           (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :selected_view]
-                                                                 selected-view])
-                                           (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :h] h])
-                                           (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :w] w])
-                                           (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :query_map] query_map])
-                                           (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :viz_map] viz_map])
-                                           (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :condis] condis]))} :width
-                                   "581px" :height "434px" ;"200px"
-                                   :style
-                                   {:zoom      0.44
-                                    :border    "1px solid #ffffff22"
-                                    :transform "translate(0)" ;; a known CSS hack for fixed position in
-                                    :overflow  "auto"} :justify :between :children
-                                   [[re-com/box :size "auto" :height "40px" :style
-                                     {:padding-left  "14px"
-                                      :cursor        "pointer"
-                                      :padding-right "14px"
-                                      :font-weight   400
-                                      :font-size     "22px"} :child (str combo_edn)]
-                                    [bricks/honeycomb panel-key (or selected-view :oz) 9 9]
-                                    [re-com/box :size "auto" :height "40px" :justify :end :align :end :style
-                                     {:padding-left "14px" :padding-right "14px" :font-weight 400 :font-size "22px"} :child
-                                     (str shape_name)]]]]
-                (if sel?
-                  (bricks/draggable (bricks/sql-spawner-meta :viz-reco)
-                                    "meta-menu"
-                                    [re-com/box :style
-                                     {;:border (str "1px dashed " (theme-pull :theme/editor-outer-rim-color
-                                      :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 22)
-                                      :cursor           "grab"} :width "258px" :height "191px" :child body])
-                  [re-com/box :style {:cursor "grab"} :size "auto" :child
-                   (bricks/draggable (bricks/sql-spawner-meta panel-key) "meta-menu" body)]))
-              (catch :default _
-                [re-com/box :width "240px" :size "auto" :height "400px" :align :center :justify :center :style
-                 {:color     (str (theme-pull :theme/editor-font-color nil) 22) ; "#ffffff22"
-                  :zoom      0.44
-                  :font-size "40px"} :child "n/a" ;(str e)
-                ])))
-        pages (/ recos-count 6)]
+                  shape_name    (get-in preview-maps [panel-key :shape_name])
+                  sel?          (= reco-selected panel-key)
+
+
+
+                  body          [re-com/v-box :size "none" :attr
+                                 {:on-click
+                                  #(do (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :combo_hash] combo_hash])
+                                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :combo_edn] combo_edn])
+                                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :shape_name] shape_name])
+                                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :selected_view]
+                                                             selected-view])
+                                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :h] h])
+                                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :w] w])
+                                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :query_map] query_map])
+                                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :viz_map] viz_map])
+                                       (ut/tracked-dispatch [::conn/click-parameter [:recos-sys :condis] condis]))}
+                                   ;:width  (px (* (/ single-width 3) 2.95)) ;;"581px" 
+                                   ;:height (px (* (/ single-height 3) 1.55)) ;; "434px"
+                                 :width (px (* ww db/brick-size))
+                                 :height (px (* hh db/brick-size))
+                                 :style
+                                 {:zoom      0.44
+                                  :border    "1px solid #ffffff22"
+                                  :transform "translate(0)" ;; a known CSS hack for fixed position in
+                                  :overflow  "auto"} :justify :between :children
+                                 [[re-com/box :size "auto" :height "40px" :style
+                                   {:padding-left  "14px"
+                                    :cursor        "pointer"
+                                    :padding-right "14px"
+                                    :font-weight   400
+                                    :font-size     "22px"} :child (str combo_edn)]
+                                  [bricks/honeycomb panel-key (or selected-view :oz) ww hh]
+                                  [re-com/box :size "auto" :height "40px" :justify :end :align :end :style
+                                   {:padding-left "14px" :padding-right "14px" :font-weight 400 :font-size "22px"} :child
+                                   (str shape_name)]]]]
+              (if sel?
+                (bricks/draggable (bricks/sql-spawner-meta :viz-reco)
+                                  "meta-menu"
+                                  [re-com/box :style
+                                   {;:border (str "1px dashed " (theme-pull :theme/editor-outer-rim-color nil))
+                                    :background-color (str (theme-pull :theme/editor-outer-rim-color nil) 22)
+                                    :cursor           "grab"}
+                                     ;:width "258px" 
+                                     ;:height "191px" 
+
+                                   :child body])
+                [re-com/box :style {:cursor "grab"} :size "auto" :child
+                 (bricks/draggable (bricks/sql-spawner-meta panel-key) "meta-menu" body)]))
+            (catch :default _
+              [re-com/box
+               ;:width "240px"
+               :size "auto"
+               ;:height "400px"
+
+                                                  
+               :width (px (* ww db/brick-size))
+               :height (px (* hh db/brick-size))
+
+                 ;:width (px (* ww db/brick-size))
+                 ;:height (px (* hh db/brick-size))
+               :align :center :justify :center :style
+               {:color     (str (theme-pull :theme/editor-font-color nil) 22) ; "#ffffff22"
+                ;:border "1px solid white"
+                :zoom      0.44
+                :font-size "40px"} :child "n/a" ;(str e)
+               ])))
+        pages (/ recos-count recos-per-page)]
     (dorun (let [prev-preview-keys (for [k @(ut/tracked-subscribe [::bricks/preview-keys])] (keyword (str "reco-preview" k)))
-                 per-page          6 ;; if we ever get more room...
+                 per-page          recos-per-page ;;6 ;; if we ever get more room...
                  grid-page         @(ut/tracked-subscribe [::bricks/recos-page])
                  grid-page         (if (> (- grid-page 1) pages) 0 grid-page)
                  recos             (take per-page
@@ -496,48 +554,121 @@
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
-    [re-com/v-box :height "433px" :children
+    [re-com/v-box 
+     :height (px hhh) ;;"433px" 
+     :width (px www)
+     ;:style {:border "1px solid pink"}
+     :children
      [[re-com/h-box :height "39px" :gap "4px" :style {:overflow "auto" :padding-bottom "5px" :padding-left "7px"} :children
        block-list-boxes]
       [re-com/h-box :height "40px" :gap "12px" :align :center :justify :start :style
        {;:background-color "maroon"
-        :padding-left "6px"} :children
-       [[re-com/single-dropdown :choices (conj (for [c combo-singles] {:id c :label c}) {:id nil :label "(all possible fields)"})
-         :max-height "320px" :placeholder "(all possible fields)" :style {:font-size "13px"} :model
-         (get sql-params :user-dropdown-sys/req-field) :on-change
-         #(ut/tracked-dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] %]) :width "285px"]
-        [re-com/single-dropdown :choices
-         (conj (for [{:keys [combo_edn recos]} combo-list] {:id combo_edn :label (str combo_edn " (" recos ")")})
-               {:id nil :label "(all possible field combos)"}) :max-height "320px" :placeholder "(all possible field combos)"
-         :style {:font-size "13px"} :model (get sql-params :viz-shapes-sys/combo_edn) :on-change
-         #(ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] %]) :width "660px"]
-        [re-com/box :child "grid" :attr {:on-click #(ut/tracked-dispatch [::bricks/set-grid-reco? true])} :style
-         {:color       (if grid-reco? (theme-pull :theme/editor-font-color nil) "inherit")
-          :cursor      "pointer"
-          :margin-top  "-9px"
-          :font-weight 700}]
-        [re-com/box :child "previews" :attr {:on-click #(ut/tracked-dispatch [::bricks/set-grid-reco? false])} :style
-         {:color       (if (not grid-reco?) (theme-pull :theme/editor-font-color nil) "inherit")
-          :cursor      "pointer"
-          :margin-top  "-9px"
-          :font-weight 700}]]]
-      [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
-       [[re-com/box :size "none" :width "300px" :child [bricks/magic-table :viz-shapes0-list* [:viz-shapes0-sys] 7 8 []]]
+        :color (theme-pull :theme/editor-font-color  nil)
+        :padding-left "6px" :padding-right "6px"}
+       :children [
+                  [re-com/single-dropdown :choices (conj (for [{:keys [shape recos]} shape-list] {:id shape :label (str shape " (" recos ")")}) {:id nil :label "(all possible shapes)"})
+                   :max-height "320px" :placeholder "(all possible shapes)" :style {:font-size "13px" }
+                   :model (get sql-params :user-dropdown-sys/shape)
+                   :on-change
+                   #(ut/tracked-dispatch [::conn/click-parameter [:user-dropdown-sys :shape] %])
+                           ;:width "285px"
+                   ]
+                  
+                  
+                  [re-com/single-dropdown :choices (conj (for [c combo-singles] {:id c :label c}) {:id nil :label "(all possible fields)"})
+                   :max-height "320px" :placeholder "(all possible fields)" :style {:font-size "13px"} :model
+                   (get sql-params :user-dropdown-sys/req-field) :on-change
+                   #(ut/tracked-dispatch [::conn/click-parameter [:user-dropdown-sys :req-field] %])
+         ;:width "285px"
+                   ]
+                  [re-com/single-dropdown :choices
+                   (conj (for [{:keys [combo_edn recos]} combo-list] {:id combo_edn :label (str combo_edn " (" recos ")")})
+                         {:id nil :label "(all possible field combos)"}) :max-height "320px" :placeholder "(all possible field combos)"
+                   :style {:font-size "13px"} :model (get sql-params :viz-shapes-sys/combo_edn) :on-change
+                   #(ut/tracked-dispatch [::conn/click-parameter [:viz-shapes-sys :combo_edn] %])
+         ;:width "660px"
+                   ]
+                  [re-com/box
+                   :child "grid"
+                   :attr {:on-click #(ut/tracked-dispatch [::bricks/set-grid-reco? true])}
+                   :style {:color       (if grid-reco? (theme-pull :theme/editor-font-color nil) 
+                                            (str (theme-pull :theme/editor-font-color nil) 33))
+                           :cursor      "pointer"
+                           :margin-top  "-9px"
+                           :font-weight 700}]
+                  
+                  [re-com/box
+                   :child "previews"
+                   :attr {:on-click #(ut/tracked-dispatch [::bricks/set-grid-reco? false])}
+                   :style {:color       (if (not grid-reco?) (theme-pull :theme/editor-font-color nil) 
+                                            (str (theme-pull :theme/editor-font-color nil) 33))
+                           :cursor      "pointer"
+                           :margin-top  "-9px"
+                           :font-weight 700}]]]
+      
+      [(if vertical? re-com/v-box re-com/h-box) 
+       :size "auto" 
+       :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} 
+       :children
+       [
+        (when false ;; (and (not @hide-panel-2?) (not no-room-for-2?))
+          [re-com/box
+           :size "none"
+         ;:width "300px" 
+           :child [bricks/magic-table :viz-shapes0-list* [:viz-shapes0-sys] 
+                   single-width-bricks  ;;7 
+                   (- single-height-bricks 2.2) []]])
+        
         (if grid-reco?
-          [re-com/box :size "none" :width "880px" :child
-           [bricks/magic-table :recos-list* [:recos-sys] 19 8
+          [re-com/box 
+           :size "none" 
+           ;:width "880px" 
+           :child [bricks/magic-table :recos-list* [:recos-sys] 
+                   ;;(Math/floor (/ www db/brick-size)) ;;
+                   (* 2 single-width-bricks) ;;(* 1.4 single-width-bricks) 
+                   (- single-height-bricks 2.2)
+
             [;(when shape-picked? :shape_name)
              :query_map_str :table_name :context_hash :connection_id :h :w :condis :viz_map :combo_hash]]]
+          
           (let [] ;; get the next 6 graphs and render?
             [re-com/h-box :children
-             [[re-com/v-box :size "auto" :height "380px" :width "770px" :children
-               [[re-com/h-box :size "auto" :children
-                 [[preview-container preview-maps preview-keys 0] [preview-container preview-maps preview-keys 1]
-                  [preview-container preview-maps preview-keys 2]]]
-                [re-com/h-box :size "auto" :children
-                 [[preview-container preview-maps preview-keys 3] [preview-container preview-maps preview-keys 4]
-                  [preview-container preview-maps preview-keys 5]]]]]
-              [re-com/v-box :size "auto" :height "380px" 
+             [
+              ;; (let [charts-wide 3
+              ;;       charts-hight 3]
+                
+              ;;   [re-com/v-box
+              ;;    :size "auto"
+              ;;    :style {:border "1px solid pink"}
+              ;;    :height (px (-  single-height 120)) ;;"380px" 
+              ;;    :width (px (* single-width 1.36)) ;;"770px" 
+              ;;    :children
+              ;;    [[re-com/h-box :size "auto" :children
+              ;;      [[preview-container preview-maps preview-keys 0]
+              ;;       [preview-container preview-maps preview-keys 1]
+              ;;       [preview-container preview-maps preview-keys 2]]]
+              ;;     [re-com/h-box :size "auto" :children
+              ;;      [[preview-container preview-maps preview-keys 3]
+              ;;       [preview-container preview-maps preview-keys 4]
+              ;;       [preview-container preview-maps preview-keys 5]]]]])
+                
+
+                (let []
+                  [re-com/v-box
+                   :size "auto"
+                   :style {:transform  "translate(0)"
+                           ;:border     "1px solid pink"
+                           }
+                   :height (px hhh)
+                   :width (px www)
+                   :children
+                   (for [h (range charts-high)]
+                     [re-com/h-box :size "none" :children
+                      (for [w (range charts-wide)] [bricks/reecatch [preview-container preview-maps preview-keys (+ (* h charts-wide) w)]])])])
+                
+                
+                
+              [re-com/v-box :size "auto" :height (px hhh) 
                :style {:border-top (str "1px solid " (theme-pull :theme/universal-pop-color "#9973e0") "66")
                        :overflow "hidden"} :children
                (let []
@@ -559,7 +690,8 @@
 
 (defn editor-panel-viz
   []
-  (let [all-sql-call-keys     @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
+  (let [{:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
+        all-sql-call-keys     @(ut/tracked-subscribe [::bricks/all-sql-call-keys])
         all-sql-call-keys-str (for [e all-sql-call-keys] (ut/replacer (ut/safe-name e) "-" "_"))
         sql-params            (into {}
                                     (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape]]
@@ -828,7 +960,8 @@
 
 (defn editor-panel-metadata-ext
   []
-  (let [sql-params (into {}
+  (let [{:keys [single-width-bricks single-height-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
+        sql-params (into {}
                          (for [k [:connections-sys/connection_id :tables-sys/table_name]]
                            {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
@@ -855,7 +988,7 @@
           (cond grid?    [:fields-sys]
                 attribs? [:attribs-sys]
                 combos?  [:combos-sys]
-                :else    [:fields-sys]) 11 10
+                :else    [:fields-sys]) single-width-bricks single-height-bricks ;; 11 10
           [:db_type :db_schema :table_type :database_name :db_catalog :table_name :connection_id :database_version :key_hash
            :context_has]]]]]]]))
 
@@ -865,7 +998,8 @@
 
 (defn editor-panel-metadata-viz
   []
-  (let [sql-params    (into {}
+  (let [{:keys [single-width-bricks single-height-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
+        sql-params    (into {}
                             (for [k [:viz-tables-sys/table_name :viz-shapes0-sys/shape :viz-shapes-sys/combo_edn]]
                               {k ;;@(ut/tracked-subscribe [::conn/clicked-parameter-key [k]])
                                  @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
@@ -885,7 +1019,7 @@
     [re-com/h-box :size "auto" :style {:color (theme-pull :theme/editor-font-color nil)} :children
      [[re-com/v-box :size "auto" :children
        [[re-com/box :size "auto" :child
-         [bricks/magic-table :recos-list* [:recos-sys] 11 10
+         [bricks/magic-table :recos-list* [:recos-sys] single-width-bricks single-height-bricks ;; 11 10
           [(when shape-picked? :shape_name) :query_map_str :table_name :context_hash :connection_id :h :w :condis :viz_map
            (when combo-picked? :combo_edn)]]]]]]]))
 
@@ -1076,7 +1210,9 @@
                                      :background-color (if (= k data-key)
                                                  ;"#9973e0"
                                                          (theme-pull :theme/universal-pop-color "#9973e0")
-                                                         "inherit")
+                                                         ;"inherit"
+                                                         (str (ut/invert-hex-color (theme-pull :theme/universal-pop-color "#9973e0")) 55)
+                                                         )
                                      :padding-right    "5px"
                                      :padding-left     "5px"} :gap "4px" :children
                                     [[re-com/box :padding "3px" :attr
@@ -1328,24 +1464,27 @@
           y       (- start-y off-y)
           ;xmax    (if (< x 650) 650 x)
           ;ymax    (if (< y 750) 750 y)
-          ;xmax    (+ (Math/ceil (/ x bricks/brick-size)) (get @editor-size 0))
-          ;ymax    (+ (Math/ceil (/ y bricks/brick-size)) (get @editor-size 1))
-          xmax     (Math/floor (/ x bricks/brick-size))
-          ymax     (Math/floor (/ y bricks/brick-size))
-          xmax    (+ (if (< xmax 10) 10 xmax) 0.3)
-          ;xmax    (if (< xmax 30) 30 xmax)
-          ymax    (if (< ymax 10) 10 ymax)]
+          ;xmax    (+ (Math/ceil (/ x db/brick-size)) (get @editor-size 0))
+          ;ymax    (+ (Math/ceil (/ y db/brick-size)) (get @editor-size 1))
+          xmax     (Math/floor (/ x db/brick-size))
+          ymax     (Math/floor (/ y db/brick-size))
+          xmax    (+ (if (< xmax 8) 8 xmax) 0.3)
+          ymax    (if (< ymax 8) 8 ymax)]
+      ;(when @bricks/dragging-editor? )
+      
       ;(ut/tapp>> (str [:editor-size xmax ymax]))
       (reset! editor-size [xmax ymax]))))
 
 (defn resize-mouse-down-handler [e]
   (let [{:keys [left top]} (get-client-rect e)
-        width               (* (get @editor-size 0) bricks/brick-size)
-        height              (* (get @editor-size 1) bricks/brick-size)
+        width               (* (get @editor-size 0) db/brick-size)
+        height              (* (get @editor-size 1) db/brick-size)
         offset             {:x (+ -10 (- (.-clientX e) width))
                             :y (+ -30 (- (.-clientY e) height))}
 
         on-move            (resize-mouse-move-handler offset)]
+    (.preventDefault e) ;; to stop text selection from dragging
+    
     (do
       (reset! bricks/dragging-editor? true)
       ;; (when @bricks/dragging-editor? (.addEventListener js/document "mousedown" prevent-selection))
@@ -1361,8 +1500,8 @@
 ;;         ccc (count cc)
 ;;         cc (str (if (> ccc 7) (subs cc 0 7) cc) 45)
 ;;         [x y] @detached-coords
-;;         xb (Math/floor (/ x bricks/brick-size))
-;;         yb (Math/floor (/ y bricks/brick-size))
+;;         xb (Math/floor (/ x db/brick-size))
+;;         yb (Math/floor (/ y db/brick-size))
 ;;         near? (<= xb 2)
 ;;         inside? (and (= xb 0) (or (>= yb 1) (<= yb (- bricks-tall 2))))]
 ;;     (when near?
@@ -1381,39 +1520,39 @@
 ;;                            :background-size  (str "50px 50px, 50px 50px")
 ;;                            :left 0
 ;;                            :border-radius "0px 12px 12px 0px"
-;;                            :height (* (- bricks-tall 2) bricks/brick-size)
-;;                            :width bricks/brick-size
-;;                            :top bricks/brick-size}]]])))
+;;                            :height (* (- bricks-tall 2) db/brick-size)
+;;                            :width db/brick-size
+;;                            :top db/brick-size}]]])))
 
 
 
 ;; (defn edge-properties [edge bricks-wide bricks-tall]
 ;;   (case edge
-;;     :left   {:width bricks/brick-size
-;;              :height (* (- bricks-tall 2) bricks/brick-size)
-;;              :top bricks/brick-size
+;;     :left   {:width db/brick-size
+;;              :height (* (- bricks-tall 2) db/brick-size)
+;;              :top db/brick-size
 ;;              :left 0
 ;;              :border-radius "0px 12px 12px 0px"
 ;;              :near? #(<= (first %) 2)
 ;;              :inside? #(and (= (first %) 0) (or (>= (second %) 1) (<= (second %) (- bricks-tall 2))))}
-;;     :right  {:width bricks/brick-size
-;;              :height (* (- bricks-tall 2) bricks/brick-size)
-;;              :top bricks/brick-size
+;;     :right  {:width db/brick-size
+;;              :height (* (- bricks-tall 2) db/brick-size)
+;;              :top db/brick-size
 ;;              :right 0
 ;;              :border-radius "12px 0px 0px 12px"
 ;;              :near? #(>= (first %) (- bricks-wide 3))
 ;;              :inside? #(and (= (first %) (dec bricks-wide)) (or (>= (second %) 1) (<= (second %) (- bricks-tall 2))))}
-;;     :top    {:width (* (- bricks-wide 2) bricks/brick-size)
-;;              :height bricks/brick-size
+;;     :top    {:width (* (- bricks-wide 2) db/brick-size)
+;;              :height db/brick-size
 ;;              :top 0
-;;              :left bricks/brick-size
+;;              :left db/brick-size
 ;;              :border-radius "0px 0px 12px 12px"
 ;;              :near? #(<= (second %) 2)
 ;;              :inside? #(and (= (second %) 0) (or (>= (first %) 1) (<= (first %) (- bricks-wide 2))))}
-;;     :bottom {:width (* (- bricks-wide 2) bricks/brick-size)
-;;              :height bricks/brick-size
+;;     :bottom {:width (* (- bricks-wide 2) db/brick-size)
+;;              :height db/brick-size
 ;;              :bottom 0
-;;              :left bricks/brick-size
+;;              :left db/brick-size
 ;;              :border-radius "12px 12px 0px 0px"
 ;;              :near? #(>= (second %) (- bricks-tall 3))
 ;;              :inside? #(and (= (second %) (dec bricks-tall)) (or (>= (first %) 1) (<= (first %) (- bricks-wide 2))))}))
@@ -1424,8 +1563,8 @@
 ;;         ccx (if (> ccc 7) (subs cc 0 7) cc)
 ;;         cc (str ccx 45)
 ;;         [x y] @detached-coords
-;;         xb (Math/floor (/ x bricks/brick-size))
-;;         yb (Math/floor (/ y bricks/brick-size))
+;;         xb (Math/floor (/ x db/brick-size))
+;;         yb (Math/floor (/ y db/brick-size))
 ;;         props (edge-properties edge bricks-wide bricks-tall)
 ;;         near? ((:near? props) [xb yb])
 ;;         inside? ((:inside? props) [xb yb])]
@@ -1459,31 +1598,31 @@
 
 (defn edge-properties [edge bricks-wide bricks-tall]
   (case edge
-    :left   {:width bricks/brick-size
-             :height (* (- bricks-tall 2) bricks/brick-size)
-             :top bricks/brick-size
+    :left   {:width db/brick-size
+             :height (* (- bricks-tall 2) db/brick-size)
+             :top db/brick-size
              :left 0
              :border-radius "0px 12px 12px 0px"
              :near? #(<= (first %) 2)
              :inside? #(and (= (first %) 0) (or (>= (second %) 1) (<= (second %) (- bricks-tall 2))))}
-    :right  {:width bricks/brick-size
-             :height (* (- bricks-tall 2) bricks/brick-size)
-             :top bricks/brick-size
+    :right  {:width db/brick-size
+             :height (* (- bricks-tall 2) db/brick-size)
+             :top db/brick-size
              :right 0
              :border-radius "12px 0px 0px 12px"
              :near? #(>= (first %) (- bricks-wide 3))
              :inside? #(and (= (first %) (dec bricks-wide)) (or (>= (second %) 1) (<= (second %) (- bricks-tall 2))))}
-    :top    {:width (* (- bricks-wide 2) bricks/brick-size)
-             :height bricks/brick-size
+    :top    {:width (* (- bricks-wide 2) db/brick-size)
+             :height db/brick-size
              :top 0
-             :left bricks/brick-size
+             :left db/brick-size
              :border-radius "0px 0px 12px 12px"
              :near? #(<= (second %) 2)
              :inside? #(and (= (second %) 0) (or (>= (first %) 1) (<= (first %) (- bricks-wide 2))))}
-    :bottom {:width (* (- bricks-wide 2) bricks/brick-size)
-             :height bricks/brick-size
+    :bottom {:width (* (- bricks-wide 2) db/brick-size)
+             :height db/brick-size
              :bottom 0
-             :left bricks/brick-size
+             :left db/brick-size
              :border-radius "12px 12px 0px 0px"
              :near? #(>= (second %) (- bricks-tall 3))
              :inside? #(and (= (second %) (dec bricks-tall)) (or (>= (first %) 1) (<= (first %) (- bricks-wide 2))))}))
@@ -1494,8 +1633,8 @@
         ccx (if (> ccc 7) (subs cc 0 7) cc)
         cc (str ccx 45)
         [x y] @detached-coords
-        xb (Math/floor (/ x bricks/brick-size))
-        yb (Math/floor (/ y bricks/brick-size))
+        xb (Math/floor (/ x db/brick-size))
+        yb (Math/floor (/ y db/brick-size))
         props (edge-properties edge bricks-wide bricks-tall)
         near? ((:near? props) [xb yb])
         inside? ((:inside? props) [xb yb])]
@@ -1554,19 +1693,27 @@
 
 (defonce cm-instance (reagent/atom nil))
 (defonce hide-responses? (reagent/atom false))
-(defonce console-responses (reagent/atom {})) 
-(defonce console-history (reagent/atom #{})) 
+(def console-responses (reagent/atom {})) 
+(def console-history (reagent/atom #{})) 
+
+(defn insert-response-block [w h data]
+  (let [root (ut/find-safe-position w h)]
+    (bricks/insert-new-block-raw root w h data)))
 
 (defn run-console-command [command]
   (ut/tapp>> (str "Command entered: " command))
   (reset! hide-responses? false)
-  (let [ee (str "fs dfsdf s" command " asdasdasd")]
+  (let [resp (insert-response-block 6 3 command)
+        ee (str command "  ! " resp)]
+    (ut/dispatch-delay 300 [::http/insert-alert [:v-box :children [[:box :child (str resp)] 
+                                                                   [:box :child (str command) 
+                                                                    :style {:font-size "12px"}]]] 6 1.5 5])
     (swap! console-responses assoc command ee)))
 
 (defn console-text-box
-  [width-int height-int value on-enter]
+  [width-int height-int value]
   (let [history-index (reagent/atom -1)]
-    (fn [width-int height-int value on-enter]
+    (fn [width-int height-int value]
       [re-com/box
        :size "auto"
        :width (px (- width-int 24))
@@ -1626,7 +1773,7 @@
     (get modes next-index)))
 
 (defn quake-console [ww]
-  (let [hh (* 2  bricks/brick-size)
+  (let [hh (* 2  db/brick-size)
         reacts! [@console-responses @console-history @hide-responses?]
         ww (Math/floor (* ww  0.8))]
     [re-com/v-box
@@ -1691,7 +1838,7 @@
                             [console-text-box nil nil " "]]]]]))
 
 ;; (defn quake-console [ww]
-;;   (let [hh (* 2 bricks/brick-size)
+;;   (let [hh (* 2 db/brick-size)
 ;;         reacts! [@console-responses @console-history @hide-responses?]
 ;;         ww (Math/floor (* ww 0.8))]
 ;;     ;(reagent/with-let [cm-instance (reagent/atom nil)]
@@ -1777,16 +1924,20 @@
         no-room-for-3?      (and (not @hide-panel-2?) (<= (if vertical? bricks-tall bricks-wide) 24))
         no-room-for-2?      (and (not @hide-panel-3?) (<= (if vertical? bricks-tall bricks-wide) 16))
         ;;_ (ut/tapp>> [:no-room-for-2? no-room-for-2? :no-room-for-3? no-room-for-3?])
-        panel-count         (if system-panel? 3
-                                (if
-                                 (or views? queries? runners?)
-                                  (- 3 (count (filter #(= % true) [(or no-room-for-2? @hide-panel-2?)
-                                                                   (or no-room-for-3? @hide-panel-3?)])))
-                                  2))
+        ;; panel-count         (if system-panel? 3
+        ;;                         (if
+        ;;                          (or views? queries? runners?)
+        ;;                           (- 3 (count (filter #(= % true) [(or no-room-for-2? @hide-panel-2?)
+        ;;                                                            (or no-room-for-3? @hide-panel-3?)])))
+        ;;                           2))
+        panel-count         (if (or views? queries? runners? system-panel?)
+                              (- 3 (count (filter #(= % true) [(or no-room-for-2? @hide-panel-2?)
+                                                               (or no-room-for-3? @hide-panel-3?)])))
+                              3)
 
         ;;bricks-wide         (if (or system-panel? queries? views? runners?) bricks-wide (js/Math.ceil (* bricks-wide 0.66)))
 
-        ttl-width           (* bricks-wide bricks/brick-size)
+        ttl-width           (* bricks-wide db/brick-size)
         ttl-width-px        (px ttl-width)
 
         single-height-bricks (if vertical? (js/Math.floor (/ bricks-tall panel-count)) bricks-tall)
@@ -1795,36 +1946,36 @@
         pdiff (if vertical?
                 (- (Math/floor bricks-tall) (* single-height-bricks panel-count))
                 (- (Math/floor bricks-wide) (* single-width-bricks panel-count)))
-        
-        single-height-bricks (if (and (> pdiff 0) vertical?) 
+
+        single-height-bricks (if (and (> pdiff 0) vertical?)
                                (+ single-height-bricks (/ pdiff panel-count) 0.15)
                                single-height-bricks)
-        
+
         single-width-bricks (if (and (> pdiff 0) (not vertical?))
-                               (+ single-width-bricks (/ pdiff panel-count) 0.05)
-                               single-width-bricks)
-                               
+                              (+ single-width-bricks (/ pdiff panel-count) 0.05)
+                              single-width-bricks)
 
 
-        ttl-height          (* bricks-tall bricks/brick-size)
+
+        ttl-height          (* bricks-tall db/brick-size)
         ttl-height-px       (px (+ 10 ttl-height))
 
-        x-px                (px (first @detached-coords)) ;(px (* x bricks/brick-size))
-        y-px                (px (last @detached-coords)) ;(px (* y bricks/brick-size))
+        x-px                (px (first @detached-coords)) ;(px (* x db/brick-size))
+        y-px                (px (last @detached-coords)) ;(px (* y db/brick-size))
 
 
 
         ;single-width-bricks 
         single-width        (if vertical?
-                              (- (* single-width-bricks bricks/brick-size) 12)
-                              (* single-width-bricks bricks/brick-size))
+                              (- (* single-width-bricks db/brick-size) 12)
+                              (* single-width-bricks db/brick-size))
         single-width-px     (px single-width)
 
         hh1                 [@db/mad-libs-waiting-room @db/data-browser-query-con @view-title-edit-idx
                              @db/item-browser-mode @db/scrubbers @db/solver-meta-spy @editor-size
                              @db/value-spy @bricks/dragging-editor? @hide-panel-2? @hide-panel-3?] ;; reactivity hack! React!
 
-        single-height       (if vertical? (* single-height-bricks bricks/brick-size) ttl-height)
+        single-height       (if vertical? (* single-height-bricks db/brick-size) ttl-height)
         single-height-px    (if vertical?
                               ;(px (+ single-height 10)) 
                               (px single-height)
@@ -1840,6 +1991,8 @@
                              :single-height-bricks single-height-bricks
                              :bricks-wide bricks-wide
                              :bricks-tall bricks-tall
+                             :panel-count panel-count
+                             :vertical? vertical?
                              :single-width single-width
                              :single-height single-height}
         _                   (when (not= @editor-dimensions atom-map) (reset! editor-dimensions atom-map))
@@ -1857,10 +2010,15 @@
         mad-libs-combos     (when mad-libs-combo?
                               @(ut/tracked-subscribe [::bricks/get-combo-rows selected-block
                                                       (get selected-panel-map :mad-libs-combo-hash)]))
+       ;;; _ (ut/tapp>> [:mad-libs-combo? reco-selected? mad-libs-combo? mad-libs-combos (str (get selected-panel-map :mad-libs-combo-hash)) selected-block])
         data-key-type       @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
         screen-name         (ut/safe-name @(ut/tracked-subscribe [::bricks/screen-name]))
         screen-name-regex   #"(.|\s)*\S(.|\s)*"
         websocket-status    (select-keys @(ut/tracked-subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])]
+    
+    ;; (when mad-libs-combo? (ut/tracked-dispatch [::bricks/update-reco-previews]))
+    ;; (ut/tapp>> [:things-running @(ut/tracked-sub ::bricks/things-running {})])
+
     (when (nil? (get @db/data-browser-query selected-block)) ;; at this point lets just
       (swap! db/data-browser-query assoc selected-block data-key))
     (when (and (not (= reco-selected reco-preview)) reco-selected?)
@@ -1873,9 +2031,24 @@
       (if @bricks/dragging-editor?
 
         [(let [coord-str (str (mapv Math/floor @editor-size))
-               min? (= coord-str "[10 10]")]
-           [re-com/box
-            :child (str coord-str @active-edge (when min? " (minimum size)"))
+               ;min? (= coord-str "[10 10]")
+               ]
+
+           [(if vertical? re-com/v-box re-com/h-box)
+            :children (for [p (range panel-count)] 
+                        [re-com/box
+                         :size "auto"  
+                         :align :center 
+                         :justify :center
+                         :height (px single-height)
+                         :width (px single-width)
+                         :style {:border (str "2px solid " (theme-pull :theme/universal-pop-color nil))
+                                 :color (theme-pull :theme/universal-pop-color nil)}
+                         :child [re-com/v-box :children [[re-com/box 
+                                                          :size "auto" :align :center :justify :center 
+                                                          :style {:font-size "40px"}
+                                                          :child (str (+ p 1))]
+                                                         [re-com/box :child (str " [" (Math/floor single-height-bricks) " " (Math/floor single-width-bricks) "]")]]]])
             :style {:user-select "none"
                     ;:pointer-events "none"
                     :font-size "33px"
@@ -2232,7 +2405,11 @@
                 :margin-top   "-9px"
                 :padding-left "8px"}])]]
           :height single-height-px
-          :width (if (and (= @db/editor-mode :vvv) system-panel?) (px (* 2 single-width)) single-width-px) :style {:overflow "hidden"}]
+          :width (if 
+                  (and (= @db/editor-mode :vvv) system-panel? false) 
+                   (px (* 2 single-width)) 
+                   single-width-px) 
+          :style {:overflow "hidden"}]
 
          (when (and (not @hide-panel-2?) (not no-room-for-2?))
            (cond
@@ -2368,16 +2545,18 @@
                                                        [bricks/read-only-sql-box single-width (/ single-height 3.2) (str sql-string)])])]
                                       (or
                                        (get @db/data-browser-query-con data-key)
-                                       solver-meta-spy?) (let [are-solver        (get @db/solver-fn-lookup [:panels selected-block data-key])
-                                                               meta-data          (when are-solver
-                                                                                    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                                                     {:keypath [(keyword (str (ut/replacer are-solver
-                                                                                                                                           ":solver/" "solver-meta/")))]}))
-                                                               running-status    (when are-solver
-                                                                                   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                                                    {:keypath [(keyword (str (ut/replacer are-solver
-                                                                                                                                          ":solver/" "solver-status/*client-name*>")))]}))
-                                                               console-output (get-in meta-data [:output :evald-result :out] [])]
+                                       solver-meta-spy?) (let [are-solver           (get @db/solver-fn-lookup [:panels selected-block data-key])
+                                                               meta-data-ckp-str    (str (ut/replacer are-solver ":solver/" "solver-meta/"))
+                                                               meta-data-ckp        (keyword meta-data-ckp-str)
+                                                               meta-data-ckp-output (keyword (str meta-data-ckp-str ">output>evald-result>out"))
+                                                               meta-data            (when are-solver
+                                                                                      @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                                                       {:keypath [meta-data-ckp]}))
+                                                               running-status-ckp   (keyword (str (ut/replacer are-solver ":solver/" "solver-status/*client-name*>")))
+                                                               running-status       (when are-solver
+                                                                                      @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                                                       {:keypath [running-status-ckp]}))
+                                                               console-output       (get-in meta-data [:output :evald-result :out] [])]
                                                   ;;(ut/tapp>>  [:console-output console-output])
                                                            [re-com/box
                                                             :size "none"
@@ -2396,12 +2575,18 @@
                                                                                           :margin-left "3px"
                                                                                           :margin-right "3px"
                                                                                           :border-radius "12px"}
-                                                                                  :children [[re-com/box
+                                                                                  :children [[bricks/draggable-clover 
+                                                                                              [re-com/box
                                                                                               :style {:padding-top "4px"
                                                                                                       :color (str (theme-pull :theme/editor-outer-rim-color nil) 65)
                                                                                                       :padding-left "6px"}
                                                                                               :align :start :justify :center
-                                                                                              :child "console output"]
+                                                                                              :child "console output"] 
+                                                                                              [:console meta-data-ckp-output] 
+                                                                                              :views 
+                                                                                              (str "console " are-solver) :console-out
+                                                                                              3 6]
+                                                                                             ;; draggable-clover [element data runner & [nname h w]]
                                                                                              [re-com/v-box
                                                                                               :gap "0px"
                                                                                               :style {:padding-top "10px"}
@@ -2426,9 +2611,13 @@
                                                                                                     :padding-left "6px"}
                                                                                             :align :start :justify :center
                                                                                             :child "meta data"]
-                                                                                           [bricks/map-boxes2
-                                                                                            meta-data ;;{:meta meta-data} 
-                                                                                            selected-block data-key [] :output nil]]]
+                                                                                           [bricks/map-boxes2 
+                                                                                            meta-data 
+                                                                                            ;selected-block
+                                                                                            meta-data-ckp
+                                                                                            data-key [] :output nil]
+                                                                                           ;;map-boxes2 [data block-id selected-view keypath kki init-data-type & [draggable? key-depth]]
+                                                                                           ]]
 
                                                                                [re-com/v-box
                                                                                 :style {:border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
@@ -2442,9 +2631,11 @@
                                                                                                     :padding-left "6px"}
                                                                                             :align :start :justify :center
                                                                                             :child "runner status"]
-                                                                                           [bricks/map-boxes2
+                                                                                           [bricks/map-boxes2 
                                                                                             running-status
-                                                                                            selected-block data-key [] :output nil]]]]]])
+                                                                                            ;selected-block
+                                                                                            running-status-ckp
+                                                                                            data-key [] :output nil]]]]]])
                             ;; runner-box? [re-com/box :size "none" :style {:transform "translate(0)"}
                             ;;              :height (px (- single-height 100))
                             ;;              :child (str "render-loop for" data-key  " runner."  
@@ -2468,12 +2659,12 @@
                                          :style {:transform "translate(0)"}
                                          :height (px (- single-height 100))
                                          :width (px single-width)
-                                         :child [bricks/honeycomb selected-block (or default-shape-view :oz) single-width-bricks bricks-tall]])
+                                         :child [bricks/honeycomb selected-block (or default-shape-view :oz) single-width-bricks (dec single-height-bricks)]])
                                       :else      [re-com/box :size "none"
                                                   :style {:transform "translate(0)"}
                                                   :height (px (- single-height 100))
                                                   :width (px single-width)
-                                                  :child [bricks/honeycomb selected-block data-key  single-width-bricks bricks-tall]])
+                                                  :child [bricks/honeycomb selected-block data-key  single-width-bricks (dec single-height-bricks)]])
                                 (if viz-gen? ;; dont show scrubber boolean if on viz-gen mode
                                   [re-com/box :style {:font-size "10px" :margin-left "8px"} :child
                                    (str "('viz-gen' debug - "
@@ -2576,7 +2767,10 @@
                                       ]]]
                                    :height single-height-px
                                    :width
-                                   (if (= @db/editor-mode :vvv) "0px" single-width-px) :style
+                                   (if 
+                                    false ;(= @db/editor-mode :vvv)
+                                     "0px" single-width-px) 
+                                   :style
                                    {;:border "1px solid white" :background-color "#1f2430"
                                     :overflow "hidden"}]
              :else [re-com/box :child "missing something?!"]))
@@ -2586,7 +2780,7 @@
          (when (and (not @hide-panel-3?) (not no-room-for-3?))
            (let [;{:keys [single-width-bricks bricks-wide]} @editor-dimensions
                  panels-open (if @hide-panel-2? 2 3)
-                 offset-last (* bricks/brick-size (if (and vertical? (= panels-open 3)) -1 0)) ;(if vertical? 0 (* (- bricks-wide (* panels-open single-width-bricks)) bricks/brick-size))
+                 offset-last (* db/brick-size (if (and vertical? (= panels-open 3)) -1 0)) ;(if vertical? 0 (* (- bricks-wide (* panels-open single-width-bricks)) db/brick-size))
                  ;offset-last (if @hide-panel-2?)
                  single-height (+ single-height offset-last)
                  single-height-px (px (- single-height 10))
@@ -2682,8 +2876,8 @@
                                               :children
                                               (conj
                                                (vec (for [b    (remove nil? [(when nrepl? 
-                                                                               ;"nrepl"
-                                                                               "namespaces"
+                                                                               "nrepl"
+                                                                               ;"namespaces"
                                                                                ) "queries" "blocks"])
                                                           :let [selected? (= (keyword b) @db/item-browser-mode)]]
                                                       [re-com/box :attr {:on-click #(reset! db/item-browser-mode (keyword b))}
@@ -3320,6 +3514,7 @@
         client-name @(ut/tracked-subscribe [::bricks/client-name])
         flow-watcher-subs-grouped @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped])
         server-subs @(ut/tracked-subscribe [::bricks/server-subs])
+        things-running @(ut/tracked-sub ::bricks/things-running {})
         coords (if lines? ;; expensive otherwise
                  (let [subq-mapping (if lines? @(ut/tracked-subscribe [::bricks/subq-mapping]) {})
                        dwn-from-here (vec (ut/cached-downstream-search subq-mapping selected-block))
@@ -3372,8 +3567,8 @@
                  [])]
     (bricks/droppable
       (if @rvbbit-frontend.flows/dragging-port? ["meta-menu" :flow-port] ["meta-menu" ]) ;; eyes
-      [(js/Math.floor (/ (ifnil (first @db/context-modal-pos) 0) bricks/brick-size))
-       (js/Math.floor (/ (ifnil (last @db/context-modal-pos) 0) bricks/brick-size))]
+      [(js/Math.floor (/ (ifnil (first @db/context-modal-pos) 0) db/brick-size))
+       (js/Math.floor (/ (ifnil (last @db/context-modal-pos) 0) db/brick-size))]
       [re-com/box :style {:background-color "black"} :attr
        {:id              "base-canvas"
         :on-drag-over    #(bricks/tag-screen-position %)
@@ -3381,8 +3576,8 @@
                                             (bricks/tag-screen-position event) ;; event is magic in handler-fn
                                             (when (and (not @bricks/over-block?) (not @bricks/over-flow?))
                                               (bricks/insert-new-block
-                                                [(js/Math.floor (/ (first @db/context-modal-pos) bricks/brick-size))
-                                                 (js/Math.floor (/ (last @db/context-modal-pos) bricks/brick-size))]
+                                                [(js/Math.floor (/ (first @db/context-modal-pos) db/brick-size))
+                                                 (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size))]
                                                 5
                                                 4))
                                             #_{:clj-kondo/ignore [:unresolved-symbol]}
@@ -3394,8 +3589,8 @@
                                   (let [x  (keyword (ut/replacer (str (talltale.core/quality-color-animal)) " " "-"))
                                         x  (ut/safe-key x)
                                         kp [:param x]]
-                                    (bricks/insert-new-block [(js/Math.floor (/ (first @db/context-modal-pos) bricks/brick-size))
-                                                              (js/Math.floor (/ (last @db/context-modal-pos) bricks/brick-size))]
+                                    (bricks/insert-new-block [(js/Math.floor (/ (first @db/context-modal-pos) db/brick-size))
+                                                              (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size))]
                                                              5
                                                              4
                                                              {:drag-meta     {:type :open-input}
@@ -3439,7 +3634,7 @@
         [[bricks/reecatch [tab-menu]]
          [bricks/reecatch [snapshot-menu]]
          (when @bricks/dragging-editor?
-           [bricks/reecatch [docker-edges (Math/floor (/ ww bricks/brick-size)) (Math/floor (/ hh bricks/brick-size))]])
+           [bricks/reecatch [docker-edges (Math/floor (/ ww db/brick-size)) (Math/floor (/ hh db/brick-size))]])
          (when session? [session-modal])
          (when (and editor? (not @bricks/mouse-dragging-panel?))
            ;;[bricks/reecatch [editor-panel 33 10]]
@@ -3451,10 +3646,10 @@
             {:background-color (str (theme-pull :theme/editor-background-color nil) 22) ;; "#00000022"
              :filter           "drop-shadow(16px 16px 20px red) invert(75%)"
              :position         "fixed"
-             :left             (* (js/Math.floor (/ (first @db/context-modal-pos) bricks/brick-size)) bricks/brick-size)
-             :top              (* (js/Math.floor (/ (last @db/context-modal-pos) bricks/brick-size)) bricks/brick-size)} :width
-            (px (* (get @bricks/dragging-body :w) bricks/brick-size)) :height
-            (px (* (get @bricks/dragging-body :h) bricks/brick-size))])
+             :left             (* (js/Math.floor (/ (first @db/context-modal-pos) db/brick-size)) db/brick-size)
+             :top              (* (js/Math.floor (/ (last @db/context-modal-pos) db/brick-size)) db/brick-size)} :width
+            (px (* (get @bricks/dragging-body :w) db/brick-size)) :height
+            (px (* (get @bricks/dragging-body :h) db/brick-size))])
          (when (and buffy? (not @bricks/mouse-dragging-panel?)) [bricks/reecatch [buffy/chat-panel]])
          
          (when flows? ;(and flows? (not @bricks/mouse-dragging-panel?))
@@ -3571,6 +3766,7 @@
           [[re-com/box :size "none" :child
             (str (get websocket-status :waiting -1)
                  (str ", " (ut/nf (count server-subs)))
+                 (str ", " (ut/nf (count things-running)))
                  (when (not online?) " (RVBBIT server is offline)"))]
            (when (ut/ne? flow-watcher-subs-grouped)
              [re-com/h-box :style {:padding-left "10px" :font-size "12px"} :gap "8px" :children

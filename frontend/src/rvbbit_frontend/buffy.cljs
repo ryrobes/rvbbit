@@ -43,9 +43,9 @@
 (defonce detached-coords
   (reagent/atom (let [hh          (.-innerHeight js/window) ;; starting size set on load
                       ww          (.-innerWidth js/window) ;; starting size set on load
-                      bricks-wide (+ (js/Math.floor (/ ww bricks/brick-size)) 1)
-                      topper      (* 2 bricks/brick-size)
-                      lefty       (* (- bricks-wide 15) bricks/brick-size)]
+                      bricks-wide (+ (js/Math.floor (/ ww db/brick-size)) 1)
+                      topper      (* 2 db/brick-size)
+                      lefty       (* (- bricks-wide 15) db/brick-size)]
                   [lefty topper])))
 
 (defn mouse-move-handler
@@ -1390,8 +1390,8 @@
                                                        (dissoc :refresh-every))}
                                 h        (get data_d :_h (or h 6))
                                 w        (get data_d :_w (or w 10))]
-                            [re-com/box :size "none" :width (px (* w bricks/brick-size)) :height
-                             (px (- (* h bricks/brick-size) 30)) :child [bricks/honeycomb panel-key temp-key h w nil query]])
+                            [re-com/box :size "none" :width (px (* w db/brick-size)) :height
+                             (px (- (* h db/brick-size) 30)) :child [bricks/honeycomb panel-key temp-key h w nil query]])
           (= type :both)  (let [queries (get data_d :queries)
                                 qkeys   (into {}
                                               (for [q (keys queries)]
@@ -1894,8 +1894,8 @@
 
 (defn chat-panel
   []
-  (let [x-px            (px (first @detached-coords)) ;(px (* x bricks/brick-size))
-        y-px            (px (last @detached-coords)) ;(px (* y bricks/brick-size))
+  (let [x-px            (px (first @detached-coords)) ;(px (* x db/brick-size))
+        y-px            (px (last @detached-coords)) ;(px (* y db/brick-size))
         panel-width     600
         text-box-height 110
         selected-block  @(ut/tracked-subscribe [::bricks/selected-block])

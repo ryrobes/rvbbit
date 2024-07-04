@@ -17,6 +17,7 @@
    [re-frame.core     :as re-frame]
    [reagent.core      :as reagent]
    [talltale.core     :as tales]
+   [rvbbit-frontend.db :as db]
    [talltale.core     :as tales]
    [zprint.core       :as zp])
   (:import
@@ -167,8 +168,8 @@
 
 
 
-(def clover-walk-singles-map (atom {}))     
-(defonce process-key-cache (atom {}))
+(def clover-walk-singles-map (atom {}))                                         
+(defonce process-key-cache (atom {}))  
 (defonce process-key-tracker (atom {}))
 
 (defn process-key2
@@ -698,6 +699,7 @@
 
 (defn ne? [x] (if (seqable? x) (boolean (seq x)) true))
 
+
 (defn base64-to-blob
   [base64-content content-type]
   (let [byte-array (base64-to-uint8-array base64-content)
@@ -1217,7 +1219,66 @@
 
 (defn dissoc-in-many [m keypaths] (reduce (fn [m keypath] (dissoc-in m keypath)) m keypaths))
 
+(defn well-formed? [s]
+  (let [opens "{[("
+        closes "}])"
+        matching (zipmap opens closes)
+        stack (atom [])]
+    (try
+      (doseq [c s]
+        (cond
+          (contains? matching c) (swap! stack conj c)
+          (contains? (set closes) c) (when-not (= (matching (peek @stack)) c)
+                                       (throw (js/Error. "Mismatched delimiter")))
+          :else (swap! stack pop)))
+      (= @stack [])
+      (catch :default _ false))))
 
+(re-frame/reg-sub ::w (fn [db] (get-in db [:window :w])))
+(re-frame/reg-sub ::h (fn [db] (get-in db [:window :h])))
+
+(re-frame/reg-sub ::all-roots-tab-sizes
+                  (fn [db _]
+                    (let [tab (get db :selected-tab)]
+                      (vec (for [[_ v] (into {} (filter #(= tab (get (val %) :tab "")) (get db :panels)))]
+                           (vec (into (get v :root) [(get v :h) (get v :w)])))))))
+
+(defn find-safe-position [block-height block-width ]
+  (let [hh @(tracked-sub ::h {})
+        ww @(tracked-sub ::w {})
+        canvas-width (Math/floor (/ ww db/brick-size))
+        canvas-height (Math/floor (/ hh db/brick-size))
+        existing-blocks @(tracked-sub ::all-roots-tab-sizes {})
+        center-x (/ canvas-width 2)
+        center-y (/ canvas-height 2)
+        possible-positions (for [x (range 0 (- canvas-width block-width))
+                                 y (range 0 (- canvas-height block-height))]
+                             [x y])
+        overlaps? (fn [[x y]]
+                    (some (fn [[bx by bh bw]]
+                            (and (< x (+ bx bw))
+                                 (> (+ x block-width) bx)
+                                 (< y (+ by bh))
+                                 (> (+ y block-height) by)))
+                          existing-blocks))
+        safe-positions (remove overlaps? possible-positions)
+        distance-from-center (fn [[x y]]
+                               (+ (Math/abs (- x center-x))
+                                  (Math/abs (- y center-y))))]
+    (if (empty? safe-positions)
+      nil  ; No safe position found
+      (apply min-key distance-from-center safe-positions))))
+
+;; ;; Example usage:
+;; (let [block-height 50
+;;       block-width 50
+;;       canvas-width 500
+;;       canvas-height 500
+;;       existing-blocks [[100 100 50 50] [200 200 100 100]]
+;;       result (find-safe-position block-height block-width canvas-width canvas-height existing-blocks)]
+;;   (if result
+;;     (println "Safe position found:" result)
+;;     (println "No safe position available")))
 
 
 (def format-map-atom (atom {}))
