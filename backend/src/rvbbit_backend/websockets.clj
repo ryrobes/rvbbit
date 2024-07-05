@@ -2929,7 +2929,8 @@
           signal-history? last-signals-history-atom
           server?         server-atom ;; no need to split for now, will keep an eye on it - don't
           ;time?           time-atom ;;(get-time-atom-for-client :rvbbit) ;;  time-atom ;; zero need to split ever. lol, its like 6 keys
-          time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
+          ;time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
+          time?           (get-atom-splitter (keyword (second sub-path)) :time time-child-atoms father-time)
           panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
           client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
           flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -3024,7 +3025,8 @@
                           signal-history? last-signals-history-atom
                           server?         server-atom ;; no need to split for now, will keep an eye on it - I
                           ;;time?           time-atom ;;(get-time-atom-for-client  client-name) ;; time-atom ;; zero need to split ever. lol, its like 6 keys
-                          time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
+                          ;time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
+                          time?           (get-atom-splitter (keyword (second sub-path)) :time time-child-atoms father-time)
                           panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                           client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
                           flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -3106,7 +3108,8 @@
                           signal-history? last-signals-history-atom
                           server?         server-atom ;; no need to split for now, will keep an eye on it -
                           ;;time?           time-atom ;;(get-time-atom-for-client  client-name) ;; time-atom ;; zero need to split ever. lol, its like 6 keys
-                          time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
+                          ;time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
+                          time?           (get-atom-splitter (keyword (second sub-path)) :time time-child-atoms father-time)
                           panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
                           client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
                           flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
@@ -3202,8 +3205,8 @@
     (ut/pp [:solver-lookup! flow-key base-type client-param-path keypath {:sub-path sub-path}])
     (cond
       (cstr/includes? (str flow-key) "*running?")  false
-      ;(= base-type :time)                         (get @father-time client-param-path)
-      (= base-type :time)                         (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
+      (= base-type :time)                         (get @father-time client-param-path)
+      ;;(= base-type :time)                         (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
       (= base-type :signal)                       (get @last-signals-atom client-param-path)
       (= base-type :data)                         (get-in @last-solvers-data-atom
                                                           (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -3305,46 +3308,47 @@
 
 (defn run-solver
   [solver-name client-name & [override-map override-input temp-solver-name]]
-  (let [;temp-running-elsewhere? (atom (running-elsewhere? temp-solver-name))
+  (let [;;temp-running-elsewhere? (atom (running-elsewhere? temp-solver-name))
         timestamp             (System/currentTimeMillis)]
 
-  ;(if false ;@temp-running-elsewhere?
+  ;; (if @temp-running-elsewhere?
 
-    ;; (when @temp-running-elsewhere?
-    ;;     ;; pretend we started while we wait for someone else to finish the work 
-    ;;   (let [vdata0 (get override-map :data) ;;[(get override-map :data) override-input]
-    ;;         vdata0 (if (> (count (str vdata0)) 60)
-    ;;                  (subs (str vdata0) 0 60)
-    ;;                  (str vdata0))]
-    ;;     (swap! solver-status assoc-in [client-name solver-name] {:started timestamp
-    ;;                                                              :stopped nil
-    ;;                                                              :running? false ;true
-    ;;                                                              :waiting? true
-    ;;                                                              :time-running ""
-    ;;                                                              :ref (str "waiting: " vdata0)})
+  ;;   ;(when @temp-running-elsewhere?
+  ;;       ;; pretend we started while we wait for someone else to finish the work 
+  ;;     (let [vdata0 (get override-map :data) ;;[(get override-map :data) override-input]
+  ;;           vdata0 (if (> (count (str vdata0)) 60)
+  ;;                    (subs (str vdata0) 0 60)
+  ;;                    (str vdata0))]
+  ;;       (swap! solver-status assoc-in [client-name solver-name] {:started timestamp
+  ;;                                                                :stopped nil
+  ;;                                                                :running? false ;true
+  ;;                                                                :waiting? true
+  ;;                                                                :time-running ""
+  ;;                                                                :ref (str "waiting: " vdata0)})
 
-    ;;     (ut/pp [:*waiting!!! client-name :for-another temp-solver-name vdata0]))
+  ;;       (ut/pp [:*waiting!!! client-name :for-another temp-solver-name vdata0])
 
-    ;;   (loop []
-    ;;     (reset! temp-running-elsewhere? (running-elsewhere? temp-solver-name))
-    ;;     (when @temp-running-elsewhere?
-    ;;       (Thread/sleep 1500) ;; wait a sec...
-    ;;       (recur)))
-    ;;     ;; when done, celebrate and pretend we did it!
-    ;;   (swap! solver-status update-in [client-name solver-name]
-    ;;          (fn [solver]
-    ;;            (-> solver
-    ;;                (assoc :stopped (System/currentTimeMillis))
-    ;;                (assoc :waiting? false)
-    ;;                (assoc :cache-served? true)
-    ;;                (assoc :time-running (ut/format-duration
-    ;;                                      (:started solver)
-    ;;                                      (System/currentTimeMillis))))))
-    ;;   (ut/delay-execution ;; we shouldnt have to do this, atom watcher reactions SHOULD be enough.
-    ;;    1800
-    ;;    (let [vv (get @last-solvers-atom temp-solver-name)]
-    ;;      (when (not (nil? vv))
-    ;;        (kick client-name [:solver temp-solver-name] (get @last-solvers-atom temp-solver-name) nil nil nil)))))
+  ;;     (loop []
+  ;;       (reset! temp-running-elsewhere? (running-elsewhere? temp-solver-name))
+  ;;       (when @temp-running-elsewhere?
+  ;;         (Thread/sleep 1500) ;; wait a sec...
+  ;;         (recur)))
+  ;;       ;; when done, celebrate and pretend we did it!
+  ;;     (swap! solver-status update-in [client-name solver-name]
+  ;;            (fn [solver]
+  ;;              (-> solver
+  ;;                  (assoc :stopped (System/currentTimeMillis))
+  ;;                  (assoc :waiting? false)
+  ;;                  (assoc :cache-served? true)
+  ;;                  (assoc :time-running (ut/format-duration
+  ;;                                        (:started solver)
+  ;;                                        (System/currentTimeMillis))))))
+  ;;     ;; (ut/delay-execution ;; we shouldnt have to do this, atom watcher reactions SHOULD be enough.
+  ;;     ;;  1800
+  ;;     ;;  (let [vv (get @last-solvers-atom temp-solver-name)]
+  ;;     ;;    (when (not (nil? vv))
+  ;;     ;;      (kick client-name [:solver temp-solver-name] (get @last-solvers-atom temp-solver-name) nil nil nil))))
+  ;;     )
 
 
 
@@ -3654,7 +3658,7 @@
       ;;              (assoc :time-running (ut/format-duration
       ;;                                    (:started solver)
       ;;                                    (System/currentTimeMillis))))))
-)));)
+)));;)
 
 (defonce last-signals-history-atom-temp (atom {}))
 
@@ -3953,8 +3957,8 @@
       (kick client-name
             [base-type client-param-path]
             (cond (cstr/includes? (str flow-key) "running?")  false
-                  ;;(= base-type :time)                         (get @father-time client-param-path)
-                  (= base-type :time)                         (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
+                  (= base-type :time)                         (get @father-time client-param-path)
+                  ;;(= base-type :time)                         (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
                   (= base-type :signal)                       (get @last-signals-atom client-param-path)
                   (= base-type :data)                         (get-in @last-solvers-data-atom
                                                                       (vec (into [(keyword (second sub-path))]
@@ -5598,15 +5602,34 @@
               (reduce + 0 chunk)))))
 
 
-(defn rnd [vv scale]
-  (let [rounding-mode java.math.RoundingMode/HALF_UP
-        vv-str (str (if (rational? vv) (double vv) vv)) ;; Convert to String to avoid constructor issues
-        rounded (BigDecimal. vv-str)]
-    (.setScale rounded scale rounding-mode)
-    (let [rounded-value (.doubleValue rounded)]
-      (if (or (integer? vv) (= (.setScale rounded 0 rounding-mode) rounded))
-        (.intValue rounded)
-        rounded-value))))
+;; (defn rnd [vv scale]
+;;   (let [rounding-mode java.math.RoundingMode/HALF_UP
+;;         vv-str (str (if (rational? vv) (double vv) vv)) ;; Convert to String to avoid constructor issues
+;;         rounded (BigDecimal. vv-str)]
+;;     (.setScale rounded scale rounding-mode)
+;;     (let [rounded-value (.doubleValue rounded)]
+;;       (if (or (integer? vv) (= (.setScale rounded 0 rounding-mode) rounded))
+;;         (.intValue rounded)
+;;         rounded-value))))
+
+;; Define a function to check if a number is a fraction (rational and not an integer)
+;; (defn fraction? [n]
+;;   (and (rational? n) (not (integer? n))))
+
+;; ;; Adjusted rnd function
+;; (defn rnd [number scale]
+;;   (let [number (if (fraction? number) (double number) number) ; Convert fractions to decimal
+;;         rounding-mode java.math.RoundingMode/HALF_UP
+;;         big-decimal (BigDecimal. (str number))
+;;         rounded (.setScale big-decimal scale rounding-mode)
+;;         rounded-value (if (= 0 scale)
+;;                         (.longValue rounded)
+;;                         (.doubleValue rounded))]
+;;     (if (integer? number)
+;;       number
+;;       (if (and (not (integer? number)) (zero? (mod rounded-value 1.0)))
+;;         (.intValue rounded)
+;;         rounded-value))))
 
 (defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color freq agg] :or {color :default freq 1 agg "avg"}}]
   (try
@@ -5691,14 +5714,14 @@
       
       ;; (println (for [chunk (drop-last (partition-all time-marker-interval truncated))] 
       ;;            (let [vv (last chunk)
-      ;;                  lb (ut/nf (rnd vv 2))
+      ;;                  lb (ut/nf (ut/rnd vv 2))
       ;;                  lbc (count (str lb))]
       ;;              (apply str (repeat (- 30 lbc) " ")  lb))))
       (println (let [chunks (partition-all time-marker-interval truncated)
                      ;last-chunk (count (last chunks))
                      value-strings (apply str (for [chunk (drop-last chunks)]
                                                 (let [vv (last chunk)
-                                                      lb (ut/nf (rnd vv 2))
+                                                      lb (ut/nf (ut/rnd vv 2))
                                                       lb (str "(μ " (ut/nf  (ut/avgf chunk)) ") " lb)
                                                       lbc (count (str lb))]
                                                   (str (apply str (repeat (- 32 lbc) " ")) lb))))

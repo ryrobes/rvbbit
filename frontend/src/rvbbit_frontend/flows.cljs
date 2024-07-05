@@ -4727,7 +4727,7 @@
        :border-radius    "19px 0px 0px 19px"
        :bottom           25
        :z-index          9999
-       :transition       "all 0.6s ease-in-out"
+       ;:transition       "all 0.6s ease-in-out"
        :right            (if @db/kick-alert 0 edge-hide)
        :backdrop-filter  "blur(4px)"
        :background-color (str "#000000" (if @db/kick-alert 88 11))

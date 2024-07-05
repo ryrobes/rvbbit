@@ -497,29 +497,49 @@
   ;;                   (throw e)))) 
   ;;                 :time-marches-on-or-does-it?)
 
-  (wss/add-watch+ wss/father-time
+  ;; (wss/add-watch+ wss/father-time
+  ;;                 :master-time-watcher
+  ;;                 (fn [_ _ old-state new-state]
+  ;;                   (try
+  ;;                     (let [changes (reduce-kv
+  ;;                                    (fn [m k v]
+  ;;                                      (if (not= v (get old-state k))
+  ;;                                        (assoc m k v)
+  ;;                                        m))
+  ;;                                    {}
+  ;;                                    new-state)]
+  ;;                       (doseq [[k v] changes]
+  ;;                         (let [group (ut/hash-group k wss/num-groups)]
+  ;;                           (swap! wss/time-child-atoms
+  ;;                                  (fn [child-atoms]
+  ;;                                    (if-let [child-atom (get child-atoms group)]
+  ;;                                      (do (swap! child-atom assoc k v)
+  ;;                                          child-atoms)
+  ;;                                      (let [new-child-atom (atom {k v})]
+  ;;                                        (assoc child-atoms group new-child-atom))))))))
+  ;;                     (catch Exception e
+  ;;                       (println "Error in time-marches-on:" (.getMessage e))
+  ;;                       (throw e))))
+  ;;                 :master-time-watcher)
+  
+    (wss/add-watch+ wss/father-time
                   :master-time-watcher
                   (fn [_ _ old-state new-state]
-                    (try
-                      (let [changes (reduce-kv
-                                     (fn [m k v]
-                                       (if (not= v (get old-state k))
-                                         (assoc m k v)
-                                         m))
-                                     {}
-                                     new-state)]
-                        (doseq [[k v] changes]
-                          (let [group (ut/hash-group k wss/num-groups)]
-                            (swap! wss/time-child-atoms
-                                   (fn [child-atoms]
-                                     (if-let [child-atom (get child-atoms group)]
-                                       (do (swap! child-atom assoc k v)
-                                           child-atoms)
-                                       (let [new-child-atom (atom {k v})]
-                                         (assoc child-atoms group new-child-atom))))))))
-                      (catch Exception e
-                        (println "Error in time-marches-on:" (.getMessage e))
-                        (throw e))))
+                    (let [changes (reduce-kv
+                                   (fn [m k v]
+                                     (if (not= v (get old-state k))
+                                       (assoc m k v)
+                                       m))
+                                   {}
+                                   new-state)]
+                      (doseq [[k v] changes]
+                        (swap! wss/time-child-atoms
+                               (fn [child-atoms]
+                                 (if-let [child-atom (get child-atoms k)]
+                                   (do (swap! child-atom assoc k v)
+                                       child-atoms)
+                                   (let [new-child-atom (atom {k v})]
+                                     (assoc child-atoms k new-child-atom))))))))
                   :master-time-watcher)
 
   ;; (wss/add-watch+ wss/screens-atom

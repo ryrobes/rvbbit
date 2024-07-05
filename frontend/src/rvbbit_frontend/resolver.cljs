@@ -124,6 +124,7 @@
                                      unresolved-req-hash       (hash (if false ;override?
                                                                        fkp ;this 
                                                                        [solver-name fkp client-name]))
+                                     clover-kps                (vec (filter #(cstr/includes? (str %) "/") (ut/deep-flatten (conj [(first this)] input-map))))
                                      resolved-input-map        (logic-and-params input-map panel-key)
                                      resolved-full-map         (when override? (logic-and-params (first this) panel-key))
                                      unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
@@ -148,9 +149,13 @@
                                     ;;                  @db/solver-fn-runs]))
                                      _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                      _ (when lets-go?
-                                         (ut/dispatch-delay 20 [::http/insert-alert [:v-box :children [[:box :child "resolver solver running"]
-                                                                                                       [:box :child (str fkp)
-                                                                                                        :style {:font-size "12px"}]]] 6 1.5 5])
+                                         (ut/dispatch-delay 100 [::http/insert-alert [:v-box :children [[:box :child "solver running (via resolver)"]
+                                                                                                        [:box :child (str fkp)
+                                                                                                         :style {:font-size "12px"}]
+                                                                                                        [:box :child (str clover-kps)
+                                                                                                         :style {:font-size "9px"}]
+                                                                                                        [:box :child (str (.toLocaleString (js/Date.)))
+                                                                                                         :style {:font-size "8px" :opacity 0.6}]]] 8 1.7 3])
                                          (swap! db/solver-fn-lookup assoc fkp sub-param)
                                          ;(ut/tracked-dispatch [::conn/update-solver-fn-lookup fkp sub-param])
                                          (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)

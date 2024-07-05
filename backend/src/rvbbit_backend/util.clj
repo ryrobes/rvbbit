@@ -1334,8 +1334,35 @@
   ([prev m result] (reduce-kv (fn [res k v] (if (map? v) (keypaths (conj prev k) v res) (conj res (conj prev k)))) result m)))
 
 
+;; Define a function to check if a number is a fraction (rational and not an integer)
+(defn fraction? [n]
+  (and (rational? n) (not (integer? n))))
+
+;; Adjusted rnd function
+(defn rnd [number scale]
+  (let [number (if (fraction? number) (double number) number) ; Convert fractions to decimal
+        rounding-mode java.math.RoundingMode/HALF_UP
+        big-decimal (BigDecimal. (str number))
+        rounded (.setScale big-decimal scale rounding-mode)
+        rounded-value (if (= 0 scale)
+                        (.longValue rounded)
+                        (.doubleValue rounded))]
+    (if (integer? number)
+      number
+      (if (and (not (integer? number)) (zero? (mod rounded-value 1.0)))
+        (.intValue rounded)
+        rounded-value))))
+
+
+;;; atom sniffer...
+
 (declare estimate-size-with-nested-atoms)
 (declare find-nested-atoms)
+
+(defn enumerate-namespaces
+  "Returns a vector of all currently loaded namespaces. "
+  []
+  (vec (sort (map ns-name (all-ns)))))
 
 (defn atom?
   "Check if an object is an atom or other reference type."
@@ -1344,66 +1371,72 @@
 
 (defn estimate-size-with-nested-atoms
   "Estimate the size of an object, including all nested atoms."
-  [obj]
-  (let [derefed-obj (if (atom? obj) @obj obj)]
-    (+ (cond
-         (nil? derefed-obj) 0
-         (number? derefed-obj) 8  ; Assuming 64-bit numbers
-         (string? derefed-obj) (* 2 (count derefed-obj))  ; Assuming UTF-16 encoding
-         (keyword? derefed-obj) (+ 2 (* 2 (count (name derefed-obj))))  ; ':' + name
-         (symbol? derefed-obj) (* 2 (count (str derefed-obj)))
-         (vector? derefed-obj) (+ 24 (reduce + (map estimate-size-with-nested-atoms derefed-obj)))
-         (map? derefed-obj) (+ 24 (reduce + (map (fn [[k v]]
-                                                   (+ (estimate-size-with-nested-atoms k)
-                                                      (estimate-size-with-nested-atoms v)))
-                                                 derefed-obj)))
-         (set? derefed-obj) (+ 24 (reduce + (map estimate-size-with-nested-atoms derefed-obj)))
-         (seq? derefed-obj) (reduce + (map estimate-size-with-nested-atoms derefed-obj))
-         :else 16)
-       (if (atom? obj) 16 0))))  ; Add 16 bytes for the atom itself if it's an atom
+  [obj & {:keys [depth] :or {depth 0}}]
+  (if (> depth 3)  ; Reduced recursion limit
+    16
+    (let [derefed-obj (if (atom? obj) @obj obj)]
+      (+ (cond
+           (nil? derefed-obj) 0
+           (number? derefed-obj) 8  ; Assuming 64-bit numbers
+           (string? derefed-obj) (* 2 (count derefed-obj))  ; Assuming UTF-16 encoding
+           (keyword? derefed-obj) (+ 2 (* 2 (count (name derefed-obj))))  ; ':' + name
+           (symbol? derefed-obj) (* 2 (count (str derefed-obj)))
+           (vector? derefed-obj) (+ 24 (reduce + (map #(estimate-size-with-nested-atoms % :depth (inc depth)) derefed-obj)))
+           (map? derefed-obj) (+ 24 (reduce + (map (fn [[k v]]
+                                                     (+ (estimate-size-with-nested-atoms k :depth (inc depth))
+                                                        (estimate-size-with-nested-atoms v :depth (inc depth))))
+                                                   derefed-obj)))
+           (set? derefed-obj) (+ 24 (* (count derefed-obj) 16))  ; Estimate 16 bytes per item without recursing
+           (seq? derefed-obj) (* (count derefed-obj) 16)  ; Estimate 16 bytes per item without recursing
+           :else 16)
+         (if (atom? obj) 16 0)))))  ; Add 16 bytes for the atom itself if it's an atom
 
 (defn find-nested-atoms
   "Find all nested atoms within an object, returning a map of paths to atoms."
-  ([obj] (find-nested-atoms obj [] {}))
-  ([obj path result]
-   (cond
-     (atom? obj)
-     (let [derefed (find-nested-atoms @obj (conj path ::deref) {})]
-       (if (seq derefed)
-         (merge result derefed)
-         (assoc result path obj)))
+  ([obj] (find-nested-atoms obj [] {} 0))
+  ([obj path result depth]
+   (if (> depth 3)  ; Reduced recursion limit
+     result
+     (cond
+       (atom? obj)
+       (let [derefed (find-nested-atoms @obj (conj path ::deref) {} (inc depth))]
+         (if (seq derefed)
+           (merge result derefed)
+           (assoc result path obj)))
 
-     (map? obj)
-     (reduce-kv (fn [r k v]
-                  (find-nested-atoms v (conj path k) r))
-                result obj)
+       (map? obj)
+       (reduce-kv (fn [r k v]
+                    (find-nested-atoms v (conj path k) r (inc depth)))
+                  result obj)
 
-     (coll? obj)
-     (reduce (fn [r [idx v]]
-               (find-nested-atoms v (conj path idx) r))
-             result (map-indexed vector obj))
+       (vector? obj)
+       (reduce (fn [r [idx v]]
+                 (find-nested-atoms v (conj path idx) r (inc depth)))
+               result (map-indexed vector obj))
 
-     :else result)))
+       :else result))))
 
 (defn get-type-info
   "Get detailed type information for an object, including nested atom count."
-  [obj]
-  (let [derefed-obj (if (atom? obj) @obj obj)
-        nested-atoms (find-nested-atoms obj)
-        nested-atom-count (count nested-atoms)]
-    (str
-     (cond
-       (nil? derefed-obj) "nil"
-       (map? derefed-obj) (format "map with %d entries" (count derefed-obj))
-       (vector? derefed-obj) (format "vector with %d items" (count derefed-obj))
-       (set? derefed-obj) (format "set with %d items" (count derefed-obj))
-       (seq? derefed-obj) (format "seq with %d items" (count derefed-obj))
-       (coll? derefed-obj) (format "collection with %d items" (count derefed-obj))
-       (atom? derefed-obj) (str "atom containing: " (get-type-info @derefed-obj))
-       :else (str (type derefed-obj)))
-     (if (pos? nested-atom-count)
-       (format " (contains %d nested atom%s)" nested-atom-count (if (= 1 nested-atom-count) "" "s"))
-       ""))))
+  [obj & {:keys [depth] :or {depth 0}}]
+  (if (> depth 4)  ; Reduced recursion limit
+    "max depth reached"
+    (let [derefed-obj (if (atom? obj) @obj obj)
+          nested-atoms (find-nested-atoms obj)
+          nested-atom-count (count nested-atoms)]
+      (str
+       (cond
+         (nil? derefed-obj) "nil"
+         (map? derefed-obj) (format "map with %d entries" (count derefed-obj))
+         (vector? derefed-obj) (format "vector with %d items" (count derefed-obj))
+         (set? derefed-obj) (format "set with %d items" (count derefed-obj))
+         (seq? derefed-obj) (format "seq with %d items" (count derefed-obj))
+         (coll? derefed-obj) (format "collection with %d items" (count derefed-obj))
+         (atom? derefed-obj) (str "atom containing: " (get-type-info @derefed-obj :depth (inc depth)))
+         :else (str (type derefed-obj)))
+       (if (pos? nested-atom-count)
+         (format " (contains %d nested atom%s)" nested-atom-count (if (= 1 nested-atom-count) "" "s"))
+         "")))))
 
 (defn introspect-atoms
   "Introspect all atoms in the given namespace and return their names, estimated sizes, and nested atom info."
@@ -1411,7 +1444,9 @@
   (let [ns-vars (ns-interns ns-sym)
         atoms (filter (fn [[_ v]] (atom? (var-get v))) ns-vars)]
     (for [[symbol var] atoms
-          :let [atom-value (var-get var)
+          :when (not (cstr/includes? (str symbol) "live"))
+          :let [_ (pp [:working-on (str ns-sym "/" symbol ".⚛")])
+                atom-value (var-get var)
                 size-estimate (estimate-size-with-nested-atoms atom-value)
                 nested-atoms (find-nested-atoms atom-value)
                 type-info (get-type-info atom-value)]]
@@ -1426,26 +1461,76 @@
                                 (keys nested-atoms))})))
 
 (defn bytes-to-mb
-  "Convert bytes to megabytes with four decimal places."
+  "Convert bytes to megabytes with four decimal places, avoiding scientific notation."
   [bytes]
-  (format "%.4f" (/ bytes 1048576.0)))
+  (rnd (double (/ bytes 1048576)) 4))
 
-(defn get-atom-sizes
+(defn introspect-atoms-with-ns
+  "Introspect all atoms in the given namespace and return their names, estimated sizes, and nested atom info, including namespace."
+  [ns-sym]
+  (let [ns-vars (ns-interns ns-sym)
+        atoms (filter (fn [[_ v]] (atom? (var-get v))) ns-vars)]
+    (for [[symbol var] atoms
+          :when (not (cstr/includes? (str symbol) "live"))
+          :let [_ (pp [:working-on (str ns-sym "/" symbol)])
+                atom-value (var-get var)
+                size-estimate (estimate-size-with-nested-atoms atom-value)
+                nested-atoms (find-nested-atoms atom-value)
+                type-info (get-type-info atom-value)]]
+      {:name (str symbol)
+       :namespace (str ns-sym)
+       :size-estimate size-estimate
+       :type-info type-info
+       :nested-atoms (count nested-atoms)
+       :nested-atom-paths (mapv (fn [path]
+                                  (if (seq path)
+                                    (subvec path 1)
+                                    []))
+                                (keys nested-atoms))})))
+
+(defn atom-sniffer
+  "Print the names and estimated sizes of all atoms in the given namespaces.
+   If no namespace is provided, it uses the current namespace.
+   Accepts a single namespace symbol or a vector of namespace symbols."
+  ([]
+   (atom-sniffer *ns*))
+  ([ns-input]
+   (let [namespaces (if (vector? ns-input) ns-input [ns-input])
+         all-atom-info (mapcat introspect-atoms-with-ns namespaces)]
+     (if (seq all-atom-info)
+       (pp
+        (vec
+         (sort-by :size-mb >
+                  (for [{:keys [name namespace size-estimate type-info]} all-atom-info]
+                    {:namespace namespace
+                     :name name
+                     :size-mb (bytes-to-mb size-estimate)
+                     :type-info type-info}))))
+       (println "No atoms found in the specified namespace(s).")))))
+
+(defn atom-sniffer2
   "Print the names and estimated sizes of all atoms in the given namespace.
    If no namespace is provided, it uses the current namespace."
   ([]
-   (get-atom-sizes *ns*))
+   (atom-sniffer2 *ns*))
   ([ns-sym]
    (let [atom-info (introspect-atoms ns-sym)]
      (if (seq atom-info)
-       (pp
-        (vec
-         (sort-by :size-mb
-                  (for [{:keys [name size-estimate type-info nested-atoms nested-atom-paths]} atom-info]
-                    {:name name
-                     :size-mb (edn/read-string (bytes-to-mb size-estimate))
-                     :type-info type-info
-                     ;:nested-atoms nested-atoms
-                     ;:nested-atom-paths nested-atom-paths
-                     }))))
+       (doseq [{:keys [name size-estimate type-info nested-atoms nested-atom-paths]} atom-info]
+         (pp {:name name
+                 :size-mb (bytes-to-mb size-estimate)
+                 :type-info type-info}))
        (println "No atoms found in the namespace.")))))
+
+;; (time (atom-sniffer2 'rvbbit-backend.queue-party))
+;; (time (atom-sniffer ['rvbbit-backend.queue-party 'rvbbit-backend.util 'rvbbit-backend.core 'rvbbit-backend.sql 'flowmaps.db]))
+
+
+;;(time (ut/atom-sniffer2 'rvbbit-backend.queue-party))
+;;(time (ut/atom-sniffer2)) ;; curr
+;;(time (ut/atom-sniffer2 ['rvbbit-backend.queue-party 'rvbbit-backend.util])) ;; multi
+
+;; (time (ut/atom-sniffer2 'rvbbit-backend.queue-party))
+;; (time (ut/atom-sniffer ['rvbbit-backend.queue-party 'rvbbit-backend.util 'rvbbit-backend.core 'rvbbit-backend.sql 'flowmaps.db]))
+;; (time (ut/atom-sniffer (vec (filter #(not (cstr/includes? (str %) "cljs")) (enumerate-namespaces)))))
+;; (do (reset! rvbbit-backend.util/df-cache {}) (reset! rvbbit-backend.sql/errors {}) (reset! rvbbit-backend.websockets/pool-stats-atom {}))

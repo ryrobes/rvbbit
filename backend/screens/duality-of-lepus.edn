@@ -88,6 +88,7 @@
        (vec (for [f files] {:ffilename (str f)})))}],
    :page 3,
    :_last-run "03:02:01"}},
+ :audio-playing? false,
  :meta
  {:flow-fn-sys
   {:fields
@@ -1276,17 +1277,18 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [514724025 437126757 4294705152],
+ :memory [805127348 776812916 4294705152],
  :flow-subs
- [:solver-status/*client-name*>raw-custom-override-1610584445>running?
+ [:solver-meta/raw-custom-override-1610584445>extra
+  :solver-status/*client-name*>raw-custom-override-1610584445>running?
   :solver/get-my-colors1359879335
-  :solver-status/*client-name*>raw-custom-override136934373
   :solver/raw-custom-override136934373>10>0>2
   :solver-status/*client-name*>get-my-colors1359879335>running?
-  :solver-meta/raw-custom-override136934373
   :solver/raw-custom-override-1610584445>howdy-str
+  :time/minute
+  :time/hour
   :solver/raw-custom-override-1610584445
   :solver/get-my-colors1128330406
   :flow/live-scratch-flow>*running?
@@ -1297,7 +1299,7 @@
  :client-name :resounding-Prussian-blue-snake-29,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2647, :h 1451},
+ :window {:w 2978, :h 1633},
  :quake-console? false,
  :post-meta
  {:setlists {},
@@ -1307,13 +1309,14 @@
  :status
  {:heartbeat
   {:kick
-   [:solver-status/*client-name*>raw-custom-override-1610584445>running?
+   [:solver-meta/raw-custom-override-1610584445>extra
+    :solver-status/*client-name*>raw-custom-override-1610584445>running?
     :solver/get-my-colors1359879335
-    :solver-status/*client-name*>raw-custom-override136934373
     :solver/raw-custom-override136934373>10>0>2
     :solver-status/*client-name*>get-my-colors1359879335>running?
-    :solver-meta/raw-custom-override136934373
     :solver/raw-custom-override-1610584445>howdy-str
+    :time/minute
+    :time/hour
     :solver/raw-custom-override-1610584445
     :solver/get-my-colors1128330406
     :flow/live-scratch-flow>*running?
@@ -1336,16 +1339,16 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   7509
+   53272
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries {:setlists 1669794951, :shows 89957543, :jvm_stats 1498154063},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1414508738,
+ :user-params-hash 508665050,
  :grid-recos? true,
  :preview-keys2 [],
- :session-hash 1056338460,
+ :session-hash -922509912,
  :resolved-queries
  {:setlists-drag-2
   {:select [:show_id :song_name :song_order :ts],
@@ -1693,10 +1696,10 @@
       :background "transparent"}
      {:actions false}]}},
   :block-899
-  {:h 4,
-   :w 6,
+  {:h 3,
+   :w 11,
    :tab "azure oyster",
-   :root [15 2],
+   :root [15 1],
    :name "block-899",
    :views
    {:pulled-val
@@ -1708,7 +1711,7 @@
      :justify
      :center
      :style
-     {}
+     {:font-size "29px", :color :theme/universal-pop-color}
      :child
      [:string :solver/raw-custom-override-1610584445>howdy-str]]},
    :queries {}},
@@ -1771,19 +1774,24 @@
       (let [clojure-version (clojure-version)
             jvm-version (System/getProperty "java.version")]
         (println "HUUGE33?! Yes. Giant.")
-        (println "VERY33")
+        (println "the hour is " :time/hour)
         (def message2 "far side")
         (defn test [] 123333)
         (defonce my-atom (atom {:test 123}))
-        (doseq [e (range 4)] (println (str e "!")))
+        (doseq [e (range :time/minute)] (println (str "minute " (inc e) "!")))
         {:howdy-str
          (str
-           "🐇🥕 Sup333! Internal RVBBIT nREPL. Clojure "
+           "🐇🥕 Sup!"
+           :time/hour
+           ":"
+           :time/minute
+           " Internal RVBBIT nREPL. Clojure "
            clojure-version
            " on "
            jvm-version
            " JVM tech"
            " 🥕🐇"),
+         :min :time/minute,
          :jvm-version jvm-version,
          :clojure-version clojure-version}))},
    :name "block-2769",
@@ -1841,6 +1849,15 @@
      :_last-run "05:53:09"}},
    :root [5 14],
    :tab "azure oyster"},
+  :block-11761
+  {:h 6,
+   :w 7,
+   :tab "azure oyster",
+   :root [45 0],
+   :name "block-11761",
+   :views
+   {:pulled-val [:data-viewer :solver-meta/raw-custom-override-1610584445>extra]},
+   :queries {}},
   :block-7138
   {:h 5,
    :w 8,
@@ -2129,7 +2146,7 @@
   {:name "block-5503",
    :w 7,
    :selected-view :hare-vw,
-   :root [45 6],
+   :root [45 7],
    :h 4,
    :queries {},
    :tab "azure oyster",
@@ -2601,7 +2618,7 @@
   :block-2361
   {:h 14,
    :w 7,
-   :root [45 11],
+   :root [45 12],
    :tab "azure oyster",
    :selected-view :large-bgss,
    :name "block-2361",
@@ -2668,7 +2685,7 @@
    :tab "azure oyster",
    :create-image
    {:new-create-image-1
-    ["A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a misty autumn morning that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead.   A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Her cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace.              Her full lips are slightly parted, enhancing her allure.   She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up.."]},
+    ["A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England   inspired dystopian small town amidst a misty autumn morning that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead.   A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, & sky blue. Her cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace.                  Her full lips are slightly parted, enhancing her allure....   She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s.   The visual perspective is a camera close-up from mid-torso up....."]},
    :views
    {:hare-vw
     [:box
@@ -2725,13 +2742,13 @@
    :root [1 10],
    :tab "star-shaped wallaby"},
   :block-6190
-  {:h 4,
-   :w 9,
+  {:h 31,
+   :w 5,
    :views
    {"console-out"
     [:console :solver-meta/raw-custom-override-1610584445>output>evald-result>out]},
    :name "console :solver/raw-custom-override-1610584445",
-   :root [22 2],
+   :root [53 1],
    :tab "azure oyster"},
   :block-284
   {:w 32,
@@ -2780,7 +2797,7 @@
      :from [[:offenses :dd484]]}},
    :root [25 20],
    :tab "globular koala"}},
- :selected-block :block-9030,
+ :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#d8bfbf",
   "boolean" "#d1b4b4",
@@ -2828,7 +2845,8 @@
    :blocks 12,
    :queries 11,
    :ts "2024-07-03 09:31:06"},
-  :time {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :month 4},
+  :time
+  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 14, :hour 0},
   :user-dropdown-sys {:req-field nil, :shape nil},
   :searches-types-sys {:item_type "saved-views"},
   :large-bgss {:ffilename "b64-image3-27981-85558-4k.webp"},
@@ -2848,13 +2866,36 @@
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   ["A hyperrealistic image of a full-figured woman in her late twenties, of Irish-Scottish descent and fair complexion, standing in the midst of a New England inspired dystopian small town amidst a misty autumn morning that combines the aesthetics of cyberpunk and vaporwave. The town sinks into a noir atmosphere reminiscent of the 20th century, with an enchanting midnight canopy overhead.   A forest looms at the edges. The scene is eerily lit by neon lights casting hues of rose pink, purple, and sky blue. Her cascading hair and intricate tattoos extend up to her neckline, marked by a recurring rabbit emblem also adorned on her necklace.           Her full lips are slightly parted, enhancing her allure.   She wears a dress reminiscent of pin-up art that thrived from the late 1800s to the early 1900s. The visual perspective is a camera close-up from mid-torso up.."],
-   :selected-view [:create-image :new-create-image-1],
+   (do
+     (let [clojure-version (clojure-version)
+           jvm-version (System/getProperty "java.version")]
+       (println "HUUGE33?! Yes. Giant.")
+       (println "the hour is " :time/hour)
+       (def message2 "far side")
+       (defn test [] 123333)
+       (defonce my-atom (atom {:test 123}))
+       (doseq [e (range :time/minute)] (println (str "minute " (inc e) "!")))
+       {:howdy-str
+        (str
+          "🐇🥕 Sup!"
+          :time/hour
+          ":"
+          :time/minute
+          " Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇"),
+        :min :time/minute,
+        :jvm-version jvm-version,
+        :clojure-version clojure-version})),
+   :selected-view [:clojure :new-clojure-2],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :rel-image-path [:string3 "images/large/" :large-bgss/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-9030,
+   :selected-block :block-5503,
    :glass-fish-style
    {:background-color [:string3 :param/generated-colors>darkest 73],
     :border-radius "16px",
@@ -3309,19 +3350,19 @@
     :width
     :width-px
     :style
-    {:background-color "#2e364c",
+    {:background-color "#3a3444",
      :border-radius "20px",
      :font-size "12px",
      :font-weight 700,
-     :color "#7fc7ca"}
+     :color "#312939"}
     :children
-    [[:box :child "./images/gen/b64-image3-6386-23448.png"]
+    [[:box :child "./images/gen/b64-image3-1150-17789.png"]
      [:box
       :size
       "auto"
       :child
       [:img
-       {:src "./images/gen/b64-image3-6386-23448.png",
+       {:src "./images/gen/b64-image3-1150-17789.png",
         :style {:border-radius "30px"}}]]]],
    :raw-custom-override1165054916
    [:div
@@ -3664,7 +3705,7 @@
     :child
     "🐇🥕 Sup! Internal RVBBIT nREPL!!. Clojure 1.11.1 on 17.0.11 JVM tech!!! 🥕🐇"],
    :raw-custom-override-1610584445>howdy-str
-   "🐇🥕 Sup333! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   "🐇🥕 Sup!0:14 Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override-1736866437
    {:error
     {:error
@@ -3912,7 +3953,8 @@
     :class "class clojure.lang.ExceptionInfo"},
    :raw-custom-override-1610584445
    {:howdy-str
-    "🐇🥕 Sup333! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+    "🐇🥕 Sup!0:14 Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+    :min 14,
     :jvm-version "17.0.11",
     :clojure-version "1.11.1"},
    :raw-custom-override596631388 nil,
@@ -3994,7 +4036,7 @@
     :second-brightest "#d8bab4",
     :brightest "#bac7d3",
     :most-contrasting-light "#b36780"},
-   :raw-custom-override136934373>10>0>2 "./images/gen/b64-image3-6386-23448.png",
+   :raw-custom-override136934373>10>0>2 "./images/gen/b64-image3-1150-17789.png",
    :raw-custom-override-1535991406
    {:error
     {:error "This request has been blocked by our content filters.",

@@ -114,7 +114,7 @@
   {:cache? false,
    :limit 18,
    :group-by [3],
-   :_last-run "15:00:49",
+   :_last-run "00:00:01",
    :refresh-every 45,
    :from
    [{:select
@@ -147,7 +147,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 26,
    :group-by [2],
-   :_last-run "15:00:48",
+   :_last-run "00:00:01",
    :refresh-every 45,
    :from
    [{:select
@@ -195,16 +195,16 @@
    {[:sys_load :heatmap-7696]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#c59de0" "#271741"] 20 :desc],
+     {:background-color [:heatmap ["#d6c1b7" "#141c27"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}},
     [:recent_messages_per_second :heatmap-2888]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#a8378e" "#d2cfce"] 20 :desc],
+     {:background-color [:heatmap ["#b65360" "#cc847c"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}}},
-   :_last-run "15:00:49",
+   :_last-run "00:00:01",
    :refresh-every 45,
    :from [[:jvm_stats :zz596]],
    :order-by [[:ts :desc]],
@@ -227,7 +227,7 @@
    :refresh-every 20,
    :order-by [[:client_name :asc]],
    :from [[:client_stats :ww254]],
-   :_last-run "15:00:49",
+   :_last-run "00:00:02",
    :style-rules
    {[:* :highlight-8717]
     {:logic [:= :client_name :*client-name-str],
@@ -264,12 +264,12 @@
    :cache? false,
    :from [[:jvm_stats :kke192]],
    :order-by [[3 :desc]],
-   :_last-run "15:00:48"},
+   :_last-run "00:00:01"},
   :gen-viz-1002
   {:cache? false,
    :limit 18,
    :group-by [4],
-   :_last-run "15:00:48",
+   :_last-run "00:00:01",
    :refresh-every 45,
    :from
    [{:select
@@ -329,7 +329,7 @@
   {:cache? false,
    :limit 24,
    :group-by [2],
-   :_last-run "15:00:49",
+   :_last-run "00:00:02",
    :refresh-every 45,
    :from
    [[{:group-by [:ts1],
@@ -393,23 +393,23 @@
   {:fields
    {:thread_count
     {:data-type "float",
-     :distinct 18,
+     :distinct 1,
      :group-by? true,
-     :commons {527.5897435897435 1, 537.825 1, 535.325 1},
+     :commons {380.3529411764706 1},
      :cardinality 100},
     :clients
     {:data-type "float",
      :distinct 1,
      :group-by? true,
-     :commons {9 18},
-     :cardinality 5},
+     :commons {9 1},
+     :cardinality 100},
     :ts
     {:data-type "string",
-     :distinct 18,
+     :distinct 1,
      :group-by? true,
-     :commons {"2024-07-04 12:1" 1, "2024-07-04 13:1" 1, "2024-07-04 13:4" 1},
+     :commons {"2024-07-04 23:5" 1},
      :cardinality 100}},
-   :rowcount 18},
+   :rowcount 1},
   :status-drag-0
   {:fields
    {:queries_run
@@ -568,232 +568,232 @@
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 2,
+     :distinct 1,
      :group-by? true,
-     :commons {"-44" 1, "325 MB" 1},
+     :commons {"257 MB" 1},
      :cardinality 100},
     :mem_used
     {:data-type "float",
-     :distinct 2,
+     :distinct 1,
      :group-by? true,
-     :commons {294644483 1, 3.410380119863946E8 1},
+     :commons {2.6941838762857145E8 1},
      :cardinality 100},
     :ts_hour
     {:data-type "string",
-     :distinct 2,
+     :distinct 1,
      :group-by? true,
-     :commons {"2024-07-04 15" 1, "2024-07-04 14" 1},
+     :commons {"2024-07-04 23" 1},
      :cardinality 100}},
-   :rowcount 2},
+   :rowcount 1},
   :new-query-1
   {:fields
    {:queries_run
     {:data-type "integer",
-     :distinct 49,
+     :distinct 32,
      :group-by? true,
-     :commons {49985 2, 49811 1, 49790 1},
-     :cardinality 98},
+     :commons {40 2, 116 2, 177 1},
+     :cardinality 94},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 48,
+     :distinct 33,
      :group-by? true,
-     :commons {53.08 2, 53.53 2, 49.43 1},
-     :cardinality 95},
+     :commons {51.82 2, 54.93 1, 53.93 1},
+     :cardinality 97},
     :uptime_seconds
     {:data-type "integer",
-     :distinct 50,
+     :distinct 34,
      :group-by? true,
-     :commons {105736 1, 106096 1, 105871 1},
+     :commons {390 1, 209 1, 105 1},
      :cardinality 100},
     :queries_per_second
     {:data-type "float",
-     :distinct 1,
+     :distinct 3,
      :group-by? true,
-     :commons {0 50},
-     :cardinality 1},
+     :commons {0 32, -17 1, 1 1},
+     :cardinality 8},
     :recent_batches
     {:data-type "integer",
-     :distinct 50,
+     :distinct 34,
      :group-by? true,
-     :commons {1456649 1, 1455794 1, 1457227 1},
+     :commons {362 1, 3960 1, 939 1},
      :cardinality 100},
     :sql_cache_size
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {3 50},
-     :cardinality 1},
+     :commons {0 34},
+     :cardinality 2},
     :styler_heatmap_2888
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {1 50},
-     :cardinality 1},
+     :commons {1 34},
+     :cardinality 2},
     :ts
     {:data-type "string",
-     :distinct 50,
+     :distinct 34,
      :group-by? true,
      :commons
-     {"2024-07-04 14:58:35" 1, "2024-07-04 14:53:35" 1, "2024-07-04 14:56:05" 1},
+     {"2024-07-04 23:59:27" 1, "2024-07-04 23:56:12" 1, "2024-07-04 23:57:57" 1},
      :cardinality 100},
     :subscriptions
     {:data-type "integer",
-     :distinct 1,
+     :distinct 3,
      :group-by? true,
-     :commons {173 50},
-     :cardinality 1},
+     :commons {178 28, 162 5, 75 1},
+     :cardinality 8},
     :messages_per_second
     {:data-type "float",
-     :distinct 49,
+     :distinct 32,
      :group-by? true,
-     :commons {125.78 2, 125.86 1, 125.61 1},
-     :cardinality 98},
+     :commons {55.82 2, 55.6 2, 58.68 1},
+     :cardinality 94},
     :messages
     {:data-type "integer",
-     :distinct 50,
+     :distinct 34,
      :group-by? true,
-     :commons {13328078 1, 13310849 1, 13309285 1},
+     :commons {15105 1, 13468 1, 8453 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 47,
+     :distinct 31,
      :group-by? true,
-     :commons {16518 2, 16568 2, 16555 2},
-     :cardinality 93},
+     :commons {64 2, 48 2, 15 2},
+     :cardinality 91},
     :sys_load
     {:data-type "float",
-     :distinct 48,
+     :distinct 32,
      :group-by? true,
-     :commons {27.88 2, 31.38 2, 21.34 1},
-     :cardinality 95},
+     :commons {4.34 2, 7.98 2, 3.02 1},
+     :cardinality 94},
     :recent_batches_per_second
     {:data-type "float",
-     :distinct 40,
+     :distinct 22,
      :group-by? true,
-     :commons {7.88 2, 8.02 2, 8.18 2},
-     :cardinality 80},
+     :commons {9.41 3, 9.2 3, 8.67 2},
+     :cardinality 64},
     :batches
     {:data-type "integer",
-     :distinct 50,
+     :distinct 34,
      :group-by? true,
-     :commons {1456649 1, 1455794 1, 1457227 1},
+     :commons {362 1, 3960 1, 939 1},
      :cardinality 100},
     :unix_ms
     {:data-type "integer",
-     :distinct 50,
+     :distinct 34,
      :group-by? true,
-     :commons {1720119422029 1, 1720119451879 1, 1720119392373 1},
+     :commons {1720151922580 1, 1720151892592 1, 1720151787580 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 50,
+     :distinct 34,
      :group-by? true,
-     :commons {35259 1, 38099 1, 26190 1},
+     :commons {1923 1, 3683 1, 1853 1},
      :cardinality 100},
     :styler_heatmap_7696
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {1 50},
-     :cardinality 1},
+     :commons {1 34},
+     :cardinality 2},
     :recent_queries_run
     {:data-type "integer",
-     :distinct 13,
+     :distinct 16,
      :group-by? true,
-     :commons {3 10, 9 8, 2 6},
-     :cardinality 25},
+     :commons {5 7, 3 5, 10 3},
+     :cardinality 47},
     :thread_count
     {:data-type "integer",
-     :distinct 33,
+     :distinct 22,
      :group-by? true,
-     :commons {522 4, 537 3, 523 3},
-     :cardinality 66},
+     :commons {373 3, 375 3, 390 2},
+     :cardinality 64},
     :internal_queries_run
     {:data-type "integer",
      :distinct 31,
      :group-by? true,
-     :commons {356 3, 326 2, 346 2},
-     :cardinality 62},
+     :commons {30 2, 35 2, 47 2},
+     :cardinality 91},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 5,
+     :distinct 1,
      :group-by? true,
-     :commons {11 37, 0 10, 35 1},
-     :cardinality 10},
+     :commons {11 34},
+     :cardinality 2},
     :ws_peers
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {9 50},
-     :cardinality 1},
+     :commons {9 34},
+     :cardinality 2},
     :recent_messages
     {:data-type "integer",
-     :distinct 50,
+     :distinct 34,
      :group-by? true,
-     :commons {13310849 1, 13309285 1, 13304022 1},
+     :commons {5172 1, 4403 1, 19144 1},
      :cardinality 100},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 27,
+     :distinct 16,
      :group-by? true,
-     :commons {0.2 8, 0.13 6, 0.61 4},
-     :cardinality 54},
+     :commons {0.33 7, 0.2 5, 0.67 3},
+     :cardinality 47},
     :batches_per_second
     {:data-type "float",
-     :distinct 5,
+     :distinct 34,
      :group-by? true,
-     :commons {13.8 12, 13.79 12, 13.78 12},
-     :cardinality 10},
+     :commons {10.17 1, 9.67 1, 9.92 1},
+     :cardinality 100},
     :seconds_since_last_update
     {:data-type "integer",
-     :distinct 2,
+     :distinct 3,
      :group-by? true,
-     :commons {14 26, 15 24},
-     :cardinality 3}},
-   :rowcount 50},
+     :commons {15 17, 14 16, -1 1},
+     :cardinality 8}},
+   :rowcount 34},
   :client-stats-drag-33
   {:fields
    {:server_subs
     {:data-type "integer",
-     :distinct 6,
+     :distinct 5,
      :group-by? true,
-     :commons {16 4, 29 1, 21 1},
-     :cardinality 66},
+     :commons {16 4, 21 2, 29 1},
+     :cardinality 55},
     :push
     {:data-type "integer",
      :distinct 9,
      :group-by? true,
-     :commons {114086 1, 117753 1, 114156 1},
+     :commons {3998 1, 541 1, 553 1},
      :cardinality 100},
     :client_subs
     {:data-type "integer",
-     :distinct 6,
+     :distinct 5,
      :group-by? true,
-     :commons {16 4, 29 1, 21 1},
-     :cardinality 66},
+     :commons {16 4, 21 2, 29 1},
+     :cardinality 55},
     :recent_messages_per_second
     {:data-type "float",
      :distinct 6,
      :group-by? true,
-     :commons {1.07 4, 6.89 1, 3.81 1},
+     :commons {1.07 4, 7.73 1, 0.07 1},
      :cardinality 66},
     :last_seen_seconds
     {:data-type "integer",
-     :distinct 4,
+     :distinct 2,
      :group-by? true,
-     :commons {13 5, 11 2, 14 1},
-     :cardinality 44},
+     :commons {14 5, 13 4},
+     :cardinality 22},
     :memory
     {:data-type "string",
      :distinct 9,
      :group-by? true,
-     :commons {"464" 1, "986" 1, "555" 1},
+     :commons {"163.1053" 1, "423.9903" 1, "727.449" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-07-04 15:00:46" 9},
+     :commons {"2024-07-04 23:59:57" 9},
      :cardinality 11},
     :styler_highlight_8717
     {:data-type "integer",
@@ -805,14 +805,14 @@
     {:data-type "integer",
      :distinct 9,
      :group-by? true,
-     :commons {177 1, 1514 1, 145 1},
+     :commons {145 1, 1342 1, 115 1},
      :cardinality 100},
     :ack
     {:data-type "integer",
-     :distinct 4,
+     :distinct 2,
      :group-by? true,
-     :commons {7076 5, 7077 2, 151 1},
-     :cardinality 44},
+     :commons {33 6, 34 3},
+     :cardinality 22},
     :client_name
     {:data-type "string",
      :distinct 9,
@@ -824,10 +824,10 @@
      :cardinality 100},
     :last_seen
     {:data-type "string",
-     :distinct 4,
+     :distinct 2,
      :group-by? true,
-     :commons {"13 seconds" 5, "11 seconds" 2, "14 seconds" 1},
-     :cardinality 44}},
+     :commons {"14 seconds" 5, "13 seconds" 4},
+     :cardinality 22}},
    :rowcount 9},
   :query-4704
   {:fields
@@ -848,135 +848,135 @@
   {:fields
    {:ts1
     {:data-type "string",
-     :distinct 500,
+     :distinct 34,
      :group-by? true,
      :commons
-     {"2024-07-04 14:58:35" 1, "2024-07-04 13:03:17" 1, "2024-07-04 14:53:35" 1},
+     {"2024-07-04 23:59:27" 1, "2024-07-04 23:56:12" 1, "2024-07-04 23:57:57" 1},
      :cardinality 100},
     :queries_run
     {:data-type "integer",
-     :distinct 487,
+     :distinct 32,
      :group-by? true,
-     :commons {49084 2, 49985 2, 48726 2},
-     :cardinality 97},
+     :commons {40 2, 116 2, 177 1},
+     :cardinality 94},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 402,
+     :distinct 33,
      :group-by? true,
-     :commons {56.14 4, 54.74 4, 54.57 3},
-     :cardinality 80},
+     :commons {51.82 2, 54.93 1, 53.93 1},
+     :cardinality 97},
     :sql_cache_size
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {3 500},
-     :cardinality 0},
+     :commons {0 34},
+     :cardinality 2},
     :ts
     {:data-type "string",
-     :distinct 14,
+     :distinct 1,
      :group-by? true,
-     :commons {"2024-07-04 13:1" 40, "2024-07-04 13:4" 40, "2024-07-04 13:5" 40},
+     :commons {"2024-07-04 23:5" 34},
      :cardinality 2},
     :messages
     {:data-type "integer",
-     :distinct 500,
+     :distinct 34,
      :group-by? true,
-     :commons {13195975 1, 13285178 1, 13199234 1},
+     :commons {15105 1, 13468 1, 8453 1},
      :cardinality 100},
     :sniffs_run
     {:data-type "integer",
-     :distinct 372,
+     :distinct 31,
      :group-by? true,
-     :commons {16370 4, 16332 4, 16317 3},
-     :cardinality 74},
+     :commons {64 2, 48 2, 15 2},
+     :cardinality 91},
     :sys_load
     {:data-type "float",
-     :distinct 416,
+     :distinct 32,
      :group-by? true,
-     :commons {32.84 4, 28.59 3, 34.79 3},
-     :cardinality 83},
+     :commons {4.34 2, 7.98 2, 3.02 1},
+     :cardinality 94},
     :recent_batches_per_second
     {:data-type "float",
-     :distinct 197,
+     :distinct 22,
      :group-by? true,
-     :commons {8.02 9, 8.04 9, 7.7 9},
-     :cardinality 39},
+     :commons {9.41 3, 9.2 3, 8.67 2},
+     :cardinality 64},
     :batches
     {:data-type "integer",
-     :distinct 500,
+     :distinct 34,
      :group-by? true,
-     :commons {1456649 1, 1434401 1, 1437824 1},
+     :commons {362 1, 3960 1, 939 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "integer",
-     :distinct 492,
+     :distinct 34,
      :group-by? true,
-     :commons {37859 2, 38704 2, 38811 2},
-     :cardinality 98},
+     :commons {1923 1, 3683 1, 1853 1},
+     :cardinality 100},
     :thread_count
     {:data-type "integer",
-     :distinct 59,
+     :distinct 22,
      :group-by? true,
-     :commons {539 21, 522 17, 525 17},
-     :cardinality 11},
+     :commons {373 3, 375 3, 390 2},
+     :cardinality 64},
     :internal_queries_run
     {:data-type "integer",
-     :distinct 68,
+     :distinct 31,
      :group-by? true,
-     :commons {286 183, 290 116, 289 48},
-     :cardinality 13},
+     :commons {30 2, 35 2, 47 2},
+     :cardinality 91},
     :open_flow_channels
     {:data-type "integer",
-     :distinct 8,
+     :distinct 1,
      :group-by? true,
-     :commons {11 338, 0 136, 81 9},
-     :cardinality 1},
+     :commons {11 34},
+     :cardinality 2},
     :ws_peers
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {9 500},
-     :cardinality 0},
+     :commons {9 34},
+     :cardinality 2},
     :recent_queries_per_second
     {:data-type "float",
-     :distinct 68,
+     :distinct 16,
      :group-by? true,
-     :commons {0.13 73, 0.07 55, 0.2 55},
-     :cardinality 13}},
-   :rowcount 500},
+     :commons {0.33 7, 0.2 5, 0.67 3},
+     :cardinality 47}},
+   :rowcount 34},
   :gen-viz-1002
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 18,
+     :distinct 1,
      :group-by? true,
-     :commons {"+3412" 1, "-822" 1, "+265" 1},
+     :commons {"2987 MB" 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "float",
-     :distinct 18,
+     :distinct 1,
      :group-by? true,
-     :commons {30612.48 1, 26850.83 1, 30795.63 1},
+     :commons {2987.24 1},
      :cardinality 100},
     :cpu_usage
     {:data-type "float",
-     :distinct 17,
+     :distinct 1,
      :group-by? true,
-     :commons {31.2 2, 32.68 1, 31.07 1},
-     :cardinality 94},
+     :commons {6.44 1},
+     :cardinality 100},
     :mps
     {:data-type "float",
-     :distinct 18,
+     :distinct 1,
      :group-by? true,
-     :commons {55.43 1, 52.71 1, 56.46 1},
+     :commons {38.32 1},
      :cardinality 100},
     :ts1
     {:data-type "string",
-     :distinct 18,
+     :distinct 1,
      :group-by? true,
-     :commons {"2024-07-04 12:1" 1, "2024-07-04 13:1" 1, "2024-07-04 13:4" 1},
+     :commons {"2024-07-04 23:5" 1},
      :cardinality 100}},
-   :rowcount 18},
+   :rowcount 1},
   :jvm_stats
   {:fields
    {:queries_run
@@ -1385,100 +1385,100 @@
   {:fields
    {:server_subs
     {:data-type "integer",
-     :distinct 6,
+     :distinct 5,
      :group-by? true,
-     :commons {16 4, 29 1, 21 1},
-     :cardinality 66},
+     :commons {16 4, 21 2, 14 2},
+     :cardinality 50},
     :queue_size
     {:data-type "integer",
-     :distinct 4,
+     :distinct 5,
      :group-by? true,
-     :commons {0 6, 15 1, 10 1},
-     :cardinality 44},
+     :commons {0 5, 1 2, 3 1},
+     :cardinality 50},
     :push
     {:data-type "integer",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
-     :commons {10996 1, 111831 1, 2159 1},
+     :commons {692 1, 142611 1, 142794 1},
      :cardinality 100},
     :client_subs
     {:data-type "integer",
-     :distinct 6,
+     :distinct 5,
      :group-by? true,
-     :commons {16 4, 29 1, 21 1},
-     :cardinality 66},
+     :commons {16 4, 21 2, 14 2},
+     :cardinality 50},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 6,
+     :distinct 7,
      :group-by? true,
-     :commons {1.07 4, 2.14 1, 8.38 1},
-     :cardinality 66},
+     :commons {1.11 3, 0.07 2, 2.22 1},
+     :cardinality 69},
     :uptime_seconds
     {:data-type "float",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
-     :commons {103876.592 1, 103874.711 1, 103875.028 1},
+     :commons {132885.434 1, 132884.353 1, 132886.998 1},
      :cardinality 100},
     :uptime
     {:data-type "string",
-     :distinct 6,
+     :distinct 8,
      :group-by? true,
      :commons
-     {"28 hours, 51 minutes, 0 second" 2,
-      "28 hours, 51 minutes, 1 second" 2,
-      "28 hours, 50 minutes, 59 seconds" 2},
-     :cardinality 66},
+     {"36 hours, 54 minutes, 30 seconds" 3,
+      "36 hours, 54 minutes, 29 seconds" 1,
+      "2 hours, 2 minutes, 40 seconds" 1},
+     :cardinality 80},
     :last_seen_seconds
     {:data-type "integer",
-     :distinct 4,
+     :distinct 7,
      :group-by? true,
-     :commons {13 6, 14 1, 8 1},
-     :cardinality 44},
+     :commons {12 4, 14 1, 10 1},
+     :cardinality 69},
     :memory
     {:data-type "string",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
-     :commons {"964" 1, "460" 1, "570" 1},
+     :commons {"366" 1, "153" 1, "320" 1},
      :cardinality 100},
     :queue_distro
     {:data-type "string",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
-     :commons {"{0 111823}" 1, "{0 2099}" 1, "{0 115203}" 1},
+     :commons {"{0 142786}" 1, "{0 147379}" 1, "{0 291008}" 1},
      :cardinality 100},
     :ts
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"2024-07-04 14:22:47" 9},
-     :cardinality 11},
+     :commons {"2024-07-04 22:26:17" 10},
+     :cardinality 10},
     :messages_per_second
     {:data-type "float",
      :distinct 8,
      :group-by? true,
-     :commons {1.08 2, 2.22 1, 7.5 1},
-     :cardinality 88},
+     :commons {1.07 3, 2.22 1, 7.38 1},
+     :cardinality 80},
     :client_latency
     {:data-type "integer",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
-     :commons {2660 1, 1331 1, 1598 1},
+     :commons {185 1, 180 1, 1192 1},
      :cardinality 100},
     :ack
     {:data-type "integer",
-     :distinct 4,
+     :distinct 6,
      :group-by? true,
-     :commons {6924 5, 6925 2, 166 1},
-     :cardinality 44},
+     :commons {8858 4, 8859 2, 491 1},
+     :cardinality 60},
     :booted_ts
     {:data-type "integer",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
-     :commons {1720013491697 1, 1720013491906 1, 1720098700191 1},
+     :commons {1720145256417 1, 1720145927924 1, 1720139001496 1},
      :cardinality 100},
     :client_name
     {:data-type "string",
-     :distinct 9,
+     :distinct 10,
      :group-by? true,
      :commons
      {":cheery-pear-pig-5" 1,
@@ -1487,11 +1487,11 @@
      :cardinality 100},
     :last_seen
     {:data-type "string",
-     :distinct 4,
+     :distinct 7,
      :group-by? true,
-     :commons {"13 seconds" 6, "14 seconds" 1, "8 seconds" 1},
-     :cardinality 44}},
-   :rowcount 9},
+     :commons {"12 seconds" 4, "14 seconds" 1, "10 seconds" 1},
+     :cardinality 69}},
+   :rowcount 10},
   :query-11325
   {:fields
    {:table_name
@@ -1535,44 +1535,30 @@
   {:fields
    {:diff
     {:data-type "string",
-     :distinct 24,
+     :distinct 1,
      :group-by? true,
-     :commons {"+62" 1, "+361" 1, "-502" 1},
+     :commons {"2987 MB" 1},
      :cardinality 100},
     :used_memory_mb
     {:data-type "float",
-     :distinct 24,
+     :distinct 1,
      :group-by? true,
-     :commons {32319 1, 31214 1, 26877 1},
+     :commons {2987 1},
      :cardinality 100},
     :ts1
     {:data-type "string",
-     :distinct 24,
-     :group-by? true,
-     :commons {"04-07" 1, "04-06" 1, "03-21" 1},
-     :cardinality 100}},
-   :rowcount 24},
-  :reco-counts
-  {:fields
-   {:table_name
-    {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"setlists_drag_2" 1},
-     :cardinality 100},
-    :cnt
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {82 1},
+     :commons {"04-23" 1},
      :cardinality 100}},
-   :rowcount 1}},
+   :rowcount 1},
+  :reco-counts {:fields {}, :rowcount 0}},
  :default-col-widths
  {:block-494 {:jvm-stats-drag-40 100},
   :block-8179 {:client-stats-drag-33 141},
   :block-3438 {:new-query-1 100}},
  :runstream-drops nil,
- :data-hash -1660245130,
+ :data-hash -1111920355,
  :tabs
  ["welcome to the party pal"
   "reassuring sand dollar"
@@ -1815,73 +1801,73 @@
  :runstreams nil,
  :editor? false,
  :buffy? false,
- :memory [352414876 328421244 4294705152],
+ :memory [347269763 303126595 4294705152],
  :sched
- {:jvm-stats-drag-40 2058,
-  :gen-viz-1002 2058,
-  :client-stats-drag-33 2033,
-  :new-query 2058,
-  :gen-viz-553 2058,
-  :new-query-1 2058,
-  :gen-viz-1002-clone-38 2058},
+ {:jvm-stats-drag-40 5317,
+  :gen-viz-1002 5317,
+  :client-stats-drag-33 5292,
+  :new-query 5317,
+  :gen-viz-553 5317,
+  :new-query-1 5317,
+  :gen-viz-1002-clone-38 5317},
  :flow-subs
  [:time/now-seconds
-  :client/*client-name*>stats>client-latency
-  :solver/raw-custom-override-1754408745
   :solver/colors-of-the-moment>dominant
-  :solver-status/*client-name*>raw-custom-override-1754408745>running?
-  :client/*client-name*>stats>recent-messages-per-second
   :solver/colors-of-the-moment-8k>most-contrasting-light
   :server/uptime
+  :client/*client-name*>stats>memory
   :solver/colors-of-the-moment>data-colors
   :solver/colors-of-the-moment>colors>2
+  :client/*client-name*>stats>recent-messages-per-second
   :solver/colors-of-the-moment>colors>1
   :solver/colors-of-the-moment>brightest
   :flow/live-scratch-flow>*running?
   :solver/wallpaper-of-the-moment
   :solver/colors-of-the-moment>most-contrasting-dark
   :solver/colors-of-the-moment>colors>0
+  :client/*client-name*>stats>messages-per-second
   :time/second
   :solver/colors-of-the-moment>second-brightest
-  :client/*client-name*>stats>messages-per-second
-  :client/*client-name*>stats>memory
+  :client/*client-name*>stats>client-latency
+  :solver-status/*client-name*>raw-custom-override1089371668>running?
+  :solver/raw-custom-override1089371668
   :solver/colors-of-the-moment>darkest],
- :client-name :smile-cubic-koala-29,
+ :client-name :essential-cobalt-turtle-11,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2699, :h 1480},
+ :window {:w 3036, :h 1665},
  :post-meta
- {:jvm-stats-drag-40 {:* {:rowcount 7059}},
+ {:jvm-stats-drag-40 {:* {:rowcount 101}},
+  :gen-viz-1002 {:* {:rowcount 3}},
   :client-stats-drag-33 {:* {:rowcount 9}},
   :new-query {:* {:rowcount 1}},
   :gen-viz-553 {:* {:rowcount 18}},
-  :new-query-1 {:* {:rowcount 50}},
-  :gen-viz-1002-clone-38 {:* {:rowcount 24}}},
+  :new-query-1 {:* {:rowcount 27}},
+  :gen-viz-1002-clone-38 {:* {:rowcount 1}}},
  :status
  {:heartbeat
   {:kick
    [:time/now-seconds
-    :client/*client-name*>stats>client-latency
-    :solver/raw-custom-override-1754408745
     :solver/colors-of-the-moment>dominant
-    :solver-status/*client-name*>raw-custom-override-1754408745>running?
-    :client/*client-name*>stats>recent-messages-per-second
     :solver/colors-of-the-moment-8k>most-contrasting-light
     :server/uptime
+    :client/*client-name*>stats>memory
     :solver/colors-of-the-moment>data-colors
     :solver/colors-of-the-moment>colors>2
+    :client/*client-name*>stats>recent-messages-per-second
     :solver/colors-of-the-moment>colors>1
     :solver/colors-of-the-moment>brightest
     :flow/live-scratch-flow>*running?
     :solver/wallpaper-of-the-moment
     :solver/colors-of-the-moment>most-contrasting-dark
     :solver/colors-of-the-moment>colors>0
+    :client/*client-name*>stats>messages-per-second
     :time/second
     :solver/colors-of-the-moment>second-brightest
-    :client/*client-name*>stats>messages-per-second
-    :client/*client-name*>stats>memory
-    :solver/colors-of-the-moment>darkest]},
-  :alert1 {:alerts :alert2}},
+    :client/*client-name*>stats>client-latency
+    :solver-status/*client-name*>raw-custom-override1089371668>running?
+    :solver/raw-custom-override1089371668
+    :solver/colors-of-the-moment>darkest]}},
  :screen-name "server-stats2",
  :recos-page2 0,
  :selected-tab "welcome to the party pal",
@@ -1891,12 +1877,24 @@
  :alerts
  [[[:v-box
     :children
-    [[:box :child "canvas solver running"]
-     [:box :child "[:panels :block-4586 :vmstat]" :style {:font-size "12px"}]]]
-   6
-   1.5
-   2029
-   -1539818940]
+    [[:box :child "solver running (via canvas)"]
+     [:box :child "[:panels :block-4586 :vmstat]" :style {:font-size "12px"}]
+     [:box :child "[:time/now-seconds]" :style {:font-size "9px"}]
+     [:box :child "7/5/2024, 12:00:28 AM" :style {:font-size "8px", :opacity 0.6}]]]
+   8
+   1.7
+   5300
+   667188395]
+  [[:v-box
+    :children
+    [[:box :child "solver running (via canvas)"]
+     [:box :child "[:panels :block-4586 :vmstat]" :style {:font-size "12px"}]
+     [:box :child "[:time/now-seconds]" :style {:font-size "9px"}]
+     [:box :child "7/5/2024, 12:00:29 AM" :style {:font-size "8px", :opacity 0.6}]]]
+   8
+   1.7
+   5300
+   673791509]
   [[:box
     :child
     "sent screen save request to server... Please wait."
@@ -1904,22 +1902,21 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   2032
+   5305
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries
  {:jvm_stats 1498154063, :kke192 -995149087, :client_stats -175748261},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1368986261,
+ :user-params-hash 350799901,
  :grid-recos? true,
- :session-hash 677059368,
  :resolved-queries
  {:gen-viz-553
   {:cache? false,
    :limit 18,
    :group-by [3],
-   :_last-run "15:00:49",
+   :_last-run "00:00:01",
    :refresh-every 45,
    :from
    [{:select
@@ -1953,7 +1950,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 26,
    :group-by [2],
-   :_last-run "15:00:48",
+   :_last-run "00:00:01",
    :refresh-every 45,
    :from
    [{:select
@@ -2001,16 +1998,16 @@
    {[:sys_load :heatmap-7696]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#c59de0" "#271741"] 20 :desc],
+     {:background-color [:heatmap ["#bdc0ce" "#112631"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}},
     [:recent_messages_per_second :heatmap-2888]
     {:logic true,
      :style
-     {:background-color [:heatmap ["#a8378e" "#d2cfce"] 20 :desc],
+     {:background-color [:heatmap ["#112631" "#cc847c"] 20 :desc],
       :border "1px solid #00000000",
       :color "#ffffff"}}},
-   :_last-run "15:00:49",
+   :_last-run "00:00:01",
    :refresh-every 45,
    :from [[:jvm_stats :zz596]],
    :order-by [[:ts :desc]],
@@ -2033,7 +2030,7 @@
    :refresh-every 20,
    :order-by [[:client_name :asc]],
    :from [[:client_stats :ww254]],
-   :_last-run "15:00:49",
+   :_last-run "00:00:02",
    :style-rules
    {[:* :highlight-8717]
     {:logic [:= :client_name :*client-name-str],
@@ -2101,12 +2098,12 @@
    :cache? false,
    :from [[:jvm_stats :kke192]],
    :order-by [[3 :desc]],
-   :_last-run "15:00:48"},
+   :_last-run "00:00:01"},
   :gen-viz-1002
   {:cache? false,
    :limit 18,
    :group-by [4],
-   :_last-run "15:00:48",
+   :_last-run "00:00:01",
    :refresh-every 45,
    :from
    [{:select
@@ -2276,7 +2273,7 @@
   {:cache? false,
    :limit 24,
    :group-by [2],
-   :_last-run "15:00:49",
+   :_last-run "00:00:02",
    :refresh-every 45,
    :from
    [[{:group-by [:ts1],
@@ -2331,7 +2328,7 @@
    :block-key ":block-4658",
    :selected-view :jvm-stats-drag-40,
    :root [30 4],
-   :h 13,
+   :h 11,
    :file-path "./screens/refresh-test.edn",
    :connection-id "system",
    :queries
@@ -2357,7 +2354,7 @@
      :cache? false,
      :from [[:jvm_stats :kke192]],
      :order-by [[3 :desc]],
-     :_last-run "15:00:48"}},
+     :_last-run "00:00:01"}},
    :tab "welcome to the party pal",
    :minimized? false},
   :block-3678
@@ -2455,7 +2452,7 @@
     {:cache? false,
      :limit 18,
      :group-by [4],
-     :_last-run "15:00:48",
+     :_last-run "00:00:01",
      :refresh-every :param/refresh-timer,
      :from [:query/jvm-stats-drag-40],
      :order-by [[4 :desc]],
@@ -2631,7 +2628,7 @@
      :refresh-every 20,
      :order-by [[:client_name :asc]],
      :from [[:client_stats :ww254]],
-     :_last-run "15:00:49",
+     :_last-run "00:00:02",
      :style-rules
      {[:* :highlight-8717]
       {:logic [:= :client_name :*client-name-str],
@@ -2756,7 +2753,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 26,
      :group-by [2],
-     :_last-run "15:00:48",
+     :_last-run "00:00:01",
      :refresh-every :param/refresh-timer,
      :from
      [{:select
@@ -2891,7 +2888,7 @@
     {:cache? false,
      :limit 18,
      :group-by [3],
-     :_last-run "15:00:49",
+     :_last-run "00:00:01",
      :refresh-every :param/refresh-timer,
      :from [:query/jvm-stats-drag-40],
      :order-by [[:ts :desc]],
@@ -3139,12 +3136,39 @@
          :desc],
         :border "1px solid #00000000",
         :color "#ffffff"}}},
-     :_last-run "15:00:49",
+     :_last-run "00:00:01",
      :refresh-every :param/refresh-timer,
      :from [[:jvm_stats :zz596]],
      :order-by [[:ts :desc]],
      :connection-id "system-db",
      :select [:*]}}},
+  :block-10180
+  {:h 3,
+   :w 5,
+   :views
+   {:view-clone
+    [:v-box
+     :size
+     "auto"
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "56px",
+      :color :param/_theme-color4,
+      :font-weight 700,
+      :transition "all 0.6s ease-in-out"}
+     :children
+     [[:box :child [:string3 :jvm-stats-drag-40/sys_load.0 "%"]]
+      [:box
+       :style
+       {:font-size "18px", :margin-top "-10px"}
+       :child
+       "curr cpu usage"]]]},
+   :name "clone-hi8",
+   :root [25 1],
+   :tab "welcome to the party pal"},
   :block-10582
   {:w 47,
    :selected-view :vv,
@@ -3197,7 +3221,7 @@
     {:cache? false,
      :limit 24,
      :group-by [2],
-     :_last-run "15:00:49",
+     :_last-run "00:00:02",
      :refresh-every :param/refresh-timer,
      :from
      [[{:group-by [:ts1],
@@ -3342,51 +3366,29 @@
        :child
        "recent q-per-sec"]]]}},
   :block-3218
-  {:h 3,
-   :w 5,
-   :root [25 1],
+  {:h 2,
+   :w 18,
+   :root [30 15],
    :tab "welcome to the party pal",
    :selected-view :hi,
    :name "block-3218",
    :views
    {:hi
-    [:v-box
+    [:box
+     :size
+     "auto"
      :align
      :center
      :justify
      :center
-     :size
-     "auto"
-     :height
-     "100px"
      :style
-     {:font-size "20px",
+     {:font-size "30px",
       :color :param/theme-color2,
       :font-weight 700,
+      :margin-top "7px",
       :transition "all 0.6s ease-in-out"}
-     :children
-     [[:box
-       :size
-       "auto"
-       :align
-       :center
-       :justify
-       :center
-       :child
-       [:string :server/uptime]]
-      [:box
-       :align
-       :center
-       :justify
-       :center
-       :size
-       "auto"
-       :height
-       "10px"
-       :style
-       {:font-size "18px"}
-       :child
-       "server uptime"]]]},
+     :child
+     [:string3 "uptime: " :server/uptime]]},
    :queries {}},
   :block-7665
   {:h 5,
@@ -3829,19 +3831,19 @@
    :queries {}}},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#caaddd",
-  "boolean" "#e78fd0",
-  "map" "#b6c986",
-  "list" "#970bcc",
-  "string" "#f5fcf3",
-  "any" "#3db4a0",
-  "vector" "#51e6dd",
-  "keyword" "#eae3c8",
-  "rabbit-code" "#784ed3",
-  "datetime" "#962f21",
-  "integer" "#d2e09d",
-  "unknown" "#a40266",
-  "date" "#184b59"},
+ {"float" "#cec1bd",
+  "boolean" "#8cd5ef",
+  "map" "#94b4cd",
+  "list" "#5b6a73",
+  "string" "#ffffff",
+  "any" "#19d88d",
+  "vector" "#c0a1a8",
+  "keyword" "#f8f6f7",
+  "rabbit-code" "#8b9fb6",
+  "datetime" "#8f2595",
+  "integer" "#c5bab8",
+  "unknown" "#920733",
+  "date" "#114326"},
  :click-param
  {:blocks-sys
   {:block_key ":*theme*",
@@ -3886,7 +3888,7 @@
    :seconds_since_last_update 15},
   :error-str-drag-13.* {},
   :flow {:live-scratch-flow>*running? false},
-  :server {:uptime "29 hours, 30 minutes, 41 seconds"},
+  :server {:uptime "10 minutes, 12 seconds"},
   :query-4704 {:test_name "total_rows", :rowcnt 77},
   :jvm-stats-drag-40
   {:ts1 "2024-06-21 16:02:13",
@@ -3911,13 +3913,14 @@
    :blocks 29,
    :queries 11,
    :ts "2024-06-06 10:18:48"},
-  :time {:second 3, :now-seconds "Thursday, July 4th 3:01:03PM"},
+  :time {:second 29, :now-seconds "Friday, July 5th 12:00:29AM"},
   :client
   {:growing-cubic-boar-44>stats>recent-messages-per-second nil,
    :smile-cubic-koala-29>stats>recent-messages-per-second nil,
    :unwavering-champagne-fox-17>stats>messages-per-second nil,
-   :*client-name*>stats>messages-per-second 3.62,
+   :*client-name*>stats>messages-per-second 5.23,
    :fortunate-square-frog-25>stats>memory nil,
+   :essential-cobalt-turtle-11>stats>client-latency 388,
    :unwavering-champagne-fox-17>stats>client-latency nil,
    :smile-cubic-koala-29>stats>memory nil,
    :vigorous-chocolate-eel-26>stats>recent-messages-per-second nil,
@@ -3925,6 +3928,7 @@
    :easy-narrow-wolf-19>stats>recent-messages-per-second nil,
    :cheery-gold-finch-26>stats>client-latency nil,
    :easy-narrow-wolf-19>stats>messages-per-second nil,
+   :essential-cobalt-turtle-11>stats>memory 239.1995,
    :prepared-cubic-yellow-jacket-20>stats>messages-per-second 1.57,
    :lively-cubic-opossum-32>stats>memory 433,
    :prepared-cubic-yellow-jacket-20>stats>client-latency 255,
@@ -3953,6 +3957,7 @@
    :fortunate-square-frog-25>stats>client-latency nil,
    :easy-narrow-wolf-19>stats>client-latency nil,
    :truthful-circular-cattle-38>stats>client-latency nil,
+   :essential-cobalt-turtle-11>stats>messages-per-second 5.17,
    :intellectual-desert-mule-14>stats>messages-per-second 6,
    :upstanding-indigo-locust-39>stats>memory 1006,
    :poised-viridian-walrus-38>stats>memory nil,
@@ -3965,7 +3970,7 @@
    :composed-cerulean-armadillo-7>stats>recent-messages-per-second nil,
    :growing-cubic-boar-44>stats>memory nil,
    :virtuous-spring-green-eagle-43>stats>messages-per-second nil,
-   :*client-name*>stats>memory 282,
+   :*client-name*>stats>memory 268.4197,
    :lively-cubic-opossum-32>stats>recent-messages-per-second 5.4,
    :cheery-gold-finch-26>stats>recent-messages-per-second nil,
    :vigorous-chocolate-eel-26>stats>messages-per-second nil,
@@ -3977,13 +3982,14 @@
    :truthful-circular-cattle-38>stats>memory nil,
    :poised-viridian-walrus-38>stats>client-latency nil,
    :virtuous-spring-green-eagle-43>stats>recent-messages-per-second nil,
-   :*client-name*>stats>recent-messages-per-second 3.96,
+   :*client-name*>stats>recent-messages-per-second 7.13,
    :prominent-plum-serval-0>stats>recent-messages-per-second nil,
    :composed-cerulean-armadillo-7>stats>messages-per-second nil,
+   :essential-cobalt-turtle-11>stats>recent-messages-per-second 4.93,
    :brilliant-gold-mallard-13>stats>messages-per-second 0.54,
    :virtuous-spring-green-eagle-43>stats>client-latency nil,
    :unwavering-champagne-fox-17>stats>memory nil,
-   :*client-name*>stats>client-latency 2375,
+   :*client-name*>stats>client-latency 719,
    :vigorous-chocolate-eel-26>stats>memory nil,
    :vigorous-chocolate-eel-26>stats>client-latency nil,
    :poised-viridian-walrus-38>stats>recent-messages-per-second nil,
@@ -4001,39 +4007,50 @@
    :theme-split-complement
    [:split-complements :solver/colors-of-the-moment>dominant],
    :selected-view-data
-   {:cache? false,
-    :limit 50,
-    :style-rules
-    {[:sys_load :heatmap-7696]
-     {:logic true,
+   [:v-box
+    :align
+    :center
+    :justify
+    :center
+    :size
+    "auto"
+    :height
+    "100px"
+    :style
+    {:font-size "20px",
+     :color :param/theme-color2,
+     :font-weight 700,
+     :transition "all 0.6s ease-in-out"}
+    :children
+    [[:box
+      :size
+      "auto"
+      :align
+      :center
+      :justify
+      :center
+      :child
+      [:string :server/uptime]]
+     [:box
+      :align
+      :center
+      :justify
+      :center
+      :size
+      "auto"
+      :height
+      "10px"
       :style
-      {:background-color [:heatmap :PuRd :9 :asc],
-       :border "1px solid #00000000",
-       :color "#ffffff"}},
-     [:recent_messages_per_second :heatmap-2888]
-     {:logic true,
-      :style
-      {:background-color
-       [:heatmap
-        [:solver/colors-of-the-moment>most-contrasting-dark
-         :solver/colors-of-the-moment-8k>most-contrasting-light]
-        9
-        :asc],
-       :border "1px solid #00000000",
-       :color "#ffffff"}}},
-    :_last-run "01:32:20",
-    :refresh-every :param/refresh-timer,
-    :from [[:jvm_stats :zz596]],
-    :order-by [[:ts :desc]],
-    :connection-id "system-db",
-    :select [:*]},
+      {:font-size "18px"}
+      :child
+      "server uptime"]]],
    :tt :solver/colors-of-the-moment>data-colors,
-   :selected-view [:queries :new-query-1],
+   :selected-view [:views :hi],
    :theme-color4 :param/theme-tetrads>3,
    :_theme-color4 :solver/colors-of-the-moment>colors>1,
    :theme-tetrads [:tetrads :solver/colors-of-the-moment>brightest],
    :_theme-color3 :solver/colors-of-the-moment>dominant,
-   :selected-block :block-3438},
+   :selected-block :block-3218},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
    :editor-param-background-color "#000000",
@@ -4183,25 +4200,27 @@
    :raw-custom-override303369484 nil,
    :raw-custom-override670003302
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 5  0      0 7471372 1736104 76646720    0    0    50    66    1    5 25  2 72  0  0\n------------------------[ Wednesday, June 12th 3:56:44PM ]------------------------",
-   :colors-of-the-moment>most-contrasting-dark "#a8378e",
-   :colors-of-the-moment>colors>0 "#c59de0",
+   :colors-of-the-moment>most-contrasting-dark "#112631",
+   :colors-of-the-moment>colors>0 "#bdc0ce",
    :raw-custom-override439623297
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 6  0      0 17842404 1674048 81459680    0    0    57    67    6    7 26  2 72  0  0\n-----hey----------------[ Tuesday, June 11th 6:38:07PM ]------------------------",
    :raw-custom-override763379653
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 5  0      0 20195748 1667432 80540840    0    0    57    67    5    4 26  2 72  0  0\n-------------- Tuesday, June 11th 6:26:04PM --------------",
-   :colors-of-the-moment>brightest "#c59de0",
-   :colors-of-the-moment>second-brightest "#be86c9",
+   :colors-of-the-moment>brightest "#bdc0ce",
+   :colors-of-the-moment>second-brightest "#b9b8c5",
    :raw-custom-override-1867869067
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n12  0      0 2461660 1636776 81755288    0    0    28    52    8    4 27  3 70  0  0\n------------------------[ Tuesday, June 25th 5:12:10PM ]------------------------",
    :raw-custom-override-1754408745
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n21  0      0 2384740 1545116 27813272    0    0    31   191    3    7 54  4 41  1  0\n------------------------[ Thursday, July 4th 3:01:00PM ]------------------------",
+   :raw-custom-override1089371668
+   "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 6  0      0 56103228 1635892 33698484    0    0    30   206    2    3 54  4 40  1  0\n------------------------[ Friday, July 5th 12:00:28AM ]------------------------",
    :raw-custom-override-1435162113
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 9  0      0 1773716 1382552 28442780    0    0    31   190    8    5 54  4 41  1  0\n------------------------[ Thursday, July 4th 2:22:21PM ]------------------------",
    :raw-custom-override-1250353532
    "🐇🥕 Hello there! This is Clojure version 1.10.1 on JVM  17.0.11 🥕🐇 Wednesday, June 12th 7:06:47PM",
    :raw-custom-override-2140363808
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 2  0      0 20347244 1666900 80554208    0    0    57    67    5    3 26  2 72  0  0\n\nhey",
-   :colors-of-the-moment>darkest "#271741",
+   :colors-of-the-moment>darkest "#112631",
    :raw-custom-override-422704321
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 6  0      0 12708716 1675772 81495784    0    0    57    67    7    1 26  2 72  0  0\n------------------------[ Tuesday, June 11th 6:52:37PM ]------------------------",
    :raw-custom-override-79245356
@@ -4218,34 +4237,34 @@
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 6  0      0 11929408 2275608 61637412    0    0    59    70   24   31 46  5 49  0  0\n------------------------[ Friday, June 28th 1:34:40AM ]------------------------",
    :raw-custom-override1839462388
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 6  0      0 18159720 1932248 44982292    0    0    17    60   17   16 38  3 59  0  0\n------------------------[ Wednesday, June 19th 11:35:50AM ]------------------------",
-   :colors-of-the-moment-8k>most-contrasting-light "#d2cfce",
+   :colors-of-the-moment-8k>most-contrasting-light "#cc847c",
    :raw-custom-override30028481
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 8  0      0 4074612 1641268 76942208    0    0    28    53    7    0 28  3 70  0  0\n------------------------[ Tuesday, June 25th 6:41:17PM ]------------------------",
-   :wallpaper-of-the-moment "./images/large/b64-image3-10000-8193-4k.webp",
+   :wallpaper-of-the-moment "./images/large/b64-image3-70883-16809-4k.webp",
    :raw-custom-override53501390
    ["12!" "13!" "14!" "15!" "16!" "17!" "18!" "19!" "20!"],
    :raw-custom-override1280324832
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 4  0      0 20129716 1667516 80541544    0    0    57    67    5    4 26  2 72  0  0\n------------------------- Tuesday, June 11th 6:26:41PM -------------------------",
    :raw-custom-override-1819227190 nil,
-   :colors-of-the-moment>dominant "#be86c9",
-   :colors-of-the-moment>colors>2 "#5c3783",
-   :colors-of-the-moment>colors>1 "#2d96c3",
+   :colors-of-the-moment>dominant "#b9b8c5",
+   :colors-of-the-moment>colors>2 "#4db3d7",
+   :colors-of-the-moment>colors>1 "#206e9a",
    :raw-custom-override1706292072
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 3  0      0 20188324 1667444 80541008    0    0    57    67    5    4 26  2 72  0  0\n------------------- Tuesday, June 11th 6:26:12PM -------------------",
    :colors-of-the-moment>data-colors
-   {"float" "#caaddd",
-    "boolean" "#e78fd0",
-    "map" "#b6c986",
-    "list" "#970bcc",
-    "string" "#f5fcf3",
-    "any" "#3db4a0",
-    "vector" "#51e6dd",
-    "keyword" "#eae3c8",
-    "rabbit-code" "#784ed3",
-    "datetime" "#962f21",
-    "integer" "#d2e09d",
-    "unknown" "#a40266",
-    "date" "#184b59"},
+   {"float" "#cec1bd",
+    "boolean" "#8cd5ef",
+    "map" "#94b4cd",
+    "list" "#5b6a73",
+    "string" "#ffffff",
+    "any" "#19d88d",
+    "vector" "#c0a1a8",
+    "keyword" "#f8f6f7",
+    "rabbit-code" "#8b9fb6",
+    "datetime" "#8f2595",
+    "integer" "#c5bab8",
+    "unknown" "#920733",
+    "date" "#114326"},
    :raw-custom-override2014884488
    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 5  0      0 20095580 1667328 80572448    0    0    57    67    5    4 26  2 72  0  0\nTuesday, June 11th 6:25:18PM"}},
  :selected-flow "live-scratch-flow"}

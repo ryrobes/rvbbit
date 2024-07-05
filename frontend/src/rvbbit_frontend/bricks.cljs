@@ -428,9 +428,14 @@
                                 :color            (ut/invert-hex-color (theme-pull :theme/editor-outer-rim-color nil))}}))
 
 
-(def nff (NumberFormat. Format/DECIMAL))
+;; (def nff (NumberFormat. Format/DECIMAL))
 
-(defn nf [num] (.format nff (str num)))
+;; (defn nf [num] (.format nff (str num)))
+
+(def nff (js/Intl.NumberFormat. "en-US" #js {:minimumFractionDigits 0 :maximumFractionDigits 2}))
+
+(defn nf [num]
+  (.format nff num))
 
 (defn num-format-int [num] (.format (NumberFormat. Format/INTEGER) (str num)))
 
@@ -9295,6 +9300,7 @@
                                    unresolved-req-hash       (hash (if false ;override?
                                                                      fkp ;this 
                                                                      [solver-name fkp client-name]))
+                                   clover-kps                (vec (filter #(cstr/includes? (str %) "/") (ut/deep-flatten (conj [(first this)] input-map))))
                                    resolved-input-map        (resolver/logic-and-params input-map panel-key)
                                    resolved-full-map         (when override? (resolver/logic-and-params (first this) panel-key))
                                    unique-resolved-map       (if override? resolved-full-map resolved-input-map) ;; for tracker atom key triggers
@@ -9318,10 +9324,17 @@
                                   ;;      (ut/tapp>> [:run-solver-req-map-bricks! (str fkp) sub-param override? (str (first this)) lets-go? (not run?) ;req-map
                                   ;;                  ]))
                                    _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
-                                   _ (when lets-go?
-                                       (ut/dispatch-delay 20 [::http/insert-alert [:v-box :children [[:box :child "canvas solver running"]
+                                   _ (when (and lets-go? 
+                                                (not (some #(= % :time/now-seconds) clover-kps))
+                                                (not (some #(= % :time/second) clover-kps)))
+                                       (ut/dispatch-delay 100 [::http/insert-alert [:v-box :children [[:box :child "solver running (via canvas)"]
                                                                                                      [:box :child (str fkp)
-                                                                                                      :style {:font-size "12px"}]]] 6 1.5 5])
+                                                                                                      :style {:font-size "12px"}]
+                                                                                                     [:box :child (str clover-kps)
+                                                                                                      :style {:font-size "9px"}]
+                                                                                                     [:box :child (str (.toLocaleString (js/Date.)))
+                                                                                                      :style {:font-size "8px" :opacity 0.6}]
+                                                                                                     ]] 8 1.7 3])
                                        ;;(ut/tracked-dispatch [::add-placeholder-value new-solver-name])
                                        (swap! db/solver-fn-lookup assoc fkp sub-param)
                                        ;(ut/tracked-dispatch [::conn/update-solver-fn-lookup fkp sub-param])
