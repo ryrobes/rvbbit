@@ -121,7 +121,7 @@
   []
   (ut/tracked-dispatch
     [::poll/set-rules
-     [{:interval                 10 ;; 1 terrible idea. test
+     [{:interval                 10 
        :event                    [::bricks/dispatch-auto-queries]
        :poll-when                [::bricks/auto-run-and-connected?]
        :dispatch-event-on-start? false}
@@ -158,7 +158,7 @@
        :poll-when                [::bricks/new-flow-subs?]
        :dispatch-event-on-start? false}
     
-      {:interval                 5 ;; subscribe to server data from flows if we see it
+      {:interval                 5 ;; unsubscribe to server data
        :event                    [::bricks/unsub-to-flows]
        :poll-when                [::bricks/stale-flow-subs?]
        :dispatch-event-on-start? false}
@@ -179,11 +179,14 @@
       ;;  :event [::bricks/update-metadata-tabs] 
       ;;  :dispatch-event-on-start? false}
 
-      {:interval 5 ;; too much when recos gets big? filter?
-       :event [::bricks/update-reco-previews]
-       :dispatch-event-on-start? false}
+      ;; {:interval 5 ;; too much when recos gets big? filter?
+      ;;  :event [::bricks/update-reco-previews]
+      ;;  :dispatch-event-on-start? false}
 
-      {:interval 1 :event [::bricks/update-conditionals] :dispatch-event-on-start? false}
+      ;; {:interval 1 
+      ;;  :event [::bricks/update-conditionals] 
+      ;;  :dispatch-event-on-start? false}
+      
       {:interval                 4
        :event                    [::bricks/refresh-status]
        :poll-when                [::bricks/bg-status?] ;; @db/editor-mode

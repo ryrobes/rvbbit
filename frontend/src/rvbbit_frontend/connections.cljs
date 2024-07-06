@@ -360,20 +360,23 @@
                                     ;;  _ (when lets-go?
                                     ;;      (ut/tapp>> [:run-solver-req-map-conns! override? (str (first this)) lets-go? (not run?) req-map
                                     ;;                  @db/solver-fn-runs]))
-                                     _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                      _ (when lets-go?
+                                         (ut/tracked-dispatch [::wfx/push :default req-map])
+                                         (swap! db/solver-fn-lookup assoc fkp sub-param)
+                                         ;(ut/tracked-dispatch [::update-solver-fn-lookup fkp sub-param])
+                                         (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)
+                                         ;(ut/tracked-dispatch [::update-solver-fn-runs [panel-key sub-param] unique-resolved-map])
+                                         )
+                                     _ (when (and lets-go?
+                                                  (not (some #(= % :time/now-seconds) clover-kps))
+                                                  (not (some #(= % :time/second) clover-kps)))
                                          (ut/dispatch-delay 100 [::http/insert-alert [:v-box :children [[:box :child "solver running (via connections)"]
                                                                                                         [:box :child (str fkp)
                                                                                                          :style {:font-size "12px"}]
                                                                                                         [:box :child (str clover-kps)
                                                                                                          :style {:font-size "9px"}]
                                                                                                         [:box :child (str (.toLocaleString (js/Date.)))
-                                                                                                         :style {:font-size "8px" :opacity 0.6}]]] 8 1.7 3])
-                                         (swap! db/solver-fn-lookup assoc fkp sub-param)
-                                         ;(ut/tracked-dispatch [::update-solver-fn-lookup fkp sub-param])
-                                         (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)
-                                         ;(ut/tracked-dispatch [::update-solver-fn-runs [panel-key sub-param] unique-resolved-map])
-                                         )]
+                                                                                                         :style {:font-size "8px" :opacity 0.6}]]] 8 1.7 3]))]
                                  {v sub-param})))]
               (walk/postwalk-replace logic-kps obody)))
           obody-key-set (ut/deep-flatten block-map)
@@ -1070,10 +1073,11 @@
   [panels-map resolved-panels-map client-name]
   (let []
     (dorun (ut/tracked-dispatch
-             [::wfx/request :default
-              {:message {:kind :current-panels :panels panels-map :resolved-panels resolved-panels-map :client-name client-name}
-               :timeout 50000 ;;@(ut/tracked-subscribe [::client-name])}
-              }]))))
+             [::wfx/push :default
+              {:kind :current-panels 
+               :panels panels-map 
+               :resolved-panels resolved-panels-map 
+               :client-name client-name}]))))
 
 (re-frame/reg-event-db ::set-query-schedule
                        (fn [db [_ query-id schedule]]

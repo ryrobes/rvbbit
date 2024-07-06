@@ -90,69 +90,71 @@
 
 (defn update-screen-meta
   [f-path]
-  (try
-    (let [;file-path "./screens/"
-          screen-data      (read-screen f-path)
-          screen-name      (get screen-data :screen-name "unnamed-screen!")
-          resolved-queries (get screen-data :resolved-queries)
-          screen-data      (if (ut/ne? resolved-queries)
-                             (assoc screen-data
-                                    :panels (into {}
-                                                  (for [[k v] (get screen-data :panels)]
-                                                    (try
-                                                      {k (assoc v :queries (select-keys resolved-queries (keys (get v :queries))))}
-                                                      (catch Throwable e (ut/pp [:error-reading-screen-panels f-path e k v]) {}))))) ;; issue with pomp-girl2? TODO
-                             screen-data)
-          theme-map        (get-in screen-data [:click-param :theme])
-          has-theme?       (and (not (nil? theme-map)) (ut/ne? theme-map))
-          theme-name       (if (and has-theme? (not (nil? (get theme-map :theme-name))))
-                             (str ", " (get theme-map :theme-name) " ")
-                             "")
-          blocks           (remove nil? (conj (keys (get-in screen-data [:panels])) (when has-theme? :*theme*)))
-          boards           (distinct (for [[_ v] (get-in screen-data [:panels])] (get v :tab)))
-          blocks           (into blocks boards) ; (map #(str "board/" %) boards))
-          params           (get-in screen-data [:click-param])
-          board-map        (into {}
-                                 (for [b boards]
-                                   {b (into {} (for [[k v] (get-in screen-data [:panels]) :when (= (get v :tab) b)] {k v}))}))
-          queries          (into {} (for [b blocks] (get-in screen-data [:panels b :queries])))]
-      (doseq [b blocks] ;; collect keywords from all views for autocomplete - might get
-        (doseq [[_ vv] (get-in screen-data [:panels b :views])]
-          (reset! wss/autocomplete-view-atom (vec (filter #(and (not (cstr/includes? (str %) "/")) (keyword? %))
-                                                          (distinct (into (vec (distinct (ut/deep-flatten vv)))
-                                                                          @wss/autocomplete-view-atom)))))))
-      (swap! wss/screens-atom assoc screen-name screen-data) ;; update master screen atom for
-      (sql-exec system-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
-      (sql-exec system-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
-      (sql-exec system-db
-                (to-sql {:insert-into [:screens]
-                         :columns     [:file_path :screen_name :blocks :queries]
-                         :values      [[f-path screen-name (count blocks) (count (keys queries))]]}))
-      (sql-exec system-db
-                (to-sql
-                 {:insert-into [:blocks]
-                  :columns     [:file_path :screen_name :block_key :block_name :views :queries :view_names :query_names :block_data
-                                :tab_name]
-                  :values      (for [b blocks]
-                                 (let [theme?     (true? (= b :*theme*))
-                                       board?     (some #(= b %) boards) ;(cstr/starts-with? (str b)
-                                       queries    (get-in screen-data [:panels b :queries])
-                                       views      (if theme? theme-map (get-in screen-data [:panels b :views]))
-                                       block-name (str (cond theme? (str "(meta: this screen's theme" theme-name ")")
-                                                             board? (str "board: " b)
-                                                             :else  (get-in screen-data [:panels b :name])))]
-                                   [f-path screen-name (str b) block-name (count (keys views)) (count (keys queries))
-                                    (try (str (cstr/join " " (keys views))) (catch Exception _ ""))
-                                    (try (str (cstr/join " " (keys queries))) (catch Exception _ ""))
-                                    (cond theme? (str theme-map)
-                                          board? (pr-str {:panels (get board-map b) :click-param {:param (get params :param)}})
-                                          :else  (str (get-in screen-data [:panels b])))
-                                    (str (get-in screen-data [:panels b :tab]))]))})))
-    (catch Throwable e 
+  ;(qp/slot-queue :update-screen-meta f-path
+  (wss/execute-in-thread-pools :update-screen-meta
+   (fn []
+     (try
+       (let [;file-path "./screens/"
+             screen-data      (read-screen f-path)
+             screen-name      (get screen-data :screen-name "unnamed-screen!")
+             resolved-queries (get screen-data :resolved-queries)
+             screen-data      (if (ut/ne? resolved-queries)
+                                (assoc screen-data
+                                       :panels (into {}
+                                                     (for [[k v] (get screen-data :panels)]
+                                                       (try
+                                                         {k (assoc v :queries (select-keys resolved-queries (keys (get v :queries))))}
+                                                         (catch Throwable e (ut/pp [:error-reading-screen-panels f-path e k v]) {}))))) ;; issue with pomp-girl2? TODO
+                                screen-data)
+             theme-map        (get-in screen-data [:click-param :theme])
+             has-theme?       (and (not (nil? theme-map)) (ut/ne? theme-map))
+             theme-name       (if (and has-theme? (not (nil? (get theme-map :theme-name))))
+                                (str ", " (get theme-map :theme-name) " ")
+                                "")
+             blocks           (remove nil? (conj (keys (get-in screen-data [:panels])) (when has-theme? :*theme*)))
+             boards           (distinct (for [[_ v] (get-in screen-data [:panels])] (get v :tab)))
+             blocks           (into blocks boards) ; (map #(str "board/" %) boards))
+             params           (get-in screen-data [:click-param])
+             board-map        (into {}
+                                    (for [b boards]
+                                      {b (into {} (for [[k v] (get-in screen-data [:panels]) :when (= (get v :tab) b)] {k v}))}))
+             queries          (into {} (for [b blocks] (get-in screen-data [:panels b :queries])))]
+         (doseq [b blocks] ;; collect keywords from all views for autocomplete - might get
+           (doseq [[_ vv] (get-in screen-data [:panels b :views])]
+             (reset! wss/autocomplete-view-atom (vec (filter #(and (not (cstr/includes? (str %) "/")) (keyword? %))
+                                                             (distinct (into (vec (distinct (ut/deep-flatten vv)))
+                                                                             @wss/autocomplete-view-atom)))))))
+         (swap! wss/screens-atom assoc screen-name screen-data) ;; update master screen atom for
+         (sql-exec system-db (to-sql {:delete-from [:screens] :where [:= :file_path f-path]}))
+         (sql-exec system-db (to-sql {:delete-from [:blocks] :where [:= :file_path f-path]}))
+         (sql-exec system-db
+                   (to-sql {:insert-into [:screens]
+                            :columns     [:file_path :screen_name :blocks :queries]
+                            :values      [[f-path screen-name (count blocks) (count (keys queries))]]}))
+         (sql-exec system-db
+                   (to-sql
+                    {:insert-into [:blocks]
+                     :columns     [:file_path :screen_name :block_key :block_name :views :queries :view_names :query_names :block_data
+                                   :tab_name]
+                     :values      (for [b blocks]
+                                    (let [theme?     (true? (= b :*theme*))
+                                          board?     (some #(= b %) boards) ;(cstr/starts-with? (str b)
+                                          queries    (get-in screen-data [:panels b :queries])
+                                          views      (if theme? theme-map (get-in screen-data [:panels b :views]))
+                                          block-name (str (cond theme? (str "(meta: this screen's theme" theme-name ")")
+                                                                board? (str "board: " b)
+                                                                :else  (get-in screen-data [:panels b :name])))]
+                                      [f-path screen-name (str b) block-name (count (keys views)) (count (keys queries))
+                                       (try (str (cstr/join " " (keys views))) (catch Exception _ ""))
+                                       (try (str (cstr/join " " (keys queries))) (catch Exception _ ""))
+                                       (cond theme? (str theme-map)
+                                             board? (pr-str {:panels (get board-map b) :click-param {:param (get params :param)}})
+                                             :else  (str (get-in screen-data [:panels b])))
+                                       (str (get-in screen-data [:panels b :tab]))]))})))
+       (catch Throwable e
       ;(ut/pp [:update-screen-meta-error! f-path e])
-      (println "Error in update-screen-meta:" (.getMessage e))
-      (.printStackTrace e)
-      )))
+         (println "Error in update-screen-meta:" (.getMessage e))
+         (.printStackTrace e))))))
 
 (defn update-all-screen-meta
   []
@@ -163,19 +165,22 @@
 
 (defn update-flow-meta
   [f-path]
-  (try (let [screen-str (slurp (str f-path))
-             flow-data  (edn/read-string screen-str)
-             flow-id    (get flow-data :flow-id "unnamed-flow!")
-             insert-sql {:insert-into [:flows]
-                         :values      [{:flow_id       (str flow-id)
-                                        :components    (count (get flow-data :components))
-                                        :last_modified (get-last-modified-time f-path)
-                                        :connections   (count (get flow-data :connections))
-                                        :file_path     (str f-path)
-                                        :body          (pr-str flow-data)}]}]
-         (sql-exec flows-db (to-sql {:delete-from [:flows] :where [:= :file_path f-path]}))
-         (sql-exec flows-db (to-sql insert-sql)))
-       (catch Exception e (ut/pp [:read-flow-error f-path e]))))
+  ;(qp/slot-queue :update-flow-meta f-path
+  (wss/execute-in-thread-pools :update-flow-meta               
+   (fn []
+     (try (let [screen-str (slurp (str f-path))
+                flow-data  (edn/read-string screen-str)
+                flow-id    (get flow-data :flow-id "unnamed-flow!")
+                insert-sql {:insert-into [:flows]
+                            :values      [{:flow_id       (str flow-id)
+                                           :components    (count (get flow-data :components))
+                                           :last_modified (get-last-modified-time f-path)
+                                           :connections   (count (get flow-data :connections))
+                                           :file_path     (str f-path)
+                                           :body          (pr-str flow-data)}]}]
+            (sql-exec flows-db (to-sql {:delete-from [:flows] :where [:= :file_path f-path]}))
+            (sql-exec flows-db (to-sql insert-sql)))
+          (catch Exception e (ut/pp [:read-flow-error f-path e]))))))
 
 (defn update-all-flow-meta
   []
@@ -242,13 +247,16 @@
       (try ;; connection errors, etc
         (do (when poolable? (swap! wss/conn-map assoc conn-name conn))
             (when harvest-on-boot?
-              (cruiser/lets-give-it-a-whirl-no-viz f-path
-                                                   conn
-                                                   system-db
-                                                   cruiser/default-sniff-tests
-                                                   cruiser/default-field-attributes
-                                                   cruiser/default-derived-fields
-                                                   cruiser/default-viz-shapes)))
+              ;(qp/slot-queue :schema-sniff f
+              (wss/execute-in-thread-pools :conn-schema-sniff
+                                    (fn []
+                                      (cruiser/lets-give-it-a-whirl-no-viz f-path
+                                                                           conn
+                                                                           system-db
+                                                                           cruiser/default-sniff-tests
+                                                                           cruiser/default-field-attributes
+                                                                           cruiser/default-derived-fields
+                                                                           cruiser/default-viz-shapes)))))
         (catch Exception e (do (swap! wss/conn-map dissoc conn-name) (ut/pp [:sniff-error conn-name e])))))))
 
 (defn watch-connections-folder
@@ -972,9 +980,9 @@
 ;;                (let [ttt (ut/current-datetime-parts)]
 ;;                  (doall (pmap #(update-time-atom % ttt) wss/time-atoms)))))
 
-  (update-all-screen-meta)
+  (update-all-screen-meta) ;; has queue per screen 
 
-  (update-all-flow-meta)
+  (update-all-flow-meta) ;; has queue per flow 
 
   (cruiser/insert-current-rules!
    system-db
@@ -1163,7 +1171,7 @@
                         (swap! wss/non-heap-mem-usage conj (ut/get-non-heap-memory-usage))
                         (swap! wss/time-usage conj (System/currentTimeMillis)) ;; in case we want to easily ref w/o generating
                         (qp/update-queue-stats-history) ;; has it's own timestamp key
-                        (qp/update-specific-queue-stats-history [:push-to-client])
+                        (qp/update-specific-queue-stats-history [:watcher-to-client-serial :update-stat-atom-serial])
                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
                    "Stats Keeper")
 
@@ -1293,100 +1301,105 @@
                            (shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))))
   (defn update-stat-atom
     [kks]
-    (let [;flows (if (or (nil? flows) (empty? flows))
-          ]
-      (swap! wss/flow-status merge
-             (into
-              {}
-              (for [k     kks ;(keys @flow-db/results-atom)
-                    :when (not (= k "client-keepalive"))] ;; dont want to track heartbeats
-                (let [;; _ (ut/pp [:flow-status-atom-all! k (get @flow-db/results-atom k)
-                      cc              (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf?
-                      blocks          (get-in @flow-db/working-data [k :components-list])
-                      running-blocks  (vec (for [[k v] (get @flow-db/tracker k) :when (nil? (get v :end))] k))
-                      done-blocks     (vec (for [[k v] (get @flow-db/tracker k) :when (not (nil? (get v :end)))] k))
-                      not-started-yet (vec (cset/difference (set blocks) (set (into running-blocks done-blocks))))
-                      running-blocks  (vec (cset/difference (set blocks) (set (into done-blocks not-started-yet))))
-                      res             (get-in @flow-db/results-atom [k :done] :nope)
-                      running?        (or (= res :nope) (ut/chan? res) (= res :skip))
-                      done?           (not (= res :nope))
-                      error?          (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
-                      _ (when error? (swap! wss/temp-error-blocks assoc k not-started-yet))
-                      start           (try (apply min (or (for [[_ v] (get @flow-db/tracker k)] (get v :start)) [-1]))
-                                           (catch Exception _ (System/currentTimeMillis)))
-                      start-ts        (ut/millis-to-date-string start)
-                      end             (try (apply max (or (remove nil? (for [[_ v] (get @flow-db/tracker k)] (get v :end))) [-1]))
-                                           (catch Exception e
-                                             (do ;(ut/pp [:exception-in-getting-time-duration!! k
-                                               (System/currentTimeMillis))))
-                      start           (if error? (get-in @wss/last-times [k :start]) start)
-                      end             (if error? (System/currentTimeMillis) end)
-                      elapsed         (try (- end start)
-                                           (catch Throwable e (do (ut/pp [:elapsed-error?? k e :start start :end end]) 0)))
-                      _ (swap! wss/last-times assoc-in [k :end] (System/currentTimeMillis))
-                      human-elapsed   (ut/format-duration start end)
-                      run-id          (str (get-in @flow-db/results-atom [k :run-id]))
-                      parent-run-id   (str (get-in @flow-db/results-atom [k :parent-run-id]))
-                      overrides       (get-in @flow-db/subflow-overrides [k run-id])
-                      cname           (get-in @flow-db/results-atom
-                                              [k :opts-map :client-name]
-                                              (get @wss/orig-caller k :rvbbit))
-                      client-name     (str cname)
-                      run-sql?        (and done? (not (some #(= % run-id) @saved-uids)))
-                      _ (when (and done? (not error?))
-                          (swap! wss/times-atom assoc k (conj (get @wss/times-atom k []) (int (/ elapsed 1000)))))
-                      _ (when run-sql?
-                          (try (let [row        {:client_name     client-name
-                                                 :flow_id         (str k)
-                                                 :started         start ;(get-in @flow-db/results-atom
-                                                 :start_ts        start-ts
-                                                 :ended           end ;(get-in @flow-db/results-atom
-                                                 :run_id          run-id
-                                                 :parent-run_id   parent-run-id
-                                                 :elapsed         elapsed
-                                                 :overrides       (pr-str overrides)
-                                                 :elapsed_seconds (float (/ elapsed 1000))
-                                                 :in_error        (cstr/includes? (str res) ":error")
-                                                 :human_elapsed   (str human-elapsed)}
-                                     insert-sql {:insert-into [:flow_history] :values [row]}]
+     (qp/serial-slot-queue
+      :update-stat-atom-serial :serial
+      (fn []
+        (let [;flows (if (or (nil? flows) (empty? flows))
+              ]
+          (swap! wss/flow-status merge
+                 (into
+                  {}
+                  (for [k     kks ;(keys @flow-db/results-atom)
+                        :when (not (= k "client-keepalive"))] ;; dont want to track heartbeats
+                    (let [;; _ (ut/pp [:flow-status-atom-all! k (get @flow-db/results-atom k)
+                          cc              (into {} (for [[k v] @flow-db/results-atom] {k (count v)})) ;; wtf?
+                          blocks          (get-in @flow-db/working-data [k :components-list])
+                          running-blocks  (vec (for [[k v] (get @flow-db/tracker k) :when (nil? (get v :end))] k))
+                          done-blocks     (vec (for [[k v] (get @flow-db/tracker k) :when (not (nil? (get v :end)))] k))
+                          not-started-yet (vec (cset/difference (set blocks) (set (into running-blocks done-blocks))))
+                          running-blocks  (vec (cset/difference (set blocks) (set (into done-blocks not-started-yet))))
+                          res             (get-in @flow-db/results-atom [k :done] :nope)
+                          running?        (or (= res :nope) (ut/chan? res) (= res :skip))
+                          done?           (not (= res :nope))
+                          error?          (try (some #(or (= % :timeout) (= % :error)) (ut/deep-flatten res)) (catch Exception _ false))
+                          _ (when error? (swap! wss/temp-error-blocks assoc k not-started-yet))
+                          start           (try (apply min (or (for [[_ v] (get @flow-db/tracker k)] (get v :start)) [-1]))
+                                               (catch Exception _ (System/currentTimeMillis)))
+                          start-ts        (ut/millis-to-date-string start)
+                          end             (try (apply max (or (remove nil? (for [[_ v] (get @flow-db/tracker k)] (get v :end))) [-1]))
+                                               (catch Exception e
+                                                 (do ;(ut/pp [:exception-in-getting-time-duration!! k
+                                                   (System/currentTimeMillis))))
+                          start           (if error? (get-in @wss/last-times [k :start]) start)
+                          end             (if error? (System/currentTimeMillis) end)
+                          elapsed         (try (- end start)
+                                               (catch Throwable e (do (ut/pp [:elapsed-error?? k e :start start :end end]) 0)))
+                          _ (swap! wss/last-times assoc-in [k :end] (System/currentTimeMillis))
+                          human-elapsed   (ut/format-duration start end)
+                          run-id          (str (get-in @flow-db/results-atom [k :run-id]))
+                          parent-run-id   (str (get-in @flow-db/results-atom [k :parent-run-id]))
+                          overrides       (get-in @flow-db/subflow-overrides [k run-id])
+                          cname           (get-in @flow-db/results-atom
+                                                  [k :opts-map :client-name]
+                                                  (get @wss/orig-caller k :rvbbit))
+                          client-name     (str cname)
+                          run-sql?        (and done? (not (some #(= % run-id) @saved-uids)))
+                          _ (when (and done? (not error?))
+                              (swap! wss/times-atom assoc k (conj (get @wss/times-atom k []) (int (/ elapsed 1000)))))
+                          _ (when run-sql?
+                              (try (let [row        {:client_name     client-name
+                                                     :flow_id         (str k)
+                                                     :started         start ;(get-in @flow-db/results-atom
+                                                     :start_ts        start-ts
+                                                     :ended           end ;(get-in @flow-db/results-atom
+                                                     :run_id          run-id
+                                                     :parent-run_id   parent-run-id
+                                                     :elapsed         elapsed
+                                                     :overrides       (pr-str overrides)
+                                                     :elapsed_seconds (float (/ elapsed 1000))
+                                                     :in_error        (cstr/includes? (str res) ":error")
+                                                     :human_elapsed   (str human-elapsed)}
+                                         insert-sql {:insert-into [:flow_history] :values [row]}]
                              ;(wss/enqueue-task3 ;; temp remove to test some shit 3/9/24
                              ;  (fn []
-                                 (sql-exec flows-db (to-sql insert-sql)) ;; sql-exec has its own queue now
+                                     (sql-exec flows-db (to-sql insert-sql)) ;; sql-exec has its own queue now
                              ;    ))
-                                 )
-                               (catch Exception e (ut/pp [:flow-history-insert-error k (str e)]))))
-                      _ (swap! last-look assoc k done?)
-                      _ (when run-sql? (swap! saved-uids conj run-id))
-                      chans-open      (count (doall (map (fn [[_ ch]]
-                                                           (let [vv (try (not (ut/channel-open? ch)) (catch Throwable e (str e)))]
-                                                             (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
-                                                         (get @flow-db/channels-atom k))))
-                      channels-open?  (true? (> chans-open 0))]
-                  {k {:*done?          done? ;(true? (not (nil? res)))
-                      :*started-by     cname
-                      :*channels-open? channels-open?
-                      :*channels-open  chans-open
-                      :running-blocks  running-blocks
-                      :done-blocks     done-blocks
-                      :waiting-blocks  not-started-yet
-                      :error-blocks    (get @wss/temp-error-blocks k [])
-                      :overrides       overrides
-                      :started         start
-                      :*finished       (count done-blocks)
-                      :*running        running-blocks
-                      :*done           done-blocks
-                      :*ms-elapsed     elapsed
-                      :*time-running   (str human-elapsed)
-                      :*not-started    not-started-yet
-                      :*open-channels  (get cc k)
-                      :*running?       running?}}))))))
+                                     )
+                                   (catch Exception e (ut/pp [:flow-history-insert-error k (str e)]))))
+                          _ (swap! last-look assoc k done?)
+                          _ (when run-sql? (swap! saved-uids conj run-id))
+                          chans-open      (count (doall (map (fn [[_ ch]]
+                                                               (let [vv (try (not (ut/channel-open? ch)) (catch Throwable e (str e)))]
+                                                                 (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
+                                                             (get @flow-db/channels-atom k))))
+                          channels-open?  (true? (> chans-open 0))]
+                      {k {:*done?          done? ;(true? (not (nil? res)))
+                          :*started-by     cname
+                          :*channels-open? channels-open?
+                          :*channels-open  chans-open
+                          :running-blocks  running-blocks
+                          :done-blocks     done-blocks
+                          :waiting-blocks  not-started-yet
+                          :error-blocks    (get @wss/temp-error-blocks k [])
+                          :overrides       overrides
+                          :started         start
+                          :*finished       (count done-blocks)
+                          :*running        running-blocks
+                          :*done           done-blocks
+                          :*ms-elapsed     elapsed
+                          :*time-running   (str human-elapsed)
+                          :*not-started    not-started-yet
+                          :*open-channels  (get cc k)
+                          :*running?       running?}}))))))))
 
   (defn tracker-changed
     [key ref old-state new-state]
     (let [[_ b _] (data/diff old-state new-state)
-          kks     (try (keys b) (catch Exception _ nil))]
-      (when (> (count (remove #(= "client-keepalive" %) kks)) 0) (update-stat-atom kks))))
-
+          kks     (try (keys b) (catch Exception _ []))
+          kks     (vec (remove #(= "client-keepalive" %) kks))]
+      (when (ut/ne? kks) ;; (> (count kks) 0) 
+        (update-stat-atom kks))))
+  
   (wss/add-watch+ flow-db/status :master-flow-db-status-watcher* tracker-changed :master-flow-db-status-watcher*)
 
   (defn log-tracker

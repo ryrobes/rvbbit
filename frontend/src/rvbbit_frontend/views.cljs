@@ -1690,29 +1690,51 @@
 ;;                :readOnly          false
 ;;                :theme             (theme-pull :theme/codemirror-theme nil)}}]])
 
+;(def modes ["🍀" "🌞" "🌙" "🔥" [:img {:src "images/rabbit-console.png" :width "40px" :height "40px"}]])
 
+(def selected-mode (reagent/atom (merge (select-keys ;; set default to clover ("views")
+                                             (get @(ut/tracked-sub ::bricks/hop-bar-runners {}) :views)
+                                             [:icon :description :syntax]) {:name :clover})))
+(def hop-bar-tooltip (reagent/atom nil))
 (defonce cm-instance (reagent/atom nil))
 (defonce hide-responses? (reagent/atom false))
 (def console-responses (reagent/atom {})) 
 (def console-history (reagent/atom #{})) 
 
-(defn insert-response-block [w h data]
+(defn insert-response-block [w h data runner syntax]
   (let [root (ut/find-safe-position w h)]
-    (bricks/insert-new-block-raw root w h data)))
+    (bricks/insert-new-block-raw root w h data runner syntax)))
+
+(defn ensure-quoted-string
+  "Adds double quotes to a string if they don't already exist.
+   If the string already has double quotes, it's returned as-is."
+  [s]
+  (let [trimmed (cstr/trim s)]
+    (if (and (cstr/starts-with? trimmed "\"")
+             (cstr/ends-with? trimmed "\""))
+      trimmed
+      (str "\"" trimmed "\""))))
 
 (defn run-console-command [command]
-  (ut/tapp>> (str "Command entered: " command))
-  (reset! hide-responses? false)
-  (let [resp (insert-response-block 6 3 command)
-        ee (str command "  ! " resp)]
-    (ut/dispatch-delay 300 [::http/insert-alert [:v-box :children [[:box :child (str resp)] 
-                                                                   [:box :child (str command) 
-                                                                    :style {:font-size "12px"}]]] 6 1.5 5])
-    (swap! console-responses assoc command ee)))
+  (let [runner (get @selected-mode :name)
+        syntax (get @selected-mode :syntax)
+        command (if (not= syntax "clojure")
+                  command ;; the "implied string"
+                  (ensure-quoted-string command))]
+    (ut/tapp>> (str "Command entered: " command))
+    (reset! hide-responses? false)
+    (let [resp (insert-response-block 6 3 command runner syntax)
+          ee (str command "  ! " resp)]
+      (when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
+      (ut/dispatch-delay 200 [::http/insert-alert
+                              [:v-box :children [[:box :child (str resp)]
+                                                 [:box :child (str command)
+                                                  :style {:font-size "12px"}]]] 6 1.5 5])
+      (swap! console-responses assoc command ee))))
 
-(defn console-text-box
-  [width-int height-int value]
-  (let [history-index (reagent/atom -1)]
+(defn console-text-box [width-int height-int value]
+  (let [history-index (reagent/atom -1)
+        react! [@hop-bar-tooltip]]
     (fn [width-int height-int value]
       [re-com/box
        :size "auto"
@@ -1730,8 +1752,8 @@
         {:value   (or value " ")
          :onBeforeChange (fn [editor _ _] ;; data value]
                            (reset! cm-instance editor))
-         ;:onBlur #(re-frame/dispatch [::bricks/toggle-quake-console]) ;; when not hovered over? to detect a click off into the canvas?
-         :options {:mode              "clojure"
+         :onBlur #(when (nil? @hop-bar-tooltip) (re-frame/dispatch [::bricks/toggle-quake-console])) ;; when not hovered over? to detect a click off into the canvas?
+         :options {:mode              (get @selected-mode :syntax "clojure") 
                    :lineWrapping      false
                    :lineNumbers       false
                    :matchBrackets     true
@@ -1764,13 +1786,32 @@
                                                    (reset! history-index new-index)
                                                    (.setValue cm (nth (vec @console-history) new-index)))))})}}]])))
 
-(def modes ["🍀" "🌞" "🌙" "🔥" [:img {:src "images/rabbit-console.png" :width "40px" :height "40px"}]])
-(defonce selected-mode (reagent/atom "🍀"))
 
 (defn cycle-mode [current-mode]
-  (let [current-index (.indexOf modes current-mode)
-        next-index (mod (inc current-index) (count modes))]
+  (let [modes           @(ut/tracked-sub ::bricks/hop-bar-runners {})
+        modes           (walk/postwalk-replace {:views :clover} modes)
+        modes           (vec (for [[k m] modes] (merge m {:name k})))
+        current-index   (.indexOf modes current-mode)
+        next-index      (mod (inc current-index) (count modes))]
     (get modes next-index)))
+
+(defn hop-render-icon [i]
+  (if (vector? i) [re-com/h-box
+                   ;:style {:border "1px solid yellow"}
+                   :height "40px" :gap "3px"
+                   :children (map hop-render-icon i)]
+      (cond
+
+        (and (string? i) (cstr/includes? i "."))
+        [:img {:src i :width "40px" :height "40px"}]
+
+        (string? i) [re-com/box 
+                     :child i 
+                     :width "40px" 
+                     :height "40px" 
+                     :size "auto" 
+                     :align :center 
+                     :justify :center])))
 
 (defn quake-console [ww]
   (let [hh (* 2  db/brick-size)
@@ -1791,8 +1832,20 @@
      :children [[re-com/h-box
                  :justify :between
                  :children [[re-com/box
-                             :child (if (not @hide-responses?)
-                                      (str (get @console-responses (last @console-history) "")) "")]
+                             :child (if @hop-bar-tooltip
+                                      (let [[title desc] @hop-bar-tooltip]
+                                        [re-com/h-box
+                                         :gap "14px"
+                                         :align :center 
+                                         :children [[re-com/box :child (str title) 
+                                                     :style {:font-size "18px"}]
+                                                    [re-com/box :child (str desc) 
+                                                     :style {:font-size "15px" 
+                                                             :font-weight 400
+                                                             :opacity 0.8}]]])
+
+                                      (if (not @hide-responses?)
+                                        (str (get @console-responses (last @console-history) "")) ""))]
                             (when
                              (and (not @hide-responses?)
                                   (get @console-responses (last @console-history)))
@@ -1801,8 +1854,9 @@
                                :style {:font-size "16px"
                                        :opacity 0.5}])]
                  :height (if
-                          (and (not @hide-responses?)
-                               (get @console-responses (last @console-history))) "auto" "0px")
+                          (or @hop-bar-tooltip
+                              (and (not @hide-responses?)
+                                   (get @console-responses (last @console-history)))) "auto" "0px")
                  :padding "9px"
                  :style {:position "fixed"
                          :bottom hh ;(if (get @console-responses (last @console-history)) hh (- hh 20))
@@ -1825,10 +1879,13 @@
                          :overflow "hidden"
                          :font-size "22px"}
                  :children [[re-com/box
-                             :child   @selected-mode
+                             :child [hop-render-icon (get @selected-mode :icon "?")]
                              :attr {:on-click #(do (swap! selected-mode cycle-mode)
-                                                   (when @cm-instance
-                                                     (.focus @cm-instance)))}
+                                                   (reset! hop-bar-tooltip [(get @selected-mode :name)  (get @selected-mode :description)])
+                                                   ;(js/setTimeout (fn [] (reset! hop-bar-tooltip nil)) 800)
+                                                   (when @cm-instance  (.focus @cm-instance)))
+                                    :on-mouse-enter #(reset! hop-bar-tooltip [(get @selected-mode :name)  (get @selected-mode :description)])
+                                    :on-mouse-leave #(reset! hop-bar-tooltip nil)}
                              :style {:font-size "31px"
                                      :padding-left "5px" :margin-top "4px"
                                      :user-select "none"

@@ -1,5 +1,5 @@
 {:orders
- {:offenses (:query_error),
+ {:offenses [],
   :offenses-drag-26
   [:DAY_OF_WEEK
    :DISTRICT
@@ -18,10 +18,10 @@
    :STREET
    :UCR_PART
    :YEAR],
+  :connections-sys [:database_name :connection_id],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :fields-sys [:field_name :field_type :data_type],
-  :connections-sys [:database_name :connection_id]},
+  :fields-sys [:field_name :field_type :data_type]},
  :reco-preview nil,
  :sql-source
  {:offenses
@@ -45,7 +45,8 @@
     :STREET
     :UCR_PART
     :YEAR],
-   :from [[:offenses :ff277]]}},
+   :from [[:offenses :ff277]],
+   :_last-run "05:25:08"}},
  :meta
  {:fields-sys
   {:fields
@@ -385,17 +386,7 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :offenses
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons
-     {"(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: offenses)" 1},
-     :cardinality 100}},
-   :rowcount 2},
+  :offenses {:fields {}},
   :gen-viz-84
   {:fields
    {:rows
@@ -528,7 +519,21 @@
      :commons {27 35, 26 24, 29 23},
      :cardinality 23}},
    :rowcount 500},
-  :reco-counts {:fields {}, :rowcount 0},
+  :reco-counts
+  {:fields
+   {:table_name
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"offenses_drag_26" 1},
+     :cardinality 100},
+    :cnt
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? false,
+     :commons {917 1},
+     :cardinality 100}},
+   :rowcount 1},
   :state-drag-3
   {:fields
    {:state
@@ -560,11 +565,10 @@
      :cardinality 83}},
    :rowcount 30}},
  :default-col-widths
- {:system-connections-list* {:connections-sys 140},
-  :system-tables-list* {:tables-sys 147},
-  :system-fields-list* {:fields-sys 170},
-  :block-3098 {:offenses-drag-16 100},
-  :block-3392 {:offenses-drag-26 100}},
+ {:block-3392 {:offenses-drag-26 100},
+  :system-connections-list* {:connections-sys 126},
+  :system-tables-list* {:tables-sys 133},
+  :system-fields-list* {:fields-sys 170}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -579,7 +583,7 @@
    :default "./screens/looking-glass-redux.edn",
    :eleven-labs-api-key nil,
    :modes
-   {:text
+   {:pre
     [:pre
      {:style
       {:color :theme/editor-outer-rim-color,
@@ -589,6 +593,7 @@
        :font-size "17px",
        :font-family :theme/monospaced-font}}
      [:string3 :*data]],
+    :text [:console :*data],
     :data [:data-viewer :*data],
     :pretty [:pretty-box :*data],
     :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
@@ -632,7 +637,7 @@
       {:color "yellow", :font-size "23px"}
       :child
       [:string3 :x "CHEESEBURGER!"]]}},
-   :eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive",
+   :eleven-labs-default-voice-name "Not OG Buffy",
    :debug-level 1,
    :screens
    ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
@@ -688,6 +693,7 @@
     "demo-light-bkgrd-sept23"
     "demo-lime-green-slime"
     "desktops-and-broomsticks"
+    "duality-of-lepus"
     "error-monitor"
     "error-monitor-vanessa"
     "error-monitor-vanessa2"
@@ -802,44 +808,80 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [179846112 153383916 4294705152],
+ :memory [1625739611 1600086331 4294705152],
  :flow-subs
- [:solver/raw-custom-override-1220921771
-  :solver/get-my-colors136717390
+ [:solver/raw-custom-override-1448584061
+  :solver-status/*client-name*>raw-custom-override-1066877553>running?
+  :solver-status/*client-name*>raw-custom-override-1448584061>running?
+  :solver-status/*client-name*>raw-custom-override816101629>running?
+  :solver-status/*client-name*>raw-custom-override-543613597>running?
   :flow/flow-forever>*running?
-  :solver-status/*client-name*>get-my-colors136717390>running?
-  :solver/get-my-colors-1179564465
-  :solver-status/*client-name*>raw-custom-override1473424428>running?
-  :solver-status/*client-name*>get-my-colors-1179564465>running?
-  :solver-status/*client-name*
-  :solver/raw-custom-override-1535991406
-  :solver-status/*client-name*>raw-custom-override-1535991406>running?
+  :solver-status/*client-name*>raw-custom-override-1609576239>running?
+  :repl-ns/repl-client-namespaces-map>*client-name*
+  :solver/raw-custom-override391045012
+  :solver-status/*client-name*>get-my-colors-231051622>running?
+  :solver/get-my-colors-1748511361
+  :solver/raw-custom-override-505667052
+  :solver-status/*client-name*>raw-custom-override1395867983>running?
+  :solver/get-my-colors-231051622
+  :solver/raw-custom-override-1609576239
+  :solver-status/*client-name*>raw-custom-override-505667052>running?
+  :solver/raw-custom-override1395867983
+  :solver/raw-custom-override816101629
+  :solver/raw-custom-override-1066877553
+  :solver-status/*client-name*>get-my-colors-1748511361>running?
   :flow/live-scratch-flow>*running?
-  :solver/raw-custom-override1473424428
-  :solver-status/*client-name*>raw-custom-override-1220921771>running?],
- :client-name :fabulous-white-giraffe-41,
+  :solver-status/*client-name*>raw-custom-override1943429055>running?
+  :solver-status/*client-name*>raw-custom-override391045012>running?
+  :solver/raw-custom-override1943429055
+  :solver/raw-custom-override-543613597
+  :solver-status/*client-name*>raw-custom-override1029923398>running?
+  :time/second
+  :solver/raw-custom-override1029923398
+  :solver-meta/raw-custom-override-841333514>output>evald-result>out
+  :solver-meta/raw-custom-override1943429055>output>evald-result>out],
+ :client-name :remarkable-rectangular-armadillo-4,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2570, :h 1590},
+ :window {:w 2680, :h 1656},
+ :quake-console? false,
  :post-meta {:offenses-drag-26 {:* {:rowcount 319073}}},
  :status
  {:heartbeat
   {:kick
-   [:solver/raw-custom-override-1220921771
-    :solver/get-my-colors136717390
+   [:solver/raw-custom-override-1448584061
+    :solver-status/*client-name*>raw-custom-override-1066877553>running?
+    :solver-status/*client-name*>raw-custom-override-1448584061>running?
+    :solver-status/*client-name*>raw-custom-override816101629>running?
+    :solver-status/*client-name*>raw-custom-override-543613597>running?
     :flow/flow-forever>*running?
-    :solver-status/*client-name*>get-my-colors136717390>running?
-    :solver/get-my-colors-1179564465
-    :solver-status/*client-name*>raw-custom-override1473424428>running?
-    :solver-status/*client-name*>get-my-colors-1179564465>running?
-    :solver-status/*client-name*
-    :solver/raw-custom-override-1535991406
-    :solver-status/*client-name*>raw-custom-override-1535991406>running?
+    :solver-status/*client-name*>raw-custom-override-1609576239>running?
+    :repl-ns/repl-client-namespaces-map>*client-name*
+    :solver/raw-custom-override391045012
+    :solver-status/*client-name*>get-my-colors-231051622>running?
+    :solver/get-my-colors-1748511361
+    :solver/raw-custom-override-505667052
+    :solver-status/*client-name*>raw-custom-override1395867983>running?
+    :solver/get-my-colors-231051622
+    :solver/raw-custom-override-1609576239
+    :solver-status/*client-name*>raw-custom-override-505667052>running?
+    :solver/raw-custom-override1395867983
+    :solver/raw-custom-override816101629
+    :solver/raw-custom-override-1066877553
+    :solver-status/*client-name*>get-my-colors-1748511361>running?
     :flow/live-scratch-flow>*running?
-    :solver/raw-custom-override1473424428
-    :solver-status/*client-name*>raw-custom-override-1220921771>running?]}},
+    :solver-status/*client-name*>raw-custom-override1943429055>running?
+    :solver-status/*client-name*>raw-custom-override391045012>running?
+    :solver/raw-custom-override1943429055
+    :solver/raw-custom-override-543613597
+    :solver-status/*client-name*>raw-custom-override1029923398>running?
+    :time/second
+    :solver/raw-custom-override1029923398
+    :solver-meta/raw-custom-override-841333514>output>evald-result>out
+    :solver-meta/raw-custom-override1943429055>output>evald-result>out]},
+  :alert1 {:alerts :alert2}},
  :screen-name "looking-glass-redux",
  :recos-page2 0,
  :selected-tab "star-shaped wallaby",
@@ -854,14 +896,16 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   294
+   3693
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :base-sniff-queries {:offenses -505802446},
+ :panels-hash -1731294884,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 823725702,
+ :user-params-hash -598255977,
  :grid-recos? true,
+ :session-hash 20396544,
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -962,7 +1006,8 @@
     :STREET
     :UCR_PART
     :YEAR],
-   :from [[:offenses :ff277]]},
+   :from [[:offenses :ff277]],
+   :_last-run "05:25:08"},
   :gen-viz-828
   {:select [[[[:count 1]] :agg] :date_posted],
    :from
@@ -1138,6 +1183,49 @@
       :padding 4,
       :background "transparent"}
      {:actions false}]}},
+  :block-12286
+  {:h 3,
+   :w 6,
+   :root [29 24],
+   :tab "star-shaped wallaby",
+   :selected-view :clojure-intro-hop-3,
+   :name "block-12286",
+   :clojure-intro
+   {:clojure-intro-hop-3
+    (do
+      (ns hoppy.chuck-norris
+        (:require [clojure.data.json :as json] [clojure.java.io :as io]))
+      (def url (java.net.URL. "https://api.chucknorris.io/jokes/random"))
+      (defn fetch-chuck-norris-joke []
+        (let [conn (.openConnection url)]
+          (with-open [reader (io/reader (.getInputStream conn))]
+            (json/read (java.io.PushbackReader. reader) :key-fn keyword))))
+      (defn joke-to-hiccup [joke]
+        [:v-box
+         :size
+         "auto"
+         :align
+         :center
+         :justify
+         :center
+         :gap
+         "4px"
+         :style
+         {:color :theme/editor-outer-rim-color}
+         :children
+         [[:h2 "Chuck's Wisdom of the Day"]
+          [:p (:value joke)]
+          [:img
+           {:src "https://placekitten.com/200/200",
+            :width "200px",
+            :height "200px",
+            :style {:border-radius "15px"},
+            :alt "A cute bunny (actually a kitten)"}]]])
+      (def joke (fetch-chuck-norris-joke))
+      (def inputs (pr-str john))
+      (def hiccup (joke-to-hiccup joke))
+      (println "Console joke output:" (pr-str (get joke :value)))
+      hiccup)}},
   :block-11251
   {:name "block-11251",
    :w 6,
@@ -1167,6 +1255,43 @@
      :child
      [:push ["flow-forever" ":open-input" 21555]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-5185
+  {:h 4,
+   :w 5,
+   :root [13 21],
+   :tab "star-shaped wallaby",
+   :selected-view :hare-vw,
+   :name "block-5185",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-5185.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's a perfect day for planting seeds and planning adventures!"]},
+   :queries {}},
+  :block-8981
+  {:h 6,
+   :w 10,
+   :root [25 17],
+   :tab "star-shaped wallaby",
+   :selected-view :create-image-hop,
+   :name "block-8981",
+   :create-image
+   {:create-image-hop
+    ["A beautiful buxom irish woman in her late 20s prepares for battle, as the sun sets behind her in the 1800s burlesque club."]}},
   :block-11609
   {:h 5,
    :w 8,
@@ -1213,6 +1338,15 @@
    :name "flow-play-from-runstreams",
    :root [5 18],
    :tab "through the rabbit hole and out the other side"},
+  :block-3572
+  {:h 11,
+   :w 9,
+   :root [46 0],
+   :tab "star-shaped wallaby",
+   :selected-view :hare-vw,
+   :name "block-3572",
+   :views {:hare-vw [:data-viewer [:app-db [:panels]]]},
+   :queries {}},
   :block-204
   {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
    :name "compound_trend_1 - \"date_posted, rows\" - 1141",
@@ -1393,6 +1527,49 @@
      :order-by [[:rowcnt :desc]]}},
    :root [25 8],
    :tab "sapphire ape"},
+  :block-3492
+  {:h 3,
+   :w 6,
+   :root [26 24],
+   :tab "star-shaped wallaby",
+   :selected-view :clojure-intro-hop-4,
+   :name "block-3492",
+   :clojure-intro
+   {:clojure-intro-hop-4
+    (do
+      (ns hoppy.chuck-norris
+        (:require [clojure.data.json :as json] [clojure.java.io :as io]))
+      (def url (java.net.URL. "https://api.chucknorris.io/jokes/random"))
+      (defn fetch-chuck-norris-joke []
+        (let [conn (.openConnection url)]
+          (with-open [reader (io/reader (.getInputStream conn))]
+            (json/read (java.io.PushbackReader. reader) :key-fn keyword))))
+      (defn joke-to-hiccup [joke]
+        [:v-box
+         :size
+         "auto"
+         :align
+         :center
+         :justify
+         :center
+         :gap
+         "4px"
+         :style
+         {:color :theme/editor-outer-rim-color}
+         :children
+         [[:h2 "Chuck's Wisdom of the Day"]
+          [:p (:value joke)]
+          [:img
+           {:src "https://placekitten.com/200/200",
+            :width "200px",
+            :height "200px",
+            :style {:border-radius "15px"},
+            :alt "A cute bunny (actually a kitten)"}]]])
+      (def joke (fetch-chuck-norris-joke))
+      (def inputs (pr-str underwar))
+      (def hiccup (joke-to-hiccup joke))
+      (println "Console joke output:" (pr-str (get joke :value)))
+      hiccup)}},
   :block-8502
   {:h 2,
    :w 6,
@@ -1420,6 +1597,56 @@
      :child
      :theme/universal-pop]},
    :queries {}},
+  :block-3477
+  {:clojure
+   {:new-clojure-3
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (def tooo [1 2 3])
+        (println tooo)
+        (str
+          "🐇🥕 Sup! In ternal RdVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇")))},
+   :name "block-3477",
+   :w 11,
+   :selected-mode {:new-clojure-3 :text},
+   :selected-view :new-clojure-3,
+   :root [44 21],
+   :h 3,
+   :queries {},
+   :tab "star-shaped wallaby",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3477.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's a perfect day for planting seeds and planning adventures!"]}},
+  :block-2377
+  {:h 3,
+   :w 6,
+   :root [26 4],
+   :tab "star-shaped wallaby",
+   :selected-view :clojure-hop,
+   :name "block-2377",
+   :clojure {:clojure-hop "(+ 0 9 8 7)"}},
   :block-94
   {:mad-libs-combo-hash ["1561519308" "ufo_sightings_drag_9"],
    :name "basic_v_bar - \"country, rows\" - 559",
@@ -1515,6 +1742,16 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-9773
+  {:h 23,
+   :w 41,
+   :views
+   {"console-out"
+    [:terminal :solver-meta/raw-custom-override1943429055>output>evald-result>out]},
+   :name "console :solver/raw-custom-override1943429055",
+   :root [3 2],
+   :tab "star-shaped wallaby",
+   :z 3},
   :block-7328
   {:drag-meta {:type :open-input},
    :w 14,
@@ -1530,6 +1767,19 @@
    :tab "star-shaped wallaby",
    :root [0 1],
    :name "block-7328"},
+  :block-1071
+  {:h 2,
+   :w 2,
+   :root [45 30],
+   :tab "star-shaped wallaby",
+   :selected-view :clojure-hop-1,
+   :name "block-1071",
+   :clojure
+   {:clojure-hop-1
+    (do
+      (let [graphs-gen :time/second]
+        (rvbbit-backend.websockets/draw-stats [:mem :cpu :threads] [1 5 30])
+        graphs-gen))}},
   :block-7319
   {:h 5,
    :w 8,
@@ -1627,6 +1877,85 @@
      :order-by [[:rowcnt :desc]]}},
    :root [17 8],
    :tab "sapphire ape"},
+  :block-12121
+  {:h 3,
+   :w 6,
+   :views
+   {"console-out"
+    [:console :solver-meta/raw-custom-override-841333514>output>evald-result>out]},
+   :name "console :solver/raw-custom-override-841333514",
+   :root [44 26],
+   :tab "star-shaped wallaby"},
+  :block-7425
+  {:clojure
+   {:new-clojure-2
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (println 234)
+        (str
+          "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇")))},
+   :name "block-7425",
+   :w 5,
+   :selected-view :hare-vw,
+   :root [32 11],
+   :h 4,
+   :queries {},
+   :shell {:new-shell-3 "ls -l ; top -n 1  ; pwd"},
+   :tab "star-shaped wallaby",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-7425.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's a perfect day for planting seeds and planning adventures!"]}},
+  :block-2113
+  {:name "block-2113",
+   :w 17,
+   :selected-mode {:new-shell-4 :text},
+   :selected-view :new-shell-4,
+   :root [38 11],
+   :h 9,
+   :queries {},
+   :shell {:new-shell-4 ["ls -l ; top -n 1  ; pwd ; vmstat 1 1 ; uname --all"]},
+   :tab "star-shaped wallaby",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-2113.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's a perfect day for planting seeds and planning adventures!"]}},
   :block-35
   {:h 9,
    :w 9,
@@ -1754,15 +2083,6 @@
    :root [1 1],
    :tab "sapphire ape",
    :selected-view :ufo-sightings-drag-9},
-  :block-3158
-  {:h 19,
-   :w 13,
-   :root [46 1],
-   :tab "star-shaped wallaby",
-   :selected-view :hi,
-   :name "block-3158",
-   :views {:hi [:data-viewer :solver-status/*client-name*]},
-   :queries {}},
   :block-3392
   {:h 7,
    :w 30,
@@ -1788,9 +2108,11 @@
       :STREET
       :UCR_PART
       :YEAR],
-     :from [[:offenses :ff277]]}},
+     :from [[:offenses :ff277]],
+     :_last-run "05:25:08"}},
    :root [1 10],
-   :tab "star-shaped wallaby"},
+   :tab "star-shaped wallaby",
+   :selected-view :offenses-drag-26},
   :block-284
   {:w 32,
    :selected-view :vv,
@@ -1837,7 +2159,15 @@
       :YEAR],
      :from [[:offenses :dd484]]}},
    :root [25 20],
-   :tab "globular koala"}},
+   :tab "globular koala"},
+  :block-7621
+  {:h 3,
+   :w 6,
+   :root [35 15],
+   :tab "star-shaped wallaby",
+   :selected-view :shell-hop,
+   :name "block-7621",
+   :shell {:shell-hop ["\"ls -l  -h\""]}}},
  :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#ff2050",
@@ -1868,18 +2198,23 @@
    :flow-forever>final-math nil,
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
-  :time {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :month 4},
+  :time {:second 0, :now-seconds "Wednesday, April 24 1:43:57PM", :month 4},
+  :viz-tables-sys2 {:table_name :offenses-drag-26},
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data nil,
-   :selected-view nil,
+   :selected-view-data
+   (do
+     (let [graphs-gen :time/second]
+       (rvbbit-backend.websockets/draw-stats [:cpu :threads :mem :tasks])
+       graphs-gen)),
+   :selected-view [:clojure :clojure-hop-1],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :well-cerise-kangaroo
    "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently.   The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity. ",
    :rel-image-path "images/large/b64-image3-48163-50841-4k.webp",
-   :selected-block :block-3392,
+   :selected-block :block-9773,
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",
@@ -1945,7 +2280,7 @@
     "date" "#6A6391",
     "nil" "#68beff"},
    :editor-grid-selected-font-color "#000000",
-   :monospaced-font "Nova Mono",
+   :monospaced-font "Source Code Pro",
    :editor-grid-selected-background-color "#dc9cb0",
    :nivo-defaults
    {:font-family "Instagram Sans",
@@ -2015,12 +2350,60 @@
     {:error "This request has been blocked by our content filters.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :get-my-colors919195177
+   {:second-darkest "#34275d",
+    :highest-saturation "#0e3969",
+    :most-contrasting "#9c8c6c",
+    :darkest "#1b0a20",
+    :contrast-with-dominant "#9c8c6c",
+    :colors
+    ["#5d9cc3"
+     "#ec75a4"
+     "#db71c2"
+     "#9e3d8c"
+     "#402263"
+     "#1b0a20"
+     "#0e3969"
+     "#9c8c6c"
+     "#5c5584"
+     "#5b2d92"
+     "#34275d"],
+    :most-frequent "#9e3d8c",
+    :data-colors
+    {"float" "#a0e095",
+     "boolean" "#9c98bf",
+     "map" "#71db83",
+     "list" "#234889",
+     "string" "#cee0fc",
+     "any" "#caa52d",
+     "vector" "#5255ca",
+     "keyword" "#bbcdf3",
+     "rabbit-code" "#aa6f9a",
+     "datetime" "#7f4d2b",
+     "integer" "#75ecbe",
+     "unknown" "#720694",
+     "date" "#0a1e2c"},
+    :dominant "#34275d",
+    :most-contrasting-dark "#1b0a20",
+    :second-brightest "#db71c2",
+    :brightest "#ec75a4",
+    :most-contrasting-light "#9c8c6c"},
    :raw-custom-override-2099661531
    {:error
     {:error "This request has been blocked by our content filters.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override816101629
+   {:error
+    {:error "This request has been blocked by our content filters.",
+     :class "class clojure.lang.ExceptionInfo"},
+    :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override-1031779101 "(returns nil value)",
    :raw-custom-override-210407138 nil,
+   :raw-custom-override-543613597
+   "total 415680\n-rw-rw-r--   1 ryanr ryanr      2470 Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr       792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr      4096 Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr   4345856 Jul  6 07:58 flow-history\ndrwxrwxr-x   2 ryanr ryanr   2138112 Jul  6 07:55 flow-logs\ndrwxrwxr-x   3 ryanr ryanr      4096 Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr   8870985 Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr   8771849 Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr     14372 Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr      4096 Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr      5765 Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr      2838 Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr     17261 Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr      4147 Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 380698624 Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr       752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr     64443 Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     31125 Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr     32129 Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr     30765 Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     14555 Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr      2592 Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr     69632 Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20103168 May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr      4096 Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr     12052 Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr     24576 Mar 29 20:40 tracker-logs\ndrwxrwxr-x 288 ryanr ryanr     20480 Jul  6 07:33 transit-data\n-rw-rw-r--   1 ryanr ryanr       132 Jun 26 19:24 user.clj\ntop: failed tty get\n/home/ryanr/rvbbit/backend\nprocs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n31  0      0 1979456 1296672 58684008    0    0   645   412   82   13 37  4 59  0  0\nLinux rvbbit-dev 6.5.0-41-generic #41~22.04.2-Ubuntu SMP PREEMPT_DYNAMIC Mon Jun  3 11:32:55 UTC 2 x86_64 x86_64 x86_64 GNU/Linux\n",
+   :raw-custom-override1234473705
+   "total 406M\n-rw-rw-r--   1 ryanr ryanr 2.5K Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr  792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr 4.0K Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr 4.2M Jul  6 06:20 flow-history\ndrwxrwxr-x   2 ryanr ryanr 2.1M Jul  6 06:21 flow-logs\ndrwxrwxr-x   3 ryanr ryanr 4.0K Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr 8.5M Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr 8.4M Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr  15K Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr  12K Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr 4.0K Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr 5.7K Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr 2.8K Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr  17K Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr 4.1K Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 364M Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr  752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr  63K Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr  31K Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr  32K Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr  31K Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr  15K Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr 2.6K Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr  12K Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr  68K Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20M May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr 4.0K Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr  12K Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr  24K Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr  20K Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr  132 Jun 26 19:24 user.clj\n",
    :raw-custom-override1473424428
    [:v-box
     :padding
@@ -2044,6 +2427,41 @@
       [:img
        {:src "./images/gen/b64-image3-60932-36309.png",
         :style {:border-radius "30px"}}]]]],
+   :raw-custom-override1585930159
+   "total 415676\n-rw-rw-r--   1 ryanr ryanr      2470 Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr       792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr      4096 Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr   4341760 Jul  6 06:05 flow-history\ndrwxrwxr-x   2 ryanr ryanr   2138112 Jul  6 06:05 flow-logs\ndrwxrwxr-x   3 ryanr ryanr      4096 Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr   8870985 Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr   8771849 Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr     14372 Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr      4096 Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr      5765 Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr      2838 Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr     17261 Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr      4147 Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 380698624 Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr       752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr     64443 Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     31125 Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr     32129 Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr     30765 Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     14555 Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr      2592 Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr     69632 Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20103168 May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr      4096 Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr     12052 Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr     24576 Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr     20480 Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr       132 Jun 26 19:24 user.clj\ntop: failed tty get\n/home/ryanr/rvbbit/backend\n",
+   :raw-custom-override1964996312 "top: failed tty get\n",
+   :raw-custom-override1943429055 59,
+   :raw-custom-override-1576085329
+   "total 415676\n-rw-rw-r--   1 ryanr ryanr      2470 Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr       792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr      4096 Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr   4341760 Jul  6 06:10 flow-history\ndrwxrwxr-x   2 ryanr ryanr   2138112 Jul  6 06:10 flow-logs\ndrwxrwxr-x   3 ryanr ryanr      4096 Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr   8870985 Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr   8771849 Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr     14372 Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr      4096 Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr      5765 Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr      2838 Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr     17261 Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr      4147 Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 380698624 Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr       752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr     64443 Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     31125 Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr     32129 Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr     30765 Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     14555 Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr      2592 Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr     69632 Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20103168 May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr      4096 Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr     12052 Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr     24576 Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr     20480 Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr       132 Jun 26 19:24 user.clj\ntop: failed tty get\n/home/ryanr/rvbbit/backend\nprocs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 4  0      0 1995164 1096576 89140432    0    0   801   489   78   56 36  4 60  0  0\nLinux rvbbit-dev 6.5.0-41-generic #41~22.04.2-Ubuntu SMP PREEMPT_DYNAMIC Mon Jun  3 11:32:55 UTC 2 x86_64 x86_64 x86_64 GNU/Linux\n",
+   :raw-custom-override2036847066 "(returns nil value)",
+   :raw-custom-override-2138130241
+   "total 415676\n-rw-rw-r--   1 ryanr ryanr      2470 Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr       792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr      4096 Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr   4341760 Jul  6 06:05 flow-history\ndrwxrwxr-x   2 ryanr ryanr   2138112 Jul  6 06:05 flow-logs\ndrwxrwxr-x   3 ryanr ryanr      4096 Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr   8870985 Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr   8771849 Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr     14372 Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr      4096 Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr      5765 Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr      2838 Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr     17261 Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr      4147 Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 380698624 Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr       752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr     64443 Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     31125 Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr     32129 Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr     30765 Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     14555 Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr      2592 Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr     69632 Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20103168 May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr      4096 Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr     12052 Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr     24576 Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr     20480 Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr       132 Jun 26 19:24 user.clj\ntop: failed tty get\n/home/ryanr/rvbbit/backend\n",
+   :raw-custom-override-361256212
+   "🐇🥕 Sup!e! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override-1964771808
+   [:v-box
+    :padding
+    "10px"
+    :gap
+    "8px"
+    :width
+    :width-px
+    :style
+    {:background-color "#dd8e95",
+     :border-radius "20px",
+     :font-size "12px",
+     :font-weight 700,
+     :color "#de9197"}
+    :children
+    [[:box :child "./images/gen/b64-image3-50816-94507.png"]
+     [:box
+      :size
+      "auto"
+      :child
+      [:img
+       {:src "./images/gen/b64-image3-50816-94507.png",
+        :style {:border-radius "30px"}}]]]],
+   :raw-custom-override-261232297 "sh: 1: ls -l -h: not found\n",
    :raw-custom-override-2070279978
    [:v-box
     :padding
@@ -2067,6 +2485,12 @@
       [:img
        {:src "./images/gen/b64-image3-54002-72405.png",
         :style {:border-radius "30px"}}]]]],
+   :raw-custom-override-1448584061 "sh: 1: ls -l  -h: not found\n",
+   :raw-custom-override1798476957 123,
+   :raw-custom-override-1260039765
+   "Linux rvbbit-dev 6.5.0-41-generic #41~22.04.2-Ubuntu SMP PREEMPT_DYNAMIC Mon Jun  3 11:32:55 UTC 2 x86_64 x86_64 x86_64 GNU/Linux\n",
+   :raw-custom-override-1359279241
+   "total 406M\n-rw-rw-r--   1 ryanr ryanr 2.5K Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr  792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr 4.0K Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr 4.2M Jul  6 06:30 flow-history\ndrwxrwxr-x   2 ryanr ryanr 2.1M Jul  6 06:30 flow-logs\ndrwxrwxr-x   3 ryanr ryanr 4.0K Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr 8.5M Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr 8.4M Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr  15K Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr  12K Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr 4.0K Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr 5.7K Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr 2.8K Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr  17K Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr 4.1K Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 364M Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr  752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr  63K Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr  31K Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr  32K Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr  31K Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr  15K Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr 2.6K Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr  12K Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr  68K Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20M May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr 4.0K Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr  12K Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr  24K Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr  20K Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr  132 Jun 26 19:24 user.clj\n",
    :raw-custom-override-1220921771
    [:v-box
     :padding
@@ -2090,12 +2514,61 @@
       [:img
        {:src "./images/gen/b64-image3-47603-31641.png",
         :style {:border-radius "30px"}}]]]],
+   :raw-custom-override-1458542752
+   [:v-box
+    :size
+    "auto"
+    :align
+    :center
+    :justify
+    :center
+    :gap
+    "4px"
+    :style
+    {:color "#379fb5"}
+    :children
+    [[:h2 "Chuck's Wisdom of the Day"]
+     [:p
+      "Proponents of higher-order theories of consciousness argue that consciousness is explained by the relation between two levels of mental states in which a higher-order mental state takes another mental state. If you mention this to Chuck Norris, expect an explosive roundhouse kick to the face for spouting too much fancy-talk."]
+     [:img
+      {:src "https://placekitten.com/200/200",
+       :width "200px",
+       :height "200px",
+       :style {:border-radius "15px"},
+       :alt "A cute bunny (actually a kitten)"}]]],
+   :raw-custom-override1029923398
+   "🐇🥕 Sup! In ternal RdVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override-741729623 "top: failed tty get\n",
+   :raw-custom-override-1723805008
+   [:v-box
+    :size
+    "auto"
+    :align
+    :center
+    :justify
+    :center
+    :gap
+    "4px"
+    :style
+    {:color "#379fb5"}
+    :children
+    [[:h2 "Chuck's Wisdom of the Day"]
+     [:p
+      "The Grim Reaper recently started having nightmares. In his dream, the Reaper looks in his bathroom mirror and sees Chuck Norris right behind him."]
+     [:img
+      {:src "https://placekitten.com/200/200",
+       :width "200px",
+       :height "200px",
+       :style {:border-radius "15px"},
+       :alt "A cute bunny (actually a kitten)"}]]],
+   :raw-custom-override621112440 "sh: 1: ls -l  -h: not found\n",
    :raw-custom-override778576215
    {:error
     {:error
      "Your request was rejected as a result of our safety system. Image descriptions generated from your prompt may contain text that is not allowed by our safety system. If you believe this was done in error, your request may succeed if retried, or by adjusting your prompt.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override-2038441464 "(returns nil value)",
    :get-my-colors136717390
    {:second-darkest "#34275d",
     :highest-saturation "#0e3969",
@@ -2140,6 +2613,51 @@
      "Your request was rejected as a result of our safety system. Image descriptions generated from your prompt may contain text that is not allowed by our safety system. If you believe this was done in error, your request may succeed if retried, or by adjusting your prompt.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override-845721958
+   [:v-box
+    :size
+    "auto"
+    :align
+    :center
+    :justify
+    :center
+    :gap
+    "4px"
+    :style
+    {:color "#379fb5"}
+    :children
+    [[:h2 "Chuck's Wisdom of the Day"]
+     [:p "Chuck Norris had nasal sex with Barbara Streisand"]
+     [:img
+      {:src "https://placekitten.com/200/200",
+       :width "200px",
+       :height "200px",
+       :style {:border-radius "15px"},
+       :alt "A cute bunny (actually a kitten)"}]]],
+   :raw-custom-override800029258 "(returns nil value)",
+   :raw-custom-override-894277460
+   [:v-box
+    :padding
+    "10px"
+    :gap
+    "8px"
+    :width
+    :width-px
+    :style
+    {:background-color "#2c1f19",
+     :border-radius "20px",
+     :font-size "12px",
+     :font-weight 700,
+     :color "#241c18"}
+    :children
+    [[:box :child "./images/gen/b64-image3-5447-15826.png"]
+     [:box
+      :size
+      "auto"
+      :child
+      [:img
+       {:src "./images/gen/b64-image3-5447-15826.png",
+        :style {:border-radius "30px"}}]]]],
    :raw-custom-override-124708832
    [:box
     :style
@@ -2152,6 +2670,7 @@
      "Your request was rejected as a result of our safety system. Image descriptions generated from your prompt may contain text that is not allowed by our safety system. If you believe this was done in error, your request may succeed if retried, or by adjusting your prompt.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override391045012 "(returns nil value)",
    :get-my-colors-1179564465
    {:second-darkest "#34275d",
     :highest-saturation "#0e3969",
@@ -2190,12 +2709,122 @@
     :second-brightest "#db71c2",
     :brightest "#ec75a4",
     :most-contrasting-light "#9c8c6c"},
+   :raw-custom-override1481345231 "(returns nil value)",
+   :raw-custom-override417429913
+   {:exit-code 0, :output "/home/ryanr/rvbbit/backend\n", :error ""},
+   :raw-custom-override-841333514
+   "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override-1043853740 "",
+   :raw-custom-override76175162 24,
+   :get-my-colors-1748511361
+   {:second-darkest "#34275d",
+    :highest-saturation "#0e3969",
+    :most-contrasting "#9c8c6c",
+    :darkest "#1b0a20",
+    :contrast-with-dominant "#9c8c6c",
+    :colors
+    ["#5d9cc3"
+     "#ec75a4"
+     "#db71c2"
+     "#9e3d8c"
+     "#402263"
+     "#1b0a20"
+     "#0e3969"
+     "#9c8c6c"
+     "#5c5584"
+     "#5b2d92"
+     "#34275d"],
+    :most-frequent "#9e3d8c",
+    :data-colors
+    {"float" "#a0e095",
+     "boolean" "#9c98bf",
+     "map" "#71db83",
+     "list" "#234889",
+     "string" "#cee0fc",
+     "any" "#caa52d",
+     "vector" "#5255ca",
+     "keyword" "#bbcdf3",
+     "rabbit-code" "#aa6f9a",
+     "datetime" "#7f4d2b",
+     "integer" "#75ecbe",
+     "unknown" "#720694",
+     "date" "#0a1e2c"},
+    :dominant "#34275d",
+    :most-contrasting-dark "#1b0a20",
+    :second-brightest "#db71c2",
+    :brightest "#ec75a4",
+    :most-contrasting-light "#9c8c6c"},
+   :raw-custom-override-505667052
+   [:v-box
+    :padding
+    "10px"
+    :gap
+    "8px"
+    :width
+    :width-px
+    :style
+    {:background-color "#d3a589",
+     :border-radius "20px",
+     :font-size "12px",
+     :font-weight 700,
+     :color "#dcc4b0"}
+    :children
+    [[:box :child "./images/gen/b64-image3-25271-43968.png"]
+     [:box
+      :size
+      "auto"
+      :child
+      [:img
+       {:src "./images/gen/b64-image3-25271-43968.png",
+        :style {:border-radius "30px"}}]]]],
+   :raw-custom-override-1109980935 "(returns nil value)",
    :raw-custom-override-579076168
    {:error
     {:error "This request has been blocked by our content filters.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override-1850607043
+   "total 415676\n-rw-rw-r--   1 ryanr ryanr      2470 Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr       792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr      4096 Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr   4341760 Jul  6 06:05 flow-history\ndrwxrwxr-x   2 ryanr ryanr   2138112 Jul  6 06:05 flow-logs\ndrwxrwxr-x   3 ryanr ryanr      4096 Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr   8870985 Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr   8771849 Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr     14372 Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr      4096 Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr      5765 Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr      2838 Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr     17261 Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr      4147 Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 380698624 Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr       752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr     64443 Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     31125 Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr     32129 Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr     30765 Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     14555 Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr      2592 Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr     69632 Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20103168 May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr      4096 Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr     12052 Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr     24576 Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr     20480 Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr       132 Jun 26 19:24 user.clj\ntop: failed tty get\n/home/ryanr/rvbbit/backend\n",
+   :get-my-colors-231051622
+   {:second-darkest "#34275d",
+    :highest-saturation "#0e3969",
+    :most-contrasting "#9c8c6c",
+    :darkest "#1b0a20",
+    :contrast-with-dominant "#9c8c6c",
+    :colors
+    ["#5d9cc3"
+     "#ec75a4"
+     "#db71c2"
+     "#9e3d8c"
+     "#402263"
+     "#1b0a20"
+     "#0e3969"
+     "#9c8c6c"
+     "#5c5584"
+     "#5b2d92"
+     "#34275d"],
+    :most-frequent "#9e3d8c",
+    :data-colors
+    {"float" "#a0e095",
+     "boolean" "#9c98bf",
+     "map" "#71db83",
+     "list" "#234889",
+     "string" "#cee0fc",
+     "any" "#caa52d",
+     "vector" "#5255ca",
+     "keyword" "#bbcdf3",
+     "rabbit-code" "#aa6f9a",
+     "datetime" "#7f4d2b",
+     "integer" "#75ecbe",
+     "unknown" "#720694",
+     "date" "#0a1e2c"},
+    :dominant "#34275d",
+    :most-contrasting-dark "#1b0a20",
+    :second-brightest "#db71c2",
+    :brightest "#ec75a4",
+    :most-contrasting-light "#9c8c6c"},
+   :raw-custom-override-582299511
+   "🐇🥕 Sup! In ternal RdVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override-1375974037
    [:v-box
     :padding
@@ -2219,11 +2848,95 @@
       [:img
        {:src "./images/gen/b64-image3-82235-63107.png",
         :style {:border-radius "30px"}}]]]],
+   :raw-custom-override1395867983 "(returns nil value)",
    :raw-custom-override596631388 nil,
+   :raw-custom-override-1609576239 24,
+   :raw-custom-override1171974617
+   [:v-box
+    :size
+    "auto"
+    :align
+    :center
+    :justify
+    :center
+    :gap
+    "4px"
+    :style
+    {:color "#379fb5"}
+    :children
+    [[:h2 "Chuck's Wisdom of the Day"]
+     [:p
+      "Chuck Norris once roundhouse kicked a black person so hard he turned white"]
+     [:img
+      {:src "https://placekitten.com/200/200",
+       :width "200px",
+       :height "200px",
+       :style {:border-radius "15px"},
+       :alt "A cute bunny (actually a kitten)"}]]],
+   :get-my-colors760918022
+   {:second-darkest "#34275d",
+    :highest-saturation "#0e3969",
+    :most-contrasting "#9c8c6c",
+    :darkest "#1b0a20",
+    :contrast-with-dominant "#9c8c6c",
+    :colors
+    ["#5d9cc3"
+     "#ec75a4"
+     "#db71c2"
+     "#9e3d8c"
+     "#402263"
+     "#1b0a20"
+     "#0e3969"
+     "#9c8c6c"
+     "#5c5584"
+     "#5b2d92"
+     "#34275d"],
+    :most-frequent "#9e3d8c",
+    :data-colors
+    {"float" "#a0e095",
+     "boolean" "#9c98bf",
+     "map" "#71db83",
+     "list" "#234889",
+     "string" "#cee0fc",
+     "any" "#caa52d",
+     "vector" "#5255ca",
+     "keyword" "#bbcdf3",
+     "rabbit-code" "#aa6f9a",
+     "datetime" "#7f4d2b",
+     "integer" "#75ecbe",
+     "unknown" "#720694",
+     "date" "#0a1e2c"},
+    :dominant "#34275d",
+    :most-contrasting-dark "#1b0a20",
+    :second-brightest "#db71c2",
+    :brightest "#ec75a4",
+    :most-contrasting-light "#9c8c6c"},
    :raw-custom-override-1535991406
    {:error
     {:error "This request has been blocked by our content filters.",
      :class "class clojure.lang.ExceptionInfo"},
-    :class "class clojure.lang.ExceptionInfo"}}},
- :selected-flow "live-scratch-flow",
- :post-condi {:c345-up-or-down? [{:v 0}]}}
+    :class "class clojure.lang.ExceptionInfo"},
+   :raw-custom-override-1066877553 "(returns nil value)",
+   :raw-custom-override1285017570
+   [:v-box
+    :size
+    "auto"
+    :align
+    :center
+    :justify
+    :center
+    :gap
+    "4px"
+    :style
+    {:color "#379fb5"}
+    :children
+    [[:h2 "Chuck's Wisdom of the Day"]
+     [:p
+      "Fanboys such as Genwunners are made when Chuck Norris is hungry for the exact part of the brain that accepts opinions."]
+     [:img
+      {:src "https://placekitten.com/200/200",
+       :width "200px",
+       :height "200px",
+       :style {:border-radius "15px"},
+       :alt "A cute bunny (actually a kitten)"}]]]}},
+ :selected-flow "live-scratch-flow"}

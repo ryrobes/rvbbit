@@ -33,7 +33,15 @@
    :sys_load
    :ts],
   :large-bgss [:ffilename],
+  :tmp-52163580-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :shows (:query_error),
+  :tmp-357800983-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp--869311677-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
+  :tmp--230130987-hist-sys
+  [:client_name :data :diff :diff_kp :key :kp :panel_key :pre_data :type :updated],
   :tour-name-drag-11 [:tour_name :rowcnt],
   :flow-fn-categories-sys [:category],
   :shows-drag-22 [:location :show_date :show_id :show_name :title :tour_name :ts],
@@ -41,6 +49,19 @@
   :connections-sys [:database_name :connection_id],
   :reco-counts [:table_name :cnt],
   :setlists (:query_error),
+  :kit-results-sys
+  [:id
+   :item_hash
+   :item_name
+   :kit_name
+   :item_type
+   :item_key
+   :item_idx
+   :item_options
+   :item_data
+   :client_name
+   :flow_id
+   :updated],
   :flow-fn-all-sys [:name]},
  :reco-preview "-1489866873",
  :flow? false,
@@ -472,6 +493,7 @@
       "vap32.png" 1},
      :cardinality 100}},
    :rowcount 200},
+  :tmp-52163580-hist-sys {:fields {}, :rowcount 0},
   :shows
   {:fields
    {:query_error
@@ -483,6 +505,7 @@
       "[SQLITE_ERROR] SQL error or missing database (no such table: shows)" 1},
      :cardinality 100}},
    :rowcount 2},
+  :tmp-357800983-hist-sys {:fields {}, :rowcount 0},
   :offenses-drag-24
   {:fields
    {:SHOOTING
@@ -598,6 +621,8 @@
       "2018-09-01 17:03:00.000000" 5},
      :cardinality 80}},
    :rowcount 500},
+  :tmp--869311677-hist-sys {:fields {}, :rowcount 0},
+  :tmp--230130987-hist-sys {:fields {}, :rowcount 0},
   :rowcnt-drag-2
   {:fields
    {:rowcnt_sum
@@ -962,21 +987,7 @@
      :commons {27 35, 26 24, 29 23},
      :cardinality 23}},
    :rowcount 500},
-  :reco-counts
-  {:fields
-   {:table_name
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"setlists_drag_2" 1},
-     :cardinality 100},
-    :cnt
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? false,
-     :commons {82 1},
-     :cardinality 100}},
-   :rowcount 1},
+  :reco-counts {:fields {}, :rowcount 0},
   :state-drag-3
   {:fields
    {:state
@@ -1018,6 +1029,7 @@
       "[SQLITE_ERROR] SQL error or missing database (no such table: setlists)" 1},
      :cardinality 100}},
    :rowcount 2},
+  :kit-results-sys {:fields {}, :rowcount 0},
   :flow-fn-all-sys
   {:fields
    {:name
@@ -1032,12 +1044,12 @@
   :block-8963 {:shows-drag-22 108},
   :block-6308 {:tour-name-drag-11 180},
   :block-2361 {:large-bgss 311},
-  :system-connections-list* {:connections-sys 186},
-  :system-tables-list* {:tables-sys 187},
-  :system-fields-list* {:fields-sys 237},
+  :system-connections-list* {:connections-sys 215},
+  :system-tables-list* {:tables-sys 213},
+  :system-fields-list* {:fields-sys 270},
   :virtual-panel {:kick--1764769189 152}},
  :runstream-drops nil,
- :data-hash 1632755138,
+ :data-hash -639189675,
  :tabs
  ["through the rabbit hole and out the other side"
   "sapphire ape"
@@ -1279,7 +1291,7 @@
  :runstreams {},
  :editor? false,
  :buffy? false,
- :memory [805127348 776812916 4294705152],
+ :memory [750566478 702308102 4294705152],
  :flow-subs
  [:solver-meta/raw-custom-override-1610584445>extra
   :solver-status/*client-name*>raw-custom-override-1610584445>running?
@@ -1339,16 +1351,16 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   53272
+   133395
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries {:setlists 1669794951, :shows 89957543, :jvm_stats 1498154063},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 508665050,
+ :user-params-hash -420905282,
  :grid-recos? true,
  :preview-keys2 [],
- :session-hash -922509912,
+ :session-hash -613209913,
  :resolved-queries
  {:setlists-drag-2
   {:select [:show_id :song_name :song_order :ts],
@@ -2467,7 +2479,7 @@
   {:h 7,
    :w 10,
    :tab "azure oyster",
-   :root [20 21],
+   :root [15 22],
    :name "block-3777",
    :views
    {:pulled-val
@@ -2797,7 +2809,7 @@
      :from [[:offenses :dd484]]}},
    :root [25 20],
    :tab "globular koala"}},
- :selected-block "none!",
+ :selected-block :block-2769,
  :theme-colors-hashmap
  {"float" "#d8bfbf",
   "boolean" "#d1b4b4",
@@ -2846,7 +2858,7 @@
    :queries 11,
    :ts "2024-07-03 09:31:06"},
   :time
-  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 14, :hour 0},
+  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 30, :hour 22},
   :user-dropdown-sys {:req-field nil, :shape nil},
   :searches-types-sys {:item_type "saved-views"},
   :large-bgss {:ffilename "b64-image3-27981-85558-4k.webp"},
@@ -2895,7 +2907,7 @@
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :rel-image-path [:string3 "images/large/" :large-bgss/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-5503,
+   :selected-block :block-2769,
    :glass-fish-style
    {:background-color [:string3 :param/generated-colors>darkest 73],
     :border-radius "16px",
@@ -3705,7 +3717,7 @@
     :child
     "🐇🥕 Sup! Internal RVBBIT nREPL!!. Clojure 1.11.1 on 17.0.11 JVM tech!!! 🥕🐇"],
    :raw-custom-override-1610584445>howdy-str
-   "🐇🥕 Sup!0:14 Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   "🐇🥕 Sup!22:30 Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override-1736866437
    {:error
     {:error
@@ -3953,8 +3965,8 @@
     :class "class clojure.lang.ExceptionInfo"},
    :raw-custom-override-1610584445
    {:howdy-str
-    "🐇🥕 Sup!0:14 Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
-    :min 14,
+    "🐇🥕 Sup!22:30 Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+    :min 30,
     :jvm-version "17.0.11",
     :clojure-version "1.11.1"},
    :raw-custom-override596631388 nil,

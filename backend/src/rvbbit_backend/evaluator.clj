@@ -24,6 +24,7 @@
 
 (def repl-introspection-atom (ut/thaw-atom {} "./data/atoms/repl-introspection-atom.edn"))
 (defonce repl-introspection-child-atoms (atom {}))
+;(def repl-client-namespaces-map (atom {}))
 
 (defn logger [name edn]
   (let [dir         (str "./logs/" (str (java.time.LocalDate/now)) "/")
@@ -110,7 +111,6 @@
     (catch Throwable e {:introspection-error (str e)
                         :introspected (ut/millis-to-date-string (System/currentTimeMillis))})))
 
-
 (defn update-namespace-state-async [host port client-name id code ns-str]
   (future
     (try
@@ -127,8 +127,7 @@
       (catch Exception e
         (ut/pp [:repl "Error during async introspection:" (ex-message e)])))))
 
-(defn create-nrepl-server!
-  []
+(defn create-nrepl-server! []
   (ut/pp [:starting-local-nrepl :port repl-port])
   (reset! repl-server (nrepl-server/start-server :port repl-port :bind "127.0.0.1")))
 
@@ -153,7 +152,7 @@
                                                                                         :port ext-repl-port}
                                    (and (not (nil? repl-host)) (not (nil? repl-port))) {:host repl-host ;; override repl
                                                                                         :port repl-port}
-                                   custom-nrepl?                                       (first
+                                   custom-nrepl?                                       (first ;; parse out conn deets, old data-rabbit fn
                                                                                         (remove nil?
                                                                                                 (for [l (cstr/split s #"\n")]
                                                                                                   (when (cstr/includes?
@@ -169,7 +168,7 @@
         (if (not nrepl?) ;; never going to happen here TODO: remove? straight eval...
           (let [eval-output  (try (if (string? code) (load-string s) (eval code))
                                   (catch Exception e {:server-eval-error [] :error (ex-message e) :data (ex-data e)}))
-                output-type  (type eval-output)
+                output-type  (type eval-output) ;;; old data-rabbit code, will revisit
                 eval-output0 (cond (or (cstr/starts-with? (str output-type) "class tech.v3.dataset.impl")
                                        (cstr/starts-with? (str output-type) "class clojure.lang.Var"))
                                    [:pre (str eval-output)]
@@ -181,15 +180,24 @@
            [e (try
                 (with-open [conn (nrepl/connect :host nrepl-host :port nrepl-port)]
                   (let [user-fn-str   (slurp "./user.clj")
-                        gen-ns        (str "repl-" (-> (ut/keypath-munger [client-name "." id])
-                                                       (cstr/replace  "_" "-")
-                                                       (cstr/replace  "--" "-")))
-                        user-fn-str (if (not (cstr/includes? (str s) "(ns "))
+                        ;gen-ns        (str "repl-" (-> (ut/keypath-munger [client-name "." id])
+                        ;                               (cstr/replace  "_" "-")
+                        ;                               (cstr/replace  "--" "-")))
+                        gen-ns        (cstr/replace
+                                       (str "repl-" (str client-name) "-"
+                                            (if (vector? id)
+                                              (-> (ut/keypath-munger id)
+                                                  (cstr/replace  "_" "-")
+                                                  (cstr/replace  "--" "-"))
+                                              (-> (str id)
+                                                  (cstr/replace  "_" "-")
+                                                  (cstr/replace  "--" "-")))) ":" "")
+                        user-fn-str   (if (not (cstr/includes? (str s) "(ns "))
                                       (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
                         s             (str user-fn-str "\n" s)
                         skt           (nrepl/client conn 60000)
                         msg           (nrepl/message skt {:op "eval" :code s})
-                        rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var")) ;; no
+                        rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
                                                    (nrepl/response-values msg)))
                         rsp           (nrepl/combine-responses msg)
                         msg-out       (vec (remove nil? (for [m msg] (get m :out))))
@@ -198,10 +206,18 @@
                                        (-> rsp
                                            (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
                                            (assoc :value merged-values) ;; ?
-                                           (assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join msg-out)) #"\n")))
+                                           ;(assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join msg-out)) #"\n")))
+                                           (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
                                            (dissoc :id)
                                            (dissoc :session))}
                         ns-str (get-in output [:evald-result :ns] "user")]
+                    
+                    (swap! repl-introspection-atom assoc-in [:repl-client-namespaces-map client-name] 
+                           (vec (distinct (conj (get-in @repl-introspection-atom [:repl-client-namespaces-map client-name] []) ns-str))))
+                    
+                    ;;; :repl-ns/repl-client-namespaces-map>*client-name*
+
+                    ;;(swap! repl-client-namespaces-map update-in [client-name] (fnil conj #{}) gen-ns)
 
                     (update-namespace-state-async nrepl-host nrepl-port client-name id code ns-str)
 

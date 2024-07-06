@@ -197,10 +197,6 @@
                               :client-name client-name}]))
                          db))
 
-
-
-
-
 (defn update-context-boxes
   [result task-id ms reco-count]
   (when (and ;(= (first (get result :ui-keypath)) :reeco-status)
@@ -209,6 +205,7 @@
     (swap! db/context-box assoc
       (last (get result :ui-keypath))
       (str "shapes: found " (ut/nf reco-count) " viz suggestions in ~" ms " secs")))
+  
   (when (and (= task-id :outliers) ;;(not (= task-id :reco))
              (= (get result :status) :done))
     (swap! db/context-box assoc

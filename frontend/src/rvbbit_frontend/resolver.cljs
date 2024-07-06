@@ -147,8 +147,16 @@
                                     ;;  _ (when lets-go?
                                     ;;      (ut/tapp>> [:run-solver-req-map-resolver! override? (str (first this)) lets-go? (not run?) req-map
                                     ;;                  @db/solver-fn-runs]))
-                                     _ (when lets-go? (ut/tracked-dispatch [::wfx/push :default req-map]))
                                      _ (when lets-go?
+                                         (ut/tracked-dispatch [::wfx/push :default req-map])
+                                         (swap! db/solver-fn-lookup assoc fkp sub-param)
+                                         ;(ut/tracked-dispatch [::conn/update-solver-fn-lookup fkp sub-param])
+                                         (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)
+                                         ;(ut/tracked-dispatch [::conn/update-solver-fn-runs [panel-key sub-param] unique-resolved-map])
+                                         )
+                                     _ (when (and lets-go?
+                                                  (not (some #(= % :time/now-seconds) clover-kps))
+                                                  (not (some #(= % :time/second) clover-kps)))
                                          (ut/dispatch-delay 100 [::http/insert-alert [:v-box :children [[:box :child "solver running (via resolver)"]
                                                                                                         [:box :child (str fkp)
                                                                                                          :style {:font-size "12px"}]
@@ -156,10 +164,7 @@
                                                                                                          :style {:font-size "9px"}]
                                                                                                         [:box :child (str (.toLocaleString (js/Date.)))
                                                                                                          :style {:font-size "8px" :opacity 0.6}]]] 8 1.7 3])
-                                         (swap! db/solver-fn-lookup assoc fkp sub-param)
-                                         ;(ut/tracked-dispatch [::conn/update-solver-fn-lookup fkp sub-param])
-                                         (swap! db/solver-fn-runs assoc-in [panel-key sub-param] unique-resolved-map)
-                                         ;(ut/tracked-dispatch [::conn/update-solver-fn-runs [panel-key sub-param] unique-resolved-map])
+
                                          )]
                                  {v sub-param})))]
               (walk/postwalk-replace logic-kps obody)))

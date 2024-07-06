@@ -19,6 +19,7 @@
 		"@nivo/treemap": "^0.83.0",
 		"@nivo/waffle": "^0.83.0",
 		"@types/mapbox-gl": "^2.7.19",
+		"ansi-to-html": "^0.7.2",
 		"blob-util": "^2.0.2",
 		"codemirror": "^5.65.16",
 		"create-react-class": "^15.7.0",
@@ -38,6 +39,6 @@
 		"vega-lite": "^5.6.0"
 	},
 	"devDependencies": {
-		"shadow-cljs": "2.25.5"
+		"shadow-cljs": "2.20.5"
 	}
 }

@@ -180,7 +180,7 @@
           :values  (distinct (sort ["VikingNormal" "WolfpackHalloweed" "Roboto" "Roboto Condensed" "Ubuntu" "Alata" "Oxygen Mono"
                                     "Lato" "Poppins" "Montserrat" "Open Sans" "Victor Mono" "Sudo Var" "Overpass Mono" "ZT Gatha"
                                     "Instagram Sans Condensed" "Instagram Sans" "Nova Square" "Noto Sans Linear A" "Nova Mono"
-                                    "Share Tech Mono" "Oswald" "Raleway" "Homemade Apple" "Kulim Park" "JetBrains Mono"
+                                    "Share Tech Mono" "Oswald" "Raleway" "Homemade Apple" "Kulim Park" "JetBrains Mono"  "DejaVu Sans Mono for Powerline"
                                     "IBM Plex Mono" "Roboto Slab" "Source Code Pro" "Pastor of Muppets" "Odor Mean Chey"
                                     "Pastor of Muppets Flipped" "Roboto Condensed" "Fira Sans" "Fira Code" "Sono" "Chivo Mono"]))}
        [[:codemirror-theme]]

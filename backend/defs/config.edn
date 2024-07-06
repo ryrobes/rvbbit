@@ -11,29 +11,37 @@
  :default "./screens/looking-glass-redux.edn"
  ;; ^^ if no screen given in URL, load this one. "start page" essentially.
  :harvest-on-boot? true
- ;; see clover-templates.edn, for the full clover defs mentioned here
- :modes {:text [:pre 
-                {:style {:color :theme/editor-outer-rim-color
-                         :background-color "#00000000"
-                         :border "none"
-                         :text-shadow "4px 4px 4px #00000088"
-                         :font-size "17px"
-                         :font-family :theme/monospaced-font}}
-                [:string3 :*data]]
-         :data  [:data-viewer :*data]
-         :pretty [:pretty-box :*data]
-         :rowset [:honeycomb {:select [:*] :from {:data :*data}} 11 9] ;; this is slow and funky. revisit?
-         :clover [:box :child :*data]}
+ ;; ^^ do a full database sniff for each connection on boot (will be staggered and scheduled in the future)
+ :modes {:pre       [:pre
+                     {:style {:color :theme/editor-outer-rim-color
+                              :background-color "#00000000"
+                              :border "none"
+                              :text-shadow "4px 4px 4px #00000088"
+                              :font-size "17px"
+                              :font-family :theme/monospaced-font}}
+                     [:string3 :*data]]
+         :text      [:console :*data]
+         :terminal  [:terminal :*data]
+         :data      [:data-viewer :*data]
+         :pretty    [:pretty-box :*data]
+         :rowset    [:honeycomb {:select [:*] :from {:data :*data}} 11 9] ;; this is slow and funky. revisit?
+         :clover    [:box :child :*data]}
+  ;; ^^ see clover-templates.edn, for the full clover defs mentioned here
  :runners {:queries {:default {}
                      :modes [:rowset]
+                     :hop-bar? false
                      :icon "images/sql.png"} ;; basic clover-sql query runner
+
            :views   {:default []
                      :modes [:clover]
-                     :icon "images/clover.png"} ;; basic clover render
+                     :description "Evaluate a Clover experssion - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
+                     :icon "🍀"} ;; basic clover render
+
            ;; ^ these 2 are built in a required and mostly not configurable for now
            :clojure-intro {:type :nrepl ;; this is the built-in REPL that starts by default
                            :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
-                           :modes [:clover :text :data :rowset]
+                           :modes [:clover :text :data :rowset :terminal]
+                           :hop-function? true
                            :default (do
                                       (ns hoppy.chuck-norris
                                         (:require [clojure.data.json :as json]
@@ -47,17 +55,19 @@
                                             (json/read (java.io.PushbackReader. reader) :key-fn keyword))))
 
                                       (defn joke-to-hiccup [joke]
-                                        [:v-box 
-                                         :size "auto" :align :center :justify :center 
+                                        [:v-box
+                                         :size "auto" :align :center :justify :center
                                          :gap "4px"
                                          :style {:color :theme/editor-outer-rim-color}
                                          :children [[:h2 "Chuck's Wisdom of the Day"]
-                                         [:p (:value joke)]
-                                         [:img {:src "https://placekitten.com/200/200" 
-                                                :width "200px" :height "200px" :style {:border-radius "15px"}
-                                                :alt "A cute bunny (actually a kitten)"}]]])
+                                                    [:p (:value joke)]
+                                                    [:img {:src "https://placekitten.com/200/200"
+                                                           :width "200px" :height "200px" :style {:border-radius "15px"}
+                                                           :alt "A cute bunny (actually a kitten)"}]]])
 
                                       (def joke (fetch-chuck-norris-joke))
+
+                                      (def inputs (pr-str :clover-body))
 
                                       (def hiccup (joke-to-hiccup joke))
 
@@ -65,16 +75,10 @@
                                       hiccup)
                            :syntax "clojure"
                            :placeholder-clover [:v-box
-                                                :children [;[:box :child [:string3 :*solver-name* " running..."]]
-                                                           [:img {:src "images/running.gif"
-                                                                       ;:width "70px" 
-                                                                       ;:height "70px"
-                                                                  }]]
+                                                :children [[:img {:src "images/running.gif"}]]
                                                 :size "auto"
                                                 :style {:color :theme/universal-pop-color
-                                                             ;:border "1px solid white"
                                                         :font-size "14px"}
-                                                     ;:width  :panel-width-px
                                                 :height :panel-height+50-px
                                                 :align :center :justify :center]
                            :clover-fn [:run-solver
@@ -83,11 +87,12 @@
                                         :type :clojure
                                         :input-map {}
                                         :data :clover-body}]
-                                ;:default-view [:box :child [:string :*query-id]]
-                           :icon "images/clj.png"}
+                           :description "Demo: Fetch a random Chuck Norris joke from the chucknorris.io API and display it with a cute kitten image."
+                           :icon "images/chuck.png"}
+
            :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
                      :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
-                     :modes [:clover :text :data :rowset]
+                     :modes [:text :clover :data :rowset :terminal]
                      :default (let [clojure-version (clojure-version)
                                     jvm-version (System/getProperty
                                                  "java.version")]
@@ -116,34 +121,45 @@
                                   :type :clojure
                                   :input-map {}
                                   :data :clover-body}]
-                     ;:default-view [:box :child [:string :*query-id]]
-                     :icon "images/clj.png"}
-           :bash {:type :nrepl ;; this is the built-in REPL that starts by default
-                  :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
-                  :modes [:text :data]
-                  :default "ls -l"
-                  :syntax "shell"
-                  :clover-fn [:run-solver
-                              {:signal false
-                               :cache? false
-                               :type :clojure
-                               :input-map {}
-                               :data (let [process (.exec (Runtime/getRuntime)
-                                                          :clover-body)
-                                           reader (java.io.BufferedReader.
-                                                   (java.io.InputStreamReader.
-                                                    (.getInputStream process)))
-                                           output (StringBuilder.)]
-                                       (loop [line (.readLine reader)]
-                                         (when line
-                                           (.append output line)
-                                           (.append output "\n")
-                                           (recur (.readLine reader))))
-                                       (str output))}]
-                  :icon "images/bash.png"}
+                     :description "Run a Clojure expression and return the result. Uses the internal RVBBIT nREPL, has access to all rvbbit-backend.* namespaces."
+                     :icon "images/clojure-alt.svg"}
+           :shell {:type :nrepl ;; this is the built-in REPL that starts by default
+                   :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
+                   :modes [:text :data :terminal]
+                   :default "ls -l ; top -n 1  ; pwd" ;; "ls -l"
+                   :syntax "shell"
+                   ;:hop-function? true
+                   :clover-fn [:run-solver
+                               {:signal false
+                                :cache? false
+                                :type :clojure
+                                :input-map {}
+                                :data (let [command (str :clover-body)
+                                            process-builder (ProcessBuilder. (into-array ["sh" "-c" command]))
+                                            _ (.redirectErrorStream process-builder true)  ; Merge stderr into stdout
+                                            process (.start process-builder)
+                                            reader (java.io.BufferedReader.
+                                                    (java.io.InputStreamReader.
+                                                     (.getInputStream process)))
+                                            output (StringBuilder.)]
+                                      
+                                        (loop []
+                                          (when-let [line (.readLine reader)]
+                                            (.append output line)
+                                            (.append output "\n")
+                                            (recur)))
+                                      
+                                        (.waitFor process)
+                                      
+                                        (let [result (str output)]
+                                          (if (empty? result)
+                                            "Command executed, but produced no output."
+                                            result)))}]
+                   :description "Run a shell (in your default shell) command (from the ./shell-root/ dir) & return the output. Warning: executes with permissions of RVBBIT server user."
+                   :icon "images/snail-shell.svg"}
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
-                      :modes [:clover :text :data :rowset]
+                      :modes [:text :clover :data :rowset :terminal]
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
                                                   "java.version")]
@@ -158,12 +174,13 @@
                                     :type :clojure2
                                     :input-map {}
                                     :data :clover-body}]
-                      ;:default-view [:box :child [:string :*query-id]]
-                      :icon "images/clj.png"}
+                      :description "Run a Clojure expression and return the result. Uses an external nREPL server."
+                      :icon "images/clojure_2.svg"}
            :create-image {:runner {}
                           :modes [:clover :data :text]
                           :type :flow
                           :syntax "text"
+                          :description "Create an image with OpenAI's DALLE-3 HTTP endpoint. Uses the 'openai-image-gen-ladder3' flowmap, and returns the :hiccup-image-box-w-png step value."
                           :placeholder-on-running? true
                           :clover-fn [:run-solver
                                       {:signal false
@@ -178,10 +195,9 @@
                                           :clover-body}}
                                         :return :hiccup-image-box-w-png}}]
                           :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene. There is a beautiful full-figured woman standing in the field, she looks upon you with kind eyes and beckons you closer."
-                          ;:default-view [:box :child [:img {:src :*query-id}]]
-                          :icon "images/dalle.png"}
+                          :icon ["images/openai.png" "images/dalle3.png"]}
            :python3 {:runner {}
-                     :modes [:text :data :rowset :clover]
+                     :modes [:text :data :rowset :clover :terminal]
                      :type :flow
                      :syntax "python"
                      :placeholder-on-running? true
@@ -219,8 +235,8 @@
                                ""
                                "if __name__ == \"__main__\":"
                                "    main()"]
-                     ;:default-view [:box :child [:string :*query-id]]
-                     :icon "images/python3.png"}}
+                     :description "Run a Python script and return the output. Uses the 'simple-python-exec' flowmap. Experimental!"
+                     :icon "images/python.svg"}}
  :eleven-labs-api-key nil
  ;:eleven-labs-default-voice-name "Belle- feminine, beautiful, emotive" ;;  "Alicia Speaks-Unique and Pleasant"  ;; "Sofia-AI-frye" ;; "Taylor - Cute - Gentle" ;; "Sofia-AI-frye" ;; "Not OG Buffy"
  ;:eleven-labs-default-voice-name "Alicia Speaks-Unique and Pleasant"

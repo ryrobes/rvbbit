@@ -130,6 +130,13 @@
 
 (def pool-stats-atom  (atom {})) ;; (ut/thaw-atom {} "./data/atoms/pool-stats-atom.edn"))
 
+(def times-atom (ut/thaw-atom {} "./data/atoms/times-atom.edn"))
+(def params-atom (ut/thaw-atom {} "./data/atoms/params-atom.edn"))
+(def atoms-and-watchers (atom {}))
+
+(def last-values (ut/thaw-atom {} "./data/atoms/last-values.edn"))
+(def last-values-per (ut/thaw-atom {} "./data/atoms/last-values-per.edn"))
+
 ;; (def time-atom-1 (atom {}))
 ;; (def time-atom-2 (atom {}))
 ;; (def time-atom-3 (atom {}))
@@ -274,66 +281,53 @@
     @p))  ; Dereference the promise to return the result or propagate the exception
 
 
-(defn- compare-states [old-state new-state path-acc]
-  (cond
-    ; If states are equal, no changes
-    (= old-state new-state) []
-    ; If both are maps, compare recursively
-    (and (map? old-state) (map? new-state))
-    (reduce-kv (fn [acc k v]
-                 (let [new-v (get new-state k)
-                       new-path (conj path-acc k)]
-                   (concat acc (compare-states v new-v new-path))))
-               [] (into (keys old-state) (keys new-state)))
-    ; Otherwise, return the path to the changed value
-    :else [path-acc]))
-
 (declare break-up-flow-key-ext)
-
-(defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
-  (fn [key ref old-state new-state]
-;; test, dont bother taking the next step if nothing changed...? less thrash, does shit still work?
-    (when (not= old-state new-state)
-     (when (let [[added removed _] (clojure.data/diff old-state new-state)
-                 akp (ut/keypaths added)
-                 rkp (ut/keypaths removed)
-                 changed-kp (vec (distinct (into akp rkp)))]
-                ;(when (ut/ne? (flatten changed-kp)) 
-                ;  (ut/pp [:w+ client-name base-type key flow-key (break-up-flow-key-ext flow-key) changed-kp]))
-             (ut/ne? (flatten changed-kp)))
-       (execute-in-thread-pools (keyword (str (if client-name 
-                                                "subscriptions/"
-                                                "watchers/") (cstr/replace (str base-type) ":" "")
-                                              ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
-                                              (when client-name ".*")))
-                                (fn []
-                                  (try
-                                    (watcher-fn key ref old-state new-state)
-                                    (catch Exception e
-                                      (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
-                                      (throw e)))))))))
 
 ;; (defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
 ;;   (fn [key ref old-state new-state]
+;; ;; test, dont bother taking the next step if nothing changed...? less thrash, does shit still work?
 ;;     (when (not= old-state new-state)
-;;       (let [diff (clojure.data/diff old-state new-state)
-;;             changed-kp (into #{} (comp (take 2)
-;;                                        (remove nil?)
-;;                                        (mapcat ut/keypaths)
-;;                                        (distinct))
-;;                              diff)]
-;;         (when (seq changed-kp)
-;;           (execute-in-thread-pools
-;;            (keyword (str "watchers/"
-;;                          (cstr/replace (str base-type) ":" "")
-;;                          (when client-name
-;;                            (str "." (cstr/replace (str client-name) ":" "")))))
-;;            (fn []
-;;              (try
-;;                (watcher-fn key ref old-state new-state)
-;;                (catch Exception e
-;;                  (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
-;;                  (throw e))))))))))
+;;      (when (let [[added removed _] (clojure.data/diff old-state new-state)
+;;                  akp (ut/keypaths added)
+;;                  rkp (ut/keypaths removed)
+;;                  changed-kp (vec (distinct (into akp rkp)))]
+;;                 ;(when (ut/ne? (flatten changed-kp)) 
+;;                 ;  (ut/pp [:w+ client-name base-type key flow-key (break-up-flow-key-ext flow-key) changed-kp]))
+;;              (ut/ne? (flatten changed-kp)))
+;;        (execute-in-thread-pools (keyword (str (if client-name 
+;;                                                 "subscriptions/"
+;;                                                 "watchers/") (cstr/replace (str base-type) ":" "")
+;;                                               ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
+;;                                               (when client-name ".*")))
+;;                                 (fn []
+;;                                   (try
+;;                                     (watcher-fn key ref old-state new-state)
+;;                                     (catch Exception e
+;;                                       (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
+;;                                       (throw e)))))))))
+
+(defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
+  (fn [key ref old-state new-state]
+    (when (not= old-state new-state)
+      (let [diff (clojure.data/diff old-state new-state)
+            changed-kp (into #{} (comp (take 2)
+                                       (remove nil?)
+                                       (mapcat ut/keypaths)
+                                       (distinct))
+                             diff)]
+        (when (seq changed-kp)
+          (execute-in-thread-pools
+           (keyword (str (if client-name
+                           "subscriptions/"
+                           "watchers/") (cstr/replace (str base-type) ":" "")
+                            ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
+                         (when client-name ".*")))
+           (fn []
+             (try
+               (watcher-fn key ref old-state new-state)
+               (catch Exception e
+                 (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
+                 (throw e))))))))))
 
 
 (defn add-watch+ [atom key watcher-fn base-type  & [client-name flow-key]]
@@ -342,6 +336,10 @@
         ;                          (cstr/replace (str client-name) ":" "")))
         ;            ;;(keyword (str "client/" (cstr/replace (str client-name) ":" ""))) ;client-name
         ;            base-type)
+        ;; all-clients-subbed (for [c     (keys @atoms-and-watchers)
+        ;;                                         :when (some #(= % flow-key) (keys (get @atoms-and-watchers c)))]
+        ;;                                     c)
+        ;; _(ut/pp [:rvbbit-watching flow-key :for (count all-clients-subbed) :client-subs ])
         base-type (if (and (cstr/includes? (str flow-key) ">*") (= base-type :flow)) :flow-status base-type)
         wrapped-watcher (wrap-custom-watcher-pool watcher-fn base-type client-name flow-key)]
     (add-watch atom key wrapped-watcher)))
@@ -1027,8 +1025,7 @@
 
 (defn insert-rowset-csv ;; [rowset query & columns-vec]
   "takes a 'rowset' (vector of uniform maps) or a vector with a vector of column names
-   - inserts it into an in memory SQL db, executes a SQL query on it
-   (via a honey-sql map) and returns it"
+   - inserts it into an in memory SQL db, executes a SQL query on it (via a honey-sql map) and returns it"
   [rowset table-name client-name op-name & columns-vec]
   (ut/pp [:importing-csv-to-sql table-name])
   (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
@@ -1104,7 +1101,7 @@
            (write-transit-data rowset-fixed keypath client-name table-name-str)
            (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
            (sql-exec db-conn ddl-str extra)
-           (doseq [batch (partition-all 100 rowset-fixed)
+           (doseq [batch (partition-all 10 rowset-fixed)
                    :let  [values     (vec (for [r batch] (vals r)))
                           insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
              (sql-exec db-conn insert-sql extra))
@@ -1141,8 +1138,8 @@
                           insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
              (sql-exec db-conn insert-sql extra))
            ;(enqueue-task5 
-           (qp/slot-queue :sql-meta client-name
-                          (fn [] ;; so our sniffer metadata picks up the new column
+           ;(qp/slot-queue :sql-meta client-name
+           ;               (fn [] ;; so our sniffer metadata picks up the new column
                             (cruiser/captured-sniff "cache.db"
                                                     db-conn
                                                     db-conn
@@ -1150,7 +1147,8 @@
                                                     (hash rowset-fixed)
                                                     [:= :table-name table-name]
                                                     true
-                                                    rowset-fixed)))
+                                                    rowset-fixed)
+             ;               ))
           ;;  (ut/pp [:SNAP-INSERTED-SUCCESS2! (count rowset) :into table-name-str])
            {:sql-cache-table table-name :rows (count rowset)})
          (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
@@ -1316,7 +1314,7 @@
 
 (def client-batches (atom {}))
 
-(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :tracker :alert1}) ;; to not skip old dupes
+(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :tracker :alert1}) ;; to not skip old dupes
 
 (defn sub-push-loop
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
@@ -1332,7 +1330,7 @@
                                         res))
                    items-by-task-id (group-by :task-id items)
                    latest-items     (mapv (fn [group] (if
-                                                       (contains? valid-groups (first group))
+                                                       false  ;(contains? valid-groups (first group))
                                                         group (last group)))
                                           (vals items-by-task-id))]
                (if (not-empty latest-items)
@@ -1353,10 +1351,10 @@
 
 (defn push-to-client
   [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
-  ;(qp/slot-queue :push-to-client client-name
+  ;(qp/serial-slot-queue :push-to-client client-name
   ;(enqueue-task-slot2 client-name 
   ;(execute-in-thread-pools (keyword (str "client/push-to-client." (cstr/replace (str client-name) ":" "")))
-  ;               (fn []
+                 ;(fn []
                    (try
                      (let [rr                0 ;(rand-int 3)
                            cq                (get client-queue-atoms rr)
@@ -1466,45 +1464,57 @@
 (def panel-history (agent nil))
 (set-error-mode! panel-history :continue)
 
-(defmethod wl/handle-request :current-panels
+(defmethod wl/handle-push :current-panels
   [{:keys [panels client-name resolved-panels]}] ;; TODO add these
-  (ext/write-panels client-name panels) ;; pushn to file system for beholder cascades
-  (swap! panels-atom assoc client-name resolved-panels) ;; save to master atom for reactions,
-  (let [;resolved-panels resolved-panels ;; remove _ keys? Panels panels ;; remove _ keys?
-        prev-hashes (hash-objects (get @last-panels client-name))
-        this-hashes (hash-objects panels)
-        diffy       (data/diff this-hashes prev-hashes)
-        diffy-kps   (vec (filter #(and (not (= (count %) 1)) (not (= (last %) :views)) (not (= (last %) :queries)))
-                                 (ut/kvpaths (first diffy))))
-        dd          (data-objects panels)
-        pdd         (data-objects (get @last-panels client-name))]
-    (send panel-history ;; shouldnt the whole thing be in an agent sync block? rapid updates
-          (fn [_]
-            (let [;dd (data-objects panels)
-                  rows          (vec (for [kp   diffy-kps
-                                           :let [data  (get-in dd kp)
-                                                 pdata (get-in pdd kp)
-                                                 pdiff (first (data/diff data pdata))]]
-                                       {:kp          (str kp)
-                                        :client_name (str client-name)
-                                        :data        (pr-str data)
-                                        :pre_data    (pr-str pdata)
-                                        :diff        (pr-str pdiff)
-                                        :diff_kp     (pr-str (ut/kvpaths pdiff))
-                                        :panel_key   (str (get kp 0))
-                                        :key         (str (get kp 2))
-                                        :type        (str (get kp 1))}))
-                  ins-sql       {:insert-into [:panel-history] :values rows}
-                  board-ins-sql {:insert-into [:board_history] :values [{:client_name (str client-name) :data (pr-str panels)}]}]
-              (sql-exec system-db (to-sql board-ins-sql))
-              (when (not (empty? rows)) (sql-exec system-db (to-sql ins-sql))))))
-    (swap! last-panels assoc client-name panels) ;; lastly update last
-    ))
+  
+  ;; (qp/serial-slot-queue
+  ;;  :panel-update-serial :serial
+  ;;  (ext/write-panels client-name panels)) ;; push to file system for beholder cascades
+
+  (ut/pp [:panels-push! client-name])
+
+  ;; (qp/serial-slot-queue ;;; disable for now
+  ;;  :panel-update-serial :serial
+  ;;  (fn []
+  ;;    (do
+  ;;      (swap! panels-atom assoc client-name resolved-panels) ;; save to master atom for reactions,
+  ;;      (let [;resolved-panels resolved-panels ;; remove _ keys? Panels panels ;; remove _ keys?
+  ;;            prev-hashes (hash-objects (get @last-panels client-name))
+  ;;            this-hashes (hash-objects panels)
+  ;;            diffy       (data/diff this-hashes prev-hashes)
+  ;;            diffy-kps   (vec (filter #(and (not (= (count %) 1)) (not (= (last %) :views)) (not (= (last %) :queries)))
+  ;;                                     (ut/kvpaths (first diffy))))
+  ;;            dd          (data-objects panels)
+  ;;            pdd         (data-objects (get @last-panels client-name))]
+  ;;   ;(send panel-history ;; shouldnt the whole thing be in an agent sync block? rapid updates
+
+  ;;        (let [;dd (data-objects panels)
+  ;;              rows          (vec (for [kp   diffy-kps
+  ;;                                       :let [data  (get-in dd kp)
+  ;;                                             pdata (get-in pdd kp)
+  ;;                                             pdiff (first (data/diff data pdata))]]
+  ;;                                   {:kp          (str kp)
+  ;;                                    :client_name (str client-name)
+  ;;                                    :data        (pr-str data)
+  ;;                                    :pre_data    (pr-str pdata)
+  ;;                                    :diff        (pr-str pdiff)
+  ;;                                    :diff_kp     (pr-str (ut/kvpaths pdiff))
+  ;;                                    :panel_key   (str (get kp 0))
+  ;;                                    :key         (str (get kp 2))
+  ;;                                    :type        (str (get kp 1))}))
+  ;;              ins-sql       {:insert-into [:panel-history] :values rows}
+  ;;              board-ins-sql {:insert-into [:board_history] :values [{:client_name (str client-name) :data (pr-str panels)}]}]
+  ;;          (sql-exec system-db (to-sql board-ins-sql))
+  ;;          (when (ut/ne? rows) (sql-exec system-db (to-sql ins-sql))))
+  ;;        (swap! last-panels assoc client-name panels)))))
+         )
 
 (defn run-shell-command
   "execute a generic shell command and return output as a map of timing and seq of str lines"
   [command]
-  (let [output                   (shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+  (let [shell                    (or (System/getenv "SHELL") "/bin/sh")
+        output                   (shell/sh shell "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+        ;;output                 (shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
         split-lines              (vec (remove empty? (cstr/split-lines (get output :out))))
         exit-code                (get output :exit)
         error                    (vec (remove empty? (cstr/split-lines (get output :err))))
@@ -1515,11 +1525,11 @@
                                         seconds      (edn/read-string (cstr/join "" (drop-last (get split-timing 1))))]
                                     (+ (* 60 minutes) seconds))
         timing-data              (if has-timing? (into [] (for [x error] (timing-values-to-seconds x))) [])]
-    {;;  :output [{:output split-lines
-     :output    split-lines
-     :exception error-data
-     :seconds   timing-data
-     :command   (str command)}))
+    {:output     split-lines
+     :exception  error-data
+     :seconds    timing-data
+     :exit-code  exit-code 
+     :command    (str command)}))
 
 (defn read-local-file
   [full-path]
@@ -1585,12 +1595,7 @@
   (ut/pp [:client client-name :just-booted])
   (package-settings-for-client))
 
-(def times-atom (ut/thaw-atom {} "./data/atoms/times-atom.edn"))
-(def params-atom (ut/thaw-atom {} "./data/atoms/params-atom.edn"))
-(def atoms-and-watchers (atom {}))
 
-(def last-values (ut/thaw-atom {} "./data/atoms/last-values.edn"))
-(def last-values-per (ut/thaw-atom {} "./data/atoms/last-values-per.edn"))
 
 (defmethod wl/handle-request :autocomplete
   [{:keys [client-name surrounding panel-key view]}]
@@ -2865,23 +2870,37 @@
 
 (defn make-watcher
   [keypath flow-key client-name handler-fn & [no-save]]
+  
   (fn [kkey atom old-state new-state]
-    (let [client-name        :all ;; test, no need for individual cache for clients. kinda
-          old-value          (get-in old-state keypath)
-          new-value          (get-in new-state keypath)
-          sub-path           (break-up-flow-key-ext flow-key)
-          base-type          (first sub-path)
-          last-value         (get-in @last-values-per [client-name keypath])
-          all-clients-subbed (for [c     (keys @atoms-and-watchers)
-                                   :when (some #(= % flow-key) (keys (get @atoms-and-watchers c)))]
-                               c)]
-      (when ;(or
-       (and (not (nil? new-value)) (not= old-value new-value))
-        (doseq [client-name all-clients-subbed] (handler-fn base-type keypath client-name new-value))
-        (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker
-          (swap! last-values assoc keypath new-value)
-          (swap! last-values-per assoc-in [client-name keypath] new-value)) ;; if a new client
-        ))))
+    (let [] ;[tt (str (rand-int 123123)"-"(rand-int 123123))]
+      ;(ut/pp [:make-watcher tt flow-key client-name])
+      (let [client-name        :all ;; test, no need for individual cache for clients. kinda
+            old-value          (get-in old-state keypath)
+            new-value          (get-in new-state keypath)
+            sub-path           (break-up-flow-key-ext flow-key)
+            base-type          (first sub-path)
+            last-value         (get-in @last-values-per [client-name keypath])
+            all-clients-subbed (for [c     (keys @atoms-and-watchers)
+                                     :when (some #(= % flow-key) (keys (get @atoms-and-watchers c)))]
+                                 c)]
+        (when ;(or
+         (and (not (nil? new-value)) (not= old-value new-value))
+          (doseq [client-name all-clients-subbed]
+
+            (qp/serial-slot-queue :watcher-to-client-serial client-name (fn []
+
+                                                                          (do (when (cstr/starts-with? (str flow-key) ":flow/")
+                                                                                (spit (str "./reaction-logs/" (str (cstr/replace (str client-name) ":" "")
+                                                       ;;"-" (-> flow-key str (cstr/replace ":" "") (cstr/replace "/" ""))
+                                                                                                                   )".log")
+                                                                                      (str [(ut/get-current-timestamp) client-name flow-key old-value new-value] "\n\n") :append true)
+                                                                                (ut/pp [:running-flow-push! flow-key client-name]))
+
+                                                                              (handler-fn base-type keypath client-name new-value))))
+            (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker
+              (swap! last-values assoc keypath new-value)
+              (swap! last-values-per assoc-in [client-name keypath] new-value)) ;; if a new client
+            ))))))
 
 ;; (defn get-time-atom-for-client
 ;;   [client-name]
@@ -3355,10 +3374,10 @@
     (let [solver-map            (if (ut/ne? override-map) override-map (get @solvers-atom solver-name))
           input-map             (get solver-map :input-map {})
           input-map             (if (ut/ne? override-input) (merge input-map override-input) input-map)
-          use-cache?            (true?
-                                 (or (true? (not (nil? temp-solver-name))) ;; temp test
-                                     (true? (get solver-map :cache? false))))
-          ;use-cache?            true
+          ;use-cache?            (true?
+          ;                       (or (true? (not (nil? temp-solver-name))) ;; temp test
+          ;                           (true? (get solver-map :cache? false))))
+          use-cache?            false
           vdata                 (walk/postwalk-replace input-map (get solver-map :data))
           vdata-clover-kps      (vec (filter #(and (keyword? %) ;; get any resolvable keys in the struct before we operate on
                                                               ;; it
@@ -3375,6 +3394,16 @@
                                                  (catch Exception e
                                                    (ut/pp [:clover-lookup-error kp e])
                                                    (str "clover-param-lookup-error " kp)))}))
+          
+          prev-times       (get @times-atom solver-name [-1])
+          ship-est         (fn [client-name]
+                             (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
+                                               (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
+                                    (when (not (nil? times))
+                                      (kick client-name [:estimate] {solver-name {:times times :run-id solver-name}} nil nil nil)))
+                                  (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
+          _ (ship-est client-name)
+
           vdata                 (if (ut/ne? vdata-clover-walk-map) (walk/postwalk-replace vdata-clover-walk-map vdata) vdata)
           runner-name           (get solver-map :type :clojure)
           runner-map            (get-in (config/settings) [:runners runner-name] {})
@@ -3469,7 +3498,7 @@
                    (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
             (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
             (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
-            (when use-cache?
+            (when (and use-cache? (not error?))
               (swap! solvers-cache-atom assoc cache-key [output output-full]))
             ;;;(swap! solvers-cache-atom assoc cache-key [output output-full])
             ;(swap! solvers-running assoc-in [client-name solver-name] false)
@@ -3501,9 +3530,10 @@
                                                     (execute-in-thread-pools-but-deliver
                                                      (keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
                                                      (fn []
-                                                       (evl/repl-eval vdata repl-host repl-port client-name solver-name))))
+                                                       (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
                    output-full                 result
                    output                      (last (get-in output-full [:evald-result :value]))
+                   output                      (if (nil? output) "(returns nil value)" output)
                    output-full                 (-> output-full
                                                    (assoc-in [:evald-result :output-lines]
                                                              (try (count (remove empty?
@@ -3520,7 +3550,10 @@
                                                         :runs           (get @last-solvers-history-counts-atom solver-name) ;; (count runs)
                                                         :error?         error?}}
                    timestamp-str               (str timestamp-str " (" elapsed-ms "ms)")
-                   new-history                 (vec (conj runs timestamp-str))]
+                   new-history                 (vec (conj runs timestamp-str))
+                   output                      (if error? 
+                                                 (select-keys (get output-full :evald-result) [:root-ex :ex :err]) 
+                                                 output)]
                (swap! last-solvers-atom assoc solver-name output)
                (swap! last-solvers-atom-meta assoc
                       solver-name
@@ -3528,7 +3561,7 @@
                (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
                (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
                ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
-               (when use-cache?
+               (when (and use-cache? (not error?))
                  (swap! solvers-cache-atom assoc cache-key [output output-full]))
                ;(swap! solver-status assoc-in [client-name solver-name :running?] false)
                ;(swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
@@ -3547,7 +3580,8 @@
                                 (assoc :time-running (ut/format-duration
                                                       (:started solver)
                                                       (System/currentTimeMillis))))))
-                   (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+                   (swap! last-solvers-atom-meta assoc solver-name {:error (str e)})
+                   (swap! last-solvers-atom assoc solver-name {:error (str e)}))))
 
         (= runner-type :flow) ;; no runner def needed for anon flow pulls
         (try
@@ -3567,6 +3601,7 @@
                 output-val                  (if return ;;(keyword? return)
                                               (get-in output [:return-maps flow-id return] output-val)
                                               output-val)
+                output-val                  (if (nil? output-val) "(returns nil value)" output-val)
                    ;;_ (ut/pp [:solver-flow-return-val solver-name flow-id output-val])
                 output-full                 {:req        vdata
                                              :value      (-> (assoc output :return-maps
@@ -3593,7 +3628,7 @@
               (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
               (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
 
-              (when use-cache?
+              (when (and use-cache? (not error?))
                 (swap! solvers-cache-atom assoc cache-key [output-val output-full]))
 
               (swap! flow-db/results-atom dissoc flow-id)  ;; <-- clear out the flow atom
@@ -3619,7 +3654,8 @@
                 ;(swap! solver-status assoc-in [client-name solver-name :error?] true)
                 ;(swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
                 (swap! solver-status update-in [client-name solver-name] merge {:running? false, :error? true, :stopped (System/currentTimeMillis)})
-                (swap! last-solvers-atom-meta assoc solver-name {:error (str e)}))))
+                (swap! last-solvers-atom-meta assoc solver-name {:error (str e)})
+                (swap! last-solvers-atom assoc solver-name {:error (str e)}))))
 
 
         :else ;; else we assume it's just data and keep it as is
@@ -3811,6 +3847,7 @@
         other-client-param-path (keyword (cstr/replace (cstr/join ">" keypath) ":" "")) ;;(keyword
         client-param-path       (if (= base-type :flow) flow-client-param-path other-client-param-path)
         signal?                 (= client-name :rvbbit)]
+    
     (if (not signal?)
       (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)
       (do ;;(ut/pp [:signal-or-solver base-type keypath client-name])
@@ -6098,7 +6135,11 @@
         ;(ut/pp [:repl-introspections @evl/repl-introspection-atom])
 
         ;(ut/pp [:timekeeper-failovers? @timekeeper-failovers])
-        (ut/pp [:pool-sizes pool-sizes])
+
+
+        ;;;(ut/pp [:pool-sizes pool-sizes])
+
+
           ;; (ut/pp [:pool-sizes-ttl 
           ;;         [(apply + (for [[_ v] pool-sizes] (get v :current-pool-size)))
           ;;          :out-of 
@@ -6129,9 +6170,11 @@
           ;(ut/pp [:push-queues (count (keys @task-queues-slot2))])
           ;(ut/pp [:queue-party-stats (qp/get-queue-stats)])
 
-        (draw-stats :cpu [3 15])
-        (draw-stats :threads [3 15])
-        (draw-stats :mem [3 15])
+        (draw-stats :cpu [5])
+        (draw-stats :threads [5])
+        (draw-stats :mem [5])
+
+
           ;(draw-stats :msgs [1 15])
 ;          (draw-stats :queues [1 15])
           ;(draw-stats :workers [1 15])

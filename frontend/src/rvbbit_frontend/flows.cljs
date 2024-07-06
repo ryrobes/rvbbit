@@ -4680,11 +4680,11 @@
                                   (+ 1.25 (* 1.05 rs-running) (when (= 1 rs-running) -0.275)) 0])
                            alerts)
          alerts-cnt      (try (count alerts) (catch :default _ 0))
-         gap             1 ;11
-         all-h           (apply + (for [a alerts :let [h (* (get a 2) db/brick-size)]] h))
-         all-h           (if (> alerts-cnt 1) (+ all-h (* gap (dec alerts-cnt))) all-h)
-         all-h           (if (or (nil? all-h) (< all-h 50)) 50 all-h)
-         box-height      50
+         ;gap             1 ;11
+         ;all-h           (apply + (for [a alerts :let [h (* (get a 2) db/brick-size)]] h))
+         ;all-h           (if (> alerts-cnt 1) (+ all-h (* gap (dec alerts-cnt))) all-h)
+         ;all-h           (if (or (nil? all-h) (< all-h 50)) 50 all-h)
+         ;box-height      50
          box-width       (+ 80 max-w) ;420
          edge-hide       (* (- box-width 50) -1)]
      (when (= alerts-cnt 0) (reset! db/kick-alert false))
@@ -4704,34 +4704,44 @@
           :margin-right "12px"
           :margin-top   "-4px"
           :font-size    "34px"}] [re-com/gap :size "44px"]
-        [re-com/v-box :children ;(into (for [e (range rs-running)] [re-com/box :child "o"])
+        [re-com/v-box
+         :gap "12px"
+         :children ;(into (for [e (range rs-running)] [re-com/box :child "o"])
          (for [a    alerts
                :let [abody       (first a)
                      push-codes? (try (some #(or (= % :push) (= % :dialog-push)) (ut/deep-flatten abody))
                                       (catch :default _ false))
                      width       (+ 60 (* (get a 1 0) db/brick-size))
-                     height      (* (get a 2 0) db/brick-size)
+                     ;;height      (* (get a 2 0) db/brick-size)
                      alert-id    (last a)]]
            [re-com/box :size "none" :attr
             (when (not push-codes?) (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])} {}))
-            :width (when (> width 0) (px width)) :height (when (> height 0) (px height)) :child
-            [buffy/render-honey-comb-fragments abody (get a 1) (get a 2)]])]]] :width (px (+ 0 box-width)) :height
-      (px (if @db/kick-alert all-h box-height)) :padding "9px" :style
-      {:position         "fixed"
-       :font-size        "18px"
-       :border-left      (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
-       :border-top       (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
-       :border-bottom    (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
-       :font-weight      700
-       :cursor           "pointer"
-       :border-radius    "19px 0px 0px 19px"
-       :bottom           25
-       :z-index          9999
+            :width (when (> width 0) (px width))
+            :height "auto" ;;(when (> height 0) (px height))
+            :child [buffy/render-honey-comb-fragments
+                    abody
+                    (get a 1) ;; width 
+                    (get a 2) ;; height
+                    ]])]]]
+      :width (px (+ 0 box-width))
+      ;:height "auto" (px (if @db/kick-alert all-h box-height)) ;; experimental for auto sizing!!!
+      :padding "9px"
+      :style {:position         "fixed"
+              :font-size        "18px"
+              :padding-top "8px"  :padding-bottom "8px" ;; part of auto sizing test
+              :border-left      (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
+              :border-top       (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
+              :border-bottom    (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
+              :font-weight      700
+              :cursor           "pointer"
+              :border-radius    "19px 0px 0px 19px"
+              :bottom           25
+              :z-index          9999
        ;:transition       "all 0.6s ease-in-out"
-       :right            (if @db/kick-alert 0 edge-hide)
-       :backdrop-filter  "blur(4px)"
-       :background-color (str "#000000" (if @db/kick-alert 88 11))
-       :color            "white"}])])
+              :right            (if @db/kick-alert 0 edge-hide)
+              :backdrop-filter  "blur(4px)"
+              :background-color (str "#000000" (if @db/kick-alert 88 11))
+              :color            "white"}])])
 
 (re-frame/reg-sub ::flow-parts-lookup
                   (fn [_ [_ & [part-key]]]

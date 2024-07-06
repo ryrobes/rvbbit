@@ -167,11 +167,16 @@
   (purge-cache "deep-flatten-cache" percent deep-flatten-cache deep-flatten-data hard-limit))
 
 
+(def ansi-regex #"\u001b\[[0-9;]*[a-zA-Z]")
 
-(def clover-walk-singles-map (atom {}))                                         
-(defonce process-key-cache (atom {}))  
-(defonce process-key-tracker (atom {}))
+(defn strip-ansi [s]
+  (cstr/replace s ansi-regex ""))
 
+
+(def clover-walk-singles-map (atom {}))                                                        
+(defonce process-key-cache (atom {}))       
+(defonce process-key-tracker (atom {}))        ;;; ;       
+  
 (defn process-key2
   [k]
   (let [args (str k)]

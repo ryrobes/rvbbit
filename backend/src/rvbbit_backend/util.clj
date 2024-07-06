@@ -1,25 +1,25 @@
 (ns rvbbit-backend.util
   (:require
-    [cheshire.core           :as json]
-    [chime.core              :as chime]
-    [clojure.core.async      :as async]
-    [clojure.data.csv        :as csv]
-    [clojure.data.json       :as json2]
-    [clojure.edn             :as edn]
-    [clojure.java.io         :as io]
-    [clojure.java.jdbc       :as jdbc]
-    [clojure.java.shell      :refer [sh]]
-    [clojure.pprint          :as pprint]
-    [clojure.spec.alpha      :as s]
-    [clojure.spec.test.alpha :as stest]
-    [clojure.string          :as cstr]
+   [cheshire.core           :as json]
+   [chime.core              :as chime]
+   [clojure.core.async      :as async]
+   [clojure.data.csv        :as csv]
+   [clojure.data.json       :as json2]
+   [clojure.edn             :as edn]
+   [clojure.java.io         :as io]
+   [clojure.java.jdbc       :as jdbc]
+   [clojure.java.shell      :refer [sh]]
+   [clojure.pprint          :as pprint]
+   [clojure.spec.alpha      :as s]
+   [clojure.spec.test.alpha :as stest]
+   [clojure.string          :as cstr]
    [zprint.core              :as zp]
-    [clojure.walk            :as walk]
-    [hikari-cp.core          :as hik]
-    [honey.sql               :as honey]
-    [puget.printer           :as puget]
-    [rvbbit-backend.config   :as config]
-    [talltale.core           :as tales])
+   [clojure.walk            :as walk]
+   [hikari-cp.core          :as hik]
+   [honey.sql               :as honey]
+   [puget.printer           :as puget]
+   [rvbbit-backend.config   :as config]
+   [talltale.core           :as tales])
   (:import
    [java.lang.management ManagementFactory]
    java.time.Instant
@@ -133,8 +133,6 @@
           :nth             nth})
        (catch Throwable e {:time-atom-error (str "Error! " e)})))
 
-
-
 (defn break-out-parts
   [clause]
   (cond (not (vector? clause))             []
@@ -161,32 +159,28 @@
   [value]
   (and (not (clojure.string/includes? (pr-str value) "#object")) (not (clojure.string/includes? (pr-str value) "#error"))))
 
-
-
-
 (defn freeze-atoms
   "Freezes all managed atoms to disk."
   []
   (doall
-    (pmap (fn [[file-path a]]
-            (let [wtr (io/writer file-path)]
-              (try (binding [*out* wtr] ;; selective pretty print formatting
-                     (if (or (cstr/includes? (str file-path) "signals.")
-                             (cstr/includes? (str file-path) "rules.")
-                             (cstr/includes? (str file-path) "errors.")
-                             (cstr/includes? (str file-path) "autocomplete")
-                             (cstr/includes? (str file-path) "training-atom.")
-                             (cstr/includes? (str file-path) "sql-cache.")
-                             (cstr/includes? (str file-path) "solvers."))
-                       (clojure.pprint/pprint @a)
-                       (prn @a)))
-                   (finally (.close wtr))))
-            (let [size-in-bytes      (java.nio.file.Files/size (java.nio.file.Paths/get file-path (into-array String [])))
-                  size-in-mb         (/ size-in-bytes 1048576.0)
-                  size-in-mb-rounded (/ (Math/round (* size-in-mb 100.0)) 100.0)]
-              (pp ["  " :freezing-atom file-path size-in-mb-rounded :mb])))
-          @managed-atoms)))
-
+   (pmap (fn [[file-path a]]
+           (let [wtr (io/writer file-path)]
+             (try (binding [*out* wtr] ;; selective pretty print formatting
+                    (if (or (cstr/includes? (str file-path) "signals.")
+                            (cstr/includes? (str file-path) "rules.")
+                            (cstr/includes? (str file-path) "errors.")
+                            (cstr/includes? (str file-path) "autocomplete")
+                            (cstr/includes? (str file-path) "training-atom.")
+                            (cstr/includes? (str file-path) "sql-cache.")
+                            (cstr/includes? (str file-path) "solvers."))
+                      (clojure.pprint/pprint @a)
+                      (prn @a)))
+                  (finally (.close wtr))))
+           (let [size-in-bytes      (java.nio.file.Files/size (java.nio.file.Paths/get file-path (into-array String [])))
+                 size-in-mb         (/ size-in-bytes 1048576.0)
+                 size-in-mb-rounded (/ (Math/round (* size-in-mb 100.0)) 100.0)]
+             (pp ["  " :freezing-atom file-path size-in-mb-rounded :mb])))
+         @managed-atoms)))
 
 (defn freeze-atom
   "Freezes a single atom to disk."
@@ -343,10 +337,10 @@
                        color (Color. rgb)]
                    (format "#%02x%02x%02x" (.getRed color) (.getGreen color) (.getBlue color))))]
     (vec (map first
-           (->> (frequencies colors)
-                (sort-by val)
-                (reverse)
-                (take 50))))))
+              (->> (frequencies colors)
+                   (sort-by val)
+                   (reverse)
+                   (take 50))))))
 
 (defn hue-to-rgb
   [p q t]
@@ -440,7 +434,6 @@
 
 (defn hue-to-hex [hue] (let [[r g b] (hue-to-rgb2 hue) out (rgb-to-hex2 r g b)] (if (= out "#nullnullnull") "#00000000" out)))
 
-
 (defn hex-to-hue-sat
   [hex]
   (let [[r g b]    (hex-to-rgb hex)
@@ -448,9 +441,7 @@
         hue-scaled (* h (/ 65535 360))] ; Scale hue to Philips Hue range
     [(int hue-scaled) 254])) ; Scale saturation to [0, 254]
 
-
 (defn bytes-to-mb [bytes] (let [mb (/ bytes 1048576.0) formatted-mb0 (format "%.0f" mb)] (str formatted-mb0 "MB")))
-
 
 (defn interpolate-hsl [hsl1 hsl2 factor] (map (fn [v1 v2] (+ v1 (* (- v2 v1) factor))) hsl1 hsl2))
 
@@ -469,9 +460,7 @@
                  hsl    (interpolate-hsl hsl1 hsl2 factor)
                  rgb    (hsl-to-rgb (nth hsl 0) (nth hsl 1) (nth hsl 2))]
              (rgb-to-hex rgb)))
-      (range steps))))
-
-
+         (range steps))))
 
 (defn base64-decode [b64-string] (.decode (java.util.Base64/getDecoder) b64-string))
 
@@ -503,11 +492,6 @@
   (let [data-bytes (base64-decode2 b64-string)]
     (with-open [out-stream (io/output-stream (io/file file-path))] (.write out-stream data-bytes))))
 
-
-
-
-
-
 (defn uptime-seconds
   []
   (let [runtime-bean   (java.lang.management.ManagementFactory/getRuntimeMXBean)
@@ -532,7 +516,6 @@
         formatter     (DateTimeFormatter/ofPattern "yyyy-MM-dd HH:mm:ss")]
     (.format formatter zonedDateTime)))
 
-
 (defn get-memory-usage
   []
   (let [memory-bean       (ManagementFactory/getMemoryMXBean)
@@ -544,15 +527,14 @@
     {:heap-usage     (memory-usage->map (.getHeapMemoryUsage memory-bean))
      :non-heap-usage (memory-usage->map (.getNonHeapMemoryUsage memory-bean))}))
 
-
 (defn template-replace
   [replacements s]
   (reduce (fn [s [key value]]
             (let [value (get :code value value)
                   value (if value (str value) "")] ;; force a string, since this is a string
               (cstr/replace s (re-pattern (cstr/join ["\\{\\{" key "\\}\\}"])) value)))
-    s
-    replacements))
+          s
+          replacements))
 
 (defn get-thread-count
   []
@@ -565,14 +547,7 @@
 (defn abs-file-path
   [fpath]
   (str ;(.getAbsolutePath (clojure.java.io/file fpath))
-    (.getCanonicalPath (clojure.java.io/file fpath))))
-
-
-
-
-
-
-
+   (.getCanonicalPath (clojure.java.io/file fpath))))
 
 (defn time-seq
   [v]
@@ -645,7 +620,7 @@
     (str (.get cal Calendar/YEAR)
          "-" (inc (.get cal Calendar/MONTH))
          "-" ; +1 since jan = 0
-           (.get cal Calendar/DATE))))
+         (.get cal Calendar/DATE))))
 
 (defn chan?
   [ch]
@@ -655,12 +630,11 @@
            (= "clojure.core.async.impl.channels.ManyToManyChannel"))
        (catch Exception _ false)))
 
-
 (defn generate-name
   []
   (let [;quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
         names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) ;(rand-nth
-              ]]
+               ]]
     (str (cstr/replace (cstr/join "-" names) " " "-") "-" (rand-int 45))))
 
 (defn channel-open? [ch] (async/offer! ch nil))
@@ -672,15 +646,14 @@
                            run-end   (:end run)]
                        (cond (some #(and (= (:start %) run-start) (= (:end %) run-end)) runs) runs
                              (some #(and (= (:start %) run-start) (nil? (:end %)) run-end) runs)
-                               (conj (vec (remove #(and (= (:start %) run-start) (nil? (:end %))) runs)) run)
+                             (conj (vec (remove #(and (= (:start %) run-start) (nil? (:end %))) runs)) run)
                              :else (conj runs run))))]
     (reduce (fn [acc entry]
               (reduce (fn [inner-acc [block-id run]] (update inner-acc block-id (fn [runs] (merge-runs (or runs []) run))))
-                acc
-                (into [] entry)))
-      {}
-      data)))
-
+                      acc
+                      (into [] entry)))
+            {}
+            data)))
 
 (defn format-duration
   [start-ms end-ms]
@@ -708,10 +681,7 @@
                       (when (> seconds 1) "s"))]
     (if (= out "0 second") "less than a second" out)))
 
-
 (defn nf [i] (pprint/cl-format nil "~:d" i))
-
-
 
 (defmacro timed-exec
   [expr] ;; expression based, not fn based
@@ -720,7 +690,9 @@
          end#    (System/currentTimeMillis)]
      {:result result# :fn-start start# :fn-end end# :elapsed-ms (- end# start#)}))
 
-(defn dissoc-in [map-in keypath] (let [base-kp (pop keypath) last-kp (last keypath)] (update-in map-in base-kp dissoc last-kp)))
+(defn dissoc-in [map-in keypath]
+  (let [base-kp (pop keypath)
+        last-kp (last keypath)] (update-in map-in base-kp dissoc last-kp)))
 
 (defn ppln [x] (puget/with-options {:width 330} (puget/cprint x)))
 
@@ -769,14 +741,14 @@
             (and (vector? x) (cstr/starts-with? (str (first x)) ":re-com"))
             (and (vector? x) (cstr/starts-with? (str (first x)) ":vega"))
             (and (vector? x) (is-hiccup? x)))
-          "render-object"
+        "render-object"
         (string? x) "string"
         (boolean? x) "boolean"
         (coll-of-maps? x) "rowset" ;;; TODO, revisit. convoluted logic
         (vector? x) "vector"
         (or (and (map? x) (contains? x :classname) (contains? x :subprotocol) (contains? x :subname))
             (and (map? x) (contains? x :dbtype) (contains? x :dbname) (contains? x :user)))
-          "jdbc-conn"
+        "jdbc-conn"
         (map? x) "map"
         (list? x) "list"
         (nil? x) "nil"
@@ -810,7 +782,6 @@
     (mapv (fn [[block [x y]]] [block x y]) @placed-blocks)))
 
 (defn coords-map [connections] (into {} (for [[bid x y] (gen-coords connections)] {bid {:x x :y y}})))
-
 
 (def nspc ['flowmaps.core 'clojure.set])
 
@@ -866,10 +837,6 @@
         (coll? x) (mapv lists-to-vectors x)
         :else     x))
 
-(defn dissoc-in [map-in keypath] (let [base-kp (pop keypath) last-kp (last keypath)] (update-in map-in base-kp dissoc last-kp)))
-
-
-
 (defn millis-to-date-string
   [millis]
   (let [date (java.util.Date. millis) format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss")] (.format format date)))
@@ -903,7 +870,7 @@
 (defn generate-unique-names
   [name-map]
   (let [update-map-with-unique-name
-          (fn [acc [k v]] (let [unique-name (unique-block-id-helper v 0 (set (vals acc)))] (assoc acc k unique-name)))]
+        (fn [acc [k v]] (let [unique-name (unique-block-id-helper v 0 (set (vals acc)))] (assoc acc k unique-name)))]
     (reduce update-map-with-unique-name {} name-map)))
 
 (defn reverse-map [m] (reduce (fn [acc [k v]] (assoc acc v k)) {} m))
@@ -1107,40 +1074,29 @@
     (reset! tracker-atom {})
     (let [post-mb (get-in (calculate-atom-size :temp data-atom) [:temp :mb])]
       (pp [:cache-atom-culling! name (str pre-mb "mb") "->" (str post-mb "mb")
-               {:top-pct          percent
-                :hard-limit       hard-limit
-                :cutoff-frequency cutoff-frequency
-                :pre-mb           pre-mb
-                :distribution     distro
-                :post-mb          post-mb
-                :keeping          above-threshold
-                :purging          below-threshold}]))))
-
+           {:top-pct          percent
+            :hard-limit       hard-limit
+            :cutoff-frequency cutoff-frequency
+            :pre-mb           pre-mb
+            :distribution     distro
+            :post-mb          post-mb
+            :keeping          above-threshold
+            :purging          below-threshold}]))))
 
 (defn hash-group [key num-groups]
   (mod (hash key) num-groups))
 
-
 (defn delay-execution [ms f] (future (do (Thread/sleep ms) (f))))
 
-
-
-
-
 (defn safe-cprint [x] (locking console-lock (puget/with-options {:width (get-terminal-width)} (puget/cprint x))))
-
-
 
 (defn ppln [x] (if (>= debug-level 2) (safe-cprint x) ((fn [& _]) x)))
 
 (defn pp [x] (if (>= debug-level 1) (safe-cprint x) ((fn [& _]) x)))
 
-
 (defn ppa
   [x] ;; always print
   (safe-cprint x))
-
-
 
 (defn keywordize-string
   [s] ;; technically spaces are valid in keywords, but they make it a bitch to reference
@@ -1172,8 +1128,6 @@
         (cstr/replace #":" "")
         (cstr/replace #"-" "_"))
     (str x)))
-
-
 
 (defn pretty-spit
   [file-name collection & [width]]
@@ -1213,8 +1167,8 @@
   (for [[category items] m
         [name item]      items]
     (assoc item
-      :category category
-      :name     name)))
+           :category category
+           :name     name)))
 
 (defn sanitize-name-fn
   [name]   ;; keep updated in client also
@@ -1256,7 +1210,6 @@
         (swap! sanitize-name-atom assoc name res)
         res))))
 
-
 (defn matches-pattern? [item kw num] (and (vector? item) (= (count item) num) (= (first item) kw)))
 
 (defn extract-patterns
@@ -1287,17 +1240,17 @@
   [f]
   (keyword (let [b (str (keypath-munger (cstr/split (cstr/trim (str f)) #" ")))]
              (if ;; cant have fields that start with an integer
-               (try (integer? (Long/parseLong (str (first b)))) (catch Exception _ false))
+              (try (integer? (Long/parseLong (str (first b)))) (catch Exception _ false))
                (str "_" b)
                b))))
 
 (defn csv-data->maps
   [csv-data]
   (map zipmap
-    (->> (first csv-data) ;; First row is the header
-         (map safe-fields) ;(map keyword) ;; Drop if you want string keys instead
-         repeat)
-    (rest csv-data)))
+       (->> (first csv-data) ;; First row is the header
+            (map safe-fields) ;(map keyword) ;; Drop if you want string keys instead
+            repeat)
+       (rest csv-data)))
 
 ;;(defn nf [num] (cstr/trim (str (format "%,12d" num))))
 
@@ -1333,7 +1286,6 @@
   ([m] (keypaths [] m ()))
   ([prev m result] (reduce-kv (fn [res k v] (if (map? v) (keypaths (conj prev k) v res) (conj res (conj prev k)))) result m)))
 
-
 ;; Define a function to check if a number is a fraction (rational and not an integer)
 (defn fraction? [n]
   (and (rational? n) (not (integer? n))))
@@ -1352,7 +1304,6 @@
       (if (and (not (integer? number)) (zero? (mod rounded-value 1.0)))
         (.intValue rounded)
         rounded-value))))
-
 
 ;;; atom sniffer...
 
@@ -1518,13 +1469,12 @@
      (if (seq atom-info)
        (doseq [{:keys [name size-estimate type-info nested-atoms nested-atom-paths]} atom-info]
          (pp {:name name
-                 :size-mb (bytes-to-mb size-estimate)
-                 :type-info type-info}))
+              :size-mb (bytes-to-mb size-estimate)
+              :type-info type-info}))
        (println "No atoms found in the namespace.")))))
 
 ;; (time (atom-sniffer2 'rvbbit-backend.queue-party))
 ;; (time (atom-sniffer ['rvbbit-backend.queue-party 'rvbbit-backend.util 'rvbbit-backend.core 'rvbbit-backend.sql 'flowmaps.db]))
-
 
 ;;(time (ut/atom-sniffer2 'rvbbit-backend.queue-party))
 ;;(time (ut/atom-sniffer2)) ;; curr

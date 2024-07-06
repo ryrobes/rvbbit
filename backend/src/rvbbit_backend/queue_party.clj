@@ -1,6 +1,7 @@
 (ns rvbbit-backend.queue-party
   (:require [rvbbit-backend.util :as ut]
-            [clojure.string      :as cstr])
+            ;[clojure.string      :as cstr]
+            )
   (:import (java.util.concurrent LinkedBlockingQueue TimeUnit)))
 
 ;; ;; queue party v0 usage 
@@ -72,7 +73,7 @@
             (try
               (task)
               (catch Exception e
-                (println "Error executing task:" (.getMessage e)))
+                (ut/pp ["Error executing queue task:" queue-type id-keyword (.getMessage e)]))
               (finally
                 (swap! active-tasks update-in [queue-type id-keyword] dec))))))
       (when (and @running (not @stopping))
