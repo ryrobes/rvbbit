@@ -1305,6 +1305,27 @@
         (.intValue rounded)
         rounded-value))))
 
+(defn rnd-nf [n s] (nf (rnd n s)))
+
+;; ancient dashboard callouts
+
+
+
+;;; println to file for shutdown dumps 
+(def ansi-escape-pattern #"\u001b\[[0-9;]*[a-zA-Z]")
+
+(defn strip-ansi [s]
+  (cstr/replace s ansi-escape-pattern ""))
+
+(defn capture-output [f]
+  (let [writer (java.io.StringWriter.)]
+    (binding [*out* writer]
+      (f))
+    (strip-ansi (str writer))))
+
+(defn println-to-file [filename f]
+  (spit filename (capture-output f)))
+
 ;;; atom sniffer...
 
 (declare estimate-size-with-nested-atoms)

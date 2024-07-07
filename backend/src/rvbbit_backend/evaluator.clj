@@ -20,6 +20,9 @@
 (def ext-repl-host (get-in rabbit-config [:ext-nrepl :host] "127.0.0.1"))
 (def repl-port (get rabbit-config :nrepl-port 8181))
 
+(def nrepls-run (atom 0))
+(def nrepls-intros-run (atom 0))
+
 (defn strip-ansi-codes [s] (cstr/replace s #"\u001B\[[0-9;]*m" ""))
 
 (def repl-introspection-atom (ut/thaw-atom {} "./data/atoms/repl-introspection-atom.edn"))
@@ -37,7 +40,8 @@
 
 (defn introspect-namespace [conn namespace-name]
   (try
-    (let [introspection-code (str "
+    (let [_ (swap! nrepls-intros-run inc)
+          introspection-code (str "
                            (do
                              (println \"Debug: Starting introspection for namespace: " namespace-name "\")
                              (let [ns-obj (find-ns '" namespace-name ")
@@ -112,7 +116,7 @@
                         :introspected (ut/millis-to-date-string (System/currentTimeMillis))})))
 
 (defn update-namespace-state-async [host port client-name id code ns-str]
-  (future
+  ;(future
     (try
       (with-open [conn (nrepl/connect :host host :port port)]
         (let [introspection (introspect-namespace conn ns-str)
@@ -121,11 +125,12 @@
               ]
           ;(ut/pp [:repl {:introspected-repl-session introspection}])
           (swap! repl-introspection-atom assoc-in split-ns introspection) ;; host and port for later?
-          (logger (str (ut/keypath-munger [ns-str host port client-name id]) "-intro")
-                  {:orig-code code
-                   :introspection introspection})))
+          ;; (logger (str (ut/keypath-munger [ns-str host port client-name id]) "-intro")
+          ;;         {:orig-code code
+          ;;          :introspection introspection})
+          ))
       (catch Exception e
-        (ut/pp [:repl "Error during async introspection:" (ex-message e)])))))
+        (ut/pp [:repl "Error during async introspection:" (ex-message e)]))));)
 
 (defn create-nrepl-server! []
   (ut/pp [:starting-local-nrepl :port repl-port])
@@ -138,7 +143,8 @@
 (defn repl-eval
   [code repl-host repl-port client-name id]
 
-  (let [s           (str code) ;; ? why convert. TODO: remove
+  (let [_           (swap! nrepls-run inc)
+        s           (str code) ;; ? why convert. TODO: remove
         eval-cache? false ;true ; (cstr/includes? s ";:::cache-me")
         cache-hash  (hash (cstr/trim (cstr/trim-newline (cstr/trim s))))]
     ;(ut/pp [:repl :started (str code) client-name id])
@@ -219,7 +225,9 @@
 
                     ;;(swap! repl-client-namespaces-map update-in [client-name] (fnil conj #{}) gen-ns)
 
-                    (update-namespace-state-async nrepl-host nrepl-port client-name id code ns-str)
+                    ;; when only?
+                    (when false ;;(and (not= client-name :rvbbit) (not (nil? client-name)))
+                      (update-namespace-state-async nrepl-host nrepl-port client-name id code ns-str))
 
 
 

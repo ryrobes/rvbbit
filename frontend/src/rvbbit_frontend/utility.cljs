@@ -167,10 +167,24 @@
   (purge-cache "deep-flatten-cache" percent deep-flatten-cache deep-flatten-data hard-limit))
 
 
-(def ansi-regex #"\u001b\[[0-9;]*[a-zA-Z]")
+(defn flip-map [m]
+  (reduce (fn [acc [k v]] (assoc acc v k)) {} m))
+
+(def ansi-regex #"\u001b\[[0-9;]*[a-zA-Z]") ;; pre fancy 256 color ANSI codes
 
 (defn strip-ansi [s]
   (cstr/replace s ansi-regex ""))
+
+;; (def mutated-ansi-regex
+;;   #"[□␛]?\[(?:\d+(?:;\d+)*)?m")
+
+;; (defn strip-ansi
+;;   "Strips all mutated ANSI escape sequences from the given string."
+;;   [s]
+;;   (-> s
+;;       (cstr/replace mutated-ansi-regex "")
+;;       (cstr/replace #"\s+" " ")  ; Normalize spaces
+;;       cstr/trim))
 
 
 (def clover-walk-singles-map (atom {}))                                                        

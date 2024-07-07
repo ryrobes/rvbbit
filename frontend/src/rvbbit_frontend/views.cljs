@@ -2471,10 +2471,12 @@
          (when (and (not @hide-panel-2?) (not no-room-for-2?))
            (cond
              (or views? queries? runners?) ; data-key
-             (let [;;data-key-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
+             (let [data-key-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
                    view-type-map @(ut/tracked-sub ::bricks/view-type-map {:view-type data-key-type})
+                   output-type @(ut/tracked-sub ::bricks/repl-output-type {:panel-key selected-block :view-name data-key})
                    modes (get view-type-map :modes)
                    current-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key selected-block :data-key data-key})
+                   runner? (and (not= data-key-type :views) (not= data-key-type :queries) (not= data-key-type :clover))
                  ;;_ (ut/tapp>> [selected-block data-key data-key-type view-type-map])
                  ;data-key-type (if (nil? data-key-type) :* data-key-type)
                  ;selected-block (if (nil? (get @db/data-browser-query selected-block)) first-data-key data-key)
@@ -2499,16 +2501,53 @@
                                            :md-icon-name "zmdi-chevron-left"
                                            :style {:font-size "17px"
                                                    :margin-top "-2px"
-                                                   :opacity 0.88}]]]
-                              [re-com/box :child (str "runner: " data-key-type)
-                               :style {;:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))
-                                       :color (str (theme-pull :theme/editor-outer-rim-color nil))
-                                     ;:font-weight 700
-                                       :padding-left "3px"
-                                       :padding-right "3px"
-                                     ;:margin-top "2px"
-                                       :border-radius "7px"
-                                       :font-size "13px"}]
+                                                   :opacity 0.88}]
+                                          [re-com/box :child (str data-key-type)
+                                           :style {;:border (str "1px solid " (str (theme-pull :theme/editor-outer-rim-color nil)))
+                                                   :color (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                   :font-weight 700
+                                                   :margin-left "4px"
+                                                   :padding-left "5px"
+                                                   :padding-right "5px"
+                                                   :background-color "#00000033"
+                                                   :border-radius "7px"
+                                                   :font-size "13px"}]]]
+
+                              (when runner?
+                                [re-com/h-box
+                                 :size "none"
+                                 :align :center
+                                 :justify :center
+                                 :width "88px"
+                                 :style {;:margin-top "-1px"
+                                         :color (str (theme-pull :theme/editor-outer-rim-color nil))
+                                         :font-size "13px"}
+                              ; :justify :between 
+                                 :children [[re-com/box
+                                             :size "auto" :align :start  :justify :start
+                                             :child "value"
+                                             :attr {:on-click #(ut/tracked-dispatch [::bricks/select-output-type selected-block data-key :value])}
+                                             :style {:border-radius "7px 0px 0px 7px"
+                                                     :padding-right "4px"
+                                                     :padding-left "4px"
+                                                     :color (when (= output-type :value) "black")
+                                                     :cursor (when (not (= output-type :value)) "pointer")
+                                                     :background-color (if (= output-type :value)
+                                                                         (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                                         "#00000033")}]
+                                            [re-com/box
+                                             :size "auto" :align :end :justify :end
+                                             :child "output"
+                                             :attr {:on-click #(ut/tracked-dispatch [::bricks/select-output-type selected-block data-key :output])}
+                                             :style {:border-radius "0px 7px 7px 0px"
+                                                     :padding-left "4px"
+                                                     :padding-right "4px"
+                                                     :color (when (= output-type :output) "black")
+                                                     :cursor (when (not (= output-type :output)) "pointer")
+                                                     :background-color (if (= output-type :output)
+                                                                         (str (theme-pull :theme/editor-outer-rim-color nil))
+                                                                         "#00000033")}]]])
+
                               [re-com/h-box
                                :style {:padding-right "10px"}
                                :gap "4px"
@@ -2524,7 +2563,7 @@
                                                     :cursor (when (not selected?) "pointer")
                                                     :padding-left "3px"
                                                     :padding-right "3px"
-                                                    :margin-top "2px"
+                                                    ;:margin-top "2px"
                                                     :border-radius "7px"
                                                     :font-size "13px"}])]]
                    :style
@@ -2613,7 +2652,10 @@
                                                                running-status       (when are-solver
                                                                                       @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
                                                                                                        {:keypath [running-status-ckp]}))
-                                                               console-output       (get-in meta-data [:output :evald-result :out] [])]
+                                                               ;;console-output       (get-in meta-data [:output :evald-result :out] [])
+                                                               console-output       (when are-solver
+                                                                                      @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                                                                       {:keypath [meta-data-ckp-output]}))]
                                                   ;;(ut/tapp>>  [:console-output console-output])
                                                            [re-com/box
                                                             :size "none"
@@ -2625,7 +2667,7 @@
                                                             :child [re-com/v-box
                                                                     :gap  "10px"
                                                                     :width "98%"
-                                                                    :children [(when (ut/ne? (remove empty? console-output))
+                                                                    :children [(when true  ;(ut/ne? (remove empty? console-output))
                                                                                  [re-com/v-box
                                                                                   :style {:border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
                                                                                           :margin-top "10px"
@@ -2644,18 +2686,25 @@
                                                                                               (str "console " are-solver) :console-out
                                                                                               3 6]
                                                                                              ;; draggable-clover [element data runner & [nname h w]]
-                                                                                             [re-com/v-box
-                                                                                              :gap "0px"
-                                                                                              :style {:padding-top "10px"}
-                                                                                              :children (for [e console-output]
-                                                                                                          [:pre
-                                                                                                           {:style {:color (theme-pull :theme/editor-outer-rim-color nil)
-                                                                                                                    :background-color "#00000000"
-                                                                                                                    :border "none"
-                                                                                                                    :text-shadow "4px 4px 4px #00000088"
-                                                                                                                    :font-size "17px"
-                                                                                                                    :font-family (theme-pull :theme/monospaced-font nil)}}
-                                                                                                           e])]]])
+                                                                                             [bricks/console-viewer {:style {}
+                                                                                                                     :text console-output
+                                                                                                                     ;:width (+ px-width-int 70) 
+                                                                                                                     ;:height (+ px-height-int 50)
+                                                                                                                     }]
+                                                                                            ;;  [re-com/v-box
+                                                                                            ;;   :gap "0px"
+                                                                                            ;;   :style {:padding-top "10px"}
+                                                                                            ;;   :children (for [e console-output]
+                                                                                            ;;               [:pre
+                                                                                            ;;                {:style {:color (theme-pull :theme/editor-outer-rim-color nil)
+                                                                                            ;;                         :background-color "#00000000"
+                                                                                            ;;                         :border "none"
+                                                                                            ;;                         :text-shadow "4px 4px 4px #00000088"
+                                                                                            ;;                         :font-size "17px"
+                                                                                            ;;                         :font-family (theme-pull :theme/monospaced-font nil)}}
+                                                                                            ;;                e])]
+                                                                                             
+                                                                                             ]])
                                                                                [re-com/v-box
                                                                                 :style {:border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
                                                                                         :margin-top "10px"

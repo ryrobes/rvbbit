@@ -579,7 +579,13 @@
                                                            :when (if (cstr/starts-with? (str k) ":block")
                                                                    (some #(= % k) (keys panels-map)) true)] (keys v))))
          clover-solvers           (if all? clover-solvers-all clover-solvers-tab)
-         ;;_ (tapp>> [:clover-solvers clover-solvers clover-solvers2 @db/solver-fn-runs])
+         ;;_ (tapp>> [:clover-solvers clover-solvers  @db/solver-fn-lookup @db/solver-fn-runs])
+         clover-solver-outputs    (vec (for [[kk kp] (select-keys (ut/flip-map @db/solver-fn-lookup) clover-solvers)
+                                             :let [[p bid vid] kp]
+                                             :when (and (= p :panels)
+                                                        (= :output @(ut/tracked-sub ::repl-output-type {:panel-key bid :view-name vid})))]
+                                         (keyword (str (cstr/replace (str kk) ":solver/" "solver-meta/") ">output>evald-result>out"))))
+         ;_ (tapp>> [:output-solvers clover-solvers  @db/solver-fn-lookup])
          warren-item             (get db :selected-warren-item)
          solver-open?            (and (= (get @db/flow-editor-system-mode 0) "signals") (get db :flow?))
          solver                  (if (and (get-in db [:solvers-map warren-item :data]) solver-open?)
@@ -616,12 +622,19 @@
                                      (vec (distinct
                                            (remove nil?
                                                    (flatten (for [s in-editor-solvers0
-                                                                  :let [ns-key (keyword (str (ut/replacer s ":solver/" "solver-meta/")))
+                                                                  :let [meta-kw (str (ut/replacer s ":solver/" "solver-meta/"))
+                                                                        ns-key (keyword meta-kw)
+                                                                        console-key (keyword (str meta-kw ">output>evald-result>out"))
                                                                         ns-key1 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [ns-key]})]]
                                                               [(keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")))
+
                                                                (when (and (ut/ne? ns-key1) (get-in ns-key1 [:output :evald-result :ns]))
                                                                  (keyword (str "repl-ns/" (get-in ns-key1 [:output :evald-result :ns]))))
+
+                                                               console-key
+
                                                                ns-key])))))) [])
+         ;;;_ (tapp>> [:in-editor-solvers  (str  in-editor-solvers) ])
          clover-solvers-running  (vec (for [s clover-solvers] ;;(vec (remove (set in-editor-solvers0) clover-solvers))] 
                                         (keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")  ">running?"))))
           ;; clover-solvers-running  []
@@ -635,7 +648,8 @@
       ;;          ])
       ;(filterv #(not (cstr/includes? (str %) "||")) ;; live running subs ignore
      (vec (distinct
-           (concat flow-runners client-namespaces-refs signal-subs clover-solvers clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs)))
+           (concat flow-runners clover-solver-outputs client-namespaces-refs signal-subs clover-solvers 
+                   clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs)))
       ;         )
      )))
 
@@ -2569,14 +2583,14 @@
         key         selected-kp
         ;;repl?       (true? repl?)
         font-size   (if (nil? key) 13 17)
-        value       (if (and repl? (cstr/starts-with? (cstr/trim (str value)) "(do"))
+        value       (if (and repl? (cstr/starts-with? (cstr/trim (str value)) "(do")) 
 
                       (try (str (strip-do value))
                            (catch :default _ value))
 
                       value)  ;; remove implied DO
         code-width  (if (nil? key) (- width-int 24) (- width-int 130))]
-    (tapp>> [:code repl? (cstr/starts-with? (cstr/trim (str value)) "(do") value])
+    ;;(tapp>> [:code repl? (cstr/starts-with? (cstr/trim (str value)) "(do") value])
     [re-com/box :size "none" :width (px (- width-int 24)) :height (px (- height-int 24)) :style
      {:font-family      (theme-pull :theme/monospaced-font nil) ; "Chivo Mono" ;"Fira Code"
       :font-size        (px font-size)
@@ -6608,6 +6622,17 @@
  (fn [db {:keys [view-type]}]
    (get-in db [:server :settings :runners view-type])))
 
+(re-frame/reg-sub
+ ::repl-output-type
+ (fn [db {:keys [panel-key view-name]}]
+   (get-in db [:panels panel-key :display view-name] :value)))
+
+(re-frame/reg-event-db
+ ::select-output-type
+ (fn [db [_ panel-key view-name display]]
+   (assoc-in db [:panels panel-key :display view-name] display)))
+
+
 ;;(ut/tapp>> [:ed  (str @(ut/tracked-sub ::editor-panel-selected-view2 {}))])
 
 (re-frame/reg-event-db
@@ -7544,6 +7569,7 @@
 (defn map-boxes2 [data block-id selected-view keypath kki init-data-type & [draggable? key-depth]]
   [reecatch
    (let [keypath-in (conj keypath kki)
+         data (if (nil? data) {:error "no data, bub!"} data)
          open? (get @opened-boxes (pr-str [block-id keypath-in kki]))
          page (get @map-boxes-pages [block-id selected-view keypath kki] 1)
          cache-key (pr-str [data block-id selected-view keypath kki page init-data-type draggable? key-depth open?])
@@ -8547,6 +8573,7 @@
 
 (def ansi-converter
   (AnsiToHtml. #js {:newline true
+                    :stream true
                     ;:colors {:0 "#eeeeee" :1 "#FF0000" :2 "#00FF00" :3 "#FFFF00"
                     ;         :4 "#0000FF" :5 "#FF00FF" :6 "#00FFFF" :7 "#FFFFFF"}
                     ;:fg "#FFF"
@@ -8561,9 +8588,9 @@
                        :font-size "15px"
                        :line-height "1.1"
                        :padding "15px"
-                       :white-space "pre"
+                       :white-space "pre" 
                        ;:background-color "#000"
-                       :color "#ffffff99"
+                       ;:color "#ffffff99"
                        }]
     [re-com/box
      :size "none" :width (px width) :height (px height)
@@ -9161,17 +9188,23 @@
 
         body @(ut/tracked-sub ::views {:panel-key panel-key :ttype selected-view-type})
 
+        is-runner? (and (not= selected-view-type :views)
+                        (not= selected-view-type :queries))
+
         body (if replacement-view
                replacement-view ;{selected-view replacement-view}
                body)
+        
+         clover-fn (when is-runner? 
+                     @(ut/tracked-sub ::current-view-mode-clover-fn {:panel-key panel-key :data-key selected-view}))
+
+        ;;_ (tapp>> [:body (str body)])
 
         ;;orig-body body
 
-        body (if (and (not= selected-view-type :views)
-                      (not= selected-view-type :queries))
+        body (if is-runner?
                ;;{(first body) [:box :child [:string3 (last body)]]}
                (let [wrapper @(ut/tracked-sub ::get-clover-runner-fn {:view-type selected-view-type}) ;;(get-in br [selected-view-type :clover-fn])
-                     clover-fn @(ut/tracked-sub ::current-view-mode-clover-fn {:panel-key panel-key :data-key selected-view})
                      ;;sub-param (first (map last (filter (fn [[k _]] (cstr/includes? (str k) (str panel-key " " selected-view))) @db/solver-fn-lookup)))
                      ;;sub-param-root (try (last (cstr/split (str sub-param) #"/")) (catch :default _ ""))
                      ;;curr-val @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sub-param]})
@@ -9387,10 +9420,10 @@
                           (let [kps       (ut/extract-patterns obody :markdown 2)
                                 logic-kps (into {} (for [v kps]
                                                      (let [[_ md] v]
-                                                       {v [:box :child 
+                                                       {v [:box :child
                                                            (->> (str md)
-                                                               (m/md->hiccup)
-                                                               (m/component))]})))]
+                                                                (m/md->hiccup)
+                                                                (m/component))]})))]
                             (walk/postwalk-replace logic-kps obody)))
 
 
@@ -9498,7 +9531,7 @@
                                                                                                        :style {:font-size "8px" :opacity 0.6}]]] 8 1.7 3]))]
                                {v sub-param})))]
             (walk/postwalk-replace logic-kps obody)))
-        
+
         ;;_ (when (= panel-key :block-1430) (tapp>> [:body (str body)]))
 
         obody-key-set (ut/deep-flatten body) ;; valid-clover-template-keys ;; (ut/deep-flatten body) ;; cant reuse since body gets mutated between
@@ -9552,6 +9585,22 @@
           ;;                                                   [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
           ;;                                                    :style {:overflow "auto"} :child [map-boxes2 x panel-key selected-view [] :output nil]]))} )
           has-drops?                (drop-walk-replace (vec (keys drop-walks))))
+
+
+        ;;; have to sub in the output value late to make sure all the eval takes place first.
+        output-type (if is-runner?
+                      @(ut/tracked-sub ::repl-output-type {:panel-key panel-key :view-name selected-view})
+                      :value)
+
+        body (if (and is-runner? (= output-type :output))
+               (let [solver-clover-kw (get @db/solver-fn-lookup [:panels panel-key selected-view])
+                     console-clover-kw (keyword (str (cstr/replace (str solver-clover-kw) ":solver/" "solver-meta/") ">output>evald-result>out"))
+                     console-body @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [console-clover-kw]})]
+                 (if console-clover-kw
+                   {selected-view
+                    (ut/postwalk-replacer {:*data console-body} clover-fn)}
+                   body)) body)
+
         ;; body (if data-viewer? ;; else they will try to render shit inside the vectors... 
         ;;        (ut/postwalk-replacer 
         ;;         (->  walk-map (dissoc :box :icon :h-box :v-box)) 
@@ -9609,10 +9658,10 @@
                      placeholder-on-running? (get-in br [selected-view-type :placeholder-on-running?])
                      running? (when placeholder-on-running?
                                 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(str "solver-status/*client-name*>" sub-param-root ">running?")]}))]
-                 (if (or (nil? curr-val) running? 
+                 (if (or (nil? curr-val) running?
                          ;(and (keyword? curr-val) (cstr/starts-with?  (str curr-val) ":solver/"))
                          ;(= curr-val sub-param)
-                         ) 
+                         )
                    (assoc body selected-view
                           ;;[re-com/box :child "waiting..."]
                           (get body :waiter)) ;; use user-space clover placeholder?
@@ -10237,7 +10286,7 @@
         top-start      (* start-y db/brick-size) ;-100 ;; if shifted some bricks away...
         left-start     (* start-x db/brick-size)]
 
-    (when (and 
+    (when (and false ;; disable again
            (not @dragging?)
            (not @mouse-dragging-panel?)
            (not @on-scrubber?)) ;true ; external? UPDATE-PANELS-HASH DISABLED TMP!! WHEN

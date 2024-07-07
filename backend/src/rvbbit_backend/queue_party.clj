@@ -23,6 +23,7 @@
 ;; ;; shut it down
 ;; ;; (queue-party/stop-slot-queue-system)
 
+(def queue-tasks-run (atom 0))
 (def queue-stats-history (atom {:timestamp []
                                 :total-queues []
                                 :total-queued []
@@ -70,6 +71,7 @@
           (when-let [task (.poll queue 100 TimeUnit/MILLISECONDS)]
             (swap! task-queues assoc-in [queue-type id-keyword 1] (System/currentTimeMillis))
             (swap! active-tasks update-in [queue-type id-keyword] (fnil inc 0))
+            (swap! queue-tasks-run inc) ;; debug
             (try
               (task)
               (catch Exception e

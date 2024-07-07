@@ -33,6 +33,7 @@
                        [net.clojars.wkok/openai-clojure "0.11.1"]
                        [clj-http "3.12.3"]
                        [cheshire "5.11.0"]
+                       [clj-figlet "0.1.1"]
                        [org.clojure/core.cache "1.0.207"]
                        [talltale "0.5.8"]
                        [clucie "0.4.2"]

@@ -48,6 +48,7 @@
    [rvbbit-backend.cruiser    :as cruiser]
     ;;[tea-time.core             :as tt]
    [com.climate.claypoole     :as cp]
+   [clj-figlet.core           :as figlet]
    [clj-http.client           :as client]
    [clojure.data.json         :as json2]
    [clojure.set               :as cset]
@@ -55,10 +56,9 @@
    [clj-time.coerce           :as coerce]
    [rvbbit-backend.config     :as config]
    [honey.sql                 :as honey])
-  (:import ;(clojure.lang MultiFn)
+  (:import
    [com.github.vertical_blank.sqlformatter SqlFormatter]
    [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ArrayBlockingQueue ThreadPoolExecutor$CallerRunsPolicy]
-    ;;[java.util.concurrent                   Executors TimeUnit TimeoutException]
    [java.lang                              ProcessBuilder]
    [java.io                                BufferedReader InputStreamReader]))
 
@@ -68,6 +68,15 @@
 (defonce push-usage (atom []))
 (defonce peer-usage (atom []))
 (defonce pool-tasks (atom []))
+(defonce pool-task-usage (atom []))
+(defonce queue-tasks (atom []))
+
+(defonce sql-exec-usage (atom []))
+(defonce sql-query-usage (atom []))
+(defonce flow-usage (atom []))
+(defonce nrepl-usage (atom []))
+(defonce nrepl-intros-usage (atom []))
+
 (defonce sys-load (atom []))
 (defonce thread-usage (atom []))
 (defonce mem-usage (atom []))
@@ -191,10 +200,19 @@
 (defonce thread-pool-timing? true)
 
 (defn create-cached-thread-pool [name]
-  (if (or (cstr/includes? (str name) "watchers/") 
-          (cstr/includes? (str name) "subscriptions/"))
-    (ThreadPoolExecutor. 10 300 60 TimeUnit/SECONDS  (ArrayBlockingQueue. 20) (ThreadPoolExecutor$CallerRunsPolicy.))
-    (ThreadPoolExecutor. 1 1000 120 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))))
+  (cond ;(cstr/includes? (str name) "serial")
+        ;(ThreadPoolExecutor. 1 1 60 TimeUnit/SECONDS (java.util.concurrent.LinkedBlockingQueue.))
+    (or (cstr/includes? (str name) "flow-runner/")
+        (cstr/includes? (str name) "nrepl-eval/")
+        (cstr/includes? (str name) "query-runstream/")
+        (cstr/includes? (str name) "watchers/")
+        (cstr/includes? (str name) "subscriptions/"))
+    (ThreadPoolExecutor. 10 500 60 TimeUnit/SECONDS  (ArrayBlockingQueue. 20) (ThreadPoolExecutor$CallerRunsPolicy.)) ;;; was 10 300 60
+    :else (ThreadPoolExecutor. 1 1000 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))))
+
+
+
+
 
 ;; for later to test with:
 ;; (defn create-adaptive-pool [] 
@@ -212,7 +230,7 @@
       (swap! dyn-pools assoc name new-queue)
       new-queue)))
 
-(def get-or-create-cached-thread-pool-memoized 
+(def get-or-create-cached-thread-pool-memoized
   (memoize/memo get-or-create-cached-thread-pool))
 
 (defn close-cached-thread-pool [name]
@@ -231,6 +249,8 @@
 ;; (defn execute-in-thread-pools [base-type f]
 ;;   (.execute (get-or-create-cached-thread-pool base-type) f))
 
+(def pool-tasks-run (atom 0))
+
 (defn add-exec-time [pool-name exec-time]
   (swap! pool-exec-times
          (fn [times]
@@ -240,6 +260,7 @@
                                        [exec-time]))))))
 
 (defn execute-in-thread-pools [base-type f]
+  (swap! pool-tasks-run inc)
   (if thread-pool-timing?
     (let [start-time (System/nanoTime)]
       (try
@@ -251,12 +272,13 @@
                         (let [end-time (System/nanoTime)
                               exec-time (/ (- end-time start-time) 1e6)] ;; convert nano to milli
                           (add-exec-time base-type exec-time))))))
-                  (catch Throwable e (ut/pp [:timed-pool-execute-on base-type :failed (str e)]))))
-      (try
-        (.execute (get-or-create-cached-thread-pool base-type) f)
-        (catch Throwable e (ut/pp [:pool-execute-on base-type :failed (str e)])))))
+        (catch Throwable e (ut/pp [:timed-pool-execute-on base-type :failed (str e)]))))
+    (try
+      (.execute (get-or-create-cached-thread-pool base-type) f)
+      (catch Throwable e (ut/pp [:pool-execute-on base-type :failed (str e)])))))
 
 (defn execute-in-thread-pools-but-deliver [base-type f]
+  (swap! pool-tasks-run inc)
   (let [p (promise)]
     (if thread-pool-timing?
       (let [start-time (System/nanoTime)]
@@ -283,51 +305,53 @@
 
 (declare break-up-flow-key-ext)
 
-;; (defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
-;;   (fn [key ref old-state new-state]
-;; ;; test, dont bother taking the next step if nothing changed...? less thrash, does shit still work?
-;;     (when (not= old-state new-state)
-;;      (when (let [[added removed _] (clojure.data/diff old-state new-state)
-;;                  akp (ut/keypaths added)
-;;                  rkp (ut/keypaths removed)
-;;                  changed-kp (vec (distinct (into akp rkp)))]
-;;                 ;(when (ut/ne? (flatten changed-kp)) 
-;;                 ;  (ut/pp [:w+ client-name base-type key flow-key (break-up-flow-key-ext flow-key) changed-kp]))
-;;              (ut/ne? (flatten changed-kp)))
-;;        (execute-in-thread-pools (keyword (str (if client-name 
-;;                                                 "subscriptions/"
-;;                                                 "watchers/") (cstr/replace (str base-type) ":" "")
-;;                                               ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
-;;                                               (when client-name ".*")))
-;;                                 (fn []
-;;                                   (try
-;;                                     (watcher-fn key ref old-state new-state)
-;;                                     (catch Exception e
-;;                                       (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
-;;                                       (throw e)))))))))
-
 (defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
   (fn [key ref old-state new-state]
+;; test, dont bother taking the next step if nothing changed...? less thrash, does shit still work?
     (when (not= old-state new-state)
-      (let [diff (clojure.data/diff old-state new-state)
-            changed-kp (into #{} (comp (take 2)
-                                       (remove nil?)
-                                       (mapcat ut/keypaths)
-                                       (distinct))
-                             diff)]
-        (when (seq changed-kp)
-          (execute-in-thread-pools
-           (keyword (str (if client-name
-                           "subscriptions/"
-                           "watchers/") (cstr/replace (str base-type) ":" "")
-                            ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
-                         (when client-name ".*")))
-           (fn []
-             (try
-               (watcher-fn key ref old-state new-state)
-               (catch Exception e
-                 (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
-                 (throw e))))))))))
+      (when (let [[added removed _] (clojure.data/diff old-state new-state)
+                  akp (ut/keypaths added)
+                  rkp (ut/keypaths removed)
+                  changed-kp (vec (distinct (into akp rkp)))]
+                ;(when (ut/ne? (flatten changed-kp)) 
+                ;  (ut/pp [:w+ client-name base-type key flow-key (break-up-flow-key-ext flow-key) changed-kp]))
+              (ut/ne? (flatten changed-kp)))
+        (execute-in-thread-pools
+         (keyword (str (if client-name
+                         "subscriptions/"
+                         "watchers/")
+                       (cstr/replace (str base-type) ":" "")
+                      ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
+                       (when client-name ".*")))
+         (fn []
+           (try
+             (watcher-fn key ref old-state new-state)
+             (catch Exception e
+               (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
+               (throw e)))))))))
+
+;; (defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
+;;   (fn [key ref old-state new-state]
+;;     (when (not= old-state new-state)
+;;       (let [diff (clojure.data/diff old-state new-state)
+;;             changed-kp (into #{} (comp (take 2)
+;;                                        (remove nil?)
+;;                                        (mapcat ut/keypaths)
+;;                                        (distinct))
+;;                              diff)]
+;;         (when (seq changed-kp)
+;;           (execute-in-thread-pools
+;;            (keyword (str (if client-name
+;;                            "subscriptions/"
+;;                            "watchers/") (cstr/replace (str base-type) ":" "")
+;;                             ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
+;;                          (when client-name ".*")))
+;;            (fn []
+;;              (try
+;;                (watcher-fn key ref old-state new-state)
+;;                (catch Exception e
+;;                  (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
+;;                  (throw e))))))))))
 
 
 (defn add-watch+ [atom key watcher-fn base-type  & [client-name flow-key]]
@@ -1140,14 +1164,14 @@
            ;(enqueue-task5 
            ;(qp/slot-queue :sql-meta client-name
            ;               (fn [] ;; so our sniffer metadata picks up the new column
-                            (cruiser/captured-sniff "cache.db"
-                                                    db-conn
-                                                    db-conn
-                                                    cache-db
-                                                    (hash rowset-fixed)
-                                                    [:= :table-name table-name]
-                                                    true
-                                                    rowset-fixed)
+           (cruiser/captured-sniff "cache.db"
+                                   db-conn
+                                   db-conn
+                                   cache-db
+                                   (hash rowset-fixed)
+                                   [:= :table-name table-name]
+                                   true
+                                   rowset-fixed)
              ;               ))
           ;;  (ut/pp [:SNAP-INSERTED-SUCCESS2! (count rowset) :into table-name-str])
            {:sql-cache-table table-name :rows (count rowset)})
@@ -1320,7 +1344,7 @@
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 1000))] ;; was 100, was (async/sliding-buffer
+  (let [results (async/chan (async/sliding-buffer 100))] ;; was 100, was (async/sliding-buffer
     (try (async/go-loop []
            (async/<! (async/timeout (safe-get-timeout client-name))) ;; was 1100 ?
            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
@@ -1330,7 +1354,7 @@
                                         res))
                    items-by-task-id (group-by :task-id items)
                    latest-items     (mapv (fn [group] (if
-                                                       false  ;(contains? valid-groups (first group))
+                                                       (contains? valid-groups (first group))
                                                         group (last group)))
                                           (vals items-by-task-id))]
                (if (not-empty latest-items)
@@ -1351,34 +1375,34 @@
 
 (defn push-to-client
   [ui-keypath data client-name queue-id task-id status & [reco-count elapsed-ms]]
-  ;(qp/serial-slot-queue :push-to-client client-name
+  ;(qp/serial-slot-queue :push-to-client :hold ;;client-name
   ;(enqueue-task-slot2 client-name 
   ;(execute-in-thread-pools (keyword (str "client/push-to-client." (cstr/replace (str client-name) ":" "")))
                  ;(fn []
-                   (try
-                     (let [rr                0 ;(rand-int 3)
-                           cq                (get client-queue-atoms rr)
-                           _ (swap! queue-distributions assoc client-name (vec (conj (get @queue-distributions client-name []) rr)))
-                           client-queue-atom (get @cq client-name)]
-                       (swap! queue-status assoc-in [client-name task-id ui-keypath] status)
-                       (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
-                       (if client-queue-atom
-                         (do (inc-score! client-name :push)
-                             (inc-score! client-name :last-push true)
-                             (swap! client-queue-atom conj
-                                    {:ui-keypath  ui-keypath
-                                     :status      status
-                                     :elapsed-ms  elapsed-ms
-                                     :reco-count  reco-count
-                                     :queue-id    queue-id
-                                     :task-id     task-id
-                                     :data        [data ;; data is likely needed for :payload and :payload-kp that
-                                                   (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
-                                     :client-name client-name}))
-                         (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
-                           (new-client client-name)
-                           (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
-                     (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))));))
+  (try
+    (let [rr                0 ;(rand-int 3)
+          cq                (get client-queue-atoms rr)
+          _ (swap! queue-distributions assoc client-name (vec (conj (get @queue-distributions client-name []) rr)))
+          client-queue-atom (get @cq client-name)]
+      (swap! queue-status assoc-in [client-name task-id ui-keypath] status)
+      (swap! queue-data assoc-in [client-name task-id ui-keypath] {:data data :reco-count reco-count :elapsed-ms elapsed-ms})
+      (if client-queue-atom
+        (do (inc-score! client-name :push)
+            (inc-score! client-name :last-push true)
+            (swap! client-queue-atom conj
+                   {:ui-keypath  ui-keypath
+                    :status      status
+                    :elapsed-ms  elapsed-ms
+                    :reco-count  reco-count
+                    :queue-id    queue-id
+                    :task-id     task-id
+                    :data        [data ;; data is likely needed for :payload and :payload-kp that
+                                  (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
+                    :client-name client-name}))
+        (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
+          (new-client client-name)
+          (push-to-client ui-keypath data client-name queue-id task-id status reco-count elapsed-ms))))
+    (catch Throwable e (ut/pp [:push-to-client-err!! (str e) data]))));))
 
 (defn react-to-file-changes
   [{:keys [path type]}]
@@ -1466,7 +1490,7 @@
 
 (defmethod wl/handle-push :current-panels
   [{:keys [panels client-name resolved-panels]}] ;; TODO add these
-  
+
   ;; (qp/serial-slot-queue
   ;;  :panel-update-serial :serial
   ;;  (ext/write-panels client-name panels)) ;; push to file system for beholder cascades
@@ -1507,14 +1531,14 @@
   ;;          (sql-exec system-db (to-sql board-ins-sql))
   ;;          (when (ut/ne? rows) (sql-exec system-db (to-sql ins-sql))))
   ;;        (swap! last-panels assoc client-name panels)))))
-         )
+  )
 
 (defn run-shell-command
   "execute a generic shell command and return output as a map of timing and seq of str lines"
   [command]
-  (let [shell                    (or (System/getenv "SHELL") "/bin/sh")
-        output                   (shell/sh shell "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
-        ;;output                 (shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+  (let [;;shell                    (or (System/getenv "SHELL") "/bin/sh")
+        ;;output                   (shell/sh shell "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
+        output                   (shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
         split-lines              (vec (remove empty? (cstr/split-lines (get output :out))))
         exit-code                (get output :exit)
         error                    (vec (remove empty? (cstr/split-lines (get output :err))))
@@ -1528,7 +1552,7 @@
     {:output     split-lines
      :exception  error-data
      :seconds    timing-data
-     :exit-code  exit-code 
+     :exit-code  exit-code
      :command    (str command)}))
 
 (defn read-local-file
@@ -1641,54 +1665,51 @@
             {}
             status))))
 
-(defn flow-statuses
-  []
-  (into
-   {}
-   (for [[k {:keys [*time-running *running? *started-by *finished overrides started waiting-blocks running-blocks]}] @flow-status
-         :let [chans               (count (get @flow-db/channels-atom k))
-               chans-open          (count (doall (map (fn [[_ ch]]
-                                                        (let [vv (try (not (ut/channel-open? ch)) (catch Throwable e (str e)))]
-                                                          (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
-                                                      (get @flow-db/channels-atom k))))
-               channels-open?      (true? (> chans-open 0))
-               last-update-seconds (int (/ (- (System/currentTimeMillis) (get @watchdog-atom k)) 1000))
-               human-elapsed       (if *running? (ut/format-duration started (System/currentTimeMillis)) *time-running)
-               last-update         (get @last-block-written k)
-               _ (when (and (> last-update-seconds 120) (empty? running-blocks) (not (nil? last-update)) *running?)
-                   (ut/pp [(str "ATTN: flow " k " killed by rabbit watchdog for going idle 2+ mins")])
+(defn flow-statuses []
+  (into {}
+        (for [[k {:keys [*time-running *running? *started-by *finished overrides started waiting-blocks running-blocks]}] @flow-status
+              :let [chans               (count (get @flow-db/channels-atom k))
+                    chans-open          (count (doall (map (fn [[_ ch]]
+                                                             (let [vv (try (not (ut/channel-open? ch)) (catch Throwable e (str e)))]
+                                                               (if (cstr/includes? (str vv) "put nil on channel") :open vv)))
+                                                           (get @flow-db/channels-atom k))))
+                    channels-open?      (true? (> chans-open 0))
+                    last-update-seconds (int (/ (- (System/currentTimeMillis) (get @watchdog-atom k)) 1000))
+                    human-elapsed       (if *running? (ut/format-duration started (System/currentTimeMillis)) *time-running)
+                    last-update         (get @last-block-written k)
+                    _ (when (and (> last-update-seconds 120) (empty? running-blocks) (not (nil? last-update)) *running?)
+                        (ut/pp [(str "ATTN: flow " k " killed by rabbit watchdog for going idle 2+ mins")])
                     ;;(stop-solver k)
-                   (doseq [[client-name solvers] @solver-status]
-                     (doseq [[sk _] solvers
-                             :let [sk-mod (str (cstr/replace (str sk) ":" "") "-solver-flow-")] ;; solver flow name is a keyword?
-                             :when (= sk-mod k)]
-                       (ut/pp [:killswitch-on client-name sk k sk-mod])
+                        (doseq [[client-name solvers] @solver-status]
+                          (doseq [[sk _] solvers
+                                  :let [sk-mod (str (cstr/replace (str sk) ":" "") "-solver-flow-")] ;; solver flow name is a keyword?
+                                  :when (= sk-mod k)]
+                            (ut/pp [:killswitch-on client-name sk k sk-mod])
                        ;(swap! solver-status assoc-in [client-name sk :running?] false)
                        ;(swap! solver-status assoc-in [client-name sk :stopped] (System/currentTimeMillis))
-                       (swap! solver-status update-in [client-name sk] merge {:running? false, :stopped (System/currentTimeMillis)})
-                       ))
-                   (alert! *started-by
-                           [:box :style {:color "red"} :child
-                            (str "ATTN: flow " k " killed by rabbit watchdog for going idle 2+ mins")]
-                           15
-                           1
-                           60)
-                   (flow-kill! k :rvbbit-watchdog))]]
-     {k {:time-running        *time-running
-         :*running?           *running?
-         :retries-left        (get @restart-map k -1)
-         :*started-by         *started-by
-         :last-update-seconds (when *running? last-update-seconds)
-         :last-updated        (when *running? (ut/format-duration-seconds last-update-seconds))
-         :last-update         last-update
-         :running-blocks      running-blocks
-         :block-overrides     (vec (keys overrides))
-         :since-start         (str human-elapsed)
-         :waiting-blocks      waiting-blocks
-         :channels-open?      channels-open?
-         :channels            chans
-         :channels-open       chans-open
-         :blocks_finished     *finished}})))
+                            (swap! solver-status update-in [client-name sk] merge {:running? false, :stopped (System/currentTimeMillis)})))
+                        (alert! *started-by
+                                [:box :style {:color "red"} :child
+                                 (str "ATTN: flow " k " killed by rabbit watchdog for going idle 2+ mins")]
+                                15
+                                1
+                                60)
+                        (flow-kill! k :rvbbit-watchdog))]]
+          {k {:time-running        *time-running
+              :*running?           *running?
+              :retries-left        (get @restart-map k -1)
+              :*started-by         *started-by
+              :last-update-seconds (when *running? last-update-seconds)
+              :last-updated        (when *running? (ut/format-duration-seconds last-update-seconds))
+              :last-update         last-update
+              :running-blocks      running-blocks
+              :block-overrides     (vec (keys overrides))
+              :since-start         (str human-elapsed)
+              :waiting-blocks      waiting-blocks
+              :channels-open?      channels-open?
+              :channels            chans
+              :channels-open       chans-open
+              :blocks_finished     *finished}})))
 
 
 (defn flow-waiter
@@ -2170,165 +2191,167 @@
 
 (def last-times (atom {})) ;; stopgap for error times TODO, april 2024
 
+(def flows-run (atom 0))
+
 (defn flow!
   [client-name flowmap file-image flow-id opts & [no-return?]]
-  
-  (execute-in-thread-pools-but-deliver
-   (keyword (str "flow-runner/" (cstr/replace client-name ":" "")))
-   (fn []
-     (try
-       (let [orig-flowmap     flowmap
-             from-string?     (true? (string? flowmap))
-             _ (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of
-             orig-opts        opts ;; contains overrides
-             oo-flowmap       (if (string? flowmap) ;; load from disk and run client sync post
-                                (let [fss         (str "./flows/" flowmap ".edn")
-                                      raw         (try (edn/read-string (slurp fss))
-                                                       (catch Exception _
-                                                         (do (ut/pp [:error-reading-flow-from-disk-oo-flowmap-flow! fss flow-id
-                                                                     client-name])
-                                                             {})))
-                                      flowmaps    (process-flow-map (get raw :flowmaps))
-                                      connections (get raw :flowmaps-connections)
-                                      fmap        (process-flowmap2 flowmaps connections flow-id)
-                                      fmap        (merge fmap {:opts (get raw :opts)})]
-                                  fmap)
-                                flowmap)
-             file-image       (or file-image
-                                  (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
-                                       (catch Exception _
-                                         (do (when (not= flow-id "client-keepalive") ;; since no
-                                               (ut/pp [:error-reading-flow-from-disk-file-image-flow! flow-id client-name]))
-                                             {}))))
-             user-opts        (get oo-flowmap :opts (get opts :opts))
-             opts             (assoc opts :opts user-opts) ;; kinda weird, but we need to account
-             walk-map         (into {}
-                                    (for [[k v] (get @params-atom client-name)]
-                                      {(keyword (str "param/" (cstr/replace (str k) ":" ""))) v}))
-             flowmap          (walk/postwalk-replace walk-map oo-flowmap)
-             uid              (get opts :instance-id (str flow-id)) ;(ut/generate-name)
-             post-id          (if (get opts :increment-id? false) ;; if auto increment idx, lets
-                                (str uid "-" (count (filter #(cstr/starts-with? % uid) (keys @flow-db/channel-history))))
-                                uid)
-             uuid             (str (java.util.UUID/randomUUID))
-             sub-map          {:flow-id uid :client-name client-name}
-             finished-flowmap (process-flowmaps flowmap sub-map)
-             finished-flowmap (walk/postwalk-replace (merge ;; need to do recursively eventually?
-                                                      {:client-name client-name
-                                                       :cid         client-name
-                                                       :flow-id     flow-id
-                                                       :fid         flow-id
-                                                       :client-id   client-name
-                                                       'save!       'rvbbit-backend.websockets/save!
-                                                       'tap>        'rvbbit-backend.websockets/ttap>}
-                                                      (ut/deselect-keys (get opts :opts) ;; TODO,
-                                                                        [:retries :retry-on-error? :close-on-done? :debug?
-                                                                         :timeout]))
-                                                     finished-flowmap)
-             opts             (merge opts (select-keys (get opts :opts {}) [:close-on-done? :debug? :timeout]))
-             opts             (merge {:client-name client-name} opts)
-             finished-flowmap (assoc finished-flowmap :opts opts)
-             _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter
-             _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
-             _ (swap! last-times assoc-in [flow-id :start] (System/currentTimeMillis))
-             _ (swap! tracker-client-only assoc flow-id {})
-             _ (swap! acc-trackers assoc flow-id [])
-             _ (swap! temp-error-blocks assoc flow-id [])
-             base-flow-id     (if (cstr/includes? (str flow-id) "-SHD-") (first (cstr/split flow-id #"-SHD-")) flow-id) ;; if
+
+  (execute-in-thread-pools-but-deliver (keyword (str "flow-runner/" (cstr/replace client-name ":" "")))
+                                       (fn []
+                                         (try
+                                           (let [_                (swap! flows-run inc)
+                                                 orig-flowmap     flowmap
+                                                 from-string?     (true? (string? flowmap))
+                                                 _                (swap! orig-caller assoc flow-id client-name) ;; caller for the flow in case of
+                                                 orig-opts        opts ;; contains overrides
+                                                 oo-flowmap       (if (string? flowmap) ;; load from disk and run client sync post
+                                                                    (let [fss         (str "./flows/" flowmap ".edn")
+                                                                          raw         (try (edn/read-string (slurp fss))
+                                                                                           (catch Exception _
+                                                                                             (do (ut/pp [:error-reading-flow-from-disk-oo-flowmap-flow! fss flow-id
+                                                                                                         client-name])
+                                                                                                 {})))
+                                                                          flowmaps    (process-flow-map (get raw :flowmaps))
+                                                                          connections (get raw :flowmaps-connections)
+                                                                          fmap        (process-flowmap2 flowmaps connections flow-id)
+                                                                          fmap        (merge fmap {:opts (get raw :opts)})]
+                                                                      fmap)
+                                                                    flowmap)
+                                                 file-image       (or file-image
+                                                                      (try (edn/read-string (slurp (str "./flows/" flowmap ".edn")))
+                                                                           (catch Exception _
+                                                                             (do (when (not= flow-id "client-keepalive") ;; since no
+                                                                                   (ut/pp [:error-reading-flow-from-disk-file-image-flow! flow-id client-name]))
+                                                                                 {}))))
+                                                 user-opts        (get oo-flowmap :opts (get opts :opts))
+                                                 opts             (assoc opts :opts user-opts) ;; kinda weird, but we need to account
+                                                 walk-map         (into {}
+                                                                        (for [[k v] (get @params-atom client-name)]
+                                                                          {(keyword (str "param/" (cstr/replace (str k) ":" ""))) v}))
+                                                 flowmap          (walk/postwalk-replace walk-map oo-flowmap)
+                                                 uid              (get opts :instance-id (str flow-id)) ;(ut/generate-name)
+                                                 post-id          (if (get opts :increment-id? false) ;; if auto increment idx, lets
+                                                                    (str uid "-" (count (filter #(cstr/starts-with? % uid) (keys @flow-db/channel-history))))
+                                                                    uid)
+                                                 uuid             (str (java.util.UUID/randomUUID))
+                                                 sub-map          {:flow-id uid :client-name client-name}
+                                                 finished-flowmap (process-flowmaps flowmap sub-map)
+                                                 finished-flowmap (walk/postwalk-replace (merge ;; need to do recursively eventually?
+                                                                                          {:client-name client-name
+                                                                                           :cid         client-name
+                                                                                           :flow-id     flow-id
+                                                                                           :fid         flow-id
+                                                                                           :client-id   client-name
+                                                                                           'save!       'rvbbit-backend.websockets/save!
+                                                                                           'tap>        'rvbbit-backend.websockets/ttap>}
+                                                                                          (ut/deselect-keys (get opts :opts) ;; TODO,
+                                                                                                            [:retries :retry-on-error? :close-on-done? :debug?
+                                                                                                             :timeout]))
+                                                                                         finished-flowmap)
+                                                 opts             (merge opts (select-keys (get opts :opts {}) [:close-on-done? :debug? :timeout]))
+                                                 opts             (merge {:client-name client-name} opts)
+                                                 finished-flowmap (assoc finished-flowmap :opts opts)
+                                                 _ (swap! watchdog-atom assoc flow-id 0) ;; clear watchdog counter
+                                                 _ (swap! tracker-history assoc flow-id []) ;; clear loop step history
+                                                 _ (swap! last-times assoc-in [flow-id :start] (System/currentTimeMillis))
+                                                 _ (swap! tracker-client-only assoc flow-id {})
+                                                 _ (swap! acc-trackers assoc flow-id [])
+                                                 _ (swap! temp-error-blocks assoc flow-id [])
+                                                 base-flow-id     (if (cstr/includes? (str flow-id) "-SHD-") (first (cstr/split flow-id #"-SHD-")) flow-id) ;; if
                                                                                                                      ;; history
                                                                                                                      ;; run,
                                                                                                                      ;; only for
                                                                                                                      ;; estimates
                                                                                                                      ;; for now
-             prev-times       (get @times-atom base-flow-id [-1])
-             ship-est         (fn [client-name]
-                                (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
-                                                  (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
-                                       (when (not (nil? times))
-                                         (kick client-name [:estimate] {flow-id {:times times :run-id uuid}} nil nil nil)))
-                                     (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
-             _ (ship-est client-name)
-             image-map        (assoc file-image :opts (merge (get file-image :opts) (select-keys orig-opts [:overrides])))
-             _ (do (ext/create-dirs "./flow-history") ;; just in case
-                   (spit ;; a partial flow-history map so if someone wants to "jump into" a
-                    (str "./flow-history/" flow-id ".edn")
-                    {:image       image-map ;; a partial flow-history map so if someone wants to
-                     :source-map  finished-flowmap
-                     :client-name client-name
-                     :flow-id     flow-id}))
-             return-val       (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn
-             retry?           (get-in opts [:opts :retry-on-error?] false)
-             restarts         (if retry? (- (get-in opts [:opts :retries] 0) (get @restart-map flow-id 0)) 0)
-             restarts-left?   (> restarts 0)
-             relevant-keys    (vec (filter #(cstr/starts-with? (str %) (str post-id)) (keys @flow-db/results-atom)))
-             working-data-ref (into {} (for [[k v] (select-keys @flow-db/working-data relevant-keys)] {k (get v :description)}))
-             run-id           (get-in @flow-db/results-atom [flow-id :run-id] "no-run-id")
-             output           {:client-name     client-name
-                               :flow-id         flow-id
-                               :run-id          run-id
-                               :fn-history      {} ;(select-keys @flow-db/fn-history
-                               :run-refs        working-data-ref
-                               :tracker         (select-keys @flow-db/tracker relevant-keys) ;; generally
-                               :tracker-history (ut/accumulate-unique-runs (get @tracker-history flow-id []))
-                               :source-map      finished-flowmap ;(if no-return? {}
-                               :return-maps     (if no-return? {} (select-keys @flow-db/results-atom relevant-keys))
-                               :return-map      {} ;(get @flow-db/results-atom post-id)
-                               :return-val      (if no-return? nil return-val)}]
-         (do
-           (swap! restart-map assoc flow-id (inc (get @restart-map flow-id 0)))
+                                                 prev-times       (get @times-atom base-flow-id [-1])
+                                                 ship-est         (fn [client-name]
+                                                                    (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
+                                                                                      (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
+                                                                           (when (not (nil? times))
+                                                                             (kick client-name [:estimate] {flow-id {:times times :run-id uuid}} nil nil nil)))
+                                                                         (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
+                                                 _ (ship-est client-name)
+                                                 image-map        (assoc file-image :opts (merge (get file-image :opts) (select-keys orig-opts [:overrides])))
+                                                 _ (do (ext/create-dirs "./flow-history") ;; just in case
+                                                       (spit ;; a partial flow-history map so if someone wants to "jump into" a
+                                                        (str "./flow-history/" flow-id ".edn")
+                                                        {:image       image-map ;; a partial flow-history map so if someone wants to
+                                                         :source-map  finished-flowmap
+                                                         :client-name client-name
+                                                         :flow-id     flow-id}))
+                                                 return-val       (flow-waiter (eval finished-flowmap) uid opts) ;; eval to realize fn
+                                                 retry?           (get-in opts [:opts :retry-on-error?] false)
+                                                 restarts         (if retry? (- (get-in opts [:opts :retries] 0) (get @restart-map flow-id 0)) 0)
+                                                 restarts-left?   (> restarts 0)
+                                                 relevant-keys    (vec (filter #(cstr/starts-with? (str %) (str post-id)) (keys @flow-db/results-atom)))
+                                                 working-data-ref (into {} (for [[k v] (select-keys @flow-db/working-data relevant-keys)] {k (get v :description)}))
+                                                 run-id           (get-in @flow-db/results-atom [flow-id :run-id] "no-run-id")
+                                                 output           {:client-name     client-name
+                                                                   :flow-id         flow-id
+                                                                   :run-id          run-id
+                                                                   :fn-history      {} ;(select-keys @flow-db/fn-history
+                                                                   :run-refs        working-data-ref
+                                                                   :tracker         (select-keys @flow-db/tracker relevant-keys) ;; generally
+                                                                   :tracker-history (ut/accumulate-unique-runs (get @tracker-history flow-id []))
+                                                                   :source-map      finished-flowmap ;(if no-return? {}
+                                                                   :return-maps     (if no-return? {} (select-keys @flow-db/results-atom relevant-keys))
+                                                                   :return-map      {} ;(get @flow-db/results-atom post-id)
+                                                                   :return-val      (if no-return? nil return-val)}]
+                                             (do
+                                               (swap! restart-map assoc flow-id (inc (get @restart-map flow-id 0)))
         ;; (when (not (cstr/includes? flow-id "keepalive"))
         ;;   (ut/pp [:flowmap-returned-val (ut/limited (ut/replace-large-base64 return-val)) :flowmap-returned-val]))
-           (let [cnt         (count (str return-val))
-                 limit       160
-                 over?       (> cnt limit)
-                 error?      (or (cstr/includes? (str return-val) ":error") (cstr/includes? (str return-val) ":timeout"))
-                 sample      (str ; (str (get-in @flow-status [flow-id :*time-running]) " ")
-                              (if over? (str (subs (str return-val) 0 limit) "...") (str return-val)))
-                 result-code (cond (cstr/includes? (str return-val) ":error")   "error"
-                                   (cstr/includes? (str return-val) ":timeout") "timeout"
-                                   :else                                        "success")
-                 sample      (if error? (get-in return-val [:error :error] sample) sample)]
-             (alert! client-name
-                     [:v-box :justify :center :style {:margin-top "-6px" :color (if error? "red" "inherit")} :children
-                      [[:box :child (str "flow " flow-id " has finished" (when error? (str " in error")))]
-                       (when (and error? restarts-left?)
-                         [:box :style {:font-size "9px"} :child (str "  " restarts " attempts left, restarting in 10 seconds...")])
-                       (when (not error?)
-                         [:box :style {:font-weight 700 :font-size "10px" :opacity 0.7} :child
-                          (str (get-in @flow-status [flow-id :*time-running]) " ")])
-                       [:box :style {:font-weight 700 :font-size (if error? "13px" "10px") :opacity (if error? 1.0 0.7)} :child
-                        (if error? (str sample) (str "returns: " sample))]]]
-                     10
-                     (if (and error? restarts-left?) 1.5 1.35)
-                     (if error? 25 9))
-             (when (and error? restarts-left?)
-               (async/thread (do (Thread/sleep 10000) (flow! client-name orig-flowmap file-image flow-id opts))))
-             (when (not error?) (swap! restart-map dissoc flow-id)) ;; reset the counter on
-             (do (when (not (= flow-id "client-keepalive")) ;; no need to track heartbeats..
-                   (swap! latest-run-id assoc flow-id run-id)
-                   (ut/pp [:saving-flow-exec-for flow-id result-code run-id])
-                   (do (ext/create-dirs "./flow-history") ;; just in case
-                       (spit ;; ut/pretty-spit
-                        (str "./flow-history/" run-id ".edn")
-                        (ut/replace-large-base64 (merge output
-                                                        {;;:image file-image ;; as unprocessed as we can w/o being a file path
-                                                         :image       image-map
-                                                         :return-maps (select-keys @flow-db/results-atom relevant-keys) ;; in
+                                               (let [cnt         (count (str return-val))
+                                                     limit       160
+                                                     over?       (> cnt limit)
+                                                     error?      (or (cstr/includes? (str return-val) ":error") (cstr/includes? (str return-val) ":timeout"))
+                                                     sample      (str ; (str (get-in @flow-status [flow-id :*time-running]) " ")
+                                                                  (if over? (str (subs (str return-val) 0 limit) "...") (str return-val)))
+                                                     result-code (cond (cstr/includes? (str return-val) ":error")   "error"
+                                                                       (cstr/includes? (str return-val) ":timeout") "timeout"
+                                                                       :else                                        "success")
+                                                     sample      (if error? (get-in return-val [:error :error] sample) sample)]
+                                                 (alert! client-name
+                                                         [:v-box :justify :center :style {:margin-top "-6px" :color (if error? "red" "inherit")} :children
+                                                          [[:box :child (str "flow " flow-id " has finished" (when error? (str " in error")))]
+                                                           (when (and error? restarts-left?)
+                                                             [:box :style {:font-size "9px"} :child (str "  " restarts " attempts left, restarting in 10 seconds...")])
+                                                           (when (not error?)
+                                                             [:box :style {:font-weight 700 :font-size "10px" :opacity 0.7} :child
+                                                              (str (get-in @flow-status [flow-id :*time-running]) " ")])
+                                                           [:box :style {:font-weight 700 :font-size (if error? "13px" "10px") :opacity (if error? 1.0 0.7)} :child
+                                                            (if error? (str sample) (str "returns: " sample))]]]
+                                                         10
+                                                         (if (and error? restarts-left?) 1.5 1.35)
+                                                         (if error? 25 9))
+                                                 (when (and error? restarts-left?)
+                                                   (async/thread (do (Thread/sleep 10000) (flow! client-name orig-flowmap file-image flow-id opts))))
+                                                 (when (not error?) (swap! restart-map dissoc flow-id)) ;; reset the counter on
+                                                 (do (when (not (= flow-id "client-keepalive")) ;; no need to track heartbeats..
+                                                       (swap! latest-run-id assoc flow-id run-id)
+                                                       (ut/pp [:saving-flow-exec-for flow-id result-code run-id])
+                                                       (do (ext/create-dirs "./flow-history") ;; just in case
+                                                           (spit ;; ut/pretty-spit
+                                                            (str "./flow-history/" run-id ".edn")
+                                                            (ut/replace-large-base64 (merge output
+                                                                                            {;;:image file-image ;; as unprocessed as we can w/o being a file path
+                                                                                             :image       image-map
+                                                                                             :return-maps (select-keys @flow-db/results-atom relevant-keys) ;; in
                                                                                                                       ;; case
-                                                         :return-val  return-val} ;; in case no-return? is true
+                                                                                             :return-val  return-val} ;; in case no-return? is true
 ))))) ;; just for the record
-                 output))))
-       (catch Throwable e ;; mostly for mal-formed raw-fns, etc TODO make more informative
-         (let [error-map (Throwable->map e)]
-           (do (ut/pp [:error-in-flow-processing error-map])
-               (alert! client-name
-                       [:v-box :children
-                        [[:box :child (str flow-id ":error in flow processing!")] [:box :child (str (:phase error-map))]
-                         [:box :style {:font-size "11px"} :child (str (:cause error-map))]]]
-                       10
-                       2.1
-                       8)
-               {:error error-map})))))))
+                                                     output))))
+                                           (catch Throwable e ;; mostly for mal-formed raw-fns, etc TODO make more informative
+                                             (let [error-map (Throwable->map e)]
+                                               (do (ut/pp [:error-in-flow-processing error-map])
+                                                   (alert! client-name
+                                                           [:v-box :children
+                                                            [[:box :child (str flow-id ":error in flow processing!")] [:box :child (str (:phase error-map))]
+                                                             [:box :style {:font-size "11px"} :child (str (:cause error-map))]]]
+                                                           10
+                                                           2.1
+                                                           8)
+                                                   {:error error-map})))))))
 
 (defn schedule!
   [time-seq1 flowmap & [opts]]
@@ -2442,7 +2465,7 @@
   (when (not (get-in (flow-statuses) [flow-id :*running?] false))
    ; (execute-in-thread-pools (keyword (str "client/flow-runner." (cstr/replace (str client-name) ":" ""))) ;;:flow-runner
     ;                     (fn []
-                           (flow! client-name flowmap file-image flow-id opts true)
+    (flow! client-name flowmap file-image flow-id opts true)
      ;                      ))
     ))
 
@@ -2458,9 +2481,9 @@
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
   ;(enqueue-task-slot-pool client-name (fn [] 
   (execute-in-thread-pools (keyword (str "client/run-solver." (cstr/replace (str client-name) ":" "")))
-   ;(qp/slot-queue :solvers-req client-name 
-                       (fn []
-                         (run-solver solver-name client-name override-map))))
+  ;(qp/slot-queue :solvers client-name 
+                           (fn []
+                             (run-solver solver-name client-name override-map))))
 
 (defmethod wl/handle-push :run-solver
   [{:keys [solver-name client-name override-map]}]
@@ -2471,9 +2494,9 @@
   ;; (enqueue-task4 (fn [] (run-solver solver-name client-name override-map)))
   ;(enqueue-task-slot-pool client-name (fn [] 
   (execute-in-thread-pools (keyword (str "client/run-solver." (cstr/replace (str client-name) ":" "")))
-   ;(qp/slot-queue :solvers-push client-name 
-                       (fn []
-                         (run-solver solver-name client-name override-map))))
+  ;(qp/slot-queue :solvers client-name 
+                           (fn []
+                             (run-solver solver-name client-name override-map))))
 
 (defmethod wl/handle-push :run-solver-custom
   [{:keys [solver-name temp-solver-name client-name override-map input-map]}]
@@ -2484,10 +2507,10 @@
   ;; (enqueue-task4 (fn [] (run-solver solver-name nil input-map temp-solver-name)))
 ;;  (run-solver solver-name client-name override-map input-map temp-solver-name)
   ;(enqueue-task-slot-pool client-name (fn [] 
-  (execute-in-thread-pools (keyword (str "client/run-solver-custom." (cstr/replace (str client-name) ":" "")))
-   ;(qp/slot-queue :solvers-cust client-name 
-                       (fn []
-                         (run-solver solver-name client-name override-map input-map temp-solver-name)))
+  (execute-in-thread-pools (keyword (str "client/run-solver." (cstr/replace (str client-name) ":" "")))
+  ;(qp/slot-queue :solvers client-name 
+                           (fn []
+                             (run-solver solver-name client-name override-map input-map temp-solver-name)))
   temp-solver-name)
 
 (defn flow-kill!
@@ -2841,17 +2864,32 @@
       (swap! new-child-atom assoc key (get @parent-atom key))
       (get @child-atom key))))
 
+;; (defn get-atom-splitter-2deep
+;;   [parent-key child-key ttype child-atoms parent-atom]
+;;   (let [composite-key [parent-key child-key]]
+;;     (if-let [child-atom (get @child-atoms composite-key)]
+;;       child-atom
+;;       (let [new-child-atom (atom {})]
+;;         (swap! child-atoms assoc composite-key new-child-atom)
+;;         (swap! new-child-atom assoc parent-key
+;;                (if-let [parent-value (get @parent-atom parent-key)]
+;;                  (select-keys parent-value [child-key])
+;;                  {}))
+;;         (get @child-atoms composite-key)))))
+
 (defn get-atom-splitter-2deep
   [parent-key child-key ttype child-atoms parent-atom]
-  (let [composite-key [parent-key child-key]]
+  (let [composite-key (if child-key [parent-key child-key] parent-key)]
     (if-let [child-atom (get @child-atoms composite-key)]
       child-atom
       (let [new-child-atom (atom {})]
         (swap! child-atoms assoc composite-key new-child-atom)
-        (swap! new-child-atom assoc parent-key
-               (if-let [parent-value (get @parent-atom parent-key)]
-                 (select-keys parent-value [child-key])
-                 {}))
+        (if child-key
+          (swap! new-child-atom assoc parent-key
+                 (if-let [parent-value (get @parent-atom parent-key)]
+                   (select-keys parent-value [child-key])
+                   {}))
+          (swap! new-child-atom assoc parent-key (get @parent-atom parent-key)))
         (get @child-atoms composite-key)))))
 
 
@@ -2859,18 +2897,20 @@
 ;(get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status)
 
 
-(defn break-up-flow-key-ext
+(defn break-up-flow-key-ext ;;; ex :flow/flow-id>flow-block-data>0>1>key34 etc 
   [key]
   (let [ff             (cstr/split (-> (str key)
                                        (cstr/replace #":" ""))
                                    #"/")
         ff2            (cstr/split (last ff) #">")
-        keyword-or-int (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s)))] ;; dont
+        keyword-or-int (fn [s] (if (re-matches #"\d+" s) (Integer/parseInt s) (keyword s)))]
     (vec (into [(keyword (first ff)) (first ff2)] (rest (for [e ff2] (keyword-or-int e)))))))
+
+(break-up-flow-key-ext :flow/flow-id>flow-block-data>0>1>key34)
 
 (defn make-watcher
   [keypath flow-key client-name handler-fn & [no-save]]
-  
+
   (fn [kkey atom old-state new-state]
     (let [] ;[tt (str (rand-int 123123)"-"(rand-int 123123))]
       ;(ut/pp [:make-watcher tt flow-key client-name])
@@ -2887,16 +2927,16 @@
          (and (not (nil? new-value)) (not= old-value new-value))
           (doseq [client-name all-clients-subbed]
 
-            (qp/serial-slot-queue :watcher-to-client-serial client-name (fn []
-
-                                                                          (do (when (cstr/starts-with? (str flow-key) ":flow/")
-                                                                                (spit (str "./reaction-logs/" (str (cstr/replace (str client-name) ":" "")
-                                                       ;;"-" (-> flow-key str (cstr/replace ":" "") (cstr/replace "/" ""))
-                                                                                                                   )".log")
-                                                                                      (str [(ut/get-current-timestamp) client-name flow-key old-value new-value] "\n\n") :append true)
-                                                                                (ut/pp [:running-flow-push! flow-key client-name]))
-
-                                                                              (handler-fn base-type keypath client-name new-value))))
+            (qp/serial-slot-queue :watcher-to-client-serial client-name
+            ;(execute-in-thread-pools :watcher-to-client-serial                                 
+                                  (fn []
+                                    (do ;(when (cstr/starts-with? (str flow-key) ":flow/")
+                                        ;  (spit (str "./reaction-logs/" (str (cstr/replace (str client-name) ":" "")
+                                        ;               ;;"-" (-> flow-key str (cstr/replace ":" "") (cstr/replace "/" ""))
+                                        ;                                     )".log")
+                                        ;        (str [(ut/get-current-timestamp) client-name flow-key old-value new-value] "\n\n") :append true)
+                                        ;  (ut/pp [:running-flow-push! flow-key client-name]))
+                                      (handler-fn base-type keypath client-name new-value))))
             (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker
               (swap! last-values assoc keypath new-value)
               (swap! last-values-per assoc-in [client-name keypath] new-value)) ;; if a new client
@@ -2930,31 +2970,32 @@
         signal-history? (= base-type :signal-history)
         server?         (= base-type :server)]
     (cond ;status?         flow-status
-          status?         (get-atom-splitter (first keypath) :flow flow-status-child-atoms flow-status)
+      status?         (get-atom-splitter (first keypath) :flow flow-status-child-atoms flow-status)
 ;          tracker?        flow-db/tracker
-          tracker?         (get-atom-splitter (first keypath) :flow flow-tracker-child-atoms flow-db/tracker)
+      tracker?         (get-atom-splitter (first keypath) :flow flow-tracker-child-atoms flow-db/tracker)
           ;signal?         last-signals-atom ;; no need to split for now, will keep an eye on it (ut/hash-group (keyword (second sub-path)) num-groups)
-          signal?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :signal signal-child-atoms last-signals-atom)
+      signal?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :signal signal-child-atoms last-signals-atom)
           ;solver?         (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver solver-child-atoms last-solvers-atom) ;; last-solvers-atom
-          solver?         (get-atom-splitter (keyword (second sub-path)) :solver solver-child-atoms last-solvers-atom)
+      solver?         (get-atom-splitter (keyword (second sub-path)) :solver solver-child-atoms last-solvers-atom)
           ;solver-meta?    last-solvers-atom-meta
-          solver-meta?    (get-atom-splitter (keyword (second sub-path)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
+          ;solver-meta?    (get-atom-splitter (keyword (second sub-path)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
+      solver-meta?    (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
           ;repl-ns?        evl/repl-introspection-atom
-          repl-ns?        (get-atom-splitter (keyword (second sub-path)) :repl-ns evl/repl-introspection-child-atoms evl/repl-introspection-atom)
+      repl-ns?        (get-atom-splitter (keyword (second sub-path)) :repl-ns evl/repl-introspection-child-atoms evl/repl-introspection-atom)
           ;solver-status?  (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver-status solver-status-child-atoms solver-status) ;;solver-status
           ;solver-status?  (get-atom-splitter (keyword (second sub-path)) :solver-status solver-status-child-atoms solver-status) ;;solver-status
-          solver-status?  (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :solver-status solver-status-child-atoms solver-status)
-          data?           last-solvers-data-atom
-          signal-history? last-signals-history-atom
-          server?         server-atom ;; no need to split for now, will keep an eye on it - don't
+      solver-status?  (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :solver-status solver-status-child-atoms solver-status)
+      data?           last-solvers-data-atom
+      signal-history? last-signals-history-atom
+      server?         server-atom ;; no need to split for now, will keep an eye on it - don't
           ;time?           time-atom ;;(get-time-atom-for-client :rvbbit) ;;  time-atom ;; zero need to split ever. lol, its like 6 keys
           ;time?           (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time)
-          time?           (get-atom-splitter (keyword (second sub-path)) :time time-child-atoms father-time)
-          panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
-          client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
-          flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
-          screen?         (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
-          :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))))
+      time?           (get-atom-splitter (keyword (second sub-path)) :time time-child-atoms father-time)
+      panel?          (get-atom-splitter (keyword (second sub-path)) :panel panel-child-atoms panels-atom)
+      client?         (get-atom-splitter (keyword (second sub-path)) :client param-child-atoms params-atom)
+      flow?           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom)
+      screen?         (get-atom-splitter (second sub-path) :screen screen-child-atoms screens-atom)
+      :else           (get-atom-splitter (first keypath) :flow flow-child-atoms flow-db/results-atom))))
 
 
 
@@ -3035,7 +3076,8 @@
                           solver?         (get-atom-splitter (keyword (second sub-path)) :solver solver-child-atoms last-solvers-atom)
                           data?           last-solvers-data-atom
                           ;solver-meta?    last-solvers-atom-meta
-                          solver-meta?    (get-atom-splitter (keyword (second sub-path)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
+                          ;solver-meta?    (get-atom-splitter (keyword (second sub-path)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
+                          solver-meta?    (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
                           ;repl-ns?        evl/repl-introspection-atom
                           repl-ns?        (get-atom-splitter (keyword (second sub-path)) :repl-ns evl/repl-introspection-child-atoms evl/repl-introspection-atom)
                           ;solver-status?  (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver-status solver-status-child-atoms solver-status)
@@ -3118,7 +3160,8 @@
                           data?           last-solvers-data-atom ;; ^^ same as above -
                                                                  ;; take a hint, choom.
                           ;solver-meta?    last-solvers-atom-meta
-                          solver-meta?    (get-atom-splitter (keyword (second sub-path)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
+                          ;solver-meta?    (get-atom-splitter (keyword (second sub-path)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
+                          solver-meta?    (get-atom-splitter-2deep (keyword (second sub-path)) (keyword (get sub-path 2)) :solver-meta solver-meta-child-atoms last-solvers-atom-meta)
                           ;repl-ns?        evl/repl-introspection-atom
                           repl-ns?        (get-atom-splitter (keyword (second sub-path)) :repl-ns evl/repl-introspection-child-atoms evl/repl-introspection-atom)
                           ;solver-status?  (get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :solver-status solver-status-child-atoms solver-status)
@@ -3325,9 +3368,12 @@
        ;; ^^ is it running from another client?
        ))
 
+(def solvers-run (atom 0))
+
 (defn run-solver
   [solver-name client-name & [override-map override-input temp-solver-name]]
   (let [;;temp-running-elsewhere? (atom (running-elsewhere? temp-solver-name))
+        _                     (swap! solvers-run inc)
         timestamp             (System/currentTimeMillis)]
 
   ;; (if @temp-running-elsewhere?
@@ -3377,7 +3423,7 @@
           ;use-cache?            (true?
           ;                       (or (true? (not (nil? temp-solver-name))) ;; temp test
           ;                           (true? (get solver-map :cache? false))))
-          use-cache?            false
+          use-cache?            (true? (get solver-map :cache? false)) ;; false
           vdata                 (walk/postwalk-replace input-map (get solver-map :data))
           vdata-clover-kps      (vec (filter #(and (keyword? %) ;; get any resolvable keys in the struct before we operate on
                                                               ;; it
@@ -3394,15 +3440,15 @@
                                                  (catch Exception e
                                                    (ut/pp [:clover-lookup-error kp e])
                                                    (str "clover-param-lookup-error " kp)))}))
-          
-          prev-times       (get @times-atom solver-name [-1])
-          ship-est         (fn [client-name]
-                             (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
-                                               (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
-                                    (when (not (nil? times))
-                                      (kick client-name [:estimate] {solver-name {:times times :run-id solver-name}} nil nil nil)))
-                                  (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
-          _ (ship-est client-name)
+
+          ;; prev-times       (get @times-atom solver-name [-1])
+          ;; ship-est         (fn [client-name]
+          ;;                    (try (let [times (ut/avg ;; avg based on last 10 runs, but only if >
+          ;;                                      (vec (take-last 10 (vec (remove #(< % 1) prev-times)))))]
+          ;;                           (when (not (nil? times))
+          ;;                             (kick client-name [:estimate] {solver-name {:times times :run-id solver-name}} nil nil nil)))
+          ;;                         (catch Exception e (ut/pp [:error-shipping-estimates (Throwable->map e) (str e)]) 0)))
+          ;; _ (ship-est client-name)
 
           vdata                 (if (ut/ne? vdata-clover-walk-map) (walk/postwalk-replace vdata-clover-walk-map vdata) vdata)
           runner-name           (get solver-map :type :clojure)
@@ -3526,11 +3572,10 @@
         (= runner-type :nrepl)
         (try (let [repl-host                   (get-in runner-map [:runner :host])
                    repl-port                   (get-in runner-map [:runner :port])
-                   {:keys [result elapsed-ms]} (ut/timed-exec 
-                                                    (execute-in-thread-pools-but-deliver
-                                                     (keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
-                                                     (fn []
-                                                       (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
+                   {:keys [result elapsed-ms]} (ut/timed-exec
+                                                    ;(execute-in-thread-pools-but-deliver (keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
+                                                    ; (fn []
+                                                (evl/repl-eval vdata repl-host repl-port client-name runner-name));))
                    output-full                 result
                    output                      (last (get-in output-full [:evald-result :value]))
                    output                      (if (nil? output) "(returns nil value)" output)
@@ -3551,8 +3596,8 @@
                                                         :error?         error?}}
                    timestamp-str               (str timestamp-str " (" elapsed-ms "ms)")
                    new-history                 (vec (conj runs timestamp-str))
-                   output                      (if error? 
-                                                 (select-keys (get output-full :evald-result) [:root-ex :ex :err]) 
+                   output                      (if error?
+                                                 (select-keys (get output-full :evald-result) [:root-ex :ex :err])
                                                  output)]
                (swap! last-solvers-atom assoc solver-name output)
                (swap! last-solvers-atom-meta assoc
@@ -3636,8 +3681,7 @@
               ;(swap! solver-status assoc-in [client-name solver-name :running?] false)
               ;(swap! solver-status assoc-in [client-name solver-name :mid?] true)
               ;(swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
-              (swap! solver-status update-in [client-name solver-name] merge {:running? false, :mid? true, :stopped (System/currentTimeMillis)})
-              )
+              (swap! solver-status update-in [client-name solver-name] merge {:running? false, :mid? true, :stopped (System/currentTimeMillis)}))
               ;;  (swap! solver-status update-in [client-name solver-name]
               ;;         (fn [solver]
               ;;           (-> solver
@@ -3804,9 +3848,9 @@
                                                          (keyword (str "signal/" (cstr/replace (str kk) ":" "")))))]
                                     ;(enqueue-task4 (fn []
                                     (execute-in-thread-pools (keyword (str "signal/run-solver." (cstr/replace (str client-name) ":" "")))
-                                     ;(qp/slot-queue :solvers-int sk ;;client-name 
-                                                         (fn []
-                                                           (run-solver sk client-name)))))
+                                    ;(qp/slot-queue :solvers-int sk ;;client-name 
+                                                             (fn []
+                                                               (run-solver sk client-name)))))
                               _ (swap! last-signals-history-atom assoc kk (get @last-signals-history-atom-temp kk)) ;; one
                                                                                                                        ;; write,
                                                                                                                        ;; to
@@ -3847,7 +3891,7 @@
         other-client-param-path (keyword (cstr/replace (cstr/join ">" keypath) ":" "")) ;;(keyword
         client-param-path       (if (= base-type :flow) flow-client-param-path other-client-param-path)
         signal?                 (= client-name :rvbbit)]
-    
+
     (if (not signal?)
       (kick client-name [(or base-type :flow) client-param-path] new-value nil nil nil)
       (do ;;(ut/pp [:signal-or-solver base-type keypath client-name])
@@ -3868,7 +3912,7 @@
             :when                           (> last-seen-seconds 600)]
       ; unsub from all watchers before atom cleanup - or else the pools will keep getting created via reactions!
       (ut/pp [:dead-client :cleaning-up k])
-      (doseq [s subs] 
+      (doseq [s subs]
         (ut/pp [:trying-to-unsub k s])
         (unsub-value k s))
       (doseq [p (filter #(cstr/includes? (str %) (cstr/replace (str k) ":" "")) (keys @dyn-pools))]
@@ -4742,6 +4786,7 @@
                           (do (if data-literal-code?
                                 ;(enqueue-task
                                 (qp/serial-slot-queue :general-serial :general
+                                ;(execute-in-thread-pools :general-serial                     
                                                       (fn []
                                                         (let [;output (evl/run literals) ;; (and repl-host repl-port)
                                                               literals    (walk/postwalk-replace
@@ -4778,6 +4823,7 @@
                                                           )))
                                 ;(enqueue-task 
                                 (qp/serial-slot-queue :general-serial :general
+                                ;(execute-in-thread-pools :general-serial                      
                                                       (fn []
                                                         (insert-rowset literals
                                                                        cache-table
@@ -4946,6 +4992,7 @@
                          (swap! deep-run-list conj filtered-req-hash) ;; mark this as run
                          ;(enqueue-task
                          (qp/serial-slot-queue :general-serial :general
+                         ;(execute-in-thread-pools :general-serial                      
                                                (fn []
                                                  (ut/pp :kick-sniff)
                                                  (push-to-client ui-keypath [:reco-status (first ui-keypath)] client-name 1 :reco :started)
@@ -4993,6 +5040,7 @@
                       (when sniff-worthy? ;; want details, but not yet the full expensive meta
                         ;(enqueue-task
                         (qp/serial-slot-queue :general-serial :general
+                        ;(execute-in-thread-pools :general-serial                      
                                               (fn []
                                                 (swap! sql/query-history assoc
                                                        cache-table-name
@@ -5053,6 +5101,7 @@
   [output query-hash ui-keypath ttype kit-name elapsed-ms & [client-name flow-id]]
   ;(enqueue-task3 ;; blocking for inserts and deletes (while we are one sqlite, will be
   (qp/serial-slot-queue :general-serial :general
+  ;(execute-in-thread-pools :general-serial                      
                         (fn []
                           (let [output-is-valid? (map? output) ;; basic spec checking
                                 kit-keys         (keys output)
@@ -5098,6 +5147,7 @@
   (when (keyword? kit-name) ;;; all kit stuff. deprecated?
     ;(enqueue-task2
     (qp/serial-slot-queue :general-serial :general
+    ;(execute-in-thread-pools :general-serial                      
                           (fn []
                             (try ;; save off the full thing... or try
                               (let [;kit-name :outliers
@@ -5168,22 +5218,21 @@
                                     (<! result-chan)))] ; This returns a channel; This returns
         (do (println "inviz: Getting result from async operation...") (async/<!! async-result-chan)))) ; Blocking take from
                                                                                                          ; the channel
-     
-     (execute-in-thread-pools-but-deliver
-      (keyword (str "query-runstream/" (cstr/replace client-name ":" "")))
-      (fn []
-        (query-runstream kind
-                         ui-keypath
-                         honey-sql
-                         client-cache?
-                         sniff?
-                         connection-id
-                         client-name
-                         page
-                         panel-key
-                         clover-sql
-                         deep-meta?
-                         false)))
+
+     ;(execute-in-thread-pools-but-deliver (keyword (str "query-runstream/" (cstr/replace client-name ":" "")))
+     ; (fn []
+     (query-runstream kind
+                      ui-keypath
+                      honey-sql
+                      client-cache?
+                      sniff?
+                      connection-id
+                      client-name
+                      page
+                      panel-key
+                      clover-sql
+                      deep-meta?
+                      false);))
      )))
 
 (defn send-file-success
@@ -5490,6 +5539,7 @@
         ]
     ;(enqueue-task3 
     (qp/serial-slot-queue :general-serial :general
+    ;(execute-in-thread-pools :general-serial                      
                           (fn []
                             (sql-exec system-db (to-sql delete-sql))
                             (doseq [rr (partition-all 50 rows)]
@@ -5621,22 +5671,45 @@
 (def booted (atom nil))
 (def clients-alive (atom nil))
 
-(defn average-in-chunks [data chunk-size]
-  (->> data
-       (partition-all chunk-size) ;; vector into chunks
-       (map (fn [chunk]
-              (let [sum (apply + chunk)
-                    count (count chunk)
-                    average (if (zero? sum)
-                              0 ;(do (println "Chunk with sum zero encountered.") 0) ;; Log and return 0 for sum zero
-                              (/ sum count))] ;; Calculate average normally
-                average)))))
+;; (defn average-in-chunks [data chunk-size]
+;;   (->> data
+;;        (partition-all chunk-size) ;; vector into chunks
+;;        (map (fn [chunk]
+;;               (let [sum (apply + chunk)
+;;                     count (count chunk)
+;;                     average (if (zero? sum)
+;;                               0 ;(do (println "Chunk with sum zero encountered.") 0) ;; Log and return 0 for sum zero
+;;                               (/ sum count))] ;; Calculate average normally
+;;                 average)))))
 
-(defn sum-in-chunks [data chunk-size]
+;; (defn sum-in-chunks [data chunk-size]
+;;   (->> data
+;;        (partition-all chunk-size) ;; vector into chunks
+;;        (map (fn [chunk]
+;;               (reduce + 0 chunk)))))
+
+
+(defn average-in-chunks
+  "Calculates the average of each chunk in a sequence of numbers.
+   Returns a lazy sequence of averages."
+  [data chunk-size]
   (->> data
-       (partition-all chunk-size) ;; vector into chunks
+       (partition-all chunk-size)
        (map (fn [chunk]
-              (reduce + 0 chunk)))))
+              (let [sum (reduce + 0.0 chunk)  ; Use 0.0 to ensure float division
+                    count (count chunk)]
+                (if (pos? count)
+                  (/ sum count)
+                  0.0))))))  ; Return 0.0 for empty chunks
+
+(defn sum-in-chunks
+  "Calculates the sum of each chunk in a sequence of numbers.
+   Returns a lazy sequence of sums."
+  [data chunk-size]
+  (->> data
+       (partition-all chunk-size)
+       (map #(reduce + 0 %))))
+
 
 
 ;; (defn rnd [vv scale]
@@ -5668,9 +5741,133 @@
 ;;         (.intValue rounded)
 ;;         rounded-value))))
 
-(defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color freq agg] :or {color :default freq 1 agg "avg"}}]
+;; (def ansi-colors
+;;   {:red "\u001b[31m"
+;;    :green "\u001b[32m"
+;;    :yellow "\u001b[33m"
+;;    :blue "\u001b[34m"
+;;    :magenta "\u001b[35m"
+;;    :cyan "\u001b[36m"
+;;    :white "\u001b[37m"
+;;    :bright-red "\u001B[91m"
+;;    :bright-green "\u001B[92m"
+;;    :bright-yellow "\u001B[93m"
+;;    :bright-blue "\u001B[94m"
+;;    :bright-magenta "\u001B[95m"
+;;    :bright-cyan "\u001B[96m"
+;;    :bright-white "\u001B[97m"})
+
+(def ansi-colors-ext
+  {;:reset              "\u001b[0m"
+   ;:bold               "\u001b[1m"
+   ;:dim                "\u001b[2m"
+   ;:italic             "\u001b[3m"
+   ;:underline          "\u001b[4m"
+   ;:blink              "\u001b[5m"
+   ;:reverse            "\u001b[7m"
+   ;:hidden             "\u001b[8m"
+   ;:strikethrough      "\u001b[9m"
+
+   ;; Regular colors
+   ;:black              "\u001b[30m"
+   :red                "\u001b[31m"
+   :green              "\u001b[32m"
+   :yellow             "\u001b[33m"
+   :blue               "\u001b[34m"
+   :magenta            "\u001b[35m"
+   :cyan               "\u001b[36m"
+   :white              "\u001b[37m"
+
+   ;; Bright colors
+   ;:bright-black       "\u001b[90m"
+   :bright-red         "\u001b[91m"
+   :bright-green       "\u001b[92m"
+   :bright-yellow      "\u001b[93m"
+   :bright-blue        "\u001b[94m"
+   :bright-magenta     "\u001b[95m"
+   :bright-cyan        "\u001b[96m"
+   :bright-white       "\u001b[97m"
+
+   ;; Background colors
+   ;:bg-black           "\u001b[40m"
+   ;:bg-red             "\u001b[41m"
+   ;:bg-green           "\u001b[42m"
+   ;:bg-yellow          "\u001b[43m"
+   ;:bg-blue            "\u001b[44m"
+   ;:bg-magenta         "\u001b[45m"
+   ;:bg-cyan            "\u001b[46m"
+   ;:bg-white           "\u001b[47m"
+
+   ;; Bright background colors
+   ;:bg-bright-black    "\u001b[100m"
+   ;:bg-bright-red      "\u001b[101m"
+   ;:bg-bright-green    "\u001b[102m"
+   ;:bg-bright-yellow   "\u001b[103m"
+   ;:bg-bright-blue     "\u001b[104m"
+   ;:bg-bright-magenta  "\u001b[105m"
+   ;:bg-bright-cyan     "\u001b[106m"
+   ;:bg-bright-white    "\u001b[107m"
+   })
+
+(defn generate-256-color [n]
+  {:pre [(and (integer? n) (<= 0 n 255))]}
+  (str "\u001b[38;5;" n "m"))
+
+;; (defn generate-256-bg-color [n]
+;;   {:pre [(and (integer? n) (<= 0 n 255))]}
+;;   (str "\u001b[48;5;" n "m"))
+
+(defn generate-rgb-color [r g b]
+  {:pre [(every? #(and (integer? %) (<= 0 % 255)) [r g b])]}
+  (str "\u001b[38;2;" r ";" g ";" b "m"))
+
+;; (defn generate-rgb-bg-color [r g b]
+;;   {:pre [(every? #(and (integer? %) (<= 0 % 255)) [r g b])]}
+;;   (str "\u001b[48;2;" r ";" g ";" b "m"))
+
+;; Example usage:
+(def ansi-colors ;; extended-colors
+  (merge ansi-colors-ext
+         {:orange (generate-256-color 208)
+          :pink (generate-256-color 13)
+          :purple (generate-256-color 93)
+          ;:bg-orange (generate-256-bg-color 208)
+          ;:bg-pink (generate-256-bg-color 13)
+          ;:bg-purple (generate-256-bg-color 93)
+          :custom-red (generate-rgb-color 255 50 50)
+          ;:bg-custom-blue (generate-rgb-bg-color 0 100 255)
+          }))
+
+
+(def flf1 (figlet/load-flf "data/ansi-regular.flf"))
+
+;; (defn fig-render
+;;   ([text flf]
+;;    (fig-render text flf :white))  ; Default to white if no color is specified
+;;   ([text flf color]
+;;    (let [color-code (get ansi-colors color (:white ansi-colors))
+;;          reset-code "\u001b[0m"]
+;;      (println
+;;       (cstr/join
+;;        \newline
+;;        (conj (vec (cons color-code (figlet/render flf text))) reset-code))))))
+
+(defn fig-render
+  [text & [color flf]]
+  (let [;_ (println color (keyword? color))
+        flf (if (string? flf) (figlet/load-flf flf) flf1)
+         ;color-code (get ansi-colors color (:red ansi-colors))
+        color-code (str (get ansi-colors color))
+         ;_ (println (contains? ansi-colors color)  (get ansi-colors color "x"))
+        reset-code "\u001b[0m"]
+    (println
+     (cstr/join
+      \newline
+      (conj (vec (cons color-code (vec (figlet/render flf (str text))))) reset-code)))))
+
+(defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color freq agg width] :or {color :default freq 1 agg "avg"}}]
   (try
-    (let [console-width (- (ut/get-terminal-width) 10)
+    (let [console-width (if width width (- (ut/get-terminal-width) 10))
           rows 5
           border-width 2
           label-padding 4
@@ -5686,23 +5883,24 @@
                        (repeat (count truncated) 0)
                        (map #(int (/ (* % (* rows 8)) max-cpu)) truncated))
           bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
-          color-code (case color
-                       :red "\u001B[31m"
-                       :green "\u001B[32m"
-                       :yellow "\u001B[33m"
-                       :blue "\u001B[34m"
-                       :magenta "\u001B[35m"
-                       :cyan "\u001B[36m"
-                       :white "\u001B[37m"
-                       :bright-red "\u001B[91m"
-                       :bright-green "\u001B[92m"
-                       :bright-yellow "\u001B[93m"
-                       :bright-blue "\u001B[94m"
-                       :bright-magenta "\u001B[95m"
-                       :bright-cyan "\u001B[96m"
-                       :bright-white "\u001B[97m"
-                       "")
-          reset-code "\u001B[0m"
+          ;; color-code (case color
+          ;;              :red "\u001B[31m"
+          ;;              :green "\u001B[32m"
+          ;;              :yellow "\u001B[33m"
+          ;;              :blue "\u001B[34m"
+          ;;              :magenta "\u001B[35m"
+          ;;              :cyan "\u001B[36m"
+          ;;              :white "\u001B[37m"
+          ;;              :bright-red "\u001B[91m"
+          ;;              :bright-green "\u001B[92m"
+          ;;              :bright-yellow "\u001B[93m"
+          ;;              :bright-blue "\u001B[94m"
+          ;;              :bright-magenta "\u001B[95m"
+          ;;              :bright-cyan "\u001B[96m"
+          ;;              :bright-white "\u001B[97m"
+          ;;              "")
+          color-code (get ansi-colors color  "")
+          reset-code  "\u001B[0m"
           colorize (fn [s] (str color-code s reset-code))
           get-bar-char (fn [height row]
                          (let [row-height (- height (* row 8))]
@@ -5729,7 +5927,7 @@
           padding (str (apply str (repeat (- console-width (count label) 4) " ")) " ")
           ;;end-padding (str (apply str (repeat (- console-width (count label) 4) " ")) " ")
           ;;label-row (str "│ " (colorize label) padding "│")
-          label-row (str "│ " (str "\u001B[1m" (colorize label) "\u001B[0m") padding "│")
+          label-row (str "│ " (str "\u001B[1m" (colorize label) reset-code) padding "│")
           draw-row (fn [row-data]
                      (let [graph-data (apply str
                                              (map-indexed
@@ -5748,7 +5946,7 @@
       (doseq [row (range (dec rows) -1 -1)]
         (println (draw-row (map #(get-bar-char % row) normalized))))
       ;;(println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
-      
+
       ;; (println (for [chunk (drop-last (partition-all time-marker-interval truncated))] 
       ;;            (let [vv (last chunk)
       ;;                  lb (ut/nf (ut/rnd vv 2))
@@ -5764,11 +5962,12 @@
                                                   (str (apply str (repeat (- 32 lbc) " ")) lb))))
                      vals-line (str "│" "\u001B[1m"
                                     (colorize value-strings)
-                                    "\u001B[0m" )
+                                    reset-code)
                      padding (str (apply str (repeat (- console-width (count value-strings) 4) " ")) " ")]
                  (str vals-line padding " │")))
+      ;(fig-render "hey" color)
       (println border-bottom)
-      (println (str "\u001B[1m" (colorize legned) "\u001B[0m")))
+      (println (str "\u001B[1m" (colorize legned) reset-code)))
     (catch Throwable e
       (ut/pp [:bar-graph-error! (str e) label-str (count cpu-usage) :vals :passed (vec (take 10 cpu-usage))]))))
 
@@ -5823,11 +6022,7 @@
                         ;[1 15]
                         [15]
                         freqs)
-                colors [:red :green :yellow
-                        :blue :magenta :cyan
-                        :white :bright-red :bright-green
-                        :bright-yellow :bright-blue :bright-magenta
-                        :bright-cyan :bright-white]
+                colors (vec (keys ansi-colors))
                 color-index (mod (hash pp) (count colors))
                 color (nth colors color-index)]]
 
@@ -5887,55 +6082,74 @@
 ;;         color (nth colors color-index)]
 ;;     (doseq [ff freqs] (draw-it ff color data-base))))
 
-(defn stats-keywords []
-  {:cpu [@cpu-usage "cpu usage" "%"]
-   :mem [@mem-usage "heap memory usage" "mb"]
-   :non-heap-mem [@non-heap-mem-usage "non-heap memory usage" "mb"]
-   :msgs-cum [@push-usage "messages/sec" "client 'pushes'"]
-   :load [@sys-load "system load" "load"]
-   :clients [@peer-usage "clients" "clients"]
-   :threads [@thread-usage "total threads" "threads"]
-   :solvers [@solver-usage "solvers running" "solvers" true]
-   :msgs [(ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes"]
-   :pool-tasks [(ut/cumulative-to-delta @pool-tasks) "pool tasks" "tasks run"]
-   :websockets [(get-in @pool-stats-atom ["websocket-thread-pool" :current-pool-size]) "threads" "threads"]
-   :queues [(get @qp/queue-stats-history :total-queues) "queues" "queues"]
-   :queued-avg [(get @qp/queue-stats-history :total-queued) "queued" "tasks queued"]
-   :queued-sum [(get @qp/queue-stats-history :total-queued) "queued" "tasks queued" true]
-   :workers [(get @qp/queue-stats-history :total-workers) "workers" "workers"]
-   :tasks [(get @qp/queue-stats-history :total-tasks) "tasks" "tasks" true]})
+(defn stats-keywords [] ;; add a "+" to the end of the kw for sum instead of avg..
+  (let [base-avg {:cpu [@cpu-usage "cpu usage" "%"]
+                  :mem [@mem-usage "heap memory usage" "mb"]
+                  :non-heap-mem [@non-heap-mem-usage "non-heap memory usage" "mb"]
+                  :msgs-cum [@push-usage "messages/sec" "client 'pushes'"]
+                  :load [@sys-load "system load" "load"]
+                  :clients [@peer-usage "clients" "clients"]
+                  :threads [@thread-usage "total threads" "threads"]
+
+                  :flows [(ut/cumulative-to-delta @flow-usage) "flows run" "flows"]
+                  :nrepl-calls [(ut/cumulative-to-delta @nrepl-usage) "nrepl calls run" "evals"]
+                  :nrepl-intro-calls [(ut/cumulative-to-delta @nrepl-intros-usage) "nrepl introspection calls run" "intro evals"]
+
+                  :sql-queries [(ut/cumulative-to-delta @sql-query-usage) "sql queries run" "sql reads"]
+                  :sql-exec [(ut/cumulative-to-delta @sql-exec-usage) "sql execs run" "sql writes"]
+                  :queue-tasks [(ut/cumulative-to-delta @queue-tasks) "queue tasks run" "tasks"]
+                  :solvers [(ut/cumulative-to-delta @solver-usage) "solvers running" "solvers"]
+                  :pool-tasks-run [(ut/cumulative-to-delta @pool-task-usage) "pool tasks run" "tasks run"]
+
+                  :msgs [(ut/cumulative-to-delta @push-usage) "msgs/sec" "client pushes"]
+                  :pool-tasks [(ut/cumulative-to-delta @pool-tasks) "pool tasks" "tasks run"]
+                  :websockets [(get-in @pool-stats-atom ["websocket-thread-pool" :current-pool-size]) "threads" "threads"]
+                  :queues [(get @qp/queue-stats-history :total-queues) "queues" "queues"]
+                  :queued [(get @qp/queue-stats-history :total-queued) "queued" "tasks queued"]
+                  :workers [(get @qp/queue-stats-history :total-workers) "workers" "workers"]
+                  :tasks [(get @qp/queue-stats-history :total-tasks) "tasks" "tasks"]}
+        summed (into {} (for [[k v] base-avg
+                              :let [k (keyword (str (cstr/replace (str k) ":" "") "+"))]]
+                          {k (conj v true)}))]
+    (merge base-avg summed)))
+
+(defn get-stats [kkey agg num]
+  (let [stat (get (stats-keywords) kkey)]
+    (let [[data-vec kkey sym] stat]
+      (if agg
+        (last (sum-in-chunks data-vec num))
+        (last (average-in-chunks data-vec num))))))
 
 (defn draw-stats
   ([]
    (ut/pp [:draw-stats-needs-help
            (str "Hi. Draw what? " (clojure.string/join ", " (map str (keys (stats-keywords)))))]))
-  ([kks & [freqs]]
+  ([kks & [freqs label? width]]
    (let [kksv (if (vector? kks) kks [kks])]
      (doseq [kks kksv]
        (let [data-base (get (stats-keywords) kks)
          ;;_ (ut/pp data-base)
+             draw-label (fn [data color]
+                          (let [[_ kkey _ _] data]
+                            (fig-render (str kkey) color)))
              draw-it (fn [ff color data]
                        (let [[data-vec kkey sym sum?] data]
-                        ; (ut/pp 
-                          (draw-bar-graph
-                                 (if (= ff 1)
-                                   data-vec
-                                   (if sum?
-                                     (sum-in-chunks data-vec ff)
-                                     (average-in-chunks data-vec ff)))
-                                 (str kkey " : " kks) sym :color color :freq ff :agg (if sum? "sum" "avg"))
-                         ; )
-                         ))
-             freqs (if (nil? freqs) [1 15 60] freqs)
-             colors [:red :green :yellow
-                     :blue :magenta :cyan
-                     :white :bright-red :bright-green
-                     :bright-yellow :bright-blue :bright-magenta
-                     :bright-cyan :bright-white]
+                         (draw-bar-graph
+                          (if (= ff 1)
+                            data-vec
+                            (if (and (true? sum?) (not (nil? sum?)))
+                              (sum-in-chunks data-vec ff)
+                              (average-in-chunks data-vec ff)))
+                          (str kkey " : " kks) sym :color color :freq ff :agg (if sum? "sum" "avg") :width width)))
+             freqs (cond (nil? freqs) [1 15 60]
+                         (number? freqs) [freqs]
+                         :else freqs)
+             colors (vec (keys ansi-colors))
              color-index (mod (hash kks) (count colors))
              color (nth colors color-index)]
          (if data-base
-           (doseq [ff freqs] (draw-it ff color data-base))
+           (do (doseq [ff freqs] (draw-it ff color data-base))
+               (when label? (draw-label data-base color)))
            (ut/pp [:draw-stats-needs-help
                    (str kks "? Nope. Invalid data type, bro! Gimmie something: " (clojure.string/join ", " (map str (keys (stats-keywords)))))])))))))
 
@@ -6076,8 +6290,8 @@
         (when booted?
           (println " ")
           (reset! booted (System/currentTimeMillis))
-          (ut/print-ansi-art "nname.ans")
-          (ut/pp [:version 0 :june 2024 "Hi."])
+          ;(ut/print-ansi-art "nname.ans")
+          ;(ut/pp [:version 0 :june 2024 "Hi."])
           (println " "))
 
         ;;(let [fss (flow-statuses) fssk (vec (keys fss))] (ut/pp [:flow-status (select-keys fss fssk)]))
@@ -6170,9 +6384,9 @@
           ;(ut/pp [:push-queues (count (keys @task-queues-slot2))])
           ;(ut/pp [:queue-party-stats (qp/get-queue-stats)])
 
-        (draw-stats :cpu [5])
-        (draw-stats :threads [5])
-        (draw-stats :mem [5])
+        ;; (draw-stats :cpu [5])
+        ;; (draw-stats :threads [5])
+        ;; (draw-stats :mem [5])
 
 
           ;(draw-stats :msgs [1 15])
@@ -6190,37 +6404,40 @@
         ;(draw-pool-stats nil [15])
 
         (ut/pp [:pool-sizes
-                (let [pool-sizes (query-pool-sizes) 
-                      pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes]
-                                                             [k (get-in v [1 :current-pool-size]) 
-                                                              {:runs (get-in v [1 :tasks-run]) 
-                                                               :avg (get-in v [1 :tasks-avg-ms])}])))
+                (let [pool-sizes (query-pool-sizes)
+                      pairs (vec (sort-by (comp str first) (for [[k v] pool-sizes
+                                                                 :let [runs (get-in v [1 :tasks-run] 0)
+                                                                       avgs (get-in v [1 :tasks-avg-ms] 0)]]
+                                                             [k (get-in v [1 :current-pool-size])
+                                                              {:runs runs
+                                                               :ttl-secs (try (ut/rnd (/ (* runs avgs) 1000) 2) (catch Exception _  -1))
+                                                               :avg avgs}])))
                       ttls {:pools (count pairs) :threads (apply + (map second pairs))}
                       prev @pool-ttls-last]
                   (reset! pool-ttls-last ttls)
                   (into (sorted-map)
                         {:pool-counts pairs
-                   :pool-groups-counts (sort-by val (reduce (fn [acc [k _ {:keys [runs]}]]
-                                                 (let [group-key (first (clojure.string/split (str k) #"\."))]
-                                                   (update acc group-key (fn [existing-runs]
-                                                                           (if existing-runs
-                                                                             (+ existing-runs runs)
-                                                                             runs)))))
-                                               {}
-                                               pairs))
-                   :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
-                   :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
-                   :prev prev
-                   :now ttls}))])
-        
+                         :pool-groups-counts (sort-by val (reduce (fn [acc [k _ {:keys [runs]}]]
+                                                                    (let [group-key (first (clojure.string/split (str k) #"\."))]
+                                                                      (update acc group-key (fn [existing-runs]
+                                                                                              (if existing-runs
+                                                                                                (+ existing-runs runs)
+                                                                                                runs)))))
+                                                                  {}
+                                                                  pairs))
+                         :zdiff-pools (format "%+d"  (- (get prev :pools 0) (get ttls :pools 0)))
+                         :zdiff-threads (format "%+d"  (- (get prev :threads 0) (get ttls :threads 0)))
+                         :prev prev
+                         :now ttls}))])
+
         ;; (ut/pp [:client-cost (let [pool-sizes (query-pool-sizes)
         ;;                            clients (distinct 
         ;;                                     (for [[k v] pool-sizes] 
         ;;                                      (last (cstr/split (str k) #"\."))))]
         ;;                        (for [c clients]  ))])
-        
 
- 
+
+
 
 
 
@@ -6363,14 +6580,29 @@
   {:port                 websocket-port
    :join?                false
    :async?               true
-   ;:min-threads          50
-   ;:max-threads          300 ;; from our dedicated pool
    :input-buffer-size    32768
    :output-buffer-size   131072
    :max-message-size     6291456 ;; 6MB
-   :websockets           (into {} (for [[k v] ws-endpoints]
-                                    [k (wrap-websocket-handler v)]))
+   :websockets           (into {} (for [[k v] ws-endpoints] [k (wrap-websocket-handler v)]))
    :allow-null-path-info true})
+
+;; (def ring-options ;; using stock jetty pool (JVM shared, assumably)
+;;   {:port                 websocket-port
+;;    :join?                false
+;;    :async?               true
+;;    ;:min-threads          300
+;;    ;:max-threads          1000 ;; Increased max threads
+;;    ;:idle-timeout         500000 ;; Reduced idle timeout
+;;    ;:max-idle-time        3000000 ;; Reduced max idle time
+;;    ;:max-idle-time        15000
+;;    ;:input-buffer-size    131072 ;; default is 8192
+;;    ;:output-buffer-size   131072 ;; default is 32768
+
+;;    ;:input-buffer-size    32768
+;;    ;:output-buffer-size   131072
+;;    ;:max-message-size     6291456 ;; 6MB
+;;    :websockets           ws-endpoints
+;;    :allow-null-path-info true})
 
 (defonce websocket-server (atom nil))
 

@@ -122,8 +122,11 @@
     (swap! map-orders assoc query headers)
     mm))
 
+(def sql-queries-run (atom 0))
+
 (defn sql-query
   [db-spec query & extra]
+  (swap! sql-queries-run inc)
   (jdbc/with-db-connection ;; for connection hygiene - atomic query
     [t-con db-spec]
     (ut/ppln [query db-spec])
@@ -151,7 +154,7 @@
 
 
 
-(defn sql-exec2
+(defn sql-exec2 ;; used for rowset-sql-query, diff use case, not need to run serially
   [db-spec query & [extra]]
   (jdbc/with-db-transaction [t-con db-spec {:isolation :read-uncommitted}]
                             (try (jdbc/db-do-commands t-con query)
@@ -227,12 +230,14 @@
 
 ;; (defn recycle-workers-sql [keyword num-workers] (stop-workers-sql keyword) (start-workers-sql keyword num-workers))
 
+(def sql-exec-run (atom 0))
 
 (defn sql-exec
   [db-spec query & [extra]]
   ;(enqueue-task-sql db-spec
-  (qp/serial-slot-queue :sql-serial :sql ;;(str db-spec) 
+  (qp/serial-slot-queue :sql-serial (str db-spec)                       
                     (fn []
+                      (swap! sql-exec-run inc)
                       (jdbc/with-db-connection [t-con db-spec]
                                                (try (jdbc/db-do-commands t-con query)
                                                     (catch Exception e
@@ -245,7 +250,7 @@
 
 
 
-(defn sql-exec-no-t
+(defn sql-exec-no-t ;; older experiment from ducksdb - jdbc driver didnt support db-do-commands
   [db-spec query & [extra]]
   (jdbc/with-db-connection [conn db-spec]
                            (try (.execute conn query) ; Directly executing the query
