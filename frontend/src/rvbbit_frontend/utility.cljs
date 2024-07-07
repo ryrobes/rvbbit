@@ -168,7 +168,7 @@
 
 
 (defn flip-map [m]
-  (reduce (fn [acc [k v]] (assoc acc v k)) {} m))
+  (reduce (fn [acc [k v]] (assoc acc v k)) {} m))        
 
 (def ansi-regex #"\u001b\[[0-9;]*[a-zA-Z]") ;; pre fancy 256 color ANSI codes
 

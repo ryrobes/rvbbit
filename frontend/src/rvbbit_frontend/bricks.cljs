@@ -2234,7 +2234,12 @@
         (doseq [marker @db/markers-panel-code-box] (.clear marker))
         (reset! db/markers-panel-code-box [])
         (doseq [code codes]
-          (let [code       (str code)
+          (let [raw-code   (try (edn/read-string code) (catch :default _ code))
+                code       (str code)
+                value      @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [raw-code]})
+                vtype      (ut/data-typer value)
+                vcolor     (get (theme-pull :theme/data-colors nil) vtype)
+                code       (str code)
                 code-lines (clojure.string/split-lines code)]
             (loop [line 0]
               (when (< line (.lineCount doc))
@@ -2270,7 +2275,13 @@
                                                                  {:box-shadow (str "0 0 10px 5px "
                                                                                    (ut/invert-hex-color
                                                                                     (theme-pull :theme/editor-outer-rim-color
-                                                                                                nil)))}))))
+                                                                                                nil)))})
+                                                               (when vcolor
+                                                                 {;:color "black"  ;;vcolor
+                                                                  ;:border (when (= raw-code (first @param-hover)) (str "3px dashed " vcolor))
+                                                                  :box-shadow  (when (= raw-code (first @param-hover)) "2px 2px 20px #FF06B5")
+                                                                  :background-color (ut/invert-hex-color vcolor)})
+                                                               )))
                                       _ (.appendChild node (js/document.createTextNode code-part))]
                                   (.addEventListener
                                    node
@@ -2331,9 +2342,19 @@
         (doseq [marker @db/markers-panel-code-box] (.clear marker))
         (reset! db/markers-panel-code-box [])
         (doseq [[code value] codes]
-          (let [code       (str code)
+          (let [raw-code   (try (edn/read-string code) (catch :default _ code))
+                code       (str code)
+                vtype      (ut/data-typer value)
+                vcolor     (get (theme-pull :theme/data-colors nil) vtype)
+                ;;_ (tapp>> [:vtype vcolor vtype])
                 value      (if (string? value) (pr-str value) value)
-                code-lines (clojure.string/split-lines code)]
+                code-lines (clojure.string/split-lines code)
+                psplit        (ut/splitter (str code) "/")
+                table         (-> (first psplit)
+                                  (ut/replacer #":" "")
+                                  (ut/replacer ".*" "")
+                                  keyword)
+                field         (keyword (last psplit))]
             (loop [line 0]
               (when (< line (.lineCount doc))
                 (when (clojure.string/includes? (.getLine doc line) (first code-lines))
@@ -2346,8 +2367,19 @@
                         code-part-start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
                         code-part-end-ch   (+ (clojure.string/index-of (.getLine doc start-line) (last code-lines))
                                               (count (last code-lines)))
+                        react!     [@param-hover]
                         node               (js/document.createElement "span")
-                        _ (.setAttribute node "style" (ut/hiccup-css-to-string css))
+                        _ (.setAttribute node "style" (ut/hiccup-css-to-string (merge 
+                                                                                css
+                                                                                (let [_ (tapp>> [:psplit table field code (str @param-hover)])]
+                                                                                  {}) 
+                                                                                (when vcolor 
+                                                                                  {;:color "black"  ;;vcolor
+                                                                                   ;:border (when (= raw-code (first @param-hover)) (str "3px dashed " vcolor))
+                                                                                   :box-shadow  (when (= raw-code (first @param-hover)) "2px 2px 20px #FF06B5")
+                                                                                   :background-color (ut/invert-hex-color vcolor)}))))
+                        _ (.addEventListener node "mouseenter" (fn [_] (reset! param-hover [raw-code table field])))
+                        _ (.addEventListener node "mouseleave" (fn [_] (reset! param-hover nil)))
                         _ (.appendChild node (js/document.createTextNode value))
                         marker             (.markText doc
                                                       #js {:line start-line :ch code-part-start-ch}
@@ -2577,9 +2609,9 @@
         ;block-runners-map  @(ut/tracked-sub ::block-runners {})
         selected-block     @(ut/tracked-sub ::selected-block {})
         selected-view-type @(ut/tracked-sub ::view-type {:panel-key selected-block :view selected-kp})
-        repl? (true? (cstr/includes? (str selected-view-type) "clojure"))
+        repl? (and (not= (get @db/data-browser-query selected-block) :*)
+                   (true? (cstr/includes? (str selected-view-type) "clojure")))
         ;syntax (get-in block-runners-map [selected-view-type :syntax])
-
         key         selected-kp
         ;;repl?       (true? repl?)
         font-size   (if (nil? key) 13 17)
@@ -2606,7 +2638,8 @@
        :onBlur         #(let [_ (reset! db/cm-focused? false)
                               selected-block     @(ut/tracked-sub ::selected-block {})
                               selected-view-type @(ut/tracked-sub ::view-type {:panel-key selected-block :view selected-kp})
-                              repl? (true? (cstr/includes? (str selected-view-type) "clojure"))
+                              repl? (and (not= (get @db/data-browser-query selected-block) :*)
+                                         (true? (cstr/includes? (str selected-view-type) "clojure")))
                               parse        (if repl?
 
                                              (try (read-string (str "(do " (cstr/join " " (ut/cm-deep-values %)) ")"))
@@ -2732,7 +2765,16 @@
          clover-kpw     (filter #(and (keyword? %) (cstr/includes? (str %) "/"))
                                 (ut/deep-flatten (get-in db [:panels selected-block selected-view-type data-key])))
          clover-kpw-set (set (map str clover-kpw))
-         interspace (cset/intersection clover-kpw-set (set @db/autocomplete-keywords))
+         interspace     (cset/intersection clover-kpw-set (set @db/autocomplete-keywords))
+        ;;  interspace     (set (into (vec
+        ;;                         (apply concat
+        ;;                                (for [[k v] (get db :click-param)
+        ;;                                      :when (not (cstr/includes? (str k) "-sys"))]
+        ;;                                  (for [kk (keys v)] (keyword (cstr/replace (str k "/" kk)  ":" ""))))))
+        ;;                        (vec interspace)))
+         ;interspace (if value-spy? 
+         ;             plus-params
+         ;             interspace)
           ;_ (tapp>> [:insersec (map edn/read-string interspace)])
 
          codes          (vec interspace)  ;; (vec (into themes (into flow-subs click-params)))
@@ -2754,7 +2796,7 @@
                                                            {:keypath [c
                                                                        ;(try (edn/read-string c) (catch :default _ c))
                                                                       ]})}))
-                               {:color          inv-color
+                               {:color            inv-color
                                 :background-color inv-backgrd-color
                                 :filter           "invert(1.2)"
                                 :cursor           "pointer"
@@ -3022,6 +3064,12 @@
                           parts   (vec (ut/get-compound-keys panel))]
                       parts)))
 
+(re-frame/reg-sub
+ ::valid-params-in-tab
+ (fn [db _]
+   (let [blocks (ut/deep-flatten (into {} (filter #(= (get db :selected-tab) (get (val %) :tab "")) (get db :panels))))
+         blocks (vec (filter #(cstr/includes? (str %) "/") blocks))]
+     (or blocks []))))
 
 
 (defonce searcher-atom (reagent/atom nil))
@@ -3048,6 +3096,8 @@
                                           (vec @(ut/tracked-subscribe [::current-tab-blocks])))
                                     (vec @(ut/tracked-subscribe [::current-tab-condis])))
                               (catch :default _ []))
+        valid-params-in-tab  @(ut/tracked-subscribe [::valid-params-in-tab])
+        ;_ (tapp>> [:valid-params-in-tab valid-params-in-tab])
         clover-params       (if @db/cm-focused? @(ut/tracked-sub ::clover-params-in-view {}) {})]
     (if false ;@db/param-code-hover
       [re-com/v-box :padding "6px" :width (px (- width-int 33)) :align :center :justify :between :gap "10px" :children
@@ -3113,10 +3163,14 @@
                                            (not (cstr/starts-with? (str (first %))
                                                                    (if (get pf :condis) ":condi/***" ":condi/")))
                                            (if (get pf :this-tab? true)
-                                             (some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) current-tab-queries)
+                                             (or
+                                              (some (fn [x] (= (str x) (str (first %)))) valid-params-in-tab)
+                                              ;(some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) valid-params-in-tab)
+                                              (some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) current-tab-queries))
                                              true)
                                            (not (cstr/includes? (str (first %)) "-sys/")))
                                          grp))
+                  ;;_ (tapp>>  [:grp click-params valid-params-in-tab])
                   searches?       (ut/ne? @searcher-atom)
                   filter-keys     (if searches?
                                     (vec (filter-search @searcher-atom (keys (into {} grp))))
@@ -3313,8 +3367,9 @@
 (re-frame/reg-sub ::panel-counts
                   (fn [db [_ panel-key]]
                     (let [views   (count (keys (get-in db [:panels panel-key :views])))
+                          runners (count (keys @(ut/tracked-sub ::panel-runners-only {:panel-key panel-key})))
                           queries (count (keys (get-in db [:panels panel-key :queries])))]
-                      [views queries])))
+                      [views queries runners])))
 
 (re-frame/reg-sub ::panel-name-only (fn [db {:keys [panel-key]}] (get-in db [:panels panel-key :name] (str panel-key))))
 
@@ -3435,10 +3490,11 @@
       (for [k (filter #(not (cstr/includes? (str %) "query-preview")) blocks)]
         (let [;meta @(ut/tracked-subscribe [::meta-from-query-name k])
               nname               @(ut/tracked-sub ::panel-name-only {:panel-key k})
-              [rows fields]       @(ut/tracked-subscribe [::panel-counts k])
+              [rows fields runners]       @(ut/tracked-subscribe [::panel-counts k])
               query-panel         k ;@(ut/tracked-subscribe [::panel-from-query-name k])
               subq-blocks         @(ut/tracked-sub ::subq-panels-alpha {:panel-id selected-block})
               subq-mapping        @(ut/tracked-sub ::subq-mapping-alpha {})
+              minimized?          @(ut/tracked-sub ::panel-minimized? {:panel-key k})
               parent-of-selected? (some #(= % query-panel) subq-blocks)
               upstream?           (some #(= % query-panel) (ut/cached-upstream-search subq-mapping selected-block))
               downstream?         (some #(= % query-panel) (ut/cached-downstream-search subq-mapping selected-block))
@@ -3462,14 +3518,24 @@
                                 (str (theme-pull :theme/grid-selected-background-color nil) 55)
                                 (if selected? (theme-pull :theme/grid-selected-background-color nil) "inherit"))} :children
            [[re-com/h-box :justify :between :children
-             [[re-com/box :child (str nname) :size "auto" :style
-               {:font-weight 700 :font-size "13px" :padding-left "4px" :padding-right "4px"}]]]
-            [re-com/h-box :justify :between :children
-             [[re-com/box :child (str fields (if (= fields 1) " query" " queries")) :style
-               {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px"} :align :end]
-              [re-com/box :child (str rows (if (= rows 1) " view" " views")) :style
-               {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px"} :align
-               :end]]]]]))]]))
+             [[re-com/box 
+               :min-height "26px"
+               :child (if minimized? 
+                        [re-com/h-box 
+                         :size "auto"
+                         :justify :between :children [[re-com/box :child (str nname)] [re-com/box :child "(minimized)" :style {:opacity 0.6}]]]
+                        (str nname)) 
+               :size "auto" 
+               :style {:font-weight 700 :font-size "13px" :padding-left "4px" :padding-right "4px" :opacity (when minimized? 0.5)}]]]
+            (when (not minimized?)
+              [re-com/h-box :justify :between :children
+               [[re-com/box :child (str fields (if (= fields 1) " query" " queries")) :style
+                 {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px" :opacity (when (= fields 0) 0.4)} :align :end]
+                [re-com/box :child (str runners (if (= runners 1) " runner" " runners")) :style
+                 {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px" :opacity (when (= runners 0) 0.4)} :align :end]
+                [re-com/box :child (str rows (if (= rows 1) " view" " views")) :style
+                 {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px" :opacity (when (= rows 0) 0.4)} :align
+                 :end]]])]]))]]))
 
 (defn sql-spawner
   [type panel-map data-keypath target-id source-panel-key]
@@ -6741,6 +6807,8 @@
      (vec (remove empty?
                   (for [[k v] cc] (into {} (for [[kk vv] v] {(keyword (str (ut/safe-name k) "/" (ut/safe-name kk))) vv}))))))))
 
+;;(tapp>> @(re-frame/subscribe [::all-click-params]))
+
 (defn sql-data-boxes-values
   [keypath clickable? style]
   (let [styles        (if (and (map? style) (not (nil? style))) style {})
@@ -8589,6 +8657,7 @@
                        :line-height "1.1"
                        :padding "15px"
                        :white-space "pre" 
+                       :text-shadow "#00000088 1px 0 10px"
                        ;:background-color "#000"
                        ;:color "#ffffff99"
                        }]
@@ -8637,7 +8706,10 @@
               :panel-code-box panel-code-box
               :code-box panel-code-box
               :console #(console-box % (+ px-width-int 70) (+ px-height-int 50))
-              :terminal #(console-viewer {:style {} :text % :width (+ px-width-int 70) :height (+ px-height-int 50)})
+              :terminal #(console-viewer {:style {} :text % 
+                                          :width (+ px-width-int 70) 
+                                          :height (+ px-height-int 55)
+                                          })
               :panel-code-box-single panel-code-box-single
               :code-box-single panel-code-box-single
               :vega-lite oz.core/vega-lite
@@ -9786,6 +9858,10 @@
  (fn [db [_ brick-vec tab]]
    (let [lookup-map (into {} (for [[k v] (into {} (filter #(= tab (get (val %) :tab "")) (get db :panels)))] {(get v :root) k}))]
      (get lookup-map brick-vec))))
+
+(re-frame/reg-sub ::panel-minimized?
+                  (fn [db {:keys [panel-key]}]
+                    (get-in db [:panels panel-key :minimized?] false)))
 
 (re-frame/reg-sub ::all-panels-minimized
                   (fn [db]

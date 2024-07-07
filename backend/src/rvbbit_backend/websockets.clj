@@ -6155,6 +6155,9 @@
 
 (defonce pool-ttls-last (atom {}))
 
+;;;(mapv (fn [x] (cstr/replace (str x) ":" "")) (keys (rvbbit-backend.websockets/stats-keywords)))
+;;;(mapv #(cstr/replace (str %) ":" "") (keys (stats-keywords)))
+
 (defn jvm-stats
   []
   (when (not @shutting-down?)

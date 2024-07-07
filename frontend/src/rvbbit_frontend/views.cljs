@@ -3394,8 +3394,15 @@
                                                                  (into (map first fs)
                                                                        [:flow :time :server :flows-sys :client :solver :solver-status :data :repl-ns
                                                                         :signal-history :solver-meta nil]))
-                               new-autocompletes (vec (into (create-clover-keys-from-data (get pp-without-fs :param) "param/")
-                                                            (create-clover-keys-from-data (get pp-without-fs :theme) "theme/")))
+                               click-param-autos (vec (filter #(not (cstr/includes? (str %) "function"))
+                                                              (distinct (flatten
+                                                                         (for [kk (filter (fn [x] (not (cstr/includes? (str x) "-sys")))
+                                                                                          (keys pp))]
+                                                                           (create-clover-keys-from-data (get pp-without-fs kk) (str (cstr/replace (str kk) ":" "") "/")))))))
+                               new-autocompletes (vec (into click-param-autos
+                                                            (into (create-clover-keys-from-data (get pp-without-fs :param) "param/")
+                                                                  (create-clover-keys-from-data (get pp-without-fs :theme) "theme/"))))
+                               ;;;_ (ut/tapp>> [:click-param-autos click-param-autos new-autocompletes])
                                new-h             (hash pp-without-fs)
                                client-name       (get db :client-name)]
                            ;; (ut/tapp>>  [:update-user-params-hash-event (count new-autocompletes) new-autocompletes])
@@ -3406,6 +3413,8 @@
                                                   :client-name client-name}])
                            (reset! temp-atom pp-without-fs)
                            (assoc db :user-params-hash new-h))))
+
+;;(re-frame/dispatch [::update-user-params-hash])
 
 (re-frame/reg-sub ::watch-user-params
                   (fn [db]
