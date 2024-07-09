@@ -1267,6 +1267,18 @@
               result
               m)))
 
+(defn kvpaths22
+  ([m] (kvpaths [] m (transient [])))
+  ([prev m result]
+   (persistent!
+    (reduce-kv (fn [res k v]
+                 (if (associative? v)
+                   (kvpaths (conj prev k) v res)
+                   (conj! res (conj prev k))))
+               result
+               m))))
+
+
 (defn kvpaths2
   ([m] (kvpaths [] m ()))
   ([prev m result]
@@ -1285,6 +1297,83 @@
 (defn keypaths2
   ([m] (keypaths [] m ()))
   ([prev m result] (reduce-kv (fn [res k v] (if (map? v) (keypaths (conj prev k) v res) (conj res (conj prev k)))) result m)))
+
+
+ (defn diff-keypaths
+  [old-state new-state]
+  (letfn [(diff-helper [prev old new result]
+            (cond
+              ;; When both old and new are maps, recursively traverse them
+              (and (map? old) (map? new))
+              (let [all-keys (into (set (keys old)) (keys new))]
+                (reduce (fn [res k]
+                          (let [old-v (get old k ::not-found)
+                                new-v (get new k ::not-found)
+                                keypath (conj prev k)]
+                            (if (or (= old-v ::not-found)
+                                    (= new-v ::not-found)
+                                    (not= old-v new-v))
+                              (diff-helper keypath old-v new-v (conj res keypath))
+                              res)))
+                        result
+                        all-keys))
+
+              ;; When only new is a map, accumulate new key paths and parent paths
+              (map? new)
+              (reduce-kv (fn [res k v]
+                           (let [keypath (conj prev k)]
+                             (diff-helper keypath nil v (conj res prev keypath))))
+                         result
+                         new)
+
+              ;; When only old is a map, accumulate removed key paths and parent paths
+              (map? old)
+              (reduce-kv (fn [res k _]
+                           (let [keypath (conj prev k)]
+                             (conj res prev keypath)))
+                         result
+                         old)
+
+              ;; When both old and new are vectors, compare elements at each index
+              (and (vector? old) (vector? new))
+              (reduce (fn [res idx]
+                        (let [old-v (get old idx ::not-found)
+                              new-v (get new idx ::not-found)
+                              keypath (conj prev idx)]
+                          (if (or (= old-v ::not-found) (= new-v ::not-found) (not= old-v new-v))
+                            (diff-helper keypath old-v new-v (conj res prev keypath))
+                            res)))
+                      result
+                      (range (max (count old) (count new))))
+
+              ;; When only new is a vector, accumulate new key paths and parent paths
+              (vector? new)
+              (reduce (fn [res idx]
+                        (let [keypath (conj prev idx)]
+                          (diff-helper keypath nil (get new idx) (conj res prev keypath))))
+                      result
+                      (range (count new)))
+
+              ;; When only old is a vector, accumulate removed key paths and parent paths
+              (vector? old)
+              (reduce (fn [res idx]
+                        (let [keypath (conj prev idx)]
+                          (conj res prev keypath)))
+                      result
+                      (range (count old)))
+
+              ;; Otherwise, compare values directly and accumulate differences
+              :else (if (not= old new)
+                      (conj result prev)
+                      result)))]
+
+    (let [result (diff-helper [] old-state new-state [])]
+      (distinct (remove #(= % []) result)))))
+
+
+
+
+
 
 ;; Define a function to check if a number is a fraction (rational and not an integer)
 (defn fraction? [n]

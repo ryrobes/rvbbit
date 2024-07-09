@@ -1,7 +1,7 @@
 (ns rvbbit-backend.queue-party
   (:require [rvbbit-backend.util :as ut]
-            ;[clojure.string      :as cstr]
-            )
+            [clojure.data       :as data]
+            [clojure.string      :as cstr])
   (:import (java.util.concurrent LinkedBlockingQueue TimeUnit)))
 
 ;; ;; queue party v0 usage 
@@ -398,3 +398,29 @@
          removed-count)))))
 
 
+
+(defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
+  (fn [key ref old-state new-state]
+    (when (not= old-state new-state)
+      (let [diff (clojure.data/diff old-state new-state)
+            changed-kp (into #{} (comp (take 2)
+                                       (remove nil?)
+                                       (mapcat ut/keypaths)
+                                       (distinct))
+                             diff)
+            ;; ckp (ut/diff-keypaths old-state new-state) ???
+            ]
+        (when (seq changed-kp)
+          (serial-slot-queue :master-watcher-pool base-type
+           (fn []
+             (try
+               (watcher-fn key ref old-state new-state)
+               (catch Exception e
+                 (ut/pp [:error-in-wrap-custom-watcher-pool-exec key e])
+                 ;;(throw e)
+                 )))))))))
+
+(defn add-watch+ [atom key watcher-fn base-type & [client-name flow-key]]
+  (let [base-type (if (and (cstr/includes? (str flow-key) ">*") (= base-type :flow)) :flow-status base-type)
+        wrapped-watcher (wrap-custom-watcher-pool watcher-fn base-type client-name flow-key)]
+    (add-watch atom key wrapped-watcher)))

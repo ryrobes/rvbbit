@@ -960,6 +960,7 @@
  :opts
  {:close-on-done? true,
   :retry-on-error? true,
+  :timeout 120000,
   :retries 404,
   :overrides
   {:prompt

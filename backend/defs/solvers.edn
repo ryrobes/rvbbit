@@ -282,7 +282,7 @@
       (map (fn [x] (.getName x)))
       (shuffle))
      random-file
-     (first (remove (set (deref selected-files-4k)) files))
+     (rand-nth (vec (remove (set (deref selected-files-4k)) files)))
      _
      (if
       random-file

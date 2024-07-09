@@ -7145,9 +7145,9 @@
 
 (re-frame/reg-event-db ::insert-sql-source (fn [db [_ query-id sql-source]] (assoc-in db [:sql-source query-id] sql-source)))
 
-(re-frame/reg-event-db ::check-status
+(re-frame/reg-event-db ::check-status ;; deprecated due to pub sub reactor
                        (fn [db _]
-                         (let [client-name (get db :client-name)]
+                         (let [client-name (get db :client-name)] 
                            (ut/tracked-dispatch [::wfx/request :default
                                                  {:message     {:kind :get-status :client-name client-name}
                                                   :on-response [::http/status-response]
