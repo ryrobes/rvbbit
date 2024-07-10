@@ -235,7 +235,7 @@
 (defn sql-exec
   [db-spec query & [extra]]
   ;(enqueue-task-sql db-spec
-  (qp/serial-slot-queue :sql-serial (str db-spec)                       
+  (qp/serial-slot-queue :sql-serial :sql ;;(str db-spec)                       
                     (fn []
                       (swap! sql-exec-run inc)
                       (jdbc/with-db-connection [t-con db-spec]

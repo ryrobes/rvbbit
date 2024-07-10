@@ -121,6 +121,7 @@
           :month           (.getMonthValue now)
           :month-name      (.name month)
           :day             day
+          :unix-ms         (System/currentTimeMillis)
           :day-of-week-int (.getValue day-of-week)
           :day-of-week     (.name day-of-week)
           :hour            (.getHour now)

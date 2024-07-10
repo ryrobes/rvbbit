@@ -400,7 +400,10 @@
                                      (run [_]
                                        (try
                                          (f)
-                                         (swap! wss/scheduler-atom assoc name-str (ut/get-current-timestamp))
+                                        ;;  (swap! wss/scheduler-atom assoc name-str (merge
+                                        ;;                                            {:last-run (ut/get-current-timestamp)
+                                        ;;                                             :times-run (inc (get-in @wss/scheduler-atom [name-str :times-run] 0))}
+                                        ;;                                            (dissoc (get @wss/scheduler-atom name-str) :last-run :times-run)))
                                          (catch Exception e
                                            (ut/pp [e "Error in scheduler" name-str])))))
                                    delay
@@ -485,11 +488,11 @@
 
   ;; (doseq [args wss/master-atom-map]
   ;;   (apply wss/master-watch-splitter-2deep args))
-  
+
   (doseq [[type atom] wss/master-reactor-atoms]
     ;(swap! wss/sharded-atoms assoc type (atom {})) ;; bootstrap the child atom shard
     ;(swap! wss/sharded-atoms (fn [current-state] (assoc current-state type (atom {}))))
-    (wss/master-watch-splitter-deep 
+    (wss/master-watch-splitter-deep
      ;;(keyword (str "watcher-" (name type)))
      type
      atom))
@@ -738,6 +741,7 @@
 
 
 
+
   (ppy/add-watch+ wss/signals-atom
                   :master-signal-def-watcher ;; watcher signals defs
                   (fn [_ _ old-state new-state]
@@ -945,6 +949,26 @@
 
   ;;  all schedulers
 
+  ;; (- (System/currentTimeMillis)  (get-in @rvbbit-client-sub-values [:unix-ms]))
+
+;;  (ut/pp @watcher-log-atom)
+
+  (defn reboot-reactor-and-resub []
+    (wss/reboot-reactor!)
+    (wss/reload-signals-subs)
+    (wss/reload-solver-subs))
+
+  ;;;  (reboot-reactor-and-resub)
+
+  (start-scheduler 15
+                   #(let [ddiff (- (System/currentTimeMillis)  (get-in @wss/rvbbit-client-sub-values [:unix-ms]))]
+                      (when
+                       (> ddiff 31000)
+                        (ut/pp [:WATCHDOG-REBOOTING-REACTOR-AND-SUBS! ddiff :ms :behind!])
+                        (swap! wss/scheduler-atom assoc :executed! (inc (get-in @wss/scheduler-atom [:executed!] 0)))
+                        (reboot-reactor-and-resub)))
+                   "Watchdog - Reboot Reactor and Subs" 30)
+
   (start-scheduler 1
                    #(try
                       ;(println "Updating atom at" (System/currentTimeMillis))
@@ -964,17 +988,25 @@
                    wss/param-sql-sync
                    "Parameter Sync" 120)
 
+  (start-scheduler 45
+                   wss/sync-client-subs
+                   "Sync Client Subs" 120)
+
   (start-scheduler 5
                    wss/flow-atoms>sql
                    "Refresh Flow Tables" 30)
 
-  (start-scheduler 6000
+  (start-scheduler 600 ;; 10 minutes
                    wss/purge-dead-client-watchers
-                   "Purge Dead Clients" 7200)
+                   "Purge Dead Clients" 720)
 
-  (start-scheduler 6000
-                   #(qp/cleanup-inactive-queues 10) ;; MINUTES
-                   "Purge Idle Queues" 7200)
+  (start-scheduler 3600 ;; 1 hour
+                   reboot-reactor-and-resub
+                   "Reboot Atom Reactor" 1800)
+
+  ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical though
+  ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES
+  ;;                  "Purge Idle Queues" 7200)
 
   ;;(when debug? 
   (start-scheduler 1
@@ -982,14 +1014,11 @@
                         (swap! wss/push-usage conj @wss/all-pushes)
                         (swap! wss/solver-usage conj @wss/solvers-run)
                         (swap! wss/queue-tasks conj @qp/queue-tasks-run)
-
                         (swap! wss/nrepl-intros-usage conj @evl/nrepls-intros-run)
-
                         (swap! wss/sql-exec-usage conj @sql/sql-exec-run)
                         (swap! wss/sql-query-usage conj @sql/sql-queries-run)
                         (swap! wss/nrepl-usage conj @evl/nrepls-run)
                         (swap! wss/flow-usage conj @wss/flows-run)
-
                         (swap! wss/mem-usage conj (ut/memory-used))
                         (let [thread-mx-bean (java.lang.management.ManagementFactory/getThreadMXBean)
                               thread-count (.getThreadCount thread-mx-bean)]
@@ -1004,14 +1033,14 @@
                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
                    "Stats Keeper")
 
-  (start-scheduler 600
+  (start-scheduler 6000 ;; 1 hour
                    #(do
                       (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
                       (reset! wss/solvers-cache-hits-atom {})
                       (reset! wss/solvers-cache-atom {})
                       (reset! sql/errors {}) ;; just for now
                       (reset! ut/df-cache {})) ;; <--- big boy
-                   "Purge Solver Cache" 600)
+                   "Purge Solver & Deep-Flatten Cache" 6000)
 
   ;; (start-scheduler 1
   ;;                  #(doseq [[client-name solvers] @wss/solver-status]
@@ -1082,11 +1111,17 @@
                            (do (ut/pp [:saving-shutdown-metrics...])
                                (ext/create-dirs "./shutdown-logs")
                                (ut/println-to-file (str "./shutdown-logs/" (cstr/replace (ut/get-current-timestamp) " " "_") ".log")
-                                                   (fn [] (wss/draw-stats
-                                                           [:cpu :threads :mem  :sql-queries+ :sql-exec+ :nrepl-calls+ :solvers+ :flows+ :pool-tasks-run+ :workers :msgs+]
-                                                           [1 10 30 60 120 240 600]  true))))
+                                                   (fn [] (let [freqs [1 10 30 60 120 240 600]
+                                                                stats [:cpu :threads :mem :sql-queries+ :sql-exec+ :nrepl-calls+ :solvers+ :flows+ :pool-tasks-run+ :workers :msgs+]]
+                                                            (wss/draw-stats      nil freqs true) ;; all stats, with labels 
+                                                            (wss/draw-pool-stats nil freqs true)))))
                            (qp/stop-slot-queue-system)
                            (stop-all-schedulers)
+                          ;;  (reset! flow-db/results-atom (select-keys @flow-db/results-atom 
+                          ;;                                            (filter (fn [x] ;; clean up temp runs
+                          ;;                                                      (not (or (cstr/includes? (str x) "solver-flow")
+                          ;;                                                               (cstr/includes? (str %) "raw")))) 
+                          ;;                                                    (keys @flow-db/results-atom))))
                            (let [destinations (vec (keys @wss/client-queues))]
                              (doseq [d destinations]
                                (wss/alert! d
@@ -1362,8 +1397,9 @@
                   combined-tracker-watcher
                   :master-flow-db-tracker-combined-watcher)
 
+  (wss/sub-to-value :rvbbit :time/unix-ms true) ;; importante! 
 
-  ;;(ut/pp {:settings config/settings})
+  ;; (ut/pp {:settings config/settings})
   (defn heartbeat
     [dest]
     {:components

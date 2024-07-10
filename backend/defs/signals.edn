@@ -23,6 +23,8 @@
  :hourly? {:signal [:or [:changed? :time/hour] [:<> :time/minute -1]]},
  :fair-armadillo-signal
  {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
+ :every-30-seconds?
+ {:signal [:or [:= :time/second 30] [:= :time/second 0]]},
  :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
  :elegant-grasshopper-signal
  {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},

@@ -41,14 +41,23 @@
 (defonce thread-pool-timing? true)
 
 (defn create-cached-thread-pool [name]
-  (cond ;(cstr/includes? (str name) "serial")
-        ;(ThreadPoolExecutor. 1 1 60 TimeUnit/SECONDS (java.util.concurrent.LinkedBlockingQueue.))
+  (cond
+    (cstr/includes? (str name) "serial")
+    (ThreadPoolExecutor. 1 1 60 TimeUnit/SECONDS (java.util.concurrent.LinkedBlockingQueue.))
+
+    (= name :watchers/signal)
+    ;;(ThreadPoolExecutor. 10 1000 15 TimeUnit/SECONDS  (ArrayBlockingQueue. 200) (ThreadPoolExecutor$CallerRunsPolicy.))
+    (ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
+
     (or (cstr/includes? (str name) "flow-runner/")
         (cstr/includes? (str name) "nrepl-eval/")
         (cstr/includes? (str name) "query-runstream/")
         (cstr/includes? (str name) "watchers/")
-        (cstr/includes? (str name) "subscriptions/"))
-    (ThreadPoolExecutor. 10 500 60 TimeUnit/SECONDS  (ArrayBlockingQueue. 20) (ThreadPoolExecutor$CallerRunsPolicy.)) ;;; was 10 300 60
+        ;(cstr/includes? (str name) "subscriptions/")
+        )
+    (ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
+    ;(ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS  (ArrayBlockingQueue. 20) (ThreadPoolExecutor$CallerRunsPolicy.)) ;;; was 10 300 60
+
     :else (ThreadPoolExecutor. 1 1000 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))))
 
 
@@ -71,8 +80,8 @@
       (swap! dyn-pools assoc name new-queue)
       new-queue)))
 
-(def get-or-create-cached-thread-pool-memoized
-  (memoize/memo get-or-create-cached-thread-pool))
+;; (def get-or-create-cached-thread-pool-memoized
+;;   (memoize/memo get-or-create-cached-thread-pool))
 
 (defn close-cached-thread-pool [name]
   (if-let [queue (@dyn-pools name)]
@@ -81,6 +90,16 @@
       (swap! dyn-pools dissoc name)
       (ut/pp [:*closed-thread-pool-for name]))
     (ut/pp [:*no-thread-pool-found-for name])))
+
+(defn reset-cached-thread-pool [name]
+  ;; First, close the existing thread pool if it exists
+  (close-cached-thread-pool name)
+  ;; Then, create and return a new thread pool with the same name
+  (get-or-create-cached-thread-pool name))
+
+(defn reset-cached-thread-pools-wildcard [wildcard]
+  (doseq [[name _] (filter #(cstr/includes? (str (key %) " ") wildcard) @dyn-pools)]
+    (reset-cached-thread-pool name)))
 
 ;; (defn execute-in-thread-pools [base-type f]
 ;;   (try
@@ -149,13 +168,13 @@
 (defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
   (fn [key ref old-state new-state]
 ;; test, dont bother taking the next step if nothing changed...? less thrash, does shit still work?
-    (when (not= old-state new-state)
-      (when (let [;[added removed _] (clojure.data/diff old-state new-state)
-                  ;akp (ut/keypaths added)
-                  ;rkp (ut/keypaths removed)
-                  ;changed-kp (vec (distinct (into akp rkp)))
-                  changed-kp (ut/diff-keypaths old-state new-state)]
-              (ut/ne? (flatten changed-kp)))
+    ;(when (not= old-state new-state)
+      ;(when (let [;[added removed _] (clojure.data/diff old-state new-state)
+      ;            ;akp (ut/keypaths added)
+      ;            ;rkp (ut/keypaths removed)
+      ;            ;changed-kp (vec (distinct (into akp rkp)))
+      ;            changed-kp (ut/diff-keypaths old-state new-state)]
+      ;        (ut/ne? changed-kp))
         (execute-in-thread-pools
          (keyword (str (if client-name
                          "subscriptions/"
@@ -169,7 +188,7 @@
              (catch Exception e
                (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
                ;(throw e)
-               ))))))))
+               )))))););)
 
 ;; (defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
 ;;   (fn [key ref old-state new-state]
