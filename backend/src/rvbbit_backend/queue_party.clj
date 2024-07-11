@@ -421,6 +421,6 @@
                  ))))));)))
 
 (defn add-watch+ [atom key watcher-fn base-type & [client-name flow-key]]
-  (let [base-type (if (and (cstr/includes? (str flow-key) ">*") (= base-type :flow)) :flow-status base-type)
+  (let [;base-type (if (and (cstr/includes? (str flow-key) ">*") (= base-type :flow)) :flow-status base-type)
         wrapped-watcher (wrap-custom-watcher-pool watcher-fn base-type client-name flow-key)]
     (add-watch atom key wrapped-watcher)))

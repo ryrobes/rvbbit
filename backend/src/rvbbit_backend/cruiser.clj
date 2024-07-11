@@ -66,7 +66,8 @@
 
 
 (def filter-db
-  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:./db/filter.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
+  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
+                              :jdbc-url    "jdbc:sqlite:file:./db/filter.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               :auto_vacuum "FULL"
                               :cache       "shared"}
                              "filter-db")})
@@ -1441,15 +1442,15 @@
 
 
 (def tmp-db-src1
-  {:datasource @(pool-create {;:jdbc-url
-                              :jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?mode=memory&cache=shared&auto_vacuum=FULL"
+  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?mode=memory&cache=shared&auto_vacuum=FULL"
+                              :jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               :auto_vacuum "FULL"
                               :cache       "shared"}
                              "tmp-db-src1")})
 
 (def dest
-  {:datasource @(pool-create {;:jdbc-url
-                              :jdbc-url    "jdbc:sqlite:file:sniffdbdb2?mode=memory&cache=shared&auto_vacuum=FULL"
+  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:sniffdbdb2?mode=memory&cache=shared&auto_vacuum=FULL"
+                              :jdbc-url    "jdbc:sqlite:file:sniffdbdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               :auto_vacuum "FULL"
                               :cache       "shared"}
                              "tmp-db-dest")})

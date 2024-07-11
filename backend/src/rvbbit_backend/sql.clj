@@ -38,15 +38,42 @@
   {:datasource
      @(pool-create
         {:jdbc-url
-           "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=10000&locking_mode=EXCLUSIVE"
+           ;;;;;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=NORMAL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
-           ;;;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456" 
+           "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456" 
          :idle-timeout      600000
          :maximum-pool-size 20
          :max-lifetime      1800000
          :cache             "shared"}
         "system-db")})
+
+
+;; (def system-db 
+;;   {:datasource 
+;;    @(pool-create
+;;      {:auto-commit        true
+;;       ;:read-only          true
+;;       :connection-timeout 30000
+;;       ;:validation-timeout 5000
+;;       ;:idle-timeout       600000
+;;       ;:max-lifetime       1800000
+;;       ;:minimum-idle       10
+;;       ;:maximum-pool-size  10
+;;       :jdbc-url           "jdbc:postgresql://ryanr:notofox@10.174.1.255:5432" ;; needs both? wtf, worked
+;;       ;:jdbc-url           "jdbc:postgresql://postgres:notofox@localhost:5432" ;; needs both? wtf, worked
+;;       :adapter            "postgresql"
+;;       :username           "rvbbit"
+;;       ;:username           "postgres"
+;;       :password           "notofox"
+;;       :database-name      "rvbbit_system" ;;"postgres" ;; where citus is installed apparently
+;;       :server-name        "10.174.1.248"
+;;       ;:server-name        "localhost"
+;;       :port-number        5432
+;;       :register-mbeans    false}
+;;      "system-db")})
+
+
 
 (def flows-db
   {:datasource
@@ -54,19 +81,45 @@
         {:jdbc-url
            ;"jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL"
            ;;&transaction_mode=IMMEDIATE&journal_mode=WAL"
-           "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456" ;
+           "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456" ;
          :idle-timeout 600000
          :max-lifetime 1800000
          :auto_vacuum  "FULL"
          :cache        "shared"}
         "flows-db")})
 
+;; (def flows-db
+;;   {:datasource
+;;    @(pool-create
+;;      {:auto-commit        true
+;;       ;:read-only          true
+;;       :connection-timeout 30000
+;;       ;:validation-timeout 5000
+;;       ;:idle-timeout       600000
+;;       ;:max-lifetime       1800000
+;;       ;:minimum-idle       10
+;;       ;:maximum-pool-size  10
+;;       :jdbc-url           "jdbc:postgresql://ryanr:notofox@10.174.1.255:5432" ;; needs both? wtf, worked
+;;       ;:jdbc-url           "jdbc:postgresql://postgres:notofox@localhost:5432" ;; needs both? wtf, worked
+;;       :adapter            "postgresql"
+;;       :username           "rvbbit"
+;;       ;:username           "postgres"
+;;       :password           "notofox"
+;;       :database-name      "rvbbit_flow" ;;"postgres" ;; where citus is installed apparently
+;;       :server-name        "10.174.1.248"
+;;       ;:server-name        "localhost"
+;;       :port-number        5432
+;;       :register-mbeans    false}
+;;      "flows-db")})
+
 (def ghost-db
-  {:datasource @(pool-create {:jdbc-url     "jdbc:sqlite:file:./db/ghost.db?cache=shared&journal_mode=WAL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL"
-                              :idle-timeout 600000
-                              :max-lifetime 1800000
-                              :cache        "shared"}
-                             "ghost-db")})
+  {:datasource 
+   @(pool-create
+     {:jdbc-url     "jdbc:sqlite:file:./db/ghost.db?cache=shared&journal_mode=WAL&mode=memory" ;&transaction_mode=IMMEDIATE&journal_mode=WAL"
+      :idle-timeout 600000
+      :max-lifetime 1800000
+      :cache        "shared"}
+     "ghost-db")})
 
 
 
@@ -231,6 +284,10 @@
 ;; (defn recycle-workers-sql [keyword num-workers] (stop-workers-sql keyword) (start-workers-sql keyword num-workers))
 
 (def sql-exec-run (atom 0))
+(def sql-exec-log (atom []))
+
+;; (ut/pp (reverse (sort-by last (frequencies @sql-exec-log))))
+;; (reset! sql-exec-log  [])
 
 (defn sql-exec
   [db-spec query & [extra]]
@@ -238,6 +295,8 @@
   (qp/serial-slot-queue :sql-serial :sql ;;(str db-spec)                       
                     (fn []
                       (swap! sql-exec-run inc)
+                      (swap! sql-exec-log conj (str (str db-spec) (try (subs (str query) 0 100)
+                                                                   (catch Throwable _ (str query)))))
                       (jdbc/with-db-connection [t-con db-spec]
                                                (try (jdbc/db-do-commands t-con query)
                                                     (catch Exception e

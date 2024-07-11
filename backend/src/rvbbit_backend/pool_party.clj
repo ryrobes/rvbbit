@@ -58,7 +58,7 @@
     (ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
     ;(ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS  (ArrayBlockingQueue. 20) (ThreadPoolExecutor$CallerRunsPolicy.)) ;;; was 10 300 60
 
-    :else (ThreadPoolExecutor. 1 1000 60 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))))
+    :else (ThreadPoolExecutor. 1 1000 240 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))))
 
 
 
@@ -181,7 +181,8 @@
                          "watchers/")
                        (cstr/replace (str base-type) ":" "")
                       ;(when client-name (str "." (cstr/replace (str client-name) ":" "")))
-                       (when client-name ".*")))
+                       ;(when client-name ".*")
+                       ))
          (fn []
            (try
              (watcher-fn key ref old-state new-state)
@@ -226,6 +227,6 @@
         ;;                                         :when (some #(= % flow-key) (keys (get @atoms-and-watchers c)))]
         ;;                                     c)
         ;; _(ut/pp [:rvbbit-watching flow-key :for (count all-clients-subbed) :client-subs ])
-        base-type (if (and (cstr/includes? (str flow-key) ">*") (= base-type :flow)) :flow-status base-type)
+        ;; base-type (if (and (cstr/includes? (str flow-key) ">*") (= base-type :flow)) :flow-status base-type)
         wrapped-watcher (wrap-custom-watcher-pool watcher-fn base-type client-name flow-key)]
     (add-watch atom key wrapped-watcher)))

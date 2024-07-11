@@ -1702,7 +1702,7 @@
 (def console-history (reagent/atom #{})) 
 
 (defn insert-response-block [w h data runner syntax]
-  (let [root (ut/find-safe-position w h)]
+  (let [root (ut/find-safe-position h w)]
     (bricks/insert-new-block-raw root w h data runner syntax)))
 
 (defn ensure-quoted-string
@@ -1718,19 +1718,23 @@
 (defn run-console-command [command]
   (let [runner (get @selected-mode :name)
         syntax (get @selected-mode :syntax)
+        ;;command 
         command (if (not= syntax "clojure")
                   command ;; the "implied string"
-                  (ensure-quoted-string command))]
+                  (ensure-quoted-string (cstr/replace command "\"" "\\\"")))]
     (ut/tapp>> (str "Command entered: " command))
     (reset! hide-responses? false)
     (let [resp (insert-response-block 6 3 command runner syntax)
-          ee (str command "  ! " resp)]
-      (when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
+          ee (str command "("resp")")]
+      ;;(when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
+      ;(re-frame/dispatch [::bricks/toggle-quake-console])
       (ut/dispatch-delay 200 [::http/insert-alert
                               [:v-box :children [[:box :child (str resp)]
                                                  [:box :child (str command)
                                                   :style {:font-size "12px"}]]] 6 1.5 5])
       (swap! console-responses assoc command ee))))
+
+
 
 (defn console-text-box [width-int height-int value]
   (let [history-index (reagent/atom -1)
@@ -1762,9 +1766,9 @@
                    :autoScroll        false
                    :theme             (theme-pull :theme/codemirror-theme nil)
                    :extraKeys         (clj->js
-                                       {"`" (fn [cm] (re-frame/dispatch [::bricks/toggle-quake-console]))
+                                       {;;"`" (fn [_] (re-frame/dispatch [::bricks/toggle-quake-console-off]))
                                         "Enter" (fn [cm]
-                                                  (let [command (first (ut/cm-deep-values cm))]
+                                                  (let [command (cstr/join "\n" (ut/cm-deep-values cm))]
                                                     (when (not-empty command)
                                                       (swap! console-history conj command)
                                                       (reset! history-index -1)
@@ -2789,8 +2793,11 @@
                                         are-solver            (get @db/solver-fn-lookup [:panels selected-block data-key])
                                         solver-running?       (when are-solver
                                                                 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                                 {:keypath [(keyword (str (ut/replacer are-solver
-                                                                                                                       ":solver/" "solver-status/*client-name*>")  ">running?"))]}))]
+                                                                                 {:keypath [(keyword
+                                                                                             (cstr/replace
+                                                                                              (str (ut/replacer are-solver
+                                                                                                                ":solver/" "solver-status/*client-name*>")  ">running?")
+                                                                                              ":" ""))]}))]
                           ;; (ut/tapp>> [:solver-running? solver-running? are-solver (keyword (str (ut/replacer are-solver
                           ;;                                                                                    ":solver/" "solver-status/*client-name*>")  ">running?"))])
                           ;;;(ut/tapp>> [:dd @db/solver-fn-lookup])
@@ -3392,7 +3399,7 @@
                                pp                (get db :click-param)
                                pp-without-fs     (ut/remove-keys pp
                                                                  (into (map first fs)
-                                                                       [:flow :time :server :flows-sys :client :solver :solver-status :data :repl-ns
+                                                                       [:flow :time :server :flows-sys :client :solver :solver-status :flow-status :data :repl-ns
                                                                         :signal-history :solver-meta nil]))
                                click-param-autos (vec (filter #(not (cstr/includes? (str %) "function"))
                                                               (distinct (flatten
@@ -3424,7 +3431,7 @@
                           pp            (get db :click-param)
                           pp-without-fs (ut/remove-keys pp
                                                         (into (map first fs)
-                                                              [:flow :time :server :flows-sys :client :solver :signal-history :data :repl-ns :solver-status :solver-meta :repl-ns nil]))]
+                                                              [:flow :time :server :flows-sys :client :solver :signal-history :data :repl-ns :solver-status :flow-status :solver-meta :repl-ns nil]))]
                       (hash pp-without-fs)))) ;; was :param
 
 (re-frame/reg-sub ::user-params-hash (fn [db] (get db :user-params-hash)))
@@ -3459,7 +3466,7 @@
   (if @(ut/tracked-subscribe [::is-fire-on-change? flow-id])
     (let [client-name  @(ut/tracked-subscribe [::bricks/client-name])
           base-opts    {:increment-id? false}
-          running-key  (keyword (str "flow/" flow-id ">*running?"))
+          running-key  (keyword (str "flow-status/" flow-id ">*running?"))
           running?     @(ut/tracked-subscribe [::conn/clicked-parameter-key [running-key]])
           runstreamed? (= overrides :runstream-overrides)
           overrides    (if runstreamed? @(ut/tracked-subscribe [::bricks/runstream-overrides flow-id]) overrides)
@@ -3875,14 +3882,19 @@
           {:position    "fixed"
            :left        138
            :bottom      0
+           :z-index 99999999999
+           ;:background-color "#000000"
            :font-weight 700
            :color       (if (not online?) "#ffffff" "#ffffff77")
            :font-family (theme-pull :theme/monospaced-font nil)} :children
-          [[re-com/box :size "none" :child
-            (str (get websocket-status :waiting -1)
-                 (str ", " (ut/nf (count server-subs)))
-                 (str ", " (ut/nf (count things-running)))
-                 (when (not online?) " (RVBBIT server is offline)"))]
+          [[re-com/box
+            :size "none"
+            ;; :style {:z-index 99999999999
+            ;;         :background-color "#000000"}
+            :child (str (get websocket-status :waiting -1)
+                        (str ", " (ut/nf (count server-subs)))
+                        (str ", " (ut/nf (count things-running)))
+                        (when (not online?) " (RVBBIT server is offline)"))]
            (when (ut/ne? flow-watcher-subs-grouped)
              [re-com/h-box :style {:padding-left "10px" :font-size "12px"} :gap "8px" :children
               (for [[kk cnt] flow-watcher-subs-grouped]

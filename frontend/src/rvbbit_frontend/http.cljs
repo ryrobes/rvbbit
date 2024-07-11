@@ -177,9 +177,19 @@
 ;;                               :timeout     15000000}]))
 ;;                          db))
 
+(defn sub-alert [key]
+  [:box :child (str key)
+   :style {:font-size "12px"
+           :opacity (when (cstr/includes? (str key) "un-sub") 0.6)
+           :text-decoration (when (cstr/includes? (str key) "un-sub") "line-through")}])
+
+;(ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to thing")) 10 0.75 5])
+;(ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to thing")) 10 0.75 5])
+
 (re-frame/reg-event-db ::sub-to-flow-value
                        (fn [db [_ key]]
                          (let [client-name (get db :client-name)]
+                           (ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to" key)) 10 0.75 5])
                            (ut/tracked-dispatch
                             [::wfx/push :default
                              {:kind :sub-to-flow-value 
@@ -190,6 +200,7 @@
 (re-frame/reg-event-db ::unsub-to-flow-value
                        (fn [db [_ key]]
                          (let [client-name (get db :client-name)]
+                           (ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to" key)) 10 0.75 5])
                            (ut/tracked-dispatch
                             [::wfx/push :default
                              {:kind :unsub-to-flow-value 
@@ -282,7 +293,7 @@
 (defonce batches-received (atom 0))
 
 
-(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :signal-history :panel :client})
+(def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
 (re-frame/reg-event-db
   ::simple-response
@@ -351,6 +362,8 @@
 
           (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
 
+          (when (cstr/starts-with? (str client-name) ":reliable-" )  (ut/tapp>> [:task-id result]))
+
           ;; (when (not batched?) 
           ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id))]))
 
@@ -400,6 +413,7 @@
                           (assoc-in [:post-meta ui-keypath] post-meta-shape)))
 
             (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
+
             (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
 
             condi-tracker? (assoc-in db [:flow-results :condis (get-in result [:task-id 1])] (get result :status))
@@ -601,6 +615,7 @@
                             (ut/dissoc-in [:click-param :solver-meta])
                             (ut/dissoc-in [:click-param :repl-ns])
                             (ut/dissoc-in [:click-param :solver-status])
+                            (ut/dissoc-in [:click-param :flow-status])
                             (ut/dissoc-in [:click-param :signal])
                             (dissoc :data)
                             (dissoc :flows) ;;; mostly ephemeral with the UI....

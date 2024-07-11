@@ -569,7 +569,7 @@
   (let [;started? @(ut/tracked-subscribe [::flow-runner flow-id bid])
         chans-open?     @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
         server-running? (or (if only? false chans-open?)
-                            @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str "flow/" flow-id ">*running?"))]]))
+                            @(ut/tracked-subscribe [::conn/clicked-parameter-key [(keyword (str "flow-status/" flow-id ">*running?"))]]))
         rrblocks        (get @db/real-running-blocks flow-id [])]
     
     (if (= bid :*) server-running? (and (some #(= bid %) rrblocks) server-running?))
@@ -584,7 +584,7 @@
                   (fn [db [_ bid flow-id & [only?]]]
                     (let [;chans-open? @(ut/tracked-subscribe [::bricks/flow-channels-open? flow-id])
                           flow-running? @(ut/tracked-subscribe [::conn/clicked-parameter-key
-                                                                [(keyword (str "flow/" flow-id ">*running?"))]])
+                                                                [(keyword (str "flow-status/" flow-id ">*running?"))]])
                           running       (get-in db [:flow-results :tracker-blocks flow-id :running-blocks])]
                       (cond (= bid :*) flow-running?
                             :else      (true? (and flow-running? (some #(= bid %) running))))
@@ -595,7 +595,7 @@
                   (fn [db [_ bid flow-id]]
                     (let [waiting       (get-in db [:flow-results :tracker-blocks flow-id :waiting-blocks])
                           flow-running? @(ut/tracked-subscribe [::conn/clicked-parameter-key
-                                                                [(keyword (str "flow/" flow-id ">*running?"))]])]
+                                                                [(keyword (str "flow-status/" flow-id ">*running?"))]])]
                       (true? (and flow-running? (some #(= bid %) waiting))))))
 
 (re-frame/reg-sub ::is-done?

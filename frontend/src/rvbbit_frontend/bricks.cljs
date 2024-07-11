@@ -49,7 +49,7 @@
    [re-frame.core :as re-frame]
    [reagent.core :as reagent]
    [garden.color :as    color]
-    ;[reagent.dom :as rdom]
+   [reagent.dom :as rdom]
    [rvbbit-frontend.audio :as audio]
    [rvbbit-frontend.connections :as conn]
    [rvbbit-frontend.db :as db]
@@ -521,19 +521,19 @@
                                          logic-kps (into {}
                                                          (for [v kps]
                                                            (let [[_ that] v]
-                                                             {v (keyword (str "flow/" (first that) ">*running?"))})))]
+                                                             {v (keyword (str "flow-status/" (cstr/replace (str (first that)) ":" "") ">*running?"))})))]
                                      (ut/postwalk-replacer logic-kps obody)))
          create-solver-listeners (fn [obody]
                                    (let [kps       (ut/extract-patterns obody :click-solver 2)
                                          logic-kps (into {}
                                                          (for [v kps]
                                                            (let [[_ that] v]
-                                                             {v (keyword (str "solver-status/*client-name*>" (first that) ">running?"))})))]
+                                                             {v (keyword (str "solver-status/*client-name*>" (cstr/replace (str (first that)) ":" "") ">running?"))})))]
                                      (ut/postwalk-replacer logic-kps obody)))
          runstream-refs          (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
                                                         (ut/deep-flatten (get db :runstreams)))))
          runstreams              (vec (for [{:keys [flow-id]} @(ut/tracked-sub ::runstreams {})]
-                                        (keyword (str "flow/" flow-id ">*running?"))))
+                                        (keyword (str "flow-status/" flow-id ">*running?"))))
          client-namespaces-refs  [:repl-ns/repl-client-namespaces-map>*client-name*]
          selected-block          (get db :selected-block)
          editor?                 (get db :editor?)
@@ -548,7 +548,7 @@
                                   (create-solver-listeners panels-map)]
          drop-refs               (vec (distinct (vals @drop-last-tracker-refs)))
          sflow                   (get db :selected-flow)
-         current-flow-open       (when (ut/ne? sflow) (keyword (str "flow/" sflow ">*running?")))
+         current-flow-open       (when (ut/ne? sflow) (keyword (str "flow-status/" sflow ">*running?")))
          flow-refs               (vec (distinct (conj (filter #(or (cstr/starts-with? (str %) ":flow/")
                                                                    (cstr/starts-with? (str %) ":screen/")
                                                                    (cstr/starts-with? (str %) ":time/")
@@ -559,6 +559,7 @@
                                                                    (cstr/starts-with? (str %) ":solver-meta/")
                                                                    (cstr/starts-with? (str %) ":repl-ns/")
                                                                    (cstr/starts-with? (str %) ":solver-status/")
+                                                                   (cstr/starts-with? (str %) ":flow-status/")
                                                                    (cstr/starts-with? (str %) ":data/")
                                                                    (cstr/starts-with? (str %) ":signal-history/")
                                                                    (cstr/starts-with? (str %) ":panel/")
@@ -636,7 +637,11 @@
                                                                ns-key])))))) [])
          ;;;_ (tapp>> [:in-editor-solvers  (str  in-editor-solvers) ])
          clover-solvers-running  (vec (for [s clover-solvers] ;;(vec (remove (set in-editor-solvers0) clover-solvers))] 
-                                        (keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")  ">running?"))))
+                                        (keyword (str
+                                                  (-> s
+                                                      (ut/replacer ":solver/" "solver-status/*client-name*>")
+                                                      (ut/replacer ":" ""))
+                                                  (str ">running?")))))
           ;; clover-solvers-running  []
          signal-subs             (if signals-mode? (vec (into signal-hist (into signal-ui-refs signal-ui-part-refs))) [])
          theme-refs              (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
@@ -733,16 +738,16 @@
      (and (get db :buffy?)
           (= mode :runstreams)
           (true? (some true?
-                       (for [[k v] (get-in db [:click-param :flow] {}) :when (cstr/ends-with? (str k) ">*running?")] v)))))))
+                       (for [[k v] (get-in db [:click-param :flow-status] {}) :when (cstr/ends-with? (str k) ">*running?")] v)))))))
 
 (re-frame/reg-sub ::runstreams-running
                   (fn [db _]
                     (count (filter true?
-                                   (for [[k v] (get-in db [:click-param :flow] {}) :when (cstr/ends-with? (str k) ">*running?")] v)))))
+                                   (for [[k v] (get-in db [:click-param :flow-status] {}) :when (cstr/ends-with? (str k) ">*running?")] v)))))
 
 (re-frame/reg-sub ::runstreams-running-list
                   (fn [db _]
-                    (for [[k v] (get-in db [:click-param :flow] {})
+                    (for [[k v] (get-in db [:click-param :flow-status] {})
                           :when (and (true? v) (cstr/ends-with? (str k) ">*running?"))]
                       (keyword (-> (str k)
                                    (ut/replacer ">*running?" "")
@@ -1132,6 +1137,7 @@
 (re-frame/reg-event-db ::toggle-session-modal (fn [db [_]] (assoc db :session-modal? (not (get db :session-modal? false)))))
 
 (re-frame/reg-event-db ::toggle-quake-console (fn [db [_]] (assoc db :quake-console? (not (get db :quake-console? false)))))
+(re-frame/reg-event-db ::toggle-quake-console-off (fn [db [_]] (assoc db :quake-console? false)))
 
 (re-frame/reg-event-db ::disable-session-modal (fn [db [_]] (assoc db :session-modal? false)))
 
@@ -2555,8 +2561,6 @@
   [_ width-int height-int value syntax]
   (let [syntax     (or (if (= syntax "raw (clojure)") "clojure" syntax) "clojure")
         stringify? true ;;(not (= syntax "clojure"))
-        ;selected-kp @(ut/tracked-sub ::editor-panel-selected-view {})
-        ;selected-kp (if (nil? (first selected-kp)) nil selected-kp)
         ]
     [re-com/box
      :size "auto"
@@ -2597,22 +2601,58 @@
                         :readOnly          false ;true
                         :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
 
+(defn edn-box [width-int height-int value]
+  (let [syntax      "clojure"
+        code-width  (- width-int 24)]
+    [re-com/box
+     :size "auto"
+     :padding "8px"
+     ;:width (px (- width-int 24))
+     ;:height (px (- height-int 24))
+     :style {:font-family      (if (= syntax "text")
+                                 (theme-pull :theme/base-font nil)
+                                 (theme-pull :theme/monospaced-font nil))
+             ;;:color           (theme-pull :theme/editor-outer-rim-color nil)
+             :font-size        "16px"
+             :overflow         "auto"
+             :background-color "#00000000"
+             :font-weight      700}
+     :child [(reagent/adapt-react-class cm/UnControlled)
+             {;; :value   (ut/format-map (- width-int 24)
+              ;; :value   (if stringify?
+              ;;            (try (str (cstr/join "\n" value)) (catch :default _ (str value)))
+              ;;            (ut/format-map (- width-int 24) (str value)))
+              :value (try (ut/format-map code-width (str value)) (catch :default _ value))
+              ;:onBlur  #()
+              ;:onFocus        (fn [_] (reset! db/cm-focused? true))
+              :options {:mode              syntax
+                        :lineWrapping      true
+                        :lineNumbers       false ;true
+                        :matchBrackets     true
+                        :autoCloseBrackets true
+                        :autofocus         false
+                        :autoScroll        false
+                        :detach            true
+                        :readOnly          true
+                        :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
+
 (defn strip-do [s]
   (let [s (cstr/trim (str s))]
     (subs s 3 (dec (count s)))))
 
-(defn panel-code-box
-  [_ _ width-int height-int value & [repl?]]
-  (let [sql-hint?   (cstr/includes? (str value) ":::sql-string")
-        selected-kp @(ut/tracked-sub ::editor-panel-selected-view {})
-        selected-kp (if (nil? (first selected-kp)) nil selected-kp)
+
+(defn panel-code-box [_ _ width-int height-int value & [repl?]]
+  (let [;sql-hint?   (cstr/includes? (str value) ":::sql-string")
+        ;selected-kp @(ut/tracked-sub ::editor-panel-selected-view {})
+        ;selected-kp (if (nil? (first selected-kp)) nil selected-kp)
         ;block-runners-map  @(ut/tracked-sub ::block-runners {})
-        selected-block     @(ut/tracked-sub ::selected-block {})
-        selected-view-type @(ut/tracked-sub ::view-type {:panel-key selected-block :view selected-kp})
-        repl? (and (not= (get @db/data-browser-query selected-block) :*)
-                   (true? (cstr/includes? (str selected-view-type) "clojure")))
+        ;selected-block     @(ut/tracked-sub ::selected-block {})
+        ;selected-view-type @(ut/tracked-sub ::view-type {:panel-key selected-block :view selected-kp})
+        ;; repl? (and (not= (get @db/data-browser-query selected-block) :*)
+        ;;            (true? (cstr/includes? (str selected-view-type) "clojure")))
         ;syntax (get-in block-runners-map [selected-view-type :syntax])
-        key         selected-kp
+        ;;_ (tapp>>  [:stiff (=  (get @db/data-browser-query selected-block) :*) (str selected-kp) selected-block  @db/data-browser-query selected-view-type])
+        ;key         selected-kp
         ;;repl?       (true? repl?)
         font-size   (if (nil? key) 13 17)
         value       (if (and repl? (cstr/starts-with? (cstr/trim (str value)) "(do")) 
@@ -2635,11 +2675,15 @@
        :onBeforeChange (fn [editor _ _] ;; data value]
                          (reset! db/cm-instance-panel-code-box editor))
        :onFocus        (fn [_] (reset! db/cm-focused? true))
-       :onBlur         #(let [_ (reset! db/cm-focused? false)
+       :onBlur         #(let [_ (reset! db/cm-focused? false) ;; best to do all this at save time, since passing values from outside can be... a problem
                               selected-block     @(ut/tracked-sub ::selected-block {})
-                              selected-view-type @(ut/tracked-sub ::view-type {:panel-key selected-block :view selected-kp})
-                              repl? (and (not= (get @db/data-browser-query selected-block) :*)
-                                         (true? (cstr/includes? (str selected-view-type) "clojure")))
+                              selected-kp        @(ut/tracked-sub ::editor-panel-selected-view {}) ;; @(ut/tracked-subscribe [::editor-panel-selected-view])
+                              selected-view-type (first selected-kp) ;; @(ut/tracked-sub ::view-type {:panel-key selected-block :view selected-kp})
+                              repl? (true?
+                                     (and (not= (get @db/data-browser-query selected-block) :*)
+                                          (not= selected-view-type :queries)
+                                          (not= selected-view-type :views)
+                                          (true? (cstr/includes? (str selected-view-type) "clojure"))))
                               parse        (if repl?
 
                                              (try (read-string (str "(do " (cstr/join " " (ut/cm-deep-values %)) ")"))
@@ -2648,7 +2692,7 @@
                                              (try (read-string (cstr/join " " (ut/cm-deep-values %)))
                                                   (catch :default e [:cannot-parse (str (.-message e))])))
 
-                              selected-kp  @(ut/tracked-subscribe [::editor-panel-selected-view])
+                              
                               selected-kp  (if (nil? (first selected-kp)) nil selected-kp)
                               key          selected-kp
                               unparseable? (= (first parse) :cannot-parse)]
@@ -2698,7 +2742,7 @@
       ;;                                ;;(= token-string ">") ;; this didnt work
       ;;                                     (and token-end (can-be-autocompleted? token-string)))
       ;;                             (js/setTimeout (fn [] (.execCommand cm "autocomplete")) 0))))
-       :options        {:mode              (if sql-hint? "sql" "clojure")
+       :options        {:mode              "clojure" ;;(if sql-hint? "sql" "clojure")
                         :hintOptions       {:hint custom-hint-simple-fn :completeSingle false}
                         :lineWrapping      true
                         :lineNumbers       true
@@ -2739,6 +2783,7 @@
                                                                       (.setSelection cm cursor (.-to match))
                                                                       (.execCommand cm "goGroupLeft"))))})
                         :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
+
 
 
 
@@ -8703,6 +8748,7 @@
               :dropdown #(dropdown (try (assoc % :panel-key panel-key) (catch :default _ %)))
               :atom #(reagent/atom %)
               :get get
+              :edn #(edn-box (+ px-width-int 70) (+ px-height-int 55) %)
               :panel-code-box panel-code-box
               :code-box panel-code-box
               :console #(console-box % (+ px-width-int 70) (+ px-height-int 50))
@@ -8957,7 +9003,7 @@
               ;; :run-flow (fn [[flow-id tt & [overrides]]]
               ;;             (let [client-name  @(ut/tracked-sub ::client-name {})
               ;;                   base-opts    {:increment-id? false}
-              ;;                   running-key  (keyword (str "flow/" flow-id ">*running?"))
+              ;;                   running-key  (keyword (str "flow-status/" flow-id ">*running?"))
               ;;                   running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
               ;;                   runstreamed? (= overrides :runstream-overrides)
               ;;                   overrides    (if runstreamed? @(ut/tracked-subscribe [::runstream-overrides flow-id]) overrides)
@@ -8998,7 +9044,7 @@
               :run-flow  (fn [[flow-id tt & [overrides]]]
                             (let [client-name  @(ut/tracked-sub ::client-name {})
                                   base-opts    {:increment-id? false}
-                                  running-key  (keyword (str "flow/" flow-id ">*running?"))
+                                  running-key  (keyword (str "flow-status/" flow-id ">*running?"))
                                   running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
                                   runstreamed? (= overrides :runstream-overrides)
                                   overrides    (if runstreamed? @(ut/tracked-subscribe [::runstream-overrides flow-id]) overrides)
@@ -9045,7 +9091,7 @@
               
               :click-solver (fn [[solver-name tt & [input-map overrides]]]
                               (let [client-name  @(ut/tracked-sub ::client-name {})
-                                    running-key  (keyword (str "solver-status/*client-name*>" solver-name ">running?"))
+                                    running-key  (keyword (str "solver-status/*client-name*>" (cstr/replace (str solver-name) ":" "") ">running?"))
                                     running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
                                     overrides?   (ut/ne? overrides)
                                     input-map?   (ut/ne? input-map)
@@ -9510,7 +9556,7 @@
         run-rs-flow (fn [flow-id flow-id-inst panel-key override-merge-map]
                       (let [client-name @(ut/tracked-subscribe [::client-name])
                             base-opts   {:increment-id? false :instance-id flow-id-inst}
-                            running-key (keyword (str "flow/" flow-id-inst ">*running?"))
+                            running-key (keyword (str "flow-status/" flow-id-inst ">*running?"))
                             running?    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
                             overrides   (merge @(ut/tracked-subscribe [::runstream-overrides flow-id]) override-merge-map)]
                         (when (not running?) ;(not (some (fn [x] (= x text)) @db/speech-log))
@@ -9729,7 +9775,8 @@
                      sub-param-root (try (last (cstr/split (str sub-param) #"/")) (catch :default _ ""))
                      placeholder-on-running? (get-in br [selected-view-type :placeholder-on-running?])
                      running? (when placeholder-on-running?
-                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(str "solver-status/*client-name*>" sub-param-root ">running?")]}))]
+                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [(str "solver-status/*client-name*>"
+                                                                                                    (cstr/replace (str sub-param-root) ":"  "") ">running?")]}))]
                  (if (or (nil? curr-val) running?
                          ;(and (keyword? curr-val) (cstr/starts-with?  (str curr-val) ":solver/"))
                          ;(= curr-val sub-param)
@@ -10252,7 +10299,7 @@
                               (let [aa     (ut/replacer e ":flow/" "")
                                     spl    (ut/splitter aa ">")
                                     runkey (keyword (str (first spl) ">*running?"))]
-                                (get-in db [:click-param :flow runkey])))))))
+                                (get-in db [:click-param :flow-status runkey])))))))
 
 (re-frame/reg-sub ::has-a-flow-view?
                   (fn [db [_ panel-key view]]
@@ -10274,7 +10321,7 @@
                                             (let [aa     (ut/replacer e ":flow/" "")
                                                   spl    (ut/splitter aa ">")
                                                   runkey (keyword (str (first spl) ">*running?"))]
-                                              (get-in db [:click-param :flow runkey]))))]
+                                              (get-in db [:click-param :flow-status runkey]))))]
                       running?)))
 
 
@@ -10362,7 +10409,7 @@
         top-start      (* start-y db/brick-size) ;-100 ;; if shifted some bricks away...
         left-start     (* start-x db/brick-size)]
 
-    (when (and false ;; disable again
+    (when (and ;;false ;; disable again
            (not @dragging?)
            (not @mouse-dragging-panel?)
            (not @on-scrubber?)) ;true ; external? UPDATE-PANELS-HASH DISABLED TMP!! WHEN
@@ -10724,8 +10771,11 @@
                                       runner-running?   (when runner?
                                                           (let [are-solver        (get @db/solver-fn-lookup [:panels brick-vec-key s])
                                                                 rr? @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                                     {:keypath [(keyword (str (ut/replacer are-solver
-                                                                                                                           ":solver/" "solver-status/*client-name*>") ">running?"))]})] rr?))
+                                                                                     {:keypath [(keyword 
+                                                                                                 (cstr/replace
+                                                                                                  (str (ut/replacer are-solver
+                                                                                                                    ":solver/" "solver-status/*client-name*>") ">running?")
+                                                                                                  ":" ""))]})] rr?))
                                       ;;  runner-running?  (when runner? (true?
                                       ;;                                  (let [;selected-view-type @(ut/tracked-sub ::view-type {:panel-key brick-vec-key :view s})
                                       ;;                                        are-solver        (get @db/solver-fn-lookup [:panels brick-vec-key s])

@@ -16,7 +16,8 @@
                        [mvxcvi/puget "1.3.2"] ;; https://github.com/greglook/puget
                        [clojure.java-time "1.1.0"] ;; https://github.com/dm3/clojure.java-time
                        [com.nextjournal/beholder "1.0.0"]
-                       [org.xerial/sqlite-jdbc "3.36.0.3"]
+                       ;[org.xerial/sqlite-jdbc "3.36.0.3"]
+                       [org.xerial/sqlite-jdbc "3.46.0.0"]
                        [org.postgresql/postgresql "42.3.3"]
                        [ru.yandex.clickhouse/clickhouse-jdbc "0.3.1"] ; "0.3.2"]
                        [org.clojars.prepor/vertica-jdbc "7.0.1-0"]

@@ -20,6 +20,7 @@
                               :font-size "17px"
                               :font-family :theme/monospaced-font}}
                      [:string3 :*data]]
+         :edn       [:edn :*data]
          :text      [:console :*data]
          :terminal  [:terminal :*data]
          :data      [:data-viewer :*data]
@@ -92,7 +93,7 @@
 
            :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
                      :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
-                     :modes [:text :clover :data :rowset :terminal]
+                     :modes [:text :edn :clover :data :rowset :terminal]
                      :default (let [clojure-version (clojure-version)
                                     jvm-version (System/getProperty
                                                  "java.version")]
@@ -159,7 +160,7 @@
                    :icon "images/snail-shell.svg"}
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
-                      :modes [:text :clover :data :rowset :terminal]
+                      :modes [:text :edn :clover :data :rowset :terminal]
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
                                                   "java.version")]

@@ -1288,6 +1288,39 @@
       nil  ; No safe position found
       (apply min-key distance-from-center safe-positions))))
 
+;; (defn find-safe-position [block-height block-width]
+;;   (let [hh @(tracked-sub ::h {})
+;;         ww @(tracked-sub ::w {})
+;;         canvas-width (Math/floor (/ ww db/brick-size))
+;;         canvas-height (Math/floor (/ hh db/brick-size))
+;;         existing-blocks @(tracked-sub ::all-roots-tab-sizes {})
+;;         center-x (/ canvas-width 2)
+;;         center-y (/ canvas-height 2)
+;;         possible-positions (for [x (range 0 (- canvas-width block-width))
+;;                                  y (range 0 (- canvas-height block-height))]
+;;                              [x y])
+;;         blocks-overlap? (fn [x y block-width block-height [bx by bh bw]]
+;;                           (and (< x (+ bx bw))
+;;                                (> (+ x block-width) bx)
+;;                                (< y (+ by bh))
+;;                                (> (+ y block-height) by)))
+;;         overlaps? (fn [[x y]]
+;;                     (some (fn [block]
+;;                             (blocks-overlap? x y block-width block-height block))
+;;                           existing-blocks))
+;;         safe-positions (remove overlaps? possible-positions)
+;;         distance-from-center (fn [[x y]]
+;;                                (+ (Math/abs (- x center-x))
+;;                                   (Math/abs (- y center-y))))]
+
+;;     (if (empty? safe-positions)
+;;       nil  ; No safe position found
+;;       (apply min-key distance-from-center safe-positions))))
+
+
+
+
+
 ;; ;; Example usage:
 ;; (let [block-height 50
 ;;       block-width 50
@@ -1328,7 +1361,7 @@
         (swap! format-map-atom assoc [w s] o)
         o))))
 
-(defn remove-keys [m keys] (apply dissoc m keys))
+(defn remove-keys [m keys] (apply dissoc m keys))         
 
 (defn hiccup-css-to-string
   [css-map]

@@ -400,10 +400,10 @@
                                      (run [_]
                                        (try
                                          (f)
-                                        ;;  (swap! wss/scheduler-atom assoc name-str (merge
-                                        ;;                                            {:last-run (ut/get-current-timestamp)
-                                        ;;                                             :times-run (inc (get-in @wss/scheduler-atom [name-str :times-run] 0))}
-                                        ;;                                            (dissoc (get @wss/scheduler-atom name-str) :last-run :times-run)))
+                                         (swap! wss/scheduler-atom assoc name-str (merge
+                                                                                   {:last-run (ut/get-current-timestamp)
+                                                                                    :times-run (inc (get-in @wss/scheduler-atom [name-str :times-run] 0))}
+                                                                                   (dissoc (get @wss/scheduler-atom name-str) :last-run :times-run)))
                                          (catch Exception e
                                            (ut/pp [e "Error in scheduler" name-str])))))
                                    delay
@@ -849,6 +849,7 @@
 
   ;;(tt/start!)
 
+  (wss/subscribe-to-session-changes)
 
 
   ;(wss/recycle-worker) ;; single blocking
@@ -949,9 +950,9 @@
 
   ;;  all schedulers
 
-  ;; (- (System/currentTimeMillis)  (get-in @rvbbit-client-sub-values [:unix-ms]))
-
-;;  (ut/pp @watcher-log-atom)
+ ;;  (- (System/currentTimeMillis)  (get-in @rvbbit-client-sub-values [:unix-ms]))
+ ;;  (ut/pp (wss/client-statuses))
+ ;;  (ut/pp @watcher-log-atom)
 
   (defn reboot-reactor-and-resub []
     (wss/reboot-reactor!)
@@ -960,21 +961,19 @@
 
   ;;;  (reboot-reactor-and-resub)
 
-  (start-scheduler 15
-                   #(let [ddiff (- (System/currentTimeMillis)  (get-in @wss/rvbbit-client-sub-values [:unix-ms]))]
-                      (when
-                       (> ddiff 31000)
-                        (ut/pp [:WATCHDOG-REBOOTING-REACTOR-AND-SUBS! ddiff :ms :behind!])
-                        (swap! wss/scheduler-atom assoc :executed! (inc (get-in @wss/scheduler-atom [:executed!] 0)))
-                        (reboot-reactor-and-resub)))
-                   "Watchdog - Reboot Reactor and Subs" 30)
+  ;; (start-scheduler 15
+  ;;                  #(let [ddiff (- (System/currentTimeMillis)  (get-in @wss/rvbbit-client-sub-values [:unix-ms]))]
+  ;;                     (when
+  ;;                      (> ddiff 31000)
+  ;;                       (ut/pp [:WATCHDOG-REBOOTING-REACTOR-AND-SUBS! ddiff :ms :behind!])
+  ;;                       (swap! wss/scheduler-atom assoc :executed! (inc (get-in @wss/scheduler-atom [:executed!] 0)))
+  ;;                       (reboot-reactor-and-resub)))
+  ;;                  "Watchdog - Reboot Reactor and Subs" 30)
 
   (start-scheduler 1
                    #(try
-                      ;(println "Updating atom at" (System/currentTimeMillis))
                       (let [ddate (ut/current-datetime-parts)]
                         (reset! wss/father-time ddate))
-                      ;(println "Atom updated:" @wss/father-time)
                       (catch Exception e
                         (println "Error updating atom:" (.getMessage e))
                         (throw e)))
@@ -984,27 +983,40 @@
                    wss/jvm-stats
                    "JVM Stats" 30)
 
-  (start-scheduler 30
-                   wss/param-sql-sync
-                   "Parameter Sync" 120)
+  (start-scheduler 15
+                   #(wss/flow-statuses true)
+                   "Flow Stats & Watchdog" 15)
+
+  (start-scheduler 45 ;; was 30
+                   #(ppy/execute-in-thread-pools
+                     :param-sql-sync
+                     (fn [] (wss/param-sql-sync)))
+                   "Parameter Sync" 30)
 
   (start-scheduler 45
-                   wss/sync-client-subs
+                   #(when (> (count (wss/client-subs-late-delivery 30000)) 0)
+                      (wss/sync-client-subs))
                    "Sync Client Subs" 120)
 
-  (start-scheduler 5
-                   wss/flow-atoms>sql
-                   "Refresh Flow Tables" 30)
+  (start-scheduler 120
+                   wss/clean-up-reactor
+                   "Remove unneeded watchers from Reactor" 120)
+
+  (start-scheduler 300 ;; was 5
+                   #(ppy/execute-in-thread-pools
+                     :flow-atoms>sql
+                     (fn [] (wss/flow-atoms>sql)))
+                   "Refresh Flow Tables" 120)
 
   (start-scheduler 600 ;; 10 minutes
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  (start-scheduler 3600 ;; 1 hour
+  (start-scheduler (* 3600 1) ;; 1 hours
                    reboot-reactor-and-resub
-                   "Reboot Atom Reactor" 1800)
+                   "Reboot Atom Reactor" 3600)
 
-  ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical though
+  ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical, we barely use the queues except for sqlite writes
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES
   ;;                  "Purge Idle Queues" 7200)
 
@@ -1019,6 +1031,10 @@
                         (swap! wss/sql-query-usage conj @sql/sql-queries-run)
                         (swap! wss/nrepl-usage conj @evl/nrepls-run)
                         (swap! wss/flow-usage conj @wss/flows-run)
+                        (swap! wss/clover-params-usage conj @wss/param-sql-sync-rows)
+                        (swap! wss/watcher-usage conj (count (wss/current-watchers)))
+                        (swap! wss/sub-usage conj (count (wss/current-subs)))
+                        (swap! wss/sub-client-usage conj (count (wss/current-all-subs)))
                         (swap! wss/mem-usage conj (ut/memory-used))
                         (let [thread-mx-bean (java.lang.management.ManagementFactory/getThreadMXBean)
                               thread-count (.getThreadCount thread-mx-bean)]
@@ -1031,16 +1047,16 @@
                         (qp/update-queue-stats-history) ;; has it's own timestamp key
                         ;(qp/update-specific-queue-stats-history [:watcher-to-client-serial :update-stat-atom-serial])
                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
-                   "Stats Keeper")
+                   "Stats Keeper");;)
 
-  (start-scheduler 6000 ;; 1 hour
+  (start-scheduler (* 3600 3) ;; 3 hours
                    #(do
                       (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
                       (reset! wss/solvers-cache-hits-atom {})
                       (reset! wss/solvers-cache-atom {})
                       (reset! sql/errors {}) ;; just for now
                       (reset! ut/df-cache {})) ;; <--- big boy
-                   "Purge Solver & Deep-Flatten Cache" 6000)
+                   "Purge Solver & Deep-Flatten Cache" (* 3600 3))
 
   ;; (start-scheduler 1
   ;;                  #(doseq [[client-name solvers] @wss/solver-status]
@@ -1172,7 +1188,7 @@
   (defn update-stat-atom
     [kks]
     (qp/serial-slot-queue :update-stat-atom-serial :serial
-      ;(ppy/execute-in-thread-pools :update-stat-atom-serial
+    ;(ppy/execute-in-thread-pools :update-stat-atom
                           (fn []
                             (let [;flows (if (or (nil? flows) (empty? flows))
                                   ]
@@ -1264,16 +1280,20 @@
                                               :*running?       running?}}))))))))
 
   (defn tracker-changed
-    [key ref old-state new-state]
+    [_ _ old-state new-state]
     (when (not= old-state new-state)
       (let [[_ b _] (data/diff old-state new-state)
             kks     (try (keys b) (catch Exception _ []))
-          ;kks     (vec (remove #(= "client-keepalive" %) kks))
-            kks     (remove #(= "client-keepalive" %) kks)]
-        (when (ut/ne? kks) ;; (> (count kks) 0) 
+            kks     (vec (remove #(= "client-keepalive" %) kks))
+            ;kks     (remove #(= "client-keepalive" %) kks)
+            ]
+        (when (> (count kks) 0)
           (update-stat-atom kks)))))
 
-  (ppy/add-watch+ flow-db/status :master-flow-db-status-watcher* tracker-changed :master-flow-db-status-watcher*)
+  (ppy/add-watch+ flow-db/status
+                  :flow-db-status
+                  tracker-changed
+                  :flow-db-status)
 
   (defn log-tracker
     [kks]
@@ -1345,33 +1365,33 @@
     [key ref old-state new-state]
     (when (not= new-state old-state)
 
-      (qp/serial-slot-queue :combined-tracker-watcher-serial :serial-queues
-    ;(ppy/execute-in-thread-pools :combined-tracker-watcher-serial                         
-                            (fn []
+     ; (qp/serial-slot-queue :combined-tracker-watcher-serial :serial-queues
+      (ppy/execute-in-thread-pools :combined-tracker-watcher-side-effects
+                                   (fn []
 
-                              (let [[_ b _] (data/diff old-state new-state)
-                                    kks     (try (keys b) (catch Exception _ nil))]
-                                (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
+                                     (let [[_ b _] (data/diff old-state new-state)
+                                           kks     (try (keys b) (catch Exception _ nil))]
+                                       (when (> (count (remove #(= "client-keepalive" %) kks)) 0)
       ;; Side effects part (originally from tracker-changed2)
-                                  (ppy/execute-in-thread-pools :flow-tracker-side-effects*
-                                                               (fn []
-                                                                 (ext/create-dirs "./flow-logs/")
-                                                                 (doseq [flow-id kks
-                                                                         :let [run-id     (str (get-in @flow-db/results-atom [flow-id :run-id]))
-                                                                               fp         (str "./flow-logs/" (cstr/replace flow-id "/" "-CALLING-") "--" run-id ".edn")
-                                                                               mst        (System/currentTimeMillis)
-                                                                               _          (swap! wss/watchdog-atom assoc flow-id mst)
-                                                                               diffy      (get (ut/replace-large-base64 b) flow-id)
-                                                                               diffy-keys (into {} (for [[k v] diffy] {k (first (keys v))}))
-                                                                               _          (swap! wss/last-block-written assoc flow-id diffy-keys)
-                                                                               blocks     (keys (get (ut/replace-large-base64 b) flow-id))]]
-                                                                   (let [data        [[(ut/millis-to-date-string mst) blocks]
-                                                                                      {:values (select-keys (ut/replace-large-base64 (get-in @flow-db/results-atom [flow-id])) blocks)
-                                                                                       :diff   diffy}]
-                                                                         pretty-data (with-out-str (ppt/pprint data))]
-                                                                     (spit fp (str pretty-data "\n") :append true)))))
-                                  (log-tracker kks)
-                                  (update-stat-atom kks))
+                                         (ppy/execute-in-thread-pools :flow-log-file-writing
+                                                                      (fn []
+                                                                        (ext/create-dirs "./flow-logs/")
+                                                                        (doseq [flow-id kks
+                                                                                :let [run-id     (str (get-in @flow-db/results-atom [flow-id :run-id]))
+                                                                                      fp         (str "./flow-logs/" (cstr/replace flow-id "/" "-CALLING-") "--" run-id ".edn")
+                                                                                      mst        (System/currentTimeMillis)
+                                                                                      _          (swap! wss/watchdog-atom assoc flow-id mst)
+                                                                                      diffy      (get (ut/replace-large-base64 b) flow-id)
+                                                                                      diffy-keys (into {} (for [[k v] diffy] {k (first (keys v))}))
+                                                                                      _          (swap! wss/last-block-written assoc flow-id diffy-keys)
+                                                                                      blocks     (keys (get (ut/replace-large-base64 b) flow-id))]]
+                                                                          (let [data        [[(ut/millis-to-date-string mst) blocks]
+                                                                                             {:values (select-keys (ut/replace-large-base64 (get-in @flow-db/results-atom [flow-id])) blocks)
+                                                                                              :diff   diffy}]
+                                                                                pretty-data (with-out-str (ppt/pprint data))]
+                                                                            (spit fp (str pretty-data "\n") :append true)))))
+                                         (log-tracker kks)
+                                         (update-stat-atom kks))
 
     ;; Child atom update part (originally from the second watcher)
                                 ;; (let [changes (reduce-kv
@@ -1389,13 +1409,13 @@
                                 ;;                    child-atoms)
                                 ;;                (let [new-child-atom (atom {k v})]
                                 ;;                  (assoc child-atoms k new-child-atom)))))))
-                                )))))
+                                       )))))
 
 ;; Add the combined watcher
   (ppy/add-watch+ flow-db/tracker
-                  :master-flow-db-tracker-combined-watcher
+                  :flow-db-tracker
                   combined-tracker-watcher
-                  :master-flow-db-tracker-combined-watcher)
+                  :flow-db-tracker)
 
   (wss/sub-to-value :rvbbit :time/unix-ms true) ;; importante! 
 
