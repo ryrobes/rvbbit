@@ -837,6 +837,16 @@
           (if (map? v) [k (remove-underscored v)] [k v]))))
 
 
+(defn remove-underscored-plus-dims
+  "Recursively removes keys that are either :h, :w, :root, or start with an underscore."
+  [m]
+  (into {}
+        (for [[k v] m
+              :when (not (and (keyword? k)
+                              (or (= k :h) (= k :root) (= k :w)
+                                  (cstr/starts-with? (name k) "_"))))]
+          [k (if (map? v) (remove-underscored-plus-dims v) v)])))
+
 
 
 (defn remove-temp-keys

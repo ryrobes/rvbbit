@@ -176,7 +176,7 @@
     (sql-exec system-db sqlite-ddl/create-reco-vw)
     (sql-exec system-db sqlite-ddl/create-reco-vw2)
     (sql-exec system-db sqlite-ddl/create-status)
-    (sql-exec system-db sqlite-ddl/create-client-items)
+    (sql-exec sql/autocomplete-db sqlite-ddl/create-client-items)
     (sql-exec system-db sqlite-ddl/create-client-memory)
     (sql-exec system-db sqlite-ddl/create-status-vw)))
 

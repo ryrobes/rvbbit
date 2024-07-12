@@ -27,9 +27,34 @@
            (ut/pp [:creating-conn-pool name])
            (hik/make-datasource bbase))))
 
+(defn close-pool [ds]
+  (try (hik/close-datasource ds) (catch Exception e (ut/pp [:close-pool-error! e]))))
 
+(def client-db-pools (atom {}))
 
+(defn create-or-get-client-db-pool [db-name]
+  (let [db-key (keyword db-name)]
+    (if-let [pool (@client-db-pools db-key)]
+      {:datasource pool}
+      (let [_ (ut/pp [:creating-new-client-db-pool db-name])
+            pool @(pool-create
+                   {:jdbc-url (str "jdbc:sqlite:file:./db/client-temp/"
+                                   (cstr/replace (str db-name) ":" "")
+                                   ".db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL")
+                    :idle-timeout      600000
+                    :maximum-pool-size 20
+                    :max-lifetime      1800000
+                    :cache             "shared"}
+                   (cstr/replace (str db-name) ":" ""))]
+        (swap! client-db-pools assoc db-key pool)
+        {:datasource pool}))))
 
+(defn close-client-db-pool
+  [db-name]
+  (let [db-key (keyword db-name)]
+    (when-let [pool (@client-db-pools db-key)]
+      (close-pool pool)
+      (swap! client-db-pools dissoc db-key))))
 
 
 
@@ -47,6 +72,16 @@
          :max-lifetime      1800000
          :cache             "shared"}
         "system-db")})
+
+(def autocomplete-db
+  {:datasource
+   @(pool-create
+     {:jdbc-url "jdbc:sqlite:file:./db/autocomplete.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
+      :idle-timeout      600000
+      :maximum-pool-size 20
+      :max-lifetime      1800000
+      :cache             "shared"}
+     "autocomplete-db")})
 
 
 ;; (def system-db 
@@ -188,7 +223,10 @@
            (do (ut/pp {:sql-query-fn-error e :query query :extra (when extra extra)})
                (insert-error-row! db-spec query e)
                [;{:query_error (str (.getType e))}
-                {:query_error (str (.getMessage e))} {:query_error "(from database connection)"}])))))
+                {:query_error (str (.getMessage e))} 
+                {:query_error "(from database connection)"}
+                {:query_error (subs (str db-spec) 0 50)}
+                ])))))
 
 (defn sql-query-meta
   [db-spec query]
@@ -292,20 +330,21 @@
 (defn sql-exec
   [db-spec query & [extra]]
   ;(enqueue-task-sql db-spec
-  (qp/serial-slot-queue :sql-serial :sql ;;(str db-spec)                       
-                    (fn []
-                      (swap! sql-exec-run inc)
-                      (swap! sql-exec-log conj (str (str db-spec) (try (subs (str query) 0 100)
-                                                                   (catch Throwable _ (str query)))))
-                      (jdbc/with-db-connection [t-con db-spec]
-                                               (try (jdbc/db-do-commands t-con query)
-                                                    (catch Exception e
-                                                      (do (ut/pp (merge {:sql-exec-fn-error e
-                                                                         :db-spec           db-spec
-                                                                         :query             (try (subs (str query) 0 1000)
-                                                                                                 (catch Throwable _ (str query)))}
-                                                                        (if extra {:ex extra} {})))
-                                                          (insert-error-row! db-spec query e))))))))
+  (let [queue-name (or (try (get extra :queue :general-sql) (catch Exception _ :general-sql)) :general-sql)]
+    (qp/serial-slot-queue :sql-serial queue-name                      
+                          (fn []
+                            (swap! sql-exec-run inc)
+                            (swap! sql-exec-log conj (str (str db-spec) (try (subs (str query) 0 100)
+                                                                             (catch Throwable _ (str query)))))
+                            (jdbc/with-db-connection [t-con db-spec]
+                              (try (jdbc/db-do-commands t-con query)
+                                   (catch Exception e
+                                     (do (ut/pp (merge {:sql-exec-fn-error e
+                                                        :db-spec           db-spec
+                                                        :query             (try (subs (str query) 0 1000)
+                                                                                (catch Throwable _ (str query)))}
+                                                       (if extra {:ex extra} {})))
+                                         (insert-error-row! db-spec query e)))))))))
 
 
 

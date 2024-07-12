@@ -1069,15 +1069,15 @@
                                         :timeout     50000}])
                  (ut/tracked-dispatch [::add-to-sql-history-condi kp hsql kk])))))))
 
-(defn push-panels-to-server
-  [panels-map resolved-panels-map client-name]
-  (let []
-    (dorun (ut/tracked-dispatch
-             [::wfx/push :default
-              {:kind :current-panels 
-               :panels panels-map 
-               :resolved-panels resolved-panels-map 
-               :client-name client-name}]))))
+;; (defn push-panels-to-server
+;;   [panels-map resolved-panels-map client-name]
+;;   (let []
+;;     (dorun (ut/tracked-dispatch
+;;              [::wfx/push :default
+;;               {:kind :current-panels 
+;;                :panels panels-map 
+;;                :resolved-panels resolved-panels-map 
+;;                :client-name client-name}]))))
 
 (re-frame/reg-event-db ::set-query-schedule
                        (fn [db [_ query-id schedule]]
@@ -1106,26 +1106,33 @@
                                 [[:case (:logic logic) 1 :else 0] (keyword (str "styler_" (ut/safe-name name)))])))
          panel-key     @(ut/tracked-sub ::lookup-panel-key-by-query-key-alpha {:query-key (first keypath)})
          clover-sql    (assoc honey-sql :connection-id "system-db")
+         connection-id (get honey-sql :connection-id "system-db")
          honey-sql     (ut/clean-sql-from-ui-keys honey-sql)
          hselect       (get honey-sql :select)
          flat          (ut/deep-flatten honey-sql)
-         connection-id nil ;(get honey-sql :connection-id)
+         client-name   @(ut/tracked-subscribe [::client-name])
+         honey-sql  (ut/postwalk-replacer {:*client-name client-name
+                                           :*client-name* client-name
+                                           :*client-name-str (str client-name)} honey-sql)
+         
+         ;;;;honey-sql     (assoc honey-sql :connection-id connection-id)
          literal-data? (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
          honey-modded  (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
-         client-name   @(ut/tracked-subscribe [::client-name])
-         honey-modded  (ut/postwalk-replacer {:*client-name client-name :*client-name-str (pr-str client-name)} honey-modded)]
+         ;client-name   @(ut/tracked-subscribe [::client-name])
+         ;honey-modded  (ut/postwalk-replacer {:*client-name client-name
+         ;                                     :*client-name* client-name
+         ;                                     :*client-name-str (pr-str client-name)} honey-modded)
+         ]
      (ut/tracked-dispatch
        [::wfx/request :default
-        {:message     {:kind          (if (or connection-id literal-data?) :honey-xcall :honey-call) ;; override
-                                                                                                     ;; for
-                                                                                                     ;; data
-                                                                                                     ;; literals
+        {:message     {:kind          :honey-xcall ;; (if (or connection-id literal-data?) :honey-xcall :honey-call) 
                        :ui-keypath    keypath
                        :panel-key     panel-key
                        :deep-meta?    deep-meta?
                        :kit-name      kit-name
                        :clover-sql    clover-sql
                        :honey-sql     honey-modded
+                       :connection-id connection-id
                        :client-cache? (if literal-data? (get honey-sql :cache? true) false)
                        :page          (get honey-sql :page)
                        :sniff?        sniff? ;; on used for ext tables
@@ -1148,6 +1155,10 @@
            rules         (when has-rules?
                            (vec (for [[[col name] logic] style-rules]
                                   [[:case (:logic logic) 1 :else 0] (keyword (str "styler_" (ut/safe-name name)))])))
+           client-name   @(ut/tracked-subscribe [::client-name])
+           honey-sql  (ut/postwalk-replacer {:*client-name client-name
+                                                :*client-name* client-name
+                                                :*client-name-str (str client-name)} honey-sql)
            connection-id (cond (get honey-sql :connection-id) (get honey-sql :connection-id)
                                (nil? connection-id)           "cache.db"
                                (= connection-id "system")     "system-db"
@@ -1160,8 +1171,11 @@
            honey-sql     (ut/clean-sql-from-ui-keys honey-sql)
            hselect       (get honey-sql :select)
            honey-modded  (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
-           client-name   @(ut/tracked-subscribe [::client-name])
-           honey-modded  (ut/postwalk-replacer {:*client-name client-name :*client-name-str (str client-name)} honey-modded)]
+           ;client-name   @(ut/tracked-subscribe [::client-name])
+           ;honey-modded  (ut/postwalk-replacer {:*client-name client-name 
+           ;                                     :*client-name* client-name 
+           ;                                     :*client-name-str (str client-name)} honey-modded)
+           ]
        (do (when (not (nil? refresh-every)) (ut/tracked-dispatch [::set-query-schedule (first keypath) refresh-every]))
            (ut/tracked-dispatch [::wfx/request :default
                                  {:message     {:kind          :honey-xcall

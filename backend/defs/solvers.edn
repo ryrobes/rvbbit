@@ -16,6 +16,8 @@
     "/home/ryanr/rvbbit/frontend/resources/public/images/large"
     rel-dir
     "./images/large/"
+    _
+    (Thread/sleep 5000)
     files
     (->>
      (file-seq (clojure.java.io/file dir))

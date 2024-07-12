@@ -2,6 +2,7 @@
   (:require [clojure.string         :as cstr]
             [clojure.data           :as data]
             [clojure.core.memoize   :as memoize]
+            [rvbbit-backend.queue-party :as qp]
             [rvbbit-backend.util    :as ut])
   (:import
    [java.util.concurrent                  Executors ThreadPoolExecutor SynchronousQueue TimeUnit TimeoutException ArrayBlockingQueue ThreadPoolExecutor$CallerRunsPolicy]
@@ -72,13 +73,25 @@
 ;;   (ThreadPoolExecutor. 1 100 60 TimeUnit/SECONDS  (ArrayBlockingQueue. 1000) (ThreadPoolExecutor$CallerRunsPolicy.)))
 
 
+;; (defn get-or-create-cached-thread-pool [name]
+;;   (if-let [queue (@dyn-pools name)]
+;;     queue
+;;     (let [new-queue (create-cached-thread-pool name)]
+;;       (ut/pp [:*creating-thread-pool-for name])
+;;       (swap! dyn-pools assoc name new-queue)
+;;       new-queue)))
+
 (defn get-or-create-cached-thread-pool [name]
   (if-let [queue (@dyn-pools name)]
     queue
-    (let [new-queue (create-cached-thread-pool name)]
-      (ut/pp [:*creating-thread-pool-for name])
-      (swap! dyn-pools assoc name new-queue)
-      new-queue)))
+    (locking dyn-pools
+      ;; busy busy. bobs burgers.
+      (if-let [queue (@dyn-pools name)]
+        queue
+        (let [new-queue (create-cached-thread-pool name)]
+          (ut/pp [:*creating-thread-pool-for name])
+          (swap! dyn-pools assoc name new-queue)
+          new-queue)))))
 
 ;; (def get-or-create-cached-thread-pool-memoized
 ;;   (memoize/memo get-or-create-cached-thread-pool))

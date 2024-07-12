@@ -31,10 +31,12 @@
  :runners {:queries {:default {}
                      :modes [:rowset]
                      :hop-bar? false
+                     :ext ".edn"
                      :icon "images/sql.png"} ;; basic clover-sql query runner
 
            :views   {:default []
                      :modes [:clover]
+                     :ext ".edn"
                      :description "Evaluate a Clover experssion - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
                      :icon "🍀"} ;; basic clover render
 
@@ -43,6 +45,7 @@
                            :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
                            :modes [:clover :text :data :rowset :terminal]
                            :hop-function? true
+                           :ext ".clj"
                            :default (do
                                       (ns hoppy.chuck-norris
                                         (:require [clojure.data.json :as json]
@@ -94,6 +97,7 @@
            :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
                      :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
                      :modes [:text :edn :clover :data :rowset :terminal]
+                     :ext ".clj"
                      :default (let [clojure-version (clojure-version)
                                     jvm-version (System/getProperty
                                                  "java.version")]
@@ -129,6 +133,7 @@
                    :modes [:text :data :terminal]
                    :default "ls -l ; top -n 1  ; pwd" ;; "ls -l"
                    :syntax "shell"
+                   :ext ".sh"
                    ;:hop-function? true
                    :clover-fn [:run-solver
                                {:signal false
@@ -161,6 +166,7 @@
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
                       :modes [:text :edn :clover :data :rowset :terminal]
+                      :ext ".clj"
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
                                                   "java.version")]
@@ -181,6 +187,7 @@
                           :modes [:clover :data :text]
                           :type :flow
                           :syntax "text"
+                          :ext ".txt"
                           :description "Create an image with OpenAI's DALLE-3 HTTP endpoint. Uses the 'openai-image-gen-ladder3' flowmap, and returns the :hiccup-image-box-w-png step value."
                           :placeholder-on-running? true
                           :clover-fn [:run-solver
@@ -201,6 +208,7 @@
                      :modes [:text :data :rowset :clover :terminal]
                      :type :flow
                      :syntax "python"
+                     :ext ".py"
                      :placeholder-on-running? true
                      :clover-fn [:run-solver
                                  {:signal false

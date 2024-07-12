@@ -1,49 +1,16 @@
 {:orders
- {:flow-fn-sys
-  [:name :description :full_map :inputs :icon :input_types :output_types :category],
+ {:stats-types-34 [:type],
+  :time-freq-345d [:freq],
+  :new-query [:ffilename],
+  :connections-sys [:database_name :connection_id],
   :fields-sys [:field_name :field_type :data_type],
   :tables-sys
-  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :new-query [:ffilename],
-  :flows-sys [:flow_id :file_path :last_modified],
-  :jvm_stats
-  [:used_memory_mb
-   :thread_count
-   :messages
-   :batches
-   :recent_batches
-   :recent_batches_per_second
-   :batches_per_second
-   :unix_ms
-   :messages_per_second
-   :recent_messages
-   :recent_messages_per_second
-   :recent_queries_run
-   :recent_queries_per_second
-   :queries_per_second
-   :sql_cache_size
-   :ws_peers
-   :subscriptions
-   :open_flow_channels
-   :uptime_seconds
-   :seconds_since_last_update
-   :queries_run
-   :internal_queries_run
-   :sniffs_run
-   :sys_load
-   :ts],
-  :time-freq-345d [:freq],
-  :stats-types-34 [:type],
-  :flow-fn-categories-sys [:category],
-  :connections-sys [:database_name :connection_id],
-  :flow-fn-all-sys [:name]},
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields]},
  :reco-preview nil,
- :flow? false,
  :sql-source
- {:jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
-  :stats-types-34
+ {:stats-types-34
   {:select [:*],
+   :connection-id :*client-name*,
    :order-by [1],
    :from
    [{:data
@@ -53,14 +20,17 @@
           (mapv
             (fn [x] (cstr/replace (str x) ":" ""))
             (keys (rvbbit-backend.websockets/stats-keywords)))]
-         {:type t}))}]},
+         {:type t}))}],
+   :_last-run "11:02:36"},
   :time-freq-345d
   {:select [:*],
+   :connection-id :*client-name*,
    :order-by [[1 :asc]],
-   :from [{:data (vec (for [e [1 5 30 45 60 90 120 240 600 3600]] {:freq e}))}],
-   :_last-run "14:13:28"},
+   :from [{:data (vec (for [e [1 5 15 30 45 60 90 120 240 600 3600]] {:freq e}))}],
+   :_last-run "11:02:28"},
   :new-query
   {:select [:*],
+   :connection-id :*client-name*,
    :from
    [{:data
      (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
@@ -74,72 +44,10 @@
                    (map (fn [x] (.getName x))))]
        (println (count files))
        (vec (for [f files] {:ffilename (str f)})))}],
-   :page 3,
-   :_last-run "03:02:01"}},
- :selected-flow-block nil,
+   :page -1,
+   :_last-run "11:02:42"}},
  :meta
- {:flow-fn-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 131,
-     :group-by? true,
-     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
-     :cardinality 100},
-    :description
-    {:data-type "string",
-     :distinct 33,
-     :group-by? true,
-     :commons
-     {"" 97, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
-     :cardinality 25},
-    :full_map
-    {:data-type "string",
-     :distinct 131,
-     :group-by? true,
-     :commons
-     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
-      1},
-     :cardinality 100},
-    :inputs
-    {:data-type "string",
-     :distinct 70,
-     :group-by? true,
-     :commons
-     {"[:open-input-1 :open-input]" 10,
-      "[:value1 :value2]" 7,
-      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
-     :cardinality 53},
-    :icon
-    {:data-type "string",
-     :distinct 21,
-     :group-by? true,
-     :commons {"zmdi-puzzle-piece" 97, "zmdi-pizza" 3, "zmdi-file-text" 3},
-     :cardinality 16},
-    :input_types
-    {:data-type "string",
-     :distinct 59,
-     :group-by? true,
-     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
-     :cardinality 45},
-    :output_types
-    {:data-type "string",
-     :distinct 14,
-     :group-by? true,
-     :commons {":any" 67, "" 17, ":string" 14},
-     :cardinality 10},
-    :category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 97, ":rabbit-base" 18, ":clojure-base" 16},
-     :cardinality 2}},
-   :rowcount 131},
-  :fields-sys
+ {:fields-sys
   {:fields
    {:field_name
     {:data-type "string",
@@ -166,51 +74,51 @@
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"none" 25},
+     :commons {"none" 26},
      :cardinality 3},
     :db_catalog
     {:data-type "unknown",
      :distinct 1,
      :group-by? true,
-     :commons {nil 25},
+     :commons {nil 26},
      :cardinality 3},
     :connection_id
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"snifftmp2" 25},
+     :commons {"snifftmp2" 26},
      :cardinality 3},
     :schema_cat
     {:data-type "unknown",
      :distinct 1,
      :group-by? false,
-     :commons {nil 25},
+     :commons {nil 26},
      :cardinality 3},
     :table_name
     {:data-type "string",
-     :distinct 25,
+     :distinct 26,
      :group-by? true,
-     :commons {"connections" 1, "board_history" 1, "client_items" 1},
+     :commons {"connections" 1, "board_history" 1, "rule_maps_tests" 1},
      :cardinality 100},
     :fields
     {:data-type "integer",
      :distinct 16,
      :group-by? false,
      :commons {6 4, 5 3, 15 3},
-     :cardinality 63}},
-   :rowcount 25},
+     :cardinality 61}},
+   :rowcount 26},
   :new-query
   {:fields
    {:ffilename
     {:data-type "string",
-     :distinct 200,
+     :distinct 1041,
      :group-by? true,
      :commons
-     {"b64-image-83886-74618-4k.webp" 1,
-      "b64-image3-80423-54454-4k.webp" 1,
-      "vap32.png" 1},
+     {"b64-image5-57853-95564-4k.webp" 1,
+      "b64-image-31549-41819-4k.webp" 1,
+      "b64-image3-65849-64925-4k.webp" 1},
      :cardinality 100}},
-   :rowcount 200},
+   :rowcount 1041},
   :gen-viz-797
   {:fields
    {:rows
@@ -226,32 +134,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :flows-sys
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 96,
-     :group-by? true,
-     :commons
-     {"clam-flow-851" 3, "openai-image-gen-ladder" 2, "python3-runner-v1" 1},
-     :cardinality 96},
-    :file_path
-    {:data-type "string",
-     :distinct 99,
-     :group-by? true,
-     :commons
-     {"./flows/generated-flow-map.edn" 1,
-      "./flows/stitches-math.edn" 1,
-      "./flows/openai-image-gen-ladder3.edn" 1},
-     :cardinality 100},
-    :last_modified
-    {:data-type "string",
-     :distinct 34,
-     :group-by? true,
-     :commons
-     {"2024-03-12 02:37:43" 66, "2024-06-22 18:16:16" 1, "2024-03-14 07:50:09" 1},
-     :cardinality 34}},
-   :rowcount 99},
   :gen-viz-94
   {:fields
    {:diff
@@ -261,178 +143,24 @@
      :commons {nil 1},
      :cardinality 100}},
    :rowcount 1},
-  :jvm_stats
-  {:fields
-   {:queries_run
-    {:data-type "integer",
-     :distinct 109,
-     :group-by? true,
-     :commons {381 2, 611 2, 84 1},
-     :cardinality 98},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 108,
-     :group-by? true,
-     :commons {55.79 2, 53.03 2, 55.75 2},
-     :cardinality 97},
-    :uptime_seconds
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {390 1, 915 1, 1320 1},
-     :cardinality 100},
-    :queries_per_second
-    {:data-type "float",
-     :distinct 3,
-     :group-by? true,
-     :commons {0 109, 1 1, -15 1},
-     :cardinality 2},
-    :recent_batches
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {12314 1, 2047 1, 4086 1},
-     :cardinality 100},
-    :sql_cache_size
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :ts
-    {:data-type "string",
-     :distinct 111,
-     :group-by? true,
-     :commons
-     {"2024-07-07 11:22:21" 1, "2024-07-07 11:11:21" 1, "2024-07-07 10:57:06" 1},
-     :cardinality 100},
-    :subscriptions
-    {:data-type "integer",
-     :distinct 5,
-     :group-by? true,
-     :commons {207 102, 188 6, 204 1},
-     :cardinality 4},
-    :messages_per_second
-    {:data-type "float",
-     :distinct 55,
-     :group-by? true,
-     :commons {54.24 9, 54.25 6, 54.11 5},
-     :cardinality 49},
-    :messages
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {3404 1, 5635 1, 32451 1},
-     :cardinality 100},
-    :sniffs_run
-    {:data-type "integer",
-     :distinct 99,
-     :group-by? true,
-     :commons {18 3, 82 3, 199 2},
-     :cardinality 89},
-    :sys_load
-    {:data-type "float",
-     :distinct 97,
-     :group-by? true,
-     :commons {3.22 3, 3.3 3, 7.96 2},
-     :cardinality 87},
-    :recent_batches_per_second
-    {:data-type "float",
-     :distinct 38,
-     :group-by? true,
-     :commons {9.67 12, 9.73 11, 9.87 9},
-     :cardinality 34},
-    :batches
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {12314 1, 16013 1, 2047 1},
-     :cardinality 100},
-    :unix_ms
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {1720365021419 1, 1720365261418 1, 1720365801416 1},
-     :cardinality 100},
-    :used_memory_mb
-    {:data-type "integer",
-     :distinct 107,
-     :group-by? true,
-     :commons {3408 2, 2942 2, 3229 2},
-     :cardinality 96},
-    :recent_queries_run
-    {:data-type "integer",
-     :distinct 9,
-     :group-by? true,
-     :commons {2 26, 15 25, 4 21},
-     :cardinality 8},
-    :thread_count
-    {:data-type "integer",
-     :distinct 37,
-     :group-by? true,
-     :commons {355 11, 356 10, 352 9},
-     :cardinality 33},
-    :internal_queries_run
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 111},
-     :cardinality 0},
-    :open_flow_channels
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {11 85, 0 26},
-     :cardinality 1},
-    :ws_peers
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {9 111},
-     :cardinality 0},
-    :recent_messages
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {35725 1, 79539 1, 5635 1},
-     :cardinality 100},
-    :recent_queries_per_second
-    {:data-type "float",
-     :distinct 10,
-     :group-by? true,
-     :commons {0.13 26, 1 24, 0.27 21},
-     :cardinality 9},
-    :batches_per_second
-    {:data-type "float",
-     :distinct 55,
-     :group-by? true,
-     :commons {9.64 9, 9.67 8, 9.68 8},
-     :cardinality 49},
-    :seconds_since_last_update
-    {:data-type "integer",
-     :distinct 3,
-     :group-by? true,
-     :commons {15 60, 14 50, -1 1},
-     :cardinality 2}},
-   :rowcount 111},
   :time-freq-345d
   {:fields
    {:freq
     {:data-type "integer",
-     :distinct 10,
+     :distinct 11,
      :group-by? true,
      :commons {30 1, 120 1, 45 1},
      :cardinality 100}},
-   :rowcount 10},
+   :rowcount 11},
   :stats-types-34
   {:fields
    {:type
     {:data-type "string",
-     :distinct 44,
+     :distinct 52,
      :group-by? true,
      :commons {"flows" 1, "workers" 1, "queue-tasks" 1},
      :cardinality 100}},
-   :rowcount 44},
+   :rowcount 52},
   :offenses-drag-24
   {:fields
    {:SHOOTING
@@ -572,15 +300,6 @@
      :commons {"2000-12-09" 1, "2010-08-30" 1, "2003-11-08" 1},
      :cardinality 100}},
    :rowcount 317},
-  :flow-fn-categories-sys
-  {:fields
-   {:category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
-     :cardinality 100}},
-   :rowcount 3},
   :gen-viz-84
   {:fields
    {:rows
@@ -757,24 +476,14 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30},
-  :flow-fn-all-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 131,
-     :group-by? true,
-     :commons {":=" 1, "python3-runner-v1" 1, ":>=" 1},
-     :cardinality 100}},
-   :rowcount 131}},
+   :rowcount 30}},
  :default-col-widths
- {:block-135 {:stats-types-34 111},
-  :block-10810 {:time-freq-345d 111},
-  :block-7523 {:new-query 261},
-  :system-connections-list* {:connections-sys 115},
-  :system-tables-list* {:tables-sys 124},
-  :system-fields-list* {:fields-sys 158},
-  :virtual-panel {:kick--1764769189 152}},
+ {:block-10810 {:time-freq-345d 111},
+  :block-7523 {:new-query 561},
+  :block-135 {:stats-types-34 111},
+  :system-connections-list* {:connections-sys 140},
+  :system-tables-list* {:tables-sys 147},
+  :system-fields-list* {:fields-sys 187}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -800,6 +509,7 @@
        :font-size "17px",
        :font-family :theme/monospaced-font}}
      [:string3 :*data]],
+    :edn [:edn :*data],
     :text [:console :*data],
     :terminal [:terminal :*data],
     :data [:data-viewer :*data],
@@ -1017,92 +727,86 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [479477214 432265626 4294705152],
+ :memory [425876786 350959138 4294705152],
  :flow-subs
- [:solver/raw-custom-override2044550781
+ [:solver/get-my-colors637228907
   :signal/every-30-seconds?
-  :solver-meta/raw-custom-override-275285222>output>evald-result>out
-  :solver/raw-custom-override427527016
-  :solver-meta/raw-custom-override-1266238610>output>evald-result>out
-  :flow/flow-forever>*running?
-  :solver-meta/raw-custom-override-1898437157>output>evald-result>out
-  :repl-ns/repl-client-namespaces-map>*client-name*
-  :solver/raw-custom-override-1266238610
-  :solver-meta/raw-custom-override427527016>output>evald-result>out
+  :solver-status/*client-name*>get-my-colors637228907>running?
+  :flow-status/flow-forever>*running?
+  :solver-status/*client-name*>get-my-colors-162245426>running?
+  :solver-status/*client-name*>raw-custom-override1006946013>running?
+  :solver-status/*client-name*>raw-custom-override1236397792>running?
+  :solver-meta/raw-custom-override2070032843>output>evald-result>out
+  :solver/get-my-colors-162245426
+  :solver-status/*client-name*>raw-custom-override2070032843>running?
+  :solver/raw-custom-override2070032843
+  :solver-status/*client-name*>raw-custom-override644785251>running?
+  :solver/raw-custom-override-127780995
+  :solver-meta/raw-custom-override644785251>output>evald-result>out
+  :solver/raw-custom-override1006946013
+  :solver-meta/raw-custom-override1410458575>output>evald-result>out
+  :solver-status/*client-name*>raw-custom-override225851831>running?
+  :solver-meta/raw-custom-override-127780995>output>evald-result>out
   :time/minute
-  :solver-status/*client-name*>raw-custom-override427527016>running?
-  :solver/raw-custom-override171616481
-  :solver-status/*client-name*>raw-custom-override2044550781>running?
-  :solver/raw-custom-override-1898437157
-  :solver-meta/raw-custom-override171616481>output>evald-result>out
-  :solver/get-my-colors2109536347
-  :solver-status/*client-name*>raw-custom-override171616481>running?
-  :solver-meta/raw-custom-override206617657>output>evald-result>out
-  :solver-meta/raw-custom-override2044550781>output>evald-result>out
-  :solver/raw-custom-override206617657
-  :flow/live-scratch-flow>*running?
-  :solver-status/*client-name*>raw-custom-override-1898437157>running?
-  :solver-status/*client-name*>raw-custom-override206617657>running?
-  :solver-status/*client-name*>raw-custom-override-275285222>running?
+  :solver-meta/raw-custom-override1006946013>output>evald-result>out
+  :repl-ns/repl-client-namespaces-map>*client-name*
+  :solver-meta/raw-custom-override1236397792>output>evald-result>out
+  :solver-status/*client-name*>raw-custom-override-127780995>running?
+  :solver/raw-custom-override225851831
+  :solver-meta/raw-custom-override225851831>output>evald-result>out
+  :flow-status/live-scratch-flow>*running?
+  :solver/raw-custom-override1236397792
   :time/second
-  :solver/get-my-colors579069987
-  :solver/raw-custom-override-275285222
-  :solver-status/*client-name*>raw-custom-override-1266238610>running?
-  :solver-status/*client-name*>get-my-colors2109536347>running?
-  :solver-status/*client-name*>get-my-colors579069987>running?],
- :client-name :refreshing-square-wombat-29,
+  :solver/raw-custom-override1410458575
+  :solver-status/*client-name*>raw-custom-override1410458575>running?
+  :solver/raw-custom-override644785251],
+ :client-name :wholesome-diamond-deer-19,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2932, :h 1506},
+ :window {:w 2658, :h 1506},
  :post-meta
- {:jvm_stats {:* {:rowcount 111}},
-  :new-query {:* {:rowcount 200}},
-  :flows-sys {:* {:rowcount 99}}},
- :flow-estimates
- {"get-my-colors579069987-solver-flow-"
-  {:times 1, :run-id "b6fc6ad2-d492-4f8e-b80c-30a25a8d9868"},
-  "get-my-colors2109536347-solver-flow-"
-  {:times 1, :run-id "d264cef4-1032-41fb-a98c-a419caf18391"}},
+ {:stats-types-34 {:* {:rowcount 52}},
+  :time-freq-345d {:* {:rowcount 11}},
+  :new-query {:* {:rowcount 1041}}},
  :status
  {:heartbeat
   {:kick
-   [:solver/raw-custom-override2044550781
+   [:solver/get-my-colors637228907
     :signal/every-30-seconds?
-    :solver-meta/raw-custom-override-275285222>output>evald-result>out
-    :solver/raw-custom-override427527016
-    :solver-meta/raw-custom-override-1266238610>output>evald-result>out
-    :flow/flow-forever>*running?
-    :solver-meta/raw-custom-override-1898437157>output>evald-result>out
-    :repl-ns/repl-client-namespaces-map>*client-name*
-    :solver/raw-custom-override-1266238610
-    :solver-meta/raw-custom-override427527016>output>evald-result>out
+    :solver-status/*client-name*>get-my-colors637228907>running?
+    :flow-status/flow-forever>*running?
+    :solver-status/*client-name*>get-my-colors-162245426>running?
+    :solver-status/*client-name*>raw-custom-override1006946013>running?
+    :solver-status/*client-name*>raw-custom-override1236397792>running?
+    :solver-meta/raw-custom-override2070032843>output>evald-result>out
+    :solver/get-my-colors-162245426
+    :solver-status/*client-name*>raw-custom-override2070032843>running?
+    :solver/raw-custom-override2070032843
+    :solver-status/*client-name*>raw-custom-override644785251>running?
+    :solver/raw-custom-override-127780995
+    :solver-meta/raw-custom-override644785251>output>evald-result>out
+    :solver/raw-custom-override1006946013
+    :solver-meta/raw-custom-override1410458575>output>evald-result>out
+    :solver-status/*client-name*>raw-custom-override225851831>running?
+    :solver-meta/raw-custom-override-127780995>output>evald-result>out
     :time/minute
-    :solver-status/*client-name*>raw-custom-override427527016>running?
-    :solver/raw-custom-override171616481
-    :solver-status/*client-name*>raw-custom-override2044550781>running?
-    :solver/raw-custom-override-1898437157
-    :solver-meta/raw-custom-override171616481>output>evald-result>out
-    :solver/get-my-colors2109536347
-    :solver-status/*client-name*>raw-custom-override171616481>running?
-    :solver-meta/raw-custom-override206617657>output>evald-result>out
-    :solver-meta/raw-custom-override2044550781>output>evald-result>out
-    :solver/raw-custom-override206617657
-    :flow/live-scratch-flow>*running?
-    :solver-status/*client-name*>raw-custom-override-1898437157>running?
-    :solver-status/*client-name*>raw-custom-override206617657>running?
-    :solver-status/*client-name*>raw-custom-override-275285222>running?
+    :solver-meta/raw-custom-override1006946013>output>evald-result>out
+    :repl-ns/repl-client-namespaces-map>*client-name*
+    :solver-meta/raw-custom-override1236397792>output>evald-result>out
+    :solver-status/*client-name*>raw-custom-override-127780995>running?
+    :solver/raw-custom-override225851831
+    :solver-meta/raw-custom-override225851831>output>evald-result>out
+    :flow-status/live-scratch-flow>*running?
+    :solver/raw-custom-override1236397792
     :time/second
-    :solver/get-my-colors579069987
-    :solver/raw-custom-override-275285222
-    :solver-status/*client-name*>raw-custom-override-1266238610>running?
-    :solver-status/*client-name*>get-my-colors2109536347>running?
-    :solver-status/*client-name*>get-my-colors579069987>running?]},
+    :solver/raw-custom-override1410458575
+    :solver-status/*client-name*>raw-custom-override1410458575>running?
+    :solver/raw-custom-override644785251]},
   :alert1 {:alerts :alert2}},
  :screen-name "nostromo-console",
  :recos-page2 0,
- :selected-warren-item :every-30-seconds?,
  :selected-tab "star-shaped wallaby",
  :col-names nil,
  :snapshots nil,
@@ -1115,19 +819,19 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   206920
+   6361
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
- :base-sniff-queries {:jvm_stats 1498154063},
+ :panels-hash 1421849799,
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -257280793,
+ :user-params-hash 434034595,
  :grid-recos? true,
  :preview-keys2 [],
- :session-hash 927297971,
  :resolved-queries
  {:new-query
   {:select [:*],
+   :connection-id :*client-name*,
    :from
    [{:data
      (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
@@ -1141,8 +845,8 @@
                    (map (fn [x] (.getName x))))]
        (println (count files))
        (vec (for [f files] {:ffilename (str f)})))}],
-   :page 3,
-   :_last-run "03:02:01"},
+   :page -1,
+   :_last-run "11:02:42"},
   :gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
    :from
@@ -1182,11 +886,13 @@
      :order-by [[:city :asc]]}]},
   :time-freq-345d
   {:select [:*],
+   :connection-id :*client-name*,
    :order-by [[1 :asc]],
-   :from [{:data (vec (for [e [1 5 30 45 60 90 120 240 600 3600]] {:freq e}))}],
-   :_last-run "14:13:28"},
+   :from [{:data (vec (for [e [1 5 15 30 45 60 90 120 240 600 3600]] {:freq e}))}],
+   :_last-run "11:02:28"},
   :stats-types-34
   {:select [:*],
+   :connection-id :*client-name*,
    :order-by [1],
    :from
    [{:data
@@ -1196,7 +902,8 @@
           (mapv
             (fn [x] (cstr/replace (str x) ":" ""))
             (keys (rvbbit-backend.websockets/stats-keywords)))]
-         {:type t}))}]},
+         {:type t}))}],
+   :_last-run "11:02:36"},
   :offenses-drag-24
   {:select
    [:DAY_OF_WEEK
@@ -1455,6 +1162,7 @@
    :queries
    {:stats-types-34
     {:select [:*],
+     :connection-id :*client-name*,
      :order-by [1],
      :from
      [{:data
@@ -1464,7 +1172,8 @@
             (mapv
               (fn [x] (cstr/replace (str x) ":" ""))
               (keys (rvbbit-backend.websockets/stats-keywords)))]
-           {:type t}))}]}}},
+           {:type t}))}],
+     :_last-run "11:02:36"}}},
   :block-11609
   {:h 5,
    :w 8,
@@ -1543,9 +1252,11 @@
    :queries
    {:time-freq-345d
     {:select [:*],
+     :connection-id :*client-name*,
      :order-by [[1 :asc]],
-     :from [{:data (vec (for [e [1 5 30 45 60 90 120 240 600 3600]] {:freq e}))}],
-     :_last-run "14:13:28"}}},
+     :from
+     [{:data (vec (for [e [1 5 15 30 45 60 90 120 240 600 3600]] {:freq e}))}],
+     :_last-run "11:02:28"}}},
   :block-204
   {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
    :name "compound_trend_1 - \"date_posted, rows\" - 1141",
@@ -1882,7 +1593,7 @@
    {:clojure-hop-1
     (do
       (ns rvbbit-backend.websockets)
-      (let [graphs-gen :time/minute
+      (let [graphs-gen :signal/every-30-seconds?
             single :stats-types-34/type
             multi :stats-types-34.*/type
             freqs :time-freq-345d.*/freq
@@ -2030,7 +1741,7 @@
    :views {}},
   :block-7523
   {:h 19,
-   :w 6,
+   :w 12,
    :root [41 2],
    :tab "star-shaped wallaby",
    :selected-view :hare-vw,
@@ -2039,6 +1750,7 @@
    :queries
    {:new-query
     {:select [:*],
+     :connection-id :*client-name*,
      :from
      [{:data
        (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
@@ -2052,8 +1764,8 @@
                      (map (fn [x] (.getName x))))]
          (println (count files))
          (vec (for [f files] {:ffilename (str f)})))}],
-     :page 3,
-     :_last-run "03:02:01"}}},
+     :page -1,
+     :_last-run "11:02:42"}}},
   :block-35
   {:h 9,
    :w 9,
@@ -2156,8 +1868,8 @@
    :selected-view :ufo-sightings-drag-9},
   :block-2096
   {:h 4,
-   :w 7,
-   :root [39 22],
+   :w 4,
+   :root [38 22],
    :tab "star-shaped wallaby",
    :selected-view :hare-vw,
    :name "block-2096",
@@ -2179,7 +1891,7 @@
       :color :theme/universal-pop-color,
       :font-family :theme/base-font}
      :child
-     :time/second]},
+     [:string3 :time/second]]},
    :queries {}},
   :block-284
   {:w 32,
@@ -2220,19 +1932,19 @@
    :tab "globular koala"}},
  :selected-block "none!",
  :theme-colors-hashmap
- {"float" "#fccbc6",
-  "boolean" "#aea7ee",
-  "map" "#dcc1a5",
-  "list" "#6b8059",
-  "string" "#ffffff",
-  "any" "#a72cc2",
-  "vector" "#e195ba",
-  "keyword" "#e1e1f2",
-  "rabbit-code" "#cbcc9c",
-  "datetime" "#94306e",
-  "integer" "#e8c0d4",
-  "unknown" "#644b5d",
-  "date" "#0d601f"},
+ {"float" "#bdd496",
+  "boolean" "#88c9d2",
+  "map" "#7fdb51",
+  "list" "#c40100",
+  "string" "#e3f5e1",
+  "any" "#aa07e7",
+  "vector" "#c55e6a",
+  "keyword" "#f0f0d3",
+  "rabbit-code" "#608fa8",
+  "datetime" "#03a847",
+  "integer" "#aed08c",
+  "unknown" "#3b1d74",
+  "date" "#142c0e"},
  :click-param
  {:blocks-sys
   {:block_key ":*theme*",
@@ -2251,13 +1963,13 @@
    :schema_cat nil,
    :table_name "client_memory",
    :fields 15},
-  :new-query {:ffilename "b64-image2-85471-80566-4k.webp"},
+  :new-query {:ffilename "b64-image3-40825-45238-4k.webp"},
   :flow
   {:crow-flow-201a>*running? false,
    :counting-loop>*running? false,
    :flow-forever>final-math nil,
-   :live-scratch-flow>*running? false,
-   :flow-forever>*running? false},
+   :live-scratch-flow>*running? nil,
+   :flow-forever>*running? nil},
   :files-sys
   {:file_path "./screens/duality-of-lepus.edn",
    :screen_name "duality-of-lepus",
@@ -2265,20 +1977,37 @@
    :queries 19,
    :ts "2024-07-07 10:55:47"},
   :time
-  {:now-seconds "Wednesday, April 24 1:43:57PM", :month 4, :minute 59, :second 48},
+  {:now-seconds "Wednesday, April 24 1:43:57PM", :month 4, :minute 3, :second 37},
   :viz-tables-sys2 {:table_name :offenses-drag-26},
-  :time-freq-345d.* {:freq [120 30 5 60]},
-  :stats-types-34.* {:type ["cpu" "threads+"]},
+  :time-freq-345d.* {:freq [600 120 45]},
+  :stats-types-34.* {:type ["cpu" "watchers" "subs-client" "subs" "solvers"]},
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :test444 123,
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data nil,
-   :selected-view nil,
+   :selected-view-data
+   {:select [:*],
+    :connection-id :*client-name*,
+    :from
+    [{:data
+      (let [dir "/home/ryanr/rvbbit/frontend/resources/public/images/large"
+            rel-dir " ./images/large/"
+            files (->>
+                    (file-seq (clojure.java.io/file dir))
+                    (filter (fn [x] (.isFile x)))
+                    (filter
+                      (fn [x]
+                        (not (clojure.string/includes? (str (.getName x)) "8k"))))
+                    (map (fn [x] (.getName x))))]
+        (println (count files))
+        (vec (for [f files] {:ffilename (str f)})))}],
+    :page -1,
+    :_last-run "10:46:12"},
+   :selected-view [:queries :new-query],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :rel-image-path [:string3 "images/large/" :new-query/ffilename],
-   :selected-block :block-1071,
+   :selected-block :block-7523,
    :glass-fish-style
    {:background-color "#00000000",
     :box-shadow "10px 5px 5px #00000034",
@@ -2438,6 +2167,44 @@
     {:error "This request has been blocked by our content filters.",
      :class "class clojure.lang.ExceptionInfo"},
     :class "class clojure.lang.ExceptionInfo"},
+   :get-my-colors-1197003843
+   {:second-darkest "#4c3c4c",
+    :highest-saturation "#fcdec6",
+    :most-contrasting "#fcdec6",
+    :darkest "#102d45",
+    :contrast-with-dominant "#102d45",
+    :colors
+    ["#bc6d6d"
+     "#604755"
+     "#102d45"
+     "#fcdec6"
+     "#648cd4"
+     "#cc9cbc"
+     "#2c5c8c"
+     "#5c7cc4"
+     "#2c4c6c"
+     "#4c3c4c"
+     "#c78180"],
+    :most-frequent "#fcdec6",
+    :data-colors
+    {"float" "#fccbc6",
+     "boolean" "#aea7ee",
+     "map" "#dcc1a5",
+     "list" "#6b8059",
+     "string" "#ffffff",
+     "any" "#a72cc2",
+     "vector" "#e195ba",
+     "keyword" "#e1e1f2",
+     "rabbit-code" "#cbcc9c",
+     "datetime" "#94306e",
+     "integer" "#e8c0d4",
+     "unknown" "#644b5d",
+     "date" "#0d601f"},
+    :dominant "#c78180",
+    :most-contrasting-dark "#102d45",
+    :second-brightest "#cc9cbc",
+    :brightest "#fcdec6",
+    :most-contrasting-light "#fcdec6"},
    :raw-custom-override-1513280300 16,
    :get-my-colors919195177
    {:second-darkest "#34275d",
@@ -2477,6 +2244,45 @@
     :second-brightest "#db71c2",
     :brightest "#ec75a4",
     :most-contrasting-light "#9c8c6c"},
+   :raw-custom-override-1415569722 false,
+   :get-my-colors318096947
+   {:second-darkest "#4c3c4c",
+    :highest-saturation "#fcdec6",
+    :most-contrasting "#fcdec6",
+    :darkest "#102d45",
+    :contrast-with-dominant "#102d45",
+    :colors
+    ["#bc6d6d"
+     "#604755"
+     "#102d45"
+     "#fcdec6"
+     "#648cd4"
+     "#cc9cbc"
+     "#2c5c8c"
+     "#5c7cc4"
+     "#2c4c6c"
+     "#4c3c4c"
+     "#c78180"],
+    :most-frequent "#fcdec6",
+    :data-colors
+    {"float" "#fccbc6",
+     "boolean" "#aea7ee",
+     "map" "#dcc1a5",
+     "list" "#6b8059",
+     "string" "#ffffff",
+     "any" "#a72cc2",
+     "vector" "#e195ba",
+     "keyword" "#e1e1f2",
+     "rabbit-code" "#cbcc9c",
+     "datetime" "#94306e",
+     "integer" "#e8c0d4",
+     "unknown" "#644b5d",
+     "date" "#0d601f"},
+    :dominant "#c78180",
+    :most-contrasting-dark "#102d45",
+    :second-brightest "#cc9cbc",
+    :brightest "#fcdec6",
+    :most-contrasting-light "#fcdec6"},
    :raw-custom-override-2099661531
    {:error
     {:error "This request has been blocked by our content filters.",
@@ -2490,10 +2296,12 @@
    :raw-custom-override507551355 "(returns nil value)",
    :raw-custom-override200941297 29,
    :raw-custom-override2044550781 59,
+   :raw-custom-override225851831 3,
    :raw-custom-override-1031779101 "(returns nil value)",
    :raw-custom-override1239307186 46,
    :raw-custom-override206617657 false,
    :raw-custom-override-977131907 29,
+   :raw-custom-override-983098209 false,
    :raw-custom-override-210407138 nil,
    :raw-custom-override-543613597
    "total 415680\n-rw-rw-r--   1 ryanr ryanr      2470 Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr       792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr      4096 Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr   4345856 Jul  6 07:58 flow-history\ndrwxrwxr-x   2 ryanr ryanr   2138112 Jul  6 07:55 flow-logs\ndrwxrwxr-x   3 ryanr ryanr      4096 Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr   8870985 Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr   8771849 Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr     14372 Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr      4096 Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr      5765 Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr      2838 Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr     17261 Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr      4147 Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 380698624 Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr       752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr     64443 Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     31125 Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr     32129 Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr     30765 Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     14555 Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr      2592 Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr     69632 Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20103168 May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr      4096 Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr     12052 Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr     24576 Mar 29 20:40 tracker-logs\ndrwxrwxr-x 288 ryanr ryanr     20480 Jul  6 07:33 transit-data\n-rw-rw-r--   1 ryanr ryanr       132 Jun 26 19:24 user.clj\ntop: failed tty get\n/home/ryanr/rvbbit/backend\nprocs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n31  0      0 1979456 1296672 58684008    0    0   645   412   82   13 37  4 59  0  0\nLinux rvbbit-dev 6.5.0-41-generic #41~22.04.2-Ubuntu SMP PREEMPT_DYNAMIC Mon Jun  3 11:32:55 UTC 2 x86_64 x86_64 x86_64 GNU/Linux\n",
@@ -2538,7 +2346,47 @@
    :raw-custom-override-381058325 24,
    :raw-custom-override1234473705
    "total 406M\n-rw-rw-r--   1 ryanr ryanr 2.5K Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr  792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr 4.0K Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr 4.2M Jul  6 06:20 flow-history\ndrwxrwxr-x   2 ryanr ryanr 2.1M Jul  6 06:21 flow-logs\ndrwxrwxr-x   3 ryanr ryanr 4.0K Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr 8.5M Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr 8.4M Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr  15K Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr  12K Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr 4.0K Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr 5.7K Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr 2.8K Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr  17K Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr 4.1K Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 364M Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr  752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr  63K Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr  31K Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr  32K Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr  31K Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr  15K Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr 2.6K Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr  12K Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr  68K Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20M May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr 4.0K Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr  12K Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr  24K Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr  20K Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr  132 Jun 26 19:24 user.clj\n",
+   :get-my-colors1328225346
+   {:second-darkest "#4c3c4c",
+    :highest-saturation "#fcdec6",
+    :most-contrasting "#fcdec6",
+    :darkest "#102d45",
+    :contrast-with-dominant "#102d45",
+    :colors
+    ["#bc6d6d"
+     "#604755"
+     "#102d45"
+     "#fcdec6"
+     "#648cd4"
+     "#cc9cbc"
+     "#2c5c8c"
+     "#5c7cc4"
+     "#2c4c6c"
+     "#4c3c4c"
+     "#c78180"],
+    :most-frequent "#fcdec6",
+    :data-colors
+    {"float" "#fccbc6",
+     "boolean" "#aea7ee",
+     "map" "#dcc1a5",
+     "list" "#6b8059",
+     "string" "#ffffff",
+     "any" "#a72cc2",
+     "vector" "#e195ba",
+     "keyword" "#e1e1f2",
+     "rabbit-code" "#cbcc9c",
+     "datetime" "#94306e",
+     "integer" "#e8c0d4",
+     "unknown" "#644b5d",
+     "date" "#0d601f"},
+    :dominant "#c78180",
+    :most-contrasting-dark "#102d45",
+    :second-brightest "#cc9cbc",
+    :brightest "#fcdec6",
+    :most-contrasting-light "#fcdec6"},
    :v 4,
+   :raw-custom-override1587549322 15,
+   :raw-custom-override113048967 59,
    :get-my-colors-504728509
    {:second-darkest "#2c375c",
     :highest-saturation "#1c4c64",
@@ -2645,17 +2493,58 @@
    :raw-custom-override-1576085329
    "total 415676\n-rw-rw-r--   1 ryanr ryanr      2470 Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr       792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr      4096 Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr   4341760 Jul  6 06:10 flow-history\ndrwxrwxr-x   2 ryanr ryanr   2138112 Jul  6 06:10 flow-logs\ndrwxrwxr-x   3 ryanr ryanr      4096 Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr   8870985 Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr   8771849 Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr     14372 Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr      4096 Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr      5765 Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr      2838 Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr     17261 Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr      4147 Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 380698624 Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr       752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr     64443 Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     31125 Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr     32129 Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr     30765 Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     14555 Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr      2592 Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr     69632 Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20103168 May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr      4096 Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr     12052 Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr     24576 Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr     20480 Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr       132 Jun 26 19:24 user.clj\ntop: failed tty get\n/home/ryanr/rvbbit/backend\nprocs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n 4  0      0 1995164 1096576 89140432    0    0   801   489   78   56 36  4 60  0  0\nLinux rvbbit-dev 6.5.0-41-generic #41~22.04.2-Ubuntu SMP PREEMPT_DYNAMIC Mon Jun  3 11:32:55 UTC 2 x86_64 x86_64 x86_64 GNU/Linux\n",
    :raw-custom-override1614031738 24,
+   :raw-custom-override1236397792 "(returns nil value)",
    :raw-custom-override204913902 46,
    :raw-custom-override-40187839 "(returns nil value)",
+   :raw-custom-override-1049796375 "(returns nil value)",
    :raw-custom-override1782607838 16,
    :raw-custom-override1463573696 21,
    :raw-custom-override-1920582253 24,
    :raw-custom-override2036847066 "(returns nil value)",
    :raw-custom-override1066584070 21,
+   :get-my-colors-212940324
+   {:second-darkest "#4c3c4c",
+    :highest-saturation "#fcdec6",
+    :most-contrasting "#fcdec6",
+    :darkest "#102d45",
+    :contrast-with-dominant "#102d45",
+    :colors
+    ["#bc6d6d"
+     "#604755"
+     "#102d45"
+     "#fcdec6"
+     "#648cd4"
+     "#cc9cbc"
+     "#2c5c8c"
+     "#5c7cc4"
+     "#2c4c6c"
+     "#4c3c4c"
+     "#c78180"],
+    :most-frequent "#fcdec6",
+    :data-colors
+    {"float" "#fccbc6",
+     "boolean" "#aea7ee",
+     "map" "#dcc1a5",
+     "list" "#6b8059",
+     "string" "#ffffff",
+     "any" "#a72cc2",
+     "vector" "#e195ba",
+     "keyword" "#e1e1f2",
+     "rabbit-code" "#cbcc9c",
+     "datetime" "#94306e",
+     "integer" "#e8c0d4",
+     "unknown" "#644b5d",
+     "date" "#0d601f"},
+    :dominant "#c78180",
+    :most-contrasting-dark "#102d45",
+    :second-brightest "#cc9cbc",
+    :brightest "#fcdec6",
+    :most-contrasting-light "#fcdec6"},
    :raw-custom-override-2138130241
    "total 415676\n-rw-rw-r--   1 ryanr ryanr      2470 Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr       792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr      4096 Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr   4341760 Jul  6 06:05 flow-history\ndrwxrwxr-x   2 ryanr ryanr   2138112 Jul  6 06:05 flow-logs\ndrwxrwxr-x   3 ryanr ryanr      4096 Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr   8870985 Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr   8771849 Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr     14372 Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr      4096 Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr      5765 Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr      2838 Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr     17261 Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr      4147 Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 380698624 Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr       752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr     64443 Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     31125 Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr     32129 Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr     30765 Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     14555 Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr      2592 Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr     69632 Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20103168 May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr      4096 Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr     12052 Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr     24576 Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr     20480 Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr       132 Jun 26 19:24 user.clj\ntop: failed tty get\n/home/ryanr/rvbbit/backend\n",
    :raw-custom-override-361256212
    "🐇🥕 Sup!e! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override1449849318 27,
    :raw-custom-override142466700
    {:root-ex "class java.lang.RuntimeException",
     :ex "class clojure.lang.ExceptionInfo",
@@ -2710,8 +2599,85 @@
       [:img
        {:src "./images/gen/b64-image3-54002-72405.png",
         :style {:border-radius "30px"}}]]]],
+   :get-my-colors637228907
+   {:second-darkest "#1c2454",
+    :highest-saturation "#0b8c89",
+    :most-contrasting "#b4348c",
+    :darkest "#0d1220",
+    :contrast-with-dominant "#0d1220",
+    :colors
+    ["#d496ad"
+     "#0d4d77"
+     "#0d1220"
+     "#57acb4"
+     "#5d4d7f"
+     "#149ca4"
+     "#1c2454"
+     "#9c4474"
+     "#0b8c89"
+     "#b4348c"
+     "#d08ca8"],
+    :most-frequent "#9c4474",
+    :data-colors
+    {"float" "#bdd496",
+     "boolean" "#88c9d2",
+     "map" "#7fdb51",
+     "list" "#c40100",
+     "string" "#e3f5e1",
+     "any" "#aa07e7",
+     "vector" "#c55e6a",
+     "keyword" "#f0f0d3",
+     "rabbit-code" "#608fa8",
+     "datetime" "#03a847",
+     "integer" "#aed08c",
+     "unknown" "#3b1d74",
+     "date" "#142c0e"},
+    :dominant "#d08ca8",
+    :most-contrasting-dark "#b4348c",
+    :second-brightest "#d08ca8",
+    :brightest "#d496ad",
+    :most-contrasting-light "#149ca4"},
    :raw-custom-override1872022286 "(returns nil value)",
    :raw-custom-override-1448584061 "sh: 1: ls -l  -h: not found\n",
+   :get-my-colors-162245426
+   {:second-darkest "#1c2454",
+    :highest-saturation "#0b8c89",
+    :most-contrasting "#b4348c",
+    :darkest "#0d1220",
+    :contrast-with-dominant "#0d1220",
+    :colors
+    ["#d496ad"
+     "#0d4d77"
+     "#0d1220"
+     "#57acb4"
+     "#5d4d7f"
+     "#149ca4"
+     "#1c2454"
+     "#9c4474"
+     "#0b8c89"
+     "#b4348c"
+     "#d08ca8"],
+    :most-frequent "#9c4474",
+    :data-colors
+    {"float" "#bdd496",
+     "boolean" "#88c9d2",
+     "map" "#7fdb51",
+     "list" "#c40100",
+     "string" "#e3f5e1",
+     "any" "#aa07e7",
+     "vector" "#c55e6a",
+     "keyword" "#f0f0d3",
+     "rabbit-code" "#608fa8",
+     "datetime" "#03a847",
+     "integer" "#aed08c",
+     "unknown" "#3b1d74",
+     "date" "#142c0e"},
+    :dominant "#d08ca8",
+    :most-contrasting-dark "#b4348c",
+    :second-brightest "#d08ca8",
+    :brightest "#d496ad",
+    :most-contrasting-light "#149ca4"},
+   :raw-custom-override-1279793466 59,
    :raw-custom-override1881808911
    [:box
     :style
@@ -2719,10 +2685,12 @@
     :child
     "🐇🥕 Sup! Internal RVBBIT nREPL!!. Clojure 1.11.1 on 17.0.11 JVM tech!!! 🥕🐇"],
    :raw-custom-override1798476957 123,
+   :raw-custom-override-128089427 59,
    :raw-custom-override-1260039765
    "Linux rvbbit-dev 6.5.0-41-generic #41~22.04.2-Ubuntu SMP PREEMPT_DYNAMIC Mon Jun  3 11:32:55 UTC 2 x86_64 x86_64 x86_64 GNU/Linux\n",
    :raw-custom-override-1359279241
    "total 406M\n-rw-rw-r--   1 ryanr ryanr 2.5K Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr  792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr 4.0K Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr 4.2M Jul  6 06:30 flow-history\ndrwxrwxr-x   2 ryanr ryanr 2.1M Jul  6 06:30 flow-logs\ndrwxrwxr-x   3 ryanr ryanr 4.0K Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr 8.5M Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr 8.4M Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr  15K Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr  12K Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr 4.0K Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr 5.7K Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr 2.8K Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr  17K Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr 4.1K Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 364M Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr  752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr  63K Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr  31K Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr  32K Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr  31K Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr  15K Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr 2.6K Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr  12K Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr 4.0K Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr 4.0K Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr  68K Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20M May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr 4.0K Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr 4.0K Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr  12K Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr  24K Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr  20K Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr  132 Jun 26 19:24 user.clj\n",
+   :raw-custom-override1410458575 3,
    :get-my-colors2109536347
    {:second-darkest "#4c3c4c",
     :highest-saturation "#fcdec6",
@@ -2761,7 +2729,9 @@
     :second-brightest "#cc9cbc",
     :brightest "#fcdec6",
     :most-contrasting-light "#fcdec6"},
+   :raw-custom-override-38129492 15,
    :raw-custom-override-444870461 "top: failed tty get\n",
+   :raw-custom-override644785251 false,
    :raw-custom-override1248574794 46,
    :raw-custom-override-1220921771
    [:v-box
@@ -2786,6 +2756,44 @@
       [:img
        {:src "./images/gen/b64-image3-47603-31641.png",
         :style {:border-radius "30px"}}]]]],
+   :get-my-colors86482931
+   {:second-darkest "#4c3c4c",
+    :highest-saturation "#fcdec6",
+    :most-contrasting "#fcdec6",
+    :darkest "#102d45",
+    :contrast-with-dominant "#102d45",
+    :colors
+    ["#bc6d6d"
+     "#604755"
+     "#102d45"
+     "#fcdec6"
+     "#648cd4"
+     "#cc9cbc"
+     "#2c5c8c"
+     "#5c7cc4"
+     "#2c4c6c"
+     "#4c3c4c"
+     "#c78180"],
+    :most-frequent "#fcdec6",
+    :data-colors
+    {"float" "#fccbc6",
+     "boolean" "#aea7ee",
+     "map" "#dcc1a5",
+     "list" "#6b8059",
+     "string" "#ffffff",
+     "any" "#a72cc2",
+     "vector" "#e195ba",
+     "keyword" "#e1e1f2",
+     "rabbit-code" "#cbcc9c",
+     "datetime" "#94306e",
+     "integer" "#e8c0d4",
+     "unknown" "#644b5d",
+     "date" "#0d601f"},
+    :dominant "#c78180",
+    :most-contrasting-dark "#102d45",
+    :second-brightest "#cc9cbc",
+    :brightest "#fcdec6",
+    :most-contrasting-light "#fcdec6"},
    :raw-custom-override-1458542752
    [:v-box
     :size
@@ -2810,7 +2818,46 @@
        :alt "A cute bunny (actually a kitten)"}]]],
    :raw-custom-override1029923398
    "🐇🥕 Sup! In ternal RdVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
+   :raw-custom-override-324124920 27,
    :raw-custom-override-2100979694 16,
+   :get-my-colors-480460488
+   {:second-darkest "#4c3c4c",
+    :highest-saturation "#fcdec6",
+    :most-contrasting "#fcdec6",
+    :darkest "#102d45",
+    :contrast-with-dominant "#102d45",
+    :colors
+    ["#bc6d6d"
+     "#604755"
+     "#102d45"
+     "#fcdec6"
+     "#648cd4"
+     "#cc9cbc"
+     "#2c5c8c"
+     "#5c7cc4"
+     "#2c4c6c"
+     "#4c3c4c"
+     "#c78180"],
+    :most-frequent "#fcdec6",
+    :data-colors
+    {"float" "#fccbc6",
+     "boolean" "#aea7ee",
+     "map" "#dcc1a5",
+     "list" "#6b8059",
+     "string" "#ffffff",
+     "any" "#a72cc2",
+     "vector" "#e195ba",
+     "keyword" "#e1e1f2",
+     "rabbit-code" "#cbcc9c",
+     "datetime" "#94306e",
+     "integer" "#e8c0d4",
+     "unknown" "#644b5d",
+     "date" "#0d601f"},
+    :dominant "#c78180",
+    :most-contrasting-dark "#102d45",
+    :second-brightest "#cc9cbc",
+    :brightest "#fcdec6",
+    :most-contrasting-light "#fcdec6"},
    :raw-custom-override-741729623 "top: failed tty get\n",
    :raw-custom-override-1723805008
    [:v-box
@@ -2911,6 +2958,7 @@
        :style {:border-radius "15px"},
        :alt "A cute bunny (actually a kitten)"}]]],
    :raw-custom-override167963322 24,
+   :raw-custom-override589842570 "(returns nil value)",
    :raw-custom-override661306466 "sh: 1: ls -l  -h: not found\n",
    :get-my-colors1238314177
    {:second-darkest "#0c142c",
@@ -2956,6 +3004,7 @@
     :ex "class clojure.lang.Compiler$CompilerException",
     :err
     "Syntax error compiling at (/tmp/form-init11649253365753047399.clj:8:736).\nUnable to resolve symbol: underwar in this context\n"},
+   :raw-custom-override2070032843 3,
    :get-my-colors175443210
    {:second-darkest "#0c142c",
     :highest-saturation "#07687e",
@@ -3069,6 +3118,7 @@
     :class "class clojure.lang.ExceptionInfo"},
    :raw-custom-override391045012 "(returns nil value)",
    :raw-custom-override2081480968 21,
+   :raw-custom-override508636981 15,
    :get-my-colors-1179564465
    {:second-darkest "#34275d",
     :highest-saturation "#0e3969",
@@ -3112,6 +3162,7 @@
    :raw-custom-override1818464245 21,
    :raw-custom-override417429913
    {:exit-code 0, :output "/home/ryanr/rvbbit/backend\n", :error ""},
+   :raw-custom-override164792993 false,
    :raw-custom-override-841333514
    "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure 1.11.1 on 17.0.11 JVM tech 🥕🐇",
    :raw-custom-override1245528689
@@ -3184,6 +3235,7 @@
     :most-contrasting-light "#bd6265"},
    :raw-custom-override-1043853740 "",
    :raw-custom-override1614040986 21,
+   :raw-custom-override-108264900 false,
    :raw-custom-override76175162 24,
    :raw-custom-override1579334059 29,
    :get-my-colors-1748511361
@@ -3250,6 +3302,7 @@
    :raw-custom-override-1266238610 59,
    :raw-custom-override1454749013 24,
    :raw-custom-override-1109980935 "(returns nil value)",
+   :raw-custom-override-58430872 "(returns nil value)",
    :raw-custom-override171616481 59,
    :raw-custom-override-579076168
    {:error
@@ -3258,6 +3311,8 @@
     :class "class clojure.lang.ExceptionInfo"},
    :raw-custom-override-1850607043
    "total 415676\n-rw-rw-r--   1 ryanr ryanr      2470 Mar 12 02:37 canvas.json\n-rw-rw-r--   1 ryanr ryanr       792 Mar 12 02:37 CHANGELOG.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:24 checkouts\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 connections\ndrwxrwxr-x   5 ryanr ryanr      4096 Jun 22 20:39 data\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  6 05:25 db\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 13 13:30 defs\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 doc\ndrwxrwxr-x   2 ryanr ryanr      4096 Jun 22 18:14 flow-blocks\ndrwxrwxr-x   5 ryanr ryanr   4341760 Jul  6 06:05 flow-history\ndrwxrwxr-x   2 ryanr ryanr   2138112 Jul  6 06:05 flow-logs\ndrwxrwxr-x   3 ryanr ryanr      4096 Jun 22 18:14 flows\n-rw-rw-r--   1 ryanr ryanr   8870985 Jul  1 04:30 hs_err_pid1393621.log\n-rw-rw-r--   1 ryanr ryanr   8771849 Jul  1 04:34 hs_err_pid1426863.log\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kit-rowsets\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 12 02:37 kits\n-rw-rw-r--   1 ryanr ryanr     14372 Mar 12 02:37 LICENSE\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  6 01:50 live\ndrwxrwxr-x  15 ryanr ryanr      4096 Jul  6 01:04 logs\n-rw-rw-r--   1 ryanr ryanr      5765 Mar 12 02:37 name.ans\n-rw-rw-r--   1 ryanr ryanr      2838 Mar 12 02:37 name-smol.ans\n-rw-rw-r--   1 ryanr ryanr     17261 Mar 12 02:37 nname.ans\n-rw-rw-r--   1 ryanr ryanr      4147 Jul  1 07:20 project.clj\ndrwxrwxr-x   2 ryanr ryanr 380698624 Jul  5 22:51 reaction-logs\n-rw-rw-r--   1 ryanr ryanr       752 Mar 12 02:37 README.md\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:37 resources\n-rw-rw-r--   1 ryanr ryanr     64443 Mar 12 02:37 rrvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     31125 Mar 12 02:37 rrvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr     32129 Mar 12 02:37 rrvbitt-smol.ans\n-rw-rw-r--   1 ryanr ryanr     30765 Mar 12 02:37 rvbbit.ans\n-rw-rw-r--   1 ryanr ryanr     14555 Mar 12 02:37 rvbbit-smol.ans\n-rw-rw-r--   1 ryanr ryanr      2592 Mar 12 02:37 rvbbit.txt\ndrwxrwxr-x   4 ryanr ryanr     12288 Jul  2 21:16 screens\ndrwxrwxr-x   2 ryanr ryanr      4096 Jul  2 21:16 screen-snaps\ndrwxrwxr-x   2 ryanr ryanr      4096 Mar 11 11:29 shell-root\ndrwxrwxr-x   2 ryanr ryanr     69632 Jun  6 16:57 snaps\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 12 02:38 src\ndrwxrwxr-x   2 ryanr ryanr  20103168 May 18 17:38 status-change-logs\ndrwxrwxr-x   4 ryanr ryanr      4096 Mar 12 02:37 target\ndrwxrwxr-x   3 ryanr ryanr      4096 Mar 11 11:35 test\n-rw-rw-r--   1 ryanr ryanr     12052 Mar 12 02:37 TODO.md\ndrwxrwxr-x   2 ryanr ryanr     24576 Mar 29 20:40 tracker-logs\ndrwxrwxr-x 285 ryanr ryanr     20480 Jul  6 05:23 transit-data\n-rw-rw-r--   1 ryanr ryanr       132 Jun 26 19:24 user.clj\ntop: failed tty get\n/home/ryanr/rvbbit/backend\n",
+   :raw-custom-override-127780995 false,
+   :raw-custom-override1006946013 3,
    :get-my-colors-231051622
    {:second-darkest "#34275d",
     :highest-saturation "#0e3969",
@@ -3384,11 +3439,17 @@
        {:src "./images/gen/b64-image3-15315-60336.png",
         :style {:border-radius "30px"}}]]]],
    :raw-custom-override1395867983 "(returns nil value)",
+   :raw-custom-override-502186004 59,
+   :raw-custom-override-1130295446 27,
    :raw-custom-override596631388 nil,
    :raw-custom-override-717138272 46,
+   :raw-custom-override-1325889285 false,
+   :raw-custom-override-1303906497 15,
+   :raw-custom-override-1274020337 false,
    :raw-custom-override520529454 29,
    :raw-custom-override-1609576239 24,
    :raw-custom-override-1898437157 59,
+   :raw-custom-override-25750707 27,
    :raw-custom-override1171974617
    [:v-box
     :size

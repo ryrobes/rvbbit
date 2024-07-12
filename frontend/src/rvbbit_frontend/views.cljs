@@ -148,6 +148,13 @@
                                                [[:case [:like :connection_str "%csv%"] "*csv-import-db*"
                                                  [:like :connection_str "%cache%"] "*cache-db*" :else :database_name]
                                                 :database_name] :connection_id]
+                                       :style-rules
+                                      {[:* :highlight-8717ss]
+                                       {:logic [:like :connection_str "%t%"] ;;[:= :connection_str "cache.db" ;;:*client-name-str
+                                      ; ]
+                                        :style {:border "1px solid red"}}}
+                                      :where [:and [:not [:like :connection_str "%rvbbit%"]]
+                                              [:in :connection_id {:select [:connection_id] :from [:fields] :group-by [1]}]] ;; only dbs that have tables logged
                                       :from   [:connections]}
                     :tables-sys      {:select   [:db_schema :db_catalog :connection_id
                                                  [[:|| :db_catalog "/" :db_schema] :schema_cat] :table_name [[:count 1] :fields]]
@@ -178,11 +185,13 @@
   (let [{:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions
         client-name (ut/replacer (str @(ut/tracked-subscribe [::bricks/client-name])) ":" "")
         sql-calls   {:searches-types-sys     {:select   [:item_type] ;; :searches-types-sys/item_type
+                                              :connection-id "autocomplete-db"
                                               :where    [:and [:not [:like :item_sub_type "%preview%"]]
                                                          [:not [:= :item_type "saved-block"]]]
                                               :from     [:client_items]
                                               :group-by [1]}
                      :searches-sub-types-sys {:select      [:item_key :is_live [[:count 1] :items]] ;; :searches-types-sys/item_type
+                                              :connection-id "autocomplete-db"
                                               :where       [:and [:not [:= :item_key client-name]]
                                                             [:not [:like :item_sub_type "%preview%"]]
                                                             [:not [:= :item_type "saved-block"]]
@@ -207,7 +216,7 @@
                    data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
                    unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
                (when (or (not data-exists?) unrun-sql?)
-                 (conn/sql-data [k] query)
+                 (conn/sql-data [k] query )
                  (ut/tracked-dispatch [::bricks/insert-sql-source k query])))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} ;; rows label under
      :children
@@ -232,6 +241,7 @@
         selected-shortcode (get sql-params :searches-rows-sys/value)
         sql-calls          {:searches-rows-sys
                               {:select [:item_sub_type :item_type :item_key :display_name :sample :value :is_live :block_meta] ;; :searches-types-sys/item_type
+                               :connection-id "autocomplete-db"
                                :where  [:and [:not [:like :item_sub_type "%preview%"]] [:not [:= :item_type "saved-block"]]
                                         [:= :item_key :searches-sub-types-sys/item_key]
                                         [:= :item_type :searches-types-sys/item_type]]
@@ -1715,24 +1725,41 @@
       trimmed
       (str "\"" trimmed "\""))))
 
+;;  [:dispatch :rvbbit-frontend.bricks/update-panels-hash]
+
+(ut/tracked-dispatch [::bricks/update-panels-hash]      )
+
 (defn run-console-command [command]
   (let [runner (get @selected-mode :name)
         syntax (get @selected-mode :syntax)
-        ;;command 
+        is-rf-event? (and (or (= runner :views) (= runner :clover)) 
+                          (cstr/starts-with? (cstr/trim command) "[:dispatch"))
         command (if (not= syntax "clojure")
                   command ;; the "implied string"
                   (ensure-quoted-string (cstr/replace command "\"" "\\\"")))]
     (ut/tapp>> (str "Command entered: " command))
     (reset! hide-responses? false)
-    (let [resp (insert-response-block 6 3 command runner syntax)
-          ee (str command "("resp")")]
+
+    (if is-rf-event?
+      
+      (let [ee (str "dispatched re-frame event")]
+        (ut/tracked-dispatch (get (edn/read-string command) 1))
+        (ut/dispatch-delay 200 [::http/insert-alert
+                                [:v-box :children [[:box :child ee]
+                                                   [:box :child (str command)
+                                                    :style {:font-size "12px"}]]] 6 1.5 5])
+        (swap! console-responses assoc command ee))
+      
+      (let [resp (insert-response-block 6 3 command runner syntax)
+            ee (str command "(" resp ")")]
       ;;(when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
       ;(re-frame/dispatch [::bricks/toggle-quake-console])
-      (ut/dispatch-delay 200 [::http/insert-alert
-                              [:v-box :children [[:box :child (str resp)]
-                                                 [:box :child (str command)
-                                                  :style {:font-size "12px"}]]] 6 1.5 5])
-      (swap! console-responses assoc command ee))))
+        (ut/dispatch-delay 200 [::http/insert-alert
+                                [:v-box :children [[:box :child (str resp)]
+                                                   [:box :child (str command)
+                                                    :style {:font-size "12px"}]]] 6 1.5 5])
+        (swap! console-responses assoc command ee)))
+    ))
 
 
 

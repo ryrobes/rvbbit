@@ -37,7 +37,7 @@
    [rvbbit-backend.transform  :as ts]
    [rvbbit-backend.pivot      :as pivot]
    [rvbbit-backend.sql        :as    sql
-    :refer [sql-exec sql-query sql-query-one system-db ghost-db flows-db insert-error-row! to-sql
+    :refer [sql-exec sql-query sql-query-one system-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
             pool-create]]
    [clojure.data.csv          :as csv]
    [csv-map.core              :as ccsv]
@@ -92,6 +92,12 @@
 (defonce watcher-log (atom {}))
 
 (defonce timekeeper-failovers (atom {}))
+
+(def client-panels (atom {}))
+(def client-panels-resolved (atom {}))
+(def client-panels-materialized (atom {}))
+
+(def client-panels-history (atom {}))
 
 ;;(def num-groups 8) ;; atom segments to split solvers master atom into
 (def num-groups 64) ;; eyes emoji
@@ -523,7 +529,7 @@
            limited-path (take @key-depth-limit parsed-path)]
        (into [master-type] limited-path)))))
 
-(ut/pp (parse-coded-keypath :flow/my-flow-id>:fook>1>foo>2>bar>3))
+;; (ut/pp (parse-coded-keypath :flow/my-flow-id>:fook>1>foo>2>bar>3))
 
 ;; (def create-coded-keypath
 ;;   (memoize
@@ -1630,18 +1636,21 @@
     (with-open [out (io/output-stream file)] (transit/write (transit/writer out :msgpack) data))))
 
 (defn insert-rowset
-  [rowset table-name keypath client-name & columns-vec]
+  [rowset table-name keypath client-name & [columns-vec db-conn queue-name]]
   ;; (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
   (if (ut/ne? rowset)
     (try (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
                                      (and (not (map? (first rowset))) (vector? rowset)) :vectors)
-               columns-vec-arg (first columns-vec)
-               db-conn         cache-db
-               rowset-fixed    (if (= rowset-type :vectors) (for [r rowset] (zipmap columns-vec-arg r)) rowset)
+               columns-vec-arg columns-vec
+               db-conn         (or db-conn cache-db)
+               rowset-fixed    (if (= rowset-type :vectors) 
+                                 (for [r rowset] (zipmap columns-vec-arg r)) 
+                                 rowset)
                columns         (keys (first rowset-fixed))
                table-name-str  (ut/unkeyword table-name)
                ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed)
-               extra           [ddl-str columns-vec-arg table-name table-name-str]]
+               extra           {:queue (if (= db-conn cache-db) nil queue-name)
+                                :extras[ddl-str columns-vec-arg table-name table-name-str]}]
            ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
            ;(swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
            (write-transit-data rowset-fixed keypath client-name table-name-str)
@@ -1659,7 +1668,7 @@
 (def snap-pushes (atom {}))
 
 (defn insert-rowset-snap
-  [rowset table-name keypath client-name & columns-vec]
+  [rowset table-name keypath client-name & [columns-vec]]
   ;; (ut/pp [:insert-into-cache-dbss!! (first rowset) (count rowset) table-name columns-vec])
   (if (ut/ne? rowset)
     (try (let [;;rowset-type (cond (and (map? (first rowset)) (vector? rowset)) :rowset
@@ -1860,12 +1869,13 @@
   (ut/pp [:new-client-is-alive! client-name :opening (count client-queue-atoms) :websocket-queues])
   ;(client-sized-pools)
   (swap! ack-scoreboard assoc-in [client-name :booted-ts] (System/currentTimeMillis))
+  (sql/create-or-get-client-db-pool client-name)
   (doseq [cq client-queue-atoms]
     (let [new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)] (swap! cq assoc client-name new-queue-atom))))
 
 (def client-batches (atom {}))
 
-(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :tracker :alert1}) ;; to not skip old dupes
+(def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :solver-status :tracker :alert1}) ;; to not skip old dupes
 
 (defn sub-push-loop
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
@@ -2018,12 +2028,50 @@
 (def panel-history (agent nil))
 (set-error-mode! panel-history :continue)
 
-(defmethod wl/handle-push :current-panels
-  [{:keys [panels client-name resolved-panels]}] ;; TODO add these
+;; new :updated-panels with just one or more and mat,resolved, source versions 
+
+
+
+
+(defmethod wl/handle-push :updated-panels
+  [{:keys [panels client-name resolved-panels materialized-panels]}]
 
   (qp/serial-slot-queue
    :panel-update-serial :serial
-   (ext/write-panels client-name panels)) ;; push to file system for beholder cascades
+   (fn [] (ext/write-panels client-name (merge (get @client-panels client-name {}) panels)))) ;; push to file system for beholder cascades
+
+  (doseq [p (keys panels)]
+    (swap! client-panels-history assoc-in [client-name p (System/currentTimeMillis)] {:source (get panels p)
+                                                                                      :resolved (get resolved-panels p)
+                                                                                      :materialized (get materialized-panels p)}))
+
+  (swap! client-panels assoc client-name
+         (merge (get @client-panels client-name {}) panels))
+  (swap! client-panels-resolved assoc client-name
+         (merge (get @client-panels-resolved client-name {}) resolved-panels))
+  (swap! client-panels-materialized assoc client-name
+         (merge (get @client-panels-materialized client-name {}) materialized-panels))
+
+  (ut/pp [:single-panel-push! client-name (keys panels)]))
+
+
+
+
+(defmethod wl/handle-push :current-panels
+  [{:keys [panels client-name resolved-panels materialized-panels]}] 
+
+  (qp/serial-slot-queue
+   :panel-update-serial :serial
+   (fn [] (ext/write-panels client-name panels))) ;; push to file system for beholder cascades
+  
+    (doseq [p (keys panels)]
+      (swap! client-panels-history assoc-in [client-name p (System/currentTimeMillis)] {:source (get panels p)
+                                                                                        :resolved (get resolved-panels p)
+                                                                                        :materialized (get materialized-panels p)}))
+  
+  (swap! client-panels assoc client-name panels) ;; the whole block map, will be mutating it with single updates later
+  (swap! client-panels-resolved assoc client-name resolved-panels)
+  (swap! client-panels-materialized assoc client-name materialized-panels)
 
   (ut/pp [:panels-push! client-name])
 
@@ -3911,7 +3959,9 @@
         ;literal-data?  (and (some #(= % :data) flat) (not (some #(= % :panel_history) flat)))
         honey-modded   (if has-rules? (assoc honey-sql :select (apply merge hselect rules)) honey-sql)
         client-name    (or client-name :rvbbit)
-        honey-modded   (walk/postwalk-replace {:*client-name client-name :*client-name-str (pr-str client-name)} honey-modded)
+        honey-modded   (walk/postwalk-replace {:*client-name client-name 
+                                               :*client-name* client-name 
+                                               :*client-name-str (pr-str client-name)} honey-modded)
         ;client-name    (keyword (str (cstr/replace (str client-name) ":" "") ".via-solver"))
         client-cache?  false ;(if literal-data? (get honey-sql :cache? true) false)
         ]
@@ -4606,7 +4656,7 @@
 
 (defn client-kp
   [flow-key keypath base-type sub-path client-param-path]
-  (cond (cstr/includes? (str flow-key) "*running?") false
+  (cond ;(cstr/includes? (str flow-key) "*running?") false
         (= base-type :time)                         client-param-path
         (= base-type :signal)                       client-param-path
         (= base-type :solver)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -5327,7 +5377,8 @@
                     _ (when (and repl-host repl-port) (ut/pp [:external-repl! repl-host repl-port]))
                     honey-sql (walk/postwalk-replace {[:*all= {}]       nil ;; take care of empty
                                                       :*client-name-str (pr-str client-name)
-                                                      :*client-name     (str client-name)}
+                                                      :*client-name     (str client-name)
+                                                      :*client-name*    client-name}
                                                      honey-sql)
                     orig-honey-sql honey-sql ;; for transform later
                     query-meta-subq? (true? (some #(or (= % :query_meta_subq) (= % :query-meta-subq))
@@ -5353,8 +5404,10 @@
                     honey-sql (if has-rql? (extract-rql ui-keypath honey-sql rql-holder) honey-sql)
                     honey-sql (replace-pre-sql honey-sql) ;; runs a subset of clover replacements
                     target-db (cond query-meta-subq? system-db ;; override for sidecar meta queries
+                                    (keyword? connection-id) (sql/create-or-get-client-db-pool client-name)
                                     (= connection-id "system-db") system-db
                                     (= connection-id "flows-db") flows-db
+                                    (= connection-id "autocomplete-db") autocomplete-db
                                     (= connection-id "system") system-db
                                     (or (= connection-id :cache) (= connection-id "cache.db") (nil? connection-id)) cache-db ;mem-db2
                                     :else (get-connection-string connection-id))
@@ -5394,6 +5447,8 @@
                             (not post-sniffed-literal-data?) ;; questionable, we SHOULD be able
                             (not literal-data?) ;; questionable, we SHOULD be able to invalidate
                             (not (= connection-id "flows-db"))
+                            (not (keyword? connection-id))
+                            (not (= connection-id "autocomplete-db"))
                             (not (= connection-id "system-log"))
                             (not (= target-db system-db)))
                     cache-table-name ;(if (or post-sniffed-literal-data? literal-data?)
@@ -5419,7 +5474,7 @@
                                                                                                ;post-sniffed-literal-data?))
                           (do (if data-literal-code?
                                 ;(enqueue-task
-                                (qp/serial-slot-queue :general-serial :general
+                                (qp/serial-slot-queue :serial-data-literal-code client-name ;:general
                                 ;(ppy/execute-in-thread-pools :general-serial                     
                                                       (fn []
                                                         (let [;output (evl/run literals) ;; (and repl-host repl-port)
@@ -5448,7 +5503,9 @@
                                                                               cache-table
                                                                               (first ui-keypath)
                                                                               client-name
-                                                                              (keys (first output)))
+                                                                              (keys (first output))
+                                                                              (sql/create-or-get-client-db-pool client-name)
+                                                                              client-name)
                                                                (catch Exception e
                                                                  (do (reset! data-literal-insert-error
                                                                              ["Data struct not a proper 'rowset', see console log ^" e])
@@ -5456,14 +5513,16 @@
                                                           (async/>!! completion-channel true) ;; unblock
                                                           )))
                                 ;(enqueue-task 
-                                (qp/serial-slot-queue :general-serial :general
+                                (qp/serial-slot-queue :serial-data-literal client-name ;:general
                                 ;(ppy/execute-in-thread-pools :general-serial                      
                                                       (fn []
                                                         (insert-rowset literals
                                                                        cache-table
                                                                        (first ui-keypath)
                                                                        client-name
-                                                                       (keys (first literals)))
+                                                                       (keys (first literals))
+                                                                       (sql/create-or-get-client-db-pool client-name)
+                                                                       client-name)
                                                         (async/>!! completion-channel true) ;; unblock
                                                         )))
                               (async/<!! completion-channel) ;; BLOCK until our threaded job is
@@ -6080,8 +6139,20 @@
 
 (def param-sql-sync-rows (atom 0))
 
-(defn param-sql-sync [] ;; placeholder function, will not scale - output is correct however
-  (let [display-name (fn [x & [num]] (cstr/join " " (vec (drop (or num 2) x))))
+(defn param-sql-sync [] ;; placeholder function, not very scalable - output is correct however
+  (let [create-ddl
+        "drop table if exists client_items; 
+         create table if not exists client_items
+               (item_key text NULL,
+                item_type text NULL,
+                item_sub_type text NULL,
+                value text NULL,
+                is_live boolean NULL,
+                sample text NULL,
+                display_name text NULL,
+                block_meta text NULL,
+                ts TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;"
+        display-name (fn [x & [num]] (cstr/join " " (vec (drop (or num 2) x))))
         flow-rows    (vec (filter #(and (= (count %) 2)
                                         (not= (second %) :opts-map)
                                         (not (cstr/includes? (str (get % 1 "")) "/")) ;; debatable
@@ -6106,15 +6177,13 @@
         solver-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) solver-rows)))
         solver-rows  (for [e solver-rows]
                        [(cstr/replace (str (first e)) ":" "") "solvers" (cstr/replace (str (second e)) ":" "")
-                        (str ":solver/" (cstr/replace (cstr/join ">" e) ":" "")) false ;(true? (some #(= (first
-                                                                                       ;e) %) live-clients))
+                        (str ":solver/" (cstr/replace (cstr/join ">" e) ":" "")) false 
                         (strunc (ut/replace-large-base64 (get-in @last-solvers-atom e))) (display-name e) nil])
         signal-rows  (ut/keypaths2 (into {} (filter (fn [[k _]] (keyword? k)) @last-signals-atom)))
         signal-rows  (vec (distinct (map (fn [x] (vec (take 3 x))) signal-rows)))
         signal-rows  (for [e signal-rows]
                        [(cstr/replace (str (first e)) ":" "") "signals" (cstr/replace (str (second e)) ":" "")
-                        (str ":signal/" (cstr/replace (cstr/join ">" e) ":" "")) false ;(true? (some #(= (first
-                                                                                       ;e) %) live-clients))
+                        (str ":signal/" (cstr/replace (cstr/join ">" e) ":" "")) false 
                         (strunc (ut/replace-large-base64 (get-in @last-signals-atom e))) (display-name e) nil])
         panel-rows   (vec (filter #(or (= (get % 2) :views) (= (get % 2) :queries)) (ut/kvpaths @panels-atom)))
         panel-rows   (vec (distinct (map (fn [x] (vec (take 4 x))) panel-rows)))
@@ -6171,14 +6240,22 @@
                                                                                        (cstr/starts-with? (str %) ":client/")))
                                                                               (<= (count (re-seq #"/" (str %))) 1))
                                                                         (mapv :value rows)))))
-        delete-sql   {:delete-from [:client_items] :where [:= 1 1]}]
+        delete-sql   {:delete-from [:client_items] :where [:= 1 1]}
+        ;drop-ddl "drop table if exists client_items;"
+        _ (sql-exec autocomplete-db (to-sql delete-sql) {:queue :autocomplete})]
     ;(enqueue-task3 
-    (qp/serial-slot-queue :general-serial :general
+    ;(sql-exec autocomplete-db create-ddl {:queue :autocomplete})
+    
+    (qp/serial-slot-queue :autocomplete-sql :sql
     ;(ppy/execute-in-thread-pools :general-serial                      
                           (fn []
-                            (sql-exec system-db (to-sql delete-sql))
-                            (doseq [rr (partition-all 100 rows)]
-                              (sql-exec system-db (to-sql {:insert-into [:client_items] :values rr})))))))
+                            ;(sql-exec autocomplete-db drop-ddl   {:queue :autocomplete})
+                            ;(sql-exec autocomplete-db create-ddl {:queue :autocomplete})
+                            ;(sql-exec autocomplete-db (to-sql delete-sql) {:queue :autocomplete})
+                            (doseq [rr (partition-all 50 rows)]
+                              (sql-exec autocomplete-db 
+                                        (to-sql {:insert-into [:client_items] :values rr})
+                                        {:queue :autocomplete}))))))
 
 (defn update-flow-results>sql []
   (let [rows (try (vec (apply concat

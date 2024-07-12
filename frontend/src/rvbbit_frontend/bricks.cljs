@@ -291,6 +291,7 @@
                 (when (not (nil? dataUrl)) (ut/tracked-dispatch [(if save? ::http/save-screen-snap ::http/save-snap) dataUrl]))))
             (fn [error] (ut/tapp>> ["Error taking screenshot:" error])))
      (when (not save?)
+       (ut/tracked-dispatch [::update-panels-hash])
        (ut/tracked-dispatch
         [::wfx/request :default
          {:message {:kind :session-snaps :client-name (get db :client-name)} :on-response [::save-sessions] :timeout 15000}]))
@@ -1371,19 +1372,22 @@
                        (undoable)
                        (fn [db [_ value]]
                          (ut/tapp>> [:updating-selected [:panels (get db :selected-block)] :with value])
+                         ;(ut/tracked-dispatch [::send-panel-updates [(get db :selected-block)]])
                          (assoc-in db [:panels (get db :selected-block)] value)))
 
 (re-frame/reg-event-db ::update-selected-key
                        (undoable)
                        (fn [db [_ key value]]
-                         (ut/tapp>> [:updating-selected [:panels (get db :selected-block) key] :with value])
+                         (ut/tapp>> [:updating-selected-key [:panels (get db :selected-block) key] :with value])
+                         ;(ut/tracked-dispatch [::send-panel-updates [(get db :selected-block)]])
                          (assoc-in db [:panels (get db :selected-block) key] value)))
 
 (re-frame/reg-event-db ::update-selected-key-cons
                        (undoable)
                        (fn [db [_ key value]]
                          (let [kp (vec (into [:panels (get db :selected-block)] key))]
-                           (ut/tapp>> [:updating-selected2 kp :with value])
+                           (ut/tapp>> [:updating-selected-key-cons kp :with value])
+                           (ut/tracked-dispatch [::send-panel-updates [(get db :selected-block)]])
                            (assoc-in db kp value))))
 
 (re-frame/reg-event-db ::update-selected-field
@@ -9799,7 +9803,8 @@
         (when (and (or (not data-exists?) unrun-sql?) (not being-edited?))
           (let [src     @(ut/tracked-sub ::conn/sql-source {:kkey k})
                 srcnew? (not= src query)]
-            (if (or (empty? connection-id) (nil? connection-id))
+            (if (or (nil? connection-id) ;; because sometimes connection-id is a keyword and (empty? :keyword) will throw
+                    (and (string? connection-id) (empty? connection-id)))
               (conn/sql-data [k] query)
               (conn/sql-data [k] query connection-id))
             (when srcnew? ;;; no need to dispatch to update the same shit over and over...
@@ -10079,17 +10084,96 @@
      (ut/dissoc-in db [:data @db/active-tmp-history])
      db)))
 
+
+(defn materialize-values [block-map]
+  (let [valid-body-params (vec (ut/get-compound-keys block-map))
+        workspace-params (into {}
+                               (for [k valid-body-params] ;; deref here?
+                                 {k @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))
+        value-walks-targets (filter #(and (cstr/includes? (str %) ".") (not (cstr/includes? (str %) ".*"))) valid-body-params)
+        value-walks (into {}
+                          (for [k value-walks-targets] ;all-sql-call-keys]
+                            (let [fs    (ut/splitter (ut/safe-name k) "/")
+                                  gs    (ut/splitter (last fs) ".")
+                                  ds    (keyword (first fs))
+                                  row   (try (int (last gs)) (catch :default _ "label"))
+                                  field (keyword (first gs))]
+                              {k (if (not (integer? row))
+                                   (str field)
+                                   (get-in @(ut/tracked-sub ::conn/sql-data-alpha {:keypath [ds]}) [row field]))})))
+        new-vw (cond->> block-map
+                 (ut/ne? value-walks)      (ut/postwalk-replacer value-walks)
+                 (ut/ne? workspace-params) (ut/postwalk-replacer workspace-params))]
+    new-vw))
+
+(re-frame/reg-event-db
+ ::update-single-panels-hash
+ (fn [db _]
+   (let [panels (get db :panels)
+         panel-map (into {}
+                         (for [[k v] panels]
+                           {k (hash (ut/remove-underscored-plus-dims v))}))]
+     (assoc db :panel-hashes panel-map))))
+
+(re-frame/reg-sub
+ ::single-panels-hash-now
+ (fn [db _]
+   (let [panels (get db :panels)
+         panel-map (into {}
+                         (for [[k v] panels]
+                           {k (hash (ut/remove-underscored-plus-dims v))}))]
+     panel-map)))
+
+(re-frame/reg-event-db
+ ::send-panel-updates
+ (fn [db [_ block-keys]]
+   (if
+    (and (not @dragging?)
+         (not @mouse-dragging-panel?)
+         (not @on-scrubber?))
+     (let [pp (get db :panels)
+           panels-map (select-keys pp block-keys)
+           resolved-panels-map  (into {} (for [[k v] panels-map] ;; super slow and lags out clients when panels edited
+                                           {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)]
+                                                                           {kk (sql-alias-replace-sub vv)})))}))
+           materialized-panels-map (into {}  (for [[k v] panels-map] ;; super slow and lags out clients when panels edited
+                                               {k (materialize-values v)}))]
+       (tapp>> [:sending-updated-panels  block-keys
+              ;panels-map 
+              ;resolved-panels-map 
+              ;materialized-panels-map
+                ])
+       (ut/tracked-dispatch
+        [::wfx/push :default
+         {:kind :updated-panels
+          :materialized-panels materialized-panels-map
+          :panels panels-map
+          :resolved-panels resolved-panels-map
+          :client-name (get db :client-name)}]) db)
+   db)))
+
+
 (re-frame/reg-event-db
  ::update-panels-hash
  (fn [db _]
    (if (not @on-scrubber?) ;; dont want to push updates during scrubbing
      (let [pp          (get db :panels)
-           ppr         {} ;;; TEMPO!
-                                 ;;ppr (into {} (for [[k v] pp] ;; super slow and lags out clients when panels edited
-                                 ;;               {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace-sub vv)})))})) v
+           ;;ppr         {} ;;; TEMP!
+           ppr         (into {} (for [[k v] pp] ;; super slow and lags out clients when panels edited
+                                  {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace-sub vv)})))}))
+           ppm         (into {}  (for [[k v] pp] ;; super slow and lags out clients when panels edited
+                                   {k (materialize-values v)}))
            new-h       (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
-       (conn/push-panels-to-server pp ppr client-name)
+       (tapp>> [:running :update-panels-hash :event :expensive! "full send of all panels to server"])
+       ;;(conn/push-panels-to-server pp ppr client-name)
+       (ut/tracked-dispatch
+        [::wfx/push :default
+         {:kind :current-panels
+          :panels pp
+          :materialized-panels ppm
+          :resolved-panels ppr
+          :client-name client-name}])
        (when (get db :buffy?) (ut/dispatch-delay 2000 [::refresh-history-log]))
        (assoc db :panels-hash new-h))
      db)))
@@ -10107,6 +10191,8 @@
 
 
 (re-frame/reg-sub ::panels-hash (fn [db _] (get db :panels-hash "not-yet!")))
+
+(re-frame/reg-sub ::panels-hash-singles (fn [db _] (get db :panel-hashes)))
 
 (re-frame/reg-sub ::panels (fn [db _] (get db :panels)))
 
@@ -10380,13 +10466,24 @@
                                    (dissoc :queries))]
                       (resolver/logic-and-params-fn body panel-key))))
 
+(defn compare-maps [map1 map2] ;; basic, single layer only 
+  (let [keys1 (set (keys map1))
+        keys2 (set (keys map2))
+        added (cset/difference keys2 keys1)
+        removed (cset/difference keys1 keys2)
+        changed (filter #(not= (map1 %) (map2 %)) (cset/intersection keys1 keys2))]
+    {:added (select-keys map2 added)
+     :removed (select-keys map1 removed)
+     :changed (into {} (map (fn [k] [k {:from (map1 k) :to (map2 k)}]) changed))}))
+
 (defn maybedoall [] (let [hover-highlight? (or @param-hover @query-hover)] (if hover-highlight? doall seq)))
 
 (defn grid
   [& [tab]]
   (let [;reaction-hack! @hover-square ;; seems less expensive than doall-for ? Reaction-hack2!
-        panels-hash1   @(ut/tracked-sub ::panels-hash {})
-        panels-hash2   (hash (ut/remove-underscored @(ut/tracked-sub ::panels {})))
+        ;panels-hash1   @(ut/tracked-sub ::panels-hash {})
+        ;panels-hash2   (hash (ut/remove-underscored @(ut/tracked-sub ::panels {})))
+        ;panel-hash-singles @(ut/tracked-sub ::panels-hash-singles {})
         [tab-x tab-y]  (if tab
                          (let [tt @(ut/tracked-sub ::tab-recenter-alpha {:tab tab})]
                               ;[tt @(ut/tracked-subscribe [::tab-recenter tab])]
@@ -10409,12 +10506,18 @@
         top-start      (* start-y db/brick-size) ;-100 ;; if shifted some bricks away...
         left-start     (* start-x db/brick-size)]
 
-    (when (and ;;false ;; disable again
-           (not @dragging?)
-           (not @mouse-dragging-panel?)
-           (not @on-scrubber?)) ;true ; external? UPDATE-PANELS-HASH DISABLED TMP!! WHEN
-      (when (not (= panels-hash2 panels-hash1)) ;; core update for blind backend updating /
-        (ut/tracked-dispatch [::update-panels-hash])))
+    ;; (when (and false ;;false ;; disable again
+    ;;        (not @dragging?)
+    ;;        (not @mouse-dragging-panel?)
+    ;;        (not @on-scrubber?)) ;true ; external? UPDATE-PANELS-HASH DISABLED TMP!! WHEN
+    ;;   (when (not (= panels-hash2 panels-hash1)) ;; core update for blind backend updating /
+    ;;     ;;(tapp>> [:compare-hashes (compare-maps panel-hash-singles @(ut/tracked-sub ::single-panels-hash-now {}))])
+    ;;     (let [comps  (compare-maps panel-hash-singles @(ut/tracked-sub ::single-panels-hash-now {}))
+    ;;           added-or-changed (vec (into (keys (get comps :added)) (keys (get comps :changed))))]
+    ;;       (when (ut/ne? added-or-changed)
+    ;;         (ut/tracked-dispatch [::send-panel-updates added-or-changed]))
+    ;;     (ut/tracked-dispatch [::update-single-panels-hash]) ;; do each panel individually for a-la-carte pushes later...
+    ;;     (ut/tracked-dispatch [::update-panels-hash]))))
 
     (when false ;;true ;; (cstr/includes? (str @(ut/tracked-sub ::client-name)) "emerald")
       ;; (ut/tapp>> [:dispatch-peek! @(ut/tracked-sub ::client-name)

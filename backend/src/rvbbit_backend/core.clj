@@ -998,6 +998,21 @@
                       (wss/sync-client-subs))
                    "Sync Client Subs" 120)
 
+  (start-scheduler 30
+                   #(doseq [[name conn] @sql/client-db-pools]
+                      (qp/serial-slot-queue
+                       :re-sniff-client-sql-dbs :single
+                       (fn []
+                         (cruiser/lets-give-it-a-whirl-no-viz
+                          (cstr/replace (str name) ":" "")
+                          {:datasource conn}
+                          system-db
+                          cruiser/default-sniff-tests
+                          cruiser/default-field-attributes
+                          cruiser/default-derived-fields
+                          cruiser/default-viz-shapes))))
+                   "(Re)Sniff Client SQL DBs" 30)
+
   (start-scheduler 120
                    wss/clean-up-reactor
                    "Remove unneeded watchers from Reactor" 120)
@@ -1123,7 +1138,7 @@
 
   (shutdown/add-hook! ::the-pool-is-now-closing
                       #(do (reset! wss/shutting-down? true)
-                           ;(wss/destroy-websocket-server!)
+                           (wss/destroy-websocket-server!)
                            (do (ut/pp [:saving-shutdown-metrics...])
                                (ext/create-dirs "./shutdown-logs")
                                (ut/println-to-file (str "./shutdown-logs/" (cstr/replace (ut/get-current-timestamp) " " "_") ".log")
@@ -1138,15 +1153,16 @@
                           ;;                                                      (not (or (cstr/includes? (str x) "solver-flow")
                           ;;                                                               (cstr/includes? (str %) "raw")))) 
                           ;;                                                    (keys @flow-db/results-atom))))
-                           (let [destinations (vec (keys @wss/client-queues))]
-                             (doseq [d destinations]
-                               (wss/alert! d
-                                           [:v-box :justify :center :style {:opacity 0.7} :children
-                                            [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
-                                              :child
-                                              [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]]
-                                           10 1
-                                           5)))
+                          ;;  (let [destinations (vec (keys @wss/client-queues))]
+                          ;;    (doseq [d destinations]
+                          ;;      (wss/alert! d
+                          ;;                  [:v-box 
+                          ;;                   :justify :center 
+                          ;;                   :style {:opacity 0.7}
+                          ;;                   :children [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                          ;;                               :child [:box :child (str "Heads up: R-V-B-B-I-T system going offline.")]]]]
+                          ;;                  10 1
+                          ;;                  5)))
                            ;;  (Thread/sleep 2000)
                            (wss/destroy-websocket-server!)
                            ;;(tt/stop!)
@@ -1158,9 +1174,15 @@
                            (Thread/sleep 2000)
                            (wss/destroy-websocket-server!)))
   (shutdown/add-hook! ::the-pool-is-now-closed
-                      #(doseq [[conn-name conn] @wss/conn-map]
-                         (do (ut/ppa [:shutting-down-connection-pool conn-name conn])
-                             (try (hik/close-datasource (get conn :datasource)) (catch Exception e (ut/pp [:close-error e]))))))
+                      #(do
+                         (ut/pp [:the-pool-is-now-closing :please-take-your-towels-with-you :have-a-nice-day-citizen!])
+                         (doseq [[conn-name conn] @wss/conn-map
+                                 :let [cn (get conn :datasource)]]
+                           (ut/ppa [:shutting-down-connection-pool conn-name cn])
+                           (sql/close-pool cn))
+                         (doseq [[conn-name conn] @sql/client-db-pools]
+                           (ut/ppa [:shutting-down-client-connection-pool (cstr/replace (str conn-name) ":" "") conn])
+                           (sql/close-pool conn))))
   (shutdown/add-hook! ::close-system-pools
                       #(do (wss/destroy-websocket-server!)
                            (Thread/sleep 1000)

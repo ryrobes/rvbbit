@@ -178,10 +178,19 @@
 ;;                          db))
 
 (defn sub-alert [key]
-  [:box :child (str key)
-   :style {:font-size "12px"
-           :opacity (when (cstr/includes? (str key) "un-sub") 0.6)
-           :text-decoration (when (cstr/includes? (str key) "un-sub") "line-through")}])
+  (let [un? (cstr/includes? (str key) "un-sub")]
+    [:h-box 
+     :align :center 
+     :style {:padding-left "6px"}
+     :gap "10px"
+     :children [[:md-icon
+                        :style {:font-size "12px"}
+                        :md-icon-name (if un? "fa-solid fa-skull"
+                                          "fa-solid fa-handshake")]
+                       [:box :child (str key)]]
+     :style {:font-size "12px"
+             :opacity (when un? 0.6)
+             :text-decoration (when un? "line-through")}]))
 
 ;(ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to thing")) 10 0.75 5])
 ;(ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to thing")) 10 0.75 5])
