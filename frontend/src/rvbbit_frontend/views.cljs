@@ -1727,7 +1727,7 @@
 
 ;;  [:dispatch :rvbbit-frontend.bricks/update-panels-hash]
 
-(ut/tracked-dispatch [::bricks/update-panels-hash]      )
+;;;(ut/tracked-dispatch [::bricks/update-panels-hash]      )
 
 (defn run-console-command [command]
   (let [runner (get @selected-mode :name)
@@ -1988,6 +1988,7 @@
   (let [selected-panel-map  @(ut/tracked-subscribe [::bricks/selected-block-map])
         selected-block      @(ut/tracked-subscribe [::bricks/selected-block])
         sql-calls           @(ut/tracked-sub ::bricks/panel-sql-calls {:panel-key selected-block})
+        client-name         @(ut/tracked-sub ::bricks/client-name {})
         views               @(ut/tracked-sub ::bricks/panel-views {:panel-key selected-block})
         runners             @(ut/tracked-sub ::bricks/panel-runners {:panel-key selected-block})
         runners-only        @(ut/tracked-sub ::bricks/panel-runners-only {:panel-key selected-block})
@@ -2102,7 +2103,20 @@
         data-key-type       @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
         screen-name         (ut/safe-name @(ut/tracked-subscribe [::bricks/screen-name]))
         screen-name-regex   #"(.|\s)*\S(.|\s)*"
-        websocket-status    (select-keys @(ut/tracked-subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])]
+        websocket-status    (select-keys @(ut/tracked-subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])
+
+
+        ;; are-solver            (get @db/solver-fn-lookup [:panels selected-block data-key])
+        ;; solver-running-kw      (keyword
+        ;;                         (cstr/replace
+        ;;                          (str (ut/replacer are-solver
+        ;;                                            ":solver/"
+        ;;                                                                                    ;;"solver-status/*client-name*>"
+        ;;                                            (str "solver-status/" (cstr/replace (str client-name) ":" ""))) ">running?")
+        ;;                          ":" ""))
+        ;; solver-running?       @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [solver-running-kw]})
+                                
+        ]
     
     ;; (when mad-libs-combo? (ut/tracked-dispatch [::bricks/update-reco-previews]))
     ;; (ut/tapp>> [:things-running @(ut/tracked-sub ::bricks/things-running {})])
@@ -2501,13 +2515,16 @@
 
          (when (and (not @hide-panel-2?) (not no-room-for-2?))
            (cond
-             (or views? queries? runners?) ; data-key
+             (or views? queries? runners?) ; data-key 
              (let [data-key-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
                    view-type-map @(ut/tracked-sub ::bricks/view-type-map {:view-type data-key-type})
-                   output-type @(ut/tracked-sub ::bricks/repl-output-type {:panel-key selected-block :view-name data-key})
-                   modes (get view-type-map :modes)
+                   output-type   @(ut/tracked-sub ::bricks/repl-output-type {:panel-key selected-block :view-name data-key})
+                   rowset-data?  @(ut/tracked-sub ::bricks/has-rowset-data? {:panel-key selected-block :view-name data-key})
+                   modes         (remove nil? (distinct (conj (get view-type-map :modes) (when rowset-data? :rowset))))
                    current-view-mode @(ut/tracked-sub ::bricks/current-view-mode {:panel-key selected-block :data-key data-key})
                    runner? (and (not= data-key-type :views) (not= data-key-type :queries) (not= data-key-type :clover))
+
+
                  ;;_ (ut/tapp>> [selected-block data-key data-key-type view-type-map])
                  ;data-key-type (if (nil? data-key-type) :* data-key-type)
                  ;selected-block (if (nil? (get @db/data-browser-query selected-block)) first-data-key data-key)
@@ -2629,6 +2646,8 @@
                                   query-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys sql-calls))
                                                  (some #(= % data-key) (keys sql-calls)))
                                   solver-meta-spy?      (get-in @db/solver-meta-spy [selected-block data-key] false)
+                                  ;; runner-rowset? (and @(ut/tracked-sub ::has-rowset-data? {:panel-key selected-block :view-name data-key})
+                                  ;;                     (= :rowset @(ut/tracked-sub ::current-view-mode {:panel-key selected-block :data-key data-key})))
                         ;; runners-items (into {} (for [[k v] runners] {(first (first v)) {:base-key k}}))
                         ;; runner-box? (or (some #(= % (get @db/data-browser-query selected-block)) (keys runners-items))
                         ;;                 (some #(= % data-key) (keys runners-items)))
@@ -2649,7 +2668,8 @@
                         ;;                      ] rdata))
                        ; is-layout? @(ut/tracked-subscribe [::bricks/is-layout? selected-block data-key])
                                   viz-gen?   (= :viz-gen (get @db/data-browser-query selected-block))]
-                              [re-com/v-box :children
+                              [re-com/v-box
+                               :children
                                [(cond query-box? [re-com/v-box :justify :between :children
                                                   (if (get @db/data-browser-query-con data-key)
                                                     [(let [repl-output (dissoc @(ut/tracked-subscribe [::bricks/repl-output data-key]) :status)
@@ -2666,10 +2686,17 @@
                                                            [re-com/v-box :children (for [r console] [re-com/box :child (str r)])])
                                                          [shape/map-boxes2 (dissoc repl-output :out) "no-block" "no-flow" [] "no-block"
                                                           "map"]]])]
-                                                    [@(ut/tracked-subscribe [::bricks/sql-data-table-editor selected-block [data-key]
-                                                                             single-width-bricks (* bricks-tall 0.8)])
+
+                                                    [[bricks/magic-table selected-block [data-key] single-width-bricks (- bricks-tall 3)] 
                                                      (when (not @bricks/dragging?)
-                                                       [bricks/read-only-sql-box single-width (/ single-height 3.2) (str sql-string)])])]
+                                                       [re-com/box 
+                                                        :height (px (* 1.7 db/brick-size))
+                                                        :style {:overflow "auto" :background-color "#00000038" :border-radius "12px"}
+                                                        :child [bricks/read-only-sql-box single-width nil (str sql-string)]])]
+
+
+                                                    ;;[[bricks/magic-table selected-block [data-key] single-width-bricks (* bricks-tall 0.8)]]
+                                                    )]
                                       (or
                                        (get @db/data-browser-query-con data-key)
                                        solver-meta-spy?) (let [are-solver           (get @db/solver-fn-lookup [:panels selected-block data-key])
@@ -2705,15 +2732,15 @@
                                                                                           :margin-left "3px"
                                                                                           :margin-right "3px"
                                                                                           :border-radius "12px"}
-                                                                                  :children [[bricks/draggable-clover 
+                                                                                  :children [[bricks/draggable-clover
                                                                                               [re-com/box
-                                                                                              :style {:padding-top "4px"
-                                                                                                      :color (str (theme-pull :theme/editor-outer-rim-color nil) 65)
-                                                                                                      :padding-left "6px"}
-                                                                                              :align :start :justify :center
-                                                                                              :child "console output"] 
-                                                                                              [:console meta-data-ckp-output] 
-                                                                                              :views 
+                                                                                               :style {:padding-top "4px"
+                                                                                                       :color (str (theme-pull :theme/editor-outer-rim-color nil) 65)
+                                                                                                       :padding-left "6px"}
+                                                                                               :align :start :justify :center
+                                                                                               :child "console output"]
+                                                                                              [:console meta-data-ckp-output]
+                                                                                              :views
                                                                                               (str "console " are-solver) :console-out
                                                                                               3 6]
                                                                                              ;; draggable-clover [element data runner & [nname h w]]
@@ -2734,7 +2761,6 @@
                                                                                             ;;                         :font-size "17px"
                                                                                             ;;                         :font-family (theme-pull :theme/monospaced-font nil)}}
                                                                                             ;;                e])]
-                                                                                             
                                                                                              ]])
                                                                                [re-com/v-box
                                                                                 :style {:border (str "3px solid " (theme-pull :theme/editor-outer-rim-color nil) 45)
@@ -2748,8 +2774,8 @@
                                                                                                     :padding-left "6px"}
                                                                                             :align :start :justify :center
                                                                                             :child "meta data"]
-                                                                                           [bricks/map-boxes2 
-                                                                                            meta-data 
+                                                                                           [bricks/map-boxes2
+                                                                                            meta-data
                                                                                             ;selected-block
                                                                                             meta-data-ckp
                                                                                             data-key [] :output nil]
@@ -2768,7 +2794,7 @@
                                                                                                     :padding-left "6px"}
                                                                                             :align :start :justify :center
                                                                                             :child "runner status"]
-                                                                                           [bricks/map-boxes2 
+                                                                                           [bricks/map-boxes2
                                                                                             running-status
                                                                                             ;selected-block
                                                                                             running-status-ckp
@@ -2816,15 +2842,19 @@
                                         ")")]
                                   (let [view-scrubbers?       (get-in @db/scrubbers [selected-block data-key] false)
                                         value-spy?            (get-in @db/value-spy [selected-block data-key] false)
-                                        solver-meta-spy?      (get-in @db/solver-meta-spy [selected-block data-key] false)
+                                        ;solver-meta-spy?      (get-in @db/solver-meta-spy [selected-block data-key] false)
                                         are-solver            (get @db/solver-fn-lookup [:panels selected-block data-key])
+                                        solver-running-kw      (keyword
+                                                                (cstr/replace
+                                                                 (str (ut/replacer are-solver
+                                                                                   ":solver/"
+                                                                                   ;;"solver-status/*client-name*>"
+                                                                                   (str "solver-status/" (cstr/replace (str client-name) ":" "") ">")) ">running?")
+                                                                 ":" ""))
                                         solver-running?       (when are-solver
-                                                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                                 {:keypath [(keyword
-                                                                                             (cstr/replace
-                                                                                              (str (ut/replacer are-solver
-                                                                                                                ":solver/" "solver-status/*client-name*>")  ">running?")
-                                                                                              ":" ""))]}))]
+                                                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [solver-running-kw]}))
+                                        ]
+                                    
                           ;; (ut/tapp>> [:solver-running? solver-running? are-solver (keyword (str (ut/replacer are-solver
                           ;;                                                                                    ":solver/" "solver-status/*client-name*>")  ">running?"))])
                           ;;;(ut/tapp>> [:dd @db/solver-fn-lookup])
@@ -2872,12 +2902,17 @@
                                                    :gap  "6px"
                                                    :style {:color (if solver-running? (theme-pull :theme/universal-pop-color nil) "grey")}
                                                    :children
-                                                   [(when solver-running?
+                                                   [;[re-com/box :child (str solver-running-kw)]
+                                                    ;[re-com/box :child (str "." @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [solver-running-kw]}))]
+                                                    (when solver-running?
                                                       [re-com/md-icon-button :md-icon-name "zmdi-refresh" :class "rotate linear infinite"
                                                        :style
                                                        {:font-size "15px" :transform-origin "7.5px 12px"
                                                         :margin-top "-4px"}])
-                                                    [re-com/box :child (str are-solver)]]])]]))]]))]]]
+                                                    [re-com/box :child 
+                                                     (str are-solver)
+                                                     ;(str solver-running-kw)
+                                                     ]]])]]))]]))]]]
                 :height (px (- single-height 10)) ;; (px (- ttl-height 24))
                 :width single-width-px
                 :style {:overflow "hidden"}])
@@ -3016,8 +3051,8 @@
                                               :children
                                               (conj
                                                (vec (for [b    (remove nil? [(when nrepl? 
-                                                                               "nrepl"
-                                                                               ;"namespaces"
+                                                                               ;"nrepl"
+                                                                               "namespace"
                                                                                ) "queries" "blocks"])
                                                           :let [selected? (= (keyword b) @db/item-browser-mode)]]
                                                       [re-com/box :attr {:on-click #(reset! db/item-browser-mode (keyword b))}
@@ -3038,10 +3073,11 @@
                                                   (= @db/item-browser-mode :blocks)  [bricks/screen-block-browser
                                                                                       (* single-width 0.379)
                                                                                       (- single-height 1.3)]
-                                                  (= @db/item-browser-mode :nrepl)  [bricks/nrepl-introspection-browser
+                                                  (= @db/item-browser-mode :namespace)  [bricks/nrepl-introspection-browser
                                                                                      selected-block data-key-type data-key
                                                                                      (* single-width 0.379)
-                                                                                     (- single-height 1.3)]
+                                                                                     (- single-height 1.3)
+                                                                                         @editor-dimensions]
 
                                                   :else                              [re-com/box :child "nothing selected above?"])]]])]
                             :height single-height-px

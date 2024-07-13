@@ -198,7 +198,7 @@
 (re-frame/reg-event-db ::sub-to-flow-value
                        (fn [db [_ key]]
                          (let [client-name (get db :client-name)]
-                           (ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to" key)) 10 0.75 5])
+                           (ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to " key)) 10 0.75 5])
                            (ut/tracked-dispatch
                             [::wfx/push :default
                              {:kind :sub-to-flow-value 
@@ -209,7 +209,7 @@
 (re-frame/reg-event-db ::unsub-to-flow-value
                        (fn [db [_ key]]
                          (let [client-name (get db :client-name)]
-                           (ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to" key)) 10 0.75 5])
+                           (ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to " key)) 10 0.75 5])
                            (ut/tracked-dispatch
                             [::wfx/push :default
                              {:kind :unsub-to-flow-value 
@@ -301,6 +301,24 @@
 (defonce packets-received (atom 0))
 (defonce batches-received (atom 0))
 
+(re-frame/reg-event-db
+ ::update-sub-counts
+ (fn [db [_ sub-results]]
+   (let [smm (vec (for [s sub-results] (keyword (cstr/replace (cstr/join "/" (get s :task-id)) ":" ""))))
+         flow-sub-cnts (get db :flow-sub-cnts)
+         ;smmc (into {} (for [fk smm] (update flow-sub-cnts fk (fnil inc 0))))
+         smmc (reduce (fn [acc fk] (update acc fk (fnil inc 0))) flow-sub-cnts smm)
+         flow-subs (get db :flow-subs)]
+     ;(ut/tapp>>  [:smmc smmc])
+     (assoc db :flow-sub-cnts (select-keys smmc flow-subs)))))
+
+(re-frame/reg-event-db
+ ::insert-implicit-rowset
+ (fn [db [_ data flow-key]]
+   (let [view-map (into {} (for [[k v] @db/solver-fn-lookup] 
+                             {v (last k)}))
+         data-key (get view-map flow-key)]
+   (assoc-in db [:data data-key] data))))
 
 (def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
@@ -333,6 +351,17 @@
                                               (not heartbeat?))) result)
             result-subs (get grouped-results true)
             result (get grouped-results false)
+            _ (doseq [rr result-subs] ;; is it rowset? if so lets put it in :data also
+                (let [data (get rr :status)
+                      all-maps (and (vector? data) (every? map? data))
+                      all-keys-match (and all-maps
+                                          (let [first-keys (set (keys (first data)))]
+                                            (every? #(and (= first-keys (set (keys %)))
+                                                          (every? keyword? (keys %)))
+                                                    data)))]
+                  (when all-keys-match
+                    (ut/tracked-dispatch [::insert-implicit-rowset data
+                                          (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))))
             updates (reduce (fn [acc res]
                               (let [task-id (get res :task-id)]
                                 (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
@@ -340,11 +369,11 @@
         ;; (ut/tapp>> [:batch-of-messages (count result) :grouped-update (count result-subs)
         ;;             (vec (for [r result] (str (get r :task-id))))
         ;;             (vec (for [r result-subs] (str (get r :task-id))))])
+        (re-frame/dispatch [::update-sub-counts result-subs])
         (swap! batches-received inc)
         (doseq [res result] (re-frame/dispatch [::simple-response res true])) ;; process the other batches as a side-effect
-        (reduce-kv (fn [db k v] (update db k #(merge-with merge % v))) db updates)
-        ;db
-        ) ;; update db with updates
+        (reduce-kv (fn [db k v] (update db k #(merge-with merge % v))) db updates))
+
 
       (try
         (let [ui-keypath                  (first (get result :ui-keypath))
@@ -411,7 +440,11 @@
 
           (cond
             
-            server-sub? (assoc-in db (vec (cons :click-param task-id)) (get result :status))
+            server-sub? 
+            (let [flow-key (keyword (cstr/replace (cstr/join "/" task-id) ":" ""))]
+              (-> db
+                  (assoc-in [:flow-sub-cnts flow-key] (inc (get-in db [:flow-sub-cnts flow-key] 0)))
+                  (assoc-in (vec (cons :click-param task-id)) (get result :status))))
 
             settings-update? (assoc-in db [:server :settings] (get result :status))
 
@@ -603,7 +636,9 @@
           ;;                               (re-matches #".*\d" (str %)))
           ;;                          (not (cstr/ends-with? (str %) "*running?")))
           ;;                        (keys (get db :click-params)))
-          image       (if (= save-type :skinny)
+          ;;flow-subs-child-keys (for [e (get db :flow-subs)] 
+          ;;                       (remove nil? (try (keyword (last (cstr/split (str e) #"/"))) (catch :default _ nil))))
+          image       (if true ;(= save-type :skinny)
                         (-> db ;; dehydrated... as it were
                             (select-keys base-keys)
                             (dissoc :query-history)
@@ -616,6 +651,8 @@
                             (dissoc :status-data)
                             (dissoc :solvers-map)
                             (dissoc :flow-statuses)
+                            (dissoc :flow-subs)
+                            (dissoc :flow-sub-cnts)
                             (dissoc :signals-map)
                             (dissoc :repl-output)
                             (dissoc :solver-fn)
@@ -624,6 +661,7 @@
                             (ut/dissoc-in [:click-param :solver-meta])
                             (ut/dissoc-in [:click-param :repl-ns])
                             (ut/dissoc-in [:click-param :solver-status])
+                            (ut/dissoc-in [:click-param :solver])
                             (ut/dissoc-in [:click-param :flow-status])
                             (ut/dissoc-in [:click-param :signal])
                             (dissoc :data)
@@ -634,6 +672,8 @@
                             (dissoc :file-changed)
                             (assoc :panels (select-keys (get db :panels) p0)))
                         db)
+          click-params-running (filter #(cstr/ends-with? (str %) "running?") (keys (get image :click-param)))
+          image (assoc image :click-param (apply dissoc (get image :click-param) click-params-running))
           bogus-kw    (vec (find-bogus-keywords image))
           image       (apply dissoc image (map first bogus-kw))
           request     {:image (assoc image :resolved-queries resolved-queries) :client-name client-name :screen-name screen-name}

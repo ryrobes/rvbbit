@@ -158,7 +158,7 @@
        :poll-when                [::bricks/new-flow-subs?]
        :dispatch-event-on-start? false}
     
-      {:interval                 5 ;; unsubscribe to server data
+      {:interval                 60 ;; 5 ;; unsubscribe to server data
        :event                    [::bricks/unsub-to-flows]
        :poll-when                [::bricks/stale-flow-subs?]
        :dispatch-event-on-start? false}

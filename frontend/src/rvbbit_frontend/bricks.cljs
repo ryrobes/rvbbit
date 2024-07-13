@@ -45,11 +45,11 @@
    [re-com.core :as    re-com
     :refer [at]]
    [re-com.util :refer [px]]
-   [re-frame.alpha :as rfa]
+   ;[re-frame.alpha :as rfa]
    [re-frame.core :as re-frame]
    [reagent.core :as reagent]
    [garden.color :as    color]
-   [reagent.dom :as rdom]
+   ;[reagent.dom :as rdom]
    [rvbbit-frontend.audio :as audio]
    [rvbbit-frontend.connections :as conn]
    [rvbbit-frontend.db :as db]
@@ -291,7 +291,7 @@
                 (when (not (nil? dataUrl)) (ut/tracked-dispatch [(if save? ::http/save-screen-snap ::http/save-snap) dataUrl]))))
             (fn [error] (ut/tapp>> ["Error taking screenshot:" error])))
      (when (not save?)
-       (ut/tracked-dispatch [::update-panels-hash])
+       ;;(ut/tracked-dispatch [::update-panels-hash])
        (ut/tracked-dispatch
         [::wfx/request :default
          {:message {:kind :session-snaps :client-name (get db :client-name)} :on-response [::save-sessions] :timeout 15000}]))
@@ -455,6 +455,16 @@
 
 (defn get-all-values [data] (vec (flatten-values data)))
 
+(defonce get-all-values-flatten (atom {}))
+
+(defn cached-get-all-values [data]
+  (if-let [cached-result (@get-all-values-flatten (str data))]
+    cached-result
+    (let [result (get-all-values data)]
+      (swap! get-all-values-flatten assoc (str data) result)
+      result)))
+
+
 ;; (defn get-grid [obody]
 ;;   (let [kps       (ut/extract-patterns obody :grid 2)
 ;;         logic-kps (into [] (for [v kps] (let [[_ tab-name] v] tab-name)))]
@@ -535,7 +545,10 @@
                                                         (ut/deep-flatten (get db :runstreams)))))
          runstreams              (vec (for [{:keys [flow-id]} @(ut/tracked-sub ::runstreams {})]
                                         (keyword (str "flow-status/" flow-id ">*running?"))))
-         client-namespaces-refs  [:repl-ns/repl-client-namespaces-map>*client-name*]
+         client-name             @(ut/tracked-sub ::client-name {})
+        ;;  client-namespaces-refs  [:repl-ns/repl-client-namespaces-map>*client-name*]
+        ;;  client-namespace-intros (vec (for [nms @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath client-namespaces-refs})]
+        ;;                                 (keyword (str "repl-ns/" nms ">introspected"))))
          selected-block          (get db :selected-block)
          editor?                 (get db :editor?)
          selected-tab            (get db :selected-tab)
@@ -547,6 +560,8 @@
                                       (when editor? (select-keys (get db :panels) [selected-block]))))
          panels                  [(create-runner-listeners panels-map)
                                   (create-solver-listeners panels-map)]
+         dfp                     (ut/deep-flatten panels)
+         client-ns-intro-map     (when (dfp :introspect!) [:repl-ns/*client-name*])  ;; if we have any introspected runners, then only sub to introspect-map
          drop-refs               (vec (distinct (vals @drop-last-tracker-refs)))
          sflow                   (get db :selected-flow)
          current-flow-open       (when (ut/ne? sflow) (keyword (str "flow-status/" sflow ">*running?")))
@@ -566,8 +581,8 @@
                                                                    (cstr/starts-with? (str %) ":panel/")
                                                                    (cstr/starts-with? (str %) ":client/"))
                                                               (filter keyword?
-                                                                      (into (ut/deep-flatten panels)
-                                                                            (ut/deep-flatten (get-all-values (get db :click-param))))))
+                                                                      (into dfp
+                                                                            (ut/deep-flatten (cached-get-all-values (get db :click-param))))))
                                                       current-flow-open)))
          ;;_ (tapp>> [:click-param-subs? (ut/deep-flatten (get-all-values (get db :click-param)))])
           ;; flow-runners            (when (and (get db :flow?) 
@@ -627,22 +642,29 @@
                                                                   :let [meta-kw (str (ut/replacer s ":solver/" "solver-meta/"))
                                                                         ns-key (keyword meta-kw)
                                                                         console-key (keyword (str meta-kw ">output>evald-result>out"))
-                                                                        ns-key1 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [ns-key]})]]
+                                                                        ;;ns-key1 @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [ns-key]})
+                                                                        ]]
                                                               [(keyword (str (ut/replacer s ":solver/" "solver-status/*client-name*>")))
 
-                                                               (when (and (ut/ne? ns-key1) (get-in ns-key1 [:output :evald-result :ns]))
-                                                                 (keyword (str "repl-ns/" (get-in ns-key1 [:output :evald-result :ns]))))
+                                                              ;;  (when (and (ut/ne? ns-key1) (get-in ns-key1 [:output :evald-result :ns]))
+                                                              ;;    (keyword (str "repl-ns/" (get-in ns-key1 [:output :evald-result :ns]))))
 
                                                                console-key
 
                                                                ns-key])))))) [])
          ;;;_ (tapp>> [:in-editor-solvers  (str  in-editor-solvers) ])
-         clover-solvers-running  (vec (for [s clover-solvers] ;;(vec (remove (set in-editor-solvers0) clover-solvers))] 
-                                        (keyword (str
-                                                  (-> s
-                                                      (ut/replacer ":solver/" "solver-status/*client-name*>")
-                                                      (ut/replacer ":" ""))
-                                                  (str ">running?")))))
+         clover-solvers-running  (vec (apply concat (for [s clover-solvers] ;;(vec (remove (set in-editor-solvers0) clover-solvers))] 
+                                        [;(keyword (str
+                                         ;         (-> s
+                                         ;             (ut/replacer ":solver/" "solver-status/*client-name*>")
+                                         ;             (ut/replacer ":" ""))
+                                         ;         (str ">running?")))
+                                         (keyword (str
+                                                   (-> s
+                                                       (ut/replacer ":solver/" (str "solver-status/" (cstr/replace (str client-name) ":" "") ">"))
+                                                       (ut/replacer ":" ""))
+                                                   (str ">running?")))
+                                         ])))
           ;; clover-solvers-running  []
          signal-subs             (if signals-mode? (vec (into signal-hist (into signal-ui-refs signal-ui-part-refs))) [])
          theme-refs              (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
@@ -654,7 +676,11 @@
       ;;          ])
       ;(filterv #(not (cstr/includes? (str %) "||")) ;; live running subs ignore
      (vec (distinct
-           (concat flow-runners clover-solver-outputs client-namespaces-refs signal-subs clover-solvers 
+           (concat flow-runners clover-solver-outputs 
+                   ;;client-namespaces-refs 
+                   ;;client-namespace-intros 
+                   client-ns-intro-map
+                   signal-subs clover-solvers 
                    clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs)))
       ;         )
      )))
@@ -1069,7 +1095,7 @@
 
 (re-frame/reg-sub ::flow-editor? (fn [db] (get db :flow-editor? false)))
 
-(re-frame/reg-sub ::auto-run? (fn [db] (get db :auto-run? false)))
+(re-frame/reg-sub ::auto-run? (fn [db] (get db :auto-run? true)))
 
 (re-frame/reg-sub ::auto-run-and-connected?
                   (fn [db]
@@ -2611,8 +2637,8 @@
     [re-com/box
      :size "auto"
      :padding "8px"
-     ;:width (px (- width-int 24))
-     ;:height (px (- height-int 24))
+     ;:width (px (- width-int 24))    
+     :height (px (- height-int 14))
      :style {:font-family      (if (= syntax "text")
                                  (theme-pull :theme/base-font nil)
                                  (theme-pull :theme/monospaced-font nil))
@@ -3422,8 +3448,51 @@
 
 (re-frame/reg-sub ::panel-name-only (fn [db {:keys [panel-key]}] (get-in db [:panels panel-key :name] (str panel-key))))
 
-(defn nrepl-introspection-browser [selected-block data-key-type data-key width-int height-int]
+
+(defn draggable-intro
+  [element name-space item-name item-type item-value data-key-type]
+  [(reagent/adapt-react-class rdnd/Draggable)
+   (let [vname (ut/safe-key (keyword (str item-name (rand-int 45))))
+         client-name @(ut/tracked-sub ::client-name {})
+         gen-namespace (str "repl-" (cstr/replace (str client-name) ":" "") "-" (cstr/replace (str data-key-type) ":" ""))
+         is-gen-namespace? (true? (= gen-namespace name-space))
+         ;;name-space (if is-gen-namespace? (str "repl-" ))
+         code (cond (= item-type ":atom")
+                    (str "(do "
+                         (when (not is-gen-namespace?) (str " (ns " name-space ") "))
+                         " (let [last-run :repl-ns/" name-space ">introspected] (println last-run) (deref " item-name ")))")
+
+                    (= item-type ":sqlized")
+                    (assoc item-value :connection-id :*client-name*)
+
+                    :else (str "(do "
+                               (when (not is-gen-namespace?) (str " (ns " name-space ") "))
+                               " (let [last-run :repl-ns/" name-space ">introspected] (println last-run) " item-name "))"))
+         data-key-type (if (= item-type ":sqlized") :queries data-key-type)
+         data {:h         4
+               :w         7
+               :selected-view vname
+               :connection-id client-name
+               :selected-mode (when (not (= item-type ":sqlized"))  {vname :edn})
+               :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
+               ;:views     {vname [:box :child (str  name-space " " item-name " " item-type " " data-key-type )]}
+               data-key-type {vname code}
+               :name      (str "introspected " (ut/replacer item-name ":" ""))}]
+     {:type          "meta-menu" ;:play-port
+      :on-drag-end   #(do (reset! dragging? false))
+      :on-drag-start #(do (reset! dragging? true)
+                          (reset! dragging-size [(get data :w) (get data :h)])
+                          (reset! dragging-body data))
+      :data          (pr-str data)})
+   [re-com/box
+    :size "none"
+    :child element
+    :style {:cursor "grab"}]])
+
+
+(defn nrepl-introspection-browser [selected-block data-key-type data-key width-int height-int editor-dims]
   (let [;ph             @query-hover ;; reaction hack
+       ;; {:keys [single-width-bricks single-height-bricks single-width single-height bricks-wide bricks-tall]} editor-dims
       ;selected-block @(ut/tracked-sub ::selected-block {})
       ;blocks         (map keyword @(ut/tracked-sub ::current-tab-blocks {}))
         are-solver        (get @db/solver-fn-lookup [:panels selected-block data-key])
@@ -3432,11 +3501,15 @@
                                               {:keypath [(keyword (str (ut/replacer are-solver
                                                                                     ":solver/" "solver-meta/")))]}))
         name-space        (get-in meta-data [:output :evald-result :ns])
-        ns-clover         (keyword (str "repl-ns/" name-space))
-        intro-map         (when are-solver
-                            @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                             {:keypath [ns-clover]}))
-        intro-at (get intro-map :introspected)
+        ;ns-clover         (keyword (str "repl-ns/" name-space))
+        intro-map-all     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                           {:keypath [:repl-ns/*client-name*]})
+        intro-map         (get intro-map-all name-space)
+        ;intro-map         (when are-solver
+        ;                    @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+        ;                                     {:keypath [ns-clover]}))
+        ;intro-at (get intro-map :introspected)
+        _ (tapp>> [:intro-map intro-map])
         intro-map (vec (apply concat (for [[k v] (dissoc intro-map :introspected)]
                                        (for [[kk vv] v]
                     ;;(merge {:type k} vv)
@@ -3483,47 +3556,63 @@
                       ;selected?           @(ut/tracked-subscribe [::has-query? selected-block k])
                         dtype (ut/data-typer item-value)
                         dcolor (get @(ut/tracked-sub ::conn/data-colors {}) dtype)]
-                    [re-com/v-box :attr
-                     {;:on-mouse-enter #(reset! query-hover k)
+
+                    [draggable-intro
+                     [re-com/v-box 
+                      :size "auto"
+                      :attr
+                      {;:on-mouse-enter #(reset! query-hover k)
                     ;:on-mouse-leave #(reset! query-hover nil)
                     ;:on-click       #(ut/tracked-dispatch [::select-block query-panel])
-                      }
-                     :style
-                     {;:border           (cond (= selected-block query-panel) (str "2px solid " (theme-pull :theme/universal-pop-color "#9973e0"))
+                       }
+                      :style
+                      {;:border           (cond (= selected-block query-panel) (str "2px solid " (theme-pull :theme/universal-pop-color "#9973e0"))
                     ;                        parent-of-selected?            "2px solid #e6ed21"
                     ;                        upstream?                      "2px solid #7be073"
                     ;                        downstream?                    "2px dashed #05dfff"
                     ;                        :else                          (str "1px solid "
                     ;                                                            (theme-pull :theme/editor-font-color nil)
                     ;                                                            33))
-                      :border          (str "1px solid " dcolor)
-                      :color dcolor
+                       :border          (str "1px solid " dcolor)
+                       :color dcolor
                     ;:color            (if (or selected? (= k @query-hover))
                     ;                    (theme-pull :theme/grid-selected-font-color nil)
                     ;                    (str (theme-pull :theme/editor-font-color nil) 99))
-                      :cursor           "pointer"
-                      :background-color (str dcolor 55)
+                       ;:cursor           "pointer"
+                       :background-color (str dcolor 55)
                     ;:background-color (if (= k @query-hover)
                     ;                    (str (theme-pull :theme/grid-selected-background-color nil) 55)
                     ;                    (if selected? (theme-pull :theme/grid-selected-background-color nil) "inherit"))
-                      }
-                     :children
-                     [[re-com/h-box
-                       :justify :between
-                       :size "auto"
-                       :width "100%"
-                       :children
-                       [[re-com/box :child (str item-name) :size "auto" :style
-                         {:font-weight 700 :font-size "13px" :padding-left "4px" :padding-right "4px"}]
-
-                        [re-com/box :child (str dtype) :size "auto" :style
-                         {:font-weight 700 :font-size "13px" :padding-left "4px" :padding-right "4px"}]]]
-                      [re-com/h-box :justify :between :children
-                       [[re-com/box :child (str repl-type) :style
-                         {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px"} :align :end]
-                        [re-com/box :child (str item-value) :style
-                         {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px"} :align
-                         :end]]]]]))]]))
+                       }
+                      :children
+                      [[re-com/h-box
+                        :justify :between
+                        :size "auto"
+                       ;:width (px (* single-width 0.3))
+                        :children
+                        [[re-com/box :child (str item-name)
+                          :size "auto"
+                          :style {:font-weight 700
+                                  :font-size "13px"
+                                  :padding-left "4px"
+                                  :padding-right "4px"}]
+                         [re-com/box :child (str dtype) ;:size "auto" 
+                          :style {:font-weight 700
+                                  :font-size "13px"
+                                  :padding-left "4px"
+                                  :padding-right "4px"}]]]
+                       [re-com/h-box :justify :between :children
+                        [[re-com/box :child (str repl-type) :style
+                          {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px"} :align :end]
+                         [re-com/box
+                         ;:child (str item-value) 
+                          :child (let [str-val (str item-value)
+                                       limit 28]
+                                   (if (<= (count str-val) limit)
+                                     str-val
+                                     (str (subs str-val 0 limit) "...")))
+                          :style {:font-size "13px" :font-weight 500 :padding-left "4px" :padding-right "4px" :padding-bottom "2px"} :align
+                          :end]]]]]  name-space item-name repl-type item-value data-key-type]))]]))
 
 (defn screen-block-browser
   [width-int height-int]
@@ -6504,14 +6593,15 @@
 
 
 
-(re-frame/reg-sub ::sql-data-table (fn [_ [_ panel-key keypath]] [magic-table panel-key keypath]))
+;; (re-frame/reg-sub ::sql-data-table (fn [_ [_ panel-key keypath]] [magic-table panel-key keypath]))
 
-(re-frame/reg-sub ::sql-data-table-magic (fn [_ [_ panel-key keypath]] [magic-table panel-key keypath]))
+;; (re-frame/reg-sub ::sql-data-table-magic (fn [_ [_ panel-key keypath]] [magic-table panel-key keypath]))
 
-(re-frame/reg-sub ::sql-data-table-magic2 (fn [_ [_ panel-key keypath]] [re-com/box :child [magic-table panel-key keypath]]))
+;; (re-frame/reg-sub ::sql-data-table-magic2 (fn [_ [_ panel-key keypath]] [re-com/box :child [magic-table panel-key keypath]]))
 
-(re-frame/reg-sub ::sql-data-table-editor
-                  (fn [_ [_ panel-key keypath block-sizes block-width]] [magic-table panel-key keypath block-sizes block-width]))
+;; (re-frame/reg-sub ::sql-data-table-editor
+;;                   (fn [_ [_ panel-key keypath block-sizes block-width]] 
+;;                     [magic-table panel-key keypath block-sizes block-width]))
 
 (re-frame/reg-sub ::is-single-view?
                   (fn [db [_ panel-key]]
@@ -6741,6 +6831,11 @@
  ::repl-output-type
  (fn [db {:keys [panel-key view-name]}]
    (get-in db [:panels panel-key :display view-name] :value)))
+
+(re-frame/reg-sub
+ ::has-rowset-data?
+ (fn [db {:keys [panel-key view-name]}]
+   (ut/ne? (get-in db [:data view-name]))))
 
 (re-frame/reg-event-db
  ::select-output-type
@@ -7265,6 +7360,7 @@
            :ut/subq-mapping-alpha          ut/subq-mapping-alpha
            :db/flow-results                db/flow-results
            :db/scrubbers                   db/scrubbers
+           :bricks/get-all-values-flatten  get-all-values-flatten
            :ut/is-base64-atom              ut/is-base64-atom
            :db/solver-fn-runs              db/solver-fn-runs
            :ut/is-large-base64-atom        ut/is-large-base64-atom
@@ -7313,7 +7409,7 @@
            (ut/dissoc-in [:panels nil]) ;; garbage keys created by external edit with bad
            (assoc :panels (select-keys (get db :panels)
                                        (filter #(not (cstr/starts-with? (str %) ":query-preview")) (keys (get db :panels)))))
-           (assoc :data (select-keys (get db :data) keepers))
+           ;;(assoc :data (select-keys (get db :data) keepers))
            (assoc :meta (select-keys (get db :meta) keepers))
            (assoc :orders (select-keys (get db :orders) keepers))
            (assoc :post-meta (select-keys (get db :post-meta) keepers))
@@ -8699,7 +8795,9 @@
 
 (defn console-viewer [{:keys [text style width height]}]
   (let [is-vec?      (vector? text)
-        text         (if is-vec? text (vec (cstr/split text "\n")))
+        text         (if is-vec?
+                       (map str text)
+                       (vec (cstr/split text "\n")))
         html-content (cstr/join "\n" (map #(.toHtml ansi-converter %) text))
         console-style {:font-family "monospace" ;;(theme-pull :theme/monospaced-font nil)
                        :font-size "15px"
@@ -9363,6 +9461,11 @@
                 ;;                                  :child [:data-viewer (ut/postwalk-replacer {:clover-body v} wrapper)]]}))
 ) ;; adds the render wrapper
                body)
+        
+        runner-rowset? (true?
+                        (when is-runner?
+                          (and @(ut/tracked-sub ::has-rowset-data? {:panel-key panel-key :view-name selected-view})
+                               (= :rowset @(ut/tracked-sub ::current-view-mode {:panel-key panel-key :data-key selected-view})))))
 
         ;; _ (when (not= selected-view-type :views)
         ;;     (ut/tapp>> [:body body selected-view-type]))
@@ -9811,6 +9914,11 @@
               (ut/tracked-dispatch [::insert-sql-source k query]))))))
 
     (cond ;;replacement-all? [reecatch [re-com/box :child (get body selected-view)]]
+      runner-rowset?
+      (if (and fw fh) 
+        [reecatch [magic-table panel-key [selected-view] fw (+ fh 2)]]
+        [reecatch [magic-table panel-key [selected-view]]])
+
       (seq body)
       (cond
         (not (nil? override-view)) ;; for editor usage

@@ -3,7 +3,7 @@
   :setlists-drag-2 [:show_id :song_name :song_order :ts],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :large-bgss [:ffilename],
+  :large-bgss (:query_error),
   :shows (:query_error),
   :tour-name-drag-11 [:tour_name :rowcnt],
   :shows-drag-22 [:location :show_date :show_id :show_name :title :tour_name :ts],
@@ -42,7 +42,7 @@
    :from
    [{:data
      (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
-           rel-dir " ./images/large/"
+           rel-dir "./images/large/"
            files (->>
                    (file-seq (clojure.java.io/file dir))
                    (filter (fn [x] (.isFile x)))
@@ -52,8 +52,8 @@
                    (map (fn [x] (.getName x))))]
        (println (count files))
        (vec (for [f files] {:ffilename (str f)})))}],
-   :page 3,
-   :_last-run "13:48:32"}},
+   :page 2,
+   :_last-run "14:04:15"}},
  :meta
  {:fields-sys
   {:fields
@@ -186,16 +186,16 @@
    :rowcount 13},
   :large-bgss
   {:fields
-   {:ffilename
+   {:query_error
     {:data-type "string",
-     :distinct 500,
+     :distinct 3,
      :group-by? true,
      :commons
-     {"b64-image5-57853-95564-4k.webp" 1,
-      "b64-image4-20194-34527-4k.webp" 1,
-      "b64-image-34647-16558-4k.webp" 1},
+     {"{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
+      "(from database connection)" 1,
+      "[SQLITE_ERROR] SQL error or missing database (no such table: large_bgss)" 1},
      :cardinality 100}},
-   :rowcount 500},
+   :rowcount 3},
   :shows
   {:fields
    {:query_error
@@ -743,7 +743,8 @@
   "star-shaped wallaby"
   "globular koala"
   "azure oyster"
-  "fat hawk"],
+  "fat hawk"
+  "thin crane"],
  :selected-cols nil,
  :server
  {:settings
@@ -933,6 +934,7 @@
     "purple-techno-sunset"
     "recharts-test-blocks"
     "refresh-test"
+    "repl-tests-3"
     "retro-machines"
     "riffle-test"
     "server-stats"
@@ -981,68 +983,53 @@
  :runstreams {},
  :editor? true,
  :buffy? false,
- :memory [351162978 333169806 4294705152],
- :client-name :soulful-gray-rat-18,
+ :memory [208666514 184022858 4294705152],
+ :client-name :yummy-wide-buffalo-17,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2627, :h 1241},
- :post-meta
- {:shows-drag-22 {:* {:rowcount 2214}},
-  :large-bgss {:* {:rowcount 1041}},
-  :tables-sys {:* {:rowcount 7}}},
+ :window {:w 2505, :h 1205},
+ :post-meta {:large-bgss {}, :fields-sys {:* {:rowcount 7}}},
  :status
- {:alert1 {:alerts :alert2},
-  :heartbeat
+ {:heartbeat
   {:kick
-   [:solver-meta/raw-custom-override-1610584445>extra
-    :solver/get-my-colors1570390773
-    :solver/raw-custom-override-1859350263
-    :solver/raw-custom-override136934373>10>0>2
-    :solver-status/soulful-gray-rat-18>raw-custom-override1115028399>running?
-    :solver/raw-custom-override-1610584445>howdy-str
+   [:solver-status/yummy-wide-buffalo-17>get-my-colors-1180948524>running?
+    :solver-status/yummy-wide-buffalo-17>get-my-colors570095682>running?
+    :solver-meta/raw-custom-override613247716>output>evald-result>out
     :time/minute
+    :repl-ns/*client-name*
     :time/hour
-    :solver-status/soulful-gray-rat-18>get-my-colors-809088472>running?
-    :solver-status/soulful-gray-rat-18>raw-custom-override-1859350263>running?
+    :solver-status/yummy-wide-buffalo-17>raw-custom-override613247716>running?
+    :solver/raw-custom-override613247716
     :flow-status/live-scratch-flow>*running?
-    :solver/get-my-colors-809088472
-    :solver/raw-custom-override1115028399
-    :solver-meta/raw-custom-override-1610584445>output>evald-result>out
-    :solver-status/soulful-gray-rat-18>get-my-colors1570390773>running?]},
+    :solver/get-my-colors-1180948524
+    :solver-status/*client-name*>raw-custom-override613247716
+    :solver-meta/raw-custom-override613247716
+    :solver/get-my-colors570095682]},
+  :alert1 {:alerts :alert2},
   :file-change {:file-changed :done}},
- :screen-name "duality-of-lepus",
+ :screen-name "duality-of-lepus33",
  :recos-page2 0,
- :selected-tab "azure oyster",
+ :selected-tab "thin crane",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
- [[[:v-box
-    :children
-    [[:box :child "solver running (via canvas)"]
-     [:box :child "[:panels :block-2769 :new-clojure-2]" :style {:font-size "12px"}]
-     [:box :child "[:time/minute :time/hour]" :style {:font-size "9px"}]
-     [:box :child "7/13/2024, 1:51:01 PM" :style {:font-size "8px", :opacity 0.6}]]]
-   8
-   1.7
-   322
-   -1889304821]
-  [[:box
+ [[[:box
     :child
     "sent screen save request to server... Please wait."
     :style
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   327
+   508
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries {:setlists 1669794951, :shows 89957543},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1263040215,
+ :user-params-hash -2076875513,
  :grid-recos? true,
- :session-hash 358121512,
+ :session-hash 565075637,
  :resolved-queries
  {:setlists-drag-2
   {:select [:show_id :song_name :song_order :ts],
@@ -1116,7 +1103,7 @@
    :from
    [{:data
      (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
-           rel-dir " ./images/large/"
+           rel-dir "./images/large/"
            files (->>
                    (file-seq (clojure.java.io/file dir))
                    (filter (fn [x] (.isFile x)))
@@ -1126,8 +1113,8 @@
                    (map (fn [x] (.getName x))))]
        (println (count files))
        (vec (for [f files] {:ffilename (str f)})))}],
-   :page 3,
-   :_last-run "13:48:32"},
+   :page 2,
+   :_last-run "14:04:15"},
   :offenses-drag-24
   {:select
    [:DAY_OF_WEEK
@@ -1468,10 +1455,11 @@
     (do
       (let [clojure-version (clojure-version)
             jvm-version (System/getProperty "java.version")]
+        :introspect!
         (println "HUUGE33?! Yes. Giant.")
         (println "the hour is " :time/hour)
         (def message2 "far side")
-        (defn test [] 123333)
+        (defn teste [] 123333)
         (defonce my-atom (atom {:test 123}))
         (doseq [e (range :time/minute)] (println (str "minute " (inc e) "!")))
         {:howdy-str
@@ -1488,13 +1476,15 @@
            " 🥕🐇"),
          :min :time/minute,
          :jvm-version jvm-version,
-         :clojure-version clojure-version}))},
+         :clojure-version clojure-version})
+      (swap! my-atom merge {:new-key "hey"}))},
    :name "block-2769",
    :w 9,
-   :selected-mode {:new-clojure-2 :data},
+   :selected-mode {:new-clojure-2 :text},
    :selected-view :new-clojure-2,
    :root [5 6],
    :h 7,
+   :display {:new-clojure-2 :value},
    :queries {},
    :tab "azure oyster",
    :clojure-intro {},
@@ -1900,6 +1890,18 @@
      :child
      [:speak-click
       "It's a perfect day for planting seeds and planning adventures!"]]}},
+  :block-9645
+  {:clojure
+   {:my-atom43
+    "(do  (let [last-run :repl-ns/repl-yummy-wide-buffalo-17-clojure>introspected] (println last-run) (deref my-atom)))"},
+   :name "introspected my-atom",
+   :w 7,
+   :selected-mode {:my-atom43 :edn},
+   :selected-view :my-atom43,
+   :root [29 4],
+   :h 4,
+   :connection-id :yummy-wide-buffalo-17,
+   :tab "azure oyster"},
   :block-9369
   {:h 3,
    :w 16,
@@ -2324,7 +2326,7 @@
      :from
      [{:data
        (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
-             rel-dir " ./images/large/"
+             rel-dir "./images/large/"
              files (->>
                      (file-seq (clojure.java.io/file dir))
                      (filter (fn [x] (.isFile x)))
@@ -2334,8 +2336,8 @@
                      (map (fn [x] (.getName x))))]
          (println (count files))
          (vec (for [f files] {:ffilename (str f)})))}],
-     :page 3,
-     :_last-run "13:48:32"}},
+     :page 2,
+     :_last-run "14:04:15"}},
    :tab "azure oyster",
    :views {}},
   :block-1449
@@ -2494,7 +2496,7 @@
      :from [[:offenses :dd484]]}},
    :root [25 20],
    :tab "globular koala"}},
- :selected-block :block-2361,
+ :selected-block :block-2769,
  :theme-colors-hashmap
  {"float" "#bdbae5",
   "boolean" "#c8a4a4",
@@ -2543,7 +2545,7 @@
    :queries 11,
    :ts "2024-07-03 09:31:06"},
   :time
-  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 51, :hour 13},
+  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 8, :hour 14},
   :user-dropdown-sys {:req-field nil, :shape nil},
   :searches-types-sys {:item_type "saved-views"},
   :large-bgss {:ffilename "b64-image-51574-82843-4k.webp"},
@@ -2563,30 +2565,38 @@
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   {:select [:*],
-    :connection-id :*client-name*,
-    :where [:like :ffilename "%50841%"],
-    :from
-    [{:data
-      (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
-            rel-dir " ./images/large/"
-            files (->>
-                    (file-seq (clojure.java.io/file dir))
-                    (filter (fn [x] (.isFile x)))
-                    (filter
-                      (fn [x]
-                        (not (clojure.string/includes? (str (.getName x)) "8k"))))
-                    (map (fn [x] (.getName x))))]
-        (println (count files))
-        (vec (for [f files] {:ffilename (str f)})))}],
-    :page 3,
-    :_last-run "13:48:32"},
-   :selected-view [:queries :large-bgss],
+   (do
+     (let [clojure-version (clojure-version)
+           jvm-version (System/getProperty "java.version")]
+       :introspect!
+       (println "HUUGE33?! Yes. Giant.")
+       (println "the hour is " :time/hour)
+       (def message2 "far side")
+       (defn teste [] 123333)
+       (defonce my-atom (atom {:test 123}))
+       (doseq [e (range :time/minute)] (println (str "minute " (inc e) "!")))
+       {:howdy-str
+        (str
+          "🐇🥕 Sup!"
+          :time/hour
+          ":"
+          :time/minute
+          " Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇"),
+        :min :time/minute,
+        :jvm-version jvm-version,
+        :clojure-version clojure-version})
+     (swap! my-atom merge {:new-key "hey"})),
+   :selected-view [:clojure :new-clojure-2],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :rel-image-path [:string3 "images/large/" :large-bgss/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-2361,
+   :selected-block :block-2769,
    :glass-fish-style
    {:background-color [:string3 :param/generated-colors>darkest 73],
     :border-radius "16px",
@@ -2639,7 +2649,7 @@
    :vega-default-color-scheme {:scheme "pastel2"},
    :data-colors :param/generated-colors>data-colors,
    :editor-grid-selected-font-color "#000000",
-   :monospaced-font "Fira Code",
+   :monospaced-font "JetBrains Mono",
    :editor-grid-selected-background-color "#dc9cb0",
    :nivo-defaults
    {:font-family "Instagram Sans",
@@ -2676,12 +2686,13 @@
    :grid-selected-background-color "#a3d3ff",
    :grid-font-color "#ffffff",
    :canvas-background-css
-   {:background-image [:string3 "url(" :param/rel-image-path ")"],
+   {:background-image [:string3 "url(images/large/b64-image3-42412-78214-4k.webp)"],
     :transition "all 1.8s ease-in-out",
+    :background-blend-mode "multiply",
     :background-size "cover",
-    :background-color :param/generated-colors>dominant},
+    :background-color "#00000088"},
    :editor-font-color "#ffffff",
-   :base-font "Odor Mean Chey",
+   :base-font "Poppins",
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
@@ -2694,7 +2705,7 @@
    :tour_name "World Magnetic",
    :ts "2023-09-24 19:19:11"},
   :connections-sys {:database_name "SQLite", :connection_id "met-on-tour"},
-  :sys {:selected-tab "azure oyster", :selected-tab-idx 5},
+  :sys {:selected-tab "thin crane", :selected-tab-idx 7},
   :searches-sub-types-sys
   {:item_key "aaaah-wednesday-the-day",
    :is_live nil,

@@ -120,6 +120,12 @@
                               [panel-key :name]
                               block-name)
         runners       (into {} (for [[k v] (get (cfg/settings) :runners {})] {k (get v :ext ".edn")}))
+        extensions    (set (map :ext (vals runners)))
+        remove-extension (fn [filename]
+                           (let [ext (first (filter #(cstr/ends-with? filename %) extensions))]
+                             (if ext
+                               (subs filename 0 (- (count filename) (count ext)))
+                               filename)))
         special-keys  (atom {})
         repack        (into {}
                             (for [file  files
@@ -132,6 +138,8 @@
                                                             (cstr/replace  ".txt" ""))
                                                         ;;(first (cstr/split (str (last (cstr/split relative-path #"/"))) #"."))
                                                         )
+                                         ;filename      (last (cstr/split relative-path #"/"))
+                                         ;keyname       (keyword (remove-extension filename))
                                          special-key   (first (keep (fn [[k v]]
                                                                       (when (cstr/includes? relative-path (str "/" (name k) "/"))
                                                                         k))
@@ -145,7 +153,7 @@
                                   {})
                                 {keyname file-data})))
         repack        (merge repack @special-keys)
-        _ (ut/pp [:repack3 repack])
+       ;; _ (ut/pp [:repack3 repack])
         base-map      (get repack panel-key)]
     (-> (merge base-map (dissoc repack panel-key))
         (assoc :tab tab)
@@ -164,17 +172,17 @@
                                                    (catch Exception e (do (ut/pp [:cannot-read-existing view-file-base e]) {})))
                            base-exists?       (and (.exists (io/file view-file-base)) (= vv existing-file-data))]]
             (swap! path-history conj view-file-base)
-            (if (not base-exists?)
-              (do ;(ut/pp [:file-unpacker! k kk :views client-name
+            (when (not base-exists?)
+              ;(do ;(ut/pp [:file-unpacker! k kk :views client-name
                 (create-dirs view-base)
-                (pretty-spit view-file-base vv))))))
+                (pretty-spit view-file-base vv)))));)
 
 (defn write-panels
   [client-name panels]
   (pretty-spit (str "./live/" (fixstr client-name) ".edn") panels) ;; overwrite existing
   (let [name-mapping-raw (into {} (for [[k v] panels] {k (get v :name)}))
         name-mapping     (ut/generate-unique-names name-mapping-raw)
-        rev-name-mapping (ut/reverse-map name-mapping)
+        ;rev-name-mapping (ut/reverse-map name-mapping)
         client-name      (fixstr client-name)
         panel-cnt        (count (keys panels))
         path-history     (atom [])

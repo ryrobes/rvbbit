@@ -43,7 +43,7 @@
            ;; ^ these 2 are built in a required and mostly not configurable for now
            :clojure-intro {:type :nrepl ;; this is the built-in REPL that starts by default
                            :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
-                           :modes [:clover :text :data :rowset :terminal]
+                           :modes [:clover :text :data  :terminal]
                            :hop-function? true
                            :ext ".clj"
                            :default (do
@@ -96,7 +96,7 @@
 
            :clojure {:type :nrepl ;; this is the built-in REPL that starts by default
                      :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
-                     :modes [:text :edn :clover :data :rowset :terminal]
+                     :modes [:text :edn :clover :data  :terminal]
                      :ext ".clj"
                      :default (let [clojure-version (clojure-version)
                                     jvm-version (System/getProperty
@@ -165,7 +165,7 @@
                    :icon "images/snail-shell.svg"}
            :clojure2 {:type :nrepl ;; this is an example of some external remote nrepl that you control
                       :runner {:port 37851 :host "127.0.0.1"}
-                      :modes [:text :edn :clover :data :rowset :terminal]
+                      :modes [:text :edn :clover :data   :terminal]
                       :ext ".clj"
                       :default (let [clojure-version (clojure-version)
                                      jvm-version (System/getProperty
@@ -205,7 +205,7 @@
                           :default "A beautiful viking forest landscape with a waterfall, wildlife, fantasy lit with cyberpunk and vaporwave colors. A retro future. Many rabbits eye the scene. There is a beautiful full-figured woman standing in the field, she looks upon you with kind eyes and beckons you closer."
                           :icon ["images/openai.png" "images/dalle3.png"]}
            :python3 {:runner {}
-                     :modes [:text :data :rowset :clover :terminal]
+                     :modes [:text :data  :clover :terminal]
                      :type :flow
                      :syntax "python"
                      :ext ".py"

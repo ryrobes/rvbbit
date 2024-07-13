@@ -134,6 +134,24 @@
           :nth             nth})
        (catch Throwable e {:time-atom-error (str "Error! " e)})))
 
+(defn limit-coll [coll limit]
+  (if (seq? coll)
+    (take limit coll)
+    (into (empty coll) (take limit coll))))
+
+(defn limit-map [m limit]
+  (into {} (take limit m)))
+
+(defn limit-sample [data] data) ;; disabled for now 
+
+;; (defn limit-sample
+;;   ([data] (limit-sample data 10))
+;;   ([data limit]
+;;    (cond
+;;      (map? data) (limit-map (update-vals data #(limit-sample % limit)) limit)
+;;      (coll? data) (limit-coll (map #(limit-sample % limit) data) limit)
+;;      :else data)))
+
 (defn break-out-parts
   [clause]
   (cond (not (vector? clause))             []

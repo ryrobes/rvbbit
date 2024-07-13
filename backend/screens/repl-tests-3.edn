@@ -39,6 +39,7 @@
   :large-bgss
   {:select [:*],
    :connection-id :*client-name*,
+   :where [:like :ffilename "50841"],
    :from
    [{:data
      (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
@@ -184,18 +185,7 @@
      :commons {35717 1, 1765 1, 23460 1},
      :cardinality 100}},
    :rowcount 13},
-  :large-bgss
-  {:fields
-   {:ffilename
-    {:data-type "string",
-     :distinct 500,
-     :group-by? true,
-     :commons
-     {"b64-image5-57853-95564-4k.webp" 1,
-      "b64-image4-20194-34527-4k.webp" 1,
-      "b64-image-34647-16558-4k.webp" 1},
-     :cardinality 100}},
-   :rowcount 500},
+  :large-bgss {:fields {}, :rowcount 0},
   :shows
   {:fields
    {:query_error
@@ -731,7 +721,7 @@
  {:block-198 {:setlists-drag-2 102},
   :block-8963 {:shows-drag-22 108},
   :block-6308 {:tour-name-drag-11 180},
-  :block-2361 {:large-bgss 311},
+  :block-2361 {:large-bgss ##Inf},
   :system-connections-list* {:connections-sys 126},
   :system-tables-list* {:tables-sys 133},
   :system-fields-list* {:fields-sys 170}},
@@ -743,7 +733,8 @@
   "star-shaped wallaby"
   "globular koala"
   "azure oyster"
-  "fat hawk"],
+  "fat hawk"
+  "rhomboidal platypus"],
  :selected-cols nil,
  :server
  {:settings
@@ -979,24 +970,27 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [351162978 333169806 4294705152],
+ :memory [394117696 266970700 4294705152],
  :client-name :soulful-gray-rat-18,
  :flow-editor? true,
  :openai-api-key "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",
  :window {:w 2627, :h 1241},
  :post-meta
  {:shows-drag-22 {:* {:rowcount 2214}},
-  :large-bgss {:* {:rowcount 1041}},
+  :large-bgss {:* {:rowcount 0}},
   :tables-sys {:* {:rowcount 7}}},
  :status
  {:alert1 {:alerts :alert2},
   :heartbeat
   {:kick
-   [:solver-meta/raw-custom-override-1610584445>extra
+   [:solver-status/*client-name*>raw-custom-override-1164360893
+    :solver-meta/raw-custom-override-1610584445>extra
     :solver/get-my-colors1570390773
+    :solver-meta/raw-custom-override-1164360893
     :solver/raw-custom-override-1859350263
+    :solver-status/soulful-gray-rat-18>raw-custom-override-1164360893>running?
     :solver/raw-custom-override136934373>10>0>2
     :solver-status/soulful-gray-rat-18>raw-custom-override1115028399>running?
     :solver/raw-custom-override-1610584445>howdy-str
@@ -1005,44 +999,36 @@
     :solver-status/soulful-gray-rat-18>get-my-colors-809088472>running?
     :solver-status/soulful-gray-rat-18>raw-custom-override-1859350263>running?
     :flow-status/live-scratch-flow>*running?
+    :solver-meta/raw-custom-override-1164360893>output>evald-result>out
     :solver/get-my-colors-809088472
     :solver/raw-custom-override1115028399
+    :solver/raw-custom-override-1164360893
     :solver-meta/raw-custom-override-1610584445>output>evald-result>out
     :solver-status/soulful-gray-rat-18>get-my-colors1570390773>running?]},
   :file-change {:file-changed :done}},
- :screen-name "duality-of-lepus",
+ :screen-name "repl-tests-3",
  :recos-page2 0,
- :selected-tab "azure oyster",
+ :selected-tab "rhomboidal platypus",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
- [[[:v-box
-    :children
-    [[:box :child "solver running (via canvas)"]
-     [:box :child "[:panels :block-2769 :new-clojure-2]" :style {:font-size "12px"}]
-     [:box :child "[:time/minute :time/hour]" :style {:font-size "9px"}]
-     [:box :child "7/13/2024, 1:51:01 PM" :style {:font-size "8px", :opacity 0.6}]]]
-   8
-   1.7
-   322
-   -1889304821]
-  [[:box
+ [[[:box
     :child
     "sent screen save request to server... Please wait."
     :style
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   327
+   831
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {},
  :base-sniff-queries {:setlists 1669794951, :shows 89957543},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1263040215,
+ :user-params-hash 349591134,
  :grid-recos? true,
- :session-hash 358121512,
+ :session-hash 1045120270,
  :resolved-queries
  {:setlists-drag-2
   {:select [:show_id :song_name :song_order :ts],
@@ -1113,6 +1099,7 @@
   :large-bgss
   {:select [:*],
    :connection-id :*client-name*,
+   :where [:like :ffilename "50841"],
    :from
    [{:data
      (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
@@ -1900,6 +1887,44 @@
      :child
      [:speak-click
       "It's a perfect day for planting seeds and planning adventures!"]]}},
+  :block-7932
+  {:clojure
+   {:new-clojure-9
+    (let [clojure-version (clojure-version)
+          jvm-version (System/getProperty "java.version")]
+      (str
+        "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+        clojure-version
+        " on "
+        jvm-version
+        " JVM tech"
+        " 🥕🐇"))},
+   :name "block-7932",
+   :w 13,
+   :selected-view :hare-vw,
+   :root [2 3],
+   :h 11,
+   :queries {},
+   :tab "rhomboidal platypus",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-7932.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's a perfect day for planting seeds and planning adventures!"]}},
   :block-9369
   {:h 3,
    :w 16,
@@ -2321,6 +2346,7 @@
    {:large-bgss
     {:select [:*],
      :connection-id :*client-name*,
+     :where [:like :ffilename "50841"],
      :from
      [{:data
        (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
@@ -2494,21 +2520,23 @@
      :from [[:offenses :dd484]]}},
    :root [25 20],
    :tab "globular koala"}},
- :selected-block :block-2361,
+ :selected-block :block-7932,
  :theme-colors-hashmap
- {"float" "#bdbae5",
-  "boolean" "#c8a4a4",
-  "map" "#9ecc96",
-  "list" "#6b5d9c",
-  "string" "#f8f5f3",
-  "any" "#b56365",
-  "vector" "#9193c6",
-  "keyword" "#f2e7ec",
-  "rabbit-code" "#60b7bd",
-  "datetime" "#3e30a5",
-  "integer" "#ccaeae",
-  "unknown" "#752c64",
-  "date" "#10290a"},
+ {"float" "#2c728e",
+  "boolean" "#f386bf",
+  "map" "#00FFFF",
+  "list" "#c32148",
+  "string" "#5dc963",
+  "any" "#ffffff",
+  "vector" "#008080",
+  "keyword" "#add8e6",
+  "rabbit-code" "#FC0FC0",
+  "datetime" "#472d7b",
+  "integer" "#d6e367",
+  "unknown" "#c7005d",
+  "date" "#3b528b",
+  "rabbitsql" "#FC0FC0",
+  "nil" "#ff2147"},
  :click-param
  {:recos-sys
   {:query_map
@@ -2543,7 +2571,7 @@
    :queries 11,
    :ts "2024-07-03 09:31:06"},
   :time
-  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 51, :hour 13},
+  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 59, :hour 13},
   :user-dropdown-sys {:req-field nil, :shape nil},
   :searches-types-sys {:item_type "saved-views"},
   :large-bgss {:ffilename "b64-image-51574-82843-4k.webp"},
@@ -2563,36 +2591,35 @@
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   {:select [:*],
-    :connection-id :*client-name*,
-    :where [:like :ffilename "%50841%"],
-    :from
-    [{:data
-      (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
-            rel-dir " ./images/large/"
-            files (->>
-                    (file-seq (clojure.java.io/file dir))
-                    (filter (fn [x] (.isFile x)))
-                    (filter
-                      (fn [x]
-                        (not (clojure.string/includes? (str (.getName x)) "8k"))))
-                    (map (fn [x] (.getName x))))]
-        (println (count files))
-        (vec (for [f files] {:ffilename (str f)})))}],
-    :page 3,
-    :_last-run "13:48:32"},
-   :selected-view [:queries :large-bgss],
+   [:box
+    :align
+    :center
+    :justify
+    :center
+    :attr
+    {:id ":block-7932.:hi"}
+    :style
+    {:font-size "21px",
+     :font-weight 700,
+     :padding-top "6px",
+     :padding-left "14px",
+     :margin-top "-8px",
+     :color :theme/editor-outer-rim-color,
+     :font-family :theme/base-font}
+    :child
+    "It's a perfect day for planting seeds and planning adventures!"],
+   :selected-view [:views :hare-vw],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
-   :rel-image-path [:string3 "images/large/" :large-bgss/ffilename],
+   :rel-image-path [:string3 "images/large/" "b64-image3-42412-78214-4k.webp"],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-2361,
+   :selected-block :block-7932,
    :glass-fish-style
    {:background-color [:string3 :param/generated-colors>darkest 73],
+    :backdrop-filter "blur(4px) brightness(40%)",
     :border-radius "16px",
     :border [:string3 "3px solid " :param/generated-colors>darkest 99],
     :box-shadow "10px 5px 5px #00000034",
-    :backdrop-filter "blur(4px) brightness(60%)",
     :filter nil}},
   :theme
   {:codemirror-theme "rvbbit-dynamic",
@@ -2639,7 +2666,7 @@
    :vega-default-color-scheme {:scheme "pastel2"},
    :data-colors :param/generated-colors>data-colors,
    :editor-grid-selected-font-color "#000000",
-   :monospaced-font "Fira Code",
+   :monospaced-font "IBM Plex Mono",
    :editor-grid-selected-background-color "#dc9cb0",
    :nivo-defaults
    {:font-family "Instagram Sans",
@@ -2678,10 +2705,11 @@
    :canvas-background-css
    {:background-image [:string3 "url(" :param/rel-image-path ")"],
     :transition "all 1.8s ease-in-out",
+    :background-blend-mode "darken",
     :background-size "cover",
-    :background-color :param/generated-colors>dominant},
+    :background-color "#00000089"},
    :editor-font-color "#ffffff",
-   :base-font "Odor Mean Chey",
+   :base-font "Poppins",
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
@@ -2694,7 +2722,7 @@
    :tour_name "World Magnetic",
    :ts "2023-09-24 19:19:11"},
   :connections-sys {:database_name "SQLite", :connection_id "met-on-tour"},
-  :sys {:selected-tab "azure oyster", :selected-tab-idx 5},
+  :sys {:selected-tab "rhomboidal platypus", :selected-tab-idx 7},
   :searches-sub-types-sys
   {:item_key "aaaah-wednesday-the-day",
    :is_live nil,

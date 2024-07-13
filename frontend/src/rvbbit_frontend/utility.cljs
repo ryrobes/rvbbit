@@ -302,7 +302,7 @@
 
 (defn extract-patterns
   [data kw num] ;; param based
-  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
+  (if true ;cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
     (extract-patterns* data kw num)
     (extract-patterns-real data kw num)))
 
@@ -1348,10 +1348,10 @@
 (defn format-map
   [w s]
   (let [cache (get @format-map-atom [w s])]
-    (if (not (nil? cache))
+    (if false ;(not (nil? cache))
       cache
       (let [;s (replacer s #"1.0" "\"ONE-POINT-ZERO\"")
-            type (cond (cstr/includes? s "(")                         :community
+            type (cond (cstr/includes? s "(")                         [ :respect-nl   :justified-original]
                        (cstr/starts-with? (cstr/trim-newline s) "[:") [:justified-original :hiccup] ;:community ;[:hiccup :justified-original]
                        :else                                          :justified)
             o    (zp/zprint-str s
@@ -1367,7 +1367,8 @@
                                  :binding       {:force-nl? true}
                                  :vector        {:respect-nl? true}
                                  ;:map           {:comma? false :sort? false}
-                                 :parse         {:interpose "\n\n"}})]
+                                 :parse         {:interpose "\n\n"}
+                                 })]
         (swap! format-map-atom assoc [w s] o)
         o))))
 

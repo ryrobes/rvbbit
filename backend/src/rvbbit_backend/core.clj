@@ -1013,9 +1013,9 @@
                           cruiser/default-viz-shapes))))
                    "(Re)Sniff Client SQL DBs" 30)
 
-  (start-scheduler 120
-                   wss/clean-up-reactor
-                   "Remove unneeded watchers from Reactor" 120)
+  ;; (start-scheduler 120
+  ;;                  wss/clean-up-reactor
+  ;;                  "Remove unneeded watchers from Reactor" 120)
 
   (start-scheduler 300 ;; was 5
                    #(ppy/execute-in-thread-pools
@@ -1027,9 +1027,9 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  (start-scheduler (* 3600 1) ;; 1 hours
+  (start-scheduler (* 3600 3) ;; 3 hours
                    reboot-reactor-and-resub
-                   "Reboot Atom Reactor" 3600)
+                   "Reboot Atom Reactor" (* 3600 3))
 
   ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical, we barely use the queues except for sqlite writes
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES

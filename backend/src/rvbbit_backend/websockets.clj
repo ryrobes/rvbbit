@@ -4127,7 +4127,7 @@
                      (swap! last-solvers-atom assoc solver-name output)
                      (swap! last-solvers-atom-meta assoc
                             solver-name
-                            (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
+                            (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
                      (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
                      (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
                     ;;  (ut/pp [:*cacheddd!!! client-name :for temp-solver-name vdata-ref])
@@ -4177,7 +4177,7 @@
             ;(swap! last-solvers-data-atom assoc solver-name output) ;; full data can be clover
             (swap! last-solvers-atom-meta assoc
                    solver-name
-                   (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
+                   (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
             (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
             (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
             (when (and use-cache? (not error?))
@@ -4238,7 +4238,7 @@
                (swap! last-solvers-atom assoc solver-name output)
                (swap! last-solvers-atom-meta assoc
                       solver-name
-                      (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
+                      (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
                (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
                (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
                ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
@@ -4305,7 +4305,7 @@
               (swap! last-solvers-atom assoc solver-name output-val)
               (swap! last-solvers-atom-meta assoc
                      solver-name
-                     (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
+                     (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
               (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
               (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
 
@@ -4351,7 +4351,7 @@
           (swap! last-solvers-atom assoc solver-name vdata)
           (swap! last-solvers-atom-meta assoc
                  solver-name
-                 (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output output-full}))
+                 (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
           (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
           (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
           ;(swap! solvers-running assoc-in [client-name solver-name] false)
@@ -4656,7 +4656,7 @@
 
 (defn client-kp
   [flow-key keypath base-type sub-path client-param-path]
-  (cond ;(cstr/includes? (str flow-key) "*running?") false
+  (cond (cstr/includes? (str flow-key) "running?")  false
         (= base-type :time)                         client-param-path
         (= base-type :signal)                       client-param-path
         (= base-type :solver)                       (vec (into [(keyword (second sub-path))] (vec (rest (rest sub-path)))))
@@ -4716,7 +4716,8 @@
     (when (not signal?)
       (kick client-name
             [base-type client-param-path]
-            (cond ;(cstr/includes? (str flow-key) "running?")  false
+            (cond 
+              (cstr/includes? (str flow-key) "running?")  false
               (= base-type :time)                         (get @father-time client-param-path)
                   ;;(= base-type :time)                       (get @(get-atom-splitter (ut/hash-group (keyword (second sub-path)) num-groups) :time time-child-atoms father-time) client-param-path)
               (= base-type :signal)                       (get @last-signals-atom client-param-path)
@@ -7299,12 +7300,12 @@
   {:port                 websocket-port
    :join?                false
    :async?               true
-   ;:input-buffer-size    32768
-   ;:output-buffer-size   131072
+   :input-buffer-size    32768
+   :output-buffer-size   131072
    ;:idle-timeout         500000  ;; Reduced idle timeout
    ;:max-idle-time        3000000 ;; Reduced max idle time
    ;;:max-idle-time        15000
-   ;:max-message-size     6291456 ;; 6MB
+   :max-message-size     6291456 ;; 6MB
    :websockets           (into {} (for [[k v] ws-endpoints] [k (wrap-websocket-handler v)]))
    :allow-null-path-info true})
 

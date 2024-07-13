@@ -6,7 +6,12 @@
    [nrepl.core            :as nrepl]
    [nrepl.server          :as nrepl-server]
    [rvbbit-backend.config :as config]
+   [rvbbit-backend.sql        :as    sql
+    :refer [sql-exec sql-query sql-query-one system-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
+            pool-create]]
+   [rvbbit-backend.ddl        :as sqlite-ddl]
    [rvbbit-backend.external :as ext]
+   [rvbbit-backend.queue-party :as qp]
    [rvbbit-backend.util   :as ut]))
 
 (defn run [code] (eval code))
@@ -29,6 +34,38 @@
 (defonce repl-introspection-child-atoms (atom {}))
 ;(def repl-client-namespaces-map (atom {}))
 
+
+(defn insert-rowset
+  [rowset table-name keypath client-name & [columns-vec db-conn queue-name]]
+  ;; (ut/pp [:insert-into-cache-db!! (first rowset) (count rowset) table-name columns-vec])
+  (if (ut/ne? rowset)
+    (try (let [rowset-type     (cond (and (map? (first rowset)) (vector? rowset))       :rowset
+                                     (and (not (map? (first rowset))) (vector? rowset)) :vectors)
+               columns-vec-arg columns-vec
+               ;db-conn         (or db-conn cache-db)
+               rowset-fixed    (if (= rowset-type :vectors)
+                                 (for [r rowset] (zipmap columns-vec-arg r))
+                                 rowset)
+               columns         (keys (first rowset-fixed))
+               table-name-str  (ut/unkeyword table-name)
+               ddl-str         (sqlite-ddl/create-attribute-sample table-name-str rowset-fixed)
+               extra           {:queue queue-name
+                                :extras [ddl-str columns-vec-arg table-name table-name-str]}]
+           ;;(enqueue-task5d (fn [] (write-transit-data rowset-fixed keypath client-name table-name-str)))
+           ;(swap! last-solvers-data-atom assoc keypath rowset-fixed) ;; full data can be clover
+           ;(write-transit-data rowset-fixed keypath client-name table-name-str)
+           (sql-exec db-conn (str "drop table if exists " table-name-str " ; ") extra)
+           (sql-exec db-conn ddl-str extra)
+           (doseq [batch (partition-all 10 rowset-fixed)
+                   :let  [values     (vec (for [r batch] (vals r)))
+                          insert-sql (to-sql {:insert-into [table-name] :columns columns :values values})]]
+             (sql-exec db-conn insert-sql extra))
+           (ut/pp [:INSERTED-SUCCESS! :introspected-rowset (count rowset) :into table-name-str  client-name])
+           {:sql-cache-table table-name :rows (count rowset)})
+         (catch Exception e (ut/pp [:INSERT-ERROR! (str e) table-name])))
+    (ut/pp [:cowardly-wont-insert-empty-rowset table-name :puttem-up-puttem-up!])))
+
+
 (defn logger [name edn]
   (let [dir         (str "./logs/" (str (java.time.LocalDate/now)) "/")
         _           (ext/create-dirs dir)
@@ -38,7 +75,7 @@
         pretty-data (with-out-str (ppt/pprint data))]
     (spit fp (str pretty-data "\n") :append false)))
 
-(defn introspect-namespace [conn namespace-name]
+(defn introspect-namespace [conn namespace-name client-name]
   (try
     (let [_ (swap! nrepls-intros-run inc)
           introspection-code (str "
@@ -93,7 +130,7 @@
                                (println \"Debug: Introspection complete. Result count:\" (count result))
                                result))
                            ")
-          skt (nrepl/client conn 60000)
+          skt (nrepl/client conn 60000000)
           msg (nrepl/message skt {:op "eval" :code introspection-code})
           rsp-read      (vec ;(remove #(or (nil? %) (cstr/starts-with? (str %) "(var")) ;; no
                          (nrepl/response-values msg));)
@@ -105,12 +142,52 @@
                     ;(assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join msg-out)) #"\n")))
                     ;(dissoc :id :out :status :session)
                       (assoc :ns namespace-name))
+          sampler  (fn [x] (cond
+                               ;; Handle strings
+                             (string? x) (if (> (count x) 30)
+                                           (subs x 0 30)
+                                           x)
+                               ;; Handle vectors
+                             (vector? x) (subvec x 0 (min (count x) 5))
+                               ;; Handle lists
+                             (list? x) (let [limited (take 5 x)]
+                                         (apply list limited))
+                               ;; Handle maps
+                             (map? x) (into (empty x) (take 5 x))
+                               ;; Handle sets
+                             (set? x) (into (empty x) (take 5 x))
+                               ;; Default case for other types
+                             :else x))
           results0 (group-by :type (for [[_ v] (get results :values)] v))
+          sqlized  (atom {})
           results0 (into {} (for [[k v] results0]
-                              {k (into {} (for [vv v]
+                              {k (into {} (for [vv v
+                                                :let [value-data (try (edn/read-string (get vv :value)) (catch Exception _ (get vv :value)))
+                                                      table-name (str
+                                                                  (-> (str namespace-name) (cstr/replace  "." "_") (cstr/replace  "-" "_")) "_"
+                                                                  (-> (str (get vv :name)) (cstr/replace  "." "_") (cstr/replace  "-" "_")) "_tbl"
+                                                                  ;;(cstr/replace (str (get vv :name)) ":" "")
+                                                                  )
+                                                      _ (when (try
+                                                                (and (vector? value-data) (map? (first value-data)))
+                                                                (catch Exception _ false))
+                                                          (swap! sqlized assoc table-name {:select [:*]
+                                                                                           :connection-id client-name
+                                                                                           :from [(keyword table-name)]})
+                                                          (qp/serial-slot-queue :serial-data-literal-code-intro client-name
+                                                                                (fn []
+                                                                                  (insert-rowset value-data
+                                                                                                 table-name
+                                                                                                 nil
+                                                                                                 nil
+                                                                                                 (keys (first value-data))
+                                                                                                 (sql/create-or-get-client-db-pool client-name)
+                                                                                                 client-name))))]]
                                             {(get vv :name)
-                                             (try (edn/read-string (get vv :value)) (catch Exception _ (get vv :value)))}))}))
-          results0 (assoc results0 :introspected (ut/millis-to-date-string (System/currentTimeMillis)))]
+                                             (sampler value-data)
+                                             }))}))
+          results0 (assoc results0 :introspected (ut/millis-to-date-string (System/currentTimeMillis)))
+          results0 (assoc results0 ":sqlized" @sqlized)]
       results0)
     (catch Throwable e {:introspection-error (str e)
                         :introspected (ut/millis-to-date-string (System/currentTimeMillis))})))
@@ -119,12 +196,14 @@
   ;(future
     (try
       (with-open [conn (nrepl/connect :host host :port port)]
-        (let [introspection (introspect-namespace conn ns-str)
+        (let [_ (ut/pp [:running-namespace-introspection ns-str host port client-name id ])
+              introspection (introspect-namespace conn ns-str client-name)
               ;split-ns (vec (map keyword (cstr/split ns-str #".")))
-              split-ns (vec (map keyword (cstr/split ns-str #"\.")))
+              ;split-ns (vec (map keyword (cstr/split ns-str #"\.")))
               ]
-          ;(ut/pp [:repl {:introspected-repl-session introspection}])
-          (swap! repl-introspection-atom assoc-in split-ns introspection) ;; host and port for later?
+          (ut/pp [:repl {:introspected-repl-session introspection}])
+          ;;(swap! repl-introspection-atom assoc-in split-ns introspection) ;; host and port for later?
+          (swap! repl-introspection-atom assoc-in [client-name ns-str] introspection) ;; host and port for later?
           ;; (logger (str (ut/keypath-munger [ns-str host port client-name id]) "-intro")
           ;;         {:orig-code code
           ;;          :introspection introspection})
@@ -201,7 +280,7 @@
                         user-fn-str   (if (not (cstr/includes? (str s) "(ns "))
                                       (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
                         s             (str user-fn-str "\n" s)
-                        skt           (nrepl/client conn 60000)
+                        skt           (nrepl/client conn 60000000)
                         msg           (nrepl/message skt {:op "eval" :code s})
                         rsp-read      (vec (remove #(or (nil? %) (cstr/starts-with? (str %) "(var"))
                                                    (nrepl/response-values msg)))
@@ -226,8 +305,12 @@
                     ;;(swap! repl-client-namespaces-map update-in [client-name] (fnil conj #{}) gen-ns)
 
                     ;; when only?
-                    (when false ;;(and (not= client-name :rvbbit) (not (nil? client-name)))
-                      (update-namespace-state-async nrepl-host nrepl-port client-name id code ns-str))
+                    (when (and (cstr/includes? (str code) ":introspect!")
+                               (not= client-name :rvbbit)
+                               (not (nil? client-name))
+                               (not (cstr/includes? (str ns-str) "rvbbit-backend.")))
+                      (qp/serial-slot-queue :nrepl-introspection client-name
+                                            (fn [] (update-namespace-state-async nrepl-host nrepl-port client-name id code ns-str))))
 
 
 
@@ -258,3 +341,5 @@
               ;;(ut/pp [:repl (str code) client-name id :result e])
               e) ;; nrepl://127.0.0.1:44865
             ))))))
+
+
