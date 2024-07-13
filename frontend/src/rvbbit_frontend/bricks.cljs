@@ -8786,12 +8786,7 @@
 
 (def ansi-converter
   (AnsiToHtml. #js {:newline true
-                    :stream true
-                    ;:colors {:0 "#eeeeee" :1 "#FF0000" :2 "#00FF00" :3 "#FFFF00"
-                    ;         :4 "#0000FF" :5 "#FF00FF" :6 "#00FFFF" :7 "#FFFFFF"}
-                    ;:fg "#FFF"
-                    ;:bg "#000"
-                    }))
+                    :stream true}))
 
 (defn console-viewer [{:keys [text style width height]}]
   (let [is-vec?      (vector? text)
@@ -8814,6 +8809,150 @@
      :child [:div {:style {:font-family "inherit"}
                    :dangerouslySetInnerHTML
                    {:__html html-content}}]]))
+
+
+
+
+
+;; (defn safe-subvec [v start end]
+;;   (let [start (max 0 start)
+;;         end (min (count v) end)]
+;;     (if (< start end)
+;;       (subvec v start end)
+;;       [])))
+
+;; (defn virtualized-console-viewer [{:keys [text style width height]}]
+;;   (let [line-height 19 ;; Assuming each line is 17px high
+        
+;;         ;; Ensure text is always a vector
+;;         text-lines (if (vector? text)
+;;                      text
+;;                      (vec (cstr/split text "\n")))
+;;         num-visible-lines (int (+ (/ height line-height) 3))
+;;         total-lines       (+ (count text-lines) num-visible-lines 3)
+;;         state (reagent/atom {:start 0 :end num-visible-lines})
+;;         handle-scroll (fn [e]
+;;                         (let [scroll-top (.. e -target -scrollTop)
+;;                               start (int (/ scroll-top line-height))
+;;                               end (min total-lines (+ start num-visible-lines))]
+;;                           (swap! state assoc :start start :end end)))]
+;;     (fn []
+;;       (let [{:keys [start end]} @state
+;;             ;; Safeguard subvec to handle edge cases
+;;             visible-lines (if (and (<= start end) (<= end total-lines))
+;;                             (safe-subvec text-lines start end)
+;;                             [])
+;;             html-content (cstr/join "\n" (map #(.toHtml ansi-converter %) visible-lines))
+;;             padding-top (* start line-height)
+;;             padding-bottom (* (- total-lines end) line-height)
+;;             console-style {:font-family "monospace"
+;;                            :font-size "15px"
+;;                            :line-height (str line-height "px")
+;;                            :padding "15px"
+;;                            :white-space "pre"
+;;                            :text-shadow "#00000088 1px 0 10px"
+;;                            :overflow "auto"}]
+;;         [re-com/box
+;;          :size "none" :width (str width "px") :height (str height "px")
+;;          :style (merge console-style style)
+;;          :attr {:on-scroll handle-scroll}
+;;          :child [:div {:style {:font-family "inherit"
+;;                                :padding-top (str padding-top "px")
+;;                                :padding-bottom (str padding-bottom "px")}
+;;                        :dangerouslySetInnerHTML
+;;                        {:__html html-content}}]]))))
+
+
+
+
+(def scrollbar-style
+  {:scrollbar-width "thin"
+   ;:scrollbar-color "#4a4a4a #2a2a2a66"
+   :scrollbar-color (str (str (theme-pull :theme/universal-pop-color nil) 33) "#00000033")
+   :&::-webkit-scrollbar {:width "10px"}
+   :&::-webkit-scrollbar-track {:background "#2a2a2a"
+                                :border-radius "5px"}
+   :&::-webkit-scrollbar-thumb {:background "#4a4a4a"
+                                :border-radius "15px"}
+   :&::-webkit-scrollbar-thumb:hover {:background "#6a6a6a"}})
+
+(defn virtualized-console-viewer [{:keys [text style width height]}]
+  (let [line-height 19 ;; Assuming each line is 17px high
+        ;; Ensure text is always a vector
+        text-lines (if (vector? text)
+                     text
+                     (vec (cstr/split text "\n")))
+        num-visible-lines (int (- (/ height line-height) 1))
+        total-lines       (+ (count text-lines) num-visible-lines 3)
+        state (reagent/atom {:start 0 :end num-visible-lines})
+        handle-scroll (fn [e]
+                        (let [scroll-top (.. e -target -scrollTop)
+                              start (int (/ scroll-top line-height))
+                              end (min total-lines (+ start num-visible-lines))]
+                          (swap! state assoc :start start :end end)))]
+    (fn []
+      (let [{:keys [start end]} @state
+            ;; Safeguard subvec to handle edge cases
+            visible-lines (if (and (<= start end) (<= end total-lines))
+                            (ut/safe-subvec text-lines start end)
+                            [])
+            html-content (cstr/join "\n" (map #(.toHtml ansi-converter %) visible-lines))
+            padding-top (* start line-height)
+            padding-bottom (* (- total-lines end) line-height)
+            console-style {:font-family "monospace"
+                           :font-size "15px"
+                           :line-height (str line-height "px")
+                           :padding "15px"
+                           :white-space "pre"
+                           :text-shadow "#00000088 1px 0 10px"
+                           :overflow "auto"}]
+        [re-com/box
+         :size "none" :width (str width "px") :height (str height "px")
+         :style (merge console-style style scrollbar-style)
+         :attr {:on-scroll handle-scroll}
+         :child [:div {:style {:font-family "inherit"
+                               :padding-top (str padding-top "px")
+                               :padding-bottom (str padding-bottom "px")}
+                       :dangerouslySetInnerHTML
+                       {:__html html-content}}]]))))
+
+(defn reactive-virtualized-console-viewer [{:keys [text] :as props}]
+  [:f> (with-meta virtualized-console-viewer
+         {:key (hash text)})
+   props])
+
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
 
 
 (re-frame/reg-sub
@@ -8854,10 +8993,12 @@
               :panel-code-box panel-code-box
               :code-box panel-code-box
               :console #(console-box % (+ px-width-int 70) (+ px-height-int 50))
-              :terminal #(console-viewer {:style {} :text % 
-                                          :width (+ px-width-int 70) 
-                                          :height (+ px-height-int 55)
-                                          })
+              ;; :terminal #(console-viewer {:style {} :text %
+              ;;                             :width (+ px-width-int 70)
+              ;;                             :height (+ px-height-int 55)})
+              :terminal (fn [x] [reactive-virtualized-console-viewer {:style {} :text x
+                                                      :width (+ px-width-int 70)
+                                                      :height (+ px-height-int 55)}])
               :panel-code-box-single panel-code-box-single
               :code-box-single panel-code-box-single
               :vega-lite oz.core/vega-lite
@@ -9101,7 +9242,7 @@
                                 :padding-right "12px"}]])))
               :insert-alert (fn [[c w h d]] (ut/tracked-dispatch [::http/insert-alert c w h d]))
                  ;;:invert-hex-color (fn [x] (ut/invert-hex-color x))
-              
+
               ;; :run-flow (fn [[flow-id tt & [overrides]]]
               ;;             (let [client-name  @(ut/tracked-sub ::client-name {})
               ;;                   base-opts    {:increment-id? false}
@@ -9144,53 +9285,53 @@
               ;;                     :cursor           "pointer"}] [re-com/box :child ""]]]]]))
 
               :run-flow  (fn [[flow-id tt & [overrides]]]
-                            (let [client-name  @(ut/tracked-sub ::client-name {})
-                                  base-opts    {:increment-id? false}
-                                  running-key  (keyword (str "flow-status/" flow-id ">*running?"))
-                                  running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
-                                  runstreamed? (= overrides :runstream-overrides)
-                                  overrides    (if runstreamed? @(ut/tracked-subscribe [::runstream-overrides flow-id]) overrides)
-                                  overrides?   (ut/ne? overrides)
-                                  trig!        [@waiting?]]
-                              [re-com/h-box :size "auto" :children
-                               [[re-com/box :child (str tt)]
-                                [re-com/h-box :size "auto" :height "10px" :children
-                                 [(when runstreamed?
-                                    [re-com/md-icon-button :md-icon-name "zmdi-tune" :style
-                                     {:font-size        "inherit"
-                                      :padding          "5px"
-                                      :margin-right     "-14px"
-                                      :transform-origin "18px 17px"
-                                      :margin-top       "2px"}])
-                                  [re-com/md-icon-button
-                                   :md-icon-name (if (or (get @waiting? flow-id) running?) "zmdi-refresh" "zmdi-play")
-                                   :class (cond
-                                            running? "rotate linear infinite"
-                                            (get @waiting? flow-id) "rotate-reverse linear infinite"
-                                            :else "")
-                                   :on-click (fn []
-                                               (when (not running?)
-                                                 (swap! waiting? assoc flow-id true)
-                                                 (let [fstr (str "running flow " flow-id (when overrides? " (with overrides)"))
-                                                       w    (/ (count fstr) 4.1)]
-                                                   (ut/tracked-dispatch
-                                                    [::wfx/push :default
-                                                     {:kind        :run-flow
-                                                      :flow-id     flow-id
-                                                      :flowmap     flow-id
-                                                      :no-return?  true
-                                                      :opts        (if (map? overrides) (merge base-opts {:overrides overrides}) base-opts)
-                                                      :client-name client-name
-                                                      :keypath     [:panels panel-key :views selected-view]}])
-                                                   (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
-                                                   (js/setTimeout #(swap! waiting? assoc flow-id false) 5000))))
-                                   :style {:font-size        "inherit"
-                                           :padding          "5px"
-                                           :transform-origin "18px 17px"
-                                           :margin-top       "2px"
-                                           :cursor           "pointer"}]
-                                  [re-com/box :child ""]]]]]))
-              
+                           (let [client-name  @(ut/tracked-sub ::client-name {})
+                                 base-opts    {:increment-id? false}
+                                 running-key  (keyword (str "flow-status/" flow-id ">*running?"))
+                                 running?     @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [running-key]})
+                                 runstreamed? (= overrides :runstream-overrides)
+                                 overrides    (if runstreamed? @(ut/tracked-subscribe [::runstream-overrides flow-id]) overrides)
+                                 overrides?   (ut/ne? overrides)
+                                 trig!        [@waiting?]]
+                             [re-com/h-box :size "auto" :children
+                              [[re-com/box :child (str tt)]
+                               [re-com/h-box :size "auto" :height "10px" :children
+                                [(when runstreamed?
+                                   [re-com/md-icon-button :md-icon-name "zmdi-tune" :style
+                                    {:font-size        "inherit"
+                                     :padding          "5px"
+                                     :margin-right     "-14px"
+                                     :transform-origin "18px 17px"
+                                     :margin-top       "2px"}])
+                                 [re-com/md-icon-button
+                                  :md-icon-name (if (or (get @waiting? flow-id) running?) "zmdi-refresh" "zmdi-play")
+                                  :class (cond
+                                           running? "rotate linear infinite"
+                                           (get @waiting? flow-id) "rotate-reverse linear infinite"
+                                           :else "")
+                                  :on-click (fn []
+                                              (when (not running?)
+                                                (swap! waiting? assoc flow-id true)
+                                                (let [fstr (str "running flow " flow-id (when overrides? " (with overrides)"))
+                                                      w    (/ (count fstr) 4.1)]
+                                                  (ut/tracked-dispatch
+                                                   [::wfx/push :default
+                                                    {:kind        :run-flow
+                                                     :flow-id     flow-id
+                                                     :flowmap     flow-id
+                                                     :no-return?  true
+                                                     :opts        (if (map? overrides) (merge base-opts {:overrides overrides}) base-opts)
+                                                     :client-name client-name
+                                                     :keypath     [:panels panel-key :views selected-view]}])
+                                                  (ut/dispatch-delay 800 [::http/insert-alert fstr w 1 5])
+                                                  (js/setTimeout #(swap! waiting? assoc flow-id false) 5000))))
+                                  :style {:font-size        "inherit"
+                                          :padding          "5px"
+                                          :transform-origin "18px 17px"
+                                          :margin-top       "2px"
+                                          :cursor           "pointer"}]
+                                 [re-com/box :child ""]]]]]))
+
               :click-solver (fn [[solver-name tt & [input-map overrides]]]
                               (let [client-name  @(ut/tracked-sub ::client-name {})
                                     running-key  (keyword (str "solver-status/*client-name*>" (cstr/replace (str solver-name) ":" "") ">running?"))
@@ -9202,12 +9343,12 @@
                                  [[re-com/box :child (if (not (vector? tt)) (str tt) tt)]
                                   [re-com/h-box :size "auto" :height "10px" :children
                                    [;(str running?)
-                                    [re-com/md-icon-button 
+                                    [re-com/md-icon-button
                                      :md-icon-name (if (or (get @waiting? solver-name) running?) "zmdi-refresh" "zmdi-play")
                                      ;:class (when running? "rotate linear infinite")
                                      :class (cond
                                               running? "rotate linear infinite"
-                                              (get @waiting? solver-name ) "rotate-reverse linear infinite"
+                                              (get @waiting? solver-name) "rotate-reverse linear infinite"
                                               :else "")
                                      :on-click (fn []
                                                  (when (not running?) ;(not (some (fn [x] (= x text))
@@ -9232,7 +9373,7 @@
                                              :transform-origin "18px 17px"
                                              :margin-top       "2px"
                                              :cursor           "pointer"}] [re-com/box :child ""]]]]]))
-              
+
               :case (fn [x] (ut/vectorized-case x))
               :scrubber (fn [[kk pm & [opts]]] [scrubber-panel true @(ut/tracked-sub ::keypaths-in-params {:key-type :param}) kk pm
                                                 (if opts {:fm true :canvas? true :opts opts} {:fm true :canvas? true})])

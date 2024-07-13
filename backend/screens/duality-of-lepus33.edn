@@ -1,59 +1,10 @@
 {:orders
  {:fields-sys [:field_name :field_type :data_type],
-  :setlists-drag-2 [:show_id :song_name :song_order :ts],
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :large-bgss (:query_error),
-  :shows (:query_error),
-  :tour-name-drag-11 [:tour_name :rowcnt],
-  :shows-drag-22 [:location :show_date :show_id :show_name :title :tour_name :ts],
-  :gen-viz-342 [:rows :song_order],
-  :connections-sys [:database_name :connection_id :styler_highlight_8717ss],
-  :setlists (:query_error)},
+  :connections-sys [:database_name :connection_id :styler_highlight_8717ss]},
  :reco-preview "-1489866873",
- :sql-source
- {:setlists
-  {:select [:*], :connection-id "system-db", :from [:setlists], :limit 111},
-  :shows {:select [:*], :connection-id "system-db", :from [:shows], :limit 111},
-  :setlists-drag-2
-  {:select [:show_id :song_name :song_order :ts],
-   :from [[:setlists :hh333]],
-   :_last-run "05:53:09"},
-  :shows-drag-22
-  {:select [:location :show_date :show_id :show_name :title :tour_name :ts],
-   :from [[:shows :pp193]],
-   :_last-run "05:52:51"},
-  :tour-name-drag-11
-  {:select [:tour_name [[:count 1] :rowcnt]],
-   :from
-   [[{:select [:location :show_date :show_id :show_name :title :tour_name :ts],
-      :from [[:shows :pp193]]}
-     :kk455]],
-   :group-by [:tour_name],
-   :order-by [[:rowcnt :desc]]},
-  :gen-viz-342
-  {:select [[[[:count 1]] :rows] :song_order],
-   :from
-   [{:select [:show_id :song_name :song_order :ts], :from [[:setlists :hh333]]}],
-   :group-by [:song_order]},
-  :large-bgss
-  {:select [:*],
-   :connection-id :*client-name*,
-   :from
-   [{:data
-     (let [dir " /home/ryanr/rvbbit/frontend/resources/public/images/large"
-           rel-dir "./images/large/"
-           files (->>
-                   (file-seq (clojure.java.io/file dir))
-                   (filter (fn [x] (.isFile x)))
-                   (filter
-                     (fn [x]
-                       (not (clojure.string/includes? (str (.getName x)) "8k"))))
-                   (map (fn [x] (.getName x))))]
-       (println (count files))
-       (vec (for [f files] {:ffilename (str f)})))}],
-   :page 2,
-   :_last-run "14:04:15"}},
+ :sql-source {},
  :meta
  {:fields-sys
   {:fields
@@ -194,18 +145,6 @@
      {"{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
       "(from database connection)" 1,
       "[SQLITE_ERROR] SQL error or missing database (no such table: large_bgss)" 1},
-     :cardinality 100}},
-   :rowcount 3},
-  :shows
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
-      "(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: shows)" 1},
      :cardinality 100}},
    :rowcount 3},
   :offenses-drag-24
@@ -567,11 +506,11 @@
     {:data-type "string",
      :distinct 3,
      :group-by? true,
-     :commons {"*cache-db*" 6, "SQLite" 3, "*csv-import-db*" 1},
-     :cardinality 30},
+     :commons {"*cache-db*" 7, "SQLite" 3, "*csv-import-db*" 1},
+     :cardinality 27},
     :connection_id
     {:data-type "string",
-     :distinct 10,
+     :distinct 11,
      :group-by? true,
      :commons {"imported" 1, "bigfoot-ufos" 1, "met-on-tour" 1},
      :cardinality 100},
@@ -579,9 +518,9 @@
     {:data-type "integer",
      :distinct 1,
      :group-by? true,
-     :commons {1 10},
-     :cardinality 10}},
-   :rowcount 10},
+     :commons {1 11},
+     :cardinality 9}},
+   :rowcount 11},
   :ufo-sightings-drag-9
   {:fields
    {:duration_seconds_int
@@ -714,27 +653,12 @@
      :group-by? false,
      :commons {1 5, 2 2, 1283 1},
      :cardinality 83}},
-   :rowcount 30},
-  :setlists
-  {:fields
-   {:query_error
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons
-     {"{:datasource #object[com.zaxxer.hikari.HikariDataS" 1,
-      "(from database connection)" 1,
-      "[SQLITE_ERROR] SQL error or missing database (no such table: setlists)" 1},
-     :cardinality 100}},
-   :rowcount 3}},
+   :rowcount 30}},
  :default-col-widths
- {:block-198 {:setlists-drag-2 102},
-  :block-8963 {:shows-drag-22 108},
-  :block-6308 {:tour-name-drag-11 180},
-  :block-2361 {:large-bgss 311},
-  :system-connections-list* {:connections-sys 126},
-  :system-tables-list* {:tables-sys 133},
-  :system-fields-list* {:fields-sys 170}},
+ {:system-connections-list* {:connections-sys 121},
+  :system-tables-list* {:tables-sys 129},
+  :system-fields-list* {:fields-sys 165},
+  :block-12262 {:new-clojure-9 100}},
  :runstream-drops nil,
  :tabs
  ["through the rabbit hole and out the other side"
@@ -865,6 +789,7 @@
     "demo-lime-green-slime"
     "desktops-and-broomsticks"
     "duality-of-lepus"
+    "duality-of-lepus33"
     "error-monitor"
     "error-monitor-vanessa"
     "error-monitor-vanessa2"
@@ -981,32 +906,15 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [208666514 184022858 4294705152],
- :client-name :yummy-wide-buffalo-17,
+ :memory [96358341 70883161 4294705152],
+ :client-name :awesome-erin-butterfly-13,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2505, :h 1205},
- :post-meta {:large-bgss {}, :fields-sys {:* {:rowcount 7}}},
- :status
- {:heartbeat
-  {:kick
-   [:solver-status/yummy-wide-buffalo-17>get-my-colors-1180948524>running?
-    :solver-status/yummy-wide-buffalo-17>get-my-colors570095682>running?
-    :solver-meta/raw-custom-override613247716>output>evald-result>out
-    :time/minute
-    :repl-ns/*client-name*
-    :time/hour
-    :solver-status/yummy-wide-buffalo-17>raw-custom-override613247716>running?
-    :solver/raw-custom-override613247716
-    :flow-status/live-scratch-flow>*running?
-    :solver/get-my-colors-1180948524
-    :solver-status/*client-name*>raw-custom-override613247716
-    :solver-meta/raw-custom-override613247716
-    :solver/get-my-colors570095682]},
-  :alert1 {:alerts :alert2},
-  :file-change {:file-changed :done}},
+ :window {:w 2102, :h 1060},
+ :post-meta {:tables-sys {:* {:rowcount 7}}, :connections-sys {:* {:rowcount 11}}},
+ :status {:heartbeat {:kick []}},
  :screen-name "duality-of-lepus33",
  :recos-page2 0,
  :selected-tab "thin crane",
@@ -1021,15 +929,13 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   508
+   490
    1100038046]],
  :recos-page 0,
  :rs-overrides-hashmap {},
- :base-sniff-queries {:setlists 1669794951, :shows 89957543},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -2076875513,
+ :user-params-hash -221110949,
  :grid-recos? true,
- :session-hash 565075637,
  :resolved-queries
  {:setlists-drag-2
   {:select [:show_id :song_name :song_order :ts],
@@ -2180,6 +2086,33 @@
      :child
      [:img {:src :solver/raw-custom-override136934373>10>0>2, :width "100%"}]]},
    :queries {}},
+  :block-10081
+  {:h 2,
+   :w 15,
+   :root [1 1],
+   :tab "thin crane",
+   :selected-view :hare-vw,
+   :name "block-10081",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-10081.:hi"}
+     :style
+     {:font-size "36px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Fun with 'Hybrid REPL Canvas'?"]},
+   :queries {}},
   :block-35
   {:h 9,
    :w 9,
@@ -2496,7 +2429,7 @@
      :from [[:offenses :dd484]]}},
    :root [25 20],
    :tab "globular koala"}},
- :selected-block :block-2769,
+ :selected-block "none!",
  :theme-colors-hashmap
  {"float" "#bdbae5",
   "boolean" "#c8a4a4",
@@ -2545,7 +2478,7 @@
    :queries 11,
    :ts "2024-07-03 09:31:06"},
   :time
-  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 8, :hour 14},
+  {:second 7, :now-seconds "Wednesday, April 24 1:43:57PM", :minute 38, :hour 14},
   :user-dropdown-sys {:req-field nil, :shape nil},
   :searches-types-sys {:item_type "saved-views"},
   :large-bgss {:ffilename "b64-image-51574-82843-4k.webp"},
@@ -2565,38 +2498,21 @@
    :keper "b64-image3-30849-74975-4k.webp",
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
    :selected-view-data
-   (do
-     (let [clojure-version (clojure-version)
-           jvm-version (System/getProperty "java.version")]
-       :introspect!
-       (println "HUUGE33?! Yes. Giant.")
-       (println "the hour is " :time/hour)
-       (def message2 "far side")
-       (defn teste [] 123333)
-       (defonce my-atom (atom {:test 123}))
-       (doseq [e (range :time/minute)] (println (str "minute " (inc e) "!")))
-       {:howdy-str
-        (str
-          "🐇🥕 Sup!"
-          :time/hour
-          ":"
-          :time/minute
-          " Internal RVBBIT nREPL. Clojure "
-          clojure-version
-          " on "
-          jvm-version
-          " JVM tech"
-          " 🥕🐇"),
-        :min :time/minute,
-        :jvm-version jvm-version,
-        :clojure-version clojure-version})
-     (swap! my-atom merge {:new-key "hey"})),
-   :selected-view [:clojure :new-clojure-2],
+   (let [clojure-version (clojure-version)
+         jvm-version (System/getProperty "java.version")]
+     (str
+       "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+       clojure-version
+       " on "
+       jvm-version
+       " JVM tech"
+       " 🥕🐇")),
+   :selected-view [:clojure :new-clojure-9],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :rel-image-path [:string3 "images/large/" :large-bgss/ffilename],
    :tetradss [:tetrads :param/generated-colors>dominant],
-   :selected-block :block-2769,
+   :selected-block :block-12262,
    :glass-fish-style
    {:background-color [:string3 :param/generated-colors>darkest 73],
     :border-radius "16px",

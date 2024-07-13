@@ -310,16 +310,7 @@
   [percent & [hard-limit]]
   (purge-cache "extract-patterns-cache" percent extract-patterns-cache extract-patterns-data hard-limit))
 
-
-
 (defn lists-to-vectors [data] (walk/postwalk (fn [x] (if (list? x) (vec x) x)) data))
-
-
-
-
-
-
-
 
 ;; (defn extract-patterns2-orig
 ;;   [data kw num] ;; raw
@@ -327,7 +318,7 @@
 ;;     (walk/prewalk (fn [item] (when (matches-pattern2-orig? item kw num) (swap! matches conj item)) item) data)
 ;;     @matches))
 
-(defonce extract-patterns2-cache (atom {}))
+(defonce extract-patterns2-cache (atom {}))               
 
 (defn matches-pattern2-orig? [item kw num] (and (vector? item) (= (count item) num) (= (first item) kw)))
 
@@ -348,11 +339,16 @@
 
 
 
+(defn safe-subvec [v start end]
+  (let [start (max 0 start)
+        end (min (count v) end)]
+    (if (< start end)
+      (subvec v start end)
+      [])))
 
 
 
-
-(defonce safe-name-cache (atom {}))
+(defonce safe-name-cache (atom {}))    
 
 
 (defn safe-name [x] (replacer (str x) ":" ""))
