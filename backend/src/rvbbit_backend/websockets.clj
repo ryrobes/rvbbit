@@ -1428,75 +1428,76 @@
          {:error (get-in response-body ["error" "message"]) :class (str (type e))})
        (catch Exception _ {:error (str e) :class "ERROR IN PARSE-ERROR-BODY. lol"})))
 
-(defn make-http-call
-  [req]
-  (try
-    (let [{:keys [url headers query-params method body file save-to] :or {method :get}} req
-          http-method                                                                   (case method
-                                                                                          :get     client/get
-                                                                                          :post    client/post
-                                                                                          :put     client/put
-                                                                                          :delete  client/delete
-                                                                                          :head    client/head
-                                                                                          :options client/options
-                                                                                          :patch   client/patch
-                                                                                          :GET     client/get
-                                                                                          :POST    client/post
-                                                                                          :PUT     client/put
-                                                                                          :DELETE  client/delete
-                                                                                          :HEAD    client/head
-                                                                                          :OPTIONS client/options
-                                                                                          :PATCH   client/patch
-                                                                                          (throw (IllegalArgumentException.
-                                                                                                  {:error
-                                                                                                   (str "Unknown http method: "
-                                                                                                        method)})))
-          body2                                                                         (if (nil? body)
-                                                                                          {:query-params query-params}
-                                                                                          (if (nil? file)
-                                                                                            {:body (json/generate-string body)}
-                                                                                            {:multipart
-                                                                                             [{:name     "file"
-                                                                                               :content  (slurp file)
-                                                                                               :filename (last
-                                                                                                          (clojure.string/split
-                                                                                                           file
-                                                                                                           #"/"))}
-                                                                                              {:name    "purpose"
-                                                                                               :content "assistants"}]}))
-          response                                                                      (try (http-method url
-                                                                                                          (merge {:as
-                                                                                                                  (if save-to
-                                                                                                                    :byte-array
-                                                                                                                    :json)
-                                                                                                                  :headers headers
-                                                                                                                  :debug false}
-                                                                                                                 body2))
-                                                                                             (catch Exception e
-                                                                                               {;:error (str e)
-                                                                                                :error (parse-error-body e)
-                                                                                                :class (str (type e))}))]
-      (cond (:error response)                            (do ;(ut/pp [:http-call2-error response
+(defn make-http-call [req]
+  (ppy/execute-in-thread-pools-but-deliver :make-http-call ;; try to combat random stackoverflows from this call - new stack in thread pool wrapper
+   (fn []
+     (try
+       (let [{:keys [url headers query-params method body file save-to] :or {method :get}} req
+             http-method                                                                   (case method
+                                                                                             :get     client/get
+                                                                                             :post    client/post
+                                                                                             :put     client/put
+                                                                                             :delete  client/delete
+                                                                                             :head    client/head
+                                                                                             :options client/options
+                                                                                             :patch   client/patch
+                                                                                             :GET     client/get
+                                                                                             :POST    client/post
+                                                                                             :PUT     client/put
+                                                                                             :DELETE  client/delete
+                                                                                             :HEAD    client/head
+                                                                                             :OPTIONS client/options
+                                                                                             :PATCH   client/patch
+                                                                                             (throw (IllegalArgumentException.
+                                                                                                     {:error
+                                                                                                      (str "Unknown http method: "
+                                                                                                           method)})))
+             body2                                                                         (if (nil? body)
+                                                                                             {:query-params query-params}
+                                                                                             (if (nil? file)
+                                                                                               {:body (json/generate-string body)}
+                                                                                               {:multipart
+                                                                                                [{:name     "file"
+                                                                                                  :content  (slurp file)
+                                                                                                  :filename (last
+                                                                                                             (clojure.string/split
+                                                                                                              file
+                                                                                                              #"/"))}
+                                                                                                 {:name    "purpose"
+                                                                                                  :content "assistants"}]}))
+             response                                                                      (try (http-method url
+                                                                                                             (merge {:as
+                                                                                                                     (if save-to
+                                                                                                                       :byte-array
+                                                                                                                       :json)
+                                                                                                                     :headers headers
+                                                                                                                     :debug false}
+                                                                                                                    body2))
+                                                                                                (catch Exception e
+                                                                                                  {;:error (str e)
+                                                                                                   :error (parse-error-body e)
+                                                                                                   :class (str (type e))}))]
+         (cond (:error response)                            (do ;(ut/pp [:http-call2-error response
                                                              ;:body-sent body2])
-                                                           {:error response :message (:error response)})
-            (cstr/includes? (str response) "status 400") (do ;(ut/pp [:http-call2-error-400 response
+                                                              {:error response :message (:error response)})
+               (cstr/includes? (str response) "status 400") (do ;(ut/pp [:http-call2-error-400 response
                                                              ;:body-sent body2])
-                                                           {:error response :message "400 code"})
-            :else                                        (if save-to
-                                                           (do (spit save-to (:body response)) {:success true :path save-to})
-                                                           (let [resp (recursive-clean (get response
-                                                                                            :body
-                                                                                            {:success true
-                                                                                             :status  (get response :status)}))
-                                                                 rr   (recursive-clean resp)
-                                                                 rrs  (pr-str rr)
-                                                                 tts  (cstr/replace rrs #":/" ":")
-                                                                 ttsr (edn/read-string tts)]
-                                                             ttsr))))
-    (catch Exception e ;{:error (str e)
-      {;:error (str e)
-       :error [(parse-error-body e) (str e)]
-       :class (str (type e))})))
+                                                              {:error response :message "400 code"})
+               :else                                        (if save-to
+                                                              (do (spit save-to (:body response)) {:success true :path save-to})
+                                                              (let [resp (recursive-clean (get response
+                                                                                               :body
+                                                                                               {:success true
+                                                                                                :status  (get response :status)}))
+                                                                    rr   (recursive-clean resp)
+                                                                    rrs  (pr-str rr)
+                                                                    tts  (cstr/replace rrs #":/" ":")
+                                                                    ttsr (edn/read-string tts)]
+                                                                ttsr))))
+       (catch Exception e ;{:error (str e)
+         {;:error (str e)
+          :error [(parse-error-body e) (str e)]
+          :class (str (type e))})))))
 
 
 (defn- run-task

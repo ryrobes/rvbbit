@@ -44,12 +44,12 @@
     ;[re-catch.core :as rc]
    [re-com.core :as    re-com
     :refer [at]]
-   [re-com.util :refer [px]]
+   [re-com.util :refer [px px-n]]
    ;[re-frame.alpha :as rfa]
    [re-frame.core :as re-frame]
    [reagent.core :as reagent]
    [garden.color :as    color]
-   ;[reagent.dom :as rdom]
+   [reagent.dom :as rdom]
    [rvbbit-frontend.audio :as audio]
    [rvbbit-frontend.connections :as conn]
    [rvbbit-frontend.db :as db]
@@ -80,6 +80,11 @@
 (defonce mad-libs-view (reagent/atom nil))
 (defonce mad-libs-top? (reagent/atom true))
 (def swap-layers? (reagent/atom false))
+
+
+(defonce  opened-boxes (reagent/atom {})) 
+(defonce  opened-boxes-code (reagent/atom {}))
+(defonce  map-boxes-pages (reagent/atom {}))
 
 ;; (defn- render-error-component [{:keys [error info]}]
 ;;   [:div
@@ -333,19 +338,11 @@
 
 (defn theme-pull-fn
   [cmp-key fallback & test-fn]
-  (let [;v                   @(ut/tracked-subscribe [::conn/clicked-parameter-key [cmp-key]])
-        v                   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [cmp-key]})
+  (let [v                   @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [cmp-key]})
         t0                  (ut/splitter (str (ut/safe-name cmp-key)) #"/")
         t1                  (keyword (first t0))
         t2                  (keyword (last t0))
-        ;;self-ref-keys       (distinct (filter #(and (keyword? %) (namespace %)) (ut/deep-flatten db/base-theme)))
-        ;; new deep-flatten is already a set with only keywords
-        ;self-ref-keys       (filter #(namespace %) (ut/deep-flatten db/base-theme))
         self-ref-keys       (into #{} (filter namespace) (ut/deep-flatten db/base-theme))
-        ;; self-ref-pairs      (into {}
-        ;;                           (for [k    self-ref-keys ;; todo add a reurziver version of
-        ;;                                 :let [bk (keyword (ut/replacer (str k) ":theme/" ""))]]
-        ;;                             {k (get db/base-theme bk)}))
         self-ref-pairs (reduce (fn [acc k]
                                  (let [bk (keyword (cstr/replace (name k) "theme/" ""))]
                                    (if-let [value (get db/base-theme bk)]
@@ -364,6 +361,289 @@
 (re-frame/reg-sub ::theme-pull-sub (fn [_ {:keys [cmp-key fallback test-fn]}] (theme-pull-fn cmp-key fallback test-fn)))
 
 (defn theme-pull [cmp-key fallback & test-fn] @(ut/tracked-sub ::theme-pull-sub {:cmp-key cmp-key :fallback fallback :test-fn test-fn}))
+
+
+
+(def scrollbar-stylev
+  {:scrollbar-width "thin"
+   :scrollbar-color (str (theme-pull :theme/universal-pop-color nil) "#00000033")
+   :&::-webkit-scrollbar {:height "10px"}
+   :&::-webkit-scrollbar-track {:background "#2a2a2a"
+                                :border-radius "5px"}
+   :&::-webkit-scrollbar-thumb {:background "#4a4a4a"
+                                :border-radius "15px"}
+   :&::-webkit-scrollbar-thumb:hover {:background "#6a6a6a"}})
+
+(defn safe-subvec [v start end]
+  (let [start (max 0 start)
+        end (min (count v) end)]
+    (if (< start end)
+      (subvec v start end)
+      [])))
+
+(def scroll-state (reagent/atom {}))
+
+(defn px- [x]
+  (try (edn/read-string (cstr/replace (str x) "px" "")) (catch :default _ 0)))
+
+;;(tapp>>  (px-  "123px"))
+
+(defn virtualized-v-box [{:keys [children style width height id] :as props}]
+  (let [calculate-heights (fn [new-children]
+                            (let [new-heights (mapv second new-children)
+                                  new-cumulative-heights (reduce
+                                                          (fn [acc height]
+                                                            (conj acc (+ (or (last acc) 0) height)))
+                                                          []
+                                                          new-heights)
+                                  ;_ (tapp>> [:new-cumulative-heights (last new-cumulative-heights) id])
+                                  ]
+                              (swap! scroll-state update id assoc
+                                     :heights new-heights
+                                     :cumulative-heights new-cumulative-heights
+                                     :total-height (last new-cumulative-heights))))
+        find-start-index (fn [scroll-top]
+                           (let [cumulative-heights (get-in @scroll-state [id :cumulative-heights])]
+                             (or (some #(when (> (nth cumulative-heights % 0) scroll-top) %)
+                                       (range (count cumulative-heights)))
+                                 0)))
+        update-visible-range (fn [container-height scroll-top]
+                               (let [start (find-start-index scroll-top)
+                                     end (find-start-index (+ scroll-top container-height))
+                                     end (min (count children) (+ end 1))] ; Add 2 for buffer
+                                 (swap! scroll-state update id assoc
+                                        :scroll-top scroll-top
+                                        :start start
+                                        :end end)))
+        handle-scroll (fn [e]
+                        (let [container-height (.. e -target -clientHeight)
+                              scroll-top (.. e -target -scrollTop)]
+                          (update-visible-range container-height scroll-top)))
+        set-scroll-position (fn [node]
+                              (when node
+                                (let [{:keys [scroll-top total-height]} (get @scroll-state id)
+                                      max-scroll (- total-height height)
+                                      target-scroll (min (or scroll-top 0) max-scroll)]
+                                  (set! (.-scrollTop node) target-scroll)
+                                  (update-visible-range height target-scroll))))]
+
+    (reagent/create-class
+     {:component-did-mount
+      (fn [this]
+        (calculate-heights children)
+        (set-scroll-position (rdom/dom-node this)))
+
+      :component-did-update
+      (fn [this old-argv]
+        (let [new-argv (reagent/argv this)
+              old-children (get-in old-argv [1 :children]) 
+              new-children (get-in new-argv [1 :children])]
+          (when (not= (count old-children) (count new-children))
+                ;true ;(not= old-children new-children)
+           ;(not= (apply + (mapv second old-children))
+           ;      (apply + (mapv second new-children)))
+            (calculate-heights new-children)
+            (js/requestAnimationFrame #(set-scroll-position (rdom/dom-node this))))))
+
+      :reagent-render
+      (fn [{:keys [children style width height id] :as props}]
+        (let [{:keys [start end cumulative-heights total-height] :or {start 0 end 0}} (get @scroll-state id)
+              visible-children (safe-subvec children start end)
+              v-box-style (merge {:overflow-y "auto"
+                                  :overflow-x "hidden"
+                                  ;:border "1px solid cyan"
+                                  }
+                                 style
+                                 scrollbar-stylev)]
+          [:div (merge
+                 (dissoc props :children :initial-scroll)
+                 {:style (merge v-box-style
+                                {:width (str width "px")
+                                 :height (str height "px")})
+                  :on-scroll handle-scroll})
+           [:div {:style {:height (str total-height "px")
+                          ;;:width (str width "px")
+                          :position "relative"
+                          }}
+            (for [[index [child-width child-height child]] (map-indexed vector visible-children)]
+              ^{:key (str id (+ start index))}
+              [:div {:style {:position "absolute"
+                             :top (str (if (zero? (+ start index))
+                                         0
+                                         (try (nth cumulative-heights (dec (+ start index))) (catch :default _ 0))) "px")
+                             :height (str child-height "px")
+                             :width (str child-width "px")
+                             ;:width "100%"
+                             }}
+               ;;[re-com/box :child child :size "auto"]
+               child
+               ]
+              ;; [re-com/box
+              ;;  :style {:position "absolute"
+              ;;          :top (str (if (zero? (+ start index))
+              ;;                      0
+              ;;                      (try (nth cumulative-heights (dec (+ start index))) (catch :default _ 0))) "px")
+              ;;          :padding-bottom "6px"}
+              ;;  :height (str child-height "px")
+              ;;  :width (str child-width "px")
+              ;;  :size "none"
+              ;;  :child child]
+              )
+            [:div {:style {:position "fixed"
+                           :top 41
+                           :left 22
+                           :color "white"}}
+             (str "Showing items " start " to " end " of " (count children))]
+            ]]))})))
+
+(defn reactive-virtualized-v-box [props]
+  (fn [props]
+    [:f> (with-meta virtualized-v-box
+           {:key (hash (:children props))})
+     props]))
+
+(defn vv-box [w h num] ;; your test fn
+  [reactive-virtualized-v-box {:children (vec (for [i (range num)
+                                                    :let [hh 145]]
+                                                [w hh
+                                                 [re-com/box
+                                                  :size "none"
+                                                  :height (str hh "px") :width (str (- w 20) "px")
+                                                  :style {:border "1px solid white"}
+                                                  :child (str "heys " i)]]))
+                               :id (str h w)
+                               :height h
+                               :width w}])
+
+(defn virtual-v-box [& {:keys [id children height width attr] :as cfg-map}]
+  ;(tapp>> [:vb id height width children])
+  (let [width  (if (string? width)  (px- width) width)
+        height (if (string? height) (px- height) height)
+        id (or id (get attr :id)) ;; in case mixed with re-com, which will throw if given root level :id key
+        cfg-map (-> cfg-map
+                    (assoc :width width)
+                    (assoc :height height)
+                    (assoc :id id))]
+    [reactive-virtualized-v-box cfg-map]))
+
+
+(def h-scroll-state (reagent/atom {}))
+
+(defn virtualized-h-box [{:keys [children style width height id] :as props}]
+  (let [calculate-widths (fn [new-children]
+                           (let [new-widths (mapv first new-children)
+                                 new-cumulative-widths (reduce
+                                                        (fn [acc width]
+                                                          (conj acc (+ (or (last acc) 0) width)))
+                                                        []
+                                                        new-widths)]
+                             (swap! h-scroll-state update id assoc
+                                    :widths new-widths
+                                    :cumulative-widths new-cumulative-widths
+                                    :total-width (last new-cumulative-widths))))
+
+        find-start-index (fn [scroll-left]
+                           (let [cumulative-widths (get-in @h-scroll-state [id :cumulative-widths])]
+                             (or (some #(when (> (nth cumulative-widths % 0) scroll-left) %)
+                                       (range (count cumulative-widths)))
+                                 0)))
+
+        update-visible-range (fn [container-width scroll-left]
+                               (let [start (find-start-index scroll-left)
+                                     end (find-start-index (+ scroll-left container-width))
+                                     end (min (count children) (+ end 2))] ; Add 2 for buffer
+                                 (swap! h-scroll-state update id assoc
+                                        :scroll-left scroll-left
+                                        :start start
+                                        :end end)))
+
+        handle-scroll (fn [e]
+                        (let [container-width (.. e -target -clientWidth)
+                              scroll-left (.. e -target -scrollLeft)]
+                          (update-visible-range container-width scroll-left)))
+
+        set-scroll-position (fn [node]
+                              (when node
+                                (let [{:keys [scroll-left total-width]} (get @h-scroll-state id)
+                                      max-scroll (- total-width width)
+                                      target-scroll (min (or scroll-left 0) max-scroll)]
+                                  (set! (.-scrollLeft node) target-scroll)
+                                  (update-visible-range width target-scroll))))]
+
+    (reagent/create-class
+     {:component-did-mount
+      (fn [this]
+        (calculate-widths children)
+        (set-scroll-position (rdom/dom-node this)))
+
+      :component-did-update
+      (fn [this old-argv]
+        (let [new-argv (reagent/argv this)
+              old-children (get-in old-argv [1 :children])
+              new-children (get-in new-argv [1 :children])]
+          (when (not= (count old-children) (count new-children))
+            (calculate-widths new-children)
+            (js/requestAnimationFrame #(set-scroll-position (rdom/dom-node this))))))
+
+      :reagent-render
+      (fn [{:keys [children style width height id] :as props}]
+        (let [{:keys [start end cumulative-widths total-width] :or {start 0 end 0}} (get @h-scroll-state id)
+              visible-children (safe-subvec children start end)
+              h-box-style (merge {:overflow-x "auto"
+                                  :overflow-y "hidden"
+                                  ;:border "1px solid cyan"
+                                  }
+                                 style
+                                 scrollbar-stylev)]
+          [:div (merge
+                 (dissoc props :children :initial-scroll)
+                 {:style (merge h-box-style
+                                {:width (str width "px")
+                                 :height (str height "px")})
+                  :on-scroll handle-scroll})
+           [:div {:style {:width (str total-width "px")
+                          :height "100%"
+                          :position "relative"}}
+            (for [[index [child-width child-height child]] (map-indexed vector visible-children)]
+              ^{:key (+ start index)}
+              [:div {:style {:position "absolute"
+                             :left (str (if (zero? (+ start index))
+                                          0
+                                          (try (nth cumulative-widths (dec (+ start index))) (catch :default _ 0))) "px")
+                             :height "100%"
+                             :width (str child-width "px")}}
+               child])
+            [:div {:style {:position "fixed"
+                           :top 41
+                           :left 22
+                           :color "white"}}
+             (str "Showing items " start " to " end " of " (count children))]]]))})))
+
+(defn reactive-virtualized-h-box [props]
+  (fn [props]
+    [:f> (with-meta virtualized-h-box
+           {:key (hash (:children props))})
+     props]))
+
+(defn vh-box [w h num] ;; your test fn
+  [reactive-virtualized-h-box {:children (vec (for [i (range num)
+                                                    :let [ww 145]]
+                                                [ww h
+                                                 [re-com/box
+                                                  :size "none"
+                                                  :width (str ww "px") :height (str (- h 20) "px")
+                                                  :style {:border "1px solid white"}
+                                                  :child (str "heys " i)]]))
+                               :id (str h w)
+                               :height h
+                               :width w}])
+
+(defn virtual-h-box [& {:keys [id children height width] :as cfg-map}]
+  (let []
+    [reactive-virtualized-h-box cfg-map]))
+
+
+
 
 
 
@@ -455,14 +735,14 @@
 
 (defn get-all-values [data] (vec (flatten-values data)))
 
-(defonce get-all-values-flatten (atom {}))
+;; (defonce get-all-values-flatten (atom {}))
 
-(defn cached-get-all-values [data]
-  (if-let [cached-result (@get-all-values-flatten (str data))]
-    cached-result
-    (let [result (get-all-values data)]
-      (swap! get-all-values-flatten assoc (str data) result)
-      result)))
+;; (defn cached-get-all-values [data]
+;;   (if-let [cached-result (@get-all-values-flatten (hash data))]
+;;     cached-result
+;;     (let [result (get-all-values data)]
+;;       (swap! get-all-values-flatten assoc (hash data) result)
+;;       result)))
 
 
 ;; (defn get-grid [obody]
@@ -477,7 +757,7 @@
 ;;                          {k v}))
 ;;         grids (get-grid (ut/deep-flatten curr-tab)) ;; returns a vec of tab names if found
 ;;         ]
-    
+
 ;;     ))
 
 ;; (defn get-grid [obody]
@@ -507,7 +787,7 @@
         logic-kps (into [] (for [v kps] (let [[_ tab-name] v] tab-name)))]
     logic-kps))
 
-(defn- recursive-panel-filter [panels-map selected-tab & [processed-tabs]]
+(defn recursive-panel-filter [panels-map selected-tab & [processed-tabs]]
   (let [processed-tabs (conj (or processed-tabs #{}) selected-tab)
         curr-tab-panels (into {}
                               (for [[k v] panels-map
@@ -523,7 +803,7 @@
 (defn only-relevant-tabs [panels-map selected-tab]
   (recursive-panel-filter panels-map selected-tab))
 
-                                                             
+
 (re-frame/reg-sub
  ::get-flow-subs
  (fn [db {:keys [all?]}]
@@ -582,7 +862,7 @@
                                                                    (cstr/starts-with? (str %) ":client/"))
                                                               (filter keyword?
                                                                       (into dfp
-                                                                            (ut/deep-flatten (cached-get-all-values (get db :click-param))))))
+                                                                            (ut/deep-flatten (get-all-values (get db :click-param))))))
                                                       current-flow-open)))
          ;;_ (tapp>> [:click-param-subs? (ut/deep-flatten (get-all-values (get db :click-param)))])
           ;; flow-runners            (when (and (get db :flow?) 
@@ -654,17 +934,16 @@
                                                                ns-key])))))) [])
          ;;;_ (tapp>> [:in-editor-solvers  (str  in-editor-solvers) ])
          clover-solvers-running  (vec (apply concat (for [s clover-solvers] ;;(vec (remove (set in-editor-solvers0) clover-solvers))] 
-                                        [;(keyword (str
+                                                      [;(keyword (str
                                          ;         (-> s
                                          ;             (ut/replacer ":solver/" "solver-status/*client-name*>")
                                          ;             (ut/replacer ":" ""))
                                          ;         (str ">running?")))
-                                         (keyword (str
-                                                   (-> s
-                                                       (ut/replacer ":solver/" (str "solver-status/" (cstr/replace (str client-name) ":" "") ">"))
-                                                       (ut/replacer ":" ""))
-                                                   (str ">running?")))
-                                         ])))
+                                                       (keyword (str
+                                                                 (-> s
+                                                                     (ut/replacer ":solver/" (str "solver-status/" (cstr/replace (str client-name) ":" "") ">"))
+                                                                     (ut/replacer ":" ""))
+                                                                 (str ">running?")))])))
           ;; clover-solvers-running  []
          signal-subs             (if signals-mode? (vec (into signal-hist (into signal-ui-refs signal-ui-part-refs))) [])
          theme-refs              (vec (distinct (filter #(cstr/starts-with? (str %) ":flow/")
@@ -676,11 +955,11 @@
       ;;          ])
       ;(filterv #(not (cstr/includes? (str %) "||")) ;; live running subs ignore
      (vec (distinct
-           (concat flow-runners clover-solver-outputs 
+           (concat flow-runners clover-solver-outputs
                    ;;client-namespaces-refs 
                    ;;client-namespace-intros 
                    client-ns-intro-map
-                   signal-subs clover-solvers 
+                   signal-subs clover-solvers
                    clover-solvers-running in-editor-solvers solver solvers drop-refs runstream-refs runstreams theme-refs flow-refs)))
       ;         )
      )))
@@ -1095,7 +1374,7 @@
 
 (re-frame/reg-sub ::flow-editor? (fn [db] (get db :flow-editor? false)))
 
-(re-frame/reg-sub ::auto-run? (fn [db] (get db :auto-run? true)))
+(re-frame/reg-sub ::auto-run? (fn [db] (get db :auto-run? false)))
 
 (re-frame/reg-sub ::auto-run-and-connected?
                   (fn [db]
@@ -1104,14 +1383,14 @@
 (re-frame/reg-sub ::bg-status?
                   (fn [_]
                     (and @db/auto-refresh? ;; auto-refresh killswitch bool
-                         (or (= @db/editor-mode :status) 
-                             (= @db/editor-mode :vvv) 
+                         (or (= @db/editor-mode :status)
+                             (= @db/editor-mode :vvv)
                              (= @db/editor-mode :meta)))))
 
 (re-frame/reg-sub
  ::update-flow-statuses?
- (fn [db] (and (get db :flow? false) 
-               (= (get @db/flow-editor-system-mode 0) "flows running") 
+ (fn [db] (and (get db :flow? false)
+               (= (get @db/flow-editor-system-mode 0) "flows running")
                (get db :flow-editor? false))))
 
 (re-frame/reg-event-db ::flow-statuses-response (fn [db [_ ss]] (assoc db :flow-statuses ss)))
@@ -1860,21 +2139,21 @@
   (and (number? n) (not= n (js/Math.floor n))))
 
 (defn insert-new-block-raw [root width height body runner syntax]
-    (let [new-key            (str "block-" (rand-int 12345))
-          clover?            (= runner :clover)
-          clojure?           (= syntax "clojure")
-          view-name          (ut/safe-key (keyword (str (cstr/replace (str runner) ":" "") "-hop")))
-          runner             (if clover? :views runner)
-          block-runners-map  @(ut/tracked-sub ::block-runners {})
-          as-function?       (get-in block-runners-map [runner :hop-function?] false)
-          _ (tapp>> [:new-hop-block clover? clojure? runner syntax body as-function?])
-          req-block-name     (get-in (first body) [:drag-meta :block-name])
-          new-keyw           (if (nil? req-block-name) (keyword new-key) (keyword req-block-name))
-          new-keyw           (ut/safe-key new-keyw)
-          tab                @(ut/tracked-subscribe [::selected-tab])
-          valid-body         (if (or clover? clojure?)
-                               (try (edn/read-string (str body))
-                                    (catch :default _ (str body)))
+  (let [new-key            (str "block-" (rand-int 12345))
+        clover?            (= runner :clover)
+        clojure?           (= syntax "clojure")
+        view-name          (ut/safe-key (keyword (str (cstr/replace (str runner) ":" "") "-hop")))
+        runner             (if clover? :views runner)
+        block-runners-map  @(ut/tracked-sub ::block-runners {})
+        as-function?       (get-in block-runners-map [runner :hop-function?] false)
+        _ (tapp>> [:new-hop-block clover? clojure? runner syntax body as-function?])
+        req-block-name     (get-in (first body) [:drag-meta :block-name])
+        new-keyw           (if (nil? req-block-name) (keyword new-key) (keyword req-block-name))
+        new-keyw           (ut/safe-key new-keyw)
+        tab                @(ut/tracked-subscribe [::selected-tab])
+        valid-body         (if (or clover? clojure?)
+                             (try (edn/read-string (str body))
+                                  (catch :default _ (str body)))
                               ;;  (if (cstr/starts-with? body "\"") ;; add quotes if need be
                               ;;    body
                               ;;    (pr-str body))
@@ -1884,28 +2163,28 @@
                                ;(pr-str body)
                                ;(vec (map pr-str (cstr/split (str body) "\n")))
                                ;[(str (char 34) (cstr/trim (str body)) (char 34))]
-                               [(str body)])
+                             [(str body)])
           ;;valid-body         (if (or clover? clojure?) valid-body [body])
-          valid-body         (if (and as-function? (or clover? clojure?))
-                               (walk/postwalk-replace
-                                {:clover-body valid-body}
-                                (get-in block-runners-map [runner :default] valid-body))
-                               valid-body)
+        valid-body         (if (and as-function? (or clover? clojure?))
+                             (walk/postwalk-replace
+                              {:clover-body valid-body}
+                              (get-in block-runners-map [runner :default] valid-body))
+                             valid-body)
           ;valid-body?       (ut/well-formed? body)
-          base-map           {:h             height
-                              :w             width
-                              :root          root
-                              :tab           tab
-                              :selected-view view-name
-                              :name          new-key
-                              runner         {view-name valid-body}
+        base-map           {:h             height
+                            :w             width
+                            :root          root
+                            :tab           tab
+                            :selected-view view-name
+                            :name          new-key
+                            runner         {view-name valid-body}
                               ;:queries       {}
-                              }]
-      (if valid-body
-        (do (ut/tracked-dispatch [::update-workspace [new-keyw] base-map])
-            (ut/tracked-dispatch [::select-block new-keyw])
-            :success)
-        :failed)))
+                            }]
+    (if valid-body
+      (do (ut/tracked-dispatch [::update-workspace [new-keyw] base-map])
+          (ut/tracked-dispatch [::select-block new-keyw])
+          :success)
+      :failed)))
 
 
 (defn insert-new-block
@@ -1990,17 +2269,16 @@
                             :selected-view :hare-vw
                             :name          new-key
                             :views         {:hare-vw [:box :align :center :justify :center :attr {:id (str new-keyw "." :hi)} :style
-                                                 {:font-size    "21px"
-                                                  :font-weight  700
-                                                  :padding-top  "6px"
-                                                  :padding-left "14px"
-                                                  :margin-top   "-8px"
-                                                  :color        :theme/editor-outer-rim-color ;"#f9b9f9"
-                                                  :font-family  :theme/base-font} 
-                                                 :child 
+                                                      {:font-size    "21px"
+                                                       :font-weight  700
+                                                       :padding-top  "6px"
+                                                       :padding-left "14px"
+                                                       :margin-top   "-8px"
+                                                       :color        :theme/editor-outer-rim-color ;"#f9b9f9"
+                                                       :font-family  :theme/base-font}
+                                                      :child
                                                  ;;["hi!"]
-                                                 "It's a perfect day for planting seeds and planning adventures!"
-                                                 ]}
+                                                      "It's a perfect day for planting seeds and planning adventures!"]}
                             :queries       {}})]
       (ut/tracked-dispatch [::update-workspace [new-keyw] base-map])
       (reset! hover-square nil))))
@@ -2316,8 +2594,7 @@
                                                                  {;:color "black"  ;;vcolor
                                                                   ;:border (when (= raw-code (first @param-hover)) (str "3px dashed " vcolor))
                                                                   :box-shadow  (when (= raw-code (first @param-hover)) "2px 2px 20px #FF06B5")
-                                                                  :background-color (ut/invert-hex-color vcolor)})
-                                                               )))
+                                                                  :background-color (ut/invert-hex-color vcolor)}))))
                                       _ (.appendChild node (js/document.createTextNode code-part))]
                                   (.addEventListener
                                    node
@@ -2405,11 +2682,11 @@
                                               (count (last code-lines)))
                         react!     [@param-hover]
                         node               (js/document.createElement "span")
-                        _ (.setAttribute node "style" (ut/hiccup-css-to-string (merge 
+                        _ (.setAttribute node "style" (ut/hiccup-css-to-string (merge
                                                                                 css
                                                                                 (let [_ (tapp>> [:psplit table field code (str @param-hover)])]
-                                                                                  {}) 
-                                                                                (when vcolor 
+                                                                                  {})
+                                                                                (when vcolor
                                                                                   {;:color "black"  ;;vcolor
                                                                                    ;:border (when (= raw-code (first @param-hover)) (str "3px dashed " vcolor))
                                                                                    :box-shadow  (when (= raw-code (first @param-hover)) "2px 2px 20px #FF06B5")
@@ -2512,7 +2789,7 @@
          data {:h         (or h 4)
                :w         (or w 7)
                ;:drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
-                runner     {view-name data}
+               runner     {view-name data}
                :name      (or nname (str "dragged-clover"))}]
      {:type          "meta-menu" ;:play-port
       :on-drag-end   #(do (reset! dragging? false))
@@ -2637,24 +2914,16 @@
     [re-com/box
      :size "auto"
      :padding "8px"
-     ;:width (px (- width-int 24))    
      :height (px (- height-int 14))
      :style {:font-family      (if (= syntax "text")
                                  (theme-pull :theme/base-font nil)
                                  (theme-pull :theme/monospaced-font nil))
-             ;;:color           (theme-pull :theme/editor-outer-rim-color nil)
              :font-size        "16px"
              :overflow         "auto"
              :background-color "#00000000"
              :font-weight      700}
      :child [(reagent/adapt-react-class cm/UnControlled)
-             {;; :value   (ut/format-map (- width-int 24)
-              ;; :value   (if stringify?
-              ;;            (try (str (cstr/join "\n" value)) (catch :default _ (str value)))
-              ;;            (ut/format-map (- width-int 24) (str value)))
-              :value (try (ut/format-map code-width (str value)) (catch :default _ value))
-              ;:onBlur  #()
-              ;:onFocus        (fn [_] (reset! db/cm-focused? true))
+             {:value (try (ut/format-map code-width (str value)) (catch :default _ value))
               :options {:mode              syntax
                         :lineWrapping      true
                         :lineNumbers       false ;true
@@ -2666,10 +2935,17 @@
                         :readOnly          true
                         :theme             (theme-pull :theme/codemirror-theme nil)}}]]))
 
+
+
+
+
+
+
+
+
 (defn strip-do [s]
   (let [s (cstr/trim (str s))]
     (subs s 3 (dec (count s)))))
-
 
 (defn panel-code-box [_ _ width-int height-int value & [repl?]]
   (let [;sql-hint?   (cstr/includes? (str value) ":::sql-string")
@@ -2685,7 +2961,7 @@
         ;key         selected-kp
         ;;repl?       (true? repl?)
         font-size   (if (nil? key) 13 17)
-        value       (if (and repl? (cstr/starts-with? (cstr/trim (str value)) "(do")) 
+        value       (if (and repl? (cstr/starts-with? (cstr/trim (str value)) "(do"))
 
                       (try (str (strip-do value))
                            (catch :default _ value))
@@ -2722,7 +2998,7 @@
                                              (try (read-string (cstr/join " " (ut/cm-deep-values %)))
                                                   (catch :default e [:cannot-parse (str (.-message e))])))
 
-                              
+
                               selected-kp  (if (nil? (first selected-kp)) nil selected-kp)
                               key          selected-kp
                               unparseable? (= (first parse) :cannot-parse)]
@@ -3558,7 +3834,7 @@
                         dcolor (get @(ut/tracked-sub ::conn/data-colors {}) dtype)]
 
                     [draggable-intro
-                     [re-com/v-box 
+                     [re-com/v-box
                       :size "auto"
                       :attr
                       {;:on-mouse-enter #(reset! query-hover k)
@@ -3656,14 +3932,14 @@
                                 (str (theme-pull :theme/grid-selected-background-color nil) 55)
                                 (if selected? (theme-pull :theme/grid-selected-background-color nil) "inherit"))} :children
            [[re-com/h-box :justify :between :children
-             [[re-com/box 
+             [[re-com/box
                :min-height "26px"
-               :child (if minimized? 
-                        [re-com/h-box 
+               :child (if minimized?
+                        [re-com/h-box
                          :size "auto"
                          :justify :between :children [[re-com/box :child (str nname)] [re-com/box :child "(minimized)" :style {:opacity 0.6}]]]
-                        (str nname)) 
-               :size "auto" 
+                        (str nname))
+               :size "auto"
                :style {:font-weight 700 :font-size "13px" :padding-left "4px" :padding-right "4px" :opacity (when minimized? 0.5)}]]]
             (when (not minimized?)
               [re-com/h-box :justify :between :children
@@ -3870,7 +4146,7 @@
                                :name          (str "select-" field-name "-" table-name)
                                :queries       {sql-name {:select [[[:sum (keyword field-name)] (keyword (str field-name "_sum"))]]
                                                          :from   [(keyword qual-table-name)]}}}]
-    
+
      ;; update counts so we can do viz-gen 
 
     (cond (= type :viz-reco)     (let [;; we need to change all the generic aliases into real rando keys
@@ -4320,7 +4596,7 @@
                                   (for [k valid-params]
                                     (if (cstr/includes? (str k) ":query/")
                                       {k (dissoc @(ut/tracked-sub ::resolve-sql-alias
-                                                           {:sql-key (keyword (ut/replacer (str k) ":query/" ""))})
+                                                                  {:sql-key (keyword (ut/replacer (str k) ":query/" ""))})
                                                  :style-rules)}
                                       {k @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})})))
         replaced            (->> query
@@ -5059,8 +5335,8 @@
                (if (and (not self?) block-panel?) {:block-ops block-ops} (if big-enough-for-viz? {:new-viz viz-options} {}))
                (if (and self? block-panel?)
                  {:block-ops
-                  [(if (= drag-type :query) 
-                     (if is-child? [:delete-query :promote-query] [:delete-query]) 
+                  [(if (= drag-type :query)
+                     (if is-child? [:delete-query :promote-query] [:delete-query])
                      [:delete-view :materialize-values])]}
                  {}))
               (and (>= w 11) (>= h 6) not-sys?)
@@ -5283,7 +5559,7 @@
 (re-frame/reg-sub ::stylers
                   (fn [db [_ panel-key query-key]]
                     (into {}
-                          (for [[[cols name] logic-map] (get-in db [:sql-source query-key :style-rules])] 
+                          (for [[[cols name] logic-map] (get-in db [:sql-source query-key :style-rules])]
                             {name (merge {:cols cols} logic-map)}))))
 
 (defn hex-to-rgb [hex]
@@ -5332,8 +5608,8 @@
         temp       (str "hsl(" hue ",100%,50%)")
         custom?    (and (vector? scheme) (= (count scheme) 2))
         ;;_ (tapp>> [:scheme :why scheme custom?] )
-        scheme     (if custom? 
-                     (gen-gradient (first scheme) (second scheme) 3) 
+        scheme     (if custom?
+                     (gen-gradient (first scheme) (second scheme) 3)
                      (get-in ut/colorbrewer [scheme depth] []))
         num-scheme (count scheme)
         bins       (/ 100 num-scheme)
@@ -5608,10 +5884,10 @@
                   hh (js/Math.floor (* (/ (/ height-int charts-high) db/brick-size) h-multi))
                   ww (js/Math.floor (* (/ (/ width-int charts-wide) db/brick-size) w-multi))
                   body
-                  [re-com/v-box 
-                   :size "none" 
-                   :width (px (* ww db/brick-size)) 
-                   :height (px (* hh db/brick-size)) 
+                  [re-com/v-box
+                   :size "none"
+                   :width (px (* ww db/brick-size))
+                   :height (px (* hh db/brick-size))
                    :style
                    {:zoom         0.44
                     :padding-left "10px"
@@ -5846,7 +6122,7 @@
         child-parts (into kit-callout-fields
                           (cond parent-of-selected? (vec ;;
                                                      (ut/deep-flatten (merge @(ut/tracked-sub ::panel-sql-calls
-                                                                                       {:panel-key selected-block})
+                                                                                              {:panel-key selected-block})
                                                                              @(ut/tracked-sub ::views {:panel-key selected-block}))))
                                 :else               []))
         hide?
@@ -5986,7 +6262,7 @@
               ;;                         (ut/tracked-dispatch [::select-view panel-key query-key])
               ;;                         (reset! animate? false))
               ;;                      1000)))}
-               {}) :size "auto" :style
+                 {}) :size "auto" :style
              {:font-size       pxsize
               :cursor          (when agg? "pointer")
               :transition      "all 0.6s ease-in-out"
@@ -7291,7 +7567,7 @@
 
 (re-frame/reg-event-db ::check-status ;; deprecated due to pub sub reactor
                        (fn [db _]
-                         (let [client-name (get db :client-name)] 
+                         (let [client-name (get db :client-name)]
                            (ut/tracked-dispatch [::wfx/request :default
                                                  {:message     {:kind :get-status :client-name client-name}
                                                   :on-response [::http/status-response]
@@ -7360,7 +7636,7 @@
            :ut/subq-mapping-alpha          ut/subq-mapping-alpha
            :db/flow-results                db/flow-results
            :db/scrubbers                   db/scrubbers
-           :bricks/get-all-values-flatten  get-all-values-flatten
+          ;; :bricks/get-all-values-flatten  get-all-values-flatten
            :ut/is-base64-atom              ut/is-base64-atom
            :db/solver-fn-runs              db/solver-fn-runs
            :ut/is-large-base64-atom        ut/is-large-base64-atom
@@ -7384,6 +7660,7 @@
                                                                                                                         ;; cache
                                                                                                                         ;; hits
                                                                                                                         ;; distro
+         ;;(when (> (get-in atom-size-map [:bricks/get-all-values-flatten]) 40) (reset! get-all-values-flatten {}))
          (when (> (get-in atom-size-map [:ut/split-cache-data :mb]) 40) (ut/purge-splitter-cache 0.99 100))
          (when (> (get-in atom-size-map [:ut/replacer-data :mb]) 40) (ut/purge-replacer-cache 0.99 50))
          (when (> (get-in atom-size-map [:ut/deep-flatten-data :mb]) 40) (ut/purge-deep-flatten-cache 0.99 100))
@@ -7446,9 +7723,8 @@
                           (let [p (get-in e [:message :ui-keypath])] p))))
          reco-counts @(ut/tracked-subscribe [::query-reco-counts table-name])]
      ;(tapp>> [:combo-rows (str existing) table-name reco-counts (get-in db [:data :reco-counts])])
-     (when (and (empty? (get-in db [:data :viz-shapes])) 
-                (not (running? [:viz-shapes]))
-                )
+     (when (and (empty? (get-in db [:data :viz-shapes]))
+                (not (running? [:viz-shapes])))
        (conn/sql-data [:viz-shapes]
                       {:select [:axes_logic :base_score :connection_id :library_shapes :selected_view :run_id :shape_name
                                 :sql_maps]
@@ -7685,7 +7961,7 @@
 
 
 (re-frame/reg-event-db
- ::update-reco-previews 
+ ::update-reco-previews
  (fn [db [_]]
    (let [data-hash   (hash (get db :data))]
      (tapp>>  [:fetch-reco-previews-run])
@@ -7697,8 +7973,7 @@
                        :from     [[:combo_rows :uu2434aa]]
                        :group-by [:table_name]}))
      ;;(doseq [[k v] all-queries] (conn/sql-deep-meta [k] (sql-alias-replace-sub v) (get-in db [:panels (lkp k) :connection-id])))
-     (assoc db :data-hash data-hash)
-     )))
+     (assoc db :data-hash data-hash))))
 
 
 
@@ -7733,6 +8008,8 @@
 
 (defn iif [v this that] (if (true? v) this that))
 (defn eql [this that] (= this that))
+
+
 
 
 
@@ -7775,29 +8052,27 @@
 
 (declare map-boxes2*)
 
-(defonce opened-boxes (reagent/atom {}))
-(defonce opened-boxes-code (reagent/atom {}))
-(defonce map-boxes-pages (reagent/atom {}))
 
-(defn map-boxes2 [data block-id selected-view keypath kki init-data-type & [draggable? key-depth]]
+
+(defn map-boxes2 [data block-id selected-view keypath kki init-data-type & [draggable? key-depth inner?]]
   [reecatch
    (let [keypath-in (conj keypath kki)
          data (if (nil? data) {:error "no data, bub!"} data)
-         open? (get @opened-boxes (pr-str [block-id keypath-in kki]))
+         open? (get-in @opened-boxes [block-id keypath-in kki])
          page (get @map-boxes-pages [block-id selected-view keypath kki] 1)
          cache-key (pr-str [data block-id selected-view keypath kki page init-data-type draggable? key-depth open?])
          react! [@opened-boxes @opened-boxes-code]
          cache (get @ut/map-boxes-cache cache-key)]
      (swap! ut/map-boxes-cache-hits update cache-key (fnil inc 0))
      (if false cache
-         (let [res (map-boxes2* data block-id selected-view keypath kki init-data-type draggable? key-depth)]
+         (let [res (map-boxes2* data block-id selected-view keypath kki init-data-type draggable? key-depth inner?)]
            (swap! ut/map-boxes-cache assoc cache-key res)
            res)))])
 
 ;;(ut/tapp>> [:map-boxes-cache-hits @ut/map-boxes-cache-hits])
 ;;(ut/tapp>> [:map-boxes-cache-hits2 (ut/distribution ut/map-boxes-cache-hits 0.33)]) 
 
-;;; [map-boxes2 x panel-key selected-view [] :output nil ]
+;;; [map-boxes2 x panel-key selected-view [] :output nil ] 
 
 (re-frame/reg-event-db
  ::drill-down-data-viewer-view
@@ -7811,7 +8086,7 @@
 (declare edn-code-box)
 
 ;(def start 0)  ; the start index of the page
-(def limit 20)  ; the number of items per page
+(def limit 20000000)  ; the number of items per page
 
 (defn get-page [iter page limit]
   (if (= page "*")
@@ -7820,11 +8095,11 @@
       (subvec iter start (min (+ start limit) (count iter))))))
 
 (defn map-boxes2*
-  [data block-id selected-view keypath kki init-data-type & [draggable? key-depth]] ;; dupe of a fn inside
+  [data block-id selected-view keypath kki init-data-type & [draggable? key-depth inner?]] ;; dupe of a fn inside
   (if (<= (count keypath) (or key-depth 6))
     (let [sql-explanations (sql-explanations-kp) ;; turn into general key annotations as some point with KP lookups?
           flow-name (ut/data-typer data)
-          react! [@opened-boxes]
+          react! [@opened-boxes @opened-boxes-code]
           ;;;_ (tapp>>  [:kki (str keypath) kki])
           data (if (or (string? data) (number? data) (boolean? data)) [data] data)
           base-type-vec? (or (vector? data) (list? data))
@@ -7835,12 +8110,16 @@
                  (get-page (vec (keys data)) start limit))
           total-items (if base-type-vec? (count data) (count (keys data)))
           total-pages (Math/ceil (/ total-items (float limit)))
+          [h w] @(ut/tracked-subscribe [::size block-id])
+         ; h (if inner? 300 h)
+         ; w (if inner? 300 w)
+          ;_ (tapp>> [:sizes h w block-id])
           ;;current-page (inc (/ start limit))
           ;current-page (quot start limit)
           ;current-page (/ start limit)
           ;iter (vec (take 4 iter))
           clover-kp-block? (and (keyword? block-id) (cstr/includes? (str block-id) "/"))
-          source (if clover-kp-block? 
+          source (if clover-kp-block?
                    block-id
                    @(ut/tracked-sub ::data-viewer-source {:block-id block-id :selected-view selected-view}))
           source-kp (when (vector? source) (last source))
@@ -7853,394 +8132,491 @@
           dcolors @(ut/tracked-sub ::conn/data-colors {})
           non-canvas? (nil? block-id)
           dggbl (if non-canvas? draggable-stub draggable)
+          inner-w (- (* w db/brick-size) 24)
+          inner-w2 (if inner?
+                     (- (first inner?) (* (last inner?) 1.2) )
+                     (- inner-w 21))
+          inner-h (- (* h db/brick-size) 90)
           main-boxes
-          [re-com/v-box ;(if cells? re-com/h-box re-com/v-box)   
-           :size "auto" :padding "5px" :gap "2px" :style
+          [(if inner? ;; dont want to double-bag virtual v-boxes, shit gets weird
+             re-com/v-box
+             virtual-v-box)
+           ;re-com/v-box ;(if cells? re-com/h-box re-com/v-box)   
+           :width (when (not inner?) (px inner-w)) 
+           :height (when (not inner?) (px inner-h)) 
+           :attr {:id (str block-id selected-view)} 
+           ;:size "1" 
+           ;:padding "5px" 
+           ;:justify :between 
+           ;:align :end
+           ;:gap "2px" 
+;           :size "auto"
+           :style
            {:color       "black"
+            ;:border "1px solid yellow"
             :font-family (theme-pull :theme/base-font nil)
             :font-size   font-size ; "11px"
             :font-weight 500}
-           :children
-           (conj
-            (vec (for [kk iter] ;; (keys data)
-                   (let [k-val      (get-in data [kk])
-                         k-val-type (or init-data-type (ut/data-typer k-val))
-                         in-body?   true ;(ut/contains-data? only-body k-val)
-                         hovered?   false ;(ut/contains-data? mat-hovered-input k-val)
-                         border-ind (if in-body? "solid" "dashed")
-                         val-color  (get dcolors k-val-type (theme-pull :theme/editor-outer-rim-color nil))
-                         keypath-in (conj keypath kk)
-                         clover-kp  (when source-clover-key?
-                                      (edn/read-string (str source ">" (cstr/replace (cstr/join ">" keypath-in) ":" ""))))
-                  ;;  _ (ut/tapp>> [:clover-kp clover-kp (str keypath-in)])
-                         keystyle   {:background-color (if hovered? (str val-color 66) "#00000000")
-                                     :color            val-color
-                                     :border-radius    "12px"
-                                     :border           (str "3px " border-ind " " val-color)}
-                         valstyle   {:background-color (if hovered? (str val-color 22) "#00000000") ;"#00000000"
-                                     :color            val-color
-                                     :border-radius    "12px"
-                                     :border           (str "3px " border-ind " " val-color 40)}
-                         kp-clover (cond source-clover-key? clover-kp
-                                         source-app-db? [:app-db (vec  (into source-kp keypath-in))]
-                                         :else [:get-in [source keypath-in]])]
-                     ^{:key (str block-id keypath kki kk)}
-                     [re-com/box :child
-                      (cond
-                        (or (= k-val-type "map")
-                            (= k-val-type "list")
-                      ;(= k-val-type "set")
-                            (= k-val-type "rowset")
-                            (= k-val-type "vector"))
-                        ^{:key (str block-id keypath kki kk k-val-type)}
+           :children (let [children-vec (conj
+                                         (vec (for [kk iter] ;; (keys data)
+                                                (let [k-val      (get-in data [kk])
+                                                      k-val-type (or init-data-type (ut/data-typer k-val))
+                                                      in-body?   true ;(ut/contains-data? only-body k-val)
+                                                      hovered?   false ;(ut/contains-data? mat-hovered-input k-val)
+                                                      border-ind (if in-body? "solid" "dashed")
+                                                      val-color  (get dcolors k-val-type (theme-pull :theme/editor-outer-rim-color nil))
+                                                      keypath-in (conj keypath kk)
+                                                      clover-kp  (when source-clover-key?
+                                                                   (edn/read-string (str source ">" (cstr/replace (cstr/join ">" keypath-in) ":" ""))))
+                                                          ;;  _ (ut/tapp>> [:clover-kp clover-kp (str keypath-in)])
+                                                      keystyle   {:background-color (if hovered? (str val-color 66) "#00000000")
+                                                                  :color            val-color
+                                                                  :border-radius    "12px"
+                                                                  :border           (str "3px " border-ind " " val-color)}
+                                                      valstyle   {:background-color (if hovered? (str val-color 22) "#00000000") ;"#00000000"
+                                                                  :color            val-color
+                                                                  :border-radius    "12px"
+                                                                  :border           (str "3px " border-ind " " val-color 40)}
+                                                      kp-clover (cond source-clover-key? clover-kp
+                                                                      source-app-db? [:app-db (vec  (into source-kp keypath-in))]
+                                                                      :else [:get-in [source keypath-in]])
+                                                      open? (or (get-in @opened-boxes [block-id keypath-in kki] false) (= (try (count k-val) (catch :default _ 1)) 1))
+                                                      symbol-str (cond (= k-val-type "map") "{}"
+                                                                       (= k-val-type "vector") "[]"
+                                                                       (= k-val-type "list") "()"
+                                                                       (= k-val-type "set") "#{}"
+                                                                       :else "[]")
+                                                      header-gap (max (* (count (str kk)) 11) 90)
+                                                      code? (get-in @opened-boxes-code [block-id keypath-in kki] false)
+                                                      ;child-keys (try (count (keys k-val)) (catch :default _ 1))
+                                                      ;recur-sizes (apply + (for [[k v] k-val] (if (or (map? v) (vector? v) (set? v) (list? v)) 90 45)))
+                                                      sizes (fn [k-val]
+                                                              (try
+                                                                (cond
+                                                                  (nil? k-val) 0
+                                                                  (empty? k-val) 0
+                                                                  (map? k-val) (apply + (map (fn [[k v]] (if (or (seq? v) (map? v)) 110 45)) k-val))
+                                                                  (vector? k-val) (apply + (map (fn [v] (if (or (seq? v) (map? v)) 110 45)) k-val))
+                                                                  :else 0) (catch :default _ 0)))
+                                                      open-height (sizes k-val)
+                                                      open-kps (vec (for [kp (ut/keypaths (select-keys @opened-boxes [block-id]))
+                                                                          :when (get-in @opened-boxes kp)] (second kp)))
+                                                      open-kps (filter #(cstr/starts-with? (str %) (cstr/replace (str keypath-in)  "]" "")) open-kps)
+                                                      rem-smaller (fn [smaller-kp larger-kp]
+                                                                      (if (every? true? (map #(= %1 %2) smaller-kp (take (count smaller-kp) larger-kp)))
+                                                                        (subvec larger-kp (count smaller-kp))
+                                                                        []))
+                                                      open-vals (distinct (for [kps open-kps
+                                                                      :let [kps2  (rem-smaller keypath-in kps)
+                                                                            vvv (get-in k-val kps2)]
+                                                                      :when (ut/ne? vvv)] vvv))
+                                                      child-open-sizes (- (apply + (for [e open-vals] (sizes e))) 0)
+                                                      ;; _ (when (and open? (= (count keypath-in) 1)) 
+                                                      ;;     (tapp>> [:child-open-sizes keypath-in open? child-open-sizes open-height open-kps  (str (for [e open-vals] (sizes e)))]))
+                                                     ;; open-height (+ child-open-sizes open-height)
+                                                      ;; _ (tapp>> [(str [block-id keypath-in kki]) (for [kps open-kps
+                                                      ;;                                                  :let [kps2  (vec (rest kps))
+                                                      ;;                                                        vvv (get-in k-val kps2)]
+                                                      ;;                                                  :when (ut/ne? vvv)] (sizes vvv))])
+                                                      ;; _ (tapp>> [:open-kps open-kps (for [kps open-kps
+                                                      ;;                                     :let [kps2  (vec (rest kps))
+                                                      ;;                                           vvv (get-in k-val kps2)]
+                                                      ;;                                      ] vvv) k-val])
+                                                      ;; _ (try (tapp>> [(str [block-id keypath-in kki]) open-kps (try (keys k-val) (catch :default _ -1))
+                                                      ;;                 ;;(for [kvp (ut/kvpaths k-val)] (into keypath-in kvp))
+                                                      ;;                 ]) (catch :default _ nil))
 
-                        (let [open? (or (get @opened-boxes (pr-str [block-id keypath-in kki]) false) (= (count k-val) 1))
-                              symbol-str (cond (= k-val-type "map") "{}"
-                                               (= k-val-type "vector") "[]"
-                                               (= k-val-type "list") "()"
-                                               (= k-val-type "set") "#{}"
-                                               :else "[]")
-                              code? (get @opened-boxes-code (pr-str [block-id keypath-in kki]) false)]
+                                                      ;open-height (* child-keys 45)
+                                                      hhh (if open? child-open-sizes 85)]
+                                                  
+                                                  [inner-w hhh
+                                                   ^{:key (str block-id keypath kki kk)}
+                                                   [re-com/box
+                                                    :width (px inner-w2) ;(when (not inner?) (px inner-w2))
+                                                    :height (when (not inner?) (px hhh))
+                                                    :style {:overflow "hidden"
+                                                            ;:border "1px solid lime"
+                                                            }
+                                                    :size "none"
+                                                    ;:size "auto"
+                                                    :child
+                                                    (cond
+                                                      (or (= k-val-type "map")
+                                                          (= k-val-type "list")
+                                                              ;(= k-val-type "set")
+                                                          (= k-val-type "rowset")
+                                                          (= k-val-type "vector"))
+                                                      ^{:key (str block-id keypath kki kk k-val-type)}
 
-                          (cond (and open? (not code?))
-                                [re-com/h-box :children
-                                 [[dggbl ;;draggable
-                                   {:h         4
-                                    :w         6
-                                    :root      [0 0]
-                                    :drag-meta {:type        :viewer-pull
-                                                :param-full  ;[:box :style {:font-size "17px"} :child
-                                                [:data-viewer
-                                                 kp-clover];]
-                                                :param-type  k-val-type
-                                                :param-table :what
-                                                :param-field :what}} "meta-menu"
-                                   ^{:key (str block-id keypath kki kk k-val-type 1)}
-                                   [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
-                                    :children
-                                    [^{:key (str block-id keypath kki kk k-val-type 124)}
-                                     [re-com/box
-                                      :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
-                                      :child (str kk)]
-                                     ^{:key (str block-id keypath kki kk k-val-type 134)}
-                                     [re-com/h-box
-                                      :gap "6px"
-                                      :children [[re-com/box :child (str k-val-type)]
-                                                 (when (> (count k-val) 1)
-                                                   ^{:key (str block-id keypath kki kk k-val-type 156)}
-                                                   [re-com/box :style {:opacity 0.6} :child (str "(" (count k-val) ")")])]
-                                      :style
-                                      {:opacity     0.45
-                                       :font-size   font-size ; "9px"
-                                       :padding-top "7px"}]
+                                                      (let []
 
-
-                                     [re-com/h-box
-                                ;:align :end :justify :end 
-                                      :children [(when (not (= (count k-val) 1))
-                                                   [re-com/box :child symbol-str
-                                                    :padding "2px 8px 2px 8px"
-                                                                         ;:width "30px"
-                                                    :attr {:on-click #(swap! opened-boxes-code assoc (pr-str [block-id keypath-in kki]) (not code?))}
-                                                    :style
-                                                    {:opacity     0.45
-                                                     :font-family (theme-pull :theme/monospaced-font nil)
-                                                     :font-weight 700
-                                                     :border-radius "12px" ;:padding "3px"
-                                                     :background-color (when code? (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55))
-                                                     :cursor "pointer"
-                                                     :font-size   font-size ; "9px"
-                                                                              ;:padding-top "7px"
-                                                     }])
-
-                                                 (when (not (= (count k-val) 1))
-                                                   [re-com/box :child (str "   - ")
-                                                    :padding "2px 8px 2px 8px"
-                                                    :width "20px"
-                                                    :attr {:on-click #(swap! opened-boxes assoc (pr-str [block-id keypath-in kki]) false)}
-                                                    :style
-                                                    {:opacity     0.45
-                             ;:padding-left "2px"
-                                                     :border-radius "12px" ;:padding "3px"
-                                                     :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
-                                                     :cursor "pointer"
-                                                     :font-size   font-size ; "9px"
-                                   ;:padding-top "7px"
-                                                     }])]]]:padding
-                                    "8px"]] [map-boxes2
-                                             (if (= k-val-type "list")
-                                               (ut/lists-to-vectors k-val)
-                                               k-val)
-
-                                             block-id selected-view keypath-in kk nil draggable? key-depth]] :style
-                                 keystyle]
-
-
-                                (and open? code?)
-                                [re-com/h-box
-                                 :style keystyle
-                                 :children [^{:key (str block-id keypath kki kk k-val-type 1)}
-                                            [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
-                                             :children
-                                             [^{:key (str block-id keypath kki kk k-val-type 124)}
-                                              [re-com/box
-                                               :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
-                                               :child (str kk)]
-                                              ^{:key (str block-id keypath kki kk k-val-type 134)}
-
-                                              [re-com/h-box
-                                               :gap "6px"
-                                               :children [[re-com/box :child (str k-val-type)]
-                                                          (when (> (count k-val) 1)
-                                                            ^{:key (str block-id keypath kki kk k-val-type 156)}
-                                                            [re-com/box :style {:opacity 0.6} :child (str "(" (count k-val) ")")])]
-                                               :style
-                                               {:opacity     0.45
-                                                :font-size   font-size ; "9px"
-                                                :padding-top "7px"}]
-
-                                        ;; [re-com/box :child (str k-val-type) :style
-                                        ;;  {:opacity     0.45
-                                        ;;   :font-size   font-size ; "9px"
-                                        ;;   :padding-top "7px"}]
-                                        ;; (when (> (count k-val) 1)
-                                        ;;   ^{:key (str block-id keypath kki kk k-val-type 156)}
-                                        ;;   [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])
-
-                                              [re-com/h-box
-                                         ;:align :end :justify :end
-                                               :children [(when (not (= (count k-val) 1))
-                                                            [re-com/box :child symbol-str
-                                                             :padding "2px 8px 2px 8px"
-                                                    ;:width "30px"
-                                                             :attr {:on-click #(swap! opened-boxes-code assoc (pr-str [block-id keypath-in kki]) (not code?))}
-                                                             :style
-                                                             {:opacity     0.45
-                                                              :font-family (theme-pull :theme/monospaced-font nil)
-                                                              :font-weight 700
-                                                     ;:border-radius "12px" :padding "3px"
-                                                     ;:background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
-                                                              :cursor "pointer"
-                                                              :font-size   font-size ; "9px"
-                                            ;:padding-top "7px"
-                                                              }])
-
-                                                          (when (not (= (count k-val) 1))
-                                                            [re-com/box :child (str "   - ")
-                                                             :padding "2px 8px 2px 8px"
-                                                             :width "20px"
-                                                             :attr {:on-click #(swap! opened-boxes assoc (pr-str [block-id keypath-in kki]) false)}
-                                                             :style
-                                                             {:opacity     0.45
-                                                   ;:padding-left "2px"
-                                                              :border-radius "12px" ;:padding "3px"
-                                                              :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
-                                                              :cursor "pointer"
-                                                              :font-size   font-size ; "9px"
-                                            ;:padding-top "7px"
-                                                              }])]]]:padding
-                                             "8px"]
-
-                                            [re-com/v-box :children [;[re-com/box :child "x"
-                                                               ; :attr {:on-click #(swap! opened-boxes-code assoc (pr-str [block-id keypath-in kki]) false)}]
-                                                               ;[re-com/box :child (pr-str k-val)]
-                                                                     [edn-code-box 330 nil (str k-val)]]]]]
+                                                        (cond (and open? (not code?))
+                                                              [re-com/h-box
+                                                               :width (px inner-w2)
+                                                               ;:height (px hhh)
+                                                               ;:size "none"
+                                                               ;:size  "none"
+                                                               :justify :between
+                                                               :children
+                                                               [[dggbl ;;draggable
+                                                                 {:h         4
+                                                                  :w         6
+                                                                  :root      [0 0]
+                                                                  :drag-meta {:type        :viewer-pull
+                                                                              :param-full  ;[:box :style {:font-size "17px"} :child
+                                                                              [:data-viewer
+                                                                               kp-clover];]
+                                                                              :param-type  k-val-type
+                                                                              :param-table :what
+                                                                              :param-field :what}} "meta-menu"
+                                                                 ^{:key (str block-id keypath kki kk k-val-type 1)}
+                                                                 [re-com/v-box 
+                                                                  :min-width (px header-gap) ;"110px"
+                                                                  ;:width (px inner-w2)
+                                                                  :children
+                                                                  [^{:key (str block-id keypath kki kk k-val-type 124)}
+                                                                   [re-com/box
+                                                                    :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
+                                                                    :child (str kk)]
+                                                                   ^{:key (str block-id keypath kki kk k-val-type 134)}
+                                                                   [re-com/h-box
+                                                                    :gap "6px"
+                                                                    ;:width "100%"
+                                                                    ;:size "auto"
+                                                                    :children [[re-com/box
+                                                                                :child (str k-val-type)]
+                                                                               (when (> (count k-val) 1)
+                                                                                 ^{:key (str block-id keypath kki kk k-val-type 156)}
+                                                                                 [re-com/box :style {:opacity 0.6} :child (str "(" (count k-val) ")")])]
+                                                                    :style
+                                                                    {:opacity     0.45
+                                                                     :font-size   font-size ; "9px"
+                                                                     :padding-top "7px"}]
 
 
+                                                                   [re-com/h-box
+                                                                        ;:align :end :justify :end 
+                                                                    :children [(when (not (= (count k-val) 1))
+                                                                                 [re-com/box :child symbol-str
+                                                                                  :padding "2px 8px 2px 8px"
+                                                                                                                 ;:width "30px"
+                                                                                  :attr {:on-click #(swap! opened-boxes-code assoc-in [block-id keypath-in kki] (not code?))}
+                                                                                  :style
+                                                                                  {:opacity     0.45
+                                                                                   :font-family (theme-pull :theme/monospaced-font nil)
+                                                                                   :font-weight 700
+                                                                                   :border-radius "12px" ;:padding "3px"
+                                                                                   :background-color (when code? (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55))
+                                                                                   :cursor "pointer"
+                                                                                   :font-size   font-size ; "9px"
+                                                                                                                      ;:padding-top "7px"
+                                                                                   }])
+
+                                                                               (when (not (= (count k-val) 1))
+                                                                                 [re-com/box :child (str "   - ")
+                                                                                  :padding "2px 8px 2px 8px"
+                                                                                  :width "20px"
+                                                                                  :attr {:on-click #(swap! opened-boxes assoc-in [block-id keypath-in kki] false)}
+                                                                                  :style
+                                                                                  {:opacity     0.45
+                                                                     ;:padding-left "2px"
+                                                                                   :border-radius "12px" ;:padding "3px"
+                                                                                   :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                                                                   :cursor "pointer"
+                                                                                   :font-size   font-size ; "9px"
+                                                                           ;:padding-top "7px"
+                                                                                   }])]]]:padding
+                                                                  "8px"]]
+                                                                [map-boxes2
+                                                                 (if (= k-val-type "list")
+                                                                   (ut/lists-to-vectors k-val)
+                                                                   k-val)
+                                                                 block-id selected-view keypath-in kk nil draggable? key-depth [inner-w2 header-gap]]] :style
+                                                               keystyle]
 
 
-                                :else
-                                [re-com/v-box
-                                 :style keystyle
-                                 :min-width (px (* (count (str kk)) 11)) ;"110px"
-                                 :children
-                                 [^{:key (str block-id keypath kki kk k-val-type 124)}
-                                  [dggbl ;;draggable
-                                   {:h         4
-                                    :w         6
-                                    :root      [0 0]
-                                    :drag-meta {:type        :viewer-pull
-                                                :param-full  ;[:box :style {:font-size "17px"} :child
-                                                [:data-viewer
-                                                 kp-clover];]
-                                                :param-type  k-val-type
-                                                :param-table :what
-                                                :param-field :what}} "meta-menu"
-                                   [re-com/box
-                                    :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
-                                    :child (str kk)]]
-                                  ^{:key (str block-id keypath kki kk k-val-type 134)}
-                                  [re-com/h-box
-                                   :justify :between
-                                   :children
-                                   [[re-com/box :child (str k-val-type) :style
-                                     {:opacity     0.45
-                                      :font-size   font-size ; "9px"
-                                      :padding-top "7px"}]
-                                    [re-com/h-box
-                                     :justify :between :align :center :gap "4px"
-                                     :children (if (> (count k-val) 1)
-                                                 [[re-com/box :child (str (subs (str k-val) 0 30) (when (> (count (str k-val)) 30) "... ")) :style {:font-size "12px" :overflow "hidden"}]
-                                                  [re-com/box :child (str (count k-val) " items +")
-                                                   :attr {:on-click #(swap! opened-boxes assoc (pr-str [block-id keypath-in kki]) true)}
-                                                   :padding "2px 8px 2px 8px"
-                                                   :style
-                                                   {:opacity     0.45
-                                                    :border-radius "12px"
-                                                    :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
-                                                    :cursor "pointer"
-                                                    :font-size   font-size ; "9px"
-                                                    :padding-top "7px"}]]
-                                                 [[re-com/box :child "empty"
-                                                   :padding "2px 8px 2px 8px"
-                                                   :style
-                                                   {:opacity     0.45
-                                                    :border-radius "12px"
-                                                    :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
-                                                    :cursor "pointer"
-                                                    :font-size   font-size ; "9px"
-                                                    :padding-top "7px"}]])]]]] :padding
-                                 "8px"]))
+                                                              (and open? code?)
+                                                              [re-com/h-box
+                                                               :style keystyle
+                                                               :children [^{:key (str block-id keypath kki kk k-val-type 1)}
+                                                                          [re-com/v-box :min-width (px header-gap) ;"110px"
+                                                                           :children
+                                                                           [^{:key (str block-id keypath kki kk k-val-type 124)}
+                                                                            [re-com/box
+                                                                             :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
+                                                                             :child (str kk)]
+                                                                            ^{:key (str block-id keypath kki kk k-val-type 134)}
 
-                        (or ;(= k-val-type "vector")
-                      ;(= k-val-type "list")
-                      ;(= k-val-type "function")
-                      ;(= k-val-type "rowset")
-                         (= k-val-type "jdbc-conn")
-                         (= k-val-type "render-object"))
-                        ^{:key (str block-id keypath kki kk k-val-type 2)}
-                        [re-com/h-box :style {:border-radius "12px" :border "3px solid black"} :children
-                         [[dggbl ;;draggable
-                           {:h         4
-                            :w         6
-                            :root      [0 0]
-                            :drag-meta {:type        :viewer-pull
-                                        :param-full  ;[:box :style {:font-size "17px"}
-                                                ;:child
-                                        [:data-viewer
-                                         kp-clover];]
-                                        :param-type  k-val-type
-                                        :param-table :what
-                                        :param-field :what}} "meta-menu"         ;block-id
-                           ^{:key (str block-id keypath kki kk k-val-type 3)}
-                           [re-com/v-box :min-width (px (* (count (str kk)) 11)) ;"110px"
-                            :style
-                            {;:cursor (when draggable? "grab") ;;; skeptical, ryan 5/24/33
-                             }:children
-                            (if (and (= k-val-type "list") (= (ut/data-typer (first k-val)) "function"))
-                              [^{:key (str block-id keypath kki kk k-val-type 4)}
-                               [re-com/h-box :style {:margin-top "4px"} :gap "5px" :children
-                                [[re-com/box
-                                  :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
-                                  :child (str kk)
-                                  :style {:opacity 0.25}]
-                                 [re-com/box :child "(" :style
-                                  {;:opacity 0.5
-                                   :color       "orange"
-                                   :margin-top  "-2px"
-                                   :font-size   "14px"
-                                   :font-weight 700}]
-                                 ^{:key (str block-id keypath kki kk k-val-type 5)}
-                                 [re-com/box :child (str (first k-val)) ; (str  "(")
-                                  :style
-                                  {:color     "#ffffff"
-                                   :font-size font-size ;"17px"
-                                   }]]]
-                               ^{:key (str block-id keypath kki kk k-val-type 6)}
-                               [re-com/box :child (str k-val-type) :style
-                                {:opacity     0.45
-                                 :font-size   font-size ; "9px"
-                                 :padding-top "16px"}]
-                               (when (> (count k-val) 1)
-                                 ^{:key (str block-id keypath kki kk k-val-type 827)}
-                                 [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])]
+                                                                            [re-com/h-box
+                                                                             :gap "6px"
+                                                                             :children [[re-com/box :child (str k-val-type)]
+                                                                                        (when (> (count k-val) 1)
+                                                                                          ^{:key (str block-id keypath kki kk k-val-type 156)}
+                                                                                          [re-com/box :style {:opacity 0.6} :child (str "(" (count k-val) ")")])]
+                                                                             :style
+                                                                             {:opacity     0.45
+                                                                              :font-size   font-size ; "9px"
+                                                                              :padding-top "7px"}]
 
-                              [(when true ;(not (get sql-explanations keypath ""))
-                                 ^{:key (str block-id keypath kki kk k-val-type 7)}
-                                 [re-com/box
-                                  :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
-                                  :child (str kk)])
-                               (when true ; (not (get sql-explanations keypath ""))
-                                 ^{:key (str block-id keypath kki kk k-val-type 8)}
-                                 [re-com/box :child (str (when (= (count k-val) 0) "empty ") k-val-type)
-                                  :style
-                                  {:opacity     0.45
-                                   :font-size   font-size ; "9px"
-                                   :padding-top "7px"}])
-                               (when (ut/ne? (get sql-explanations keypath ""))
-                                 ^{:key (str block-id keypath kki kk k-val-type 82)}
-                                 [re-com/md-icon-button :md-icon-name "zmdi-info" :tooltip
-                                  (str "FOOO" (get sql-explanations keypath "")) :style
-                                  {:font-size "16px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}])]) :padding
-                            "8px"]]
-                          [map-boxes2
-                           (if (= k-val-type "rowset")
-                             (zipmap (iterate inc 0) (take 10 k-val))
-                             (zipmap (iterate inc 0) k-val))
-                           block-id selected-view keypath-in kk nil draggable? key-depth]] :style keystyle]
-                        :else
-                        ^{:key (str block-id keypath kki kk k-val-type 9)}
-                        [re-com/h-box :children
-                         [^{:key (str block-id keypath kki kk k-val-type 10)}
-                          [re-com/h-box :gap "6px" :children
-                           [[dggbl ;;draggable
-                             {:h         4
-                              :w         6
-                              :root      [0 0]
-                              :drag-meta {:type        :viewer-pull
-                                          :param-full  [:box :size "auto" :align :center :justify :center :style
-                                                        {;:font-size [:auto-size-px
-                                                         ;            (cond source-clover-key? clover-kp
-                                                         ;                  source-app-db? [:app-db keypath-in]
-                                                         ;                  :else [:get-in [source keypath-in]])]
-                                                         }
-                                                        :child
-                                                        [:string (cond source-clover-key? clover-kp
-                                                                       source-app-db? [:app-db keypath-in]
-                                                                       :else [:get-in [source keypath-in]])]]
-                                          :param-type  k-val-type
-                                          :param-table :what
-                                          :param-field :what}} "meta-menu" ;block-id
-                             ^{:key (str block-id keypath kki kk k-val-type 11)}
-                             [re-com/box
-                              :child (str kk)
-                              :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
-                              :style
-                              {;:cursor (when draggable? "grab")  
-                               }]]
-                            (when true ;(not (get sql-explanations (vec (conj keypath kk)) ""))
-                              ^{:key (str block-id keypath kki kk k-val-type 12)}
-                              [re-com/box :child (str k-val-type) :style
-                               {:opacity    0.45
-                                :font-size  font-size ;"9px"
-                                :font-style (if (= k-val-type "function") "italic" "normal")}])
-                            (when (get sql-explanations (vec (conj keypath kk)) "")
-                              ^{:key (str block-id keypath kki kk k-val-type 822)}
-                              [re-com/box :style {:opacity 0.45} :child (str (get sql-explanations (vec (conj keypath kk)) ""))])]]
-                          ^{:key (str block-id keypath kki kk k-val-type 13)}
-                          [re-com/box :size "auto" :align :end :justify :end :child [map-value-box k-val k-val-type] :style
-                           {;:font-weight 500
-                            :line-height  "1.2em"
-                            :padding-left "5px"}]] :justify :between :padding "5px" :style valstyle])])))
+                                                                                ;; [re-com/box :child (str k-val-type) :style
+                                                                                ;;  {:opacity     0.45
+                                                                                ;;   :font-size   font-size ; "9px"
+                                                                                ;;   :padding-top "7px"}]
+                                                                                ;; (when (> (count k-val) 1)
+                                                                                ;;   ^{:key (str block-id keypath kki kk k-val-type 156)}
+                                                                                ;;   [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])
 
-            (when (> total-pages 1)
-              (let [current-page (dec (get @map-boxes-pages [block-id selected-view keypath kki] 1))]
-                [re-com/v-box
-                 :style {:color "white"}
-                 :children [[re-com/h-box
-                             :justify :between :align :center
-                             :children (for [p (range total-pages)
-                                             :let [p (inc p)
-                                                   selected? (= (dec p) current-page)]]
-                                         [re-com/box
-                                          :attr {:on-click #(swap! map-boxes-pages assoc [block-id selected-view keypath kki] p)}
-                                          :style {:padding-left "5px"
-                                                  :cursor "pointer"
-                                                  :background-color (when selected? "darkcyan")
-                                                  :padding-right "5px"}
-                                          :child (str p)])]
-                                      ;[re-com/box :child (str current-page)]
-                            ]])))]]
+                                                                            [re-com/h-box
+                                                                                 ;:align :end :justify :end
+                                                                             :children [(when (not (= (count k-val) 1))
+                                                                                          [re-com/box :child symbol-str
+                                                                                           :padding "2px 8px 2px 8px"
+                                                                                            ;:width "30px"
+                                                                                           :attr {:on-click #(swap! opened-boxes-code assoc-in [block-id keypath-in kki] (not code?))}
+                                                                                           :style
+                                                                                           {:opacity     0.45
+                                                                                            :font-family (theme-pull :theme/monospaced-font nil)
+                                                                                            :font-weight 700
+                                                                                             ;:border-radius "12px" :padding "3px"
+                                                                                             ;:background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                                                                            :cursor "pointer"
+                                                                                            :font-size   font-size ; "9px"
+                                                                                    ;:padding-top "7px"
+                                                                                            }])
+
+                                                                                        (when (not (= (count k-val) 1))
+                                                                                          [re-com/box :child (str "   - ")
+                                                                                           :padding "2px 8px 2px 8px"
+                                                                                           :width "20px"
+                                                                                           :attr {:on-click #(swap! opened-boxes assoc-in [block-id keypath-in kki] false)}
+                                                                                           :style
+                                                                                           {:opacity     0.45
+                                                                                           ;:padding-left "2px"
+                                                                                            :border-radius "12px" ;:padding "3px"
+                                                                                            :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                                                                            :cursor "pointer"
+                                                                                            :font-size   font-size ; "9px"
+                                                                                    ;:padding-top "7px"
+                                                                                            }])]]]:padding
+                                                                           "8px"]
+
+                                                                          [re-com/v-box :children [;[re-com/box :child "x"
+                                                                                                       ; :attr {:on-click #(swap! opened-boxes-code assoc-in [block-id keypath-in kki] false)}]
+                                                                                                       ;[re-com/box :child (pr-str k-val)]
+                                                                                                   [edn-code-box 330 nil (str k-val)]]]]]
+
+
+
+
+                                                              :else
+                                                              [re-com/v-box
+                                                               :style keystyle
+                                                               ;:min-width (px (* (count (str kk)) 11)) ;"110px"
+                                                               :width "100%"
+                                                               ;:width (px inner-w2)
+                                                               :children
+                                                               [^{:key (str block-id keypath kki kk k-val-type 124)}
+                                                                [dggbl ;;draggable
+                                                                 {:h         4
+                                                                  :w         6
+                                                                  :root      [0 0]
+                                                                  :drag-meta {:type        :viewer-pull
+                                                                              :param-full  ;[:box :style {:font-size "17px"} :child
+                                                                              [:data-viewer
+                                                                               kp-clover];]
+                                                                              :param-type  k-val-type
+                                                                              :param-table :what
+                                                                              :param-field :what}} "meta-menu"
+                                                                 [re-com/box
+                                                                  :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
+                                                                  :child (str kk)]]
+                                                                ^{:key (str block-id keypath kki kk k-val-type 134)}
+                                                                [re-com/h-box
+                                                                 :width "100%"
+                                                                 :justify :between
+                                                                 :children
+                                                                 [[re-com/box :child (str k-val-type) :style
+                                                                   {:opacity     0.45
+                                                                    :font-size   font-size ; "9px"
+                                                                    :padding-top "7px"}]
+                                                                  [re-com/h-box
+                                                                   ;:justify :between 
+                                                                   ;:align :center 
+                                                                   ;:justify :end
+                                                                   ;:width "100%"
+                                                                   :gap "4px"
+                                                                   :children (let [preview-len (/ (* inner-w2 0.3) 4)]
+                                                                               (if (> (count k-val) 1)
+                                                                                 [[re-com/box :child (str (subs (str k-val) 0 preview-len) 
+                                                                                                          (when (> (count (str k-val)) preview-len) "... ")) 
+                                                                                   :style {:font-size "12px" :overflow "hidden"}]
+                                                                                  [re-com/box :child (str (count k-val) " items +")
+                                                                                   :attr {:on-click #(swap! opened-boxes assoc-in [block-id keypath-in kki] true)}
+                                                                                   :padding "2px 8px 2px 8px"
+                                                                                   :style
+                                                                                   {:opacity     0.45
+                                                                                    :border-radius "12px"
+                                                                                    :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                                                                    :cursor "pointer"
+                                                                                    :font-size   font-size ; "9px"
+                                                                                    :padding-top "7px"}]]
+                                                                                 [[re-com/box :child "empty"
+                                                                                   :padding "2px 8px 2px 8px"
+                                                                                   :style
+                                                                                   {:opacity     0.45
+                                                                                    :border-radius "12px"
+                                                                                    :background-color (str (get keystyle :color (theme-pull :theme/editor-outer-rim-color nil)) 55)
+                                                                                    :cursor "pointer"
+                                                                                    :font-size   font-size ; "9px"
+                                                                                    :padding-top "7px"}]]))]]]] :padding
+                                                               "8px"]))
+
+                                                      (or ;(= k-val-type "vector")
+                                                              ;(= k-val-type "list")
+                                                              ;(= k-val-type "function")
+                                                              ;(= k-val-type "rowset")
+                                                       (= k-val-type "jdbc-conn")
+                                                       (= k-val-type "render-object"))
+                                                      ^{:key (str block-id keypath kki kk k-val-type 2)}
+                                                      [re-com/h-box :style {:border-radius "12px" :border "3px solid black"} :children
+                                                       [[dggbl ;;draggable
+                                                         {:h         4
+                                                          :w         6
+                                                          :root      [0 0]
+                                                          :drag-meta {:type        :viewer-pull
+                                                                      :param-full  ;[:box :style {:font-size "17px"}
+                                                                                        ;:child
+                                                                      [:data-viewer
+                                                                       kp-clover];]
+                                                                      :param-type  k-val-type
+                                                                      :param-table :what
+                                                                      :param-field :what}} "meta-menu"         ;block-id
+                                                         ^{:key (str block-id keypath kki kk k-val-type 3)}
+                                                         [re-com/v-box :min-width (px header-gap) ;"110px"
+                                                          :style
+                                                          {;:cursor (when draggable? "grab") ;;; skeptical, ryan 5/24/33
+                                                           }:children
+                                                          (if (and (= k-val-type "list") (= (ut/data-typer (first k-val)) "function"))
+                                                            [^{:key (str block-id keypath kki kk k-val-type 4)}
+                                                             [re-com/h-box :style {:margin-top "4px"} :gap "5px" :children
+                                                              [[re-com/box
+                                                                :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
+                                                                :child (str kk)
+                                                                :style {:opacity 0.25}]
+                                                               [re-com/box :child "(" :style
+                                                                {;:opacity 0.5
+                                                                 :color       "orange"
+                                                                 :margin-top  "-2px"
+                                                                 :font-size   "14px"
+                                                                 :font-weight 700}]
+                                                               ^{:key (str block-id keypath kki kk k-val-type 5)}
+                                                               [re-com/box :child (str (first k-val)) ; (str  "(")
+                                                                :style
+                                                                {:color     "#ffffff"
+                                                                 :font-size font-size ;"17px"
+                                                                 }]]]
+                                                             ^{:key (str block-id keypath kki kk k-val-type 6)}
+                                                             [re-com/box :child (str k-val-type) :style
+                                                              {:opacity     0.45
+                                                               :font-size   font-size ; "9px"
+                                                               :padding-top "16px"}]
+                                                             (when (> (count k-val) 1)
+                                                               ^{:key (str block-id keypath kki kk k-val-type 827)}
+                                                               [re-com/box :style {:opacity 0.45} :child (str "(" (count k-val) ")")])]
+
+                                                            [(when true ;(not (get sql-explanations keypath ""))
+                                                               ^{:key (str block-id keypath kki kk k-val-type 7)}
+                                                               [re-com/box
+                                                                :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
+                                                                :child (str kk)])
+                                                             (when true ; (not (get sql-explanations keypath ""))
+                                                               ^{:key (str block-id keypath kki kk k-val-type 8)}
+                                                               [re-com/box :child (str (when (= (count k-val) 0) "empty ") k-val-type)
+                                                                :style
+                                                                {:opacity     0.45
+                                                                 :font-size   font-size ; "9px"
+                                                                 :padding-top "7px"}])
+                                                             (when (ut/ne? (get sql-explanations keypath ""))
+                                                               ^{:key (str block-id keypath kki kk k-val-type 82)}
+                                                               [re-com/md-icon-button :md-icon-name "zmdi-info" :tooltip
+                                                                (str "FOOO" (get sql-explanations keypath "")) :style
+                                                                {:font-size "16px" :cursor "pointer" :opacity 0.5 :padding "0px" :margin-top "-1px"}])]) :padding
+                                                          "8px"]]
+                                                        [map-boxes2
+                                                         (if (= k-val-type "rowset")
+                                                           (zipmap (iterate inc 0) (take 10 k-val))
+                                                           (zipmap (iterate inc 0) k-val))
+                                                         block-id selected-view keypath-in kk nil draggable? key-depth [inner-w2 header-gap]]] :style keystyle]
+                                                      :else
+                                                      ^{:key (str block-id keypath kki kk k-val-type 9)}
+                                                      [re-com/h-box :children
+                                                       [^{:key (str block-id keypath kki kk k-val-type 10)}
+                                                        [re-com/h-box :gap "6px" :children
+                                                         [[dggbl ;;draggable
+                                                           {:h         4
+                                                            :w         6
+                                                            :root      [0 0]
+                                                            :drag-meta {:type        :viewer-pull
+                                                                        :param-full  [:box :size "auto" :align :center :justify :center :style
+                                                                                      {;:font-size [:auto-size-px
+                                                                                                 ;            (cond source-clover-key? clover-kp
+                                                                                                 ;                  source-app-db? [:app-db keypath-in]
+                                                                                                 ;                  :else [:get-in [source keypath-in]])]
+                                                                                       }
+                                                                                      :child
+                                                                                      [:string (cond source-clover-key? clover-kp
+                                                                                                     source-app-db? [:app-db keypath-in]
+                                                                                                     :else [:get-in [source keypath-in]])]]
+                                                                        :param-type  k-val-type
+                                                                        :param-table :what
+                                                                        :param-field :what}} "meta-menu" ;block-id
+                                                           ^{:key (str block-id keypath kki kk k-val-type 11)}
+                                                           [re-com/box
+                                                            :child (str kk)
+                                                            :attr {:on-double-click #(ut/tracked-dispatch [::drill-down-data-viewer-view block-id selected-view kp-clover])}
+                                                            :style
+                                                            {;:cursor (when draggable? "grab")  
+                                                             }]]
+                                                          (when true ;(not (get sql-explanations (vec (conj keypath kk)) ""))
+                                                            ^{:key (str block-id keypath kki kk k-val-type 12)}
+                                                            [re-com/box :child (str k-val-type) :style
+                                                             {:opacity    0.45
+                                                              :font-size  font-size ;"9px"
+                                                              :font-style (if (= k-val-type "function") "italic" "normal")}])
+                                                          (when (get sql-explanations (vec (conj keypath kk)) "")
+                                                            ^{:key (str block-id keypath kki kk k-val-type 822)}
+                                                            [re-com/box :style {:opacity 0.45} :child (str (get sql-explanations (vec (conj keypath kk)) ""))])]]
+                                                        ^{:key (str block-id keypath kki kk k-val-type 13)}
+                                                        [re-com/box :size "auto" :align :end :justify :end :child [map-value-box k-val k-val-type] :style
+                                                         {;:font-weight 500
+                                                          :line-height  "1.2em"
+                                                          :padding-left "5px"}]] :justify :between :padding "5px" :style valstyle])]])))
+
+                                         (when (> total-pages 1)
+                                           (let [current-page (dec (get @map-boxes-pages [block-id selected-view keypath kki] 1))]
+                                             [re-com/v-box
+                                              :style {:color "white"}
+                                              :children [[re-com/h-box
+                                                          :justify :between :align :center
+                                                          :children (for [p (range total-pages)
+                                                                          :let [p (inc p)
+                                                                                selected? (= (dec p) current-page)]]
+                                                                      [re-com/box
+                                                                       :attr {:on-click #(swap! map-boxes-pages assoc [block-id selected-view keypath kki] p)}
+                                                                       :style {:padding-left "5px"
+                                                                               :cursor "pointer"
+                                                                               :background-color (when selected? "darkcyan")
+                                                                               :padding-right "5px"}
+                                                                       :child (str p)])]
+                                                                              ;[re-com/box :child (str current-page)]
+                                                         ]])))
+                           non-v-children (mapv last children-vec)]
+                       (if inner? 
+                         (vec non-v-children) 
+                         (vec children-vec))
+                       )
+                         ]]
+      
       (if (= keypath [])
         (let [k-val-type (ut/data-typer data)
               nin?       (not (= block-id :inline-render))
@@ -8274,6 +8650,62 @@
 ;; dcolors @(ut/tracked-sub ::conn/data-colors {})
 
 
+
+;; (def scrollbar-style
+;;   {:scrollbar-width "thin"
+;;    ;:scrollbar-color "#4a4a4a #2a2a2a66"
+;;    :scrollbar-color (str (str (theme-pull :theme/universal-pop-color nil) 33) "#00000033")
+;;    :&::-webkit-scrollbar {:width "10px"}
+;;    :&::-webkit-scrollbar-track {:background "#2a2a2a"
+;;                                 :border-radius "5px"}
+;;    :&::-webkit-scrollbar-thumb {:background "#4a4a4a"
+;;                                 :border-radius "15px"}
+;;    :&::-webkit-scrollbar-thumb:hover {:background "#6a6a6a"}})
+
+;; (defn virtualized-map-boxes2 [{:keys [text style width height]}]
+;;   (let [line-height 19 ;; Assuming each line is 17px high
+;;         ;; Ensure text is always a vector
+;;         text-lines (if (vector? text)
+;;                      text
+;;                      (vec (cstr/split text "\n")))
+;;         num-visible-lines (int (- (/ height line-height) 1))
+;;         total-lines       (+ (count text-lines) num-visible-lines 3)
+;;         state (reagent/atom {:start 0 :end num-visible-lines})
+;;         handle-scroll (fn [e]
+;;                         (let [scroll-top (.. e -target -scrollTop)
+;;                               start (int (/ scroll-top line-height))
+;;                               end (min total-lines (+ start num-visible-lines))]
+;;                           (swap! state assoc :start start :end end)))]
+;;     (fn []
+;;       (let [{:keys [start end]} @state
+;;             ;; Safeguard subvec to handle edge cases
+;;             visible-lines (if (and (<= start end) (<= end total-lines))
+;;                             (ut/safe-subvec text-lines start end)
+;;                             [])
+;;             html-content (cstr/join "\n" (map #(.toHtml ansi-converter %) visible-lines))
+;;             padding-top (* start line-height)
+;;             padding-bottom (* (- total-lines end) line-height)
+;;             console-style {:font-family "monospace"
+;;                            :font-size "15px"
+;;                            :line-height (str line-height "px")
+;;                            :padding "15px"
+;;                            :white-space "pre"
+;;                            :text-shadow "#00000088 1px 0 10px"
+;;                            :overflow "auto"}]
+;;         [re-com/box
+;;          :size "none" :width (str width "px") :height (str height "px")
+;;          :style (merge console-style style scrollbar-style)
+;;          :attr {:on-scroll handle-scroll}
+;;          :child [:div {:style {:font-family "inherit"
+;;                                :padding-top (str padding-top "px")
+;;                                :padding-bottom (str padding-bottom "px")}
+;;                        :dangerouslySetInnerHTML
+;;                        {:__html html-content}}]]))))
+
+;; (defn reactive-virtualized-map-boxes2 [{:keys [text] :as props}]
+;;   [:f> (with-meta virtualized-map-boxes2
+;;          {:key (hash text)})
+;;    props])
 
 
 
@@ -8601,7 +9033,7 @@
                     (let [src (get-in db [:runstreams flow-id :values kkey :source])]
                       (if (= src :param)
                         (let [vvv @(ut/tracked-sub ::resolver/logic-and-params
-                                            {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
+                                                   {:m [(get-in db [:runstreams flow-id :values kkey :value])]})
                               vv  (try (first vvv ;;@(ut/tracked-sub ::resolver/logic-and-params {:m [(get-in db
                                                   ;;[:runstreams
                                               )
@@ -8798,7 +9230,7 @@
                        :font-size "15px"
                        :line-height "1.1"
                        :padding "15px"
-                       :white-space "pre" 
+                       :white-space "pre"
                        :text-shadow "#00000088 1px 0 10px"
                        ;:background-color "#000"
                        ;:color "#ffffff99"
@@ -8823,7 +9255,7 @@
 
 ;; (defn virtualized-console-viewer [{:keys [text style width height]}]
 ;;   (let [line-height 19 ;; Assuming each line is 17px high
-        
+
 ;;         ;; Ensure text is always a vector
 ;;         text-lines (if (vector? text)
 ;;                      text
@@ -8929,10 +9361,6 @@
 
 
 
- 
-
-
- 
 
 
 
@@ -8942,7 +9370,11 @@
 
 
 
- 
+
+
+
+
+
 
 
 
@@ -8997,8 +9429,8 @@
               ;;                             :width (+ px-width-int 70)
               ;;                             :height (+ px-height-int 55)})
               :terminal (fn [x] [reactive-virtualized-console-viewer {:style {} :text x
-                                                      :width (+ px-width-int 70)
-                                                      :height (+ px-height-int 55)}])
+                                                                      :width (+ px-width-int 70)
+                                                                      :height (+ px-height-int 55)}])
               :panel-code-box-single panel-code-box-single
               :code-box-single panel-code-box-single
               :vega-lite oz.core/vega-lite
@@ -9555,9 +9987,9 @@
         body (if replacement-view
                replacement-view ;{selected-view replacement-view}
                body)
-        
-         clover-fn (when is-runner? 
-                     @(ut/tracked-sub ::current-view-mode-clover-fn {:panel-key panel-key :data-key selected-view}))
+
+        clover-fn (when is-runner?
+                    @(ut/tracked-sub ::current-view-mode-clover-fn {:panel-key panel-key :data-key selected-view}))
 
         ;;_ (tapp>> [:body (str body)])
 
@@ -9602,7 +10034,7 @@
                 ;;                                  :child [:data-viewer (ut/postwalk-replacer {:clover-body v} wrapper)]]}))
 ) ;; adds the render wrapper
                body)
-        
+
         runner-rowset? (true?
                         (when is-runner?
                           (and @(ut/tracked-sub ::has-rowset-data? {:panel-key panel-key :view-name selected-view})
@@ -9982,6 +10414,8 @@
                                       :px re-com.util/px
                                       :icon re-com/md-icon-button
                                       :md-icon re-com/md-icon-button
+                                      :vv-box #(vv-box  (+ px-width-int 70) (+ px-height-int 55) %)
+                                      :vh-box #(vh-box  (+ px-width-int 70) (+ px-height-int 55) %)
                                       :h-box re-com/h-box
                                       :hbox re-com/h-box
                                       :vbox re-com/v-box} body)
@@ -10056,7 +10490,7 @@
 
     (cond ;;replacement-all? [reecatch [re-com/box :child (get body selected-view)]]
       runner-rowset?
-      (if (and fw fh) 
+      (if (and fw fh)
         [reecatch [magic-table panel-key [selected-view] fw (+ fh 2)]]
         [reecatch [magic-table panel-key [selected-view]]])
 
@@ -10399,7 +10833,7 @@
           :panels panels-map
           :resolved-panels resolved-panels-map
           :client-name (get db :client-name)}]) db)
-   db)))
+     db)))
 
 
 (re-frame/reg-event-db
@@ -10830,7 +11264,7 @@
                sql-keys                                     @(ut/tracked-sub ::panel-sql-call-keys {:panel-key brick-vec-key})
                reco-selected                                (let [;;rr @(ut/tracked-subscribe [::conn/clicked-parameter-key
                                                                   rr @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                               {:keypath [:viz-tables-sys/table_name]})
+                                                                                      {:keypath [:viz-tables-sys/table_name]})
                                                                   rr (if (not (nil? rr)) (keyword (ut/replacer rr "_" "-")) nil)]
                                                               rr)
                viz-reco?                                    (and (or (= selected-block "none!") (nil? selected-block))
@@ -11096,9 +11530,9 @@
                      ^{:key (str "brick-" brick-vec-key "-honeycomb-box")}
                      (if @dragging-block ;(or @dragging-editor? @dragging-block) ;; @dragging? ;; dragging-block
                        [re-com/box :child " "]
-                       [reecatch (if viz-reco? 
-                                   [honeycomb brick-vec-key selected-view] 
-                                     [honeycomb brick-vec-key])]))]
+                       [reecatch (if viz-reco?
+                                   [honeycomb brick-vec-key selected-view]
+                                   [honeycomb brick-vec-key])]))]
                   (if (or (and (not ghosted?) (not no-ui?)) selected?)
                     (let [] ;;  single-view? @(ut/tracked-subscribe [::is-single-view?
                       ^{:key (str "brick-" brick-vec "-footer")}
@@ -11123,7 +11557,7 @@
                                       runner-running?   (when runner?
                                                           (let [are-solver        (get @db/solver-fn-lookup [:panels brick-vec-key s])
                                                                 rr? @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                                     {:keypath [(keyword 
+                                                                                     {:keypath [(keyword
                                                                                                  (cstr/replace
                                                                                                   (str (ut/replacer are-solver
                                                                                                                     ":solver/" "solver-status/*client-name*>") ">running?")
@@ -11199,13 +11633,13 @@
                                      (when (or flow-running?
                                                runner-running?
                                                (and (not selected?) query-running? not-view?))
-                                       [re-com/md-icon-button 
-                                        :md-icon-name "zmdi-refresh" 
+                                       [re-com/md-icon-button
+                                        :md-icon-name "zmdi-refresh"
                                         :class "rotate linear infinite"
-                                        :style {:font-size "20px" 
+                                        :style {:font-size "20px"
                                                 :color (theme-pull :theme/universal-pop-color nil)
-                                                :transform-origin "10px 11px" 
-                                                :padding "0px" 
+                                                :transform-origin "10px 11px"
+                                                :padding "0px"
                                                 :margin-top "-5px"}])
                                      (when reco-ready?
                                        [re-com/box :style {:margin-top "-6px"} :child
@@ -11216,7 +11650,7 @@
                                               (reset! mad-libs-view (if (= s @mad-libs-view) nil s))
                                               (when (not (= s
                                                             @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                                      {:keypath [:viz-tables-sys2/table_name]})))
+                                                                             {:keypath [:viz-tables-sys2/table_name]})))
                                                 (ut/tracked-dispatch [::conn/click-parameter [:viz-tables-sys2 :table_name]
                                                                       s]))) :style
                                          {:font-size        "14px"
