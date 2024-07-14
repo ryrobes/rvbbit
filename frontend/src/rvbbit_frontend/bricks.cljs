@@ -407,10 +407,24 @@
                              (or (some #(when (> (nth cumulative-heights % 0) scroll-top) %)
                                        (range (count cumulative-heights)))
                                  0)))
+        ;; update-visible-range (fn [container-height scroll-top]
+        ;;                        (let [start (find-start-index scroll-top)
+        ;;                              end (find-start-index (+ scroll-top container-height))
+        ;;                              end (min (count children) (+ end 1))] ; Add 2 for buffer
+        ;;                          (swap! scroll-state update id assoc
+        ;;                                 :scroll-top scroll-top
+        ;;                                 :start start
+        ;;                                 :end end)))
         update-visible-range (fn [container-height scroll-top]
                                (let [start (find-start-index scroll-top)
-                                     end (find-start-index (+ scroll-top container-height))
-                                     end (min (count children) (+ end 1))] ; Add 2 for buffer
+                                     initial-end (find-start-index (+ scroll-top container-height))
+                                     end (loop [idx initial-end]
+                                           (let [current-height (- (get-in @scroll-state [id :cumulative-heights idx] 0)
+                                                                   (get-in @scroll-state [id :cumulative-heights start] 0))]
+                                             (if (or (>= current-height container-height) (>= idx (count children)))
+                                               (min (inc idx) (count children))
+                                               (recur (inc idx)))))
+                                     end (max end (min (count children) (+ start 2)))] ; Ensure at least 2 items are rendered
                                  (swap! scroll-state update id assoc
                                         :scroll-top scroll-top
                                         :start start
@@ -490,10 +504,10 @@
               ;;  :child child]
               )
             [:div {:style {:position "fixed"
-                           :top 41
-                           :left 22
-                           :color "white"}}
-             (str "Showing items " start " to " end " of " (count children))]
+                           :top 22
+                           :left 13
+                           :color "#ffffff33"}}
+             (str "showing items " start " to " end " of " (count children))]
             ]]))})))
 
 (defn reactive-virtualized-v-box [props]
@@ -8096,6 +8110,7 @@
 
 (defn map-boxes2*
   [data block-id selected-view keypath kki init-data-type & [draggable? key-depth inner?]] ;; dupe of a fn inside
+  ;;(tapp>> [:block-id block-id data])
   (if (<= (count keypath) (or key-depth 6))
     (let [sql-explanations (sql-explanations-kp) ;; turn into general key annotations as some point with KP lookups?
           flow-name (ut/data-typer data)
@@ -8153,6 +8168,7 @@
 ;           :size "auto"
            :style
            {:color       "black"
+            :padding "5px"
             ;:border "1px solid yellow"
             :font-family (theme-pull :theme/base-font nil)
             :font-size   font-size ; "11px"
@@ -8180,7 +8196,9 @@
                                                       kp-clover (cond source-clover-key? clover-kp
                                                                       source-app-db? [:app-db (vec  (into source-kp keypath-in))]
                                                                       :else [:get-in [source keypath-in]])
-                                                      open? (or (get-in @opened-boxes [block-id keypath-in kki] false) (= (try (count k-val) (catch :default _ 1)) 1))
+                                                      open? (or (get-in @opened-boxes [block-id keypath-in kki] false) 
+                                                                (= (try (count k-val) (catch :default _ 1)) 1)
+                                                                )
                                                       symbol-str (cond (= k-val-type "map") "{}"
                                                                        (= k-val-type "vector") "[]"
                                                                        (= k-val-type "list") "()"
@@ -8195,9 +8213,10 @@
                                                                 (cond
                                                                   (nil? k-val) 0
                                                                   (empty? k-val) 0
+                                                                  (= (try (count k-val) (catch :default _ 1)) 1) 65
                                                                   (map? k-val) (apply + (map (fn [[k v]] (if (or (seq? v) (map? v)) 110 45)) k-val))
                                                                   (vector? k-val) (apply + (map (fn [v] (if (or (seq? v) (map? v)) 110 45)) k-val))
-                                                                  :else 0) (catch :default _ 0)))
+                                                                  :else 55) (catch :default _ 0)))
                                                       open-height (sizes k-val)
                                                       open-kps (vec (for [kp (ut/keypaths (select-keys @opened-boxes [block-id]))
                                                                           :when (get-in @opened-boxes kp)] (second kp)))
@@ -8227,7 +8246,8 @@
                                                       ;;                 ]) (catch :default _ nil))
 
                                                       ;open-height (* child-keys 45)
-                                                      hhh (if open? child-open-sizes 85)]
+                                                      hhh (if open? (max child-open-sizes (sizes k-val) 35) 85)
+                                                      ]
                                                   
                                                   [inner-w hhh
                                                    ^{:key (str block-id keypath kki kk)}
@@ -8338,6 +8358,7 @@
                                                               (and open? code?)
                                                               [re-com/h-box
                                                                :style keystyle
+                                                               :width "100%"
                                                                :children [^{:key (str block-id keypath kki kk k-val-type 1)}
                                                                           [re-com/v-box :min-width (px header-gap) ;"110px"
                                                                            :children
@@ -8549,7 +8570,9 @@
                                                          block-id selected-view keypath-in kk nil draggable? key-depth [inner-w2 header-gap]]] :style keystyle]
                                                       :else
                                                       ^{:key (str block-id keypath kki kk k-val-type 9)}
-                                                      [re-com/h-box :children
+                                                      [re-com/h-box 
+                                                       :width "100%"
+                                                       :children
                                                        [^{:key (str block-id keypath kki kk k-val-type 10)}
                                                         [re-com/h-box :gap "6px" :children
                                                          [[dggbl ;;draggable
@@ -9494,13 +9517,13 @@
                                          ]
                                      [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
                                       :style {:overflow "auto"} :child
-                                      [map-boxes2 x (or solver-key panel-key) selected-view [] :output nil]]))
+                                      [map-boxes2 x (or  panel-key solver-key) selected-view [] :output nil]]))
               :data-viewer-limit (fn [[x l]] (let [x (walk/postwalk-replace {:box :_box :icon :_icon :v-box :_v-box  :h-box :_h-box
                                                                              :data-viewer :_data-viewer} x)
                                                    solver-key (get @db/solver-fn-lookup [:panels panel-key selected-view])]
                                                [re-com/box :width (px (- ww 10)) :size "none" :height (px (- hh 60)) ;;"300px" ;(px hh)
                                                 :style {:overflow "auto"} :child
-                                                [map-boxes2 x (or solver-key panel-key) selected-view [] :output nil nil l]]))
+                                                [map-boxes2 x (or  panel-key  solver-key) selected-view [] :output nil nil l]]))
               :progress-bar
               (fn [[ww seconds uid]]
                 (let [progress            (or (get @progress-bars uid) (reagent.core/atom 0))

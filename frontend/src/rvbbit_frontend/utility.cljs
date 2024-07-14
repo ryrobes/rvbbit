@@ -318,7 +318,7 @@
 ;;     (walk/prewalk (fn [item] (when (matches-pattern2-orig? item kw num) (swap! matches conj item)) item) data)
 ;;     @matches))
 
-(defonce extract-patterns2-cache (atom {}))               
+(defonce extract-patterns2-cache (atom {}))                   
 
 (defn matches-pattern2-orig? [item kw num] (and (vector? item) (= (count item) num) (= (first item) kw)))
 
