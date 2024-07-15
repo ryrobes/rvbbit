@@ -75,7 +75,8 @@
             (try
               (task)
               (catch Exception e
-                (ut/pp ["Error executing queue task:" queue-type id-keyword (.getMessage e)]))
+                (ut/pp ["Error executing queue task:" queue-type id-keyword (.getMessage e)
+                        (try (subs (str task) 0 200) (catch Exception _ (str task)))]))
               (finally
                 (swap! active-tasks update-in [queue-type id-keyword] dec))))))
       (when (and @running (not @stopping))

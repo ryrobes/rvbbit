@@ -2910,7 +2910,11 @@
                                                              (if (and error? restarts-left?) 1.5 1.35)
                                                              (if error? 25 9))
                                                      (when (and error? restarts-left?)
-                                                       (async/thread (do (Thread/sleep 10000) (flow! client-name orig-flowmap file-image flow-id opts))))
+                                                       (async/thread
+                                                         (do (Thread/sleep 2000)
+                                                             (flow-statuses) ;; make sure the statuses are up to date.
+                                                             (Thread/sleep 10000)
+                                                             (flow! client-name orig-flowmap file-image flow-id opts))))
                                                      (when (not error?) (swap! restart-map dissoc flow-id)) ;; reset the counter on
                                                      (do (when (not (= flow-id "client-keepalive")) ;; no need to track heartbeats..
                                                            (swap! latest-run-id assoc flow-id run-id)
@@ -3187,7 +3191,7 @@
 (defn boomerang-client-subs
   [cid]
   (let [sub-task (vec (keys (get @atoms-and-watchers cid {})))]
-    (doseq [fk sub-task] (sub-to-value cid fk)) ;; resub just in case?
+    ;;(doseq [fk sub-task] (sub-to-value cid fk)) ;; resub just in case?
     (push-to-client [:kick]
                     {:at "" :payload nil :payload-kp [:heartbeat :heartbeat] :sent! :heartbeat :to :all}
                     cid

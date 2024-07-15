@@ -22,6 +22,8 @@
 
 (defonce cm-focused? (reagent/atom false))
 
+(def virtualized-debug-msg (reagent/atom {}))
+
 (defonce value-spy (reagent/atom {}))
 (defonce solver-meta-spy (reagent/atom {}))
 (defonce signal-history-ticker? (reagent/atom true))
