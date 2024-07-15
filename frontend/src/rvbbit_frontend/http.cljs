@@ -351,17 +351,17 @@
                                               (not heartbeat?))) result)
             result-subs (get grouped-results true)
             result (get grouped-results false)
-            _ (doseq [rr result-subs] ;; is it rowset? if so lets put it in :data also
-                (let [data (get rr :status)
-                      all-maps (and (vector? data) (every? map? data))
-                      all-keys-match (and all-maps
-                                          (let [first-keys (set (keys (first data)))]
-                                            (every? #(and (= first-keys (set (keys %)))
-                                                          (every? keyword? (keys %)))
-                                                    data)))]
-                  (when all-keys-match
-                    (ut/tracked-dispatch [::insert-implicit-rowset data
-                                          (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))))
+            ;; _ (doseq [rr result-subs] ;; is it rowset? if so lets put it in :data also
+            ;;     (let [data (get rr :status)
+            ;;           all-maps (and (vector? data) (every? map? data))
+            ;;           all-keys-match (and all-maps
+            ;;                               (let [first-keys (set (keys (first data)))]
+            ;;                                 (every? #(and (= first-keys (set (keys %)))
+            ;;                                               (every? keyword? (keys %)))
+            ;;                                         data)))]
+            ;;       (when all-keys-match
+            ;;         (ut/tracked-dispatch [::insert-implicit-rowset data
+            ;;                               (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))))
             updates (reduce (fn [acc res]
                               (let [task-id (get res :task-id)]
                                 (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
@@ -369,7 +369,7 @@
         ;; (ut/tapp>> [:batch-of-messages (count result) :grouped-update (count result-subs)
         ;;             (vec (for [r result] (str (get r :task-id))))
         ;;             (vec (for [r result-subs] (str (get r :task-id))))])
-        (re-frame/dispatch [::update-sub-counts result-subs])
+        ;; (re-frame/dispatch [::update-sub-counts result-subs])
         (swap! batches-received inc)
         (doseq [res result] (re-frame/dispatch [::simple-response res true])) ;; process the other batches as a side-effect
         (reduce-kv (fn [db k v] (update db k #(merge-with merge % v))) db updates))
@@ -441,10 +441,11 @@
           (cond
             
             server-sub? 
-            (let [flow-key (keyword (cstr/replace (cstr/join "/" task-id) ":" ""))]
-              (-> db
-                  (assoc-in [:flow-sub-cnts flow-key] (inc (get-in db [:flow-sub-cnts flow-key] 0)))
-                  (assoc-in (vec (cons :click-param task-id)) (get result :status))))
+            (assoc-in db (vec (cons :click-param task-id)) (get result :status))
+            ;; (let [flow-key (keyword (cstr/replace (cstr/join "/" task-id) ":" ""))]
+            ;;   (-> db
+            ;;       (assoc-in [:flow-sub-cnts flow-key] (inc (get-in db [:flow-sub-cnts flow-key] 0)))
+            ;;       (assoc-in (vec (cons :click-param task-id)) (get result :status))))
 
             settings-update? (assoc-in db [:server :settings] (get result :status))
 

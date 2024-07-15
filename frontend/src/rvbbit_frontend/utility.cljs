@@ -21,15 +21,15 @@
    [talltale.core     :as tales]
    [zprint.core       :as zp])
   (:import
-    [goog.i18n              NumberFormat]
-    [goog.i18n.NumberFormat Format]
-    [goog.events            EventType]))
+   [goog.i18n              NumberFormat]
+   [goog.i18n.NumberFormat Format]
+   [goog.events            EventType]))
 
 (defn apply-assoc-ins [target-map kv-map] (reduce (fn [acc [k v]] (assoc-in acc k v)) target-map kv-map))
 
 (re-frame/reg-sub ;; for benchmarks
-  ::client-name
-  (fn [db] (get db :client-name)))
+ ::client-name
+ (fn [db] (get db :client-name)))
 
 (re-frame/reg-sub ::param-lookup (fn [db {:keys [kk]}] (get-in db [:click-param :param kk])))
 
@@ -45,15 +45,22 @@
         (coll? x)    (map stringify-keywords x)
         :else        x))
 
+(re-frame/reg-event-db
+ ::write-tap-to-db
+ (fn [db [_ tap-edn]]
+   (assoc db :taps (vec (take-last 100 (conj (get db :taps []) (conj tap-edn (str (js/Date.))) ))))))
+
 (defn tapp>>
   [data] ;; doubletap!
+  (re-frame/dispatch [::write-tap-to-db data]) 
   (js/console.info (clj->js (stringify-keywords data))))
 
+;; (tapp>> [:yo-fucko 123])
 
 (def t> tapp>>)
 
 (def map-boxes-cache (atom {}))
-(def map-boxes-cache-hits (atom {}))    
+(def map-boxes-cache-hits (atom {}))
 
 
 (defn distribution
@@ -99,8 +106,8 @@
 
 
 
-(def deep-flatten-data (atom {}))   
-(def deep-flatten-cache (atom {}))    
+(def deep-flatten-data (atom {}))
+(def deep-flatten-cache (atom {}))
 
 ;; (defn deep-flatten-real [x] (if (coll? x) (into #{} (mapcat deep-flatten-real x)) #{x}))
 
@@ -168,7 +175,7 @@
 
 
 (defn flip-map [m]
-  (reduce (fn [acc [k v]] (assoc acc v k)) {} m))        
+  (reduce (fn [acc [k v]] (assoc acc v k)) {} m))
 
 (def ansi-regex #"\u001b\[[0-9;]*[a-zA-Z]") ;; pre fancy 256 color ANSI codes
 
@@ -187,10 +194,10 @@
 ;;       cstr/trim))
 
 
-(def clover-walk-singles-map (atom {}))                                                        
-(defonce process-key-cache (atom {}))       
+(def clover-walk-singles-map (atom {}))
+(defonce process-key-cache (atom {}))
 (defonce process-key-tracker (atom {}))        ;;; ;       
-  
+
 (defn process-key2
   [k]
   (let [args (str k)]
@@ -302,7 +309,7 @@
 
 (defn extract-patterns
   [data kw num] ;; param based
-  (if true ;cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
     (extract-patterns* data kw num)
     (extract-patterns-real data kw num)))
 
@@ -318,7 +325,7 @@
 ;;     (walk/prewalk (fn [item] (when (matches-pattern2-orig? item kw num) (swap! matches conj item)) item) data)
 ;;     @matches))
 
-(defonce extract-patterns2-cache (atom {}))                   
+(defonce extract-patterns2-cache (atom {}))
 
 (defn matches-pattern2-orig? [item kw num] (and (vector? item) (= (count item) num) (= (first item) kw)))
 
@@ -326,16 +333,15 @@
   [data kw num]
   ;(let [] ;; [cache (get @extract-patterns2-cache (pr-str [data kw num]))]
     ;(if false [] cache ;; cache 
-    (let [rr (letfn [(walk [data path]
-                       (cond
-                         (matches-pattern2-orig? data kw num) [[path data]]
-                         (map? data) (mapcat (fn [[k v]] (walk v (conj path k))) data)
-                         (sequential? data) (mapcat (fn [v] (walk v path)) data)
-                         :else []))]
-               (walk data []))]
+  (let [rr (letfn [(walk [data path]
+                     (cond
+                       (matches-pattern2-orig? data kw num) [[path data]]
+                       (map? data) (mapcat (fn [[k v]] (walk v (conj path k))) data)
+                       (sequential? data) (mapcat (fn [v] (walk v path)) data)
+                       :else []))]
+             (walk data []))]
       ;(swap! extract-patterns2-cache assoc (pr-str [data kw num]) rr)
-      rr
-      )););)
+    rr)););)
 
 
 
@@ -348,7 +354,7 @@
 
 
 
-(defonce safe-name-cache (atom {}))    
+(defonce safe-name-cache (atom {}))
 
 
 (defn safe-name [x] (replacer (str x) ":" ""))
@@ -490,8 +496,8 @@
   [query] ;;; hack to track subscriptions for debugging, easy freq
   ;(swap! subscription-counts update (first query) (fnil inc 0))
   (cond (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query)
-          (do ;(tapp>> [:cpk! (last query)])
-            (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))
+        (do ;(tapp>> [:cpk! (last query)])
+          (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))
         (cstr/ends-with? (str (first query)) "conn/data-colors") (rfa/sub :rvbbit-frontend.connections/data-colors {})
         (cstr/ends-with? (str (first query)) "conn/sql-metadata") (rfa/sub :rvbbit-frontend.connections/sql-metadata-alpha
                                                                            {:keypath (last query)})
@@ -504,11 +510,11 @@
                                                                           {:keypath (last query)})
         (cstr/ends-with? (str (first query)) "bricks/selected-block") (rfa/sub :rvbbit-frontend.bricks/selected-block {})
         (cstr/ends-with? (str (first query)) "bricks/editor-panel-selected-view")
-          (rfa/sub :rvbbit-frontend.bricks/editor-panel-selected-view {})
+        (rfa/sub :rvbbit-frontend.bricks/editor-panel-selected-view {})
         (cstr/ends-with? (str (first query)) "bricks/client-name") (rfa/sub :rvbbit-frontend.bricks/client-name {})
         (cstr/ends-with? (str (first query)) "connections/client-name") (rfa/sub :rvbbit-frontend.connections/client-name {})
         (cstr/ends-with? (str (first query)) "signals/selected-warren-item")
-          (rfa/sub :rvbbit-frontend.signals/selected-warren-item {})
+        (rfa/sub :rvbbit-frontend.signals/selected-warren-item {})
         :else (re-frame.core/subscribe query)))
 
 (defonce dispatch-counts (atom {}))
@@ -540,7 +546,7 @@
   []
   (let [;quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
         names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) ;(rand-nth
-              ]]
+               ]]
     (keyword (str (replacer (cstr/join "-" names) " " "-") "-" (rand-int 45)))))
 
 (defn gen-signal-name
@@ -690,9 +696,9 @@
                                                      (mapcat (fn [[_ v]] (keys (get v r))) (get db :panels))))
                      ;;      _ (tapp>>  [:prop runner-keys all-runners])
                           all-keys          (vec (apply concat
-                                                   [block-names user-param-names locals 
-                                                    view-names snapshot-names tab-names
-                                                    query-names all-runners]))
+                                                        [block-names user-param-names locals
+                                                         view-names snapshot-names tab-names
+                                                         query-names all-runners]))
                           reco              (unique-block-id proposed all-keys [])]
                       (cond (and incoming-keyword? (keyword? reco))       reco
                             (and incoming-keyword? (not (keyword? reco))) (keyword (replacer (str reco) #":" ""))
@@ -732,15 +738,15 @@
             (and (vector? x) (cstr/starts-with? (str (first x)) ":div"))
             (and (vector? x) (cstr/starts-with? (str (first x)) ":span"))
             (and (vector? x) (is-hiccup? x)))
-          "render-object"
+        "render-object"
         (string? x) "string"
         (boolean? x) "boolean"
         (or (and (or (list? x) (vector? x)) (ne? x) (every? map? x)) (and (vector-of-maps? x) (not (has-nested-map-values? x))))
-          "rowset" ;;; breaks shit? TODO
+        "rowset" ;;; breaks shit? TODO
         (vector? x) "vector"
         (or (and (map? x) (contains? x :classname) (contains? x :subprotocol) (contains? x :subname))
             (and (map? x) (contains? x :dbtype) (contains? x :dbname) (contains? x :user)))
-          "jdbc-conn"
+        "jdbc-conn"
         (map? x) "map"
         (list? x) "list"
         (nil? x) "nil"
@@ -819,8 +825,8 @@
   [replacements s]
   (reduce (fn [str [key value]]
             (let [value (get :code value value)] (replacer str (re-pattern (cstr/join ["\\{\\{" key "\\}\\}"])) value)))
-    s
-    replacements))
+          s
+          replacements))
 
 (defn hex-color? [s] (true? (and (string? s) (cstr/starts-with? (str s) "#"))))
 
@@ -961,8 +967,8 @@
             (reduce (fn [sstr [key value]]
                       (let [value-str (str (get :code value value))] ; Convert value to string
                         (replacer sstr (re-pattern (cstr/join ["\\{\\{" key "\\}\\}"])) value-str)))
-              s
-              replacements))]
+                    s
+                    replacements))]
     (walk/postwalk (fn [x] (if (string? x) (replace-in-str x) x)) data)))
 
 
@@ -1074,8 +1080,8 @@
 (defn update-multiple-if-exists
   [orig-map updates]
   (reduce (fn [acc-map [keypath value]] (if (not (nil? (get-in acc-map keypath))) (assoc-in acc-map keypath value) acc-map))
-    orig-map
-    updates))
+          orig-map
+          updates))
 
 (defn is-hex-color? [s] (and (string? s) (cstr/starts-with? s "#") (or (= (count s) 4) (= (count s) 7) (= (count s) 9))))
 
@@ -1122,7 +1128,7 @@
 
 (defn clean-sql-from-ui-keys
   [x] ; <-- gets called hundreds of times
-  (if true  ;cache?
+  (if cache?
     (let [hx    (hash x)
           cache (get @clean-sql-atom hx)]
       (if cache
@@ -1186,7 +1192,7 @@
   [coords]
   (reduce (fn [acc coord]
             (if (or (< (first coord) (first acc)) (and (= (first coord) (first acc)) (< (second coord) (second acc)))) coord acc))
-    coords))
+          coords))
 
 (defn not-empty? [coll] (try (boolean (seq coll)) (catch :default e (do (tapp>> [:no-empty-failed coll e]) false))))
 
@@ -1209,7 +1215,7 @@
                          " { "
                          (cstr/join " " (map (fn [[prop val]] (str (replacer (name prop) #"_" "-") ": " val ";")) styles))
                          "}"))
-               m)))
+                  m)))
 
 (defn update-theme-css
   [css-string]
@@ -1266,9 +1272,9 @@
                   (fn [db _]
                     (let [tab (get db :selected-tab)]
                       (vec (for [[_ v] (into {} (filter #(= tab (get (val %) :tab "")) (get db :panels)))]
-                           (vec (into (get v :root) [(get v :h) (get v :w)])))))))
+                             (vec (into (get v :root) [(get v :h) (get v :w)])))))))
 
-(defn find-safe-position [block-height block-width ]
+(defn find-safe-position [block-height block-width]
   (let [hh @(tracked-sub ::h {})
         ww @(tracked-sub ::w {})
         canvas-width (Math/floor (/ ww db/brick-size))
@@ -1347,7 +1353,7 @@
     (if false ;(not (nil? cache))
       cache
       (let [;s (replacer s #"1.0" "\"ONE-POINT-ZERO\"")
-            type (cond (cstr/includes? s "(")                         [ :respect-nl   :justified-original]
+            type (cond (cstr/includes? s "(")                         [:respect-nl   :justified-original]
                        (cstr/starts-with? (cstr/trim-newline s) "[:") [:justified-original :hiccup] ;:community ;[:hiccup :justified-original]
                        :else                                          :justified)
             o    (zp/zprint-str s
@@ -1363,12 +1369,11 @@
                                  :binding       {:force-nl? true}
                                  :vector        {:respect-nl? true}
                                  ;:map           {:comma? false :sort? false}
-                                 :parse         {:interpose "\n\n"}
-                                 })]
+                                 :parse         {:interpose "\n\n"}})]
         (swap! format-map-atom assoc [w s] o)
         o))))
 
-(defn remove-keys [m keys] (apply dissoc m keys))         
+(defn remove-keys [m keys] (apply dissoc m keys))
 
 (defn hiccup-css-to-string
   [css-map]
@@ -1402,7 +1407,7 @@
         (map (fn [[k v]] [k
                           (cond (map? v) (deep-remove-nil-values v)
                                 :else    v)])
-          (filter (fn [[_ v]] (not (nil? v))) m))))
+             (filter (fn [[_ v]] (not (nil? v))) m))))
 
 (defn cm-deep-values
   [s]
@@ -1460,7 +1465,7 @@
     (cond
       (and (keyword? item) (re-matches pattern-ns (pr-str item))) (keyword target (name item))
       (and (keyword? item) (re-matches pattern-name (pr-str item)))
-        (let [new-name (str target "." (second (clojure.string/split (name item) #"\.")))] (keyword (namespace item) new-name))
+      (let [new-name (str target "." (second (clojure.string/split (name item) #"\.")))] (keyword (namespace item) new-name))
       :else item)))
 
 (defn namespaced-swapper
@@ -1485,7 +1490,7 @@
                        (vector? item)  (let [last-in-vector (last item)]
                                          (if (and (keyword? last-in-vector) (= key last-in-vector)) [] [item]))
                        :else           [item]))
-         coll)))
+               coll)))
 
 
 

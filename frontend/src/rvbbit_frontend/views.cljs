@@ -894,6 +894,7 @@
             (when (get display-map :image-url) [re-com/gap :size "12px"])]]
           [shape/map-boxes2 display-map "no-block" "full-config-map" [] "no-block" "map"]]]]])))
 
+(defonce structured-editor? (reagent/atom {}))
 (defonce param-scrubber? (reagent/atom {}))
 (defonce param-search (reagent/atom {}))
 
@@ -929,9 +930,7 @@
         [re-com/box 
          :size "none" 
          :width (px single-width) 
-         :height (px (- single-height 90)) ;;; [view?
-                                                                                            ;;; keypath-map
-                                                                                            ;;; view-key]
+         :height (px (- single-height 90)) 
          :child
          [bricks/scrubber-panel true ; view?
           @(ut/tracked-sub ::bricks/keypaths-in-params {:key-type key-type}) key-type (get @param-search key-type) {:fm true}] ; view-key
@@ -939,9 +938,21 @@
                                                                                                                         ; kp)
          :style {:overflow "auto"}]
         [bricks/panel-param-box key-type nil (+ 17 single-width) (- single-height 66) param-map])
-      [re-com/box :child (str "scrubber " (if (get @param-scrubber? key-type) "on" "off")) :attr
-       {:on-click #(swap! param-scrubber? assoc key-type (not (get @param-scrubber? key-type false)))} :style
-       {:padding-left "18px" :color (if (get @param-scrubber? key-type) "yellow" "inherit") :cursor "pointer"}]]]))
+      [re-com/box
+       :child (str "scrubber " (if (get @param-scrubber? key-type) "on" "off"))
+       :attr {:on-click #(swap! param-scrubber? assoc key-type (not (get @param-scrubber? key-type false)))}
+       :style {:padding-left "18px" 
+               :color (if (get @param-scrubber? key-type) (theme-pull :theme/universal-pop-color nil) "inherit") 
+               :cursor "pointer"}]
+      
+      ;; [re-com/box
+      ;;  :child (str "struc-ed " (if (get @structured-editor? key-type) "on" "off"))
+      ;;  :attr {:on-click #(swap! structured-editor? assoc key-type (not (get @structured-editor? key-type false)))}
+      ;;  :style {:padding-left "18px" 
+      ;;          :color (if (get @structured-editor? key-type) (theme-pull :theme/universal-pop-color nil) "inherit") 
+      ;;          :cursor "pointer"}]
+      
+      ]]))
 
 (defn editor-panel-metadata-ext-files
   []
@@ -2061,7 +2072,7 @@
         single-width-px     (px single-width)
 
         hh1                 [@db/mad-libs-waiting-room @db/data-browser-query-con @view-title-edit-idx
-                             @db/item-browser-mode @db/scrubbers @db/solver-meta-spy @editor-size
+                             @db/item-browser-mode @db/scrubbers @db/solver-meta-spy @editor-size @db/structured-editor
                              @db/value-spy @bricks/dragging-editor? @hide-panel-2? @hide-panel-3?] ;; reactivity hack! React!
 
         single-height       (if vertical? (* single-height-bricks db/brick-size) ttl-height)
@@ -2471,10 +2482,22 @@
                                                                                      selected-kp (if (nil? (first selected-kp))
                                                                                                    nil
                                                                                                    selected-kp)] ;; if viz-gen or
-                                                                       ;;(ut/tapp>> [:sel-keypath (str selected-kp) (get @db/data-browser-query selected-block)])
-                                                                                 (if ;(and ;view-selected?
-                                                                                  (get-in @db/scrubbers [selected-block data-key] false)
+                                                                                ;;  (ut/tapp>> [:sel-keypath  (str selected-kp) 
+                                                                                ;;              (get @db/data-browser-query selected-block)
+                                                                                ;;              @(ut/tracked-sub ::bricks/selected-block-map-kp {:keypath selected-kp})
+                                                                                ;;              ])
+                                                                                 (cond
+                                                                                   
+                                                                                   (get-in @db/structured-editor [selected-block data-key] false)
+                                                                                   ;[re-com/box :child (str "editor!" selected-block " " data-key)]
+                                                                                   [bricks/map-boxes2 
+                                                                                    @(ut/tracked-sub ::bricks/selected-block-map-kp {:keypath selected-kp})
+                                                                                    selected-block data-key [] 
+                                                                                    [single-height-bricks
+                                                                                     single-width-bricks] nil]
+                                                                                    
 
+                                                                                   (get-in @db/scrubbers [selected-block data-key] false)
                                                                                    [re-com/box :size "none" :width (px single-width) :height
                                                                                     (px (- single-height 40)) :child
                                                                                     [bricks/scrubber-panel view-selected?
@@ -2485,21 +2508,21 @@
                                                                                                                selected-block data-key]))
                                                                                      data-key nil {:fm true}] :style {:overflow "auto"}]
 
-                                                                                   (let [selected-view-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
-                                                                                         repl? (true? (cstr/includes? (str selected-view-type) "clojure"))
-                                                                                         syntax (get-in block-runners-map [selected-view-type :syntax])]
+                                                                                   :else (let [selected-view-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
+                                                                                               repl? (true? (cstr/includes? (str selected-view-type) "clojure"))
+                                                                                               syntax (get-in block-runners-map [selected-view-type :syntax])]
                                                                            ;;(ut/tapp>> [selected-view-type repl? syntax])
-                                                                                     (if (or (nil? syntax) (= syntax "clojure"))
-                                                                                       [bricks/panel-code-box selected-block selected-kp
-                                                                                        (+ 17 single-width) (- single-height 20)
-                                                                                        (if (nil? selected-kp)
-                                                                                          selected-panel-map
-                                                                                          (get-in selected-panel-map selected-kp)) repl?]
-                                                                                       [bricks/panel-string-box selected-kp (+ 17 single-width) (- single-height 20)
-                                                                                        (if (nil? selected-kp)
-                                                                                          selected-panel-map
-                                                                                          (get-in selected-panel-map selected-kp))
-                                                                                        syntax])))))]
+                                                                                           (if (or (nil? syntax) (= syntax "clojure"))
+                                                                                             [bricks/panel-code-box selected-block selected-kp
+                                                                                              (+ 17 single-width) (- single-height 20)
+                                                                                              (if (nil? selected-kp)
+                                                                                                selected-panel-map
+                                                                                                (get-in selected-panel-map selected-kp)) repl?]
+                                                                                             [bricks/panel-string-box selected-kp (+ 17 single-width) (- single-height 20)
+                                                                                              (if (nil? selected-kp)
+                                                                                                selected-panel-map
+                                                                                                (get-in selected-panel-map selected-kp))
+                                                                                              syntax])))))]
             (when (and system-panel? (= @db/editor-mode :status))
               [re-com/box :child (str websocket-status) :style
                {:color        (str (theme-pull :theme/editor-font-color nil) 77) ;; "#ffffff44"
@@ -2841,6 +2864,7 @@
                                         (get (first mad-libs-combos) :combo_hash)
                                         ")")]
                                   (let [view-scrubbers?       (get-in @db/scrubbers [selected-block data-key] false)
+                                        structured-editor?    (get-in @db/structured-editor [selected-block data-key] false)
                                         value-spy?            (get-in @db/value-spy [selected-block data-key] false)
                                         ;solver-meta-spy?      (get-in @db/solver-meta-spy [selected-block data-key] false)
                                         are-solver            (get @db/solver-fn-lookup [:panels selected-block data-key])
@@ -2873,6 +2897,15 @@
                                                     :user-select "none"
                                                     :margin-top  (if query-box? "9px" "inherit")
                                                     :cursor      "pointer"}]
+
+                                                  [re-com/box :size "none" :width "90px" :child (if structured-editor? "struc-ed on" "struc-ed off") :attr
+                                                   {:on-click #(swap! db/structured-editor assoc-in [selected-block data-key] (not structured-editor?))} :style
+                                                   {:color       (if structured-editor? (theme-pull :theme/universal-pop-color nil) "grey")
+                                                    :z-index     100
+                                                    :user-select "none"
+                                                    :margin-top  (if query-box? "9px" "inherit")
+                                                    :cursor      "pointer"}]
+
                                                   [re-com/box :size "none" :width "90px" :child "value spy" :attr
                                                    {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))} :style
                                                    {:color           (if value-spy? (theme-pull :theme/universal-pop-color nil) "grey")

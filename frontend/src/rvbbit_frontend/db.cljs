@@ -76,6 +76,7 @@
 
 (defonce active-flow-scrubbers (reagent/atom {}))
 (defonce scrubbers (reagent/atom {}))
+(defonce structured-editor (reagent/atom {}))  
 (defonce data-browser-query (reagent/atom {}))
 (defonce data-browser-query-con (reagent/atom {}))
 (defonce kit-browser (reagent/atom {}))
