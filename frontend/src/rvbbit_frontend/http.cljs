@@ -366,12 +366,15 @@
                               (let [task-id (get res :task-id)]
                                 (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))
                             {} result-subs)]
+        
         ;; (ut/tapp>> [:batch-of-messages (count result) :grouped-update (count result-subs)
         ;;             (vec (for [r result] (str (get r :task-id))))
         ;;             (vec (for [r result-subs] (str (get r :task-id))))])
-        ;; (re-frame/dispatch [::update-sub-counts result-subs])
+        
+        (re-frame/dispatch [::update-sub-counts result-subs])
         (swap! batches-received inc)
-        (doseq [res result] (re-frame/dispatch [::simple-response res true])) ;; process the other batches as a side-effect
+        (doseq [res result] 
+          (re-frame/dispatch [::simple-response res true])) ;; process the other batches as a side-effect
         (reduce-kv (fn [db k v] (update db k #(merge-with merge % v))) db updates))
 
 
@@ -400,10 +403,10 @@
 
           (when settings-update? (ut/tapp>> [:settings-update (get result :status)]))
 
-          (when (cstr/starts-with? (str client-name) ":reliable-" )  (ut/tapp>> [:task-id result]))
+          ;; (when (cstr/starts-with? (str client-name) ":reliable-" )  (ut/tapp>> [:task-id result]))
 
           ;; (when (not batched?) 
-          ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id))]))
+          ;;   (ut/tapp>> [:single server-sub? (str (get result :task-id)) result]))
 
           (swap! packets-received inc)
 
@@ -441,11 +444,11 @@
           (cond
             
             server-sub? 
-            (assoc-in db (vec (cons :click-param task-id)) (get result :status))
-            ;; (let [flow-key (keyword (cstr/replace (cstr/join "/" task-id) ":" ""))]
-            ;;   (-> db
-            ;;       (assoc-in [:flow-sub-cnts flow-key] (inc (get-in db [:flow-sub-cnts flow-key] 0)))
-            ;;       (assoc-in (vec (cons :click-param task-id)) (get result :status))))
+            ;;(assoc-in db (vec (cons :click-param task-id)) (get result :status))
+            (let [flow-key (keyword (cstr/replace (cstr/join "/" task-id) ":" ""))]
+              (-> db
+                  (assoc-in [:flow-sub-cnts flow-key] (inc (get-in db [:flow-sub-cnts flow-key] 0)))
+                  (assoc-in (vec (cons :click-param task-id)) (get result :status))))
 
             settings-update? (assoc-in db [:server :settings] (get result :status))
 
@@ -456,7 +459,6 @@
                           (assoc-in [:post-meta ui-keypath] post-meta-shape)))
 
             (and file-push? (not (nil? (get-in result [:data 0 :panel-key]))) external-enabled?)
-
             (assoc-in db [:panels (get-in result [:data 0 :panel-key])] (get-in result [:data 0 :block-data]))
 
             condi-tracker? (assoc-in db [:flow-results :condis (get-in result [:task-id 1])] (get result :status))

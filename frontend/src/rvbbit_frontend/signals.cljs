@@ -557,8 +557,10 @@
         fid          @(ut/tracked-subscribe [::signal-flow-id])]
     (dorun
       (for [[k query] sql-calls]
-        (let [data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-              unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+        (let [;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+              ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+              data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+              unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
           (when (or (not data-exists?) unrun-sql?)
             (if (get query :connection-id) (conn/sql-data [k] query (get query :connection-id)) (conn/sql-data [k] query))))))
     [re-com/v-box :padding "6px" :children

@@ -19,6 +19,7 @@
    ["codemirror/mode/r/r.js"]
    ["codemirror/mode/sql/sql.js"]
    ["react-codemirror2" :as cm]
+   ["react-drag-and-drop" :as rdnd]
    [re-com.core             :as    re-com
     :refer [at]]
    [re-com.util             :refer [px]]
@@ -168,8 +169,10 @@
                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     [re-com/h-box 
      :size "auto" 
@@ -213,8 +216,10 @@
                                @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?)
                  (conn/sql-data [k] query )
                  (ut/tracked-dispatch [::bricks/insert-sql-source k query])))))
@@ -248,8 +253,10 @@
                                :from   [:client_items]}}]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
      [[re-com/v-box :size "auto" :children
@@ -561,8 +568,10 @@
                (insert-hidden-reco-preview combo_hash viz_map query_map condis combo_edn shape_name false))))
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     [re-com/v-box 
      :height (px hhh) ;;"433px" 
@@ -731,8 +740,10 @@
        ]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
      [[re-com/v-box :children
@@ -751,8 +762,10 @@
         sql-calls   {:status-sys {:select [:*] :from [:latest_status] :where [:= :client_name client-name]}}]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     [re-com/box :size "auto" :child [bricks/magic-table :status-sys-list* [:status-sys] 11 20 [:ts :client_name]]]))
 
@@ -766,8 +779,10 @@
                               @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [k]})}))]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
      [;[re-com/box
@@ -967,8 +982,10 @@
                                  :order-by [:block_name]}}]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
      [;[re-com/box
@@ -998,8 +1015,10 @@
         grid?      (= gmode :data)]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     [re-com/h-box :size "auto" :style {:color (str (theme-pull :theme/editor-font-color nil) 35)} :children
      [;[re-com/box
@@ -1034,8 +1053,10 @@
                                               (when shape-picked? [:= :shape_name :viz-shapes0-sys/shape])]}}]
     (dorun (for [[k v] sql-calls]
              (let [query        (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     [re-com/h-box :size "auto" :style {:color (theme-pull :theme/editor-font-color nil)} :children
      [[re-com/v-box :size "auto" :children
@@ -1944,7 +1965,7 @@
 ;;       (reagent/create-class
 ;;        {:component-did-mount
 ;;         (fn [this]
-;;           (let [node (reagent/dom-node this)
+;;           (let [node (rdom/dom-node  this)
 ;;                 cm (.querySelector node ".CodeMirror")]
 ;;             (when cm
 ;;               (reset! cm-instance (.getDoc cm)))))
@@ -1994,10 +2015,34 @@
 ;;                                            :font-weight 700}]
 ;;                                   [console-text-box nil nil " "]]]]])})));)
 
+
+(defn draggable-editor
+  [element block-id data-key-type data-key h w]
+  [(reagent/adapt-react-class rdnd/Draggable)
+   (let [nname    (str "editor-" (ut/replacer block-id ":" "") "-" (ut/replacer data-key ":" ""))
+         view-key (keyword nname)
+         data {:h         h
+               :w         w
+               :drag-meta {:source-table :hi :table-fields [:*] :connection-id nil :source-panel-key :block-7034 :type :view}
+               :views     {view-key [:editor [block-id data-key-type data-key]]}
+               :name      nname}]
+     {:type          "meta-menu" ;:play-port
+      :on-drag-end   #(do (reset! bricks/dragging? false))
+      :on-drag-start #(do (reset! bricks/dragging? true)
+                          (reset! bricks/dragging-size [(get data :w) (get data :h)])
+                          (reset! bricks/dragging-body data))
+      :data          (pr-str data)})
+   [re-com/box
+    :size "none"
+    :child element
+    :style {:cursor "grab"}]])
+
+
 (defn editor-panel
   [bricks-wide bricks-tall]
   (let [selected-panel-map  @(ut/tracked-subscribe [::bricks/selected-block-map])
         selected-block      @(ut/tracked-subscribe [::bricks/selected-block])
+        selected-block?     (true? (and (not= selected-block "none!") (not (nil? selected-block))))
         sql-calls           @(ut/tracked-sub ::bricks/panel-sql-calls {:panel-key selected-block})
         client-name         @(ut/tracked-sub ::bricks/client-name {})
         views               @(ut/tracked-sub ::bricks/panel-views {:panel-key selected-block})
@@ -2143,7 +2188,7 @@
 
       (if @bricks/dragging-editor?
 
-        [(let [coord-str (str (mapv Math/floor @editor-size))
+        [(let [;coord-str (str (mapv Math/floor @editor-size))
                ;min? (= coord-str "[10 10]")
                ]
 
@@ -2232,10 +2277,15 @@
                                             :opacity 0.88}]
                              [re-com/h-box
                               :gap "2px"
-                              :children [[re-com/md-icon-button ;; zmdi-n-2-square
-                                                    ;:attr {:on-click #(reset! hide-panel-2? true)}
-                                          :md-icon-name "zmdi-n-1-square"
-                                          :style style-map]
+                              :children [(if selected-block?
+                                           [draggable-editor
+                                            [re-com/md-icon-button
+                                             :md-icon-name "zmdi-n-1-square"
+                                             :style (merge style-map {:cursor "grab"})]
+                                            selected-block data-key-type data-key single-height-bricks single-width-bricks]
+                                           [re-com/md-icon-button
+                                            :md-icon-name "zmdi-n-1-square"
+                                            :style style-map])
                                          [re-com/md-icon-button
                                           :attr {:on-click #(reset! hide-panel-2? (not @hide-panel-2?))}
                                           :md-icon-name (if @hide-panel-2?   "zmdi-square-o" "zmdi-n-2-square")
@@ -2472,11 +2522,12 @@
                                          [(when open?
                                             [re-com/box :style {:font-weight 200 :opacity 0.7} :child (str "score: " (rounder score2))])
                                           (when loading? ;(= new-curr-axe @db/mad-libs-waiting-room)
-                                            [:img {:src "images/loading-cropped.gif" :width "19px" :height "19px"}])]]]]] :attr
-                                     {:on-click #(when (not (or cur? cur-rev?))
-                                                   (let []
-                                                     (ut/tracked-dispatch [::bricks/get-combo-hash selected-block src-table-id-str
-                                                                           shape-name new-curr-axe])))}])]]]]])]]])
+                                            [:img {:src "images/loading-cropped.gif" :width "19px" :height "19px"}])]]]]]
+                                     :attr {:on-click #(when (not (or cur? cur-rev?))
+                                                         (let []
+                                                           (ut/tracked-dispatch [::bricks/get-combo-hash selected-block src-table-id-str
+                                                                                 shape-name new-curr-axe])))}])]]]]])]]])
+
 
                       :else                                                    (let [selected-kp @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
                                                                                      selected-kp (if (nil? (first selected-kp))
@@ -2487,15 +2538,15 @@
                                                                                 ;;              @(ut/tracked-sub ::bricks/selected-block-map-kp {:keypath selected-kp})
                                                                                 ;;              ])
                                                                                  (cond
-                                                                                   
+
                                                                                    (get-in @db/structured-editor [selected-block data-key] false)
                                                                                    ;[re-com/box :child (str "editor!" selected-block " " data-key)]
-                                                                                   [bricks/map-boxes2 
+                                                                                   [bricks/map-boxes2
                                                                                     @(ut/tracked-sub ::bricks/selected-block-map-kp {:keypath selected-kp})
-                                                                                    selected-block data-key [] 
+                                                                                    selected-block data-key []
                                                                                     [single-height-bricks
                                                                                      single-width-bricks] nil]
-                                                                                    
+
 
                                                                                    (get-in @db/scrubbers [selected-block data-key] false)
                                                                                    [re-com/box :size "none" :width (px single-width) :height
@@ -3599,6 +3650,7 @@
           theme-colors-hashmap    @(ut/tracked-subscribe [::theme-colors-hashmap])
           theme-colors            (theme-pull :theme/data-colors db/data-colors)
           min-panels              (vec (into min-panels minimized-system-panels))]
+      
       (when (not= rs-overrides rs-overrides-hashmap) ;; execute flows when mutated
         (do (ut/tapp>> [:runstream-overides-change! rs-overrides rs-overrides-hashmap])
             (doseq [[k v] rs-overrides
@@ -3607,16 +3659,21 @@
               (when (ut/ne? rs-overrides-hashmap) ;; on first run, dont want to trigger all...
                 (run-flow k v))))
         (ut/tracked-dispatch [::set-rs-overrides-hashmap rs-overrides]))
+      
       (when (not= theme-colors theme-colors-hashmap) ;; execute flows when mutated
         (ut/apply-theme (bricks/code-mirror-theme))
         (ut/tracked-dispatch [::set-theme-colors-hashmap theme-colors]))
+      
       (when true ; some atom to short-circuit this if needed later.. (putting it here since
         (doall (when (not (= user-param-hash1 user-param-hash2)) ;; core update for blind
+                 (ut/tapp>> [:user-params-changed-updating-autocomplete! (str [:run :views/update-user-params-hash])])
                  (ut/tracked-dispatch [::update-user-params-hash]))))
+      
       (when (and editor? (not (= selected-view sselected-view)))
         (let [view-data @(ut/tracked-subscribe [::view-data selected-view])]
           (ut/tracked-dispatch [::conn/click-parameter [:param :selected-view] selected-view])
           (ut/tracked-dispatch [::conn/click-parameter [:param :selected-view-data] view-data])))
+      
       (when (ut/not-empty? min-panels)
         [re-com/h-box :style {:position "fixed" :bottom 0 :left "50%" :z-index 999 :transform "translateX(-50%)"} :children
          (for [[e name] min-panels
@@ -3732,7 +3789,7 @@
         client-name @(ut/tracked-subscribe [::bricks/client-name])
         flow-watcher-subs-grouped @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped])
         server-subs @(ut/tracked-subscribe [::bricks/server-subs])
-        things-running @(ut/tracked-sub ::bricks/things-running {})
+        things-running [] ;;@(ut/tracked-sub ::bricks/things-running {})
         coords (if lines? ;; expensive otherwise
                  (let [subq-mapping (if lines? @(ut/tracked-subscribe [::bricks/subq-mapping]) {})
                        dwn-from-here (vec (ut/cached-downstream-search subq-mapping selected-block))

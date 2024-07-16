@@ -1279,8 +1279,10 @@
                                          :connection-id "flows-db"
                                          :order-by      [[3 :desc]]}}]
            (dorun (for [[k query] sql-calls]
-                    (let [data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                          unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                    (let [;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                          ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                          data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                          unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                       (when (or (not data-exists?) unrun-sql?)
                         (if (get query :connection-id)
                           (conn/sql-data [k] query (get query :connection-id))
@@ -1476,8 +1478,10 @@
         sql-calls        {:kit-results-sys {:select [:*] :from [:kits] :where where-filter}}]
     (doseq [[k query] sql-calls]
       (let [;query (ut/postwalk-replacer sql-params v)
-            data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-            unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+            ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+            ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+            data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+            unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
         (when (and (or (not data-exists?) unrun-sql?) (not (or wait? queued?))) (sql-data [k] query))))
     (ut/tapp>> [:narratives kit-name kits @db/chat-mode @db/kit-mode])
     (if false ; true
@@ -1827,8 +1831,10 @@
     (reset! db/active-tmp-history hist-key)
     (dorun (for [[k query] sql-calls]
              (let [;query (ut/postwalk-replacer sql-params v)
-                   data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-                   unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+                   ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+                   ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+                   data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+                   unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
                (when (or (not data-exists?) unrun-sql?) (conn/sql-data [k] query)))))
     (reagent.core/next-tick #(smooth-scroll-to-bottom "chat-v-box-parent" "chat-v-box"))
     [re-com/box :padding "5px" :size "none" :height (px (- panel-height 12 25 (when text-box? text-box-height))) ;; minus size

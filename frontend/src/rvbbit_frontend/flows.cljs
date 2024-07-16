@@ -3434,8 +3434,10 @@
     (dorun
       (for [[k v] sql-calls]
         (let [query        (ut/postwalk-replacer sql-params v)
-              data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-              unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+              ;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+              ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+              data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+              unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
           (when (or (not data-exists?) unrun-sql?)
             (if (get query :connection-id) (conn/sql-data [k] query (get query :connection-id)) (conn/sql-data [k] query))))))
     [re-com/v-box :size "none" :width (px w) :height (px h) :gap "10px" :style
@@ -4779,8 +4781,10 @@
                                      :from     [:flow_functions]}}]
     (dorun
       (for [[k query] sql-calls]
-        (let [data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
-              unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])]
+        (let [;data-exists? @(ut/tracked-subscribe [::conn/sql-data-exists? [k]])
+              ;unrun-sql?   @(ut/tracked-subscribe [::conn/sql-query-not-run? [k] query])
+              data-exists?   @(ut/tracked-sub ::conn/sql-data-exists-alpha? {:keypath [k]})
+              unrun-sql?     @(ut/tracked-sub ::conn/sql-query-not-run-alpha? {:keypath [k] :query query})]
           (when (or (not data-exists?) unrun-sql?)
             (if (get query :connection-id) (conn/sql-data [k] query (get query :connection-id)) (conn/sql-data [k] query))))))
     [re-com/modal-panel :style {:z-index 999 :padding "0px"} :parts

@@ -500,6 +500,13 @@
                     ;;   @(ut/tracked-sub ::clicked-parameter-key {:keypath [kk]}))
                   ))
 
+(re-frame/reg-sub ::clicked-parameter-alpha
+                  (fn [db {:keys [keypath]}]
+                    (if false ;(= (first keypath) :param)
+                      (let [kk (keyword (cstr/join "/" (map #(cstr/replace (str %) ":" "") keypath)))]
+                        @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [kk]}))
+                      (let [val (get-in db (cons :click-param keypath))] val))))
+
 (defn contains-namespaced-keyword?
   [data]
   (cond (map? data)     (some contains-namespaced-keyword? (concat (keys data) (vals data)))
@@ -810,7 +817,15 @@
                       {:fields   (into {} (for [[k v] (get m :fields)] {k (merge v (get pm k))}))
                        :rowcount (get-in pm [:* :rowcount])})))
 
-(re-frame/reg-sub ::sql-data-exists? (fn [db [_ keypath]] (not (nil? (get-in db (cons :data keypath))))))
+(re-frame/reg-sub 
+ ::sql-data-exists? 
+ (fn [db [_ keypath]] 
+   (not (nil? (get-in db (cons :data keypath))))))
+
+(re-frame/reg-sub
+ ::sql-data-exists-alpha?
+ (fn [db {:keys [keypath]}]
+   (not (nil? (get-in db (cons :data keypath))))))
 
 (re-frame/reg-sub ::sql-data-text (fn [db [_ keypath]] (str (get-in db (cons :data keypath)))))
 
@@ -839,12 +854,20 @@
                      {:cursor           (if clickable? "pointer" "inherit")
                       :background-color (if (= r @(ut/tracked-subscribe [::clicked-parameter keypath])) "grey" "inherit")})])))))
 
-(re-frame/reg-sub ::sql-query-not-run?
-                  (fn [db [_ keypath query]] ;; LOGIC HERE NEEDS TO BE THE SAME AS conn/sql-data ore shit gets
-                    (let [;query (dissoc query :col-widths)
-                          query        (ut/clean-sql-from-ui-keys query)
-                          not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
-                      (and not-col-sel? (not (= (hash query) (get-in db (cons :query-history keypath))))))))
+(re-frame/reg-sub
+ ::sql-query-not-run?
+ (fn [db [_ keypath query]] ;; LOGIC HERE NEEDS TO BE THE SAME AS conn/sql-data ore shit gets
+   (let [;query (dissoc query :col-widths)
+         query        (ut/clean-sql-from-ui-keys query)
+         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
+     (and not-col-sel? (not (= (hash query) (get-in db (cons :query-history keypath))))))))
+
+(re-frame/reg-sub
+ ::sql-query-not-run-alpha?
+ (fn [db {:keys [keypath query]}] ;; LOGIC HERE NEEDS TO BE THE SAME AS conn/sql-data ore shit gets
+   (let [query        (ut/clean-sql-from-ui-keys query)
+         not-col-sel? (not (= (first keypath) (get-in db [:selected-cols 1])))]
+     (and not-col-sel? (not (= (hash query) (get-in db (cons :query-history keypath))))))))
 
 (re-frame/reg-event-db ::add-to-sql-history ;; :ran tap is good
                        (fn [db [_ keypath query]]
@@ -1110,7 +1133,7 @@
          honey-sql     (ut/clean-sql-from-ui-keys honey-sql)
          hselect       (get honey-sql :select)
          flat          (ut/deep-flatten honey-sql)
-         client-name   @(ut/tracked-subscribe [::client-name])
+         client-name   @(ut/tracked-sub ::client-name {})
          honey-sql  (ut/postwalk-replacer {:*client-name client-name
                                            :*client-name* client-name
                                            :*client-name-str (str client-name)} honey-sql)
@@ -1136,7 +1159,7 @@
                        :client-cache? (if literal-data? (get honey-sql :cache? true) false)
                        :page          (get honey-sql :page)
                        :sniff?        sniff? ;; on used for ext tables
-                       :client-name   @(ut/tracked-subscribe [::client-name])}
+                       :client-name   client-name}
          :on-response [::http/socket-response]
          :on-timeout  [::http/timeout-response [keypath honey-sql]]
          :timeout     50000}])
@@ -1144,6 +1167,7 @@
    (when (not (nil? (get honey-sql :refresh-every)))
      (ut/tracked-dispatch [::set-query-schedule (first keypath) (get honey-sql :refresh-every)]))
    (ut/tracked-dispatch [::add-to-sql-history keypath honey-sql]))
+  
   ([keypath honey-sql connection-id]
    (doall
      (let [style-rules   (get honey-sql :style-rules)
@@ -1155,7 +1179,7 @@
            rules         (when has-rules?
                            (vec (for [[[col name] logic] style-rules]
                                   [[:case (:logic logic) 1 :else 0] (keyword (str "styler_" (ut/safe-name name)))])))
-           client-name   @(ut/tracked-subscribe [::client-name])
+           client-name   @(ut/tracked-sub ::client-name {})
            honey-sql  (ut/postwalk-replacer {:*client-name client-name
                                                 :*client-name* client-name
                                                 :*client-name-str (str client-name)} honey-sql)
@@ -1189,7 +1213,7 @@
                                                 :sniff?        sniff?
                                                 :honey-sql     honey-modded
                                                 :connection-id connection-id
-                                                :client-name   @(ut/tracked-subscribe [::client-name])}
+                                                :client-name   client-name}
                                   :on-response [::http/socket-response]
                                   :on-timeout  [::http/timeout-response [keypath honey-sql]]
                                   :timeout     50000}])

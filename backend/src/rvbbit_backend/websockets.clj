@@ -1877,6 +1877,7 @@
 (def client-batches (atom {}))
 
 (def valid-groups #{:flow-runner :tracker-blocks :acc-tracker :flow :flow-status :solver-status :tracker :alert1}) ;; to not skip old dupes
+(def sub-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
 (defn sub-push-loop
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
@@ -1934,8 +1935,9 @@
                     :reco-count  reco-count
                     :queue-id    queue-id
                     :task-id     task-id
-                    :data        [data ;; data is likely needed for :payload and :payload-kp that
-                                  (try (get (first reco-count) :cnt) (catch Exception _ reco-count))]
+                    :data        (when (try (some #(= (first task-id) %) sub-task-ids) (catch Exception _ true)) ;; server sub doenst need :data, just :status (as val)
+                                   [data ;; data is likely needed for :payload and :payload-kp that
+                                  (try (get (first reco-count) :cnt) (catch Exception _ reco-count))])
                     :client-name client-name}))
         (do ;[new-queue-atom (atom clojure.lang.PersistentQueue/EMPTY)]
           (new-client client-name)

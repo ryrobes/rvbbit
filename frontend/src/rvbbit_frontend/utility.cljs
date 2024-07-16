@@ -52,7 +52,7 @@
 
 (defn tapp>>
   [data] ;; doubletap!
-  (re-frame/dispatch [::write-tap-to-db data]) 
+  ;;(re-frame/dispatch [::write-tap-to-db data]) 
   (js/console.info (clj->js (stringify-keywords data))))
 
 ;; (tapp>> [:yo-fucko 123])
@@ -120,7 +120,8 @@
 
 (defn deep-flatten*
   [x]
-  (let [hx (pr-str x)] ;; switching from hash keys to pr-str due to collisions... 6/2/24
+  (let [;hx (pr-str x)
+        hx (hash x)]
     (swap! deep-flatten-cache update hx (fnil inc 0))
     (or (@deep-flatten-data hx)
         (let [deep (deep-flatten-real x)
@@ -129,12 +130,13 @@
           (swap! deep-flatten-data assoc hx deep)
           deep))))
 
-
 (defn deep-flatten
   [x] ;; param based
   (if true ;cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES
     (deep-flatten* x)
     (deep-flatten-real x)))
+
+
 
 (defn purge-cache
   [name percent tracker-atom data-atom & [hard-limit]]
@@ -472,18 +474,9 @@
 
 (defonce subq-mapping-alpha (atom {}))
 (defonce subq-panels-alpha (atom {}))
-
-
-
-
-
-
-
 (defonce parameter-keys-hit (atom {}))
-
 (defonce subscription-counts (atom {}))
 (defonce subscription-counts-alpha (atom {}))
-
 (defonce simple-subscription-counts (atom []))
 
 
