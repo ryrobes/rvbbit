@@ -311,7 +311,7 @@
 
 (defn extract-patterns
   [data kw num] ;; param based
-  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
+  (if true ;;cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
     (extract-patterns* data kw num)
     (extract-patterns-real data kw num)))
 

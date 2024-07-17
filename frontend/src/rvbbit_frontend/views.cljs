@@ -2277,12 +2277,15 @@
                                             :opacity 0.88}]
                              [re-com/h-box
                               :gap "2px"
-                              :children [(if selected-block?
+                              :children [(if selected-block? 
                                            [draggable-editor
                                             [re-com/md-icon-button
                                              :md-icon-name "zmdi-n-1-square"
                                              :style (merge style-map {:cursor "grab"})]
-                                            selected-block data-key-type data-key single-height-bricks single-width-bricks]
+                                            selected-block data-key-type data-key 
+                                            (Math/floor single-height-bricks) 
+                                            (Math/floor single-width-bricks)
+                                            ]
                                            [re-com/md-icon-button
                                             :md-icon-name "zmdi-n-1-square"
                                             :style style-map])
