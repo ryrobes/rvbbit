@@ -386,7 +386,7 @@
       [])))
 
 (def scroll-state (reagent/atom {}))
-;;(def node-ref (reagent/atom {}))
+(def node-ref (reagent/atom {}))
 
 (defn px- [x]
   (try (edn/read-string (cstr/replace (str x) "px" "")) (catch :default _ 0)))
@@ -410,7 +410,7 @@
            :total-height (last new-cumulative-heights))))
 
 (defn virtualized-v-box [{:keys [children style width height id] :as props}]
-  (let [node-ref (reagent/atom {})
+  (let [;;node-ref (reagent/atom {})
         find-start-index (fn [scroll-top]
                            (let [cumulative-heights (get-in @scroll-state [id :cumulative-heights])]
                              (or (some #(when (> (nth cumulative-heights % 0) scroll-top) %)
@@ -2716,15 +2716,15 @@
           _ (ut/tapp>> [:highlighted-code-panel-code-box code])]
       (doseq [marker @db/markers-panel-code-box] (.clear marker))
       (reset! db/markers-panel-code-box [])
-      (let [code-lines (clojure.string/split-lines code)
+      (let [code-lines (cstr/split-lines code)
             start-line (loop [line 0]
                          (when (< line (.lineCount doc))
-                           (if (clojure.string/includes? (.getLine doc line) (first code-lines)) line (recur (inc line)))))
+                           (if (cstr/includes? (.getLine doc line) (first code-lines)) line (recur (inc line)))))
             end-line (loop [line start-line]
                        (when (< line (.lineCount doc))
-                         (if (clojure.string/includes? (.getLine doc line) (last code-lines)) line (recur (inc line)))))
-            start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
-            end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+                         (if (cstr/includes? (.getLine doc line) (last code-lines)) line (recur (inc line)))))
+            start-ch (cstr/index-of (.getLine doc start-line) (first code-lines))
+            end-ch (+ (cstr/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
             marker
             (try (.markText
                   doc
@@ -2768,29 +2768,29 @@
                 vtype      (ut/data-typer value)
                 vcolor     (get (theme-pull :theme/data-colors nil) vtype)
                 code       (str code)
-                code-lines (clojure.string/split-lines code)]
+                code-lines (cstr/split-lines code)]
             (loop [line 0]
               (when (< line (.lineCount doc))
-                (when (clojure.string/includes? (.getLine doc line) (first code-lines))
+                (when (cstr/includes? (.getLine doc line) (first code-lines))
                   (let [start-line         line
                         end-line           (loop [line start-line]
                                              (when (< line (.lineCount doc))
-                                               (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+                                               (if (cstr/includes? (.getLine doc line) (last code-lines))
                                                  line
                                                  (recur (inc line)))))
-                        code-parts         (let [ff (vec (clojure.string/split code #"/"))
-                                                 vv (vec (clojure.string/split (get ff 1) #">"))
+                        code-parts         (let [ff (vec (cstr/split code #"/"))
+                                                 vv (vec (cstr/split (get ff 1) #">"))
                                                  cc (vec (into [(first ff)] vv))]
                                              cc)
                         full-code-parts    code-parts
-                        code-part-start-ch (clojure.string/index-of (.getLine doc start-line) (first full-code-parts))
-                        code-part-end-ch   (+ (clojure.string/index-of (.getLine doc start-line) (last full-code-parts))
+                        code-part-start-ch (cstr/index-of (.getLine doc start-line) (first full-code-parts))
+                        code-part-end-ch   (+ (cstr/index-of (.getLine doc start-line) (last full-code-parts))
                                               (count (last full-code-parts)))]
                     (loop [code-parts code-parts
                            start-ch   0]
                       (when (seq code-parts)
                         (let [code-part (first code-parts)
-                              start-ch (clojure.string/index-of (.getLine doc start-line) code-part start-ch)
+                              start-ch (cstr/index-of (.getLine doc start-line) code-part start-ch)
                               end-ch (+ start-ch (count code-part))
                               marker
                               (try
@@ -2855,7 +2855,7 @@
                                              #js {:line end-line :ch end-ch}
                                              #js {:replacedWith node}))
                                 (catch :default e (ut/tapp>> [:marker-error (str e)])))]
-                          (when (clojure.string/includes? (.getLine doc start-line) code-part)
+                          (when (cstr/includes? (.getLine doc start-line) code-part)
                             (swap! db/markers-panel-code-box conj marker))
                           (recur (rest code-parts) end-ch))))))
                 (recur (inc line))))))))))
@@ -2875,7 +2875,7 @@
                 vcolor     (get (theme-pull :theme/data-colors nil) vtype)
                 ;;_ (tapp>> [:vtype vcolor vtype])
                 value      (if (string? value) (pr-str value) value)
-                code-lines (clojure.string/split-lines code)
+                code-lines (cstr/split-lines code)
                 psplit        (ut/splitter (str code) "/")
                 table         (-> (first psplit)
                                   (ut/replacer #":" "")
@@ -2884,15 +2884,15 @@
                 field         (keyword (last psplit))]
             (loop [line 0]
               (when (< line (.lineCount doc))
-                (when (clojure.string/includes? (.getLine doc line) (first code-lines))
+                (when (cstr/includes? (.getLine doc line) (first code-lines))
                   (let [start-line         line
                         end-line           (loop [line start-line]
                                              (when (< line (.lineCount doc))
-                                               (if (clojure.string/includes? (.getLine doc line) (last code-lines))
+                                               (if (cstr/includes? (.getLine doc line) (last code-lines))
                                                  line
                                                  (recur (inc line)))))
-                        code-part-start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
-                        code-part-end-ch   (+ (clojure.string/index-of (.getLine doc start-line) (last code-lines))
+                        code-part-start-ch (cstr/index-of (.getLine doc start-line) (first code-lines))
+                        code-part-end-ch   (+ (cstr/index-of (.getLine doc start-line) (last code-lines))
                                               (count (last code-lines)))
                         react!     [@param-hover]
                         node               (js/document.createElement "span")
@@ -2974,7 +2974,7 @@
 (defn autocomplete-suggestions
   [input all-keywords]
   (if (not (cstr/ends-with? input ">"))
-    (let [regs   (first (filter #(and (not= % input) (clojure.string/starts-with? % input)) all-keywords))
+    (let [regs   (first (filter #(and (not= % input) (cstr/starts-with? % input)) all-keywords))
           match? (cstr/starts-with? (ut/replacer regs input "") ">")]
       (if match? (autocomplete-suggestions-fn (str input ">") all-keywords) (autocomplete-suggestions-fn input all-keywords)))
     (autocomplete-suggestions-fn input all-keywords)))
@@ -3072,7 +3072,7 @@
 (defn can-be-autocompleted?
   [token-string]
   (let [list @db/autocomplete-keywords
-        fff (filter #(clojure.string/starts-with? % token-string) list)
+        fff (filter #(cstr/starts-with? % token-string) list)
         can? (and (> (count fff) 1) (ut/ne? fff))
         _ (ut/tapp>> [:can-be-autocompleted? can? (count fff) token-string])]
     can?))
@@ -3196,12 +3196,13 @@
      [(reagent/adapt-react-class cm/UnControlled)
       {:value          (ut/format-map code-width (str value)) ;; value will be pre filtered by caller
        :onBeforeChange (fn [editor _ _] ;; data value]
+                         ;;(swap! db/cm-instance-panel-code-box assoc [bid (last view-kp)] editor)
                          (reset! db/cm-instance-panel-code-box editor))
        :onFocus        (fn [_] (reset! db/cm-focused? true))
        :onBlur         (fn [x]
                          (let [_ (reset! db/cm-focused? false) ;; best to do all this at save time, since passing values from outside can be... a problem
-                               selected-block     (or bid @(ut/tracked-sub ::selected-block {}))
-                               selected-kp        (or view-kp @(ut/tracked-sub ::editor-panel-selected-view {})) ;; @(ut/tracked-subscribe [::editor-panel-selected-view])
+                               selected-block     bid ;(or bid @(ut/tracked-sub ::selected-block {}))
+                               selected-kp        view-kp ;(or view-kp @(ut/tracked-sub ::editor-panel-selected-view {})) ;; @(ut/tracked-subscribe [::editor-panel-selected-view])
                                selected-view-type (first selected-kp) ;; @(ut/tracked-sub ::view-type {:panel-key selected-block :view selected-kp})
                                repl? (or repl?
                                          (true?
@@ -8309,8 +8310,8 @@
 (defn nested-search [data search-str]
   (letfn [(match? [x]
             (and (some? x)
-                 (clojure.string/includes? (clojure.string/lower-case (str x))
-                                           (clojure.string/lower-case search-str))))
+                 (cstr/includes? (cstr/lower-case (str x))
+                                           (cstr/lower-case search-str))))
 
           (search-nested [obj]
             (cond
@@ -9829,36 +9830,38 @@
 
 
 
-
-
-
-
-
-
 (defn wrap-text [text col-width]
-  (letfn [(split-line [line]
-            (if (<= (count line) col-width)
-              [line]
-              (let [split-index (or (last (take-while #(and (not= % -1) (<= % col-width))
-                                                      (concat (map #(.lastIndexOf line " " %) (range col-width -1 -1))
-                                                              [-1])))
-                                    col-width)]
-                (if (= split-index -1)
-                  [(subs line 0 col-width) (subs line col-width)]
-                  [(subs line 0 split-index) (subs line (inc split-index))]))))]
+  (let [split-line (fn [line]
+                     (loop [words (clojure.string/split line #"\s+")
+                            current-line ""
+                            lines []]
+                       (if (empty? words)
+                         (if (empty? current-line)
+                           lines
+                           (conj lines current-line))
+                         (let [word (first words)
+                               new-line (if (empty? current-line)
+                                          word
+                                          (str current-line " " word))]
+                           (if (<= (count new-line) col-width)
+                             (recur (rest words) new-line lines)
+                             (recur (rest words) word (conj lines current-line)))))))]
     (->> (clojure.string/split-lines text)
-         (mapcat (fn [line]
-                   (loop [remaining line
-                          result []]
-                     (if (empty? remaining)
-                       result
-                       (let [[current-line rest-line] (split-line remaining)]
-                         (recur rest-line (conj result current-line)))))))
+         (mapcat split-line)
          (clojure.string/join "\n"))))
+
+
+
+
+
+
+
+
+
 
 (defn choose-viewer [edn-string]
   (let [char-count (count edn-string)
-        line-count (count (clojure.string/split edn-string #"\n"))]
+        line-count (count (cstr/split edn-string #"\n"))]
     (cond
       (> char-count 10000) :virtualized
       (> line-count 200) :virtualized
@@ -10555,9 +10558,12 @@
                                                                                                  ;:line-height "1.1"
                                                                                    }
                                                                            :text (wrap-text (if (vector? x) (cstr/join "\n" x) (str x)) (/ (+ px-width-int 70) 9))
+                                                                           :id (str panel-key "-" selected-view)
                                                                            :width (+ px-width-int 70)
                                                                            :height (+ px-height-int 55)}])
-                   :terminal (fn [x] [reactive-virtualized-console-viewer {:style {} :text x
+                   :terminal (fn [x] [reactive-virtualized-console-viewer {:style {} 
+                                                                           :text x 
+                                                                           :id (str panel-key "-" selected-view)
                                                                            :width (+ px-width-int 70)
                                                                            :height (+ px-height-int 55)}])
                    :panel-code-box-single panel-code-box-single
@@ -12184,6 +12190,7 @@
         ;panels-hash1   @(ut/tracked-sub ::panels-hash {})
         ;panels-hash2   (hash (ut/remove-underscored @(ut/tracked-sub ::panels {})))
         ;panel-hash-singles @(ut/tracked-sub ::panels-hash-singles {})
+        client-name    @(ut/tracked-sub ::client-name {})
         [tab-x tab-y]  (if tab
                          (let [tt @(ut/tracked-sub ::tab-recenter-alpha {:tab tab})]
                               ;[tt @(ut/tracked-subscribe [::tab-recenter tab])]
@@ -12580,7 +12587,8 @@
                                                                                      {:keypath [(keyword
                                                                                                  (cstr/replace
                                                                                                   (str (ut/replacer are-solver
-                                                                                                                    ":solver/" "solver-status/*client-name*>") ">running?")
+                                                                                                                    ":solver/" 
+                                                                                                                    (str "solver-status/" (cstr/replace (str client-name) ":" "") ">") ) ">running?")
                                                                                                   ":" ""))]})] rr?))
                                       ;;  runner-running?  (when runner? (true?
                                       ;;                                  (let [;selected-view-type @(ut/tracked-sub ::view-type {:panel-key brick-vec-key :view s})

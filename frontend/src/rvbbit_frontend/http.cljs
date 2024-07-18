@@ -42,7 +42,7 @@
   (let [;protocol (.-protocol js/window.location)
         protocol          "ws"
         host              (.-host js/window.location)
-        host-without-port (clojure.string/replace host #":\d+$" "")
+        host-without-port (cstr/replace host #":\d+$" "")
         ws-port           "3030"
         url               (str protocol "://" host-without-port ":" ws-port "/ws")]
     (ut/tapp>> [:http-ws-connect-url! url])

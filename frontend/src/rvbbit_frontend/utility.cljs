@@ -601,7 +601,7 @@
   []
   (let [quals ["of-the" "hailing-from" "banned-from" "of" "exiled-from"]
         names [(tales/quality) (rand-nth [(tales/shape) (tales/color)]) (tales/animal) (rand-nth quals) (tales/landform)]]
-    (keyword (clojure.string/replace (clojure.string/join "-" names) " " "-"))))
+    (keyword (cstr/replace (cstr/join "-" names) " " "-"))))
 
 (defn make-tab-name [] (str (str (rand-nth [(tales/shape) (tales/quality) (tales/color)]) " " (tales/animal))))
 
@@ -723,7 +723,7 @@
 
 (defn data-typer-fn
   [x] ;; exists in both block and db TODO - but they are different!!!
-  (cond (or (and (vector? x) (clojure.string/includes? (str x) "#object"))
+  (cond (or (and (vector? x) (cstr/includes? (str x) "#object"))
             (and (vector? x) (fn? (first x))) ;; ?
             (and (vector? x) (cstr/starts-with? (str (first x)) ":re-com"))
             (and (vector? x) (cstr/starts-with? (str (first x)) ":vega"))
@@ -1013,13 +1013,13 @@
 (defn read-string-preserve-floats
   [s]
   (-> s
-      (clojure.string/replace #"(\d+\.\d+)" "FLOAT-$1-FLOAT") ; mark floats
+      (cstr/replace #"(\d+\.\d+)" "FLOAT-$1-FLOAT") ; mark floats
       read-string
       (clojure.walk/postwalk (fn [item]
-                               (if (and (string? item) (clojure.string/starts-with? item "FLOAT-"))
+                               (if (and (string? item) (cstr/starts-with? item "FLOAT-"))
                                  (-> item
-                                     (clojure.string/replace-first "FLOAT-" "")
-                                     (clojure.string/replace-first "-FLOAT" "")
+                                     (cstr/replace-first "FLOAT-" "")
+                                     (cstr/replace-first "-FLOAT" "")
                                      (js/parseFloat))
                                  item)))))
 
@@ -1458,7 +1458,7 @@
     (cond
       (and (keyword? item) (re-matches pattern-ns (pr-str item))) (keyword target (name item))
       (and (keyword? item) (re-matches pattern-name (pr-str item)))
-      (let [new-name (str target "." (second (clojure.string/split (name item) #"\.")))] (keyword (namespace item) new-name))
+      (let [new-name (str target "." (second (cstr/split (name item) #"\.")))] (keyword (namespace item) new-name))
       :else item)))
 
 (defn namespaced-swapper
@@ -1497,31 +1497,31 @@
 (defn sanitize-name
   [name]   ;; keep updated in server also
   (-> name ;; chars that make file and folder operations annoying
-      (clojure.string/replace " " "_")
-      (clojure.string/replace "<" "_")
-      (clojure.string/replace ">" "_")
-      (clojure.string/replace "#" "_")
-      (clojure.string/replace "$" "_")
-      (clojure.string/replace "+" "_")
-      (clojure.string/replace "%" "_")
-      (clojure.string/replace "!" "_")
-      (clojure.string/replace "`" "_")
-      (clojure.string/replace "&" "_")
-      (clojure.string/replace "*" "_")
-      (clojure.string/replace "'" "_")
-      (clojure.string/replace "|" "_")
-      (clojure.string/replace "{" "_")
-      (clojure.string/replace "}" "_")
-      (clojure.string/replace "?" "_")
-      (clojure.string/replace "," "_")
-      (clojure.string/replace (str (char 34)) "_") ;; double quote
-      (clojure.string/replace "=" "_")
-      (clojure.string/replace "/" "_")
-      (clojure.string/replace ":" "_")
-      (clojure.string/replace "@" "_")
-      (clojure.string/replace "[" "_")
-      (clojure.string/replace "]" "_")
-      (clojure.string/replace "\\" "_")))
+      (cstr/replace " " "_")
+      (cstr/replace "<" "_")
+      (cstr/replace ">" "_")
+      (cstr/replace "#" "_")
+      (cstr/replace "$" "_")
+      (cstr/replace "+" "_")
+      (cstr/replace "%" "_")
+      (cstr/replace "!" "_")
+      (cstr/replace "`" "_")
+      (cstr/replace "&" "_")
+      (cstr/replace "*" "_")
+      (cstr/replace "'" "_")
+      (cstr/replace "|" "_")
+      (cstr/replace "{" "_")
+      (cstr/replace "}" "_")
+      (cstr/replace "?" "_")
+      (cstr/replace "," "_")
+      (cstr/replace (str (char 34)) "_") ;; double quote
+      (cstr/replace "=" "_")
+      (cstr/replace "/" "_")
+      (cstr/replace ":" "_")
+      (cstr/replace "@" "_")
+      (cstr/replace "[" "_")
+      (cstr/replace "]" "_")
+      (cstr/replace "\\" "_")))
 
 (defn keypath-munger
   [kp]

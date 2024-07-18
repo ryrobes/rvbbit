@@ -257,15 +257,15 @@
           _ (ut/tapp>> [:highlighted-code code])]
       (doseq [marker @markers] (.clear marker))
       (reset! markers [])
-      (let [code-lines (clojure.string/split-lines code)
+      (let [code-lines (cstr/split-lines code)
             start-line (loop [line 0]
                          (when (< line (.lineCount doc))
-                           (if (clojure.string/includes? (.getLine doc line) (first code-lines)) line (recur (inc line)))))
+                           (if (cstr/includes? (.getLine doc line) (first code-lines)) line (recur (inc line)))))
             end-line (loop [line start-line]
                        (when (< line (.lineCount doc))
-                         (if (clojure.string/includes? (.getLine doc line) (last code-lines)) line (recur (inc line)))))
-            start-ch (clojure.string/index-of (.getLine doc start-line) (first code-lines))
-            end-ch (+ (clojure.string/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
+                         (if (cstr/includes? (.getLine doc line) (last code-lines)) line (recur (inc line)))))
+            start-ch (cstr/index-of (.getLine doc start-line) (first code-lines))
+            end-ch (+ (cstr/index-of (.getLine doc end-line) (last code-lines)) (count (last code-lines)))
             marker
               (try (.markText
                      doc

@@ -993,10 +993,10 @@
                      (fn [] (wss/param-sql-sync)))
                    "Parameter Sync" 30)
 
-  (start-scheduler 45
-                   #(when (> (count (wss/client-subs-late-delivery 30000)) 0)
-                      (wss/sync-client-subs))
-                   "Sync Client Subs" 120)
+  ;; (start-scheduler 45
+  ;;                  #(when (> (count (wss/client-subs-late-delivery 30000)) 0)
+  ;;                     (wss/sync-client-subs))
+  ;;                  "Sync Client Subs" 120)
 
   (start-scheduler 30
                    #(doseq [[name conn] @sql/client-db-pools]
@@ -1027,9 +1027,9 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  (start-scheduler (* 3600 3) ;; 3 hours
-                   reboot-reactor-and-resub
-                   "Reboot Atom Reactor" (* 3600 3))
+  ;; (start-scheduler (* 3600 1) ;; 3 hours
+  ;;                  reboot-reactor-and-resub
+  ;;                  "Reboot Atom Reactor" (* 3600 1))
 
   ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical, we barely use the queues except for sqlite writes
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES
@@ -1081,6 +1081,15 @@
   ;;                              [client-name solver-name :time-running]
   ;;                              (ut/format-duration (get v :started) (System/currentTimeMillis)))))
   ;;                  "Update Solver Statuses")
+
+  (start-scheduler 15
+                   #(let [dbs (wss/database-sizes)]
+                      (doseq [[db dbv] dbs]
+                        (swap! wss/sql-metrics assoc db
+                               (conj (get @wss/sql-metrics db [])
+                                     dbv))))
+                   "Simple SQLite Db Stats" 60)
+
 
   (start-scheduler 1
                    #(let [pst (wss/query-pool-sizes)]
@@ -1472,7 +1481,7 @@
                    [:open-input :kick-1/thread-desc] [:open-input :kick-1/message-name]
                    [:kick-1destination :kick-1/destination]]})
 
-  (wss/schedule! [:seconds 15]
+  (wss/schedule! [:seconds wss/heartbeat-seconds]
                  (heartbeat :all)
                  {:flow-id "client-keepalive" :increment-id? false :close-on-done? true :debug? false})
 

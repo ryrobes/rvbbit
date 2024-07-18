@@ -211,22 +211,53 @@
     mm))
 
 (def sql-queries-run (atom 0))
+(def sql-query-log (atom []))
+
+(ut/pp (take 100 @sql-query-log))
+;; (reset! sql-query-log [])
+
+;; (defn sql-query ;; pre timing... keep 
+;;   [db-spec query & extra]
+;;   (swap! sql-queries-run inc)
+;;   (jdbc/with-db-connection ;; for connection hygiene - atomic query
+;;     [t-con db-spec]
+;;     (ut/ppln [query db-spec])
+;;     (try (wrap-maps query (jdbc/query t-con query {:identifiers keyword :as-arrays? true :result-set-fn doall}))
+;;          (catch Exception e
+;;            (do (ut/pp {:sql-query-fn-error e :query query :extra (when extra extra)})
+;;                (insert-error-row! db-spec query e)
+;;                [;{:query_error (str (.getType e))}
+;;                 {:query_error (str (.getMessage e))} 
+;;                 {:query_error "(from database connection)"}
+;;                 {:query_error (subs (str db-spec) 0 50)}
+;;                 ])))))
 
 (defn sql-query
   [db-spec query & extra]
   (swap! sql-queries-run inc)
-  (jdbc/with-db-connection ;; for connection hygiene - atomic query
-    [t-con db-spec]
-    (ut/ppln [query db-spec])
-    (try (wrap-maps query (jdbc/query t-con query {:identifiers keyword :as-arrays? true :result-set-fn doall}))
-         (catch Exception e
-           (do (ut/pp {:sql-query-fn-error e :query query :extra (when extra extra)})
-               (insert-error-row! db-spec query e)
-               [;{:query_error (str (.getType e))}
-                {:query_error (str (.getMessage e))} 
-                {:query_error "(from database connection)"}
-                {:query_error (subs (str db-spec) 0 50)}
-                ])))))
+  (let [start-time (System/nanoTime)] ;; Capture start time
+    (jdbc/with-db-connection [t-con db-spec]
+      (ut/ppln [query db-spec])
+      (try
+        (let [result (wrap-maps query (jdbc/query t-con query {:identifiers keyword :as-arrays? true :result-set-fn doall}))
+              end-time (System/nanoTime) ;; Capture end time
+              execution-time-ms (/ (- end-time start-time) 1e6)] ;; Calculate execution time in milliseconds
+          (swap! sql-query-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)
+                                     (str (try (subs (str query) 0 100)
+                                                             (catch Throwable _ (str query))) "-" (hash query)) execution-time-ms])
+          ;;(conj result {:execution_time_ms execution-time-ms})
+          result) ;; Return result with execution time
+        (catch Exception e
+          (let [end-time (System/nanoTime) ;; Capture end time in case of exception
+                execution-time-ms (/ (- end-time start-time) 1e6)] ;; Calculate execution time in milliseconds
+            (do (ut/pp {:sql-query-fn-error e :query query :extra (when extra extra)})
+                (insert-error-row! db-spec query e)
+                [{:query_error (str (.getMessage e))} 
+                 {:query_error "(from database connection)"}
+                 {:query_error (subs (str db-spec) 0 50)}
+                 {:execution_time_ms execution-time-ms}])))))))  
+
+
 
 (defn sql-query-meta
   [db-spec query]
@@ -331,20 +362,22 @@
   [db-spec query & [extra]]
   ;(enqueue-task-sql db-spec
   (let [queue-name (or (try (get extra :queue :general-sql) (catch Exception _ :general-sql)) :general-sql)]
-    (qp/serial-slot-queue :sql-serial queue-name                      
-                          (fn []
-                            (swap! sql-exec-run inc)
-                            (swap! sql-exec-log conj (str (str db-spec) (try (subs (str query) 0 100)
-                                                                             (catch Throwable _ (str query)))))
-                            (jdbc/with-db-connection [t-con db-spec]
-                              (try (jdbc/db-do-commands t-con query)
-                                   (catch Exception e
-                                     (do (ut/pp (merge {:sql-exec-fn-error e
-                                                        :db-spec           db-spec
-                                                        :query             (try (subs (str query) 0 1000)
-                                                                                (catch Throwable _ (str query)))}
-                                                       (if extra {:ex extra} {})))
-                                         (insert-error-row! db-spec query e)))))))))
+    (qp/serial-slot-queue
+     :sql-serial queue-name
+     (fn []
+       (swap! sql-exec-run inc)
+       (swap! sql-exec-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)
+                                 (str (try (subs (str query) 0 100)
+                                           (catch Throwable _ (str query))))])
+       (jdbc/with-db-connection [t-con db-spec]
+         (try (jdbc/db-do-commands t-con query)
+              (catch Exception e
+                (do (ut/pp (merge {:sql-exec-fn-error e
+                                   :db-spec           db-spec
+                                   :query             (try (subs (str query) 0 1000)
+                                                           (catch Throwable _ (str query)))}
+                                  (if extra {:ex extra} {})))
+                    (insert-error-row! db-spec query e)))))))))
 
 
 

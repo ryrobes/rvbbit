@@ -1,8 +1,8 @@
 {:orders
  {:tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
-  :connections-sys [:database_name :connection_id :styler_highlight_8717ss],
-  :fields-sys [:field_name :field_type :data_type]},
+  :fields-sys [:field_name :field_type :data_type],
+  :connections-sys [:database_name :connection_id :styler_highlight_8717ss]},
  :reco-preview nil,
  :sql-source {},
  :meta
@@ -341,7 +341,7 @@
     {:data-type "string",
      :distinct 8,
      :group-by? true,
-     :commons {"cache.db" 1, "flows-db" 1, "snifftmp2" 1},
+     :commons {"cache.db" 1, "flows-db" 1, "system-db" 1},
      :cardinality 100},
     :styler_highlight_8717ss
     {:data-type "integer",
@@ -511,7 +511,8 @@
   "salmon lion"
   "coffee llama"
   "victorious hippopotamus"
-  "amaranth mouse"],
+  "amaranth mouse"
+  "motivating falcon"],
  :selected-cols nil,
  :server
  {:settings
@@ -749,31 +750,36 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"flow-forever" {:open? false, :open-outputs? true}},
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [634034061 611712825 4294705152],
- :client-name :instantaneous-globular-bat-39,
+ :memory [270843585 234956969 4294705152],
+ :client-name :masterful-bronze-hare-38,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2660, :h 1480},
- :quake-console? false,
- :post-meta {:connections-sys {:* {:rowcount 8}}, :fields-sys {:* {:rowcount 7}}},
+ :window {:w 2150, :h 1650},
+ :post-meta {:tables-sys {:* {:rowcount 7}}},
  :status
  {:heartbeat
   {:kick
-   [:solver-status/instantaneous-globular-bat-39>get-my-colors1885265543>running?
-    :flow-status/flow-forever>*running?
-    :solver/raw-custom-override-147045789
-    :solver-status/instantaneous-globular-bat-39>get-my-colors-1604729630>running?
-    :solver/get-my-colors-1604729630
+   [:flow-status/flow-forever>*running?
+    :solver/get-my-colors-1192657073
+    :solver/get-my-colors1585084885
+    :solver-meta/raw-custom-override-311672213>output>evald-result>out
+    :solver-meta/raw-custom-override-311672213
+    :solver-status/masterful-bronze-hare-38>raw-custom-override-311672213>running?
+    :solver-status/*client-name*>raw-custom-override-311672213
+    :solver-status/masterful-bronze-hare-38>get-my-colors1585084885>running?
     :flow-status/live-scratch-flow>*running?
-    :solver-status/instantaneous-globular-bat-39>raw-custom-override1763506705>running?
-    :solver-status/instantaneous-globular-bat-39>raw-custom-override-147045789>running?
-    :solver/raw-custom-override1763506705
-    :solver/get-my-colors1885265543]}},
+    :solver-status/masterful-bronze-hare-38>raw-custom-override-449076375>running?
+    :solver/raw-custom-override-311672213
+    :time/second
+    :solver/raw-custom-override-449076375
+    :solver-status/masterful-bronze-hare-38>raw-custom-override941119844>running?
+    :solver-status/masterful-bronze-hare-38>get-my-colors-1192657073>running?
+    :solver/raw-custom-override941119844]}},
  :screen-name "looking-glass-redux",
  :recos-page2 0,
- :selected-tab "amaranth mouse",
+ :selected-tab "motivating falcon",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -785,13 +791,14 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   4704
-   1100038046]],
+   24058
+   -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"flow-forever" nil},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash 1768025922,
+ :user-params-hash -1351953581,
  :grid-recos? true,
+ :preview-keys2 [],
  :resolved-queries
  {:gen-viz-797
   {:select [[[:count 1] :rows] :date_posted],
@@ -1256,7 +1263,7 @@
    :display {:clojure-hop-3 :output},
    :tab "star-shaped wallaby"},
   :block-10271
-  {:h 26,
+  {:h 20,
    :w 22,
    :root [13 2],
    :tab "victorious hippopotamus",
@@ -1307,6 +1314,15 @@
       :font-family :theme/base-font}
      :child
      "It's a perfect day for planting seeds and planning adventures!"]}},
+  :block-9240
+  {:h 8,
+   :w 8,
+   :views
+   {"console-out"
+    [:console :solver-meta/raw-custom-override-311672213>output>evald-result>out]},
+   :name "console :solver/raw-custom-override-311672213",
+   :root [16 11],
+   :tab "motivating falcon"},
   :block-204
   {:mad-libs-combo-hash ["-1610972762" "ufo_sightings_drag_9"],
    :name "compound_trend_1 - \"date_posted, rows\" - 1141",
@@ -1659,6 +1675,51 @@
       "Going back to the canvas, the dialog box and channel reactivity works the same way. The server flow waits for the client and reacts to the value. No need to render or load the flow like before, we are merely a 'subscription client' to this flow."]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-3887
+  {:clojure
+   {:new-clojure-5
+    (do
+      (ns buttecheeks.core
+        (:require [clojure.string :as cstr]))
+      (let [tt :time/second
+            clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (println "go " tt)
+        (str
+          "🐇 🥕  Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕 🐇 "
+          tt)))},
+   :name "block-3887",
+   :w 22,
+   :selected-mode {:new-clojure-5 :text},
+   :selected-view :new-clojure-5,
+   :root [2 8],
+   :h 3,
+   :queries {},
+   :tab "motivating falcon",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3887.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's a perfect day for planting seeds and planning adventures!"]}},
   :block-6033
   {:clojure
    {:clojure-hop-4
@@ -1867,6 +1928,15 @@
      :order-by [[:rowcnt :desc]]}},
    :root [17 8],
    :tab "sapphire ape"},
+  :block-10902
+  {:h 8,
+   :w 14,
+   :views
+   {:editor-block-3887-new-clojure-5
+    [:editor [:block-3887 :clojure :new-clojure-5]]},
+   :name "editor-block-3887-new-clojure-5",
+   :root [2 11],
+   :tab "motivating falcon"},
   :block-12121
   {:h 3,
    :w 6,
@@ -1897,6 +1967,26 @@
    :queries {},
    :tab "star-shaped wallaby",
    :views {}},
+  :block-1219
+  {:clojure
+   {:new-clojure-6
+    (let [clojure-version (clojure-version)
+          jvm-version (System/getProperty "java.version")]
+      (str
+        "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+        clojure-version
+        " on "
+        jvm-version
+        " JVM tech"
+        " 🥕🐇"))},
+   :name "block-1219",
+   :w 10,
+   :selected-view :new-clojure-6,
+   :root [28 12],
+   :h 6,
+   :queries {},
+   :tab "motivating falcon",
+   :views {:hare-vw (ns buttecheeks.core)}},
   :block-35
   {:h 9,
    :w 9,
@@ -2088,6 +2178,45 @@
      :from [[:offenses :dd484]]}},
    :root [25 20],
    :tab "globular koala"},
+  :block-9989
+  {:clojure
+   {:new-clojure-2
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (str
+          "🐇🥕 Sup! Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕 🐇 ")))},
+   :name "block-9989",
+   :w 13,
+   :selected-view :new-clojure-2,
+   :root [28 6],
+   :h 4,
+   :queries {},
+   :tab "motivating falcon",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-9989.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's a perfect day for planting seeds and planning adventures!"]}},
   :block-5042
   {:clojure
    {:clojure-hop-7
@@ -2112,7 +2241,7 @@
    :name "block-11887",
    :shell {:shell-hop [" whoami ; ls  -l --color"]},
    :selected-mode {:shell-hop :terminal}}},
- :selected-block :block-6134,
+ :selected-block :block-3887,
  :theme-colors-hashmap
  {"float" "#ff2050",
   "boolean" "#8EA2A8",
@@ -2142,21 +2271,37 @@
    :flow-forever>final-math nil,
    :live-scratch-flow>*running? false,
    :flow-forever>*running? false},
-  :time {:now-seconds "Wednesday, April 24 1:43:57PM", :month 4, :minute 59},
+  :time
+  {:now-seconds "Wednesday, April 24 1:43:57PM", :month 4, :minute 59, :second 52},
   :viz-tables-sys2 {:table_name :offenses-drag-26},
   :time-freq-345d.* {:freq [1 30 60]},
   :stats-types-34.* {:type ["sql-exec" "cpu" "mem" "load" "flows+"]},
   :param
   {:background-image-path [:string3 :param/path-dir :param/rel-image-path],
    :path-dir "/home/ryanr/rvbbit/frontend/resources/public/",
-   :selected-view-data [:editor [:block-9339 :clojure :clojure-hop-8]],
-   :selected-view [:views :editor-block-9339-clojure-hop-8],
+   :selected-view-data
+   (do
+     (ns buttecheeks.core
+       (:require [clojure.string :as cstr]))
+     (let [tt :time/second
+           clojure-version (clojure-version)
+           jvm-version (System/getProperty "java.version")]
+       (println "go " tt)
+       (str
+         "🐇 🥕  Internal RVBBIT nREPL. Clojure "
+         clojure-version
+         " on "
+         jvm-version
+         " JVM tech"
+         " 🥕 🐇 "
+         tt))),
+   :selected-view [:clojure :new-clojure-5],
    :generated-colors
    [:run-solver [:get-my-colors {:input-image-path :param/background-image-path}]],
    :well-cerise-kangaroo
    "Create a hyperrealistic image of a beautiful full-figured woman in her late 20s, of Irish descent, standing amidst the haunting scenery of a dystopian cyberpunk northeastern America, consumed by the gnarled overgrowth of a New England forest. The scene is steeped in a moody, melancholic atmosphere dominated by neon hues of pink, purple, and light blue, nestling in a stormy, rainy ambiance. The woman gazes directly into the camera, her long hair cascading down and her high-quality, intricate neck tattoos displayed prominently.   The atmosphere is gritty, breathing life into the combined aesthetic of cyberpunk and vaporwave. An air of defiance clings to her, an invitation or a challenge for you to join her world. A rabbit necklace graces her neck while matching intricate rabbit tattoos adorn her skin. Her lips are full and pouty, adding to her voluptuous charm and subtle pinup style. Her makeup runs down her face from the rain and humidity. ",
    :rel-image-path "images/large/b64-image3-48163-50841-4k.webp",
-   :selected-block :block-6134,
+   :selected-block :block-3887,
    :glass-fish-style
    {:background-color "#00000000",
     :border-radius "16px",
@@ -2286,5 +2431,5 @@
    :datetime "1956-10-10 21:00:00.000000",
    :latitude "28.9783333",
    :country "us"},
-  :sys {:selected-tab "amaranth mouse", :selected-tab-idx 8}},
+  :sys {:selected-tab "motivating falcon", :selected-tab-idx 9}},
  :selected-flow "live-scratch-flow"}

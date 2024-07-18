@@ -32,8 +32,8 @@
   [key]
   (let [key (if (keyword? key) (name key) key)] ; Convert to string if it's a keyword
     (-> key
-        (clojure.string/replace " " "_") ; Replace spaces with dashes
-        (clojure.string/replace #"[^\w-]" "") ; Remove any characters that are not
+        (cstr/replace " " "_") ; Replace spaces with dashes
+        (cstr/replace #"[^\w-]" "") ; Remove any characters that are not
     )))
 
 (def transform-cache (reagent.core/atom {}))

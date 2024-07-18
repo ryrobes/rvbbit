@@ -82,6 +82,9 @@
 (defonce nrepl-usage (atom []))
 (defonce nrepl-intros-usage (atom []))
 
+(defonce client-metrics (atom {}))
+(defonce sql-metrics (atom {}))
+
 (defonce sys-load (atom []))
 (defonce thread-usage (atom []))
 (defonce mem-usage (atom []))
@@ -98,6 +101,8 @@
 (def client-panels-materialized (atom {}))
 
 (def client-panels-history (atom {}))
+
+(def heartbeat-seconds 15)
 
 ;;(def num-groups 8) ;; atom segments to split solvers master atom into
 (def num-groups 64) ;; eyes emoji
@@ -1775,15 +1780,28 @@
          (vec (conj (get @client-latency client-name [])
                     (try (- (System/currentTimeMillis) (get @ping-ts client-name)) (catch Exception _ -2)))))
   (let [cstats  (client-statuses)
+        latency (get-in cstats [client-name :client-latency])
+        server-subs (get-in cstats [client-name :server-subs])
+        client-subs (get-in cstats [client-name :client-subs])
+        msgs-per-recent (get-in @ack-scoreboard [client-name :recent-messages-per-second])
+        msgs (get-in @ack-scoreboard [client-name :messages-per-second])
+        mem-mb (ut/bytes-to-mb (get memory :mem_used))
+        _ (swap! client-metrics assoc client-name
+                  (conj (get @client-metrics client-name [])
+                        {:latency latency
+                         :server-subs server-subs
+                         :client-subs client-subs
+                         :recent-messages-per-second msgs-per-recent
+                         :messages-per-second msgs
+                         :mem-mb mem-mb}))
         ins-sql {:insert-into [:client-memory]
                  :values      [(-> memory
-                                   (assoc :latency (get-in cstats [client-name :client-latency]))
-                                   (assoc :server_subs (get-in cstats [client-name :server-subs]))
-                                   (assoc :client_subs (get-in cstats [client-name :client-subs]))
-                                   (assoc :recent-messages-per-second (get-in @ack-scoreboard
-                                                                              [client-name :recent-messages-per-second]))
-                                   (assoc :messages-per-second (get-in @ack-scoreboard [client-name :messages-per-second]))
-                                   (assoc :mem_used_mb (ut/bytes-to-mb (get memory :mem_used))))]}]
+                                   (assoc :latency latency)
+                                   (assoc :server_subs server-subs)
+                                   (assoc :client_subs client-subs)
+                                   (assoc :recent-messages-per-second msgs-per-recent)
+                                   (assoc :messages-per-second msgs)
+                                   (assoc :mem_used_mb mem-mb))]}]
     (sql-exec system-db (to-sql ins-sql)))
   (swap! ack-scoreboard assoc-in [client-name :memory] (ut/bytes-to-mb (get memory :mem_used)))
   (swap! ack-scoreboard assoc-in [client-name :client-sub-list] flow-subs)
@@ -3193,7 +3211,9 @@
 (defn boomerang-client-subs
   [cid]
   (let [sub-task (vec (keys (get @atoms-and-watchers cid {})))]
-    ;;(doseq [fk sub-task] (sub-to-value cid fk)) ;; resub just in case?
+    ;; (ppy/execute-in-thread-pools :boomerang-heartbeat
+    ;;                              (doseq [fk sub-task]
+    ;;                                (sub-to-value cid fk))) ;; resub just in case?
     (push-to-client [:kick]
                     {:at "" :payload nil :payload-kp [:heartbeat :heartbeat] :sent! :heartbeat :to :all}
                     cid
@@ -3476,13 +3496,14 @@
                                                                   (System/currentTimeMillis))
                                                         (assoc-in [client-name flow-key :last-push]
                                                                   (last (cstr/split (get (ut/current-datetime-parts) :now) #", "))))))
-                                               ;(when false  ;; true ;; (cstr/starts-with? (str flow-key) ":flow/")
-                                               ;  (spit (str "./reaction-logs/" (str (cstr/replace (str client-name) ":" "")
-                                               ;        ;;"-" (-> flow-key str (cstr/replace ":" "") (cstr/replace "/" ""))
-                                               ;                                     )".log")
-                                               ;        (str [(ut/get-current-timestamp) client-name flow-key old-value new-value] "\n\n") :append true)
-                                               ;     ;(ut/pp [:running-push! flow-key client-name])
-                                               ;  )
+                                           (ppy/execute-in-thread-pools (keyword (str "reaction-logger/" (cstr/replace (str client-name) ":" "")))
+                                                                        (fn []
+                                                                          (when (or (not= flow-key :time/now)
+                                                                                    (not= flow-key :time/second)) ;;(not (cstr/starts-with? (str flow-key) ":time/"))
+                                                                            (spit (str "./reaction-logs/" (str (cstr/replace (str client-name) ":" "")) ".log")
+                                                                                  (str (ut/get-current-timestamp) "  " client-name "  " flow-key "\n" old-value "\n" new-value "\n\n\n") :append true)
+                                                    ;(ut/pp [:running-push! flow-key client-name])
+                                                                            )))
                                            (handler-fn base-type keypath client-name new-value)))
             (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker
               (swap! last-values assoc keypath new-value)
@@ -6779,6 +6800,71 @@
     ;;(ut/pp [:total-pools (try (count kks) (catch Exception _ -1))])
   )
 
+
+(defn draw-client-stats [& [kks freqs stats label? width {:keys [metrics-atom] :or {metrics-atom client-metrics}}]]
+  (try
+    (let []
+      (doseq [pp (cond (keyword? kks) [kks]
+                       (vector? kks)   kks ;;(sort-by str (keys @metrics-atom))
+                       (string? kks)  (vec (sort-by str (filter #(cstr/includes? (str " " (cstr/replace (str %) ":" "") " ") kks) (keys @metrics-atom))))
+                       :else (vec (sort-by str (keys @metrics-atom))))
+              :let [draw-it (fn [kkey sym ff color]
+                              (ut/pp (let [data0 (mapv kkey (get @metrics-atom pp))
+                                           data0 (mapv (fn [x] (if (nil? x) 0 x)) data0) ;; replace nil 
+                                           data (vec (mapcat (fn [item] (repeat heartbeat-seconds item)) data0))]
+                                       (draw-bar-graph
+                                        (if (= ff 1) data (average-in-chunks data ff))
+                                        (str pp " - " kkey) sym :color color :freq ff :width width))))
+                    stats (cond (vector? stats) stats
+                                (keyword? stats) [stats]
+                                (nil? stats) (keys (first (get @metrics-atom (first (keys @metrics-atom)))))
+                                :else [:mem-bm])
+                    freqs (if (nil? freqs)
+                        ;[1 15]
+                            [15 90]
+                            freqs)
+                    colors (vec (keys ansi-colors))
+                    color-index (mod (hash pp) (count colors))
+                    color (nth colors color-index)]]
+
+        (doseq [s stats]
+          (doseq [ff freqs]
+            (draw-it s "val" ff color)))
+
+        (when label? (fig-render (str pp) color))))
+    (catch Exception e (ut/pp [:draw-client-stats-error e]))))
+
+(defn get-table-sizes []
+  (let [dbs [system-db cache-db flows-db autocomplete-db]
+        cnts-all (into {} (for [db dbs
+                                :let [dbname (-> (last (cstr/split (str (:datasource db)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)]]
+                            {dbname
+                             (let [tables (sql-query db "SELECT name FROM sqlite_master WHERE type='table'")
+                                   table-names (vec (for [t tables] (get t :name)))
+                                   table-cnts (into {} (for [t table-names]
+                                                         {t (get-in (sql-query db (str "SELECT count(*) as c FROM " t)) [0 :c])}))]
+                               table-cnts)}))]
+    cnts-all))
+
+(ut/pp (get-table-sizes))
+
+(defn database-sizes []
+  (into {}  (for [[dbname dbtables] (get-table-sizes)]
+    {dbname {:tables (count (keys dbtables)) 
+             :avg-exec (ut/avgf (map last (filter #(= (first %) dbname) @sql/sql-query-log)))
+             :rows (apply + (vals dbtables))}})))
+    
+(ut/pp (database-sizes))
+
+
+;; (ut/pp @sql-metrics)
+
+;; (ut/pp @client-metrics)
+;; (draw-client-stats nil [30 90 240] [:mem-mb :latency :messages-per-second] true 200)
+;; (draw-client-stats nil [30] [:mem-mb :latency :recent-messages-per-second] true 300)
+;; (draw-client-stats nil [30] nil true 300 {:metrics-atom sql-metrics})
+;; (draw-pool-stats)
+;; (draw-stats :cpu)
 
 ;; (defn draw-cpu-stats []
 ;;   (ut/pp (draw-bar-graph @cpu-usage "cpu usage" "%" :color :cyan))

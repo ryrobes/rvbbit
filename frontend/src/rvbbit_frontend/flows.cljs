@@ -2974,7 +2974,7 @@
                 [{:data
                     '(vec
                       (filter
-                       (fn [x] (not (clojure.string/includes? (get x :block) "/")))
+                       (fn [x] (not (cstr/includes? (get x :block) "/")))
                        (for
                         [row (get (clojure.core/deref flowmaps.db/fn-history) :fflow-id)]
                         {:start (get row :start 0) :end (+ 5 (get row :end 0)) :block (str (get row :block "?"))})))}]}}

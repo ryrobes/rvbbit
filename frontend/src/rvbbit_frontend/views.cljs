@@ -2532,10 +2532,11 @@
                                                                                  shape-name new-curr-axe])))}])]]]]])]]])
 
 
-                      :else                                                    (let [selected-kp @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
-                                                                                     selected-kp (if (nil? (first selected-kp))
+                      :else                                                    (let [s-kp @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
+                                                                                     ;;;;selected-kp @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
+                                                                                     selected-kp (if (nil? (first s-kp))
                                                                                                    nil
-                                                                                                   selected-kp)] ;; if viz-gen or
+                                                                                                   s-kp)] ;; if viz-gen or
                                                                                 ;;  (ut/tapp>> [:sel-keypath  (str selected-kp) 
                                                                                 ;;              (get @db/data-browser-query selected-block)
                                                                                 ;;              @(ut/tracked-sub ::bricks/selected-block-map-kp {:keypath selected-kp})
@@ -2567,7 +2568,7 @@
                                                                                                syntax (get-in block-runners-map [selected-view-type :syntax])]
                                                                            ;;(ut/tapp>> [selected-view-type repl? syntax])
                                                                                            (if (or (nil? syntax) (= syntax "clojure"))
-                                                                                             [bricks/panel-code-box selected-block selected-kp
+                                                                                             [bricks/panel-code-box selected-block s-kp
                                                                                               (+ 17 single-width) (- single-height 20)
                                                                                               (if (nil? selected-kp)
                                                                                                 selected-panel-map

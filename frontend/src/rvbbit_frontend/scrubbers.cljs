@@ -245,7 +245,7 @@
 (defn int-slider
   [kp v view-key type-key & [[ext]]]
   [re-com/box :src (at) :child
-   (let [v           (if (= ext :px) (int (first (clojure.string/split v "px"))) v)
+   (let [v           (if (= ext :px) (int (first (cstr/split v "px"))) v)
          values      (get (first (remove nil? ;;; slider values should be [:min :step :max]
                                    (for [[k v] (friendly-text)] (when (ordered-keys-in-kp? k kp) v))))
                           :values)
