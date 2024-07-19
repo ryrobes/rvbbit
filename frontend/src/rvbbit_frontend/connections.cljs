@@ -19,6 +19,22 @@
 
 (re-frame/reg-sub ::sub-flow-incoming (fn [db [_]] (get db :sub-flow-incoming)))
 
+(re-frame/reg-event-fx
+ ::copy-to-clipboard
+ (fn [_ [_ text]]
+   {:clipboard/copy text}))
+
+(re-frame/reg-fx
+ :clipboard/copy
+ (fn [text]
+   (let [temp-element (js/document.createElement "textarea")]
+     (set! (.-value temp-element) text)
+     (.appendChild js/document.body temp-element)
+     (.select temp-element)
+     (.setSelectionRange temp-element 0 (.-length (.-value temp-element)))
+     (js/document.execCommand "copy")
+     (.removeChild js/document.body temp-element))))
+
 (defn gn [x] (try (name x) (catch :default _ x)))
 (defn gns [x] (try (namespace x) (catch :default _ x)))
 (defn gns? [x] (not (nil? (try (namespace x) (catch :default _ false)))))
@@ -757,7 +773,12 @@
                                nil
                                value)))))
 
-(re-frame/reg-event-db ::declick-parameter (undoable) (fn [db [_ keypath]] (ut/dissoc-in db (vec (cons :click-param keypath)))))
+(re-frame/reg-event-db 
+ ::declick-parameter 
+ (undoable) 
+ (fn [db [_ keypath]] 
+   (ut/tapp>> [:unclick-param (str keypath) (str (vec (cons :click-param keypath)))])
+   (ut/dissoc-in db (vec (cons :click-param keypath)))))
 
 (re-frame/reg-event-db
   ::cell-click-parameter

@@ -23,6 +23,8 @@
 (defonce cm-focused? (reagent/atom false))
 (defonce last-focused (reagent/atom nil))
 
+(defonce unsafe-keys (atom #{}))
+
 ;;(defonce incidental-rowsets (atom []))
 
 (def virtualized-debug-msg (reagent/atom {}))

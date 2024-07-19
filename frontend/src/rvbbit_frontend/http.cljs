@@ -324,38 +324,60 @@
      ;(ut/tapp>>  [:smmc smmc])
      (assoc db :flow-sub-cnts (select-keys smmc flow-subs)))))
 
+(defn rowset-fit [data]
+  (let [all-single-values-vector (and (vector? data) (every? (complement coll?) data))
+        all-single-values-set (and (set? data) (every? (complement coll?) data))
+        data (cond all-single-values-vector (mapv #(hash-map :vec-val %) data)
+                   all-single-values-set (mapv #(hash-map :set-val %) data)
+                   :else data)]
+    data))
+
 (re-frame/reg-sub
  ::clover-data-exists?
  (fn [db {:keys [data-key data]}]
-   (let [all-single-values-vector (and (vector? data) (every? (complement coll?) data))
-         all-single-values-set (and (set? data) (every? (complement coll?) data))
-         data (cond all-single-values-vector (mapv #(hash-map :vec-val %) data)
-                    all-single-values-set (mapv #(hash-map :set-val %) data)
-                    :else data)
+   (let [data (rowset-fit data)
          is-flow-key (cstr/includes? (str data-key) "/")
-         view-map (into {} (for [[k v] @db/solver-fn-lookup]
-                             {v (last k)}))
+         view-map (into {}
+                        (for [[k v] @db/solver-fn-lookup]
+                          {v (last k)}))
          data-key (if is-flow-key
                     (get view-map data-key)
                     data-key)]
      (= (get-in db [:data data-key]) data))))
 
 (re-frame/reg-event-db
+ ::update-rowset-metadata
+ (fn [db [_ data data-key]]
+   (let [rows (count data)
+         meta-map (into {}
+                        (for [field-name (keys (first data))
+                              :let [distinct-vals (count (distinct (map #(get % field-name) data)))]]
+                          {field-name {:data-type (ut/data-typer (get-in data [0 field-name]))
+                                       :distinct distinct-vals
+                                       :group-by? true
+                                       :commons {}
+                                       :cardinality (try (int (* 100 (float (/ distinct-vals rows))))
+                                                         (catch :default _ 0))}}))
+         full-map {:fields meta-map
+                   :rowcount rows}]
+     (assoc-in db [:meta data-key] full-map))))
+
+(re-frame/reg-event-db
  ::insert-implicit-rowset
  (fn [db [_ data flow-key & [non-solver?]]]
-   (let [all-single-values-vector (and (vector? data) (every? (complement coll?) data))
-         all-single-values-set (and (set? data) (every? (complement coll?) data))
-         view-map (into {} (for [[k v] @db/solver-fn-lookup]
-                             {v (last k)}))
+   (let [data (rowset-fit data)
+         view-map (into {}
+                        (for [[k v] @db/solver-fn-lookup]
+                          {v (last k)}))
          data-key (if non-solver?
                     flow-key
                     (get view-map flow-key))
-         data (cond all-single-values-vector (mapv #(hash-map :vec-val %) data)
-                    all-single-values-set (mapv #(hash-map :set-val %) data)
-                    :else data)]
-   (-> db
-       (assoc :incidental-rowsets (conj (get db :incidental-rowsets []) data-key))
-       (assoc-in [:data data-key] data)))))
+
+         tracking-key [:implicit-rowsets (if non-solver? :clover :solver)]]
+     (ut/tracked-dispatch [::update-rowset-metadata data data-key])
+     (-> db
+         (assoc-in tracking-key (vec (distinct (conj (get-in db tracking-key []) data-key))))
+         (assoc-in [:data data-key] data)))))
 
 (def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
@@ -422,12 +444,12 @@
                       data-rowset? (is-rowset? data)
                       ;all-single-values-vector (and (vector? data) (every? (complement coll?) data))
                       ;all-single-values-set (and (set? data) (every? (complement coll?) data))
-                      flow-key (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))
-                      ]
+                      flow-key (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]
+                  
                   (when (and data-rowset?
                              (not @(ut/tracked-sub ::clover-data-exists? {:data-key flow-key :data data})))
-                    (ut/tracked-dispatch [::insert-implicit-rowset data
-                                          flow-key]))
+                    (ut/tracked-dispatch [::insert-implicit-rowset data flow-key]))
+                  
                   ;; (cond
                   ;;   all-keys-match
                   ;;   (ut/tracked-dispatch [::insert-implicit-rowset data

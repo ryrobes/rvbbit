@@ -148,15 +148,15 @@
                                                     (java.io.InputStreamReader.
                                                      (.getInputStream process)))
                                             output (StringBuilder.)]
-                                      
+
                                         (loop []
                                           (when-let [line (.readLine reader)]
                                             (.append output line)
                                             (.append output "\n")
                                             (recur)))
-                                      
+
                                         (.waitFor process)
-                                      
+
                                         (let [result (str output)]
                                           (if (empty? result)
                                             "Command executed, but produced no output."
@@ -251,5 +251,51 @@
  ;:eleven-labs-default-voice-name "Alicia Speaks-Unique and Pleasant"
  ;:eleven-labs-default-voice-name "Sofia-AI-frye"
  :eleven-labs-default-voice-name "Not OG Buffy"
- }
+ :new-block-rand  ["Why, sometimes I've believed as many as six impossible things before breakfast."
+                   "Imagination is the only weapon in the war against reality."
+                   "It's no use going back to yesterday, because I was a different person then."
+                   "Who in the world am I? Ah, that's the great puzzle."
+                   "Curiouser and curiouser!"
+                   "If you don't know where you are going any road can take you there."
+                   "We're all mad here."
+                   "I can't go back to yesterday because I was a different person then."
+                   "It's always tea-time."
+                   "Begin at the beginning and go on till you come to the end; then stop."
+                   "I knew who I was this morning, but I've changed a few times since then."
+                   "How long is forever? Sometimes, just one second."
+                   "If everybody minded their own business, the world would go around a great deal faster than it does."
+                   "I don't think... then you shouldn't talk, said the Hatter."
+                   "Oh, how I wish I could shut up like a telescope! I think I could, if I only knew how to begin."
+                   "You're entirely bonkers. But I'll tell you a secret... all the best people are."
+                   "It was much pleasanter at home, when one wasn't always growing larger and smaller."
+                   "I wonder if I've been changed in the night. Let me think. Was I the same when I got up this morning?"
+                   "Have I gone mad? I'm afraid so, but let me tell you something, the best people usually are."
+                   "Well, I never heard it before, but it sounds uncommon nonsense."
+                   ;; end Alice in Wonderland quotes, start various cyberpunk 
+                   "Why, sometimes I've believed as many as six impossible things before breakfast."
+                   "Imagination is the only weapon in the war against reality."
+                   "Who in the world am I? Ah, that's the great puzzle."
+                   "We're all mad here."
+                   "How long is forever? Sometimes, just one second."
+                   "The world is full of obvious things which nobody by any chance ever observes."
+                   "Reality is that which, when you stop believing in it, doesn't go away."
+                   "The sky above the port was the color of television, tuned to a dead channel."
+                   "Information wants to be free."
+                   "The future is already here – it's just not evenly distributed."
+                   "He had a chip in his head, an interface jack that allowed him to plug his brain directly into the console."
+                   "The 'Net is a waste of time, and that's exactly what's right about it."
+                   "Cyberspace. A consensual hallucination experienced daily by billions of legitimate operators, in every nation."
+                   "The street finds its own uses for things."
+                   "Accelerated world. Accelerated nervous system to go with it."
+                   "The future has arrived — it's just not evenly distributed yet."
+                   "It's not enough to be able to pick up a sword. You have to know which end to poke into the enemy."
+                   "When you want to know how things really work, study them when they're coming apart."
+                   "The human sensory system is a lot more complex and weird than most people realize."
+                   "Time moves in one direction, memory in another."
+                   "The only thing that keeps you sane is to think that it's all a bad dream."
+                   "We're an information economy. They teach you that in school. What they don't tell you is that it's impossible to move, to live, to operate at any level without leaving traces, bits, seemingly meaningless fragments of personal information."
+                   "We monitor many frequencies. We listen always. Came a voice, out of the babel of tongues, speaking to us. It played us a mighty dub."
+                   "Secrets are not the same as surprises."
+                   "Neuromancer. The lane to the land of the dead."
+                   ]}
 

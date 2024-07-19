@@ -764,7 +764,8 @@
                                                         [block-names user-param-names locals
                                                          view-names snapshot-names tab-names
                                                          query-names all-runners]))
-                          reco              (unique-block-id proposed all-keys [])]
+                          _                 (reset! db/unsafe-keys (into @db/unsafe-keys all-keys))
+                          reco              (unique-block-id proposed @db/unsafe-keys [])]
                       (cond (and incoming-keyword? (keyword? reco))       reco
                             (and incoming-keyword? (not (keyword? reco))) (keyword (replacer (str reco) #":" ""))
                             :else                                         reco))))

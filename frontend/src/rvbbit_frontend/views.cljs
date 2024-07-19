@@ -2906,11 +2906,13 @@
                                          :height (px (- single-height 100))
                                          :width (px single-width)
                                          :child [bricks/honeycomb selected-block (or default-shape-view :oz) single-width-bricks (dec single-height-bricks)]])
-                                      :else      [re-com/box :size "none"
-                                                  :style {:transform "translate(0)"}
-                                                  :height (px (- single-height 100))
-                                                  :width (px single-width)
-                                                  :child [bricks/honeycomb selected-block data-key  single-width-bricks (dec single-height-bricks)]])
+                                      
+                                      :else      (let [{:keys [single-width-bricks single-width single-height bricks-wide bricks-tall]} @editor-dimensions] ;; force reaction
+                                                   [re-com/box :size "none"
+                                                    :style {:transform "translate(0)"}
+                                                    :height (px (- single-height 100))
+                                                    :width (px single-width)
+                                                    :child [bricks/honeycomb selected-block data-key  single-width-bricks (dec single-height-bricks)]]))
                                 (if viz-gen? ;; dont show scrubber boolean if on viz-gen mode
                                   [re-com/box :style {:font-size "10px" :margin-left "8px"} :child
                                    (str "('viz-gen' debug - "
@@ -3798,7 +3800,7 @@
         client-name @(ut/tracked-subscribe [::bricks/client-name])
         flow-watcher-subs-grouped @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped])
         server-subs @(ut/tracked-subscribe [::bricks/server-subs])
-        things-running [] ;;@(ut/tracked-sub ::bricks/things-running {})
+        things-running @(ut/tracked-sub ::bricks/things-running {})
         coords (if lines? ;; expensive otherwise
                  (let [subq-mapping (if lines? @(ut/tracked-subscribe [::bricks/subq-mapping]) {})
                        dwn-from-here (vec (ut/cached-downstream-search subq-mapping selected-block))
