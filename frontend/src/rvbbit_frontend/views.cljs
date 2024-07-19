@@ -2568,11 +2568,16 @@
                                                                                                syntax (get-in block-runners-map [selected-view-type :syntax])]
                                                                            ;;(ut/tapp>> [selected-view-type repl? syntax])
                                                                                            (if (or (nil? syntax) (= syntax "clojure"))
-                                                                                             [bricks/panel-code-box selected-block s-kp
-                                                                                              (+ 17 single-width) (- single-height 20)
-                                                                                              (if (nil? selected-kp)
-                                                                                                selected-panel-map
-                                                                                                (get-in selected-panel-map selected-kp)) repl?]
+                                                                                             (let [;;_ (reset! bricks/tt [selected-block s-kp (get @db/data-browser-query selected-block)])
+                                                                                                   react! [@db/data-browser-query ]]
+                                                                                               ^{:key (str "cm-" selected-block s-kp)}
+                                                                                               [bricks/panel-code-box 
+                                                                                                (fn [] selected-block) ;; sneaky sneaky, react.... :/
+                                                                                                (fn [] s-kp)
+                                                                                                (+ 17 single-width) (- single-height 20)
+                                                                                                (if (nil? selected-kp)
+                                                                                                  selected-panel-map
+                                                                                                  (get-in selected-panel-map selected-kp)) repl? true])
                                                                                              [bricks/panel-string-box selected-kp (+ 17 single-width) (- single-height 20)
                                                                                               (if (nil? selected-kp)
                                                                                                 selected-panel-map

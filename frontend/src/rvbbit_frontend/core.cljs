@@ -131,16 +131,16 @@
        :poll-when                [::bricks/update-flow-statuses?]
        :dispatch-event-on-start? true} 
       
-      {:interval 120 
-       :event [::bricks/clean-up-reco-previews] 
+      {:interval                 120 
+       :event                    [::bricks/clean-up-reco-previews] 
        :dispatch-event-on-start? false}
       
-      {:interval 3 
-       :event [::bricks/prune-alerts] 
+      {:interval                 3 
+       :event                    [::bricks/prune-alerts] 
        :dispatch-event-on-start? false}
 
-      {:interval 5 
-       :event [::bricks/get-memory-usage] 
+      {:interval                 5 
+       :event                    [::bricks/get-memory-usage] 
        :dispatch-event-on-start? false}
 
       {:interval                 1 ;;; test
@@ -163,9 +163,9 @@
        :poll-when                [::bricks/stale-flow-subs?]
        :dispatch-event-on-start? false}
                                        
-      {:interval                 600 ;; ten mins. less? more?
-       :event                    [::bricks/purge-cache-atoms]
-       :dispatch-event-on-start? false}
+      ;; {:interval                 3600 ;; ten mins. less? more?
+      ;;  :event                    [::bricks/purge-cache-atoms]
+      ;;  :dispatch-event-on-start? false}
       
       {:interval                 3600 ;; one hour. more?
        :event                    [::bricks/clear-cache-atoms]

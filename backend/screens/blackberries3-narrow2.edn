@@ -1,822 +1,409 @@
 {:orders
- {:flow-fn-sys
-  [:name :description :full_map :inputs :icon :input_types :output_types :category],
-  :client_memory
-  [:mem_time
-   :client_name
-   :packets
-   :batches
-   :mem_limit
-   :mem_used
-   :mem_used_mb
-   :mem_total
-   :latency
-   :client_subs
-   :server_subs
-   :messages_per_second
-   :recent_messages_per_second
-   :ts],
-  :new-query (:diff :mem_used :ts_hour),
-  :flows-sys [:flow_id :file_path :last_modified],
-  :jvm_stats
-  [:used_memory_mb
-   :thread_count
-   :sql_cache_size
-   :ws_peers
-   :open_flow_channels
-   :queries_run
-   :internal_queries_run
-   :sniffs_run
-   :sys_load
-   :ts],
-  :client-stats-drag-36
-  [:ack
-   :client_latency
-   :client_name
-   :last_seen
-   :last_seen_seconds
-   :memory
-   :recent_messages_per_second
-   :push
-   :queue_distro
-   :server_subs
-   :uptime
-   :styler_highlight_8717],
-  :client_stats
-  [:client_name
-   :ack
-   :client_latency
-   :client_subs
-   :last_seen
-   :memory
-   :push
-   :queue_size
-   :server_subs
-   :last_seen_seconds
-   :booted_ts
-   :queue_distro
-   :uptime_seconds
-   :uptime
-   :messages_per_second
-   :recent_messages_per_second
-   :ts],
-  :flow-fn-categories-sys [:category],
-  :reco-counts [:table_name :cnt],
-  :client-memory-drag-36
-  [:client_name
-   :recent_messages_per_second
-   :messages_per_second
-   :mem_used
-   :batches
-   :packets
-   :ts],
-  :gen-viz-516 (:mb :mem_used :messages_per_second :ts),
-  :flow-fn-all-sys [:name]},
+ {:fields-sys [:field_name :field_type :data_type],
+  :tables-sys
+  [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
+  :connections-sys [:database_name :connection_id :styler_highlight_8717ss]},
  :reco-preview nil,
- :rules-map {:surprising-panda-rule {:flow-id nil, :signal nil, :overrides {}}},
- :flow? false,
- :sql-source
- {:client_memory
-  {:select [:*], :connection-id "system-db", :from [:client_memory], :limit 111},
-  :client_stats
-  {:select [:*], :connection-id "system-db", :from [:client_stats], :limit 111},
-  :jvm_stats
-  {:select [:*], :connection-id "system-db", :from [:jvm_stats], :limit 111},
-  :client-memory-drag-36
-  {:select
-   [:client_name
-    :recent_messages_per_second
-    :messages_per_second
-    :mem_used
-    :batches
-    :packets
-    :ts],
-   :where [:= :client_name :*client-name-str],
-   :from [[:client_memory :ee183]],
-   :refresh-every 200,
-   :cache? false,
-   :_last-run "23:41:37",
-   :order-by [[:mem_time :desc]],
-   :col-widths {:batches 131, :packets 131, :ts 151}},
-  :gen-viz-516
-  {:cache? false,
-   :where [:= :client_name :*client-name-str],
-   :limit 50,
-   :group-by [:ts],
-   :_last-run "23:40:37",
-   :refresh-every 200,
-   :from
-   [{:select
-     [:client_name
-      :recent_messages_per_second
-      :messages_per_second
-      :mem_used
-      :batches
-      :packets
-      :ts],
-     :where [:= :client_name :*client-name-str],
-     :from [[:client_memory :ee183]],
-     :order-by [[:mem_time :desc]]}],
-   :order-by [[:ts :desc]],
-   :connection-id "system-db",
-   :select
-   [[[[:sum :mem_used]] :mem_used]
-    [[:sum :recent_messages_per_second] :messages_per_second]
-    :ts],
-   :post-process-fn
-   (fn [x]
-     (vec
-       (reverse
-         (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))},
-  :client-stats-drag-36
-  {:select
-   [:ack
-    :client_latency
-    :client_name
-    :last_seen
-    :last_seen_seconds
-    :memory
-    :recent_messages_per_second
-    :push
-    :queue_distro
-    :server_subs
-    :uptime],
-   :from [[:client_stats :gg588]],
-   :refresh-every 210,
-   :cache? false,
-   :_last-run "23:40:57",
-   :col-widths
-   {:ack 81,
-    :client_latency 141,
-    :client_name 261,
-    :memory 81,
-    :push 91,
-    :server_subs 111,
-    :uptime 201,
-    :last_seen 171},
-   :order-by [[:last_seen_seconds :asc]],
-   :style-rules
-   {[:* :highlight-8717]
-    {:logic [:= :client_name :*client-name-str],
-     :style {:border "1px solid #cac18255"}}}},
-  :new-query
-  {:cache? false,
-   :where [:= :client_name :*client-name-str],
-   :limit 26,
-   :group-by [2],
-   :_last-run "23:40:37",
-   :refresh-every 230,
-   :from
-   [{:select
-     [:client_name
-      :recent_messages_per_second
-      :messages_per_second
-      :mem_used
-      :batches
-      :packets
-      :ts],
-     :where [:= :client_name :*client-name-str],
-     :from [[:client_memory :ee183]],
-     :order-by [[:mem_time :desc]]}],
-   :order-by [[:ts :desc]],
-   :connection-id "system-db",
-   :select [[[[:avg :mem_used]] :mem_used] [[:substring :ts 1 13] :ts_hour]],
-   :post-process-fn
-   (fn [x]
-     (vec
-       (for
-         [idx
-          (range (count x))
-          :let
-          [rx
-           (vec (reverse x))
-           prev-row
-           (get rx (- idx 1) {:mem_used 0})
-           row
-           (get rx idx {:mem_used 0})
-           pre-mb
-           (/ (get prev-row :mem_used) 1048576)
-           mb
-           (/ (get row :mem_used) 1048576)
-           diff
-           (Math/round (- mb pre-mb))
-           pos
-           (cond (> diff 0) "+" (< diff 0) "" :else "")]]
-         (merge
-           row
-           {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))}},
+ :sql-source {},
  :meta
- {:flow-fn-sys
-  {:fields
-   {:name
-    {:data-type "string",
-     :distinct 125,
-     :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
-     :cardinality 100},
-    :description
-    {:data-type "string",
-     :distinct 33,
-     :group-by? true,
-     :commons
-     {"" 91, "Basic HTTP call primitive" 2, "Clojure subtract function." 2},
-     :cardinality 26},
-    :full_map
-    {:data-type "string",
-     :distinct 125,
-     :group-by? true,
-     :commons
-     {"{:description nil, :fn (), :flow-id \"callie-5\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/callie-5.edn\", :defaults {:open-input-1 [:speak \"Excellent, I'm super excited you are enjoying it already! Now, let us get down to business by taking a look at the 'detail pane' located in block-630, aptly named select-all-ufo-sightings after the parent table. Original, right? \"], :open-input-3 \"evening-ryan-3456\", :open-input {:select [:city :comments :country :date_posted :datetime :duration_hours :duration_seconds :duration_seconds_int :id :latitude :longitude :shape :state], :connection-id \"bigfoot-ufos\", :from [[:ufo_sightings :tt91]]}, :open-input-2 :free-pyramidal-goat-exiled-from-blowhole}, :types {:open-input-1 :vector, :open-input-3 :string, :open-input :map, :open-input-2 :keyword, :out :any}, :inputs [:open-input-1 :open-input-3 :open-input :open-input-2], :required [:open-input-1 :open-input-3 :open-input :open-input-2]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"dalle3-create-image-rvbbit\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/dalle3-create-image-rvbbit.edn\", :defaults {:open-input-1 \"vivid\", :in-prompt \"a stylized app logo, for RVBBIT, a data exploration and flow based workflow platform written in lisp. The Rabbit head forms the V of the company name - head turned to the side so the ears make the V. bright pink and neon blues on a dark background. cyberpunk and vaporwave inspired. gritty yet iconic. would be at home in Cyberpunk 2077 or Blade Runner. Striking. Iconic. Simple yet striking\", :quality \"hd\", :open-input-2 \"natural\", :headers-map {\"Authorization\" \"Bearer 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\", \"Content-Type\" \"application/json\"}, :url-str \"https://api.openai.com/v1/images/generations\"}, :types {:open-input-1 :string, :in-prompt :string, :quality :string, :open-input-2 :string, :headers-map :map, :url-str :string, :out :any}, :inputs [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str], :required [:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]}"
-      1,
-      "{:description nil, :fn (), :flow-id \"prongh-rn-flow-927\", :icon \"zmdi-puzzle-piece\", :flow-path \"./flows/prongh-rn-flow-927.edn\", :defaults {:open-input 123}, :types {:open-input :integer, :out :any}, :inputs [:open-input], :required [:open-input]}"
-      1},
-     :cardinality 100},
-    :inputs
-    {:data-type "string",
-     :distinct 66,
-     :group-by? true,
-     :commons
-     {"[:open-input-1 :open-input]" 10,
-      "[:value1 :value2]" 7,
-      "[:open-input-1 :in-prompt :quality :open-input-2 :headers-map :url-str]" 7},
-     :cardinality 52},
-    :icon
-    {:data-type "string",
-     :distinct 21,
-     :group-by? true,
-     :commons {"zmdi-puzzle-piece" 91, "zmdi-pizza" 3, "zmdi-file-text" 3},
-     :cardinality 16},
-    :input_types
-    {:data-type "string",
-     :distinct 56,
-     :group-by? true,
-     :commons {"[:string]" 12, "[:integer :integer]" 9, "[:integer]" 8},
-     :cardinality 44},
-    :output_types
-    {:data-type "string",
-     :distinct 14,
-     :group-by? true,
-     :commons {":any" 63, "" 21, ":boolean" 12},
-     :cardinality 11},
-    :category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 91, ":rabbit-base" 18, ":clojure-base" 16},
-     :cardinality 2}},
-   :rowcount 125},
-  :client_memory
-  {:fields
-   {:mem_limit
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {4294705152 100, 2172649472 11},
-     :cardinality 1},
-    :server_subs
-    {:data-type "integer",
-     :distinct 7,
-     :group-by? true,
-     :commons {11 39, 13 21, 1 11},
-     :cardinality 6},
-    :mem_used
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {62602831 1, 60466016 1, 1472112836 1},
-     :cardinality 100},
-    :client_subs
-    {:data-type "integer",
-     :distinct 7,
-     :group-by? true,
-     :commons {11 39, 13 21, 1 11},
-     :cardinality 6},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 38,
-     :group-by? true,
-     :commons {1 14, 1.03 13, -1 10},
-     :cardinality 34},
-    :mem_time
-    {:data-type "string",
-     :distinct 107,
-     :group-by? true,
-     :commons
-     {"2024-05-17T01:13:17.557Z" 2,
-      "2024-05-17T01:14:02.571Z" 2,
-      "2024-05-17T01:12:32.539Z" 2},
-     :cardinality 96},
-    :ts
-    {:data-type "string",
-     :distinct 15,
-     :group-by? true,
-     :commons
-     {"2024-05-16 21:13:08" 10, "2024-05-16 21:08:38" 10, "2024-05-16 21:10:08" 10},
-     :cardinality 13},
-    :messages_per_second
-    {:data-type "float",
-     :distinct 59,
-     :group-by? true,
-     :commons {nil 10, 0.97 5, 2.18 5},
-     :cardinality 53},
-    :latency
-    {:data-type "integer",
-     :distinct 99,
-     :group-by? true,
-     :commons {486 2, 283 2, 622 2},
-     :cardinality 89},
-    :batches
-    {:data-type "integer",
-     :distinct 100,
-     :group-by? true,
-     :commons {2 12, 11569 1, 2525 1},
-     :cardinality 90},
-    :client_name
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons
-     {":whole-oval-gnat-25" 12,
-      ":easy-narrow-wolf-19" 12,
-      ":great-triangular-clam-38" 11},
-     :cardinality 9},
-    :mem_total
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {86657773 1, 73574491 1, 105398668 1},
-     :cardinality 100},
-    :packets
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {70707 1, 70944 1, 415125 1},
-     :cardinality 100},
-    :mem_used_mb
-    {:data-type "string",
-     :distinct 82,
-     :group-by? true,
-     :commons {"76" 4, "69" 4, "58" 4},
-     :cardinality 73}},
-   :rowcount 111},
-  :new-query
-  {:fields
-   {:diff
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"+137" 1, "149 MB" 1},
-     :cardinality 100},
-    :mem_used
-    {:data-type "float",
-     :distinct 2,
-     :group-by? true,
-     :commons {2.9932176517241377E8 1, 1.5609010914285713E8 1},
-     :cardinality 100},
-    :ts_hour
-    {:data-type "string",
-     :distinct 2,
-     :group-by? true,
-     :commons {"2024-05-16 23" 1, "2024-05-16 22" 1},
-     :cardinality 100}},
-   :rowcount 2},
-  :flows-sys
-  {:fields
-   {:flow_id
-    {:data-type "string",
-     :distinct 90,
-     :group-by? true,
-     :commons {"clam-flow-851" 3, "map-pull-test2" 1, "callie-3" 1},
-     :cardinality 97},
-    :file_path
-    {:data-type "string",
-     :distinct 92,
-     :group-by? true,
-     :commons
-     {"./flows/stitches-math.edn" 1,
-      "./flows/openai-image-gen-ladder3.edn" 1,
-      "./flows/hey-rabbit-pathfinder.edn" 1},
-     :cardinality 100},
-    :last_modified
-    {:data-type "string",
-     :distinct 26,
-     :group-by? true,
-     :commons
-     {"2024-03-12 02:37:43" 67, "2024-05-03 21:13:48" 1, "2024-03-14 07:50:09" 1},
-     :cardinality 28}},
-   :rowcount 92},
-  :jvm_stats
-  {:fields
-   {:queries_run
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {9810 1, 6160 1, 5229 1},
-     :cardinality 100},
-    :sql_cache_size
-    {:data-type "integer",
-     :distinct 6,
-     :group-by? true,
-     :commons {12 37, 9 34, 16 21},
-     :cardinality 5},
-    :ts
-    {:data-type "string",
-     :distinct 111,
-     :group-by? true,
-     :commons
-     {"2024-05-16 21:08:13" 1, "2024-05-16 21:29:43" 1, "2024-05-16 21:13:43" 1},
-     :cardinality 100},
-    :sniffs_run
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {190 1, 3946 1, 71 1},
-     :cardinality 100},
-    :sys_load
-    {:data-type "float",
-     :distinct 111,
-     :group-by? true,
-     :commons {4.74560546875 1, 4.32373046875 1, 3.87255859375 1},
-     :cardinality 100},
-    :used_memory_mb
-    {:data-type "integer",
-     :distinct 107,
-     :group-by? true,
-     :commons {2291 2, 2415 2, 2386 2},
-     :cardinality 96},
-    :thread_count
-    {:data-type "integer",
-     :distinct 26,
-     :group-by? true,
-     :commons {122 14, 114 10, 123 10},
-     :cardinality 23},
-    :internal_queries_run
-    {:data-type "integer",
-     :distinct 111,
-     :group-by? true,
-     :commons {692 1, 183 1, 438 1},
-     :cardinality 100},
-    :open_flow_channels
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {-1 111},
-     :cardinality 0},
-    :ws_peers
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {10 110, 0 1},
-     :cardinality 1}},
-   :rowcount 111},
-  :client-stats-drag-36
-  {:fields
-   {:server_subs
-    {:data-type "integer",
-     :distinct 6,
-     :group-by? true,
-     :commons {11 4, 13 3, 35 2},
-     :cardinality 50},
-    :push
-    {:data-type "integer",
-     :distinct 12,
-     :group-by? true,
-     :commons {2708 1, 14138 1, 9847 1},
-     :cardinality 100},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 11,
-     :group-by? true,
-     :commons {1.2 2, 1.03 1, 1.27 1},
-     :cardinality 91},
-    :uptime
-    {:data-type "string",
-     :distinct 7,
-     :group-by? true,
-     :commons
-     {"2 hours, 35 minutes, 24 seconds" 3,
-      "2 hours, 35 minutes, 22 seconds" 2,
-      "2 hours, 35 minutes, 20 seconds" 2},
-     :cardinality 58},
-    :last_seen_seconds
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {4 12},
-     :cardinality 8},
-    :memory
-    {:data-type "string",
-     :distinct 12,
-     :group-by? true,
-     :commons {"65" 1, "373" 1, "74" 1},
-     :cardinality 100},
-    :queue_distro
-    {:data-type "string",
-     :distinct 12,
-     :group-by? true,
-     :commons {"{0 9680}" 1, "{0 11919}" 1, "{0 891}" 1},
-     :cardinality 100},
-    :styler_highlight_8717
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {0 11, 1 1},
-     :cardinality 16},
-    :client_latency
-    {:data-type "integer",
-     :distinct 12,
-     :group-by? true,
-     :commons {432 1, 574 1, 423 1},
-     :cardinality 100},
-    :ack
-    {:data-type "integer",
-     :distinct 4,
-     :group-by? true,
-     :commons {208 9, 210 1, 39 1},
-     :cardinality 33},
-    :client_name
-    {:data-type "string",
-     :distinct 12,
-     :group-by? true,
-     :commons
-     {":great-triangular-clam-38" 1,
-      ":pretty-icosahedral-hog-32" 1,
-      ":attractive-rhomboidal-otter-29" 1},
-     :cardinality 100},
-    :last_seen
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"4 seconds" 12},
-     :cardinality 8}},
-   :rowcount 12},
-  :client_stats
-  {:fields
-   {:server_subs
-    {:data-type "integer",
-     :distinct 7,
-     :group-by? true,
-     :commons {11 3, 35 2, 13 2},
-     :cardinality 63},
-    :queue_size
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {0 11},
-     :cardinality 9},
-    :push
-    {:data-type "integer",
-     :distinct 11,
-     :group-by? true,
-     :commons {13274 1, 4665 1, 3 1},
-     :cardinality 100},
-    :client_subs
-    {:data-type "integer",
-     :distinct 7,
-     :group-by? true,
-     :commons {11 3, 35 2, 13 2},
-     :cardinality 63},
-    :recent_messages_per_second
-    {:data-type "float",
-     :distinct 9,
-     :group-by? true,
-     :commons {1.03 2, 1.1 2, 3.13 1},
-     :cardinality 81},
-    :uptime_seconds
-    {:data-type "float",
-     :distinct 11,
-     :group-by? true,
-     :commons {4581.731 1, 4583.152 1, 4584.452 1},
-     :cardinality 100},
-    :uptime
-    {:data-type "string",
-     :distinct 6,
-     :group-by? true,
-     :commons
-     {"1 hour, 15 minutes, 54 seconds" 3,
-      "1 hour, 15 minutes, 52 seconds" 2,
-      "1 hour, 15 minutes, 50 seconds" 2},
-     :cardinality 54},
-    :last_seen_seconds
-    {:data-type "integer",
-     :distinct 1,
-     :group-by? true,
-     :commons {4 11},
-     :cardinality 9},
-    :memory
-    {:data-type "string",
-     :distinct 10,
-     :group-by? true,
-     :commons {"63" 2, "41" 1, "375" 1},
-     :cardinality 90},
-    :queue_distro
-    {:data-type "string",
-     :distinct 11,
-     :group-by? true,
-     :commons {"{0 429}" 1, "{0 5874}" 1, "{0 7734}" 1},
-     :cardinality 100},
-    :ts
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"2024-05-16 22:23:43" 11},
-     :cardinality 9},
-    :messages_per_second
-    {:data-type "float",
-     :distinct 9,
-     :group-by? true,
-     :commons {1.02 2, 1.05 2, 0.31 1},
-     :cardinality 81},
-    :client_latency
-    {:data-type "integer",
-     :distinct 11,
-     :group-by? true,
-     :commons {543 1, 320 1, 647 1},
-     :cardinality 100},
-    :ack
-    {:data-type "integer",
-     :distinct 2,
-     :group-by? true,
-     :commons {102 10, 1 1},
-     :cardinality 18},
-    :booted_ts
-    {:data-type "integer",
-     :distinct 11,
-     :group-by? true,
-     :commons {1715908041470 1, 1715908039181 1, 1715908040049 1},
-     :cardinality 100},
-    :client_name
-    {:data-type "string",
-     :distinct 11,
-     :group-by? true,
-     :commons
-     {":great-triangular-clam-38" 1,
-      ":pretty-icosahedral-hog-32" 1,
-      ":attractive-rhomboidal-otter-29" 1},
-     :cardinality 100},
-    :last_seen
-    {:data-type "string",
-     :distinct 1,
-     :group-by? true,
-     :commons {"4 seconds" 11},
-     :cardinality 9}},
-   :rowcount 11},
-  :flow-fn-categories-sys
-  {:fields
-   {:category
-    {:data-type "string",
-     :distinct 3,
-     :group-by? true,
-     :commons {":sub-flows" 1, ":rabbit-base" 1, ":clojure-base" 1},
-     :cardinality 100}},
-   :rowcount 3},
-  :reco-counts {:fields {}, :rowcount 0},
+ {:reco-counts {:fields {}, :rowcount 0},
   :client-memory-drag-36
   {:fields
    {:client_name
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":good-sapphire-hyena-18" 107},
+     :commons {":wealthy-thin-lark-35" 278},
      :cardinality 0},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 20,
+     :distinct 23,
      :group-by? true,
-     :commons {3.1 16, 3.17 14, 3.13 13},
-     :cardinality 18},
+     :commons {7.87 52, 8 41, 7.93 34},
+     :cardinality 8},
     :messages_per_second
     {:data-type "float",
-     :distinct 14,
+     :distinct 25,
      :group-by? true,
-     :commons {3.13 54, 3.12 33, 3.11 5},
-     :cardinality 13},
+     :commons {7.99 39, 7.98 36, 8.07 35},
+     :cardinality 8},
     :mem_used
     {:data-type "integer",
-     :distinct 107,
+     :distinct 278,
      :group-by? true,
-     :commons {147170530 1, 43263937 1, 96855986 1},
+     :commons {295730079 1, 292891811 1, 362648276 1},
      :cardinality 100},
     :batches
     {:data-type "integer",
-     :distinct 107,
+     :distinct 278,
      :group-by? true,
-     :commons {49 1, 936 1, 549 1},
+     :commons {390 1, 49 1, 820 1},
      :cardinality 100},
     :packets
     {:data-type "integer",
-     :distinct 107,
+     :distinct 278,
      :group-by? true,
-     :commons {5214 1, 7752 1, 8852 1},
+     :commons {4274 1, 1547 1, 7666 1},
      :cardinality 100},
     :ts
     {:data-type "string",
-     :distinct 107,
+     :distinct 278,
      :group-by? true,
      :commons
-     {"2024-05-16 22:40:08" 1, "2024-05-16 23:37:08" 1, "2024-05-16 23:04:08" 1},
+     {"2024-07-17 20:20:47" 1, "2024-07-17 21:14:05" 1, "2024-07-17 20:38:33" 1},
      :cardinality 100}},
-   :rowcount 107},
+   :rowcount 278},
   :gen-viz-516
   {:fields
    {:mb
     {:data-type "integer",
-     :distinct 44,
+     :distinct 41,
      :group-by? true,
-     :commons {296 2, 342 2, 303 2},
-     :cardinality 87},
+     :commons {374 3, 390 2, 403 2},
+     :cardinality 81},
     :mem_used
     {:data-type "integer",
      :distinct 50,
      :group-by? true,
-     :commons {341029325 1, 291253599 1, 365657613 1},
+     :commons {349275991 1, 472933450 1, 390746890 1},
      :cardinality 100},
     :messages_per_second
     {:data-type "float",
-     :distinct 16,
+     :distinct 14,
      :group-by? true,
-     :commons {3.13 8, 3.1 8, 2.93 5},
-     :cardinality 31},
+     :commons {7.87 13, 7.8 8, 7.93 5},
+     :cardinality 28},
     :ts
     {:data-type "string",
      :distinct 50,
      :group-by? true,
      :commons
-     {"2024-05-16 23:37:08" 1, "2024-05-16 23:41:38" 1, "2024-05-16 23:26:38" 1},
+     {"2024-07-17 21:14:05" 1, "2024-07-17 21:12:32" 1, "2024-07-17 21:11:48" 1},
      :cardinality 100}},
    :rowcount 50},
-  :flow-fn-all-sys
+  :client-stats-drag-36
   {:fields
-   {:name
-    {:data-type "string",
-     :distinct 125,
+   {:server_subs
+    {:data-type "integer",
+     :distinct 7,
      :group-by? true,
-     :commons {":=" 1, ":>=" 1, "map-pull-test2" 1},
+     :commons {11 2, 16 2, 10 1},
+     :cardinality 77},
+    :push
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? true,
+     :commons {5492 1, 5684 1, 57605 1},
+     :cardinality 100},
+    :recent_messages_per_second
+    {:data-type "float",
+     :distinct 7,
+     :group-by? true,
+     :commons {1.07 3, 13.33 1, 8.13 1},
+     :cardinality 77},
+    :uptime
+    {:data-type "string",
+     :distinct 5,
+     :group-by? true,
+     :commons
+     {"1 hour, 25 minutes, 15 seconds" 3,
+      "1 hour, 25 minutes, 16 seconds" 2,
+      "1 hour, 25 minutes, 12 seconds" 2},
+     :cardinality 55},
+    :last_seen_seconds
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {14 8, 13 1},
+     :cardinality 22},
+    :memory
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons {"159.2636" 1, "106.3377" 1, "379.5735" 1},
+     :cardinality 100},
+    :queue_distro
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"nil" 9},
+     :cardinality 11},
+    :styler_highlight_8717
+    {:data-type "integer",
+     :distinct 2,
+     :group-by? true,
+     :commons {0 8, 1 1},
+     :cardinality 22},
+    :client_latency
+    {:data-type "integer",
+     :distinct 9,
+     :group-by? true,
+     :commons {403 1, 126 1, 821 1},
+     :cardinality 100},
+    :ack
+    {:data-type "integer",
+     :distinct 3,
+     :group-by? true,
+     :commons {342 5, 341 3, 279 1},
+     :cardinality 33},
+    :client_name
+    {:data-type "string",
+     :distinct 9,
+     :group-by? true,
+     :commons
+     {":nutritious-olive-quail-6" 1,
+      ":natural-spherical-butterfly-19" 1,
+      ":wealthy-thin-lark-35" 1},
+     :cardinality 100},
+    :last_seen
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"14 seconds" 8, "13 seconds" 1},
+     :cardinality 22}},
+   :rowcount 9},
+  :new-query
+  {:fields
+   {:diff
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"+92" 1, "287 MB" 1},
+     :cardinality 100},
+    :mem_used
+    {:data-type "float",
+     :distinct 2,
+     :group-by? true,
+     :commons {3.9779396590909094E8 1, 3.011855443631841E8 1},
+     :cardinality 100},
+    :ts_hour
+    {:data-type "string",
+     :distinct 2,
+     :group-by? true,
+     :commons {"2024-07-17 21" 1, "2024-07-17 20" 1},
      :cardinality 100}},
-   :rowcount 125}},
+   :rowcount 2},
+  :fields-sys {:fields {}, :rowcount 0},
+  :tables-sys
+  {:fields
+   {:db_schema
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"none" 23},
+     :cardinality 4},
+    :db_catalog
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? true,
+     :commons {nil 23},
+     :cardinality 4},
+    :connection_id
+    {:data-type "string",
+     :distinct 1,
+     :group-by? true,
+     :commons {"system-db" 23},
+     :cardinality 4},
+    :schema_cat
+    {:data-type "unknown",
+     :distinct 1,
+     :group-by? false,
+     :commons {nil 23},
+     :cardinality 4},
+    :table_name
+    {:data-type "string",
+     :distinct 23,
+     :group-by? true,
+     :commons {"connections" 1, "board_history" 1, "rule_maps_tests" 1},
+     :cardinality 100},
+    :fields
+    {:data-type "integer",
+     :distinct 15,
+     :group-by? false,
+     :commons {6 4, 5 3, 12 2},
+     :cardinality 65}},
+   :rowcount 23},
+  :connections-sys
+  {:fields
+   {:database_name
+    {:data-type "string",
+     :distinct 3,
+     :group-by? true,
+     :commons {"*cache-db*" 4, "SQLite" 3, "*csv-import-db*" 1},
+     :cardinality 37},
+    :connection_id
+    {:data-type "string",
+     :distinct 8,
+     :group-by? true,
+     :commons {"cache.db" 1, "flows-db" 1, "system-db" 1},
+     :cardinality 100},
+    :styler_highlight_8717ss
+    {:data-type "integer",
+     :distinct 1,
+     :group-by? true,
+     :commons {1 8},
+     :cardinality 12}},
+   :rowcount 8}},
  :default-col-widths
- {:block-3108 {:client-memory-drag-36 151},
-  :block-2618 {:client-stats-drag-36 114},
-  :virtual-panel {:kick--1764769189 152},
-  :block-12050 {:gen-viz-516 127}},
+ {:block-9679 {:hare-vw 105},
+  :block-7593 {:hare-v23232w 211},
+  :system-connections-list* {:connections-sys 126},
+  :system-tables-list* {:tables-sys 133},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-11015 {:new-clojure-2 255}},
  :runstream-drops nil,
- :data-hash -457578433,
- :tabs ["generated lass of the woodlands" "bountiful bird"],
- :auto-run? true,
+ :tabs
+ ["generated lass of the woodlands"
+  "bountiful bird"
+  "beige whale"
+  "effective pheasant"],
+ :incidental-rowsets
+ [nil
+  nil
+  :hare-vw
+  :hare-vw
+  :hare-vw
+  :hare-vw
+  :editor-block-3661-hare-vw
+  :editor-block-4118-new-clojure-1
+  :editor-block-9713-hare-vw
+  "console-out"
+  :editor-block-3661-hare-vw
+  :editor-block-4118-new-clojure-1
+  :editor-block-9713-hare-vw
+  "console-out"
+  :hare-vw
+  :hare-vw
+  :hare-vw
+  :hare-vw
+  :hare-v23232w
+  :hare-v23232w
+  :hare-v23232w
+  :hare-v23232w
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  :new-clojure-2
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  nil
+  :new-clojure-2
+  nil
+  nil
+  nil
+  nil
+  nil
+  :new-clojure-2
+  :new-clojure-2
+  nil
+  :new-clojure-2
+  nil
+  nil
+  :new-clojure-2
+  nil
+  :new-clojure-2
+  nil
+  :new-clojure-2
+  nil
+  :new-clojure-2
+  nil
+  :new-clojure-2
+  nil
+  :new-clojure-2
+  nil
+  :new-clojure-2
+  nil
+  :new-clojure-2
+  nil],
  :selected-cols nil,
  :server
  {:settings
   {:harvest-on-boot? true,
    :default "./screens/looking-glass-redux.edn",
    :eleven-labs-api-key nil,
-   :kits
-   {:outliers
-    {:description
-     "A basic multivariate outlier detection runstream. Highlight outliers in various dimensional groupings as a launch pad for further exploration.",
-     :image-url "images/outliers-image.png",
-     :fn (rabbit-kit-outliers.core/get-outliers :query-name :panel-name :query),
-     :name "Outliers",
-     :icon "zmdi-functions",
-     :author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :run-on :queries,
-     :repl {:host "127.0.0.1", :port 42999},
-     :kit-name :outliers,
-     :package-name :query-basics-1},
-    :forecast
-    {:description "WIP: basic timeseries forecasting based on previous values",
-     :fn (rabbit-kit-outliers.core/get-forecast :query-name :panel-name :query),
-     :name "Forecasting",
-     :icon "zmdi-brightness-7",
-     :author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :run-on :queries,
-     :repl {:host "127.0.0.1", :port 42999},
-     :kit-name :forecast,
-     :package-name :query-basics-1},
-    :buffy
-    {:author
-     {:name "Ryan Robitaille",
-      :email "ryan.robitaille@gmail.com",
-      :x "@ryrobes",
-      :site "https://ryrob.es/"},
-     :kit-name :buffy,
-     :package-name :grab-bag,
-     :fn (rvbbit-backend.assistants/buffy :query-name),
-     :name "Ask Buffy!",
-     :icon "zmdi-cocktail",
-     :run-on :queries,
-     :description "What does Buffy think about this data? Who knows!"}},
-   :graphite-host "127.0.0.1",
-   :openapi-org-id nil,
+   :modes
+   {:pre
+    [:pre
+     {:style
+      {:color :theme/editor-outer-rim-color,
+       :background-color "#00000000",
+       :border "none",
+       :text-shadow "4px 4px 4px #00000088",
+       :font-size "17px",
+       :font-family :theme/monospaced-font}}
+     [:string3 :*data]],
+    :edn [:edn :*data],
+    :text [:console :*data],
+    :terminal [:terminal :*data],
+    :data [:data-viewer :*data],
+    :pretty [:pretty-box :*data],
+    :rowset [:honeycomb {:select [:*], :from {:data :*data}} 11 9],
+    :clover [:box :child :*data]},
+   :kits {},
+   :clover-templates
+   {:color-theft
+    {:args [:*input],
+     :body
+     [:data-viewer [:run-solver [:get-my-colors {:input-image-path :*input}]]]},
+    :pretty-box
+    {:args [:*input],
+     :body
+     [:box
+      :size
+      "auto"
+      :align
+      :center
+      :justify
+      :center
+      :style
+      {:color :theme/editor-outer-rim-color,
+       :font-size [:auto-size-px [:string3 :*input]]}
+      :child
+      [:string3 :*input]]},
+    :clj
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure, :input-map {}, :data :code}]},
+    :clj2
+    {:args [:code],
+     :body
+     [:run-solver
+      {:signal false, :cache? false, :type :clojure2, :input-map {}, :data :code}]},
+    :cheese-burger
+    {:args [:x],
+     :body
+     [:box
+      :style
+      {:color "yellow", :font-size "23px"}
+      :child
+      [:string3 :x "CHEESEBURGER!"]]}},
+   :eleven-labs-default-voice-name "Not OG Buffy",
    :debug-level 1,
    :screens
    ["GGGeat-ochre-mole-exiled-from-abyssal-plain"
@@ -826,7 +413,11 @@
     "aaaaah-esday-the-day"
     "aaaaah-wednesday-the-day"
     "aaaah-wednesday-the-day"
+    "alarm-clock-tv"
     "alarm-clock1"
+    "alarm-clock2"
+    "alarm-clock22"
+    "alarm-clock23"
     "alice-puzzle-1"
     "asdasdasdasd"
     "autumn-theme"
@@ -839,6 +430,7 @@
     "blackberries3"
     "blackberries3-narrow"
     "blackberries3-narrow2"
+    "blank-blue"
     "blank-sizzle"
     "blank-sizzle2"
     "blue-pines"
@@ -867,6 +459,8 @@
     "demo-light-bkgrd-sept23"
     "demo-lime-green-slime"
     "desktops-and-broomsticks"
+    "duality-of-lepus"
+    "duality-of-lepus33"
     "error-monitor"
     "error-monitor-vanessa"
     "error-monitor-vanessa2"
@@ -879,6 +473,7 @@
     "fetching-pentagonal-termite-of-tghe-submarine-canyon"
     "final-fantasy-dorchester"
     "fox-hills"
+    "game-of-life"
     "glass-fish-board-test"
     "green-storm-city"
     "hue-board-1"
@@ -888,12 +483,17 @@
     "layout-test-12"
     "light-theme"
     "literal-data-test"
+    "looking-glass-conway"
     "looking-glass-redux"
+    "looking-glass-redux-conway2"
+    "looking-glass-redux-mix5"
+    "looking-glass-redux-test"
     "looking-glass-redux-viking"
     "looking-glass-redux-viking2"
     "looking-glass-redux2"
     "looking-glass-redux23a"
     "looking-glass-redux23abb"
+    "looking-glass-redux23b"
     "looking-glass-redux2a"
     "looking-glass-redux2aa"
     "looking-glass-redux45"
@@ -911,6 +511,7 @@
     "nivo-hacking-2023"
     "nivo-hacking-2023333"
     "nivo-hacking-october-2nd"
+    "nostromo-console"
     "old-defaults"
     "old-fashioned-christmas"
     "old-town-snow-stars"
@@ -920,6 +521,8 @@
     "pink-and-green-elk"
     "pink-dusk-falls"
     "pinup-rabbit-fields"
+    "pomp-girl1"
+    "pomp-girl2"
     "poor-touring-me"
     "pres-sql-test-1"
     "purple-dusk-old-town"
@@ -927,14 +530,20 @@
     "purple-techno-sunset"
     "recharts-test-blocks"
     "refresh-test"
+    "repl-tests-3"
     "retro-machines"
     "riffle-test"
+    "server-stats"
+    "server-stats2"
     "sick-of-your-shit"
     "sizzle-board-1"
     "sneaky-swamp-creatures1"
+    "solver-test"
     "stop-drawing-dead-dashboards"
     "swamp-nightgown"
     "swamp-reacher"
+    "system-monitor"
+    "system-monitor2"
     "tallica-param-test2"
     "tangerine-dreams"
     "technicolor-shanny"
@@ -966,276 +575,77 @@
     "winter-twin-peaks"
     "witchy425"
     "wonderland-horror-interface"
-    "wow-board"],
-   :openapi-key "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"}},
+    "wow-board"]}},
  :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
  :editor? false,
  :buffy? false,
- :memory [508648801 474359701 4294705152],
- :sched
- {:gen-viz-516 5016,
-  :new-query 5010,
-  :client-stats-drag-36 4990,
-  :client-memory-drag-36 4980},
- :status-data
- {:heartbeat
-  {:kick
-   {:data
-    [{:sent! :heartbeat,
-      :to :all,
-      :at "2024-05-16 23:43:53",
-      :payload nil,
-      :payload-kp [:heartbeat :heartbeat]}
-     nil],
-    :elapsed-ms nil,
-    :reco-count nil}}},
- :flow-subs
- [:client/*client-name*>stats>messages-per-second
-  :client/*client-name*>stats>client-latency
-  :client/*client-name*>stats>client-name
-  :signal/cool-raccoon-signal-yo
-  :time/now
-  :client/*client-name*>stats>uptime
-  :client/*client-name*>stats>memory
-  :flow/live-scratch-flow>*running?
-  :time/second
-  :flow/a-random-wow>*running?
-  :client/*client-name*>stats>recent-messages-per-second],
- :client-name :good-sapphire-hyena-18,
- :signals-history
- {[:and
-   [:or [:> :time/hour 12] [:< :time/hour 6]]
-   [:or
-    [:= :time/second 10]
-    [:= :time/second 20]
-    [:= :time/second 45]
-    [:= :time/second 25]]]
-  [[false 1715917386206]
-   [false 1715917387204]
-   [false 1715917388204]
-   [false 1715917389204]
-   [true 1715917390206]
-   [false 1715917391205]
-   [false 1715917392204]
-   [false 1715917393205]
-   [false 1715917394204]
-   [false 1715917395204]
-   [false 1715917396204]
-   [false 1715917397204]
-   [false 1715917398204]],
-  [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
-  [[false 1715917386206]
-   [false 1715917387204]
-   [false 1715917388204]
-   [false 1715917389204]
-   [false 1715917390206]
-   [false 1715917391205]
-   [false 1715917392204]
-   [false 1715917393205]
-   [false 1715917394204]
-   [false 1715917395204]
-   [false 1715917396204]
-   [false 1715917397204]
-   [false 1715917398204]],
-  [:= :time/second 45]
-  [[false 1715917386206]
-   [false 1715917387204]
-   [false 1715917388204]
-   [false 1715917389204]
-   [false 1715917390206]
-   [false 1715917391205]
-   [false 1715917392204]
-   [false 1715917393205]
-   [false 1715917394204]
-   [false 1715917395204]
-   [false 1715917396204]
-   [false 1715917397204]
-   [false 1715917398204]],
-  [:> :time/hour 12]
-  [[true 1715917386206]
-   [true 1715917387204]
-   [true 1715917388204]
-   [true 1715917389204]
-   [true 1715917390206]
-   [true 1715917391205]
-   [true 1715917392204]
-   [true 1715917393205]
-   [true 1715917394204]
-   [true 1715917395204]
-   [true 1715917396204]
-   [true 1715917397204]
-   [true 1715917398204]],
-  [:or [:> :time/hour 12] [:< :time/hour 6]]
-  [[true 1715917386206]
-   [true 1715917387204]
-   [true 1715917388204]
-   [true 1715917389204]
-   [true 1715917390206]
-   [true 1715917391205]
-   [true 1715917392204]
-   [true 1715917393205]
-   [true 1715917394204]
-   [true 1715917395204]
-   [true 1715917396204]
-   [true 1715917397204]
-   [true 1715917398204]],
-  [:= :time/second 10]
-  [[false 1715917386206]
-   [false 1715917387204]
-   [false 1715917388204]
-   [false 1715917389204]
-   [true 1715917390206]
-   [false 1715917391205]
-   [false 1715917392204]
-   [false 1715917393205]
-   [false 1715917394204]
-   [false 1715917395204]
-   [false 1715917396204]
-   [false 1715917397204]
-   [false 1715917398204]],
-  [:< :time/hour 6]
-  [[false 1715917386206]
-   [false 1715917387204]
-   [false 1715917388204]
-   [false 1715917389204]
-   [false 1715917390206]
-   [false 1715917391205]
-   [false 1715917392204]
-   [false 1715917393205]
-   [false 1715917394204]
-   [false 1715917395204]
-   [false 1715917396204]
-   [false 1715917397204]
-   [false 1715917398204]],
-  [:= :time/second 20]
-  [[false 1715917386206]
-   [false 1715917387204]
-   [false 1715917388204]
-   [false 1715917389204]
-   [false 1715917390206]
-   [false 1715917391205]
-   [false 1715917392204]
-   [false 1715917393205]
-   [false 1715917394204]
-   [false 1715917395204]
-   [false 1715917396204]
-   [false 1715917397204]
-   [false 1715917398204]],
-  [:or
-   [:= :time/second 10]
-   [:= :time/second 20]
-   [:= :time/second 45]
-   [:= :time/second 25]]
-  [[false 1715917386206]
-   [false 1715917387204]
-   [false 1715917388204]
-   [false 1715917389204]
-   [true 1715917390206]
-   [false 1715917391205]
-   [false 1715917392204]
-   [false 1715917393205]
-   [false 1715917394204]
-   [false 1715917395204]
-   [false 1715917396204]
-   [false 1715917397204]
-   [false 1715917398204]],
-  [:= :time/second 25]
-  [[false 1715917386206]
-   [false 1715917387204]
-   [false 1715917388204]
-   [false 1715917389204]
-   [false 1715917390206]
-   [false 1715917391205]
-   [false 1715917392204]
-   [false 1715917393205]
-   [false 1715917394204]
-   [false 1715917395204]
-   [false 1715917396204]
-   [false 1715917397204]
-   [false 1715917398204]],
-  [:or
-   [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
-   [:and
-    [:or [:> :time/hour 12] [:< :time/hour 6]]
-    [:or
-     [:= :time/second 10]
-     [:= :time/second 20]
-     [:= :time/second 45]
-     [:= :time/second 25]]]]
-  [[false 1715917386206]
-   [false 1715917387204]
-   [false 1715917388204]
-   [false 1715917389204]
-   [true 1715917390206]
-   [false 1715917391205]
-   [false 1715917392204]
-   [false 1715917393205]
-   [false 1715917394204]
-   [false 1715917395204]
-   [false 1715917396204]
-   [false 1715917397204]
-   [false 1715917398204]]},
+ :memory [292840396 254156428 4294705152],
+ :client-name :satisfactory-navy-blue-hummingbird-27,
  :flow-editor? true,
  :openai-api-key "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",
- :window {:w 2750, :h 1408},
- :post-meta
- {:client-memory-drag-36 {:* {:rowcount 105}},
-  :gen-viz-516 {:* {:rowcount 50}},
-  :client-stats-drag-36 {:* {:rowcount 12}},
-  :new-query {:* {:rowcount 2}}},
+ :window {:w 2651, :h 1474},
+ :post-meta {:connections-sys {:* {:rowcount 8}}},
  :status
  {:heartbeat
   {:kick
-   [:client/*client-name*>stats>messages-per-second
-    :client/*client-name*>stats>client-latency
-    :client/*client-name*>stats>client-name
-    :signal/cool-raccoon-signal-yo
-    :time/now
-    :client/*client-name*>stats>uptime
-    :client/*client-name*>stats>memory
-    :flow/live-scratch-flow>*running?
-    :time/second
-    :flow/a-random-wow>*running?
-    :client/*client-name*>stats>recent-messages-per-second]}},
+   [:signal/every-30-seconds?
+    :solver-status/satisfactory-navy-blue-hummingbird-27>raw-custom-override1561002794>running?
+    :solver/raw-custom-override1561002794
+    :solver-status/satisfactory-navy-blue-hummingbird-27>raw-custom-override-1603405347>running?
+    :solver/raw-custom-override-1603405347
+    :flow-status/live-scratch-flow>*running?
+    :solver-meta/raw-custom-override1561002794>output>evald-result>out
+    :flow-status/a-random-wow>*running?]}},
  :screen-name "blackberries3-narrow2",
  :recos-page2 0,
- :selected-warren-item :cool-raccoon-signal-yo,
- :selected-tab "generated lass of the woodlands",
+ :selected-tab "beige whale",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
- :alerts [],
+ :alerts
+ [[[:v-box
+    :children
+    [[:box :child "solver running (via canvas)"]
+     [:box :child "[:panels :block-721 :new-clojure]" :style {:font-size "12px"}]
+     [:box
+      :child
+      "[:signal/every-30-seconds? :new-clojure-2.*/client-name]"
+      :style
+      {:font-size "9px"}]
+     [:box :child "7/18/2024, 9:21:31 PM" :style {:font-size "8px", :opacity 0.6}]]]
+   8
+   1.7
+   2166
+   116330569]
+  [[:v-box
+    :children
+    [[:box :child "solver running (via canvas)"]
+     [:box
+      :child
+      "[:panels :block-11015 :new-clojure-2]"
+      :style
+      {:font-size "12px"}]
+     [:box :child "[:signal/every-30-seconds?]" :style {:font-size "9px"}]
+     [:box :child "7/18/2024, 9:21:31 PM" :style {:font-size "8px", :opacity 0.6}]]]
+   8
+   1.7
+   2166
+   765151861]
+  [[:box
+    :child
+    "sent screen save request to server... Please wait."
+    :style
+    {:font-size "12px", :opacity 0.66}]
+   11
+   0.5
+   2171
+   -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"a-random-wow" nil},
- :base-sniff-queries
- {:client_memory -1981695802, :client_stats -175748261, :jvm_stats 1498154063},
- :panels-hash -1375906633,
- :sessions
- (["respected-icosahedral-clam-1.edn"
-   "1002 hours, 33 minutes, 40 seconds"
-   3609220529]
-   ["grin-hexagonal-leopard-32.edn" "1006 hours, 2 minutes, 50 seconds" 3621770972]
-   ["open-elliptic-frog-of-volcanic-island.edn"
-    "1030 hours, 34 minutes, 28 seconds"
-    3710068891]
-   ["simple-globular-lion-of-tepui.edn"
-    "1030 hours, 45 minutes, 21 seconds"
-    3710721496]
-   ["sparkling-hexagonal-bee-38.edn"
-    "1033 hours, 16 minutes, 25 seconds"
-    3719785397]
-   ["efficient-prismatic-parrot-18.edn"
-    "1048 hours, 55 minutes, 10 seconds"
-    3776110782]
-   ["ready-azure-snake-17.edn" "1048 hours, 58 minutes, 28 seconds" 3776308509]
-   ["transformative-oval-raven-19.edn"
-    "1049 hours, 7 minutes, 36 seconds"
-    3776856142]
-   ["virtuous-blush-rabbit-27.edn" "1052 hours, 28 minutes, 2 seconds" 3788882335]),
- :solvers-map {:vibrant-antelope-solver {:signal nil, :body nil}},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1535870810,
+ :user-params-hash 567665822,
  :grid-recos? true,
+ :preview-keys2 [],
  :resolved-queries
  {:client-memory-drag-36
   {:select
@@ -1250,7 +660,7 @@
    :from [[:client_memory :ee183]],
    :refresh-every 200,
    :cache? false,
-   :_last-run "23:41:37",
+   :_last-run "21:23:00",
    :order-by [[:mem_time :desc]],
    :col-widths {:batches 131, :packets 131, :ts 151}},
   :gen-viz-516
@@ -1258,7 +668,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 50,
    :group-by [:ts],
-   :_last-run "23:40:37",
+   :_last-run "21:23:00",
    :refresh-every 200,
    :from
    [{:select
@@ -1299,7 +709,7 @@
    :from [[:client_stats :gg588]],
    :refresh-every 210,
    :cache? false,
-   :_last-run "23:40:57",
+   :_last-run "21:21:29",
    :col-widths
    {:ack 81,
     :client_latency 141,
@@ -1319,7 +729,7 @@
    :where [:= :client_name :*client-name-str],
    :limit 26,
    :group-by [2],
-   :_last-run "23:40:37",
+   :_last-run "21:23:31",
    :refresh-every 230,
    :from
    [{:select
@@ -1361,7 +771,14 @@
            row
            {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))}},
  :panels
- {:block-8670
+ {:block-6720
+  {:h 10,
+   :w 11,
+   :views {:editor-block-3661-hare-vw [:editor [:block-3661 :views :hare-vw]]},
+   :name "editor-block-3661-hare-vw",
+   :root [33 3],
+   :tab "effective pheasant"},
+  :block-8670
   {:h 2,
    :w 12,
    :root [28 21],
@@ -1447,6 +864,33 @@
      [:string :time/now]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
    :queries {}},
+  :block-3661
+  {:h 4,
+   :w 9,
+   :root [13 3],
+   :tab "effective pheasant",
+   :selected-view :hare-vw,
+   :name "block-3661",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-3661.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "YOOO"]},
+   :queries {}},
   :block-7453
   {:name "block-7453",
    :w 5,
@@ -1497,7 +941,7 @@
      :from [[:client_memory :ee183]],
      :refresh-every 200,
      :cache? false,
-     :_last-run "23:41:37",
+     :_last-run "21:23:00",
      :order-by [[:mem_time :desc]],
      :col-widths {:batches 131, :packets 131, :ts 151}}},
    :root [1 21],
@@ -1532,6 +976,43 @@
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}],
     :params {:my-dash-killswitch? true}},
    :queries {}},
+  :block-9713
+  {:h 4,
+   :w 9,
+   :root [4 3],
+   :tab "effective pheasant",
+   :selected-view :hare-vw,
+   :name "block-9713",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-9713.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Itsdfsdfsdf's fsdfsdfsdfa perfect day for planting seeds and planning adventures!"]},
+   :queries {}},
+  :block-7593
+  {:name "block-7593",
+   :w 5,
+   :selected-mode {:hare-v23232w :rowset},
+   :selected-view :hare-v23232w,
+   :root [9 19],
+   :h 4,
+   :queries {},
+   :tab "effective pheasant",
+   :views {:hare-v23232w [:testa3 :test66 :test343 :test234324]}},
   :block-2505
   {:name "client latency callout",
    :w 5,
@@ -1564,6 +1045,16 @@
        :child
        "client latency (ms)"]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-9679
+  {:name "block-9679",
+   :w 5,
+   :selected-mode {:hare-vw :rowset},
+   :selected-view :hare-vw,
+   :root [4 19],
+   :h 4,
+   :queries {},
+   :tab "effective pheasant",
+   :views {:hare-vw [{:bb 122223, :yy "testsfs444"} {:bb 343352, :yy "tests444"}]}},
   :block-5659
   {:name "block-5659",
    :w 5,
@@ -1596,6 +1087,44 @@
        :child
        "messages/sec (all)"]]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]}},
+  :block-3053
+  {:h 8,
+   :w 14,
+   :views
+   {:editor-block-4118-new-clojure-1
+    [:editor [:block-4118 :clojure :new-clojure-1]]},
+   :name "editor-block-4118-new-clojure-1",
+   :root [8 10],
+   :tab "effective pheasant"},
+  :block-2935
+  {:h 10,
+   :w 11,
+   :views {:editor-block-9713-hare-vw [:editor [:block-9713 :views :hare-vw]]},
+   :name "editor-block-9713-hare-vw",
+   :root [22 3],
+   :tab "effective pheasant"},
+  :block-721
+  {:clojure
+   {:new-clojure
+    (do
+      (ns rvbbit-backend.websockets)
+      (let [timer :signal/every-30-seconds?]
+        (draw-client-stats
+          :new-clojure-2.*/client-name
+          [15 30 90 120 240]
+          [:mem-mb]
+          true
+          210)))},
+   :name "block-721",
+   :w 39,
+   :selected-mode {:new-clojure :terminal},
+   :selected-view :new-clojure,
+   :root [1 0],
+   :h 29,
+   :display {:new-clojure :output},
+   :queries {},
+   :tab "beige whale",
+   :views {:hare-vw (ns rvbbit-backend.websockets)}},
   :block-9994
   {:name "block-9994",
    :w 5,
@@ -1652,6 +1181,14 @@
      :child
      [:string ["uptime: " :client/*client-name*>stats>uptime]]]},
    :queries {}},
+  :block-9432
+  {:h 10,
+   :w 11,
+   :views
+   {:editor-block-721-new-clojure [:editor [:block-721 :clojure :new-clojure]]},
+   :name "editor-block-721-new-clojure",
+   :root [41 1],
+   :tab "beige whale"},
   :block-285
   {:name "block-285",
    :w 5,
@@ -1696,7 +1233,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 50,
      :group-by [:ts],
-     :_last-run "23:40:37",
+     :_last-run "21:23:00",
      :refresh-every 200,
      :from [:query/client-memory-drag-36],
      :order-by [[:ts :desc]],
@@ -1770,6 +1307,15 @@
         :fill "#00000000",
         :stroke-width 3,
         :stroke "#82ca9d"}]]]}},
+  :block-2310
+  {:h 8,
+   :w 4,
+   :views
+   {"console-out"
+    [:console :solver-meta/raw-custom-override-1629024070>output>evald-result>out]},
+   :name "console :solver/raw-custom-override-1629024070",
+   :root [4 10],
+   :tab "effective pheasant"},
   :block-2618
   {:h 8,
    :w 26,
@@ -1792,7 +1338,7 @@
      :from [[:client_stats :gg588]],
      :refresh-every 210,
      :cache? false,
-     :_last-run "23:40:57",
+     :_last-run "21:21:29",
      :col-widths
      {:ack 81,
       :client_latency 141,
@@ -1809,6 +1355,26 @@
        :style {:border "1px solid #cac18255"}}}}},
    :root [14 13],
    :tab "generated lass of the woodlands"},
+  :block-3261
+  {:h 3,
+   :w 6,
+   :tab "effective pheasant",
+   :root [23 14],
+   :name ":hare-v23232w/vec-val",
+   :views
+   {:param-val
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "45px"}
+     :child
+     [:string :hare-v23232w/vec-val]]},
+   :queries {}},
   :block-2178
   {:h 6,
    :w 34,
@@ -1855,7 +1421,7 @@
      :where [:= :client_name :*client-name-str],
      :limit 26,
      :group-by [2],
-     :_last-run "23:40:37",
+     :_last-run "21:23:31",
      :refresh-every 230,
      :from [:query/client-memory-drag-36],
      :order-by [[:ts :desc]],
@@ -1886,6 +1452,26 @@
              row
              {:diff
               (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))}}},
+  :block-6633
+  {:h 3,
+   :w 9,
+   :tab "effective pheasant",
+   :root [30 14],
+   :name ":hare-v23232w.*/vec-val",
+   :views
+   {:multi-param-vals
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :padding
+     "13px"
+     :style
+     {:font-size "30px"}
+     :child
+     [:h-box :gap "9px" :children :hare-v23232w.*/vec-val]]},
+   :queries {}},
   :block-12288
   {:h 4,
    :w 6,
@@ -1913,50 +1499,86 @@
      :child
      [:string :time/second]],
     :stack [:layout {:panels {:hello-there {:h 0.99, :w 0.99, :root [0 0]}}}]},
-   :queries {}}},
+   :queries {}},
+  :block-4118
+  {:clojure
+   {:new-clojure-1
+    (do
+      (let [clojure-version (clojure-version)
+            jvm-version (System/getProperty "java.version")]
+        (Thread/sleep 3400)
+        (doseq [e (range 222)] (println "yoo! " e))
+        (str
+          "🐇🥕 Baby!! Internal RVBBIT nREPL. Clojure "
+          clojure-version
+          " on "
+          jvm-version
+          " JVM tech"
+          " 🥕🐇")))},
+   :name "block-4118",
+   :w 18,
+   :selected-view :new-clojure-1,
+   :root [4 7],
+   :h 3,
+   :queries {},
+   :tab "effective pheasant",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-4118.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's a perfect day for planting seeds and planning adventures!"]}},
+  :block-11015
+  {:clojure
+   {:new-clojure-2
+    (do
+      (ns rvbbit-backend.websockets)
+      (let [timer :signal/every-30-seconds?]
+        (vec
+          (for
+            [[k v] (deref client-metrics)]
+            {:client-name k, :ticks (count v)}))))},
+   :name "block-11015",
+   :w 11,
+   :selected-mode {:new-clojure-2 :rowset},
+   :selected-view :new-clojure-2,
+   :root [41 12],
+   :h 9,
+   :queries {},
+   :tab "beige whale",
+   :views
+   {:hare-vw
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :attr
+     {:id ":block-11015.:hi"}
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "It's a perfect day for planting seeds and planning adventures!"]}}},
  :selected-block "none!",
- :signals-map
- {:fun-gorilla
-  {:signal
-   [:and
-    [:= :client/cute-prismatic-human-7>click-param>param>jessica "jessica"]
-    [:changed? :time/second]
-    [:or [:= 21 21] [:or [:= 1 2] [:= 9 9]]]
-    [:or [:= 2 1] [:< 9 4]]
-    [:signal/worthy-fish-signal]]},
-  :cool-raccoon-signal-yo
-  {:signal
-   [:or
-    [:= :client/cute-prismatic-human-7>param>my-dash-killswitch? true]
-    [:and
-     [:or [:> :time/hour 12] [:< :time/hour 6]]
-     [:or
-      [:= :time/second 10]
-      [:= :time/second 20]
-      [:= :time/second 45]
-      [:= :time/second 25]]]]},
-  :worthy-fish-signal {:signal [:or [:= :time/hour 16] [:= 221 22]]},
-  :hourly? {:signal [:or [:changed? :time/hour] [:<> :time/minute -1]]},
-  :fair-armadillo-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :nice-coyote-signal {:signal [:and [:= 9 9] [= :time/second 45]]},
-  :elegant-grasshopper-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :brave-ape-signal {:signal [:and [:= :time/day 1] [:= :time/hour 9]]},
-  :exciting-cheetah-signal
-  {:signal [:and [:> :time/day 1] [:= "cheecse" "cheese"] [:= :time/hour 9]]},
-  :genius-gnat-signal {:signal [:or [:= :time/day 1] [:= 0 :time/second]]},
-  :dragging-to-potential-cross-breed?
-  {:signal [:= :client/classic-aquamarine-wombat-21>dragging? true]},
-  :special-lion-signal
-  {:signal [:and [:= :time/second 30] [:changed? :time/minute]]},
-  :optimistic-sheep-signal
-  {:signal
-   [:and
-    [:= :time/day 1]
-    [:= :time/hour 9]
-    [:changed? :time/minute]
-    [:changed? :flow/openai-image-gen-ladder>:relative-url-path-for-png-version]]},
-  :glowing-bat-signal
-  {:signal [:and [:= :time/day 1] [:changed? :time/second] [:= :time/hour 9]]}},
  :theme-colors-hashmap
  {"float" "#2A3959",
   "boolean" "#13283E",
@@ -2004,7 +1626,7 @@
    :blocks 3,
    :queries 0,
    :ts "2024-03-24 00:18:04"},
-  :time {:second 57, :now "Thursday, May 16th 11:43PM", :minute 39},
+  :time {:second 28, :now "Wednesday, July 17th 9:20PM", :minute 39},
   :viz-tables-sys2 {:table_name :client-memory-drag-36},
   :client-stats-drag-36
   {:server_subs 12,
@@ -2024,11 +1646,11 @@
    :good-sapphire-hyena-18>stats>uptime nil,
    :friendly-wide-grasshopper-40>stats>memory nil,
    :spirited-jungle-green-rat-27>stats>recent-messages-per-second nil,
-   :*client-name*>stats>messages-per-second 3.13,
+   :*client-name*>stats>messages-per-second 7.93,
    :good-sapphire-hyena-18>stats>recent-messages-per-second nil,
    :satisfactory-octohedral-cheetah-26>stats>memory nil,
    :familiar-prismatic-woodpecker-22>stats>uptime nil,
-   :*client-name*>stats>client-name ":good-sapphire-hyena-18",
+   :*client-name*>stats>client-name ":wealthy-thin-lark-35",
    :satisfactory-octohedral-cheetah-26>stats>recent-messages-per-second nil,
    :familiar-prismatic-woodpecker-22>stats>memory nil,
    :thrilling-icosahedral-raccoon-3>stats>messages-per-second nil,
@@ -2040,10 +1662,12 @@
    :constant-lime-wombat-41>stats>memory nil,
    :graceful-star-shaped-opossum-5>stats>client-name nil,
    :spirited-jungle-green-rat-27>stats>memory nil,
+   :wealthy-thin-lark-35>stats>uptime nil,
    :genius-rectangular-ostrich-17>stats>uptime nil,
    :genius-thin-sea-urchin-30>stats>uptime "5 minutes, 13 seconds",
    :attractive-rhomboidal-otter-29>stats>memory nil,
    :friendly-wide-grasshopper-40>stats>recent-messages-per-second nil,
+   :wealthy-thin-lark-35>stats>client-name nil,
    :graceful-star-shaped-opossum-5>stats>memory nil,
    :genius-rectangular-ostrich-17>stats>messages-per-second nil,
    :genius-rectangular-ostrich-17>stats>client-latency nil,
@@ -2058,88 +1682,36 @@
    :familiar-prismatic-woodpecker-22>stats>recent-messages-per-second nil,
    :attractive-rhomboidal-otter-29>stats>client-latency nil,
    :constant-lime-wombat-41>stats>recent-messages-per-second nil,
+   :wealthy-thin-lark-35>stats>client-latency nil,
    :genius-rectangular-ostrich-17>stats>memory nil,
    :familiar-prismatic-woodpecker-22>stats>client-name nil,
    :stellar-viridian-bee-26>stats>uptime nil,
-   :*client-name*>stats>memory 373,
+   :wealthy-thin-lark-35>stats>memory nil,
+   :*client-name*>stats>memory 452.8871,
    :friendly-wide-grasshopper-40>stats>client-latency nil,
    :graceful-star-shaped-opossum-5>stats>recent-messages-per-second nil,
    :friendly-wide-grasshopper-40>stats>uptime nil,
    :good-sapphire-hyena-18>stats>memory nil,
    :attractive-rhomboidal-otter-29>stats>messages-per-second nil,
-   :*client-name*>stats>recent-messages-per-second 3.13,
-   :*client-name*>stats>uptime "1 hour, 19 minutes, 37 seconds",
+   :*client-name*>stats>recent-messages-per-second 1.53,
+   :*client-name*>stats>uptime "1 hour, 12 minutes, 10 seconds",
    :familiar-prismatic-woodpecker-22>stats>client-latency nil,
    :attractive-rhomboidal-otter-29>stats>client-name nil,
    :genius-rectangular-ostrich-17>stats>client-name nil,
    :constant-lime-wombat-41>stats>client-latency nil,
-   :*client-name*>stats>client-latency 424,
+   :*client-name*>stats>client-latency 332,
    :constant-lime-wombat-41>stats>client-name nil,
    :constant-lime-wombat-41>stats>messages-per-second nil,
    :familiar-prismatic-woodpecker-22>stats>messages-per-second 3.11,
+   :wealthy-thin-lark-35>stats>messages-per-second nil,
    :attractive-rhomboidal-otter-29>stats>recent-messages-per-second nil,
+   :wealthy-thin-lark-35>stats>recent-messages-per-second nil,
    :thrilling-icosahedral-raccoon-3>stats>client-name nil},
   :param
-  {:selected-view [:views :every-45-seconds],
+  {:selected-view [:clojure :new-clojure-2],
    :selected-view-data
-   [:>
-    :ResponsiveContainer
-    {:width "100%", :height :panel-height+50}
-    [:>
-     :ComposedChart
-     {:data :gen-viz-516,
-      :style {:font-family :theme/base-font},
-      :margin {:top 5, :bottom 5, :right 30, :left 20}}
-     [:> :CartesianGrid {:strokeDasharray "0 0", :opacity 0}]
-     [:>
-      :Tooltip
-      {:content-style
-       {:background-color "#00000099",
-        :font-weight 700,
-        :border "1px solid transparent",
-        :border-radius "4px"}}]
-     [:> :XAxis {:dataKey :ts}]
-     [:>
-      :YAxis
-      {:yAxisId "left",
-       :label
-       {:value "MB",
-        :angle -90,
-        :fill "#8884d8",
-        :style {:font-size "20px", :font-weight 700},
-        :position "middle",
-        :dx -25},
-       :domain ["auto" "auto"]}]
-     [:>
-      :YAxis
-      {:yAxisId "right",
-       :label
-       {:value "Messages per Second",
-        :angle 90,
-        :fill "#82ca9d",
-        :style {:font-weight 700, :font-size "15px"},
-        :position "middle",
-        :dx 20},
-       :domain ["auto" "auto"],
-       :orientation "right"}]
-     [:>
-      :Line
-      {:isAnimationActive false,
-       :dataKey :mb,
-       :yAxisId "left",
-       :stroke-width 3,
-       :stroke "#8884d8",
-       :activeDot {:r 8}}]
-     [:>
-      :Bar
-      {:type "monotone",
-       :isAnimationActive false,
-       :dataKey :messages_per_second,
-       :yAxisId "right",
-       :fill "#00000000",
-       :stroke-width 3,
-       :stroke "#82ca9d"}]]],
-   :selected-block :block-12050,
+   (do (ns rvbbit-backend.websockets) (vec (keys (deref client-metrics)))),
+   :selected-block :block-11015,
    :my-dash-killswitch? false,
    :upstanding-crimson-frog "new parameter value!",
    :super-cobalt-mole ["1121pm - 229mb"]},
@@ -2249,69 +1821,12 @@
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
+  :new-clojure-2.*
+  {:vec-val [:nice-chocolate-kangaroo-4],
+   :client-name [:nice-chocolate-kangaroo-4]},
+  :hare-v23232w {:vec-val :testa3},
   :connections-sys {:database_name "*cache-db*", :connection_id "system-db"},
-  :sys {:selected-tab "generated lass of the woodlands", :selected-tab-idx 0},
-  :signal
-  {:fun-gorilla false,
-   :cool-raccoon-signal-yo false,
-   :part-fun-gorilla-6 false,
-   :part-optimistic-sheep-signal-1 false,
-   :worthy-fish-signal false,
-   :hourly? true,
-   :part-glowing-bat-signal-1 false,
-   :part-nice-coyote-signal-2 false,
-   :part-fun-gorilla-4 true,
-   :part-cool-raccoon-signal-yo-6 false,
-   :part-genius-gnat-signal-0 true,
-   :part-worthy-fish-signal-0 false,
-   :fair-armadillo-signal false,
-   :part-fun-gorilla-7 true,
-   :part-cool-raccoon-signal-yo-0 false,
-   :part-cool-raccoon-signal-yo-1 false,
-   :part-dragging-to-potential-cross-breed?-0 false,
-   :cool-raccoon-story-yo nil,
-   :part-fun-gorilla-1 false,
-   :part-worthy-fish-signal-1 false,
-   :part-cool-raccoon-signal-yo-3 true,
-   :nice-coyote-signal false,
-   :part-cool-raccoon-signal-yo-2 false,
-   :part-elegant-grasshopper-signal-1 true,
-   :part-fun-gorilla-10 false,
-   :part-cool-raccoon-signal-yo-9 false,
-   :part-glowing-bat-signal-3 false,
-   :part-glowing-bat-signal-0 false,
-   :elegant-grasshopper-signal false,
-   :brave-ape-signal false,
-   :exciting-cheetah-signal false,
-   :part-fun-gorilla-11 false,
-   :part-optimistic-sheep-signal-4 false,
-   :part-fun-gorilla-3 true,
-   :genius-gnat-signal false,
-   :dragging-to-potential-cross-breed? false,
-   :part-worthy-fish-signal-2 false,
-   :part-cool-raccoon-signal-yo-7 false,
-   :part-cool-raccoon-signal-yo-4 true,
-   :part-nice-coyote-signal-1 true,
-   :part-optimistic-sheep-signal-0 false,
-   :part-fun-gorilla-8 false,
-   :part-cool-raccoon-signal-yo-10 false,
-   :part-glowing-bat-signal-2 true,
-   :part-fun-gorilla-5 true,
-   :part-nice-coyote-signal-0 false,
-   :part-fun-gorilla-2 true,
-   :part-genius-gnat-signal-2 false,
-   :part-cool-raccoon-signal-yo-8 false,
-   :part-fun-gorilla-0 false,
-   :part-optimistic-sheep-signal-3 true,
-   :part-optimistic-sheep-signal-2 false,
-   :part-elegant-grasshopper-signal-2 false,
-   :special-lion-signal false,
-   :part-cool-raccoon-signal-yo-5 false,
-   :part-fun-gorilla-9 false,
-   :optimistic-sheep-signal false,
-   :part-genius-gnat-signal-1 true,
-   :part-elegant-grasshopper-signal-0 false,
-   :glowing-bat-signal false},
+  :sys {:selected-tab "beige whale", :selected-tab-idx 2},
   :client-memory-drag-36
   {:client_name ":friendly-wide-grasshopper-40",
    :recent_messages_per_second 2.07,
@@ -2319,67 +1834,6 @@
    :mem_used 1672912224,
    :batches 3349,
    :packets 47211,
-   :ts "2024-05-13 21:53:16"}},
- :selected-flow "live-scratch-flow",
- :flow-statuses
- {"crow-flow-201a"
-  {:last-updated nil,
-   :blocks_finished 9,
-   :block-overrides [],
-   :channels 0,
-   :channels-open 0,
-   :since-start "less than a second",
-   :*started-by :rvbbit-scheduler,
-   :time-running "less than a second",
-   :last-update {:done :end},
-   :*running? false,
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "counting-loop"
-  {:last-updated nil,
-   :blocks_finished 13,
-   :block-overrides [],
-   :channels 0,
-   :channels-open 0,
-   :since-start "6 seconds",
-   :*started-by :rvbbit-scheduler,
-   :time-running "6 seconds",
-   :last-update {:done :end},
-   :*running? false,
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "openai-image-gen-ladder3"
-  {:last-updated nil,
-   :blocks_finished 83,
-   :block-overrides [:prompt :prompt-2 :prompt-3],
-   :channels 0,
-   :channels-open 0,
-   :since-start "38 seconds",
-   :*started-by :whole-oval-gnat-25,
-   :time-running "38 seconds",
-   :last-update {:done :end},
-   :*running? false,
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []},
-  "openai-image-gen-ladder3/node-js-color-thief-script"
-  {:last-updated nil,
-   :blocks_finished 16,
-   :block-overrides [:image-path],
-   :channels 0,
-   :channels-open 0,
-   :since-start "less than a second",
-   :*started-by :whole-oval-gnat-25,
-   :time-running "less than a second",
-   :last-update {:done :end},
-   :*running? false,
-   :last-update-seconds nil,
-   :channels-open? false,
-   :retries-left -1,
-   :running-blocks []}},
- :current-url "#/blackberries3-narrow2"}
+   :ts "2024-05-13 21:53:16"},
+  :hare-v23232w.* {:vec-val [:test66]}},
+ :selected-flow "live-scratch-flow"}

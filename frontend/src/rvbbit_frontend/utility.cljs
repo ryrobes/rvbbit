@@ -3,6 +3,7 @@
    [cljs.core.async   :as    async
     :refer [<! timeout]]
    [cljs.tools.reader :refer [read-string]]
+   [clojure.core.reducers :as r]
    [clojure.string    :as cstr]
    [clojure.walk      :as walk]
    [goog.crypt.Hash   :as Hash]
@@ -113,10 +114,21 @@
 
 ;;(defn deep-flatten-real [x] (if (coll? x) (into #{} (filter keyword? (mapcat deep-flatten-real x))) #{x}))
 
-(defn deep-flatten-real [x] ;; only keywords, not sure why i'd need the rest of the shit for my use cases - 6/13/24
-  (if (coll? x)
-    (into #{} (filter keyword? (mapcat deep-flatten-real x)))
-    (if (keyword? x) #{x} #{})))
+;; (defn deep-flatten-real [x] ;; only keywords, not sure why i'd need the rest of the shit for my use cases - 6/13/24
+;;   (if (coll? x)
+;;     (into #{} (filter keyword? (mapcat deep-flatten-real x)))
+;;     (if (keyword? x) #{x} #{})))
+
+(defn deep-flatten-real
+  "Efficiently extracts all keywords from a nested collection."
+  [x]
+  (let [result (transient #{})]
+    (letfn [(collect! [item]
+              (cond
+                (keyword? item) (conj! result item)
+                (coll? item) (run! collect! item)))]
+      (collect! x)
+      (persistent! result))))
 
 (defn deep-flatten*
   [x]
@@ -132,7 +144,7 @@
 
 (defn deep-flatten
   [x] ;; param based
-  (if true ;cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES
+  (if cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES
     (deep-flatten* x)
     (deep-flatten-real x)))
 
@@ -290,7 +302,11 @@
 (defonce extract-patterns-data (atom {}))
 (defonce extract-patterns-cache (atom {}))
 
-(defn matches-pattern? [item kw num] (and (vector? item) (= (count item) num) (= (first item) kw)))
+(defn matches-pattern? 
+  [item kw num] 
+  (and (vector? item) 
+       (= (count item) num)
+       (= (first item) kw)))
 
 (defn extract-patterns*
   [data kw num]
@@ -309,15 +325,38 @@
     (walk/prewalk (fn [item] (when (matches-pattern? item kw num) (swap! matches conj item)) item) data)
     @matches))
 
-(defn extract-patterns
+(defn extract-patterns-oldd
   [data kw num] ;; param based
-  (if true ;;cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
+  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
     (extract-patterns* data kw num)
     (extract-patterns-real data kw num)))
 
 (defn purge-extract-patterns-cache
   [percent & [hard-limit]]
   (purge-cache "extract-patterns-cache" percent extract-patterns-cache extract-patterns-data hard-limit))
+
+
+
+
+(defn extract-patterns
+  "Extracts patterns from nested data structures efficiently in ClojureScript."
+  [data kw num]
+  (let [matches (volatile! [])]
+    (walk/prewalk
+     (fn [item]
+       (when (matches-pattern? item kw num)
+         (vswap! matches conj item))
+       item)
+     data)
+    @matches))
+
+
+
+
+
+
+
+
 
 (defn lists-to-vectors [data] (walk/postwalk (fn [x] (if (list? x) (vec x) x)) data))
 
@@ -329,21 +368,54 @@
 
 (defonce extract-patterns2-cache (atom {}))
 
-(defn matches-pattern2-orig? [item kw num] (and (vector? item) (= (count item) num) (= (first item) kw)))
+;; (defn matches-pattern?
+;;   [item kw num]
+;;   (and (vector? item)
+;;        (= (count item) num)
+;;        (= (first item) kw)))
 
-(defn extract-patterns-with-keypath ;; used for solvers and making stable unique keys. important.
+;; (defn matches-pattern2-orig? 
+;;   [item kw num] 
+;;   (and (vector? item)
+;;        (= (count item) num)
+;;        (= (first item) kw)))
+
+;; (defn extract-patterns-with-keypath ;; used for solvers and making stable unique keys. important.
+;;   [data kw num]
+;;   (let [rr (letfn [(walk [data path]
+;;                      (cond
+;;                        (matches-pattern? data kw num) [[path data]]
+;;                        (map? data) (mapcat (fn [[k v]] (walk v (conj path k))) data)
+;;                        (sequential? data) (mapcat (fn [v] (walk v path)) data)
+;;                        :else []))]
+;;              (walk data []))]
+;;     rr))
+
+
+(defn extract-patterns-with-keypath
+  "Extracts patterns from nested data structures, returning keypaths and matching data."
   [data kw num]
-  ;(let [] ;; [cache (get @extract-patterns2-cache (pr-str [data kw num]))]
-    ;(if false [] cache ;; cache 
-  (let [rr (letfn [(walk [data path]
-                     (cond
-                       (matches-pattern2-orig? data kw num) [[path data]]
-                       (map? data) (mapcat (fn [[k v]] (walk v (conj path k))) data)
-                       (sequential? data) (mapcat (fn [v] (walk v path)) data)
-                       :else []))]
-             (walk data []))]
-      ;(swap! extract-patterns2-cache assoc (pr-str [data kw num]) rr)
-    rr)););)
+  (letfn [(walk [data path acc]
+            (cond
+              (matches-pattern? data kw num)
+              (conj acc [path data])
+
+              (map? data)
+              (reduce-kv
+               (fn [acc k v]
+                 (walk v (conj path k) acc))
+               acc
+               data)
+
+              (sequential? data)
+              (reduce-kv
+               (fn [acc idx v]
+                 (walk v (conj path idx) acc))
+               acc
+               (vec data))
+
+              :else acc))]
+    (walk data [] [])))
 
 
 
@@ -1408,12 +1480,27 @@
                       (for [c (range (count (.-children (.-doc s))))]
                         (into [] (for [line (.-lines (aget (.-children (.-doc s)) c))] (.-text line))))))))
 
+;; (defn kvpaths
+;;   ([m] (kvpaths [] m ()))
+;;   ([prev m result]
+;;    (reduce-kv (fn [res k v] (if (associative? v) (let [kp (conj prev k)] (kvpaths kp v (conj res kp))) (conj res (conj prev k))))
+;;               result
+;;               m)))
+
 (defn kvpaths
-  ([m] (kvpaths [] m ()))
+  "Returns all keypaths in a nested structure, including intermediate paths."
+  ([m] (kvpaths [] m []))
   ([prev m result]
-   (reduce-kv (fn [res k v] (if (associative? v) (let [kp (conj prev k)] (kvpaths kp v (conj res kp))) (conj res (conj prev k))))
-              result
-              m)))
+   (if (associative? m)
+     (reduce-kv
+      (fn [res k v]
+        (let [path (conj prev k)]
+          (if (associative? v)
+            (kvpaths path v (conj res path))
+            (conj res path))))
+      result
+      m)
+     result)))
 
 (defn kvpaths2
   ([m] (kvpaths [] m ()))
@@ -1489,10 +1576,25 @@
 
 
 
+;; (defn keypaths
+;;   ([m] (keypaths [] m ()))
+;;   ([prev m result]
+;;    (reduce-kv (fn [res k v] (if (associative? v) (keypaths (conj prev k) v res) (conj res (conj prev k)))) result m)))
+
 (defn keypaths
-  ([m] (keypaths [] m ()))
+  "Returns all leaf keypaths in a nested structure."
+  ([m] (keypaths [] m []))
   ([prev m result]
-   (reduce-kv (fn [res k v] (if (associative? v) (keypaths (conj prev k) v res) (conj res (conj prev k)))) result m)))
+   (if (associative? m)
+     (reduce-kv
+      (fn [res k v]
+        (let [path (conj prev k)]
+          (if (associative? v)
+            (keypaths path v res)
+            (conj res path))))
+      result
+      m)
+     result)))
 
 (defn sanitize-name
   [name]   ;; keep updated in server also

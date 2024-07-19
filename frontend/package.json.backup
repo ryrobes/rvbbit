@@ -33,12 +33,12 @@
 		"react-drag-and-drop": "^3.0.0",
 		"react-map-gl": "^7.1.6",
 		"react-zoom-pan-pinch": "^3.0.8",
-		"recharts": "^2.9.0",
+		"recharts": "^2.12.7",
 		"vega": "^5.22.1",
 		"vega-embed": "^6.21.0",
 		"vega-lite": "^5.6.0"
 	},
 	"devDependencies": {
-		"shadow-cljs": "2.20.5"
+		"shadow-cljs": "2.28.10"
 	}
 }

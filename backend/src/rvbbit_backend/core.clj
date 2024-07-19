@@ -1027,9 +1027,9 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  ;; (start-scheduler (* 3600 1) ;; 3 hours
-  ;;                  reboot-reactor-and-resub
-  ;;                  "Reboot Atom Reactor" (* 3600 1))
+  (start-scheduler (* 3600 1) ;; 3 hours
+                   reboot-reactor-and-resub
+                   "Reboot Atom Reactor" (* 3600 1))
 
   ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical, we barely use the queues except for sqlite writes
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES

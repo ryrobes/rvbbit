@@ -238,6 +238,7 @@
 
 (re-frame/reg-event-db ::insert-alert
                        (fn [db [_ content w h duration & [alert-id]]]
+                         ;;(ut/tapp>> [:insert-alert content w h duration] )
                          (let [ticktock (get-in db [:re-pollsive.core/polling :counter])
                                alert-id (or alert-id (hash content))
                                duration (or duration 30)]
@@ -298,6 +299,17 @@
       {}
       data)))
 
+(defn is-rowset? [data]
+  (let  [all-maps (and (vector? data) (every? map? data))
+         all-keys-match (and all-maps
+                             (let [first-keys (set (keys (first data)))]
+                               (every? #(and (= first-keys (set (keys %)))
+                                             (every? keyword? (keys %)))
+                                       data)))
+         all-single-values-vector (and (vector? data) (every? (complement coll?) data))
+         all-single-values-set (and (set? data) (every? (complement coll?) data))]
+    (or all-keys-match all-single-values-set all-single-values-vector)))
+
 (defonce packets-received (atom 0))
 (defonce batches-received (atom 0))
 
@@ -312,13 +324,38 @@
      ;(ut/tapp>>  [:smmc smmc])
      (assoc db :flow-sub-cnts (select-keys smmc flow-subs)))))
 
+(re-frame/reg-sub
+ ::clover-data-exists?
+ (fn [db {:keys [data-key data]}]
+   (let [all-single-values-vector (and (vector? data) (every? (complement coll?) data))
+         all-single-values-set (and (set? data) (every? (complement coll?) data))
+         data (cond all-single-values-vector (mapv #(hash-map :vec-val %) data)
+                    all-single-values-set (mapv #(hash-map :set-val %) data)
+                    :else data)
+         is-flow-key (cstr/includes? (str data-key) "/")
+         view-map (into {} (for [[k v] @db/solver-fn-lookup]
+                             {v (last k)}))
+         data-key (if is-flow-key
+                    (get view-map data-key)
+                    data-key)]
+     (= (get-in db [:data data-key]) data))))
+
 (re-frame/reg-event-db
  ::insert-implicit-rowset
- (fn [db [_ data flow-key]]
-   (let [view-map (into {} (for [[k v] @db/solver-fn-lookup] 
+ (fn [db [_ data flow-key & [non-solver?]]]
+   (let [all-single-values-vector (and (vector? data) (every? (complement coll?) data))
+         all-single-values-set (and (set? data) (every? (complement coll?) data))
+         view-map (into {} (for [[k v] @db/solver-fn-lookup]
                              {v (last k)}))
-         data-key (get view-map flow-key)]
-   (assoc-in db [:data data-key] data))))
+         data-key (if non-solver?
+                    flow-key
+                    (get view-map flow-key))
+         data (cond all-single-values-vector (mapv #(hash-map :vec-val %) data)
+                    all-single-values-set (mapv #(hash-map :set-val %) data)
+                    :else data)]
+   (-> db
+       (assoc :incidental-rowsets (conj (get db :incidental-rowsets []) data-key))
+       (assoc-in [:data data-key] data)))))
 
 (def valid-task-ids #{:flow :screen :time :signal :server :ext-param :solver :data :solver-status :solver-meta :repl-ns :flow-status :signal-history :panel :client})
 
@@ -362,6 +399,48 @@
             ;;       (when all-keys-match
             ;;         (ut/tracked-dispatch [::insert-implicit-rowset data
             ;;                               (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))))
+            ;; _ (doseq [rr result-subs]
+            ;;     (let [data (get rr :status)
+            ;;           all-single-values-vector (and (vector? data) (every? (complement coll?) data))
+            ;;           all-single-values-set (and (set? data) (every? (complement coll?) data))]
+            ;;       (cond
+            ;;         all-single-values-vector
+            ;;         (ut/tracked-dispatch [::insert-implicit-rowset (mapv #(hash-map :vec-val %) data)
+            ;;                               (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))])
+
+            ;;         all-single-values-set
+            ;;         (ut/tracked-dispatch [::insert-implicit-rowset (mapv #(hash-map :set-val %) data)
+            ;;                               (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))))
+            _ (doseq [rr result-subs] ;; populate the :data key with the rowset data if it exists
+                (let [data (get rr :status)
+                      ;; all-maps (and (vector? data) (every? map? data))
+                      ;; all-keys-match (and all-maps
+                      ;;                     (let [first-keys (set (keys (first data)))]
+                      ;;                       (every? #(and (= first-keys (set (keys %)))
+                      ;;                                     (every? keyword? (keys %)))
+                      ;;                               data)))
+                      data-rowset? (is-rowset? data)
+                      ;all-single-values-vector (and (vector? data) (every? (complement coll?) data))
+                      ;all-single-values-set (and (set? data) (every? (complement coll?) data))
+                      flow-key (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))
+                      ]
+                  (when (and data-rowset?
+                             (not @(ut/tracked-sub ::clover-data-exists? {:data-key flow-key :data data})))
+                    (ut/tracked-dispatch [::insert-implicit-rowset data
+                                          flow-key]))
+                  ;; (cond
+                  ;;   all-keys-match
+                  ;;   (ut/tracked-dispatch [::insert-implicit-rowset data
+                  ;;                         (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))])
+
+                  ;;   all-single-values-vector
+                  ;;   (ut/tracked-dispatch [::insert-implicit-rowset (mapv #(hash-map :vec-val %) data)
+                  ;;                         (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))])
+
+                  ;;   all-single-values-set
+                  ;;   (ut/tracked-dispatch [::insert-implicit-rowset (mapv #(hash-map :set-val %) data)
+                  ;;                         (keyword (cstr/replace (cstr/join "/" (get rr :task-id)) ":" ""))]))
+                  ))
             updates (reduce (fn [acc res]
                               (let [task-id (get res :task-id)]
                                 (assoc-in acc (vec (cons :click-param task-id)) (get res :status))))

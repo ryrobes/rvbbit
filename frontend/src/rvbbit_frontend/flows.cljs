@@ -4715,7 +4715,9 @@
                                       (catch :default _ false))
                      width       (+ 60 (* (get a 1 0) db/brick-size))
                      ;;height      (* (get a 2 0) db/brick-size)
-                     alert-id    (last a)]]
+                     alert-id    (last a)
+                    ;; _ (ut/tapp>> [:alert abody])
+                     ]]
            [re-com/box :size "none" :attr
             (when (not push-codes?) (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])} {}))
             :width (when (> width 0) (px width))

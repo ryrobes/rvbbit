@@ -82,7 +82,7 @@
 (defonce nrepl-usage (atom []))
 (defonce nrepl-intros-usage (atom []))
 
-(defonce client-metrics (atom {}))
+(defonce client-metrics (ut/thaw-atom {} "./data/atoms/client-metrics-atom.edn")) ;;(atom {}))
 (defonce sql-metrics (atom {}))
 
 (defonce sys-load (atom []))
@@ -1806,8 +1806,7 @@
   (swap! ack-scoreboard assoc-in [client-name :memory] (ut/bytes-to-mb (get memory :mem_used)))
   (swap! ack-scoreboard assoc-in [client-name :client-sub-list] flow-subs)
   (swap! ack-scoreboard assoc-in [client-name :client-subs] (count flow-subs))
-  (inc-score! client-name :last-ack true)
-  {})
+  (inc-score! client-name :last-ack true))
 
 
 (defmethod wl/handle-request :ack2 [{:keys [client-name body]}] (inc-score! client-name :last-ack true) {})
@@ -1857,13 +1856,14 @@
       (ut/pp [:error-in-get-adaptive-timeout client-name (.getMessage e)])
       1000))) ; Default timeout in case of any error
 
-;; Helper function to safely get the current timeout for a client
 (defn safe-get-timeout [client-name]
   (try
     (get-adaptive-timeout client-name)
     (catch Exception e
       (ut/pp [:error-getting-timeout client-name (.getMessage e)])
       1000))) ; Default timeout if anything goes wrong
+
+;; (defn safe-get-timeout [_] 450) 
 
 ;; custom-watcher-thread-pool ;; websocket-thread-pool 
 (defn adjust-thread-pool-size [thread-pool new-core-size new-max-size]
@@ -1901,7 +1901,7 @@
   [client-name data cq sub-name] ;; version 2, tries to remove dupe task ids
   (when (not (get @cq client-name)) (new-client client-name)) ;; new? add to atom, create queue
   (inc-score! client-name :booted true)
-  (let [results (async/chan (async/sliding-buffer 100))] ;; was 100, was (async/sliding-buffer
+  (let [results (async/chan (async/sliding-buffer 100))] ;; was 100
     (try (async/go-loop []
            (async/<! (async/timeout (safe-get-timeout client-name))) ;; was 1100 ?
            (if-let [queue-atom (get @cq client-name (atom clojure.lang.PersistentQueue/EMPTY))]
@@ -1916,6 +1916,7 @@
                                           (vals items-by-task-id))]
                (if (not-empty latest-items)
                  (let [_ (swap! client-batches update client-name (fnil inc 0))
+                      ;;; _ (when (> 1 (count latest-items)) (ut/pp [:sending (count latest-items) :items-to client-name]))
                        message (if (= 1 (count latest-items)) (first latest-items) latest-items)]
                    (when (async/>! results message) (recur)))
                  (recur)))
@@ -3462,6 +3463,10 @@
 
 (ut/pp @watcher-log)
 
+(defn grab-string-chunk [s]
+  (try (subs (str s) 0 100)
+       (catch Throwable _ (str s))))
+
 (defn make-watcher
   [keypath flow-key client-name handler-fn & [no-save]]
 
@@ -3496,14 +3501,18 @@
                                                                   (System/currentTimeMillis))
                                                         (assoc-in [client-name flow-key :last-push]
                                                                   (last (cstr/split (get (ut/current-datetime-parts) :now) #", "))))))
-                                           (ppy/execute-in-thread-pools (keyword (str "reaction-logger/" (cstr/replace (str client-name) ":" "")))
-                                                                        (fn []
-                                                                          (when (or (not= flow-key :time/now)
-                                                                                    (not= flow-key :time/second)) ;;(not (cstr/starts-with? (str flow-key) ":time/"))
-                                                                            (spit (str "./reaction-logs/" (str (cstr/replace (str client-name) ":" "")) ".log")
-                                                                                  (str (ut/get-current-timestamp) "  " client-name "  " flow-key "\n" old-value "\n" new-value "\n\n\n") :append true)
-                                                    ;(ut/pp [:running-push! flow-key client-name])
-                                                                            )))
+                                          ;;  (ppy/execute-in-thread-pools (keyword (str "reaction-logger/" (cstr/replace (str client-name) ":" "")))
+                                          ;;                               (fn []
+                                          ;;                                 (when (or (not= flow-key :time/now)
+                                          ;;                                           (not= flow-key :time/second)) ;;(not (cstr/starts-with? (str flow-key) ":time/"))
+                                          ;;                                   (spit (str "./reaction-logs/" (str (cstr/replace (str client-name) ":" "")) ".log")
+                                          ;;                                         (str (ut/get-current-timestamp) "  " client-name "  " flow-key " " (ut/data-typer new-value) "\n" 
+                                          ;;                                              (grab-string-chunk old-value) 
+                                          ;;                                              "\n" 
+                                          ;;                                              (grab-string-chunk new-value) 
+                                          ;;                                              "\n\n\n") :append true)
+                                          ;;           ;(ut/pp [:running-push! flow-key client-name])
+                                          ;;                                   )))
                                            (handler-fn base-type keypath client-name new-value)))
             (when (and (not no-save) (ut/serializable? new-value)) ;; dont want to cache tracker
               (swap! last-values assoc keypath new-value)
@@ -4582,6 +4591,7 @@
                                                   (> last-seen-seconds 600))]
       ; unsub from all watchers before atom cleanup - or else the pools will keep getting created via reactions!
         (ut/pp [:dead-client :cleaning-up k])
+        (swap! client-metrics dissoc k)
         (doseq [s subs]
           (ut/pp [:trying-to-unsub k s])
           (unsub-value k s))

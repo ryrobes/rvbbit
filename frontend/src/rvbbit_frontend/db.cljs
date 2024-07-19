@@ -21,6 +21,9 @@
 (def snap-to-grid 25)
 
 (defonce cm-focused? (reagent/atom false))
+(defonce last-focused (reagent/atom nil))
+
+;;(defonce incidental-rowsets (atom []))
 
 (def virtualized-debug-msg (reagent/atom {}))
 
@@ -28,8 +31,8 @@
 (defonce solver-meta-spy (reagent/atom {}))
 (defonce signal-history-ticker? (reagent/atom true))
 
-(defonce cm-instance-panel-code-box (atom nil)) ;; for highlighting
-(defonce markers-panel-code-box (atom []))
+(defonce cm-instance-panel-code-box (atom {})) ;; for highlighting
+(defonce markers-panel-code-box (atom {}))
 
 (defonce autocomplete-keywords (atom []))
 

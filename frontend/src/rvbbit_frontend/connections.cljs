@@ -487,25 +487,26 @@
             (or (list? long-keyword) (vector? long-keyword)) (into {} (for [k long-keyword] {k (get-it k)}))
             :else                                            nil))))
 
-(re-frame/reg-sub ::clicked-parameter
-                  (fn [db [_ keypath]]
-                    (if false ;(= (first keypath) :param)
-                      (let [kk (keyword (cstr/join "/" (map #(cstr/replace (str %) ":" "") keypath)))]
-                        @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [kk]}))
-                      (let [val (get-in db (cons :click-param keypath))] val))
+(re-frame/reg-sub
+ ::clicked-parameter
+ (fn [db [_ keypath]]
+   ;;(ut/tapp>>  [:keypath (str keypath)])
+   (if false ;(= (first keypath) :param)
+     (let [kk (keyword (cstr/join "/" (map #(cstr/replace (str %) ":" "") keypath)))]
+       @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [kk]}))
+     (let [val (get-in db (cons :click-param keypath))] val))
                     ;; (let [kk (keyword (ut/replacer (cstr/join "/" keypath) ":" ""))] ;; resolved...
                     ;;   (ut/tapp>> [:resolve-click-param kk keypath
                     ;;               (edn/read-string (str ":" (cstr/replace (str (first keypath)) ":" "") "/"
                     ;;                    (cstr/replace (str (last keypath)) ":" "")))])
                     ;;   @(ut/tracked-sub ::clicked-parameter-key {:keypath [kk]}))
-                  ))
+   ))
 
-(re-frame/reg-sub ::clicked-parameter-alpha
-                  (fn [db {:keys [keypath]}]
-                    (if false ;(= (first keypath) :param)
-                      (let [kk (keyword (cstr/join "/" (map #(cstr/replace (str %) ":" "") keypath)))]
-                        @(ut/tracked-sub ::clicked-parameter-key-alpha {:keypath [kk]}))
-                      (let [val (get-in db (cons :click-param keypath))] val))))
+(re-frame/reg-sub
+ ::clicked-parameter-alpha
+ (fn [db {:keys [keypath]}]
+   ;;(ut/tapp>>  [:keypath-alpha (str keypath)])
+   (get-in db (cons :click-param keypath))))
 
 (defn contains-namespaced-keyword?
   [data]

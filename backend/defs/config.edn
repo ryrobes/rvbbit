@@ -35,7 +35,7 @@
                      :icon "images/sql.png"} ;; basic clover-sql query runner
 
            :views   {:default []
-                     :modes [:clover]
+                     :modes [:clover :edn]
                      :ext ".edn"
                      :description "Evaluate a Clover experssion - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
                      :icon "🍀"} ;; basic clover render
