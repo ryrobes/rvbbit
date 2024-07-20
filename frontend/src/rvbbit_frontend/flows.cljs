@@ -4643,16 +4643,19 @@
 
 
 
-(re-frame/reg-sub ::estimates (fn [db _] (get db :flow-estimates)))
+(re-frame/reg-sub 
+ ::estimates 
+ (fn [db _] 
+   (get db :flow-estimates)))
 
 (defn alert-box
   []
   [bricks/reecatch
    (let [rekt            [@db/kick-alert @db/pause-alerts]
-         rs-running      @(ut/tracked-subscribe [::bricks/runstreams-running])
-         rs-running-list @(ut/tracked-subscribe [::bricks/runstreams-running-list])
-         alerts          @(ut/tracked-subscribe [::bricks/alerts])
-         estimates       @(ut/tracked-subscribe [::estimates])
+         rs-running      @(ut/tracked-sub ::bricks/runstreams-running {})
+         rs-running-list @(ut/tracked-sub ::bricks/runstreams-running-list {})
+         alerts          @(ut/tracked-sub ::bricks/alerts {})
+         estimates       @(ut/tracked-sub ::estimates {})
          max-w           (apply max (for [a alerts :let [width (* (get a 1) db/brick-size)]] width))
          max-w           (if (or (nil? max-w) (< max-w 50))
                            300 ;420
@@ -4747,17 +4750,18 @@
               :background-color (str "#000000" (if @db/kick-alert 88 11))
               :color            "white"}])])
 
-(re-frame/reg-sub ::flow-parts-lookup
-                  (fn [_ [_ & [part-key]]]
-                    (let [fflowparts-sys @(ut/tracked-subscribe [::conn/sql-data [:fflowparts-sys]])
-                          flow-parts     (vec (sort-by :name fflowparts-sys))
-                          flow-parts-key (when part-key
-                                           (let [ss   (ut/splitter (ut/replacer (str part-key) ":" "") "/")
-                                                 cat  (keyword (first ss))
-                                                 name (keyword (second ss))]
-                                             (first (filter #(and (= (get % :category) (str cat)) (= (get % :name) (str name)))
-                                                      flow-parts))))]
-                      (if flow-parts-key flow-parts-key flow-parts))))
+(re-frame/reg-sub
+ ::flow-parts-lookup
+ (fn [_ [_ & [part-key]]]
+   (let [fflowparts-sys @(ut/tracked-subscribe [::conn/sql-data [:fflowparts-sys]])
+         flow-parts     (vec (sort-by :name fflowparts-sys))
+         flow-parts-key (when part-key
+                          (let [ss   (ut/splitter (ut/replacer (str part-key) ":" "") "/")
+                                cat  (keyword (first ss))
+                                name (keyword (second ss))]
+                            (first (filter #(and (= (get % :category) (str cat)) (= (get % :name) (str name)))
+                                           flow-parts))))]
+     (if flow-parts-key flow-parts-key flow-parts))))
 
 
 

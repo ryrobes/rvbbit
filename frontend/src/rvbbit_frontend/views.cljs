@@ -1191,10 +1191,10 @@
   [re-com/box :child "search" :size "auto" :width (px single-width) :height (px single-height) :style
    {:border "2px solid yellow"}])
 
-(defonce view-title-edit-idx (reagent/atom nil))
+
 
 (defn block-layer-rename [data-key-type t]
-  (if (= @view-title-edit-idx t)
+  (if (= @db/view-title-edit-idx t)
   (let [selected-block      @(ut/tracked-subscribe [::bricks/selected-block])
         block-layer-regex   #"^[a-zA-Z0-9_-]+$"]
     [re-com/h-box
@@ -1210,7 +1210,7 @@
                                             ;(not (some (fn [x] (= x %)) block-layers))
                                             )
                                    (ut/tracked-dispatch [::bricks/rename-block-layer selected-block (str t) (str %)]))
-                                 (reset! view-title-edit-idx nil))
+                                 (reset! db/view-title-edit-idx nil))
                  :change-on-blur? true
                  :width (px (+ 15 (* (count (str t)) 7)))
                  :style {:background-color "#00000000"
@@ -1333,14 +1333,14 @@
                                                                         false
                                                               ;; (let [b (get @db/data-browser-query-con k)] 
                                                               ;;   (if 
-                                                              ;;   (= (get @view-title-edit-idx (str k)) (str k)) false  
+                                                              ;;   (= (get @db/view-title-edit-idx (str k)) (str k)) false  
                                                               ;;   (if (nil? b) true (not b))))
                                                               ;true
                                                                         )))}
                                                (when (and
                                                       (= k data-key)
-                                                      (not= (get @view-title-edit-idx (str k)) (str k)))
-                                                 {:on-double-click #(reset! view-title-edit-idx (str k))}))
+                                                      (not= (get @db/view-title-edit-idx (str k)) (str k)))
+                                                 {:on-double-click #(reset! db/view-title-edit-idx (str k))}))
                                         :style {:cursor        "pointer"
                                                 :font-size     "13px"
                                                 :border-bottom (when repl?
@@ -1387,8 +1387,8 @@
                                              {:on-click #(do (swap! db/data-browser-query assoc selected-block k))}
                                              (when (and
                                                     (= k data-key)
-                                                    (not= (get @view-title-edit-idx (str k)) (str k)))
-                                               {:on-double-click #(reset! view-title-edit-idx (str k))}))
+                                                    (not= (get @db/view-title-edit-idx (str k)) (str k)))
+                                               {:on-double-click #(reset! db/view-title-edit-idx (str k))}))
                                       :style {:cursor "pointer" :font-size "13px" :padding-left "5px" :padding-right "5px"}
                                       :child [block-layer-rename data-key-type (str k)]
                               ;(str "🍀" " " k)
@@ -2116,7 +2116,7 @@
                               (* single-width-bricks db/brick-size))
         single-width-px     (px single-width)
 
-        hh1                 [@db/mad-libs-waiting-room @db/data-browser-query-con @view-title-edit-idx
+        hh1                 [@db/mad-libs-waiting-room @db/data-browser-query-con @db/view-title-edit-idx @db/value-spy
                              @db/item-browser-mode @db/scrubbers @db/solver-meta-spy @editor-size @db/structured-editor
                              @db/value-spy @bricks/dragging-editor? @hide-panel-2? @hide-panel-3?] ;; reactivity hack! React!
 
@@ -2569,15 +2569,16 @@
                                                                            ;;(ut/tapp>> [selected-view-type repl? syntax])
                                                                                            (if (or (nil? syntax) (= syntax "clojure"))
                                                                                              (let [;;_ (reset! bricks/tt [selected-block s-kp (get @db/data-browser-query selected-block)])
-                                                                                                   react! [@db/data-browser-query ]]
-                                                                                               ^{:key (str "cm-" selected-block s-kp)}
+                                                                                                   react! [@db/data-browser-query @db/value-spy]]
+                                                                                               ^{:key (str "cm-" selected-block s-kp ;; important!
+                                                                                                           (get-in @db/value-spy [selected-block data-key]))}
                                                                                                [bricks/panel-code-box 
                                                                                                 (fn [] selected-block) ;; sneaky sneaky, react.... :/
                                                                                                 (fn [] s-kp)
                                                                                                 (+ 17 single-width) (- single-height 20)
                                                                                                 (if (nil? selected-kp)
                                                                                                   selected-panel-map
-                                                                                                  (get-in selected-panel-map selected-kp)) repl? true])
+                                                                                                  (get-in selected-panel-map selected-kp)) repl? true nil  ])
                                                                                              [bricks/panel-string-box selected-kp (+ 17 single-width) (- single-height 20)
                                                                                               (if (nil? selected-kp)
                                                                                                 selected-panel-map
@@ -2969,13 +2970,13 @@
                                                     :cursor      "pointer"}]
 
                                                   [re-com/box :size "none" :width "90px" :child "value spy" :attr
-                                                   {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))} :style
-                                                   {:color           (if value-spy? (theme-pull :theme/universal-pop-color nil) "grey")
-                                                    :z-index         100
-                                                    :user-select     "none"
-                                                    :text-decoration (when (not value-spy?) "strikethrough")
-                                                    :margin-top      (if query-box? "9px" "inherit")
-                                                    :cursor          "pointer"}]
+                                                   {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))}
+                                                   :style {:color           (if value-spy? (theme-pull :theme/universal-pop-color nil) "grey")
+                                                           :z-index         100
+                                                           :user-select     "none"
+                                                           :text-decoration (when (not value-spy?) "strikethrough")
+                                                           :margin-top      (if query-box? "9px" "inherit")
+                                                           :cursor          "pointer"}]
 
                                         ;; (when are-solver
 
@@ -3648,17 +3649,17 @@
 (defn task-bar
   []
   (try
-    (let [min-panels              @(ut/tracked-subscribe [::bricks/all-panels-minimized])
-          user-param-hash2        @(ut/tracked-subscribe [::watch-user-params])
-          selected-view           @(ut/tracked-subscribe [::bricks/editor-panel-selected-view])
-          sselected-view          @(ut/tracked-subscribe [::conn/clicked-parameter [:param :selected-view]])
-          editor?                 @(ut/tracked-subscribe [::bricks/editor?])
-          user-param-hash1        @(ut/tracked-subscribe [::user-params-hash])
-          minimized-system-panels @(ut/tracked-subscribe [::minimized-system-panels])
+    (let [min-panels              @(ut/tracked-sub ::bricks/all-panels-minimized {})
+          user-param-hash2        @(ut/tracked-sub ::watch-user-params {})
+          selected-view           @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
+          sselected-view          @(ut/tracked-sub ::conn/clicked-parameter-alpha {:keypath [:param :selected-view]})
+          editor?                 @(ut/tracked-sub ::bricks/editor? {})
+          user-param-hash1        @(ut/tracked-sub ::user-params-hash {})
+          minimized-system-panels @(ut/tracked-sub ::minimized-system-panels {})
           audio-playing?          false ;@(ut/tracked-subscribe [::audio/audio-playing?])
-          rs-overrides            @(ut/tracked-subscribe [::bricks/runstream-override-map])
-          rs-overrides-hashmap    @(ut/tracked-subscribe [::rs-overrides-hashmap])
-          theme-colors-hashmap    @(ut/tracked-subscribe [::theme-colors-hashmap])
+          rs-overrides            @(ut/tracked-sub ::bricks/runstream-override-map {})
+          rs-overrides-hashmap    @(ut/tracked-sub ::rs-overrides-hashmap {})
+          theme-colors-hashmap    @(ut/tracked-sub ::theme-colors-hashmap {})
           theme-colors            (theme-pull :theme/data-colors db/data-colors)
           min-panels              (vec (into min-panels minimized-system-panels))]
       
@@ -3779,27 +3780,29 @@
 
 (defn main-panel
   []
-  (let [editor? (and @(ut/tracked-subscribe [::bricks/editor?]) (not @bricks/dragging?))
-        buffy? @(ut/tracked-subscribe [::bricks/buffy?])
-        console? @(ut/tracked-subscribe [::bricks/quake-console?])
-        flows? @(ut/tracked-subscribe [::bricks/flow?])
-        external? @(ut/tracked-subscribe [::bricks/external?])
-        session? @(ut/tracked-subscribe [::bricks/session-modal?])
-        lines? @(ut/tracked-subscribe [::bricks/lines?])
-        peek? @(ut/tracked-subscribe [::bricks/peek?])
-        auto-run? @(ut/tracked-subscribe [::bricks/auto-run?])
+  (let [editor? (and @(ut/tracked-subscribe_ [::bricks/editor?]) 
+                     (not @bricks/dragging?))
+        buffy? @(ut/tracked-subscribe_ [::bricks/buffy?])
+        console? @(ut/tracked-subscribe_ [::bricks/quake-console?])
+        flows? @(ut/tracked-subscribe_ [::bricks/flow?])
+        external? @(ut/tracked-subscribe_ [::bricks/external?])
+        session? @(ut/tracked-subscribe_ [::bricks/session-modal?])
+        lines? @(ut/tracked-subscribe_ [::bricks/lines?])
+        peek? @(ut/tracked-subscribe_ [::bricks/peek?])
+        auto-run? @(ut/tracked-subscribe_ [::bricks/auto-run?])
         rekt [@db/kick-alert @editor-size]
-        websocket-status (select-keys @(ut/tracked-subscribe [::http/websocket-status]) [:status :datasets :panels :waiting])
+        wssk @(ut/tracked-subscribe_ [::http/websocket-status])
+        websocket-status (select-keys wssk [:status :datasets :panels :waiting])
         online? (true? (= (get websocket-status :status) :connected))
-        hh @(ut/tracked-subscribe [::subs/h])
-        ww @(ut/tracked-subscribe [::subs/w])
-        selected-block @(ut/tracked-subscribe [::bricks/selected-block])
-        selected-tab @(ut/tracked-subscribe [::bricks/selected-tab])
+        hh @(ut/tracked-subscribe_ [::subs/h])
+        ww @(ut/tracked-subscribe_ [::subs/w])
+        selected-block @(ut/tracked-subscribe_ [::bricks/selected-block])
+        selected-tab @(ut/tracked-subscribe_ [::bricks/selected-tab])
         selected-block? (true? (not (or (nil? selected-block) (= selected-block "none!"))))
-        screen-name (ut/safe-name @(ut/tracked-subscribe [::bricks/screen-name]))
-        client-name @(ut/tracked-subscribe [::bricks/client-name])
-        flow-watcher-subs-grouped @(ut/tracked-subscribe [::bricks/flow-watcher-subs-grouped])
-        server-subs @(ut/tracked-subscribe [::bricks/server-subs])
+        screen-name (ut/safe-name @(ut/tracked-subscribe_ [::bricks/screen-name]))
+        client-name @(ut/tracked-subscribe_ [::bricks/client-name])
+        flow-watcher-subs-grouped @(ut/tracked-subscribe_ [::bricks/flow-watcher-subs-grouped])
+        server-subs @(ut/tracked-subscribe_ [::bricks/server-subs])
         things-running @(ut/tracked-sub ::bricks/things-running {})
         coords (if lines? ;; expensive otherwise
                  (let [subq-mapping (if lines? @(ut/tracked-subscribe [::bricks/subq-mapping]) {})
@@ -3918,7 +3921,7 @@
                                            (when (get custom-map :background-size) ", ")
                                            (get custom-map :background-size))}))) :children
         [[bricks/reecatch [tab-menu]]
-         [bricks/reecatch [snapshot-menu]]
+         ;[bricks/reecatch [snapshot-menu]]
          (when @bricks/dragging-editor?
            [bricks/reecatch [docker-edges (Math/floor (/ ww db/brick-size)) (Math/floor (/ hh db/brick-size))]])
          (when session? [session-modal])
@@ -4026,7 +4029,7 @@
            :left             115
            :background-color "#00000022"
            :color            "white"}]
-         (when @(ut/tracked-subscribe [::audio/audio-playing?])
+         (when @(ut/tracked-subscribe_ [::audio/audio-playing?])
            [re-com/md-icon-button :src (at) :md-icon-name "zmdi-speaker" :style
             {;:margin-top "4px"
              :position  "fixed"
@@ -4034,7 +4037,7 @@
              :bottom    0
              :color     "red"
              :font-size "22px"}])
-         (when @(ut/tracked-subscribe [::audio/recording?])
+         (when @(ut/tracked-subscribe_ [::audio/recording?])
            [re-com/md-icon-button :src (at) :md-icon-name "zmdi-mic" :style
             {;:margin-top "-0px"
              :position  "fixed"
@@ -4075,7 +4078,7 @@
                         (ut/tracked-dispatch [::wfx/request :default
                                               {:message {:kind :remove-flow-watcher :client-name client-name :flow-id kk}
                                                :timeout 50000}]))]]])])]]
-         (let [mem @(ut/tracked-subscribe [::bricks/memory])]
+         (let [mem @(ut/tracked-subscribe_ [::bricks/memory])]
            [re-com/box :size "none" :style {:position "fixed" :left 2 :bottom 20 :font-weight 700 :color "#ffffff99"} :child
             (str (ut/bytes-to-mb (get mem 1))
                  ;;(str " (lazy-grid? " (not (or @bricks/param-hover @bricks/query-hover)) ")")

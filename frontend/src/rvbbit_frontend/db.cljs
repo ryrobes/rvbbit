@@ -25,6 +25,8 @@
 
 (defonce unsafe-keys (atom #{}))
 
+(defonce view-title-edit-idx (reagent/atom nil))
+
 ;;(defonce incidental-rowsets (atom []))
 
 (def virtualized-debug-msg (reagent/atom {}))

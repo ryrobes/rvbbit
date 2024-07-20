@@ -124,6 +124,7 @@
                                      unresolved-req-hash       (hash (if false ;override?
                                                                        fkp ;this 
                                                                        [solver-name fkp client-name]))
+                                     rtype                     (get (first this) :type :unknown)
                                      clover-kps                (vec (filter #(cstr/includes? (str %) "/") (ut/deep-flatten (conj [(first this)] input-map))))
                                      resolved-input-map        (logic-and-params input-map panel-key)
                                      resolved-full-map         (when override? (logic-and-params (first this) panel-key))
@@ -157,13 +158,7 @@
                                      _ (when (and lets-go?
                                                   (not (some #(= % :time/now-seconds) clover-kps))
                                                   (not (some #(= % :time/second) clover-kps)))
-                                         (ut/dispatch-delay 100 [::http/insert-alert [:v-box :children [[:box :child "solver running (via resolver)"]
-                                                                                                        [:box :child (str fkp)
-                                                                                                         :style {:font-size "12px"}]
-                                                                                                        [:box :child (str clover-kps)
-                                                                                                         :style {:font-size "9px"}]
-                                                                                                        [:box :child (str (.toLocaleString (js/Date.)))
-                                                                                                         :style {:font-size "8px" :opacity 0.6}]]] 8 1.7 3])
+                                         (ut/dispatch-delay 100 [::http/insert-alert (ut/solver-alert-clover fkp clover-kps :resolver rtype) 11 1.7 3])
 
                                          )]
                                  {v sub-param})))]

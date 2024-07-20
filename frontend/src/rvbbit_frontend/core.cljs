@@ -135,18 +135,18 @@
        :event                    [::bricks/clean-up-reco-previews] 
        :dispatch-event-on-start? false}
       
-      {:interval                 3 
+      {:interval                 5 
        :event                    [::bricks/prune-alerts] 
        :dispatch-event-on-start? false}
 
-      {:interval                 5 
+      {:interval                 7 
        :event                    [::bricks/get-memory-usage] 
        :dispatch-event-on-start? false}
 
-      {:interval                 1 ;;; test
-       :event                    [::bricks/highlight-panel-code]
-       :poll-when                [::bricks/panel-code-up?]
-       :dispatch-event-on-start? false}
+      ;; {:interval                 1 ;;; test
+      ;;  :event                    [::bricks/highlight-panel-code]
+      ;;  :poll-when                [::bricks/panel-code-up?]
+      ;;  :dispatch-event-on-start? false}
       
       {:interval                 2 ;; push sample data to runstream when running ?
        :event                    [::bricks/refresh-runstreams]
@@ -171,7 +171,7 @@
        :event                    [::bricks/clear-cache-atoms]
        :dispatch-event-on-start? false}
       
-      {:interval                 3600 ;; hella expensive, testing
+      {:interval                 3600 ;; expensive, testing
        :event                    [::http/get-autocomplete-values]
        :dispatch-event-on-start? true}
 

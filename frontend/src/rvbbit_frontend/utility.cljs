@@ -62,6 +62,60 @@
 
 (def map-boxes-cache (atom {}))
 (def map-boxes-cache-hits (atom {}))
+(declare tracked-sub)
+
+(re-frame/reg-sub 
+ ::runner-icon 
+ (fn [db {:keys [rtype]}] 
+   (get-in db [:server :settings :runners rtype :icon] "zmdi-pizza")))
+
+(defn clover-render-icon [i]
+  (if (vector? i) [:h-box
+                   ;:style {:border "1px solid yellow"}
+                   :height "20px" :gap "3px"
+                   :children (map clover-render-icon i)]
+      (cond
+
+        (and (string? i) (cstr/includes? i "."))
+        [:img {:src i :width "40px" :height "40px"}]
+
+        (string? i) [:box
+                     :child i
+                     :width "20px"
+                     :height "20px"
+                     :size "auto"
+                     :align :center
+                     :justify :center])))
+
+(defn solver-alert-clover [fkp clover-kps ttype rtype]
+  (let [type-label (case ttype
+                     :bricks "foreground"
+                     :conn "background"
+                     :else "background*")
+        string-limit 70
+        ;icon @(tracked-sub ::runner-icon {:rtype rtype})
+        ]
+    [:h-box
+     :align :center 
+     :justify  :start  
+     :gap "10px"
+     :size "auto"
+     :children
+     [
+      [:v-box
+       :children [[:h-box :gap "7px"
+                   :children [[:box
+                               :style {:opacity 0.55}
+                               :child "running"]
+                              [:box :child (str (cstr/join " " (rest fkp)) " " rtype)]]
+                   :style {:font-size "14px"}]
+                  [:box :child (if (> (count (str clover-kps)) string-limit)
+                                 (str (subs (str clover-kps) 0 string-limit) "...") (str clover-kps))
+                   :style {:font-size "12px"}]
+                  [:box :child (str "(via " type-label " @ " (.toLocaleString (js/Date.)) ")")
+                   :style {:font-size "12px" :opacity 0.6}]]]
+      ;(clover-render-icon icon)
+      ]]))
 
 
 (defn distribution
@@ -132,19 +186,16 @@
 
 (defn deep-flatten*
   [x]
-  (let [;hx (pr-str x)
-        hx (hash x)]
+  (let [hx (hash x)]
     (swap! deep-flatten-cache update hx (fnil inc 0))
     (or (@deep-flatten-data hx)
-        (let [deep (deep-flatten-real x)
-              ;deep (set (filter keyword? (deep-flatten-real x)))
-              ]
+        (let [deep (deep-flatten-real x)]
           (swap! deep-flatten-data assoc hx deep)
           deep))))
 
 (defn deep-flatten
   [x] ;; param based
-  (if cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES
+  (if true ;;cache?  ;(true? @(rfa/sub ::param-lookup {:kk :deep-flatten-cache?})) ;; THIS DOES
     (deep-flatten* x)
     (deep-flatten-real x)))
 
@@ -308,37 +359,24 @@
        (= (count item) num)
        (= (first item) kw)))
 
-(defn extract-patterns*
-  [data kw num]
-  (let [x (pr-str [data kw num])] ;; switching from hash keys to pr-str due to collisions...
-    (swap! extract-patterns-cache update x (fnil inc 0))
-    (or (@extract-patterns-data x)
-        (let [matches (atom [])]
-          (walk/prewalk (fn [item] (when (matches-pattern? item kw num) (swap! matches conj item)) item) data)
-          (let [result @matches]
-            (swap! extract-patterns-data assoc x result)
-            result)))))
+;; (defn extract-patterns*
+;;   [data kw num]
+;;   (let [x (pr-str [data kw num])] ;; switching from hash keys to pr-str due to collisions...
+;;     (swap! extract-patterns-cache update x (fnil inc 0))
+;;     (or (@extract-patterns-data x)
+;;         (let [matches (atom [])]
+;;           (walk/prewalk (fn [item] (when (matches-pattern? item kw num) (swap! matches conj item)) item) data)
+;;           (let [result @matches]
+;;             (swap! extract-patterns-data assoc x result)
+;;             result)))))
+
+;; (defn extract-patterns-real
+;;   [data kw num] ;; raw
+;;   (let [matches (atom [])]
+;;     (walk/prewalk (fn [item] (when (matches-pattern? item kw num) (swap! matches conj item)) item) data)
+;;     @matches))
 
 (defn extract-patterns-real
-  [data kw num] ;; raw
-  (let [matches (atom [])]
-    (walk/prewalk (fn [item] (when (matches-pattern? item kw num) (swap! matches conj item)) item) data)
-    @matches))
-
-(defn extract-patterns-oldd
-  [data kw num] ;; param based
-  (if cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
-    (extract-patterns* data kw num)
-    (extract-patterns-real data kw num)))
-
-(defn purge-extract-patterns-cache
-  [percent & [hard-limit]]
-  (purge-cache "extract-patterns-cache" percent extract-patterns-cache extract-patterns-data hard-limit))
-
-
-
-
-(defn extract-patterns
   "Extracts patterns from nested data structures efficiently in ClojureScript."
   [data kw num]
   (let [matches (volatile! [])]
@@ -350,7 +388,24 @@
      data)
     @matches))
 
+(defn extract-patterns*
+  [data kw num]
+  (let [cache-key (hash [data kw num])
+        cache (get @extract-patterns-cache cache-key)]
+    (if cache cache
+        (let [res (extract-patterns-real data kw num)]
+          (swap! extract-patterns-cache assoc cache-key res)
+          res))))
 
+(defn extract-patterns
+  [data kw num] ;; param based
+  (if true ;; cache? ;(true? @(rfa/sub ::param-lookup {:kk :extract-patterns-cache?}))
+    (extract-patterns* data kw num)
+    (extract-patterns-real data kw num)))
+
+(defn purge-extract-patterns-cache
+  [percent & [hard-limit]]
+  (purge-cache "extract-patterns-cache" percent extract-patterns-cache extract-patterns-data hard-limit))
 
 
 
@@ -557,30 +612,38 @@
   ;(swap! subscription-counts-alpha update sub-key (fnil inc 0))
   (rfa/sub sub-key sub-map))
 
+(defn tracked-subscribe_ [query]
+  ;(swap! subscription-counts update (first query) (fnil inc 0))
+  (rfa/sub (first query) {}))
+
 (defn tracked-subscribe
   [query] ;;; hack to track subscriptions for debugging, easy freq
   ;(swap! subscription-counts update (first query) (fnil inc 0))
-  (cond (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query)
-        (do ;(tapp>> [:cpk! (last query)])
-          (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))
-        (cstr/ends-with? (str (first query)) "conn/data-colors") (rfa/sub :rvbbit-frontend.connections/data-colors {})
-        (cstr/ends-with? (str (first query)) "conn/sql-metadata") (rfa/sub :rvbbit-frontend.connections/sql-metadata-alpha
-                                                                           {:keypath (last query)})
-        (cstr/ends-with? (str (first query)) "bricks/all-drops-of") (rfa/sub :rvbbit-frontend.bricks/all-drops-of-alpha
-                                                                             {:ttype (last query)})
-        (cstr/ends-with? (str (first query)) "bricks/subq-mapping") (rfa/sub :rvbbit-frontend.bricks/subq-mapping-alpha {})
-        (cstr/ends-with? (str (first query)) "bricks/subq-panels") (rfa/sub :rvbbit-frontend.bricks/subq-panels-alpha
-                                                                            {:panel-id (last query)})
-        (cstr/ends-with? (str (first query)) "bricks/workspace") (rfa/sub :rvbbit-frontend.bricks/workspace-alpha
-                                                                          {:keypath (last query)})
-        (cstr/ends-with? (str (first query)) "bricks/selected-block") (rfa/sub :rvbbit-frontend.bricks/selected-block {})
-        (cstr/ends-with? (str (first query)) "bricks/editor-panel-selected-view")
-        (rfa/sub :rvbbit-frontend.bricks/editor-panel-selected-view {})
-        (cstr/ends-with? (str (first query)) "bricks/client-name") (rfa/sub :rvbbit-frontend.bricks/client-name {})
-        (cstr/ends-with? (str (first query)) "connections/client-name") (rfa/sub :rvbbit-frontend.connections/client-name {})
-        (cstr/ends-with? (str (first query)) "signals/selected-warren-item")
-        (rfa/sub :rvbbit-frontend.signals/selected-warren-item {})
-        :else (re-frame.core/subscribe query)))
+  (cond
+    ;;(and (cstr/includes? (str (first query)) "/")
+    ;;     (= (count query) 1)) 
+    ;;(rfa/sub (first query) {})
+    (cstr/ends-with? (str (first query)) "clicked-parameter-key") ;; (= (first query)
+    (do ;(tapp>> [:cpk! (last query)])
+      (rfa/sub :rvbbit-frontend.connections/clicked-parameter-key-alpha {:keypath (last query)}))
+    (cstr/ends-with? (str (first query)) "conn/data-colors") (rfa/sub :rvbbit-frontend.connections/data-colors {})
+    (cstr/ends-with? (str (first query)) "conn/sql-metadata") (rfa/sub :rvbbit-frontend.connections/sql-metadata-alpha
+                                                                       {:keypath (last query)})
+    (cstr/ends-with? (str (first query)) "bricks/all-drops-of") (rfa/sub :rvbbit-frontend.bricks/all-drops-of-alpha
+                                                                         {:ttype (last query)})
+    (cstr/ends-with? (str (first query)) "bricks/subq-mapping") (rfa/sub :rvbbit-frontend.bricks/subq-mapping-alpha {})
+    (cstr/ends-with? (str (first query)) "bricks/subq-panels") (rfa/sub :rvbbit-frontend.bricks/subq-panels-alpha
+                                                                        {:panel-id (last query)})
+    (cstr/ends-with? (str (first query)) "bricks/workspace") (rfa/sub :rvbbit-frontend.bricks/workspace-alpha
+                                                                      {:keypath (last query)})
+    (cstr/ends-with? (str (first query)) "bricks/selected-block") (rfa/sub :rvbbit-frontend.bricks/selected-block {})
+    (cstr/ends-with? (str (first query)) "bricks/editor-panel-selected-view")
+    (rfa/sub :rvbbit-frontend.bricks/editor-panel-selected-view {})
+    (cstr/ends-with? (str (first query)) "bricks/client-name") (rfa/sub :rvbbit-frontend.bricks/client-name {})
+    (cstr/ends-with? (str (first query)) "connections/client-name") (rfa/sub :rvbbit-frontend.connections/client-name {})
+    (cstr/ends-with? (str (first query)) "signals/selected-warren-item")
+    (rfa/sub :rvbbit-frontend.signals/selected-warren-item {})
+    :else (re-frame.core/subscribe query)))
 
 (defonce dispatch-counts (atom {}))
 (defonce simple-dispatch-counts (atom []))
@@ -729,7 +792,8 @@
 
 (defn unique-block-id
   [proposed existing-keys reserved-names]
-  (let [all-names (set (concat existing-keys reserved-names))] (unique-block-id-helper proposed 0 all-names)))
+  (let [all-names (set (concat existing-keys reserved-names))] 
+    (unique-block-id-helper proposed 0 all-names)))
 
 (defn hex-to-rgb [hex] (mapv #(js/parseInt % 16) [(subs hex 1 3) (subs hex 3 5) (subs hex 5 7)]))
 
@@ -737,38 +801,50 @@
   [rgb]
   (let [[r g b] (mapv #(double (/ % 255.0)) rgb) luminance (+ (* 0.2126 r) (* 0.7152 g) (* 0.0722 b))] luminance))
 
-(defn choose-text-color [hex] (let [rgb (hex-to-rgb hex) luma (luminance rgb)] (if (> luma 0.5) "#000000" "#ffffff")))
+;; (defn choose-text-color [hex] 
+;;   (let [rgb (hex-to-rgb hex) luma (luminance rgb)] 
+;;     (if (> luma 0.5) "#000000" "#ffffff")))
 
-(defn find-next [v k] (second (drop-while #(not= % k) v)))
+(def choose-text-color
+  (memoize
+   (fn [hex]
+     (let [rgb (hex-to-rgb hex) luma (luminance rgb)]
+       (if (> luma 0.5) "#000000" "#ffffff")))))
 
-(defn select-keypaths [m keys] (into {} (for [k keys] [k (get-in m k)])))
+(defn find-next [v k] 
+  (second (drop-while #(not= % k) v)))
 
-(defn sort-map-by-key [m] (sort-by first (into [] m)))
+(defn select-keypaths [m keys] 
+  (into {} (for [k keys] [k (get-in m k)])))
 
-(re-frame/reg-sub ::safe-key
-                  (fn [db {:keys [proposed locals]}]
-                    (let [block-names       (keys (get db :panels))
-                          locals            (or locals [])
-                          incoming-keyword? (keyword? proposed)
-                          snapshot-names    (keys (get-in db [:snapshots :params]))
-                          tab-names         (get db :tabs)
-                          user-param-names  (keys (get-in db [:click-param :param]))
-                          view-names        (distinct (mapcat (fn [[_ v]] (keys (get v :views))) (get db :panels)))
-                          query-names       (mapcat (fn [[_ v]] (keys (get v :queries))) (get db :panels)) ;; faster
-                          runner-keys       (keys (get-in db [:server :settings :runners] {}))
-                          all-runners       (apply concat
-                                                   (for [r runner-keys]
-                                                     (mapcat (fn [[_ v]] (keys (get v r))) (get db :panels))))
+(defn sort-map-by-key [m] 
+  (sort-by first (into [] m)))
+
+(re-frame/reg-sub
+ ::safe-key
+ (fn [db {:keys [proposed locals]}]
+   (let [block-names       (keys (get db :panels))
+         locals            (or locals [])
+         incoming-keyword? (keyword? proposed)
+         snapshot-names    (keys (get-in db [:snapshots :params]))
+         tab-names         (get db :tabs)
+         user-param-names  (keys (get-in db [:click-param :param]))
+         view-names        (distinct (mapcat (fn [[_ v]] (keys (get v :views))) (get db :panels)))
+         query-names       (mapcat (fn [[_ v]] (keys (get v :queries))) (get db :panels)) ;; faster
+         runner-keys       (keys (get-in db [:server :settings :runners] {}))
+         all-runners       (apply concat
+                                  (for [r runner-keys]
+                                    (mapcat (fn [[_ v]] (keys (get v r))) (get db :panels))))
                      ;;      _ (tapp>>  [:prop runner-keys all-runners])
-                          all-keys          (vec (apply concat
-                                                        [block-names user-param-names locals
-                                                         view-names snapshot-names tab-names
-                                                         query-names all-runners]))
-                          _                 (reset! db/unsafe-keys (into @db/unsafe-keys all-keys))
-                          reco              (unique-block-id proposed @db/unsafe-keys [])]
-                      (cond (and incoming-keyword? (keyword? reco))       reco
-                            (and incoming-keyword? (not (keyword? reco))) (keyword (replacer (str reco) #":" ""))
-                            :else                                         reco))))
+         all-keys          (vec (apply concat
+                                       [block-names user-param-names locals
+                                        view-names snapshot-names tab-names
+                                        query-names all-runners]))
+         _                 (reset! db/unsafe-keys (into @db/unsafe-keys all-keys))
+         reco              (unique-block-id proposed @db/unsafe-keys [])]
+     (cond (and incoming-keyword? (keyword? reco))       reco
+           (and incoming-keyword? (not (keyword? reco))) (keyword (replacer (str reco) #":" ""))
+           :else                                         reco))))
 
 (defn safe-key [proposed & [locals]]
   @(tracked-sub ::safe-key {:proposed proposed :locals locals}))
@@ -1115,18 +1191,49 @@
     (tapp>> [:parent-z-index z-index]) ;; Print or use the z-index as needed
     z-index)) ;; Return the z-index
 
+;; (defn deep-remove-keys
+;;   [data keys-to-remove]
+;;   (let [key-remove-set (set keys-to-remove)]
+;;     (cond (map? data)    (->> data
+;;                               (reduce-kv (fn [acc k v]
+;;                                            (if (or (key-remove-set k) (and (keyword? k) (cstr/starts-with? (name k) "_")))
+;;                                              acc
+;;                                              (assoc acc k (deep-remove-keys v keys-to-remove))))
+;;                                          {})
+;;                               (into (empty data)))
+;;           (vector? data) (mapv (fn [elem] (deep-remove-keys elem keys-to-remove)) data)
+;;           :else          data)))
+
 (defn deep-remove-keys
+  "Recursively removes specified keys and keys starting with '_' from nested data structures."
   [data keys-to-remove]
-  (let [key-remove-set (set keys-to-remove)]
-    (cond (map? data)    (->> data
-                              (reduce-kv (fn [acc k v]
-                                           (if (or (key-remove-set k) (and (keyword? k) (cstr/starts-with? (name k) "_")))
-                                             acc
-                                             (assoc acc k (deep-remove-keys v keys-to-remove))))
-                                         {})
-                              (into (empty data)))
-          (vector? data) (mapv (fn [elem] (deep-remove-keys elem keys-to-remove)) data)
-          :else          data)))
+  (let [key-remove-set (set keys-to-remove)
+        should-remove? (fn [k]
+                         (or (key-remove-set k)
+                             (and (keyword? k)
+                                  (cstr/starts-with? (name k) "_"))))]
+    (letfn [(remove-keys [x]
+              (cond
+                (map? x)
+                (persistent!
+                 (reduce-kv
+                  (fn [acc k v]
+                    (if (should-remove? k)
+                      acc
+                      (assoc! acc k (remove-keys v))))
+                  (transient (empty x))
+                  x))
+
+                (vector? x)
+                (persistent!
+                 (reduce
+                  (fn [acc v]
+                    (conj! acc (remove-keys v)))
+                  (transient [])
+                  x))
+
+                :else x))]
+      (remove-keys data))))
 
 (defn clean-sql-from-ui-keys-fn
   [query]
@@ -1413,10 +1520,10 @@
 
 (def format-map-atom (atom {}))
 
-(defn format-map
-  [w s]
-  (let [cache (get @format-map-atom [w s])]
-    (if false ;(not (nil? cache))
+(defn format-map [w s]
+  (let [cache-key (hash [w s])
+        cache (get @format-map-atom cache-key)]
+    (if (not (nil? cache))
       cache
       (let [;s (replacer s #"1.0" "\"ONE-POINT-ZERO\"")
             type (cond (cstr/includes? s "(")                         [:respect-nl   :justified-original]
@@ -1436,7 +1543,7 @@
                                  :vector        {:respect-nl? true}
                                  ;:map           {:comma? false :sort? false}
                                  :parse         {:interpose "\n\n"}})]
-        (swap! format-map-atom assoc [w s] o)
+        (swap! format-map-atom assoc cache-key o)
         o))))
 
 (defn remove-keys [m keys] (apply dissoc m keys))
