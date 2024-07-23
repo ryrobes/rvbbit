@@ -1455,6 +1455,16 @@
                      (catch :default _ []))]
      (or blocks []))))
 
+(re-frame/reg-sub
+ ::current-tab-slices
+ (fn [db _]
+   (let [blocks (try (keys (into {} (filter #(= (get db :selected-tab) (get (val %) :tab "")) (get db :panels))))
+                     (catch :default _ []))
+         runners-map (vec (keys (get-in db [:server :settings :runners] {})))]
+     (vec (map name (distinct (remove nil? (flatten (apply concat (for [b blocks] (for [r runners-map] (keys (get-in db [:panels b r]))))))))))
+     ;(for [b blocks] (for [r runners-map] (get-in db [:panels b r])))
+     )))
+
 (re-frame/reg-sub ::same-tab?
                   (fn [db [_ panel-key1 panel-key2]]
                     (= (get-in db [:panels panel-key1 :tab] "") (get-in db [:panels panel-key2 :tab] ""))))
@@ -3903,6 +3913,8 @@
                                           (vec @(ut/tracked-sub ::current-tab-blocks {})))
                                     (vec @(ut/tracked-sub ::current-tab-condis {})))
                               (catch :default _ []))
+        current-tab-slices   @(ut/tracked-sub ::current-tab-slices {}) ;; contains ALL view names, makes above redunctant.  TODO
+        ;;_ (tapp>> [:current-tab-slices current-tab-slices])
         valid-params-in-tab  @(ut/tracked-sub ::valid-params-in-tab {})
         ;_ (tapp>> [:valid-params-in-tab valid-params-in-tab])
         clover-params       (if @db/cm-focused? @(ut/tracked-sub ::clover-params-in-view {}) {})]
@@ -3950,7 +3962,7 @@
                                         (filter
                                          #(and ;; filter out from the top bar toggle first....
                                            (not (= (str (first %)) ":/")) ;; sometimes a garbo
-                                                                            ;; param sneaks
+                                                                            ;; param sneaks in
                                            (not (cstr/starts-with? (str (first %)) ":solver-meta/"))
                                            (not (cstr/starts-with? (str (first %)) ":repl-ns/"))
                                            (not (cstr/starts-with? (str (first %)) ":solver-status/"))
@@ -3971,8 +3983,8 @@
                                                                    (if (get pf :condis) ":condi/***" ":condi/")))
                                            (if (get pf :this-tab? true)
                                              (or
-                                              (some (fn [x] (= (str x) (str (first %)))) valid-params-in-tab)
-                                              ;(some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) valid-params-in-tab)
+                                              (some (fn [x] (= (str x) (str (first %)))) valid-params-in-tab) ;; TODO this is redundant and wasteful w slices here
+                                              (some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) current-tab-slices)
                                               (some (fn [x] (cstr/starts-with? (str (first %)) (str ":" x))) current-tab-queries))
                                              true)
                                            (not (cstr/includes? (str (first %)) "-sys/")))
@@ -10286,6 +10298,7 @@
               :editor (fn [[block-id runner-key data-key]]
                         (let [is-repl-type? @(ut/tracked-sub ::is-repl-type? {:runner-key runner-key})
                               value-spy?  (get-in @db/value-spy [block-id data-key] false)
+                              spy-hash (get @db/value-spy-hashes [block-id data-key] "n/a")
                               source-data   @(ut/tracked-sub ::get-view-source-data {:view-type runner-key :block-id block-id :data-key data-key})]
                           [re-com/v-box
                            :children
@@ -10294,7 +10307,7 @@
                                                     ;:border "1px dashed orange"
                                      }
                              :child
-                             ^{:key (str "cm-" block-id runner-key data-key value-spy?)}
+                             ^{:key (str "cm-" block-id runner-key data-key value-spy? spy-hash)}
                              [panel-code-box
                               (fn [] block-id)  ;; sneaky sneaky, react.... ;/ 
                               (fn [] [runner-key data-key])
@@ -10891,6 +10904,7 @@
                                  selected-view-type
                                  :else :views)
         br @(ut/tracked-sub ::block-runners {})
+        value-spy? (get-in @db/value-spy [panel-key selected-view] false)
         ;;_ (ut/tapp>>  [:selected-view-type selected-view selected-view-type])
 
         ;all-drops @(ut/tracked-sub ::all-drops-of-alpha {:ttype :*})
@@ -10957,7 +10971,7 @@
                                                          ;; might be saved as a literal string if first in - but after being saved, it will be a vector of strings per newline
                                                          v)
                                                      v (ut/postwalk-replacer {:clover-body v} wrapper)
-                                                     v (ut/postwalk-replacer {:col-width (Math/floor (/ (* main-w db/brick-size) 9.4))} v)]
+                                                     v (ut/postwalk-replacer {:col-width (Math/floor (/ (* main-w db/brick-size) 9.5))} v)]
                                                  (if (not (nil? v))
                                                    (ut/postwalk-replacer {:*data v} clover-fn) v))}))
                      new-body (assoc solver-body :waiter placeholder-clover)]
@@ -11237,6 +11251,8 @@
                                                               (get-in @db/solver-fn-runs [panel-key sub-param])
                                                               ;;@(ut/tracked-sub ::conn/solver-fn-runs {:keypath [panel-key sub-param]})
                                                               unique-resolved-map)
+                                   runners-map               @(ut/tracked-sub ::block-runners {})
+                                   is-nrepl?                 (= :nrepl (get-in runners-map [rtype :type]))
                                    lets-go?                  (and online? (not run?))
                                    ;_ (when lets-go?
                                    ;    (ut/tapp>> [:run-solver-req-map-bricks! (str fkp) sub-param override? (str (first this)) lets-go? (not run?) @db/solver-fn-runs]))
@@ -11251,7 +11267,11 @@
                                    _ (when (and lets-go?
                                                 (not (some #(= % :time/now-seconds) clover-kps))
                                                 (not (some #(= % :time/second) clover-kps)))
-                                       (ut/dispatch-delay 100 [::http/insert-alert (ut/solver-alert-clover fkp clover-kps :bricks rtype) 11 1.7 3]))]
+                                       ;; when nrepl and first
+                                       (when (and is-nrepl? (nil? (get @ut/first-connect-nrepl rtype)))
+                                        (ut/tracked-dispatch   [::http/insert-alert (ut/first-connect-clover fkp clover-kps :bricks rtype) 11 1.7 14])
+                                         (swap! ut/first-connect-nrepl assoc rtype 1))
+                                       (ut/dispatch-delay 200 [::http/insert-alert (ut/solver-alert-clover  fkp clover-kps :bricks rtype) 11 1.7 3]))]
                                {v sub-param})))]
             (walk/postwalk-replace logic-kps obody)))
 
@@ -11395,6 +11415,11 @@
                    body)) body) ;; we have to replace it down here so the solver gets started above even though we don't render it yet...
         ;;rowset? (http/is-rowset? (get-in body [selected-view 1]))
         ]
+    
+    (when value-spy?  
+      ;(tapp>> [:value-spy-hash (hash body)])
+      (swap! db/value-spy-hashes assoc [panel-key selected-view] (hash body)))
+
 
     ;;(when (= panel-key :block-911) (tapp>> [:body orig-body (get orig-body selected-view) (str (get-in body [selected-view 1]))]))
 
@@ -11824,7 +11849,7 @@
      (into {}
            (for [[k v] runners
                  :when (not= (get v :hop-bar?) false)]
-             {k (select-keys v [:icon :description :syntax])})))))
+             {k (select-keys v [:icon :description :type :syntax])})))))
 
 
 (re-frame/reg-sub ::panels-hash (fn [db _] (get db :panels-hash "not-yet!")))

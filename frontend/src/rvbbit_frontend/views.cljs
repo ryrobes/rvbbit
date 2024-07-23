@@ -1734,14 +1734,52 @@
 
 ;(def modes ["🍀" "🌞" "🌙" "🔥" [:img {:src "images/rabbit-console.png" :width "40px" :height "40px"}]])
 
-(def selected-mode (reagent/atom (merge (select-keys ;; set default to clover ("views")
+(defn find-ns-declarations
+  [data]
+  (letfn [(extract-ns-from-form [form]
+            (when (and (seq? form)
+                       (>= (count form) 2)
+                       (= 'ns (first form)))
+              (str (second form))))
+
+          (extract-ns-from-string [s]
+            (let [matches (re-seq #"\(ns\s+([^\s\)]+)" s)]
+              (map second matches)))
+
+          (traverse [item]
+            (cond
+              (seq? item) (or (some-> item extract-ns-from-form vector)
+                              (mapcat traverse item))
+              (string? item) (extract-ns-from-string item)
+              (vector? item) (mapcat traverse item)
+              (map? item) (mapcat traverse (vals item))
+              :else nil))]
+    (vec (distinct (remove nil? (traverse data))))))
+
+(re-frame/reg-sub
+ ::local-namespaces-for
+ (fn [db {:keys [runner-key]}]
+   (let [panels-map (get db :panels)
+         ;selected-tab (get db :selected-tab)
+         ;panel-keys (set (keys (bricks/only-relevant-tabs panels-map selected-tab)))
+         ;;_ (ut/tapp>> [:panel-keys runner-key])
+         ;panel-keys @(ut/tracked-sub ::bricks/relevant-tab-panels-set {})
+         ;pkb (select-keys (get db :panels) panel-keys)
+         ]
+     (vec (distinct (find-ns-declarations (for [[_ v] panels-map] (vals (get v runner-key)))))))))
+
+;; (ut/tapp>> [:ns @(ut/tracked-sub ::local-namespaces-for {:runner-key :clojure})]) 
+
+(defonce selected-mode (reagent/atom (merge (select-keys ;; set default to clover ("views")
                                              (get @(ut/tracked-sub ::bricks/hop-bar-runners {}) :views)
-                                             [:icon :description :syntax]) {:name :clover})))
+                                             [:icon :description :type :syntax]) {:name :clover})))
 (def hop-bar-tooltip (reagent/atom nil))
 (defonce cm-instance (reagent/atom nil))
 (defonce hide-responses? (reagent/atom false))
 (def console-responses (reagent/atom {})) 
 (def console-history (reagent/atom #{})) 
+(defonce ns-selected (reagent/atom {}))
+(def over-hop-bar (reagent/atom false))
 
 (defn insert-response-block [w h data runner syntax]
   (let [root (ut/find-safe-position h w)]
@@ -1757,23 +1795,30 @@
       trimmed
       (str "\"" trimmed "\""))))
 
-;;  [:dispatch :rvbbit-frontend.bricks/update-panels-hash]
-
-;;;(ut/tracked-dispatch [::bricks/update-panels-hash]      )
-
 (defn run-console-command [command]
   (let [runner (get @selected-mode :name)
         syntax (get @selected-mode :syntax)
-        is-rf-event? (and (or (= runner :views) (= runner :clover)) 
+        ttype  (get @selected-mode :type)
+        ;nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
+        is-rf-event? (and (or (= runner :views) (= runner :clover))
                           (cstr/starts-with? (cstr/trim command) "[:dispatch"))
+        ns-pushed (when (and 
+                         (cstr/includes? (str command) "(ns ")
+                         (= ttype :nrepl)) (find-ns-declarations [command]))
+        _ (when ns-pushed (swap! ns-selected assoc runner (first ns-pushed))) ;; set ns in UI 
+        command (if (and (= ttype :nrepl)
+                         (not (cstr/includes? (str command) "(ns "))
+                         (ut/ne? (get @ns-selected runner)))
+                  (str "(ns " (get @ns-selected runner) ") " command)
+                  command)
         command (if (not= syntax "clojure")
                   command ;; the "implied string"
                   (ensure-quoted-string (cstr/replace command "\"" "\\\"")))]
-    (ut/tapp>> (str "Command entered: " command))
+    (ut/tapp>> (str "Command entered: " command " " ttype " " runner " " (get @ns-selected runner)))
     (reset! hide-responses? false)
 
     (if is-rf-event?
-      
+
       (let [ee (str "dispatched re-frame event")]
         (ut/tracked-dispatch (get (edn/read-string command) 1))
         (ut/dispatch-delay 200 [::http/insert-alert
@@ -1781,7 +1826,7 @@
                                                    [:box :child (str command)
                                                     :style {:font-size "12px"}]]] 6 1.5 5])
         (swap! console-responses assoc command ee))
-      
+
       (let [resp (insert-response-block 6 3 command runner syntax)
             ee (str command "(" resp ")")]
       ;;(when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
@@ -1790,13 +1835,13 @@
                                 [:v-box :children [[:box :child (str resp)]
                                                    [:box :child (str command)
                                                     :style {:font-size "12px"}]]] 6 1.5 5])
-        (swap! console-responses assoc command ee)))
-    ))
+        (swap! console-responses assoc command ee)))))
 
 
 
 (defn console-text-box [width-int height-int value]
   (let [history-index (reagent/atom -1)
+        ;nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
         react! [@hop-bar-tooltip]]
     (fn [width-int height-int value]
       [re-com/box
@@ -1815,7 +1860,9 @@
         {:value   (or value " ")
          :onBeforeChange (fn [editor _ _] ;; data value]
                            (reset! cm-instance editor))
-         :onBlur #(when (nil? @hop-bar-tooltip) (re-frame/dispatch [::bricks/toggle-quake-console])) ;; when not hovered over? to detect a click off into the canvas?
+         :onBlur #(when (and (not @over-hop-bar) 
+                             (nil? @hop-bar-tooltip)) 
+                    (re-frame/dispatch [::bricks/toggle-quake-console])) ;; when not hovered over? to detect a click off into the canvas?
          :options {:mode              (get @selected-mode :syntax "clojure") 
                    :lineWrapping      false
                    :lineNumbers       false
@@ -1878,10 +1925,15 @@
 
 (defn quake-console [ww]
   (let [hh (* 2  db/brick-size)
-        reacts! [@console-responses @console-history @hide-responses?]
+        reacts! [@console-responses @console-history @hide-responses? @ns-selected]
+        nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
+        has-nss? (ut/ne? nss)
         ww (Math/floor (* ww  0.8))]
     [re-com/v-box
      :size "none"
+     :attr {:on-mouse-enter #(reset! over-hop-bar true)
+            :on-mouse-over #(when (not @over-hop-bar) (reset! over-hop-bar true))
+            :on-mouse-leave #(reset! over-hop-bar false)}
      :style {:background-color "#00000099"
              :backdrop-filter "blur(4px) brightness(33%)"
              :box-shadow "0px -5px 5px 0px #00000099"
@@ -1894,21 +1946,43 @@
              :height (px hh)}
      :children [[re-com/h-box
                  :justify :between
-                 :children [[re-com/box
-                             :child (if @hop-bar-tooltip
-                                      (let [[title desc] @hop-bar-tooltip]
-                                        [re-com/h-box
-                                         :gap "14px"
-                                         :align :center 
-                                         :children [[re-com/box :child (str title) 
-                                                     :style {:font-size "18px"}]
-                                                    [re-com/box :child (str desc) 
-                                                     :style {:font-size "15px" 
-                                                             :font-weight 400
-                                                             :opacity 0.8}]]])
+                 :children [[re-com/v-box
+                             :children [[re-com/box
+                                         :child (if @hop-bar-tooltip
+                                                  (let [[title desc] @hop-bar-tooltip]
+                                                    [re-com/h-box
+                                                     :gap "14px"
+                                                     :align :center
+                                                     :children [[re-com/box :child (str title)
+                                                                 :style {:font-size "18px"}]
+                                                                [re-com/box :child (str desc)
+                                                                 :style {:font-size "15px"
+                                                                         :font-weight 400
+                                                                         :opacity 0.8}]]])
 
-                                      (if (not @hide-responses?)
-                                        (str (get @console-responses (last @console-history) "")) ""))]
+                                                  (if (not @hide-responses?)
+                                                    (str (get @console-responses (last @console-history) "")) ""))]
+                                        (when has-nss?
+                                          [re-com/h-box
+                                           :padding "6px"
+                                           :gap "10px"
+                                           :children (vec (for [n nss
+                                                                :let [cc (theme-pull :theme/editor-outer-rim-color nil)
+                                                                      ccx (ut/choose-text-color cc)
+                                                                      selected? (= n (get @ns-selected (get @selected-mode :name)))]]
+                                                            [re-com/box
+                                                             :padding "5px"
+                                                             :attr {:on-click #(do
+                                                                                 (swap! ns-selected assoc (get @selected-mode :name) (if selected? nil n))
+                                                                                 (when @cm-instance  (.focus @cm-instance)))}
+                                                             :style {:background-color (when selected? cc)
+                                                                     :color (when selected? ccx)
+                                                                     :cursor "pointer"
+                                                                     ;:padding-left "8px"
+                                                                     :border-radius "5px"
+                                                                     ;:font-size "14px"
+                                                                     :font-weight 700}
+                                                             :child (str n)]))])]]
                             (when
                              (and (not @hide-responses?)
                                   (get @console-responses (last @console-history)))
@@ -1917,9 +1991,10 @@
                                :style {:font-size "16px"
                                        :opacity 0.5}])]
                  :height (if
-                          (or @hop-bar-tooltip
+                          (or @hop-bar-tooltip has-nss?
                               (and (not @hide-responses?)
-                                   (get @console-responses (last @console-history)))) "auto" "0px")
+                                   (get @console-responses (last @console-history)))) 
+                           "auto" "0px")
                  :padding "9px"
                  :style {:position "fixed"
                          :bottom hh ;(if (get @console-responses (last @console-history)) hh (- hh 20))
@@ -1955,6 +2030,12 @@
                                      :cursor "pointer"
                                      ;:border "1px solid white"
                                      :font-weight 700}]
+                            (when (and has-nss? (get @ns-selected (get @selected-mode :name)))
+                              [re-com/box
+                               :style {:opacity 0.33
+                                       :font-weight 400
+                                       :padding-left "12px"}
+                               :child (str " " (get @ns-selected (get @selected-mode :name)) ":>")])
                             [console-text-box nil nil " "]]]]]))
 
 ;; (defn quake-console [ww]
@@ -2569,8 +2650,9 @@
                                                                            ;;(ut/tapp>> [selected-view-type repl? syntax])
                                                                                            (if (or (nil? syntax) (= syntax "clojure"))
                                                                                              (let [;;_ (reset! bricks/tt [selected-block s-kp (get @db/data-browser-query selected-block)])
-                                                                                                   react! [@db/data-browser-query @db/value-spy]]
-                                                                                               ^{:key (str "cm-" selected-block s-kp ;; important!
+                                                                                                   react! [@db/data-browser-query @db/value-spy]
+                                                                                                   spy-hash (get @db/value-spy-hashes [selected-block data-key] "n/a")]
+                                                                                               ^{:key (str "cm-" selected-block s-kp spy-hash ;; important!
                                                                                                            (get-in @db/value-spy [selected-block data-key]))}
                                                                                                [re-com/h-box
                                                                                                 :children [[bricks/reecatch [flows/alert-box selected-block data-key]]

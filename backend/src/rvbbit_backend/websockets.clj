@@ -4043,6 +4043,172 @@
 
 (def solvers-run (atom 0))
 
+(defn err? [s]
+  (let [s (str s)]
+    (or (cstr/includes? s "Exception") (cstr/includes? s ":err") (cstr/includes? s ":error"))))
+
+(defn nrepl-solver-run [vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? cache-key]
+  (try (let [repl-host                   (get-in runner-map [:runner :host])
+             repl-port                   (get-in runner-map [:runner :port])
+             {:keys [result elapsed-ms]} (ut/timed-exec
+                                          (ppy/execute-in-thread-pools-but-deliver :nrepl-evals ;;(keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
+                                                                                   (fn []
+                                                                                     (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
+             output-full                 result
+             sampled?                    true ;(get-in output-full [:sampled :sampling-details])
+             output                      (if sampled?
+                                           (get-in output-full [:sampled :data])
+                                           (last (get-in output-full [:evald-result :value])))
+             output                      (if (nil? output) "(returns nil value)" output)
+             output-full                 (-> output-full
+                                             (assoc-in [:evald-result :output-lines]
+                                                       (try (count (remove empty?
+                                                                           (get-in output-full [:evald-result :out])))
+                                                            (catch Exception _ 0)))
+                                             (assoc-in [:evald-result :values]
+                                                       (try (count (last (get-in output-full [:evald-result :value])))
+                                                            (catch Exception _ 0))))
+             error?                      (err? output-full)
+             runs                        (get @last-solvers-history-atom solver-name [])
+             meta-extra                  {:extra {:last-processed timestamp-str
+                                                  :cache-hit?     cache-hit?
+                                                  :elapsed-ms     elapsed-ms
+                                                  :runs           (get @last-solvers-history-counts-atom solver-name) ;; (count runs)
+                                                  :error?         error?}}
+             timestamp-str               (str timestamp-str " (" elapsed-ms "ms)")
+             new-history                 (vec (conj runs timestamp-str))
+             output                      (if error?
+                                           (select-keys (get output-full :evald-result) [:root-ex :ex :err])
+                                           output)]
+         (when sampled?
+           (try
+             (let [sample-message (get-in output-full [:sampled :message] "")
+                   sample-message-lines (cstr/split sample-message #"\. ")
+                   ;;_ (ut/pp [:sample-message sample-message-lines])
+                   sample-error   (get-in output-full [:sampled :error] "")
+                   sample-details (get-in output-full [:sampled :sampling-details] {})]
+               (alert! client-name
+                       [:v-box
+                        :gap "6px"
+                        :children
+                        [;[:box :style {:font-size "13px"} :child (str solver-name " - " (get-in output-full [:sampled :message]))]
+                         [:box
+                          :style {:font-size "16px"}
+                          :child (str (first sample-message-lines) ".")]
+                         
+                         [:h-box 
+                          :style {:font-size "13px"}
+                          :gap "12px"
+                          :children (vec (for [x (rest sample-message-lines)] 
+                                           [:v-box
+                                            :gap "6px"
+                                            :children (let [ss (cstr/split x #"\: ")]
+                                                        [[:box 
+                                                          :style {:font-size "15px"}
+                                                          :child (str (first ss))]
+                                                         [:v-box 
+                                                          :style {:opacity 0.9 :font-weight 700}
+                                                          :children (vec (for [e (rest (cstr/split (str (last ss)) #"\, "))
+                                                                               :let [e (cond
+                                                                                         (cstr/ends-with? e "items")
+                                                                                         [:h-box
+                                                                                          :gap "8px"
+                                                                                          :justify :between
+                                                                                          :children
+                                                                                          [[:box :child (ut/nf (edn/read-string (first (cstr/split e #" "))))]
+                                                                                           [:box
+                                                                                            :style {:opacity 0.5}
+                                                                                            :child "values"]]]
+                                                                                         
+                                                                                         (cstr/includes? e "size")
+                                                                                         [:h-box
+                                                                                          :gap "8px"
+                                                                                          :justify :between
+                                                                                          :children
+                                                                                          [[:box
+                                                                                            :style {:opacity 0.5}
+                                                                                            :child "est size"]
+                                                                                           [:box :child (let [result (last (cstr/split e #"size "))
+                                                                                                              truncated (if (.endsWith result ".")
+                                                                                                                          (.substring result 0 (- (.length result) 1))
+                                                                                                                          result)]
+                                                                                                          truncated)]
+                                                                                           ]]
+
+                                                                                         (cstr/starts-with? e "dimensions")
+                                                                                         [:h-box
+                                                                                          :gap "8px"
+                                                                                          :justify :between
+                                                                                          :children
+                                                                                          [[:box
+                                                                                            :style {:opacity 0.5}
+                                                                                            :child "key depth"]
+                                                                                           [:box :child (cstr/join " x " (map #(-> % edn/read-string ut/nf str)
+                                                                                                                              (cstr/split (last (cstr/split e #" ")) #"x")))]]]
+                                                                                         :else e)]]
+                                                                           [:box 
+                                                                            ;:min-width "130px"
+                                                                            :child e]))]]
+                                                        )]))]
+
+                        ;;  [:v-box
+                        ;;   :style {:font-size "12px"}
+                        ;;   :children [[:v-box
+                        ;;               :children [[:box :child "original"]
+                        ;;                          [:h-box :size "auto"
+                        ;;                           :children (vec (for [[k v] (get sample-details :original-structure)]
+                        ;;                                            [:v-box
+                        ;;                                             :size "auto"
+                        ;;                                             :children [[:box
+                        ;;                                                         :size "auto"
+                        ;;                                                         :child (str k)]
+                        ;;                                                        [:box
+                        ;;                                                         :size "auto"
+                        ;;                                                         :child (str v)]]]))]]]
+                        ;;              [:v-box
+                        ;;               :children [[:box :child "sampled"]
+                        ;;                          [:box :child "sampled data"]]]]]
+  
+                        ;;  [:box
+                        ;;   :size "auto"
+                        ;;   :style {:font-size "11px" :opacity 0.4}
+                        ;;   :child (str sample-details)]
+  
+                         [:box :style {:font-size "11px"} :child (str sample-error)]
+                         [:box :style {:font-size "11px" :opacity 0.4} :child (str solver-name)]]]
+                       13
+                       nil ;2.1
+                       (if sample-details 8 20)))
+             (catch Exception  e (ut/pp [:solver-repl-alert-error (str e) e]))))
+         (swap! last-solvers-atom assoc solver-name output)
+         (swap! last-solvers-atom-meta assoc
+                solver-name
+                (merge meta-extra {:history (vec (reverse (take-last 20 new-history)))
+                                   :error "none"
+                                   :output (ut/dissoc-in output-full [:evald-result :value]) ;;(ut/limit-sample output-full) ;;; replace with sampler now?
+                                   }))
+         (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
+         (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
+        ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
+         (when (and use-cache? (not error?))
+           (swap! solvers-cache-atom assoc cache-key [output output-full]))
+         (swap! solver-status update-in [client-name solver-name] merge {:running? false, :stopped (System/currentTimeMillis)})
+         output)
+       (catch Throwable e
+         (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
+                     ;(swap! solvers-running assoc-in [client-name solver-name] false)
+             (swap! solver-status update-in [client-name solver-name]
+                    (fn [solver]
+                      (-> solver
+                          (assoc :stopped (System/currentTimeMillis))
+                          (assoc :running? false)
+                          (assoc :error? true)
+                          (assoc :time-running (ut/format-duration
+                                                (:started solver)
+                                                (System/currentTimeMillis))))))
+             (swap! last-solvers-atom-meta assoc solver-name {:error (str e)})
+             (swap! last-solvers-atom assoc solver-name {:error (str e)})))))
+
 (defn run-solver
   [solver-name client-name & [override-map override-input temp-solver-name keypath]]
   (let [;;temp-running-elsewhere? (atom (running-elsewhere? temp-solver-name))
@@ -4137,9 +4303,9 @@
                                              (not= runner-type :sql)
                                      ;(not= runner-type :nrepl)
                                              ))
-          err?                  (fn [s]
-                                  (let [s (str s)]
-                                    (or (cstr/includes? s "Exception") (cstr/includes? s ":err") (cstr/includes? s ":error"))))
+          ;; err?                  (fn [s]
+          ;;                         (let [s (str s)]
+          ;;                           (or (cstr/includes? s "Exception") (cstr/includes? s ":err") (cstr/includes? s ":error"))))
           timestamp-str         (cstr/trim (str (when use-cache? "^") (when cache-hit? "*") " " (millis-to-date timestamp)))
           vdata-ref             (if (> (count (str vdata)) 60)
                                   (subs (str vdata) 0 60)
@@ -4243,91 +4409,7 @@
 
 
         (= runner-type :nrepl)
-        (try (let [repl-host                   (get-in runner-map [:runner :host])
-                   repl-port                   (get-in runner-map [:runner :port])
-                   {:keys [result elapsed-ms]} (ut/timed-exec
-                                                    (ppy/execute-in-thread-pools-but-deliver :nrepl-evals ;;(keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
-                                                     (fn []
-                                                (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
-                   output-full                 result
-                   sampled?                    true ;(get-in output-full [:sampled :sampling-details])
-                   output                      (if sampled?
-                                                 (get-in output-full [:sampled :data])
-                                                 (last (get-in output-full [:evald-result :value])))
-                   output                      (if (nil? output) "(returns nil value)" output)
-                   output-full                 (-> output-full
-                                                   (assoc-in [:evald-result :output-lines]
-                                                             (try (count (remove empty?
-                                                                                 (get-in output-full [:evald-result :out])))
-                                                                  (catch Exception _ 0)))
-                                                   (assoc-in [:evald-result :values]
-                                                             (try (count (last (get-in output-full [:evald-result :value])))
-                                                                  (catch Exception _ 0))))
-                   error?                      (err? output-full)
-                   runs                        (get @last-solvers-history-atom solver-name [])
-                   meta-extra                  {:extra {:last-processed timestamp-str
-                                                        :cache-hit?     cache-hit?
-                                                        :elapsed-ms     elapsed-ms
-                                                        :runs           (get @last-solvers-history-counts-atom solver-name) ;; (count runs)
-                                                        :error?         error?}}
-                   timestamp-str               (str timestamp-str " (" elapsed-ms "ms)")
-                   new-history                 (vec (conj runs timestamp-str))
-                   output                      (if error?
-                                                 (select-keys (get output-full :evald-result) [:root-ex :ex :err])
-                                                 output)]
-               (when sampled? (alert! client-name
-                                      [:v-box
-                                       :children
-                                       [;[:box :style {:font-size "13px"} :child (str solver-name " - " (get-in output-full [:sampled :message]))]
-                                        [:box :style {:font-size "11px"} :child (get-in output-full [:sampled :message])]
-                                       ; (when (get-in output-full [:sampled :error])
-                                        ;; (when-let [sdet (get-in output-full [:sampled :sampling-details])]
-                                        ;;   [:v-box :style {:font-size "11px"}
-                                        ;;    :children (for [[k v] sdet]
-                                        ;;                [:h-box
-                                        ;;                 :children (for [[kk vv] v]
-                                        ;;                             [:box :child (str vv)])])])
-                                        [:box
-                                         :size "auto"
-                                         :style {:font-size "11px" :opacity 0.4} :child (str (get-in output-full [:sampled :sampling-details]))]
-                                        [:box :style {:font-size "11px"} :child (str (get-in output-full [:sampled :error] ""))]
-                                        [:box :style {:font-size "11px" :opacity 0.4} :child (str solver-name)]
-                                       ;   )
-                                        ]]
-                                      13
-                                      nil ;2.1
-                                      15))
-               (swap! last-solvers-atom assoc solver-name output)
-               (swap! last-solvers-atom-meta assoc
-                      solver-name
-                      (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) 
-                                         :error "none" 
-                                         :output (ut/dissoc-in output-full [:evald-result :value]) ;;(ut/limit-sample output-full) ;;; replace with sampler now?
-                                         }))
-               (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
-               (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
-               ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
-               (when (and use-cache? (not error?))
-                 (swap! solvers-cache-atom assoc cache-key [output output-full]))
-               ;(swap! solver-status assoc-in [client-name solver-name :running?] false)
-               ;(swap! solver-status assoc-in [client-name solver-name :stopped] (System/currentTimeMillis))
-               (swap! solver-status update-in [client-name solver-name] merge {:running? false, :stopped (System/currentTimeMillis)})
-               ;(swap! solvers-running assoc-in [client-name solver-name] false)
-               output)
-             (catch Throwable e
-               (do (ut/pp [:SOLVER-REPL-ERROR!!! (str e) :tried vdata :for solver-name :runner-type runner-type])
-                   ;(swap! solvers-running assoc-in [client-name solver-name] false)
-                   (swap! solver-status update-in [client-name solver-name]
-                          (fn [solver]
-                            (-> solver
-                                (assoc :stopped (System/currentTimeMillis))
-                                (assoc :running? false)
-                                (assoc :error? true)
-                                (assoc :time-running (ut/format-duration
-                                                      (:started solver)
-                                                      (System/currentTimeMillis))))))
-                   (swap! last-solvers-atom-meta assoc solver-name {:error (str e)})
-                   (swap! last-solvers-atom assoc solver-name {:error (str e)}))))
+        (nrepl-solver-run vdata client-name solver-name timestamp-str runner-map runner-name runner-type cache-hit? use-cache? cache-key)
 
         (= runner-type :flow) ;; no runner def needed for anon flow pulls
         (try

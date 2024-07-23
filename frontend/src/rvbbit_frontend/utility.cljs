@@ -65,10 +65,17 @@
 (declare tracked-sub)
 (declare ne?)
 
+(def first-connect-nrepl (atom {}))
+
 (re-frame/reg-sub 
  ::runner-icon 
  (fn [db {:keys [rtype]}] 
    (get-in db [:server :settings :runners rtype :icon] "zmdi-pizza")))
+
+(re-frame/reg-sub
+ ::runner-nrepl-details
+ (fn [db {:keys [rtype]}]
+   (get-in db [:server :settings :runners rtype :runner] {})))
 
 (defn clover-render-icon [i]
   (if (vector? i) [:h-box
@@ -88,11 +95,39 @@
                      :align :center
                      :justify :center])))
 
+(defn first-connect-clover [fkp clover-kps ttype rtype]
+  (let [nrepl-details @(tracked-sub ::runner-nrepl-details {:rtype rtype})
+        icon          @(tracked-sub ::runner-icon {:rtype rtype})]
+    [:h-box
+     :align :center
+     :justify  :start
+     :style {:font-size "16px"}
+     :gap "10px"
+     :size "auto"
+     :children [(clover-render-icon icon)
+                [:v-box
+                 :children [[:h-box
+                             :gap "7px"
+                             
+                             :children [[:box
+                                         :style {:opacity 0.55}
+                                         :child (str "Connected to named nREPL ")]
+                                        [:box
+                                         :child (str rtype)]]
+                             ;:style {:font-size "14px"}
+                             ]
+                            [:box
+                             :child (str (get nrepl-details :host) ":" (get nrepl-details :port))
+                             :style {;:font-size "12px" 
+                                     :font-weight 700
+                                     :opacity 0.8}]]]]]))
+
+
 (defn solver-alert-clover [fkp clover-kps ttype rtype]
-  (let [type-label (case ttype
-                     :bricks "foreground"
-                     :conn "background"
-                     :else "background*")
+  (let [type-label   (case ttype
+                       :bricks "foreground"
+                       :conn "background"
+                       :else "background*")
         string-limit 70
         ;icon @(tracked-sub ::runner-icon {:rtype rtype})
         ]

@@ -4674,10 +4674,12 @@
 
                                (and editor? (vector? selected-view))
                                (filterv #(not (or
+                                               (cstr/includes? (str %) "Data was not sampled")
                                                (when (ut/ne? solver-assoc) (cstr/includes? (str %) (str solver-assoc)))
                                                (cstr/includes? (str %) (str " " (last selected-view) " ")))) alerts)
 
                                :else (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts))
+         alerts          (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts)
          ;;_ (ut/tapp>> [:sel-view selected-view])
          estimates       @(ut/tracked-sub ::estimates {})
          max-w           (apply max (for [a alerts :let [width (* (get a 1) db/brick-size)]] width))
@@ -4732,6 +4734,7 @@
             :color        (if @db/pause-alerts (theme-pull :theme/editor-outer-rim-color nil) "inherit")
             :position     "fixed"
             :bottom        17
+            ;:overflow      "hidden"
             :margin-right "12px"
             :margin-top   "-4px"
             :font-size    "34px"}] [re-com/gap :size "44px"]
@@ -4751,6 +4754,7 @@
               (when (not push-codes?) (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])} {}))
               :width (when (> width 0) (px width))
               :height "auto" ;;(when (> height 0) (px height))
+              :style {:overflow      "hidden"}
               :child [buffy/render-honey-comb-fragments
                       abody
                       (get a 1) ;; width 
@@ -4766,13 +4770,15 @@
                 :border-top       (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
                 :border-bottom    (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
                 :font-weight      700
+                :overflow      "hidden"
                 :cursor           "pointer"
                 :border-radius    "19px 0px 0px 19px"
                 :bottom           (if in-panel? 46 25)
                 :z-index          9999
-       ;:transition       "all 0.6s ease-in-out"
+                :transition       "all 0.9s ease-in-out"
                 :right            (if @db/kick-alert 0 edge-hide)
                 :backdrop-filter  "blur(4px)"
+                :min-height       "60px"
                 :background-color (str "#000000" (if @db/kick-alert 88 11))
                 :color            "white"}]))])
 
