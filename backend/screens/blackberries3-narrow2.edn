@@ -10,11 +10,11 @@
   {:fields
    {:vec-val
     {:data-type "string",
-     :distinct 45,
+     :distinct 1,
      :group-by? true,
      :commons {},
-     :cardinality 77}},
-   :rowcount 58},
+     :cardinality 100}},
+   :rowcount 1},
   :fields-sys {:fields {}, :rowcount 0},
   :tables-sys
   {:fields
@@ -170,26 +170,17 @@
   {:fields
    {:client-name
     {:data-type "keyword",
-     :distinct 8,
+     :distinct 11,
      :group-by? true,
      :commons {},
      :cardinality 100},
     :ticks
     {:data-type "integer",
-     :distinct 4,
+     :distinct 10,
      :group-by? true,
      :commons {},
-     :cardinality 50}},
-   :rowcount 8},
-  :hare-vw-7
-  {:fields
-   {:vec-val
-    {:data-type "integer",
-     :distinct 9,
-     :group-by? true,
-     :commons {},
-     :cardinality 100}},
-   :rowcount 9},
+     :cardinality 90}},
+   :rowcount 11},
   :connections-sys
   {:fields
    {:database_name
@@ -202,7 +193,7 @@
     {:data-type "string",
      :distinct 8,
      :group-by? true,
-     :commons {"cache.db" 1, "flows-db" 1, "system-db" 1},
+     :commons {"cache.db" 1, "flows-db" 1, "snifftmp2" 1},
      :cardinality 100},
     :styler_highlight_8717ss
     {:data-type "integer",
@@ -289,9 +280,8 @@
  :default-col-widths
  {:virtual-panel {:kick-812421489 511},
   :block-11015 {:new-clojure-2 255},
-  :block-4481 {:hare-vw-7 111},
-  :system-connections-list* {:connections-sys 131},
-  :system-tables-list* {:tables-sys 138},
+  :system-connections-list* {:connections-sys 126},
+  :system-tables-list* {:tables-sys 133},
   :system-fields-list* {:fields-sys ##Inf}},
  :runstream-drops nil,
  :tabs
@@ -299,7 +289,8 @@
   "bountiful bird"
   "beige whale"
   "effective pheasant"
-  "lemon pig"],
+  "lemon pig"
+  "Persian blue cat"],
  :selected-cols nil,
  :server
  {:settings
@@ -584,263 +575,49 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
- :editor? false,
+ :editor? true,
  :buffy? false,
- :memory [886660637 864191013 4294705152],
- :client-name :courageous-azure-snake-12,
+ :memory [355804614 331365146 4294705152],
+ :client-name :phenomenal-chocolate-hare-4,
+ :alt-key-held? false,
  :flow-editor? true,
  :openai-api-key "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",
  :window {:w 2660, :h 1678},
- :implicit-rowsets
- {:solver [nil :new-clojure-2 :new-clojure-3], :clover [:hare-vw-7]},
+ :implicit-rowsets {:solver [:new-clojure-3 :new-clojure-2 nil]},
  :post-meta {:tables-sys {:* {:rowcount 24}}},
  :status
- {:heartbeat
+ {:alert1 {:alerts :alert2},
+  :heartbeat
   {:kick
-   [:solver-meta/raw-custom-override1691492753
-    :signal/every-30-seconds?
-    :solver/raw-custom-override-1125953366
-    :solver-meta/raw-custom-override-1257956405
-    :solver-status/courageous-azure-snake-12>raw-custom-override-1257956405
-    :solver-status/courageous-azure-snake-12>raw-custom-override1691492753
-    :solver-meta/raw-custom-override-1125953366>output>evald-result>out
-    :solver-status/courageous-azure-snake-12>raw-custom-override1691492753>running?
-    :solver-status/courageous-azure-snake-12>raw-custom-override-1125953366>running?
-    :time/minute
-    :solver-meta/raw-custom-override-1125953366
-    :solver-status/courageous-azure-snake-12>raw-custom-override-1257956405>running?
-    :solver-meta/raw-custom-override1691492753>output>evald-result>out
-    :solver/raw-custom-override-1257956405
-    :solver-meta/raw-custom-override-1257956405>output>evald-result>out
-    :flow-status/live-scratch-flow>*running?
+   [:solver/raw-custom-override707250133
+    :solver-status/phenomenal-chocolate-hare-4>raw-custom-override707250133>running?
     :flow-status/a-random-wow>*running?
-    :solver/raw-custom-override1691492753
-    :solver-status/courageous-azure-snake-12>raw-custom-override-1125953366]},
-  :alert1 {:alerts :alert2}},
+    :flow-status/live-scratch-flow>*running?
+    :solver-status/phenomenal-chocolate-hare-4>raw-custom-override707250133
+    :solver-meta/raw-custom-override707250133
+    :solver-meta/raw-custom-override707250133>output>evald-result>out]}},
  :screen-name "blackberries3-narrow2",
  :recos-page2 0,
- :selected-tab "beige whale",
+ :selected-tab "Persian blue cat",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
  :alerts
- [[[:h-box
-    :align
-    :center
-    :justify
-    :start
-    :gap
-    "10px"
-    :size
-    "auto"
-    :children
-    [[:v-box
-      :children
-      [[:h-box
-        :gap
-        "7px"
-        :children
-        [[:box :style {:opacity 0.55} :child "running"]
-         [:box :child ":block-721 :new-clojure :clojure"]]
-        :style
-        {:font-size "14px"}]
-       [:box
-        :child
-        "[:signal/every-30-seconds? :hare-vw-7.*/vec-val :new-clojure-2.*/clien..."
-        :style
-        {:font-size "12px"}]
-       [:box
-        :child
-        "(via foreground @ 7/20/2024, 7:03:32 PM)"
-        :style
-        {:font-size "12px", :opacity 0.6}]]]]]
-   11
-   1.7
-   4212
-   1452218015]
-  [[:h-box
-    :align
-    :center
-    :justify
-    :start
-    :gap
-    "10px"
-    :size
-    "auto"
-    :children
-    [[:v-box
-      :children
-      [[:h-box
-        :gap
-        "7px"
-        :children
-        [[:box :style {:opacity 0.55} :child "running"]
-         [:box :child ":block-11015 :new-clojure-2 :clojure"]]
-        :style
-        {:font-size "14px"}]
-       [:box :child "[:signal/every-30-seconds?]" :style {:font-size "12px"}]
-       [:box
-        :child
-        "(via foreground @ 7/20/2024, 7:03:32 PM)"
-        :style
-        {:font-size "12px", :opacity 0.6}]]]]]
-   11
-   1.7
-   4212
-   199135245]
-  [[:h-box
-    :align
-    :center
-    :style
-    {:padding-left "6px"}
-    :gap
-    "10px"
-    :children
-    [[:md-icon :style {:font-size "12px"} :md-icon-name "fa-solid fa-skull"]
-     [:box :child "un-sub to :solver-meta/raw-custom-override1691492753"]]
-    :style
-    {:font-size "12px", :opacity 0.6, :text-decoration "line-through"}]
-   10
-   0.75
-   4215
-   -1812492660]
-  [[:h-box
-    :align
-    :center
-    :style
-    {:padding-left "6px"}
-    :gap
-    "10px"
-    :children
-    [[:md-icon :style {:font-size "12px"} :md-icon-name "fa-solid fa-skull"]
-     [:box :child "un-sub to :solver-meta/raw-custom-override-1257956405"]]
-    :style
-    {:font-size "12px", :opacity 0.6, :text-decoration "line-through"}]
-   10
-   0.75
-   4215
-   -1003883703]
-  [[:h-box
-    :align
-    :center
-    :style
-    {:padding-left "6px"}
-    :gap
-    "10px"
-    :children
-    [[:md-icon :style {:font-size "12px"} :md-icon-name "fa-solid fa-skull"]
-     [:box
-      :child
-      "un-sub to :solver-status/courageous-azure-snake-12>raw-custom-override-1257956405"]]
-    :style
-    {:font-size "12px", :opacity 0.6, :text-decoration "line-through"}]
-   10
-   0.75
-   4215
-   1807368243]
-  [[:h-box
-    :align
-    :center
-    :style
-    {:padding-left "6px"}
-    :gap
-    "10px"
-    :children
-    [[:md-icon :style {:font-size "12px"} :md-icon-name "fa-solid fa-skull"]
-     [:box
-      :child
-      "un-sub to :solver-status/courageous-azure-snake-12>raw-custom-override1691492753"]]
-    :style
-    {:font-size "12px", :opacity 0.6, :text-decoration "line-through"}]
-   10
-   0.75
-   4215
-   -1889705366]
-  [[:h-box
-    :align
-    :center
-    :style
-    {:padding-left "6px"}
-    :gap
-    "10px"
-    :children
-    [[:md-icon :style {:font-size "12px"} :md-icon-name "fa-solid fa-skull"]
-     [:box
-      :child
-      "un-sub to :solver-meta/raw-custom-override-1125953366>output>evald-result>out"]]
-    :style
-    {:font-size "12px", :opacity 0.6, :text-decoration "line-through"}]
-   10
-   0.75
-   4215
-   -1715785270]
-  [[:h-box
-    :align
-    :center
-    :style
-    {:padding-left "6px"}
-    :gap
-    "10px"
-    :children
-    [[:md-icon :style {:font-size "12px"} :md-icon-name "fa-solid fa-skull"]
-     [:box :child "un-sub to :solver-meta/raw-custom-override-1125953366"]]
-    :style
-    {:font-size "12px", :opacity 0.6, :text-decoration "line-through"}]
-   10
-   0.75
-   4215
-   450521869]
-  [[:h-box
-    :align
-    :center
-    :style
-    {:padding-left "6px"}
-    :gap
-    "10px"
-    :children
-    [[:md-icon :style {:font-size "12px"} :md-icon-name "fa-solid fa-skull"]
-     [:box
-      :child
-      "un-sub to :solver-meta/raw-custom-override1691492753>output>evald-result>out"]]
-    :style
-    {:font-size "12px", :opacity 0.6, :text-decoration "line-through"}]
-   10
-   0.75
-   4215
-   -1605274024]
-  [[:h-box
-    :align
-    :center
-    :style
-    {:padding-left "6px"}
-    :gap
-    "10px"
-    :children
-    [[:md-icon :style {:font-size "12px"} :md-icon-name "fa-solid fa-skull"]
-     [:box
-      :child
-      "un-sub to :solver-status/courageous-azure-snake-12>raw-custom-override-1125953366"]]
-    :style
-    {:font-size "12px", :opacity 0.6, :text-decoration "line-through"}]
-   10
-   0.75
-   4215
-   2015031311]
-  [[:box
+ [[[:box
     :child
     "sent screen save request to server... Please wait."
     :style
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   4220
+   3396
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"a-random-wow" nil},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -163032166,
+ :user-params-hash 256216451,
  :grid-recos? true,
- :session-hash 1056574745,
+ :preview-keys2 [],
  :resolved-queries
  {:client-memory-drag-36
   {:select
@@ -1320,6 +1097,39 @@
    :name "editor-block-4118-new-clojure-1",
    :root [8 10],
    :tab "effective pheasant"},
+  :block-9416
+  {:clojure
+   {:new-clojure-4
+    (do
+      (ns rvbbit-backend.websockets)
+      (println "hddde123ddddfffdd?")
+      @client-metrics)},
+   :name "block-9416",
+   :w 22,
+   :selected-mode {:new-clojure-4 :data},
+   :selected-view :new-clojure-4,
+   :root [8 11],
+   :h 9,
+   :display {:new-clojure-4 :value},
+   :queries {},
+   :tab "Persian blue cat",
+   :views
+   {:hare-vw-1
+    [:box
+     :align
+     :center
+     :justify
+     :center
+     :style
+     {:font-size "21px",
+      :font-weight 700,
+      :padding-top "6px",
+      :padding-left "14px",
+      :margin-top "-8px",
+      :color :theme/editor-outer-rim-color,
+      :font-family :theme/base-font}
+     :child
+     "Well, I never heard it before, but it sounds uncommon nonsense."]}},
   :block-2935
   {:h 10,
    :w 11,
@@ -1426,6 +1236,16 @@
    :root [41 1],
    :tab "beige whale",
    :clojure {}},
+  :block-179
+  {:h 4,
+   :w 6,
+   :tab "Persian blue cat",
+   :root [31 11],
+   :name "block-179",
+   :selected-view :pulled-val,
+   :views
+   {:pulled-val [:data-viewer [:get-in [nil [:surprising-puce-squirrel-24]]]]},
+   :queries {}},
   :block-285
   {:name "block-285",
    :w 5,
@@ -1824,7 +1644,7 @@
       :font-family :theme/base-font}
      :child
      "It's a perfect day for planting seeds and planning adventures!"]}}},
- :selected-block "none!",
+ :selected-block :block-179,
  :theme-colors-hashmap
  {"float" "#2A3959",
   "boolean" "#13283E",
@@ -1871,7 +1691,7 @@
    :blocks 3,
    :queries 0,
    :ts "2024-03-24 00:18:04"},
-  :time {:second 20, :now "Friday, July 19th 12:41PM", :minute 3},
+  :time {:second 20, :now "Friday, July 19th 12:41PM", :minute 51},
   :clover-hop {},
   :viz-tables-sys2 {:table_name :client-memory-drag-36},
   :client-stats-drag-36
@@ -1961,9 +1781,10 @@
    :wealthy-thin-lark-35>stats>recent-messages-per-second nil,
    :thrilling-icosahedral-raccoon-3>stats>client-name nil},
   :param
-  {:selected-view [:views :hare-vw-7],
-   :selected-view-data [1 15 30 45 60 90 120 200 600],
-   :selected-block :block-4481,
+  {:selected-view [:views :pulled-val],
+   :selected-view-data
+   [:data-viewer [:get-in [nil [:surprising-puce-squirrel-24]]]],
+   :selected-block :block-179,
    :my-dash-killswitch? false,
    :upstanding-crimson-frog "new parameter value!",
    :super-cobalt-mole ["1121pm - 229mb"]},
@@ -2073,11 +1894,11 @@
    :block-tab-selected-font-color "#c9d1ff",
    :editor-background-color "#000006",
    :editor-grid-font-color "#ffffff"},
-  :new-clojure-2.* {:client-name [:thorough-bulbous-hippopotamus-24]},
+  :new-clojure-2.* {},
   :hare-v23232w {:vec-val :testa3},
   :connections-sys {:database_name "*cache-db*", :connection_id "system-db"},
   :hare-vw-7.* {:vec-val [200 90 45 15]},
-  :sys {:selected-tab "beige whale", :selected-tab-idx 2},
+  :sys {:selected-tab "Persian blue cat", :selected-tab-idx 5},
   :block-6551 {:clover-hop-1 nil},
   :client-memory-drag-36
   {:client_name ":friendly-wide-grasshopper-40",

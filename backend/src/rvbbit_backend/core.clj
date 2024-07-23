@@ -1154,7 +1154,10 @@
                                                    (fn [] (let [freqs [1 10 30 60 120 240 600]
                                                                 stats [:cpu :threads :mem :sql-queries+ :sql-exec+ :nrepl-calls+ :solvers+ :flows+ :pool-tasks-run+ :workers :msgs+]]
                                                             (wss/draw-stats      nil freqs true) ;; all stats, with labels 
-                                                            (wss/draw-pool-stats nil freqs true)))))
+                                                            (wss/draw-pool-stats nil freqs true)
+                                                            (wss/draw-client-stats nil freqs nil true {:metrics-atom wss/sql-metrics})
+                                                            (wss/draw-client-stats nil freqs nil true)
+                                                            ))))
                            (qp/stop-slot-queue-system)
                            (stop-all-schedulers)
                           ;;  (reset! flow-db/results-atom (select-keys @flow-db/results-atom 

@@ -1538,7 +1538,7 @@
   {:datasource
    @(pool-create
      {:jdbc-url
-       ;;"jdbc:sqlite:file:cachedb?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL&auto_vacuum=FULL"
+     ;;  "jdbc:sqlite:file:./db/cache.db?mode=memory&cache=shared&transaction_mode=IMMEDIATE&journal_mode=WAL"
       "jdbc:sqlite:file:./db/cache.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456"
       :cache    "shared"}
      "cache-db-pool")})
@@ -4044,7 +4044,7 @@
 (def solvers-run (atom 0))
 
 (defn run-solver
-  [solver-name client-name & [override-map override-input temp-solver-name]]
+  [solver-name client-name & [override-map override-input temp-solver-name keypath]]
   (let [;;temp-running-elsewhere? (atom (running-elsewhere? temp-solver-name))
         _                     (swap! solvers-run inc)
         timestamp             (System/currentTimeMillis)]
@@ -4250,7 +4250,10 @@
                                                      (fn []
                                                 (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
                    output-full                 result
-                   output                      (last (get-in output-full [:evald-result :value]))
+                   sampled?                    true ;(get-in output-full [:sampled :sampling-details])
+                   output                      (if sampled?
+                                                 (get-in output-full [:sampled :data])
+                                                 (last (get-in output-full [:evald-result :value])))
                    output                      (if (nil? output) "(returns nil value)" output)
                    output-full                 (-> output-full
                                                    (assoc-in [:evald-result :output-lines]
@@ -4272,10 +4275,35 @@
                    output                      (if error?
                                                  (select-keys (get output-full :evald-result) [:root-ex :ex :err])
                                                  output)]
+               (when sampled? (alert! client-name
+                                      [:v-box
+                                       :children
+                                       [;[:box :style {:font-size "13px"} :child (str solver-name " - " (get-in output-full [:sampled :message]))]
+                                        [:box :style {:font-size "11px"} :child (get-in output-full [:sampled :message])]
+                                       ; (when (get-in output-full [:sampled :error])
+                                        ;; (when-let [sdet (get-in output-full [:sampled :sampling-details])]
+                                        ;;   [:v-box :style {:font-size "11px"}
+                                        ;;    :children (for [[k v] sdet]
+                                        ;;                [:h-box
+                                        ;;                 :children (for [[kk vv] v]
+                                        ;;                             [:box :child (str vv)])])])
+                                        [:box
+                                         :size "auto"
+                                         :style {:font-size "11px" :opacity 0.4} :child (str (get-in output-full [:sampled :sampling-details]))]
+                                        [:box :style {:font-size "11px"} :child (str (get-in output-full [:sampled :error] ""))]
+                                        [:box :style {:font-size "11px" :opacity 0.4} :child (str solver-name)]
+                                       ;   )
+                                        ]]
+                                      13
+                                      nil ;2.1
+                                      15))
                (swap! last-solvers-atom assoc solver-name output)
                (swap! last-solvers-atom-meta assoc
                       solver-name
-                      (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) :error "none" :output (ut/limit-sample output-full)}))
+                      (merge meta-extra {:history (vec (reverse (take-last 20 new-history))) 
+                                         :error "none" 
+                                         :output (ut/dissoc-in output-full [:evald-result :value]) ;;(ut/limit-sample output-full) ;;; replace with sampler now?
+                                         }))
                (swap! last-solvers-history-atom assoc solver-name (vec (take 100 new-history)))
                (swap! last-solvers-history-counts-atom update solver-name (fnil inc 0))
                ;;;disable-cache;;(swap! solvers-cache-atom assoc cache-key [output output-full])
@@ -5779,18 +5807,19 @@
                                                        {:honey-sql honey-sql :connection-id connection-id})
                                                 (doall
                                                  (let [resultv (vec (for [r result] (assoc r :rows 1)))] ;;; hack to
-                                                   (when (not= (first ui-keypath) :solvers) ;; solvers have their
-                                                     (if false ;snapshot-cache?
-                                                       (insert-rowset-snap result
-                                                                           cache-table-name
-                                                                           (first ui-keypath)
-                                                                           client-name
-                                                                           (conj (keys (first result)) :snapshot_ds))
-                                                       (insert-rowset result
-                                                                      cache-table-name
-                                                                      (first ui-keypath)
-                                                                      client-name
-                                                                      (keys (first result)))))
+                                                  ;;  (when (not= (first ui-keypath) :solvers) ;; solvers have their
+                                                  ;;    (if false ;snapshot-cache?
+                                                  ;;      (insert-rowset-snap result
+                                                  ;;                          cache-table-name
+                                                  ;;                          (first ui-keypath)
+                                                  ;;                          client-name
+                                                  ;;                          (conj (keys (first result)) :snapshot_ds))
+                                                  ;;      (insert-rowset result
+                                                  ;;                     cache-table-name
+                                                  ;;                     (first ui-keypath)
+                                                  ;;                     client-name
+                                                  ;;                     (keys (first result))))
+                                                  ;;    )
                                                    (cruiser/captured-sniff "cache.db"
                                                                            connection-id
                                                                            target-db
@@ -6634,7 +6663,7 @@
       \newline
       (conj (vec (cons color-code (vec (figlet/render flf (str text))))) reset-code)))))
 
-(defn draw-bar-graph [cpu-usage label-str symbol-str & {:keys [color freq agg width] :or {color :default freq 1 agg "avg"}}]
+(defn draw-bar-graph [usage-vals label-str symbol-str & {:keys [color freq agg width] :or {color :default freq 1 agg "avg"}}]
   (try
     (let [console-width (if width width (- (ut/get-terminal-width) 10))
           rows 5
@@ -6645,29 +6674,18 @@
           max-values (- console-width border-width label-padding)
           num-markers (quot max-values values-per-marker)
           actual-width (- max-values num-markers)
-          truncated (take-last actual-width cpu-usage)
-          max-cpu (apply max truncated)
-          ;;normalized (map #(int (/ (* % (* rows 8)) max-cpu)) truncated)
-          normalized (if (zero? max-cpu)
+          truncated (take-last actual-width usage-vals)
+          mmax (apply max truncated)
+          mmin (apply min truncated)
+          adjusted-min (* mmin 0.9) ; 90% to avoid zero bar 
+          value-range (- mmax adjusted-min)
+          ;; normalized (if (zero? mmax) ;; zero axis
+          ;;              (repeat (count truncated) 0)
+          ;;              (map #(int (/ (* % (* rows 8)) mmax)) truncated))
+          normalized (if (zero? value-range)
                        (repeat (count truncated) 0)
-                       (map #(int (/ (* % (* rows 8)) max-cpu)) truncated))
+                       (map #(int (/ (* (- % adjusted-min) (* rows 8)) value-range)) truncated))
           bar-chars [" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█"]
-          ;; color-code (case color
-          ;;              :red "\u001B[31m"
-          ;;              :green "\u001B[32m"
-          ;;              :yellow "\u001B[33m"
-          ;;              :blue "\u001B[34m"
-          ;;              :magenta "\u001B[35m"
-          ;;              :cyan "\u001B[36m"
-          ;;              :white "\u001B[37m"
-          ;;              :bright-red "\u001B[91m"
-          ;;              :bright-green "\u001B[92m"
-          ;;              :bright-yellow "\u001B[93m"
-          ;;              :bright-blue "\u001B[94m"
-          ;;              :bright-magenta "\u001B[95m"
-          ;;              :bright-cyan "\u001B[96m"
-          ;;              :bright-white "\u001B[97m"
-          ;;              "")
           color-code (get ansi-colors color  "")
           reset-code  "\u001B[0m"
           colorize (fn [s] (str color-code s reset-code))
@@ -6683,20 +6701,53 @@
           border-top (str "╭" border-line "╮")
           border-bottom (str "╰" border-line "╯")
           time-span (count truncated)
-          ;minutes (quot time-span 60)
           seconds (* time-span freq) ;(rem time-span 60)
+          ;; trend (let [first-half  (take (/ (count truncated) 2) truncated)
+          ;;             second-half (drop (/ (count truncated) 2) truncated)
+          ;;             avg-sec     (ut/avg second-half)
+          ;;             avg-first   (ut/avg first-half)
+          ;;             raw-pct     (* (/ (- avg-sec avg-first) avg-sec) 100)
+          ;;             pct-chg     (Math/ceil raw-pct)]
+          ;;         (cond
+          ;;           (> pct-chg 0) "up"
+          ;;           (< pct-chg 0) "down"
+          ;;           :else "stable"))
+          trend (let [hchunk      (Math/floor (/ (count truncated) 2))
+                      first-half  (take hchunk truncated)
+                      second-half (drop hchunk truncated)
+                      avg-sec     (ut/avgf second-half)
+                      avg-first   (ut/avgf first-half)
+                      raw-pct     (* (/ (- avg-sec avg-first) avg-first) 100)
+                      pct-chg     (Math/abs (Math/ceil raw-pct))
+                      direction   (cond (> raw-pct 0) "up"
+                                        (< raw-pct 0) "down"
+                                        :else "stable")
+                      magnitude   (cond
+                                    (>= pct-chg 50) "dramatically"
+                                    (>= pct-chg 25) "significantly"
+                                    (>= pct-chg 10) "noticeably"
+                                    (>= pct-chg 5)  "moderately"
+                                    (>= pct-chg 1)  "slightly"
+                                    :else           "marginally")]
+                  (cond
+                    (and (= direction "stable")
+                         (= avg-first avg-sec))
+                    "flat"
+                    (and (= direction "stable")
+                         (= (Math/floor avg-sec) (Math/floor avg-first)))
+                    "mostly stable"
+                    :else (str magnitude " " direction)))
           label (str label-str
-                     (str " (last " (ut/format-duration-seconds seconds)  ")")
-                     " | max " symbol-str ": "
-                     (ut/nf (float (apply max truncated)))
-                     ", min " symbol-str ": "
-                     (ut/nf (float (apply min truncated)))
-                     ", avg " symbol-str ": "
-                     (ut/nf (float (ut/avgf truncated))))
-          padding (str (apply str (repeat (- console-width (count label) 4) " ")) " ")
-          ;;end-padding (str (apply str (repeat (- console-width (count label) 4) " ")) " ")
-          ;;label-row (str "│ " (colorize label) padding "│")
-          label-row (str "│ " (str "\u001B[1m" (colorize label) reset-code) padding "│")
+                     (str " (last " (ut/format-duration-seconds seconds) " / " trend ")")
+                     " | max "  (ut/nf (float (apply max truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
+                     ", min "  (ut/nf (float (apply min truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
+                     ", avg "  (ut/nf (float (ut/avgf truncated))) (when (not (= "%" symbol-str)) " ") symbol-str)
+          max-label-length (- console-width 6)
+          fitted-label (if (<= (count label) max-label-length)
+                         label
+                         (str (subs label 0 (- max-label-length 3)) "..."))
+          padding (str (apply str (repeat (- console-width (count fitted-label) 4) " ")) " ")
+          label-row (str "│ " (str "\u001B[1m" (colorize fitted-label) reset-code) padding "│")
           draw-row (fn [row-data]
                      (let [graph-data (apply str
                                              (map-indexed
@@ -6706,27 +6757,27 @@
                                                   (str " " (colorize ch)) ; Space instead of vertical line
                                                   (colorize ch)))
                                               row-data))
-                           padding (apply str (repeat (- console-width (count (clojure.string/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
+                           padding (apply str (repeat (- console-width (count (cstr/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
                        (str "│ " graph-data padding "│")))
-          legned (str "  (each segment is " (ut/format-duration-seconds (* time-marker-interval freq)) ", each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str " **" agg)) ")")]
+          legend (str "  (each segment is " (ut/format-duration-seconds (* time-marker-interval freq)) " - each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str " **" agg)) ")")
+          legend (cstr/replace legend ", -" " -")]
       (println border-top)
       (println label-row)
       (println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
       (doseq [row (range (dec rows) -1 -1)]
         (println (draw-row (map #(get-bar-char % row) normalized))))
-      ;;(println (str "│" (apply str (repeat (- console-width 2) " ")) "│"))
-
-      ;; (println (for [chunk (drop-last (partition-all time-marker-interval truncated))] 
-      ;;            (let [vv (last chunk)
-      ;;                  lb (ut/nf (ut/rnd vv 2))
-      ;;                  lbc (count (str lb))]
-      ;;              (apply str (repeat (- 30 lbc) " ")  lb))))
       (println (let [chunks (partition-all time-marker-interval truncated)
                      ;last-chunk (count (last chunks))
-                     value-strings (apply str (for [chunk (drop-last chunks)]
-                                                (let [vv (last chunk)
-                                                      lb (ut/nf (ut/rnd vv 2))
-                                                      lb (str "(μ " (ut/nf  (ut/avgf chunk)) ") " lb)
+                     complete-chunks (vec (drop-last chunks))
+                     value-strings (apply str (for [chunk-idx (range (count complete-chunks))
+                                                    :let [chunk (vec (get complete-chunks chunk-idx))
+                                                          last-chunk (if (> chunk-idx 0) (vec (get complete-chunks (- chunk-idx 1))) [0])]]
+                                                (let [avg-last (ut/avgf last-chunk)
+                                                      avg-this (ut/avgf chunk)
+                                                      diff-last (-  avg-this avg-last)
+                                                      vv (* (/ diff-last avg-this) 100)
+                                                      lb (if (= chunk-idx 0) "" (str (when (> vv 0) "+") (ut/nf (ut/rnd vv 0)) "%" ))
+                                                      lb (cstr/trim (str "(μ " (ut/nf  avg-this) ") " lb))
                                                       lbc (count (str lb))]
                                                   (str (apply str (repeat (- 32 lbc) " ")) lb))))
                      vals-line (str "│" "\u001B[1m"
@@ -6734,15 +6785,17 @@
                                     reset-code)
                      padding (str (apply str (repeat (- console-width (count value-strings) 4) " ")) " ")]
                  (str vals-line padding " │")))
-      ;(fig-render "hey" color)
       (println border-bottom)
-      (println (str "\u001B[1m" (colorize legned) reset-code)))
+      (println (str "\u001B[1m" (colorize legend) reset-code)))
     (catch Throwable e
-      (ut/pp [:bar-graph-error! (str e) label-str (count cpu-usage) :vals :passed (vec (take 10 cpu-usage))]))))
-
-;; (draw-stats [:threads :cpu :pool-tasks] [1 15 60 90 600])
+      (ut/pp [:bar-graph-error! (str e) label-str (count usage-vals) :ex-vals-passed (vec (take 10 usage-vals))]))))
 
 
+;; (draw-client-stats nil [30] nil true 300 {:metrics-atom sql-metrics})
+;; (draw-stats [:cpu] [1 15 60 90] true)
+;; ⬉ ⬈ ⬊ ⬋⬅➡ ⬆ ⬇
+
+;; (ut/pp (range (count [1 2 3])))
 
 (defn pool-monitor
   [thread-pool pool-name]
@@ -6994,6 +7047,8 @@
                (when label? (draw-label data-base color)))
            (ut/pp [:draw-stats-needs-help
                    (str kks "? Nope. Invalid data type, bro! Gimmie something: " (clojure.string/join ", " (map str (keys (stats-keywords)))))])))))))
+;; (draw-stats :cpu)
+
 
 (defonce pool-ttls-last (atom {}))
 

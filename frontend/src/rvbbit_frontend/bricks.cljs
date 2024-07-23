@@ -3524,20 +3524,29 @@
          clover-kpw-set (set (map str clover-kpw))]
      clover-kpw-set)))
 
+(re-frame/reg-sub
+ ::relevant-tab-panels-set
+ (fn [db _]
+   (let [panels-map (get db :panels)
+         selected-tab (get db :selected-tab)]
+     (set (keys (only-relevant-tabs panels-map selected-tab))))))
+
+
 ;;; do this for every code panel visible based on the db/ atom map
 (re-frame/reg-event-db
  ::highlight-panel-code
  (fn [db [_ & [vs?]]]
-   ;;(tapp>> [:highlight-panel-code!])
-   (doseq [kvec (keys @db/cm-instance-panel-code-box)]
-     (let [;flow-subs      (get db :flow-subs)
+   ;;(tapp>> [:highlight-panel-code! @(ut/tracked-sub ::relevant-tab-panels {})])
+   (let [visible-panel-keys @(ut/tracked-sub ::relevant-tab-panels-set {})]
+     (doseq [kvec (filter #(visible-panel-keys (first %)) (keys @db/cm-instance-panel-code-box))]
+       (let [;flow-subs      (get db :flow-subs)
            ;[_ data-key]   @(ut/tracked-sub ::editor-panel-selected-view {})
            ;selected-block (get db :selected-block)
 
-           [selected-block data-key editor?] kvec
+             [selected-block data-key editor?] kvec
 
 
-           value-spy?     (get-in @db/value-spy [selected-block data-key] false)
+             value-spy?     (get-in @db/value-spy [selected-block data-key] false)
 
           ;; click-params   (vec (for [e (keys (get-in db [:click-param :param]))]
           ;;                       (keyword (str "param/" (ut/replacer (str e) ":" "")))))
@@ -3545,13 +3554,13 @@
           ;;                       (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
 
           ;; instead of looking for all the possible things, why not just look at what is here and if it applies?
-           selected-view-type @(ut/tracked-sub ::view-type {:panel-key selected-block :view data-key})
+             selected-view-type @(ut/tracked-sub ::view-type {:panel-key selected-block :view data-key})
 
           ;;  clover-kpw     (filter #(and (keyword? %) (cstr/includes? (str %) "/"))
           ;;                         (ut/deep-flatten (get-in db [:panels selected-block selected-view-type data-key])))
           ;;  clover-kpw-set (set (map str clover-kpw))
-           clover-kpw-set @(ut/tracked-sub ::clover-kpw-set {:selected-block selected-block :selected-view-type selected-view-type :data-key data-key})
-           interspace     (cset/intersection clover-kpw-set (set @db/autocomplete-keywords))
+             clover-kpw-set @(ut/tracked-sub ::clover-kpw-set {:selected-block selected-block :selected-view-type selected-view-type :data-key data-key})
+             interspace     (cset/intersection clover-kpw-set (set @db/autocomplete-keywords))
         ;;  interspace     (set (into (vec
         ;;                         (apply concat
         ;;                                (for [[k v] (get db :click-param)
@@ -3563,7 +3572,7 @@
          ;             interspace)
           ;_ (tapp>> [:insersec (map edn/read-string interspace)])
 
-           codes          (vec interspace)  ;; (vec (into themes (into flow-subs click-params)))
+             codes          (vec interspace)  ;; (vec (into themes (into flow-subs click-params)))
 
           ; part-kp        @(ut/tracked-sub ::editor-panel-selected-view {})
           ; view-code-hash (hash [(get-in db [:panels (get db :selected-block)]) part-kp])
@@ -3571,34 +3580,34 @@
            ;;part-kp        selected-view-type ;;@(ut/tracked-sub ::editor-panel-selected-view {})
            ;;view-code-hash (hash [(get-in db [:panels selected-block]) part-kp])
 
-           inv-backgrd-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
+             inv-backgrd-color (str (ut/invert-hex-color (get (theme-pull :theme/data-colors nil) "keyword")))
            ;inv-color (ut/invert-hex-color  inv-backgrd-color)
-           ]
-       
-       ;;(swap! last-view-highlighted-hash assoc kvec view-code-hash)
-       (tapp>> [:ran-update-panel-highlight-code-on (str kvec)])
+             ]
 
-       (if (not value-spy?)
-         (highlight-codes-only codes selected-block data-key editor?
-                               {:color            (ut/choose-text-color inv-backgrd-color) ;;inv-color
-                                :background-color inv-backgrd-color
-                                :text-shadow      "none"
-                                :filter           "invert(1.2)"
-                                :cursor           "pointer"
-                                :border-radius    "5px"})
-         (highlight-codes-values (into {}
-                                       (for [c codes]
-                                         {c @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
-                                                             {:keypath [c
-                                                                       ;(try (edn/read-string c) (catch :default _ c))
-                                                                        ]})}))
-                                 selected-block data-key editor?
-                                 {:color            (ut/choose-text-color inv-backgrd-color) ;; inv-color
+       ;;(swap! last-view-highlighted-hash assoc kvec view-code-hash)
+         (tapp>> [:ran-update-panel-highlight-code-on (str kvec)])
+
+         (if (not value-spy?)
+           (highlight-codes-only codes selected-block data-key editor?
+                                 {:color            (ut/choose-text-color inv-backgrd-color) ;;inv-color
                                   :background-color inv-backgrd-color
                                   :text-shadow      "none"
                                   :filter           "invert(1.2)"
                                   :cursor           "pointer"
-                                  :border-radius    "5px"}))))
+                                  :border-radius    "5px"})
+           (highlight-codes-values (into {}
+                                         (for [c codes]
+                                           {c @(ut/tracked-sub ::conn/clicked-parameter-key-alpha
+                                                               {:keypath [c
+                                                                       ;(try (edn/read-string c) (catch :default _ c))
+                                                                          ]})}))
+                                   selected-block data-key editor?
+                                   {:color            (ut/choose-text-color inv-backgrd-color) ;; inv-color
+                                    :background-color inv-backgrd-color
+                                    :text-shadow      "none"
+                                    :filter           "invert(1.2)"
+                                    :cursor           "pointer"
+                                    :border-radius    "5px"})))))
    db))
 
 
@@ -7234,7 +7243,7 @@
                      (when single-wait? "rotate linear infinite") :style
                      {:font-size        "15px"
                       :cursor           "pointer"
-                      :transform-origin "7.5px 11px"
+                      :transform-origin "7.5px 10px"
                       :opacity          0.5
                       :padding          "0px"
                       :margin-top       "-3px"}]
@@ -7251,7 +7260,7 @@
                        :style
                        {:font-size        "15px"
                         :cursor           "pointer"
-                        :transform-origin "7.5px 11px"
+                        :transform-origin "7.5px 10px"
                         :opacity          0.5
                         :padding          "0px"
                         :margin-top       "-3px"}])
@@ -7270,7 +7279,7 @@
                              :else        nil) :style
                        {:font-size        "15px"
                         :cursor           "pointer"
-                        :transform-origin "7.5px 11px"
+                        :transform-origin "7.5px 10px"
                         :opacity          0.5
                         :padding          "0px"
                         :margin-top       "-3px"}])]]
@@ -7297,7 +7306,7 @@
                                  :else   nil) :style
                            {:font-size        "15px"
                             :cursor           "pointer"
-                            :transform-origin "7.5px 11px"
+                            :transform-origin "7.5px 10px"
                             :opacity          0.5
                             :padding          "0px"
                             :margin-top       "-3px"}]))))])
@@ -7325,7 +7334,7 @@
                      {:font-size        "15px"
                       :color            (if has-one? "orange" "inherit")
                       :cursor           "pointer"
-                      :transform-origin "7.5px 11px"
+                      :transform-origin "7.5px 10px"
                       :opacity          0.5
                       :padding          "0px"
                       :margin-top       "-3px"}]
@@ -7339,7 +7348,7 @@
                         :on-mouse-leave #(swap! db/context-box dissoc query-key)}) :style
                      {:font-size        "15px"
                       :cursor           "pointer"
-                      :transform-origin "7.5px 11px"
+                      :transform-origin "7.5px 10px"
                       :opacity          0.5
                       :padding          "0px"
                       :margin-top       "-3px"}]]]))
@@ -7364,8 +7373,12 @@
        [[re-com/box :child (if (and running? (not sys-panel?)) "waiting" "no data")]
         (when (not (and running? (not sys-panel?)))
           [re-com/md-icon-button :md-icon-name "zmdi-refresh" :on-click
-           #(ut/tracked-dispatch [::conn/clear-query-history query-key]) :style
-           {:font-size "15px" :cursor "pointer" :transform-origin "7.5px 11px" :padding "0px" :margin-top "-3px"}])]])))
+           #(ut/tracked-dispatch [::conn/clear-query-history query-key]) 
+           :style {:font-size "15px" 
+                   :cursor "pointer" 
+                   :transform-origin "7.5px 10px" 
+                   :padding "0px" 
+                   :margin-top "-3px"}])]])))
 
 
 
@@ -8578,12 +8591,16 @@
 
 (defn data-viewer-source
   [obody]
-  (let [kps (ut/extract-patterns obody :data-viewer 2) logic-kps (first (for [v kps] (let [[_ src] v] src)))] logic-kps))
+  (let [kps (ut/extract-patterns obody :data-viewer 2) logic-kps 
+        (first (for [v kps] (let [[_ src] v] src)))] logic-kps))
 
-(re-frame/reg-sub ::data-viewer-source
-                  (fn [db {:keys [block-id selected-view]}]
-                    (let [view (get-in db [:panels block-id :views selected-view])]
-                      (data-viewer-source view))))
+(re-frame/reg-sub
+ ::data-viewer-source
+ (fn [db {:keys [block-id selected-view]}]
+   (let [view (get-in db [:panels block-id :views selected-view])
+         solver-view (get @db/solver-fn-lookup [:panels block-id selected-view])
+         dvs (data-viewer-source view)]
+     (or solver-view dvs))))
 
 (defn nested-search [data search-str]
   (letfn [(match? [x]
@@ -8694,14 +8711,16 @@
           ;current-page (/ start limit)
           ;iter (vec (take 4 iter))
           clover-kp-block? (and (keyword? block-id) (cstr/includes? (str block-id) "/"))
+          dvs @(ut/tracked-sub ::data-viewer-source {:block-id block-id :selected-view selected-view})
           source (if clover-kp-block?
                    block-id
-                   @(ut/tracked-sub ::data-viewer-source {:block-id block-id :selected-view selected-view}))
+                   dvs)
           source-kp (when (vector? source) (last source))
+          ;;_ (tapp>> [:dv source source-kp])
           ;;_ (tapp>>  [:dv-source source (str source-kp)])
           source-clover-key? (and (keyword? source) (cstr/includes? (str source) "/"))
           source-app-db? (try (= (first source) :app-db) (catch :default _ false))
-          ;;_ (ut/tapp>> [:data-viewer-source (str source) source-clover-key? source-app-db?])
+         ;;; _ (ut/tapp>> [:data-viewer-source (str source) (str dvs) source-clover-key? clover-kp-block? source-app-db?])
           font-size "inherit" ;;"11px"
           draggable? false ;; override bs TODO
           dcolors @(ut/tracked-sub ::conn/data-colors {})
@@ -12589,16 +12608,18 @@
                                               :padding-left     "4px"
                                               :padding-right    "4px"} :height "18px"]
                                      (when (or flow-running?
-                                               runner-running?
+                                               runner-running? 
                                                (and (not selected?) query-running? not-view?))
                                        [re-com/md-icon-button
                                         :md-icon-name "zmdi-refresh"
                                         :class "rotate linear infinite"
-                                        :style {:font-size "20px"
+                                        :style {:font-size "15px" ;;"20px"
                                                 :color (theme-pull :theme/universal-pop-color nil)
-                                                :transform-origin "10px 11px"
-                                                :padding "0px"
-                                                :margin-top "-5px"}])
+                                                :transform-origin "7.5px 10px" ;;"10px 11px"
+                                                :padding "0px" 
+                                                :margin-left "4px"
+                                                :margin-right "4px" 
+                                                :margin-top "-3px"}])
                                      (when reco-ready?
                                        [re-com/box :style {:margin-top "-6px"} :child
                                         [re-com/md-icon-button :md-icon-name "zmdi-view-dashboard" :on-click

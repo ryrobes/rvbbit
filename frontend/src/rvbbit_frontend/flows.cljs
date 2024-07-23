@@ -4648,13 +4648,37 @@
  (fn [db _] 
    (get db :flow-estimates)))
 
-(defn alert-box
-  []
+(defn alert-box [& [panel-key data-key]]
   [bricks/reecatch
    (let [rekt            [@db/kick-alert @db/pause-alerts]
          rs-running      @(ut/tracked-sub ::bricks/runstreams-running {})
          rs-running-list @(ut/tracked-sub ::bricks/runstreams-running-list {})
+         selected-view   @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
+         selected-block  @(ut/tracked-sub ::bricks/selected-block {})
+         editor?         @(ut/tracked-sub ::bricks/editor? {})
+         in-panel?       (and (or panel-key data-key) editor?)
+         solver-assoc    (cond in-panel?
+                               (cstr/replace (str (get @db/solver-fn-lookup [:panels panel-key data-key])) ":solver/" "")
+
+                               (and editor? (vector? selected-view))
+                               (cstr/replace (str (get @db/solver-fn-lookup [:panels selected-block (last selected-view)])) ":solver/" "")
+
+                               :else nil)
+         ;;_ (ut/tapp>> [:solver-lookup solver-assoc])
+         ;; ^^ since from the servers perspective it has no :solver/ prefix, since solver calls are each kw unique (for now)
          alerts          @(ut/tracked-sub ::bricks/alerts {})
+         alerts          (cond in-panel?
+                               (filterv #(or
+                                          (cstr/includes? (str %) (str solver-assoc))
+                                          (cstr/includes? (str %) (str " " data-key " "))) alerts)
+
+                               (and editor? (vector? selected-view))
+                               (filterv #(not (or
+                                               (when (ut/ne? solver-assoc) (cstr/includes? (str %) (str solver-assoc)))
+                                               (cstr/includes? (str %) (str " " (last selected-view) " ")))) alerts)
+
+                               :else (filterv #(not (cstr/includes? (str %) "Data was not sampled")) alerts))
+         ;;_ (ut/tapp>> [:sel-view selected-view])
          estimates       @(ut/tracked-sub ::estimates {})
          max-w           (apply max (for [a alerts :let [width (* (get a 1) db/brick-size)]] width))
          max-w           (if (or (nil? max-w) (< max-w 50))
@@ -4664,24 +4688,24 @@
                            (conj alerts
                                  [[:v-box :children
                                    (vec
-                                     (into [[:box :child (str rs-running " flow" (when (> rs-running 1) "s") " running")]]
-                                           (vec
-                                             (for [e    rs-running-list
-                                                   :let [fid    (ut/replacer e ":" "")
-                                                         run-id (get-in estimates [fid :run-id])
-                                                         est    (+ (js/Math.round (get-in estimates [fid :times] 0)) 1)
-                                                         est?   (> est 1)]]
-                                               [:v-box :padding "3px" :width (px max-w) ;;"215px"
-                                                :size "auto" ;:justify :center
-                                                :style {:font-size "11px"} :children
-                                                [[:box :size "auto" :style {:padding-left "5px"} :child (str fid)]
-                                                 (when est? ;true ;est?
-                                                   [:box :child [:progress-bar [(- max-w 15) est (str e run-id)]] :height "25px"
-                                                    :padding "3px"])
-                                                 (when est? ;true ;est?
-                                                   [:box :align :end :style
-                                                    {:font-size "10px" :font-weight 400 :padding-right "5px"} :child
-                                                    (str "estimate: " (ut/format-duration-seconds est))])]]))))] 4
+                                    (into [[:box :child (str rs-running " flow" (when (> rs-running 1) "s") " running")]]
+                                          (vec
+                                           (for [e    rs-running-list
+                                                 :let [fid    (ut/replacer e ":" "")
+                                                       run-id (get-in estimates [fid :run-id])
+                                                       est    (+ (js/Math.round (get-in estimates [fid :times] 0)) 1)
+                                                       est?   (> est 1)]]
+                                             [:v-box :padding "3px" :width (px max-w) ;;"215px"
+                                              :size "auto" ;:justify :center
+                                              :style {:font-size "11px"} :children
+                                              [[:box :size "auto" :style {:padding-left "5px"} :child (str fid)]
+                                               (when est? ;true ;est?
+                                                 [:box :child [:progress-bar [(- max-w 15) est (str e run-id)]] :height "25px"
+                                                  :padding "3px"])
+                                               (when est? ;true ;est?
+                                                 [:box :align :end :style
+                                                  {:font-size "10px" :font-weight 400 :padding-right "5px"} :child
+                                                  (str "estimate: " (ut/format-duration-seconds est))])]]))))] 4
                                   (+ 1.25 (* 1.05 rs-running) (when (= 1 rs-running) -0.275)) 0])
                            alerts)
          alerts-cnt      (try (count alerts) (catch :default _ 0))
@@ -4694,61 +4718,63 @@
          edge-hide       (* (- box-width 50) -1)]
      (when (= alerts-cnt 0) (reset! db/kick-alert false))
      (when (> alerts-cnt 0) (reset! db/kick-alert true))
-     [re-com/box :child
-      [re-com/h-box :attr
-       {:on-mouse-enter #(reset! db/pause-alerts true)
-        :on-mouse-over  #(when (not @db/pause-alerts) (reset! db/pause-alerts true))
-        :on-mouse-leave #(reset! db/pause-alerts false)} :children
-       [;[:img {:src "images/test-kick-icon.png" :width 30 :height 30}]
-        [re-com/md-icon-button :src (at) :md-icon-name (if @db/kick-alert "zmdi-star" "zmdi-star-outline") :style
-         {;:color "red"
-          :transition   "all 0.4s ease-in-out"
-          :color        (if @db/pause-alerts (theme-pull :theme/editor-outer-rim-color nil) "inherit")
-          :position     "fixed"
-          :bottom       17
-          :margin-right "12px"
-          :margin-top   "-4px"
-          :font-size    "34px"}] [re-com/gap :size "44px"]
-        [re-com/v-box
-         :gap "12px"
-         :children ;(into (for [e (range rs-running)] [re-com/box :child "o"])
-         (for [a    alerts
-               :let [abody       (first a)
-                     push-codes? (try (some #(or (= % :push) (= % :dialog-push)) (ut/deep-flatten abody))
-                                      (catch :default _ false))
-                     width       (+ 60 (* (get a 1 0) db/brick-size))
+     (when (or (not in-panel?) 
+               (and in-panel? (> (count alerts) 0)))
+       [re-com/box :child
+        [re-com/h-box :attr
+         {:on-mouse-enter #(reset! db/pause-alerts true)
+          :on-mouse-over  #(when (not @db/pause-alerts) (reset! db/pause-alerts true))
+          :on-mouse-leave #(reset! db/pause-alerts false)} :children
+         [;[:img {:src "images/test-kick-icon.png" :width 30 :height 30}]
+          [re-com/md-icon-button :src (at) :md-icon-name (if @db/kick-alert "zmdi-star" "zmdi-star-outline") :style
+           {;:color "red"
+            :transition   "all 0.4s ease-in-out"
+            :color        (if @db/pause-alerts (theme-pull :theme/editor-outer-rim-color nil) "inherit")
+            :position     "fixed"
+            :bottom        17
+            :margin-right "12px"
+            :margin-top   "-4px"
+            :font-size    "34px"}] [re-com/gap :size "44px"]
+          [re-com/v-box
+           :gap "12px"
+           :children ;(into (for [e (range rs-running)] [re-com/box :child "o"])
+           (for [a    alerts
+                 :let [abody       (first a)
+                       push-codes? (try (some #(or (= % :push) (= % :dialog-push)) (ut/deep-flatten abody))
+                                        (catch :default _ false))
+                       width       (+ 60 (* (get a 1 0) db/brick-size))
                      ;;height      (* (get a 2 0) db/brick-size)
-                     alert-id    (last a)
+                       alert-id    (last a)
                     ;; _ (ut/tapp>> [:alert abody])
-                     ]]
-           [re-com/box :size "none" :attr
-            (when (not push-codes?) (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])} {}))
-            :width (when (> width 0) (px width))
-            :height "auto" ;;(when (> height 0) (px height))
-            :child [buffy/render-honey-comb-fragments
-                    abody
-                    (get a 1) ;; width 
-                    (get a 2) ;; height
-                    ]])]]]
-      :width (px (+ 0 box-width))
+                       ]]
+             [re-com/box :size "none" :attr
+              (when (not push-codes?) (if @db/kick-alert {:on-click #(ut/tracked-dispatch [::bricks/prune-alert alert-id])} {}))
+              :width (when (> width 0) (px width))
+              :height "auto" ;;(when (> height 0) (px height))
+              :child [buffy/render-honey-comb-fragments
+                      abody
+                      (get a 1) ;; width 
+                      (get a 2) ;; height
+                      ]])]]]
+        :width (px (+ 0 box-width))
       ;:height "auto" (px (if @db/kick-alert all-h box-height)) ;; experimental for auto sizing!!!
-      :padding "9px"
-      :style {:position         "fixed"
-              :font-size        "18px"
-              :padding-top "8px"  :padding-bottom "8px" ;; part of auto sizing test
-              :border-left      (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
-              :border-top       (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
-              :border-bottom    (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
-              :font-weight      700
-              :cursor           "pointer"
-              :border-radius    "19px 0px 0px 19px"
-              :bottom           25
-              :z-index          9999
+        :padding "9px"
+        :style {:position         "fixed"
+                :font-size        "18px"
+                :padding-top "8px"  :padding-bottom "8px" ;; part of auto sizing test
+                :border-left      (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
+                :border-top       (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
+                :border-bottom    (str "2px solid " (theme-pull :theme/editor-outer-rim-color nil) (if @db/kick-alert "" "01"))
+                :font-weight      700
+                :cursor           "pointer"
+                :border-radius    "19px 0px 0px 19px"
+                :bottom           (if in-panel? 46 25)
+                :z-index          9999
        ;:transition       "all 0.6s ease-in-out"
-              :right            (if @db/kick-alert 0 edge-hide)
-              :backdrop-filter  "blur(4px)"
-              :background-color (str "#000000" (if @db/kick-alert 88 11))
-              :color            "white"}])])
+                :right            (if @db/kick-alert 0 edge-hide)
+                :backdrop-filter  "blur(4px)"
+                :background-color (str "#000000" (if @db/kick-alert 88 11))
+                :color            "white"}]))])
 
 (re-frame/reg-sub
  ::flow-parts-lookup

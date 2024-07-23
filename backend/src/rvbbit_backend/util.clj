@@ -695,10 +695,11 @@
         seconds  (.toSecondsPart duration)
         out      (str (when (pos? hours) (str hours " hour" (when (> hours 1) "s") ", "))
                       (when (pos? minutes) (str minutes " minute" (when (> minutes 1) "s") ", "))
-                      seconds
-                      " second"
-                      (when (> seconds 1) "s"))]
-    (if (= out "0 second") "less than a second" out)))
+                      (if (not (zero? seconds))
+                        (str seconds " second" (when (> seconds 1) "s")) " "))
+        out (cstr/trim (if (= out " ") "less than a second" out))
+        out (if (cstr/ends-with? out ",") (subs out 0 (- (count out) 1)) out)]
+    out))
 
 (defn nf [i] (pprint/cl-format nil "~:d" i))
 

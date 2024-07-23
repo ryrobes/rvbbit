@@ -6,6 +6,7 @@
    [nrepl.core            :as nrepl]
    [nrepl.server          :as nrepl-server]
    [rvbbit-backend.config :as config]
+   [clojure.walk :as walk]
    [rvbbit-backend.sql        :as    sql
     :refer [sql-exec sql-query sql-query-one system-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
             pool-create]]
@@ -14,7 +15,186 @@
    [rvbbit-backend.queue-party :as qp]
    [rvbbit-backend.util   :as ut]))
 
-(defn run [code] (eval code))
+
+
+
+(def ^:private initial-max-items 200)
+(def ^:private max-wire-size (* 50 1024)) ; 50KB, as per your example
+(def ^:private max-string-length 1000)
+
+(defn- format-bytes
+  "Format byte size to a human-readable string with appropriate unit."
+  [bytes]
+  (let [units ["bytes" "KB" "MB" "GB"]
+        unit-index (int (Math/floor (/ (Math/log (max bytes 1)) (Math/log 1024))))
+        value (/ bytes (Math/pow 1024 unit-index))
+        formatted (if (zero? unit-index)
+                    (format "%,d" (int value))
+                    (format "%.2f" value))
+        unit (nth units unit-index)]
+    (str formatted " " unit)))
+
+
+
+(defn- estimate-wire-size
+  "Estimate the wire size of a data structure."
+  [data]
+  (cond
+    (nil? data) 4  ; Assume nil takes 4 bytes
+    (string? data) (count (.getBytes ^String data "UTF-8"))
+    (number? data) (count (str data))
+    (keyword? data) (+ 1 (count (name data)))
+    (symbol? data) (count (str data))
+    (map? data) (reduce + (map #(+ (estimate-wire-size (key %))
+                                   (estimate-wire-size (val %)))
+                               data))
+    (coll? data) (reduce + (map estimate-wire-size data))
+    :else 1))
+
+(defn- truncate-string
+  "Truncate a string if it's too long."
+  [s]
+  (if (and (string? s) (> (count s) max-string-length))
+    (str (subs s 0 max-string-length) "...")
+    s))
+
+(defn- adaptive-sample-collection
+  "Sample a collection, adaptively reducing the number of items until under the size limit."
+  [coll current-size]
+  (loop [limit (min initial-max-items (count coll))
+         sampled-size (estimate-wire-size coll)]
+    (if (<= (+ current-size sampled-size) max-wire-size)
+      {:data (vec (take limit coll))
+       :pruned (> (count coll) limit)
+       :size sampled-size}
+      (if (<= limit 1)
+        {:data []
+         :pruned true
+         :size 0}
+        (let [new-limit (max 1 (int (* limit 0.75)))]  ; Reduce by 25% each iteration, minimum 1
+          (recur new-limit
+                 (estimate-wire-size (take new-limit coll))))))))
+
+(defn- sample-nested-structure
+  "Recursively sample a nested structure, preserving structure while limiting size."
+  [data current-size]
+  (let [item-size (estimate-wire-size data)]
+    (if (<= (+ current-size item-size) max-wire-size)
+      {:data data
+       :pruned false
+       :size item-size}
+      (cond
+        (string? data)
+        (let [truncated (truncate-string data)]
+          {:data truncated
+           :pruned (not= data truncated)
+           :size (estimate-wire-size truncated)})
+
+        (map? data)
+        (let [{:keys [data pruned size]} (adaptive-sample-collection
+                                          (map (fn [[k v]]
+                                                 [k (sample-nested-structure v 0)])
+                                               data)
+                                          current-size)]
+          {:data (into {} (map (fn [[k v]] [k (:data v)]) data))
+           :pruned (or pruned (some :pruned (map second data)))
+           :size size})
+
+        (coll? data)
+        (let [{:keys [data pruned size]} (adaptive-sample-collection
+                                          (map #(sample-nested-structure % 0) data)
+                                          current-size)]
+          {:data (mapv :data data)
+           :pruned (or pruned (some :pruned data))
+           :size size})
+
+        :else
+        {:data data
+         :pruned false
+         :size item-size}))))
+
+(defn- describe-structure
+  "Generate a detailed description of the structure."
+  [data]
+  (letfn [(count-levels
+            ([d] (count-levels d 0 []))
+            ([d depth acc]
+             (if (and (coll? d) (seq d))
+               (let [current-count (count d)
+                     next-level (if (map? d) (vals d) d)]
+                 (recur
+                  (first next-level)
+                  (inc depth)
+                  (update acc depth (fnil max 0) current-count)))
+               acc)))]
+    (let [levels (count-levels data)
+          depth (count levels)
+          total-items (reduce * levels)
+          estimated-size (estimate-wire-size data)
+          level-description (if (seq levels)
+                              (cstr/join "x" levels)
+                              "1")]
+      {:depth depth
+       :dimensions level-description
+       :total-items total-items
+       :estimated-size estimated-size})))
+
+(defn safe-sample
+  "Safely sample a data structure, preserving structure while limiting size."
+  [data]
+  (try
+    (let [initial-description (describe-structure data)
+          initial-wire-size (:estimated-size initial-description)
+          {:keys [data pruned size] :as sample-result} (sample-nested-structure data 0)]
+      (if (nil? sample-result)
+        (throw (ex-info "Unexpected nil result from sample-nested-structure"
+                        {:initial-wire-size initial-wire-size}))
+        (let [sampling-occurred? (or pruned (not= initial-wire-size size))
+              final-description (when sampling-occurred? (describe-structure data))]
+          {:data data
+           :message (if sampling-occurred?
+                      (format "Data was sampled to reduce size. Original structure: depth %d, dimensions %s, %s items, size %s. Sampled structure: depth %d, dimensions %s, %s items, size %s."
+                              (:depth initial-description)
+                              (:dimensions initial-description)
+                              (:total-items initial-description)
+                              (format-bytes initial-wire-size)
+                              (:depth final-description)
+                              (:dimensions final-description)
+                              (:total-items final-description)
+                              (format-bytes size))
+                      (format "Data was not sampled. Structure: depth %d, dimensions %s, %s items, size %s."
+                              (:depth initial-description)
+                              (:dimensions initial-description)
+                              (:total-items initial-description)
+                              (format-bytes initial-wire-size)))
+           :sampling-details (when sampling-occurred?
+                               {:original-structure initial-description
+                                :sampled-structure final-description
+                                :pruning-occurred pruned
+                                :size-reduction-percentage (int (* 100 (/ (- initial-wire-size size) initial-wire-size)))})
+           :sampling-error? false})))
+    (catch Exception e
+      {:error (.getMessage e)
+       :data data
+       :message "An error occurred during sampling. Original, unsampled data is returned."
+       :sampling-error? true})))
+
+(defn safe-sample-with-description
+  "Safely sample data, preserving structure when possible, and provide a description."
+  [data]
+  (let [{:keys [data message sampling-details error sampling-error?]} (safe-sample data)]
+    (cond-> {:data data
+             :message message
+             :sampling-error? (boolean sampling-error?)}
+      (not sampling-error?) (assoc :sampling-details sampling-details)
+      error (assoc :error error))))
+
+
+
+
+
+
+;;(defn run [code] (eval code))
 
 (defonce eval-cache (atom {}))
 (def rabbit-config (config/settings)) ;; legacy
@@ -184,8 +364,7 @@
                                                                                                  (sql/create-or-get-client-db-pool client-name)
                                                                                                  client-name))))]]
                                             {(get vv :name)
-                                             (sampler value-data)
-                                             }))}))
+                                             (sampler value-data)}))}))
           results0 (assoc results0 :introspected (ut/millis-to-date-string (System/currentTimeMillis)))
           results0 (assoc results0 ":sqlized" @sqlized)]
       results0)
@@ -194,22 +373,22 @@
 
 (defn update-namespace-state-async [host port client-name id code ns-str]
   ;(future
-    (try
-      (with-open [conn (nrepl/connect :host host :port port)]
-        (let [_ (ut/pp [:running-namespace-introspection ns-str host port client-name id ])
-              introspection (introspect-namespace conn ns-str client-name)
+  (try
+    (with-open [conn (nrepl/connect :host host :port port)]
+      (let [_ (ut/pp [:running-namespace-introspection ns-str host port client-name id])
+            introspection (introspect-namespace conn ns-str client-name)
               ;split-ns (vec (map keyword (cstr/split ns-str #".")))
               ;split-ns (vec (map keyword (cstr/split ns-str #"\.")))
-              ]
-          (ut/pp [:repl {:introspected-repl-session introspection}])
+            ]
+        (ut/pp [:repl {:introspected-repl-session introspection}])
           ;;(swap! repl-introspection-atom assoc-in split-ns introspection) ;; host and port for later?
-          (swap! repl-introspection-atom assoc-in [client-name ns-str] introspection) ;; host and port for later?
+        (swap! repl-introspection-atom assoc-in [client-name ns-str] introspection) ;; host and port for later?
           ;; (logger (str (ut/keypath-munger [ns-str host port client-name id]) "-intro")
           ;;         {:orig-code code
           ;;          :introspection introspection})
-          ))
-      (catch Exception e
-        (ut/pp [:repl "Error during async introspection:" (ex-message e)]))));)
+        ))
+    (catch Exception e
+      (ut/pp [:repl "Error during async introspection:" (ex-message e)]))));)
 
 (defn create-nrepl-server! []
   (ut/pp [:starting-local-nrepl :port repl-port])
@@ -278,7 +457,7 @@
                                                   (cstr/replace  "_" "-")
                                                   (cstr/replace  "--" "-")))) ":" "")
                         user-fn-str   (if (not (cstr/includes? (str s) "(ns "))
-                                      (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
+                                        (cstr/replace user-fn-str "rvbbit-board.user" (str gen-ns)) user-fn-str)
                         s             (str user-fn-str "\n" s)
                         skt           (nrepl/client conn 60000000)
                         msg           (nrepl/message skt {:op "eval" :code s})
@@ -287,19 +466,24 @@
                         rsp           (nrepl/combine-responses msg)
                         msg-out       (vec (remove nil? (for [m msg] (get m :out))))
                         merged-values rsp-read
+                        sampled-values (try
+                                         (safe-sample-with-description (first rsp-read))
+                                        ;; ^^ revist when we have multi output repl calls - for now, just one output, one result (since front-end embeds DO block)
+                                         (catch Exception e (do (ut/pp [:safe-sample-with-description-ERROR e]) {})))
                         output        {:evald-result
                                        (-> rsp
                                            (assoc-in [:meta :nrepl-conn] custom-nrepl-map)
-                                           (assoc :value merged-values) ;; ?
+                                           (assoc :value merged-values)
                                            ;(assoc :out (vec (cstr/split (strip-ansi-codes (cstr/join msg-out)) #"\n")))
                                            (assoc :out (vec (cstr/split (cstr/join msg-out) #"\n")))
                                            (dissoc :id)
-                                           (dissoc :session))}
+                                           (dissoc :session))
+                                       :sampled sampled-values}
                         ns-str (get-in output [:evald-result :ns] "user")]
-                    
-                    (swap! repl-introspection-atom assoc-in [:repl-client-namespaces-map client-name] 
+
+                    (swap! repl-introspection-atom assoc-in [:repl-client-namespaces-map client-name]
                            (vec (distinct (conj (get-in @repl-introspection-atom [:repl-client-namespaces-map client-name] []) ns-str))))
-                    
+
                     ;;; :repl-ns/repl-client-namespaces-map>*client-name*
 
                     ;;(swap! repl-client-namespaces-map update-in [client-name] (fnil conj #{}) gen-ns)

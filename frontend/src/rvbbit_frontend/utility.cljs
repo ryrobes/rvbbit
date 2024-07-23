@@ -63,6 +63,7 @@
 (def map-boxes-cache (atom {}))
 (def map-boxes-cache-hits (atom {}))
 (declare tracked-sub)
+(declare ne?)
 
 (re-frame/reg-sub 
  ::runner-icon 
@@ -96,24 +97,26 @@
         ;icon @(tracked-sub ::runner-icon {:rtype rtype})
         ]
     [:h-box
-     :align :center 
-     :justify  :start  
+     :align :center
+     :justify  :start
      :gap "10px"
      :size "auto"
-     :children
-     [
-      [:v-box
-       :children [[:h-box :gap "7px"
-                   :children [[:box
-                               :style {:opacity 0.55}
-                               :child "running"]
-                              [:box :child (str (cstr/join " " (rest fkp)) " " rtype)]]
-                   :style {:font-size "14px"}]
-                  [:box :child (if (> (count (str clover-kps)) string-limit)
-                                 (str (subs (str clover-kps) 0 string-limit) "...") (str clover-kps))
-                   :style {:font-size "12px"}]
-                  [:box :child (str "(via " type-label " @ " (.toLocaleString (js/Date.)) ")")
-                   :style {:font-size "12px" :opacity 0.6}]]]
+     :children [[:v-box
+                 :children [[:h-box
+                             :gap "7px"
+                             :children [[:box
+                                         :style {:opacity 0.55}
+                                         :child "running"]
+                                        [:box 
+                                         :child (str (cstr/join " " (rest fkp)) " " rtype)]]
+                             :style {:font-size "14px"}]
+                            (when (ne? clover-kps)
+                              [:box :child (if (> (count (str clover-kps)) string-limit)
+                                             (str (subs (str clover-kps) 0 string-limit) "...") (str clover-kps))
+                               :style {:font-size "12px"}])
+                            [:box 
+                             :child (str "(via " type-label " @ " (.toLocaleString (js/Date.)) ")")
+                             :style {:font-size "12px" :opacity 0.6}]]]
       ;(clover-render-icon icon)
       ]]))
 

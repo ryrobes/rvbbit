@@ -2572,13 +2572,15 @@
                                                                                                    react! [@db/data-browser-query @db/value-spy]]
                                                                                                ^{:key (str "cm-" selected-block s-kp ;; important!
                                                                                                            (get-in @db/value-spy [selected-block data-key]))}
-                                                                                               [bricks/panel-code-box 
-                                                                                                (fn [] selected-block) ;; sneaky sneaky, react.... :/
-                                                                                                (fn [] s-kp)
-                                                                                                (+ 17 single-width) (- single-height 20)
-                                                                                                (if (nil? selected-kp)
-                                                                                                  selected-panel-map
-                                                                                                  (get-in selected-panel-map selected-kp)) repl? true nil  ])
+                                                                                               [re-com/h-box
+                                                                                                :children [[bricks/reecatch [flows/alert-box selected-block data-key]]
+                                                                                                           [bricks/panel-code-box
+                                                                                                           (fn [] selected-block) ;; sneaky sneaky, react.... :/
+                                                                                                           (fn [] s-kp)
+                                                                                                           (+ 17 single-width) (- single-height 20)
+                                                                                                           (if (nil? selected-kp)
+                                                                                                             selected-panel-map
+                                                                                                             (get-in selected-panel-map selected-kp)) repl? true nil]]])
                                                                                              [bricks/panel-string-box selected-kp (+ 17 single-width) (- single-height 20)
                                                                                               (if (nil? selected-kp)
                                                                                                 selected-panel-map
@@ -2969,8 +2971,8 @@
                                                     :margin-top  (if query-box? "9px" "inherit")
                                                     :cursor      "pointer"}]
 
-                                                  [re-com/box :size "none" :width "90px" :child "value spy" :attr
-                                                   {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))}
+                                                  [re-com/box :size "none" :width "90px" :child "value spy"
+                                                   :attr {:on-click #(swap! db/value-spy assoc-in [selected-block data-key] (not value-spy?))}
                                                    :style {:color           (if value-spy? (theme-pull :theme/universal-pop-color nil) "grey")
                                                            :z-index         100
                                                            :user-select     "none"
@@ -3003,8 +3005,9 @@
                                                     (when solver-running?
                                                       [re-com/md-icon-button :md-icon-name "zmdi-refresh" :class "rotate linear infinite"
                                                        :style
-                                                       {:font-size "15px" :transform-origin "7.5px 12px"
-                                                        :margin-top "-4px"}])
+                                                       {:font-size "15px"
+                                                        :transform-origin "7.5px 10px" ;; perfect spin!
+                                                        :margin-top "-3px"}])
                                                     [re-com/box :child 
                                                      (str are-solver)
                                                      ;(str solver-running-kw)
@@ -3745,8 +3748,10 @@
             :font-size     "9px"} :children
            [[re-com/box :size "auto" :child (str t " ago")]
             (if loading?
-              [re-com/md-icon-button :md-icon-name "zmdi-refresh" :class "rotate linear infinite" :style
-               {:font-size "15px" :transform-origin "7.5px 12px" :margin-bottom "-8px"}]
+              [re-com/md-icon-button :md-icon-name "zmdi-refresh" :class "rotate linear infinite" 
+               :style {:font-size "15px" 
+                       :transform-origin "7.5px 10px" 
+                       :margin-bottom "-8px"}]
               [re-com/gap :size "10px"])]]]]))))
 
 (defn session-modal
