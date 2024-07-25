@@ -447,6 +447,11 @@
   (cruiser/create-sqlite-sys-tables-if-needed! system-db)
   (cruiser/create-sqlite-flow-sys-tables-if-needed! flows-db)
 
+  ;; temp test indexes
+  (ut/pp (sql-exec system-db "CREATE INDEX idx_client_name ON client_memory(client_name);"))
+  ;; (ut/pp (sql-exec system-db "CREATE INDEX idx_ts ON client_memory(ts);"))
+  ;; (ut/pp (sql-exec system-db "CREATE INDEX idx_client_name2 ON client_memory(client_name, ts);"))
+  ;; (ut/pp (sql-exec system-db "CREATE INDEX idx_ts1 ON jvm_stats(ts);"))
 
 
 
@@ -948,6 +953,8 @@
   ;;     #(async/close! stop-ch)))
 
 
+;;  (qp/cleanup-inactive-queues 10)
+
   ;;  all schedulers
 
  ;;  (- (System/currentTimeMillis)  (get-in @rvbbit-client-sub-values [:unix-ms]))
@@ -955,6 +962,7 @@
  ;;  (ut/pp @watcher-log-atom)
 
   (defn reboot-reactor-and-resub []
+    (evl/graceful-restart-nrepl-server!)
     (wss/reboot-reactor!)
     (wss/reload-signals-subs)
     (wss/reload-solver-subs))
@@ -1027,9 +1035,9 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  (start-scheduler (* 3600 1) ;; 3 hours
+  (start-scheduler (* 3600 4) ;; 1 hour
                    reboot-reactor-and-resub
-                   "Reboot Atom Reactor" (* 3600 1))
+                   "Reboot Atom Reactor" (* 3600 4))
 
   ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical, we barely use the queues except for sqlite writes
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES
@@ -1156,8 +1164,7 @@
                                                             (wss/draw-stats      nil freqs true) ;; all stats, with labels 
                                                             (wss/draw-pool-stats nil freqs true)
                                                             (wss/draw-client-stats nil freqs nil true {:metrics-atom wss/sql-metrics})
-                                                            (wss/draw-client-stats nil freqs nil true)
-                                                            ))))
+                                                            (wss/draw-client-stats nil freqs nil true)))))
                            (qp/stop-slot-queue-system)
                            (stop-all-schedulers)
                           ;;  (reset! flow-db/results-atom (select-keys @flow-db/results-atom 
@@ -1219,8 +1226,8 @@
                            (shell/sh "/bin/bash" "-c" (str "rm " "tracker-logs/*"))
                            (shell/sh "/bin/bash" "-c" (str "rm " "reaction-logs/*"))
                            (shell/sh "/bin/bash" "-c" (str "rm " "db/system.db"))))
-  (defn update-stat-atom
-    [kks]
+
+  (defn update-stat-atom [kks]
     (qp/serial-slot-queue :update-stat-atom-serial :serial
     ;(ppy/execute-in-thread-pools :update-stat-atom
                           (fn []

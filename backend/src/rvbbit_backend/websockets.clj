@@ -10,6 +10,7 @@
    [nextjournal.beholder      :as beholder]
    [io.pedestal.http          :as http]
    [rvbbit-backend.surveyor   :as surveyor]
+   [rvbbit-backend.fabric     :as fbc]
    [clojure.java.shell        :as shell]
    [rvbbit-backend.assistants :as assistants]
    [flowmaps.db               :as flow-db]
@@ -687,12 +688,23 @@
   (doseq [cn (keys @atoms-and-watchers)]
     (ppy/reset-cached-thread-pools-wildcard (cstr/replace (str cn) ":" "")))
   (reset! atoms-and-watchers {})
-  (ppy/reset-cached-thread-pools-wildcard ":subscriptions/")
-  (ppy/reset-cached-thread-pools-wildcard ":watchers/")
+  (ppy/reset-cached-thread-pools-wildcard ":subscriptions")
+  (ppy/reset-cached-thread-pools-wildcard ":watchers")
+  (ppy/reset-cached-thread-pools-wildcard ":nrepl")
+  (ppy/reset-cached-thread-pools-wildcard ":flow")
+  (ppy/reset-cached-thread-pools-wildcard ":sql")
+  (ppy/reset-cached-thread-pools-wildcard ":param")
+  (ppy/reset-cached-thread-pools-wildcard ":client")
+  (ppy/reset-cached-thread-pools-wildcard ":query")
+  (ppy/reset-cached-thread-pools-wildcard ":signal")
+  (ppy/reset-cached-thread-pools-wildcard ":captured")
   (reset! reactor-boot-time (System/currentTimeMillis))
+  (qp/cleanup-inactive-queues 10)
   (vreset! splitter-stats  {}))
 
 ;;(reboot-reactor!)
+;; (ppy/reset-cached-thread-pools-wildcard ":nrepl")
+;; (ppy/reset-cached-thread-pools-wildcard ":flow")
 
 (defn client-sub-latency []
   (let [last-times (into {} (for [[_ v] @splitter-stats]
@@ -1802,7 +1814,7 @@
                                    (assoc :recent-messages-per-second msgs-per-recent)
                                    (assoc :messages-per-second msgs)
                                    (assoc :mem_used_mb mem-mb))]}]
-    (sql-exec system-db (to-sql ins-sql)))
+    (sql-exec system-db (to-sql ins-sql) {:queue :client-memory}))
   (swap! ack-scoreboard assoc-in [client-name :memory] (ut/bytes-to-mb (get memory :mem_used)))
   (swap! ack-scoreboard assoc-in [client-name :client-sub-list] flow-subs)
   (swap! ack-scoreboard assoc-in [client-name :client-subs] (count flow-subs))
@@ -2204,15 +2216,21 @@
       (ring-resp/not-found "File not found"))))
 
 (defn package-settings-for-client []
-  (merge (config/settings)
-         {:clover-templates (edn/read-string (slurp "./defs/clover-templates.edn"))
-          :kits    {} ;;config/kit-fns
-          :screens (vec (map :screen_name
-                             (sql-query system-db
-                                        (to-sql {:select   [:screen_name]
-                                                 :from     [[:screens :jj24a7a]]
-                                                 :group-by [:screen_name]
-                                                 :order-by [[1 :asc]]}))))}))
+  (let [settings (merge (config/settings)
+                        {:clover-templates (edn/read-string (slurp "./defs/clover-templates.edn"))
+                         :kits    {} ;;config/kit-fns
+                         :screens (vec (map :screen_name
+                                            (sql-query system-db
+                                                       (to-sql {:select   [:screen_name]
+                                                                :from     [[:screens :jj24a7a]]
+                                                                :group-by [:screen_name]
+                                                                :order-by [[1 :asc]]}))))})
+        fabric-patterns (fbc/get-fabric-patterns)
+        fabric-models   (fbc/get-fabric-models)
+        settings (-> settings
+                     (assoc-in [:runners :fabric :patterns] fabric-patterns)
+                     (assoc-in [:runners :fabric :models] fabric-models))]
+    settings))
 
 (defmethod wl/handle-request :get-settings
   [{:keys [client-name]}]
@@ -4581,9 +4599,10 @@
          client-name :rvbbit
          nowah (System/currentTimeMillis) ;; want to have a consistent timestamp for this
          signals-resolved (into {}
-                                (for [[k v] signals-map]
+                                (for [[k v] signals-map
+                                      :let [res-changed (resolve-changed-fn (get v :signal) k)]]
                                   {k (walk/postwalk-replace (get signals-resolve-map k)
-                                                            (resolve-changed-fn (get v :signal) k))}))
+                                                            res-changed)}))
          parts-work
          (into
           {} ;; important side effects / will transition to a doseq after debugging phase
@@ -4591,9 +4610,10 @@
             {kk (into
                  {}
                  (for [vvv  vv
-                       :let [rvv           (walk/postwalk-replace (get signals-resolve-map kk) (resolve-changed-fn vvv kk))
+                       :let [res-changed   (resolve-changed-fn vvv kk)
+                             rvv           (walk/postwalk-replace (get signals-resolve-map kk) res-changed)
                              honey-sql-str (to-sql {:select [[1 :vv]] :where rvv})
-                             result        (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))
+                             result        (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve1 kk res-changed])))
                              part-key      (keyword (str "part-" (cstr/replace (str kk) ":" "") "-" (ut/index-of vv vvv)))
                              _ (when true ;(not= result (get @last-signals-atom part-key))
                                  (swap! last-signals-history-atom-temp assoc-in
@@ -4616,7 +4636,7 @@
          (into {} ;; all side effects / will transition to a doseq after debugging phase
                (for [[kk vv] signals-resolved
                      :let    [honey-sql-str (to-sql {:select [[1 :vv]] :where vv})
-                              result        (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve kk])))
+                              result        (true? (ut/ne? (sql-query ghost-db honey-sql-str [:ghost-signal-resolve2 kk vv])))
                               _ (when true ;(not= result (get @last-signals-atom kk))  ;; no
                                   (swap! last-signals-history-atom-temp assoc-in
                                          [kk kk]
@@ -5503,6 +5523,8 @@
          (swap! clover-sql-training-atom assoc clover-sql data-map))
        (catch Throwable e (ut/pp [:error-in-clover-sql-training-harvest! (str e)]))))
 
+(defonce quick-sniff-hash (atom {}))
+
 (defn query-runstream
   [kind ui-keypath honey-sql client-cache? sniff? connection-id client-name page panel-key clover-sql deep-meta? snapshot-cache?]
   (doall
@@ -5881,14 +5903,16 @@
                                                  ))))
                       (when sniff-worthy? ;; want details, but not yet the full expensive meta
                         ;(enqueue-task
-                        (qp/serial-slot-queue :general-serial :general
+                        
+                        (when (not= (hash honey-sql) (get @quick-sniff-hash [cache-table-name client-name]))
+                          (qp/serial-slot-queue :general-serial :general
                         ;(ppy/execute-in-thread-pools :general-serial                      
-                                              (fn []
-                                                (swap! sql/query-history assoc
-                                                       cache-table-name
-                                                       {:honey-sql honey-sql :connection-id connection-id})
-                                                (doall
-                                                 (let [resultv (vec (for [r result] (assoc r :rows 1)))] ;;; hack to
+                                                (fn []
+                                                  (swap! sql/query-history assoc
+                                                         cache-table-name
+                                                         {:honey-sql honey-sql :connection-id connection-id})
+                                                  (doall
+                                                   (let [resultv (vec (for [r result] (assoc r :rows 1)))] ;;; hack to
                                                   ;;  (when (not= (first ui-keypath) :solvers) ;; solvers have their
                                                   ;;    (if false ;snapshot-cache?
                                                   ;;      (insert-rowset-snap result
@@ -5902,17 +5926,19 @@
                                                   ;;                     client-name
                                                   ;;                     (keys (first result))))
                                                   ;;    )
-                                                   (cruiser/captured-sniff "cache.db"
-                                                                           connection-id
-                                                                           target-db
-                                                                           cache-db
-                                                                           result-hash
-                                                                           [:= :table-name cache-table-name]
-                                                                           true
-                                                                           resultv)
+                                                     (cruiser/captured-sniff "cache.db"
+                                                                             connection-id
+                                                                             target-db
+                                                                             cache-db
+                                                                             result-hash
+                                                                             [:= :table-name cache-table-name]
+                                                                             true
+                                                                             resultv)
                                     ;; (ut/pp [[:quick-sniff-for (first ui-keypath)] :via client-name ui-keypath
                                     ;;         filtered-req-hash])
-                                                   ))))))
+                                                     ))))
+                                                     (swap! quick-sniff-hash assoc [cache-table-name client-name] (hash honey-sql))
+                                                     )))
                     (do ;(swap! sql-cache assoc req-hash output)
                       (when client-cache? (insert-into-cache req-hash output)) ;; no point to
                       output)))))
@@ -6732,6 +6758,20 @@
 ;;        \newline
 ;;        (conj (vec (cons color-code (figlet/render flf text))) reset-code))))))
 
+(defn stacktrace-element->map [^StackTraceElement element]
+  {:class-name (.getClassName element)
+   :file-name (.getFileName element)
+   :line-number (.getLineNumber element)
+   :method-name (.getMethodName element)
+   :native? (.isNativeMethod element)})
+
+(defn stacktrace->map [^Throwable thrown-error]
+  (let [cause (.getCause thrown-error)]
+    {:type (class thrown-error)
+     :message (.getMessage thrown-error)
+     :stacktrace (mapv stacktrace-element->map (.getStackTrace thrown-error))
+     :cause (when cause (stacktrace->map cause))}))
+
 (defn fig-render
   [text & [color flf]]
   (let [;_ (println color (keyword? color))
@@ -6744,6 +6784,9 @@
      (cstr/join
       \newline
       (conj (vec (cons color-code (vec (figlet/render flf (str text))))) reset-code)))))
+
+;; (take-last 123 [34.5345345])
+;; (apply min [34.5345345])
 
 (defn draw-bar-graph [usage-vals label-str symbol-str & {:keys [color freq agg width] :or {color :default freq 1 agg "avg"}}]
   (try
@@ -6784,41 +6827,33 @@
           border-bottom (str "╰" border-line "╯")
           time-span (count truncated)
           seconds (* time-span freq) ;(rem time-span 60)
-          ;; trend (let [first-half  (take (/ (count truncated) 2) truncated)
-          ;;             second-half (drop (/ (count truncated) 2) truncated)
-          ;;             avg-sec     (ut/avg second-half)
-          ;;             avg-first   (ut/avg first-half)
-          ;;             raw-pct     (* (/ (- avg-sec avg-first) avg-sec) 100)
-          ;;             pct-chg     (Math/ceil raw-pct)]
-          ;;         (cond
-          ;;           (> pct-chg 0) "up"
-          ;;           (< pct-chg 0) "down"
-          ;;           :else "stable"))
-          trend (let [hchunk      (Math/floor (/ (count truncated) 2))
-                      first-half  (take hchunk truncated)
-                      second-half (drop hchunk truncated)
-                      avg-sec     (ut/avgf second-half)
-                      avg-first   (ut/avgf first-half)
-                      raw-pct     (* (/ (- avg-sec avg-first) avg-first) 100)
-                      pct-chg     (Math/abs (Math/ceil raw-pct))
-                      direction   (cond (> raw-pct 0) "up"
-                                        (< raw-pct 0) "down"
-                                        :else "stable")
-                      magnitude   (cond
-                                    (>= pct-chg 50) "dramatically"
-                                    (>= pct-chg 25) "significantly"
-                                    (>= pct-chg 10) "noticeably"
-                                    (>= pct-chg 5)  "moderately"
-                                    (>= pct-chg 1)  "slightly"
-                                    :else           "marginally")]
-                  (cond
-                    (and (= direction "stable")
-                         (= avg-first avg-sec))
-                    "flat"
-                    (and (= direction "stable")
-                         (= (Math/floor avg-sec) (Math/floor avg-first)))
-                    "mostly stable"
-                    :else (str magnitude " " direction)))
+          trend (try
+                  (let [hchunk      (Math/floor (/ (count truncated) 2))
+                        first-half  (take hchunk truncated)
+                        second-half (drop hchunk truncated)
+                        avg-sec     (ut/avgf second-half)
+                        avg-first   (ut/avgf first-half)
+                        raw-pct     (* (/ (- avg-sec avg-first) avg-first) 100)
+                        pct-chg     (Math/abs (Math/ceil raw-pct))
+                        direction   (cond (> raw-pct 0) "up"
+                                          (< raw-pct 0) "down"
+                                          :else "stable")
+                        magnitude   (cond
+                                      (>= pct-chg 50) "dramatically"
+                                      (>= pct-chg 25) "significantly"
+                                      (>= pct-chg 10) "noticeably"
+                                      (>= pct-chg 5)  "moderately"
+                                      (>= pct-chg 1)  "slightly"
+                                      :else           "marginally")]
+                    (cond
+                      (and (= direction "stable")
+                           (= avg-first avg-sec))
+                      "flat"
+                      (and (= direction "stable")
+                           (= (Math/floor avg-sec) (Math/floor avg-first)))
+                      "mostly stable"
+                      :else (str magnitude " " direction)))
+                      (catch Throwable _ "not enough data"))
           label (str label-str
                      (str " (last " (ut/format-duration-seconds seconds) " / " trend ")")
                      " | max "  (ut/nf (float (apply max truncated))) (when (not (= "%" symbol-str)) " ") symbol-str
@@ -6841,7 +6876,10 @@
                                               row-data))
                            padding (apply str (repeat (- console-width (count (cstr/replace graph-data #"\u001B\[[0-9;]*[mGK]" "")) 3) " "))]
                        (str "│ " graph-data padding "│")))
-          legend (str "  (each segment is " (ut/format-duration-seconds (* time-marker-interval freq)) " - each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str " **" agg)) ")")
+          agg-label (str ", " (if (= agg "avg") "averaged" "summed"))
+          legend (str (when (> freq 1)
+                        (str " freq: " freq))
+                      " (each segment is " (ut/format-duration-seconds (* time-marker-interval freq)) " - each tick is " (ut/format-duration-seconds freq) (when (> freq 1) (str " " agg-label)) ")")
           legend (cstr/replace legend ", -" " -")]
       (println border-top)
       (println label-row)
@@ -6870,7 +6908,9 @@
       (println border-bottom)
       (println (str "\u001B[1m" (colorize legend) reset-code)))
     (catch Throwable e
-      (ut/pp [:bar-graph-error! (str e) label-str (count usage-vals) :ex-vals-passed (vec (take 10 usage-vals))]))))
+      (ut/pp [:bar-graph-error! (str e) 
+              ;;(stacktrace->map e)
+              label-str (count usage-vals) :ex-vals-passed (vec (take 10 usage-vals))]))))
 
 
 ;; (draw-client-stats nil [30] nil true 300 {:metrics-atom sql-metrics})
@@ -6999,15 +7039,21 @@
              :avg-exec (ut/avgf (map last (filter #(= (first %) dbname) @sql/sql-query-log)))
              :rows (apply + (vals dbtables))}})))
     
-(ut/pp (database-sizes))
+;;(ut/pp (database-sizes))
 
+;; (ut/pp (sql-exec system-db "CREATE INDEX idx_client_name ON client_memory(client_name);"))
+;; (ut/pp (sql-exec system-db "CREATE INDEX idx_ts ON client_memory(ts);"))
+;; (ut/pp (sql-exec system-db "CREATE INDEX idx_client_name2 ON client_memory(client_name, ts);"))
+;; (ut/pp (sql-exec system-db "CREATE INDEX idx_ts1 ON jvm_stats(ts);"))
+
+;;(ut/pp [:test])
 
 ;; (ut/pp @sql-metrics)
 
 ;; (ut/pp @client-metrics)
 ;; (draw-client-stats nil [30 90 240] [:mem-mb :latency :messages-per-second] true 200)
 ;; (draw-client-stats nil [30] [:mem-mb :latency :recent-messages-per-second] true 300)
-;; (draw-client-stats nil [30] nil true 300 {:metrics-atom sql-metrics})
+;; (draw-client-stats nil [10 ] nil true 260 {:metrics-atom sql-metrics})
 ;; (draw-pool-stats)
 ;; (draw-stats :cpu)
 

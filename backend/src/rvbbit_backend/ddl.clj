@@ -1147,10 +1147,10 @@ group by 1, 2) tt on s.client_name = tt.client_name
                                             kk   (ut/unkeyword k)]
                                         (str kk " " type " NULL,"))))]
          ;(ut/pp [:debug field-types (keys (first rowset))])
-         (str " -- drop table if exists "
-              sample-table-name-str
-              ";
-           create table if not exists "
+         (str  ;; " -- drop table if exists "
+              ;; sample-table-name-str
+              ;; ";
+           " create table if not exists "
               sample-table-name-str
               "
   ("

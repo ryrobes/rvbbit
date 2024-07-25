@@ -1759,26 +1759,34 @@
 (re-frame/reg-sub
  ::local-namespaces-for
  (fn [db {:keys [runner-key]}]
-   (let [panels-map (get db :panels)
+   (let [;panels-map (get db :panels)
          ;selected-tab (get db :selected-tab)
          ;panel-keys (set (keys (bricks/only-relevant-tabs panels-map selected-tab)))
          ;;_ (ut/tapp>> [:panel-keys runner-key])
-         ;panel-keys @(ut/tracked-sub ::bricks/relevant-tab-panels-set {})
-         ;pkb (select-keys (get db :panels) panel-keys)
+         panel-keys @(ut/tracked-sub ::bricks/relevant-tab-panels-set {})
+         panels-map (select-keys (get db :panels) panel-keys)
          ]
      (vec (distinct (find-ns-declarations (for [[_ v] panels-map] (vals (get v runner-key)))))))))
 
 ;; (ut/tapp>> [:ns @(ut/tracked-sub ::local-namespaces-for {:runner-key :clojure})]) 
 
-(defonce selected-mode (reagent/atom (merge (select-keys ;; set default to clover ("views")
-                                             (get @(ut/tracked-sub ::bricks/hop-bar-runners {}) :views)
-                                             [:icon :description :type :syntax]) {:name :clover})))
+(defonce base-hop-bar-runner (merge (select-keys ;; set default to clover ("views")
+                                 (get @(ut/tracked-sub ::bricks/hop-bar-runners {}) :views)
+                                 [:icon :description :type :syntax]) 
+                                    {:name :clover
+                                     :description "Evaluate a Clover expression - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
+                                     :icon "🍀"}))
+
+(defonce selected-mode (reagent/atom base-hop-bar-runner))
+
 (def hop-bar-tooltip (reagent/atom nil))
 (defonce cm-instance (reagent/atom nil))
 (defonce hide-responses? (reagent/atom false))
 (def console-responses (reagent/atom {})) 
 (def console-history (reagent/atom #{})) 
 (defonce ns-selected (reagent/atom {}))
+(defonce fbc-selected (reagent/atom {}))
+(defonce fbc-selected-model (reagent/atom {}))
 (def over-hop-bar (reagent/atom false))
 
 (defn insert-response-block [w h data runner syntax]
@@ -1903,7 +1911,7 @@
         modes           (vec (for [[k m] modes] (merge m {:name k})))
         current-index   (.indexOf modes current-mode)
         next-index      (mod (inc current-index) (count modes))]
-    (get modes next-index)))
+    (get modes next-index base-hop-bar-runner)))
 
 (defn hop-render-icon [i]
   (if (vector? i) [re-com/h-box
@@ -1927,8 +1935,11 @@
   (let [hh (* 2  db/brick-size)
         reacts! [@console-responses @console-history @hide-responses? @ns-selected]
         nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
+        is-fabric? (= (get @selected-mode :name) :fabric)
+        fabric-settings (when is-fabric? @(ut/tracked-sub ::bricks/fabric-settings {}))
         has-nss? (ut/ne? nss)
         ww (Math/floor (* ww  0.8))]
+    (ut/tapp>> [:fabric-settings fabric-settings])
     [re-com/v-box
      :size "none"
      :attr {:on-mouse-enter #(reset! over-hop-bar true)
@@ -1962,7 +1973,57 @@
 
                                                   (if (not @hide-responses?)
                                                     (str (get @console-responses (last @console-history) "")) ""))]
-                                        (when has-nss?
+                                        (cond
+                                          is-fabric?
+                                          [re-com/v-box
+                                           :children [(when (get @fbc-selected (get @selected-mode :name))
+                                                        [re-com/h-box
+                                                         :padding "6px"
+                                                         :gap "10px"
+                                                         :style {:font-size "14px"}
+                                                         :children (vec (for [n (get-in fabric-settings [:models (get @fbc-selected (get @selected-mode :name))])
+                                                                              :let [cc (theme-pull :theme/editor-outer-rim-color nil)
+                                                                                    ccx (ut/choose-text-color cc)
+                                                                                    selected? (= n (get @fbc-selected-model (get @selected-mode :name)))]]
+                                                                          [re-com/box
+                                                                           :padding "5px"
+                                                                           :attr {:on-click #(do
+                                                                                               (swap! fbc-selected-model assoc (get @selected-mode :name) (if selected? nil n))
+                                                                                               (when @cm-instance  (.focus @cm-instance)))}
+                                                                           :style {:background-color (when selected? cc)
+                                                                                   :color (when selected? ccx)
+                                                                                   :cursor "pointer"
+                                                                                   :border-radius "5px"
+                                                                                   :font-weight 500}
+                                                                           :child (str n)]))])
+
+                                                      [re-com/h-box
+                                                       :padding "6px"
+                                                       :gap "10px"
+                                                       :children (vec (for [n (keys (get fabric-settings :models))
+                                                                            :let [cc (theme-pull :theme/editor-outer-rim-color nil)
+                                                                                  ccx (ut/choose-text-color cc)
+                                                                                  cnt (count (get-in fabric-settings [:models n]))
+                                                                                  selected? (= n (get @fbc-selected (get @selected-mode :name)))]]
+                                                                        [re-com/box
+                                                                         :padding "5px"
+                                                                         :attr {:on-click #(do
+                                                                                             (swap! fbc-selected assoc (get @selected-mode :name) (if selected? nil n))
+                                                                                             (when @cm-instance  (.focus @cm-instance)))}
+                                                                         :style {:background-color (when selected? cc)
+                                                                                 :color (when selected? ccx)
+                                                                                 :cursor "pointer"
+                                                                                 :border-radius "5px"
+                                                                                 :font-weight 700}
+                                                                         :child [re-com/h-box
+                                                                                 :gap "8px"
+                                                                                 :children [[re-com/box
+                                                                                             :child (str n)]
+                                                                                            [re-com/box
+                                                                                             :style {:opacity 0.5}
+                                                                                             :child (str cnt)]]]]))]]]
+
+                                          has-nss?
                                           [re-com/h-box
                                            :padding "6px"
                                            :gap "10px"
@@ -1982,7 +2043,8 @@
                                                                      :border-radius "5px"
                                                                      ;:font-size "14px"
                                                                      :font-weight 700}
-                                                             :child (str n)]))])]]
+                                                             :child (str n)]))]
+                                          :else nil)]]
                             (when
                              (and (not @hide-responses?)
                                   (get @console-responses (last @console-history)))
@@ -1991,7 +2053,7 @@
                                :style {:font-size "16px"
                                        :opacity 0.5}])]
                  :height (if
-                          (or @hop-bar-tooltip has-nss?
+                          (or @hop-bar-tooltip has-nss? is-fabric? 
                               (and (not @hide-responses?)
                                    (get @console-responses (last @console-history)))) 
                            "auto" "0px")

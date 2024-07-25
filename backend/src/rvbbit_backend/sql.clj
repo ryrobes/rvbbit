@@ -11,6 +11,7 @@
    [honey.sql           :as honey]
    [rvbbit-backend.util :as ut]
    [rvbbit-backend.queue-party :as qp]
+   [rvbbit-backend.pool-party :as ppy]
    [taskpool.taskpool   :as tp]))
 
 
@@ -186,7 +187,8 @@
 (defn insert-error-row!
   [error-db-conn query error] ;; warning uses shit outside of what it is passed!!!
   (swap! errors conj [(str error) (str error-db-conn) query])
-  (ut/pp {:sql-error! error :error-db-conn error-db-conn :query (try (subs (str query) 0 1000) (catch Throwable _ (str query)))}))
+  ;; (ut/pp {:sql-error! error :error-db-conn error-db-conn :query (try (subs (str query) 0 1000) (catch Throwable _ (str query)))})
+  )
 
 
 
@@ -250,7 +252,7 @@
         (catch Exception e
           (let [end-time (System/nanoTime) ;; Capture end time in case of exception
                 execution-time-ms (/ (- end-time start-time) 1e6)] ;; Calculate execution time in milliseconds
-            (do (ut/pp {:sql-query-fn-error e :query query :extra (when extra extra)})
+            (do ;(ut/pp {:sql-query-fn-error e :query query :extra (when extra extra)})
                 (insert-error-row! db-spec query e)
                 [{:query_error (str (.getMessage e))} 
                  {:query_error "(from database connection)"}
@@ -276,7 +278,10 @@
 
 
 
-(defn sql-exec2 ;; used for rowset-sql-query, diff use case, not need to run serially
+
+
+
+(defn sql-exec2-old ;; used for rowset-sql-query, diff use case, not need to run serially
   [db-spec query & [extra]]
   (jdbc/with-db-transaction [t-con db-spec {:isolation :read-uncommitted}]
                             (try (jdbc/db-do-commands t-con query)
@@ -284,6 +289,12 @@
                                    (do (ut/pp (merge {:sql-exec-fn-error e :db-spec db-spec :query query}
                                                      (if extra {:ex extra} {})))
                                        (insert-error-row! db-spec query e))))))
+
+
+
+
+
+
 
 
 ;; (def task-queue-sql (java.util.concurrent.LinkedBlockingQueue.))
@@ -361,9 +372,34 @@
 (defn sql-exec
   [db-spec query & [extra]]
   ;(enqueue-task-sql db-spec
-  (let [queue-name (or (try (get extra :queue :general-sql) (catch Exception _ :general-sql)) :general-sql)]
-    (qp/serial-slot-queue
-     :sql-serial queue-name
+  (let [;queue-name (or (try (get extra :queue :general-sql) (catch Exception _ :general-sql)) :general-sql)
+        db-kw (-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)]
+     ;(qp/serial-slot-queue :sql-serial :sql
+     (ppy/execute-in-thread-pools-but-deliver :sql-serial-everything
+     ;(keyword (str "sql-serial/" (cstr/replace (str db-kw) ":" ""))) ;; :sql-serial db-kw ;; (str db-spec) ;; queue-name
+     (fn []
+       (swap! sql-exec-run inc)
+       (swap! sql-exec-log conj [db-kw
+                                 (str (try (subs (str query) 0 100)
+                                           (catch Throwable _ (str query))))])
+       (jdbc/with-db-connection [t-con db-spec]
+         (try (jdbc/db-do-commands t-con query)
+              (catch Exception e
+                (do ;(ut/pp (merge {:sql-exec-fn-error e
+                    ;               :db-spec           db-spec
+                    ;               :query             (try (subs (str query) 0 1000)
+                    ;                                       (catch Throwable _ (str query)))}
+                    ;              (if extra {:ex extra} {})))
+                    (insert-error-row! db-spec query e)))))))))
+
+
+
+(defn sql-exec2
+  [db-spec query & [extra]]
+  ;(enqueue-task-sql db-spec
+  (let [queue-name (str db-spec)]
+    ;(qp/serial-slot-queue :sql-serial2 queue-name
+    (ppy/execute-in-thread-pools-but-deliver :sql-serial-everything ;;:serial-filter-sql-db
      (fn []
        (swap! sql-exec-run inc)
        (swap! sql-exec-log conj [(-> (last (cstr/split (str (:datasource db-spec)) #" ")) (cstr/replace "(" "") (cstr/replace ")" "") keyword)
@@ -372,12 +408,15 @@
        (jdbc/with-db-connection [t-con db-spec]
          (try (jdbc/db-do-commands t-con query)
               (catch Exception e
-                (do (ut/pp (merge {:sql-exec-fn-error e
-                                   :db-spec           db-spec
-                                   :query             (try (subs (str query) 0 1000)
-                                                           (catch Throwable _ (str query)))}
-                                  (if extra {:ex extra} {})))
+                (do ;(ut/pp (merge {:sql-exec-fn-error e
+                    ;               :db-spec           db-spec
+                    ;               :query             (try (subs (str query) 0 1000)
+                    ;                                       (catch Throwable _ (str query)))}
+                    ;              (if extra {:ex extra} {})))
                     (insert-error-row! db-spec query e)))))))))
+
+
+
 
 
 

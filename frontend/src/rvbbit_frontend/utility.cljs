@@ -127,7 +127,7 @@
   (let [type-label   (case ttype
                        :bricks "foreground"
                        :conn "background"
-                       :else "background*")
+                       :resolver "background-resolver")
         string-limit 70
         ;icon @(tracked-sub ::runner-icon {:rtype rtype})
         ]

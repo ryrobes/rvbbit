@@ -1905,6 +1905,7 @@
  (undoable)
  (fn [db [_ keypath value]]
    (tapp>> [:update-raw keypath value])
+   (ut/tracked-dispatch [::update-panels-hash])
    (if (not (= (get-in db keypath) value))
      (assoc-in db keypath value)
      db)))
@@ -11821,10 +11822,10 @@
    (if (not @on-scrubber?) ;; dont want to push updates during scrubbing
      (let [pp          (get db :panels)
            ;;ppr         {} ;;; TEMP!
-           ppr         (into {} (for [[k v] pp] ;; super slow and lags out clients when panels edited
-                                  {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace vv)})))}))
-           ppm         (into {}  (for [[k v] pp] ;; super slow and lags out clients when panels edited
-                                   {k (materialize-values v)}))
+          ;;  ppr         (into {} (for [[k v] pp] ;; super slow and lags out clients when panels edited
+          ;;                         {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace vv)})))}))
+          ;;  ppm         (into {}  (for [[k v] pp] ;; super slow and lags out clients when panels edited
+          ;;                          {k (materialize-values v)}))
            new-h       (hash (ut/remove-underscored pp))
            client-name (get db :client-name)]
        (tapp>> [:running :update-panels-hash :event :expensive! "full send of all panels to server"])
@@ -11833,8 +11834,8 @@
         [::wfx/push :default
          {:kind :current-panels
           :panels pp
-          :materialized-panels ppm
-          :resolved-panels ppr
+          :materialized-panels {} ;ppm
+          :resolved-panels {} ;ppr
           :client-name client-name}])
        (when (get db :buffy?) (ut/dispatch-delay 2000 [::refresh-history-log]))
        (assoc db :panels-hash new-h))
@@ -11851,46 +11852,70 @@
                  :when (not= (get v :hop-bar?) false)]
              {k (select-keys v [:icon :description :type :syntax])})))))
 
+(re-frame/reg-sub
+ ::fabric-settings
+ (fn [db _]
+   (get-in db [:server :settings :runners :fabric])))
 
-(re-frame/reg-sub ::panels-hash (fn [db _] (get db :panels-hash "not-yet!")))
 
-(re-frame/reg-sub ::panels-hash-singles (fn [db _] (get db :panel-hashes)))
+(re-frame/reg-sub 
+ ::panels-hash 
+ (fn [db _] 
+   (get db :panels-hash "not-yet!")))
 
-(re-frame/reg-sub ::panels (fn [db _] (get db :panels)))
+(re-frame/reg-sub 
+ ::panels-hash-singles 
+ (fn [db _] 
+   (get db :panel-hashes)))
 
-(re-frame/reg-event-db ::toggle-minimize-block
-                       (undoable)
-                       (fn [db [_ panel-id]]
-                         (assoc-in db [:panels panel-id :minimized?] (not (get-in db [:panels panel-id :minimized?] false)))))
+(re-frame/reg-sub 
+ ::panels 
+ (fn [db _] 
+   (get db :panels)))
 
-(re-frame/reg-event-db ::toggle-pin-block
-                       (undoable)
-                       (fn [db [_ panel-id]]
-                         (assoc-in db [:panels panel-id :pinned?] (not (get-in db [:panels panel-id :pinned?] false)))))
+(re-frame/reg-event-db
+ ::toggle-minimize-block
+ (undoable)
+ (fn [db [_ panel-id]]
+   (assoc-in db [:panels panel-id :minimized?] 
+             (not (get-in db [:panels panel-id :minimized?] false)))))
 
-(re-frame/reg-event-db ::toggle-icon-block
-                       (undoable)
-                       (fn [db [_ panel-id]]
-                         (assoc-in db [:panels panel-id :iconized?] (not (get-in db [:panels panel-id :iconized?] false)))))
+(re-frame/reg-event-db
+ ::toggle-pin-block
+ (undoable)
+ (fn [db [_ panel-id]]
+   (assoc-in db [:panels panel-id :pinned?] 
+             (not (get-in db [:panels panel-id :pinned?] false)))))
 
-(re-frame/reg-event-db ::launch-clone
-                       (undoable)
-                       (fn [db [_ panel-id]]
-                         (let [pid     (ut/safe-key (keyword (str (ut/safe-name panel-id) "-window")))
-                               [nx ny] (vec (map #(js/Math.floor (/ % db/brick-size)) @db/context-modal-pos))
-                               orig    (get-in db [:panels panel-id])
-                               new     (-> orig
-                                           (assoc :tab (get db :selected-tab))
-                                           (assoc :root [nx ny])
-                                           (assoc :z (+ 10 (get-in db [:panels @over-block :z] 11)))
-                                           (assoc :window (str "spawned-from-icon-of_" panel-id))
-                                           (assoc :pinned? false)
-                                           (assoc :iconized? false))]
-                           (assoc-in db [:panels pid] new))))
+(re-frame/reg-event-db
+ ::toggle-icon-block
+ (undoable)
+ (fn [db [_ panel-id]]
+   (assoc-in db [:panels panel-id :iconized?] 
+             (not (get-in db [:panels panel-id :iconized?] false)))))
 
-(re-frame/reg-event-db ::move-to-current-tab
-                       (undoable)
-                       (fn [db [_ panel-id]] (assoc-in db [:panels panel-id :tab] (get db :selected-tab))))
+(re-frame/reg-event-db
+ ::launch-clone
+ (undoable)
+ (fn [db [_ panel-id]]
+   (let [pid     (ut/safe-key (keyword (str (ut/safe-name panel-id) "-window")))
+         [nx ny] (vec (map #(js/Math.floor (/ % db/brick-size)) @db/context-modal-pos))
+         orig    (get-in db [:panels panel-id])
+         new     (-> orig
+                     (assoc :tab (get db :selected-tab))
+                     (assoc :root [nx ny])
+                     (assoc :z (+ 10 (get-in db [:panels @over-block :z] 11)))
+                     (assoc :window (str "spawned-from-icon-of_" panel-id))
+                     (assoc :pinned? false)
+                     (assoc :iconized? false))]
+     (assoc-in db [:panels pid] new))))
+
+(re-frame/reg-event-db
+ ::move-to-current-tab
+ (undoable)
+ (fn [db [_ panel-id]] 
+   (assoc-in db [:panels panel-id :tab] 
+             (get db :selected-tab))))
 
 
 

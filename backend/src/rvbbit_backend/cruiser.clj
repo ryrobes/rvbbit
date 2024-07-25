@@ -14,6 +14,7 @@
     [rvbbit-backend.ddl        :as sqlite-ddl] ;; needed for hardcoded rowset-sql-query usage
     [rvbbit-backend.util       :as ut]
     [rvbbit-backend.surveyor   :as surveyor]
+   [rvbbit-backend.pool-party  :as ppy]
     [rvbbit-backend.sql        :as    sql
                                :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db
                                        insert-error-row! to-sql pool-create]]
@@ -68,7 +69,7 @@
 (def filter-db
   {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:./db/filter.db?auto_vacuum=FULL" ; "jdbc:sqlite:file:filterdb?mode=memory&auto_vacuum=FULL"
                               :jdbc-url    "jdbc:sqlite:file:./db/filter.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
-                              :auto_vacuum "FULL"
+                              ;:auto_vacuum "FULL"
                               :cache       "shared"}
                              "filter-db")})
 
@@ -78,16 +79,16 @@
    (via a honey-sql map) and returns it"
   [rowset query & columns-vec]
   (when (ut/ne? rowset)
-    (let [rando-name                  (str "rowset" (rand-int 12345567)) ;; prevent
+    (let [rando-name                  (cstr/replace (str "rowset" (hash [rowset columns-vec])) "-" "__") 
           rowset-type                 (cond (and (map? (first rowset)) (vector? rowset))       :rowset
                                             (and (not (map? (first rowset))) (vector? rowset)) :vectors)
           columns-vec-arg             (first columns-vec)
           columns-vec-arg-underscores (edn/read-string (cstr/replace (str columns-vec-arg) #"-" "_")) ;; ugly,
-          db-conn-old                 {:classname   "org.sqlite.JDBC"
-                                       :subprotocol "sqlite"
-                                       :auto_vacuum "FULL"
-                                       :subname     "::memory::?auto_vacuum=FULL" ;; "file:filterdb?mode=memory&auto_vacuum=FULL"
-                                      }
+          ;; db-conn-old                 {:classname   "org.sqlite.JDBC"
+          ;;                              :subprotocol "sqlite"
+          ;;                              :auto_vacuum "FULL"
+          ;;                              :subname     "::memory::?auto_vacuum=FULL" ;; "file:filterdb?mode=memory&auto_vacuum=FULL"
+          ;;                             }
           db-conn                     filter-db ;; ^^^
           rowset-fixed                (if (= rowset-type :vectors) (vec (for [r rowset] (zipmap columns-vec-arg r))) rowset)
           asort                       (fn [m order]
@@ -98,7 +99,9 @@
           values                      (vec (for [r rowset-fixed] (vals r)))
           ddl-str                     (sqlite-ddl/create-attribute-sample rando-name rowset-fixed) ;; has
           insert-sql                  (to-sql {:insert-into [(keyword rando-name)] :columns columns :values values})
-          query-sql                   (to-sql (assoc query :from [(keyword rando-name)]))]
+          query-sql                   (to-sql (assoc query :from [(keyword rando-name)]))
+          ;;_ (ut/pp [:rowset-sql-query rando-name ddl-str insert-sql query-sql])
+          ]
       (sql-exec2 db-conn ddl-str)
       ;(sql-exec db-conn ddl-str)
       (sql-exec2 db-conn insert-sql)
@@ -1419,7 +1422,8 @@
               pw (java.io.PrintWriter. sw)]
           (.printStackTrace e pw)
           (ut/pp [:error-running-whirl f-path sql-filter target-db (str e) (.toString sw)])
-          (insert-error-row! target-db (str (str e) (.toString sw)) {:sql-filter sql-filter}))))))
+          (insert-error-row! target-db (str (str e) (.toString sw)) {:sql-filter sql-filter})
+          )))))
 
 (defn insert-rowset
   [rowset table-name db-conn & columns-vec] ;; special version for captured sniff
@@ -1462,13 +1466,15 @@
 
 (defn captured-sniff
   [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset]]
-  (swap! sniffs inc)
-  (doall
-    (let [res?     (not (nil? resultset))
-          cols     (keys (first resultset))
-          src-conn (if res? tmp-db-src1 src-conn)]
-      (when res? (insert-rowset resultset (last sql-filter) src-conn cols)) ;; if passed
-      ((if quick? lets-give-it-a-whirl-no-viz lets-give-it-a-whirl)
+ (ppy/execute-in-thread-pools
+  (keyword (cstr/lower-case (cstr/replace (str "captured-sniff/" (last sql-filter)) ":" "")))
+  (fn [] (swap! sniffs inc)
+    (doall
+     (let [res?     (not (nil? resultset))
+           cols     (keys (first resultset))
+           src-conn (if res? tmp-db-src1 src-conn)]
+       (when res? (insert-rowset resultset (last sql-filter) src-conn cols)) ;; if passed
+       ((if quick? lets-give-it-a-whirl-no-viz lets-give-it-a-whirl)
         src-conn-id
         src-conn
         dest
@@ -1477,18 +1483,18 @@
         default-derived-fields
         default-viz-shapes
         sql-filter) ;[:= :table-name "viz_recos_vw"]
-      (let [sniff-rows (sql/fetch-all-tables dest quick?)
-            sniff-rows (-> sniff-rows
-                           (dissoc :rules_maps_attributes)
-                           (dissoc :rules_maps_derived_fields)
-                           (dissoc :rules_maps_tests)
-                           (dissoc :rules_maps_viz_shapes)
-                           (dissoc :status))
-            sniff-rows (dissoc sniff-rows :connections)]
-        (sql/insert-all-tables sniff-rows (last sql-filter))
-        (doseq [k (keys sniff-rows)] (sql-exec dest (to-sql {:delete-from [k]})))
-        (when res? (sql-exec src-conn (to-sql {:drop-table [(last sql-filter)]}))) ;)
-        nil))))
+       (let [sniff-rows (sql/fetch-all-tables dest quick?)
+             sniff-rows (-> sniff-rows
+                            (dissoc :rules_maps_attributes)
+                            (dissoc :rules_maps_derived_fields)
+                            (dissoc :rules_maps_tests)
+                            (dissoc :rules_maps_viz_shapes)
+                            (dissoc :status))
+             sniff-rows (dissoc sniff-rows :connections)]
+         (sql/insert-all-tables sniff-rows (last sql-filter))
+         (doseq [k (keys sniff-rows)] (sql-exec dest (to-sql {:delete-from [k]})))
+         (when res? (sql-exec src-conn (to-sql {:drop-table [(last sql-filter)]}))) ;)
+         nil))))))
 
 
 

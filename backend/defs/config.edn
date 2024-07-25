@@ -37,11 +37,11 @@
            :views   {:default []
                      :modes [:clover :edn]
                      :ext ".edn"
-                     :description "Evaluate a Clover experssion - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
+                     :description "Evaluate a Clover expression - the main DSL of all Rabbit view blocks. Can also mutate data via special shortcodes."
                      :icon "🍀"} ;; basic clover render
 
            ;; ^ these 2 are built in a required and mostly not configurable for now
-           :clojure-intro {:type :nrepl ;; this is the built-in REPL that starts by default
+           :clojure-intro {:type :nrepl ;; this is the built-in REPL that starts by default  
                            :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
                            :modes [:clover :text :data  :terminal]
                            :hop-function? true
@@ -128,6 +128,43 @@
                                   :data :clover-body}]
                      :description "Run a Clojure expression and return the result. Uses the internal RVBBIT nREPL, has access to all rvbbit-backend.* namespaces."
                      :icon "images/clojure-alt.svg"}
+           
+           :fabric {:type :nrepl
+                    :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
+                    :modes [:text :data :terminal]
+                    :default "funny tweet about rabbits and clojure"
+                    :syntax "text"
+                    :ext ".txt"
+                    ;:hop-function? true
+                    :clover-fn [:run-solver
+                                {:signal false
+                                 :cache? false
+                                 :type :clojure
+                                 :input-map {}
+                                 :data (let [command (rvbbit-backend.fabric/fabric :input (str :clover-body) :pattern "tweet" :model "gpt-4o")
+                                             process-builder (ProcessBuilder. (into-array ["sh" "-c" command]))
+                                             _ (.redirectErrorStream process-builder true)
+                                             process (.start process-builder)
+                                             reader (java.io.BufferedReader.
+                                                     (java.io.InputStreamReader.
+                                                      (.getInputStream process)))
+                                             output (StringBuilder.)]
+
+                                         (loop []
+                                           (when-let [line (.readLine reader)]
+                                             (.append output line)
+                                             (.append output "\n")
+                                             (recur)))
+
+                                         (.waitFor process)
+
+                                         (let [result (str output)]
+                                           (if (empty? result)
+                                             "Command executed, but produced no output."
+                                             result)))}]
+                    :description "Fabric AI: Uses the Fabric command line tool to access various local and remote LLM models with pre-defined 'patterns', +special context-aware RVBBIT patterns."
+                    :icon "https://github.com/danielmiessler/fabric/blob/main/images/fabric-logo-gif.gif?raw=true"}
+           
            :shell {:type :nrepl ;; this is the built-in REPL that starts by default
                    :runner {:port 8181 :host "127.0.0.1"} ;; from 8181 default for test overnight
                    :modes [:text :data :terminal]

@@ -18,6 +18,7 @@
   :tables-sys
   [:db_schema :db_catalog :connection_id :schema_cat :table_name :fields],
   :new-query (:diff :mem_used :ts_hour),
+  :kick-812421489 [],
   :client-stats-drag-36
   [:ack
    :client_latency
@@ -83,7 +84,8 @@
    :col-widths {:batches 131, :packets 131, :ts 151}},
   :gen-viz-516
   {:cache? false,
-   :where [:= :client_name :*client-name-str],
+   :where
+   [:and [:>= :recent_messages_per_second 0] [:= :client_name :*client-name-str]],
    :limit 50,
    :group-by [:ts],
    :_last-run "21:23:00",
@@ -187,7 +189,8 @@
            (cond (> diff 0) "+" (< diff 0) "" :else "")]]
          (merge
            row
-           {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))}},
+           {:diff (if (= idx 0) (str (Math/round mb) " MB") (str pos diff))}))))},
+  :kick-812421489 {:select [:*], :from {:data [1 15 30 45 60 90 120 200 600]}}},
  :meta
  {nil
   {:fields
@@ -338,13 +341,13 @@
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {"325 MB" 1},
+     :commons {"221 MB" 1},
      :cardinality 100},
     :mem_used
     {:data-type "float",
      :distinct 1,
      :group-by? true,
-     :commons {3.409799243076923E8 1},
+     :commons {2.317015004318182E8 1},
      :cardinality 100},
     :ts_hour
     {:data-type "string",
@@ -353,6 +356,7 @@
      :commons {"2024-07-23 19" 1},
      :cardinality 100}},
    :rowcount 1},
+  :kick-812421489 {:fields {}},
   :new-clojure-3
   {:fields
    {:vec-val
@@ -597,74 +601,74 @@
     {:data-type "string",
      :distinct 1,
      :group-by? true,
-     :commons {":delightful-puce-codfish-41" 13},
-     :cardinality 7},
+     :commons {":delightful-puce-codfish-41" 44},
+     :cardinality 2},
     :recent_messages_per_second
     {:data-type "float",
-     :distinct 11,
+     :distinct 18,
      :group-by? true,
-     :commons {0.07 2, 5.6 2, 3.73 1},
-     :cardinality 84},
+     :commons {0.07 23, 2.53 2, 8.13 2},
+     :cardinality 40},
     :messages_per_second
     {:data-type "float",
-     :distinct 13,
+     :distinct 40,
      :group-by? true,
-     :commons {2.94 1, 2.06 1, 3.04 1},
-     :cardinality 100},
+     :commons {2.08 2, 3.08 2, 1.43 2},
+     :cardinality 90},
     :mem_used
     {:data-type "integer",
-     :distinct 13,
+     :distinct 44,
      :group-by? true,
-     :commons {158753562 1, 508408310 1, 192246216 1},
+     :commons {158753562 1, 156960214 1, 165626678 1},
      :cardinality 100},
     :batches
     {:data-type "integer",
-     :distinct 9,
+     :distinct 17,
      :group-by? true,
-     :commons {27 5, 45 1, 9 1},
-     :cardinality 69},
+     :commons {67 22, 27 5, 66 3},
+     :cardinality 38},
     :packets
     {:data-type "integer",
-     :distinct 13,
+     :distinct 44,
      :group-by? true,
-     :commons {49 1, 52 1, 68 1},
+     :commons {49 1, 212 1, 183 1},
      :cardinality 100},
     :ts
     {:data-type "string",
-     :distinct 13,
+     :distinct 44,
      :group-by? true,
      :commons
-     {"2024-07-23 19:22:21" 1, "2024-07-23 19:24:36" 1, "2024-07-23 19:22:51" 1},
+     {"2024-07-23 19:27:36" 1, "2024-07-23 19:22:21" 1, "2024-07-23 19:24:36" 1},
      :cardinality 100}},
-   :rowcount 13},
+   :rowcount 44},
   :gen-viz-516
   {:fields
    {:mb
     {:data-type "integer",
-     :distinct 13,
+     :distinct 33,
      :group-by? true,
-     :commons {183 1, 171 1, 173 1},
-     :cardinality 100},
+     :commons {151 3, 144 3, 183 2},
+     :cardinality 78},
     :mem_used
     {:data-type "integer",
-     :distinct 13,
+     :distinct 42,
      :group-by? true,
-     :commons {158753562 1, 508408310 1, 192246216 1},
+     :commons {158753562 1, 156960214 1, 165626678 1},
      :cardinality 100},
     :messages_per_second
     {:data-type "float",
-     :distinct 11,
+     :distinct 16,
      :group-by? true,
-     :commons {0.07 2, 5.6 2, 3.73 1},
-     :cardinality 84},
+     :commons {0.07 23, 2.53 2, 8.13 2},
+     :cardinality 38},
     :ts
     {:data-type "string",
-     :distinct 13,
+     :distinct 42,
      :group-by? true,
      :commons
-     {"2024-07-23 19:22:21" 1, "2024-07-23 19:24:36" 1, "2024-07-23 19:22:51" 1},
+     {"2024-07-23 19:27:36" 1, "2024-07-23 19:22:21" 1, "2024-07-23 19:24:36" 1},
      :cardinality 100}},
-   :rowcount 13}},
+   :rowcount 42}},
  :default-col-widths
  {:block-3108 {:client-memory-drag-36 151},
   :block-2618 {:client-stats-drag-36 114},
@@ -676,7 +680,8 @@
   :block-11015 {:new-clojure-2 255},
   :system-connections-list* {:connections-sys 126},
   :system-tables-list* {:tables-sys 133},
-  :system-fields-list* {:fields-sys ##Inf}},
+  :system-fields-list* {:fields-sys ##Inf},
+  :block-12050 {:gen-viz-516 127}},
  :runstream-drops nil,
  :tabs
  ["some client stats w recharts"
@@ -968,32 +973,42 @@
     "wonderland-horror-interface"
     "wow-board"]}},
  :runstreams {"a-random-wow" {:open? true, :open-outputs? true}},
- :editor? true,
+ :editor? false,
  :buffy? false,
- :memory [181254522 161634070 4294705152],
+ :memory [223802692 186119928 4294705152],
  :sched
- {:client-memory-drag-36 387,
-  :gen-viz-516 387,
+ {:client-memory-drag-36 855,
+  :gen-viz-516 855,
   :client-stats-drag-36 231,
-  :new-query 417},
+  :new-query 885},
  :client-name :delightful-puce-codfish-41,
  :flow-editor? true,
  :openai-api-key "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",
  :window {:w 2374, :h 1518},
  :implicit-rowsets {:solver [:new-clojure-2 :new-clojure-3 nil]},
  :post-meta
- {:client-memory-drag-36 {:* {:rowcount 12}},
-  :gen-viz-516 {:* {:rowcount 12}},
+ {:client-memory-drag-36 {:* {:rowcount 43}},
+  :gen-viz-516 {:* {:rowcount 42}},
   :new-query {:* {:rowcount 1}},
   :fields-sys {:* {:rowcount 0}}},
  :status
  {:heartbeat
   {:kick
-   [:flow-status/live-scratch-flow>*running? :flow-status/a-random-wow>*running?]},
+   [:client/*client-name*>stats>client-latency
+    :signal/cool-raccoon-signal-yo
+    :time/now
+    :client/*client-name*>stats>recent-messages-per-second
+    :client/*client-name*>stats>messages-per-second
+    :client/*client-name*>stats>memory
+    :client/*client-name*>stats>client-name
+    :client/*client-name*>stats>uptime
+    :flow-status/live-scratch-flow>*running?
+    :time/second
+    :flow-status/a-random-wow>*running?]},
   :alert1 {:alerts :alert2}},
  :screen-name "repl-demo-july23",
  :recos-page2 0,
- :selected-tab "Persian blue cat",
+ :selected-tab "some client stats w recharts",
  :col-names nil,
  :snapshots nil,
  :openai-org-id "org-YLngjih2M4oju0tnnZtKCAYg",
@@ -1005,14 +1020,15 @@
     {:font-size "12px", :opacity 0.66}]
    11
    0.5
-   503
+   661
    -1247625457]],
  :recos-page 0,
  :rs-overrides-hashmap {"a-random-wow" nil},
  :base-sniff-queries {:client_memory -1981695802, :client_stats -175748261},
  :elevenlabs-api-key "f74e20dec69741c2d51663cbd8cd4cf6",
- :user-params-hash -1507588010,
+ :user-params-hash -135631098,
  :grid-recos? true,
+ :session-hash -1984560822,
  :resolved-queries
  {:client-memory-drag-36
   {:select
@@ -1032,7 +1048,8 @@
    :col-widths {:batches 131, :packets 131, :ts 151}},
   :gen-viz-516
   {:cache? false,
-   :where [:= :client_name :*client-name-str],
+   :where
+   [:and [:>= :recent_messages_per_second 0] [:= :client_name :*client-name-str]],
    :limit 50,
    :group-by [:ts],
    :_last-run "21:23:00",
@@ -1611,7 +1628,8 @@
    :queries
    {:gen-viz-516
     {:cache? false,
-     :where [:= :client_name :*client-name-str],
+     :where
+     [:and [:>= :recent_messages_per_second 0] [:= :client_name :*client-name-str]],
      :limit 50,
      :group-by [:ts],
      :_last-run "21:23:00",
@@ -2007,7 +2025,7 @@
    :blocks 3,
    :queries 0,
    :ts "2024-03-24 00:18:04"},
-  :time {:second 53, :now "Tuesday, July 23rd 7:24PM", :minute 24},
+  :time {:second 31, :now "Tuesday, July 23rd 7:32PM", :minute 32},
   :clover-hop {},
   :viz-tables-sys2 {:table_name :client-memory-drag-36},
   :client-stats-drag-36
@@ -2029,7 +2047,7 @@
    :good-sapphire-hyena-18>stats>uptime nil,
    :friendly-wide-grasshopper-40>stats>memory nil,
    :spirited-jungle-green-rat-27>stats>recent-messages-per-second nil,
-   :*client-name*>stats>messages-per-second 3.08,
+   :*client-name*>stats>messages-per-second 1.89,
    :fabulous-lime-hedgehog-39>stats>uptime nil,
    :fabulous-lime-hedgehog-39>stats>client-name nil,
    :good-sapphire-hyena-18>stats>recent-messages-per-second nil,
@@ -2046,7 +2064,7 @@
    :attractive-rhomboidal-otter-29>stats>uptime nil,
    :stellar-viridian-bee-26>stats>memory nil,
    :stellar-viridian-bee-26>stats>recent-messages-per-second nil,
-   :delightful-puce-codfish-41>stats>recent-messages-per-second 0.07,
+   :delightful-puce-codfish-41>stats>recent-messages-per-second nil,
    :genius-rectangular-ostrich-17>stats>recent-messages-per-second nil,
    :constant-lime-wombat-41>stats>memory nil,
    :graceful-star-shaped-opossum-5>stats>client-name nil,
@@ -2079,7 +2097,7 @@
    :familiar-prismatic-woodpecker-22>stats>client-name nil,
    :stellar-viridian-bee-26>stats>uptime nil,
    :wealthy-thin-lark-35>stats>memory nil,
-   :*client-name*>stats>memory 151.3992,
+   :*client-name*>stats>memory 193.0254,
    :friendly-wide-grasshopper-40>stats>client-latency nil,
    :fabulous-lime-hedgehog-39>stats>client-latency nil,
    :delightful-puce-codfish-41>stats>client-latency nil,
@@ -2087,14 +2105,14 @@
    :friendly-wide-grasshopper-40>stats>uptime nil,
    :good-sapphire-hyena-18>stats>memory nil,
    :attractive-rhomboidal-otter-29>stats>messages-per-second nil,
-   :*client-name*>stats>recent-messages-per-second 8.4,
-   :delightful-puce-codfish-41>stats>memory nil,
-   :*client-name*>stats>uptime "3 minutes, 1 second",
+   :*client-name*>stats>recent-messages-per-second 6.73,
+   :delightful-puce-codfish-41>stats>memory 149.172,
+   :*client-name*>stats>uptime "10 minutes, 31 seconds",
    :familiar-prismatic-woodpecker-22>stats>client-latency nil,
    :attractive-rhomboidal-otter-29>stats>client-name nil,
    :genius-rectangular-ostrich-17>stats>client-name nil,
    :constant-lime-wombat-41>stats>client-latency nil,
-   :*client-name*>stats>client-latency 894,
+   :*client-name*>stats>client-latency 223,
    :constant-lime-wombat-41>stats>client-name nil,
    :constant-lime-wombat-41>stats>messages-per-second nil,
    :familiar-prismatic-woodpecker-22>stats>messages-per-second 3.11,
@@ -2103,9 +2121,27 @@
    :wealthy-thin-lark-35>stats>recent-messages-per-second nil,
    :thrilling-icosahedral-raccoon-3>stats>client-name nil},
   :param
-  {:selected-view nil,
-   :selected-view-data nil,
-   :selected-block :block-4699,
+  {:selected-view [:queries :gen-viz-516],
+   :selected-view-data
+   {:cache? false,
+    :where [:= :client_name :*client-name-str],
+    :limit 50,
+    :group-by [:ts],
+    :_last-run "21:23:00",
+    :refresh-every 200,
+    :from [:query/client-memory-drag-36],
+    :order-by [[:ts :desc]],
+    :connection-id "system-db",
+    :select
+    [[[[:sum :mem_used]] :mem_used]
+     [[:sum :recent_messages_per_second] :messages_per_second]
+     :ts],
+    :post-process-fn
+    (fn [x]
+      (vec
+        (reverse
+          (for [row x] (assoc row :mb (int (/ (get row :mem_used) 1048576)))))))},
+   :selected-block :block-12050,
    :my-dash-killswitch? false,
    :upstanding-crimson-frog "new parameter value!",
    :super-cobalt-mole ["1121pm - 229mb"]},
@@ -2219,7 +2255,7 @@
   :hare-v23232w {:vec-val :testa3},
   :connections-sys {:database_name "*cache-db*", :connection_id "system-db"},
   :hare-vw-7.* {:vec-val [200 90 45 15]},
-  :sys {:selected-tab "Persian blue cat", :selected-tab-idx 4},
+  :sys {:selected-tab "some client stats w recharts", :selected-tab-idx 0},
   :block-6551 {:clover-hop-1 nil},
   :client-memory-drag-36
   {:client_name ":friendly-wide-grasshopper-40",

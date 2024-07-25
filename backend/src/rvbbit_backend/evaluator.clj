@@ -5,6 +5,7 @@
    [clojure.pprint        :as ppt]
    [nrepl.core            :as nrepl]
    [nrepl.server          :as nrepl-server]
+   [nrepl.transport       :as transport]
    [rvbbit-backend.config :as config]
    [clojure.walk :as walk]
    [rvbbit-backend.sql        :as    sql
@@ -13,7 +14,8 @@
    [rvbbit-backend.ddl        :as sqlite-ddl]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.queue-party :as qp]
-   [rvbbit-backend.util   :as ut]))
+   [rvbbit-backend.util   :as ut])
+  (:import [java.util.concurrent TimeoutException TimeUnit]))
 
 
 
@@ -33,8 +35,6 @@
                     (format "%.2f" value))
         unit (nth units unit-index)]
     (str formatted " " unit)))
-
-
 
 (defn- estimate-wire-size
   "Estimate the wire size of a data structure."
@@ -390,10 +390,59 @@
     (catch Exception e
       (ut/pp [:repl "Error during async introspection:" (ex-message e)]))));)
 
+
 (defn create-nrepl-server! []
   (ut/pp [:starting-local-nrepl :port repl-port])
   (reset! repl-server (nrepl-server/start-server :port repl-port :bind "127.0.0.1")))
 
+(defn stop-nrepl-server! [timeout-ms]
+  (when @repl-server
+    (ut/pp [:stopping-local-nrepl])
+    (let [shutdown-future (future
+                            (doseq [session (:sessions @repl-server)]
+                              (try
+                                (transport/send (:transport session) {:op "interrupt"})
+                                (catch Exception e
+                                  (ut/pp [:failed-to-interrupt-session (str e)]))))
+                            (nrepl-server/stop-server @repl-server)
+                            (reset! repl-server nil)
+                            (ut/pp [:performing-additional-cleanup])
+                            ;; Add your custom cleanup logic here
+                            )]
+      (try
+        @(deref shutdown-future timeout-ms :timeout)
+        (catch TimeoutException _
+          (ut/pp [:forceful-shutdown-required])
+          (future-cancel shutdown-future))))))
+
+(defn perform-gc []
+  (ut/pp [:triggering-garbage-collection])
+  (System/gc)
+  (Thread/sleep 1000)  ; Give GC some time to work
+  (System/runFinalization))
+
+(defn graceful-restart-nrepl-server! []
+  (ut/pp [:performing-graceful-restart])
+  ;(stop-nrepl-server! 5000)  ; 5 second timeout for graceful shutdown
+  (try
+    (nrepl-server/stop-server @repl-server) ;; will throw due to closing socket ? TODO
+    (catch Throwable _ nil))
+  (reset! repl-server nil)
+  ;(perform-gc)
+  (create-nrepl-server!))
+
+;; (graceful-restart-nrepl-server!)
+
+(defn forceful-restart-nrepl-server! []
+  (ut/pp [:performing-forceful-restart])
+  (when @repl-server
+    (try
+      (nrepl-server/stop-server @repl-server)
+      (catch Exception e
+        (ut/pp [:error-stopping-server (str e)]))))
+  (reset! repl-server nil)
+  (perform-gc)
+  (create-nrepl-server!))
 
 
 
