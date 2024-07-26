@@ -24,14 +24,14 @@
                             :style {:color :theme/editor-outer-rim-color
                                     :font-size [:auto-size-px [:string3 :*input]]}
                             :child [:string3 :*input]]}
- :clojure            {:args [:code]
+ :clj            {:args [:code]
                       :body  [:run-solver
                               {:signal false
                                :cache? false
                                :type :clojure
                                :input-map {}
                                :data :code}]}
- :clojure2            {:args [:code]
+ :clj2            {:args [:code]
                        :body  [:run-solver
                                {:signal false
                                 :cache? false

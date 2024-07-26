@@ -43,4 +43,8 @@ flow-logs/
 .directory
 screen-snaps/
 transit-data/
+fabric-inputs/
+fabric-outputs/
+fabric-sessions/
+
 

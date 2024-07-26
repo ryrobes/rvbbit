@@ -1035,9 +1035,9 @@
                    wss/purge-dead-client-watchers
                    "Purge Dead Clients" 720)
 
-  (start-scheduler (* 3600 4) ;; 1 hour
-                   reboot-reactor-and-resub
-                   "Reboot Atom Reactor" (* 3600 4))
+  ;; (start-scheduler (* 3600 4) ;; 1 hour
+  ;;                  reboot-reactor-and-resub
+  ;;                  "Reboot Atom Reactor" (* 3600 4))
 
   ;; (start-scheduler 6000 ;; 10 mins - was causing problems?? TODO: investigate, not critical, we barely use the queues except for sqlite writes
   ;;                  #(qp/cleanup-inactive-queues 10) ;; MINUTES
@@ -1072,14 +1072,14 @@
                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
                    "Stats Keeper");;)
 
-  (start-scheduler (* 3600 3) ;; 3 hours
-                   #(do
-                      (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
-                      (reset! wss/solvers-cache-hits-atom {})
-                      (reset! wss/solvers-cache-atom {})
-                      (reset! sql/errors {}) ;; just for now
-                      (reset! ut/df-cache {})) ;; <--- big boy
-                   "Purge Solver & Deep-Flatten Cache" (* 3600 3))
+  ;; (start-scheduler (* 3600 3) ;; 3 hours
+  ;;                  #(do
+  ;;                     (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
+  ;;                     (reset! wss/solvers-cache-hits-atom {})
+  ;;                     (reset! wss/solvers-cache-atom {})
+  ;;                     (reset! sql/errors {}) ;; just for now
+  ;;                     (reset! ut/df-cache {})) ;; <--- big boy
+  ;;                  "Purge Solver & Deep-Flatten Cache" (* 3600 3))
 
   ;; (start-scheduler 1
   ;;                  #(doseq [[client-name solvers] @wss/solver-status]

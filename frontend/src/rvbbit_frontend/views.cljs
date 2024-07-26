@@ -1787,11 +1787,13 @@
 (defonce ns-selected (reagent/atom {}))
 (defonce fbc-selected (reagent/atom {}))
 (defonce fbc-selected-model (reagent/atom {}))
+(defonce fbc-selected-pattern (reagent/atom {}))
 (def over-hop-bar (reagent/atom false))
+(def searcher-atom (reagent/atom nil))
 
-(defn insert-response-block [w h data runner syntax]
+(defn insert-response-block [w h data runner syntax opts-map]
   (let [root (ut/find-safe-position h w)]
-    (bricks/insert-new-block-raw root w h data runner syntax)))
+    (bricks/insert-new-block-raw root w h data runner syntax opts-map)))
 
 (defn ensure-quoted-string
   "Adds double quotes to a string if they don't already exist.
@@ -1808,9 +1810,9 @@
         syntax (get @selected-mode :syntax)
         ttype  (get @selected-mode :type)
         ;nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
-        is-rf-event? (and (or (= runner :views) (= runner :clover))
-                          (cstr/starts-with? (cstr/trim command) "[:dispatch"))
-        ns-pushed (when (and 
+        ;; is-rf-event? (and (or (= runner :views) (= runner :clover))
+        ;;                   (cstr/starts-with? (cstr/trim command) "[:dispatch"))
+        ns-pushed (when (and
                          (cstr/includes? (str command) "(ns ")
                          (= ttype :nrepl)) (find-ns-declarations [command]))
         _ (when ns-pushed (swap! ns-selected assoc runner (first ns-pushed))) ;; set ns in UI 
@@ -1821,29 +1823,22 @@
                   command)
         command (if (not= syntax "clojure")
                   command ;; the "implied string"
-                  (ensure-quoted-string (cstr/replace command "\"" "\\\"")))]
+                  (ensure-quoted-string (cstr/replace command "\"" "\\\"")))
+        opts-map (if (= runner :fabric) {:model (get @fbc-selected-model runner) 
+                                         :pattern (get @fbc-selected-pattern runner)} {})]
     (ut/tapp>> (str "Command entered: " command " " ttype " " runner " " (get @ns-selected runner)))
     (reset! hide-responses? false)
 
-    (if is-rf-event?
-
-      (let [ee (str "dispatched re-frame event")]
-        (ut/tracked-dispatch (get (edn/read-string command) 1))
-        (ut/dispatch-delay 200 [::http/insert-alert
-                                [:v-box :children [[:box :child ee]
-                                                   [:box :child (str command)
-                                                    :style {:font-size "12px"}]]] 6 1.5 5])
-        (swap! console-responses assoc command ee))
-
-      (let [resp (insert-response-block 6 3 command runner syntax)
-            ee (str command "(" resp ")")]
-      ;;(when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
-      ;(re-frame/dispatch [::bricks/toggle-quake-console])
-        (ut/dispatch-delay 200 [::http/insert-alert
-                                [:v-box :children [[:box :child (str resp)]
-                                                   [:box :child (str command)
-                                                    :style {:font-size "12px"}]]] 6 1.5 5])
-        (swap! console-responses assoc command ee)))))
+    (let [resp (insert-response-block 6 3 command runner syntax opts-map)
+          ee (str command "(" resp ")")]
+          ;;(when (= resp :success) (re-frame/dispatch [::bricks/toggle-quake-console]))
+          ;(re-frame/dispatch [::bricks/toggle-quake-console])
+      ;(ut/tracked-dispatch [::bricks/toggle-quake-console-off])
+      (ut/dispatch-delay 200 [::http/insert-alert
+                              [:v-box :children [[:box :child (str resp)]
+                                                 [:box :child (str command)
+                                                  :style {:font-size "12px"}]]] 6 1.5 5])
+      (swap! console-responses assoc command ee))))
 
 
 
@@ -1932,13 +1927,16 @@
                      :justify :center])))
 
 (defn quake-console [ww]
-  (let [hh (* 2  db/brick-size)
-        reacts! [@console-responses @console-history @hide-responses? @ns-selected]
-        nss @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
-        is-fabric? (= (get @selected-mode :name) :fabric)
-        fabric-settings (when is-fabric? @(ut/tracked-sub ::bricks/fabric-settings {}))
-        has-nss? (ut/ne? nss)
-        ww (Math/floor (* ww  0.8))]
+  (let [hh                  (* 2  db/brick-size)
+        reacts!             [@console-responses @console-history @hide-responses? @ns-selected]
+        nss                 @(ut/tracked-sub ::local-namespaces-for {:runner-key (get @selected-mode :name)})
+        is-fabric?          (= (get @selected-mode :name) :fabric)
+        fabric-settings     (when is-fabric? @(ut/tracked-sub ::bricks/fabric-settings {}))
+        selected-block      @(ut/tracked-subscribe [::bricks/selected-block])
+        [runner data-key]   @(ut/tracked-sub ::bricks/editor-panel-selected-view {})
+        has-nss?            (ut/ne? nss)
+        ww                  (Math/floor (* ww  0.8))
+        ww2                 (- ww 40)]
     (ut/tapp>> [:fabric-settings fabric-settings])
     [re-com/v-box
      :size "none"
@@ -1946,7 +1944,7 @@
             :on-mouse-over #(when (not @over-hop-bar) (reset! over-hop-bar true))
             :on-mouse-leave #(reset! over-hop-bar false)}
      :style {:background-color "#00000099"
-             :backdrop-filter "blur(4px) brightness(33%)"
+             :backdrop-filter "blur(4px) brightness(13%)"
              :box-shadow "0px -5px 5px 0px #00000099"
              :position "fixed" :bottom 0 :left "50%" :z-index 999 :transform "translateX(-50%)"
              :border-radius  "11px 11px 0px 0px"
@@ -1957,6 +1955,7 @@
              :height (px hh)}
      :children [[re-com/h-box
                  :justify :between
+
                  :children [[re-com/v-box
                              :children [[re-com/box
                                          :child (if @hop-bar-tooltip
@@ -1976,13 +1975,74 @@
                                         (cond
                                           is-fabric?
                                           [re-com/v-box
-                                           :children [(when (get @fbc-selected (get @selected-mode :name))
+                                           :children [(when (get @fbc-selected-model (get @selected-mode :name))
+                                                        (let [search-width 150
+                                                              filtered-patterns (filterv #(cstr/includes? (str %) (str @searcher-atom))
+                                                                                         (get fabric-settings :patterns))]
+                                                          [re-com/h-box
+                                                           :justify :center 
+                                                           :children
+                                                           [[re-com/h-box
+                                                             :width (px search-width)
+                                                             :justify :between 
+                                                             ;:style {:border "1px solid lime"}
+                                                             :style {:margin-top (when (> (count filtered-patterns) 5) "-6px")}
+                                                             :align :center
+                                                             :children [[re-com/input-text :src (at) :model searcher-atom :width "93%"
+                                                                         :on-change #(reset! searcher-atom (let [vv (str %)]
+                                                                                                             (if (empty? vv) nil vv)))
+                                                                         :placeholder "(search patterns)"
+                                                                         :change-on-blur? false
+                                                                         :width            (px (- search-width 10))
+                                                                         :style {:text-decoration  (when (ut/ne? @searcher-atom) "underline")
+                                                                                 :color            "inherit"
+                                                                                 :border           "none"
+                                                                                 :outline          "none"
+                                                                                 :font-size        "11px"
+                                                                                 
+                                                                                  ;:text-align       "center"
+                                                                                 :background-color "#00000000"}]
+                                                                        (when (ut/ne? @searcher-atom)
+                                                                          [re-com/md-icon-button
+                                                                           :md-icon-name "zmdi-close"
+                                                                           :on-click #(reset! searcher-atom nil)
+                                                                           :style {:cursor "pointer"
+                                                                                   :font-size "10px"}])]]
+                                                            [re-com/h-box
+                                                             :padding "6px"
+                                                             :gap "10px"
+                                                             :width (px (- ww2 search-width))
+                                                             :style {:font-size "11px"
+                                                                     ;:border "1px solid pink"
+                                                                     :overflow "auto"}
+                                                             :children (vec (for [n filtered-patterns
+                                                                                  :let [cc (str (theme-pull :theme/editor-outer-rim-color nil) 89)
+                                                                                        ccx (ut/choose-text-color cc)
+                                                                                        selected? (= n (get @fbc-selected-pattern (get @selected-mode :name)))]]
+                                                                              [re-com/box
+                                                                               :padding "5px"
+                                                                               :attr {:on-click #(do
+                                                                                                   (swap! fbc-selected-pattern assoc (get @selected-mode :name) (if selected? nil n))
+                                                                                                   (when @cm-instance  (.focus @cm-instance)))}
+                                                                               :style {:background-color (if selected? cc "#00000045")
+                                                                                       :border (when (not selected?) (str "1px solid " cc 90))
+                                                                                       :color (when selected? ccx)
+                                                                                       :cursor "pointer"
+                                                                                       :border-radius "5px"
+                                                                                       :font-weight 500}
+                                                                               :child (str n)]))]]]))
+                                                      
+                                                      (when (get @fbc-selected (get @selected-mode :name))
                                                         [re-com/h-box
                                                          :padding "6px"
                                                          :gap "10px"
-                                                         :style {:font-size "14px"}
+                                                         :width (px ww2)
+                                                         :style {:font-size "12px"
+                                                                 :overflow "auto"
+                                                                 ;:border "1px solid pink"
+                                                                 }
                                                          :children (vec (for [n (get-in fabric-settings [:models (get @fbc-selected (get @selected-mode :name))])
-                                                                              :let [cc (theme-pull :theme/editor-outer-rim-color nil)
+                                                                              :let [cc (str (theme-pull :theme/editor-outer-rim-color nil) 89)
                                                                                     ccx (ut/choose-text-color cc)
                                                                                     selected? (= n (get @fbc-selected-model (get @selected-mode :name)))]]
                                                                           [re-com/box
@@ -1990,7 +2050,8 @@
                                                                            :attr {:on-click #(do
                                                                                                (swap! fbc-selected-model assoc (get @selected-mode :name) (if selected? nil n))
                                                                                                (when @cm-instance  (.focus @cm-instance)))}
-                                                                           :style {:background-color (when selected? cc)
+                                                                           :style {:background-color (if selected? cc "#00000045")
+                                                                                   :border (when (not selected?) (str "1px solid " cc 90))
                                                                                    :color (when selected? ccx)
                                                                                    :cursor "pointer"
                                                                                    :border-radius "5px"
@@ -2008,9 +2069,11 @@
                                                                         [re-com/box
                                                                          :padding "5px"
                                                                          :attr {:on-click #(do
+                                                                                             (swap! fbc-selected-model assoc (get @selected-mode :name) nil)
                                                                                              (swap! fbc-selected assoc (get @selected-mode :name) (if selected? nil n))
                                                                                              (when @cm-instance  (.focus @cm-instance)))}
-                                                                         :style {:background-color (when selected? cc)
+                                                                         :style {:background-color (if selected? cc "#00000045")
+                                                                                 :border (when (not selected?) (str "1px solid " cc 35))
                                                                                  :color (when selected? ccx)
                                                                                  :cursor "pointer"
                                                                                  :border-radius "5px"
@@ -2087,7 +2150,8 @@
                                     :on-mouse-enter #(reset! hop-bar-tooltip [(get @selected-mode :name)  (get @selected-mode :description)])
                                     :on-mouse-leave #(reset! hop-bar-tooltip nil)}
                              :style {:font-size "31px"
-                                     :padding-left "5px" :margin-top "4px"
+                                     :padding-left (if (vector? (get @selected-mode :icon "?")) "20px" "5px") 
+                                     :margin-top "4px"
                                      :user-select "none"
                                      :cursor "pointer"
                                      ;:border "1px solid white"
@@ -2098,65 +2162,36 @@
                                        :font-weight 400
                                        :padding-left "12px"}
                                :child (str " " (get @ns-selected (get @selected-mode :name)) ":>")])
-                            [console-text-box nil nil " "]]]]]))
+                            ;; (when is-fabric?
+                            ;;   [re-com/box
+                            ;;    :style {;:opacity 0.33
+                            ;;            :font-weight 400
+                            ;;            :padding-left "12px"}
+                            ;;    :child [re-com/single-dropdown
+                            ;;            :choices (vec (for [p (get fabric-settings :patterns)] {:id p :label p}))
+                            ;;            :max-height "320px"
+                            ;;            :can-drop-above? true
+                            ;;            :est-item-height 100
+                            ;;            :placeholder "(all possible shapes)"
+                            ;;            :style {:font-size "13px"}
+                            ;;            :model (get @fbc-selected-pattern (get @selected-mode :name))
+                            ;;            :on-change #(swap! fbc-selected-pattern assoc (get @selected-mode :name) %)]
+                            ;;    ])
 
-;; (defn quake-console [ww]
-;;   (let [hh (* 2 db/brick-size)
-;;         reacts! [@console-responses @console-history @hide-responses?]
-;;         ww (Math/floor (* ww 0.8))]
-;;     ;(reagent/with-let [cm-instance (reagent/atom nil)]
-;;       (reagent/create-class
-;;        {:component-did-mount
-;;         (fn [this]
-;;           (let [node (rdom/dom-node  this)
-;;                 cm (.querySelector node ".CodeMirror")]
-;;             (when cm
-;;               (reset! cm-instance (.getDoc cm)))))
+                            [re-com/h-box 
+                             :width (px (- ww 85))
+                             ;:style {:border "1px solid green"}
+                             :align :center
+                             :justify :between
+                             :children [[console-text-box nil nil " "] 
+                                        (when (and is-fabric? (keyword? selected-block))
+                                          [re-com/box
+                                           :style {;:border "1px solid pink" 
+                                                   :font-size "14px"
+                                                   :padding-right "12px"}
+                                           :child (str selected-block " "  runner " " data-key)])
+                                        ]]]]]]))
 
-;;         :component-did-update
-;;         (fn [this]
-;;           (when @cm-instance
-;;             (.focus @cm-instance)))
-
-;;         :reagent-render
-;;         (fn [ww]
-;;           [re-com/v-box
-;;            :size "none"
-;;            :style {:background-color "#00000099"
-;;                    :backdrop-filter "blur(4px) brightness(33%)"
-;;                    :box-shadow "0px -5px 5px 0px #00000099"
-;;                    :position "fixed" :bottom 0 :left "50%" :z-index 999 :transform "translateX(-50%)"
-;;                    :border-radius  "11px 11px 0px 0px"
-;;                    :width (px ww)
-;;                    :font-weight 700
-;;                    :transition "all 0.6s ease-in-out"
-;;                    :padding "8px"
-;;                    :height (px hh)}
-;;            :children [[re-com/h-box
-;;                        ;; ... (rest of your existing code)
-;;                        ]
-;;                       [re-com/h-box
-;;                        :size "none" :align :center :justify :center
-;;                        :height (px (- hh 20))
-;;                        :style {:border (str "3px dashed " (theme-pull :theme/universal-pop-color nil) 33)
-;;                                :font-family (theme-pull :theme/monospaced-font nil)
-;;                                :color (theme-pull :theme/universal-pop-color nil)
-;;                                :border-radius "11px"
-;;                                :padding-left "8px"
-;;                                :overflow "hidden"
-;;                                :font-size "22px"}
-;;                        :children [[re-com/box
-;;                                    :child  (str @selected-mode)
-;;                                    :attr {:on-click (fn []
-;;                                                       (swap! selected-mode cycle-mode)
-;;                                                       (when @cm-instance
-;;                                                         (.focus @cm-instance)))}
-;;                                    :style {:font-size "31px"
-;;                                            :padding-left "5px" :margin-top "4px"
-;;                                            :user-select "none"
-;;                                            :cursor "pointer"
-;;                                            :font-weight 700}]
-;;                                   [console-text-box nil nil " "]]]]])})));)
 
 
 (defn draggable-editor
@@ -2708,7 +2743,9 @@
 
                                                                                    :else (let [selected-view-type @(ut/tracked-sub ::bricks/view-type {:panel-key selected-block :view data-key})
                                                                                                repl? (true? (cstr/includes? (str selected-view-type) "clojure"))
-                                                                                               syntax (get-in block-runners-map [selected-view-type :syntax])]
+                                                                                               all-block? (=  (get @db/data-browser-query selected-block) :*)
+                                                                                               syntax (if all-block? "clojure"
+                                                                                                          (get-in block-runners-map [selected-view-type :syntax]))]
                                                                            ;;(ut/tapp>> [selected-view-type repl? syntax])
                                                                                            (if (or (nil? syntax) (= syntax "clojure"))
                                                                                              (let [;;_ (reset! bricks/tt [selected-block s-kp (get @db/data-browser-query selected-block)])

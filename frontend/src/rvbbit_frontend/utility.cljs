@@ -26,6 +26,8 @@
    [goog.i18n.NumberFormat Format]
    [goog.events            EventType]))
 
+     
+
 (defn apply-assoc-ins [target-map kv-map] (reduce (fn [acc [k v]] (assoc-in acc k v)) target-map kv-map))
 
 (re-frame/reg-sub ;; for benchmarks

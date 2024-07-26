@@ -3230,9 +3230,9 @@
 (defn boomerang-client-subs
   [cid]
   (let [sub-task (vec (keys (get @atoms-and-watchers cid {})))]
-    (ppy/execute-in-thread-pools :boomerang-heartbeat
-                                 (doseq [fk sub-task]
-                                   (sub-to-value cid fk))) ;; resub just in case?
+    ;; (ppy/execute-in-thread-pools :boomerang-heartbeat
+    ;;                              (doseq [fk sub-task]
+    ;;                                (sub-to-value cid fk))) ;; resub just in case?
     (push-to-client [:kick]
                     {:at "" :payload nil :payload-kp [:heartbeat :heartbeat] :sent! :heartbeat :to :all}
                     cid

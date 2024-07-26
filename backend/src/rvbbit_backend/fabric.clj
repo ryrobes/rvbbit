@@ -47,7 +47,7 @@
   [full-path file-data]
   (let [fqd?      (or (cstr/starts-with? full-path "/") (cstr/starts-with? full-path "~"))
         output    (run-shell-command "pwd")
-        pwd       (first (get-in output [:output :output] []))
+        pwd       (first (get-in output [:output] []))
         full-path (if fqd? full-path (str pwd "/" full-path))]
     (ut/pp [:writing-file full-path])
     (do (try (spit full-path file-data)
@@ -124,7 +124,12 @@
   (when (or (nil? input) (nil? pattern))
     (throw (IllegalArgumentException. "Both :input and :pattern are required arguments.")))
 
-  (let [cli-args (reduce-kv
+  (let [id (get opts :id)
+        opts (dissoc opts :id)
+        opts (if id (-> opts
+                        (assoc :session (str id))
+                        (assoc :output  (str "./fabric-outputs/" id))) opts)
+        cli-args (reduce-kv
                   (fn [args k v]
                     (case k
                       :input (conj args "--text" (shell-escape v))
@@ -135,14 +140,16 @@
                   ["fabric"]  ; Start with the command name
                   opts)
         command (cstr/join " " cli-args)]
+    (write-local-file (str "../fabric-inputs/" id) (str opts "\n \n \n" command))
+    (ut/pp [:fabric-cli command])
 
     ;; Execute the command
     ;(shell/sh "/bin/bash" "-c" (str "mkdir -p shell-root ; cd shell-root ; " command))
-    command
-    ))
+    command))
 
 (ext/create-dirs "./fabric-sessions") ;; from base rvbbit folder
 (ext/create-dirs "./fabric-outputs")
+(ext/create-dirs "./fabric-inputs")
 
 (ut/pp [:fabric-models (get-fabric-models)])
 (ut/pp [:fabric-patterns (get-fabric-patterns)])
@@ -154,4 +161,4 @@
                      :model "gpt-4o")]
   (ut/pp [:fabric-cli fb-cli :output (run-shell-command fb-cli)]))
 
-
+;; (write-local-file (str "../fabric-inputs/hey" ) "he y hey hye")

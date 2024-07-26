@@ -1691,6 +1691,7 @@
 (re-frame/reg-event-db ::toggle-session-modal (fn [db [_]] (assoc db :session-modal? (not (get db :session-modal? false)))))
 
 (re-frame/reg-event-db ::toggle-quake-console (fn [db [_]] (assoc db :quake-console? (not (get db :quake-console? false)))))
+
 (re-frame/reg-event-db ::toggle-quake-console-off (fn [db [_]] (assoc db :quake-console? false)))
 
 (re-frame/reg-event-db ::disable-session-modal (fn [db [_]] (assoc db :session-modal? false)))
@@ -2308,6 +2309,7 @@
    (reset! mad-libs-view nil)
    (reset! db/editor-mode :meta)
    (reset! db/cm-focused? false)
+   (ut/tracked-dispatch [::toggle-quake-console-off])
    (cond (and (not (nil? (get db :selected-flow-block))) (get db :flow?)) (assoc db :selected-flow-block nil)
          (nil? (get db :selected-cols))                                   (-> db
                                                                               (assoc :selected-block "none!")
@@ -2477,7 +2479,7 @@
   [n] ;; cljs uses js "number" so core "float?" cant tell between int and float
   (and (number? n) (not= n (js/Math.floor n))))
 
-(defn insert-new-block-raw [root width height body runner syntax]
+(defn insert-new-block-raw [root width height body runner syntax opts-map]
   (let [new-key            (str "block-" (rand-int 12345))
         clover?            (= runner :clover)
         clojure?           (= syntax "clojure")
@@ -2489,7 +2491,8 @@
         req-block-name     (get-in (first body) [:drag-meta :block-name])
         new-keyw           (if (nil? req-block-name) (keyword new-key) (keyword req-block-name))
         new-keyw           (ut/safe-key new-keyw)
-        tab                @(ut/tracked-subscribe [::selected-tab])
+        tab                @(ut/tracked-sub ::selected-tab {})
+        client-name        @(ut/tracked-sub ::client-name {})
         valid-body         (if (or clover? clojure?)
                              (try (edn/read-string (str body))
                                   (catch :default _ (str body)))
@@ -2504,21 +2507,29 @@
                                ;[(str (char 34) (cstr/trim (str body)) (char 34))]
                              [(str body)])
           ;;valid-body         (if (or clover? clojure?) valid-body [body])
-        valid-body         (if (and as-function? (or clover? clojure?))
-                             (walk/postwalk-replace
-                              {:clover-body valid-body}
-                              (get-in block-runners-map [runner :default] valid-body))
-                             valid-body)
+        opts-map-star       (assoc 
+                             (into {} (for [[k v] opts-map] 
+                                       {(keyword (cstr/replace (str k) ":" "*")) v}))
+                             :*id (cstr/replace (str client-name "++" new-keyw "++" runner "++" view-name) ":" ""))
+        valid-body          (if (and as-function? (or clover? clojure?))
+                              (walk/postwalk-replace
+                               (merge
+                                {:clover-body valid-body}
+                                opts-map-star)
+                               (get-in block-runners-map [runner :default] valid-body))
+                              valid-body)
           ;valid-body?       (ut/well-formed? body)
         base-map           {:h             height
                             :w             width
                             :root          root
                             :tab           tab
                             :selected-view view-name
+                            :opts          {view-name (or opts-map {})}
                             :name          new-key
                             runner         {view-name valid-body}
                               ;:queries       {}
                             }]
+    (tapp>> [:new-hop-block-valid-body valid-body [new-keyw] base-map])
     (if valid-body
       (do (ut/tracked-dispatch [::update-workspace [new-keyw] base-map])
           (ut/tracked-dispatch [::select-block new-keyw])
@@ -3692,7 +3703,7 @@
 (defn panel-param-box
   [type-key key width-int height-int value]
   (let [hidden-params-map (select-keys value [:selected-view :selected-view-data :selected-block])
-        value (dissoc value :selected-view :selected-view-data :selected-block)]
+        value (dissoc value :selected-view :selected-view-data :selected-block :opts)]
     [re-com/box :size "none" :width (px (- width-int 24)) :height (px (- height-int 24)) :style
      {:font-family   (theme-pull :theme/monospaced-font nil) ;"Fira Code" ; "Chivo Mono" ;"Fira
       :font-size     "13px"
@@ -7603,7 +7614,7 @@
 (re-frame/reg-sub ::editor-panel-selected-view
                   (fn [db _]
                     (let [selected-block (get db :selected-block)
-                          panel (dissoc (get-in db [:panels selected-block]) :selected-mode :selected-view)
+                          panel (dissoc (get-in db [:panels selected-block]) :selected-mode :selected-view :opts)
                           panel-pairs (apply concat (for [[k v] panel
                                                           :when (map? v)]
                                                       (for [vv (keys v)] [k vv])))
@@ -7620,7 +7631,7 @@
  ::view-type
  (fn [db {:keys [panel-key view]}]
    (let [selected-block panel-key
-         panel (dissoc (get-in db [:panels selected-block]) :selected-mode :selected-view)
+         panel (dissoc (get-in db [:panels selected-block]) :selected-mode :selected-view :opts)
          panel-pairs (apply concat (for [[k v] panel
                                          :when (map? v)]
                                      (for [vv (keys v)] [k vv])))
@@ -10348,7 +10359,7 @@
                                                                                                              ;:overflow-wrap "break-word"
                                                                                                              ;:line-height "1.1"
                                                                               }
-                                                                      :text (wrap-text (if (vector? x) (cstr/join "\n" x) (str x)) (/ (+ px-width-int 70) 9))
+                                                                      :text (wrap-text (if (vector? x) (cstr/join "\n" x) (str x)) (/ (+ px-width-int 40) 9))
                                                                       :id (str panel-key "-" selected-view)
                                                                       :width (+ px-width-int 70)
                                                                       :height (+ px-height-int 55)}])
@@ -10863,7 +10874,10 @@
    (assoc-in db [:click-param :solver solver-name]
              [:box :child "running..."])))
 
-
+(re-frame/reg-sub
+ ::view-opts-map
+ (fn [db {:keys [panel-key data-key]}]
+   (get-in db [:panels panel-key :opts data-key] {})))
 
 (defn honeycomb
   [panel-key & [override-view fh fw replacement-view replacement-query]] ;; can sub lots of this
@@ -10953,12 +10967,17 @@
                      ;;curr-val @(ut/tracked-sub ::conn/clicked-parameter-key-alpha {:keypath [sub-param]})
                      placeholder-clover (get-in br [selected-view-type :placeholder-clover] ;; inject placeholder if we have no data for this
                                                 [:box
-                                                 :child [:img {:src "images/running.gif"}]
+                                                 :child [:img {:src "images/running.gif"}] 
                                                  :size "auto"
                                                  :style {:color :theme/universal-pop-color
                                                          :font-size "14px"}
                                                  :height :panel-height+50-px
                                                  :align :center :justify :center])
+                     opts-map            @(ut/tracked-sub ::view-opts-map {:panel-key panel-key :data-key selected-view})
+                     opts-map-star       (assoc 
+                                          (into {} (for [[k v] opts-map]
+                                                    {(keyword (cstr/replace (str k) ":" "*")) v})) 
+                                          :*id (cstr/replace (str client-name "++" panel-key "++" selected-view-type "++" selected-view) ":" ""))
                      ;;placeholder-clover (edn/read-string (cstr/replace (pr-str placeholder-clover) "*solver-name*" sub-param-root)) ;; ugly, but cheaper than parse and postwalk here
                      ;;_ (tapp>> [:ss sub-param sub-param-root  (str placeholder-clover)])
 
@@ -10971,7 +10990,9 @@
                                                          (if (string? v) (str v) (try (str (cstr/join "\n" v)) (catch :default _ (str v))))
                                                          ;; might be saved as a literal string if first in - but after being saved, it will be a vector of strings per newline
                                                          v)
-                                                     v (ut/postwalk-replacer {:clover-body v} wrapper)
+                                                     v (ut/postwalk-replacer (merge
+                                                                              {:clover-body v}
+                                                                              opts-map-star) wrapper)
                                                      v (ut/postwalk-replacer {:col-width (Math/floor (/ (* main-w db/brick-size) 9.5))} v)]
                                                  (if (not (nil? v))
                                                    (ut/postwalk-replacer {:*data v} clover-fn) v))}))
