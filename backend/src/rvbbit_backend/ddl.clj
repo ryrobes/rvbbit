@@ -377,6 +377,34 @@ group by 1, 2) tt on s.client_name = tt.client_name
     type text NULL,
     updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
 
+(def create-panel-resolved-history
+  "create table if not exists panel_resolved_history
+   (kp text NULL, 
+    client_name text NULL, 
+    data text NULL, 
+    pre_data text NULL,
+    diff text NULL,     
+    diff_kp text NULL,                           
+    panel_key text NULL, 
+    key text NULL,
+    type text NULL,
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+
+(def create-panel-materialized-history
+  "create table if not exists panel_materialized_history
+   (kp text NULL, 
+    client_name text NULL, 
+    data text NULL, 
+    pre_data text NULL,
+    diff text NULL,     
+    diff_kp text NULL,                           
+    panel_key text NULL, 
+    key text NULL,
+    type text NULL,
+    updated TIMESTAMP DEFAULT (datetime('now', 'localtime')) NULL) ;")
+
+
+
 (def create-board-history
   "create table if not exists board_history
    (client_name text NULL, 

@@ -6,6 +6,8 @@
    [clojure.data.csv        :as csv]
    [clojure.data.json       :as json2]
    [clojure.edn             :as edn]
+   [clojure.set             :as cset]
+   [clojure.data            :as data]
    [clojure.java.io         :as io]
    [clojure.java.jdbc       :as jdbc]
    [clojure.java.shell      :refer [sh]]
@@ -1286,6 +1288,101 @@
    (reduce-kv (fn [res k v] (if (associative? v) (let [kp (conj prev k)] (kvpaths kp v (conj res kp))) (conj res (conj prev k))))
               result
               m)))
+
+(defn kvpaths-a
+  "Generate keypaths for both associative and non-associative structures."
+  ([m] (kvpaths [] m ()))
+  ([prev m result]
+   (cond
+     (map? m)
+     (reduce-kv (fn [res k v]
+                  (let [kp (conj prev k)]
+                    (kvpaths kp v (conj res kp))))
+                result
+                m)
+
+     (vector? m)
+     (reduce (fn [res [idx v]]
+               (let [kp (conj prev idx)]
+                 (kvpaths kp v (conj res kp))))
+             result
+             (map-indexed vector m))
+
+     (seq? m)
+     (reduce (fn [res [idx v]]
+               (let [kp (conj prev idx)]
+                 (kvpaths kp v (conj res kp))))
+             result
+             (map-indexed vector m))
+
+     :else
+     (conj result prev))))
+
+(defn safe-diff
+  "Safely diff two Clojure data structures, handling lists and symbols."
+  [a b]
+  (cond
+    (and (coll? a) (coll? b))
+    (if (= (type a) (type b))
+      (let [[only-a only-b] (data/diff a b)]
+        [(not-empty only-a) (not-empty only-b)])
+      [a b])
+
+    (= a b) [nil nil]
+    :else [a b]))
+
+(defn safe-get-in
+  "Safely get a value from a nested structure, returning nil if any part of the path is invalid."
+  [m ks]
+  (try
+    (get-in m ks)
+    (catch Exception _
+      nil)))
+
+(defn list-diff
+  "Find differences between two lists, returning a map of changed indices."
+  [old-list new-list]
+  (let [old-indexed (map-indexed (fn [idx item] [idx item]) old-list)
+        new-indexed (map-indexed (fn [idx item] [idx item]) new-list)
+        max-length (max (count old-list) (count new-list))]
+    (into {}
+          (for [idx (range max-length)
+                :let [old-item (get old-list idx)
+                      new-item (get new-list idx)]
+                :when (not= old-item new-item)]
+            [idx {:old old-item :new new-item}]))))
+
+(defn deep-diff
+  "Recursively diff two structures, handling both associative and non-associative types."
+  [a b]
+  (cond
+    (and (map? a) (map? b))
+    (let [keys (cset/union (set (keys a)) (set (keys b)))]
+      (into {}
+            (for [k keys
+                  :let [v1 (get a k)
+                        v2 (get b k)]
+                  :when (not= v1 v2)]
+              [k (deep-diff v1 v2)])))
+
+    (and (vector? a) (vector? b))
+    (vec (map-indexed
+          (fn [idx [v1 v2]]
+            (when (not= v1 v2)
+              (deep-diff v1 v2)))
+          (map vector a b)))
+
+    (and (seq? a) (seq? b))
+    (list-diff a b)
+
+    :else
+    {:old a :new b}))
+
+(defn find-changed-paths
+  "Find all changed paths in two structures."
+  [old-data new-data]
+  (let [diff (deep-diff old-data new-data)]
+    (kvpaths diff)))
 
 (defn kvpaths22
   ([m] (kvpaths [] m (transient [])))

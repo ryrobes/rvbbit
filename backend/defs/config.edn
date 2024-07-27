@@ -23,6 +23,7 @@
          :edn       [:edn :*data]
          :text      [:console :*data]
          :terminal  [:terminal :*data]
+         :markdown  [:markdown :*data]
          :data      [:data-viewer :*data]
          :pretty    [:pretty-box :*data]
          :rowset    [:honeycomb {:select [:*] :from {:data :*data}} 11 9] ;; this is slow and funky. revisit?
@@ -131,7 +132,7 @@
            
            :fabric {:type :nrepl
                     :runner {:port 8181 :host "127.0.0.1"} ;; internal since it needs a rvbbit-backend namespace 
-                    :modes [:text :data :terminal]
+                    :modes [ :text :markdown  :clover :data :terminal]
                     :default "funny tweet about rabbits and clojure"
                     :syntax "text"
                     :ext ".txt"
@@ -139,7 +140,7 @@
                     :placeholder-on-running? true
                     :clover-fn [:run-solver
                                 {:signal false
-                                 :cache? false
+                                 :cache? true
                                  :type :clojure
                                  :input-map {}
                                  :data (let [command (rvbbit-backend.fabric/fabric

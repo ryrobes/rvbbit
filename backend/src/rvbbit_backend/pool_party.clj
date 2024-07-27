@@ -41,25 +41,49 @@
 (defonce pool-exec-times (atom {}))
 (defonce thread-pool-timing? true)
 
+;; (defn create-cached-thread-pool [name]
+;;   (cond
+;;     (cstr/includes? (str name) "serial")
+;;     (ThreadPoolExecutor. 1 1 60 TimeUnit/SECONDS (java.util.concurrent.LinkedBlockingQueue.))
+
+;;     (= name :watchers/signal)
+;;     ;;(ThreadPoolExecutor. 10 1000 15 TimeUnit/SECONDS  (ArrayBlockingQueue. 200) (ThreadPoolExecutor$CallerRunsPolicy.))
+;;     (ThreadPoolExecutor. 3 1000 600 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
+
+;;     (or (cstr/includes? (str name) "flow-runner/")
+;;         (cstr/includes? (str name) "nrepl-eval/")
+;;         (cstr/includes? (str name) "query-runstream/")
+;;         (cstr/includes? (str name) "watchers/")
+;;         ;(cstr/includes? (str name) "subscriptions/")
+;;         )
+;;     (ThreadPoolExecutor. 3 1000 600 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
+;;     ;(ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS  (ArrayBlockingQueue. 20) (ThreadPoolExecutor$CallerRunsPolicy.)) ;;; was 10 300 60
+
+;;     :else (ThreadPoolExecutor. 1 1000 600 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))))
+
+
 (defn create-cached-thread-pool [name]
-  (cond
-    (cstr/includes? (str name) "serial")
-    (ThreadPoolExecutor. 1 1 60 TimeUnit/SECONDS (java.util.concurrent.LinkedBlockingQueue.))
+  (let [base-pool (cond
+                    (cstr/includes? (str name) "serial")
+                    (ThreadPoolExecutor. 1 1 60 TimeUnit/SECONDS (java.util.concurrent.LinkedBlockingQueue.))
 
-    (= name :watchers/signal)
-    ;;(ThreadPoolExecutor. 10 1000 15 TimeUnit/SECONDS  (ArrayBlockingQueue. 200) (ThreadPoolExecutor$CallerRunsPolicy.))
-    (ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
+                    (= name :watchers/signal)
+                    (ThreadPoolExecutor. 3 1000 10 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
 
-    (or (cstr/includes? (str name) "flow-runner/")
-        (cstr/includes? (str name) "nrepl-eval/")
-        (cstr/includes? (str name) "query-runstream/")
-        (cstr/includes? (str name) "watchers/")
-        ;(cstr/includes? (str name) "subscriptions/")
-        )
-    (ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
-    ;(ThreadPoolExecutor. 3 1000 120 TimeUnit/SECONDS  (ArrayBlockingQueue. 20) (ThreadPoolExecutor$CallerRunsPolicy.)) ;;; was 10 300 60
+                    (or (cstr/includes? (str name) "flow-runner/")
+                        (cstr/includes? (str name) "nrepl-eval/")
+                        (cstr/includes? (str name) "query-runstream/")
+                        (cstr/includes? (str name) "watchers/"))
+                    (ThreadPoolExecutor. 3 1000 10 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))
 
-    :else (ThreadPoolExecutor. 1 1000 240 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.))))
+                    :else (ThreadPoolExecutor. 1 1000 10 TimeUnit/SECONDS (SynchronousQueue.) (ThreadPoolExecutor$CallerRunsPolicy.)))
+        thread-factory (proxy [java.util.concurrent.ThreadFactory] []
+                         (newThread [r]
+                           (let [thread (java.lang.Thread. r)]
+                             (.setName thread (str name "-" (.getName thread)))
+                             thread)))]
+    (.setThreadFactory base-pool thread-factory)
+    base-pool))
 
 
 
@@ -181,13 +205,13 @@
 (defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
   (fn [key ref old-state new-state]
 ;; test, dont bother taking the next step if nothing changed...? less thrash, does shit still work?
-    ;(when (not= old-state new-state)
-      ;(when (let [;[added removed _] (clojure.data/diff old-state new-state)
-      ;            ;akp (ut/keypaths added)
-      ;            ;rkp (ut/keypaths removed)
-      ;            ;changed-kp (vec (distinct (into akp rkp)))
-      ;            changed-kp (ut/diff-keypaths old-state new-state)]
-      ;        (ut/ne? changed-kp))
+    (when (not= old-state new-state)
+      (when (let [;[added removed _] (clojure.data/diff old-state new-state)
+                  ;akp (ut/keypaths added)
+                  ;rkp (ut/keypaths removed)
+                  ;changed-kp (vec (distinct (into akp rkp)))
+                  changed-kp (ut/diff-keypaths old-state new-state)]
+              (ut/ne? changed-kp))
         (execute-in-thread-pools
          (keyword (str (if client-name
                          "subscriptions/"
@@ -202,7 +226,7 @@
              (catch Exception e
                (ut/pp [:error-in-wrap-custom-watcher-pool-exec key (.getMessage e)])
                ;(throw e)
-               )))))););)
+               ))))))))
 
 ;; (defn wrap-custom-watcher-pool [watcher-fn base-type client-name flow-key]
 ;;   (fn [key ref old-state new-state]

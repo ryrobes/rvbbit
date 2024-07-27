@@ -2,7 +2,7 @@
   (:require [rvbbit-backend.util :as ut]
             [clojure.data       :as data]
             [clojure.string      :as cstr])
-  (:import (java.util.concurrent LinkedBlockingQueue TimeUnit)))
+  (:import (java.util.concurrent LinkedBlockingQueue TimeUnit ThreadFactory)))
 
 ;; ;; queue party v0 usage 
 
@@ -63,8 +63,37 @@
       0)
     0))
 
-(defn- worker-loop [system queue-type id-keyword]
+(defn- create-named-thread-factory [queue-type id-keyword]
+  (let [thread-counter (atom 0)]
+    (reify ThreadFactory
+      (newThread [this runnable]
+        (let [thread (Thread. runnable)
+              counter (swap! thread-counter inc)]
+          (.setName thread (format "QueueWorker-%s-%s-%d" (name queue-type) (name id-keyword) counter))
+          thread)))))
+
+;; (defn- worker-loop [system queue-type id-keyword]
+;;   (let [{:keys [task-queues running stopping active-tasks]} system]
+;;     (loop []
+;;       (when (and @running (not @stopping))
+;;         (when-let [[queue _] (get-in @task-queues [queue-type id-keyword])]
+;;           (when-let [task (.poll queue 100 TimeUnit/MILLISECONDS)]
+;;             (swap! task-queues assoc-in [queue-type id-keyword 1] (System/currentTimeMillis))
+;;             (swap! active-tasks update-in [queue-type id-keyword] (fnil inc 0))
+;;             (swap! queue-tasks-run inc) ;; debug
+;;             (try
+;;               (task)
+;;               (catch Exception e
+;;                 (ut/pp ["Error executing queue task:" queue-type id-keyword (.getMessage e)
+;;                         (try (subs (str task) 0 200) (catch Exception _ (str task)))]))
+;;               (finally
+;;                 (swap! active-tasks update-in [queue-type id-keyword] dec))))))
+;;       (when (and @running (not @stopping))
+;;         (recur)))))
+
+(defn- worker-loop [system queue-type id-keyword thread-name]
   (let [{:keys [task-queues running stopping active-tasks]} system]
+    (.setName (Thread/currentThread) thread-name)
     (loop []
       (when (and @running (not @stopping))
         (when-let [[queue _] (get-in @task-queues [queue-type id-keyword])]
@@ -87,11 +116,22 @@
   (swap! (:task-queues system) update-in [queue-type id-keyword]
          #(or % [(LinkedBlockingQueue.) (System/currentTimeMillis)])))
 
+;; (defn- start-workers [system queue-type id-keyword num-workers]
+;;   (swap! (:workers system) update-in [queue-type id-keyword]
+;;          (fn [current-workers]
+;;            (into (or current-workers [])
+;;                  (repeatedly num-workers #(future (worker-loop system queue-type id-keyword)))))))
+
 (defn- start-workers [system queue-type id-keyword num-workers]
-  (swap! (:workers system) update-in [queue-type id-keyword]
-         (fn [current-workers]
-           (into (or current-workers [])
-                 (repeatedly num-workers #(future (worker-loop system queue-type id-keyword)))))))
+  (let [thread-factory (create-named-thread-factory queue-type id-keyword)]
+    (swap! (:workers system) update-in [queue-type id-keyword]
+           (fn [current-workers]
+             (into (or current-workers [])
+                   (repeatedly num-workers
+                               #(future
+                                  (let [thread-name (.getName (.newThread thread-factory nil))]
+                                    (worker-loop system queue-type id-keyword thread-name)))))))))
+
 
 (defn- stop-workers [system queue-type id-keyword & [num-workers-to-remove]]
   (let [current-workers (get-in @(:workers system) [queue-type id-keyword])
@@ -159,13 +199,24 @@
        (start-workers system queue-type id-keyword (get-in @(:config system) [:min-workers])))
      system)))
 
+;; (defn- ensure-serial-queue [system queue-type id-keyword]
+;;   (ensure-queue system queue-type id-keyword)
+;;   (let [current-workers (get-in @(:workers system) [queue-type id-keyword])]
+;;     (when (not= (count current-workers) 1)
+;;       (stop-workers system queue-type id-keyword)
+;;       (swap! (:workers system) assoc-in [queue-type id-keyword]
+;;              [(future (worker-loop system queue-type id-keyword))]))))
+
 (defn- ensure-serial-queue [system queue-type id-keyword]
   (ensure-queue system queue-type id-keyword)
-  (let [current-workers (get-in @(:workers system) [queue-type id-keyword])]
+  (let [current-workers (get-in @(:workers system) [queue-type id-keyword])
+        thread-factory (create-named-thread-factory queue-type id-keyword)]
     (when (not= (count current-workers) 1)
       (stop-workers system queue-type id-keyword)
       (swap! (:workers system) assoc-in [queue-type id-keyword]
-             [(future (worker-loop system queue-type id-keyword))]))))
+             [(future
+                (let [thread-name (.getName (.newThread thread-factory nil))]
+                  (worker-loop system queue-type id-keyword thread-name)))]))))
 
 (defn serial-slot-queue
   ([queue-type id-keyword task]

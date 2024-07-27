@@ -28,17 +28,43 @@
                 :extras      {:hello? true}}
    :on-message [::simple-response]})
 
-(re-frame/reg-sub ::pending-requests
-                  (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
-                    (vals (get-in db [::sockets socket-id :requests]))))
+(re-frame/reg-sub
+ ::pending-requests
+ (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
+   (vals (get-in db [::sockets socket-id :requests]))))
 
-(re-frame/reg-sub ::open-subscriptions
-                  (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
-                    (get-in db [::sockets socket-id :subscriptions])))
+(re-frame/reg-sub
+ ::open-subscriptions
+ (fn [db {:keys [socket-id]}] ;; modded for re-frame.alpha/sub usage with a destruct map arg
+   (get-in db [::sockets socket-id :subscriptions])))
 
 
-(defn options
-  [x]
+(re-frame/reg-event-db
+ ::update-panels-hash
+ (fn [db _]
+   (let [pp          (get db :panels)
+              ;;ppr         {} ;;; TEMP!
+              ;; ppr         (into {} (for [[k v] pp] ;; super slow and lags out clients when panels edited
+              ;;                        {k (assoc v :queries (into {} (for [[kk vv] (get v :queries)] {kk (sql-alias-replace vv)})))}))
+              ;; ppm         (into {}  (for [[k v] pp] ;; super slow and lags out clients when panels edited
+              ;;                         {k (materialize-values v)}))
+         new-h       (hash (ut/remove-underscored pp))
+         client-name (get db :client-name)]
+     (ut/tapp>> [:running :update-panels-hash-FROM-HTTP :event :expensive! "full send of all panels to server"])
+     (ut/dispatch-delay 800 [::insert-alert [:box :child "ATTN: ::update-panels-hash running"] 12 1 5])
+     ;;(conn/push-panels-to-server pp ppr client-name)
+     (ut/tracked-dispatch
+      [::wfx/push :default
+       {:kind :current-panels
+        :panels pp
+        :materialized-panels {} ;ppm
+        :resolved-panels {} ;ppr
+        :client-name client-name}])
+     ;;(when (get db :buffy?) (ut/dispatch-delay 2000 [::refresh-history-log]))
+     (assoc db :panels-hash new-h))))
+
+
+(defn options [x]
   (let [;protocol (.-protocol js/window.location)
         protocol          "ws"
         host              (.-host js/window.location)
@@ -51,18 +77,23 @@
      :on-disconnect [::dispatch-unsubscriptions]
      :on-connect    [::dispatch-subscriptions x]}))
 
-(re-frame/reg-event-fx ::dispatch-subscriptions
-                       (fn [_ [_ x]]
-                         {:dispatch-n [[::wfx/subscribe socket-id :server-push2 (subscription x :server-push2)]
-                                       [::wfx/request :default
-                                        {:message     {:kind :get-settings :client-name x}
-                                         :on-response [::simple-response-boot-no-load] ;; just get
+(re-frame/reg-event-fx
+ ::dispatch-subscriptions
+ (fn [_ [_ x]]
+   {:dispatch-n [[::wfx/subscribe socket-id :server-push2 (subscription x :server-push2)]
+                 [::update-panels-hash] ;; expensive to re-pop the server data for client panels 
+                 [::wfx/request :default
+                  {:message     {:kind :get-settings :client-name x}
+                   :on-response [::simple-response-boot-no-load] ;; just get
                                                                                        ;; settings,
                                                                                        ;; in case
-                                         :on-timeout  [::imeout-response [:boot :get-settings]]
-                                         :timeout     15000}]]}))
+                   :on-timeout  [::imeout-response [:boot :get-settings]]
+                   :timeout     15000}]]}))
 
-(re-frame/reg-event-fx ::dispatch-unsubscriptions (fn [_ _] {:dispatch-n [[::wfx/unsubscribe socket-id :server-push2]]}))
+(re-frame/reg-event-fx 
+ ::dispatch-unsubscriptions 
+ (fn [_ _]
+   {:dispatch-n [[::wfx/unsubscribe socket-id :server-push2]]}))
 
 
 
@@ -70,16 +101,16 @@
 (def url-base (str (cstr/join ":" (drop-last (ut/splitter (.. js/document -location -href) #":"))) ":" server-http-port)) ;; no trailing slash
 
 
-(re-frame/reg-sub ::url-vec
-                  (fn [_ _]
-                    (let [url-str (.. js/document -location -href)
-                          url-vec (if (and (cstr/includes? url-str "/#/") (> (count (ut/splitter url-str "/#/")) 1))
-                                    (ut/splitter (last (ut/splitter url-str "/#/")) "/")
-                                    [])]
-                      url-vec)))
+(re-frame/reg-sub
+ ::url-vec
+ (fn [_ _]
+   (let [url-str (.. js/document -location -href)
+         url-vec (if (and (cstr/includes? url-str "/#/") (> (count (ut/splitter url-str "/#/")) 1))
+                   (ut/splitter (last (ut/splitter url-str "/#/")) "/")
+                   [])]
+     url-vec)))
 
-(defn start-listening-to-url-changes
-  []
+(defn start-listening-to-url-changes []
   (let [on-hashchange (fn [_]
                         (let [new-url (-> js/window
                                           .-location
@@ -87,84 +118,90 @@
                           (ut/tracked-dispatch [::url-changed new-url])))]
     (.addEventListener js/window "hashchange" on-hashchange)))
 
-(defn change-url
-  [new-hash]
+(defn change-url [new-hash]
   (let [new-url (str "/#" new-hash)]
     (.pushState js/history nil "" new-url)
     (.replaceState js/history nil "" new-url)))
 
-(re-frame/reg-event-db ::url-changed
-                       (fn [db [_ new-url]]
-                         (let [url-vec  (if (and (cstr/includes? new-url "#") (> (count (ut/splitter new-url "#")) 1))
-                                          (ut/splitter (last (ut/splitter new-url "#")) "/")
-                                          [])
-                               base-dir "./screens/"
-                               screen   (str base-dir (last url-vec) ".edn")]
-                           (ut/tapp>> [:url-changed new-url url-vec :loading-new-screen])
-                           (ut/tracked-dispatch [::load screen])
-                           (assoc db :current-url new-url))))
+(re-frame/reg-event-db
+ ::url-changed
+ (fn [db [_ new-url]]
+   (let [url-vec  (if (and (cstr/includes? new-url "#") (> (count (ut/splitter new-url "#")) 1))
+                    (ut/splitter (last (ut/splitter new-url "#")) "/")
+                    [])
+         base-dir "./screens/"
+         screen   (str base-dir (last url-vec) ".edn")]
+     (ut/tapp>> [:url-changed new-url url-vec :loading-new-screen])
+     (ut/tracked-dispatch [::load screen])
+     (assoc db :current-url new-url))))
 
-(re-frame/reg-event-db ::simple-response-boot
-                       (fn [db [_ result]]
-                         (let [screens        (get result :screens)
-                               url            @(ut/tracked-subscribe [::url-vec])
-                               default-screen (get result :default)]
-                           (ut/tapp>> [:screens screens :url-vec url])
-                           (when default-screen ;; load default canvas settings
-                             (ut/tracked-dispatch [::load default-screen]))
-                           (if default-screen
-                             (-> db
-                                 (assoc :screen-name (str (get db :screen-name) (rand-int 12345))))
-                             (assoc-in db [:server :settings] result)))))
+(re-frame/reg-event-db
+ ::simple-response-boot
+ (fn [db [_ result]]
+   (let [screens        (get result :screens)
+         url            @(ut/tracked-subscribe [::url-vec])
+         default-screen (get result :default)]
+     (ut/tapp>> [:screens screens :url-vec url])
+     (when default-screen ;; load default canvas settings
+       (ut/tracked-dispatch [::load default-screen]))
+     (if default-screen
+       (-> db
+           (assoc :screen-name (str (get db :screen-name) (rand-int 12345))))
+       (assoc-in db [:server :settings] result)))))
 
-(re-frame/reg-event-db ::simple-response-boot-no-load
-                       (fn [db [_ result]]
-                         (let [] ;screens (get result :screens)
-                           (if false ;default-screen
-                             (-> db
-                                 (assoc :screen-name (str (get db :screen-name) (rand-int 12345))))
-                             (assoc-in db [:server :settings] result)))))
+(re-frame/reg-event-db
+ ::simple-response-boot-no-load
+ (fn [db [_ result]]
+   (let [] ;screens (get result :screens)
+     (if false ;default-screen
+       (-> db
+           (assoc :screen-name (str (get db :screen-name) (rand-int 12345))))
+       (assoc-in db [:server :settings] result)))))
 
-(re-frame/reg-event-db ::value-response-flow
-                       (fn [db [_ result]]
-                         (let [base-key (get result :base-key)
-                               sub-key  (get result :sub-key) ;; including .step
-                               value    (get result :value)]
-                           (assoc-in db [:click-param base-key sub-key] value))))
-
-
-(re-frame/reg-event-db ::autocomplete-response
-                       (fn [db [_ result]]
-                         (let [;;codes [:theme/base-font :font-family :height]
-                               server-params (get result :clover-params [])
-                               view-codes    (get result :view-keywords [])
-                               flow-subs     (get db :flow-subs)
-                               click-params  (vec (for [e (keys (get-in db [:click-param :param]))]
-                                                    (keyword (str "param/" (ut/replacer (str e) ":" "")))))
-                               themes        (vec (for [e (keys (get-in db [:click-param :theme]))]
-                                                    (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
-                               codes         (vec (apply concat [server-params view-codes themes flow-subs click-params]))]
-                           (reset! db/autocomplete-keywords (set (map str codes)))
-                           db)))
+(re-frame/reg-event-db
+ ::value-response-flow
+ (fn [db [_ result]]
+   (let [base-key (get result :base-key)
+         sub-key  (get result :sub-key) ;; including .step
+         value    (get result :value)]
+     (assoc-in db [:click-param base-key sub-key] value))))
 
 
-(re-frame/reg-event-db ::timeout-response
-                       (fn [db [_ result what-req]]
-                         (let [client-name (get db :client-name)]
-                           (ut/tapp>> [:websocket-timeout! client-name result what-req])
-                           db)))
+(re-frame/reg-event-db
+ ::autocomplete-response
+ (fn [db [_ result]]
+   (let [;;codes [:theme/base-font :font-family :height]
+         server-params (get result :clover-params [])
+         view-codes    (get result :view-keywords [])
+         flow-subs     (get db :flow-subs)
+         click-params  (vec (for [e (keys (get-in db [:click-param :param]))]
+                              (keyword (str "param/" (ut/replacer (str e) ":" "")))))
+         themes        (vec (for [e (keys (get-in db [:click-param :theme]))]
+                              (keyword (str "theme/" (ut/replacer (str e) ":" "")))))
+         codes         (vec (apply concat [server-params view-codes themes flow-subs click-params]))]
+     (reset! db/autocomplete-keywords (set (map str codes)))
+     db)))
 
 
-(re-frame/reg-event-db ::get-autocomplete-values
-                       (fn [db _]
-                         (let [client-name (get db :client-name)]
-                           (ut/tracked-dispatch
-                             [::wfx/request :default
-                              {:message {:kind :autocomplete :surrounding nil :panel-key nil :view nil :client-name client-name}
-                               :on-response [::autocomplete-response]
-                               :on-timeout [::timeout-response ::autocomplete]
-                               :timeout 15000000}]))
-                         db))
+(re-frame/reg-event-db
+ ::timeout-response
+ (fn [db [_ result what-req]]
+   (let [client-name (get db :client-name)]
+     (ut/tapp>> [:websocket-timeout! client-name result what-req])
+     db)))
+
+
+(re-frame/reg-event-db
+ ::get-autocomplete-values
+ (fn [db _]
+   (let [client-name (get db :client-name)]
+     (ut/tracked-dispatch
+      [::wfx/request :default
+       {:message {:kind :autocomplete :surrounding nil :panel-key nil :view nil :client-name client-name}
+        :on-response [::autocomplete-response]
+        :on-timeout [::timeout-response ::autocomplete]
+        :timeout 15000000}]))
+   db))
 
 ;; (re-frame/reg-event-db ::sub-to-flow-value
 ;;                        (fn [db [_ key]]
@@ -195,27 +232,29 @@
 ;(ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to thing")) 10 0.75 5])
 ;(ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to thing")) 10 0.75 5])
 
-(re-frame/reg-event-db ::sub-to-flow-value
-                       (fn [db [_ key]]
-                         (let [client-name (get db :client-name)]
-                           (ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to " key)) 10 0.75 5])
-                           (ut/tracked-dispatch
-                            [::wfx/push :default
-                             {:kind :sub-to-flow-value 
-                              :flow-key key 
-                              :client-name client-name}]))
-                         db))
+(re-frame/reg-event-db
+ ::sub-to-flow-value
+ (fn [db [_ key]]
+   (let [client-name (get db :client-name)]
+     (ut/tracked-dispatch [::insert-alert (sub-alert (str "sub to " key)) 10 0.75 5])
+     (ut/tracked-dispatch
+      [::wfx/push :default
+       {:kind :sub-to-flow-value
+        :flow-key key
+        :client-name client-name}]))
+   db))
 
-(re-frame/reg-event-db ::unsub-to-flow-value
-                       (fn [db [_ key]]
-                         (let [client-name (get db :client-name)]
-                           (ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to " key)) 10 0.75 5])
-                           (ut/tracked-dispatch
-                            [::wfx/push :default
-                             {:kind :unsub-to-flow-value 
-                              :flow-key key 
-                              :client-name client-name}]))
-                         db))
+(re-frame/reg-event-db
+ ::unsub-to-flow-value
+ (fn [db [_ key]]
+   (let [client-name (get db :client-name)]
+     (ut/tracked-dispatch [::insert-alert (sub-alert (str "un-sub to " key)) 10 0.75 5])
+     (ut/tracked-dispatch
+      [::wfx/push :default
+       {:kind :unsub-to-flow-value
+        :flow-key key
+        :client-name client-name}]))
+   db))
 
 (defn update-context-boxes
   [result task-id ms reco-count]
@@ -236,21 +275,23 @@
 
 (def last-hash (reagent/atom []))
 
-(re-frame/reg-event-db ::insert-alert
-                       (fn [db [_ content w h duration & [alert-id]]]
+(re-frame/reg-event-db
+ ::insert-alert
+ (fn [db [_ content w h duration & [alert-id]]]
                          ;;(ut/tapp>> [:insert-alert content w h duration] )
-                         (let [ticktock (get-in db [:re-pollsive.core/polling :counter])
-                               alert-id (or alert-id (hash content))
-                               duration (or duration 30)]
-                           (if (some #(= % (str content)) (for [[cc _ _ _ _] (get db :alerts [])] (str cc)))
-                             db ;; no dupes now
-                             (assoc db :alerts (vec (conj (get db :alerts []) [content w h (+ ticktock duration) alert-id])))))))
+   (let [ticktock (get-in db [:re-pollsive.core/polling :counter])
+         alert-id (or alert-id (hash content))
+         duration (or duration 30)]
+     (if (some #(= % (str content)) (for [[cc _ _ _ _] (get db :alerts [])] (str cc)))
+       db ;; no dupes now
+       (assoc db :alerts (vec (conj (get db :alerts []) [content w h (+ ticktock duration) alert-id])))))))
 
-(re-frame/reg-event-db ::runstream-item
-                       (fn [db [_ result]]
-                         (-> db
-                             (assoc-in [:runstreams-lookups (get result :flow-id) :open-inputs] (get result :open-inputs))
-                             (assoc-in [:runstreams-lookups (get result :flow-id) :blocks] (get result :blocks)))))
+(re-frame/reg-event-db
+ ::runstream-item
+ (fn [db [_ result]]
+   (-> db
+       (assoc-in [:runstreams-lookups (get result :flow-id) :open-inputs] (get result :open-inputs))
+       (assoc-in [:runstreams-lookups (get result :flow-id) :blocks] (get result :blocks)))))
 
 (re-frame/reg-event-db
   ::refresh-runstreams-sly

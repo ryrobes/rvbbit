@@ -38,7 +38,7 @@
    [rvbbit-backend.transform  :as ts]
    [rvbbit-backend.pivot      :as pivot]
    [rvbbit-backend.sql        :as    sql
-    :refer [sql-exec sql-query sql-query-one system-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
+    :refer [sql-exec sql-query sql-query-one system-db history-db autocomplete-db ghost-db flows-db insert-error-row! to-sql
             pool-create]]
    [clojure.data.csv          :as csv]
    [csv-map.core              :as ccsv]
@@ -102,6 +102,7 @@
 (def client-panels-materialized (atom {}))
 
 (def client-panels-history (atom {}))
+;;(def client-panels-history (ut/thaw-atom {} "./data/atoms/client-panel-history-atom.edn"))
 
 (def heartbeat-seconds 15)
 
@@ -1720,7 +1721,8 @@
                                    (hash rowset-fixed)
                                    [:= :table-name table-name]
                                    true
-                                   rowset-fixed)
+                                   rowset-fixed
+                                   client-name)
              ;               ))
           ;;  (ut/pp [:SNAP-INSERTED-SUCCESS2! (count rowset) :into table-name-str])
            {:sql-cache-table table-name :rows (count rowset)})
@@ -2032,35 +2034,60 @@
                              :file-change
                              :done)))))))
 
-(defn subscribe-to-session-changes
-  []
-  (let [file-path0 (str "./live/")]
-    (do (ut/pp [:beholder-watching file-path0])
-        (beholder/watch
-         #(send-off ext/file-work-agent (react-to-file-changes %))
-         ;;(ppy/execute-in-thread-pools :external-editing-watcher  ((react-to-file-changes %)))
-         file-path0))))
+;; (defn subscribe-to-session-changes
+;;   []
+;;   (let [file-path0 (str "./live/")]
+;;     (do (ut/pp [:beholder-watching file-path0])
+;;         (beholder/watch
+;;          #(send-off ext/file-work-agent (react-to-file-changes %))
+;;          ;;(ppy/execute-in-thread-pools :external-editing-watcher  ((react-to-file-changes %)))
+;;          file-path0))))
 
 (defonce last-panels (atom {}))
+(defonce last-panels-resolved (atom {}))
+(defonce last-panels-materialized (atom {}))
+
+;; (defn hash-objects
+;;   [panels]
+;;   (into {}
+;;         (for [[k v] panels]
+;;           {k {:base    (hash v) ; (hash (-> v (dissoc :views) (dissoc :queries)))
+;;               :views   (into {} (for [[k v] (get v :views {})] {k (hash v)}))
+;;               :queries (into {} (for [[k v] (get v :queries {})] {k (hash v)}))}})))
+
+;; (defn data-objects
+;;   [panels]
+;;   (into {}
+;;         (for [[k v] panels]
+;;           {k {:base    v ;(-> v (dissoc :views) (dissoc :queries))
+;;               :views   (into {} (for [[k v] (get v :views {})] {k v}))
+;;               :queries (into {} (for [[k v] (get v :queries {})] {k v}))}})))
+
+
+(defn process-runner-keys [v runner-keys process-fn]
+  (into {} (for [key runner-keys
+                 :let [data (get v key {})]]
+             {key (process-fn data)})))
 
 (defn hash-objects
-  [panels]
+  [panels runner-keys]
   (into {}
         (for [[k v] panels]
-          {k {:base    (hash v) ; (hash (-> v (dissoc :views) (dissoc :queries)))
-              :views   (into {} (for [[k v] (get v :views {})] {k (hash v)}))
-              :queries (into {} (for [[k v] (get v :queries {})] {k (hash v)}))}})))
+          {k (merge
+              {:base (hash v)}
+              (process-runner-keys v runner-keys #(into {} (for [[k v] %] {k (hash v)}))))})))
 
 (defn data-objects
-  [panels]
+  [panels runner-keys]
   (into {}
         (for [[k v] panels]
-          {k {:base    v ;(-> v (dissoc :views) (dissoc :queries))
-              :views   (into {} (for [[k v] (get v :views {})] {k v}))
-              :queries (into {} (for [[k v] (get v :queries {})] {k v}))}})))
+          {k (merge
+              {:base v}
+              (process-runner-keys v runner-keys #(into {} (for [[k v] %] {k v}))))})))
 
-(def panel-history (agent nil))
-(set-error-mode! panel-history :continue)
+
+;(def panel-history (agent nil))
+;(set-error-mode! panel-history :continue)
 
 ;; new :updated-panels with just one or more and mat,resolved, source versions 
 
@@ -2070,9 +2097,9 @@
 (defmethod wl/handle-push :updated-panels
   [{:keys [panels client-name resolved-panels materialized-panels]}]
 
-  (qp/serial-slot-queue
-   :panel-update-serial :serial
-   (fn [] (ext/write-panels client-name (merge (get @client-panels client-name {}) panels)))) ;; push to file system for beholder cascades
+  ;; (qp/serial-slot-queue
+  ;;  :panel-update-serial :serial
+  ;;  (fn [] (ext/write-panels client-name (merge (get @client-panels client-name {}) panels)))) ;; push to file system for beholder cascades
 
   (doseq [p (keys panels)]
     (swap! client-panels-history assoc-in [client-name p (System/currentTimeMillis)] {:source (get panels p)
@@ -2089,60 +2116,234 @@
   (ut/pp [:single-panel-push! client-name (keys panels)]))
 
 
+;; (defn push-to-history-db [client-name panels comp-atom tname]
+;;   (let [;resolved-panels resolved-panels ;; remove _ keys? Panels panels ;; remove _ keys?
+;;         runner-keys (vec (keys (get (config/settings) :runners)))
+;;         _ (ut/pp [:runner-keys runner-keys])
+;;         prev-data   (get @comp-atom client-name)
+;;         prev-hashes (hash-objects prev-data  runner-keys)
+;;         this-hashes (hash-objects panels runner-keys)
+;;         _           (ut/pp [:push-to-hist client-name tname (keys @comp-atom)])
+;;         diffy       (data/diff this-hashes prev-hashes)
+;;         diffy-kps   (vec (filter #(and (not (= (count %) 1))
+;;                                        ;(not (= (last %) :views))
+;;                                        ;(not (= (last %) :queries))
+;;                                        (not (some (fn [x] (= (last %) x)) runner-keys)))
+;;                                  (ut/kvpaths (first diffy))))
+;;         _ (ut/pp [:diffy  diffy-kps tname])
+;;         dd          (data-objects panels runner-keys)
+;;         pdd         (data-objects prev-data runner-keys)
+;;           ;dd (data-objects panels)
+;;         _ (ut/pp [:diffy2 tname (keys dd)])
+;;         table-name  (keyword (str tname  "-history"))
+;;         rows        (vec (for [kp   diffy-kps
+;;                                :let [data  (get-in dd kp)
+;;                                      pdata (get-in pdd kp)
+;;                                      pdiff (first (data/diff data pdata))
+;;                                      _ (ut/pp  [:diff-in kp]) ;; error in this for loop when the "data" is lists and symbols...
+;;                                      ]]
+;;                            {:kp          (str kp)
+;;                             :client_name (str client-name)
+;;                             :data        (pr-str data)
+;;                             :pre_data    (pr-str pdata)
+;;                             :diff        (pr-str pdiff)
+;;                             :diff_kp     (pr-str (ut/kvpaths pdiff))
+;;                             :panel_key   (str (get kp 0))
+;;                             :key         (str (get kp 2))
+;;                             :type        (str (get kp 1))}))
+;;         _ (ut/pp [:diffy3 (count rows) tname])
+;;         ins-sql       {:insert-into [table-name] :values rows}
+;;         ;;board-ins-sql {:insert-into [:board-history] :values [{:client_name (str client-name) :data (pr-str panels)}]}
+;;         ]
+;;     ;;(sql-exec history-db (to-sql board-ins-sql))
+;;     (when (ut/ne? rows) 
+;;       (sql-exec history-db (to-sql ins-sql))))
+;;   (swap! comp-atom assoc client-name panels))
+
+
+
+
+(declare deep-diff)
+
+(defn kvpaths
+  "Generate keypaths for both associative and non-associative structures."
+  ([m] (kvpaths [] m ()))
+  ([prev m result]
+   (cond
+     (map? m)
+     (reduce-kv (fn [res k v]
+                  (let [kp (conj prev k)]
+                    (kvpaths kp v (conj res kp))))
+                result
+                m)
+
+     (or (vector? m) (seq? m))
+     (reduce (fn [res [idx v]]
+               (let [kp (conj prev idx)]
+                 (kvpaths kp v (conj res kp))))
+             result
+             (map-indexed vector m))
+
+     :else
+     (conj result prev))))
+
+(defn list-diff
+  "Find differences between two lists, returning a map of changed indices."
+  [old-list new-list]
+  (let [max-length (max (count old-list) (count new-list))]
+    (into {}
+          (for [idx (range max-length)
+                :let [old-item (nth old-list idx nil)
+                      new-item (nth new-list idx nil)]
+                :when (not= old-item new-item)]
+            [idx (deep-diff old-item new-item)]))))
+
+(defn deep-diff
+  "Recursively diff two structures, handling both associative and non-associative types."
+  [a b]
+  (cond
+    (and (map? a) (map? b))
+    (let [keys (cset/union (set (keys a)) (set (keys b)))]
+      (into {}
+            (for [k keys
+                  :let [v1 (get a k)
+                        v2 (get b k)]
+                  :when (not= v1 v2)]
+              [k (deep-diff v1 v2)])))
+
+    (and (vector? a) (vector? b))
+    (vec (keep-indexed
+          (fn [idx [v1 v2]]
+            (when (not= v1 v2)
+              [idx (deep-diff v1 v2)]))
+          (map vector a b)))
+
+    (and (seq? a) (seq? b))
+    (let [diff (list-diff a b)]
+      (if (empty? diff)
+        {}
+        {:list-diff diff}))
+
+    (not= a b)
+    {:old a :new b}
+
+    :else
+    {}))
+
+(defn find-changed-paths
+  "Find all changed paths in two structures."
+  [old-data new-data]
+  (let [diff (deep-diff old-data new-data)]
+    (if (or (seq? diff) (vector? diff))
+      (kvpaths [] diff ())
+      (kvpaths diff))))
+
+
+
+
+
+(defn push-to-history-db [client-name panels comp-atom tname]
+  (let [runner-keys (vec (keys (get (config/settings) :runners)))
+        _ (ut/pp [:runner-keys runner-keys])
+        prev-data   (get @comp-atom client-name)
+        _           (ut/pp [:push-to-hist client-name tname (keys @comp-atom)])
+        changed-paths (find-changed-paths prev-data panels)
+        diffy-kps   (vec (filter #(and ;(not (= (count %) 1))
+                                       (= (count %) 3)
+                                       ;(not (some (fn [x] (= (last %) x)) runner-keys))
+                                       )
+                                 changed-paths))
+        _ (ut/pp [:diffy  diffy-kps tname])
+        _ (ut/pp [:diffy2 tname  ])
+        table-name  (keyword (str tname  "-history"))
+        rows        (vec (for [kp diffy-kps
+                               :let [data  (get-in panels kp)
+                                     pdata (get-in prev-data kp)
+                                     pdiff (deep-diff pdata data)
+                                     _ (ut/pp [:diff-in kp data pdata pdiff])
+                                     ]]
+                           {:kp          (str kp)
+                            :client_name (str client-name)
+                            :data        (pr-str data)
+                            :pre_data    (pr-str pdata)
+                            :diff        (pr-str pdiff)
+                            :diff_kp     (pr-str (kvpaths pdiff))
+                            :panel_key   (str (first kp))
+                            :key         (str (last kp))
+                            :type        (str (second kp))}))
+        _ (ut/pp [:diffy3 (count rows) tname])
+        ins-sql     {:insert-into [table-name] :values rows}]
+    (when (ut/ne? rows)
+      (sql-exec history-db (to-sql ins-sql))))
+  (swap! comp-atom assoc client-name panels))
 
 
 (defmethod wl/handle-push :current-panels
-  [{:keys [panels client-name resolved-panels materialized-panels]}] 
+  [{:keys [panels client-name resolved-panels materialized-panels]}]
 
-  (qp/serial-slot-queue
-   :panel-update-serial :serial
-   (fn [] (ext/write-panels client-name panels))) ;; push to file system for beholder cascades
-  
-    (doseq [p (keys panels)]
-      (swap! client-panels-history assoc-in [client-name p (System/currentTimeMillis)] {:source (get panels p)
-                                                                                        :resolved (get resolved-panels p)
-                                                                                        :materialized (get materialized-panels p)}))
-  
+  ;; (qp/serial-slot-queue :panel-update-serial :serial
+  ;;  (fn [] (ext/write-panels client-name panels))) ;; push to file system for beholder cascades
+
+  (doseq [p (keys panels)]
+    (swap! client-panels-history assoc-in [client-name p (System/currentTimeMillis)] {:source (get panels p)
+                                                                                      :resolved (get resolved-panels p)
+                                                                                      :materialized (get materialized-panels p)}))
+
   (swap! client-panels assoc client-name panels) ;; the whole block map, will be mutating it with single updates later
   (swap! client-panels-resolved assoc client-name resolved-panels)
   (swap! client-panels-materialized assoc client-name materialized-panels)
 
+  (swap! panels-atom assoc client-name resolved-panels) ;; save to master atom for reactions, important! 
+
   (ut/pp [:panels-push! client-name])
 
-  ;; (qp/serial-slot-queue ;;; disable for now
-  ;;  :panel-update-serial :serial
-  ;;  (fn []
-  ;;    (do
-  ;;      (swap! panels-atom assoc client-name resolved-panels) ;; save to master atom for reactions,
-  ;;      (let [;resolved-panels resolved-panels ;; remove _ keys? Panels panels ;; remove _ keys?
-  ;;            prev-hashes (hash-objects (get @last-panels client-name))
-  ;;            this-hashes (hash-objects panels)
-  ;;            diffy       (data/diff this-hashes prev-hashes)
-  ;;            diffy-kps   (vec (filter #(and (not (= (count %) 1)) (not (= (last %) :views)) (not (= (last %) :queries)))
-  ;;                                     (ut/kvpaths (first diffy))))
-  ;;            dd          (data-objects panels)
-  ;;            pdd         (data-objects (get @last-panels client-name))]
-  ;;   ;(send panel-history ;; shouldnt the whole thing be in an agent sync block? rapid updates
+  (qp/serial-slot-queue :panel-update-serial :serial
+                        (fn [] (push-to-history-db client-name panels last-panels "panel")))
+  
+  (push-to-history-db client-name panels last-panels "panel")
 
-  ;;        (let [;dd (data-objects panels)
-  ;;              rows          (vec (for [kp   diffy-kps
-  ;;                                       :let [data  (get-in dd kp)
-  ;;                                             pdata (get-in pdd kp)
-  ;;                                             pdiff (first (data/diff data pdata))]]
-  ;;                                   {:kp          (str kp)
-  ;;                                    :client_name (str client-name)
-  ;;                                    :data        (pr-str data)
-  ;;                                    :pre_data    (pr-str pdata)
-  ;;                                    :diff        (pr-str pdiff)
-  ;;                                    :diff_kp     (pr-str (ut/kvpaths pdiff))
-  ;;                                    :panel_key   (str (get kp 0))
-  ;;                                    :key         (str (get kp 2))
-  ;;                                    :type        (str (get kp 1))}))
-  ;;              ins-sql       {:insert-into [:panel-history] :values rows}
-  ;;              board-ins-sql {:insert-into [:board_history] :values [{:client_name (str client-name) :data (pr-str panels)}]}]
-  ;;          (sql-exec system-db (to-sql board-ins-sql))
-  ;;          (when (ut/ne? rows) (sql-exec system-db (to-sql ins-sql))))
-  ;;        (swap! last-panels assoc client-name panels)))))
+    ;;  (do
+    ;;    (let [;resolved-panels resolved-panels ;; remove _ keys? Panels panels ;; remove _ keys?
+    ;;          runner-keys (vec (keys (get (config/settings) :runners)))
+    ;;          prev-hashes (hash-objects (get @last-panels client-name) runner-keys)
+    ;;          this-hashes (hash-objects panels runner-keys)
+    ;;          diffy       (data/diff this-hashes prev-hashes)
+    ;;          diffy-kps   (vec (filter #(and (not (= (count %) 1)) 
+    ;;                                         (not (= (last %) :views)) 
+    ;;                                         (not (= (last %) :queries)))
+    ;;                                   (ut/kvpaths (first diffy))))
+    ;;          dd          (data-objects panels runner-keys)
+    ;;          pdd         (data-objects (get @last-panels client-name) runner-keys)]
+    ;; ;(send panel-history ;; shouldnt the whole thing be in an agent sync block? rapid updates
+
+    ;;      (let [;dd (data-objects panels)
+    ;;            rows          (vec (for [kp   diffy-kps
+    ;;                                     :let [data  (get-in dd kp)
+    ;;                                           pdata (get-in pdd kp)
+    ;;                                           pdiff (first (data/diff data pdata))]]
+    ;;                                 {:kp          (str kp)
+    ;;                                  :client_name (str client-name)
+    ;;                                  :data        (pr-str data)
+    ;;                                  :pre_data    (pr-str pdata)
+    ;;                                  :diff        (pr-str pdiff)
+    ;;                                  :diff_kp     (pr-str (ut/kvpaths pdiff))
+    ;;                                  :panel_key   (str (get kp 0))
+    ;;                                  :key         (str (get kp 2))
+    ;;                                  :type        (str (get kp 1))}))
+    ;;            ins-sql       {:insert-into [:panel-history] :values rows}
+    ;;            board-ins-sql {:insert-into [:board-history] :values [{:client_name (str client-name) :data (pr-str panels)}]}]
+    ;;        (sql-exec history-db (to-sql board-ins-sql))
+    ;;        (when (ut/ne? rows) (sql-exec history-db (to-sql ins-sql))))
+    ;;      (swap! last-panels assoc client-name panels)))
+                          ;;))
+
+  ;; (qp/serial-slot-queue :panel-update-serial :serial
+  ;;                       (fn [] (push-to-history-db client-name resolved-panels last-panels-resolved "panel-resolved")))
+  
+  ;; (qp/serial-slot-queue :panel-update-serial :serial
+  ;;                       (fn [] (push-to-history-db client-name materialized-panels last-panels-materialized "panel-materialized")))
+  
+  
   )
 
 (defn run-shell-command
@@ -4069,7 +4270,9 @@
   (try (let [repl-host                   (get-in runner-map [:runner :host])
              repl-port                   (get-in runner-map [:runner :port])
              {:keys [result elapsed-ms]} (ut/timed-exec
-                                          (ppy/execute-in-thread-pools-but-deliver :nrepl-evals ;;(keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
+                                          (ppy/execute-in-thread-pools-but-deliver (keyword (str "serial-nrepl-instance/" (cstr/replace (str solver-name) ":" "")))
+                                           ;;:nrepl-evals 
+                                          ;;(keyword (str "nrepl-eval/" (cstr/replace client-name ":" "")))
                                                                                    (fn []
                                                                                      (evl/repl-eval vdata repl-host repl-port client-name runner-name))))
              output-full                 result
@@ -5575,12 +5778,15 @@
                     honey-sql (if has-rql? (extract-rql ui-keypath honey-sql rql-holder) honey-sql)
                     honey-sql (replace-pre-sql honey-sql) ;; runs a subset of clover replacements
                     target-db (cond query-meta-subq? system-db ;; override for sidecar meta queries
-                                    (keyword? connection-id) (sql/create-or-get-client-db-pool client-name)
-                                    (= connection-id "system-db") system-db
-                                    (= connection-id "flows-db") flows-db
+                                    (keyword? connection-id)           (sql/create-or-get-client-db-pool client-name)
+                                    (= connection-id "system-db")       system-db
+                                    (= connection-id "flows-db")        flows-db
                                     (= connection-id "autocomplete-db") autocomplete-db
-                                    (= connection-id "system") system-db
-                                    (or (= connection-id :cache) (= connection-id "cache.db") (nil? connection-id)) cache-db ;mem-db2
+                                    (= connection-id "history-db")      history-db
+                                    (= connection-id "system")          system-db
+                                    (or (= connection-id :cache) 
+                                        (= connection-id "cache.db") 
+                                        (nil? connection-id))           cache-db
                                     :else (get-connection-string connection-id))
                     has-pivot?
                     #_{:clj-kondo/ignore [:not-empty?]}
@@ -5881,8 +6087,11 @@
                                                                                                               target-db
                                                                                                               cache-db
                                                                                                               result-hash
-                                                                                                              [:= :table-name
-                                                                                                               cache-table-name]))
+                                                                                                              [:= :table-name cache-table-name]
+                                                                                                              nil
+                                                                                                              nil
+                                                                                                              client-name
+                                                                                                              ))
                                                            reco-count-sql {:select [[[:count 1] :cnt]]
                                                                            :from   [:combos]
                                                                            :where  [:= :table-name cache-table-name]}
@@ -5933,7 +6142,8 @@
                                                                              result-hash
                                                                              [:= :table-name cache-table-name]
                                                                              true
-                                                                             resultv)
+                                                                             resultv
+                                                                             client-name)
                                     ;; (ut/pp [[:quick-sniff-for (first ui-keypath)] :via client-name ui-keypath
                                     ;;         filtered-req-hash])
                                                      ))))
@@ -7041,6 +7251,8 @@
     
 ;;(ut/pp (database-sizes))
 
+;; (ut/pp (sql-exec system-db "delete from client_memory where 1=1;"))
+;; (ut/pp (sql-exec system-db "delete from jvm_stats where 1=1;"))
 ;; (ut/pp (sql-exec system-db "CREATE INDEX idx_client_name ON client_memory(client_name);"))
 ;; (ut/pp (sql-exec system-db "CREATE INDEX idx_ts ON client_memory(ts);"))
 ;; (ut/pp (sql-exec system-db "CREATE INDEX idx_client_name2 ON client_memory(client_name, ts);"))
@@ -7332,7 +7544,7 @@
 
         ;;(ut/pp [:solvers-running? @solver-status])
 
-        (ut/pp [:solver-cache (ut/calculate-atom-size :solver-cache solvers-cache-atom)])
+        ;; (ut/pp [:solver-cache (ut/calculate-atom-size :solver-cache solvers-cache-atom)])
 
           ;(ut/pp [:solver-runner-pool-stats (get-slot-pool-queue-sizes)])
 
@@ -7581,41 +7793,42 @@
 (def websocket-port 3030)
 
 (def ws-endpoints {"/ws" (net/websocket-handler {:encoding :edn})})
+;; net/websocket-handler actually creates it own thread pool w https://github.com/clj-commons/dirigiste
+;; TODO investigate, this could be where the long-term compute leak is coming from...
 
-(def ring-options
-  {:port                 websocket-port
-   :join?                false
-   :async?               true
-   :input-buffer-size    32768
-   :output-buffer-size   131072
-   ;:idle-timeout         500000  ;; Reduced idle timeout
-   ;:max-idle-time        3000000 ;; Reduced max idle time
-   ;;:max-idle-time        15000
-   :max-message-size     6291456 ;; 6MB
-   :websockets           (into {} (for [[k v] ws-endpoints] [k (wrap-websocket-handler v)]))
-   :allow-null-path-info true})
-
-;; (def ring-options ;; using stock jetty pool (JVM shared, assumably)
+;; (def ring-options
 ;;   {:port                 websocket-port
 ;;    :join?                false
 ;;    :async?               true
-;;    ;:min-threads          300
-;;    ;:max-threads          1000 ;; Increased max threads
-;;    ;:idle-timeout         500000 ;; Reduced idle timeout
+;;    :input-buffer-size    32768
+;;    :output-buffer-size   131072
+;;    ;:idle-timeout         500000  ;; Reduced idle timeout
 ;;    ;:max-idle-time        3000000 ;; Reduced max idle time
-;;    ;:max-idle-time        15000
-;;    ;:input-buffer-size    131072 ;; default is 8192
-;;    ;:output-buffer-size   131072 ;; default is 32768
-
-;;    ;:input-buffer-size    32768
-;;    ;:output-buffer-size   131072
-;;    ;:max-message-size     6291456 ;; 6MB
-;;    :websockets           ws-endpoints
+;;    ;;:max-idle-time        15000
+;;    :max-message-size     6291456 ;; 6MB
+;;    :websockets           (into {} (for [[k v] ws-endpoints] [k (wrap-websocket-handler v)]))
 ;;    :allow-null-path-info true})
+
+(def ring-options ;; using stock jetty pool (JVM shared, assumably)
+  {:port                 websocket-port
+   :join?                false
+   :async?               true
+   ;:min-threads          300
+   ;:max-threads          1000 ;; Increased max threads
+   ;:idle-timeout         500000 ;; Reduced idle timeout
+   ;:max-idle-time        3000000 ;; Reduced max idle time
+   ;:max-idle-time        15000
+   ;:input-buffer-size    131072 ;; default is 8192
+   ;:output-buffer-size   131072 ;; default is 32768
+   ;:input-buffer-size    32768
+   ;:output-buffer-size   131072
+   ;:max-message-size     6291456 ;; 6MB
+   :websockets           ws-endpoints
+   :allow-null-path-info true})
 
 (defonce websocket-server (atom nil))
 
-;; (reset! websocket-server (jetty/run-jetty #'web-handler ring-options))
+;; (reset! websocket-server (jetty/run-jetty #'web-handler ring-options)) ;;; to start 
 
 (defn stop-websocket-server []
   (when-let [server @websocket-server]
@@ -7623,12 +7836,7 @@
     (reset! websocket-server nil)))
 
 
-
-
-
-
-(defn destroy-websocket-server!
-  []
+(defn destroy-websocket-server! []
   (ut/ppa [:shutting-down-websocket-server :port websocket-port])
   (try (do (when @websocket-server
              (.stop @websocket-server)

@@ -37,7 +37,7 @@
    [rvbbit-backend.evaluator :as evl]
    [rvbbit-backend.external :as ext]
    [rvbbit-backend.sql :as    sql
-    :refer [flows-db insert-error-row! pool-create sql-exec sql-query sql-query-meta sql-query-one system-db
+    :refer [flows-db insert-error-row! pool-create sql-exec sql-query sql-query-meta sql-query-one system-db  history-db
             to-sql]]
    [rvbbit-backend.surveyor :as surveyor]
    [rvbbit-backend.transform :as ts]
@@ -850,11 +850,20 @@
    cruiser/default-derived-fields
    cruiser/default-viz-shapes)
 
+  (cruiser/lets-give-it-a-whirl-no-viz ;;; force cache-db as a conn, takes a sec
+   "history-db"
+   history-db
+   system-db
+   cruiser/default-sniff-tests
+   cruiser/default-field-attributes
+   cruiser/default-derived-fields
+   cruiser/default-viz-shapes)
+
   (shell/sh "/bin/bash" "-c" (str "rm -rf " "live/*"))
 
   ;;(tt/start!)
 
-  (wss/subscribe-to-session-changes)
+  ;; (wss/subscribe-to-session-changes) ;; DISABLE BEHOLDER FOR NOW - mostly for external editing. cpu hog?
 
 
   ;(wss/recycle-worker) ;; single blocking
@@ -1072,14 +1081,16 @@
                         (swap! wss/cpu-usage conj (ut/get-jvm-cpu-usage)))
                    "Stats Keeper");;)
 
-  ;; (start-scheduler (* 3600 3) ;; 3 hours
-  ;;                  #(do
-  ;;                     (ut/pp [:CLEARING-OUT-SOLVER-CACHE! (ut/calculate-atom-size :current-size wss/solvers-cache-atom)])
-  ;;                     (reset! wss/solvers-cache-hits-atom {})
-  ;;                     (reset! wss/solvers-cache-atom {})
-  ;;                     (reset! sql/errors {}) ;; just for now
-  ;;                     (reset! ut/df-cache {})) ;; <--- big boy
-  ;;                  "Purge Solver & Deep-Flatten Cache" (* 3600 3))
+  (start-scheduler (* 3600 3) ;; 3 hours
+                   #(do
+                      (ut/pp [:CLEARING-OUT-DEEP-FLATTEN-CACHE]) ;; (ut/pp (ut/calculate-atom-size :current-size wss/solvers-cache-atom)) ;; super expensive on big atoms 
+                      ;(reset! wss/solvers-cache-hits-atom {})
+                      ;(reset! wss/solvers-cache-atom {})
+                      ;;(reset! sql/errors {}) ;; just for now
+                      (reset! ut/df-cache {})) ;; <--- big boy
+                   "Purge Solver & Deep-Flatten Cache" (* 3600 2))
+
+  ;; (ut/calculate-atom-size :current-size ut/df-cache)
 
   ;; (start-scheduler 1
   ;;                  #(doseq [[client-name solvers] @wss/solver-status]
@@ -1089,6 +1100,24 @@
   ;;                              [client-name solver-name :time-running]
   ;;                              (ut/format-duration (get v :started) (System/currentTimeMillis)))))
   ;;                  "Update Solver Statuses")
+
+  (start-scheduler (* 3600 3) ;; 3 hours
+                   #(do
+                      (let [destinations (vec (keys @wss/client-queues))]
+                        (doseq [d destinations]
+                          (wss/alert! d
+                                      [:v-box
+                                       :justify :center
+                                       :style {:opacity 0.7}
+                                       :children [[:box :style {:color :theme/editor-outer-rim-color :font-weight 700}
+                                                   :child [:box :child (str "Restarting Websocket Server. See you in ~45 seconds...")]]]]
+                                      10 1
+                                      5)))
+                      (Thread/sleep 10000)
+                      (wss/destroy-websocket-server!)
+                      (Thread/sleep 30000)
+                      (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options)))
+                   "Restart Websocket Server, Test Debug" (* 3600 3))
 
   (start-scheduler 15
                    #(let [dbs (wss/database-sizes)]
@@ -1495,15 +1524,18 @@
                  (heartbeat :all)
                  {:flow-id "client-keepalive" :increment-id? false :close-on-done? true :debug? false})
 
-  (wss/schedule! [:minutes 20]
-                 "game-of-life-test1"
-                 {:close-on-done? true
-                  :increment-id?  false
-                  :flow-id        "game-of-life-test1"
-                  :debug?         false
-                  :overrides      {:iterations-max 1000 :tick-delay-ms 800}})
+  ;; (wss/schedule! [:minutes 20]
+  ;;                "game-of-life-test1"
+  ;;                {:close-on-done? true
+  ;;                 :increment-id?  false
+  ;;                 :flow-id        "game-of-life-test1"
+  ;;                 :debug?         false
+  ;;                 :overrides      {:iterations-max 1000 :tick-delay-ms 800}})
 
   ;; (wss/schedule! [:minutes 30] "counting-loop" {:flow-id "counting-loop" :increment-id? false :close-on-done? true :debug? false})
+
+  ;; (wss/destroy-websocket-server!)
+  ;; (reset! wss/websocket-server (jetty/run-jetty #'wss/web-handler wss/ring-options))
 
   (let [_ (ut/pp [:waiting-for-background-systems...])
         _ (Thread/sleep 13000) ;; 10 enough? want everything cranking before clients come

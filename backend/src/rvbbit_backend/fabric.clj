@@ -127,7 +127,7 @@
   (let [id (get opts :id)
         opts (dissoc opts :id)
         opts (if id (-> opts
-                        (assoc :session (str id))
+                       ;; (assoc :session (str id))
                         (assoc :output  (str "./fabric-outputs/" id))) opts)
         cli-args (reduce-kv
                   (fn [args k v]
@@ -151,14 +151,14 @@
 (ext/create-dirs "./fabric-outputs")
 (ext/create-dirs "./fabric-inputs")
 
-(ut/pp [:fabric-models (get-fabric-models)])
-(ut/pp [:fabric-patterns (get-fabric-patterns)])
+;; (ut/pp [:fabric-models (get-fabric-models)])
+;; (ut/pp [:fabric-patterns (get-fabric-patterns)])
 
-(let [fb-cli (fabric :input "Funny joke about birds" 
-                     :pattern "tweet" 
-                     ;:session "12345a" 
-                     :output "../fabric-outputs/12345a" 
-                     :model "gpt-4o")]
-  (ut/pp [:fabric-cli fb-cli :output (run-shell-command fb-cli)]))
+;; (let [fb-cli (fabric :input "Funny joke about birds" 
+;;                      :pattern "tweet" 
+;;                      ;:session "12345a" 
+;;                      :output "../fabric-outputs/12345a" 
+;;                      :model "gpt-4o")]
+;;   (ut/pp [:fabric-cli fb-cli :output (run-shell-command fb-cli)]))
 
 ;; (write-local-file (str "../fabric-inputs/hey" ) "he y hey hye")

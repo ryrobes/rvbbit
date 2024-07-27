@@ -64,15 +64,29 @@
   {:datasource
      @(pool-create
         {:jdbc-url
-           ;;;;;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
+           "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=NORMAL"
            ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
-           "jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456" 
+           ;;;;;;;"jdbc:sqlite:file:./db/system.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
          :idle-timeout      600000
          :maximum-pool-size 20
          :max-lifetime      1800000
          :cache             "shared"}
         "system-db")})
+
+(def history-db
+  {:datasource
+   @(pool-create
+     {:jdbc-url
+      "jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL&auto_vacuum=FULL"
+           ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&transaction_mode=IMMEDIATE&busy_timeout=5000&locking_mode=NORMAL"
+           ;"jdbc:sqlite:file::memory:?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&cache_size=-20000"
+           ;;;;;;;"jdbc:sqlite:file:./db/history.db?cache=shared&journal_mode=WAL&busy_timeout=5000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" 
+      :idle-timeout      600000
+      :maximum-pool-size 20
+      :max-lifetime      1800000
+      :cache             "shared"}
+     "history-db")})
 
 (def autocomplete-db
   {:datasource
@@ -117,7 +131,7 @@
         {:jdbc-url
            ;"jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&auto_vacuum=FULL"
            ;;&transaction_mode=IMMEDIATE&journal_mode=WAL"
-           "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456" ;
+           "jdbc:sqlite:file:./db/flow.db?cache=shared&journal_mode=WAL&busy_timeout=50000&locking_mode=NORMAL&mmap_size=268435456&auto_vacuum=FULL" ;
          :idle-timeout 600000
          :max-lifetime 1800000
          :auto_vacuum  "FULL"

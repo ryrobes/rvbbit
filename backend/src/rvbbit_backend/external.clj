@@ -44,14 +44,14 @@
   [dir]
   (let [dir-file (io/file dir)]
     (when (and (.isDirectory dir-file) (empty? (.list dir-file)))
-      (try (do (ut/pp [:**cleanup! :deleting-empty dir]) 
+      (try (do (ut/pp [:**clean-up! :deleting-empty dir]) 
                (io/delete-file dir-file))
            (catch Exception e (ut/pp [:error-deleting-empty dir e]))))))
 
 (defn cleanup
   [extra-files dirs]
   (doseq [file extra-files]
-    (try (do (ut/pp [:**cleanup! :deleting file]) 
+    (try (do (ut/pp [:**clean-up! :deleting file]) 
              (io/delete-file file))
          (catch Exception e (ut/pp [:error-deleting file :err e]))))
   (doseq [dir dirs] (delete-if-empty dir)))

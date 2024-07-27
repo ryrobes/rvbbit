@@ -16,7 +16,7 @@
     [rvbbit-backend.surveyor   :as surveyor]
    [rvbbit-backend.pool-party  :as ppy]
     [rvbbit-backend.sql        :as    sql
-                               :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db
+                               :refer [sql-exec sql-exec-no-t sql-exec2 sql-query sql-query-meta sql-query-one system-db history-db autocomplete-db 
                                        insert-error-row! to-sql pool-create]]
     [clojure.math.combinatorics :as combo]
     [clj-time.jdbc]) ;; enables joda time returns
@@ -173,13 +173,18 @@
     (sql-exec system-db sqlite-ddl/create-rules-table2)
     (sql-exec system-db sqlite-ddl/create-rules-table3)
     (sql-exec system-db sqlite-ddl/create-flow-functions)
-    (sql-exec system-db sqlite-ddl/create-panel-history)
+
+    (sql-exec history-db sqlite-ddl/create-panel-history)
+    (sql-exec history-db sqlite-ddl/create-panel-resolved-history)
+    (sql-exec history-db sqlite-ddl/create-panel-materialized-history)
+
+    (sql-exec autocomplete-db sqlite-ddl/create-client-items)
+
     (sql-exec system-db sqlite-ddl/create-board-history)
     (sql-exec system-db sqlite-ddl/create-errors)
     (sql-exec system-db sqlite-ddl/create-reco-vw)
     (sql-exec system-db sqlite-ddl/create-reco-vw2)
     (sql-exec system-db sqlite-ddl/create-status)
-    (sql-exec sql/autocomplete-db sqlite-ddl/create-client-items)
     (sql-exec system-db sqlite-ddl/create-client-memory)
     (sql-exec system-db sqlite-ddl/create-status-vw)))
 
@@ -965,7 +970,7 @@
                             score (get v :base-score)]
                         (dorun (for [[axis-name logic] axes]
                                  (let [found-fields (find-fields system-db context logic)]
-                                   (when (not (empty? found-fields))
+                                   (when (ut/ne? found-fields)
                                      (insert-found-fields! system-db context axis-name shape-name found-fields))))))))))))
 
 
@@ -1446,33 +1451,61 @@
 
 
 (def tmp-db-src1
-  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?mode=memory&cache=shared&auto_vacuum=FULL"
-                              :jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
+  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               :auto_vacuum "FULL"
                               :cache       "shared"}
                              "tmp-db-src1")})
-
-(def dest
-  {:datasource @(pool-create {;:jdbc-url    "jdbc:sqlite:file:sniffdbdb2?mode=memory&cache=shared&auto_vacuum=FULL"
-                              :jdbc-url    "jdbc:sqlite:file:sniffdbdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
+(def tmp-db-src2
+  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
                               :auto_vacuum "FULL"
                               :cache       "shared"}
-                             "tmp-db-dest")})
+                             "tmp-db-src2")})
+(def tmp-db-src3
+  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:tmpsniffdb3?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
+                              :auto_vacuum "FULL"
+                              :cache       "shared"}
+                             "tmp-db-src3")})
 
-(create-sqlite-sys-tables-if-needed! dest)
+(def tmp-db-dest1
+  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb1?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
+                              :auto_vacuum "FULL"
+                              :cache       "shared"}
+                             "tmp-db-dest1")})
+(def tmp-db-dest2
+  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb2?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
+                              :auto_vacuum "FULL"
+                              :cache       "shared"}
+                             "tmp-db-dest2")})
+(def tmp-db-dest3
+  {:datasource @(pool-create {:jdbc-url    "jdbc:sqlite:file:sniffdbdb3?cache=shared&journal_mode=WAL&mode=memory&transaction_mode=IMMEDIATE&busy_timeout=50000&locking_mode=NORMAL"
+                              :auto_vacuum "FULL"
+                              :cache       "shared"}
+                             "tmp-db-dest3")})
+
+(create-sqlite-sys-tables-if-needed! tmp-db-dest1)
+(create-sqlite-sys-tables-if-needed! tmp-db-dest2)
+(create-sqlite-sys-tables-if-needed! tmp-db-dest3)
 
 (def sniffs (atom 0))
 
 
-(defn captured-sniff
-  [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset]]
+;; (ut/pp @sql/client-db-pools)
+
+(defn captured-sniff [src-conn-id base-conn-id target-db src-conn result-hash & [sql-filter quick? resultset client-name]]
  (ppy/execute-in-thread-pools
   (keyword (cstr/lower-case (cstr/replace (str "captured-sniff/" (last sql-filter)) ":" "")))
   (fn [] (swap! sniffs inc)
     (doall
      (let [res?     (not (nil? resultset))
            cols     (keys (first resultset))
-           src-conn (if res? tmp-db-src1 src-conn)]
+           tmp-dbs  (rand-nth [[tmp-db-src1 tmp-db-dest1] [tmp-db-src2 tmp-db-dest2] [tmp-db-src3 tmp-db-dest3]])
+           tmp-src  (first tmp-dbs) ;; tmp-db-src1
+           dest     (last tmp-dbs)  ;; tmp-db-dest1
+           ;;; or {:datasource (get @sql/client-db-pools client-name)} ?
+           ;tmp-db-src1 0
+           ;dest 0
+           ;_ (when res? (create-sqlite-sys-tables-if-needed! dest))
+           src-conn (if res? tmp-src src-conn)]
        (when res? (insert-rowset resultset (last sql-filter) src-conn cols)) ;; if passed
        ((if quick? lets-give-it-a-whirl-no-viz lets-give-it-a-whirl)
         src-conn-id
@@ -1511,26 +1544,26 @@
 
 
 
-(def mem-db-sqlite2 "jdbc:sqlite::memory:?cache=shared") ;"jdbc:sqlite::memory:"
+;; (def mem-db-sqlite2 "jdbc:sqlite::memory:?cache=shared") ;"jdbc:sqlite::memory:"
 
-(def mem-db-sqlite3 {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :cache "shared" :subname ":memory:"})
+;; (def mem-db-sqlite3 {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :cache "shared" :subname ":memory:"})
 
-(def mem-db-sqlite
-  {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "db/query-cache.db?busy_timeout=20000&cache=shared"})
+;; (def mem-db-sqlite
+;;   {:classname "org.sqlite.JDBC" :subprotocol "sqlite" :subname "db/query-cache.db?busy_timeout=20000&cache=shared"})
 
-(def mem-db-mysql "jdbc:mysql://root:mysqlpw@localhost:3306")
+;; (def mem-db-mysql "jdbc:mysql://root:mysqlpw@localhost:3306")
 
-(def mem-db-vertica ;"jdbc:vertica://dbadmin@localhost:5433/VMart")
-  {:classname   "com.vertica.jdbc.Driver" ;; "org.clojars.prepor.Driver"
-   :subprotocol "vertica"
-   :subname     "_VMart" ; first char gets cut somehow?
-   :user        "dbadmin"
-   :host        "localhost" ;"0.0.0.0" ;"172.27.144.1" ;"localhost"
-   :port        5433})
+;; (def mem-db-vertica ;"jdbc:vertica://dbadmin@localhost:5433/VMart")
+;;   {:classname   "com.vertica.jdbc.Driver" ;; "org.clojars.prepor.Driver"
+;;    :subprotocol "vertica"
+;;    :subname     "_VMart" ; first char gets cut somehow?
+;;    :user        "dbadmin"
+;;    :host        "localhost" ;"0.0.0.0" ;"172.27.144.1" ;"localhost"
+;;    :port        5433})
 
-(def mem-db-pgsql "jdbc:postgresql://postgres:postgrespw@localhost:5555/postgres")
+;; (def mem-db-pgsql "jdbc:postgresql://postgres:postgrespw@localhost:5555/postgres")
 
-(def mem-db-clickhouse ;"jdbc:clickhouse://localhost:8123/test")
-  {:classname "ru.yandex.clickhouse.ClickHouseDriver" :subprotocol "clickhouse" :subname "//localhost:8123/default"})
+;; (def mem-db-clickhouse ;"jdbc:clickhouse://localhost:8123/test")
+;;   {:classname "ru.yandex.clickhouse.ClickHouseDriver" :subprotocol "clickhouse" :subname "//localhost:8123/default"})
 
 
